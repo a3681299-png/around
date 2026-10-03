@@ -1,7 +1,8 @@
 import type { SettingsEntry } from '../sites/types';
 import { bindSettingsForm } from './form';
-import formStyles from './form.css';
 import panelStyles from './panel.css';
+import { DEFAULT_THEME, themes } from '../themes';
+import { SETTINGS_MARKUP } from './markup';
 
 export interface SettingsPanel extends SettingsEntry {
   destroy(): void;
@@ -23,37 +24,18 @@ export function createSettingsPanel(doc: Document): SettingsPanel {
 
   const panel = doc.createElement('div');
   panel.id = 'web-world-themes-panel';
+  panel.dataset.wwUi = DEFAULT_THEME;
   panel.hidden = true;
   panel.lang = 'ja';
   panel.setAttribute('role', 'dialog');
   panel.setAttribute('aria-label', 'Web World Themes の設定');
   const shadow = panel.attachShadow({ mode: 'open' });
   const style = doc.createElement('style');
-  style.textContent = `${formStyles}\n${panelStyles}`;
+  style.textContent = [...themes[DEFAULT_THEME].editorStylesheets, panelStyles].join('\n');
   shadow.append(style);
   const main = doc.createElement('div');
-  main.className = 'settings';
-  main.innerHTML = `
-    <header>
-      <div><p class="eyebrow">YouTube / retro</p><h2>Web World Themes</h2></div>
-      <button type="button" class="close" aria-label="設定を閉じる">×</button>
-    </header>
-    <div class="control-row">
-      <label for="theme-enabled">Theme ON / OFF</label>
-      <div class="toggle-group">
-        <output id="theme-state" for="theme-enabled">OFF</output>
-        <input id="theme-enabled" type="checkbox" role="switch" disabled />
-      </div>
-    </div>
-    <div class="strength-control">
-      <div class="control-row">
-        <label for="effect-strength">Effect Strength</label>
-        <output id="strength-value" for="effect-strength">60%</output>
-      </div>
-      <input id="effect-strength" type="range" min="0" max="100" step="1" value="60" disabled />
-      <div class="range-hints" aria-hidden="true"><span>0%</span><span>100%</span></div>
-    </div>
-    <p id="save-status" class="status" role="status" aria-live="polite">設定を読み込んでいます…</p>`;
+  main.className = 'settings ww-editor';
+  main.innerHTML = SETTINGS_MARKUP;
   shadow.append(main);
   const closeButton = main.querySelector<HTMLButtonElement>('.close')!;
   let unbind: (() => void) | undefined;

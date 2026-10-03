@@ -1,8 +1,18 @@
 import { bindSettingsForm } from '../settings/form';
-import formStyles from '../settings/form.css';
+import { SETTINGS_MARKUP } from '../settings/markup';
+import { DEFAULT_THEME, themes } from '../themes';
 
+const editor = document.querySelector<HTMLElement>('.popup')!;
+document.documentElement.dataset.wwUi = DEFAULT_THEME;
 const style = document.createElement('style');
-style.textContent = formStyles;
+style.textContent = themes[DEFAULT_THEME].editorStylesheets.join('\n');
 document.head.append(style);
-const unbind = bindSettingsForm(document);
-window.addEventListener('unload', unbind, { once: true });
+editor.innerHTML = SETTINGS_MARKUP;
+const unbind = bindSettingsForm(editor);
+const onClose = () => window.close();
+const closeButton = editor.querySelector<HTMLButtonElement>('.close')!;
+closeButton.addEventListener('click', onClose);
+window.addEventListener('unload', () => {
+  unbind();
+  closeButton.removeEventListener('click', onClose);
+}, { once: true });

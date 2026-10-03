@@ -21,9 +21,9 @@ test('popup changes reach existing YouTube tabs and OFF restores native styles',
   }
   const weak = await youtube.locator('body').evaluate((element) => getComputedStyle(element).backgroundColor);
   await slider.press('End');
-  await expect(thumbnail).toHaveCSS('border-radius', '2px');
-  await expect(youtube.locator('yt-thumbnail-view-model')).toHaveCSS('border-radius', '2px');
-  await expect(youtube.locator('yt-searchbox .ytSearchboxComponentInputBox')).toHaveCSS('border-radius', '2px');
+  await expect(thumbnail).toHaveCSS('border-radius', '0px');
+  await expect(youtube.locator('yt-thumbnail-view-model')).toHaveCSS('border-radius', '0px');
+  await expect(youtube.locator('yt-searchbox .ytSearchboxComponentInputBox')).toHaveCSS('border-radius', '0px');
   await expect(second.locator('html')).toHaveAttribute('style', /--ww-strength: 1;/);
   const strong = await youtube.locator('body').evaluate((element) => getComputedStyle(element).backgroundColor);
   expect(strong).not.toBe(weak);
@@ -71,24 +71,24 @@ test('SPA replacement, lazy DOM insertion, changing IDs, and removed stylesheet 
   youtube.on('pageerror', (error) => errors.push(error.message));
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
-  await expect(youtube.locator('ytd-thumbnail #thumbnail')).toHaveCSS('border-radius', '2px');
+  await expect(youtube.locator('ytd-thumbnail #thumbnail')).toHaveCSS('border-radius', '0px');
   await youtube.getByRole('button', { name: 'SPA navigation' }).click();
   await expect(youtube).toHaveURL(/\/watch\?v=fixture$/);
   await expect(youtube.getByRole('heading', { name: 'Watch' })).toBeVisible();
-  await expect(youtube.locator('ytd-watch-metadata #description')).toHaveAttribute('data-ww-surface', 'panel frame rounded');
-  await expect(youtube.locator('ytd-thumbnail #thumbnail')).toHaveCSS('border-radius', '2px');
+  await expect(youtube.locator('ytd-watch-metadata #description')).toHaveAttribute('data-ww-surface', 'panel frame rounded text');
+  await expect(youtube.locator('ytd-thumbnail #thumbnail')).toHaveCSS('border-radius', '0px');
 
   await youtube.getByRole('button', { name: 'Load another thumbnail' }).click();
   await expect(youtube.locator('ytd-thumbnail #thumbnail')).toHaveCount(2);
-  await expect(youtube.locator('ytd-thumbnail #thumbnail').last()).toHaveCSS('border-radius', '2px');
+  await expect(youtube.locator('ytd-thumbnail #thumbnail').last()).toHaveCSS('border-radius', '0px');
   await youtube.locator('ytd-searchbox #container').evaluate((element) => { element.id = 'changed-container'; });
   await expect(youtube.locator('#changed-container')).not.toHaveAttribute('data-ww-surface', /.+/);
   await youtube.locator('#changed-container').evaluate((element) => { element.id = 'container'; });
-  await expect(youtube.locator('ytd-searchbox #container')).toHaveAttribute('data-ww-surface', 'panel frame rounded');
+  await expect(youtube.locator('ytd-searchbox #container')).toHaveAttribute('data-ww-surface', 'input frame rounded');
 
   await youtube.locator(themeStyle).evaluate((element) => element.remove());
   await expect(youtube.locator(themeStyle)).toHaveCount(1);
-  await expect(youtube.locator('ytd-thumbnail #thumbnail').last()).toHaveCSS('border-radius', '2px');
+  await expect(youtube.locator('ytd-thumbnail #thumbnail').last()).toHaveCSS('border-radius', '0px');
   expect(errors).toEqual([]);
 });
 
@@ -107,6 +107,10 @@ test('zero is native appearance and switching YouTube dark mode updates the pale
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-mode', 'dark');
   const dark = await youtube.locator('body').evaluate((element) => getComputedStyle(element).backgroundColor);
   expect(dark).not.toBe(light);
+  // Source-authored rich text must inherit the theme's dark-mode foreground.
+  await expect.poll(() => youtube.locator('#description span').evaluate(element =>
+    getComputedStyle(element).color === getComputedStyle(element.parentElement!).color,
+  )).toBe(true);
   await toggle.uncheck();
   await expect(youtube.locator('body')).toHaveCSS('background-color', 'rgb(15, 15, 15)');
 });
@@ -156,7 +160,7 @@ test('the first right-hand player icon opens shared settings even when the theme
   await icon.click();
   const toggle = panel.getByRole('switch', { name: 'Theme ON / OFF' });
   const slider = panel.getByRole('slider', { name: 'Effect Strength' });
-  await expect(panel).toHaveCSS('background-color', 'rgb(239, 238, 232)');
+  await expect(panel).toHaveCSS('background-color', 'rgb(192, 192, 192)');
   await expect(panel).toHaveCSS('border-top-width', '1px');
   await expect(toggle).toBeEnabled();
   await expect(toggle).not.toBeChecked();
@@ -235,4 +239,34 @@ test('player replacement and control-bar rebuild keep one icon at the left edge;
   await youtube.evaluate(() => document.exitFullscreen());
   await youtube.goto('https://www.youtube.com/');
   await expect(youtube.locator('[data-ww-settings-button]')).toHaveCount(0);
+});
+
+test('window chrome recovers once after DOM replacement and OFF restores the native header placement', async ({ popup, youtube }) => {
+  const toggle = popup.getByRole('switch', { name: 'Theme ON / OFF' });
+  const nativeHeader = await youtube.locator('ytd-masthead').boundingBox();
+  const nativePage = await youtube.locator('ytd-page-manager').boundingBox();
+  await toggle.check();
+  const chrome = youtube.locator('#web-world-themes-window-chrome');
+  await expect(chrome).toHaveCount(1);
+  await expect(chrome.getByText('YouTube.exe', { exact: true })).toBeVisible();
+  const themedHeader = await youtube.locator('ytd-masthead').boundingBox();
+  const page = await youtube.locator('ytd-page-manager').boundingBox();
+  expect(themedHeader!.height).toBeGreaterThan(nativeHeader!.height);
+  expect(page!.y).toBeGreaterThanOrEqual(themedHeader!.y + themedHeader!.height);
+
+  await chrome.evaluate((element) => element.remove());
+  await expect(chrome).toHaveCount(1);
+  await youtube.getByRole('button', { name: 'SPA navigation' }).click();
+  await expect(chrome).toHaveCount(1);
+  await popup.getByRole('button', { name: '効果(E)', exact: true }).click();
+  await expect(popup.getByRole('slider', { name: 'Effect Strength' })).toBeFocused();
+  await toggle.uncheck();
+  await expect(chrome).toHaveCount(0);
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-window-chrome', '');
+  await expect(youtube.locator('[data-ww-surface]')).toHaveCount(0);
+  const restoredHeader = await youtube.locator('ytd-masthead').boundingBox();
+  const restoredPage = await youtube.locator('ytd-page-manager').boundingBox();
+  expect(restoredHeader!.height).toBe(nativeHeader!.height);
+  // The SPA changed content, but its top offset returns to the native position.
+  expect(restoredPage!.y).toBe(nativePage!.y);
 });

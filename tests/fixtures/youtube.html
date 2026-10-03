@@ -8,7 +8,7 @@
       :root[dark] { --yt-spec-base-background: #0f0f0f; --yt-spec-raised-background: #212121; color: #fff; }
       body { margin: 0; background: var(--yt-spec-base-background); font: 16px system-ui; }
       ytd-app, ytd-page-manager, ytd-masthead, ytd-watch-metadata, ytd-thumbnail { display: block; }
-      ytd-masthead #container { padding: 18px; background: var(--yt-spec-raised-background); }
+      ytd-masthead #container { height: 56px; box-sizing: border-box; padding: 6px 18px; background: var(--yt-spec-raised-background); }
       ytd-page-manager { padding: 28px; min-height: 400px; }
       #description { background: var(--yt-spec-raised-background); padding: 20px; border-radius: 16px; }
       ytd-thumbnail #thumbnail { width: 260px; height: 140px; margin: 20px 0; background: #a9b4bb; border-radius: 16px; }
@@ -36,7 +36,7 @@
         <h1>Home</h1>
         <ytd-thumbnail><div id="thumbnail"></div></ytd-thumbnail>
         <yt-thumbnail-view-model></yt-thumbnail-view-model>
-        <ytd-watch-metadata><div id="description">A sample description.</div></ytd-watch-metadata>
+        <ytd-watch-metadata><div id="description"><span style="color: #101010">A sample description.</span></div></ytd-watch-metadata>
       </ytd-page-manager>
     </ytd-app>
     <script>

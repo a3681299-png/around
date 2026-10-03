@@ -3,4 +3,53 @@ html[data-ww-site="youtube"] {
   --ww-native-page: var(--yt-spec-base-background, #ffffff);
   --ww-native-panel: var(--yt-spec-raised-background, #ffffff);
   --ww-native-border: var(--yt-spec-10-percent-layer, rgba(0, 0, 0, 0.1));
+  --ww-native-text: var(--yt-spec-text-primary, #0f0f0f);
+  --ww-native-muted: var(--yt-spec-text-secondary, #606060);
+}
+
+/* Translate shared theme colors back to YouTube's own text and surface variables. */
+html[data-ww-theme][data-ww-site="youtube"] ytd-app {
+  --yt-spec-base-background: var(--ww-page) !important;
+  --yt-spec-raised-background: var(--ww-panel) !important;
+  --yt-spec-menu-background: var(--ww-panel) !important;
+  --yt-spec-text-primary: var(--ww-ink) !important;
+  --yt-spec-text-secondary: var(--ww-muted) !important;
+  --yt-spec-badge-chip-background: var(--ww-panel) !important;
+}
+
+/* Native content stays in place below the added title/menu rows. */
+html[data-ww-theme][data-ww-window-chrome] ytd-app {
+  --ytd-masthead-height: calc(var(--ww-native-header-height, 56px) + var(--ww-window-chrome-height)) !important;
+  --ytd-masthead-height-absolute: var(--ytd-masthead-height) !important;
+}
+html[data-ww-theme][data-ww-window-chrome] ytd-app #masthead-container,
+html[data-ww-theme][data-ww-window-chrome] ytd-masthead {
+  height: calc(var(--ww-native-header-height, 56px) + var(--ww-window-chrome-height)) !important;
+}
+html[data-ww-theme][data-ww-window-chrome] ytd-app #masthead-container {
+  top: 0 !important;
+  transform: none !important;
+}
+html[data-ww-theme][data-ww-window-chrome] ytd-masthead > #container {
+  height: var(--ww-native-header-height, 56px) !important;
+  box-sizing: border-box !important;
+}
+html[data-ww-theme][data-ww-window-chrome] ytd-page-manager {
+  margin-top: calc(var(--ww-native-header-height, 56px) + var(--ww-window-chrome-height)) !important;
+}
+html[data-ww-theme][data-ww-window-chrome] ytd-mini-guide-renderer,
+html[data-ww-theme][data-ww-window-chrome] ytd-feed-filter-chip-bar-renderer #chips-wrapper {
+  top: calc(var(--ww-native-header-height, 56px) + var(--ww-window-chrome-height)) !important;
+}
+html[data-ww-theme] yt-searchbox input,
+html[data-ww-theme] ytd-searchbox input {
+  color: var(--ww-ink) !important;
+  font-family: var(--ww-font) !important;
+}
+
+html[data-ww-theme] ytd-watch-metadata {
+  --yt-saturated-base-background: var(--ww-panel) !important;
+  --yt-saturated-raised-background: var(--ww-panel) !important;
+  --yt-saturated-text-primary: var(--ww-ink) !important;
+  --yt-saturated-text-secondary: var(--ww-muted) !important;
 }

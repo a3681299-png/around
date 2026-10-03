@@ -1,6 +1,8 @@
 /* Theme CSS consumes semantic attributes only; it has no YouTube selectors. */
 html[data-ww-theme="retro"] [data-ww-surface~="page"] {
   background-color: var(--ww-page) !important;
+  color: var(--ww-ink) !important;
+  font-family: var(--ww-font) !important;
 }
 
 html[data-ww-theme="retro"] [data-ww-surface~="panel"] {
@@ -8,8 +10,60 @@ html[data-ww-theme="retro"] [data-ww-surface~="panel"] {
 }
 
 html[data-ww-theme="retro"] [data-ww-surface~="frame"] {
-  box-shadow: inset 0 0 0 1px var(--ww-border) !important;
+  box-shadow: var(--ww-raised) !important;
 }
+
+html[data-ww-theme="retro"] [data-ww-surface~="window"],
+html[data-ww-theme="retro"] [data-ww-surface~="sidebar"],
+html[data-ww-theme="retro"] [data-ww-surface~="section"] {
+  color: var(--ww-ink) !important;
+  font-family: var(--ww-font) !important;
+  border-radius: 0 !important;
+}
+html[data-ww-theme="retro"] [data-ww-surface~="section"] {
+  padding: 8px !important;
+  box-sizing: border-box !important;
+}
+html[data-ww-theme="retro"] [data-ww-surface~="card"] {
+  background-color: var(--ww-paper) !important;
+  box-shadow: var(--ww-raised) !important;
+  padding: 8px !important;
+  box-sizing: border-box !important;
+  color: var(--ww-ink) !important;
+  font-family: var(--ww-font) !important;
+}
+html[data-ww-theme="retro"] [data-ww-surface~="input"] {
+  background-color: var(--ww-paper) !important;
+  box-shadow: var(--ww-sunken) !important;
+  color: var(--ww-ink) !important;
+}
+html[data-ww-theme="retro"] [data-ww-surface~="button"] {
+  background-color: var(--ww-panel) !important;
+  box-shadow: var(--ww-raised) !important;
+  color: var(--ww-ink) !important;
+  font-family: var(--ww-font) !important;
+}
+html[data-ww-theme="retro"] [data-ww-surface~="button"]:active {
+  box-shadow: var(--ww-sunken) !important;
+}
+html[data-ww-theme="retro"] [data-ww-surface~="button"]:focus-visible {
+  outline: 1px dotted var(--ww-ink) !important;
+  outline-offset: -4px !important;
+}
+
+html[data-ww-theme="retro"] [data-ww-surface~="navigation"] {
+  font-family: var(--ww-font) !important;
+  color: var(--ww-ink) !important;
+}
+html[data-ww-theme="retro"] [data-ww-surface~="selected"] {
+  box-shadow: var(--ww-sunken) !important;
+  background-color: var(--ww-page) !important;
+}
+
+/* Rich text may contain inline source colors. Keep it legible in both modes. */
+html[data-ww-theme="retro"] [data-ww-surface~="text"] { color: var(--ww-ink) !important; }
+html[data-ww-theme="retro"] [data-ww-surface~="text"] * { color: inherit !important; }
+html[data-ww-theme="retro"] [data-ww-surface~="text"] a { color: var(--ww-link) !important; }
 
 html[data-ww-theme="retro"] [data-ww-surface~="rounded"] {
   border-radius: var(--ww-radius) !important;

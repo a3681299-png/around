@@ -1,6 +1,6 @@
 # Web World Themes
 
-既存サイトを別の世界観に着せ替えるChrome拡張機能です。最初のMVPはデスクトップ版YouTubeだけに対応します。Manifest V3とTypeScriptで構築し、仮の`retro`テーマを用意しました。
+既存サイトを別の世界観に着せ替えるChrome拡張機能です。最初のMVPはデスクトップ版YouTubeだけに対応します。Manifest V3とTypeScriptで構築し、Windows 95/98風の`retro`テーマを用意しました。
 
 ## はじめ方
 
@@ -14,7 +14,9 @@ npm run build
 
 Chromeで`chrome://extensions`を開き、右上の「デベロッパーモード」をONにします。「パッケージ化されていない拡張機能を読み込む」を押し、このプロジェクトの`dist`フォルダーを選んでください。ソースのルートフォルダーではなく、ビルド後の`dist`を読み込みます。
 
-拡張機能をツールバーに固定し、YouTubeを開くか再読み込みします。Popupで`Theme ON / OFF`をONにすると、仮のretroテーマが適用されます。初期値はOFF、`Effect Strength`は60%です。スライダーは0〜100%で、0%では元の見た目に戻ります。
+拡張機能をツールバーに固定し、YouTubeを開くか再読み込みします。Popupで`Theme ON / OFF`をONにすると、retroテーマが適用されます。初期値はOFF、`Effect Strength`は60%です。スライダーは0〜100%で、0%では元の見た目に戻ります。雰囲気をはっきり確認したい場合は100%へ動かしてください。
+
+上部に紺色の`YouTube.exe`タイトルバーと、ホーム・登録チャンネル・履歴へのメニューバーを追加します。検索欄は凹んだ枠、ボタンは立体枠、動画カードとサイドバーはグレーと白のボックスにします。タイトルバー右端の窓の記号は装飾です。YouTubeがダーク表示の場合は、立体枠を残した暗い配色になります。
 
 動画プレイヤー右下のアイコン列にも、左端に仮のスライダー型アイコンを追加します。押すと動画の上に設定パネルが開き、同じON/OFFと強さを編集できます。テーマがOFFでも使えます。×ボタン、アイコンの再クリック、Esc、パネルの外をクリックすると閉じます。全画面でもプレイヤー内に表示します。
 
@@ -51,25 +53,28 @@ src/
     index.ts                  URLに応じたAdapter選択
     youtube.ts                YouTubeセレクタ / SPA / DOM監視
     youtube-player.ts         設定アイコンの配置 / プレイヤー交換時の付け直し
-    youtube.css               YouTubeの色を共通トークンへ接続
+    youtube-chrome.ts         YouTube.exe / サイト固有のナビゲーション
+    youtube.css               色の接続 / 追加ヘッダー分の配置調整
   themes/
     types.ts                  テーマ定義の共通型
     index.ts                  テーマ登録（現在retroだけ）
     controller.ts             CSSと強さの適用 / OFF時の撤去
     retro/
       index.ts                retro定義
-      tokens.css              仮の配色 / 角丸 / 強さ
-      surfaces.css            共通surfaceへのCSS
+      tokens.css              配色 / 立体枠 / フォント / 強さ / ダーク配色
+      surfaces.css            カード / 検索欄 / ボタン / サイドバー
+      chrome.css              タイトルバー / メニューバー
+      editor.css              Popupとプレイヤー設定の共通デザイン
   storage/settings.ts         chrome.storage.local / 値の検証 / 変更通知
   popup/
-    index.html                ON/OFFとスライダー
+    index.html                Popupの外枠
     index.ts                  共通フォームをPopupへ接続
-    popup.css                 Popupの見た目
+    popup.css                 Popupの幅と配置
   settings/
     form.ts                   Popupとプレイヤー設定の共通保存処理
-    form.css                  ON/OFFとスライダーの共通スタイル
+    markup.ts                 両設定画面の共通テンプレート
     panel.ts                  サイトに依存しない設定パネル / 仮アイコン
-    panel.css                 パネルの見た目（Shadow DOMで分離）
+    panel.css                 パネルの配置とホストCSSの保護
 tests/
   fixtures/youtube.html       YouTube相当の検証用DOM
   fixtures.ts                 実拡張機能を読み込むChromium
@@ -91,18 +96,27 @@ YouTube用Adapterが対象要素に`data-ww-surface`を付けます。テーマ�
 | `panel` | ヘッダーや説明欄などの背景 |
 | `frame` | レイアウト寸法を変えない内側の枠線 |
 | `rounded` | サムネイルなどの角丸 |
+| `window` / `titlebar` / `menubar` | ウィンドウの外枠と追加バー |
+| `input` / `button` | 凹んだ入力欄と立体ボタン |
+| `card` / `section` / `sidebar` | 動画カードや一覧、サイドバーのボックス |
+| `navigation` / `selected` | ナビゲーションと選択された項目 |
+| `text` | 説明欄の文字とリンクの色 |
 
 テーマの色は`--ww-native-page`などのAdapterが提供する元の色と混ぜます。ライト/ダークの判定もAdapterが担当します。ON時だけテーマ用のCSSとDOM監視を有効にし、OFFまたは0%でテーマのCSS、付与属性、CSS変数、Observerとイベント監視を撤去します。動画や画像自体の加工、元の要素の移動はしません。
 
+ウィンドウ装飾のDOMとリンク先はAdapterが用意し、見た目は`themes/retro/chrome.css`で指定します。ネイティブのツールバーの高さを読んで、追加した2行分だけページとサイドバーの位置を調整します。追加バーが取り除かれた場合は付け直し、OFFまたは0%ではバーと配置変更も撤去します。
+
+Popupとプレイヤー内設定は`settings/markup.ts`と`settings/form.ts`を共有します。テーマ定義の`editorStylesheets`が両方の見た目を指定し、設定画面の配色はサイトのON/OFFや強さにかかわらず固定します。装飾を変えるときは`themes/retro`、項目を変えるときは共通テンプレートを編集します。
+
 設定アイコンはテーマと別のライフサイクルで配置します。`sites/youtube-player.ts`だけがプレイヤーと右側の操作欄のセレクタを持ち、`settings/panel.ts`はサイトのDOM構造を知りません。プレイヤーが遅れて生成された場合やSPAで交換された場合に配置を確認し、右側の操作欄の先頭へ1つだけ置きます。設定パネルはShadow DOMでスタイルを分け、スライダーのキー入力が動画のシークに伝わるのを防ぎます。通常のデータ更新ではパネルを維持し、ページ遷移やプレイヤー交換では閉じます。
 
-YouTubeの`yt-navigate-finish`と`yt-page-data-updated`で再確認し、追加DOMやID変更は`MutationObserver`で検出します。通常の変更では追加された部分だけを調べ、更新を描画フレーム単位でまとめます。生成クラス名や要素の並び順に依存せず、YouTubeのカスタム要素とIDをAdapterに集約しています。
+YouTubeの`yt-navigate-finish`と`yt-page-data-updated`で再確認し、追加DOMやID・選択状態の変更は`MutationObserver`で検出します。通常の変更では追加された部分だけを調べ、更新を描画フレーム単位でまとめます。カスタム要素とIDを優先し、一部の新しい部品には名前付きクラスを使います。セレクタはAdapter内に集約しています。
 
 ## 現在の範囲と次の作業
 
-現在のretroは、背景を少し変え、角丸を小さくし、一部の内枠を付ける仮デザインです。世界観の作り込みはこれからです。
+現在のretroは、紺のタイトルバーとメニューバー、グレーのパネル、白黒の立体枠で全体の雰囲気を揃えています。古いWindowsの完全再現は目指さず、YouTubeの検索や再生、設定操作を使える状態にしています。
 
-次はYouTubeのホーム、検索、動画ページごとに装飾する箇所を決め、`themes/retro/tokens.css`の配色と`surfaces.css`の装飾を作り込みます。追加の適用対象は`sites/youtube.ts`で調整します。テーマを増やすときは新しいテーマ定義を`themes`へ登録し、テーマIDの設定保存とPopupの選択UIを追加します。別サイトへの対応は新しいAdapterを作る段階で行います。
+次はカード内の余白と文字の大きさ、カテゴリの選択状態、ホバーとフォーカス、チャンネル見出しなどの細部を揃えます。配色は`themes/retro/tokens.css`、装飾は`surfaces.css`と`chrome.css`、設定画面は`editor.css`で調整します。追加の対象は`sites/youtube.ts`で指定します。テーマを増やすときは新しい定義を登録し、テーマIDの保存と選択UIを追加します。別サイトへの対応は新しいAdapterを作る段階で行います。
 
 自動テストは実際のMV3拡張機能とChrome Storageを使いますが、YouTubeのHTMLは検証用DOMへ差し替えます。SPAでの要素置換、遅延追加、スタイル要素の削除からの復旧、ダークモード、0%、別ドメインへの非適用、保存失敗、ブラウザー再起動後の保持を確認します。実サイト全画面の互換性を保証するテストではありません。実サイトでの確認結果は`docs/verification.md`に記録します。
 

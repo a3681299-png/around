@@ -1,12 +1,7 @@
 :root {
   color-scheme: light;
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-  color: #222820;
-  background: #efeee8;
+  font-family: var(--ww-font);
+  color: var(--ww-ink);
+  background: var(--ww-panel);
 }
-
-body { width: 304px; margin: 0; }
-.popup { padding: 20px; }
-header { margin-bottom: 22px; }
-.eyebrow { margin: 0 0 6px; color: #626b5c; font-size: 11px; letter-spacing: 0.05em; }
-h1 { margin: 0; font-size: 17px; font-weight: 650; }
+body { width: 340px; margin: 0; }

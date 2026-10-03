@@ -1,17 +1,55 @@
-/* Prototype palette. Change these tokens before expanding the visual design. */
-html[data-ww-theme="retro"] {
-  --ww-retro-page: #e8e7df;
-  --ww-retro-panel: #f1efe8;
-  --ww-retro-border: #8b9185;
+/* Shared palette for the site, extension popup and isolated player settings. */
+:root, :host {
+  --ww-font: "MS Sans Serif", Tahoma, "MS UI Gothic", sans-serif;
+  --ww-retro-page: #d4d0c8;
+  --ww-retro-panel: #c0c0c0;
+  --ww-retro-paper: #ffffff;
+  --ww-retro-ink: #101010;
+  --ww-retro-muted: #444444;
+  --ww-retro-border: #808080;
+  --ww-retro-light: #ffffff;
+  --ww-retro-dark: #202020;
+  --ww-titlebar: #000080;
+  --ww-titlebar-ink: #ffffff;
+  --ww-link: #000080;
+  --ww-titlebar-height: 28px;
+  --ww-menubar-height: 24px;
+  --ww-window-chrome-height: calc(var(--ww-titlebar-height) + var(--ww-menubar-height));
   --ww-mix: calc(var(--ww-strength, 1) * 100%);
-  --ww-radius: calc(12px - 10px * var(--ww-strength, 1));
+  --ww-radius: calc(2px - 2px * var(--ww-strength, 1));
   --ww-page: color-mix(in srgb, var(--ww-native-page, #fff), var(--ww-retro-page) var(--ww-mix));
   --ww-panel: color-mix(in srgb, var(--ww-native-panel, #fff), var(--ww-retro-panel) var(--ww-mix));
+  --ww-paper: color-mix(in srgb, var(--ww-native-panel, #fff), var(--ww-retro-paper) var(--ww-mix));
+  --ww-ink: color-mix(in srgb, var(--ww-native-text, #101010), var(--ww-retro-ink) var(--ww-mix));
+  --ww-muted: color-mix(in srgb, var(--ww-native-muted, #606060), var(--ww-retro-muted) var(--ww-mix));
   --ww-border: color-mix(in srgb, transparent, var(--ww-retro-border) var(--ww-mix));
+  --ww-light: color-mix(in srgb, transparent, var(--ww-retro-light) var(--ww-mix));
+  --ww-dark: color-mix(in srgb, transparent, var(--ww-retro-dark) var(--ww-mix));
+  --ww-raised: inset 1px 1px var(--ww-light), inset -1px -1px var(--ww-dark), inset 2px 2px var(--ww-panel), inset -2px -2px var(--ww-border);
+  --ww-sunken: inset 1px 1px var(--ww-border), inset -1px -1px var(--ww-light), inset 2px 2px var(--ww-dark), inset -2px -2px var(--ww-panel);
 }
 
 html[data-ww-theme="retro"][data-ww-mode="dark"] {
-  --ww-retro-page: #20241f;
-  --ww-retro-panel: #292e28;
-  --ww-retro-border: #7d8d78;
+  --ww-retro-page: #25252a;
+  --ww-retro-panel: #36363d;
+  --ww-retro-paper: #1d1d23;
+  --ww-retro-ink: #f2f2f2;
+  --ww-retro-muted: #c4c4ca;
+  --ww-retro-border: #6b6b76;
+  --ww-retro-light: #9c9ca5;
+  --ww-retro-dark: #08080c;
+  --ww-link: #aac8ff;
+}
+
+/* Editors keep their classic gray palette regardless of the site's effect strength. */
+:root[data-ww-ui="retro"], :host([data-ww-ui="retro"]) {
+  --ww-strength: 1;
+  --ww-page: var(--ww-retro-page);
+  --ww-panel: var(--ww-retro-panel);
+  --ww-paper: var(--ww-retro-paper);
+  --ww-ink: var(--ww-retro-ink);
+  --ww-muted: var(--ww-retro-muted);
+  --ww-border: var(--ww-retro-border);
+  --ww-light: var(--ww-retro-light);
+  --ww-dark: var(--ww-retro-dark);
 }

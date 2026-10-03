@@ -77,13 +77,20 @@ export function bindSettingsForm(root: ParentNode): () => void {
   };
   const onToggle = () => commit({ enabled: enabled.checked });
   const onStrength = () => commit({ strength: Number(strength.value) });
+  const focusButtons = root.querySelectorAll<HTMLButtonElement>('[data-settings-focus]');
+  const onFocusControl = (event: Event) => {
+    const target = (event.currentTarget as HTMLButtonElement).dataset.settingsFocus;
+    if (target) root.querySelector<HTMLInputElement>(`#${target}`)?.focus();
+  };
   enabled.addEventListener('change', onToggle);
   strength.addEventListener('input', onStrength);
+  focusButtons.forEach((button) => button.addEventListener('click', onFocusControl));
 
   return () => {
     active = false;
     unwatch();
     enabled.removeEventListener('change', onToggle);
     strength.removeEventListener('input', onStrength);
+    focusButtons.forEach((button) => button.removeEventListener('click', onFocusControl));
   };
 }
