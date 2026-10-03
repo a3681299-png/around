@@ -145,3 +145,94 @@ test('a storage write failure shows an error and restores the saved popup state'
   await expect(toggle).not.toBeChecked();
   await expect(youtube.locator(themeStyle)).toHaveCount(0);
 });
+
+test('the first right-hand player icon opens shared settings even when the theme is OFF', async ({ context, popup, youtube }) => {
+  await youtube.goto('https://www.youtube.com/watch?v=fixture');
+  const icon = youtube.getByRole('button', { name: 'Web World Themes の設定', exact: true });
+  const panel = youtube.getByRole('dialog', { name: 'Web World Themes の設定' });
+  await expect(youtube.locator('.ytp-right-controls > :first-child')).toHaveAttribute('data-ww-settings-button', '');
+  await expect(icon).toHaveCount(1);
+  await expect(youtube.locator(themeStyle)).toHaveCount(0);
+  await icon.click();
+  const toggle = panel.getByRole('switch', { name: 'Theme ON / OFF' });
+  const slider = panel.getByRole('slider', { name: 'Effect Strength' });
+  await expect(panel).toHaveCSS('background-color', 'rgb(239, 238, 232)');
+  await expect(panel).toHaveCSS('border-top-width', '1px');
+  await expect(toggle).toBeEnabled();
+  await expect(toggle).not.toBeChecked();
+  await expect(slider).toHaveValue('60');
+
+  // Metadata and native control updates are not a navigation; keep editing open.
+  await youtube.evaluate(() => {
+    document.dispatchEvent(new Event('yt-page-data-updated'));
+    document.dispatchEvent(new Event('yt-navigate-finish'));
+    const nativeButton = document.createElement('button');
+    nativeButton.className = 'ytp-button';
+    nativeButton.setAttribute('aria-label', 'Another native control');
+    document.querySelector('.ytp-right-controls')!.prepend(nativeButton);
+  });
+  await expect(youtube.locator('.ytp-right-controls > :first-child')).toHaveAttribute('data-ww-settings-button', '');
+  await expect(panel).toBeVisible();
+
+  const second = await context.newPage();
+  await second.goto('https://www.youtube.com/results?search_query=fixture');
+  await toggle.check();
+  await slider.press('Home');
+  for (let step = 0; step < 23; step++) await slider.press('ArrowRight');
+  await expect(panel.locator('#save-status')).toHaveText('保存しました。');
+  await expect(popup.getByRole('switch', { name: 'Theme ON / OFF' })).toBeChecked();
+  await expect(popup.getByRole('slider', { name: 'Effect Strength' })).toHaveValue('23');
+  await expect(second.locator('html')).toHaveAttribute('style', /--ww-strength: 0.23;/);
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-player-key-count', /.+/);
+
+  await slider.press('Escape');
+  await expect(panel).not.toBeVisible();
+  await expect(icon).toBeFocused();
+  await icon.press('Enter');
+  await expect(slider).toHaveValue('23');
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-player-key-count', /.+/);
+  await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+  await expect(slider).toHaveValue('100');
+  await toggle.uncheck();
+  await expect(youtube.locator(themeStyle)).toHaveCount(0);
+  await expect(icon).toBeVisible();
+  await expect(panel).toBeVisible();
+  await panel.getByRole('button', { name: '設定を閉じる' }).click();
+  await expect(panel).not.toBeVisible();
+  await icon.click();
+  await youtube.getByRole('heading', { name: 'Home' }).click();
+  await expect(panel).not.toBeVisible();
+});
+
+test('player replacement and control-bar rebuild keep one icon at the left edge; fullscreen keeps the editor', async ({ popup, youtube }) => {
+  await youtube.getByRole('button', { name: 'SPA navigation' }).click();
+  const icon = youtube.getByRole('button', { name: 'Web World Themes の設定', exact: true });
+  const panel = youtube.getByRole('dialog', { name: 'Web World Themes の設定' });
+  await expect(icon).toHaveCount(1);
+  await icon.click();
+  await expect(panel.getByRole('slider', { name: 'Effect Strength' })).toBeEnabled();
+  await youtube.getByRole('button', { name: 'SPA navigation' }).click();
+  await expect(panel).not.toBeVisible();
+  await expect(icon).toHaveCount(1);
+  await expect(youtube.locator('.ytp-right-controls > :first-child')).toHaveAttribute('data-ww-settings-button', '');
+
+  await youtube.locator('.ytp-right-controls').evaluate((element) => {
+    element.replaceChildren(...Array.from(element.children).filter((child) => !child.hasAttribute('data-ww-settings-button')));
+  });
+  await expect(icon).toHaveCount(1);
+  await expect(youtube.locator('.ytp-right-controls > :first-child')).toHaveAttribute('data-ww-settings-button', '');
+  await youtube.getByRole('button', { name: 'Fullscreen', exact: true }).click();
+  await expect.poll(() => youtube.evaluate(() => document.fullscreenElement?.id)).toBe('movie_player');
+  await icon.click();
+  await expect(panel).toBeVisible();
+  await panel.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await panel.getByRole('slider', { name: 'Effect Strength' }).press('End');
+  await expect(popup.getByRole('slider', { name: 'Effect Strength' })).toHaveValue('100');
+  await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+  await panel.getByRole('slider', { name: 'Effect Strength' }).press('Escape');
+  await expect(panel).not.toBeVisible();
+  await expect.poll(() => youtube.evaluate(() => document.fullscreenElement?.id)).toBe('movie_player');
+  await youtube.evaluate(() => document.exitFullscreen());
+  await youtube.goto('https://www.youtube.com/');
+  await expect(youtube.locator('[data-ww-settings-button]')).toHaveCount(0);
+});

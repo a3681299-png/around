@@ -16,6 +16,8 @@ Chromeで`chrome://extensions`を開き、右上の「デベロッパーモー�
 
 拡張機能をツールバーに固定し、YouTubeを開くか再読み込みします。Popupで`Theme ON / OFF`をONにすると、仮のretroテーマが適用されます。初期値はOFF、`Effect Strength`は60%です。スライダーは0〜100%で、0%では元の見た目に戻ります。
 
+動画プレイヤー右下のアイコン列にも、左端に仮のスライダー型アイコンを追加します。押すと動画の上に設定パネルが開き、同じON/OFFと強さを編集できます。テーマがOFFでも使えます。×ボタン、アイコンの再クリック、Esc、パネルの外をクリックすると閉じます。全画面でもプレイヤー内に表示します。
+
 開いているYouTubeタブすべてに同じ設定を適用します。変更は自動保存され、Popupを閉じても、Chromeを再起動しても維持されます。テーマをOFFにしても、強さの設定は残ります。
 
 ## 開発
@@ -48,6 +50,7 @@ src/
     types.ts                  SiteAdapter / 共通surface定義
     index.ts                  URLに応じたAdapter選択
     youtube.ts                YouTubeセレクタ / SPA / DOM監視
+    youtube-player.ts         設定アイコンの配置 / プレイヤー交換時の付け直し
     youtube.css               YouTubeの色を共通トークンへ接続
   themes/
     types.ts                  テーマ定義の共通型
@@ -60,8 +63,13 @@ src/
   storage/settings.ts         chrome.storage.local / 値の検証 / 変更通知
   popup/
     index.html                ON/OFFとスライダー
-    index.ts                  設定読込と保存 / エラー表示
+    index.ts                  共通フォームをPopupへ接続
     popup.css                 Popupの見た目
+  settings/
+    form.ts                   Popupとプレイヤー設定の共通保存処理
+    form.css                  ON/OFFとスライダーの共通スタイル
+    panel.ts                  サイトに依存しない設定パネル / 仮アイコン
+    panel.css                 パネルの見た目（Shadow DOMで分離）
 tests/
   fixtures/youtube.html       YouTube相当の検証用DOM
   fixtures.ts                 実拡張機能を読み込むChromium
@@ -71,7 +79,7 @@ dist/                         Chromeへ読み込む生成物（Git管理対象�
 
 ## 設計
 
-Popup → `chrome.storage.local` → `storage.onChanged` → content → ThemeController → SiteAdapter / theme、という流れです。content scriptをYouTubeへ静的に登録するため、バックグラウンドService Workerは必要ありません。権限は`storage`だけで、適用先は`https://www.youtube.com/*`に限定しています。埋め込みプレイヤーとライブチャット専用ページは除外します。YouTube Music、モバイル版、Twitch、Xは対象外です。
+Popupまたはプレイヤー設定パネル → `chrome.storage.local` → `storage.onChanged` → content → ThemeController → SiteAdapter / theme、という流れです。content scriptをYouTubeへ静的に登録するため、バックグラウンドService Workerは必要ありません。権限は`storage`だけで、適用先は`https://www.youtube.com/*`に限定しています。埋め込みプレイヤーとライブチャット専用ページは除外します。YouTube Music、モバイル版、Twitch、Xは対象外です。
 
 ON/OFFと強さは別々のキーに保存します。複数のPopupから異なる設定を変更しても、もう一方の値を上書きしません。初期読込中に届いた変更は読込結果へ合流させ、古い設定への巻き戻りを防ぎます。スライダー操作のたびに保存を始め、Popupを閉じると失われる遅延タイマーは使いません。
 
@@ -84,7 +92,9 @@ YouTube用Adapterが対象要素に`data-ww-surface`を付けます。テーマ�
 | `frame` | レイアウト寸法を変えない内側の枠線 |
 | `rounded` | サムネイルなどの角丸 |
 
-テーマの色は`--ww-native-page`などのAdapterが提供する元の色と混ぜます。ライト/ダークの判定もAdapterが担当します。ON時だけCSSとDOM監視を有効にし、OFFまたは0%でCSS、付与属性、CSS変数、Observerとイベント監視を撤去します。動画や画像自体の加工、プレイヤー操作、元の要素の移動はしません。
+テーマの色は`--ww-native-page`などのAdapterが提供する元の色と混ぜます。ライト/ダークの判定もAdapterが担当します。ON時だけテーマ用のCSSとDOM監視を有効にし、OFFまたは0%でテーマのCSS、付与属性、CSS変数、Observerとイベント監視を撤去します。動画や画像自体の加工、元の要素の移動はしません。
+
+設定アイコンはテーマと別のライフサイクルで配置します。`sites/youtube-player.ts`だけがプレイヤーと右側の操作欄のセレクタを持ち、`settings/panel.ts`はサイトのDOM構造を知りません。プレイヤーが遅れて生成された場合やSPAで交換された場合に配置を確認し、右側の操作欄の先頭へ1つだけ置きます。設定パネルはShadow DOMでスタイルを分け、スライダーのキー入力が動画のシークに伝わるのを防ぎます。通常のデータ更新ではパネルを維持し、ページ遷移やプレイヤー交換では閉じます。
 
 YouTubeの`yt-navigate-finish`と`yt-page-data-updated`で再確認し、追加DOMやID変更は`MutationObserver`で検出します。通常の変更では追加された部分だけを調べ、更新を描画フレーム単位でまとめます。生成クラス名や要素の並び順に依存せず、YouTubeのカスタム要素とIDをAdapterに集約しています。
 

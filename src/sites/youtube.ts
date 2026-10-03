@@ -1,5 +1,6 @@
 import stylesheet from './youtube.css';
 import type { SiteAdapter, Surface } from './types';
+import { mountYouTubeSettings } from './youtube-player';
 
 const SURFACE_ATTRIBUTE = 'data-ww-surface';
 
@@ -34,6 +35,7 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
   return {
     id: 'youtube',
     stylesheet,
+    mountSettings: (entry) => mountYouTubeSettings(doc, view, entry),
     connect(onPageChange) {
       const root = doc.documentElement;
       const marked = new Set<Element>();

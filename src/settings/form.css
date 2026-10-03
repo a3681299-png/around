@@ -1,0 +1,12 @@
+* { box-sizing: border-box; }
+.control-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+label { font-size: 13px; }
+.toggle-group { display: flex; align-items: center; gap: 8px; }
+output { font-size: 12px; font-variant-numeric: tabular-nums; }
+#theme-enabled { width: 18px; height: 18px; margin: 0; accent-color: #596d4f; }
+.strength-control { margin-top: 22px; padding-top: 18px; border-top: 1px solid #d3d6ca; }
+#effect-strength { width: 100%; margin: 15px 0 4px; accent-color: #596d4f; }
+.range-hints { display: flex; justify-content: space-between; color: #626b5c; font-size: 10px; }
+.status { min-height: 32px; margin: 18px 0 0; color: #626b5c; font-size: 11px; line-height: 1.5; }
+.status[data-error="true"] { color: #a3322d; }
+input:focus-visible { outline: 2px solid #4d633f; outline-offset: 4px; }

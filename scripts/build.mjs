@@ -47,6 +47,7 @@ const builds = await Promise.all([
     entryPoints: ['src/popup/index.ts'],
     outfile: 'dist/popup/index.js',
     format: 'iife',
+    loader: { '.css': 'text' },
   }),
 ]);
 

@@ -1,0 +1,30 @@
+:host {
+  /* Important host rules outrank the page's player-wide div resets. */
+  all: initial !important;
+  position: absolute !important;
+  right: 12px !important;
+  bottom: 64px !important;
+  z-index: 70 !important;
+  display: block !important;
+  width: 304px !important;
+  max-width: calc(100% - 24px) !important;
+  max-height: calc(100% - 80px) !important;
+  overflow: auto !important;
+  overscroll-behavior: contain !important;
+  color-scheme: light !important;
+  color: #222820 !important;
+  background: #efeee8 !important;
+  border: 1px solid #a3aa98 !important;
+  border-radius: 4px !important;
+  box-shadow: 0 4px 18px #0006 !important;
+  font: 13px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif !important;
+  text-align: left !important;
+}
+:host([hidden]) { display: none !important; }
+.settings { padding: 16px; }
+header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 22px; }
+.eyebrow { margin: 0 0 4px; color: #626b5c; font-size: 11px; }
+h2 { margin: 0; font-size: 16px; font-weight: 650; }
+.close { width: 28px; height: 28px; border: 1px solid #a3aa98; border-radius: 2px; padding: 0; color: inherit; background: transparent; cursor: pointer; font: 20px/1 system-ui; }
+.close:hover { background: #e0e2d7; }
+.close:focus-visible { outline: 2px solid #4d633f; outline-offset: 2px; }

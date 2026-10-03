@@ -16,6 +16,15 @@
       yt-searchbox .ytSearchboxComponentInputBox { border-radius: 40px; }
       yt-thumbnail-view-model { display: block; width: 260px; height: 140px; margin: 20px 0; background: #a9b4bb; border-radius: 12px; overflow: hidden; }
       button { margin: 6px; padding: 8px; }
+      .html5-video-player { position: relative; height: 380px; background: #171a1c; color: white; }
+      .html5-video-player:fullscreen { height: 100%; width: 100%; }
+      .video-placeholder { display: grid; height: 100%; place-items: center; color: #929a9f; font-size: 20px; }
+      .ytp-chrome-bottom { position: absolute; left: 12px; right: 12px; bottom: 0; height: 48px; }
+      .ytp-right-controls { display: flex; justify-content: flex-end; height: 48px; float: right; }
+      .ytp-button { width: 48px; height: 48px; border: 0; padding: 0; margin: 0; background: transparent; color: white; cursor: pointer; }
+      .ytp-button svg { pointer-events: none; }
+      /* Match player-wide page resets that can override normal Shadow host styles. */
+      .html5-video-player div { background-color: transparent; border: 0; }
     </style>
   </head>
   <body>
@@ -32,14 +41,32 @@
     </ytd-app>
     <script>
       document.querySelector('#navigate').addEventListener('click', () => {
+        document.dispatchEvent(new Event('yt-navigate-start'));
         history.pushState({}, '', '/watch?v=fixture');
         document.querySelector('ytd-page-manager').innerHTML = '<h1>Watch</h1><ytd-thumbnail><div id="thumbnail"></div></ytd-thumbnail><ytd-watch-metadata><div id="description">The next page.</div></ytd-watch-metadata>';
+        addPlayer();
         document.dispatchEvent(new Event('yt-navigate-finish'));
       });
       document.querySelector('#lazy-add').addEventListener('click', () => {
         const item = document.createElement('ytd-thumbnail');
         item.innerHTML = '<div id="thumbnail"></div>';
         document.querySelector('ytd-page-manager').append(item);
+      });
+      function addPlayer() {
+        const player = document.createElement('div');
+        player.id = 'movie_player';
+        player.className = 'html5-video-player';
+        player.innerHTML = '<div class="video-placeholder">Video player fixture</div><div class="ytp-chrome-bottom"><div class="ytp-right-controls"><button class="ytp-button" aria-label="Subtitles">CC</button><button class="ytp-button" aria-label="YouTube settings">⚙</button><button class="ytp-button" aria-label="Fullscreen">⛶</button></div></div>';
+        player.querySelector('[aria-label="Fullscreen"]').addEventListener('click', () => {
+          if (document.fullscreenElement) document.exitFullscreen();
+          else player.requestFullscreen();
+        });
+        document.querySelector('ytd-page-manager').prepend(player);
+      }
+      if (location.pathname === '/watch') addPlayer();
+      // Stand in for YouTube's global keyboard shortcuts: slider keys must not leak.
+      document.addEventListener('keydown', () => {
+        document.documentElement.dataset.playerKeyCount = String(Number(document.documentElement.dataset.playerKeyCount || 0) + 1);
       });
     </script>
   </body>
