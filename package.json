@@ -1,0 +1,23 @@
+{
+  "name": "web-world-themes",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A theme-first Chrome extension for dressing existing websites in another world.",
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "dev": "node scripts/build.mjs --watch",
+    "build": "npm run typecheck && node scripts/build.mjs",
+    "typecheck": "tsc --noEmit",
+    "test:setup": "node scripts/test.mjs --install",
+    "test": "node scripts/test.mjs",
+    "check": "npm run build && npm test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/chrome": "0.3.4",
+    "@types/node": "^24.0.0",
+    "esbuild": "0.28.2",
+    "typescript": "7.0.2"
+  }
+}

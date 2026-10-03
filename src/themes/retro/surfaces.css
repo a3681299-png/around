@@ -1,0 +1,16 @@
+/* Theme CSS consumes semantic attributes only; it has no YouTube selectors. */
+html[data-ww-theme="retro"] [data-ww-surface~="page"] {
+  background-color: var(--ww-page) !important;
+}
+
+html[data-ww-theme="retro"] [data-ww-surface~="panel"] {
+  background-color: var(--ww-panel) !important;
+}
+
+html[data-ww-theme="retro"] [data-ww-surface~="frame"] {
+  box-shadow: inset 0 0 0 1px var(--ww-border) !important;
+}
+
+html[data-ww-theme="retro"] [data-ww-surface~="rounded"] {
+  border-radius: var(--ww-radius) !important;
+}

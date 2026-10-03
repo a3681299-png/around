@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Web World Themes",
+  "version": "0.1.0",
+  "description": "YouTubeのUIを着せ替える拡張機能。仮のretroテーマをON/OFFし、強さを調整できます。",
+  "minimum_chrome_version": "120",
+  "permissions": ["storage"],
+  "action": {
+    "default_title": "Web World Themes",
+    "default_popup": "popup/index.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/*"],
+      "exclude_matches": [
+        "https://www.youtube.com/embed/*",
+        "https://www.youtube.com/live_chat*"
+      ],
+      "js": ["content/index.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'"
+  }
+}

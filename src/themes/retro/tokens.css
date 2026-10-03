@@ -1,0 +1,17 @@
+/* Prototype palette. Change these tokens before expanding the visual design. */
+html[data-ww-theme="retro"] {
+  --ww-retro-page: #e8e7df;
+  --ww-retro-panel: #f1efe8;
+  --ww-retro-border: #8b9185;
+  --ww-mix: calc(var(--ww-strength, 1) * 100%);
+  --ww-radius: calc(12px - 10px * var(--ww-strength, 1));
+  --ww-page: color-mix(in srgb, var(--ww-native-page, #fff), var(--ww-retro-page) var(--ww-mix));
+  --ww-panel: color-mix(in srgb, var(--ww-native-panel, #fff), var(--ww-retro-panel) var(--ww-mix));
+  --ww-border: color-mix(in srgb, transparent, var(--ww-retro-border) var(--ww-mix));
+}
+
+html[data-ww-theme="retro"][data-ww-mode="dark"] {
+  --ww-retro-page: #20241f;
+  --ww-retro-panel: #292e28;
+  --ww-retro-border: #7d8d78;
+}
