@@ -2,7 +2,21 @@
 
 確認日: 2026年10月4日（UTC）
 
-## 今回の結果
+## GitHub CIでの最終確認
+
+[Theme checks / run 2](https://github.com/a3681299-png/web-world-themes/actions/runs/37169672828)（commit `96d8812`）で`npm run check`が成功しました。UbuntuのChrome for Testing 153、Playwright 1.63.0へ実際のMV3拡張機能を読み込み、**28件すべてPASS**です。
+
+- ブラウザー操作16件 + スクリーンショット／レイアウト1件 + ブラウザー不要の設定／機能テスト11件
+- ホームのライト60%／100%、ダーク100%、動画ページ、プレイヤー内設定、Popup、900px幅を画像として出力し、実際のピクセルを確認。ヘッダーとの重なり・横方向のはみ出しなし
+- テーマOFF／0%、個別window-chrome切替、保存・再起動、SPA、検索／戻る／進む、コメント入力、ローカル映像の再生／停止、画像とmedia要素の保持、全画面出入りがPASS
+- 最初のCIは14件PASS後、保存失敗テストの`uncheck()`の完了条件により停止。即座にONへ戻る正しいロールバック動作を`click()`で検証するよう修正し、全件を再実行した
+- 静的レビューで見つけた、内側の`.ytChipShapeChip`が`aria-pressed`選択色を覆うケースを修正し、選択のtrue→false切替テストを追加
+
+これは**合成YouTube DOMに対する実MV3／Storageの検証**です。実YouTubeへ変更後の拡張機能を適用した目視結果ではありません。実動画配信・ログイン状態・YouTubeの全A/B版までは保証しません。
+
+画像はGitHub Actionsの`theme-test-results` artifactに7日間保存します。ソースリポジトリへ画像や生成ビルドは追加しません。最終的な色の微調整と記録更新の後も、専用ブランチのCIを再実行します。
+
+## ローカル環境の結果と制限
 
 - Node.js 24.19.0 / npm 11.9.0のクラウドLinux環境
 - `npm ci --cache=/tmp/web-world-npm-cache`: PASS（通常のホームのnpmキャッシュは書き込み不可のため、作業用キャッシュを使用）
@@ -11,15 +25,15 @@
 - `npm test -- tests/features.spec.ts`: 11件PASS。設定の旧キー維持、機能別保存、初期読込中の変更、解除、独立したmount／destroy、未対応サイト、OFF／0%、同時保存／失敗／遅い読込の競合
 - `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run check`: lintとbuildまでPASS。ブラウザー起動時のOS制限 `process_singleton_posix.cc: socket() failed: Operation not permitted` により、MV3ブラウザー検証のアサーションは未実行
 - 実サイトのDOM読取: 未ログインのYouTube検索画面で、現在の`yt-searchbox`、`yt-lockup-metadata-view-model h3`、カテゴリ内側の`.ytChipShapeChip`を確認。後者の背景が装飾を隠さないようAdapterへ追加
-- ローカルプレビューの目視: 今回のブラウザーはfile URLを非対応、localhostアクセスも拒否するため未実施。スクリーンショットなし。実YouTubeへ変更後の拡張機能を適用した目視結果でもない
+- ローカルプレビューの目視: 今回のローカル閲覧経路はfile URLを非対応、localhostアクセスも拒否するため未実施。代わりにGitHub CIのChromiumが出力した画像を取得して確認した
 
 ## 回帰テストの内容
 
-16件のブラウザーテストを用意しています。実際のMV3とChrome Storageを使い、YouTube HTMLは合成の検証用DOMへ差し替えます。ホーム・検索・動画・コメント・動くcanvas由来のvideoを含みます。
+17件のブラウザーテストを用意しています。実際のMV3とChrome Storageを使い、YouTube HTMLは合成の検証用DOMへ差し替えます。ホーム・検索・動画・コメント・動くcanvas由来のvideoを含みます。
 
 繰り返しON／OFF／0%、強さ、ライト／ダーク、ページとブラウザー再起動、複数タブ同期、window-chrome個別ON／OFF、保存失敗、SPA／戻る／進む、検索入力、コメント入力、再生／停止、画像・mediaノードの保持、CSSフィルター非適用、全画面出入り、設定パネル、スクリーンショット生成を対象にします。テスト定義の存在は成功を意味しません。
 
-専用ブランチ向けのテスト専用GitHub Actionsワークフローも用意しました。権限はcontents:read、保存認証なし、12分の上限、7日間のテスト結果保持で、配備処理はありません。リモート実行結果は確認後に追記します。
+専用ブランチ向けのテスト専用GitHub Actionsワークフローも用意しました。権限はcontents:read、保存認証なし、12分の上限、7日間のテスト結果保持で、配備処理はありません。リモートの実行結果は上記のとおりです。課金設定や実行権限は変更せず、標準Ubuntu runnerを利用しています。
 
 ## オフライン確認用ページ
 
