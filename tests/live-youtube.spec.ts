@@ -25,13 +25,13 @@ test('optional public YouTube watch inspection with unmodified network documents
     // Public video from the reported screenshot. No cookies, account, CAPTCHA,
     // markup substitution, hidden API, or application-state injection is used.
     await page.goto('https://www.youtube.com/watch?v=AS4q9yaWJkI&list=RDAS4q9yaWJkI&start_radio=1', { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('ytd-watch-metadata h1')).toBeVisible({ timeout: 45_000 });
+    await expect(page.locator('ytd-watch-metadata h1').first()).toBeVisible({ timeout: 45_000 });
     await capture('live-native-watch');
     await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
     await expect(page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
     await expect(page.locator('#web-world-themes-player-titlebar')).toBeVisible();
     await capture('live-silver-watch');
-    await page.locator('ytd-watch-metadata h1').scrollIntoViewIfNeeded();
+    await page.locator('ytd-watch-metadata h1').first().scrollIntoViewIfNeeded();
     await capture('live-silver-metadata');
     const backgrounds = await page.locator('ytd-watch-flexy, ytd-watch-metadata, ytd-comments').evaluateAll(elements => elements.map(element => ({
       tag: element.tagName, background: getComputedStyle(element).backgroundColor, color: getComputedStyle(element).color,
