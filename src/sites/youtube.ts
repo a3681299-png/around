@@ -1,7 +1,7 @@
 import stylesheet from './youtube.css';
 import type { SiteAdapter, Surface } from './types';
 import { mountYouTubeSettings } from './youtube-player';
-import { createYouTubeChrome } from './youtube-chrome';
+import { mountYouTubeChrome } from './youtube-chrome';
 
 const SURFACE_ATTRIBUTE = 'data-ww-surface';
 
@@ -23,7 +23,7 @@ const targets: ReadonlyArray<{ selector: string; surfaces: readonly Surface[] }>
     surfaces: ['input', 'frame', 'rounded'],
   },
   {
-    selector: 'ytd-masthead button, ytd-masthead a[role="button"], ytd-masthead yt-button-shape a, ytd-masthead yt-button-view-model a, ytd-searchbox #search-icon-legacy, yt-chip-cloud-chip-renderer:not(:has(button)), yt-chip-cloud-chip-renderer button, ytd-watch-metadata yt-button-shape button',
+    selector: 'ytd-masthead button, ytd-masthead a[role="button"], ytd-masthead yt-button-shape a, ytd-masthead yt-button-view-model a, ytd-searchbox #search-icon-legacy, yt-chip-cloud-chip-renderer:not(:has(button)), yt-chip-cloud-chip-renderer button:not(:has(.ytChipShapeChip)), yt-chip-cloud-chip-renderer .ytChipShapeChip, ytd-watch-metadata yt-button-shape button',
     surfaces: ['button', 'rounded'],
   },
   {
@@ -43,6 +43,23 @@ const targets: ReadonlyArray<{ selector: string; surfaces: readonly Surface[] }>
     selector: 'ytd-guide-entry-renderer[active] tp-yt-paper-item, ytd-mini-guide-entry-renderer[active]',
     surfaces: ['selected'],
   },
+  {
+    selector: 'yt-chip-cloud-chip-renderer',
+    surfaces: ['chip'],
+  },
+  {
+    selector: 'yt-chip-cloud-chip-renderer[selected]:not(:has(button)), yt-chip-cloud-chip-renderer[selected] button:not(:has(.ytChipShapeChip)), yt-chip-cloud-chip-renderer[selected] .ytChipShapeChip, yt-chip-cloud-chip-renderer[aria-selected="true"]:not(:has(button)), yt-chip-cloud-chip-renderer[aria-selected="true"] button:not(:has(.ytChipShapeChip)), yt-chip-cloud-chip-renderer[aria-selected="true"] .ytChipShapeChip, yt-chip-cloud-chip-renderer button[aria-selected="true"]:not(:has(.ytChipShapeChip)), yt-chip-cloud-chip-renderer button[aria-selected="true"] .ytChipShapeChip, yt-chip-cloud-chip-renderer button[aria-pressed="true"]',
+    surfaces: ['selected'],
+  },
+  {
+    selector: 'ytd-rich-grid-media #video-title, ytd-grid-video-renderer #video-title, ytd-video-renderer #video-title, ytd-compact-video-renderer #video-title, yt-lockup-metadata-view-model h3, ytd-watch-metadata h1',
+    surfaces: ['heading'],
+  },
+  {
+    selector: 'ytd-video-meta-block #metadata-line, yt-content-metadata-view-model',
+    surfaces: ['metadata'],
+  },
+  { selector: 'ytd-comments#comments', surfaces: ['comments'] },
   { selector: 'ytm-shorts-lockup-view-model .shortsLockupViewModelHostThumbnailParentContainer', surfaces: ['rounded'] },
   { selector: 'ytd-thumbnail #thumbnail, yt-thumbnail-view-model', surfaces: ['rounded'] },
 ];
@@ -60,10 +77,9 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
     id: 'youtube',
     stylesheet,
     mountSettings: (entry) => mountYouTubeSettings(doc, view, entry),
+    features: { 'window-chrome': { mount: () => mountYouTubeChrome(doc) } },
     connect(onPageChange) {
       const root = doc.documentElement;
-      const chrome = createYouTubeChrome(doc);
-      let masthead: HTMLElement | null = null;
       const marked = new Set<Element>();
       const pending = new Set<Element>();
       let frame: number | undefined;
@@ -72,24 +88,7 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
 
       const setMode = () => {
         root.setAttribute('data-ww-mode', root.hasAttribute('dark') ? 'dark' : 'light');
-      };
-
-      const ensureWindowChrome = () => {
-        const next = doc.querySelector<HTMLElement>('ytd-masthead');
-        if (!next) {
-          chrome.remove();
-          masthead = null;
-          root.removeAttribute('data-ww-window-chrome');
-          return;
-        }
-        if (next !== masthead) {
-          // Read the native toolbar before expanding its outer window frame.
-          const height = next.querySelector('#container')?.getBoundingClientRect().height ?? 56;
-          root.style.setProperty('--ww-native-header-height', `${height >= 40 && height <= 80 ? height : 56}px`);
-          masthead = next;
-        }
-        if (next.firstElementChild !== chrome) next.prepend(chrome);
-        root.setAttribute('data-ww-window-chrome', '');
+        root.toggleAttribute('data-ww-fullscreen', Boolean(doc.fullscreenElement || doc.querySelector('ytd-watch-flexy[fullscreen]')));
       };
 
       const mark = (element: Element) => {
@@ -137,7 +136,6 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
         needsFullScan = false;
         needsPrune = false;
         setMode();
-        ensureWindowChrome();
         onPageChange();
       };
 
@@ -153,7 +151,6 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
       root.setAttribute('data-ww-site', 'youtube');
       setMode();
       scan(doc);
-      ensureWindowChrome();
 
       // Only added subtrees / changed IDs are scanned on ordinary DOM updates.
       const observer = new MutationObserver((records) => {
@@ -170,7 +167,7 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
         childList: true,
         subtree: true,
         attributes: true,
-        attributeFilter: ['id', 'active'],
+        attributeFilter: ['id', 'active', 'selected', 'aria-selected', 'aria-pressed', 'fullscreen'],
       });
 
       const modeObserver = new MutationObserver(() => {
@@ -179,6 +176,7 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
       });
       modeObserver.observe(root, { attributes: true, attributeFilter: ['dark'] });
       navigationEvents.forEach((event) => doc.addEventListener(event, refresh));
+      doc.addEventListener('fullscreenchange', refresh);
       view.addEventListener('popstate', refresh);
       view.addEventListener('pageshow', refresh);
 
@@ -186,18 +184,18 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
         observer.disconnect();
         modeObserver.disconnect();
         navigationEvents.forEach((event) => doc.removeEventListener(event, refresh));
+        doc.removeEventListener('fullscreenchange', refresh);
         view.removeEventListener('popstate', refresh);
         view.removeEventListener('pageshow', refresh);
         if (frame !== undefined) view.cancelAnimationFrame(frame);
         pending.clear();
         marked.forEach((element) => element.removeAttribute(SURFACE_ATTRIBUTE));
         marked.clear();
-        chrome.remove();
-        root.removeAttribute('data-ww-window-chrome');
-        root.style.removeProperty('--ww-native-header-height');
         root.removeAttribute('data-ww-site');
         root.removeAttribute('data-ww-mode');
+        root.removeAttribute('data-ww-fullscreen');
       };
     },
   };
 }
+

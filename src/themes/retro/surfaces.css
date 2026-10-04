@@ -1,70 +1,90 @@
-/* Theme CSS consumes semantic attributes only; it has no YouTube selectors. */
+/* Semantic surfaces only. The adapter owns every site selector and DOM decision. */
 html[data-ww-theme="retro"] [data-ww-surface~="page"] {
   background-color: var(--ww-page) !important;
   color: var(--ww-ink) !important;
   font-family: var(--ww-font) !important;
 }
-
-html[data-ww-theme="retro"] [data-ww-surface~="panel"] {
-  background-color: var(--ww-panel) !important;
-}
-
-html[data-ww-theme="retro"] [data-ww-surface~="frame"] {
-  box-shadow: var(--ww-raised) !important;
-}
-
+html[data-ww-theme="retro"] [data-ww-surface~="panel"] { background-color: var(--ww-panel) !important; }
+html[data-ww-theme="retro"] [data-ww-surface~="frame"] { box-shadow: var(--ww-raised) !important; }
 html[data-ww-theme="retro"] [data-ww-surface~="window"],
-html[data-ww-theme="retro"] [data-ww-surface~="sidebar"],
-html[data-ww-theme="retro"] [data-ww-surface~="section"] {
+html[data-ww-theme="retro"] [data-ww-surface~="sidebar"] {
   color: var(--ww-ink) !important;
   font-family: var(--ww-font) !important;
   border-radius: 0 !important;
 }
+html[data-ww-theme="retro"] [data-ww-surface~="toolbar"] {
+  background-image: var(--ww-silver) !important;
+  box-shadow: inset 0 1px var(--ww-light), inset 0 -1px var(--ww-border) !important;
+}
+html[data-ww-theme="retro"] [data-ww-surface~="sidebar"] {
+  background-image: linear-gradient(90deg, var(--ww-paper), var(--ww-panel)) !important;
+}
+/* Flat section dividers avoid nested, heavy boxes and preserve the site's layout. */
 html[data-ww-theme="retro"] [data-ww-surface~="section"] {
-  padding: 8px !important;
-  box-sizing: border-box !important;
+  background-color: transparent !important;
+  box-shadow: inset 0 -1px var(--ww-border), 0 1px var(--ww-light) !important;
 }
 html[data-ww-theme="retro"] [data-ww-surface~="card"] {
-  background-color: var(--ww-paper) !important;
-  box-shadow: var(--ww-raised) !important;
-  padding: 8px !important;
+  background: var(--ww-silver) !important;
+  box-shadow: var(--ww-card-shadow) !important;
+  padding: var(--ww-card-padding) !important;
   box-sizing: border-box !important;
   color: var(--ww-ink) !important;
   font-family: var(--ww-font) !important;
 }
+html[data-ww-theme="retro"] [data-ww-surface~="card"]:hover {
+  box-shadow: var(--ww-card-shadow), inset 0 0 0 1px var(--ww-accent) !important;
+}
+html[data-ww-theme="retro"] [data-ww-surface~="heading"] {
+  font-family: var(--ww-font) !important;
+  font-weight: 600 !important;
+  color: var(--ww-ink) !important;
+  text-shadow: none !important;
+}
+html[data-ww-theme="retro"] [data-ww-surface~="metadata"] { color: var(--ww-muted) !important; }
 html[data-ww-theme="retro"] [data-ww-surface~="input"] {
-  background-color: var(--ww-paper) !important;
+  background: var(--ww-paper) !important;
   box-shadow: var(--ww-sunken) !important;
   color: var(--ww-ink) !important;
 }
+html[data-ww-theme="retro"] [data-ww-surface~="input"]:focus-within {
+  outline: var(--ww-focus) !important;
+  outline-offset: 1px !important;
+}
 html[data-ww-theme="retro"] [data-ww-surface~="button"] {
-  background-color: var(--ww-panel) !important;
+  background: var(--ww-silver) !important;
   box-shadow: var(--ww-raised) !important;
   color: var(--ww-ink) !important;
   font-family: var(--ww-font) !important;
 }
-html[data-ww-theme="retro"] [data-ww-surface~="button"]:active {
-  box-shadow: var(--ww-sunken) !important;
-}
-html[data-ww-theme="retro"] [data-ww-surface~="button"]:focus-visible {
-  outline: 1px dotted var(--ww-ink) !important;
-  outline-offset: -4px !important;
-}
-
+html[data-ww-theme="retro"] [data-ww-surface~="button"]:hover { background: var(--ww-glass) !important; color: var(--ww-selected-ink) !important; }
+html[data-ww-theme="retro"] [data-ww-surface~="button"]:active { box-shadow: var(--ww-sunken) !important; }
 html[data-ww-theme="retro"] [data-ww-surface~="navigation"] {
-  font-family: var(--ww-font) !important;
   color: var(--ww-ink) !important;
+  font-family: var(--ww-font) !important;
 }
+html[data-ww-theme="retro"] [data-ww-surface~="navigation"]:hover { background: var(--ww-accent-soft) !important; }
 html[data-ww-theme="retro"] [data-ww-surface~="selected"] {
-  box-shadow: var(--ww-sunken) !important;
-  background-color: var(--ww-page) !important;
+  background: var(--ww-glass) !important;
+  color: var(--ww-selected-ink) !important;
+  box-shadow: var(--ww-raised), inset 3px 0 var(--ww-accent) !important;
 }
-
-/* Rich text may contain inline source colors. Keep it legible in both modes. */
+html[data-ww-theme="retro"] [data-ww-surface~="button"]:focus-visible,
+html[data-ww-theme="retro"] [data-ww-surface~="navigation"]:focus-visible {
+  outline: var(--ww-focus) !important;
+  outline-offset: -3px !important;
+}
+/* A restrained stationery-like surround; comment text/editors stay native. */
+html[data-ww-theme="retro"] [data-ww-surface~="comments"] {
+  border-top: 1px solid var(--ww-border) !important;
+  box-shadow: inset 0 1px var(--ww-light) !important;
+}
 html[data-ww-theme="retro"] [data-ww-surface~="text"] { color: var(--ww-ink) !important; }
 html[data-ww-theme="retro"] [data-ww-surface~="text"] * { color: inherit !important; }
 html[data-ww-theme="retro"] [data-ww-surface~="text"] a { color: var(--ww-link) !important; }
-
-html[data-ww-theme="retro"] [data-ww-surface~="rounded"] {
-  border-radius: var(--ww-radius) !important;
+html[data-ww-theme="retro"] [data-ww-surface~="rounded"] { border-radius: var(--ww-radius) !important; }
+@media (forced-colors: active) {
+  html[data-ww-theme="retro"] [data-ww-surface~="button"],
+  html[data-ww-theme="retro"] [data-ww-surface~="input"] { outline: 1px solid ButtonText !important; }
 }
+html[data-ww-theme="retro"] [data-ww-surface~="chip"] :focus-visible { outline: var(--ww-focus) !important; outline-offset: 2px !important; }

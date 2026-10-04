@@ -1,0 +1,43 @@
+import { test, expect } from './fixtures';
+
+test('capture local-fixture silver-blue theme at representative strengths and sizes', async ({ popup, youtube }, testInfo) => {
+  const errors: string[] = [];
+  youtube.on('pageerror', error => errors.push(error.message));
+  await youtube.setViewportSize({ width: 1360, height: 920 });
+  const capture = async (name: string) => {
+    await youtube.screenshot({ path: testInfo.outputPath(`${name}.png`), fullPage: true, animations: 'disabled' });
+    await testInfo.attach(name, { path: testInfo.outputPath(`${name}.png`), contentType: 'image/png' });
+  };
+  await capture('fixture-native-home');
+  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+  await capture('fixture-light-60-home');
+  await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+  await expect(youtube.locator('html')).toHaveAttribute('style', /--ww-strength: 1;/);
+  await capture('fixture-light-100-home');
+  const header = await youtube.locator('ytd-masthead').boundingBox();
+  const guide = await youtube.locator('ytd-guide-renderer').boundingBox();
+  const page = await youtube.locator('ytd-page-manager').boundingBox();
+  expect(page!.y).toBeGreaterThanOrEqual(header!.y + header!.height);
+  expect(guide!.y).toBeGreaterThanOrEqual(header!.y + header!.height);
+  expect(await youtube.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await youtube.locator('html').evaluate(element => element.setAttribute('dark', ''));
+  await expect(youtube.locator('html')).toHaveAttribute('data-ww-mode', 'dark');
+  await capture('fixture-dark-100-home');
+  await youtube.locator('html').evaluate(element => element.removeAttribute('dark'));
+  await youtube.getByRole('button', { name: 'SPA navigation' }).click();
+  await expect(youtube.getByRole('heading', { name: 'Watch', exact: true })).toBeVisible();
+  await capture('fixture-light-100-watch');
+  await youtube.getByRole('button', { name: 'Web World Themes の設定', exact: true }).click();
+  await expect(youtube.getByRole('dialog', { name: 'Web World Themes の設定' })).toBeVisible();
+  await capture('fixture-player-settings');
+  await popup.setViewportSize({ width: 380, height: 620 });
+  await popup.screenshot({ path: testInfo.outputPath('fixture-popup-settings.png'), fullPage: true, animations: 'disabled' });
+  await testInfo.attach('fixture-popup-settings', { path: testInfo.outputPath('fixture-popup-settings.png'), contentType: 'image/png' });
+  await youtube.goto('https://www.youtube.com/');
+  await youtube.setViewportSize({ width: 900, height: 760 });
+  await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+  await capture('fixture-light-100-900px');
+  expect(await youtube.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  expect(errors).toEqual([]);
+});

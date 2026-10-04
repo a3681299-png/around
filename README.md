@@ -1,6 +1,8 @@
 # Web World Themes
 
-既存サイトを別の世界観に着せ替えるChrome拡張機能です。最初のMVPはデスクトップ版YouTubeだけに対応します。Manifest V3とTypeScriptで構築し、Windows 95/98風の`retro`テーマを用意しました。
+既存サイトを別の世界観に着せ替えるChrome拡張機能です。最初のMVPはデスクトップ版YouTubeだけに対応します。Manifest V3とTypeScriptで構築し、Windows 95/98の構造と2000〜2005年の電子的な遊び心を合わせた`retro`テーマを用意しました。
+
+コンセプトは **「機能美の時代に、遊び心を取り戻す」**。明るいシルバーと青灰色のパネル、青いガラス調の選択状態、小さな黒い液晶風のバーで、YouTubeの使い方を保ちながら平成初期のPC／個人サイトの空気を足します。
 
 ## はじめ方
 
@@ -16,7 +18,9 @@ Chromeで`chrome://extensions`を開き、右上の「デベロッパーモー�
 
 拡張機能をツールバーに固定し、YouTubeを開くか再読み込みします。Popupで`Theme ON / OFF`をONにすると、retroテーマが適用されます。初期値はOFF、`Effect Strength`は60%です。スライダーは0〜100%で、0%では元の見た目に戻ります。雰囲気をはっきり確認したい場合は100%へ動かしてください。
 
-上部に紺色の`YouTube.exe`タイトルバーと、ホーム・登録チャンネル・履歴へのメニューバーを追加します。検索欄は凹んだ枠、ボタンは立体枠、動画カードとサイドバーはグレーと白のボックスにします。タイトルバー右端の窓の記号は装飾です。YouTubeがダーク表示の場合は、立体枠を残した暗い配色になります。
+上部に黒い液晶風の`YouTube.exe`バーと、ホーム・登録チャンネル・履歴へのシルバーのメニューを追加します。細い水色の光、点状のインジケーター、控えめな顔文字は拡張機能の飾りだけに使います。検索欄は凹んだ枠、ボタンは薄い立体枠、選択項目は青いガラス風にします。動画の画像・映像そのものは加工しません。本文と動画タイトルは読みやすさを優先し、OSのロゴやアイコン素材は使用していません。
+
+YouTubeのダーク表示に従う場合は、明るさを落とした青紺のパレットへ切り替わります。独立したナイトモード機能はありません。`Window chrome`をOFFにすると追加バーとその高さだけを撤去し、基本テーマは残ります。追加機能の設定はテーマをOFFにしても保持されます。
 
 動画プレイヤー右下のアイコン列にも、左端に仮のスライダー型アイコンを追加します。押すと動画の上に設定パネルが開き、同じON/OFFと強さを編集できます。テーマがOFFでも使えます。×ボタン、アイコンの再クリック、Esc、パネルの外をクリックすると閉じます。全画面でもプレイヤー内に表示します。
 
@@ -31,6 +35,7 @@ npm run dev
 TypeScriptとCSSの変更を監視して`dist`を更新します。変更後は`chrome://extensions`の再読み込みボタンを押し、YouTubeも再読み込みしてください。設定操作の反映には再読み込みは不要です。監視の終了は`Ctrl+C`です。
 
 ```powershell
+npm run lint
 npm run typecheck
 npm run build
 npm run test:setup
@@ -53,7 +58,7 @@ src/
     index.ts                  URLに応じたAdapter選択
     youtube.ts                YouTubeセレクタ / SPA / DOM監視
     youtube-player.ts         設定アイコンの配置 / プレイヤー交換時の付け直し
-    youtube-chrome.ts         YouTube.exe / サイト固有のナビゲーション
+    youtube-chrome.ts         独立したwindow-chrome機能 / サイト固有ナビゲーション
     youtube.css               色の接続 / 追加ヘッダー分の配置調整
   themes/
     types.ts                  テーマ定義の共通型
@@ -61,11 +66,12 @@ src/
     controller.ts             CSSと強さの適用 / OFF時の撤去
     retro/
       index.ts                retro定義
-      tokens.css              配色 / 立体枠 / フォント / 強さ / ダーク配色
+      tokens.css              シルバー・青ガラス・液晶 / 立体枠 / フォント / 強さ / ダーク配色
       surfaces.css            カード / 検索欄 / ボタン / サイドバー
       chrome.css              タイトルバー / メニューバー
       editor.css              Popupとプレイヤー設定の共通デザイン
-  storage/settings.ts         chrome.storage.local / 値の検証 / 変更通知
+  features/                   追加機能の登録 / 個別ON・OFF / mount・refresh・destroy
+  storage/settings.ts         chrome.storage.local / 値の検証 / 機能別キー / 変更通知
   popup/
     index.html                Popupの外枠
     index.ts                  共通フォームをPopupへ接続
@@ -106,18 +112,27 @@ YouTube用Adapterが対象要素に`data-ww-surface`を付けます。テーマ�
 
 ウィンドウ装飾のDOMとリンク先はAdapterが用意し、見た目は`themes/retro/chrome.css`で指定します。ネイティブのツールバーの高さを読んで、追加した2行分だけページとサイドバーの位置を調整します。追加バーが取り除かれた場合は付け直し、OFFまたは0%ではバーと配置変更も撤去します。
 
-Popupとプレイヤー内設定は`settings/markup.ts`と`settings/form.ts`を共有します。テーマ定義の`editorStylesheets`が両方の見た目を指定し、設定画面の配色はサイトのON/OFFや強さにかかわらず固定します。装飾を変えるときは`themes/retro`、項目を変えるときは共通テンプレートを編集します。
+Popupとプレイヤー内設定は`settings/markup.ts`と`settings/form.ts`を共有します。テーマ定義の`editorStylesheets`が両方の見た目を指定し、設定画面の配色はサイトのON/OFFや強さにかかわらず読みやすいシルバーに固定します。装飾を変えるときは`themes/retro`、項目を変えるときは共通テンプレートを編集します。
 
 設定アイコンはテーマと別のライフサイクルで配置します。`sites/youtube-player.ts`だけがプレイヤーと右側の操作欄のセレクタを持ち、`settings/panel.ts`はサイトのDOM構造を知りません。プレイヤーが遅れて生成された場合やSPAで交換された場合に配置を確認し、右側の操作欄の先頭へ1つだけ置きます。設定パネルはShadow DOMでスタイルを分け、スライダーのキー入力が動画のシークに伝わるのを防ぎます。通常のデータ更新ではパネルを維持し、ページ遷移やプレイヤー交換では閉じます。
 
 YouTubeの`yt-navigate-finish`と`yt-page-data-updated`で再確認し、追加DOMやID・選択状態の変更は`MutationObserver`で検出します。通常の変更では追加された部分だけを調べ、更新を描画フレーム単位でまとめます。カスタム要素とIDを優先し、一部の新しい部品には名前付きクラスを使います。セレクタはAdapter内に集約しています。
 
-## 現在の範囲と次の作業
+## 追加機能の設計
 
-現在のretroは、紺のタイトルバーとメニューバー、グレーのパネル、白黒の立体枠で全体の雰囲気を揃えています。古いWindowsの完全再現は目指さず、YouTubeの検索や再生、設定操作を使える状態にしています。
+`features/index.ts`の`FEATURE_REGISTRY`が機能ID、表示名、説明、初期値とライフサイクルをまとめます。現時点の登録は`window-chrome`だけです。各機能は`mount()`でインスタンスを返し、`refresh()`でSPA更新へ追従、`destroy()`で追加DOM・イベント・属性を撤去します。サイト固有の実装はAdapterの`features`に置きます。対応していないサイトでは安全にスキップします。
 
-次はカード内の余白と文字の大きさ、カテゴリの選択状態、ホバーとフォーカス、チャンネル見出しなどの細部を揃えます。配色は`themes/retro/tokens.css`、装飾は`surfaces.css`と`chrome.css`、設定画面は`editor.css`で調整します。追加の対象は`sites/youtube.ts`で指定します。テーマを増やすときは新しい定義を登録し、テーマIDの保存と選択UIを追加します。別サイトへの対応は新しいAdapterを作る段階で行います。
+保存先は`webWorldThemes.features.<id>`という機能別キーです。既存の`enabled`と`strength`キーを変更せず、保存値がまだない場合は機能の初期値を使います。異なる設定画面から同時に操作しても、他の機能の値をまとめて上書きしません。共有フォームのトグルは登録情報から生成します。全体OFFまたは0%では全機能を逆順に解除し、選択した設定自体は保持します。
 
-自動テストは実際のMV3拡張機能とChrome Storageを使いますが、YouTubeのHTMLは検証用DOMへ差し替えます。SPAでの要素置換、遅延追加、スタイル要素の削除からの復旧、ダークモード、0%、別ドメインへの非適用、保存失敗、ブラウザー再起動後の保持を確認します。実サイト全画面の互換性を保証するテストではありません。実サイトでの確認結果は`docs/verification.md`に記録します。
+新機能を追加するときは、機能定義と必要なAdapter capabilityを追加して登録します。YouTubeセレクタをテーマや共通機能へ持ち込まないでください。キリ番・アクセスカウンター・ナイトモード・BBSコメントは今回実装していません。
+
+## 検証と現在の範囲
+
+`npm run check`はCSS構文／テーマ境界のlint、TypeScriptの型チェック、ビルド、Playwrightテストを実行します。`tests/features.spec.ts`はブラウザー不要の設定・機能ライフサイクル検証です。ブラウザーテストはMV3拡張機能とChrome Storageの実物を使いますが、YouTubeのページはローカルの検証用DOMへ差し替えます。
+
+対応するChromiumがシステムにある場合は`PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`で選べます。既定では`npm run test:setup`で導入したPlaywrightのChromiumを使います。テスト専用プロファイルを作り、ユーザーのプロファイルは変更しません。
+
+ブラウザー起動・実サイト・スクリーンショットの実施状況と制限は`docs/verification.md`を参照してください。過去バージョンのPASSは今回の変更の実測結果を意味しません。デザインの意図は`docs/heisei-design.md`にまとめています。
 
 Chromeの仕様は[Content scripts](https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts)と[Storage API](https://developer.chrome.com/docs/extensions/reference/api/storage)、拡張機能の検証方法は[Playwright公式ドキュメント](https://playwright.dev/docs/chrome-extensions)を参照しています。
+

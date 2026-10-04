@@ -53,3 +53,19 @@ html[data-ww-theme] ytd-watch-metadata {
   --yt-saturated-text-primary: var(--ww-ink) !important;
   --yt-saturated-text-secondary: var(--ww-muted) !important;
 }
+
+/* Match readable theme typography without touching media or the playback controls. */
+html[data-ww-theme][data-ww-site="youtube"] ytd-app {
+  --yt-spec-brand-background-primary: var(--ww-panel) !important;
+  --yt-spec-brand-background-secondary: var(--ww-panel) !important;
+  --yt-spec-general-background-a: var(--ww-page) !important;
+}
+html[data-ww-theme][data-ww-site="youtube"] ytd-masthead input::placeholder { color: var(--ww-muted) !important; }
+html[data-ww-theme][data-ww-site="youtube"] ytd-guide-entry-renderer #endpoint,
+html[data-ww-theme][data-ww-site="youtube"] ytd-guide-entry-renderer tp-yt-paper-item { font-weight: 400 !important; }
+/* In-page fullscreen variants need the same zero chrome space as native fullscreen. */
+html[data-ww-theme][data-ww-fullscreen] { --ww-window-chrome-height: 0px; }
+html[data-ww-theme][data-ww-fullscreen] #web-world-themes-window-chrome { display: none; }
+html[data-ww-theme][data-ww-fullscreen] ytd-app #masthead-container,
+html[data-ww-theme][data-ww-fullscreen] ytd-masthead { display: none !important; }
+html[data-ww-theme][data-ww-fullscreen] ytd-page-manager { margin-top: 0 !important; }

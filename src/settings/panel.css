@@ -16,8 +16,9 @@
   background: var(--ww-panel) !important;
   border: 1px solid var(--ww-dark) !important;
   border-radius: 0 !important;
-  box-shadow: 2px 2px #0008 !important;
+  box-shadow: var(--ww-overlay-shadow) !important;
   font: 13px/1.5 var(--ww-font) !important;
   text-align: left !important;
 }
 :host([hidden]) { display: none !important; }
+

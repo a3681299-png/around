@@ -1,9 +1,11 @@
 import {
   DEFAULT_SETTINGS,
   readSettings,
+  mergeSettings,
   updateSettings,
   watchSettings,
   type UserSettings,
+  type SettingsPatch,
 } from '../storage/settings';
 
 /** Both the extension popup and the in-page panel share this storage binding. */
@@ -18,10 +20,15 @@ export function bindSettingsForm(root: ParentNode): () => void {
   const strength = required<HTMLInputElement>('#effect-strength');
   const themeState = required<HTMLOutputElement>('#theme-state');
   const strengthValue = required<HTMLOutputElement>('#strength-value');
+  const featureControls = root.querySelectorAll<HTMLInputElement>('input[data-feature-id]');
+  const controls = [enabled, strength, ...featureControls];
+  const setDisabled = (disabled: boolean) => controls.forEach((control) => { control.disabled = disabled; });
   const status = required<HTMLParagraphElement>('#save-status');
-  let settings: UserSettings = { ...DEFAULT_SETTINGS };
+  let settings: UserSettings = mergeSettings(DEFAULT_SETTINGS, {});
   let savesInFlight = 0;
+  let batchFailed = false;
   let revision = 0;
+  let storageRevision = 0;
   let active = true;
 
   const setStatus = (message: string, error = false) => {
@@ -33,50 +40,69 @@ export function bindSettingsForm(root: ParentNode): () => void {
     strength.value = String(settings.strength);
     themeState.value = settings.enabled ? 'ON' : 'OFF';
     strengthValue.value = `${settings.strength}%`;
+    featureControls.forEach((control) => {
+      const id = control.dataset.featureId;
+      control.checked = id ? settings.features[id] === true : false;
+    });
   };
-  enabled.disabled = strength.disabled = true;
+  setDisabled(true);
   setStatus('設定を読み込んでいます…');
 
   const unwatch = watchSettings((stored) => {
+    storageRevision++;
     // Keep the current slider gesture stable while its writes are completing.
     if (savesInFlight === 0) {
       settings = stored;
       render();
     }
-    enabled.disabled = strength.disabled = false;
+    setDisabled(false);
     if (revision === 0) setStatus('設定は自動保存されます。');
   }, () => {
-    enabled.disabled = strength.disabled = true;
+    setDisabled(true);
     setStatus('設定を読み込めません。拡張機能を再読み込みしてください。', true);
   });
 
-  const commit = (patch: Partial<UserSettings>) => {
-    const edit = ++revision;
-    settings = { ...settings, ...patch };
+  const finishSave = async (failed: boolean) => {
+    savesInFlight--;
+    batchFailed ||= failed;
+    if (!active || savesInFlight > 0) return;
+    const settledRevision = revision;
+    const hadFailure = batchFailed;
+    const readRevision = storageRevision;
+    // Read once every overlapping burst settles, even if an older write finishes last.
+    // This also catches another editor's changes that arrived during this gesture.
+    try {
+      const saved = await readSettings();
+      if (!active || settledRevision !== revision) return;
+      // A newer storage event already rendered its values while this read waited.
+      if (readRevision === storageRevision) {
+        settings = saved;
+        render();
+      }
+    } catch {
+      if (!active || settledRevision !== revision) return;
+      if (hadFailure) setDisabled(true);
+    }
+    setStatus(hadFailure ? '保存できませんでした。もう一度操作してください。' : '保存しました。', hadFailure);
+  };
+
+  const commit = (patch: SettingsPatch) => {
+    revision++;
+    settings = mergeSettings(settings, patch);
     render();
+    if (savesInFlight === 0) batchFailed = false;
     savesInFlight++;
     setStatus('保存しています…');
     // Start every write immediately, including when the panel closes mid-gesture.
-    void updateSettings(patch).then(() => {
-      savesInFlight--;
-      if (active && edit === revision) setStatus('保存しました。');
-    }).catch(async () => {
-      savesInFlight--;
-      if (!active || edit !== revision) return;
-      try {
-        const saved = await readSettings();
-        if (!active || edit !== revision) return;
-        settings = saved;
-        render();
-      } catch {
-        if (!active || edit !== revision) return;
-        enabled.disabled = strength.disabled = true;
-      }
-      setStatus('保存できませんでした。もう一度操作してください。', true);
-    });
+    void updateSettings(patch).then(() => finishSave(false), () => finishSave(true));
   };
   const onToggle = () => commit({ enabled: enabled.checked });
   const onStrength = () => commit({ strength: Number(strength.value) });
+  const onFeature = (event: Event) => {
+    const input = event.currentTarget as HTMLInputElement;
+    const id = input.dataset.featureId;
+    if (id) commit({ features: { [id]: input.checked } });
+  };
   const focusButtons = root.querySelectorAll<HTMLButtonElement>('[data-settings-focus]');
   const onFocusControl = (event: Event) => {
     const target = (event.currentTarget as HTMLButtonElement).dataset.settingsFocus;
@@ -84,6 +110,7 @@ export function bindSettingsForm(root: ParentNode): () => void {
   };
   enabled.addEventListener('change', onToggle);
   strength.addEventListener('input', onStrength);
+  featureControls.forEach((control) => control.addEventListener('change', onFeature));
   focusButtons.forEach((button) => button.addEventListener('click', onFocusControl));
 
   return () => {
@@ -91,6 +118,8 @@ export function bindSettingsForm(root: ParentNode): () => void {
     unwatch();
     enabled.removeEventListener('change', onToggle);
     strength.removeEventListener('input', onStrength);
+    featureControls.forEach((control) => control.removeEventListener('change', onFeature));
     focusButtons.forEach((button) => button.removeEventListener('click', onFocusControl));
   };
 }
+

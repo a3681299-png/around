@@ -1,4 +1,35 @@
-# 検証記録
+# 平成シルバー・ブルー変更の検証
+
+確認日: 2026年10月4日（UTC）
+
+## 今回の結果
+
+- Node.js 24.19.0 / npm 11.9.0のクラウドLinux環境
+- `npm ci --cache=/tmp/web-world-npm-cache`: PASS（通常のホームのnpmキャッシュは書き込み不可のため、作業用キャッシュを使用）
+- `npm run lint`: PASS。CSS構文、末尾空白、テーマとYouTubeセレクタの分離、装飾色のトークン集約
+- `npm run typecheck` / `npm run build`: PASS
+- `npm test -- tests/features.spec.ts`: 11件PASS。設定の旧キー維持、機能別保存、初期読込中の変更、解除、独立したmount／destroy、未対応サイト、OFF／0%、同時保存／失敗／遅い読込の競合
+- `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run check`: lintとbuildまでPASS。ブラウザー起動時のOS制限 `process_singleton_posix.cc: socket() failed: Operation not permitted` により、MV3ブラウザー検証のアサーションは未実行
+- 実サイトのDOM読取: 未ログインのYouTube検索画面で、現在の`yt-searchbox`、`yt-lockup-metadata-view-model h3`、カテゴリ内側の`.ytChipShapeChip`を確認。後者の背景が装飾を隠さないようAdapterへ追加
+- ローカルプレビューの目視: 今回のブラウザーはfile URLを非対応、localhostアクセスも拒否するため未実施。スクリーンショットなし。実YouTubeへ変更後の拡張機能を適用した目視結果でもない
+
+## 回帰テストの内容
+
+16件のブラウザーテストを用意しています。実際のMV3とChrome Storageを使い、YouTube HTMLは合成の検証用DOMへ差し替えます。ホーム・検索・動画・コメント・動くcanvas由来のvideoを含みます。
+
+繰り返しON／OFF／0%、強さ、ライト／ダーク、ページとブラウザー再起動、複数タブ同期、window-chrome個別ON／OFF、保存失敗、SPA／戻る／進む、検索入力、コメント入力、再生／停止、画像・mediaノードの保持、CSSフィルター非適用、全画面出入り、設定パネル、スクリーンショット生成を対象にします。テスト定義の存在は成功を意味しません。
+
+専用ブランチ向けのテスト専用GitHub Actionsワークフローも用意しました。権限はcontents:read、保存認証なし、12分の上限、7日間のテスト結果保持で、配備処理はありません。リモート実行結果は確認後に追記します。
+
+## オフライン確認用ページ
+
+`node tests/build-preview.mjs`で`.work/qa/preview.html`を生成できます。実際のAdapter／テーマ／設定モジュールをまとめますが、ホスト判定だけをテスト用に変更し、Chrome Storageはローカルの模擬実装です。明確なプレビュー表示があり、実YouTubeや実拡張機能の成功を示す資料ではありません。
+
+## 過去の検証（変更前）
+
+以下は2026年10月3日の既存バージョンの記録です。今回の変更後のPASSとして扱わないでください。
+
+### 以前の検証記録
 
 確認日: 2026年10月3日（日本時間）
 
@@ -89,3 +120,4 @@ Windows 95/98風のテーマへ変更後、同じ独立した未ログインのC
 10. 全画面にして設定を開き、Escまたは×で閉じる。別動画へ移動してもアイコンが1つだけ出ることを確認する。
 11. ON・100%でYouTube.exeとメニューバーが出て、検索欄、ボタン、カード、サイドバーが同じ雰囲気になることを確認する。
 12. OFF・0%で追加バーが消え、ページ先頭とサイドバーが元の配置へ戻ることを確認する。
+

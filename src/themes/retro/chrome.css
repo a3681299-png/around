@@ -1,22 +1,31 @@
-/* Extension-owned window decorations only; no site selectors. */
+/* Original hardware-inspired decorations, never OS artwork or site content. */
 #web-world-themes-window-chrome { font: 12px/1 var(--ww-font); }
 .ww-titlebar {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 9px;
   height: var(--ww-titlebar-height);
-  padding: 0 5px;
+  padding: 0 10px;
   box-sizing: border-box;
   background: var(--ww-titlebar);
   color: var(--ww-titlebar-ink);
-  font: bold 13px/1 var(--ww-font);
+  box-shadow: inset 0 2px var(--ww-led), inset 0 -1px var(--ww-lcd-line);
+  font: 12px/1 var(--ww-display-font);
 }
-.ww-app-icon { display: grid; place-items: center; width: 16px; height: 16px; background: #c0c0c0; color: #b00000; box-shadow: inset 1px 1px #fff, inset -1px -1px #202020; font-size: 10px; }
-.ww-window-title { flex: 1; }
-.ww-window-controls { display: flex; gap: 2px; pointer-events: none; }
-.ww-window-controls span { display: grid; place-items: center; width: 18px; height: 18px; color: #000; background: #c0c0c0; box-shadow: inset 1px 1px #fff, inset -1px -1px #202020; font: bold 14px/1 Tahoma, sans-serif; }
-.ww-menubar { display: flex; align-items: center; gap: 2px; height: var(--ww-menubar-height); box-sizing: border-box; padding: 0 5px; color: var(--ww-ink); background: var(--ww-panel); box-shadow: inset 0 -1px var(--ww-border), inset 0 -2px var(--ww-light); font: 12px/1 var(--ww-font); }
-.ww-menubar a { padding: 4px 8px; color: inherit; text-decoration: none; white-space: nowrap; }
-.ww-menubar a:hover, .ww-menubar a:focus-visible { background: var(--ww-titlebar); color: #fff; outline: none; }
-.ww-window-status { margin-left: auto; padding-right: 8px; color: var(--ww-muted); font-size: 11px; }
+.ww-app-icon {
+  display: grid; place-items: center; width: 17px; height: 17px;
+  background: var(--ww-glass); color: var(--ww-retro-selected-ink);
+  box-shadow: var(--ww-raised); border-radius: 2px; font: 9px/1 var(--ww-font);
+}
+.ww-window-title { flex: 0 0 auto; letter-spacing: .06em; }
+.ww-display-tag { color: var(--ww-lcd-muted); font-size: 9px; letter-spacing: .16em; }
+.ww-display-led { width: 4px; height: 4px; background: var(--ww-led); box-shadow: 0 0 4px var(--ww-led); }
+.ww-window-controls { display: flex; gap: 4px; margin-left: auto; pointer-events: none; }
+.ww-window-controls span { display: grid; place-items: center; width: 16px; height: 15px; color: var(--ww-lcd-muted); border: 1px solid var(--ww-lcd-line); border-radius: 2px; font: 11px/1 var(--ww-display-font); }
+.ww-menubar { display: flex; align-items: center; gap: 3px; height: var(--ww-menubar-height); box-sizing: border-box; padding: 0 8px; color: var(--ww-ink); background: var(--ww-silver); box-shadow: inset 0 -1px var(--ww-border), inset 0 -2px var(--ww-light); font: 12px/1 var(--ww-font); }
+.ww-menubar a { padding: 5px 9px; color: inherit; text-decoration: none; white-space: nowrap; border-radius: 2px; }
+.ww-menubar a:hover, .ww-menubar a[aria-current="page"] { background: var(--ww-glass); color: var(--ww-selected-ink); box-shadow: var(--ww-raised); }
+.ww-menubar a:focus-visible { outline: var(--ww-focus); outline-offset: -1px; }
+.ww-window-status { margin-left: auto; padding: 3px 6px; color: var(--ww-muted); font: 10px/1 var(--ww-display-font); letter-spacing: .04em; border-left: 1px solid var(--ww-border); }
+@media (max-width: 800px) { .ww-display-tag { display: none; } }
 @media (max-width: 640px) { .ww-window-status { display: none; } .ww-menubar a { padding-inline: 6px; } }

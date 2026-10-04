@@ -1,3 +1,4 @@
+import { createFeatureController } from '../features/controller';
 import type { SiteAdapter } from '../sites/types';
 import type { UserSettings } from '../storage/settings';
 import type { ThemeDefinition } from './types';
@@ -9,6 +10,7 @@ export function createThemeController(
   site: SiteAdapter,
   theme: ThemeDefinition,
 ): { update(settings: UserSettings): void; destroy(): void } {
+  const features = createFeatureController({ document: doc, site });
   let disconnect: (() => void) | undefined;
   let style: HTMLStyleElement | undefined;
   let strength = 0;
@@ -24,9 +26,11 @@ export function createThemeController(
       style.textContent = css;
     }
     if (!style.isConnected) (doc.head ?? root).append(style);
+    features.refresh();
   };
 
   const destroy = () => {
+    features.destroy();
     disconnect?.();
     disconnect = undefined;
     style?.remove();
@@ -44,8 +48,10 @@ export function createThemeController(
         return;
       }
       disconnect ??= site.connect(render);
+      features.update(settings.features);
       render();
     },
     destroy,
   };
 }
+

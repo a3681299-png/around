@@ -7,14 +7,23 @@ const fixturePath = path.resolve('tests/fixtures/youtube.html');
 
 export async function launchExtension(profile: string): Promise<BrowserContext> {
   const context = await chromium.launchPersistentContext(profile, {
-    channel: 'chromium',
+    ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
+      ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH }
+      : { channel: 'chromium' }),
     headless: true,
     viewport: { width: 1100, height: 760 },
     args: [`--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`],
   });
   const html = await readFile(fixturePath, 'utf8');
   // Route only test pages; the extension still uses real Chrome APIs and its MV3 manifest.
-  await context.route('https://www.youtube.com/**', (route) => route.fulfill({ contentType: 'text/html', body: html }));
+  await context.route('https://www.youtube.com/**', async (route) => {
+    if (route.request().resourceType() === 'document') {
+      await route.fulfill({ contentType: 'text/html', body: html });
+    } else {
+      // Fixtures are fully local: never fetch tracking, images, or media from YouTube.
+      await route.abort();
+    }
+  });
   await context.route('https://example.com/**', (route) => route.fulfill({ contentType: 'text/html', body: html }));
   return context;
 }
@@ -59,3 +68,4 @@ export const test = base.extend<{ profile: string; extensionId: string; popup: P
 });
 
 export { expect } from '@playwright/test';
+
