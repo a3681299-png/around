@@ -109,8 +109,9 @@ export function mountYouTubeFocus(doc: Document): SiteFeatureInstance {
   const root = doc.documentElement;
   const view = doc.defaultView!;
   let destroyed = false;
+  let focusTask: number | undefined;
   const paneFor = (target: EventTarget | null): Pane | undefined => {
-    if (!(target instanceof Element)) return undefined;
+    if (!(target instanceof view.Element)) return undefined;
     if (target.closest('ytd-playlist-panel-renderer, #web-world-themes-playlist-titlebar')) return 'playlist';
     if (target.closest('#movie_player, #player, #player-container-outer, #web-world-themes-player-titlebar')) return 'player';
     if (target.closest('ytd-masthead')) return 'header';
@@ -129,6 +130,17 @@ export function mountYouTubeFocus(doc: Document): SiteFeatureInstance {
       if (root.getAttribute('data-ww-active-pane') !== pane) root.setAttribute('data-ww-active-pane', pane);
     } else root.removeAttribute('data-ww-active-pane');
   };
+  const syncWindowFocus = () => {
+    refresh();
+    if (focusTask !== undefined) view.clearTimeout(focusTask);
+    // A blur/focus callback can run before the browser finishes transferring
+    // focus. Re-read real document state once the event's task has settled.
+    // Synthetic events still cannot override hasFocus() or visibility.
+    focusTask = view.setTimeout(() => {
+      focusTask = undefined;
+      refresh();
+    }, 0);
+  };
   const activate = (event: Event) => {
     if (!event.isTrusted) return;
     pane = paneFor(event.composedPath()[0] ?? event.target);
@@ -144,8 +156,8 @@ export function mountYouTubeFocus(doc: Document): SiteFeatureInstance {
   doc.addEventListener('focusin', activate, true);
   doc.addEventListener('focusout', focusOut, true);
   doc.addEventListener('visibilitychange', refresh);
-  view.addEventListener('focus', refresh);
-  view.addEventListener('blur', refresh);
+  view.addEventListener('focus', syncWindowFocus);
+  view.addEventListener('blur', syncWindowFocus);
   refresh();
   return {
     refresh,
@@ -155,8 +167,10 @@ export function mountYouTubeFocus(doc: Document): SiteFeatureInstance {
       doc.removeEventListener('focusin', activate, true);
       doc.removeEventListener('focusout', focusOut, true);
       doc.removeEventListener('visibilitychange', refresh);
-      view.removeEventListener('focus', refresh);
-      view.removeEventListener('blur', refresh);
+      view.removeEventListener('focus', syncWindowFocus);
+      view.removeEventListener('blur', syncWindowFocus);
+      if (focusTask !== undefined) view.clearTimeout(focusTask);
+      focusTask = undefined;
       root.removeAttribute('data-ww-document-active');
       root.removeAttribute('data-ww-active-pane');
     },

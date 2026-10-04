@@ -151,6 +151,11 @@ test('every new preference cleans up repeatedly at OFF and zero without changing
       await expect(youtube.locator('html')).not.toHaveAttribute(`data-ww-feature-${id}`, '');
       await feature(popup, id, true);
     }
+    await feature(popup, 'transparent-background', false);
+    await expect(youtube.locator('body')).toHaveCSS('background-image', /radial-gradient/);
+    expect(await sample()).toEqual(before);
+    await save(popup, { 'webWorldThemes.noiseStrength': 0 });
+    await expect.poll(() => youtube.locator('html').evaluate(el => el.style.getPropertyValue('--ww-noise-strength'))).toBe('0');
     expect(await sample()).toEqual(before);
     expect(await source.evaluate(video => video === document.querySelector('video'))).toBe(true);
     await expect(youtube.locator('video')).toHaveCSS('filter', 'none');

@@ -74,7 +74,17 @@ test('capture the silver software shell on home, watch, playlist, narrow, and fu
   await capture('fixture-fullscreen-settings', false);
   await youtube.getByRole('button', { name: '設定を閉じる', exact: true }).click();
   await youtube.evaluate(() => document.exitFullscreen());
-  await expect(youtube.locator('#web-world-themes-statusbar')).toBeVisible();
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-fullscreen', '');
+  await expect(youtube.locator('#web-world-themes-statusbar')).toHaveCount(1);
+  // A restored footer may still yield to native controls at this scroll position.
+  await expect.poll(() => youtube.locator('#web-world-themes-statusbar').evaluate(element => {
+    if (getComputedStyle(element).visibility === 'hidden') return true;
+    const bar = element.getBoundingClientRect();
+    return [...document.querySelectorAll('#movie_player, button, input, a[href]')].filter(node => !node.closest('#web-world-themes-window-chrome')).every(node => {
+      const rect = node.getBoundingClientRect();
+      return !rect.width || !rect.height || rect.bottom <= bar.top || rect.top >= bar.bottom;
+    });
+  })).toBe(true);
 
   await youtube.setViewportSize({ width: 900, height: 760 });
   await capture('fixture-silver-100-900px-watch-playlist');
