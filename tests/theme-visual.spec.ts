@@ -41,7 +41,16 @@ test('capture the silver software shell on home, watch, playlist, narrow, and fu
   await capture('fixture-native-dark-silver-100-watch');
   await capturePart('fixture-player-window-detail', '#player-mount');
   await capturePart('fixture-playlist-window-detail', 'ytd-playlist-panel-renderer');
+  // Clock detail is sampled only in a naturally unobstructed viewport; ordinary
+  // watch captures above retain the real footer-yielding behavior.
+  const originalViewport = youtube.viewportSize()!;
+  if (!(await youtube.locator('#web-world-themes-statusbar').isVisible())) {
+    await youtube.setViewportSize({ width: originalViewport.width, height: 2400 });
+    await youtube.evaluate(() => scrollTo(0, 0));
+  }
+  await expect(youtube.locator('#web-world-themes-statusbar')).toBeVisible();
   await capturePart('fixture-statusbar-clock-detail', '#web-world-themes-statusbar');
+  await youtube.setViewportSize(originalViewport);
   await youtube.locator('html').evaluate(element => element.removeAttribute('dark'));
   await capture('fixture-silver-100-watch');
   await assertNoOverflow();

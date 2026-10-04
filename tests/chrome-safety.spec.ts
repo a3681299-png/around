@@ -120,7 +120,7 @@ test('gloss, genuine pane focus, daily details, and fullscreen clean up independ
   await setFeature(popup, 'daily-details', true);
   await expect(detail).toHaveText(dailyText!);
   await setFeature(popup, 'glossy-titlebars', false);
-  await expect(youtube.locator('.ww-titlebar')).toHaveCSS('background-image', 'none');
+  await expect(youtube.locator('#web-world-themes-window-chrome .ww-titlebar')).toHaveCSS('background-image', 'none');
   await youtube.bringToFront();
   await youtube.getByRole('button', { name: 'Play', exact: true }).click();
   await expect(root).toHaveAttribute('data-ww-document-active', '');

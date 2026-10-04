@@ -76,7 +76,28 @@ test(`optional public YouTube ${colorScheme} watch inspection with unmodified ne
     expect(await wordmark.evaluate(element => getComputedStyle(element).fill)).toBe(await page.locator('ytd-watch-metadata h1').first().evaluate(element => getComputedStyle(element).color));
     await page.evaluate(() => window.scrollTo(0, 454));
     await expect(page.locator('ytd-comments-header-renderer:visible').first()).toBeVisible({ timeout: 30_000 });
+    await page.locator('ytd-comments [data-ww-bbs-number]').first().waitFor({ state: 'visible', timeout: 20_000 }).catch(() => {});
     await capture('live-silver-scroll-comments');
+    const personalDetails = await page.evaluate(() => {
+      const rows = [...document.querySelectorAll('ytd-comments [data-ww-bbs-row]')];
+      const durationHosts = [...document.querySelectorAll('yt-thumbnail-badge-view-model badge-shape')].map(element => ({
+        text: element.querySelector('.ytBadgeShapeText')?.textContent?.trim(),
+        marked: element.getAttribute('data-ww-surface')?.includes('duration') ?? false,
+        color: getComputedStyle(element).color, font: getComputedStyle(element).fontFamily,
+      }));
+      const votes = [...document.querySelectorAll('ytd-comments #vote-count-middle')].map(element => ({ text: element.textContent, color: getComputedStyle(element).color }));
+      const exactDates = [...document.querySelectorAll('[data-ww-bbs-date]')].map(element => ({ text: element.textContent, source: element.getAttribute('title') }));
+      return { loadedRows: rows.length, numbers: rows.map(row => row.querySelector('[data-ww-bbs-number]')?.textContent), durationHosts, votes, exactDates };
+    });
+    await writeFile(testInfo.outputPath('live-personalization.json'), JSON.stringify(personalDetails, null, 2));
+    if (personalDetails.loadedRows > 0) expect(personalDetails.numbers).toEqual(Array.from({ length: personalDetails.loadedRows }, (_, index) => String(index + 1)));
+    for (const badge of personalDetails.durationHosts) {
+      if (/^(?:\d+:[0-5]\d:[0-5]\d|\d+:[0-5]\d)$/.test(badge.text ?? '')) {
+        expect(badge.marked).toBe(true);
+        expect(badge.font).toContain('Web World Pixel');
+      } else expect(badge.marked).toBe(false);
+    }
+
     await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
     await expect(page.locator('#web-world-themes-style')).toHaveCount(0);
     await expect(page.locator('[data-ww-surface]')).toHaveCount(0);
