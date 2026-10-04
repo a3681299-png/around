@@ -2,6 +2,18 @@
 
 確認日: 2026年10月4日（UTC）。専用ブランチ: `feat/heisei-silver-shell`。`main`の`4386edc`から作成し、既存の統合記録は下へ保持しています。
 
+## Windowsでのmain取り込み
+
+2026年10月4日（日本時間）、`feat/heisei-silver-shell`の`89eea92`を`main`へfast-forwardで取り込みました。
+
+- `npm run lint`と`npm run build`が通りました。ビルドにはTypeScriptの型チェックを含みます。
+- `npm test -- tests/features.spec.ts`でブラウザー不要の11件のテストがすべて通りました。
+- プロジェクト直下の`dist`を更新しました。検証用ブランチのビルドとの一致、同梱フォントのバイト列、ライセンス、Manifestの参照先を確認しています。HTMLなどのテキストはWindowsの改行形式の差を除いて比較しました。
+
+実際のYouTubeの画面確認はユーザーが行います。今回Codexではブラウザーを開いていません。
+
+以下のCIと実装の記録は、専用ブランチでの作業時点のものです。
+
 ## 今回の実装とCI
 
 [Theme checks / 初回実装](https://github.com/a3681299-png/web-world-themes/actions/runs/37174658385)（`6f8e99ed9decea0ecf9f5e530ead79db3ecc761b`）で、lint・型チェック・ビルド・**33件すべてPASS**。標準Ubuntu runnerへ実MV3拡張機能を読み込み、Chrome Storageも実物を使っています。
