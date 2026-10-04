@@ -57,6 +57,10 @@ window.addEventListener('pagehide', () => unbind(), {once:true});
         contents: (await readFile(filename, 'utf8')).replace('supportsYouTube(new URL(view.location.href))', 'true'),
         loader: 'ts',
       }));
+      build.onLoad({ filter: /src[\\/]sites[\\/]youtube-chrome\.ts$/ }, async ({ path: filename }) => ({
+        contents: (await readFile(filename, 'utf8')).replace("doc.location.pathname === '/watch'", "doc.location.hash.startsWith('#/watch')"),
+        loader: 'ts',
+      }));
     },
   }],
   bundle: true,
@@ -67,11 +71,12 @@ window.addEventListener('pagehide', () => unbind(), {once:true});
   charset: 'utf8',
   legalComments: 'none',
 });
+const previewFont = (await readFile(path.join(root, 'assets/fonts/PixelMplus12-Regular.woff2'))).toString('base64');
 const storageShim = `
 // Only this offline preview supplies these browser API stubs. The extension does not.
 const previewValues = {'webWorldThemes.enabled':true,'webWorldThemes.strength':100,'webWorldThemes.features.window-chrome':true};
 const previewListeners = new Set();
-globalThis.chrome = {storage:{
+globalThis.chrome = {runtime: {getURL: () => "data:font/woff2;base64,${previewFont}"}, storage:{
   local: {
     get: async keys => Object.fromEntries(keys.filter(key => Object.hasOwn(previewValues,key)).map(key => [key,previewValues[key]])),
     set: async values => {
@@ -90,7 +95,7 @@ html = html.replaceAll("location.pathname ===", "fixturePathname ===");
 html = html.replace("history.pushState({}, '', url);", "fixturePathname = new URL(url, 'https://www.youtube.com').pathname;\n        history.pushState({ fixturePathname }, '', '#' + url);");
 html = html.replace("window.addEventListener('popstate', () => { renderPage();", "window.addEventListener('popstate', () => { fixturePathname = location.hash.startsWith('#/') ? new URL(location.hash.slice(1), 'https://www.youtube.com').pathname : '/'; renderPage();");
 html = html.replace('</style>', `
-      #preview-toolbar { position:fixed; bottom:0; left:0; z-index:90; display:flex; align-items:center; gap:10px; padding:9px 12px; background:#0d2134; color:#eaf8ff; font:11px Arial,sans-serif; border-top:1px solid #5a869f; }
+      #preview-toolbar { position:fixed; bottom:26px; left:0; z-index:90; display:flex; align-items:center; gap:10px; padding:9px 12px; background:#0d2134; color:#eaf8ff; font:11px Arial,sans-serif; border-top:1px solid #5a869f; }
       #preview-toolbar strong { font:10px monospace; letter-spacing:.08em; color:#99d7f2; }
       #preview-toolbar button { padding:5px 8px; background:#d9eafa; color:#16374d; border:1px solid #789aae; border-radius:2px; }
       @media(max-width:750px) { #preview-toolbar span { display:none; } }

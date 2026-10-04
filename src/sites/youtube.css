@@ -69,3 +69,34 @@ html[data-ww-theme][data-ww-fullscreen] #web-world-themes-window-chrome { displa
 html[data-ww-theme][data-ww-fullscreen] ytd-app #masthead-container,
 html[data-ww-theme][data-ww-fullscreen] ytd-masthead { display: none !important; }
 html[data-ww-theme][data-ww-fullscreen] ytd-page-manager { margin-top: 0 !important; }
+
+/* Override native dark tokens at the app boundary, without changing its dark setting. */
+html[data-ww-theme][data-ww-site="youtube"] { color-scheme: light !important; background: var(--ww-page) !important; }
+html[data-ww-theme][data-ww-site="youtube"] ytd-app {
+  --yt-spec-general-background-b: var(--ww-panel) !important;
+  --yt-spec-general-background-c: var(--ww-paper) !important;
+  --yt-spec-base-background: var(--ww-page) !important;
+  --yt-spec-raised-background: var(--ww-panel) !important;
+  --yt-spec-brand-background-solid: var(--ww-panel) !important;
+  --yt-spec-inverted-background: var(--ww-selection) !important;
+  --yt-spec-text-primary-inverse: var(--ww-selection-ink) !important;
+  --yt-spec-button-chip-background-hover: var(--ww-accent-soft) !important;
+  --yt-spec-10-percent-layer: var(--ww-border) !important;
+  --yt-spec-wordmark-text: var(--ww-ink) !important;
+  color-scheme: light !important;
+}
+html[data-ww-theme][data-ww-site="youtube"] :is(ytd-searchbox, yt-searchbox) input { font: var(--ww-display-size)/1.5 var(--ww-display-font) !important; }
+html[data-ww-theme][data-ww-site="youtube"] :is(ytd-playlist-panel-renderer, ytd-playlist-panel-video-renderer) {
+  --yt-spec-text-primary: var(--ww-ink) !important;
+  --yt-spec-text-secondary: var(--ww-muted) !important;
+  --yt-spec-base-background: var(--ww-panel) !important;
+}
+html[data-ww-theme][data-ww-site="youtube"] ytd-playlist-panel-video-renderer:is([selected], [aria-selected="true"]) {
+  --yt-spec-text-primary: var(--ww-selection-ink) !important;
+  --yt-spec-text-secondary: var(--ww-selection-ink) !important;
+}
+/* Bottom chrome consumes its own space; the final comment/control remains reachable. */
+html[data-ww-theme][data-ww-window-chrome] body { padding-bottom: var(--ww-statusbar-height) !important; }
+html[data-ww-theme][data-ww-window-chrome] :is(ytd-guide-renderer, ytd-mini-guide-renderer) { bottom: var(--ww-statusbar-height) !important; }
+html[data-ww-theme][data-ww-fullscreen] :is(#web-world-themes-player-titlebar, #web-world-themes-playlist-titlebar, #web-world-themes-statusbar) { display: none !important; }
+html[data-ww-theme][data-ww-fullscreen] body { padding-bottom: 0 !important; }

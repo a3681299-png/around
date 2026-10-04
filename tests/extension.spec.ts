@@ -21,9 +21,9 @@ test('popup changes reach existing YouTube tabs and OFF restores native styles',
   }
   const weak = await youtube.locator('body').evaluate((element) => getComputedStyle(element).backgroundColor);
   await slider.press('End');
-  await expect(thumbnail).toHaveCSS('border-radius', '3px');
-  await expect(youtube.locator('yt-thumbnail-view-model')).toHaveCSS('border-radius', '3px');
-  await expect(youtube.locator('yt-searchbox .ytSearchboxComponentInputBox')).toHaveCSS('border-radius', '3px');
+  await expect(thumbnail).toHaveCSS('border-radius', '0px');
+  await expect(youtube.locator('yt-thumbnail-view-model')).toHaveCSS('border-radius', '0px');
+  await expect(youtube.locator('yt-searchbox .ytSearchboxComponentInputBox')).toHaveCSS('border-radius', '0px');
   await expect(second.locator('html')).toHaveAttribute('style', /--ww-strength: 1;/);
   const strong = await youtube.locator('body').evaluate((element) => getComputedStyle(element).backgroundColor);
   expect(strong).not.toBe(weak);
@@ -71,16 +71,16 @@ test('SPA replacement, lazy DOM insertion, changing IDs, and removed stylesheet 
   youtube.on('pageerror', (error) => errors.push(error.message));
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
-  await expect(youtube.locator('ytd-thumbnail #thumbnail')).toHaveCSS('border-radius', '3px');
+  await expect(youtube.locator('ytd-thumbnail #thumbnail')).toHaveCSS('border-radius', '0px');
   await youtube.getByRole('button', { name: 'SPA navigation' }).click();
   await expect(youtube).toHaveURL(/\/watch\?v=fixture$/);
   await expect(youtube.getByRole('heading', { name: 'Watch' })).toBeVisible();
   await expect(youtube.locator('ytd-watch-metadata #description')).toHaveAttribute('data-ww-surface', 'panel frame rounded text');
-  await expect(youtube.locator('ytd-thumbnail #thumbnail')).toHaveCSS('border-radius', '3px');
+  await expect(youtube.locator('ytd-thumbnail #thumbnail')).toHaveCSS('border-radius', '0px');
 
   await youtube.getByRole('button', { name: 'Load another thumbnail' }).click();
   await expect(youtube.locator('ytd-thumbnail #thumbnail')).toHaveCount(2);
-  await expect(youtube.locator('ytd-thumbnail #thumbnail').last()).toHaveCSS('border-radius', '3px');
+  await expect(youtube.locator('ytd-thumbnail #thumbnail').last()).toHaveCSS('border-radius', '0px');
   await youtube.locator('ytd-searchbox #container').evaluate((element) => { element.id = 'changed-container'; });
   await expect(youtube.locator('#changed-container')).not.toHaveAttribute('data-ww-surface', /.+/);
   await youtube.locator('#changed-container').evaluate((element) => { element.id = 'container'; });
@@ -88,11 +88,11 @@ test('SPA replacement, lazy DOM insertion, changing IDs, and removed stylesheet 
 
   await youtube.locator(themeStyle).evaluate((element) => element.remove());
   await expect(youtube.locator(themeStyle)).toHaveCount(1);
-  await expect(youtube.locator('ytd-thumbnail #thumbnail').last()).toHaveCSS('border-radius', '3px');
+  await expect(youtube.locator('ytd-thumbnail #thumbnail').last()).toHaveCSS('border-radius', '0px');
   expect(errors).toEqual([]);
 });
 
-test('zero is native appearance and switching YouTube dark mode updates the palette', async ({ popup, youtube }) => {
+test('zero restores native appearance and native dark mode never changes the silver palette', async ({ popup, youtube }) => {
   const toggle = popup.getByRole('switch', { name: 'Theme ON / OFF' });
   const slider = popup.getByRole('slider', { name: 'Effect Strength' });
   await toggle.check();
@@ -106,8 +106,8 @@ test('zero is native appearance and switching YouTube dark mode updates the pale
   await youtube.locator('html').evaluate((element) => element.setAttribute('dark', ''));
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-mode', 'dark');
   const dark = await youtube.locator('body').evaluate((element) => getComputedStyle(element).backgroundColor);
-  expect(dark).not.toBe(light);
-  // Source-authored rich text must inherit the theme's dark-mode foreground.
+  expect(dark).toBe(light);
+  // Source-authored rich text must inherit the readable silver-theme foreground.
   await expect.poll(() => youtube.locator('#description span').evaluate(element =>
     getComputedStyle(element).color === getComputedStyle(element.parentElement!).color,
   )).toBe(true);
@@ -308,7 +308,7 @@ test('repeated theme ON, OFF, and zero strength leave no stale surfaces or layou
   await assertNative();
   await toggle.check();
   await expect(root).toHaveAttribute('data-ww-mode', 'dark');
-  await expect(youtube.locator('ytd-thumbnail #thumbnail').last()).toHaveCSS('border-radius', '3px');
+  await expect(youtube.locator('ytd-thumbnail #thumbnail').last()).toHaveCSS('border-radius', '0px');
 });
 
 test('feature preference independently mounts and cleans up window chrome in both settings surfaces', async ({ popup, youtube }) => {

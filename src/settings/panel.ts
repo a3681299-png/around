@@ -1,3 +1,4 @@
+import { mountPixelFont } from '../ui/pixel-font';
 import type { SettingsEntry } from '../sites/types';
 import { bindSettingsForm } from './form';
 import panelStyles from './panel.css';
@@ -10,6 +11,7 @@ export interface SettingsPanel extends SettingsEntry {
 
 /** Site-independent editor; Shadow DOM isolates its UI from the host site's CSS. */
 export function createSettingsPanel(doc: Document): SettingsPanel {
+  const unmountFont = mountPixelFont(doc);
   const button = doc.createElement('button');
   button.type = 'button';
   button.dataset.wwSettingsButton = '';
@@ -90,6 +92,7 @@ export function createSettingsPanel(doc: Document): SettingsPanel {
     button, panel, close,
     destroy() {
       close();
+      unmountFont();
       button.removeEventListener('click', onClick);
       button.removeEventListener('click', stopPropagation);
       button.removeEventListener('keydown', onButtonKey);

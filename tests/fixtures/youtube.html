@@ -11,7 +11,7 @@
       a { color: inherit; text-decoration: none; }
       button, input { font: inherit; }
       button { border: 0; color: inherit; cursor: pointer; }
-      ytd-app, ytd-page-manager, ytd-masthead, ytd-watch-metadata, ytd-thumbnail, ytd-guide-renderer, ytd-guide-section-renderer, ytd-guide-entry-renderer, ytd-rich-grid-renderer, ytd-rich-grid-media, yt-lockup-view-model, ytd-comments, ytd-comment-thread-renderer, ytd-watch-flexy { display: block; }
+      ytd-app, ytd-page-manager, ytd-masthead, ytd-watch-metadata, ytd-thumbnail, ytd-guide-renderer, ytd-guide-section-renderer, ytd-guide-entry-renderer, ytd-rich-grid-renderer, ytd-rich-grid-media, yt-lockup-view-model, ytd-comments, ytd-comment-thread-renderer, ytd-watch-flexy, ytd-playlist-panel-renderer, ytd-playlist-panel-video-renderer, yt-lockup-metadata-view-model { display: block; }
       ytd-masthead { position: fixed; z-index: 30; inset: 0 0 auto; height: 56px; background: var(--yt-spec-raised-background); }
       ytd-masthead > #container { height: 56px; display: flex; align-items: center; gap: 18px; padding: 7px 20px; background: var(--yt-spec-raised-background); }
       .brand { display: inline-flex; align-items: center; gap: 4px; font-size: 19px; letter-spacing: -1px; font-weight: bold; white-space: nowrap; }
@@ -37,7 +37,7 @@
       .fixture-note { padding: 8px 14px; color: var(--yt-spec-text-secondary); font-size: 10px; line-height: 1.6; }
       ytd-page-manager { margin: 56px 0 0 176px; padding: 22px 24px 62px; min-height: calc(100vh - 56px); }
       h1 { margin: 0 0 16px; font-size: 21px; font-weight: 600; }
-      .chip-row { display: flex; gap: 10px; margin-bottom: 20px; }
+      .chip-row { display: flex; gap: 10px; margin-bottom: 20px; overflow: auto; }
       yt-chip-cloud-chip-renderer button { display: block; border-radius: 8px; background: #eee; padding: 8px 12px; font-size: 13px; white-space: nowrap; }
       yt-chip-cloud-chip-renderer[selected] button { background: #141414; color: #fff; }
       :root[dark] yt-chip-cloud-chip-renderer button { background: #303030; }
@@ -53,13 +53,35 @@
       .home-description { margin-top: 22px; }
       #description { background: #f2f2f2; padding: 14px; border-radius: 16px; line-height: 1.6; font-size: 13px; }
       :root[dark] #description { background: #272727; }
-      .watch-grid { display: grid; grid-template-columns: minmax(0, 1fr) 238px; gap: 22px; }
+      .watch-grid { display: grid; grid-template-columns: minmax(0, 1fr) 286px; gap: 22px; }
       .watch-main { min-width: 0; }
       .watch-title { margin: 15px 0 10px; font-size: 19px; line-height: 1.4; }
       .watch-actions { display: flex; align-items: center; gap: 9px; margin: 12px 0 16px; }
       .watch-actions button { background: #eee; padding: 9px 14px; border-radius: 20px; }
       .watch-actions .channel-info { flex: 1; line-height: 1.5; }
       .watch-actions small { color: var(--yt-spec-text-secondary); }
+      .thumbnail-box { position: relative; }
+      ytd-thumbnail-overlay-time-status-renderer { position: absolute; right: 5px; bottom: 5px; padding: 2px 4px; background: #101010; color: #fff; border-radius: 4px; font-size: 11px; }
+      .watch-sidebar { min-width: 0; }
+      ytd-playlist-panel-renderer { margin-bottom: 18px; border: 1px solid #ddd; border-radius: 12px; overflow: hidden; background: var(--yt-spec-raised-background); }
+      ytd-playlist-panel-renderer .header { padding: 12px; background: #f2f2f2; }
+      ytd-playlist-panel-renderer #title { font-size: 14px; font-weight: 600; }
+      ytd-playlist-panel-renderer .playlist-meta { margin-top: 5px; font-size: 11px; color: var(--yt-spec-text-secondary); }
+      ytd-playlist-panel-video-renderer { border-radius: 8px; background: var(--yt-spec-raised-background); }
+      ytd-playlist-panel-video-renderer[selected] { background: #e2e2e2; }
+      ytd-playlist-panel-video-renderer > a { display: grid; grid-template-columns: 13px 82px minmax(0, 1fr); align-items: center; gap: 6px; padding: 9px 6px; }
+      ytd-playlist-panel-video-renderer .thumbnail-art { aspect-ratio: 16 / 9; border-radius: 6px; }
+      ytd-playlist-panel-video-renderer #video-title { margin: 0 0 3px; font-size: 12px; }
+      ytd-playlist-panel-video-renderer #byline { color: var(--yt-spec-text-secondary); font-size: 10px; }
+      ytd-playlist-panel-video-renderer #index { color: var(--yt-spec-text-secondary); font-size: 10px; }
+      :root[dark] ytd-playlist-panel-renderer .header { background: #181818; }
+      :root[dark] ytd-playlist-panel-video-renderer[selected] { background: #383838; }
+      /* Descendant colors/weights emulate native dark rules that survive a container-only theme. */
+      :root[dark] #video-title yt-formatted-string,
+      :root[dark] yt-lockup-metadata-view-model h3 span,
+      :root[dark] ytd-watch-metadata h1 yt-formatted-string,
+      :root[dark] ytd-playlist-panel-renderer #title yt-formatted-string,
+      :root[dark] ytd-comments #content-text span { color: #f1f1f1; font-weight: 700; }
       .related { display: grid; align-content: start; gap: 12px; }
       .related yt-lockup-view-model { padding-bottom: 9px; }
       .related .card-body { padding-top: 8px; }
@@ -85,7 +107,7 @@
       .ytp-button svg { pointer-events: none; }
       /* Match player-wide page resets that can override normal Shadow host styles. */
       .html5-video-player div { background-color: transparent; border: 0; }
-      .fixture-tools { position: fixed; right: 8px; bottom: 6px; z-index: 50; display: flex; gap: 5px; opacity: .75; }
+      .fixture-tools { position: fixed; right: 8px; bottom: 32px; z-index: 50; display: flex; gap: 5px; opacity: .75; }
       .fixture-tools button { padding: 5px 7px; border: 1px solid #aab5bd; background: #e8edf0; color: #3e505e; font-size: 10px; }
       @media (max-width: 950px) { ytd-rich-grid-renderer { grid-template-columns: repeat(2, minmax(0, 1fr)); } ytd-guide-renderer { width: 150px; } ytd-page-manager { margin-left: 150px; padding: 18px; } .watch-grid { grid-template-columns: minmax(0, 1fr); } .related { display: none; } }
       @media (max-width: 600px) { ytd-guide-renderer { display: none; } ytd-page-manager { margin-left: 0; } .header-icon, .header-create { display: none; } ytd-masthead > #container { gap: 10px; padding: 7px 10px; } .brand { font-size: 14px; } }
@@ -124,16 +146,22 @@
         return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
       }
       function image(item, extra = '') { return `<img class="thumbnail-art" alt="Generated landscape for ${item[0]}" src="${artwork(item)}" ${extra}>`; }
+      function duration(item) { return `<ytd-thumbnail-overlay-time-status-renderer><span id="text">${item[5].split(' / ')[1]}</span></ytd-thumbnail-overlay-time-status-renderer>`; }
+      function playlist(activeIndex) {
+        return `<ytd-playlist-panel-renderer><div class="header"><div id="title"><yt-formatted-string>Quiet corners / 作業用プレイリスト</yt-formatted-string></div><div class="playlist-meta">6 videos · Personal collection</div></div><div id="items">${videos.map((item, index) => `<ytd-playlist-panel-video-renderer${index === activeIndex ? ' selected' : ''}><a href="/watch?v=${index === 0 ? 'fixture' : `fixture-${index}`}&list=fixture" data-fixture-nav><span id="index">${index + 1}</span><div class="thumbnail-box">${image(item)}${duration(item)}</div><div><div id="video-title"><yt-formatted-string>${item[0]}</yt-formatted-string></div><div id="byline">${item[1]}</div></div></a></ytd-playlist-panel-video-renderer>`).join('')}</div></ytd-playlist-panel-renderer>`;
+      }
       function card(item, index, related = false) {
         const picture = index === 0 ? `<ytd-thumbnail><a id="thumbnail" href="/watch?v=fixture" data-fixture-nav>${image(item)}</a></ytd-thumbnail>` : index === 1 ? `<yt-thumbnail-view-model>${image(item)}</yt-thumbnail-view-model>` : image(item);
         const tag = related ? 'yt-lockup-view-model' : 'ytd-rich-grid-media';
-        return `<${tag}>${picture}<div class="card-body"><span class="avatar">${item[1].split(' ').map(w => w[0]).join('')}</span><div><a id="video-title" class="yt-lockup-metadata-view-model__title" href="/watch?v=fixture" data-fixture-nav>${item[0]}</a><div id="channel-name">${item[1]}</div><ytd-video-meta-block><div id="metadata-line">${item[2]}</div></ytd-video-meta-block></div></div></${tag}>`;
+        return `<${tag}><div class="thumbnail-box">${picture}${duration(item)}</div><div class="card-body"><span class="avatar">${item[1].split(' ').map(w => w[0]).join('')}</span><div><yt-lockup-metadata-view-model><h3 class="yt-lockup-metadata-view-model__title"><a id="video-title" href="/watch?v=fixture" data-fixture-nav><yt-formatted-string><span>${item[0]}</span></yt-formatted-string></a></h3></yt-lockup-metadata-view-model><div id="channel-name">${item[1]}</div><ytd-video-meta-block><div id="metadata-line">${item[2]}</div></ytd-video-meta-block></div></div></${tag}>`;
       }
       function renderPage() {
         const manager = document.querySelector('ytd-page-manager');
         if (location.pathname === '/watch') {
-          manager.innerHTML = `<ytd-watch-flexy><div class="watch-grid"><div class="watch-main"><h1>Watch</h1><div id="player-mount"></div><ytd-watch-metadata><h1 class="watch-title">A quiet afternoon by the sea</h1><div class="watch-actions"><span class="avatar">CJ</span><div class="channel-info"><b>Coastal Journal</b><br><small>2.4K subscribers</small></div><yt-button-shape><button>Subscribe</button></yt-button-shape><yt-button-shape><button aria-label="Like video">♡ 840</button></yt-button-shape></div><div id="description"><b>12K views · 2 days ago</b><br><span style="color: #101010">A sample description. A slow walk along the coastline, with room to notice the little things.</span></div></ytd-watch-metadata><ytd-comments><div class="comment-heading"><h2>Comments</h2><span>Sort by</span></div><ytd-comment-simplebox-renderer><div class="composer"><span class="avatar">AJ</span><div id="contenteditable-root" contenteditable="true" role="textbox" aria-label="Add a comment"></div></div></ytd-comment-simplebox-renderer><ytd-comment-thread-renderer><span class="avatar">RM</span><div><b>@river-morning · 2 days ago</b><p>The colors of the water are lovely. Thanks for sharing.</p><span class="comment-replies">2 replies</span></div></ytd-comment-thread-renderer></ytd-comments></div><aside class="related">${videos.slice(1,4).map((item, index) => card(item, index, true)).join('')}</aside></div></ytd-watch-flexy>`;
-          addPlayer();
+          const activeIndex = Math.max(0, Math.min(videos.length - 1, Number(new URLSearchParams(location.search).get('v')?.replace('fixture-', '')) || 0));
+          const currentVideo = videos[activeIndex];
+          manager.innerHTML = `<ytd-watch-flexy><div class="watch-grid"><div class="watch-main"><h1>Watch</h1><div id="player-mount"></div><ytd-watch-metadata><h1 class="watch-title"><yt-formatted-string id="fixture-current-title">${currentVideo[0]}</yt-formatted-string></h1><div class="watch-actions"><span class="avatar">CJ</span><div class="channel-info"><b>Coastal Journal</b><br><small>2.4K subscribers</small></div><yt-button-shape><button>Subscribe</button></yt-button-shape><yt-button-shape><button aria-label="Like video">♡ 840</button></yt-button-shape></div><div id="description"><b>12K views · 2 days ago</b><br><span style="color: #101010">A sample description. A slow walk along the coastline, with room to notice the little things.</span></div></ytd-watch-metadata><ytd-comments id="comments"><div class="comment-heading"><h2>Comments</h2><span>Sort by</span></div><ytd-comment-simplebox-renderer><div class="composer"><span class="avatar">AJ</span><div id="contenteditable-root" contenteditable="true" role="textbox" aria-label="Add a comment"></div></div></ytd-comment-simplebox-renderer><ytd-comment-thread-renderer><span class="avatar">RM</span><div><b>@river-morning · 2 days ago</b><p id="content-text"><span>The colors of the water are lovely. Thanks for sharing.</span></p><span class="comment-replies">2 replies</span></div></ytd-comment-thread-renderer></ytd-comments></div><aside class="watch-sidebar">${playlist(activeIndex)}<div class="related">${videos.slice(1,4).map((item, index) => card(item, index, true)).join('')}</div></aside></div></ytd-watch-flexy>`;
+          addPlayer(currentVideo);
         } else {
           const results = location.pathname === '/results';
           manager.innerHTML = `<h1>${results ? 'Search results' : 'Home'}</h1><div class="chip-row"><yt-chip-cloud-chip-renderer selected><button>All</button></yt-chip-cloud-chip-renderer><yt-chip-cloud-chip-renderer><button>Music</button></yt-chip-cloud-chip-renderer><yt-chip-cloud-chip-renderer><button>Creative spaces</button></yt-chip-cloud-chip-renderer><yt-chip-cloud-chip-renderer><button>Nature</button></yt-chip-cloud-chip-renderer></div><ytd-rich-grid-renderer>${videos.map((item, index) => card(item, index)).join('')}</ytd-rich-grid-renderer><ytd-watch-metadata class="home-description"><div id="description"><span style="color: #101010">A sample description.</span> This page is a local interaction and layout fixture.</div></ytd-watch-metadata>`;
@@ -164,11 +192,11 @@
         navigate(link.getAttribute('href'));
       });
       window.addEventListener('popstate', () => { renderPage(); document.dispatchEvent(new Event('yt-navigate-finish')); });
-      function addPlayer() {
+      function addPlayer(currentVideo = videos[0]) {
         const player = document.createElement('div');
         player.id = 'movie_player';
         player.className = 'html5-video-player';
-        player.innerHTML = `<video class="html5-main-video" muted playsinline poster="${artwork(videos[0])}"></video><div class="ytp-chrome-bottom"><div class="ytp-progress-bar"></div><div class="ytp-left-controls"><button class="ytp-button" aria-label="Play">▶</button><button class="ytp-button" aria-label="Mute">◖</button><span>0:00 / LIVE</span></div><div class="ytp-right-controls"><button class="ytp-button" aria-label="Subtitles">CC</button><button class="ytp-button" aria-label="YouTube settings">⚙</button><button class="ytp-button" aria-label="Fullscreen">⛶</button></div></div>`;
+        player.innerHTML = `<video class="html5-main-video" muted playsinline poster="${artwork(currentVideo)}"></video><a class="ytp-title-link" hidden>${currentVideo[0]}</a><div class="ytp-chrome-bottom"><div class="ytp-progress-bar"></div><div class="ytp-left-controls"><button class="ytp-button" aria-label="Play">▶</button><button class="ytp-button" aria-label="Mute">◖</button><span>0:00 / LIVE</span></div><div class="ytp-right-controls"><button class="ytp-button" aria-label="Subtitles">CC</button><button class="ytp-button" aria-label="YouTube settings">⚙</button><button class="ytp-button" aria-label="Fullscreen">⛶</button></div></div>`;
         const video = player.querySelector('video');
         // A local canvas stream exercises the browser's actual video playback API without downloading media.
         const canvas = document.createElement('canvas');
@@ -176,7 +204,7 @@
         const ctx = canvas.getContext('2d');
         const poster = new Image();
         poster.onload = () => { ctx.drawImage(poster, 0, 0); };
-        poster.src = artwork(videos[0]);
+        poster.src = artwork(currentVideo);
         const stream = canvas.captureStream(1);
         video.srcObject = stream;
         const clock = window.setInterval(() => {

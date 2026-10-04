@@ -4,7 +4,7 @@ import type { FeatureDefinition } from './types';
 export const windowChrome: FeatureDefinition = {
   id: 'window-chrome',
   label: 'Window chrome',
-  description: 'タイトルバーとナビゲーションを表示',
+  description: 'タイトルバー・動画とリストの小窓・時計を表示',
   // Preserve the existing appearance for users who have no feature preference yet.
   defaultEnabled: true,
   mount: ({ site }) => site.features?.['window-chrome']?.mount(),

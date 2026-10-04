@@ -1,0 +1,63 @@
+{
+  "family": "PixelMplus12",
+  "style": "Regular",
+  "weight": 400,
+  "native_size_css_px": 12,
+  "upstream_repository": "https://github.com/itouhiro/PixelMplus",
+  "upstream_commit": "d89b95f04eeb95bf98bb09cb9234a2f99d186df5",
+  "upstream_font_version": "Version 2013.0602",
+  "retrieved_date_utc": "2026-10-04",
+  "license": "M+ FONT LICENSE (upstream 2002–2013 version; see PixelMplus-LICENSE.txt)",
+  "copyright": [
+    "Copyright (C) 2013 itouhiro",
+    "Copyright (C) 2002-2013 M+ FONTS PROJECT"
+  ],
+  "sources": [
+    {
+      "upstream_path": "PixelMplus12-Regular.ttf",
+      "source_url": "https://raw.githubusercontent.com/itouhiro/PixelMplus/d89b95f04eeb95bf98bb09cb9234a2f99d186df5/PixelMplus12-Regular.ttf",
+      "bytes": 1274396,
+      "sha256": "02f19467ea7cc235cc06c570b7f6c3b0a12a6f682bc8d74c43f2d323d97bcd12",
+      "git_blob_sha1": "3a7270b87176ff7a2604f405f0599f3eb816c68e"
+    },
+    {
+      "upstream_path": "misc/mplus_bitmap_fonts/LICENSE_E",
+      "source_url": "https://raw.githubusercontent.com/itouhiro/PixelMplus/d89b95f04eeb95bf98bb09cb9234a2f99d186df5/misc/mplus_bitmap_fonts/LICENSE_E",
+      "bytes": 375,
+      "sha256": "907e9f5ac24cba6ce2523cd2a66d6ba143e082c685344dfa8d30ef12f67410a0",
+      "git_blob_sha1": "3e6f89cb439e6f6b2f2ea158bfbfc5ab0033f245"
+    },
+    {
+      "upstream_path": "README.md",
+      "source_url": "https://raw.githubusercontent.com/itouhiro/PixelMplus/d89b95f04eeb95bf98bb09cb9234a2f99d186df5/README.md",
+      "bytes": 1694,
+      "sha256": "50b47cd74a4011072d3055a8c652fd48c2ec0bf2eeff73dfd63430bc17e567b6",
+      "git_blob_sha1": "2d60ff792af8da57a2e9a0a00cf40af137b95dcb"
+    }
+  ],
+  "bundled_font": {
+    "path": "assets/fonts/PixelMplus12-Regular.woff2",
+    "bytes": 275832,
+    "sha256": "d49850831cea1508ed8e3b0ea8ace259a779807ce6c891d5bc30966b1d234b62",
+    "glyph_count": 7253,
+    "unicode_codepoint_count": 7251
+  },
+  "conversion": {
+    "fonttools_version": "4.61.1",
+    "node_version": "24.19.0",
+    "brotli_version": "1.2.0",
+    "woff2_brotli_mode": "FONT",
+    "woff2_brotli_quality": 11,
+    "timestamp_recalculation": false,
+    "subsetting": false,
+    "outline_changes": false,
+    "rebuild_script": "rebuild_pixelmplus.py"
+  },
+  "validation": [
+    "Source TTF, license, and README Git blob SHA-1 match the pinned upstream tree",
+    "All 7,253 glyph outlines and end-point/flag arrays match the TTF after WOFF2 decode",
+    "All 7,251 Unicode mappings match the TTF",
+    "Horizontal metrics and name-table bytes match the TTF",
+    "Representative Japanese kana, kanji, Latin and half-width katakana title text maps to bundled glyphs"
+  ]
+}

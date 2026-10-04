@@ -1,5 +1,5 @@
 import { context } from 'esbuild';
-import { copyFile, mkdir, readFile } from 'node:fs/promises';
+import { copyFile, cp, mkdir, readFile } from 'node:fs/promises';
 import { watch } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -19,6 +19,8 @@ await mkdir(join(outDir, 'content'), { recursive: true });
 
 async function copyStaticFiles() {
   await Promise.all([
+    cp(join(root, 'assets'), join(outDir, 'assets'), { recursive: true }),
+    copyFile(join(root, 'THIRD_PARTY_NOTICES.md'), join(outDir, 'THIRD_PARTY_NOTICES.md')),
     copyFile(join(root, 'manifest.json'), join(outDir, 'manifest.json')),
     copyFile(join(root, 'src/popup/index.html'), join(outDir, 'popup/index.html')),
     copyFile(join(root, 'src/popup/popup.css'), join(outDir, 'popup/popup.css')),
@@ -56,6 +58,7 @@ if (watching) {
   await Promise.all(builds.map((build) => build.watch()));
   const refresh = () => copyStaticFiles().catch((error) => console.error(error));
   const watchers = [
+    watch(join(root, 'assets/fonts'), refresh),
     watch(join(root, 'src/popup'), (_event, file) => {
       if (file === 'index.html' || file === 'popup.css') refresh();
     }),

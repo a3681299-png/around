@@ -23,7 +23,7 @@ const targets: ReadonlyArray<{ selector: string; surfaces: readonly Surface[] }>
     surfaces: ['input', 'frame', 'rounded'],
   },
   {
-    selector: 'ytd-masthead button, ytd-masthead a[role="button"], ytd-masthead yt-button-shape a, ytd-masthead yt-button-view-model a, ytd-searchbox #search-icon-legacy, yt-chip-cloud-chip-renderer:not(:has(button)), yt-chip-cloud-chip-renderer button:not(:has(.ytChipShapeChip)), yt-chip-cloud-chip-renderer .ytChipShapeChip, ytd-watch-metadata yt-button-shape button',
+    selector: 'ytd-app button:not(.html5-video-player button), ytd-app a[role="button"]:not(.html5-video-player a), ytd-masthead button, ytd-masthead a[role="button"], ytd-masthead yt-button-shape a, ytd-masthead yt-button-view-model a, ytd-searchbox #search-icon-legacy, yt-chip-cloud-chip-renderer:not(:has(button)), yt-chip-cloud-chip-renderer button:not(:has(.ytChipShapeChip)), yt-chip-cloud-chip-renderer .ytChipShapeChip, ytd-watch-metadata yt-button-shape button',
     surfaces: ['button', 'rounded'],
   },
   {
@@ -52,14 +52,25 @@ const targets: ReadonlyArray<{ selector: string; surfaces: readonly Surface[] }>
     surfaces: ['selected'],
   },
   {
-    selector: 'ytd-rich-grid-media #video-title, ytd-grid-video-renderer #video-title, ytd-video-renderer #video-title, ytd-compact-video-renderer #video-title, yt-lockup-metadata-view-model h3, ytd-watch-metadata h1',
+    selector: 'ytd-rich-grid-media #video-title, ytd-grid-video-renderer #video-title, ytd-video-renderer #video-title, ytd-compact-video-renderer #video-title, yt-lockup-view-model #video-title, yt-lockup-metadata-view-model h3, ytd-watch-metadata h1',
     surfaces: ['heading'],
   },
   {
     selector: 'ytd-video-meta-block #metadata-line, yt-content-metadata-view-model',
     surfaces: ['metadata'],
   },
-  { selector: 'ytd-comments#comments', surfaces: ['comments'] },
+  { selector: 'ytd-comments', surfaces: ['comments'] },
+  { selector: 'ytd-watch-metadata h1', surfaces: ['primary-heading'] },
+  { selector: 'ytd-comments #content-text, ytd-comment-thread-renderer p, ytd-comments #contenteditable-root', surfaces: ['comment-text'] },
+  { selector: 'ytd-guide-section-renderer #guide-section-title, ytd-comments #title, ytd-comments h2, ytd-watch-metadata #owner #channel-name', surfaces: ['label'] },
+  { selector: '#movie_player', surfaces: ['player-window', 'rounded'] },
+  { selector: 'ytd-playlist-panel-renderer', surfaces: ['playlist-window', 'rounded'] },
+  { selector: 'ytd-playlist-panel-renderer .header, ytd-playlist-panel-renderer #header', surfaces: ['toolbar', 'label'] },
+  { selector: 'ytd-playlist-panel-renderer #items, ytd-playlist-panel-renderer #container', surfaces: ['panel'] },
+  { selector: 'ytd-playlist-panel-video-renderer', surfaces: ['playlist-row', 'rounded'] },
+  { selector: 'ytd-playlist-panel-video-renderer[selected], ytd-playlist-panel-video-renderer[aria-selected="true"]', surfaces: ['selected'] },
+  { selector: 'ytd-playlist-panel-video-renderer #video-title', surfaces: ['heading'] },
+  { selector: 'ytd-thumbnail-overlay-time-status-renderer, yt-thumbnail-badge-view-model .badge-shape-wiz, yt-thumbnail-overlay-badge-view-model .badge-shape-wiz', surfaces: ['duration', 'rounded'] },
   { selector: 'ytm-shorts-lockup-view-model .shortsLockupViewModelHostThumbnailParentContainer', surfaces: ['rounded'] },
   { selector: 'ytd-thumbnail #thumbnail, yt-thumbnail-view-model', surfaces: ['rounded'] },
 ];

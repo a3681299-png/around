@@ -1,88 +1,64 @@
-/* Silver hardware + blue glass, circa 2000–2005. No image/font dependencies. */
+/* A silver desktop at every non-zero strength, independent of native dark mode. */
 :root, :host {
-  --ww-font: Arial, "Yu Gothic UI", "Meiryo", sans-serif;
-  --ww-display-font: "Lucida Console", "MS Gothic", monospace;
-  --ww-retro-page: #e6edf5;
-  --ww-retro-panel: #dce4ed;
-  --ww-retro-paper: #f8fbff;
-  --ww-retro-ink: #233448;
-  --ww-retro-muted: #52667e;
-  --ww-retro-border: #a0afbf;
+  --ww-font: "Yu Gothic UI", "Meiryo", "Hiragino Kaku Gothic ProN", Arial, sans-serif;
+  --ww-display-font: "Web World Pixel", "MS Gothic", monospace;
+  --ww-display-size: 12px;
+  --ww-retro-page: #d6dae0;
+  --ww-retro-panel: #d6d9de;
+  --ww-retro-paper: #f3f4f6;
+  --ww-retro-ink: #252a34;
+  --ww-retro-muted: #525b69;
+  --ww-retro-border: #a0a7b2;
   --ww-retro-light: #ffffff;
-  --ww-retro-dark: #718398;
-  --ww-retro-accent: #397db6;
-  --ww-retro-accent-soft: #d3eaff;
-  --ww-retro-glass-top: #e7f6ff;
-  --ww-retro-glass-mid: #b6d8f1;
-  --ww-retro-glass-bottom: #80b5dc;
-  --ww-retro-selected-ink: #123d63;
-  --ww-lcd: #101e2b;
-  --ww-lcd-ink: #d7f2ff;
-  --ww-lcd-muted: #a5c4d5;
-  --ww-lcd-line: #37566c;
-  --ww-led: #95e0f5;
-  --ww-titlebar: linear-gradient(180deg, #142d44, #0d1926);
-  --ww-titlebar-ink: var(--ww-lcd-ink);
-  --ww-link: #245f9a;
+  --ww-retro-dark: #737d8d;
+  --ww-retro-accent: #3c6096;
+  --ww-retro-accent-soft: #dce6f2;
+  --ww-retro-glass-top: #edf5ff;
+  --ww-retro-glass-mid: #bdd2ec;
+  --ww-retro-glass-bottom: #90afd4;
+  --ww-retro-selected-ink: #163d68;
+  --ww-selection: #223f70;
+  --ww-selection-ink: #ffffff;
+  --ww-lcd: #17221e;
+  --ww-lcd-ink: #d2ebc8;
+  --ww-lcd-muted: #bfd1bf;
+  --ww-lcd-line: #617166;
+  --ww-led: #b1ddcf;
+  --ww-titlebar: linear-gradient(180deg, #607890 0%, #3c526b 49%, #23344b 50%, #17263b 100%);
+  --ww-titlebar-ink: #f4f8ff;
+  --ww-pane-titlebar: linear-gradient(180deg, #fbfcff 0%, #e2e7ed 49%, #b9c2ce 50%, #d5dce5 100%);
+  --ww-link: #28578d;
   --ww-error: #a42e39;
-  --ww-titlebar-height: 30px;
-  --ww-menubar-height: 28px;
+  --ww-titlebar-height: 26px;
+  --ww-menubar-height: 26px;
+  --ww-pane-titlebar-height: 25px;
+  --ww-statusbar-height: 26px;
   --ww-window-chrome-height: calc(var(--ww-titlebar-height) + var(--ww-menubar-height));
   --ww-mix: calc(var(--ww-strength, 1) * 100%);
-  --ww-radius: calc(10px - 7px * var(--ww-strength, 1));
-  --ww-card-padding: calc(2px + 6px * var(--ww-strength, 1));
-  --ww-page: color-mix(in srgb, var(--ww-native-page, #fff), var(--ww-retro-page) var(--ww-mix));
-  --ww-panel: color-mix(in srgb, var(--ww-native-panel, #fff), var(--ww-retro-panel) var(--ww-mix));
-  --ww-paper: color-mix(in srgb, var(--ww-native-panel, #fff), var(--ww-retro-paper) var(--ww-mix));
-  --ww-ink: color-mix(in srgb, var(--ww-native-text, #0f0f0f), var(--ww-retro-ink) var(--ww-mix));
-  --ww-muted: color-mix(in srgb, var(--ww-native-muted, #606060), var(--ww-retro-muted) var(--ww-mix));
-  --ww-border: color-mix(in srgb, transparent, var(--ww-retro-border) var(--ww-mix));
-  --ww-light: color-mix(in srgb, transparent, var(--ww-retro-light) var(--ww-mix));
-  --ww-dark: color-mix(in srgb, transparent, var(--ww-retro-dark) var(--ww-mix));
-  --ww-accent: color-mix(in srgb, var(--ww-ink), var(--ww-retro-accent) var(--ww-mix));
-  --ww-accent-soft: color-mix(in srgb, var(--ww-paper), var(--ww-retro-accent-soft) var(--ww-mix));
-  --ww-glass-top: color-mix(in srgb, var(--ww-panel), var(--ww-retro-glass-top) var(--ww-mix));
-  --ww-glass-mid: color-mix(in srgb, var(--ww-panel), var(--ww-retro-glass-mid) var(--ww-mix));
-  --ww-glass-bottom: color-mix(in srgb, var(--ww-panel), var(--ww-retro-glass-bottom) var(--ww-mix));
-  --ww-selected-ink: var(--ww-retro-selected-ink);
-  --ww-silver: linear-gradient(180deg, var(--ww-paper), var(--ww-panel));
-  --ww-glass: linear-gradient(180deg, var(--ww-glass-top) 0%, var(--ww-glass-mid) 48%, var(--ww-glass-bottom) 49%, var(--ww-glass-mid) 100%);
-  --ww-stripes: repeating-linear-gradient(0deg, transparent 0 2px, var(--ww-light) 2px 3px);
-  --ww-raised: inset 1px 1px var(--ww-light), inset -1px -1px var(--ww-dark), inset 2px 2px var(--ww-paper), inset -2px -2px var(--ww-border);
-  --ww-sunken: inset 1px 1px var(--ww-dark), inset -1px -1px var(--ww-light), inset 2px 2px var(--ww-border);
-  --ww-card-shadow: inset 0 1px var(--ww-light), inset 0 -1px var(--ww-border), 0 2px 3px color-mix(in srgb, transparent, var(--ww-retro-dark) calc(var(--ww-strength, 1) * 13%));
-  --ww-focus: 2px solid var(--ww-accent);
-  --ww-overlay-shadow: 2px 4px 12px #0d192640;
-}
-
-/* Follow YouTube's own appearance setting; this is not a separate night-mode feature. */
-html[data-ww-theme="retro"][data-ww-mode="dark"] {
-  --ww-retro-page: #172636;
-  --ww-retro-panel: #293e53;
-  --ww-retro-paper: #203247;
-  --ww-retro-ink: #e7f2ff;
-  --ww-retro-muted: #b3c8dc;
-  --ww-retro-border: #4e6a84;
-  --ww-retro-light: #7290a9;
-  --ww-retro-dark: #0e1d2c;
-  --ww-retro-accent: #9dd7ff;
-  --ww-retro-accent-soft: #2b5273;
-  --ww-retro-glass-top: #4a7395;
-  --ww-retro-glass-mid: #3a658a;
-  --ww-retro-glass-bottom: #234b70;
-  --ww-retro-selected-ink: #f1f9ff;
-  --ww-link: #a9d8ff;
-}
-
-/* Settings are their own readable silver window, independent of site strength. */
-:root[data-ww-ui="retro"], :host([data-ww-ui="retro"]) {
-  --ww-strength: 1;
-  --ww-page: var(--ww-retro-page);
-  --ww-panel: var(--ww-retro-panel);
+  --ww-radius: 0px;
+  --ww-card-padding: calc(2px + 4px * var(--ww-strength, 1));
+  /* Strength varies the silver relief, never blends in native black/white text. */
+  --ww-page: color-mix(in srgb, #eceef1, var(--ww-retro-page) var(--ww-mix));
+  --ww-panel: color-mix(in srgb, #e7e9ed, var(--ww-retro-panel) var(--ww-mix));
   --ww-paper: var(--ww-retro-paper);
   --ww-ink: var(--ww-retro-ink);
   --ww-muted: var(--ww-retro-muted);
-  --ww-border: var(--ww-retro-border);
+  --ww-border: color-mix(in srgb, #c4c9d0, var(--ww-retro-border) var(--ww-mix));
   --ww-light: var(--ww-retro-light);
-  --ww-dark: var(--ww-retro-dark);
+  --ww-dark: color-mix(in srgb, #aab1bb, var(--ww-retro-dark) var(--ww-mix));
+  --ww-accent: var(--ww-retro-accent);
+  --ww-accent-soft: var(--ww-retro-accent-soft);
+  --ww-glass-top: var(--ww-retro-glass-top);
+  --ww-glass-mid: var(--ww-retro-glass-mid);
+  --ww-glass-bottom: var(--ww-retro-glass-bottom);
+  --ww-selected-ink: var(--ww-retro-selected-ink);
+  --ww-silver: linear-gradient(180deg, var(--ww-paper), var(--ww-panel));
+  --ww-glass: linear-gradient(180deg, var(--ww-glass-top) 0%, var(--ww-glass-mid) 49%, var(--ww-glass-bottom) 50%, var(--ww-glass-mid) 100%);
+  --ww-stripes: repeating-linear-gradient(0deg, transparent 0 2px, var(--ww-light) 2px 3px);
+  --ww-raised: inset 1px 1px var(--ww-light), inset -1px -1px var(--ww-dark), inset 2px 2px var(--ww-paper), inset -2px -2px var(--ww-border);
+  --ww-sunken: inset 1px 1px var(--ww-dark), inset -1px -1px var(--ww-light), inset 2px 2px var(--ww-border);
+  --ww-card-shadow: inset 1px 1px var(--ww-light), inset -1px -1px var(--ww-border);
+  --ww-focus: 2px solid var(--ww-accent);
+  --ww-overlay-shadow: 2px 4px 12px #17263b40;
 }
+:root[data-ww-ui="retro"], :host([data-ww-ui="retro"]) { --ww-strength: 1; }

@@ -2,7 +2,7 @@ name: Theme checks
 
 on:
   push:
-    branches: [feat/heisei-silver-blue]
+    branches: [feat/heisei-silver-blue, feat/heisei-silver-shell]
   pull_request:
 
 permissions:
