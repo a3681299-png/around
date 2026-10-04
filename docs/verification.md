@@ -1,4 +1,36 @@
-# 平成シルバー・ブルー変更の検証
+# 平成シルバー・ソフトウェアシェルの検証
+
+確認日: 2026年10月4日（UTC）。専用ブランチ: `feat/heisei-silver-shell`。`main`の`4386edc`から作成し、既存の統合記録は下へ保持しています。
+
+## 今回の実装とCI
+
+[Theme checks / 初回実装](https://github.com/a3681299-png/web-world-themes/actions/runs/37174658385)（`6f8e99ed9decea0ecf9f5e530ead79db3ecc761b`）で、lint・型チェック・ビルド・**33件すべてPASS**。標準Ubuntu runnerへ実MV3拡張機能を読み込み、Chrome Storageも実物を使っています。
+
+- ブラウザー不要11件、従来のブラウザー操作16件、新しいshell回帰5件、画像／レイアウト1件
+- native light／darkそれぞれ、強さ1／25／60／100%でも同じシルバー背景と暗い本文。0%では元のダーク背景・角丸・文字へ復帰
+- 動画名・コメント・プレイリスト本文は通常ウェイト400。native darkが内側のformatted-stringへ付ける明るい色／太字も解除。本文とのコントラストは対象要素で4.5:1以上
+- 全surfaceとサムネイルマスクの角丸0px。映像・画像ノードの保持、フィルター非適用、検索・戻る／進む・コメント入力・実video APIの再生／停止を確認
+- 動画／再生リストのタイトルは文字ノードを直接変更しても追従。SPA後は最新動画名、プレイリストの選択は紺地・白文字。追加DOMは1つずつ
+- PixelMplus12のWOFF2が実際にFontFace loadedとなること、12pxで描画されること、フォント取得先が自拡張のchrome-extension URLだけであることを確認
+- 下端26pxの固定ステータスバー、HH:MMの時計、実タイマーによる時刻更新、aria-live offを確認。CDPで拡張のisolated worldだけを計測し、個別OFF／全体OFF／0%後のタイマー・Observer解除を確認
+- `#player-container-outer > #player-container-inner > ytd-player > #movie_player`の絶対配置を含む検証用構造でも、動画の寸法・親要素を保持。再生継続、全画面のビューポート寸法、終了後の形状を確認
+- ローカルでもlint・型チェック・ビルドと11件のブラウザー不要テストがPASS。ローカルブラウザー起動は既存の環境制限を尊重し、試し直していない
+
+## 画像確認と限界
+
+CIで**16枚**を出力。デスクトップ1360pxのホーム／動画／プレイリスト、native dark中の銀色、900pxのホーム／動画と下段プレイリスト、全画面の動画と設定、個別OFF、プレイヤー・リスト・時計の拡大画像を確認します。初回画像では銀色の一貫性、タイトルバーの位置、ピクセルフォント、横方向のはみ出しがないことを目視しました。検証素材に焼き込まれていた時間表示は、DOMの時間表示と重ならないよう最終調整で削除しています。これは合成画像の修正であり、本物の動画・サムネイルを加工する処理はありません。
+
+これらは**合成YouTube DOMに対する実MV3／Storageテスト**です。今回の変更をログイン済み実YouTubeへ適用した目視結果ではありません。実際の動画配信、広告、各アカウントやA/B版の全DOM、Shorts専用再生画面までは保証しません。従来の実サイト確認記録は今回のPASSとして扱いません。
+
+この記録と最終の文字／fixture調整を追加後も、[専用ブランチのCI一覧](https://github.com/a3681299-png/web-world-themes/actions?query=branch%3Afeat%2Fheisei-silver-shell)で最終コミットを再検証します。artifact `theme-test-results`は7日保持。mainへのマージ・デプロイは行いません。
+
+## オフラインフォント
+
+PixelMplus12 Regularの完全な字形セット（7,253 glyphs）を同梱WOFF2へ圧縮。元の[M+ FONT LICENSE](../assets/fonts/PixelMplus-LICENSE.txt)の再配布・変更許諾を確認し、著作権・元のREADME・固定upstreamコミットと入力／出力SHA-256・再現用スクリプトを保持しています。最終WOFF2のSHA-256は`d49850831cea1508ed8e3b0ea8ace259a779807ce6c891d5bc30966b1d234b62`。詳細は[第三者表記](../THIRD_PARTY_NOTICES.md)。
+
+---
+
+# 以前の平成シルバー・ブルー変更の記録
 
 確認日: 2026年10月4日（UTC）
 

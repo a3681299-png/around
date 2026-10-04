@@ -52,7 +52,7 @@ const targets: ReadonlyArray<{ selector: string; surfaces: readonly Surface[] }>
     surfaces: ['selected'],
   },
   {
-    selector: 'ytd-rich-grid-media #video-title, ytd-grid-video-renderer #video-title, ytd-video-renderer #video-title, ytd-compact-video-renderer #video-title, yt-lockup-view-model #video-title, yt-lockup-metadata-view-model h3, ytd-watch-metadata h1',
+    selector: 'ytd-app h1, ytd-app h2, ytd-app h3, ytd-rich-grid-media #video-title, ytd-grid-video-renderer #video-title, ytd-video-renderer #video-title, ytd-compact-video-renderer #video-title, yt-lockup-view-model #video-title, yt-lockup-metadata-view-model h3, ytd-watch-metadata h1',
     surfaces: ['heading'],
   },
   {

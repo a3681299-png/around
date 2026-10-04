@@ -114,3 +114,6 @@ html[data-ww-theme="retro"][data-ww-fullscreen] [data-ww-surface~="player-window
 
 html[data-ww-theme="retro"] [data-ww-surface~="playlist-row"][data-ww-surface~="selected"] [data-ww-surface~="duration"],
 html[data-ww-theme="retro"] [data-ww-surface~="playlist-row"][data-ww-surface~="selected"] [data-ww-surface~="duration"] * { color: var(--ww-lcd-ink) !important; }
+
+html[data-ww-theme="retro"] [data-ww-surface~="button"] *,
+html[data-ww-theme="retro"] [data-ww-surface~="navigation"] * { font-family: var(--ww-display-font) !important; font-size: var(--ww-display-size) !important; font-weight: 400 !important; font-synthesis: none !important; }
