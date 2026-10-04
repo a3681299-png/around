@@ -18,7 +18,7 @@ const textSelectors = [
 ];
 const geometrySelectors = [
   '#player-container-outer', '#player-container-inner', '#player-container',
-  'ytd-player', '#movie_player', '.html5-main-video',
+  'ytd-player', 'ytd-player > #container', '#movie_player', '.html5-main-video',
 ];
 
 async function capture(page: Page, testInfo: TestInfo, name: string) {
@@ -52,10 +52,25 @@ async function videoPixels(page: Page) {
   return pixels(page, await page.screenshot({ scale: 'css', animations: 'disabled' }), points);
 }
 
+async function assertPanePainted(page: Page, selector: string) {
+  const bar = page.locator(selector);
+  await bar.scrollIntoViewIfNeeded();
+  const probes = await bar.evaluate(element => {
+    const rect = element.getBoundingClientRect();
+    return [0.1, 0.5, 0.9].map(fraction => {
+      const x = rect.left + rect.width * fraction, y = rect.top + rect.height / 2;
+      const hit = document.elementFromPoint(x, y);
+      return { x, y, painted: Boolean(hit && element.contains(hit)), hit: hit ? `${hit.tagName}#${hit.id}` : null };
+    });
+  });
+  for (const probe of probes) expect(probe.painted, `${selector} is covered at ${JSON.stringify(probe)}`).toBe(true);
+}
+
 async function assertPlaylistFit(page: Page, collapsed: boolean) {
   const panel = page.locator('ytd-playlist-panel-renderer');
   await panel.evaluate((element, collapsed) => element.toggleAttribute('collapsed', collapsed), collapsed);
   await panel.scrollIntoViewIfNeeded();
+  await assertPanePainted(page, '#web-world-themes-playlist-titlebar');
   const measurements = await panel.evaluate(element => {
     const bar = element.querySelector<HTMLElement>('#web-world-themes-playlist-titlebar')!;
     const container = element.querySelector<HTMLElement>(':scope > #container')!;
@@ -125,6 +140,8 @@ for (const dark of [false, true]) {
       await expect(youtube.locator('#web-world-themes-player-titlebar')).toBeVisible();
       await youtube.evaluate(() => window.scrollTo(0, 0));
       await assertHeaderAndWidth(youtube);
+      await assertPanePainted(youtube, '#web-world-themes-player-titlebar');
+      await assertPanePainted(youtube, '#web-world-themes-playlist-titlebar');
       await capture(youtube, testInfo, `native-${dark ? 'dark' : 'light'}-${strength}-top`);
 
       const wordmark = await assertContrast(youtube, '#youtube-paths_yt5', 4.5, true);
@@ -202,9 +219,10 @@ for (const dark of [false, true]) {
     for (const strength of [1, 60, 100]) {
       await setNativeTheme(popup, true, strength);
       await expect(youtube.locator('#web-world-themes-player-titlebar')).toBeVisible();
-      expect(await youtube.locator('#web-world-themes-player-titlebar').evaluate(element => element.nextElementSibling?.id)).toBe('player-container-outer');
+      expect(await youtube.locator('#web-world-themes-player-titlebar').evaluate(element => element.nextElementSibling?.id)).toBe('player');
       await expect(youtube.locator('#player-container-outer #web-world-themes-player-titlebar')).toHaveCount(0);
       await expect(youtube.locator('#cinematics')).not.toBeVisible();
+      await assertPanePainted(youtube, '#web-world-themes-player-titlebar');
       await assertGeometry();
     }
     for (const state of [{ enabled: true, strength: 0, label: 'zero' }, { enabled: false, strength: 60, label: 'off' }]) {
@@ -242,6 +260,7 @@ test('native narrow watch remains readable and unclipped at 900px while scrollin
   expect(playerBar!.y + playerBar!.height).toBeLessThanOrEqual(video!.y + 1);
   expect(playerBar!.x).toBeGreaterThanOrEqual(0);
   expect(playerBar!.x + playerBar!.width).toBeLessThanOrEqual(900);
+  await assertPanePainted(youtube, '#web-world-themes-player-titlebar');
   await capture(youtube, testInfo, 'native-dark-900-top');
   await assertContrast(youtube, '#youtube-paths_yt5', 4.5, true);
   await assertContrast(youtube, 'ytd-comments-header-renderer h2');
@@ -257,4 +276,51 @@ test('native narrow watch remains readable and unclipped at 900px while scrollin
   const icon = await assertContrast(youtube, '#guide-icon path', 3, true);
   expect(luminance(icon.ink)).toBeLessThan(0.2);
   await capture(youtube, testInfo, 'native-dark-900-scroll-454');
+});
+
+
+test('native playback-error overlay cannot cover the added player titlebar', async ({ popup, youtube }, testInfo) => {
+  test.setTimeout(60_000);
+  await youtube.setViewportSize({ width: 1360, height: 920 });
+  await installNativeYouTube(youtube, true, { errorOverlay: true });
+  const native = await youtube.evaluateHandle(() => {
+    const video = document.querySelector('video')!;
+    const error = document.querySelector('#error-screen')!;
+    const { width, height } = video.getBoundingClientRect();
+    return { video, parent: video.parentElement, error, errorParent: error.parentElement, width, height };
+  });
+  for (const strength of [1, 60, 100]) {
+    await setNativeTheme(popup, true, strength);
+    await expect(youtube.locator('#web-world-themes-player-titlebar')).toBeVisible();
+    await youtube.evaluate(() => window.scrollTo(0, 0));
+    await assertPanePainted(youtube, '#web-world-themes-player-titlebar');
+    const geometry = await youtube.evaluate(({ video, parent, error, errorParent, width, height }) => {
+      const videoRect = video.getBoundingClientRect();
+      const errorRect = error.getBoundingClientRect();
+      const playerRect = errorParent!.getBoundingClientRect();
+      const barRect = document.querySelector('#web-world-themes-player-titlebar')!.getBoundingClientRect();
+      return {
+        sameVideo: document.querySelector('video') === video, sameParent: video.parentElement === parent,
+        sameError: document.querySelector('#error-screen') === error, sameErrorParent: error.parentElement === errorParent,
+        widthDelta: videoRect.width - width, heightDelta: videoRect.height - height,
+        barBottom: barRect.bottom, errorTop: errorRect.top,
+        errorMatchesPlayer: errorRect.top === playerRect.top && errorRect.bottom === playerRect.bottom
+          && errorRect.left === playerRect.left && errorRect.right === playerRect.right,
+      };
+    }, native);
+    expect(geometry.sameVideo && geometry.sameParent && geometry.sameError && geometry.sameErrorParent).toBe(true);
+    expect(geometry.widthDelta).toBe(0);
+    expect(geometry.heightDelta).toBe(0);
+    expect(geometry.errorTop).toBeGreaterThanOrEqual(geometry.barBottom - 1);
+    expect(geometry.errorMatchesPlayer, 'Keep the native error and its controls confined to their original player region').toBe(true);
+    const retry = youtube.getByRole('button', { name: 'Retry fixture playback' });
+    await retry.click();
+    await expect(youtube.locator('#error-screen')).toHaveAttribute('data-retry-count', String([1, 60, 100].indexOf(strength) + 1));
+    await capture(youtube, testInfo, `native-playback-error-${strength}-titlebar`);
+  }
+  await setNativeTheme(popup, false, 100);
+  await expect(youtube.locator('#web-world-themes-player-titlebar')).toHaveCount(0);
+  await expect(youtube.locator('#error-screen')).toBeVisible();
+  await expect(youtube.locator('#error-screen')).toHaveCSS('background-color', 'rgb(0, 0, 0)');
+  await native.dispose();
 });

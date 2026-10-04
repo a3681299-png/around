@@ -106,9 +106,10 @@ export function mountYouTubeChrome(doc: Document): SiteFeatureInstance {
         if (link.getAttribute('aria-current') !== 'page') link.setAttribute('aria-current', 'page');
       } else link.removeAttribute('aria-current');
     });
-    // Insert beside the native player wrapper; never reparent or resize the video.
+    // Stay outside the complete native player boundary, including its absolute
+    // error/ad overlays. Never reparent or resize the player or video.
     const player = doc.querySelector('#movie_player');
-    const anchor = player?.closest('#player-container-outer') ?? player?.closest('ytd-player') ?? player;
+    const anchor = player?.closest('#player') ?? player?.closest('#player-container-outer') ?? player?.closest('ytd-player') ?? player;
     if (anchor?.parentElement && doc.location.pathname === '/watch') {
       if (anchor.previousElementSibling !== playerBar) anchor.before(playerBar);
     } else playerBar.remove();

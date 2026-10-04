@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { mkdir, mkdtemp } from 'node:fs/promises';
+import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
 
@@ -29,18 +29,43 @@ test(`optional public YouTube ${colorScheme} watch inspection with unmodified ne
     // markup substitution, hidden API, or application-state injection is used.
     await page.goto('https://www.youtube.com/watch?v=AS4q9yaWJkI&list=RDAS4q9yaWJkI&start_radio=1', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('ytd-watch-metadata h1').first()).toBeVisible({ timeout: 45_000 });
-    if (colorScheme === 'dark') await expect.poll(() => page.locator('html').evaluate(element => element.hasAttribute('dark')), { timeout: 20_000 }).toBe(true);
+    if (colorScheme === 'dark') {
+      // YouTube may ignore the OS preference until Appearance is explicitly set.
+      // Change only this disposable signed-out browser through the visible UI.
+      await page.locator('ytd-masthead').getByRole('button', { name: /^(Settings|設定)$/ }).click();
+      await page.getByRole('link', { name: /^(Appearance:|デザイン:)/ }).click();
+      await page.getByRole('link', { name: /^(Dark theme|ダークモード)$/ }).click();
+      await expect.poll(() => page.locator('html').evaluate(element => element.hasAttribute('dark'))).toBe(true);
+    }
     await capture('live-native-watch');
     await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
     await expect(page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
     await expect(page.locator('#web-world-themes-player-titlebar')).toBeVisible();
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect.poll(() => page.locator('#web-world-themes-player-titlebar').evaluate(element => {
+      const rect = element.getBoundingClientRect();
+      const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+      return Boolean(hit && element.contains(hit));
+    })).toBe(true);
     await capture('live-silver-watch');
     await page.locator('ytd-watch-metadata h1').first().scrollIntoViewIfNeeded();
     await capture('live-silver-metadata');
+    const playerGeometry = await page.evaluate(() => {
+      const selectors = ['#web-world-themes-player-titlebar', '#player', '#player-container-outer', '#player-container-inner', '#player-container', 'ytd-player', '#movie_player'];
+      return selectors.map(selector => {
+        const element = document.querySelector(selector); if (!element) return { selector, missing: true };
+        const r = element.getBoundingClientRect(), s = getComputedStyle(element);
+        const hit = document.elementFromPoint(r.left + r.width / 2, r.top + Math.min(12, r.height / 2));
+        return { selector, parent: element.parentElement?.tagName + '#' + element.parentElement?.id,
+          position: s.position, top: s.top, transform: s.transform, zIndex: s.zIndex,
+          x: r.x, y: r.y, width: r.width, height: r.height, hit: hit?.tagName + '#' + hit?.id };
+      });
+    });
+    await writeFile(testInfo.outputPath('live-player-geometry.json'), JSON.stringify(playerGeometry, null, 2));
     const backgrounds = await page.locator('ytd-watch-flexy, ytd-watch-metadata, ytd-comments').evaluateAll(elements => elements.map(element => ({
       tag: element.tagName, background: getComputedStyle(element).backgroundColor, color: getComputedStyle(element).color,
     })));
-    await testInfo.attach('live-observations', { body: JSON.stringify({ url: page.url(), browserColorScheme: colorScheme, nativeDark: await page.locator('html').getAttribute('dark'), backgrounds }, null, 2), contentType: 'application/json' });
+    await writeFile(testInfo.outputPath('live-observations.json'), JSON.stringify({ url: page.url(), browserColorScheme: colorScheme, nativeDark: await page.locator('html').getAttribute('dark'), backgrounds }, null, 2));
     for (const surface of backgrounds) expect(surface.background).not.toBe('rgb(15, 15, 15)');
     const wordmark = page.locator('ytd-masthead [id^="youtube-paths"]').first();
     await expect(wordmark).toHaveAttribute('data-ww-surface', /wordmark/);

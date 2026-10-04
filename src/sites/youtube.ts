@@ -76,7 +76,7 @@ const targets: ReadonlyArray<{ selector: string; surfaces: readonly Surface[] }>
   { selector: '#movie_player', surfaces: ['player-window', 'rounded'] },
   { selector: 'ytd-playlist-panel-renderer', surfaces: ['playlist-window', 'rounded'] },
   { selector: 'ytd-playlist-panel-renderer .header, ytd-playlist-panel-renderer #header', surfaces: ['toolbar', 'label'] },
-  { selector: 'ytd-playlist-panel-renderer #items, ytd-playlist-panel-renderer #container', surfaces: ['panel'] },
+  { selector: 'ytd-playlist-panel-renderer #items, ytd-playlist-panel-renderer > #container', surfaces: ['panel'] },
   { selector: 'ytd-playlist-panel-video-renderer', surfaces: ['playlist-row', 'rounded'] },
   { selector: 'ytd-playlist-panel-video-renderer[selected], ytd-playlist-panel-video-renderer[aria-selected="true"]', surfaces: ['selected'] },
   { selector: 'ytd-playlist-panel-video-renderer #video-title', surfaces: ['heading'] },

@@ -6,9 +6,9 @@ import type { Page } from '@playwright/test';
  * scoped/percentage/flex constraints are deliberately independent of --yt-spec-*.
  * The visible cinematic box is synthetic; the inspected live box was hidden.
  */
-export async function installNativeYouTube(page: Page, dark: boolean) {
+export async function installNativeYouTube(page: Page, dark: boolean, options: { errorOverlay?: boolean } = {}) {
   await page.goto('https://www.youtube.com/watch?v=fixture&list=fixture');
-  await page.evaluate(({ dark }) => {
+  await page.evaluate(({ dark, errorOverlay }) => {
     document.documentElement.toggleAttribute('dark', dark);
     const style = document.createElement('style');
     style.id = 'fixture-native-youtube-css';
@@ -40,10 +40,13 @@ export async function installNativeYouTube(page: Page, dark: boolean) {
       #fixture-scroll-tail { height: 500px; }
       #player.ytd-watch-flexy { position: relative; }
       #player-container-outer.ytd-watch-flexy { display: block; width: 100%; }
-      #player-container-inner.ytd-watch-flexy { position: relative; padding-top: 56.25%; }
+      #player-container-inner.ytd-watch-flexy { position: relative; height: 0; padding-top: 56.25%; }
       #player-container.ytd-watch-flexy { position: absolute; inset: 0; }
       ytd-player, #movie_player { display: block; width: 100%; height: 100%; }
+      ytd-player { position: static; overflow: hidden; }
+      ytd-player > #container { height: 100%; }
       #movie_player .html5-main-video { width: 100%; height: 100%; }
+      #error-screen.ytd-watch-flexy { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: black; color: white; }
       ytd-topbar-logo-renderer { display: flex; width: 93px; flex: 0 0 93px; }
       ytd-topbar-logo-renderer svg { display: block; width: 93px; height: 24px; fill: var(--tffc2fd3a644f6275); }
       yt-icon { display: inline-flex; width: 24px; height: 24px; color: var(--icon-color, currentcolor); fill: var(--iron-icon-fill-color, currentcolor); }
@@ -63,6 +66,15 @@ export async function installNativeYouTube(page: Page, dark: boolean) {
       }
       ytd-playlist-panel-renderer .header { flex: 0 0 auto; }
       ytd-playlist-panel-renderer #items { height: 100%; overflow-y: auto; }
+      ytd-playlist-panel-video-renderer { display: flex; }
+      ytd-playlist-panel-video-renderer > a { display: block; width: 100%; padding: 0; }
+      ytd-playlist-panel-video-renderer > a > #container {
+        display: flex; align-items: center; gap: 6px; width: 100%; padding: 8px 8px 4px 0;
+        background: transparent;
+      }
+      ytd-playlist-panel-video-renderer #index-container { flex: 0 0 13px; }
+      ytd-playlist-panel-video-renderer #thumbnail-container { flex: 0 0 82px; }
+      ytd-playlist-panel-video-renderer #meta { flex: 1; min-width: 0; }
       ytd-playlist-panel-video-renderer #video-title yt-formatted-string { color: var(--tffc2fd3a644f6275); }
       ytd-playlist-panel-video-renderer #byline, ytd-playlist-panel-video-renderer #index {
         color: var(--fixture-native-secondary);
@@ -107,9 +119,22 @@ export async function installNativeYouTube(page: Page, dark: boolean) {
     const outer = document.createElement('div'); outer.id = 'player-container-outer'; outer.className = 'ytd-watch-flexy';
     const inner = document.createElement('div'); inner.id = 'player-container-inner'; inner.className = 'ytd-watch-flexy';
     const container = document.createElement('div'); container.id = 'player-container'; container.className = 'ytd-watch-flexy';
-    const nativePlayer = document.createElement('ytd-player');
+    const nativePlayer = document.createElement('ytd-player'); nativePlayer.id = 'ytd-player';
+    const nativePlayerContainer = document.createElement('div');
+    nativePlayerContainer.id = 'container'; nativePlayerContainer.className = 'style-scope ytd-player';
     outer.append(inner); inner.append(container); container.append(nativePlayer);
-    nativePlayer.append(player); mount.append(outer);
+    nativePlayer.append(nativePlayerContainer); nativePlayerContainer.append(player); mount.append(outer);
+    if (errorOverlay) {
+      // Observed native playback-error branch: this absolute sibling covers all of
+      // #player, including a titlebar wrongly mounted inside that boundary.
+      const error = document.createElement('yt-playability-error-supported-renderers');
+      error.id = 'error-screen'; error.className = 'style-scope ytd-watch-flexy';
+      error.innerHTML = '<div><p>Sign in to confirm you’re not a bot</p><button aria-label="Retry fixture playback">Try again</button></div>';
+      error.querySelector('button')!.addEventListener('click', () => {
+        error.dataset.retryCount = String(Number(error.dataset.retryCount ?? 0) + 1);
+      });
+      mount.append(error);
+    }
 
     const owner = document.querySelector('.watch-actions')!; owner.id = 'owner';
     owner.querySelector('.channel-info')!.id = 'channel-name';
@@ -123,8 +148,21 @@ export async function installNativeYouTube(page: Page, dark: boolean) {
     playlist.setAttribute('collapsible', '');
     const playlistContainer = document.createElement('div'); playlistContainer.id = 'container';
     playlistContainer.append(...playlist.childNodes); playlist.append(playlistContainer);
+    // Live rows also have #container. It must remain a genuine painted box so a
+    // broad panel selector reproduces white selected text over an inner silver fill.
+    playlist.querySelectorAll('ytd-playlist-panel-video-renderer').forEach(row => {
+      const link = row.querySelector('a')!; link.id = 'wc-endpoint';
+      const rowContainer = document.createElement('div');
+      rowContainer.id = 'container'; rowContainer.className = 'style-scope ytd-playlist-panel-video-renderer';
+      const index = link.querySelector('#index')!;
+      const indexContainer = document.createElement('div'); indexContainer.id = 'index-container';
+      index.before(indexContainer); indexContainer.append(index);
+      link.querySelector('.thumbnail-box')!.id = 'thumbnail-container';
+      link.lastElementChild!.id = 'meta';
+      rowContainer.append(...link.childNodes); link.append(rowContainer);
+    });
     document.dispatchEvent(new Event('yt-page-data-updated'));
-  }, { dark });
+  }, { dark, errorOverlay: options.errorOverlay ?? false });
   await page.evaluate(async () => { await document.fonts.ready; });
 }
 
