@@ -73,7 +73,7 @@ test(`optional public YouTube ${colorScheme} watch inspection with unmodified ne
     for (const surface of backgrounds) expect(surface.background).not.toBe('rgb(15, 15, 15)');
     const wordmark = page.locator('ytd-masthead [id^="youtube-paths"]').first();
     await expect(wordmark).toHaveAttribute('data-ww-surface', /wordmark/);
-    await expect(wordmark).toHaveCSS('fill', 'rgb(37, 42, 52)');
+    expect(await wordmark.evaluate(element => getComputedStyle(element).fill)).toBe(await page.locator('ytd-watch-metadata h1').first().evaluate(element => getComputedStyle(element).color));
     await page.evaluate(() => window.scrollTo(0, 454));
     await expect(page.locator('ytd-comments-header-renderer:visible').first()).toBeVisible({ timeout: 30_000 });
     await capture('live-silver-scroll-comments');

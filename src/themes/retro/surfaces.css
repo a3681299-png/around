@@ -106,14 +106,14 @@ html[data-ww-theme="retro"] [data-ww-surface~="playlist-row"] { background: var(
 html[data-ww-theme="retro"] [data-ww-surface~="playlist-row"]:hover { background: var(--ww-accent-soft) !important; }
 html[data-ww-theme="retro"] [data-ww-surface~="playlist-row"][data-ww-surface~="selected"] { background: var(--ww-selection) !important; color: var(--ww-selection-ink) !important; box-shadow: inset 2px 0 var(--ww-light) !important; }
 html[data-ww-theme="retro"] [data-ww-surface~="playlist-row"][data-ww-surface~="selected"] * { color: var(--ww-selection-ink) !important; }
-html[data-ww-theme="retro"] [data-ww-surface~="duration"],
-html[data-ww-theme="retro"] [data-ww-surface~="duration"] * { color: var(--ww-lcd-ink) !important; background: var(--ww-lcd) !important; font: var(--ww-display-size)/1 var(--ww-display-font) !important; font-variant-numeric: tabular-nums !important; font-synthesis: none !important; }
-html[data-ww-theme="retro"] [data-ww-surface~="duration"] { padding: 3px 4px !important; box-shadow: inset 1px 1px var(--ww-lcd-line) !important; }
+html[data-ww-theme="retro"][data-ww-feature-lcd-durations] [data-ww-surface~="duration"],
+html[data-ww-theme="retro"][data-ww-feature-lcd-durations] [data-ww-surface~="duration"] * { color: var(--ww-lcd-ink) !important; background: var(--ww-lcd) !important; font: var(--ww-display-size)/1 var(--ww-display-font) !important; font-variant-numeric: tabular-nums !important; font-synthesis: none !important; }
+html[data-ww-theme="retro"][data-ww-feature-lcd-durations] [data-ww-surface~="duration"] { padding: 3px 4px !important; box-shadow: inset 1px 1px var(--ww-lcd-line) !important; }
 html[data-ww-theme="retro"][data-ww-window-chrome] [data-ww-surface~="player-window"] { outline: 1px solid var(--ww-dark) !important; outline-offset: 0 !important; box-shadow: 0 0 0 2px var(--ww-light) !important; }
 html[data-ww-theme="retro"][data-ww-fullscreen] [data-ww-surface~="player-window"] { outline: none !important; box-shadow: none !important; }
 
-html[data-ww-theme="retro"] [data-ww-surface~="playlist-row"][data-ww-surface~="selected"] [data-ww-surface~="duration"],
-html[data-ww-theme="retro"] [data-ww-surface~="playlist-row"][data-ww-surface~="selected"] [data-ww-surface~="duration"] * { color: var(--ww-lcd-ink) !important; }
+html[data-ww-theme="retro"][data-ww-feature-lcd-durations] [data-ww-surface~="playlist-row"][data-ww-surface~="selected"] [data-ww-surface~="duration"],
+html[data-ww-theme="retro"][data-ww-feature-lcd-durations] [data-ww-surface~="playlist-row"][data-ww-surface~="selected"] [data-ww-surface~="duration"] * { color: var(--ww-lcd-ink) !important; }
 
 html[data-ww-theme="retro"] [data-ww-surface~="button"] *,
 html[data-ww-theme="retro"] [data-ww-surface~="navigation"] * { font-family: var(--ww-display-font) !important; font-size: var(--ww-display-size) !important; font-weight: 400 !important; font-synthesis: none !important; }

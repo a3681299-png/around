@@ -1,7 +1,10 @@
 import stylesheet from './youtube.css';
+import chromeStylesheet from './youtube-chrome.css';
 import type { SiteAdapter, Surface } from './types';
 import { mountYouTubeSettings } from './youtube-player';
 import { mountYouTubeChrome } from './youtube-chrome';
+import { mountYouTubeDetails, mountYouTubeFocus } from './youtube-details';
+import { mountYouTubeComments } from './youtube-comments';
 
 const SURFACE_ATTRIBUTE = 'data-ww-surface';
 
@@ -71,6 +74,8 @@ const targets: ReadonlyArray<{ selector: string; surfaces: readonly Surface[] }>
   { selector: 'ytd-watch-metadata #owner, ytd-comments-header-renderer, ytd-comment-simplebox-renderer, ytd-comments #author-text, ytd-comments #published-time-text', surfaces: ['text'] },
   { selector: 'ytd-playlist-panel-video-renderer #byline, ytd-playlist-panel-video-renderer #index, ytd-video-meta-block #channel-name, ytd-video-meta-block #metadata-line', surfaces: ['metadata'] },
   { selector: 'ytd-watch-metadata h1', surfaces: ['primary-heading'] },
+  { selector: 'ytd-watch-metadata', surfaces: ['reading-panel'] },
+  { selector: 'ytd-comments #vote-count-middle, ytd-comments #vote-count-left, ytd-comment-engagement-bar #vote-count-middle, ytd-comment-action-buttons-renderer #vote-count-middle', surfaces: ['comment-vote'] },
   { selector: 'ytd-comments #content-text, ytd-comment-thread-renderer p, ytd-comments #contenteditable-root', surfaces: ['comment-text'] },
   { selector: 'ytd-guide-section-renderer #guide-section-title, ytd-comments #title, ytd-comments h2, ytd-watch-metadata #owner #channel-name', surfaces: ['label'] },
   { selector: '#movie_player', surfaces: ['player-window', 'rounded'] },
@@ -80,13 +85,20 @@ const targets: ReadonlyArray<{ selector: string; surfaces: readonly Surface[] }>
   { selector: 'ytd-playlist-panel-video-renderer', surfaces: ['playlist-row', 'rounded'] },
   { selector: 'ytd-playlist-panel-video-renderer[selected], ytd-playlist-panel-video-renderer[aria-selected="true"]', surfaces: ['selected'] },
   { selector: 'ytd-playlist-panel-video-renderer #video-title', surfaces: ['heading'] },
-  { selector: 'ytd-thumbnail-overlay-time-status-renderer, yt-thumbnail-badge-view-model .badge-shape-wiz, yt-thumbnail-overlay-badge-view-model .badge-shape-wiz', surfaces: ['duration', 'rounded'] },
+  { selector: 'ytd-thumbnail-overlay-time-status-renderer, yt-thumbnail-badge-view-model .badge-shape-wiz, yt-thumbnail-overlay-badge-view-model .badge-shape-wiz, yt-thumbnail-badge-view-model badge-shape, yt-thumbnail-overlay-badge-view-model badge-shape', surfaces: ['duration', 'rounded'] },
   { selector: 'ytm-shorts-lockup-view-model .shortsLockupViewModelHostThumbnailParentContainer', surfaces: ['rounded'] },
   { selector: 'ytd-thumbnail #thumbnail, yt-thumbnail-view-model', surfaces: ['rounded'] },
 ];
 
 const allSelectors = targets.map((target) => target.selector).join(', ');
 const navigationEvents = ['yt-navigate-finish', 'yt-page-data-updated'] as const;
+const durationSelector = 'ytd-thumbnail-overlay-time-status-renderer, yt-thumbnail-badge-view-model .badge-shape-wiz, yt-thumbnail-overlay-badge-view-model .badge-shape-wiz, yt-thumbnail-badge-view-model badge-shape, yt-thumbnail-overlay-badge-view-model badge-shape';
+
+function isDuration(element: Element): boolean {
+  // A badge can also mean LIVE, premiere, or new. Never make those look like a timer.
+  const value = (element.querySelector('.ytBadgeShapeText, .badge-shape-wiz__text, #text')?.textContent ?? element.textContent ?? '').trim();
+  return /^(?:\d+:[0-5]\d:[0-5]\d|\d+:[0-5]\d)$/.test(value);
+}
 
 export function supportsYouTube(url: URL): boolean {
   return url.protocol === 'https:' && url.hostname === 'www.youtube.com'
@@ -96,9 +108,14 @@ export function supportsYouTube(url: URL): boolean {
 export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
   return {
     id: 'youtube',
-    stylesheet,
+    stylesheet: `${stylesheet}\n${chromeStylesheet}`,
     mountSettings: (entry) => mountYouTubeSettings(doc, view, entry),
-    features: { 'window-chrome': { mount: () => mountYouTubeChrome(doc) } },
+    features: {
+      'window-chrome': { mount: () => mountYouTubeChrome(doc) },
+      'daily-details': { mount: () => mountYouTubeDetails(doc) },
+      'focus-titlebars': { mount: () => mountYouTubeFocus(doc) },
+      'bbs-comments': { mount: () => mountYouTubeComments(doc) },
+    },
     connect(onPageChange) {
       const root = doc.documentElement;
       const marked = new Set<Element>();
@@ -116,7 +133,10 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
         const surfaces = new Set<Surface>();
         for (const target of targets) {
           if (element.matches(target.selector)) {
-            target.surfaces.forEach((surface) => surfaces.add(surface));
+            target.surfaces.forEach((surface) => {
+              if (surface !== 'duration' || (isDuration(element)
+                && !element.parentElement?.closest('ytd-thumbnail-overlay-time-status-renderer'))) surfaces.add(surface);
+            });
           }
         }
         if (surfaces.size > 0) {
@@ -176,7 +196,16 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
       // Only added subtrees / changed IDs are scanned on ordinary DOM updates.
       const observer = new MutationObserver((records) => {
         for (const record of records) {
+          if (record.type === 'characterData') {
+            const badge = record.target.parentElement?.closest(durationSelector);
+            if (badge) pending.add(badge.closest('ytd-thumbnail-overlay-time-status-renderer') ?? badge);
+            continue;
+          }
           if (record.type === 'attributes') pending.add(record.target as Element);
+          if (record.type === 'childList' && record.target instanceof Element) {
+            const badge = record.target.closest(durationSelector);
+            if (badge) pending.add(badge.closest('ytd-thumbnail-overlay-time-status-renderer') ?? badge);
+          }
           for (const node of record.addedNodes) {
             if (node.nodeType === 1) pending.add(node as Element);
           }
@@ -186,6 +215,7 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
       });
       observer.observe(root, {
         childList: true,
+        characterData: true,
         subtree: true,
         attributes: true,
         attributeFilter: ['id', 'active', 'selected', 'aria-selected', 'aria-pressed', 'fullscreen'],
@@ -219,4 +249,3 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
     },
   };
 }
-

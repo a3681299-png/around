@@ -2,6 +2,7 @@ import { createFeatureController } from '../features/controller';
 import type { SiteAdapter } from '../sites/types';
 import type { UserSettings } from '../storage/settings';
 import type { ThemeDefinition } from './types';
+import { createPalette, PALETTE_VARIABLES } from './retro/palette';
 
 const STYLE_ID = 'web-world-themes-style';
 
@@ -37,6 +38,8 @@ export function createThemeController(
     style = undefined;
     root.removeAttribute('data-ww-theme');
     root.style.removeProperty('--ww-strength');
+    root.style.removeProperty('--ww-noise-strength');
+    PALETTE_VARIABLES.forEach((name) => root.style.removeProperty(name));
   };
 
   return {
@@ -47,6 +50,13 @@ export function createThemeController(
         destroy();
         return;
       }
+      if (settings.features['palette']) {
+        for (const [name, value] of Object.entries(createPalette(settings.palette))) root.style.setProperty(name, value);
+      } else {
+        PALETTE_VARIABLES.forEach((name) => root.style.removeProperty(name));
+      }
+      if (settings.features['surface-noise']) root.style.setProperty('--ww-noise-strength', String(settings.noiseStrength / 100));
+      else root.style.removeProperty('--ww-noise-strength');
       disconnect ??= site.connect(render);
       features.update(settings.features);
       render();

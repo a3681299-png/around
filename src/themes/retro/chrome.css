@@ -28,3 +28,57 @@
 #web-world-themes-clock { display: inline-block; min-width: 44px; padding: 2px 6px; color: var(--ww-lcd-ink); background: var(--ww-lcd); border: 1px solid var(--ww-lcd-line); font: var(--ww-display-size)/1 var(--ww-display-font); font-variant-numeric: tabular-nums; text-align: center; white-space: nowrap; }
 @media (max-width: 800px) { .ww-display-tag { display: none; } }
 @media (max-width: 640px) { .ww-window-status, .ww-status-detail { display: none; } .ww-menubar a { padding-inline: 6px; } }
+
+/* Gloss is a real optional finish. Solid fallbacks retain palette and contrast. */
+.ww-titlebar { background: var(--ww-titlebar-flat, var(--ww-titlebar)); }
+.ww-pane-titlebar { background: var(--ww-pane-titlebar-flat, var(--ww-pane-titlebar)); }
+html[data-ww-feature-glossy-titlebars] .ww-titlebar { background: var(--ww-titlebar); }
+html[data-ww-feature-glossy-titlebars] .ww-pane-titlebar { background: var(--ww-pane-titlebar); }
+
+/* Neutral until the browser/document really has focus. Panes also require a
+   native focus or pointer activation; there is no always-active fake window. */
+html[data-ww-feature-focus-titlebars]:not([data-ww-document-active]) .ww-titlebar {
+  background: var(--ww-titlebar-inactive, var(--ww-panel));
+  color: var(--ww-titlebar-inactive-ink, var(--ww-muted));
+}
+html[data-ww-feature-focus-titlebars]:not([data-ww-document-active]) .ww-display-tag { color: inherit; }
+html[data-ww-feature-focus-titlebars]:not([data-ww-document-active]) .ww-display-led { background: var(--ww-muted); }
+html[data-ww-feature-focus-titlebars] .ww-pane-titlebar {
+  background: var(--ww-pane-titlebar-inactive, var(--ww-panel));
+  color: var(--ww-pane-titlebar-inactive-ink, var(--ww-muted));
+}
+html[data-ww-feature-focus-titlebars][data-ww-document-active][data-ww-active-pane="player"] #web-world-themes-player-titlebar,
+html[data-ww-feature-focus-titlebars][data-ww-document-active][data-ww-active-pane="playlist"] #web-world-themes-playlist-titlebar {
+  background: var(--ww-pane-titlebar-active-flat, var(--ww-titlebar-flat)); color: var(--ww-pane-titlebar-active-ink, var(--ww-titlebar-ink));
+}
+html[data-ww-feature-glossy-titlebars][data-ww-feature-focus-titlebars][data-ww-document-active][data-ww-active-pane="player"] #web-world-themes-player-titlebar,
+html[data-ww-feature-glossy-titlebars][data-ww-feature-focus-titlebars][data-ww-document-active][data-ww-active-pane="playlist"] #web-world-themes-playlist-titlebar {
+  background: var(--ww-pane-titlebar-active, var(--ww-titlebar));
+}
+
+/* Decoration cannot intercept clicks, even during a viewport geometry update.
+   Visibility preserves its measurable height and the stable native reservation. */
+#web-world-themes-statusbar { pointer-events: none; }
+#web-world-themes-statusbar[data-ww-obstructed] { visibility: hidden; }
+#web-world-themes-daily-detail {
+  display: inline-block; margin-left: 8px; white-space: nowrap;
+  pointer-events: none; user-select: none;
+  font: var(--ww-display-size)/1 var(--ww-display-font); font-synthesis: none;
+}
+#web-world-themes-daily-detail.ww-detail-in-header {
+  position: fixed; width: 132px; margin: 0; color: var(--ww-muted); text-align: center;
+}
+
+html[data-ww-feature-focus-titlebars][data-ww-document-active][data-ww-active-pane="player"] #web-world-themes-player-titlebar .ww-pane-kind,
+html[data-ww-feature-focus-titlebars][data-ww-document-active][data-ww-active-pane="playlist"] #web-world-themes-playlist-titlebar .ww-pane-kind {
+  color: inherit; border-right-color: var(--ww-pane-titlebar-active-ink, var(--ww-titlebar-ink));
+}
+
+html[data-ww-feature-focus-titlebars][data-ww-document-active] .ww-titlebar {
+  background: var(--ww-pane-titlebar-active-flat, var(--ww-titlebar-flat));
+  color: var(--ww-pane-titlebar-active-ink, var(--ww-titlebar-ink));
+}
+html[data-ww-feature-glossy-titlebars][data-ww-feature-focus-titlebars][data-ww-document-active] .ww-titlebar {
+  background: var(--ww-pane-titlebar-active, var(--ww-titlebar));
+}
+html[data-ww-feature-focus-titlebars][data-ww-document-active] .ww-display-tag { color: inherit; }

@@ -14,7 +14,7 @@ export function createYouTubeChrome(doc: Document): HTMLElement {
     </div>
     <nav class="ww-menubar" data-ww-surface="menubar" aria-label="YouTube ナビゲーション">
       <a href="/">ホーム</a><a href="/feed/subscriptions">登録チャンネル</a><a href="/feed/history">履歴</a>
-      <span class="ww-window-status" aria-hidden="true">RETRO MODE : ON (・ω・)</span>
+      <span class="ww-window-status" aria-hidden="true">RETRO MODE : ON</span>
     </nav>`;
   return chrome;
 }
@@ -52,6 +52,99 @@ export function mountYouTubeChrome(doc: Document): SiteFeatureInstance {
   let masthead: HTMLElement | null = null;
   let titleNodes: Element[] = [];
   let destroyed = false;
+  let geometryFrame: number | undefined;
+  let watchedGeometry: Element[] = [];
+  let obstacles: Element[] = [];
+  let collisionObserver: IntersectionObserver | undefined;
+  let observedObstacles: Element[] = [];
+  let collisionKey = '';
+  // Keep this reservation stable even when the footer yields. Otherwise hiding
+  // it could enlarge the player, retrigger a collision, and create a layout loop.
+  let reservedHeight = 0;
+
+  const setProperty = (name: string, value: string) => {
+    if (root.style.getPropertyValue(name) !== value) root.style.setProperty(name, value);
+  };
+  const clearGeometry = () => {
+    if (geometryFrame !== undefined) view.cancelAnimationFrame(geometryFrame);
+    geometryFrame = undefined;
+    geometryObserver.disconnect();
+    collisionObserver?.disconnect(); collisionObserver = undefined;
+    observedObstacles = []; collisionKey = '';
+    watchedGeometry = []; obstacles = []; reservedHeight = 0;
+    root.style.removeProperty('--ww-statusbar-reserved-height');
+    root.style.removeProperty('--ww-player-viewport-height');
+    status.removeAttribute('data-ww-obstructed');
+  };
+  const measureGeometry = () => {
+    geometryFrame = undefined;
+    if (destroyed || !status.isConnected || !masthead) return;
+    const fullscreen = Boolean(doc.fullscreenElement || doc.querySelector('ytd-watch-flexy[fullscreen]'));
+    if (fullscreen) {
+      status.setAttribute('data-ww-obstructed', '');
+      return;
+    }
+    const rect = status.getBoundingClientRect();
+    if (rect.height > 0) reservedHeight = Math.ceil(rect.height);
+    setProperty('--ww-statusbar-reserved-height', `${reservedHeight}px`);
+    const viewport = view.visualViewport;
+    const viewportBottom = viewport ? viewport.offsetTop + viewport.height : view.innerHeight;
+    const headerBottom = Math.max(0, masthead.getBoundingClientRect().bottom);
+    const paneHeight = playerBar.isConnected ? playerBar.getBoundingClientRect().height : 0;
+    // Native YouTube layout consumes these budgets while retaining its own
+    // aspect-ratio machinery. Unknown layouts are handled by collision yielding.
+    const budget = Math.max(0, Math.floor(viewportBottom - headerBottom - paneHeight - reservedHeight - 24));
+    setProperty('--ww-player-viewport-height', `${budget}px`);
+    const top = Math.min(rect.top, viewportBottom - reservedHeight);
+    const stripTop = Math.max(0, Math.floor(top));
+    const stripBottom = Math.max(0, Math.floor(view.innerHeight - viewportBottom));
+    const key = `${stripTop}:${stripBottom}`;
+    if (key !== collisionKey || obstacles.length !== observedObstacles.length
+      || obstacles.some((element, index) => element !== observedObstacles[index])) {
+      collisionObserver?.disconnect();
+      // Browser-managed intersection catches geometry-only native transitions
+      // (theater classes, menus, animated miniplayers) with no polling loop.
+      collisionObserver = new IntersectionObserver(scheduleGeometry, {
+        rootMargin: `-${stripTop}px 0px -${stripBottom}px 0px`,
+      });
+      obstacles.forEach(element => collisionObserver!.observe(element));
+      observedObstacles = [...obstacles]; collisionKey = key;
+    }
+    const intersects = (element: Element) => {
+      if (!element.isConnected || status.contains(element) || chrome.contains(element)) return false;
+      const box = element.getBoundingClientRect();
+      return box.width > 0 && box.height > 0 && box.bottom > top && box.top < viewportBottom
+        && box.right > rect.left && box.left < rect.right;
+    };
+    // A decorative footer must never win over native interaction. Checking whole
+    // players also protects currently faded-out controls and floating miniplayers.
+    const obstruction = obstacles.some(intersects)
+      || Boolean(doc.activeElement && intersects(doc.activeElement) && doc.activeElement !== doc.body && doc.activeElement !== root);
+    status.toggleAttribute('data-ww-obstructed', obstruction);
+  };
+  const scheduleGeometry = () => {
+    if (destroyed || geometryFrame !== undefined) return;
+    geometryFrame = view.requestAnimationFrame(measureGeometry);
+  };
+  const yieldThenMeasure = () => {
+    // Hide immediately on scroll/resize, before the next paint or hit test.
+    status.setAttribute('data-ww-obstructed', '');
+    scheduleGeometry();
+  };
+  const geometryObserver = new ResizeObserver(yieldThenMeasure);
+  const refreshGeometry = () => {
+    obstacles = [...doc.querySelectorAll(
+      '#movie_player, .html5-video-player, ytd-miniplayer, video, iframe, button, input, select, textarea, a[href], [role="button"], [contenteditable="true"], [tabindex]:not([tabindex="-1"])',
+    )];
+    const nodes = [status, masthead, playerBar, doc.querySelector('#movie_player'), doc.querySelector('ytd-page-manager')]
+      .filter((node): node is Element => Boolean(node));
+    if (nodes.length !== watchedGeometry.length || nodes.some((node, index) => node !== watchedGeometry[index])) {
+      geometryObserver.disconnect();
+      nodes.forEach(node => geometryObserver.observe(node));
+      watchedGeometry = nodes;
+    }
+    scheduleGeometry();
+  };
 
   const updateClock = () => {
     const now = new Date();
@@ -90,6 +183,7 @@ export function mountYouTubeChrome(doc: Document): SiteFeatureInstance {
       titleObserver.disconnect(); titleNodes = [];
       root.removeAttribute('data-ww-window-chrome');
       root.style.removeProperty('--ww-native-header-height');
+      clearGeometry();
       syncClock();
       return;
     }
@@ -124,8 +218,15 @@ export function mountYouTubeChrome(doc: Document): SiteFeatureInstance {
       titleNodes = nodes;
     }
     refreshTitles();
+    refreshGeometry();
   };
   doc.addEventListener('visibilitychange', syncClock);
+  doc.addEventListener('scroll', yieldThenMeasure, { capture: true, passive: true });
+  doc.addEventListener('focusin', yieldThenMeasure);
+  doc.addEventListener('fullscreenchange', yieldThenMeasure);
+  view.addEventListener('resize', yieldThenMeasure, { passive: true });
+  view.visualViewport?.addEventListener('resize', yieldThenMeasure, { passive: true });
+  view.visualViewport?.addEventListener('scroll', yieldThenMeasure, { passive: true });
   refresh();
   return {
     refresh,
@@ -135,6 +236,13 @@ export function mountYouTubeChrome(doc: Document): SiteFeatureInstance {
       timer = undefined;
       titleObserver.disconnect(); titleNodes = [];
       doc.removeEventListener('visibilitychange', syncClock);
+      doc.removeEventListener('scroll', yieldThenMeasure, true);
+      doc.removeEventListener('focusin', yieldThenMeasure);
+      doc.removeEventListener('fullscreenchange', yieldThenMeasure);
+      view.removeEventListener('resize', yieldThenMeasure);
+      view.visualViewport?.removeEventListener('resize', yieldThenMeasure);
+      view.visualViewport?.removeEventListener('scroll', yieldThenMeasure);
+      clearGeometry();
       chrome.remove(); playerBar.remove(); playlistBar.remove(); status.remove();
       masthead = null;
       root.removeAttribute('data-ww-window-chrome');
