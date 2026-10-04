@@ -100,3 +100,15 @@ html[data-ww-theme][data-ww-window-chrome] body { padding-bottom: var(--ww-statu
 html[data-ww-theme][data-ww-window-chrome] :is(ytd-guide-renderer, ytd-mini-guide-renderer) { bottom: var(--ww-statusbar-height) !important; }
 html[data-ww-theme][data-ww-fullscreen] :is(#web-world-themes-player-titlebar, #web-world-themes-playlist-titlebar, #web-world-themes-statusbar) { display: none !important; }
 html[data-ww-theme][data-ww-fullscreen] body { padding-bottom: 0 !important; }
+
+/* Ambient-mode canvases/boxes are page backdrops, not playback media. Their
+   native dark paint must not bleed through the fixed silver desktop. Removing
+   this stylesheet restores the native effect; the player/video is untouched. */
+html[data-ww-theme][data-ww-site="youtube"] ytd-watch-flexy #cinematics { display: none !important; }
+
+/* Playlist hosts use a capped flex column, unlike the simplified legacy DOM.
+   Reserve the added title row and let the native scrolling container shrink. */
+html[data-ww-theme][data-ww-window-chrome] ytd-playlist-panel-renderer > #container {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+}

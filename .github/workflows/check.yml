@@ -2,7 +2,7 @@ name: Theme checks
 
 on:
   push:
-    branches: [feat/heisei-silver-blue, feat/heisei-silver-shell]
+    branches: [feat/heisei-silver-blue, feat/heisei-silver-shell, fix/youtube-silver-native-surfaces]
   pull_request:
 
 permissions:
@@ -25,10 +25,16 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium --no-shell
       - run: npm run check
+      - name: Optional public YouTube inspection
+        if: github.ref_name == 'fix/youtube-silver-native-surfaces'
+        continue-on-error: true
+        run: WW_LIVE_YOUTUBE=1 npm test -- tests/live-youtube.spec.ts --output=.work/live-results
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: theme-test-results
-          path: .work/test-results/
+          path: |
+            .work/test-results/
+            .work/live-results/
           include-hidden-files: true
           retention-days: 7

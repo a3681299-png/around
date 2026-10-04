@@ -117,3 +117,13 @@ html[data-ww-theme="retro"] [data-ww-surface~="playlist-row"][data-ww-surface~="
 
 html[data-ww-theme="retro"] [data-ww-surface~="button"] *,
 html[data-ww-theme="retro"] [data-ww-surface~="navigation"] * { font-family: var(--ww-display-font) !important; font-size: var(--ww-display-size) !important; font-weight: 400 !important; font-synthesis: none !important; }
+
+/* Native controls can assign their own dark-mode colors to nested labels/icons. */
+html[data-ww-theme="retro"] [data-ww-surface~="button"] *,
+html[data-ww-theme="retro"] [data-ww-surface~="navigation"] *,
+html[data-ww-theme="retro"] [data-ww-surface~="metadata"] * { color: inherit !important; }
+html[data-ww-theme="retro"] [data-ww-surface~="icon"] { color: var(--ww-ink) !important; }
+html[data-ww-theme="retro"] [data-ww-surface~="icon"] * { color: inherit !important; }
+/* The adapter identifies only the wordmark group, never the red/white play mark. */
+html[data-ww-theme="retro"] [data-ww-surface~="wordmark"],
+html[data-ww-theme="retro"] [data-ww-surface~="wordmark"] * { fill: var(--ww-ink) !important; }

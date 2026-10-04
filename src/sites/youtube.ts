@@ -8,6 +8,12 @@ const SURFACE_ATTRIBUTE = 'data-ww-surface';
 // All YouTube selectors live here. Prefer custom-element names over generated classes.
 const targets: ReadonlyArray<{ selector: string; surfaces: readonly Surface[] }> = [
   { selector: 'body, ytd-app, ytd-page-manager', surfaces: ['page'] },
+  // Native watch/ambient components can own their colors below the app boundary.
+  // Keep the media subtree untouched; only its surrounding content is a page.
+  { selector: 'ytd-watch-flexy, ytd-watch-flexy #columns, ytd-watch-flexy #primary, ytd-watch-flexy #secondary, ytd-watch-flexy #below, ytd-watch-metadata, ytd-comments, ytd-watch-flexy[elevated-watch-ambient] .box', surfaces: ['page'] },
+  { selector: 'ytd-masthead #country-code', surfaces: ['metadata'] },
+  { selector: 'ytd-masthead [id^="youtube-paths"]', surfaces: ['wordmark'] },
+  { selector: 'ytd-masthead yt-icon, ytd-guide-renderer yt-icon, ytd-mini-guide-renderer yt-icon, ytd-comments-header-renderer yt-icon', surfaces: ['icon'] },
   { selector: 'ytd-masthead', surfaces: ['window', 'panel', 'frame'] },
   {
     selector: 'ytd-guide-renderer, ytd-mini-guide-renderer',
@@ -60,6 +66,10 @@ const targets: ReadonlyArray<{ selector: string; surfaces: readonly Surface[] }>
     surfaces: ['metadata'],
   },
   { selector: 'ytd-comments', surfaces: ['comments'] },
+  // Current native CSS uses opaque/hashed color tokens. Style semantic text
+  // directly instead of depending on the retired --yt-spec-* token names.
+  { selector: 'ytd-watch-metadata #owner, ytd-comments-header-renderer, ytd-comment-simplebox-renderer, ytd-comments #author-text, ytd-comments #published-time-text', surfaces: ['text'] },
+  { selector: 'ytd-playlist-panel-video-renderer #byline, ytd-playlist-panel-video-renderer #index, ytd-video-meta-block #channel-name, ytd-video-meta-block #metadata-line', surfaces: ['metadata'] },
   { selector: 'ytd-watch-metadata h1', surfaces: ['primary-heading'] },
   { selector: 'ytd-comments #content-text, ytd-comment-thread-renderer p, ytd-comments #contenteditable-root', surfaces: ['comment-text'] },
   { selector: 'ytd-guide-section-renderer #guide-section-title, ytd-comments #title, ytd-comments h2, ytd-watch-metadata #owner #channel-name', surfaces: ['label'] },

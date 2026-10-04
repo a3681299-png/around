@@ -5,7 +5,7 @@ import path from 'node:path';
 const extensionPath = path.resolve('dist');
 const fixturePath = path.resolve('tests/fixtures/youtube.html');
 
-export async function launchExtension(profile: string): Promise<BrowserContext> {
+export async function launchExtension(profile: string, useFixture = true): Promise<BrowserContext> {
   const context = await chromium.launchPersistentContext(profile, {
     ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
       ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH }
@@ -14,6 +14,7 @@ export async function launchExtension(profile: string): Promise<BrowserContext> 
     viewport: { width: 1100, height: 760 },
     args: [`--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`],
   });
+  if (!useFixture) return context;
   const html = await readFile(fixturePath, 'utf8');
   // Route only test pages; the extension still uses real Chrome APIs and its MV3 manifest.
   await context.route('https://www.youtube.com/**', async (route) => {

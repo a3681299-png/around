@@ -2,7 +2,7 @@
 export type Surface = 'page' | 'panel' | 'frame' | 'rounded' | 'window'
   | 'input' | 'button' | 'card' | 'section' | 'sidebar' | 'toolbar' | 'titlebar' | 'menubar'
   | 'navigation' | 'selected' | 'text' | 'heading' | 'metadata' | 'chip' | 'comments'
-  | 'primary-heading' | 'comment-text' | 'label' | 'player-window' | 'playlist-window' | 'playlist-row' | 'duration';
+  | 'primary-heading' | 'comment-text' | 'label' | 'player-window' | 'playlist-window' | 'playlist-row' | 'duration' | 'wordmark' | 'icon';
 
 /** A site places this entry; its settings UI never needs site-specific selectors. */
 export interface SettingsEntry {
