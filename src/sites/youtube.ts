@@ -48,7 +48,7 @@ const targets: ReadonlyArray<{ selector: string; surfaces: readonly Surface[] }>
     surfaces: ['chip'],
   },
   {
-    selector: 'yt-chip-cloud-chip-renderer[selected]:not(:has(button)), yt-chip-cloud-chip-renderer[selected] button:not(:has(.ytChipShapeChip)), yt-chip-cloud-chip-renderer[selected] .ytChipShapeChip, yt-chip-cloud-chip-renderer[aria-selected="true"]:not(:has(button)), yt-chip-cloud-chip-renderer[aria-selected="true"] button:not(:has(.ytChipShapeChip)), yt-chip-cloud-chip-renderer[aria-selected="true"] .ytChipShapeChip, yt-chip-cloud-chip-renderer button[aria-selected="true"]:not(:has(.ytChipShapeChip)), yt-chip-cloud-chip-renderer button[aria-selected="true"] .ytChipShapeChip, yt-chip-cloud-chip-renderer button[aria-pressed="true"]',
+    selector: 'yt-chip-cloud-chip-renderer[selected]:not(:has(button)), yt-chip-cloud-chip-renderer[selected] button:not(:has(.ytChipShapeChip)), yt-chip-cloud-chip-renderer[selected] .ytChipShapeChip, yt-chip-cloud-chip-renderer[aria-selected="true"]:not(:has(button)), yt-chip-cloud-chip-renderer[aria-selected="true"] button:not(:has(.ytChipShapeChip)), yt-chip-cloud-chip-renderer[aria-selected="true"] .ytChipShapeChip, yt-chip-cloud-chip-renderer button[aria-selected="true"]:not(:has(.ytChipShapeChip)), yt-chip-cloud-chip-renderer button[aria-selected="true"] .ytChipShapeChip, yt-chip-cloud-chip-renderer button[aria-pressed="true"]:not(:has(.ytChipShapeChip)), yt-chip-cloud-chip-renderer button[aria-pressed="true"] .ytChipShapeChip',
     surfaces: ['selected'],
   },
   {

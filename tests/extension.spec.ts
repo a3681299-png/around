@@ -458,10 +458,31 @@ test('a failed feature save restores the saved preference without changing the a
   await popup.evaluate(() => {
     chrome.storage.local.set = async () => { throw new Error('Injected feature write failure'); };
   });
-  await feature.uncheck();
+  // A failed save immediately restores checked=true; click without uncheck's postcondition.
+  await feature.click();
   await expect(popup.locator('#save-status')).toHaveText('保存できませんでした。もう一度操作してください。');
   await expect(feature).toBeChecked();
   await expect(popup.getByRole('switch', { name: 'Theme ON / OFF' })).toBeChecked();
   await expect(youtube.locator('#web-world-themes-window-chrome')).toHaveCount(1);
   await expect(youtube.locator(themeStyle)).toHaveCount(1);
+});
+
+
+test('nested chip shapes follow aria-pressed state without hiding the selected glass', async ({ popup, youtube }) => {
+  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await youtube.locator('.chip-row').evaluate(element => {
+    const chip = document.createElement('yt-chip-cloud-chip-renderer');
+    chip.id = 'nested-chip';
+    chip.innerHTML = '<button aria-pressed="false"><div class="ytChipShapeChip">Nested chip</div></button>';
+    element.append(chip);
+  });
+  const button = youtube.locator('#nested-chip button');
+  const shape = youtube.locator('#nested-chip .ytChipShapeChip');
+  await expect(shape).toHaveAttribute('data-ww-surface', /button/);
+  await expect(shape).not.toHaveAttribute('data-ww-surface', /selected/);
+  await button.evaluate(element => element.setAttribute('aria-pressed', 'true'));
+  await expect(shape).toHaveAttribute('data-ww-surface', /selected/);
+  await expect(button).not.toHaveAttribute('data-ww-surface', /selected/);
+  await button.evaluate(element => element.setAttribute('aria-pressed', 'false'));
+  await expect(shape).not.toHaveAttribute('data-ww-surface', /selected/);
 });
