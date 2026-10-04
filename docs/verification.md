@@ -2,6 +2,17 @@
 
 確認日: 2026年10月4日（UTC）
 
+## Windowsでのmain取り込みと実サイト確認
+
+確認日: 2026年10月4日（日本時間）。取り込み元は`feat/heisei-silver-blue`の`0ff3806`です。
+
+- Windowsで`npm run check`を実行し、lint、型チェック、ビルド、既存の28件のテストがすべて通りました。ブラウザーテストにはChrome for Testing 153.0.8010.12と実際のMV3拡張機能を使い、YouTubeのHTMLは検証用DOMへ差し替えています。
+- `main`へfast-forwardで取り込み、通常の読込先であるプロジェクト直下の`dist`を再ビルドしました。
+- 普段使っているBraveの拡張機能を再読み込みし、ログイン状態の実際のYouTubeホームで確認しました。保存されていた強さ85%を保持し、新しい`PERSONAL CHANNEL / 2003`のタイトルバー、青い選択ボタン、動画カードとサイドバーを表示できています。追加タイトルバーは1つです。
+- 独立した未ログインのChrome for Testingにも同じ`dist`を読み込み、公開チャンネルのホームから動画一覧へのSPA遷移を確認しました。ダーク表示・強さ60%でテーマを維持し、タイトルバーとテーマCSSはそれぞれ1つ、横方向のはみ出しとページのJavaScriptエラーはありませんでした。この確認ではページHTMLを差し替えていません。
+
+今回の実サイト確認はホームと公開チャンネルの画面表示・遷移です。動画の再生とプレイヤー内設定、全画面の実サイト確認は今回実行していません。
+
 ## GitHub CIでの最終確認
 
 [Theme checks / run 2](https://github.com/a3681299-png/web-world-themes/actions/runs/37169672828)（commit `96d8812`）で`npm run check`が成功しました。UbuntuのChrome for Testing 153、Playwright 1.63.0へ実際のMV3拡張機能を読み込み、**28件すべてPASS**です。
