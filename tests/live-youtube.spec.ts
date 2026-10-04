@@ -3,13 +3,16 @@ import { mkdir, mkdtemp } from 'node:fs/promises';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
 
-test('optional public YouTube watch inspection with unmodified network documents', async ({}, testInfo) => {
+for (const colorScheme of ['light', 'dark'] as const) {
+test(`optional public YouTube ${colorScheme} watch inspection with unmodified network documents`, async ({}, testInfo) => {
   test.skip(process.env.WW_LIVE_YOUTUBE !== '1', 'Opt-in public-network smoke check; fixture checks remain deterministic.');
   test.setTimeout(120_000);
   await mkdir('.work', { recursive: true });
   const context = await launchExtension(await mkdtemp(path.resolve('.work/live-')), false);
   const page = await context.newPage();
+  await page.emulateMedia({ colorScheme });
   const capture = async (name: string) => {
+    await page.evaluate(async () => { await document.fonts.ready; });
     await page.screenshot({ path: testInfo.outputPath(`${name}.png`), animations: 'disabled' });
   };
   try {
@@ -26,6 +29,7 @@ test('optional public YouTube watch inspection with unmodified network documents
     // markup substitution, hidden API, or application-state injection is used.
     await page.goto('https://www.youtube.com/watch?v=AS4q9yaWJkI&list=RDAS4q9yaWJkI&start_radio=1', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('ytd-watch-metadata h1').first()).toBeVisible({ timeout: 45_000 });
+    if (colorScheme === 'dark') await expect.poll(() => page.locator('html').evaluate(element => element.hasAttribute('dark')), { timeout: 20_000 }).toBe(true);
     await capture('live-native-watch');
     await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
     await expect(page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
@@ -36,7 +40,7 @@ test('optional public YouTube watch inspection with unmodified network documents
     const backgrounds = await page.locator('ytd-watch-flexy, ytd-watch-metadata, ytd-comments').evaluateAll(elements => elements.map(element => ({
       tag: element.tagName, background: getComputedStyle(element).backgroundColor, color: getComputedStyle(element).color,
     })));
-    await testInfo.attach('live-observations', { body: JSON.stringify({ url: page.url(), nativeDark: await page.locator('html').getAttribute('dark'), backgrounds }, null, 2), contentType: 'application/json' });
+    await testInfo.attach('live-observations', { body: JSON.stringify({ url: page.url(), browserColorScheme: colorScheme, nativeDark: await page.locator('html').getAttribute('dark'), backgrounds }, null, 2), contentType: 'application/json' });
     for (const surface of backgrounds) expect(surface.background).not.toBe('rgb(15, 15, 15)');
     const wordmark = page.locator('ytd-masthead [id^="youtube-paths"]').first();
     await expect(wordmark).toHaveAttribute('data-ww-surface', /wordmark/);
@@ -50,3 +54,4 @@ test('optional public YouTube watch inspection with unmodified network documents
     await context.close();
   }
 });
+}
