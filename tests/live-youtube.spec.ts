@@ -37,6 +37,9 @@ test(`optional public YouTube ${colorScheme} watch inspection with unmodified ne
       await page.getByRole('link', { name: /^(Dark theme|ダークモード)$/ }).click();
       await expect.poll(() => page.locator('html').evaluate(element => element.hasAttribute('dark'))).toBe(true);
     }
+    // Appearance can reload the page; await the rebuilt native header/content.
+    await expect(page.locator('ytd-watch-metadata h1').first()).toBeVisible({ timeout: 30_000 });
+    await expect(page.locator('ytd-masthead #logo-icon svg').first()).toBeVisible({ timeout: 30_000 });
     await capture('live-native-watch');
     await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
     await expect(page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
@@ -47,6 +50,7 @@ test(`optional public YouTube ${colorScheme} watch inspection with unmodified ne
       const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
       return Boolean(hit && element.contains(hit));
     })).toBe(true);
+    await expect(page.locator('ytd-masthead [id^="youtube-paths"]:visible').first()).toBeVisible();
     await capture('live-silver-watch');
     await page.locator('ytd-watch-metadata h1').first().scrollIntoViewIfNeeded();
     await capture('live-silver-metadata');
@@ -70,6 +74,9 @@ test(`optional public YouTube ${colorScheme} watch inspection with unmodified ne
     const wordmark = page.locator('ytd-masthead [id^="youtube-paths"]').first();
     await expect(wordmark).toHaveAttribute('data-ww-surface', /wordmark/);
     await expect(wordmark).toHaveCSS('fill', 'rgb(37, 42, 52)');
+    await page.evaluate(() => window.scrollTo(0, 454));
+    await expect(page.locator('ytd-comments-header-renderer:visible').first()).toBeVisible({ timeout: 30_000 });
+    await capture('live-silver-scroll-comments');
     await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
     await expect(page.locator('#web-world-themes-style')).toHaveCount(0);
     await expect(page.locator('[data-ww-surface]')).toHaveCount(0);
