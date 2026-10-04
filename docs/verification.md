@@ -2,6 +2,16 @@
 
 確認日: 2026年10月4日（UTC）。専用ブランチ `fix/youtube-silver-native-surfaces`。Windowsの取り込み記録を含む `main` の `3682e240` を基点にしています。
 
+## Windowsでの最新変更の取り込み
+
+2026年10月4日（日本時間）、同ブランチの`fa3e102`を`main`へ取り込みました。配色プリセット、BBSコメント、個別の表示設定とウィンドウ装飾の更新を含みます。
+
+- `npm run lint`と`npm run build`が通りました。ビルドにはTypeScriptの型チェックを含みます。
+- `npm test -- tests/features.spec.ts tests/palette.spec.ts`で、ブラウザー不要の設定・配色テスト20件がすべて通りました。
+- プロジェクト直下の`dist`を更新しました。取り込み元とのソースの一致、コンテンツとPopupへの新設定の収録、Manifestの参照先、同梱フォント・ライセンスの一致を確認しました。
+
+今回もCodexではブラウザーを開いていません。拡張機能とYouTubeの再読み込み後、実際の画面確認はユーザーが行います。
+
 ## Windowsでのmain取り込み
 
 2026年10月4日（日本時間）、`fix/youtube-silver-native-surfaces`の`570817d`を`main`へfast-forwardで取り込みました。
