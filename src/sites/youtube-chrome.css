@@ -1,0 +1,22 @@
+/* Adapter-owned geometry: footer height is measured, not assumed from a token.
+   These declarations are present only during the chrome feature lifetime. */
+html[data-ww-theme][data-ww-window-chrome] body {
+  padding-bottom: var(--ww-statusbar-reserved-height, var(--ww-statusbar-height)) !important;
+}
+html[data-ww-theme][data-ww-window-chrome] {
+  scroll-padding-bottom: var(--ww-statusbar-reserved-height, var(--ww-statusbar-height));
+}
+html[data-ww-theme][data-ww-window-chrome] :is(ytd-guide-renderer, ytd-mini-guide-renderer) {
+  bottom: var(--ww-statusbar-reserved-height, var(--ww-statusbar-height)) !important;
+}
+/* Let native YouTube calculate the player width/aspect ratio. Never clip, scale,
+   filter, reposition, or reparent playback media to make room for decoration. */
+html[data-ww-theme][data-ww-window-chrome]:not([data-ww-fullscreen]) ytd-watch-flexy {
+  --ytd-watch-flexy-max-player-height: var(--ww-player-viewport-height, calc(100dvh - var(--ytd-masthead-height) - var(--ww-pane-titlebar-height) - var(--ww-statusbar-reserved-height, var(--ww-statusbar-height)) - 24px)) !important;
+  --ytd-watch-flexy-max-theater-height: var(--ww-player-viewport-height, calc(100dvh - var(--ytd-masthead-height) - var(--ww-pane-titlebar-height) - var(--ww-statusbar-reserved-height, var(--ww-statusbar-height)) - 24px)) !important;
+}
+html[data-ww-theme][data-ww-window-chrome][data-ww-fullscreen] {
+  scroll-padding-bottom: 0;
+}
+html[data-ww-theme][data-ww-window-chrome][data-ww-fullscreen] body { padding-bottom: 0 !important; }
+html[data-ww-theme][data-ww-fullscreen] #web-world-themes-daily-detail { display: none !important; }

@@ -71,7 +71,7 @@ html[data-ww-theme][data-ww-fullscreen] ytd-masthead { display: none !important;
 html[data-ww-theme][data-ww-fullscreen] ytd-page-manager { margin-top: 0 !important; }
 
 /* Override native dark tokens at the app boundary, without changing its dark setting. */
-html[data-ww-theme][data-ww-site="youtube"] { color-scheme: light !important; background: var(--ww-page) !important; }
+html[data-ww-theme][data-ww-site="youtube"] { color-scheme: light !important; background-color: var(--ww-page) !important; }
 html[data-ww-theme][data-ww-site="youtube"] ytd-app {
   --yt-spec-general-background-b: var(--ww-panel) !important;
   --yt-spec-general-background-c: var(--ww-paper) !important;

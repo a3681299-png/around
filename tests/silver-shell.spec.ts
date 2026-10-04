@@ -158,6 +158,9 @@ test('player and playlist windows track text-node changes, selected rows, and SP
 });
 
 test('packaged pixel font loads for chrome and the LCD clock without external font requests', async ({ context, extensionId, popup, youtube }) => {
+  // Keep this typography/clock check in an unobstructed viewport. Collision
+  // yielding at ordinary watch sizes is covered separately in chrome-safety.
+  await youtube.setViewportSize({ width: 1100, height: 2000 });
   const fontRequests: string[] = [];
   context.on('request', request => { if (request.resourceType() === 'font') fontRequests.push(request.url()); });
   await youtube.goto('https://www.youtube.com/watch?v=fixture&list=fixture');
