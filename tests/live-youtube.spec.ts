@@ -57,27 +57,41 @@ test(`optional public YouTube ${colorScheme} watch inspection with unmodified ne
     const headerStates = [];
     for (const scrollY of [0, 1, 40, 454, 40, 1, 0]) {
       await page.evaluate(y => window.scrollTo(0, y), scrollY);
-      await expect.poll(() => page.evaluate(() => {
-        const wrapper = document.querySelector('#masthead-container');
-        if (wrapper && getComputedStyle(wrapper).opacity !== '1') return false;
-        return ['yt-searchbox input', '#guide-icon'].every(selector => {
-          const element = document.querySelector(selector);
-          if (!element) return false;
-          for (let node: Element | null = element; node; node = node.parentElement) {
-            const style = getComputedStyle(node);
-            if (Number(style.opacity) < 0.99 || style.visibility !== 'visible' || style.display === 'none') return false;
-          }
-          const rect = element.getBoundingClientRect();
-          const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
-          return rect.width > 0 && rect.height > 0 && Boolean(hit && (element.contains(hit) || hit.contains(element)));
-        });
-      })).toBe(true);
+      let controlState: unknown;
+      try {
+        await expect.poll(async () => {
+          controlState = await page.evaluate(() => {
+            return ['ytd-masthead yt-searchbox input[name="search_query"]', 'ytd-masthead #guide-icon'].map(selector => {
+              const candidates = [...document.querySelectorAll(selector)];
+              const element = candidates.find(node => {
+                const box = node.getBoundingClientRect(); return box.width > 0 && box.height > 0;
+              });
+              if (!element) return { selector, problem: 'No displayed control', candidates: candidates.length };
+              const ancestors = [];
+              for (let node: Element | null = element; node; node = node.parentElement) {
+                const style = getComputedStyle(node);
+                if (Number(style.opacity) < 0.99 || style.visibility !== 'visible' || style.display === 'none') {
+                  ancestors.push({ tag: node.tagName, id: node.id, opacity: style.opacity, visibility: style.visibility, display: style.display });
+                }
+              }
+              const rect = element.getBoundingClientRect();
+              const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+              const reachable = Boolean(hit && (element.contains(hit) || hit.contains(element)));
+              return { selector, visible: ancestors.length === 0 && reachable, ancestors,
+                hit: hit?.tagName + '#' + hit?.id, x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+            });
+          });
+          return (controlState as Array<{ visible?: boolean }>).every(state => state.visible);
+        }).toBe(true);
+      } finally {
+        await writeFile(testInfo.outputPath(`live-header-controls-${scrollY}.json`), JSON.stringify(controlState, null, 2));
+      }
       await expect(page.locator('yt-searchbox .ytSearchboxComponentInputBox').first()).toHaveCSS('box-shadow', /inset/);
       headerStates.push(await page.evaluate(() => ({
         scrollY: window.scrollY,
         hidden: document.querySelector('ytd-app')?.hasAttribute('masthead-hidden'),
         frosted: document.querySelector('ytd-masthead')?.getAttribute('frosted-glass-mode'),
-        controls: ['yt-searchbox input', '#guide-icon', 'yt-searchbox .ytSearchboxComponentInputBox'].map(selector => {
+        controls: ['ytd-masthead yt-searchbox input[name="search_query"]', 'ytd-masthead #guide-icon', 'ytd-masthead yt-searchbox .ytSearchboxComponentInputBox'].map(selector => {
           const element = document.querySelector(selector)!;
           const style = getComputedStyle(element), box = element.getBoundingClientRect();
           return { selector, color: style.color, opacity: style.opacity, top: box.top, height: box.height, shadow: style.boxShadow };
