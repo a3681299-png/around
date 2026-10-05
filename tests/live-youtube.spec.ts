@@ -52,6 +52,35 @@ test(`optional public YouTube ${colorScheme} watch inspection with unmodified ne
     })).toBe(true);
     await expect(page.locator('ytd-masthead [id^="youtube-paths"]:visible').first()).toBeVisible();
     await capture('live-silver-watch');
+    // Recheck the native header at the first scroll pixel as well as deep scroll:
+    // Home and watch have different sticky/autohide transition boundaries.
+    const headerStates = [];
+    for (const scrollY of [0, 1, 40, 454, 40, 1, 0]) {
+      await page.evaluate(y => window.scrollTo(0, y), scrollY);
+      await expect.poll(() => page.evaluate(() => {
+        const wrapper = document.querySelector('#masthead-container');
+        if (wrapper && getComputedStyle(wrapper).opacity !== '1') return false;
+        return ['yt-searchbox input', '#guide-icon'].every(selector => {
+          const element = document.querySelector(selector);
+          if (!element) return false;
+          const rect = element.getBoundingClientRect();
+          const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+          return rect.width > 0 && rect.height > 0 && Boolean(hit && (element.contains(hit) || hit.contains(element)));
+        });
+      })).toBe(true);
+      headerStates.push(await page.evaluate(() => ({
+        scrollY: window.scrollY,
+        hidden: document.querySelector('ytd-app')?.hasAttribute('masthead-hidden'),
+        frosted: document.querySelector('ytd-masthead')?.getAttribute('frosted-glass-mode'),
+        controls: ['yt-searchbox input', '#guide-icon', 'yt-searchbox .ytSearchboxComponentInputBox'].map(selector => {
+          const element = document.querySelector(selector)!;
+          const style = getComputedStyle(element), box = element.getBoundingClientRect();
+          return { selector, color: style.color, opacity: style.opacity, top: box.top, height: box.height, shadow: style.boxShadow };
+        }),
+      })));
+      if (scrollY === 1 || scrollY === 454) await capture(`live-header-scroll-${scrollY}`);
+    }
+    await writeFile(testInfo.outputPath('live-header-scroll-states.json'), JSON.stringify(headerStates, null, 2));
     await page.locator('ytd-watch-metadata h1').first().scrollIntoViewIfNeeded();
     await capture('live-silver-metadata');
     const playerGeometry = await page.evaluate(() => {

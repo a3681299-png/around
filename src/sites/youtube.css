@@ -29,18 +29,37 @@ html[data-ww-theme][data-ww-window-chrome] ytd-masthead {
 html[data-ww-theme][data-ww-window-chrome] ytd-app #masthead-container {
   top: 0 !important;
   transform: none !important;
+  /* Native masthead-hidden changes opacity as well as transform. Keep the two
+     parts of that transition in sync while our chrome pins the header. */
+  opacity: 1 !important;
 }
 html[data-ww-theme][data-ww-window-chrome] ytd-masthead > #container {
   height: var(--ww-native-header-height, 56px) !important;
   box-sizing: border-box !important;
+  position: relative !important;
+  z-index: 1;
+}
+/* The theme already paints an opaque toolbar. Native scroll-dependent frosted
+   backdrops must not composite over its search field or icons. Limit this to
+   masthead decoration, never the player, media, guide, or native popup layers. */
+html[data-ww-theme][data-ww-window-chrome] ytd-masthead > #background,
+html[data-ww-theme][data-ww-window-chrome] ytd-app > #frosted-glass {
+  display: none !important;
+}
+html[data-ww-theme][data-ww-window-chrome] #web-world-themes-window-chrome {
+  position: relative;
+  z-index: 1;
 }
 html[data-ww-theme][data-ww-window-chrome] ytd-page-manager {
   margin-top: calc(var(--ww-native-header-height, 56px) + var(--ww-window-chrome-height)) !important;
 }
 html[data-ww-theme][data-ww-window-chrome] ytd-mini-guide-renderer,
-html[data-ww-theme][data-ww-window-chrome] ytd-feed-filter-chip-bar-renderer #chips-wrapper {
+html[data-ww-theme][data-ww-window-chrome] ytd-feed-filter-chip-bar-renderer:not([not-sticky]) #chips-wrapper {
   top: calc(var(--ww-native-header-height, 56px) + var(--ww-window-chrome-height)) !important;
 }
+/* At the top of Home, native [not-sticky] changes the chip wrapper to relative
+   positioning with top:0. Its parent is already below the masthead; applying the
+   fixed-position inset here a second time drops the bar onto the thumbnails. */
 html[data-ww-theme] yt-searchbox input,
 html[data-ww-theme] ytd-searchbox input {
   color: var(--ww-ink) !important;

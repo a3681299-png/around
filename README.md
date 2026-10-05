@@ -48,6 +48,8 @@ BBSの番号は現在読み込まれたコメントと返信の表示順で、�
 
 下のステータスバーは実際の高さをレイアウトへ予約します。スクロールや小さいウィンドウで操作部分と重なる場合は、操作を隠さないようバーを一時的に退避します。全画面では外側の装飾を隠します。
 
+ホームのカテゴリバーは、最上部で通常配置へ戻るYouTube本来の動きを保ち、固定時だけ追加ヘッダー分の位置を調整します。Window chromeがONの間は、固定ヘッダーの表示とスクロール時の背景レイヤーを揃え、検索欄やメニューボタンを守ります。OFF／0%ではYouTube本来の自動非表示と背景へ戻ります。
+
 透明背景は他の背景／ぼかし拡張との併用を考慮した限定的なオプションです。背景画像の一括消去や他拡張のDOM変更はしませんが、任意の拡張との互換性は保証しません。UI配色は `--ww-retro-*`、地色の透明度は `--ww-background-surface-opacity`（0〜1、既定0）から調整できます。この外部指定の変数はテーマOFFでも消去しません。
 
 全体OFF／強さ0%では追加したDOM、属性、CSS変数、監視・タイマーを撤去します。設定値だけは保持し、次にONにしたとき同じ組み合わせで戻ります。
@@ -161,4 +163,3 @@ YouTubeの`yt-navigate-finish`と`yt-page-data-updated`で再確認し、追加D
 ブラウザー起動・実サイト・スクリーンショットの実施状況と制限は`docs/verification.md`を参照してください。過去バージョンのPASSは今回の変更の実測結果を意味しません。デザインの意図は`docs/heisei-design.md`にまとめています。
 
 Chromeの仕様は[Content scripts](https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts)と[Storage API](https://developer.chrome.com/docs/extensions/reference/api/storage)、拡張機能の検証方法は[Playwright公式ドキュメント](https://playwright.dev/docs/chrome-extensions)を参照しています。
-
