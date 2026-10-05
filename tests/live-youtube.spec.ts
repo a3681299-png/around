@@ -54,6 +54,17 @@ test(`optional public YouTube ${colorScheme} watch inspection with unmodified ne
     await capture('live-silver-watch');
     // Recheck the native header at the first scroll pixel as well as deep scroll:
     // Home and watch have different sticky/autohide transition boundaries.
+    const settleScroll = async (y: number) => {
+      await page.bringToFront();
+      // Native SPA scroll anchoring may move the page after scrollTo(0, 0).
+      // Verify the measured offset after settlement, rather than just recording
+      // the requested one. Reapply only if late layout displaced it.
+      await expect.poll(async () => {
+        await page.evaluate(y => scrollTo(0, y), y);
+        await page.waitForTimeout(1600);
+        return page.evaluate(() => scrollY);
+      }, { timeout: 15_000 }).toBe(y);
+    };
     const headerStates = [];
     const inspectPaint = async (name: string) => {
       const paint = await page.evaluate(() => {
@@ -77,11 +88,10 @@ test(`optional public YouTube ${colorScheme} watch inspection with unmodified ne
       await writeFile(testInfo.outputPath(`${name}.json`), JSON.stringify(paint, null, 2));
       await capture(name);
     };
-    await page.waitForTimeout(1600);
+    await settleScroll(0);
     await inspectPaint('live-top-rest-initial');
     for (const scrollY of [0, 1, 40, 454, 40, 1, 0]) {
-      await page.evaluate(y => window.scrollTo(0, y), scrollY);
-      await page.waitForTimeout(1600);
+      await settleScroll(scrollY);
       let controlState: unknown;
       try {
         await expect.poll(async () => {
@@ -174,17 +184,19 @@ test(`optional public YouTube ${colorScheme} watch inspection with unmodified ne
     await page.evaluate(() => scrollTo(0, 0));
     await page.reload({ waitUntil: 'domcontentloaded' });
     await expect(page.locator('ytd-watch-metadata h1').first()).toBeVisible({ timeout: 30_000 });
-    await page.evaluate(() => scrollTo(0, 0));
-    await page.waitForTimeout(1600);
+    await expect(page.locator('ytd-masthead #voice-search-button svg').first()).toBeVisible({ timeout: 30_000 });
+    await settleScroll(0);
     await inspectPaint('live-top-rest-reload');
+    await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
     await expect(page.locator('yt-searchbox .ytSearchboxComponentInputBox').first()).toHaveCSS('box-shadow', /inset/);
     await page.locator('ytd-masthead a#logo').first().click();
     await expect(page).toHaveURL('https://www.youtube.com/');
     await page.goBack();
     await expect(page.locator('ytd-watch-metadata h1').first()).toBeVisible({ timeout: 30_000 });
-    await page.evaluate(() => scrollTo(0, 0));
-    await page.waitForTimeout(1600);
+    await expect(page.locator('ytd-masthead #voice-search-button svg').first()).toBeVisible({ timeout: 30_000 });
+    await settleScroll(0);
     await inspectPaint('live-top-rest-spa-back');
+    await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
     await expect(page.locator('yt-searchbox .ytSearchboxComponentInputBox').first()).toHaveCSS('box-shadow', /inset/);
     await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
     await expect(page.locator('#web-world-themes-style')).toHaveCount(0);
