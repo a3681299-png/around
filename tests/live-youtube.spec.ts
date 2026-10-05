@@ -6,7 +6,7 @@ import { launchExtension } from './fixtures';
 for (const colorScheme of ['light', 'dark'] as const) {
 test(`optional public YouTube ${colorScheme} watch inspection with unmodified network documents`, async ({}, testInfo) => {
   test.skip(process.env.WW_LIVE_YOUTUBE !== '1', 'Opt-in public-network smoke check; fixture checks remain deterministic.');
-  test.setTimeout(120_000);
+  test.setTimeout(180_000);
   await mkdir('.work', { recursive: true });
   const context = await launchExtension(await mkdtemp(path.resolve('.work/live-')), false);
   const page = await context.newPage();
@@ -24,7 +24,7 @@ test(`optional public YouTube ${colorScheme} watch inspection with unmodified ne
     const popup = await context.newPage();
     await popup.goto(`chrome-extension://${id}/popup/index.html`);
     await manager.close();
-    await page.setViewportSize({ width: 1360, height: 920 });
+    await page.setViewportSize({ width: 1917, height: 917 });
     // Public video from the reported screenshot. No cookies, account, CAPTCHA,
     // markup substitution, hidden API, or application-state injection is used.
     await page.goto('https://www.youtube.com/watch?v=AS4q9yaWJkI&list=RDAS4q9yaWJkI&start_radio=1', { waitUntil: 'domcontentloaded' });
@@ -55,8 +55,33 @@ test(`optional public YouTube ${colorScheme} watch inspection with unmodified ne
     // Recheck the native header at the first scroll pixel as well as deep scroll:
     // Home and watch have different sticky/autohide transition boundaries.
     const headerStates = [];
+    const inspectPaint = async (name: string) => {
+      const paint = await page.evaluate(() => {
+        const selectors = ['ytd-masthead', 'ytd-masthead #container', 'ytd-masthead #guide-button', 'ytd-masthead #guide-icon', 'ytd-masthead #guide-icon svg', 'ytd-masthead #guide-icon path', 'yt-searchbox', 'yt-searchbox .ytSearchboxComponentInputBox', 'yt-searchbox input[name="search_query"]'];
+        const elements = selectors.flatMap(selector => [...document.querySelectorAll(selector)].map(element => {
+          const chain = [];
+          for (let node: Element | null = element; node; node = node.parentElement) {
+            const style = getComputedStyle(node);
+            chain.push({ tag: node.tagName, id: node.id, classes: node.className, attributes: [...node.attributes].map(a => [a.name, a.value]), color: style.color, fill: style.fill, opacity: style.opacity, background: style.background, boxShadow: style.boxShadow, border: style.border, mixBlendMode: style.mixBlendMode, filter: style.filter, backdropFilter: style.backdropFilter, isolation: style.isolation, position: style.position, zIndex: style.zIndex });
+          }
+          return { selector, chain, placeholder: getComputedStyle(element, '::placeholder').color };
+        }));
+        const rules: string[] = [];
+        const scan = (list: CSSRuleList) => { for (const rule of [...list]) {
+          if ('cssRules' in rule) scan((rule as CSSGroupingRule).cssRules);
+          else if (/masthead|guide-icon|ytSearchbox/.test(rule.cssText) && /blend|filter|opacity|fill:|transparent|scroll/.test(rule.cssText)) rules.push(rule.cssText);
+        } };
+        for (const sheet of [...document.styleSheets]) { try { scan(sheet.cssRules); } catch { /* cross-origin CSS is not accessible */ } }
+        return { scrollY, elements, rules };
+      });
+      await writeFile(testInfo.outputPath(`${name}.json`), JSON.stringify(paint, null, 2));
+      await capture(name);
+    };
+    await page.waitForTimeout(1600);
+    await inspectPaint('live-top-rest-initial');
     for (const scrollY of [0, 1, 40, 454, 40, 1, 0]) {
       await page.evaluate(y => window.scrollTo(0, y), scrollY);
+      await page.waitForTimeout(1600);
       let controlState: unknown;
       try {
         await expect.poll(async () => {
@@ -97,7 +122,7 @@ test(`optional public YouTube ${colorScheme} watch inspection with unmodified ne
           return { selector, color: style.color, opacity: style.opacity, top: box.top, height: box.height, shadow: style.boxShadow };
         }),
       })));
-      if (scrollY === 1 || scrollY === 454) await capture(`live-header-scroll-${scrollY}`);
+      if (scrollY === 0 || scrollY === 1 || scrollY === 454) await inspectPaint(`live-header-scroll-${scrollY}`);
     }
     await writeFile(testInfo.outputPath('live-header-scroll-states.json'), JSON.stringify(headerStates, null, 2));
     await page.locator('ytd-watch-metadata h1').first().scrollIntoViewIfNeeded();
