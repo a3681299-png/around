@@ -1,3 +1,15 @@
+# ページ最上部のヘッダー配色修正の取り込み
+
+2026年10月5日（日本時間）、`fix/youtube-silver-native-surfaces`の`77e4483`を`main`へfast-forwardで取り込みました。
+
+- `npm run lint`と`npm run build`が通りました。ビルドにはTypeScriptの型チェックを含みます。
+- `npm test -- tests/features.spec.ts tests/palette.spec.ts`で、ブラウザー不要の設定・配色テスト20件がすべて通りました。
+- プロジェクト直下の`dist`を更新しました。取り込み元とのソースの一致、検索欄・メニューの最新配色修正の収録、Manifestの参照先、同梱ファイルの一致を確認しました。
+
+今回Codexではブラウザーを開いていません。新しい最上部の描画・実サイトのブラウザーテストは実行していません。拡張機能とYouTubeの再読み込み後、実際の画面確認はユーザーが行います。
+
+---
+
 # スクロール時のヘッダーとカテゴリーバー修正の取り込み
 
 2026年10月5日（日本時間）、`fix/youtube-silver-native-surfaces`の`fe5ca94`を`main`へマージしました。
