@@ -52,6 +52,54 @@ test(`optional public YouTube ${colorScheme} watch inspection with unmodified ne
     })).toBe(true);
     await expect(page.locator('ytd-masthead [id^="youtube-paths"]:visible').first()).toBeVisible();
     await capture('live-silver-watch');
+    // Recheck the native header at the first scroll pixel as well as deep scroll:
+    // Home and watch have different sticky/autohide transition boundaries.
+    const headerStates = [];
+    for (const scrollY of [0, 1, 40, 454, 40, 1, 0]) {
+      await page.evaluate(y => window.scrollTo(0, y), scrollY);
+      let controlState: unknown;
+      try {
+        await expect.poll(async () => {
+          controlState = await page.evaluate(() => {
+            return ['ytd-masthead yt-searchbox input[name="search_query"]', 'ytd-masthead #guide-icon'].map(selector => {
+              const candidates = [...document.querySelectorAll(selector)];
+              const element = candidates.find(node => {
+                const box = node.getBoundingClientRect(); return box.width > 0 && box.height > 0;
+              });
+              if (!element) return { selector, problem: 'No displayed control', candidates: candidates.length };
+              const ancestors = [];
+              for (let node: Element | null = element; node; node = node.parentElement) {
+                const style = getComputedStyle(node);
+                if (Number(style.opacity) < 0.99 || style.visibility !== 'visible' || style.display === 'none') {
+                  ancestors.push({ tag: node.tagName, id: node.id, opacity: style.opacity, visibility: style.visibility, display: style.display });
+                }
+              }
+              const rect = element.getBoundingClientRect();
+              const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+              const reachable = Boolean(hit && (element.contains(hit) || hit.contains(element)));
+              return { selector, visible: ancestors.length === 0 && reachable, ancestors,
+                hit: hit?.tagName + '#' + hit?.id, x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+            });
+          });
+          return (controlState as Array<{ visible?: boolean }>).every(state => state.visible);
+        }).toBe(true);
+      } finally {
+        await writeFile(testInfo.outputPath(`live-header-controls-${scrollY}.json`), JSON.stringify(controlState, null, 2));
+      }
+      await expect(page.locator('yt-searchbox .ytSearchboxComponentInputBox').first()).toHaveCSS('box-shadow', /inset/);
+      headerStates.push(await page.evaluate(() => ({
+        scrollY: window.scrollY,
+        hidden: document.querySelector('ytd-app')?.hasAttribute('masthead-hidden'),
+        frosted: document.querySelector('ytd-masthead')?.getAttribute('frosted-glass-mode'),
+        controls: ['ytd-masthead yt-searchbox input[name="search_query"]', 'ytd-masthead #guide-icon', 'ytd-masthead yt-searchbox .ytSearchboxComponentInputBox'].map(selector => {
+          const element = document.querySelector(selector)!;
+          const style = getComputedStyle(element), box = element.getBoundingClientRect();
+          return { selector, color: style.color, opacity: style.opacity, top: box.top, height: box.height, shadow: style.boxShadow };
+        }),
+      })));
+      if (scrollY === 1 || scrollY === 454) await capture(`live-header-scroll-${scrollY}`);
+    }
+    await writeFile(testInfo.outputPath('live-header-scroll-states.json'), JSON.stringify(headerStates, null, 2));
     await page.locator('ytd-watch-metadata h1').first().scrollIntoViewIfNeeded();
     await capture('live-silver-metadata');
     const playerGeometry = await page.evaluate(() => {
