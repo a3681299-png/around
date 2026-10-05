@@ -150,7 +150,8 @@ html[data-ww-theme][data-ww-site="youtube"] #masthead-container ytd-masthead > #
   color: var(--ww-muted) !important;
   opacity: 1 !important;
 }
-html[data-ww-theme][data-ww-site="youtube"] #masthead-container #guide-button #guide-icon {
+html[data-ww-theme][data-ww-site="youtube"] #masthead-container #guide-button #guide-icon,
+html[data-ww-theme][data-ww-site="youtube"] #masthead-container ytd-masthead > #container :is(yt-searchbox, ytd-searchbox) :is(#search-icon-legacy, #search-clear-button, .ytSearchboxComponentSearchButton, .ytSearchboxComponentClearButton) yt-icon {
   color: var(--ww-ink) !important;
   fill: currentColor !important;
 }

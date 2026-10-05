@@ -17,11 +17,24 @@ async function installTopRestPaint(page: Page) {
     guide.before(guideHost); guideHost.append(guide);
     const input = masthead.querySelector<HTMLInputElement>('yt-searchbox input')!;
     input.classList.add('ytSearchboxComponentInput'); input.placeholder = 'Search';
+    const searchButton = document.createElement('button');
+    searchButton.className = 'ytSearchboxComponentSearchButton';
+    searchButton.setAttribute('aria-label', 'Native search icon');
+    searchButton.innerHTML = '<yt-icon id="fixture-search-icon"><svg viewBox="0 0 24 24"><path d="M3 5h18v2H3z"/></svg></yt-icon>';
+    const clearButton = searchButton.cloneNode(true) as HTMLElement;
+    clearButton.className = 'ytSearchboxComponentClearButton';
+    clearButton.setAttribute('aria-label', 'Native clear icon');
+    clearButton.querySelector('yt-icon')!.id = 'fixture-clear-icon';
+    input.closest('yt-searchbox')!.append(searchButton, clearButton);
     const style = document.createElement('style'); style.id = 'fixture-top-rest-paint';
     style.textContent = `
       #masthead-container { position:fixed;top:0;left:0;right:0;z-index:2020; }
       #masthead-container ytd-masthead { position:static; }
       ytd-page-manager { min-height:2400px; }
+      yt-searchbox { display:flex; }
+      yt-searchbox .ytSearchboxComponentInputBox { flex:1; }
+      html[data-ambientlight-enabled][dark] #masthead-container.at-top yt-searchbox:not(:hover):not(:focus-within) .ytSearchboxComponentSearchButton yt-icon,
+      html[data-ambientlight-enabled][dark] #masthead-container.at-top yt-searchbox:not(:hover):not(:focus-within) .ytSearchboxComponentClearButton yt-icon { color:rgba(255,255,255,.4) !important; }
       html[data-ambientlight-enabled] yt-searchbox .ytSearchboxComponentInputBox { box-shadow:none !important; }
       html[data-ambientlight-enabled] #masthead-container.at-top #guide-button:not(:hover) button:not(:focus) yt-icon { color:rgba(0,0,0,.4) !important;fill:currentColor !important;transition:color .15s; }
       html[data-ambientlight-enabled]:not([dark]) #masthead-container.at-top #guide-button:not(:hover) button:not(:focus) yt-icon { color:rgb(0,0,0) !important; }
@@ -60,6 +73,8 @@ async function readable(page: Page) {
     return { guide:getComputedStyle(guide).color, ink, placeholder:getComputedStyle(input, '::placeholder').color };
   });
   expect(paint.guide).toBe(paint.ink);
+  await expect(page.locator('#fixture-search-icon')).toHaveCSS('color',paint.ink);
+  await expect(page.locator('#fixture-clear-icon')).toHaveCSS('color',paint.ink);
   expect(paint.placeholder).not.toMatch(/^rgba\(/);
   // Sample a solid interior point of the actual hamburger path, not only its
   // computed style: a composited pale glyph would otherwise pass visibility.
