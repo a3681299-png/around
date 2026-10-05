@@ -143,10 +143,15 @@ for (const dark of [false, true]) {
         await expect(youtube.locator('ytd-app > #frosted-glass')).toHaveCSS('display', 'none');
         await expect.poll(() => youtube.evaluate(() => ['input[name="search_query"]', '[aria-label="Guide"]', '.search-submit'].every(selector => {
           const element = document.querySelector(selector)!;
+          for (let node: Element | null = element; node; node = node.parentElement) {
+            const style = getComputedStyle(node);
+            if (Number(style.opacity) < 0.99 || style.visibility !== 'visible' || style.display === 'none') return false;
+          }
           const rect = element.getBoundingClientRect();
           const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
           return Boolean(hit && (element.contains(hit) || hit.contains(element)));
         }))).toBe(true);
+        await expect(youtube.locator('yt-searchbox .ytSearchboxComponentInputBox')).toHaveCSS('box-shadow', /inset/);
         await expect.poll(() => youtube.locator('video').evaluate(element => (element as HTMLVideoElement).paused)).toBe(false);
       }
     }
@@ -160,7 +165,10 @@ for (const dark of [false, true]) {
       await expect(youtube.getByRole('textbox', { name: 'Search', exact: true })).toBeVisible();
     }
     await youtube.evaluate(() => { (document.activeElement as HTMLElement)?.blur(); scrollTo(0, 0); });
+    await youtube.bringToFront();
     await youtube.getByRole('button', { name: 'Fullscreen', exact: true }).click();
+    await expect.poll(() => youtube.evaluate(() => document.fullscreenElement?.id)).toBe('movie_player');
+    await expect(youtube.locator('html')).toHaveAttribute('data-ww-fullscreen', '');
     await expect(youtube.locator('ytd-masthead')).not.toBeVisible();
     await youtube.evaluate(() => document.exitFullscreen());
     await expect(youtube.locator('ytd-masthead')).toBeVisible();

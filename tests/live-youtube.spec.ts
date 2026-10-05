@@ -63,11 +63,16 @@ test(`optional public YouTube ${colorScheme} watch inspection with unmodified ne
         return ['yt-searchbox input', '#guide-icon'].every(selector => {
           const element = document.querySelector(selector);
           if (!element) return false;
+          for (let node: Element | null = element; node; node = node.parentElement) {
+            const style = getComputedStyle(node);
+            if (Number(style.opacity) < 0.99 || style.visibility !== 'visible' || style.display === 'none') return false;
+          }
           const rect = element.getBoundingClientRect();
           const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
           return rect.width > 0 && rect.height > 0 && Boolean(hit && (element.contains(hit) || hit.contains(element)));
         });
       })).toBe(true);
+      await expect(page.locator('yt-searchbox .ytSearchboxComponentInputBox').first()).toHaveCSS('box-shadow', /inset/);
       headerStates.push(await page.evaluate(() => ({
         scrollY: window.scrollY,
         hidden: document.querySelector('ytd-app')?.hasAttribute('masthead-hidden'),
