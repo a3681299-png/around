@@ -171,6 +171,21 @@ test(`optional public YouTube ${colorScheme} watch inspection with unmodified ne
       } else expect(badge.marked).toBe(false);
     }
 
+    await page.evaluate(() => scrollTo(0, 0));
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await expect(page.locator('ytd-watch-metadata h1').first()).toBeVisible({ timeout: 30_000 });
+    await page.evaluate(() => scrollTo(0, 0));
+    await page.waitForTimeout(1600);
+    await inspectPaint('live-top-rest-reload');
+    await expect(page.locator('yt-searchbox .ytSearchboxComponentInputBox').first()).toHaveCSS('box-shadow', /inset/);
+    await page.locator('ytd-masthead a#logo').first().click();
+    await expect(page).toHaveURL('https://www.youtube.com/');
+    await page.goBack();
+    await expect(page.locator('ytd-watch-metadata h1').first()).toBeVisible({ timeout: 30_000 });
+    await page.evaluate(() => scrollTo(0, 0));
+    await page.waitForTimeout(1600);
+    await inspectPaint('live-top-rest-spa-back');
+    await expect(page.locator('yt-searchbox .ytSearchboxComponentInputBox').first()).toHaveCSS('box-shadow', /inset/);
     await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
     await expect(page.locator('#web-world-themes-style')).toHaveCount(0);
     await expect(page.locator('[data-ww-surface]')).toHaveCount(0);

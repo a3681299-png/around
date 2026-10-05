@@ -131,3 +131,32 @@ html[data-ww-theme][data-ww-window-chrome] ytd-playlist-panel-renderer > #contai
   flex: 1 1 auto !important;
   min-height: 0 !important;
 }
+
+/* Keep the themed controls legible when a transparent-header integration changes
+   its paint only at scrollY=0 (for example Ambient light's .at-top rules).
+   Use the real masthead + toolbar ID boundaries to beat those !important rules;
+   do not change its state, background canvas, observer, or media subtree. */
+html[data-ww-theme][data-ww-site="youtube"] #masthead-container ytd-masthead > #container :is(yt-searchbox, ytd-searchbox) [data-ww-surface~="input"],
+html[data-ww-theme][data-ww-site="youtube"] #masthead-container ytd-masthead > #container ytd-searchbox #container {
+  background: var(--ww-paper) !important;
+  border-color: var(--ww-border) !important;
+  box-shadow: var(--ww-sunken) !important;
+  color: var(--ww-ink) !important;
+}
+html[data-ww-theme][data-ww-site="youtube"] #masthead-container ytd-masthead > #container :is(yt-searchbox, ytd-searchbox) :is(#search, input[name="search_query"]) {
+  color: var(--ww-ink) !important;
+}
+html[data-ww-theme][data-ww-site="youtube"] #masthead-container ytd-masthead > #container :is(yt-searchbox, ytd-searchbox) :is(#search, input[name="search_query"])::placeholder {
+  color: var(--ww-muted) !important;
+  opacity: 1 !important;
+}
+html[data-ww-theme][data-ww-site="youtube"] #masthead-container #guide-button #guide-icon {
+  color: var(--ww-ink) !important;
+  fill: currentColor !important;
+}
+html[data-ww-theme][data-ww-site="youtube"] #masthead-container ytd-masthead > #container :is(yt-searchbox, ytd-searchbox) :is(#search-icon-legacy, .ytSearchboxComponentSearchButton) {
+  background: var(--ww-silver) !important;
+  border-color: var(--ww-border) !important;
+  box-shadow: var(--ww-raised) !important;
+  color: var(--ww-ink) !important;
+}
