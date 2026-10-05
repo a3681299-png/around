@@ -56,6 +56,7 @@ async function installTopRestPaint(page: Page) {
 }
 
 async function rest(page: Page, y: number) {
+  await page.bringToFront();
   await page.mouse.move(1800, 800);
   await page.evaluate(y => { (document.activeElement as HTMLElement)?.blur(); scrollTo(0, y); }, y);
   await page.waitForTimeout(700); // Beyond delayed observer and 150ms color transition.
@@ -66,6 +67,7 @@ async function rest(page: Page, y: number) {
 
 async function readable(page: Page) {
   await expect(page.locator('yt-searchbox .ytSearchboxComponentInputBox')).toHaveCSS('box-shadow', /inset/);
+  await expect.poll(() => page.evaluate(() => getComputedStyle(document.querySelector('#guide-icon')!).color === getComputedStyle(document.querySelector('ytd-masthead')!).color)).toBe(true);
   const paint = await page.evaluate(() => {
     const input = document.querySelector('yt-searchbox input')!;
     const guide = document.querySelector('#guide-icon')!;
