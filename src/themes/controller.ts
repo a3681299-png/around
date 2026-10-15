@@ -1,67 +1,100 @@
 import { createFeatureController } from '../features/controller';
+import { compileDesign, createDesignRenderer } from '../design/renderer';
+import { parseDesign } from '../design/schema';
+import type { DesignDocument } from '../design/types';
 import type { SiteAdapter } from '../sites/types';
 import type { UserSettings } from '../storage/settings';
 import type { ThemeDefinition } from './types';
-import { createPalette, PALETTE_VARIABLES } from './retro/palette';
 
 const STYLE_ID = 'web-world-themes-style';
+
+export interface ThemeController {
+  update(settings: UserSettings): void;
+  updateDesign(design: DesignDocument | undefined): void;
+  destroy(): void;
+}
 
 export function createThemeController(
   doc: Document,
   site: SiteAdapter,
   theme: ThemeDefinition,
-): { update(settings: UserSettings): void; destroy(): void } {
+  onSurfacesChanged?: () => void,
+): ThemeController {
   const features = createFeatureController({ document: doc, site });
+  const designRenderer = createDesignRenderer(doc, site.designTargets ?? []);
+  const variables = new Set<string>();
   let disconnect: (() => void) | undefined;
   let style: HTMLStyleElement | undefined;
-  let strength = 0;
+  let current: UserSettings | undefined;
+  let design: DesignDocument | undefined;
   const root = doc.documentElement;
   const css = [site.stylesheet, ...theme.stylesheets].join('\n');
 
-  const render = () => {
-    root.setAttribute('data-ww-theme', theme.id);
-    root.style.setProperty('--ww-strength', String(strength / 100));
-    if (!style) {
-      style = doc.createElement('style');
-      style.id = STYLE_ID;
-      style.textContent = css;
-    }
-    if (!style.isConnected) (doc.head ?? root).append(style);
-    features.refresh();
+  const clearVariables = () => {
+    variables.forEach((name) => root.style.removeProperty(name));
+    variables.clear();
   };
-
-  const destroy = () => {
-    features.destroy();
-    disconnect?.();
-    disconnect = undefined;
+  const removeBase = () => {
     style?.remove();
     style = undefined;
     root.removeAttribute('data-ww-theme');
     root.style.removeProperty('--ww-strength');
-    root.style.removeProperty('--ww-noise-strength');
-    PALETTE_VARIABLES.forEach((name) => root.style.removeProperty(name));
+    clearVariables();
+  };
+  const deactivate = () => {
+    designRenderer.destroy();
+    features.destroy();
+    disconnect?.();
+    disconnect = undefined;
+    removeBase();
+  };
+
+  const render = () => {
+    if (!current?.enabled || current.strength === 0) return;
+    if (design?.baseThemeId === null) {
+      // Independent designs use native site styling plus their own rules only.
+      features.destroy();
+      removeBase();
+    } else {
+      root.setAttribute('data-ww-theme', theme.id);
+      root.style.setProperty('--ww-strength', String(current.strength / 100));
+      const next = theme.variables?.(current) ?? {};
+      for (const name of variables) if (!Object.hasOwn(next, name)) root.style.removeProperty(name);
+      variables.clear();
+      for (const [name, value] of Object.entries(next)) {
+        root.style.setProperty(name, value);
+        variables.add(name);
+      }
+      if (!style) {
+        style = doc.createElement('style');
+        style.id = STYLE_ID;
+        style.textContent = css;
+      }
+      if (!style.isConnected) (doc.head ?? root).append(style);
+      features.update(current.features);
+      features.refresh();
+    }
+    designRenderer.update(design);
+    onSurfacesChanged?.();
   };
 
   return {
     update(settings) {
-      strength = settings.strength;
-      // Zero is an exact original-style boundary, including native corner radii.
-      if (!settings.enabled || strength === 0) {
-        destroy();
-        return;
-      }
-      if (settings.features['palette']) {
-        for (const [name, value] of Object.entries(createPalette(settings.palette))) root.style.setProperty(name, value);
-      } else {
-        PALETTE_VARIABLES.forEach((name) => root.style.removeProperty(name));
-      }
-      if (settings.features['surface-noise']) root.style.setProperty('--ww-noise-strength', String(settings.noiseStrength / 100));
-      else root.style.removeProperty('--ww-noise-strength');
+      current = settings;
+      if (!settings.enabled || settings.strength === 0) { deactivate(); return; }
       disconnect ??= site.connect(render);
-      features.update(settings.features);
       render();
     },
-    destroy,
+    updateDesign(input) {
+      const next = input ? parseDesign(input) : undefined;
+      if (next && (next.siteId !== site.id || (next.baseThemeId !== null && next.baseThemeId !== theme.id))) {
+        throw new Error('このサイトまたは基底テーマには対応していません。');
+      }
+      if (next) compileDesign(next, site.designTargets ?? []);
+      design = next;
+      render();
+    },
+    destroy() { current = undefined; deactivate(); },
   };
 }
 

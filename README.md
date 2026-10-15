@@ -58,6 +58,8 @@ BBSの番号は現在読み込まれたコメントと返信の表示順で、�
 
 ## 開発
 
+クリエイター向け編集の実験は `codex/creator-editor-spike` と専用worktreeで進めます。Popupの「カードをデザイン（実験）」から動画カードを選択し、背景色・枠線・角丸をプレビュー、保存、破棄できます。使い方と保存形式は [creator-editor.md](docs/creator-editor.md) を参照してください。実験用worktreeの `dist` は、別のChromeプロファイルへ読み込みます。
+
 ```powershell
 npm run dev
 ```

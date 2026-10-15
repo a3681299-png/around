@@ -42,7 +42,7 @@
       yt-chip-cloud-chip-renderer[selected] button { background: #141414; color: #fff; }
       :root[dark] yt-chip-cloud-chip-renderer button { background: #303030; }
       ytd-rich-grid-renderer { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px 15px; }
-      ytd-rich-grid-media { min-width: 0; padding-bottom: 12px; }
+      ytd-rich-grid-media, ytd-video-renderer { display: block; min-width: 0; padding-bottom: 12px; }
       .thumbnail-art, ytd-thumbnail #thumbnail, yt-thumbnail-view-model { display: block; width: 100%; aspect-ratio: 16 / 9; background: #a9b4bb; border-radius: 16px; overflow: hidden; }
       yt-thumbnail-view-model { border-radius: 12px; }
       .thumbnail-art, ytd-thumbnail img, yt-thumbnail-view-model img { object-fit: cover; width: 100%; height: auto; }
@@ -153,7 +153,7 @@
       }
       function card(item, index, related = false) {
         const picture = index === 0 ? `<ytd-thumbnail><a id="thumbnail" href="/watch?v=fixture" data-fixture-nav>${image(item)}</a></ytd-thumbnail>` : index === 1 ? `<yt-thumbnail-view-model>${image(item)}</yt-thumbnail-view-model>` : image(item);
-        const tag = related ? 'yt-lockup-view-model' : 'ytd-rich-grid-media';
+        const tag = related ? 'yt-lockup-view-model' : location.pathname === '/results' ? 'ytd-video-renderer' : 'ytd-rich-grid-media';
         return `<${tag}><div class="thumbnail-box">${picture}${duration(item)}</div><div class="card-body"><span class="avatar">${item[1].split(' ').map(w => w[0]).join('')}</span><div><yt-lockup-metadata-view-model><h3 class="yt-lockup-metadata-view-model__title"><a id="video-title" href="/watch?v=fixture" data-fixture-nav><yt-formatted-string><span>${item[0]}</span></yt-formatted-string></a></h3></yt-lockup-metadata-view-model><div id="channel-name">${item[1]}</div><ytd-video-meta-block><div id="metadata-line">${item[2]}</div></ytd-video-meta-block></div></div></${tag}>`;
       }
       function renderPage() {

@@ -31,7 +31,7 @@ export async function launchExtension(profile: string, useFixture = true): Promi
 
 export const test = base.extend<{ profile: string; extensionId: string; popup: Page; youtube: Page }>({
   profile: async ({}, use) => {
-    const work = path.resolve('.work');
+    const work = path.resolve(process.env.WW_TEST_PROFILE_ROOT ?? '.work');
     await mkdir(work, { recursive: true });
     // Chrome Storage's LevelDB can fail on Windows when test-title paths exceed MAX_PATH.
     await use(await mkdtemp(path.join(work, 'p-')));

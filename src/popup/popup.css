@@ -8,3 +8,6 @@ body { width: 340px; margin: 0; }
 
 /* Keep all options reachable within Chrome popup height limits. */
 body { max-height: 580px; overflow-y: auto; overscroll-behavior: contain; }
+.creator-launcher { padding: 12px; border-top: 1px solid var(--ww-border); }
+.creator-launcher button { width: 100%; padding: 8px; cursor: pointer; font: inherit; }
+.creator-launcher p { margin: 8px 0 0; font-size: 12px; }

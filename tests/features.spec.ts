@@ -4,6 +4,7 @@ import { createFeatureController } from '../src/features/controller';
 import { bindSettingsForm } from '../src/settings/form';
 import { createThemeController } from '../src/themes/controller';
 import { DEFAULT_PALETTE, PALETTE_CHANNELS, PALETTE_PRESETS, PALETTE_VARIABLES } from '../src/themes/retro/palette';
+import { retroVariables } from '../src/themes/retro/variables';
 import type { SiteAdapter } from '../src/sites/types';
 import {
   DEFAULT_SETTINGS,
@@ -473,7 +474,7 @@ test('invalid stored channels and noise use bounded defaults without rewriting s
 
 test('palette and noise variables follow independent toggles and leave nothing after OFF or zero', () => {
   const { doc, properties } = fakeDocument();
-  const controller = createThemeController(doc, fakeSite(), { id: 'fixture', name: 'Fixture', stylesheets: [], editorStylesheets: [] });
+  const controller = createThemeController(doc, fakeSite(), { id: 'fixture', name: 'Fixture', stylesheets: [], editorStylesheets: [], variables: retroVariables });
   const active = mergeSettings(DEFAULT_SETTINGS, {
     enabled: true, palette: PALETTE_PRESETS.mint, noiseStrength: 41,
     features: { palette: true, 'surface-noise': true },

@@ -11,8 +11,11 @@ async function check(directory) {
     if (entry.isDirectory()) { await check(file); continue; }
     if (!/\.(css|ts)$/.test(file)) continue;
     const source = await readFile(file, 'utf8');
-    const label = relative(root, file);
+    const label = relative(root, file).replaceAll('\\', '/');
     if (/[^\S\r\n]+$/m.test(source)) errors.push(`${label}: trailing whitespace`);
+    if (/^src\/(?:themes|design|editor)\//.test(label) && /\b(?:ytd|ytm|yt)-[a-z]/.test(source)) {
+      errors.push(`${label}: keep YouTube selectors inside the site adapter`);
+    }
     if (!file.endsWith('.css')) continue;
     const result = await transform(source, { loader: 'css', sourcefile: label, logLevel: 'silent' });
     errors.push(...result.warnings.map(warning => `${label}: ${warning.text}`));

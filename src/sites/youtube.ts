@@ -5,6 +5,7 @@ import { mountYouTubeSettings } from './youtube-player';
 import { mountYouTubeChrome } from './youtube-chrome';
 import { mountYouTubeDetails, mountYouTubeFocus } from './youtube-details';
 import { mountYouTubeComments } from './youtube-comments';
+import { isYouTubeVideoCard, videoCardContainer } from './youtube-cards';
 
 const SURFACE_ATTRIBUTE = 'data-ww-surface';
 
@@ -109,6 +110,7 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
   return {
     id: 'youtube',
     stylesheet: `${stylesheet}\n${chromeStylesheet}`,
+    designTargets: [{ id: 'video-card', surface: 'video-card', label: '動画カード' }],
     mountSettings: (entry) => mountYouTubeSettings(doc, view, entry),
     features: {
       'window-chrome': { mount: () => mountYouTubeChrome(doc) },
@@ -139,6 +141,7 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
             });
           }
         }
+        if (isYouTubeVideoCard(element)) surfaces.add('video-card');
         if (surfaces.size > 0) {
           const value = [...surfaces].join(' ');
           if (element.getAttribute(SURFACE_ATTRIBUTE) !== value) {
@@ -196,6 +199,10 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
       // Only added subtrees / changed IDs are scanned on ordinary DOM updates.
       const observer = new MutationObserver((records) => {
         for (const record of records) {
+          // A delayed/recycled link can change eligibility without replacing the card.
+          const owner = record.target instanceof Element ? record.target : record.target.parentElement;
+          const card = owner && videoCardContainer(owner);
+          if (card) pending.add(card);
           if (record.type === 'characterData') {
             const badge = record.target.parentElement?.closest(durationSelector);
             if (badge) pending.add(badge.closest('ytd-thumbnail-overlay-time-status-renderer') ?? badge);
@@ -218,7 +225,7 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
         characterData: true,
         subtree: true,
         attributes: true,
-        attributeFilter: ['id', 'active', 'selected', 'aria-selected', 'aria-pressed', 'fullscreen'],
+        attributeFilter: ['id', 'href', 'content-type', 'active', 'selected', 'aria-selected', 'aria-pressed', 'fullscreen'],
       });
 
       const modeObserver = new MutationObserver(() => {

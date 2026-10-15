@@ -1,0 +1,46 @@
+:host {
+  all: initial !important;
+  position: fixed !important;
+  top: 118px !important;
+  right: 16px !important;
+  display: block !important;
+  width: 300px !important;
+  max-width: calc(100vw - 32px) !important;
+  max-height: calc(100vh - 158px) !important;
+  overflow: auto !important;
+  overscroll-behavior: contain !important;
+  z-index: 2147483000 !important;
+  color-scheme: light !important;
+  background: #fff !important;
+  color: #242331 !important;
+  border: 1px solid #cbc8d5 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px #16112530 !important;
+  font: 13px/1.5 system-ui, sans-serif !important;
+  text-align: left !important;
+}
+:host([data-ww-dock="left"]) { left: 16px !important; right: auto !important; }
+* { box-sizing: border-box; }
+main { padding: 16px; }
+header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+h2 { margin: 0; font-size: 16px; }
+p { margin: 8px 0 12px; }
+.hint { color: #605b70; font-size: 12px; }
+.selection { padding: 8px; background: #f4f1fa; border-radius: 6px; }
+fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.property { display: grid; gap: 6px; padding: 12px 0; border-bottom: 1px solid #eceaf1; }
+label { display: flex; align-items: center; gap: 8px; }
+input, button { font: inherit; }
+input[type="color"] { width: 100%; height: 32px; border: 1px solid #cbc8d5; background: #fff; border-radius: 4px; }
+input[type="number"] { width: 68px; padding: 5px 8px; border: 1px solid #cbc8d5; border-radius: 4px; }
+input[type="checkbox"] { accent-color: #695089; }
+button { cursor: pointer; padding: 7px 10px; color: #423253; background: #f3f0f8; border: 1px solid #cbc8d5; border-radius: 6px; }
+button:disabled, input:disabled { cursor: default; opacity: .5; }
+button:focus-visible, input:focus-visible { outline: 2px solid #695089; outline-offset: 2px; }
+.primary { color: #fff; background: #695089; border-color: #695089; }
+.actions { display: flex; gap: 8px; margin-top: 12px; }
+.close { padding: 4px 8px; }
+.dock { padding: 4px 6px; font-size: 11px; margin-left: auto; }
+.status { min-height: 38px; margin: 10px 0 0; font-size: 12px; }
+.status[data-error="true"] { color: #8c2146; }
+.reset { margin-top: 12px; width: 100%; }
