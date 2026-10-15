@@ -44,3 +44,13 @@ button:focus-visible, input:focus-visible { outline: 2px solid #695089; outline-
 .status { min-height: 38px; margin: 10px 0 0; font-size: 12px; }
 .status[data-error="true"] { color: #8c2146; }
 .reset { margin-top: 12px; width: 100%; }
+.assets { margin-top: 12px; }
+.add-image { width: 100%; }
+.layers { display: grid; gap: 4px; max-height: 100px; overflow: auto; }
+.layers button { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+.layers button[aria-pressed="true"] { border-color: #695089; background: #eae2f5; }
+.row { grid-template-columns: 1fr 1fr; }
+.row label { gap: 4px; }
+.row input { width: 62px; }
+select { max-width: 180px; font: inherit; padding: 4px; }
+[hidden] { display: none !important; }

@@ -1,7 +1,9 @@
 import { emptyDesign, parseDesign, sameDesign } from '../design/schema';
-import type { DesignDocument, DesignTarget, SurfaceStyle } from '../design/types';
+import { IMAGE_LIMITS, type DesignDocument, type DesignTarget, type SurfaceStyle, type ImagePatch } from '../design/types';
+import type { ImageEditing } from '../design/image-renderer';
+import { commitDesign, importAssets, releaseAssets, retainAssets } from '../assets/client';
 import type { SiteAdapter } from '../sites/types';
-import { readDesign, saveDesign, watchDesign } from '../storage/designs';
+import { readDesign, watchDesign } from '../storage/designs';
 import { createCreatorPanel } from './panel';
 import type { OpenEditorResponse } from './messages';
 
@@ -24,6 +26,8 @@ export function createCreatorEditor(
   site: SiteAdapter,
   baseThemeId: string,
   apply: (design: DesignDocument | undefined) => void,
+  editImages: (editing: ImageEditing | undefined) => void,
+  validate: (design: DesignDocument | undefined) => void,
 ): CreatorEditor {
   let saved: DesignDocument | undefined;
   let draft = emptyDesign(site.id, baseThemeId);
@@ -31,6 +35,13 @@ export function createCreatorEditor(
   let panel: ReturnType<typeof createCreatorPanel> | undefined;
   let selectionStyle: HTMLStyleElement | undefined;
   let selected: { element: Element; target: DesignTarget } | undefined;
+  let selectedImageId: string | undefined;
+  let assetSession: string | undefined;
+  let leased = '';
+  let importEpoch = 0;
+  let importing = false;
+  let leaseQueue: Promise<void> = Promise.resolve();
+  const deferredReleases = new Set<string>();
   let enabled = false;
   let loaded = false;
   let dirty = false;
@@ -42,16 +53,110 @@ export function createCreatorEditor(
   let error = false;
   const initial = () => saved ? parseDesign(saved) : emptyDesign(site.id, baseThemeId);
   const applyCurrent = () => apply(panel && dirty ? draft : saved);
-  const render = () => panel?.render({
-    selected: Boolean(selected),
-    style: draft.rules.find((rule) => rule.target === selected?.target.id)?.style ?? {},
-    dirty, saving, status, error,
-  });
+  const render = () => {
+    if (selectedImageId && !draft.decorations.some((image) => image.id === selectedImageId)) selectedImageId = undefined;
+    panel?.render({
+      selected: Boolean(selected),
+      style: draft.rules.find((rule) => rule.target === selected?.target.id)?.style ?? {},
+      dirty, saving: saving || importing, status, error, images: draft.decorations,
+      image: draft.decorations.find((image) => image.id === selectedImageId),
+    });
+    editImages(panel ? { selectedId: selectedImageId, locked: saving || importing, select: selectImage,
+      change: (id, placement) => changeImage(id, { placement }),
+      error: (message) => { status = message; error = true; render(); },
+    } : undefined);
+  };
   const clearSelection = () => { selected?.element.removeAttribute('data-ww-editor-selected'); selected = undefined; };
+  const syncAssets = (): Promise<void> => {
+    const session = assetSession;
+    if (!session) return Promise.resolve();
+    const ids = [...new Set(draft.decorations.map((image) => image.assetId))];
+    const key = ids.sort().join(',');
+    leaseQueue = leaseQueue.catch(() => undefined).then(async () => {
+      if (session !== assetSession || leased === key) return;
+      await retainAssets(session, ids);
+      if (session === assetSession) leased = key;
+    });
+    return leaseQueue;
+  };
+  const settleAssets = () => { void syncAssets().catch((reason: unknown) => {
+    if (!panel) return;
+    status = reason instanceof Error ? reason.message : '素材を保持できませんでした。'; error = true; render();
+  }); };
+  const updateDraft = (next: DesignDocument) => {
+    draft = parseDesign(next);
+    dirty = !sameDesign(draft, initial());
+    status = dirty ? 'このタブでプレビュー中です。保存すると各タブに反映します。' : '保存済みの見た目です。';
+    error = false;
+    applyCurrent(); render();
+  };
+  function selectImage(id: string) {
+    if (!panel || saving || importing || !draft.decorations.some((image) => image.id === id)) return;
+    clearSelection(); selectedImageId = id;
+    status = '画像をドラッグして移動。四隅でサイズ変更、上の丸で回転できます。'; error = false; render();
+  }
+  function changeImage(id: string, patch: ImagePatch) {
+    if (!panel || saving || importing) return;
+    const next = parseDesign(draft);
+    next.decorations = next.decorations.map((image) => image.id === id ? { ...image, ...patch, placement: { ...image.placement, ...patch.placement } } : image);
+    updateDraft(next);
+  }
+  const deleteImage = () => {
+    if (!selectedImageId || saving || importing) return;
+    const next = parseDesign(draft);
+    next.decorations = next.decorations.filter((image) => image.id !== selectedImageId);
+    selectedImageId = undefined; updateDraft(next); settleAssets();
+  };
+  const addImages = async (files: readonly File[], point?: { x: number; y: number }) => {
+    if (!panel || !assetSession || saving || importing || !files.length) return;
+    if (draft.decorations.length + files.length > IMAGE_LIMITS.count) { status = '画像は32枚まで配置できます。'; error = true; render(); return; }
+    const epoch = importEpoch;
+    const importSession = `session-${crypto.randomUUID()}`;
+    let before: DesignDocument | undefined;
+    const previousSelection = selectedImageId;
+    importing = true; status = '画像を読み込んでいます…'; error = false; render();
+    try {
+      const assets = await importAssets(files, importSession);
+      if (epoch !== importEpoch || !panel) return;
+      before = parseDesign(draft);
+      const next = parseDesign(draft);
+      const view = doc.defaultView!;
+      assets.forEach((asset, index) => {
+        const scale = Math.max(IMAGE_LIMITS.minSize / Math.min(asset.width, asset.height), Math.min(260 / asset.width, 200 / asset.height, view.innerWidth * .28 / asset.width, view.innerHeight * .3 / asset.height));
+        const id = `image-${crypto.randomUUID()}`;
+        next.decorations.push({ kind: 'image', id, assetId: asset.id, name: asset.name,
+          placement: { anchor: { kind: 'viewport' }, x: Math.min(.95, Math.max(.05, (point?.x ?? view.innerWidth * .45) / view.innerWidth + index * 24 / view.innerWidth)),
+            y: Math.min(.95, Math.max(.05, (point?.y ?? view.innerHeight * .45) / view.innerHeight + index * 24 / view.innerHeight)),
+            widthPx: Math.round(asset.width * scale * 10) / 10, heightPx: Math.round(asset.height * scale * 10) / 10, rotationDeg: 0 },
+          opacity: 1, zIndex: Math.min(100, next.decorations.length), visible: true });
+        selectedImageId = id;
+      });
+      clearSelection(); updateDraft(next);
+      leased = ''; await syncAssets();
+    } catch (reason) {
+      if (epoch !== importEpoch || !panel) return;
+      if (before) { selectedImageId = previousSelection; updateDraft(before); }
+      status = reason instanceof Error ? reason.message : '画像を読み込めませんでした。'; error = true;
+      leased = ''; settleAssets();
+    } finally {
+      void releaseAssets(importSession).catch(() => undefined);
+      if (epoch === importEpoch) { importing = false; render(); }
+    }
+  };
 
   const close = () => {
+    importEpoch++;
+    importing = false;
+    if (assetSession) {
+      if (saving) deferredReleases.add(assetSession);
+      else void releaseAssets(assetSession).catch(() => undefined);
+      assetSession = undefined;
+    }
+    leased = ''; selectedImageId = undefined;
     PICK_EVENTS.forEach((event) => doc.removeEventListener(event, onPick, true));
     doc.removeEventListener('keydown', onKeyDown, true);
+    doc.removeEventListener('dragover', onDragOver, true);
+    doc.removeEventListener('drop', onDrop, true);
     clearSelection();
     panel?.destroy();
     panel = undefined;
@@ -61,6 +166,7 @@ export function createCreatorEditor(
     draft = initial();
     dirty = false;
     applyCurrent();
+    editImages(undefined);
   };
   const discard = () => {
     draft = initial();
@@ -69,24 +175,20 @@ export function createCreatorEditor(
     error = false;
     applyCurrent();
     render();
+    settleAssets();
   };
   const change = (style: SurfaceStyle) => {
-    if (!selected || saving) return;
+    if (!selected || saving || importing) return;
     const next = parseDesign(draft);
     next.rules = next.rules.filter((rule) => rule.target !== selected!.target.id);
     if (Object.keys(style).length > 0) next.rules.push({ kind: 'surface-style', target: selected.target.id, style });
-    draft = parseDesign(next);
-    dirty = !sameDesign(draft, initial());
-    status = dirty ? 'このタブでプレビュー中です。保存すると各タブに反映します。' : '保存済みの見た目です。';
-    error = false;
-    applyCurrent();
-    render();
+    updateDraft(next);
   };
 
   const accept = (incoming: DesignDocument | undefined) => {
     // Validate support before changing session state; unsupported data stays on disk.
     const previous = saved;
-    apply(incoming);
+    validate(incoming);
     saved = incoming;
     storageEpoch++;
     loaded = true;
@@ -103,6 +205,7 @@ export function createCreatorEditor(
     }
     applyCurrent();
     render();
+    if (panel) settleAssets();
   };
   const onStorageError = (reason: unknown) => {
     loaded = true;
@@ -111,7 +214,8 @@ export function createCreatorEditor(
     close();
   };
   const save = async () => {
-    if (!dirty || saving) return;
+    if (!dirty || saving || importing || !assetSession) return;
+    const saveSession = assetSession;
     const snapshot = parseDesign(draft);
     pendingSave = snapshot;
     saving = true;
@@ -119,7 +223,8 @@ export function createCreatorEditor(
     error = false;
     render();
     try {
-      await saveDesign(snapshot);
+      await syncAssets();
+      await commitDesign(snapshot, saveSession);
       const epoch = storageEpoch;
       const latest = await readDesign(site.id);
       if (!alive) return;
@@ -134,6 +239,8 @@ export function createCreatorEditor(
     } finally {
       pendingSave = undefined;
       saving = false;
+      deferredReleases.forEach((session) => { void releaseAssets(session).catch(() => undefined); });
+      deferredReleases.clear();
       if (alive) render();
     }
   };
@@ -152,8 +259,10 @@ export function createCreatorEditor(
     if (!target || ('button' in event && event.button === 2)) return;
     event.preventDefault();
     event.stopImmediatePropagation();
+    if (saving || importing) return;
     if (event.type !== 'click' && event.type !== 'auxclick') return;
     clearSelection();
+    selectedImageId = undefined;
     selected = target;
     target.element.setAttribute('data-ww-editor-selected', '');
     status = dirty ? 'この種類のカードを編集中です。' : 'プロパティを変更すると、このタブでプレビューします。';
@@ -161,7 +270,10 @@ export function createCreatorEditor(
     render();
   }
   function onKeyDown(event: KeyboardEvent) {
-    if (event.key === 'Escape' && !saving) {
+    if (event.key === 'Delete' && selectedImageId) {
+      if (event.composedPath().some((node) => node instanceof HTMLElement && (node.matches('input, textarea, select') || node.isContentEditable))) return;
+      event.preventDefault(); event.stopImmediatePropagation(); deleteImage();
+    } else if (event.key === 'Escape' && !saving && !importing) {
       event.preventDefault();
       event.stopImmediatePropagation();
       close();
@@ -170,10 +282,21 @@ export function createCreatorEditor(
       event.stopImmediatePropagation();
       const target = pickTarget(event)!;
       clearSelection();
+      selectedImageId = undefined;
       selected = target;
       target.element.setAttribute('data-ww-editor-selected', '');
       render();
     }
+  }
+
+  function onDragOver(event: DragEvent) {
+    if (!panel || !event.dataTransfer?.types.includes('Files')) return;
+    event.preventDefault(); event.stopImmediatePropagation(); event.dataTransfer.dropEffect = 'copy';
+  }
+  function onDrop(event: DragEvent) {
+    if (!panel || !event.dataTransfer?.files.length) return;
+    event.preventDefault(); event.stopImmediatePropagation();
+    void addImages([...event.dataTransfer.files], { x: event.clientX, y: event.clientY });
   }
 
   let unwatch = watchDesign(site.id, accept, onStorageError);
@@ -186,11 +309,14 @@ export function createCreatorEditor(
       if (panel) { panel.focus(); return { ok: true }; }
       draft = initial();
       dirty = false;
-      status = '動画カードをクリックして選択してください。';
+      assetSession = `session-${crypto.randomUUID()}`; leased = ''; importEpoch++;
+      status = 'カードを選ぶか、画像を追加してください。';
       error = false;
       panel = createCreatorPanel(doc, {
         change, save: () => { void save(); }, discard, reset: () => change({}), close,
-      });
+        imageImport: (files) => { void addImages(files); }, imageSelect: selectImage,
+        imageChange: (patch) => { if (selectedImageId) changeImage(selectedImageId, patch); }, imageDelete: deleteImage,
+      }, site.decorationAnchors);
       selectionStyle = doc.createElement('style');
       selectionStyle.id = 'web-world-themes-selection-style';
       selectionStyle.textContent = SELECTION_CSS;
@@ -199,7 +325,10 @@ export function createCreatorEditor(
       doc.documentElement.setAttribute('data-ww-editing', '');
       PICK_EVENTS.forEach((event) => doc.addEventListener(event, onPick, true));
       doc.addEventListener('keydown', onKeyDown, true);
+      doc.addEventListener('dragover', onDragOver, true);
+      doc.addEventListener('drop', onDrop, true);
       render();
+      settleAssets();
       panel.focus();
       return { ok: true };
     },

@@ -16,6 +16,7 @@ if (manifest.manifest_version !== 3 || manifest.version !== pkg.version) {
 
 await mkdir(join(outDir, 'popup'), { recursive: true });
 await mkdir(join(outDir, 'content'), { recursive: true });
+await mkdir(join(outDir, 'background'), { recursive: true });
 
 async function copyStaticFiles() {
   await Promise.all([
@@ -37,6 +38,12 @@ const shared = {
 };
 
 const builds = await Promise.all([
+  context({
+    ...shared,
+    entryPoints: ['src/background/index.ts'],
+    outfile: 'dist/background/index.js',
+    format: 'iife',
+  }),
   context({
     ...shared,
     entryPoints: ['src/content/index.ts'],

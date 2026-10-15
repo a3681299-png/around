@@ -7,6 +7,9 @@
   "permissions": [
     "storage"
   ],
+  "background": {
+    "service_worker": "background/index.js"
+  },
   "action": {
     "default_title": "Web World Themes",
     "default_popup": "popup/index.html"

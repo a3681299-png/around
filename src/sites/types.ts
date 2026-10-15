@@ -27,6 +27,7 @@ export interface SiteAdapter {
   readonly id: string;
   readonly stylesheet: string;
   readonly designTargets?: readonly DesignTarget[];
+  readonly decorationAnchors?: readonly DesignTarget[];
   /** Optional site-owned implementations; unsupported features are safely skipped. */
   readonly features?: Readonly<Record<string, SiteFeatureCapability>>;
   connect(onPageChange: () => void): () => void;

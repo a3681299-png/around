@@ -58,7 +58,7 @@ BBSの番号は現在読み込まれたコメントと返信の表示順で、�
 
 ## 開発
 
-クリエイター向け編集の実験は `codex/creator-editor-spike` と専用worktreeで進めます。Popupの「カードをデザイン（実験）」から動画カードを選択し、背景色・枠線・角丸をプレビュー、保存、破棄できます。使い方と保存形式は [creator-editor.md](docs/creator-editor.md) を参照してください。実験用worktreeの `dist` は、別のChromeプロファイルへ読み込みます。
+クリエイター向け編集の実験は `codex/creator-editor-spike` と専用worktreeで進めます。Popupの「デザインを編集（実験）」から動画カードの装飾を編集したり、PNG・WebP素材を読み込んで移動・サイズ変更・回転したりできます。画像は拡張専用IndexedDB、デザインはバージョン付きJSONで保存します。使い方と制限は [creator-editor.md](docs/creator-editor.md) を参照してください。実験用worktreeの `dist` は、別のChromeプロファイルへ読み込みます。
 
 ```powershell
 npm run dev
@@ -122,7 +122,7 @@ dist/                         Chromeへ読み込む生成物（Git管理対象�
 
 ## 設計
 
-Popupまたはプレイヤー設定パネル → `chrome.storage.local` → `storage.onChanged` → content → ThemeController → SiteAdapter / theme、という流れです。content scriptをYouTubeへ静的に登録するため、バックグラウンドService Workerは必要ありません。権限は`storage`だけで、適用先は`https://www.youtube.com/*`に限定しています。埋め込みプレイヤーとライブチャット専用ページは除外します。YouTube Music、モバイル版、Twitch、Xは対象外です。
+Popupまたはプレイヤー設定パネル → `chrome.storage.local` → `storage.onChanged` → content → ThemeController → SiteAdapter / theme、という流れです。content scriptをYouTubeへ静的に登録します。実験エディターのService Workerは、拡張専用IndexedDBへの画像保存と、素材参照を検証したデザイン保存を担当します。権限は`storage`だけで、適用先は`https://www.youtube.com/*`に限定しています。埋め込みプレイヤーとライブチャット専用ページは除外します。YouTube Music、モバイル版、Twitch、Xは対象外です。
 
 ON/OFFと強さは別々のキーに保存します。複数のPopupから異なる設定を変更しても、もう一方の値を上書きしません。初期読込中に届いた変更は読込結果へ合流させ、古い設定への巻き戻りを防ぎます。スライダー操作のたびに保存を始め、Popupを閉じると失われる遅延タイマーは使いません。
 

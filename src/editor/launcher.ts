@@ -8,11 +8,11 @@ export function mountCreatorLauncher(container: HTMLElement): () => void {
   const button = doc.createElement('button');
   button.id = 'creator-editor-open';
   button.type = 'button';
-  button.textContent = 'カードをデザイン（実験）';
+  button.textContent = 'デザインを編集（実験）';
   const status = doc.createElement('p');
   status.setAttribute('role', 'status');
   status.id = 'creator-launch-status';
-  status.textContent = 'YouTube上のカードを選択して編集します。';
+  status.textContent = 'YouTube上でカードと画像素材を編集します。';
   section.append(button, status);
   container.append(section);
   let alive = true;
@@ -24,7 +24,7 @@ export function mountCreatorLauncher(container: HTMLElement): () => void {
       if (tab?.id === undefined) throw new Error('タブが見つかりません。');
       const response = await chrome.tabs.sendMessage<{ type: string }, OpenEditorResponse>(tab.id, { type: OPEN_CREATOR_EDITOR });
       if (!alive) return;
-      status.textContent = response?.ok ? 'YouTubeで動画カードをクリックしてください。' : response?.error ?? '編集モードを開けませんでした。';
+      status.textContent = response?.ok ? 'YouTubeでカードを選ぶか、画像を追加してください。' : response?.error ?? '編集モードを開けませんでした。';
     } catch {
       if (alive) status.textContent = 'デスクトップ版YouTubeを開いてください。拡張を更新した後はYouTubeを再読み込みしてください。';
     } finally {

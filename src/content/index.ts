@@ -17,7 +17,7 @@ if (site) {
   lifetime.__webWorldThemesCleanup?.();
   let creator: CreatorEditor | undefined;
   const controller = createThemeController(document, site, themes[DEFAULT_THEME], () => creator?.refreshSelection());
-  creator = createCreatorEditor(document, site, DEFAULT_THEME, controller.updateDesign);
+  creator = createCreatorEditor(document, site, DEFAULT_THEME, controller.updateDesign, controller.setImageEditing, controller.validateDesign);
   const settingsPanel = createSettingsPanel(document);
   // The settings entry stays available independently of the theme's ON/OFF state.
   const unmountSettings = site.mountSettings(settingsPanel);

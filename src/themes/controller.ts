@@ -2,6 +2,7 @@ import { createFeatureController } from '../features/controller';
 import { compileDesign, createDesignRenderer } from '../design/renderer';
 import { parseDesign } from '../design/schema';
 import type { DesignDocument } from '../design/types';
+import { createImageRenderer, type ImageEditing } from '../design/image-renderer';
 import type { SiteAdapter } from '../sites/types';
 import type { UserSettings } from '../storage/settings';
 import type { ThemeDefinition } from './types';
@@ -11,6 +12,8 @@ const STYLE_ID = 'web-world-themes-style';
 export interface ThemeController {
   update(settings: UserSettings): void;
   updateDesign(design: DesignDocument | undefined): void;
+  setImageEditing(editing: ImageEditing | undefined): void;
+  validateDesign(design: DesignDocument | undefined): void;
   destroy(): void;
 }
 
@@ -22,6 +25,7 @@ export function createThemeController(
 ): ThemeController {
   const features = createFeatureController({ document: doc, site });
   const designRenderer = createDesignRenderer(doc, site.designTargets ?? []);
+  const images = createImageRenderer(doc, site.decorationAnchors ?? []);
   const variables = new Set<string>();
   let disconnect: (() => void) | undefined;
   let style: HTMLStyleElement | undefined;
@@ -42,6 +46,7 @@ export function createThemeController(
     clearVariables();
   };
   const deactivate = () => {
+    images.destroy();
     designRenderer.destroy();
     features.destroy();
     disconnect?.();
@@ -75,9 +80,22 @@ export function createThemeController(
       features.refresh();
     }
     designRenderer.update(design);
+    images.update(design?.decorations ?? []);
     onSurfacesChanged?.();
   };
 
+  const validateDesign = (input: DesignDocument | undefined) => {
+    const next = input ? parseDesign(input) : undefined;
+    if (next && (next.siteId !== site.id || (next.baseThemeId !== null && next.baseThemeId !== theme.id))) {
+      throw new Error('このサイトまたは基底テーマには対応していません。');
+    }
+    if (next) compileDesign(next, site.designTargets ?? []);
+    if (next?.decorations.some((item) => item.placement.anchor.kind === 'surface'
+      && !site.decorationAnchors?.some((anchor) => item.placement.anchor.kind === 'surface' && anchor.id === item.placement.anchor.target))) {
+      throw new Error('このサイトでは画像の配置基準を利用できません。');
+    }
+    return next;
+  };
   return {
     update(settings) {
       current = settings;
@@ -86,14 +104,11 @@ export function createThemeController(
       render();
     },
     updateDesign(input) {
-      const next = input ? parseDesign(input) : undefined;
-      if (next && (next.siteId !== site.id || (next.baseThemeId !== null && next.baseThemeId !== theme.id))) {
-        throw new Error('このサイトまたは基底テーマには対応していません。');
-      }
-      if (next) compileDesign(next, site.designTargets ?? []);
-      design = next;
+      design = validateDesign(input);
       render();
     },
+    setImageEditing(editing) { images.edit(editing); },
+    validateDesign(input) { validateDesign(input); },
     destroy() { current = undefined; deactivate(); },
   };
 }

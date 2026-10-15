@@ -111,6 +111,7 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
     id: 'youtube',
     stylesheet: `${stylesheet}\n${chromeStylesheet}`,
     designTargets: [{ id: 'video-card', surface: 'video-card', label: '動画カード' }],
+    decorationAnchors: [{ id: 'video-player', surface: 'player-window', label: '動画プレイヤー' }],
     mountSettings: (entry) => mountYouTubeSettings(doc, view, entry),
     features: {
       'window-chrome': { mount: () => mountYouTubeChrome(doc) },
