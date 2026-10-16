@@ -12,7 +12,7 @@ export interface SurfaceStyleRule {
 }
 
 export interface DesignDocument {
-  schemaVersion: 4;
+  schemaVersion: 5;
   id: string;
   siteId: string;
   /** null uses native site styling; a built-in theme is an optional starting point. */
@@ -42,6 +42,8 @@ export interface LayerState {
   zIndex: number;
   visible: boolean;
   locked: boolean;
+  /** Render-time effects never change placement or the underlying asset. */
+  effects?: import('../effects/types').LayerEffect[];
 }
 
 export type ImagePlacement = LayerPlacement;
@@ -59,7 +61,7 @@ export interface AnimationDecoration extends LayerState {
 }
 export type Decoration = ImageDecoration | AnimationDecoration;
 
-export type ImagePatch = Partial<Pick<LayerState, 'name' | 'opacity' | 'zIndex' | 'visible' | 'locked'>> & { placement?: Partial<LayerPlacement>; playback?: Partial<PlaybackSettings> };
+export type ImagePatch = Partial<Pick<LayerState, 'name' | 'opacity' | 'zIndex' | 'visible' | 'locked' | 'effects'>> & { placement?: Partial<LayerPlacement>; playback?: Partial<PlaybackSettings> };
 
 export interface DesignTarget {
   readonly id: string;

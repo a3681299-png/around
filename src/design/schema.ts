@@ -1,5 +1,6 @@
 import { IMAGE_LIMITS, STYLE_LIMITS, type DesignDocument, type SurfaceStyle, type Decoration, type PlacementAnchor } from './types';
 import { ANIMATION_LIMITS } from '../assets/motion-types';
+import { parseEffects } from '../effects/schema';
 
 export function isAssetId(value: unknown): value is string {
   return typeof value === 'string' && /^asset-[a-f0-9]{64}$/.test(value);
@@ -37,7 +38,7 @@ function number(value: unknown, min: number, max: number): number {
 }
 
 function image(value: unknown, version: number): Decoration {
-  const item = record(value, ['kind', 'id', 'assetId', 'name', 'placement', 'opacity', 'zIndex', 'visible', ...(version >= 3 ? ['locked'] : []), ...(version >= 4 ? ['format', 'playback'] : [])]);
+  const item = record(value, ['kind', 'id', 'assetId', 'name', 'placement', 'opacity', 'zIndex', 'visible', ...(version >= 3 ? ['locked'] : []), ...(version >= 4 ? ['format', 'playback'] : []), ...(version >= 5 ? ['effects'] : [])]);
   if (!['image', ...(version >= 4 ? ['animation'] : [])].includes(item['kind'] as string) || !isDesignId(item['id']) || !isAssetId(item['assetId'])
     || typeof item['name'] !== 'string' || item['name'].length < 1 || item['name'].length > 120 || /[\u0000-\u001f]/.test(item['name'])
     || typeof item['visible'] !== 'boolean' || (version >= 3 && typeof item['locked'] !== 'boolean')) throw new Error('画像レイヤーの形式が不正です。');
@@ -58,6 +59,7 @@ function image(value: unknown, version: number): Decoration {
       rotationDeg: number(placement['rotationDeg'], -180, 180),
     },
     opacity: number(item['opacity'], 0, 1), zIndex, visible: item['visible'], locked: version >= 3 ? item['locked'] as boolean : false,
+    ...(Object.hasOwn(item, 'effects') ? { effects: parseEffects(item['effects']) } : {}),
   };
   if (item['kind'] === 'image') {
     if (Object.hasOwn(item, 'format') || Object.hasOwn(item, 'playback')) throw new Error('静止画像には再生設定を指定できません。');
@@ -76,7 +78,7 @@ function image(value: unknown, version: number): Decoration {
 export function parseDesign(value: unknown): DesignDocument {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('デザインの形式が不正です。');
   const version = (value as Record<string, unknown>)['schemaVersion'];
-  if (version !== 1 && version !== 2 && version !== 3 && version !== 4) throw new Error('このデザインのバージョンには対応していません。');
+  if (version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5) throw new Error('このデザインのバージョンには対応していません。');
   const data = record(value, version === 1 ? ['schemaVersion', 'id', 'siteId', 'baseThemeId', 'rules'] : ['schemaVersion', 'id', 'siteId', 'baseThemeId', 'rules', 'decorations']);
   if (!isDesignId(data['id']) || !isDesignId(data['siteId'])
     || (data['baseThemeId'] !== null && !isDesignId(data['baseThemeId']))) {
@@ -109,11 +111,11 @@ export function parseDesign(value: unknown): DesignDocument {
     if (new Set(decorations.map((item) => item.id)).size !== decorations.length) throw new Error('画像レイヤーのIDが重複しています。');
     if (decorations.filter((item) => item.kind === 'animation').length > ANIMATION_LIMITS.count) throw new Error('アニメーションは8レイヤーまでです。');
   }
-  return { schemaVersion: 4, id: data['id'], siteId: data['siteId'], baseThemeId: data['baseThemeId'], rules, decorations };
+  return { schemaVersion: 5, id: data['id'], siteId: data['siteId'], baseThemeId: data['baseThemeId'], rules, decorations };
 }
 
 export function emptyDesign(siteId: string, baseThemeId: string | null): DesignDocument {
-  return parseDesign({ schemaVersion: 4, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
+  return parseDesign({ schemaVersion: 5, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
 }
 
 export function sameDesign(a: DesignDocument | undefined, b: DesignDocument | undefined): boolean {

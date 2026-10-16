@@ -25,7 +25,7 @@ export function createThemeController(
 ): ThemeController {
   const features = createFeatureController({ document: doc, site });
   const designRenderer = createDesignRenderer(doc, site.designTargets ?? []);
-  const images = createImageRenderer(doc, site.decorationAnchors ?? []);
+  const images = createImageRenderer(doc, site.decorationAnchors ?? [], site.signals?.videoPlayback);
   const variables = new Set<string>();
   let disconnect: (() => void) | undefined;
   let style: HTMLStyleElement | undefined;

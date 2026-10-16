@@ -64,7 +64,7 @@ for (const [extension, format] of [['gif', 'gif'], ['webp', 'animated-webp'], ['
     await panel.getByRole('checkbox', { name: 'ループ再生', exact: true }).check();
     await panel.getByRole('checkbox', { name: 'アニメーションを再生', exact: true }).check();
     await save(panel); const saved = await stored(popup);
-    expect(saved).toMatchObject({ schemaVersion: 4, decorations: [{ kind: 'animation', format, opacity: .7, placement: { rotationDeg: 25 }, playback: { playing: true, loop: true } }] });
+    expect(saved).toMatchObject({ schemaVersion: 5, decorations: [{ kind: 'animation', format, opacity: .7, placement: { rotationDeg: 25 }, playback: { playing: true, loop: true } }] });
     expect(JSON.stringify(saved)).not.toMatch(/data:image|base64|blob:/);
     await youtube.reload(); await ready(youtube, 1); await expect(layer).not.toHaveAttribute('data-editable');
     const restartedFrame = await signature(layer); await expect.poll(() => signature(layer)).not.toBe(restartedFrame);

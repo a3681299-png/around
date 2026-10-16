@@ -1,4 +1,5 @@
 import type { DesignTarget } from '../design/types';
+import type { PlaybackSource } from '../signals/types';
 
 /** The theme sees semantic surfaces; the adapter owns selectors and page lifecycle. */
 export type Surface = 'page' | 'panel' | 'frame' | 'rounded' | 'window'
@@ -28,6 +29,8 @@ export interface SiteAdapter {
   readonly stylesheet: string;
   readonly designTargets?: readonly DesignTarget[];
   readonly decorationAnchors?: readonly DesignTarget[];
+  /** Native media discovery belongs to the site; consumers only receive signals. */
+  readonly signals?: { readonly videoPlayback?: PlaybackSource };
   /** Optional site-owned implementations; unsupported features are safely skipped. */
   readonly features?: Readonly<Record<string, SiteFeatureCapability>>;
   connect(onPageChange: () => void): () => void;

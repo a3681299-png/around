@@ -89,7 +89,7 @@ CtrlまたはShiftを押してクリックすると、選択への追加・解�
 
 ```json
 {
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "id": "youtube-custom",
   "siteId": "youtube",
   "baseThemeId": "retro",
@@ -129,7 +129,9 @@ CtrlまたはShiftを押してクリックすると、選択への追加・解�
 
 色は6桁HEX、枠線は0〜12px、角丸は0〜48pxの整数。未指定の項目は基底の見た目を維持する。未知のバージョンや未対応の対象を読み込んだ場合は編集を止め、保存データを上書きしない。
 
-上のasset IDは形式の例。実際には素材のSHA-256から生成し、JSONには素材データや一時的なblob URLを入れない。旧v1〜v3は読み込み時にv4へ移行する。既存カード設定、基底テーマ、画像とasset IDは維持し、v2以前の画像の `locked` を `false` で補う。保存操作まで元データを書き換えない。
+上のasset IDは形式の例。実際には素材のSHA-256から生成し、JSONには素材データや一時的なblob URLを入れない。旧v1〜v4は読み込み時にv5へ移行する。既存カード設定、基底テーマ、画像とasset IDは維持し、v2以前の画像の `locked` を `false` で補う。保存操作まで元データを書き換えない。
+
+v5は任意の共通レイヤー属性 `effects` を追加する。「マスクと振る舞い」から円形マスクの半径・ぼかし・強度、マウス追従、動画の再生状態によるフェードを設定できる。保存・破棄・履歴は他のプロパティと共通。操作と接続構造は [effects-and-signals.md](effects-and-signals.md) を参照。
 
 `baseThemeId` は任意の組み込みテーマIDを表す。`null` は組み込みテーマを使わず、ネイティブのYouTubeにデザインだけを適用する。今回のUIはretroから開始するが、文書とRendererはretroに依存せず、`null` の描画・編集・保存も自動テストする。
 

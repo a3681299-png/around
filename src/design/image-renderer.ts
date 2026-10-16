@@ -1,4 +1,6 @@
 import { createMediaController } from '../media/controller';
+import { createEffectController, type EffectTarget } from '../effects/controller';
+import type { PlaybackSource } from '../signals/types';
 import { centre, groupBounds, moveGroup, placementBounds, resizePlacement, rotatePlacement, type PlacementChange, type PlacementSample, type Point } from './geometry';
 import { editableSamples, placementFrame, snapTargets } from './frames';
 import { snapMove, type Guide } from './layout';
@@ -37,7 +39,7 @@ const CSS = `
 `;
 
 /** Shared layer layout/gestures; media decoding and playback live in media/. */
-export function createImageRenderer(doc: Document, anchors: readonly DesignTarget[]) {
+export function createImageRenderer(doc: Document, anchors: readonly DesignTarget[], playback?: PlaybackSource) {
   const view = doc.defaultView!;
   let host: HTMLElement | undefined;
   let shadow: ShadowRoot | undefined;
@@ -47,6 +49,7 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
   let observer: ResizeObserver | undefined;
   let observed = new Set<Element>();
   let media: ReturnType<typeof createMediaController> | undefined;
+  let effects: ReturnType<typeof createEffectController> | undefined;
   let groupFrame: HTMLDivElement | undefined;
   let imageLayer: HTMLDivElement | undefined;
   let guideNodes: HTMLDivElement[] = [];
@@ -67,6 +70,7 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
     const parent = doc.fullscreenElement ?? doc.body ?? doc.documentElement;
     if (host.parentElement !== parent) parent.append(host);
     const nextObserved = new Set<Element>();
+    const effectTargets: EffectTarget[] = [];
     for (const item of images) {
       const entry = nodes.get(item.id);
       if (!entry) continue;
@@ -92,10 +96,14 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
       Object.assign(entry.controls.style, { left: `${point.x}px`, top: `${point.y}px`, width: `${item.placement.widthPx}px`, height: `${item.placement.heightPx}px`, transform: entry.node.style.transform });
       entry.media.element.style.opacity = String(item.opacity);
       const bounds = placementBounds(item.placement, rect);
-      entry.media.update(item, item.visible && item.opacity > 0 && bounds.right > 0 && bounds.bottom > 0 && bounds.left < view.innerWidth && bounds.top < view.innerHeight);
+      const renderable = item.visible && item.opacity > 0 && bounds.right > 0 && bounds.bottom > 0 && bounds.left < view.innerWidth && bounds.top < view.innerHeight;
+      let previousVisibility: boolean | undefined;
+      effectTargets.push({ layer: item, element: entry.media.element, frame: rect, renderable,
+        visibility(value) { if (previousVisibility !== value) { previousVisibility = value; entry.media.update(item, value); } } });
       entry.controls.toggleAttribute('data-locked', item.locked);
       entry.controls.toggleAttribute('data-transformable', Boolean(editing && !editing.locked && !item.locked && editing.selectedIds.length === 1));
     }
+    effects?.update(effectTargets);
     const samples = editing ? editableSamples(doc, anchors, images, editing.selectedIds) : [];
     const bounds = samples.length > 1 ? groupBounds(samples) : undefined;
     if (groupFrame) {
@@ -166,6 +174,7 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
     style.textContent = CSS;
     shadow.append(style);
     media = createMediaController(doc, (message) => editing?.error(message));
+    effects = createEffectController(doc, playback);
     imageLayer = doc.createElement('div'); imageLayer.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:0'; shadow.append(imageLayer);
     groupFrame = doc.createElement('div'); groupFrame.className = 'group-frame'; groupFrame.hidden = true; shadow.append(groupFrame);
     guideNodes = Array.from({ length: 2 }, () => { const node = doc.createElement('div'); node.className = 'guide'; node.hidden = true; shadow!.append(node); return node; });
@@ -183,6 +192,7 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
   };
   const destroy = () => {
     if (!host && nodes.size === 0) { images = []; return; }
+    effects?.destroy(); effects = undefined;
     media?.destroy(); media = undefined;
     gesture = undefined;
     if (frame !== undefined) view.cancelAnimationFrame(frame);

@@ -6,6 +6,7 @@ import { mountYouTubeChrome } from './youtube-chrome';
 import { mountYouTubeDetails, mountYouTubeFocus } from './youtube-details';
 import { mountYouTubeComments } from './youtube-comments';
 import { isYouTubeVideoCard, videoCardContainer } from './youtube-cards';
+import { youtubePlaybackSource } from './youtube-signals';
 
 const SURFACE_ATTRIBUTE = 'data-ww-surface';
 
@@ -112,6 +113,7 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
     stylesheet: `${stylesheet}\n${chromeStylesheet}`,
     designTargets: [{ id: 'video-card', surface: 'video-card', label: '動画カード' }],
     decorationAnchors: [{ id: 'video-player', surface: 'player-window', label: '動画プレイヤー' }],
+    signals: { videoPlayback: youtubePlaybackSource(doc) },
     mountSettings: (entry) => mountYouTubeSettings(doc, view, entry),
     features: {
       'window-chrome': { mount: () => mountYouTubeChrome(doc) },

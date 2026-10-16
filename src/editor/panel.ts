@@ -3,6 +3,7 @@ import { IMAGE_LIMITS, STYLE_LIMITS, type SurfaceStyle, type Decoration, type Im
 import { ANIMATION_LIMITS } from '../assets/motion-types';
 import { frontToBack } from './layers';
 import type { Alignment, Distribution } from '../design/layout';
+import { createEffectsPanel } from './effects-panel';
 
 export interface PanelState {
   selected: boolean;
@@ -42,6 +43,7 @@ export interface PanelActions {
 export function createCreatorPanel(doc: Document, actions: PanelActions, anchors: readonly DesignTarget[] = []) {
   const host = doc.createElement('aside');
   host.id = 'web-world-themes-creator';
+  host.setAttribute('data-ww-signal-control', '');
   host.lang = 'ja';
   host.setAttribute('role', 'dialog');
   host.setAttribute('aria-label', 'デザインエディター');
@@ -131,6 +133,8 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
   const radius = get<HTMLInputElement>('[aria-label="角丸"]');
   const properties = get<HTMLFieldSetElement>('.properties');
   const imageProperties = get<HTMLFieldSetElement>('.image-properties');
+  const effects = createEffectsPanel(doc, actions.imageChange);
+  imageProperties.append(effects.fieldset);
   const fileInput = get<HTMLInputElement>('.file');
   const addImage = get<HTMLButtonElement>('.add-image');
   const addAnimation = get<HTMLButtonElement>('.add-animation');
@@ -260,6 +264,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       current = state;
       imageProperties.hidden = !state.image;
       imageProperties.disabled = state.saving || Boolean(state.image?.locked);
+      effects.render(state.image);
       properties.hidden = state.selectedIds.length > 0;
       get<HTMLParagraphElement>('.card-help').hidden = state.selectedIds.length > 0;
       get<HTMLParagraphElement>('.multi-help').hidden = state.selectedIds.length < 2;
