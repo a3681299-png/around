@@ -58,7 +58,11 @@ BBSの番号は現在読み込まれたコメントと返信の表示順で、�
 
 ## 開発
 
-クリエイター向け編集の実験は `codex/creator-editor-spike` と専用worktreeで進めます。Popupの「デザインを編集（実験）」から動画カードの装飾を編集したり、PNG・WebP素材を読み込んで移動・サイズ変更・回転したりできます。レイヤー一覧、ロック、複製、複数選択と一括移動、Undo／Redo、任意のスナップ、整列・等間隔配置にも対応します。GIF・アニメーションWebP・Lottie JSONは、編集画面で再生を確認し、停止・ループ・Lottieの速度を設定できます。円形マスクで画像の一部を照らし、マウスに追従させたり動画の一時停止でフェードアウトさせたりできます。設定は既存の保存・履歴と共通です。構造と操作は [effects-and-signals.md](docs/effects-and-signals.md) を参照してください。素材は拡張専用IndexedDB、デザインはバージョン付きJSONで保存します。使い方は [creator-editor.md](docs/creator-editor.md)、アニメーションの制限は [animations.md](docs/animations.md) を参照してください。実験用worktreeの `dist` は、別のChromeプロファイルへ読み込みます。
+クリエイター向け編集の実験は `codex/creator-editor-spike` と専用worktreeで進めます。Popupの「デザインを編集（実験）」から動画カードの装飾を編集したり、PNG・WebP素材を読み込んで移動・サイズ変更・回転したりできます。レイヤー一覧、ロック、複製、複数選択と一括移動、Undo／Redo、任意のスナップ、整列・等間隔配置にも対応します。GIF・アニメーションWebP・Lottie JSONは、編集画面で再生を確認し、停止・ループ・Lottieの速度を設定できます。
+
+円形マスクで画像の一部を照らし、マウスに追従させたり動画の一時停止でフェードアウトさせたりできます。設定は既存の保存・履歴と共通です。構造と操作は [effects-and-signals.md](docs/effects-and-signals.md) を参照してください。
+
+複数素材をグループ化し、階層表示と全体移動・不透明度・共通マスクを設定できます。使い方と制約は [group-layers.md](docs/group-layers.md) にまとめています。素材は拡張専用IndexedDB、デザインはバージョン付きJSONで保存します。使い方は [creator-editor.md](docs/creator-editor.md)、アニメーションの制限は [animations.md](docs/animations.md) を参照してください。実験用worktreeの `dist` は、別のChromeプロファイルへ読み込みます。
 
 ```powershell
 npm run dev

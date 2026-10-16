@@ -89,7 +89,7 @@ test('effect edits survive undo, redo, discard, tab sync, reload and a persisten
   await panel.getByLabel('円形マスクを使う').check(); await setNumber(panel, '光の半径', 130); await setNumber(panel, '境界のぼかし', 25);
   await panel.getByLabel('マスクの表示強度').fill('65'); await panel.getByLabel('動画の一時停止で隠す').check(); await setNumber(panel, 'マスクのフェード時間', 220);
   await save(panel); const saved = await stored(popup);
-  expect(saved).toMatchObject({ schemaVersion: 5, decorations: [{ effects: [{ kind: 'mask', radiusPx: 130, featherPx: 25, intensity: .65 }] }] });
+  expect(saved).toMatchObject({ schemaVersion: 6, decorations: [{ effects: [{ kind: 'mask', radiusPx: 130, featherPx: 25, intensity: .65 }] }] });
   for (let i = 0; i < 8; i++) await youtube.mouse.move(200 + i * 20, 300);
   await expect(panel.locator('.dirty')).toHaveText('保存済み'); await expect(panel.getByRole('button', { name: '保存', exact: true })).toBeDisabled();
   await panel.getByRole('button', { name: '元に戻す', exact: true }).click(); await expect(panel.getByLabel('マスクのフェード時間')).toHaveValue('350');
@@ -167,7 +167,7 @@ test('semantic player anchor tracks resize, scroll and SPA without persisting ru
 test('32 masks share sources, stay idle, detach on background/OFF/zero and remain click-through', async ({ popup, youtube }, info) => {
   const panel = await open(popup, youtube), runtime = await isolated(youtube);
   await runtime.session.send('Runtime.evaluate', { contextId: runtime.id, expression: `
-    globalThis.__effectRafs = 0; const registrations = new Map();
+    globalThis.__effectRafs = 0; globalThis.__effectLateFrames = []; const registrations = new Map();
     const add = EventTarget.prototype.addEventListener, remove = EventTarget.prototype.removeEventListener;
     const tracked = (target, type) => target === document && type === 'pointermove' || target instanceof HTMLVideoElement && ['play', 'playing', 'pause', 'ended', 'emptied'].includes(type);
     EventTarget.prototype.addEventListener = function(type, listener, options) {
@@ -175,7 +175,7 @@ test('32 masks share sources, stay idle, detach on background/OFF/zero and remai
       return add.call(this, type, listener, options);
     };
     EventTarget.prototype.removeEventListener = function(type, listener, options) { if (tracked(this, type)) registrations.get(this)?.get(type)?.delete(listener); return remove.call(this, type, listener, options); };
-    const raf = window.requestAnimationFrame.bind(window); window.requestAnimationFrame = (callback) => raf((time) => { globalThis.__effectRafs++; callback(time); });
+    const raf = window.requestAnimationFrame.bind(window); window.requestAnimationFrame = (callback) => raf((time) => { globalThis.__effectRafs++; if (document.hidden) globalThis.__effectLateFrames.push(String(callback).slice(0, 200)); callback(time); });
     globalThis.__effectStats = () => { let pointer = 0, video = 0; registrations.forEach((entries, target) => entries.forEach((set) => { if (target === document) pointer += set.size; else video += set.size; })); return { pointer, video, rafs: globalThis.__effectRafs }; };
   ` });
   const stats = async (): Promise<{ pointer: number; video: number; rafs: number }> => (await runtime.session.send('Runtime.evaluate', { contextId: runtime.id, expression: '__effectStats()', returnByValue: true })).result.value;
@@ -200,7 +200,13 @@ test('32 masks share sources, stay idle, detach on background/OFF/zero and remai
   await mkdir('.work/verification', { recursive: true }); await writeFile('.work/verification/effect-performance.json', JSON.stringify(report, null, 2));
   await info.attach('effect-performance', { body: JSON.stringify(report, null, 2), contentType: 'application/json' });
   await runtime.session.send('Runtime.evaluate', { contextId: runtime.id, expression: 'Object.defineProperty(document, "hidden", { configurable: true, value: true }); document.dispatchEvent(new Event("visibilitychange"));' });
-  await expect.poll(stats).toMatchObject({ pointer: 0, video: 0 }); const hidden = await stats(); await youtube.waitForTimeout(150); expect((await stats()).rafs).toBe(hidden.rafs);
+  await expect.poll(stats).toMatchObject({ pointer: 0, video: 0 });
+  // A previously queued window-chrome footer measurement is independent of effects.
+  // Settle layout in the page world, then require no continuing extension frames.
+  await youtube.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+  const hidden = await stats(); await youtube.waitForTimeout(150);
+  const lateFrames = (await runtime.session.send('Runtime.evaluate', { contextId: runtime.id, expression: 'JSON.stringify(__effectLateFrames)', returnByValue: true })).result.value;
+  expect((await stats()).rafs, lateFrames).toBe(hidden.rafs);
   await runtime.session.send('Runtime.evaluate', { contextId: runtime.id, expression: 'delete document.hidden; document.dispatchEvent(new Event("visibilitychange"));' }); await expect.poll(stats).toMatchObject({ pointer: 1, video: 5 });
   // A decoration covering a page control remains pointer-transparent outside edit mode.
   await expect(youtube.locator(`${overlay} .handle:visible`)).toHaveCount(0);

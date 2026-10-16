@@ -12,12 +12,12 @@ const image = (): Decoration => ({ kind: 'image', id: 'image-world', assetId: `a
   opacity: .7, zIndex: 0, visible: true, locked: false });
 const document = () => ({ ...emptyDesign('youtube', null), decorations: [image()] });
 
-test('v1–v4 migrate without adding effects or changing assets; v5 roundtrips shared effect data', () => {
+test('legacy documents migrate without adding effects or changing assets; shared effect data roundtrips', () => {
   for (const version of [2, 3, 4]) {
     const layer = image(); if (version === 2) delete (layer as Partial<Decoration>).locked;
     const legacy = { ...document(), schemaVersion: version, decorations: [layer] };
     const before = JSON.stringify(legacy), parsed = parseDesign(legacy);
-    expect(parsed.schemaVersion).toBe(5); expect(parsed.decorations[0]).not.toHaveProperty('effects');
+    expect(parsed.schemaVersion).toBe(6); expect(parsed.decorations[0]).not.toHaveProperty('effects');
     expect(parsed.decorations[0]?.assetId).toBe(layer.assetId); expect(JSON.stringify(legacy)).toBe(before);
   }
   const mask = defaultCircleMask();

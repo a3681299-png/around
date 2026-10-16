@@ -12,13 +12,15 @@ export interface SurfaceStyleRule {
 }
 
 export interface DesignDocument {
-  schemaVersion: 5;
+  schemaVersion: 6;
   id: string;
   siteId: string;
   /** null uses native site styling; a built-in theme is an optional starting point. */
   baseThemeId: string | null;
   rules: SurfaceStyleRule[];
   decorations: Decoration[];
+  /** Composition nodes reference existing media; assets are never duplicated here. */
+  groups?: GroupLayer[];
 }
 
 export type PlacementAnchor = { kind: 'viewport' } | { kind: 'surface'; target: string };
@@ -34,10 +36,9 @@ export interface LayerPlacement {
 }
 
 /** Shared authoring state, independent of the layer's media and renderer. */
-export interface LayerState {
+export interface LayerAppearance {
   id: string;
   name: string;
-  placement: LayerPlacement;
   opacity: number;
   zIndex: number;
   visible: boolean;
@@ -45,6 +46,13 @@ export interface LayerState {
   /** Render-time effects never change placement or the underlying asset. */
   effects?: import('../effects/types').LayerEffect[];
 }
+
+export interface LayerState extends LayerAppearance { placement: LayerPlacement }
+export interface GroupLayer extends LayerAppearance { kind: 'group'; children: string[] }
+/** Group geometry is derived from its children, never a second saved coordinate system. */
+export interface GroupView extends GroupLayer { placement: LayerPlacement }
+export type LayerNode = Decoration | GroupLayer;
+export type EditorLayer = Decoration | GroupView;
 
 export type ImagePlacement = LayerPlacement;
 export interface ImageDecoration extends LayerState {
@@ -71,3 +79,4 @@ export interface DesignTarget {
 
 export const STYLE_LIMITS = Object.freeze({ borderWidth: 12, borderRadius: 48 });
 export const IMAGE_LIMITS = Object.freeze({ count: 32, minSize: 1, maxSize: 4096, maxZ: 100 });
+export const GROUP_LIMITS = Object.freeze({ count: 16 });

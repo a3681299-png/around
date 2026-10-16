@@ -1,8 +1,9 @@
 import { emptyDesign, parseDesign, sameDesign } from '../design/schema';
 import { IMAGE_LIMITS, type DesignDocument, type DesignTarget, type SurfaceStyle, type ImagePatch } from '../design/types';
 import type { ImageEditing } from '../design/image-renderer';
-import { editableSamples, placementFrame } from '../design/frames';
-import { moveGroup, movePlacement, reanchorPlacement, type PlacementChange } from '../design/geometry';
+import { editableSceneSamples, placementFrame } from '../design/frames';
+import { moveGroup, reanchorPlacement, type PlacementChange } from '../design/geometry';
+import { effectivelyLocked, groupMovable, groupView, normalizeSelection, parentGroup, sameAnchor } from '../design/hierarchy';
 import { alignSamples, distributeSamples, type Alignment, type Distribution } from '../design/layout';
 import { checkDesignAssets, commitDesign, importAssets, releaseAssets, retainAssets } from '../assets/client';
 import type { SiteAdapter } from '../sites/types';
@@ -10,7 +11,8 @@ import { readDesign, watchDesign } from '../storage/designs';
 import { createCreatorPanel } from './panel';
 import type { OpenEditorResponse } from './messages';
 import { createHistory } from './history';
-import { deleteLayers, duplicateLayers, reorderLayers, selectLayer } from './layers';
+import { selectLayer } from './layers';
+import { deleteDocumentLayers, duplicateDocumentLayers, groupLayers, groupingReason, reorderDocument, ungroupLayers } from './groups';
 
 export interface CreatorEditor {
   open(): OpenEditorResponse;
@@ -62,14 +64,21 @@ export function createCreatorEditor(
   const consumedKeys = new Set<string>();
   const initial = () => saved ? parseDesign(saved) : emptyDesign(site.id, baseThemeId);
   const applyCurrent = () => apply(panel && dirty ? draft : saved);
+  const frameFor = (placement: Parameters<typeof placementFrame>[2]) => placementFrame(doc, site.decorationAnchors ?? [], placement);
   const render = () => {
-    selectedImageIds = selectedImageIds.filter((id) => draft.decorations.some((image) => image.id === id));
+    const groups = draft.groups ?? [];
+    selectedImageIds = normalizeSelection(selectedImageIds, draft.decorations, groups);
+    const selectedGroup = selectedImageIds.length === 1 ? groups.find((group) => group.id === selectedImageIds[0]) : undefined;
+    const image = selectedGroup ? groupView(selectedGroup, draft.decorations, frameFor)
+      : selectedImageIds.length === 1 ? draft.decorations.find((image) => image.id === selectedImageIds[0]) : undefined;
     panel?.render({
       selected: Boolean(selected),
       style: draft.rules.find((rule) => rule.target === selected?.target.id)?.style ?? {},
-      dirty, saving: saving || importing, status, error, images: draft.decorations,
+      dirty, saving: saving || importing, status, error, images: draft.decorations, groups,
       selectedIds: selectedImageIds,
-      image: selectedImageIds.length === 1 ? draft.decorations.find((image) => image.id === selectedImageIds[0]) : undefined,
+      image, inheritedLocked: Boolean(image && parentGroup(groups, image.id)?.locked),
+      groupPositionAvailable: Boolean(!selectedGroup || selectedGroup.visible && groupMovable(selectedGroup, draft.decorations) && image && frameFor(image.placement)),
+      groupingReason: groupingReason(draft, selectedImageIds),
       canUndo: history.canUndo, canRedo: history.canRedo, snapping,
     });
     editImages(panel ? { selectedIds: selectedImageIds, locked: saving || importing, epoch: interactionEpoch, snapping, select: selectImage,
@@ -104,15 +113,36 @@ export function createCreatorEditor(
     applyCurrent(); render();
   };
   function selectImage(id: string, additive = false, preserve = false) {
-    if (!panel || saving || importing || !draft.decorations.some((image) => image.id === id)) return;
-    clearSelection(); selectedImageIds = selectLayer(selectedImageIds, id, additive, preserve);
+    const groups = draft.groups ?? [];
+    if (!panel || saving || importing || ![...draft.decorations, ...groups].some((image) => image.id === id)) return;
+    const parent = parentGroup(groups, id);
+    if (additive && parent) selectedImageIds = selectedImageIds.filter((id) => id !== parent.id);
+    clearSelection(); selectedImageIds = normalizeSelection(selectLayer(selectedImageIds, id, additive, preserve), draft.decorations, groups);
     status = 'Ctrl／Shiftで複数選択。矢印で微調整、Ctrl＋Dで複製できます。'; error = false; render();
   }
   function changeImage(id: string, patch: ImagePatch) {
     if (!panel || saving || importing) return;
-    const current = draft.decorations.find((image) => image.id === id);
+    const groups = draft.groups ?? [], group = groups.find((group) => group.id === id), parent = parentGroup(groups, id);
+    if (parent?.locked) return;
+    const current = group ?? draft.decorations.find((image) => image.id === id);
     if (!current || (current.locked && Object.keys(patch).some((key) => !['locked', 'visible', 'name'].includes(key)))) return;
+    if (group) {
+      const next = parseDesign(draft), { placement, playback: _playback, ...properties } = patch;
+      if (placement) {
+        if (Object.keys(placement).some((key) => !['x', 'y'].includes(key)) || !groupMovable(group, draft.decorations)) return;
+        const view = groupView(group, draft.decorations, frameFor), frame = frameFor(view.placement);
+        if (!frame) { status = '配置基準が画面に見つかりません。'; error = true; render(); return; }
+        const changes = moveGroup(editableSceneSamples(doc, site.decorationAnchors ?? [], draft.decorations, groups, [id]),
+          { x: ((placement.x ?? view.placement.x) - view.placement.x) * frame.width, y: ((placement.y ?? view.placement.y) - view.placement.y) * frame.height });
+        const positions = new Map(changes.map((change) => [change.id, change.placement]));
+        next.decorations = next.decorations.map((image) => positions.has(image.id) ? { ...image, placement: positions.get(image.id)! } : image);
+      }
+      next.groups = next.groups!.map((group) => group.id === id ? { ...group, ...properties } : group);
+      updateDraft(next); return;
+    }
+    if (current.kind === 'group') return;
     if (patch.placement?.anchor) {
+      if (parent && !sameAnchor(current.placement.anchor, patch.placement.anchor)) { status = 'グループ内では配置基準を変更できません。解除してから変更してください。'; error = true; render(); return; }
       const from = placementFrame(doc, site.decorationAnchors ?? [], current.placement);
       const to = placementFrame(doc, site.decorationAnchors ?? [], { ...current.placement, anchor: patch.placement.anchor });
       if (!from || !to) { status = '配置基準が画面に見つかりません。'; error = true; render(); return; }
@@ -129,7 +159,7 @@ export function createCreatorEditor(
     if (!panel || saving || importing) return;
     const next = parseDesign(draft);
     const placements = new Map(changes.map((change) => [change.id, change.placement]));
-    next.decorations = next.decorations.map((image) => !image.locked && placements.has(image.id) ? { ...image, placement: placements.get(image.id)! } : image);
+    next.decorations = next.decorations.map((image) => !effectivelyLocked(image, next.groups ?? []) && placements.has(image.id) ? { ...image, placement: placements.get(image.id)! } : image);
     updateDraft(next);
   }
   function finishGesture(cancel = false) {
@@ -148,32 +178,43 @@ export function createCreatorEditor(
   const deleteImage = (id?: string) => {
     if (saving || importing) return;
     finishGesture();
-    const next = parseDesign(draft);
-    next.decorations = deleteLayers(next.decorations, id ? [id] : selectedImageIds);
+    const next = deleteDocumentLayers(draft, id ? [id] : selectedImageIds);
     updateDraft(next); settleAssets();
   };
   const duplicate = (id?: string) => {
     if (saving || importing) return;
     finishGesture();
     try {
-      const next = parseDesign(draft);
-      const result = duplicateLayers(next.decorations, id ? [id] : selectedImageIds, () => `image-${crypto.randomUUID()}`, (layer) => {
-        const frame = placementFrame(doc, site.decorationAnchors ?? [], layer.placement);
-        return frame ? movePlacement(layer.placement, frame, { x: 16, y: 16 }) : { ...layer.placement };
-      });
+      const result = duplicateDocumentLayers(draft, id ? [id] : selectedImageIds, () => `image-${crypto.randomUUID()}`, frameFor);
       if (!result.ids.length) return;
-      next.decorations = result.layers; parseDesign(next); selectedImageIds = result.ids;
-      clearSelection(); updateDraft(next); settleAssets();
+      selectedImageIds = result.ids;
+      clearSelection(); updateDraft(result.doc); settleAssets();
     } catch (reason) { status = reason instanceof Error ? reason.message : '複製できませんでした。'; error = true; render(); }
   };
   const layoutSelection = (mode: Alignment | Distribution) => {
     if (saving || importing) return;
     finishGesture();
-    const samples = editableSamples(doc, site.decorationAnchors ?? [], draft.decorations, selectedImageIds);
+    if (draft.groups?.some((group) => selectedImageIds.includes(group.id))) { status = 'グループを含む整列は未対応です。子レイヤーを選択してください。'; error = true; render(); return; }
+    const samples = editableSceneSamples(doc, site.decorationAnchors ?? [], draft.decorations, draft.groups ?? [], selectedImageIds);
     const distribution = mode === 'horizontal' || mode === 'vertical';
     if (samples.length < (distribution ? 3 : 2)) { status = '表示中でロックされていないレイヤーを選択してください。'; error = true; render(); return; }
     try { changePlacements(distribution ? distributeSamples(samples, mode) : alignSamples(samples, mode)); }
     catch (reason) { status = reason instanceof Error ? reason.message : '整列できませんでした。'; error = true; render(); }
+  };
+  const groupSelection = (ungroup = false) => {
+    if (saving || importing) return;
+    finishGesture();
+    try {
+      if (ungroup) {
+        const group = selectedImageIds.length === 1 ? draft.groups?.find((group) => group.id === selectedImageIds[0]) : undefined;
+        if (!group) return;
+        const next = ungroupLayers(draft, group.id); selectedImageIds = [...group.children]; updateDraft(next);
+      } else {
+        const id = `group-${crypto.randomUUID()}`, next = groupLayers(draft, selectedImageIds, id);
+        selectedImageIds = [id]; clearSelection(); updateDraft(next);
+      }
+      settleAssets();
+    } catch (reason) { status = reason instanceof Error ? reason.message : 'グループを変更できませんでした。'; error = true; render(); }
   };
   const addImages = async (files: readonly File[], point?: { x: number; y: number }) => {
     if (!panel || !assetSession || saving || importing || !files.length) return;
@@ -369,7 +410,7 @@ export function createCreatorEditor(
         const amount = event.shiftKey ? 10 : 1;
         const delta = { x: event.key === 'ArrowRight' ? amount : event.key === 'ArrowLeft' ? -amount : 0,
           y: event.key === 'ArrowDown' ? amount : event.key === 'ArrowUp' ? -amount : 0 };
-        changePlacements(moveGroup(editableSamples(doc, site.decorationAnchors ?? [], draft.decorations, selectedImageIds), delta));
+        changePlacements(moveGroup(editableSceneSamples(doc, site.decorationAnchors ?? [], draft.decorations, draft.groups ?? [], selectedImageIds), delta));
       }
     } else if ((event.key === 'Enter' || event.key === ' ') && pickTarget(event)) {
       event.preventDefault();
@@ -417,9 +458,12 @@ export function createCreatorEditor(
         imageImport: (files) => { void addImages(files); }, imageSelect: selectImage,
         imageChange: (patch) => { if (selectedImageIds.length === 1) changeImage(selectedImageIds[0]!, patch); },
         layerChange: changeImage, imageDelete: deleteImage, duplicate,
+        group: () => groupSelection(), ungroup: () => groupSelection(true),
         reorder: (id, targetId, after) => {
           if (saving || importing) return;
-          const next = parseDesign(draft); next.decorations = reorderLayers(next.decorations, id, targetId, after); updateDraft(next);
+          finishGesture();
+          try { updateDraft(reorderDocument(draft, id, targetId, after)); }
+          catch (reason) { status = reason instanceof Error ? reason.message : '並び替えできませんでした。'; error = true; render(); }
         },
         undo: () => undoRedo(false), redo: () => undoRedo(true),
         snap: (value) => { snapping = value; render(); }, layout: layoutSelection,

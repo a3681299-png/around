@@ -2,9 +2,10 @@ import { createMediaController } from '../media/controller';
 import { createEffectController, type EffectTarget } from '../effects/controller';
 import type { PlaybackSource } from '../signals/types';
 import { centre, groupBounds, moveGroup, placementBounds, resizePlacement, rotatePlacement, type PlacementChange, type PlacementSample, type Point } from './geometry';
-import { editableSamples, placementFrame, snapTargets } from './frames';
+import { editableSceneSamples, placementFrame, snapTargets } from './frames';
+import { effectivelyLocked, groupMovable, groupView, parentGroup, rootLayers } from './hierarchy';
 import { snapMove, type Guide } from './layout';
-import type { DesignTarget, Decoration } from './types';
+import type { DesignTarget, Decoration, GroupLayer } from './types';
 
 export interface ImageEditing {
   selectedIds: readonly string[];
@@ -22,6 +23,15 @@ const CSS = `
 :host { all:initial !important; position:fixed !important; inset:0 !important; width:100vw !important; height:100vh !important; margin:0 !important; padding:0 !important; border:0 !important; background:transparent !important; overflow:hidden !important; pointer-events:none !important; z-index:2147482000 !important; }
 * { box-sizing:border-box; }
 .image, .selection-frame { position:absolute; transform-origin:center; pointer-events:none; touch-action:none; }
+.composition { position:absolute; pointer-events:none; }
+.group-content { position:absolute; inset:0; pointer-events:none; isolation:isolate; }
+.selection-frame[data-group] { border-style:dashed; border-color:#196f95; }
+.group-edge { display:none; position:absolute; }
+.selection-frame[data-group-movable] .group-edge { display:block; pointer-events:auto; cursor:move; }
+[data-group-edge="top"], [data-group-edge="bottom"] { left:0; right:0; height:8px; }
+[data-group-edge="top"] { top:-4px; } [data-group-edge="bottom"] { bottom:-4px; }
+[data-group-edge="left"], [data-group-edge="right"] { top:0; bottom:0; width:8px; }
+[data-group-edge="left"] { left:-4px; } [data-group-edge="right"] { right:-4px; }
 [hidden] { display:none !important; }
 .image[data-editable] { pointer-events:auto; cursor:move; }
 .selection-frame { z-index:1000; border:2px solid #6350ca; box-shadow:0 0 0 1px white, inset 0 0 0 1px white; }
@@ -45,6 +55,7 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
   let shadow: ShadowRoot | undefined;
   let editing: ImageEditing | undefined;
   let images: readonly Decoration[] = [];
+  let groups: readonly GroupLayer[] = [];
   let frame: number | undefined;
   let observer: ResizeObserver | undefined;
   let observed = new Set<Element>();
@@ -54,6 +65,7 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
   let imageLayer: HTMLDivElement | undefined;
   let guideNodes: HTMLDivElement[] = [];
   const nodes = new Map<string, { node: HTMLDivElement; controls: HTMLDivElement; media: ReturnType<ReturnType<typeof createMediaController>['attach']> }>();
+  const compositions = new Map<string, { node: HTMLDivElement; content: HTMLDivElement; controls: HTMLDivElement }>();
   let gesture: { pointerId: number; mode: string; samples: PlacementSample[]; point: Point } | undefined;
 
   const drawGuides = (guides: readonly Guide[]) => guideNodes.forEach((node, index) => {
@@ -71,16 +83,41 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
     if (host.parentElement !== parent) parent.append(host);
     const nextObserved = new Set<Element>();
     const effectTargets: EffectTarget[] = [];
+    const layouts = new Map(groups.map((group) => {
+      const layer = groupView(group, images, (placement) => placementFrame(doc, anchors, placement));
+      const frame = placementFrame(doc, anchors, layer.placement);
+      return [group.id, { layer, frame, bounds: frame ? placementBounds(layer.placement, frame) : undefined }] as const;
+    }));
+    const onScreen = (bounds: ReturnType<typeof placementBounds>) => bounds.right > 0 && bounds.bottom > 0 && bounds.left < view.innerWidth && bounds.top < view.innerHeight;
+    // Composite parents are evaluated first; descendants share the same effect stage.
+    for (const group of groups) {
+      const entry = compositions.get(group.id)!, { layer, frame: rect, bounds } = layouts.get(group.id)!;
+      entry.node.hidden = !group.visible || !rect;
+      entry.node.tabIndex = editing && !group.locked ? 0 : -1;
+      entry.node.toggleAttribute('data-selected', Boolean(editing?.selectedIds.includes(group.id)));
+      entry.controls.hidden = !editing?.selectedIds.includes(group.id) || !group.visible || !rect;
+      entry.controls.toggleAttribute('data-locked', !groupMovable(group, images));
+      entry.controls.toggleAttribute('data-group-movable', Boolean(editing && !editing.locked && groupMovable(group, images)));
+      entry.content.style.opacity = String(group.opacity); entry.node.style.zIndex = String(group.zIndex + 100);
+      if (bounds) {
+        Object.assign(entry.node.style, { left: `${bounds.left}px`, top: `${bounds.top}px`, width: `${bounds.right - bounds.left}px`, height: `${bounds.bottom - bounds.top}px` });
+        Object.assign(entry.controls.style, { left: `${bounds.left}px`, top: `${bounds.top}px`, width: `${bounds.right - bounds.left}px`, height: `${bounds.bottom - bounds.top}px` });
+      }
+      const renderable = Boolean(rect && group.visible && group.opacity > 0 && images.some((image) => group.children.includes(image.id) && image.visible && image.opacity > 0 && onScreen(placementBounds(image.placement, rect))));
+      effectTargets.push({ layer, element: entry.content, frame: rect, renderable, visibility() {} });
+    }
     for (const item of images) {
       const entry = nodes.get(item.id);
       if (!entry) continue;
       const rect = placementFrame(doc, anchors, item.placement);
-      entry.node.hidden = !item.visible || !rect;
+      const parent = parentGroup(groups, item.id), parentLayout = parent && layouts.get(parent.id);
+      const visible = item.visible && parent?.visible !== false, locked = effectivelyLocked(item, groups);
+      entry.node.hidden = !visible || !rect;
       const selected = Boolean(editing?.selectedIds.includes(item.id));
-      entry.controls.hidden = !selected || !item.visible || !rect;
+      entry.controls.hidden = !selected || !visible || !rect;
       entry.node.toggleAttribute('data-selected', selected);
-      entry.node.toggleAttribute('data-editable', Boolean(editing && !editing.locked && !item.locked));
-      entry.node.tabIndex = editing && !item.locked ? 0 : -1;
+      entry.node.toggleAttribute('data-editable', Boolean(editing && !editing.locked && !locked));
+      entry.node.tabIndex = editing && !locked ? 0 : -1;
       if (item.placement.anchor.kind === 'surface') {
         const id = item.placement.anchor.target;
         const target = anchors.find((candidate) => candidate.id === id);
@@ -90,22 +127,23 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
       if (!rect) { entry.media.update(item, false); continue; }
       const point = centre(item.placement, rect);
       Object.assign(entry.node.style, {
-        left: `${point.x}px`, top: `${point.y}px`, width: `${item.placement.widthPx}px`, height: `${item.placement.heightPx}px`,
+        left: `${point.x - (parentLayout?.bounds?.left ?? 0)}px`, top: `${point.y - (parentLayout?.bounds?.top ?? 0)}px`, width: `${item.placement.widthPx}px`, height: `${item.placement.heightPx}px`,
         transform: `translate(-50%, -50%) rotate(${item.placement.rotationDeg}deg)`, zIndex: String(item.zIndex + 100),
       });
       Object.assign(entry.controls.style, { left: `${point.x}px`, top: `${point.y}px`, width: `${item.placement.widthPx}px`, height: `${item.placement.heightPx}px`, transform: entry.node.style.transform });
       entry.media.element.style.opacity = String(item.opacity);
       const bounds = placementBounds(item.placement, rect);
-      const renderable = item.visible && item.opacity > 0 && bounds.right > 0 && bounds.bottom > 0 && bounds.left < view.innerWidth && bounds.top < view.innerHeight;
+      const renderable = visible && item.opacity > 0 && parent?.opacity !== 0 && onScreen(bounds);
       let previousVisibility: boolean | undefined;
       effectTargets.push({ layer: item, element: entry.media.element, frame: rect, renderable,
+        ...(parent ? { parentId: parent.id } : {}),
         visibility(value) { if (previousVisibility !== value) { previousVisibility = value; entry.media.update(item, value); } } });
-      entry.controls.toggleAttribute('data-locked', item.locked);
-      entry.controls.toggleAttribute('data-transformable', Boolean(editing && !editing.locked && !item.locked && editing.selectedIds.length === 1));
+      entry.controls.toggleAttribute('data-locked', locked);
+      entry.controls.toggleAttribute('data-transformable', Boolean(editing && !editing.locked && !locked && editing.selectedIds.length === 1));
     }
     effects?.update(effectTargets);
-    const samples = editing ? editableSamples(doc, anchors, images, editing.selectedIds) : [];
-    const bounds = samples.length > 1 ? groupBounds(samples) : undefined;
+    const samples = editing ? editableSceneSamples(doc, anchors, images, groups, editing.selectedIds) : [];
+    const bounds = editing && editing.selectedIds.length > 1 && samples.length > 1 ? groupBounds(samples) : undefined;
     if (groupFrame) {
       groupFrame.hidden = !bounds;
       if (bounds) Object.assign(groupFrame.style, { left: `${bounds.left}px`, top: `${bounds.top}px`, width: `${bounds.right - bounds.left}px`, height: `${bounds.bottom - bounds.top}px` });
@@ -122,14 +160,18 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
     if (!editing || editing.locked || event.button !== 0) return;
     const target = event.target instanceof Element ? event.target : undefined;
     const wrapper = target?.closest<HTMLDivElement>('[data-image-id], [data-frame-id]');
-    const id = wrapper?.dataset.imageId ?? wrapper?.dataset.frameId;
-    const item = images.find((image) => image.id === id), node = id ? nodes.get(id)?.node : undefined;
-    if (!node || !item || item.locked) return;
+    const originalId = wrapper?.dataset.imageId ?? wrapper?.dataset.frameId;
+    const parent = originalId && parentGroup(groups, originalId), additive = event.ctrlKey || event.metaKey || event.shiftKey;
+    const id = parent && !additive && editing.selectedIds.includes(parent.id) ? parent.id : originalId;
+    const group = groups.find((group) => group.id === id), item = group ?? images.find((image) => image.id === id);
+    const node = id ? compositions.get(id)?.node ?? nodes.get(id)?.node : undefined;
+    if (!node || !item || (group ? !groupMovable(group, images) : effectivelyLocked(item, groups))) return;
     event.preventDefault(); event.stopPropagation();
     const mode = target?.getAttribute('data-handle') ?? 'move';
-    if (mode === 'move') editing.select(item.id, event.ctrlKey || event.metaKey || event.shiftKey, true);
+    if (group && mode !== 'move') return;
+    if (mode === 'move') editing.select(item.id, additive, true);
     if (!editing.selectedIds.includes(item.id)) return;
-    const samples = editableSamples(doc, anchors, images, editing.selectedIds);
+    const samples = editableSceneSamples(doc, anchors, images, groups, editing.selectedIds);
     if (!samples.length || (mode !== 'move' && samples.length !== 1)) return;
     node.focus({ preventScroll: true });
     editing.begin();
@@ -145,7 +187,7 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
     const delta = { x: current.x - point.x, y: current.y - point.y };
     const first = samples[0]!;
     if (mode === 'move') {
-      const result = editing.snapping && !event.altKey ? snapMove(samples, delta, snapTargets(doc, anchors, images, editing.selectedIds)) : { changes: moveGroup(samples, delta), guides: [] };
+      const result = editing.snapping && !event.altKey ? snapMove(samples, delta, snapTargets(doc, anchors, images, samples.map((sample) => sample.id), groups)) : { changes: moveGroup(samples, delta), guides: [] };
       drawGuides(result.guides); editing.change(result.changes); return;
     }
     editing.change([{ id: first.id, placement: mode === 'rotate'
@@ -191,7 +233,7 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
     doc.addEventListener('fullscreenchange', onViewChange);
   };
   const destroy = () => {
-    if (!host && nodes.size === 0) { images = []; return; }
+    if (!host && nodes.size === 0) { images = []; groups = []; return; }
     effects?.destroy(); effects = undefined;
     media?.destroy(); media = undefined;
     gesture = undefined;
@@ -204,16 +246,30 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
     doc.removeEventListener('fullscreenchange', onViewChange);
     host?.remove(); host = undefined; shadow = undefined; groupFrame = undefined; imageLayer = undefined; guideNodes = [];
     nodes.clear();
-    images = [];
+    compositions.clear(); images = []; groups = [];
   };
   return {
-    update(next: readonly Decoration[]) {
+    update(next: readonly Decoration[], nextGroups: readonly GroupLayer[] = []) {
       if (!next.length) { destroy(); return; }
       images = next;
+      groups = nextGroups;
       if (!host) mount();
       const wanted = new Set(next.map((item) => item.id));
       for (const [id, entry] of nodes) if (!wanted.has(id)) { entry.media.destroy(); entry.node.remove(); entry.controls.remove(); nodes.delete(id); }
-      for (const [index, item] of next.entries()) {
+      const wantedGroups = new Set(groups.map((group) => group.id));
+      for (const [id, entry] of compositions) if (!wantedGroups.has(id)) { entry.node.remove(); entry.controls.remove(); compositions.delete(id); }
+      for (const group of groups) {
+        let entry = compositions.get(group.id);
+        if (!entry) {
+          const node = doc.createElement('div'); node.className = 'composition'; node.dataset.groupId = group.id; node.setAttribute('role', 'img');
+          const content = doc.createElement('div'); content.className = 'group-content'; node.append(content);
+          const controls = doc.createElement('div'); controls.className = 'selection-frame'; controls.dataset.frameId = group.id; controls.dataset.group = '';
+          for (const side of ['top', 'right', 'bottom', 'left']) { const edge = doc.createElement('div'); edge.className = 'group-edge'; edge.dataset.groupEdge = side; controls.append(edge); }
+          entry = { node, content, controls }; compositions.set(group.id, entry); shadow!.append(controls);
+        }
+        entry.node.setAttribute('aria-label', group.name);
+      }
+      for (const item of next) {
         let entry = nodes.get(item.id);
         if (!entry) {
           const node = doc.createElement('div');
@@ -227,10 +283,15 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
           }
           entry = { node, controls, media: content }; nodes.set(item.id, entry); imageLayer!.append(node); shadow!.append(controls);
         }
-        // Restore document tie order after undo recreates a removed node.
-        if (imageLayer!.children[index] !== entry.node) imageLayer!.insertBefore(entry.node, imageLayer!.children[index] ?? null);
         entry.node.setAttribute('aria-label', item.name);
       }
+      // Keep media nodes/decoders while parenting changes, and preserve scoped tie order.
+      const place = (container: HTMLElement, ids: readonly string[]) => ids.forEach((id, index) => {
+        const node = nodes.get(id)?.node ?? compositions.get(id)!.node;
+        if (container.children[index] !== node) container.insertBefore(node, container.children[index] ?? null);
+      });
+      groups.forEach((group) => place(compositions.get(group.id)!.content, group.children));
+      place(imageLayer!, rootLayers(images, groups).map((layer) => layer.id));
       draw();
     },
     edit(value: ImageEditing | undefined) {

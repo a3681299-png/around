@@ -1,6 +1,7 @@
-import { IMAGE_LIMITS, STYLE_LIMITS, type DesignDocument, type SurfaceStyle, type Decoration, type PlacementAnchor } from './types';
+import { GROUP_LIMITS, IMAGE_LIMITS, STYLE_LIMITS, type DesignDocument, type SurfaceStyle, type Decoration, type PlacementAnchor, type GroupLayer } from './types';
 import { ANIMATION_LIMITS } from '../assets/motion-types';
 import { parseEffects } from '../effects/schema';
+import { sameAnchor } from './hierarchy';
 
 export function isAssetId(value: unknown): value is string {
   return typeof value === 'string' && /^asset-[a-f0-9]{64}$/.test(value);
@@ -35,6 +36,17 @@ function pixels(value: unknown, max: number): number {
 function number(value: unknown, min: number, max: number): number {
   if (typeof value !== 'number' || !Number.isFinite(value) || value < min || value > max) throw new Error('画像の配置値が範囲外です。');
   return value;
+}
+
+function group(value: unknown): GroupLayer {
+  const input = record(value, ['kind', 'id', 'name', 'opacity', 'zIndex', 'visible', 'locked', 'effects', 'children']);
+  if (input['kind'] !== 'group' || !isDesignId(input['id']) || typeof input['name'] !== 'string' || !input['name'].length || input['name'].length > 120 || /[\u0000-\u001f]/.test(input['name'])
+    || typeof input['visible'] !== 'boolean' || typeof input['locked'] !== 'boolean' || !Array.isArray(input['children']) || !input['children'].length
+    || input['children'].length > IMAGE_LIMITS.count || !input['children'].every(isDesignId) || new Set(input['children']).size !== input['children'].length) throw new Error('グループの形式が不正です。');
+  const zIndex = number(input['zIndex'], -IMAGE_LIMITS.maxZ, IMAGE_LIMITS.maxZ);
+  if (!Number.isInteger(zIndex)) throw new Error('重なり順は整数で指定してください。');
+  return { kind: 'group', id: input['id'], name: input['name'], opacity: number(input['opacity'], 0, 1), zIndex, visible: input['visible'], locked: input['locked'],
+    children: [...input['children']], ...(Object.hasOwn(input, 'effects') ? { effects: parseEffects(input['effects']) } : {}) };
 }
 
 function image(value: unknown, version: number): Decoration {
@@ -78,8 +90,8 @@ function image(value: unknown, version: number): Decoration {
 export function parseDesign(value: unknown): DesignDocument {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('デザインの形式が不正です。');
   const version = (value as Record<string, unknown>)['schemaVersion'];
-  if (version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5) throw new Error('このデザインのバージョンには対応していません。');
-  const data = record(value, version === 1 ? ['schemaVersion', 'id', 'siteId', 'baseThemeId', 'rules'] : ['schemaVersion', 'id', 'siteId', 'baseThemeId', 'rules', 'decorations']);
+  if (version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5 && version !== 6) throw new Error('このデザインのバージョンには対応していません。');
+  const data = record(value, version === 1 ? ['schemaVersion', 'id', 'siteId', 'baseThemeId', 'rules'] : ['schemaVersion', 'id', 'siteId', 'baseThemeId', 'rules', 'decorations', ...(version >= 6 ? ['groups'] : [])]);
   if (!isDesignId(data['id']) || !isDesignId(data['siteId'])
     || (data['baseThemeId'] !== null && !isDesignId(data['baseThemeId']))) {
     throw new Error('デザインの識別子が不正です。');
@@ -111,11 +123,24 @@ export function parseDesign(value: unknown): DesignDocument {
     if (new Set(decorations.map((item) => item.id)).size !== decorations.length) throw new Error('画像レイヤーのIDが重複しています。');
     if (decorations.filter((item) => item.kind === 'animation').length > ANIMATION_LIMITS.count) throw new Error('アニメーションは8レイヤーまでです。');
   }
-  return { schemaVersion: 5, id: data['id'], siteId: data['siteId'], baseThemeId: data['baseThemeId'], rules, decorations };
+  let groups: GroupLayer[] = [];
+  if (Object.hasOwn(data, 'groups')) {
+    if (!Array.isArray(data['groups']) || data['groups'].length > GROUP_LIMITS.count) throw new Error('グループは16個までです。');
+    groups = data['groups'].map(group);
+    const allIds = [...decorations, ...groups].map((layer) => layer.id), assigned = new Set<string>();
+    if (new Set(allIds).size !== allIds.length) throw new Error('レイヤーのIDが重複しています。');
+    for (const group of groups) {
+      const children = group.children.map((id) => decorations.find((layer) => layer.id === id));
+      if (children.some((child) => !child) || group.children.some((id) => assigned.has(id))) throw new Error('グループの参照が不正です。多重所属・ネストには対応していません。');
+      if (children.some((child) => !sameAnchor(child!.placement.anchor, children[0]!.placement.anchor))) throw new Error('同じ配置基準のレイヤーだけをグループ化できます。');
+      group.children.forEach((id) => assigned.add(id));
+    }
+  }
+  return { schemaVersion: 6, id: data['id'], siteId: data['siteId'], baseThemeId: data['baseThemeId'], rules, decorations, ...(groups.length ? { groups } : {}) };
 }
 
 export function emptyDesign(siteId: string, baseThemeId: string | null): DesignDocument {
-  return parseDesign({ schemaVersion: 5, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
+  return parseDesign({ schemaVersion: 6, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
 }
 
 export function sameDesign(a: DesignDocument | undefined, b: DesignDocument | undefined): boolean {
