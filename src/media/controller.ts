@@ -1,6 +1,8 @@
+import { frameAt } from '../world/media-time';
+export { frameAt } from '../world/media-time';
 import { loadAsset } from '../assets/client';
 import { inspectLottie } from '../assets/lottie';
-import { ANIMATION_LIMITS, type AnimationInfo } from '../assets/motion-types';
+import { ANIMATION_LIMITS } from '../assets/motion-types';
 import type { AssetMetadata } from '../assets/validation';
 import type { Decoration } from '../design/types';
 import { createRasterSource } from './raster';
@@ -15,13 +17,6 @@ interface Resource {
 }
 interface CacheEntry { refs: number; promise: Promise<Resource> }
 interface Instance { running(): boolean; tick(delta: number): void; refresh(): void; destroy(): void }
-
-export function frameAt(info: AnimationInfo, elapsed: number): number {
-  if (info.format === 'lottie') return Math.min(info.frameCount - 1, Math.floor(elapsed / 1000 * info.frameRate!));
-  let end = 0;
-  for (const [index, duration] of info.frameDurationsMs!.entries()) { end += duration; if (elapsed < end) return index; }
-  return info.frameCount - 1;
-}
 
 /** Encoded assets/decoders are shared; playback time and SVG/canvas belong to a layer. */
 export function createMediaController(doc: Document, report: (message: string) => void) {
