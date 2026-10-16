@@ -2,7 +2,7 @@ import type { PlaybackSource, SignalSnapshot } from '../signals/types';
 import type { WorldEvent } from '../world/types';
 
 /** A shared lazy subscription per tab. No polling, page API calls or pixel reads. */
-export function createSignalSources(doc: Document, playback: PlaybackSource | undefined, changed: (source: 'pointer.position' | 'video.playing') => void) {
+export function createSignalSources(doc: Document, playback: PlaybackSource | undefined, changed: (source: 'pointer.position' | 'video.playing') => void, occurred?: () => void) {
   const snapshot: SignalSnapshot = { pointer: undefined, playing: false };
   let pointer = false;
   let events: WorldEvent[] = [];
@@ -24,7 +24,7 @@ export function createSignalSources(doc: Document, playback: PlaybackSource | un
       }
       if (!needed.video) { video?.destroy(); video = undefined; snapshot.playing = false; }
       else if (!video && playback) video = playback.connect((signal) => {
-        if (signal.event) { if (events.length === 64) events.shift(); events.push({ type: signal.event }); }
+        if (signal.event) { if (events.length === 64) events.shift(); events.push({ type: signal.event }); occurred?.(); }
         if (snapshot.playing === signal.playing) return;
         snapshot.playing = signal.playing; changed('video.playing');
       });

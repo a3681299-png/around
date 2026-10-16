@@ -1,0 +1,59 @@
+{
+  "measuredAt": "2026-10-16T09:05:10.691Z",
+  "runtimeVersion": "1.0.0",
+  "node": "v24.16.0",
+  "platform": "win32 x64",
+  "cpu": "13th Gen Intel(R) Core(TM) i7-13650HX",
+  "baseline": "1d23ec0 draw/paint numeric reference with equivalent returned data; shared unchanged geometry and mask primitives",
+  "excludes": [
+    "DOM/layout/style application",
+    "decoding",
+    "GPU",
+    "browser scheduling"
+  ],
+  "workloads": [
+    {
+      "label": "mixed-visibility",
+      "media": 32,
+      "groups": 16,
+      "inputSteps": 180,
+      "warmupRounds": 20,
+      "measuredRounds": 50,
+      "legacy": {
+        "samples": 9000,
+        "medianUs": 47.4,
+        "p95Us": 59.8,
+        "meanUs": 49.541
+      },
+      "runtime": {
+        "samples": 9000,
+        "medianUs": 45.4,
+        "p95Us": 55.3,
+        "meanUs": 47.391
+      },
+      "medianRatio": 0.958
+    },
+    {
+      "label": "all-visible",
+      "media": 32,
+      "groups": 16,
+      "inputSteps": 180,
+      "warmupRounds": 20,
+      "measuredRounds": 50,
+      "legacy": {
+        "samples": 9000,
+        "medianUs": 52.7,
+        "p95Us": 95.2,
+        "meanUs": 64.429
+      },
+      "runtime": {
+        "samples": 9000,
+        "medianUs": 49.6,
+        "p95Us": 92.4,
+        "meanUs": 62.385
+      },
+      "medianRatio": 0.941
+    }
+  ],
+  "checksum": 22435.200000000103
+}

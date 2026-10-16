@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 4,
+  "id": "youtube-custom",
+  "siteId": "youtube",
+  "baseThemeId": "retro",
+  "rules": [],
+  "decorations": [
+    {
+      "kind": "animation",
+      "format": "gif",
+      "id": "animation-test",
+      "assetId": "asset-0000000000000000000000000000000000000000000000000000000000000000",
+      "name": "petal.gif",
+      "visible": true,
+      "locked": false,
+      "opacity": 1,
+      "zIndex": 0,
+      "placement": {
+        "anchor": {
+          "kind": "viewport"
+        },
+        "x": 0.5,
+        "y": 0.5,
+        "widthPx": 64,
+        "heightPx": 48,
+        "rotationDeg": 0
+      },
+      "playback": {
+        "playing": true,
+        "loop": true,
+        "speed": 1
+      }
+    }
+  ]
+}

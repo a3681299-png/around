@@ -1,4 +1,5 @@
-import { frameAt } from '../world/media-time';
+import { createMediaClockHost, type MediaClockInstance } from '../host/media-clock';
+import { advanceMediaTime, initialMediaTime, reconcileMediaTime } from '../world/media-time';
 export { frameAt } from '../world/media-time';
 import { loadAsset } from '../assets/client';
 import { inspectLottie } from '../assets/lottie';
@@ -16,29 +17,13 @@ interface Resource {
   destroy(): void;
 }
 interface CacheEntry { refs: number; promise: Promise<Resource> }
-interface Instance { running(): boolean; tick(delta: number): void; refresh(): void; destroy(): void }
 
 /** Encoded assets/decoders are shared; playback time and SVG/canvas belong to a layer. */
 export function createMediaController(doc: Document, report: (message: string) => void) {
-  const view = doc.defaultView!;
-  const reduced = view.matchMedia('(prefers-reduced-motion: reduce)');
-  const cache = new Map<string, CacheEntry>(), instances = new Set<Instance>();
-  let closed = false, decodedPixels = 0, raf: number | undefined, previous: number | undefined;
-  const canRun = () => !closed && !doc.hidden && !reduced.matches;
-  const schedule = () => {
-    const active = canRun() && [...instances].some((instance) => instance.running());
-    if (!active) { if (raf !== undefined) view.cancelAnimationFrame(raf); raf = previous = undefined; }
-    else if (raf === undefined) raf = view.requestAnimationFrame(tick);
-  };
-  function tick(time: number) {
-    raf = undefined;
-    if (!canRun()) { previous = undefined; instances.forEach((instance) => instance.refresh()); return; }
-    const delta = previous === undefined ? 0 : time - previous;
-    if (previous === undefined || delta >= 1000 / ANIMATION_LIMITS.renderFps - .5) { previous = time; instances.forEach((instance) => instance.tick(delta)); }
-    schedule();
-  }
-  const lifecycle = () => { instances.forEach((instance) => instance.refresh()); schedule(); };
-  doc.addEventListener('visibilitychange', lifecycle); reduced.addEventListener('change', lifecycle);
+  const cache = new Map<string, CacheEntry>(), instances = new Set<MediaClockInstance>();
+  let closed = false, decodedPixels = 0;
+  const clockHost = createMediaClockHost(doc, instances, ANIMATION_LIMITS.renderFps);
+  const { canRun, schedule } = clockHost;
 
   const acquire = (id: string): CacheEntry => {
     let entry = cache.get(id);
@@ -74,15 +59,15 @@ export function createMediaController(doc: Document, report: (message: string) =
       let layer: Decoration | undefined, visible = false, alive = true, epoch = 0, ready = false, failed = false;
       let source: Resource | undefined, entry: CacheEntry | undefined, assetId = '';
       let svg: ReturnType<typeof createLottieSource> | undefined, canvas: HTMLCanvasElement | undefined;
-      let elapsed = 0, lastFrame = -1, drawing = false, finished = false;
+      let clock = initialMediaTime(), lastFrame = -1, drawing = false;
       let pendingFrame: number | undefined;
       const refresh = () => {
         if (!visible || !canRun() || layer?.kind === 'animation' && !layer.playback.playing) pendingFrame = undefined;
         element.dataset.playback = failed ? 'error' : !ready ? 'loading' : layer?.kind !== 'animation' ? 'still'
-          : !visible || doc.hidden ? 'hidden' : reduced.matches ? 'reduced-motion' : finished ? 'finished' : layer.playback.playing ? 'playing' : 'paused';
-        if (finished && ready && !failed && visible && canRun() && layer?.kind === 'animation' && layer.playback.playing) void paint(source!.metadata.animation!.frameCount - 1);
+          : !visible || clockHost.hidden() ? 'hidden' : clockHost.reducedMotion() ? 'reduced-motion' : clock.finished ? 'finished' : layer.playback.playing ? 'playing' : 'paused';
+        if (clock.finished && ready && !failed && visible && canRun() && layer?.kind === 'animation' && layer.playback.playing) void paint(source!.metadata.animation!.frameCount - 1);
       };
-      const running = () => ready && !failed && visible && !finished && layer?.kind === 'animation' && layer.playback.playing && source!.metadata.animation!.frameCount > 1;
+      const running = () => ready && !failed && visible && !clock.finished && layer?.kind === 'animation' && layer.playback.playing && source!.metadata.animation!.frameCount > 1;
       const fail = (reason: unknown) => { if (!alive) return; failed = true; svg?.destroy(); refresh(); report(reason instanceof Error ? reason.message : '素材を表示できませんでした。'); schedule(); };
       const paint = async (index: number) => {
         if (lastFrame === index || !source) return;
@@ -101,17 +86,15 @@ export function createMediaController(doc: Document, report: (message: string) =
           }
         }
       };
-      const instance: Instance = {
+      const instance: MediaClockInstance = {
         running, refresh,
         tick(delta) {
           if (!running() || layer?.kind !== 'animation') return;
           const motion = source!.metadata.animation!;
-          elapsed += delta * layer.playback.speed;
-          if (elapsed >= motion.durationMs) {
-            if (layer.playback.loop) elapsed %= motion.durationMs;
-            else { elapsed = motion.durationMs; finished = true; refresh(); }
-          }
-          void paint(frameAt(motion, elapsed));
+          const advanced = advanceMediaTime(clock, motion, layer.playback, delta, true);
+          clock = advanced.state;
+          if (clock.finished) refresh();
+          void paint(advanced.frame);
         },
         destroy() {
           if (!alive) return; alive = false; epoch++; instances.delete(instance); svg?.destroy();
@@ -124,14 +107,13 @@ export function createMediaController(doc: Document, report: (message: string) =
         element,
         update(next: Decoration, renderable: boolean) {
           if (!alive) return;
-          if (layer?.kind === 'animation' && next.kind === 'animation' && finished
-            && ((!layer.playback.playing && next.playback.playing) || (!layer.playback.loop && next.playback.loop))) { elapsed = 0; finished = false; }
+          clock = reconcileMediaTime(clock, layer?.kind === 'animation' ? layer.playback : undefined, next.kind === 'animation' ? next.playback : undefined);
           layer = next; visible = renderable;
           if (assetId !== next.assetId) {
             epoch++; const current = epoch;
             svg?.destroy(); svg = undefined; canvas = undefined; element.replaceChildren();
             if (entry) release(assetId, entry);
-            assetId = next.assetId; entry = acquire(assetId); ready = failed = finished = drawing = false; elapsed = 0; lastFrame = -1; pendingFrame = undefined;
+            assetId = next.assetId; entry = acquire(assetId); ready = failed = drawing = false; clock = initialMediaTime(); lastFrame = -1; pendingFrame = undefined;
             element.style.visibility = 'hidden';
             void entry.promise.then(async (resource) => {
               if (!alive || current !== epoch) return;
@@ -156,8 +138,7 @@ export function createMediaController(doc: Document, report: (message: string) =
     },
     destroy() {
       if (closed) return; closed = true;
-      if (raf !== undefined) view.cancelAnimationFrame(raf); raf = previous = undefined;
-      doc.removeEventListener('visibilitychange', lifecycle); reduced.removeEventListener('change', lifecycle);
+      clockHost.destroy();
       [...instances].forEach((instance) => instance.destroy());
     },
   };

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "youtube-custom",
+  "siteId": "youtube",
+  "baseThemeId": "retro",
+  "rules": [
+    {
+      "kind": "surface-style",
+      "target": "video-card",
+      "style": {
+        "backgroundColor": "#ABCDEF",
+        "border": {
+          "color": "#443366",
+          "widthPx": 4
+        },
+        "borderRadiusPx": 12
+      }
+    }
+  ]
+}

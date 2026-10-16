@@ -1,0 +1,38 @@
+[
+  {
+    "version": 1,
+    "commit": "ec75f59556b85d549ee48024b1247c0d2cc44f89",
+    "file": "tests/design.spec.ts",
+    "expression": "sample()"
+  },
+  {
+    "version": 2,
+    "commit": "bcda6b564c459471784a683f1fa1c1e4a120df18",
+    "file": "tests/image-data.spec.ts",
+    "expression": "({...emptyDesign('youtube', null), decorations:[image()]})"
+  },
+  {
+    "version": 3,
+    "commit": "082c59c9ecdfc2c1490fd6ea2c313c47c2f18608",
+    "file": "tests/image-data.spec.ts",
+    "expression": "({...emptyDesign('youtube', null), decorations:[{...image(), locked:true}]})"
+  },
+  {
+    "version": 4,
+    "commit": "68290f435ebeebc04d6dcf9adef96a26452d35e9",
+    "file": "tests/motion-data.spec.ts",
+    "expression": "({...emptyDesign('youtube', 'retro'), decorations:[layer()]})"
+  },
+  {
+    "version": 5,
+    "commit": "e2fb4b8160763886720b066c3b0c3ec1728cac35",
+    "file": "tests/effect-data.spec.ts",
+    "expression": "(()=>{const mask=defaultCircleMask(); mask.bindings.unshift({source:'video.playing',transform:{kind:'boolean-gate',fadeMs:400},target:'mask.intensity'}); return {...document(),decorations:[{...image(),effects:[mask]}]};})()"
+  },
+  {
+    "version": 6,
+    "commit": "1d23ec07b4f2143951d6f331920d3522839b7e37",
+    "file": "tests/group-data.spec.ts",
+    "expression": "({...document(),groups:[group()]})"
+  }
+]

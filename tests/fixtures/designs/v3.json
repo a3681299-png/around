@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 3,
+  "id": "youtube-custom",
+  "siteId": "youtube",
+  "baseThemeId": null,
+  "rules": [],
+  "decorations": [
+    {
+      "kind": "image",
+      "id": "image-example",
+      "assetId": "asset-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "name": "flower.png",
+      "placement": {
+        "anchor": {
+          "kind": "viewport"
+        },
+        "x": 0.5,
+        "y": 0.5,
+        "widthPx": 100,
+        "heightPx": 80,
+        "rotationDeg": 0
+      },
+      "opacity": 0.8,
+      "zIndex": 1,
+      "visible": true,
+      "locked": true
+    }
+  ]
+}

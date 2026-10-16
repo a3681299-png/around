@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 5,
+  "id": "youtube-custom",
+  "siteId": "youtube",
+  "baseThemeId": null,
+  "rules": [],
+  "decorations": [
+    {
+      "kind": "image",
+      "id": "image-world",
+      "assetId": "asset-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "name": "world.png",
+      "placement": {
+        "anchor": {
+          "kind": "surface",
+          "target": "video-player"
+        },
+        "x": 0.5,
+        "y": 0.5,
+        "widthPx": 400,
+        "heightPx": 300,
+        "rotationDeg": 90
+      },
+      "opacity": 0.7,
+      "zIndex": 0,
+      "visible": true,
+      "locked": false,
+      "effects": [
+        {
+          "kind": "mask",
+          "shape": "circle",
+          "enabled": true,
+          "center": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "radiusPx": 160,
+          "featherPx": 40,
+          "intensity": 1,
+          "bindings": [
+            {
+              "source": "video.playing",
+              "transform": {
+                "kind": "boolean-gate",
+                "fadeMs": 400
+              },
+              "target": "mask.intensity"
+            },
+            {
+              "source": "pointer.position",
+              "transform": {
+                "kind": "layer-local"
+              },
+              "target": "mask.center"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
