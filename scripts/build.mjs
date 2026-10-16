@@ -8,6 +8,8 @@ import { createHash } from 'node:crypto';
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const outDir = join(root, 'dist');
 const watching = process.argv.includes('--watch');
+const worldMode = process.env.WW_WORLD_MODE ?? 'runtime';
+if (!['legacy', 'compare', 'runtime'].includes(worldMode)) throw new Error('WW_WORLD_MODE must be legacy, compare or runtime.');
 const manifest = JSON.parse(await readFile(join(root, 'manifest.json'), 'utf8'));
 const pkg = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
 const vendor = await readFile(join(root, 'src/vendor/lottie-light.js'));
@@ -41,6 +43,7 @@ const shared = {
   charset: 'utf8',
   legalComments: 'none',
   logLevel: 'info',
+  define: { __WW_WORLD_MODE__: JSON.stringify(worldMode), __WW_WORLD_DEVTOOLS__: String(process.env.WW_WORLD_DEVTOOLS === '1') },
 };
 
 const builds = await Promise.all([

@@ -1,9 +1,14 @@
+import { captureGeometry } from '../../host/anchors';
+import { WORLD_MODE } from '../../host/world-options';
+import { evaluateLayout } from '../../world/layout';
+import { legacyLayout } from './legacy-evaluation';
+import { assertWorldParity } from './parity';
 import { createMediaController } from '../../media/controller';
 import { createEffectController, type EffectTarget } from './effects';
 import type { PlaybackSource } from '../../signals/types';
-import { centre, groupBounds, moveGroup, placementBounds, resizePlacement, rotatePlacement, type PlacementChange, type PlacementSample, type Point } from '../../world/geometry';
+import { groupBounds, moveGroup, resizePlacement, rotatePlacement, type PlacementChange, type PlacementSample, type Point } from '../../world/geometry';
 import { editableSceneSamples, placementFrame, snapTargets } from '../../design/frames';
-import { effectivelyLocked, groupMovable, groupView, parentGroup, rootLayers } from '../../world/hierarchy';
+import { effectivelyLocked, groupMovable, parentGroup, rootLayers } from '../../world/hierarchy';
 import { snapMove, type Guide } from '../../design/layout';
 import type { DesignTarget, Decoration, GroupLayer } from '../../design/types';
 
@@ -83,12 +88,11 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
     if (host.parentElement !== parent) parent.append(host);
     const nextObserved = new Set<Element>();
     const effectTargets: EffectTarget[] = [];
-    const layouts = new Map(groups.map((group) => {
-      const layer = groupView(group, images, (placement) => placementFrame(doc, anchors, placement));
-      const frame = placementFrame(doc, anchors, layer.placement);
-      return [group.id, { layer, frame, bounds: frame ? placementBounds(layer.placement, frame) : undefined }] as const;
-    }));
-    const onScreen = (bounds: ReturnType<typeof placementBounds>) => bounds.right > 0 && bounds.bottom > 0 && bounds.left < view.innerWidth && bounds.top < view.innerHeight;
+    const geometry = captureGeometry(doc, anchors), scene = { decorations: images, groups };
+    const layout = WORLD_MODE === 'legacy' ? legacyLayout(scene, geometry) : evaluateLayout(scene, geometry);
+    if (WORLD_MODE === 'compare') assertWorldParity(layout, legacyLayout(scene, geometry), 'layout');
+    const layouts = new Map(layout.groups.map((group) => [group.layer.id, group]));
+    const layerLayouts = new Map(layout.layers.map((layer) => [layer.layer.id, layer]));
     // Composite parents are evaluated first; descendants share the same effect stage.
     for (const group of groups) {
       const entry = compositions.get(group.id)!, { layer, frame: rect, bounds } = layouts.get(group.id)!;
@@ -103,15 +107,15 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
         Object.assign(entry.node.style, { left: `${bounds.left}px`, top: `${bounds.top}px`, width: `${bounds.right - bounds.left}px`, height: `${bounds.bottom - bounds.top}px` });
         Object.assign(entry.controls.style, { left: `${bounds.left}px`, top: `${bounds.top}px`, width: `${bounds.right - bounds.left}px`, height: `${bounds.bottom - bounds.top}px` });
       }
-      const renderable = Boolean(rect && group.visible && group.opacity > 0 && images.some((image) => group.children.includes(image.id) && image.visible && image.opacity > 0 && onScreen(placementBounds(image.placement, rect))));
+      const renderable = layouts.get(group.id)!.renderable;
       effectTargets.push({ layer, element: entry.content, frame: rect, renderable, visibility() {} });
     }
     for (const item of images) {
       const entry = nodes.get(item.id);
       if (!entry) continue;
-      const rect = placementFrame(doc, anchors, item.placement);
-      const parent = parentGroup(groups, item.id), parentLayout = parent && layouts.get(parent.id);
-      const visible = item.visible && parent?.visible !== false, locked = effectivelyLocked(item, groups);
+      const evaluated = layerLayouts.get(item.id)!, rect = evaluated.frame;
+      const parent = parentGroup(groups, item.id);
+      const visible = evaluated.visible, locked = evaluated.locked;
       entry.node.hidden = !visible || !rect;
       const selected = Boolean(editing?.selectedIds.includes(item.id));
       entry.controls.hidden = !selected || !visible || !rect;
@@ -125,15 +129,14 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
         if (element) nextObserved.add(element);
       }
       if (!rect) { entry.media.update(item, false); continue; }
-      const point = centre(item.placement, rect);
+      const point = evaluated.position!, local = evaluated.localPosition!;
       Object.assign(entry.node.style, {
-        left: `${point.x - (parentLayout?.bounds?.left ?? 0)}px`, top: `${point.y - (parentLayout?.bounds?.top ?? 0)}px`, width: `${item.placement.widthPx}px`, height: `${item.placement.heightPx}px`,
+        left: `${local.x}px`, top: `${local.y}px`, width: `${item.placement.widthPx}px`, height: `${item.placement.heightPx}px`,
         transform: `translate(-50%, -50%) rotate(${item.placement.rotationDeg}deg)`, zIndex: String(item.zIndex + 100),
       });
       Object.assign(entry.controls.style, { left: `${point.x}px`, top: `${point.y}px`, width: `${item.placement.widthPx}px`, height: `${item.placement.heightPx}px`, transform: entry.node.style.transform });
       entry.media.element.style.opacity = String(item.opacity);
-      const bounds = placementBounds(item.placement, rect);
-      const renderable = visible && item.opacity > 0 && parent?.opacity !== 0 && onScreen(bounds);
+      const renderable = evaluated.renderable;
       let previousVisibility: boolean | undefined;
       effectTargets.push({ layer: item, element: entry.media.element, frame: rect, renderable,
         ...(parent ? { parentId: parent.id } : {}),
@@ -141,7 +144,7 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
       entry.controls.toggleAttribute('data-locked', locked);
       entry.controls.toggleAttribute('data-transformable', Boolean(editing && !editing.locked && !locked && editing.selectedIds.length === 1));
     }
-    effects?.update(effectTargets);
+    effects?.update(effectTargets, { scene, geometry });
     const samples = editing ? editableSceneSamples(doc, anchors, images, groups, editing.selectedIds) : [];
     const bounds = editing && editing.selectedIds.length > 1 && samples.length > 1 ? groupBounds(samples) : undefined;
     if (groupFrame) {
