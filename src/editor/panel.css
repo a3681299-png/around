@@ -48,6 +48,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid #695089; outline-
 .reset { margin-top: 12px; width: 100%; }
 .assets { margin-top: 12px; }
 .add-image { width: 100%; }
+.add-animation { width: 100%; margin-top: 6px; }
 .layers { display: grid; gap: 3px; max-height: 230px; overflow: auto; padding: 3px; }
 .layer { display: grid; grid-template-columns: minmax(70px, 1fr) 23px 30px 30px 23px 23px; gap: 2px; padding: 3px; border: 1px solid transparent; border-radius: 5px; }
 .layer button { padding: 4px 2px; font-size: 10px; }

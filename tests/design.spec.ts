@@ -24,7 +24,7 @@ test('versioned data is sparse, canonical, independent of retro, and copied with
 test('unsupported versions, executable fields, arbitrary CSS and invalid dimensions are rejected', () => {
   const input = sample();
   for (const value of [
-    { ...input, schemaVersion: 4 }, { ...input, script: 'alert(1)' },
+    { ...input, schemaVersion: 5 }, { ...input, script: 'alert(1)' },
     { ...input, rules: [{ kind: 'javascript', target: 'video-card', style: {} }] },
     { ...input, rules: [{ kind: 'surface-style', target: 'video-card', selector: '*', style: {} }] },
     { ...input, rules: [{ kind: 'surface-style', target: 'video-card', style: { backgroundColor: 'url(https://example.com)' } }] },

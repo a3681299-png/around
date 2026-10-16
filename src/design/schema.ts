@@ -1,4 +1,5 @@
-import { IMAGE_LIMITS, STYLE_LIMITS, type DesignDocument, type SurfaceStyle, type ImageDecoration, type PlacementAnchor } from './types';
+import { IMAGE_LIMITS, STYLE_LIMITS, type DesignDocument, type SurfaceStyle, type Decoration, type PlacementAnchor } from './types';
+import { ANIMATION_LIMITS } from '../assets/motion-types';
 
 export function isAssetId(value: unknown): value is string {
   return typeof value === 'string' && /^asset-[a-f0-9]{64}$/.test(value);
@@ -35,11 +36,11 @@ function number(value: unknown, min: number, max: number): number {
   return value;
 }
 
-function image(value: unknown, version: number): ImageDecoration {
-  const item = record(value, ['kind', 'id', 'assetId', 'name', 'placement', 'opacity', 'zIndex', 'visible', ...(version === 3 ? ['locked'] : [])]);
-  if (item['kind'] !== 'image' || !isDesignId(item['id']) || !isAssetId(item['assetId'])
+function image(value: unknown, version: number): Decoration {
+  const item = record(value, ['kind', 'id', 'assetId', 'name', 'placement', 'opacity', 'zIndex', 'visible', ...(version >= 3 ? ['locked'] : []), ...(version >= 4 ? ['format', 'playback'] : [])]);
+  if (!['image', ...(version >= 4 ? ['animation'] : [])].includes(item['kind'] as string) || !isDesignId(item['id']) || !isAssetId(item['assetId'])
     || typeof item['name'] !== 'string' || item['name'].length < 1 || item['name'].length > 120 || /[\u0000-\u001f]/.test(item['name'])
-    || typeof item['visible'] !== 'boolean' || (version === 3 && typeof item['locked'] !== 'boolean')) throw new Error('画像レイヤーの形式が不正です。');
+    || typeof item['visible'] !== 'boolean' || (version >= 3 && typeof item['locked'] !== 'boolean')) throw new Error('画像レイヤーの形式が不正です。');
   const placement = record(item['placement'], ['anchor', 'x', 'y', 'widthPx', 'heightPx', 'rotationDeg']);
   const inputAnchor = record(placement['anchor'], ['kind', 'target']);
   let anchor: PlacementAnchor;
@@ -48,23 +49,34 @@ function image(value: unknown, version: number): ImageDecoration {
   else throw new Error('画像の配置基準が不正です。');
   const zIndex = number(item['zIndex'], -IMAGE_LIMITS.maxZ, IMAGE_LIMITS.maxZ);
   if (!Number.isInteger(zIndex)) throw new Error('重なり順は整数で指定してください。');
-  return {
-    kind: 'image', id: item['id'], assetId: item['assetId'], name: item['name'],
+  const common = {
+    id: item['id'], assetId: item['assetId'], name: item['name'],
     placement: {
       anchor, x: number(placement['x'], 0, 1), y: number(placement['y'], 0, 1),
       widthPx: number(placement['widthPx'], IMAGE_LIMITS.minSize, IMAGE_LIMITS.maxSize),
       heightPx: number(placement['heightPx'], IMAGE_LIMITS.minSize, IMAGE_LIMITS.maxSize),
       rotationDeg: number(placement['rotationDeg'], -180, 180),
     },
-    opacity: number(item['opacity'], 0, 1), zIndex, visible: item['visible'], locked: version === 3 ? item['locked'] as boolean : false,
+    opacity: number(item['opacity'], 0, 1), zIndex, visible: item['visible'], locked: version >= 3 ? item['locked'] as boolean : false,
   };
+  if (item['kind'] === 'image') {
+    if (Object.hasOwn(item, 'format') || Object.hasOwn(item, 'playback')) throw new Error('静止画像には再生設定を指定できません。');
+    return { ...common, kind: 'image' };
+  }
+  const format = item['format'];
+  if (format !== 'gif' && format !== 'animated-webp' && format !== 'lottie') throw new Error('未対応のアニメーション形式です。');
+  const playback = record(item['playback'], ['playing', 'loop', 'speed']);
+  if (typeof playback['playing'] !== 'boolean' || typeof playback['loop'] !== 'boolean') throw new Error('再生設定が不正です。');
+  const speed = number(playback['speed'], ANIMATION_LIMITS.speedMin, ANIMATION_LIMITS.speedMax);
+  if (format !== 'lottie' && speed !== 1) throw new Error('再生速度はLottieでのみ変更できます。');
+  return { ...common, kind: 'animation', format, playback: { playing: playback['playing'], loop: playback['loop'], speed } };
 }
 
 /** Rebuilds trusted data; never spreads user-provided objects into CSS or markup. */
 export function parseDesign(value: unknown): DesignDocument {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('デザインの形式が不正です。');
   const version = (value as Record<string, unknown>)['schemaVersion'];
-  if (version !== 1 && version !== 2 && version !== 3) throw new Error('このデザインのバージョンには対応していません。');
+  if (version !== 1 && version !== 2 && version !== 3 && version !== 4) throw new Error('このデザインのバージョンには対応していません。');
   const data = record(value, version === 1 ? ['schemaVersion', 'id', 'siteId', 'baseThemeId', 'rules'] : ['schemaVersion', 'id', 'siteId', 'baseThemeId', 'rules', 'decorations']);
   if (!isDesignId(data['id']) || !isDesignId(data['siteId'])
     || (data['baseThemeId'] !== null && !isDesignId(data['baseThemeId']))) {
@@ -90,17 +102,18 @@ export function parseDesign(value: unknown): DesignDocument {
     if (Object.hasOwn(input, 'borderRadiusPx')) style.borderRadiusPx = pixels(input['borderRadiusPx'], STYLE_LIMITS.borderRadius);
     return { kind: 'surface-style' as const, target: rule['target'], style };
   });
-  let decorations: ImageDecoration[] = [];
+  let decorations: Decoration[] = [];
   if (version >= 2) {
     if (!Array.isArray(data['decorations']) || data['decorations'].length > IMAGE_LIMITS.count) throw new Error('画像は32枚まで配置できます。');
     decorations = data['decorations'].map((value) => image(value, version));
     if (new Set(decorations.map((item) => item.id)).size !== decorations.length) throw new Error('画像レイヤーのIDが重複しています。');
+    if (decorations.filter((item) => item.kind === 'animation').length > ANIMATION_LIMITS.count) throw new Error('アニメーションは8レイヤーまでです。');
   }
-  return { schemaVersion: 3, id: data['id'], siteId: data['siteId'], baseThemeId: data['baseThemeId'], rules, decorations };
+  return { schemaVersion: 4, id: data['id'], siteId: data['siteId'], baseThemeId: data['baseThemeId'], rules, decorations };
 }
 
 export function emptyDesign(siteId: string, baseThemeId: string | null): DesignDocument {
-  return parseDesign({ schemaVersion: 3, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
+  return parseDesign({ schemaVersion: 4, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
 }
 
 export function sameDesign(a: DesignDocument | undefined, b: DesignDocument | undefined): boolean {

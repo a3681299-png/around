@@ -373,3 +373,53 @@ Windows 95/98風のテーマへ変更後、同じ独立した未ログインのC
 
 複数選択は一括移動・整列まで。拡縮・回転は単独選択時に行う。履歴は編集セッション内の100操作で、ページ再読み込みには持ち越さない。スナップはドラッグ移動に適用し、初期OFF。実験用 `dist` を別Chromeプロファイルへ読み込み、YouTubeを再読み込みして確認する。
 
+## 2026年10月16日：GIF・アニメーションWebP・Lottieの読み込みと編集
+
+`codex/creator-editor-spike` の `082c59c` を基に、専用worktree `.work/creator-editor` で実装した。`main` は `022a576` のままcleanで、通常版 `dist` 全12ファイルのSHA-256も作業開始時と一致した。Manifestの権限とCSPに差分はない。使い方、対応範囲、データ構造と上限は [animations.md](animations.md) に記載した。
+
+| 確認 | 結果 |
+| --- | --- |
+| 最終コードの型チェック・lint・build | PASS |
+| 全体の `npm test` 再実行 | 135件PASS、実サイト用2件SKIP（6.3分） |
+| 最終の遅延描画対応後の関連テスト | 43件PASS（1.5分） |
+| リサイズ中断・静止画混在の繰り返し検証 | 各3回、計6回PASS |
+| 重複を除く最終的な検証済みテスト | 136件PASS、実サイト用2件未実行 |
+| `git diff --check` | PASS |
+| 実YouTubeの目視・最新DOM確認 | 未実施 |
+
+全体の初回実行では134件PASS、1件FAIL、2件SKIPだった。既存のリサイズ中断テストで、resize通知より先にpointerupが来ると移動が確定する競合が判明した。pointerupでも配置基準を再確認する修正を入れ、繰り返し検証と全体再実行を通した。
+
+全体再実行後、低速なデコーダーでもループOFFの最終フレームを落とさないよう、描画待ちは最新の1要求だけ保持する処理と回帰テストを追加した。最終コマンドは `npm test -- tests/creator-editor.spec.ts tests/image-editor.spec.ts tests/layer-editor.spec.ts tests/motion-data.spec.ts tests/motion-editor.spec.ts`。未解決のテスト失敗はない。
+
+自動テストは隔離Chromiumプロファイル、実MV3拡張、実Chrome Storage、拡張オリジンの実IndexedDB、ローカルのYouTube相当HTMLで行った。実サイト向けの `WW_LIVE_YOUTUBE` は指定していない。GIF／WebPはCanvasのピクセル、LottieはSVGの変化で実フレームの描画を確認し、各形式でChrome再起動後の復元も検証した。
+
+- ファイル選択とドロップ、移動・拡縮・回転、不透明度、静止画との混在、独立した再生状態。
+- 再生・一時停止、ループON／OFF、Lottieの速度、保存・破棄・再読み込み・Chrome再起動。
+- 再生設定のUndo／Redo、複製・削除・ロック、既存カード・レイヤー操作との回帰。
+- プレイヤー基準とSPA、基準の消失、通常モードのクリック透過、OFF／0%での撤去。
+- `prefers-reduced-motion`の停止と復帰、タブ非表示状態の停止と復帰。非表示は拡張のisolated world内でシミュレートした。
+- 8レイヤーの上限、共有デコーダー数、OFF後のclose数とフレーム予約が0になること。
+- MIME偽装、破損コンテナ、寸法・複雑さ・総画素予算、素材とレイヤー種別の不一致の拒否。
+- 外部・埋め込み画像、URL、式、AEエフェクト、3D、フォント、循環参照、危険なキー、リピーターの拒否。
+- content側とWorker側での不正JSON拒否、ページの`.lottie`／`data-animation-path`から外部リクエストを起こさないこと。
+- 素材確認中に別タブで保存された場合、最新の保存値を保ち、未完の追加素材を回収すること。
+- 意図的に1フレーム300msの遅延を入れたデコーダーでも、最終フレームの実ピクセルまで描画すること。
+
+### 8レイヤーの負荷計測
+
+最終の関連テストで、64×48pxのGIF 3レイヤー、WebP 2レイヤー、Lottie 3レイヤーを同時に再生した。実素材は3種類で、測定時間は1.5秒。
+
+| 指標 | 最終サンプル |
+| --- | --- |
+| Canvas／SVGのフレーム更新数 | 176回（8レイヤー合計） |
+| Chromium ScriptDurationの増分 | 19ms |
+| Chromium TaskDurationの増分 | 107ms |
+| JSHeapUsedSize | 約4.8MiB |
+| 再生用ImageDecoder | 2個を共有 |
+| インポートの全フレーム確認用ImageDecoder | 5個、確認後に全てclose |
+| OFF後の残存デコーダー／フレーム予約 | 0／0 |
+
+計測値は `.work/verification/motion-performance.json` とPlaywrightの添付JSONに出力する。JavaScriptヒープは、GPU・デコーダーのネイティブメモリやプロセス全体のメモリではない。YouTube動画や実際の重いAE作品を含む負荷として扱わない。上限のある小さなfixtureで、処理の共有と停止・撤去を検証した結果である。
+
+Lottieは固定したLight版を同梱し、自動ページ検索を無効化した。JSONはデータとして検証し、外部JavaScriptや外部アセットを実行・取得しない。通常版の依存関係、Chrome権限、バックエンド、生成AI、タイムライン編集、3D対応は追加していない。
+

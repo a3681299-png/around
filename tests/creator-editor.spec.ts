@@ -81,7 +81,7 @@ test('pick a card, preview all properties locally, save across tabs, discard, re
   await expect(second.locator(cards).first()).toHaveCSS('background-color', 'rgb(235, 223, 255)');
   await expect(second.locator(cards).first()).toHaveCSS('border-radius', '14px');
   const stored = await popup.evaluate(async (designKey) => (await chrome.storage.local.get(designKey))[designKey], key);
-  expect(stored).toMatchObject({ schemaVersion: 3, siteId: 'youtube', baseThemeId: 'retro', rules: [{
+  expect(stored).toMatchObject({ schemaVersion: 4, siteId: 'youtube', baseThemeId: 'retro', rules: [{
     kind: 'surface-style', target: 'video-card', style: { backgroundColor: '#ebdfff', border: { color: '#443366', widthPx: 5 }, borderRadiusPx: 14 },
   }] });
 

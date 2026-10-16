@@ -1,6 +1,7 @@
 export const ASSET_LIMITS = Object.freeze({ fileBytes: 4 * 1024 * 1024, batchBytes: 12 * 1024 * 1024, batchCount: 8, totalBytes: 48 * 1024 * 1024, count: 128, edge: 4096, pixels: 16 * 1024 * 1024 });
 export interface ImageInfo { mime: 'image/png' | 'image/webp'; width: number; height: number }
-export interface AssetMetadata extends ImageInfo { id: string; name: string; byteLength: number }
+export interface AssetInfo { mime: 'image/png' | 'image/webp' | 'image/gif' | 'application/json'; width: number; height: number; animation?: import('./motion-types').AnimationInfo }
+export interface AssetMetadata extends AssetInfo { id: string; name: string; byteLength: number }
 
 const text = (data: Uint8Array, start: number, length: number) => String.fromCharCode(...data.subarray(start, start + length));
 const invalid = () => new Error('静止PNG・WebP画像を選択してください。');

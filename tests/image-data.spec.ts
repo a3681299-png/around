@@ -13,7 +13,7 @@ test('v1 migration preserves card rules and base theme without embedding any ima
     { kind: 'surface-style', target: 'video-card', style: { borderRadiusPx: 12 } },
   ] };
   const parsed = parseDesign(legacy);
-  expect(parsed).toMatchObject({ schemaVersion: 3, baseThemeId: 'retro', rules: legacy.rules, decorations: [] });
+  expect(parsed).toMatchObject({ schemaVersion: 4, baseThemeId: 'retro', rules: legacy.rules, decorations: [] });
   expect(legacy.schemaVersion).toBe(1);
   const withImage = { ...parsed, decorations: [image()] };
   expect(parseDesign(withImage)).toEqual(withImage);

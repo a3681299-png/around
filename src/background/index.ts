@@ -1,6 +1,8 @@
 import { ASSET_MESSAGE, type AssetWireFile } from '../assets/protocol';
 import { changeAssets, getAsset, type AssetLease, type StoredAsset } from '../assets/repository';
-import { ASSET_LIMITS, base64ToBytes, bytesToBase64, inspectImage, type AssetMetadata } from '../assets/validation';
+import { ASSET_LIMITS, base64ToBytes, bytesToBase64, type AssetMetadata } from '../assets/validation';
+import { inspectAsset } from '../assets/inspect';
+import { validateDesignAssets } from '../assets/design-assets';
 import { isAssetId, isDesignId, parseDesign } from '../design/schema';
 import { saveDesign } from '../storage/designs';
 
@@ -58,11 +60,15 @@ async function importBatch(input: unknown, lease: AssetLease): Promise<AssetMeta
     const bytes = base64ToBytes(file.base64);
     size += bytes.length;
     if (size > ASSET_LIMITS.batchBytes) throw new Error('一度に追加する画像は合計12MBまでです。');
-    const info = inspectImage(bytes, file.mime);
+    const info = inspectAsset(bytes, file.mime);
     const blob = new Blob([new Uint8Array(bytes).buffer], { type: info.mime });
-    const bitmap = await createImageBitmap(blob);
-    try { if (bitmap.width !== info.width || bitmap.height !== info.height) throw new Error('画像を正しく読み込めませんでした。'); }
-    finally { bitmap.close(); }
+    // ServiceWorker has no ImageDecoder. The content importer validates all
+    // frames; this boundary independently checks bounded containers and frame 0.
+    if (info.animation?.format !== 'lottie') {
+      const bitmap = await createImageBitmap(blob);
+      try { if (bitmap.width !== info.width || bitmap.height !== info.height) throw new Error('画像を正しく読み込めませんでした。'); }
+      finally { bitmap.close(); }
+    }
     const hash = await crypto.subtle.digest('SHA-256', new Uint8Array(bytes).buffer);
     const id = `asset-${[...new Uint8Array(hash)].map((byte) => byte.toString(16).padStart(2, '0')).join('')}`;
     assets.push({ ...info, id, name: file.name, byteLength: bytes.length, blob, leases: [lease] });
@@ -99,9 +105,12 @@ async function handle(message: Record<string, unknown>, sender: chrome.runtime.M
     await leaseAssets(lease, ids);
   } else if (message['action'] === 'release') {
     await leaseAssets(lease, []);
-  } else if (message['action'] === 'save') {
+  } else if (message['action'] === 'save' || message['action'] === 'validate') {
     const design = parseDesign(message['design']);
-    for (const image of design.decorations) if (!await getAsset(image.assetId)) throw new Error('保存する画像素材が見つかりません。');
+    const assets = new Map<string, AssetMetadata>();
+    for (const id of new Set(design.decorations.map((layer) => layer.assetId))) { const asset = await getAsset(id); if (asset) assets.set(id, asset); }
+    validateDesignAssets(design.decorations, assets);
+    if (message['action'] === 'validate') return undefined;
     await saveDesign(design);
   } else throw new Error('未対応の素材操作です。');
   // Cleanup is secondary to a successful save; a failed cleanup retains assets.

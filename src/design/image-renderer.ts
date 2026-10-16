@@ -1,8 +1,8 @@
-import { loadAsset } from '../assets/client';
-import { centre, groupBounds, moveGroup, resizePlacement, rotatePlacement, type PlacementChange, type PlacementSample, type Point } from './geometry';
+import { createMediaController } from '../media/controller';
+import { centre, groupBounds, moveGroup, placementBounds, resizePlacement, rotatePlacement, type PlacementChange, type PlacementSample, type Point } from './geometry';
 import { editableSamples, placementFrame, snapTargets } from './frames';
 import { snapMove, type Guide } from './layout';
-import type { DesignTarget, ImageDecoration } from './types';
+import type { DesignTarget, Decoration } from './types';
 
 export interface ImageEditing {
   selectedIds: readonly string[];
@@ -26,7 +26,7 @@ const CSS = `
 .selection-frame[data-locked] { border-color:#966000; border-style:dashed; }
 .group-frame { position:absolute; border:1px dashed #6350ca; box-shadow:0 0 0 1px white; pointer-events:none; z-index:1001; }
 .guide { position:absolute; background:#ce267e; box-shadow:0 0 0 1px #ffffffbb; pointer-events:none; z-index:1002; }
-img { display:block; width:100%; height:100%; border:0; user-select:none; pointer-events:none; }
+.media, img, canvas, svg { display:block; width:100%; height:100%; border:0; user-select:none; pointer-events:none; }
 .handle { display:none; position:absolute; width:14px; height:14px; padding:0; border:2px solid #6350ca; box-shadow:0 0 0 1px white; border-radius:2px; background:white; touch-action:none; }
 .selection-frame[data-transformable] .handle { display:block; pointer-events:auto; }
 [data-handle="nw"] { left:-7px; top:-7px; cursor:nwse-resize; }
@@ -36,22 +36,21 @@ img { display:block; width:100%; height:100%; border:0; user-select:none; pointe
 [data-handle="rotate"] { left:calc(50% - 7px); top:-32px; border-radius:50%; cursor:grab; }
 `;
 
-/** Image rendering owns DOM and object URLs. Editing state and storage stay outside. */
+/** Shared layer layout/gestures; media decoding and playback live in media/. */
 export function createImageRenderer(doc: Document, anchors: readonly DesignTarget[]) {
   const view = doc.defaultView!;
   let host: HTMLElement | undefined;
   let shadow: ShadowRoot | undefined;
   let editing: ImageEditing | undefined;
-  let images: readonly ImageDecoration[] = [];
+  let images: readonly Decoration[] = [];
   let frame: number | undefined;
   let observer: ResizeObserver | undefined;
   let observed = new Set<Element>();
-  let generation = 0;
+  let media: ReturnType<typeof createMediaController> | undefined;
   let groupFrame: HTMLDivElement | undefined;
   let imageLayer: HTMLDivElement | undefined;
   let guideNodes: HTMLDivElement[] = [];
-  const nodes = new Map<string, { node: HTMLDivElement; controls: HTMLDivElement; image: HTMLImageElement; assetId: string }>();
-  const urls = new Map<string, Promise<string>>();
+  const nodes = new Map<string, { node: HTMLDivElement; controls: HTMLDivElement; media: ReturnType<ReturnType<typeof createMediaController>['attach']> }>();
   let gesture: { pointerId: number; mode: string; samples: PlacementSample[]; point: Point } | undefined;
 
   const drawGuides = (guides: readonly Guide[]) => guideNodes.forEach((node, index) => {
@@ -62,20 +61,6 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
         : { left: `${guide.from}px`, top: `${guide.position}px`, width: `${guide.to - guide.from}px`, height: '1px' });
     }
   });
-
-  const getUrl = (id: string): Promise<string> => {
-    let pending = urls.get(id);
-    if (!pending) {
-      const epoch = generation;
-      pending = loadAsset(id).then(({ blob }) => {
-        const url = URL.createObjectURL(blob);
-        if (epoch !== generation) { URL.revokeObjectURL(url); throw new Error('表示を終了しました。'); }
-        return url;
-      });
-      urls.set(id, pending);
-    }
-    return pending;
-  };
 
   const draw = () => {
     if (!host) return;
@@ -98,14 +83,16 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
         const element = target && doc.querySelector(`[data-ww-surface~="${target.surface}"]`);
         if (element) nextObserved.add(element);
       }
-      if (!rect) continue;
+      if (!rect) { entry.media.update(item, false); continue; }
       const point = centre(item.placement, rect);
       Object.assign(entry.node.style, {
         left: `${point.x}px`, top: `${point.y}px`, width: `${item.placement.widthPx}px`, height: `${item.placement.heightPx}px`,
         transform: `translate(-50%, -50%) rotate(${item.placement.rotationDeg}deg)`, zIndex: String(item.zIndex + 100),
       });
       Object.assign(entry.controls.style, { left: `${point.x}px`, top: `${point.y}px`, width: `${item.placement.widthPx}px`, height: `${item.placement.heightPx}px`, transform: entry.node.style.transform });
-      entry.image.style.opacity = String(item.opacity);
+      entry.media.element.style.opacity = String(item.opacity);
+      const bounds = placementBounds(item.placement, rect);
+      entry.media.update(item, item.visible && item.opacity > 0 && bounds.right > 0 && bounds.bottom > 0 && bounds.left < view.innerWidth && bounds.top < view.innerHeight);
       entry.controls.toggleAttribute('data-locked', item.locked);
       entry.controls.toggleAttribute('data-transformable', Boolean(editing && !editing.locked && !item.locked && editing.selectedIds.length === 1));
     }
@@ -145,10 +132,7 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
     if (!gesture || !editing || editing.locked || event.pointerId !== gesture.pointerId) return;
     event.preventDefault(); event.stopPropagation();
     const { mode, samples, point } = gesture;
-    if (samples.some((sample) => {
-      const rect = placementFrame(doc, anchors, sample.placement);
-      return !rect || (['left', 'top', 'width', 'height'] as const).some((key) => Math.abs(rect[key] - sample.frame[key]) > .000001);
-    })) { finish(true); return; }
+    if (framesChanged(samples)) { finish(true); return; }
     const current = { x: event.clientX, y: event.clientY };
     const delta = { x: current.x - point.x, y: current.y - point.y };
     const first = samples[0]!;
@@ -160,11 +144,16 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
       ? rotatePlacement(first.placement, first.frame, point, current)
       : resizePlacement(first.placement, first.frame, delta, mode.endsWith('e') ? 1 : -1, mode.startsWith('s') ? 1 : -1) }]);
   };
+  const framesChanged = (samples: readonly PlacementSample[]) => samples.some((sample) => {
+    const rect = placementFrame(doc, anchors, sample.placement);
+    return !rect || (['left', 'top', 'width', 'height'] as const).some((key) => Math.abs(rect[key] - sample.frame[key]) > .000001);
+  });
   const finish = (cancel = false) => { drawGuides([]); if (gesture) { gesture = undefined; editing?.end(cancel); } };
   const onPointerUp = (event: PointerEvent) => {
     if (!gesture || event.pointerId !== gesture.pointerId) return;
     event.stopPropagation();
-    finish(event.type !== 'pointerup');
+    // Resize/SPA notifications can arrive after pointerup. Check the frame here too.
+    finish(event.type !== 'pointerup' || framesChanged(gesture.samples));
   };
   const onBlur = () => finish(true);
   const onViewChange = () => { finish(true); refresh(); };
@@ -176,6 +165,7 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
     const style = doc.createElement('style');
     style.textContent = CSS;
     shadow.append(style);
+    media = createMediaController(doc, (message) => editing?.error(message));
     imageLayer = doc.createElement('div'); imageLayer.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:0'; shadow.append(imageLayer);
     groupFrame = doc.createElement('div'); groupFrame.className = 'group-frame'; groupFrame.hidden = true; shadow.append(groupFrame);
     guideNodes = Array.from({ length: 2 }, () => { const node = doc.createElement('div'); node.className = 'guide'; node.hidden = true; shadow!.append(node); return node; });
@@ -192,8 +182,8 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
     doc.addEventListener('fullscreenchange', onViewChange);
   };
   const destroy = () => {
-    if (!host && nodes.size === 0 && urls.size === 0) { images = []; return; }
-    generation++;
+    if (!host && nodes.size === 0) { images = []; return; }
+    media?.destroy(); media = undefined;
     gesture = undefined;
     if (frame !== undefined) view.cancelAnimationFrame(frame);
     frame = undefined;
@@ -204,49 +194,33 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
     doc.removeEventListener('fullscreenchange', onViewChange);
     host?.remove(); host = undefined; shadow = undefined; groupFrame = undefined; imageLayer = undefined; guideNodes = [];
     nodes.clear();
-    urls.forEach((pending) => { void pending.then((url) => URL.revokeObjectURL(url), () => undefined); });
-    urls.clear();
     images = [];
   };
   return {
-    update(next: readonly ImageDecoration[]) {
+    update(next: readonly Decoration[]) {
       if (!next.length) { destroy(); return; }
       images = next;
       if (!host) mount();
       const wanted = new Set(next.map((item) => item.id));
-      for (const [id, entry] of nodes) if (!wanted.has(id)) { entry.node.remove(); entry.controls.remove(); nodes.delete(id); }
+      for (const [id, entry] of nodes) if (!wanted.has(id)) { entry.media.destroy(); entry.node.remove(); entry.controls.remove(); nodes.delete(id); }
       for (const [index, item] of next.entries()) {
         let entry = nodes.get(item.id);
         if (!entry) {
           const node = doc.createElement('div');
           node.className = 'image'; node.dataset.imageId = item.id;
           node.setAttribute('role', 'img'); node.setAttribute('aria-label', item.name);
-          const image = doc.createElement('img'); image.alt = ''; image.draggable = false; image.style.visibility = 'hidden';
-          node.append(image);
+          const content = media!.attach(node);
           const controls = doc.createElement('div'); controls.className = 'selection-frame'; controls.dataset.frameId = item.id;
           for (const [mode, label] of [['nw', '左上でサイズ変更'], ['ne', '右上でサイズ変更'], ['sw', '左下でサイズ変更'], ['se', '右下でサイズ変更'], ['rotate', '画像を回転']]) {
             const handle = doc.createElement('button'); handle.type = 'button'; handle.className = 'handle';
             handle.dataset.handle = mode; handle.setAttribute('aria-label', label!); controls.append(handle);
           }
-          entry = { node, controls, image, assetId: '' }; nodes.set(item.id, entry); imageLayer!.append(node); shadow!.append(controls);
+          entry = { node, controls, media: content }; nodes.set(item.id, entry); imageLayer!.append(node); shadow!.append(controls);
         }
         // Restore document tie order after undo recreates a removed node.
         if (imageLayer!.children[index] !== entry.node) imageLayer!.insertBefore(entry.node, imageLayer!.children[index] ?? null);
         entry.node.setAttribute('aria-label', item.name);
-        if (entry.assetId !== item.assetId) {
-          entry.assetId = item.assetId;
-          const element = entry.image, epoch = generation;
-          element.style.visibility = 'hidden';
-          void getUrl(item.assetId).then((url) => {
-            if (epoch !== generation || !element.isConnected) return;
-            element.onload = () => { element.style.visibility = 'visible'; };
-            element.onerror = () => editing?.error('画像を表示できませんでした。ページを再読み込みしてください。');
-            element.src = url;
-          }).catch((error: unknown) => { if (epoch === generation) editing?.error(error instanceof Error ? error.message : '画像を読み込めませんでした。'); });
-        }
       }
-      const assets = new Set(next.map((item) => item.assetId));
-      for (const [id, pending] of urls) if (!assets.has(id)) { urls.delete(id); void pending.then((url) => URL.revokeObjectURL(url), () => undefined); }
       draw();
     },
     edit(value: ImageEditing | undefined) {

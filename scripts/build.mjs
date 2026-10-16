@@ -3,12 +3,18 @@ import { copyFile, cp, mkdir, readFile } from 'node:fs/promises';
 import { watch } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const outDir = join(root, 'dist');
 const watching = process.argv.includes('--watch');
 const manifest = JSON.parse(await readFile(join(root, 'manifest.json'), 'utf8'));
 const pkg = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
+const vendor = await readFile(join(root, 'src/vendor/lottie-light.js'));
+const provenance = JSON.parse(await readFile(join(root, 'src/vendor/lottie-source.json'), 'utf8'));
+if (createHash('sha256').update(vendor).digest('hex') !== provenance.sha256
+  || /\beval\s*\(|\bnew\s+Function\s*\(/.test(vendor.toString())
+  || !vendor.includes('var Nt=null;')) throw new Error('Lottie Lightの固定版とCSP対策を確認してください。');
 
 if (manifest.manifest_version !== 3 || manifest.version !== pkg.version) {
   throw new Error('Manifest V3とpackage.jsonのバージョンを確認してください。');

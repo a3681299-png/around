@@ -4,7 +4,7 @@ import type { ImageEditing } from '../design/image-renderer';
 import { editableSamples, placementFrame } from '../design/frames';
 import { moveGroup, movePlacement, reanchorPlacement, type PlacementChange } from '../design/geometry';
 import { alignSamples, distributeSamples, type Alignment, type Distribution } from '../design/layout';
-import { commitDesign, importAssets, releaseAssets, retainAssets } from '../assets/client';
+import { checkDesignAssets, commitDesign, importAssets, releaseAssets, retainAssets } from '../assets/client';
 import type { SiteAdapter } from '../sites/types';
 import { readDesign, watchDesign } from '../storage/designs';
 import { createCreatorPanel } from './panel';
@@ -119,7 +119,10 @@ export function createCreatorEditor(
       patch = { ...patch, placement: reanchorPlacement(current.placement, from, to, patch.placement.anchor) };
     }
     const next = parseDesign(draft);
-    next.decorations = next.decorations.map((image) => image.id === id ? { ...image, ...patch, placement: { ...image.placement, ...patch.placement } } : image);
+    const { playback, ...properties } = patch;
+    next.decorations = next.decorations.map((image) => image.id !== id ? image : image.kind === 'animation'
+      ? { ...image, ...properties, placement: { ...image.placement, ...patch.placement }, playback: { ...image.playback, ...playback } }
+      : { ...image, ...properties, placement: { ...image.placement, ...patch.placement } });
     updateDraft(next);
   }
   function changePlacements(changes: readonly PlacementChange[]) {
@@ -159,7 +162,7 @@ export function createCreatorEditor(
         return frame ? movePlacement(layer.placement, frame, { x: 16, y: 16 }) : { ...layer.placement };
       });
       if (!result.ids.length) return;
-      next.decorations = result.layers; selectedImageIds = result.ids;
+      next.decorations = result.layers; parseDesign(next); selectedImageIds = result.ids;
       clearSelection(); updateDraft(next); settleAssets();
     } catch (reason) { status = reason instanceof Error ? reason.message : '複製できませんでした。'; error = true; render(); }
   };
@@ -189,13 +192,20 @@ export function createCreatorEditor(
       assets.forEach((asset, index) => {
         const scale = Math.max(IMAGE_LIMITS.minSize / Math.min(asset.width, asset.height), Math.min(260 / asset.width, 200 / asset.height, view.innerWidth * .28 / asset.width, view.innerHeight * .3 / asset.height));
         const id = `image-${crypto.randomUUID()}`;
-        next.decorations.push({ kind: 'image', id, assetId: asset.id, name: asset.name,
-          placement: { anchor: { kind: 'viewport' }, x: Math.min(.95, Math.max(.05, (point?.x ?? view.innerWidth * .45) / view.innerWidth + index * 24 / view.innerWidth)),
+        const common = { id, assetId: asset.id, name: asset.name,
+          placement: { anchor: { kind: 'viewport' as const }, x: Math.min(.95, Math.max(.05, (point?.x ?? view.innerWidth * .45) / view.innerWidth + index * 24 / view.innerWidth)),
             y: Math.min(.95, Math.max(.05, (point?.y ?? view.innerHeight * .45) / view.innerHeight + index * 24 / view.innerHeight)),
             widthPx: Math.round(asset.width * scale * 10) / 10, heightPx: Math.round(asset.height * scale * 10) / 10, rotationDeg: 0 },
-          opacity: 1, zIndex: Math.min(100, next.decorations.length), visible: true, locked: false });
+          opacity: 1, zIndex: Math.min(100, next.decorations.length), visible: true, locked: false };
+        next.decorations.push(asset.animation ? { ...common, kind: 'animation', format: asset.animation.format, playback: { playing: true, loop: true, speed: 1 } } : { ...common, kind: 'image' });
         selectedImageIds = [id];
       });
+      await checkDesignAssets(next, importSession);
+      if (epoch !== importEpoch || !panel) return;
+      if (!sameDesign(before, draft)) {
+        before = undefined; selectedImageIds = previousSelection;
+        throw new Error('別のタブの保存値が変わったため、素材の追加を中止しました。もう一度読み込んでください。');
+      }
       clearSelection(); updateDraft(next, false);
       leased = ''; await syncAssets();
       if (epoch !== importEpoch || !panel) return;

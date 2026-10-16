@@ -90,7 +90,7 @@ test('import a transparent image, drag and resize it, save, reload and restart w
   expect(resized.width / resized.height).toBeCloseTo(original.width / original.height, 2);
   await save(dialog);
   const design = await stored(popup);
-  expect(design.schemaVersion).toBe(3);
+  expect(design.schemaVersion).toBe(4);
   expect(design.decorations).toHaveLength(1);
   expect(JSON.stringify(design)).not.toMatch(/data:image|base64|blob:/);
   expect(await assets(context)).toHaveLength(1);
@@ -119,8 +119,8 @@ test('file selection and drop accept multiple PNG/WebP layers and each edits ind
   await dialog.getByLabel('画像の不透明度').fill('40');
   await dialog.getByLabel('画像の重なり順').fill('8');
   await dialog.getByLabel('画像の角度').fill('35');
-  await expect(youtube.locator(layers).last().locator('img')).toHaveCSS('opacity', '0.4');
-  await expect(youtube.locator(layers).first().locator('img')).toHaveCSS('opacity', '1');
+  await expect(youtube.locator(layers).last().locator('.media')).toHaveCSS('opacity', '0.4');
+  await expect(youtube.locator(layers).first().locator('.media')).toHaveCSS('opacity', '1');
   await dialog.getByRole('checkbox', { name: '画像を表示', exact: true }).uncheck();
   await expect(youtube.locator(layers).last()).toBeHidden();
   await dialog.getByRole('checkbox', { name: '画像を表示', exact: true }).check();
@@ -236,7 +236,7 @@ test('saved images sync across tabs and a foreign deletion cannot collect anothe
   await second.getByLabel('画像の不透明度').fill('60');
   await first.getByRole('button', { name: '画像を削除' }).click(); await save(first);
   await expect(second.locator('.status')).toContainText('別のタブで保存されました');
-  await expect(secondPage.locator(layers).locator('img')).toHaveCSS('opacity', '0.6');
+  await expect(secondPage.locator(layers).locator('.media')).toHaveCSS('opacity', '0.6');
   expect(await assets(context)).toHaveLength(1);
   await second.getByRole('button', { name: '変更を破棄', exact: true }).click();
   await expect(secondPage.locator(overlay)).toHaveCount(0);

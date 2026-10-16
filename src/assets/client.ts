@@ -1,5 +1,7 @@
 import type { DesignDocument } from '../design/types';
-import { ASSET_LIMITS, base64ToBytes, bytesToBase64, inspectImage, type AssetMetadata } from './validation';
+import { ASSET_LIMITS, base64ToBytes, bytesToBase64, type AssetMetadata } from './validation';
+import { inspectAsset } from './inspect';
+import { validateAnimatedFrames } from './decode';
 import { ASSET_MESSAGE, type AssetWireFile } from './protocol';
 
 async function request<T>(action: string, values: Record<string, unknown>): Promise<T> {
@@ -15,7 +17,8 @@ export async function importAssets(files: readonly File[], session: string): Pro
   for (const file of files) {
     if (file.size > ASSET_LIMITS.fileBytes) throw new Error('画像は1枚4MBまでです。');
     const bytes = new Uint8Array(await file.arrayBuffer());
-    inspectImage(bytes, file.type);
+    const info = inspectAsset(bytes, file.type);
+    await validateAnimatedFrames(bytes, info);
     wire.push({ name: file.name.replace(/[\u0000-\u001f]/g, '').slice(0, 120) || 'image', mime: file.type, base64: bytesToBase64(bytes) });
   }
   return request('import', { session, files: wire });
@@ -24,9 +27,11 @@ export async function importAssets(files: readonly File[], session: string): Pro
 export async function loadAsset(id: string): Promise<{ metadata: AssetMetadata; blob: Blob }> {
   const result = await request<{ metadata: AssetMetadata; base64: string }>('get', { id });
   const bytes = base64ToBytes(result.base64);
-  return { metadata: result.metadata, blob: new Blob([new Uint8Array(bytes).buffer], { type: result.metadata.mime }) };
+  const info = inspectAsset(bytes, result.metadata.mime);
+  return { metadata: { ...result.metadata, ...info }, blob: new Blob([new Uint8Array(bytes).buffer], { type: info.mime }) };
 }
 
 export const retainAssets = (session: string, ids: readonly string[]) => request<void>('lease', { session, ids });
 export const releaseAssets = (session: string) => request<void>('release', { session });
 export const commitDesign = (design: DesignDocument, session: string) => request<void>('save', { design, session });
+export const checkDesignAssets = (design: DesignDocument, session: string) => request<void>('validate', { design, session });

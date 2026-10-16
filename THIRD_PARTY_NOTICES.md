@@ -1,5 +1,18 @@
 # Third-party notices
 
+## Lottie Web Light 5.13.0
+
+This experimental branch bundles the SVG-only, expression-free light player
+from [airbnb/lottie-web](https://github.com/airbnb/lottie-web), under the MIT license.
+Copyright (c) 2015 Bodymovin.
+
+The upstream automatic document discovery interval is disabled: the extension
+only supplies validated local `animationData`, never page-provided paths.
+The pinned source, checksums, and modification are in `src/vendor/lottie-source.json`.
+Run `npm pack lottie-web@5.13.0 --pack-destination .work --ignore-scripts` and
+`python scripts/vendor_lottie.py` to reproduce the bundled file.
+The complete license is preserved in `assets/licenses/lottie-web-MIT.txt`.
+
 ## PixelMplus12 Regular
 
 This extension bundles `assets/fonts/PixelMplus12-Regular.woff2`, a WOFF2

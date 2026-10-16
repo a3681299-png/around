@@ -1,0 +1,10 @@
+{
+  "package": "lottie-web",
+  "version": "5.13.0",
+  "source": "https://registry.npmjs.org/lottie-web/-/lottie-web-5.13.0.tgz",
+  "upstreamFile": "package/build/player/lottie_light.min.js",
+  "upstreamSha256": "9588432bec30c8ef8200bac4a67d8aaad881047bc2a6c9fa624d90ec96402410",
+  "sha256": "184a1d7c837042f34e91bc75a267fc90f0ca6c916b8d2f90343d27cd710fe0bc",
+  "tarballSha1": "441d3df217cc8ba302338c3f168e1a3af0f221d3",
+  "modification": "Disable the ready-state interval and automatic document search; use validated animationData only."
+}

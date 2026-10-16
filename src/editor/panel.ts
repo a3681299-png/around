@@ -1,5 +1,6 @@
 import styles from './panel.css';
-import { IMAGE_LIMITS, STYLE_LIMITS, type SurfaceStyle, type ImageDecoration, type ImagePatch, type DesignTarget } from '../design/types';
+import { IMAGE_LIMITS, STYLE_LIMITS, type SurfaceStyle, type Decoration, type ImagePatch, type DesignTarget } from '../design/types';
+import { ANIMATION_LIMITS } from '../assets/motion-types';
 import { frontToBack } from './layers';
 import type { Alignment, Distribution } from '../design/layout';
 
@@ -10,8 +11,8 @@ export interface PanelState {
   saving: boolean;
   status: string;
   error: boolean;
-  images: readonly ImageDecoration[];
-  image: ImageDecoration | undefined;
+  images: readonly Decoration[];
+  image: Decoration | undefined;
   selectedIds: readonly string[];
   canUndo: boolean;
   canRedo: boolean;
@@ -54,8 +55,10 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
     <div class="editor-body">
     <section class="assets">
       <button class="add-image" type="button">画像を追加</button>
+      <button class="add-animation" type="button">アニメーションを追加</button>
       <input class="file" type="file" accept="image/png,image/webp" multiple aria-label="画像素材を追加" hidden>
-      <p class="hint">PNG・WebPを選択、または画面へドロップ。1枚4MBまで。</p>
+      <input class="animation-file" type="file" accept="image/gif,image/webp,application/json,.json" multiple aria-label="アニメーション素材を追加" hidden>
+      <p class="hint">PNG・WebP・GIF・Lottie JSONを選択、またはドロップ。素材4MB／JSON 1MB、アニメーション8枚まで。</p>
     </section>
     <details class="layers-section" open><summary>レイヤー <span class="layer-count"></span></summary>
       <p class="hint">上が手前。↕をドラッグして並び替え。Ctrl／Shiftで複数選択。</p>
@@ -102,6 +105,11 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       <div class="property"><label>不透明度 <output class="opacity-value"></output></label><input type="range" aria-label="画像の不透明度" data-image-prop="opacity" min="0" max="100" step="1"></div>
       <div class="property"><label>重なり順 <input type="number" aria-label="画像の重なり順" data-image-prop="zIndex" min="-100" max="100" step="1" required></label></div>
       <div class="property"><label><input type="checkbox" data-image-prop="visible">画像を表示</label></div>
+      <fieldset class="playback" aria-label="アニメーションの再生" hidden>
+        <div class="property"><label><input type="checkbox" data-playback="playing">アニメーションを再生</label><label><input type="checkbox" data-playback="loop">ループ再生</label></div>
+        <div class="property playback-speed"><label>再生速度 <input type="number" aria-label="再生速度" data-playback="speed" min="${ANIMATION_LIMITS.speedMin}" max="${ANIMATION_LIMITS.speedMax}" step="0.25" required>倍</label></div>
+        <p class="hint">非表示タブ・動きを減らす設定では停止します。再読み込み後は先頭から再生します。</p>
+      </fieldset>
     </fieldset>
     <p class="hint card-help">チェックを外した項目はテーマの見た目に戻ります。</p>
     <p class="hint multi-help" hidden>複数選択は一括移動に対応しています。拡縮・回転は1枚ずつ操作してください。</p>
@@ -125,6 +133,8 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
   const imageProperties = get<HTMLFieldSetElement>('.image-properties');
   const fileInput = get<HTMLInputElement>('.file');
   const addImage = get<HTMLButtonElement>('.add-image');
+  const addAnimation = get<HTMLButtonElement>('.add-animation');
+  const animationInput = get<HTMLInputElement>('.animation-file');
   const layers = get<HTMLDivElement>('.layers');
   const anchorSelect = get<HTMLSelectElement>('[data-image-prop="anchor"]');
   for (const anchor of anchors) {
@@ -156,6 +166,8 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
   };
   properties.addEventListener('input', onInput);
   addImage.addEventListener('click', () => fileInput.click());
+  addAnimation.addEventListener('click', () => animationInput.click());
+  animationInput.addEventListener('change', () => { actions.imageImport([...animationInput.files ?? []]); animationInput.value = ''; });
   fileInput.addEventListener('change', () => { actions.imageImport([...fileInput.files ?? []]); fileInput.value = ''; });
   layers.addEventListener('click', (event) => {
     const button = event.target instanceof Element ? event.target.closest<HTMLButtonElement>('button') : undefined;
@@ -210,6 +222,12 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
     else if (property === 'zIndex') actions.imageChange({ zIndex: Number(input.value) });
     else actions.imageChange({ placement: { [property]: Number(input.value) / (property === 'x' || property === 'y' ? 100 : 1) } });
   });
+  get<HTMLFieldSetElement>('.playback').addEventListener('input', (event) => {
+    const input = event.target as HTMLInputElement;
+    if (!input.checkValidity()) { setText(status, '再生速度は0.25〜3倍で入力してください。'); status.dataset.error = 'true'; save.disabled = true; return; }
+    const key = input.dataset.playback;
+    if (key) actions.imageChange({ playback: { [key]: key === 'speed' ? Number(input.value) : input.checked } });
+  });
   get<HTMLButtonElement>('.delete-image').addEventListener('click', () => actions.imageDelete());
   get<HTMLButtonElement>('.duplicate-image').addEventListener('click', () => actions.duplicate());
   get<HTMLButtonElement>('.undo').addEventListener('click', actions.undo);
@@ -247,8 +265,10 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       get<HTMLParagraphElement>('.multi-help').hidden = state.selectedIds.length < 2;
       get<HTMLDivElement>('.selection-actions').hidden = state.selectedIds.length === 0;
       const unlocked = state.images.filter((image) => state.selectedIds.includes(image.id) && !image.locked).length;
+      const animations = state.images.filter((image) => image.kind === 'animation').length;
+      const selectedAnimations = state.images.filter((image) => image.kind === 'animation' && !image.locked && state.selectedIds.includes(image.id)).length;
       get<HTMLButtonElement>('.delete-image').disabled = !unlocked || state.saving;
-      get<HTMLButtonElement>('.duplicate-image').disabled = !unlocked || state.saving || state.images.length + unlocked > IMAGE_LIMITS.count;
+      get<HTMLButtonElement>('.duplicate-image').disabled = !unlocked || state.saving || state.images.length + unlocked > IMAGE_LIMITS.count || animations + selectedAnimations > ANIMATION_LIMITS.count;
       get<HTMLButtonElement>('.undo').disabled = !state.canUndo || state.saving;
       get<HTMLButtonElement>('.redo').disabled = !state.canRedo || state.saving;
       get<HTMLInputElement>('.snap').checked = state.snapping;
@@ -263,7 +283,15 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       get<HTMLElement>('.dirty').dataset.dirty = String(state.dirty);
       setText(get<HTMLElement>('.layer-count'), `${state.images.length} / ${IMAGE_LIMITS.count}`);
       addImage.disabled = state.saving || state.images.length >= IMAGE_LIMITS.count;
-      const nextKey = JSON.stringify(state.images.map(({ id, name, zIndex, visible, locked }) => ({ id, name, zIndex, visible, locked })));
+      addAnimation.disabled = addImage.disabled || state.images.filter((image) => image.kind === 'animation').length >= ANIMATION_LIMITS.count;
+      get<HTMLFieldSetElement>('.playback').hidden = state.image?.kind !== 'animation';
+      if (state.image?.kind === 'animation') {
+        get<HTMLInputElement>('[data-playback="playing"]').checked = state.image.playback.playing;
+        get<HTMLInputElement>('[data-playback="loop"]').checked = state.image.playback.loop;
+        get<HTMLInputElement>('[data-playback="speed"]').value = String(state.image.playback.speed);
+        get<HTMLElement>('.playback-speed').hidden = state.image.format !== 'lottie';
+      }
+      const nextKey = JSON.stringify(state.images.map(({ id, name, zIndex, visible, locked, kind }) => ({ id, name, zIndex, visible, locked, kind })));
       if (layerKey !== nextKey) {
         layerKey = nextKey;
         layers.replaceChildren();
@@ -273,7 +301,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
             const button = doc.createElement('button'); button.type = 'button'; button.dataset.action = action;
             button.textContent = text; button.setAttribute('aria-label', label); button.title = label; row.append(button); return button;
           };
-          add('select', image.name, image.name).className = 'layer-select';
+          add('select', `${image.kind === 'animation' ? '▶ ' : ''}${image.name}`, image.name).className = 'layer-select';
           const grip = add('reorder', '↕', 'レイヤーを並び替え'); grip.draggable = true; grip.dataset.reorder = '';
           const visible = add('visible', image.visible ? '表示' : '隠す', image.visible ? '非表示にする' : '表示する'); visible.setAttribute('aria-pressed', String(image.visible));
           add('lock', image.locked ? '固定' : '自由', image.locked ? 'ロック解除' : 'ロック');
@@ -287,7 +315,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
         const image = state.images.find((image) => image.id === id)!;
         if (button.dataset.action === 'select') button.setAttribute('aria-pressed', String(state.selectedIds.includes(id)));
         button.disabled = state.saving || (['delete', 'duplicate'].includes(button.dataset.action!) && image.locked)
-          || (button.dataset.action === 'duplicate' && state.images.length >= IMAGE_LIMITS.count);
+          || (button.dataset.action === 'duplicate' && (state.images.length >= IMAGE_LIMITS.count || image.kind === 'animation' && animations >= ANIMATION_LIMITS.count));
       });
       layers.querySelectorAll<HTMLElement>('[data-layer-id]').forEach((row) => row.toggleAttribute('data-selected', state.selectedIds.includes(row.dataset.layerId!)));
       if (state.image) {
@@ -317,7 +345,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       radius.disabled = !radiusToggle.checked;
       save.disabled = discard.disabled = !state.dirty || state.saving;
       close.disabled = state.saving;
-      setText(selection, state.image ? `画像: ${state.image.name}${state.image.locked ? '（ロック中）' : ''}` : state.selectedIds.length > 1 ? `${state.selectedIds.length}レイヤーを選択中` : state.selected ? '動画カードを選択中' : 'カードまたは画像を選択してください');
+      setText(selection, state.image ? `${state.image.kind === 'animation' ? 'アニメーション' : '画像'}: ${state.image.name}${state.image.locked ? '（ロック中）' : ''}` : state.selectedIds.length > 1 ? `${state.selectedIds.length}レイヤーを選択中` : state.selected ? '動画カードを選択中' : 'カードまたは画像を選択してください');
       setText(status, state.status);
       status.dataset.error = String(state.error);
     },

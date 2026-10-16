@@ -25,6 +25,12 @@
 
 保存、破棄、終了時の扱いはカードと共通。通常モードの画像はクリックを透過し、選択枠とハンドルを隠す。OFF／0%ではレイヤーDOM、object URL、スクロール・サイズ監視も撤去する。
 
+## アニメーション素材
+
+「アニメーションを追加」またはドロップで、GIF・アニメーションWebP・Lottie JSONを読み込む。配置やレイヤー操作は画像と共通。再生・一時停止・ループを変更でき、Lottieは0.25〜3倍の速度を指定できる。保存と再読み込み、Chrome再起動後の復元にも対応する。フレームの再生位置は保存せず、先頭から復元する。
+
+アニメーションは8レイヤーまで。非表示タブ、画面外、動きを減らす設定では再生を止め、OFF／0%ではデコーダーと再生処理も撤去する。Lottieは自己完結した2Dベクトルに限定し、式・エフェクト・外部素材などは拒否する。対応範囲、容量・時間・総画素の制限、CSP、検証方法は [animations.md](animations.md) を参照する。
+
 ## レイヤーと選択
 
 一覧は上が手前。↕ボタンをドラッグすると重なり順を変更できる。表示切替、ロック、複製、削除は各行から操作する。名前は単独選択後のプロパティで変更する。一覧とキャンバスの選択は連動し、非表示やロック中の画像も一覧から選べる。
@@ -64,9 +70,10 @@ CtrlまたはShiftを押してクリックすると、選択への追加・解�
 - `sites/youtube.ts`: `data-ww-surface~="video-card"` を付与する。SPA、リンクの遅延追加・再利用、削除に追従し、入れ子のカードを重複して編集対象にしない。
 - `design/types.ts` / `schema.ts`: バージョン付きのデータ形式と検証。任意CSS、セレクタ、JavaScript、外部URLを受け付けない。
 - `design/renderer.ts`: 登録済みsurfaceと検証済み値からCSSを生成する。背景は既存グラデーションを置き換え、枠線は寸法を変えない内側の影で描く。角丸はカードの外枠に適用し、画像の寸法や操作部分のクリップは変更しない。
-- `design/image-renderer.ts`: 画像、独立した選択枠、操作ハンドル、ガイドの描画とポインター操作。object URLとDOMの寿命も管理する。
+- `design/image-renderer.ts`: 素材共通の配置、独立した選択枠、操作ハンドル、ガイドとポインター操作。
+- `media/controller.ts` / `raster.ts` / `lottie.ts`: 素材の描画、共有、再生、object URL・デコーダー・フレーム処理の寿命を管理する。
 - `design/geometry.ts` / `layout.ts` / `frames.ts`: 単独・複数の変形、スナップ、整列、座標変換。計算は素材形式に依存せず、DOM参照は登録済みsurfaceに限定する。
-- `assets/validation.ts` / `client.ts`: PNG・WebPの検証と拡張内通信。画像はHTMLやスクリプトとして扱わない。
+- `assets/validation.ts` / `inspect.ts` / `client.ts`: 静止画とアニメーションの検証、拡張内通信。素材はHTMLやスクリプトとして扱わない。
 - `assets/repository.ts` / `background/index.ts`: 拡張オリジンのIndexedDB、素材参照の検証、編集中の素材保持、不要素材の回収。処理を直列化し、他タブのdraftが参照する素材も保護する。
 - `editor/controller.ts`: 選択、タブ内のdraft、保存、破棄、他タブ更新との調整。サイト固有のセレクタやイベント名を持たない。
 - `editor/layers.ts` / `history.ts`: 素材形式に依存しない選択・複製・削除・順序操作と、上限付きの履歴・ドラッグのトランザクション。`LayerState` と `LayerPlacement` を今後の素材にも共有できる。
@@ -82,7 +89,7 @@ CtrlまたはShiftを押してクリックすると、選択への追加・解�
 
 ```json
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "id": "youtube-custom",
   "siteId": "youtube",
   "baseThemeId": "retro",
@@ -122,15 +129,15 @@ CtrlまたはShiftを押してクリックすると、選択への追加・解�
 
 色は6桁HEX、枠線は0〜12px、角丸は0〜48pxの整数。未指定の項目は基底の見た目を維持する。未知のバージョンや未対応の対象を読み込んだ場合は編集を止め、保存データを上書きしない。
 
-上のasset IDは形式の例。実際には画像のSHA-256から生成し、JSONには画像データや一時的なblob URLを入れない。旧v1・v2は読み込み時にv3へ移行する。既存カード設定、基底テーマ、画像とasset IDは維持し、旧画像の `locked` を `false` で補う。保存操作まで元データを書き換えない。
+上のasset IDは形式の例。実際には素材のSHA-256から生成し、JSONには素材データや一時的なblob URLを入れない。旧v1〜v3は読み込み時にv4へ移行する。既存カード設定、基底テーマ、画像とasset IDは維持し、v2以前の画像の `locked` を `false` で補う。保存操作まで元データを書き換えない。
 
 `baseThemeId` は任意の組み込みテーマIDを表す。`null` は組み込みテーマを使わず、ネイティブのYouTubeにデザインだけを適用する。今回のUIはretroから開始するが、文書とRendererはretroに依存せず、`null` の描画・編集・保存も自動テストする。
 
-装飾は `decorations` の `kind` で分け、配置基準は `anchor` の `kind` で分ける。将来のブレークポイント、モーション、別種の装飾も、カードCSSや素材保存処理へ混ぜずに拡張する。タイムライン、複数テーマ管理、テーマの入出力・配布UIは今回の範囲外。将来の配布物は、文書とasset IDに対応する画像ファイルを一緒に扱う必要がある。
+装飾は `decorations` の `kind` で分け、配置基準は `anchor` の `kind` で分ける。アニメーションは `kind: "animation"` に形式と再生設定を持つ。将来のブレークポイントや別種の装飾も、カードCSSや素材保存処理へ混ぜずに拡張する。タイムライン、複数テーマ管理、テーマの入出力・配布UIは今回の範囲外。将来の配布物は、文書とasset IDに対応する素材ファイルを一緒に扱う必要がある。
 
 ## 画像保存と制限
 
-静止PNG・WebPのみ対応する。MIME名だけでなく署名、チャンク長、画像寸法を確認し、Service Workerでも実際にデコードして検証する。SVGや任意のHTML／JavaScript、アニメーションPNG・WebPは受け付けない。
+静止画像はPNG・WebPに対応する。MIME名だけでなく署名、チャンク長、画像寸法を確認し、Service Workerでもデコードして検証する。アニメーションGIF・WebPとLottieの制限は [animations.md](animations.md) を参照する。SVGファイル、任意のHTML／JavaScript、アニメーションPNGは受け付けない。
 
 - 1枚4MB、4096×4096pxまで。
 - 一度の追加は8枚・合計12MBまで。
@@ -156,5 +163,7 @@ Manifestの権限は従来の `storage` のみ。素材をYouTubeの保存領域
 `tests/image-data.spec.ts` は形式、移行、境界値、移動・サイズ変更・回転の計算を検証する。`tests/image-editor.spec.ts` は実IndexedDBでの素材保存、透過、実マウス操作、複数素材、タブ同期、破棄、回収、ブラウザー再起動後の復元を検証する。
 
 `tests/layer-data.spec.ts` と `tests/layout.spec.ts` は共通の選択・順序・ロック・履歴、混在アンカーの移動、スナップ・整列を検証する。`tests/layer-editor.spec.ts` は実マウス・キー操作、32レイヤーの組み合わせ、33素材を参照する履歴、保存・再読み込み、入力欄や通常モードへの復帰を検証する。
+
+`tests/motion-data.spec.ts` と `tests/motion-editor.spec.ts` は3形式の入力、Lottieの安全性、実フレームの描画、再生設定、保存・再起動、停止・復帰、複数素材の負荷を検証する。
 
 専用worktreeではテスト用ブラウザーを `PLAYWRIGHT_BROWSERS_PATH`、短いプロファイル保存先を `WW_TEST_PROFILE_ROOT` で指定できる。通常のChromeプロファイルを指定しない。
