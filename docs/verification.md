@@ -534,3 +534,11 @@ GPU・ネイティブデコーダー・プロセス全体のメモリ、実YouTu
 
 実YouTubeの最新DOM、広告・ミニプレイヤー・シアター・全画面・ライブ配信、実素材を含むCPU／GPU負荷は未検証。
 
+
+## World Runtime（2026-10-16）
+
+`codex/creator-editor-spike`、起点1d23ec0。Host / World Runtime / DOM Rendererを分離し、決定的な配置・階層・マスク・メディア時刻評価と、明示的な開発用入力記録・再生を追加。DesignDocumentはv6のまま。
+
+型チェック・lint・ビルド成功。全体189成功/実YouTube2skipに加え、ブラウザー性能1件とHost回帰3件が成功（現在の192ケースは計190成功/2skip）。fixture検証であり、実YouTubeは未確認。mainと通常版dist12ファイルのハッシュは変更なし。
+
+32メディア/16グループの数値評価中央値: 旧47.4→新45.4µs。実描画コールバック中央値: 旧0.2→新0.3ms（p95 0.3→0.5ms）。異なる計測範囲のため分けて扱う。設計、再現性の範囲、全測定条件と残る制約は[World Runtime](world-runtime.md)を参照。

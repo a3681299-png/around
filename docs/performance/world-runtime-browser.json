@@ -1,0 +1,28 @@
+{
+  "browser": "153.0.8010.12",
+  "media": 32,
+  "groups": 16,
+  "measuredPointerFramesPerRound": 80,
+  "warmupFramesPerRound": 15,
+  "order": [
+    "legacy",
+    "runtime",
+    "runtime",
+    "legacy"
+  ],
+  "includes": "actual extension RAF callback: numeric evaluation, CSS writes and visibility callbacks",
+  "excludes": "asynchronous layout/paint, GPU, decoding, input dispatch and RAF wait",
+  "timing": "isolated-world performance.now; browser timer precision applies",
+  "legacy": {
+    "samples": 160,
+    "medianMs": 0.2,
+    "p95Ms": 0.3,
+    "meanMs": 0.199
+  },
+  "runtime": {
+    "samples": 160,
+    "medianMs": 0.3,
+    "p95Ms": 0.5,
+    "meanMs": 0.319
+  }
+}
