@@ -58,7 +58,7 @@ BBSの番号は現在読み込まれたコメントと返信の表示順で、�
 
 ## 開発
 
-クリエイター向け編集の実験は `codex/creator-editor-spike` と専用worktreeで進めます。Popupの「デザインを編集（実験）」から動画カードの装飾を編集したり、PNG・WebP素材を読み込んで移動・サイズ変更・回転したりできます。画像は拡張専用IndexedDB、デザインはバージョン付きJSONで保存します。使い方と制限は [creator-editor.md](docs/creator-editor.md) を参照してください。実験用worktreeの `dist` は、別のChromeプロファイルへ読み込みます。
+クリエイター向け編集の実験は `codex/creator-editor-spike` と専用worktreeで進めます。Popupの「デザインを編集（実験）」から動画カードの装飾を編集したり、PNG・WebP素材を読み込んで移動・サイズ変更・回転したりできます。レイヤー一覧、ロック、複製、複数選択と一括移動、Undo／Redo、任意のスナップ、整列・等間隔配置にも対応します。画像は拡張専用IndexedDB、デザインはバージョン付きJSONで保存します。使い方と制限は [creator-editor.md](docs/creator-editor.md) を参照してください。実験用worktreeの `dist` は、別のChromeプロファイルへ読み込みます。
 
 ```powershell
 npm run dev

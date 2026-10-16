@@ -6,18 +6,28 @@ import type { ImageDecoration } from '../src/design/types';
 
 const png = () => new Uint8Array(Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScLbtAAAAABJRU5ErkJggg==', 'base64'));
 const image = (): ImageDecoration => ({ kind: 'image', id: 'image-example', assetId: `asset-${'a'.repeat(64)}`, name: 'flower.png',
-  placement: { anchor: { kind: 'viewport' }, x: .5, y: .5, widthPx: 100, heightPx: 80, rotationDeg: 0 }, opacity: .8, zIndex: 1, visible: true });
+  placement: { anchor: { kind: 'viewport' }, x: .5, y: .5, widthPx: 100, heightPx: 80, rotationDeg: 0 }, opacity: .8, zIndex: 1, visible: true, locked: false });
 
 test('v1 migration preserves card rules and base theme without embedding any image bytes', () => {
   const legacy = { schemaVersion: 1, id: 'legacy', siteId: 'youtube', baseThemeId: 'retro', rules: [
     { kind: 'surface-style', target: 'video-card', style: { borderRadiusPx: 12 } },
   ] };
   const parsed = parseDesign(legacy);
-  expect(parsed).toMatchObject({ schemaVersion: 2, baseThemeId: 'retro', rules: legacy.rules, decorations: [] });
+  expect(parsed).toMatchObject({ schemaVersion: 3, baseThemeId: 'retro', rules: legacy.rules, decorations: [] });
   expect(legacy.schemaVersion).toBe(1);
   const withImage = { ...parsed, decorations: [image()] };
   expect(parseDesign(withImage)).toEqual(withImage);
   expect(JSON.stringify(withImage)).not.toMatch(/data:image|base64|blob:/);
+});
+
+test('v2 layers migrate unlocked; v3 locks are validated and retained without modifying the input', () => {
+  const { locked: _locked, ...legacyImage } = image();
+  const legacy = { ...emptyDesign('youtube', null), schemaVersion: 2, decorations: [legacyImage] };
+  expect(parseDesign(legacy).decorations[0]?.locked).toBe(false);
+  expect(legacyImage).not.toHaveProperty('locked');
+  const next = { ...emptyDesign('youtube', null), decorations: [{ ...image(), locked: true }] };
+  expect(parseDesign(next).decorations[0]?.locked).toBe(true);
+  expect(() => parseDesign({ ...next, decorations: [{ ...image(), locked: 'true' }] })).toThrow();
 });
 
 test('image data rejects script fields, arbitrary URLs, duplicate IDs and non-finite geometry', () => {

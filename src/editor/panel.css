@@ -1,13 +1,13 @@
 :host {
   all: initial !important;
   position: fixed !important;
-  top: 118px !important;
+  top: 84px !important;
   right: 16px !important;
   display: block !important;
-  width: 300px !important;
+  width: 340px !important;
   max-width: calc(100vw - 32px) !important;
-  max-height: calc(100vh - 158px) !important;
-  overflow: auto !important;
+  max-height: calc(100vh - 104px) !important;
+  overflow: hidden !important;
   overscroll-behavior: contain !important;
   z-index: 2147483000 !important;
   color-scheme: light !important;
@@ -21,15 +21,17 @@
 }
 :host([data-ww-dock="left"]) { left: 16px !important; right: auto !important; }
 * { box-sizing: border-box; }
-main { padding: 16px; }
-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+main { display: flex; flex-direction: column; max-height: calc(100vh - 104px); }
+header { display: flex; flex: none; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 12px 4px; }
+.editor-body { min-height: 0; overflow: auto; overscroll-behavior: contain; padding: 0 12px; }
+footer { flex: none; padding: 0 12px 8px; border-top: 1px solid #eceaf1; background: #fff; }
 h2 { margin: 0; font-size: 16px; }
 p { margin: 8px 0 12px; }
 .hint { color: #605b70; font-size: 12px; }
 .selection { padding: 8px; background: #f4f1fa; border-radius: 6px; }
 fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
-.property { display: grid; gap: 6px; padding: 12px 0; border-bottom: 1px solid #eceaf1; }
-label { display: flex; align-items: center; gap: 8px; }
+.property { display: grid; gap: 6px; padding: 8px 0; border-bottom: 1px solid #eceaf1; }
+label { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
 input, button { font: inherit; }
 input[type="color"] { width: 100%; height: 32px; border: 1px solid #cbc8d5; background: #fff; border-radius: 4px; }
 input[type="number"] { width: 68px; padding: 5px 8px; border: 1px solid #cbc8d5; border-radius: 4px; }
@@ -46,9 +48,28 @@ button:focus-visible, input:focus-visible { outline: 2px solid #695089; outline-
 .reset { margin-top: 12px; width: 100%; }
 .assets { margin-top: 12px; }
 .add-image { width: 100%; }
-.layers { display: grid; gap: 4px; max-height: 100px; overflow: auto; }
-.layers button { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
-.layers button[aria-pressed="true"] { border-color: #695089; background: #eae2f5; }
+.layers { display: grid; gap: 3px; max-height: 230px; overflow: auto; padding: 3px; }
+.layer { display: grid; grid-template-columns: minmax(70px, 1fr) 23px 30px 30px 23px 23px; gap: 2px; padding: 3px; border: 1px solid transparent; border-radius: 5px; }
+.layer button { padding: 4px 2px; font-size: 10px; }
+.layer .layer-select { font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+.layer[data-selected] { border-color: #695089; background: #eae2f5; }
+.layer[data-visible="false"] .layer-select { color: #777; text-decoration: line-through; }
+.layer[data-locked="true"] [data-action="lock"] { background: #f9e2b3; color: #684300; }
+.layer[data-drop="before"] { border-top: 3px solid #695089; }
+.layer[data-drop="after"] { border-bottom: 3px solid #695089; }
+[data-reorder] { cursor: grab; }
+.toolbar, .selection-actions { display: flex; gap: 6px; align-items: center; margin: 10px 0; }
+.toolbar { flex: none; margin: 6px 12px 8px; }
+.toolbar button, .selection-actions button { padding: 4px 8px; font-size: 12px; }
+.dirty { margin-left: auto; color: #605b70; font-size: 11px; }
+.dirty[data-dirty="true"] { color: #8c4a10; font-weight: 600; }
+details { margin: 12px 0; border-top: 1px solid #eceaf1; padding-top: 8px; }
+summary { cursor: pointer; font-weight: 600; }
+.layer-count { float: right; color: #605b70; font-weight: normal; }
+.snap-toggle { font-size: 12px; }
+.align-row { display: flex; gap: 4px; margin: 4px 0; }
+.align-row button { flex: 1; padding: 5px 3px; font-size: 11px; }
+input[type="text"] { min-width: 0; width: 100%; padding: 5px 8px; border: 1px solid #cbc8d5; border-radius: 4px; }
 .row { grid-template-columns: 1fr 1fr; }
 .row label { gap: 4px; }
 .row input { width: 62px; }

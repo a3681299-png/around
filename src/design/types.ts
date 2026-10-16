@@ -12,7 +12,7 @@ export interface SurfaceStyleRule {
 }
 
 export interface DesignDocument {
-  schemaVersion: 2;
+  schemaVersion: 3;
   id: string;
   siteId: string;
   /** null uses native site styling; a built-in theme is an optional starting point. */
@@ -23,7 +23,7 @@ export interface DesignDocument {
 
 export type PlacementAnchor = { kind: 'viewport' } | { kind: 'surface'; target: string };
 
-export interface ImagePlacement {
+export interface LayerPlacement {
   anchor: PlacementAnchor;
   /** Centre relative to the anchor; dimensions remain in CSS pixels. */
   x: number;
@@ -33,18 +33,24 @@ export interface ImagePlacement {
   rotationDeg: number;
 }
 
-export interface ImageDecoration {
-  kind: 'image';
+/** Shared authoring state, independent of the layer's media and renderer. */
+export interface LayerState {
   id: string;
-  assetId: string;
   name: string;
-  placement: ImagePlacement;
+  placement: LayerPlacement;
   opacity: number;
   zIndex: number;
   visible: boolean;
+  locked: boolean;
 }
 
-export type ImagePatch = Partial<Pick<ImageDecoration, 'opacity' | 'zIndex' | 'visible'>> & { placement?: Partial<ImagePlacement> };
+export type ImagePlacement = LayerPlacement;
+export interface ImageDecoration extends LayerState {
+  kind: 'image';
+  assetId: string;
+}
+
+export type ImagePatch = Partial<Pick<LayerState, 'name' | 'opacity' | 'zIndex' | 'visible' | 'locked'>> & { placement?: Partial<LayerPlacement> };
 
 export interface DesignTarget {
   readonly id: string;

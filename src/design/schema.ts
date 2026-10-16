@@ -35,11 +35,11 @@ function number(value: unknown, min: number, max: number): number {
   return value;
 }
 
-function image(value: unknown): ImageDecoration {
-  const item = record(value, ['kind', 'id', 'assetId', 'name', 'placement', 'opacity', 'zIndex', 'visible']);
+function image(value: unknown, version: number): ImageDecoration {
+  const item = record(value, ['kind', 'id', 'assetId', 'name', 'placement', 'opacity', 'zIndex', 'visible', ...(version === 3 ? ['locked'] : [])]);
   if (item['kind'] !== 'image' || !isDesignId(item['id']) || !isAssetId(item['assetId'])
     || typeof item['name'] !== 'string' || item['name'].length < 1 || item['name'].length > 120 || /[\u0000-\u001f]/.test(item['name'])
-    || typeof item['visible'] !== 'boolean') throw new Error('画像レイヤーの形式が不正です。');
+    || typeof item['visible'] !== 'boolean' || (version === 3 && typeof item['locked'] !== 'boolean')) throw new Error('画像レイヤーの形式が不正です。');
   const placement = record(item['placement'], ['anchor', 'x', 'y', 'widthPx', 'heightPx', 'rotationDeg']);
   const inputAnchor = record(placement['anchor'], ['kind', 'target']);
   let anchor: PlacementAnchor;
@@ -56,7 +56,7 @@ function image(value: unknown): ImageDecoration {
       heightPx: number(placement['heightPx'], IMAGE_LIMITS.minSize, IMAGE_LIMITS.maxSize),
       rotationDeg: number(placement['rotationDeg'], -180, 180),
     },
-    opacity: number(item['opacity'], 0, 1), zIndex, visible: item['visible'],
+    opacity: number(item['opacity'], 0, 1), zIndex, visible: item['visible'], locked: version === 3 ? item['locked'] as boolean : false,
   };
 }
 
@@ -64,7 +64,7 @@ function image(value: unknown): ImageDecoration {
 export function parseDesign(value: unknown): DesignDocument {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('デザインの形式が不正です。');
   const version = (value as Record<string, unknown>)['schemaVersion'];
-  if (version !== 1 && version !== 2) throw new Error('このデザインのバージョンには対応していません。');
+  if (version !== 1 && version !== 2 && version !== 3) throw new Error('このデザインのバージョンには対応していません。');
   const data = record(value, version === 1 ? ['schemaVersion', 'id', 'siteId', 'baseThemeId', 'rules'] : ['schemaVersion', 'id', 'siteId', 'baseThemeId', 'rules', 'decorations']);
   if (!isDesignId(data['id']) || !isDesignId(data['siteId'])
     || (data['baseThemeId'] !== null && !isDesignId(data['baseThemeId']))) {
@@ -91,16 +91,16 @@ export function parseDesign(value: unknown): DesignDocument {
     return { kind: 'surface-style' as const, target: rule['target'], style };
   });
   let decorations: ImageDecoration[] = [];
-  if (version === 2) {
+  if (version >= 2) {
     if (!Array.isArray(data['decorations']) || data['decorations'].length > IMAGE_LIMITS.count) throw new Error('画像は32枚まで配置できます。');
-    decorations = data['decorations'].map(image);
+    decorations = data['decorations'].map((value) => image(value, version));
     if (new Set(decorations.map((item) => item.id)).size !== decorations.length) throw new Error('画像レイヤーのIDが重複しています。');
   }
-  return { schemaVersion: 2, id: data['id'], siteId: data['siteId'], baseThemeId: data['baseThemeId'], rules, decorations };
+  return { schemaVersion: 3, id: data['id'], siteId: data['siteId'], baseThemeId: data['baseThemeId'], rules, decorations };
 }
 
 export function emptyDesign(siteId: string, baseThemeId: string | null): DesignDocument {
-  return parseDesign({ schemaVersion: 2, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
+  return parseDesign({ schemaVersion: 3, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
 }
 
 export function sameDesign(a: DesignDocument | undefined, b: DesignDocument | undefined): boolean {

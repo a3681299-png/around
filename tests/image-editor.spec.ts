@@ -53,6 +53,10 @@ async function drag(youtube: Page, element: Locator, dx: number, dy: number) {
   await youtube.mouse.up();
 }
 
+async function controls(page: Page, image: Locator) {
+  return page.locator(`${overlay} [data-frame-id="${await image.getAttribute('data-image-id')}"]`);
+}
+
 async function assets(context: BrowserContext) {
   const worker = context.serviceWorkers().find((entry) => entry.url().includes('background/index.js')) ?? await context.waitForEvent('serviceworker');
   return worker.evaluate(async () => new Promise<Array<{ id: string; bytes: number; mime: string; leases: number }>>((resolve, reject) => {
@@ -80,13 +84,13 @@ test('import a transparent image, drag and resize it, save, reload and restart w
   const moved = (await image.boundingBox())!;
   expect(moved.x).toBeCloseTo(original.x - 100, 0);
   expect(moved.y).toBeCloseTo(original.y + 90, 0);
-  await drag(youtube, image.getByRole('button', { name: '右下でサイズ変更' }), 65, 49);
+  await drag(youtube, (await controls(youtube, image)).getByRole('button', { name: '右下でサイズ変更' }), 65, 49);
   const resized = (await image.boundingBox())!;
   expect(resized.width).toBeGreaterThan(original.width + 50);
   expect(resized.width / resized.height).toBeCloseTo(original.width / original.height, 2);
   await save(dialog);
   const design = await stored(popup);
-  expect(design.schemaVersion).toBe(2);
+  expect(design.schemaVersion).toBe(3);
   expect(design.decorations).toHaveLength(1);
   expect(JSON.stringify(design)).not.toMatch(/data:image|base64|blob:/);
   expect(await assets(context)).toHaveLength(1);
@@ -137,7 +141,7 @@ test('rotation handle, Delete, discard and close preserve saved layers and colle
   const dialog = await open(popup, youtube);
   let image = await importImage(dialog, youtube);
   await save(dialog);
-  const handle = image.getByRole('button', { name: '画像を回転' });
+  const handle = (await controls(youtube, image)).getByRole('button', { name: '画像を回転' });
   const box = (await image.boundingBox())!, grip = (await handle.boundingBox())!;
   await youtube.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2); await youtube.mouse.down();
   await youtube.mouse.move(box.x + box.width + 40, box.y + box.height / 2, { steps: 8 }); await youtube.mouse.up();
@@ -155,6 +159,8 @@ test('rotation handle, Delete, discard and close preserve saved layers and colle
   await again.getByRole('group', { name: '画像レイヤー' }).getByRole('button').first().click();
   await again.getByRole('button', { name: '画像を削除' }).click(); await save(again);
   await expect(youtube.locator(overlay)).toHaveCount(0);
+  expect(await assets(context)).toHaveLength(1); // Retained for Undo even after saving.
+  await again.getByRole('button', { name: '編集を終了' }).click();
   await expect.poll(async () => (await assets(context)).length).toBe(0);
 });
 
@@ -192,10 +198,10 @@ test('viewport placement follows resizing without scroll drift; player anchors f
   expect((await image.boundingBox())!.y).toBeCloseTo(resized.y, 0);
   await dialog.getByRole('button', { name: 'パネルを左へ' }).click();
   await youtube.locator('#navigate').click(); await expect(youtube).toHaveURL(/\/watch\?/);
+  const beforeAnchor = (await image.boundingBox())!;
   await dialog.getByLabel('配置の基準').selectOption('video-player');
   await save(dialog);
-  const player = (await youtube.locator('#movie_player').boundingBox())!;
-  await expect.poll(async () => { const box = (await image.boundingBox())!; return Math.round(box.x + box.width / 2); }).toBe(Math.round(player.x + player.width * placement.x));
+  expect((await image.boundingBox())!.x).toBeCloseTo(beforeAnchor.x, 0);
   await dialog.getByRole('button', { name: '編集を終了' }).click();
   await youtube.locator('ytd-guide-entry-renderer a[href="/"]').first().click();
   await expect(youtube).toHaveURL('https://www.youtube.com/');
@@ -234,6 +240,8 @@ test('saved images sync across tabs and a foreign deletion cannot collect anothe
   expect(await assets(context)).toHaveLength(1);
   await second.getByRole('button', { name: '変更を破棄', exact: true }).click();
   await expect(secondPage.locator(overlay)).toHaveCount(0);
+  expect(await assets(context)).toHaveLength(1); // The first tab still owns its deletion history.
+  await first.getByRole('button', { name: '編集を終了' }).click();
   await expect.poll(async () => (await assets(context)).length).toBe(0);
 });
 
@@ -255,8 +263,8 @@ test('turning the theme OFF while a save waits for asset retention still complet
     }) as typeof chrome.tabs.query;
   });
   await dialog.getByRole('button', { name: '画像を削除' }).click();
-  await expect.poll(() => worker.evaluate(() => Boolean((globalThis as typeof globalThis & { resumeAssetPrune?: () => void }).resumeAssetPrune))).toBe(true);
   await dialog.getByRole('button', { name: '保存', exact: true }).click();
+  await expect.poll(() => worker.evaluate(() => Boolean((globalThis as typeof globalThis & { resumeAssetPrune?: () => void }).resumeAssetPrune))).toBe(true);
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
   await expect(youtube.locator(overlay)).toHaveCount(0);
   await worker.evaluate(() => { (globalThis as typeof globalThis & { resumeAssetPrune?: () => void }).resumeAssetPrune?.(); });

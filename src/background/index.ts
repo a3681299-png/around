@@ -75,7 +75,7 @@ async function importBatch(input: unknown, lease: AssetLease): Promise<AssetMeta
       combined.set(asset.id, existing ? { ...existing, leases: [...existing.leases.filter((entry) => entry.session !== lease.session), lease] } : asset);
     }
     if (combined.size > ASSET_LIMITS.count || [...combined.values()].reduce((sum, row) => sum + row.byteLength, 0) > ASSET_LIMITS.totalBytes) {
-      throw new Error('素材の保存上限（48MB・128素材）に達しました。不要な画像を削除して保存してください。');
+      throw new Error('素材の保存上限（48MB・128素材）に達しました。不要な画像を削除して保存し、編集を終了すると空きを確保できます。');
     }
     return { value: undefined, put: [...combined.values()] };
   });
@@ -94,7 +94,8 @@ async function handle(message: Record<string, unknown>, sender: chrome.runtime.M
   if (message['action'] === 'import') return importBatch(message['files'], lease);
   if (message['action'] === 'lease') {
     const ids = message['ids'];
-    if (!Array.isArray(ids) || ids.length > 32 || !ids.every(isAssetId)) throw new Error('素材IDが不正です。');
+    // Undo/redo can retain assets absent from the current 32-layer document.
+    if (!Array.isArray(ids) || ids.length > ASSET_LIMITS.count || !ids.every(isAssetId)) throw new Error('素材IDが不正です。');
     await leaseAssets(lease, ids);
   } else if (message['action'] === 'release') {
     await leaseAssets(lease, []);

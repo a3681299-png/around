@@ -1,5 +1,7 @@
 import styles from './panel.css';
 import { IMAGE_LIMITS, STYLE_LIMITS, type SurfaceStyle, type ImageDecoration, type ImagePatch, type DesignTarget } from '../design/types';
+import { frontToBack } from './layers';
+import type { Alignment, Distribution } from '../design/layout';
 
 export interface PanelState {
   selected: boolean;
@@ -10,6 +12,10 @@ export interface PanelState {
   error: boolean;
   images: readonly ImageDecoration[];
   image: ImageDecoration | undefined;
+  selectedIds: readonly string[];
+  canUndo: boolean;
+  canRedo: boolean;
+  snapping: boolean;
 }
 
 export interface PanelActions {
@@ -19,9 +25,16 @@ export interface PanelActions {
   reset(): void;
   close(): void;
   imageImport(files: readonly File[]): void;
-  imageSelect(id: string): void;
+  imageSelect(id: string, additive?: boolean): void;
   imageChange(patch: ImagePatch): void;
-  imageDelete(): void;
+  layerChange(id: string, patch: ImagePatch): void;
+  imageDelete(id?: string): void;
+  duplicate(id?: string): void;
+  reorder(id: string, targetId: string, after: boolean): void;
+  undo(): void;
+  redo(): void;
+  snap(value: boolean): void;
+  layout(mode: Alignment | Distribution): void;
 }
 
 /** This UI has no site selectors, theme CSS or persistence logic. */
@@ -37,14 +50,27 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
   const main = doc.createElement('main');
   main.innerHTML = `
     <header><h2>デザインを編集</h2><button class="dock" type="button">パネルを左へ</button><button class="close" type="button" aria-label="編集を終了">×</button></header>
+    <div class="toolbar"><button class="undo" type="button" title="Ctrl＋Z">元に戻す</button><button class="redo" type="button" title="Ctrl＋Shift＋Z / Ctrl＋Y">やり直す</button><span class="dirty" role="status"></span></div>
+    <div class="editor-body">
     <section class="assets">
       <button class="add-image" type="button">画像を追加</button>
       <input class="file" type="file" accept="image/png,image/webp" multiple aria-label="画像素材を追加" hidden>
       <p class="hint">PNG・WebPを選択、または画面へドロップ。1枚4MBまで。</p>
-      <div class="layers" role="group" aria-label="画像レイヤー"></div>
     </section>
-    <p class="hint">カードまたは画像をクリックして選択。カードの変更は同じ種類の動画カード全体に適用します。</p>
+    <details class="layers-section" open><summary>レイヤー <span class="layer-count"></span></summary>
+      <p class="hint">上が手前。↕をドラッグして並び替え。Ctrl／Shiftで複数選択。</p>
+      <div class="layers" role="group" aria-label="画像レイヤー"></div>
+    </details>
     <p class="selection" role="status">カードが選択されていません</p>
+    <label class="snap-toggle"><input class="snap" type="checkbox">スナップを有効にする</label>
+    <p class="hint">画面・プレイヤー・他レイヤーに吸着。Altを押している間は自由配置。</p>
+    <div class="selection-actions" hidden><button class="duplicate-image" type="button" title="Ctrl＋D">選択を複製</button><button class="delete-image" type="button" title="Delete">画像を削除</button></div>
+    <fieldset class="layout-tools" aria-label="整列と配置" hidden>
+      <div class="align-row"><button type="button" data-align="left">左揃え</button><button type="button" data-align="center-x">左右中央揃え</button><button type="button" data-align="right">右揃え</button></div>
+      <div class="align-row"><button type="button" data-align="top">上揃え</button><button type="button" data-align="center-y">上下中央揃え</button><button type="button" data-align="bottom">下揃え</button></div>
+      <div class="align-row"><button type="button" data-align="horizontal">横に等間隔</button><button type="button" data-align="vertical">縦に等間隔</button></div>
+    </fieldset>
+    <details class="properties-section" open><summary>プロパティ</summary>
     <fieldset class="properties" aria-label="カードのプロパティ" disabled>
       <div class="property">
         <label><input type="checkbox" data-override="backgroundColor">背景色を変更</label>
@@ -62,6 +88,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       <button class="reset" type="button">カードの変更をリセット</button>
     </fieldset>
     <fieldset class="image-properties" aria-label="画像のプロパティ" hidden>
+      <div class="property"><label>名前 <input type="text" aria-label="レイヤー名" class="layer-name" maxlength="120" required></label></div>
       <div class="property"><label>基準 <select aria-label="配置の基準" data-image-prop="anchor"><option value="viewport">画面</option></select></label></div>
       <div class="property row">
         <label>X <input type="number" aria-label="画像のX位置" data-image-prop="x" min="0" max="100" step="0.01" required>%</label>
@@ -74,12 +101,17 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       <div class="property"><label>角度 <input type="number" aria-label="画像の角度" data-image-prop="rotationDeg" min="-180" max="180" step="0.1" required>°</label></div>
       <div class="property"><label>不透明度 <output class="opacity-value"></output></label><input type="range" aria-label="画像の不透明度" data-image-prop="opacity" min="0" max="100" step="1"></div>
       <div class="property"><label>重なり順 <input type="number" aria-label="画像の重なり順" data-image-prop="zIndex" min="-100" max="100" step="1" required></label></div>
-      <div class="property"><label><input type="checkbox" data-image-prop="visible">画像を表示</label><button class="delete-image" type="button">画像を削除</button></div>
+      <div class="property"><label><input type="checkbox" data-image-prop="visible">画像を表示</label></div>
     </fieldset>
     <p class="hint card-help">チェックを外した項目はテーマの見た目に戻ります。</p>
+    <p class="hint multi-help" hidden>複数選択は一括移動に対応しています。拡縮・回転は1枚ずつ操作してください。</p>
+    </details>
+    <p class="hint">矢印: 1px / Shift＋矢印: 10px / Esc: 選択解除</p>
+    </div>
+    <footer>
     <p class="hint">終了すると未保存の変更を破棄します。</p>
     <div class="actions"><button class="primary save" type="button">保存</button><button class="discard" type="button">変更を破棄</button></div>
-    <p class="status" role="status" aria-live="polite"></p>`;
+    <p class="status" role="status" aria-live="polite"></p></footer>`;
   shadow.append(sheet, main);
   const get = <T extends HTMLElement>(selector: string) => main.querySelector<T>(selector)!;
   const backgroundToggle = get<HTMLInputElement>('[data-override="backgroundColor"]');
@@ -104,6 +136,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
   const dock = get<HTMLButtonElement>('.dock');
   const status = get<HTMLParagraphElement>('.status');
   const selection = get<HTMLParagraphElement>('.selection');
+  let current: PanelState | undefined;
   const setText = (element: HTMLElement, value: string) => { if (element.textContent !== value) element.textContent = value; };
   const onInput = () => {
     background.disabled = !backgroundToggle.checked;
@@ -125,8 +158,46 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
   addImage.addEventListener('click', () => fileInput.click());
   fileInput.addEventListener('change', () => { actions.imageImport([...fileInput.files ?? []]); fileInput.value = ''; });
   layers.addEventListener('click', (event) => {
-    const id = event.target instanceof Element ? event.target.closest<HTMLButtonElement>('[data-layer-id]')?.dataset.layerId : undefined;
-    if (id) actions.imageSelect(id);
+    const button = event.target instanceof Element ? event.target.closest<HTMLButtonElement>('button') : undefined;
+    const id = button?.closest<HTMLElement>('[data-layer-id]')?.dataset.layerId;
+    const image = current?.images.find((layer) => layer.id === id);
+    if (!id || !image || current?.saving) return;
+    switch (button?.dataset.action) {
+      case 'select': actions.imageSelect(id, event.ctrlKey || event.metaKey || event.shiftKey); break;
+      case 'visible': actions.layerChange(id, { visible: !image.visible }); break;
+      case 'lock': actions.layerChange(id, { locked: !image.locked }); break;
+      case 'duplicate': actions.duplicate(id); break;
+      case 'delete': actions.imageDelete(id); break;
+    }
+  });
+  let draggedId: string | undefined;
+  const clearDrop = () => layers.querySelectorAll<HTMLElement>('[data-drop]').forEach((row) => row.removeAttribute('data-drop'));
+  layers.addEventListener('dragstart', (event) => {
+    const grip = event.target instanceof Element ? event.target.closest('[data-reorder]') : undefined;
+    draggedId = grip?.closest<HTMLElement>('[data-layer-id]')?.dataset.layerId;
+    if (!draggedId || current?.saving) { event.preventDefault(); return; }
+    event.dataTransfer?.setData('application/x-ww-layer', draggedId);
+    if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
+  });
+  layers.addEventListener('dragover', (event) => {
+    if (!draggedId) return;
+    event.preventDefault(); event.stopPropagation(); clearDrop();
+    const row = event.target instanceof Element ? event.target.closest<HTMLElement>('[data-layer-id]') : undefined;
+    if (row && row.dataset.layerId !== draggedId) row.dataset.drop = event.clientY > row.getBoundingClientRect().top + row.clientHeight / 2 ? 'after' : 'before';
+  });
+  layers.addEventListener('drop', (event) => {
+    if (!draggedId) return;
+    event.preventDefault(); event.stopPropagation();
+    const row = event.target instanceof Element ? event.target.closest<HTMLElement>('[data-layer-id]') : undefined;
+    if (row?.dataset.layerId) actions.reorder(draggedId, row.dataset.layerId, row.dataset.drop === 'after');
+    draggedId = undefined; clearDrop();
+  });
+  layers.addEventListener('dragend', () => { draggedId = undefined; clearDrop(); });
+  const layerName = get<HTMLInputElement>('.layer-name');
+  layerName.addEventListener('change', () => {
+    const name = layerName.value.trim();
+    if (!name || /[\u0000-\u001f]/.test(name)) { layerName.value = current?.image?.name ?? ''; return; }
+    actions.imageChange({ name });
   });
   imageProperties.addEventListener('input', (event) => {
     const input = event.target as HTMLInputElement | HTMLSelectElement;
@@ -139,7 +210,15 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
     else if (property === 'zIndex') actions.imageChange({ zIndex: Number(input.value) });
     else actions.imageChange({ placement: { [property]: Number(input.value) / (property === 'x' || property === 'y' ? 100 : 1) } });
   });
-  get<HTMLButtonElement>('.delete-image').addEventListener('click', actions.imageDelete);
+  get<HTMLButtonElement>('.delete-image').addEventListener('click', () => actions.imageDelete());
+  get<HTMLButtonElement>('.duplicate-image').addEventListener('click', () => actions.duplicate());
+  get<HTMLButtonElement>('.undo').addEventListener('click', actions.undo);
+  get<HTMLButtonElement>('.redo').addEventListener('click', actions.redo);
+  get<HTMLInputElement>('.snap').addEventListener('change', (event) => actions.snap((event.target as HTMLInputElement).checked));
+  get<HTMLFieldSetElement>('.layout-tools').addEventListener('click', (event) => {
+    const mode = event.target instanceof HTMLElement ? event.target.dataset.align as Alignment | Distribution | undefined : undefined;
+    if (mode) actions.layout(mode);
+  });
   save.addEventListener('click', actions.save);
   discard.addEventListener('click', actions.discard);
   close.addEventListener('click', actions.close);
@@ -160,25 +239,60 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
     host,
     focus() { close.focus(); },
     render(state: PanelState) {
+      current = state;
       imageProperties.hidden = !state.image;
-      imageProperties.disabled = state.saving;
-      properties.hidden = Boolean(state.image);
-      get<HTMLParagraphElement>('.card-help').hidden = Boolean(state.image);
+      imageProperties.disabled = state.saving || Boolean(state.image?.locked);
+      properties.hidden = state.selectedIds.length > 0;
+      get<HTMLParagraphElement>('.card-help').hidden = state.selectedIds.length > 0;
+      get<HTMLParagraphElement>('.multi-help').hidden = state.selectedIds.length < 2;
+      get<HTMLDivElement>('.selection-actions').hidden = state.selectedIds.length === 0;
+      const unlocked = state.images.filter((image) => state.selectedIds.includes(image.id) && !image.locked).length;
+      get<HTMLButtonElement>('.delete-image').disabled = !unlocked || state.saving;
+      get<HTMLButtonElement>('.duplicate-image').disabled = !unlocked || state.saving || state.images.length + unlocked > IMAGE_LIMITS.count;
+      get<HTMLButtonElement>('.undo').disabled = !state.canUndo || state.saving;
+      get<HTMLButtonElement>('.redo').disabled = !state.canRedo || state.saving;
+      get<HTMLInputElement>('.snap').checked = state.snapping;
+      get<HTMLInputElement>('.snap').disabled = state.saving;
+      get<HTMLFieldSetElement>('.layout-tools').hidden = state.selectedIds.length < 2;
+      const eligible = state.images.filter((image) => state.selectedIds.includes(image.id) && image.visible && !image.locked).length;
+      main.querySelectorAll<HTMLButtonElement>('[data-align]').forEach((button) => {
+        const minimum = ['horizontal', 'vertical'].includes(button.dataset.align!) ? 3 : 2;
+        button.disabled = state.saving || eligible < minimum;
+      });
+      setText(get<HTMLElement>('.dirty'), state.dirty ? '未保存の変更' : '保存済み');
+      get<HTMLElement>('.dirty').dataset.dirty = String(state.dirty);
+      setText(get<HTMLElement>('.layer-count'), `${state.images.length} / ${IMAGE_LIMITS.count}`);
       addImage.disabled = state.saving || state.images.length >= IMAGE_LIMITS.count;
-      const nextKey = JSON.stringify(state.images.map(({ id, name, zIndex, visible }) => ({ id, name, zIndex, visible })));
+      const nextKey = JSON.stringify(state.images.map(({ id, name, zIndex, visible, locked }) => ({ id, name, zIndex, visible, locked })));
       if (layerKey !== nextKey) {
         layerKey = nextKey;
         layers.replaceChildren();
-        [...state.images].sort((a, b) => b.zIndex - a.zIndex).forEach((image) => {
-          const button = doc.createElement('button'); button.type = 'button'; button.dataset.layerId = image.id;
-          button.textContent = `${image.visible ? '' : '非表示: '}${image.name}`; layers.append(button);
+        frontToBack(state.images).forEach((image) => {
+          const row = doc.createElement('div'); row.className = 'layer'; row.dataset.layerId = image.id;
+          const add = (action: string, text: string, label: string) => {
+            const button = doc.createElement('button'); button.type = 'button'; button.dataset.action = action;
+            button.textContent = text; button.setAttribute('aria-label', label); button.title = label; row.append(button); return button;
+          };
+          add('select', image.name, image.name).className = 'layer-select';
+          const grip = add('reorder', '↕', 'レイヤーを並び替え'); grip.draggable = true; grip.dataset.reorder = '';
+          const visible = add('visible', image.visible ? '表示' : '隠す', image.visible ? '非表示にする' : '表示する'); visible.setAttribute('aria-pressed', String(image.visible));
+          add('lock', image.locked ? '固定' : '自由', image.locked ? 'ロック解除' : 'ロック');
+          add('duplicate', '⧉', '複製').disabled = image.locked || state.images.length >= IMAGE_LIMITS.count;
+          add('delete', '×', '削除').disabled = image.locked;
+          row.dataset.locked = String(image.locked); row.dataset.visible = String(image.visible); layers.append(row);
         });
       }
       layers.querySelectorAll<HTMLButtonElement>('button').forEach((button) => {
-        button.setAttribute('aria-pressed', String(button.dataset.layerId === state.image?.id)); button.disabled = state.saving;
+        const id = button.closest<HTMLElement>('[data-layer-id]')!.dataset.layerId!;
+        const image = state.images.find((image) => image.id === id)!;
+        if (button.dataset.action === 'select') button.setAttribute('aria-pressed', String(state.selectedIds.includes(id)));
+        button.disabled = state.saving || (['delete', 'duplicate'].includes(button.dataset.action!) && image.locked)
+          || (button.dataset.action === 'duplicate' && state.images.length >= IMAGE_LIMITS.count);
       });
+      layers.querySelectorAll<HTMLElement>('[data-layer-id]').forEach((row) => row.toggleAttribute('data-selected', state.selectedIds.includes(row.dataset.layerId!)));
       if (state.image) {
         const image = state.image;
+        if (shadow.activeElement !== layerName) layerName.value = image.name;
         anchorSelect.value = image.placement.anchor.kind === 'viewport' ? 'viewport' : image.placement.anchor.target;
         for (const [property, value] of Object.entries(image.placement)) {
           if (property === 'anchor') continue;
@@ -203,7 +317,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       radius.disabled = !radiusToggle.checked;
       save.disabled = discard.disabled = !state.dirty || state.saving;
       close.disabled = state.saving;
-      setText(selection, state.image ? `画像: ${state.image.name}` : state.selected ? '動画カードを選択中' : 'カードが選択されていません');
+      setText(selection, state.image ? `画像: ${state.image.name}${state.image.locked ? '（ロック中）' : ''}` : state.selectedIds.length > 1 ? `${state.selectedIds.length}レイヤーを選択中` : state.selected ? '動画カードを選択中' : 'カードまたは画像を選択してください');
       setText(status, state.status);
       status.dataset.error = String(state.error);
     },
