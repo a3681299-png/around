@@ -174,4 +174,6 @@ YouTubeの`yt-navigate-finish`と`yt-page-data-updated`で再確認し、追加D
 
 クリエイターUIの[再設計](docs/editor-ux.md)と[操作・検証結果](docs/editor-ux-verification.md)をまとめています。一覧のチェックから、キーを使わず複数選択してグループ化できます。
 
+独立StudioはPopupの「Studioを開く（別ウィンドウ）」から起動します。編集対象のYouTubeを選び、Studioで設定しながら実サイトで直接選択・移動できます。サイト内の「デザインを編集」も同じCoreとUIを使います。[構造とDesktop Hostへの境界](docs/studio-foundation.md)、[操作と検証結果](docs/studio-verification.md)を参照してください。実験版は `.work/creator-editor/dist` をChromeへ読み込みます。通常版の `dist` は更新しません。
+
 Chromeの仕様は[Content scripts](https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts)と[Storage API](https://developer.chrome.com/docs/extensions/reference/api/storage)、拡張機能の検証方法は[Playwright公式ドキュメント](https://playwright.dev/docs/chrome-extensions)を参照しています。
