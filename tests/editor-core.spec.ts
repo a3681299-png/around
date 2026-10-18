@@ -9,7 +9,7 @@ import type { DesignDocument } from '../src/design/types';
 import type { EditorAsset, EditorCheckpoint, EditorPorts } from '../src/editor-core/types';
 import { parseEditCommand } from '../src/studio/protocol';
 
-function harness() {
+function harness(validateAssets: () => Promise<void> = async () => undefined) {
   let value: DesignDocument | undefined, serial = 0;
   const listeners = new Set<(value: DesignDocument | undefined) => void>(), leases = new Map<string, readonly string[]>();
   const ports: EditorPorts<readonly EditorAsset[]> = {
@@ -18,7 +18,7 @@ function harness() {
       samples: (doc, ids) => movableMedia(ids, doc.decorations, doc.groups ?? []).map((layer) => ({ id: layer.id, placement: layer.placement, frame: { left: 0, top: 0, width: 1000, height: 800 } })),
       importFrame: (point) => ({ width: 1000, height: 800, origin: point ?? { x: 450, y: 360 } }) },
     storage: { read: async () => value, watch(accept) { listeners.add(accept); void Promise.resolve().then(() => listeners.has(accept) && accept(value)); return () => { listeners.delete(accept); }; },
-      retain: async (session, ids) => { leases.set(session, [...ids]); }, release: async (session) => { leases.delete(session); }, validate: async () => undefined,
+      retain: async (session, ids) => { leases.set(session, [...ids]); }, release: async (session) => { leases.delete(session); }, validate: validateAssets,
       import: async (source) => source, cancelImport() {}, save: async (doc) => { value = parseDesign(doc); listeners.forEach((accept) => accept(value)); } },
   };
   const editor = createEditorSession(ports);
@@ -101,4 +101,21 @@ test('tools share commands/checkpoints without changing artwork/history, and imp
   expect(parseEditCommand({ type: 'tool', tool: 'card' })).toEqual({ type: 'tool', tool: 'card' });
   expect(() => parseEditCommand({ type: 'tool', tool: 'execute' })).toThrow();
   editor.destroy(); b.editor.destroy();
+});
+
+
+test('geometry snapshots during asset preflight preserve selection until import is committed', async () => {
+  let deferred = false, release: () => void = () => {}, reached: () => void = () => {};
+  const gate = new Promise<void>((resolve) => { release = resolve; });
+  const validating = new Promise<void>((resolve) => { reached = resolve; });
+  const h = harness(async () => { if (deferred) { reached(); await gate; } });
+  await Promise.resolve(); h.editor.setEnabled(true); h.editor.open(); await h.editor.import([assets[0]!]);
+  const old = h.editor.snapshot(); deferred = true;
+  const importing = h.editor.import([assets[1]!]); await validating;
+  const pending = h.editor.snapshot(); h.editor.refreshGeometry(); h.editor.snapshot();
+  expect(pending.document).toEqual(old.document); expect(pending.view.selectedIds).toEqual(old.view.selectedIds);
+  release(); await importing;
+  const done = h.editor.snapshot(); expect(done.document.decorations).toHaveLength(2);
+  expect(done.view.selectedIds).toEqual([done.document.decorations[1]!.id]);
+  await h.editor.execute({ type: 'undo' }); expect(h.editor.snapshot().document).toEqual(old.document); h.editor.destroy();
 });

@@ -172,6 +172,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
       if (epoch !== importEpoch || !active) return;
       before = parseDesign(draft);
       const next = parseDesign(draft);
+      let importedSelection: string | undefined;
       const { width, height, origin } = ports.geometry.importFrame(point);
       assets.forEach((asset, index) => {
         const scale = Math.max(IMAGE_LIMITS.minSize / Math.min(asset.width, asset.height), Math.min(260 / asset.width, 200 / asset.height, width * .28 / asset.width, height * .3 / asset.height));
@@ -182,7 +183,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
             widthPx: Math.round(asset.width * scale * 10) / 10, heightPx: Math.round(asset.height * scale * 10) / 10, rotationDeg: 0 },
           opacity: 1, zIndex: Math.min(100, next.decorations.length), visible: true, locked: false };
         next.decorations.push(asset.animation ? { ...common, kind: 'animation', format: asset.animation.format, playback: { playing: true, loop: true, speed: 1, mode: 'auto' } } : { ...common, kind: 'image' });
-        selectedImageIds = [id];
+        importedSelection = id;
       });
       await checkDesignAssets(next, importSession);
       if (epoch !== importEpoch || !active) return;
@@ -190,6 +191,9 @@ export function createEditorSession<Source extends { readonly length: number }>(
         before = undefined; selectedImageIds = previousSelection;
         throw new Error('別のタブの保存値が変わったため、素材の追加を中止しました。もう一度読み込んでください。');
       }
+      // A geometry snapshot during preflight still sees the old document.
+      // Publish a new selected ID only when that layer enters the draft.
+      if (importedSelection) selectedImageIds = [importedSelection];
       tool = 'select'; clearSelection(); updateDraft(next, false);
       leased = ''; await syncAssets();
       if (epoch !== importEpoch || !active) return;

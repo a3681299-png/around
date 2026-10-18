@@ -14,17 +14,19 @@ export function connectStudioHost(doc: Document, site: SiteAdapter, editor: Crea
   };
   const onConnect = (port: chrome.runtime.Port) => {
     if (port.name !== STUDIO_PORT || !trusted(port.sender) || port.sender?.frameId && port.sender.frameId !== 0) return;
-    let owner: string | undefined, closed = false, attached = false, lastHistory = -1, timer: ReturnType<typeof setTimeout> | undefined;
+    let owner: string | undefined, closed = false, attached = false, lastHistory = -1, publishPending = false, timer: ReturnType<typeof setTimeout> | undefined;
     let queue: Promise<void> = Promise.resolve();
     const post = (message: StudioMessage) => { if (!closed) { try { port.postMessage(message); } catch { cleanup(); } } };
     const checkpoint = () => { lastHistory = editor.historyVersion; return editor.checkpoint(); };
     const unsubscribe = editor.subscribe((state) => {
       if (!attached || !owner) return;
       const publish = () => { timer = undefined; post({ type: 'state', state: editor.snapshot(), ...(lastHistory !== editor.historyVersion ? { checkpoint: checkpoint() } : {}) }); };
-      // End-of-gesture/history updates must reach Studio before the next Undo.
-      // Keep ordinary pointer samples coalesced, but never delay a committed edit.
-      if (!state.active || lastHistory !== editor.historyVersion) { clearTimeout(timer); publish(); }
-      else if (!timer) timer = setTimeout(publish, 25);
+      // A command can render both its document and final status. Publish its
+      // final snapshot in one microtask, before another user action can run.
+      if (!state.active || lastHistory !== editor.historyVersion) {
+        clearTimeout(timer); timer = undefined;
+        if (!publishPending) { publishPending = true; queueMicrotask(() => { publishPending = false; if (attached && owner && !closed) publish(); }); }
+      } else if (!timer && !publishPending) timer = setTimeout(publish, 25);
     });
     function cleanup() { if (closed) return; closed = true; clearTimeout(timer); unsubscribe(); if (owner) editor.detachStudio(owner); ports.delete(port); if (activePort === port) { activePort = undefined; activeSurface = undefined; } }
     ports.set(port, cleanup);
