@@ -144,7 +144,7 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
       entry.controls.toggleAttribute('data-locked', locked);
       entry.controls.toggleAttribute('data-transformable', Boolean(editing && !editing.locked && !locked && editing.selectedIds.length === 1));
     }
-    effects?.update(effectTargets, { scene, geometry });
+    effects?.update(effectTargets, { scene, geometry, layout });
     const samples = editing ? editableSceneSamples(doc, anchors, images, groups, editing.selectedIds) : [];
     const bounds = editing && editing.selectedIds.length > 1 && samples.length > 1 ? groupBounds(samples) : undefined;
     if (groupFrame) {

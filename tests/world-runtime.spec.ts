@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { evaluateWorld, initialWorldState } from '../src/world/evaluate';
+import { evaluatePreparedWorld, evaluateWorld, initialWorldState } from '../src/world/evaluate';
 import { evaluateLayout } from '../src/world/layout';
 import { legacyLayout, legacyWorld } from '../src/renderers/dom/legacy-evaluation';
 import { assertWorldParity } from '../src/renderers/dom/parity';
@@ -19,6 +19,17 @@ test('32 media / 16 groups match legacy layout and masks across anchors, lifecyc
     const actual = evaluateWorld(scene, freeze(current), input), expected = legacyWorld(scene, legacy, input);
     expect(actual).toEqual(expected); assertWorldParity(actual, expected, 'test');
     current = actual.state; legacy = expected.state;
+  }
+});
+
+test('reused layout produces the same frames and recordings; geometry changes invalidate preparation', () => {
+  const { scene, inputs } = freeze(worldScenario());
+  let state = initialWorldState(), prepared = evaluateLayout(scene, inputs[0]!), signature = '';
+  for (const input of inputs) {
+    const key = JSON.stringify({ viewport: input.viewport, anchors: input.anchors });
+    if (key !== signature) { prepared = freeze(evaluateLayout(scene, input)); signature = key; }
+    const expected = evaluateWorld(scene, state, input), result = evaluatePreparedWorld(prepared, freeze(state), input);
+    expect(result).toEqual(expected); state = result.state;
   }
 });
 

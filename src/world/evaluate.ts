@@ -10,10 +10,13 @@ export function layoutEffectTargets(layout: WorldLayout): WorldEffectTarget[] {
 }
 /** All clocks, environment and geometry are inputs. No host or renderer calls. */
 export function evaluateWorld(scene: WorldScene, previous: WorldState, input: WorldInput): { state: WorldState; frame: WorldFrame } {
+  return evaluatePreparedWorld(evaluateLayout(scene, input), previous, input);
+}
+/** Static layout can be reused until the host changes artwork or geometry. */
+export function evaluatePreparedWorld(layout: WorldLayout, previous: WorldState, input: WorldInput): { state: WorldState; frame: WorldFrame } {
   if (previous.runtimeVersion !== WORLD_RUNTIME_VERSION) throw new Error('Unsupported World Runtime version.');
   if (!Number.isFinite(input.timeMs) || !Number.isFinite(input.deltaMs) || input.timeMs < 0 || input.deltaMs < 0
     || previous.timeMs !== null && input.timeMs < previous.timeMs) throw new Error('World Runtime requires monotonic finite time.');
-  const layout = evaluateLayout(scene, input);
   const effects = input.events.some((event) => event.type === 'host.lifecycle') ? emptyEffectState() : previous.effects;
   const evaluated = evaluateEffects(layoutEffectTargets(layout), effects, input);
   const machine = { video: input.signals.playing ? 'playing' as const : 'paused' as const,
