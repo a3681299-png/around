@@ -260,6 +260,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       current = state;
       imageProperties.hidden = !state.image && !(options.fullPage || options.inPage || options.sidePanel || options.toolbarOnly) || state.selected;
       imageProperties.disabled = !state.image || state.saving || Boolean(state.image?.locked) || state.inheritedLocked;
+      imageProperties.toggleAttribute('data-empty', !state.image);
       tools.querySelectorAll<HTMLButtonElement>('[data-tool]').forEach((button) => { button.setAttribute('aria-pressed', String(button.dataset.tool === (state.tool ?? 'select'))); });
       const isGroup = state.image?.kind === 'group';
       imageProperties.setAttribute('aria-label', isGroup ? 'グループのプロパティ' : '画像のプロパティ');

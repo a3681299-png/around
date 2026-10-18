@@ -109,7 +109,9 @@ export function createWorkspace(doc: Document, host: HTMLElement, main: HTMLElem
     tree.setActive(!layersPane.hidden && !(split && compact.matches && next === 'properties') && !host.hasAttribute('data-minimized'));
   }
   nav.addEventListener('click', (event) => { const button = (event.target as Element).closest<HTMLButtonElement>('[data-area]'); if (button) { show(button.dataset.area as Area); remember(); } });
-  const adapt = () => show(area);
+  // Workbench owns its simultaneous panes; legacy tab adaptation must not hide
+  // them after the Workbench's resize handler has already arranged the grid.
+  const adapt = () => { if (!host.hasAttribute('data-workbench')) show(area); };
   compact.addEventListener('change', adapt);
   nav.addEventListener('keydown', (event) => {
     const button = (event.target as Element).closest<HTMLButtonElement>('[data-area]'); if (!button || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;

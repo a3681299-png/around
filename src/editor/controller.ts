@@ -21,6 +21,7 @@ export interface CreatorEditor {
   subscribe(listener: (state: EditorSnapshot) => void): () => void;
   attachStudio(owner: string, resume?: EditorCheckpoint, handoff?: boolean): Promise<EditorSnapshot>;
   detachStudio(owner: string): void;
+  setSidePanelVisible(owner: string, visible: boolean): void;
   command(owner: string, session: string, revision: number, command: EditCommand): Promise<EditorSnapshot>;
   import(owner: string, session: string, revision: number, files: readonly File[]): Promise<EditorSnapshot>;
   thumbnail(id: string): Promise<string | undefined>;
@@ -35,7 +36,7 @@ export function createCreatorEditor(doc: Document, site: SiteAdapter, baseThemeI
   validate: (design: DesignDocument | undefined) => void): CreatorEditor {
   let panel: ReturnType<typeof createCreatorPanel> | undefined, selectionStyle: HTMLStyleElement | undefined, selectedElement: Element | undefined;
   let remoteOwner: string | undefined, badge: HTMLElement | undefined, installed = false, destroyed = false;
-  let unprotectToolbar: (() => void) | undefined;
+  let unprotectToolbar: (() => void) | undefined, sidePanelVisible = false;
   let layout: StudioLayoutAdapter | undefined, panelMode: 'quick' | 'inpage' | 'sidepanel' = 'quick';
   const consumedKeys = new Set<string>();
   let lastDesign = '', geometryKey = '';
@@ -81,7 +82,7 @@ export function createCreatorEditor(doc: Document, site: SiteAdapter, baseThemeI
   }
   function refresh(next = core.snapshot()) {
     state = next;
-    if (!state.active) { if (panelMode === 'sidepanel' && panel) void chrome.runtime.sendMessage({ type: CLOSE_SIDE_PANEL }).catch(() => undefined); unprotectToolbar?.(); unprotectToolbar = undefined; panel?.destroy(); panel = undefined; layout?.destroy(); layout = undefined; remoteOwner = undefined; }
+    if (!state.active) { if (panelMode === 'sidepanel' && panel) void chrome.runtime.sendMessage({ type: CLOSE_SIDE_PANEL }).catch(() => undefined); unprotectToolbar?.(); unprotectToolbar = undefined; panel?.destroy(); panel = undefined; layout?.destroy(); layout = undefined; remoteOwner = undefined; sidePanelVisible = false; }
     if (!state.selectedTarget) removeSelection();
     const active = editing(); bind(active);
     if (active) { doc.documentElement.setAttribute('data-ww-editor-tool', state.view.tool ?? 'select'); doc.documentElement.toggleAttribute('data-ww-editor-card-picking', state.view.tool !== 'browse' && (panelMode === 'quick' || state.view.tool === 'card')); }
@@ -94,7 +95,7 @@ export function createCreatorEditor(doc: Document, site: SiteAdapter, baseThemeI
     } else if (!remoteOwner || !state.active || panel) { badge?.remove(); badge = undefined; }
     const design = active && state.view.dirty ? state.document : state.saved, key = JSON.stringify(design) ?? 'empty';
     if (key !== lastDesign) { lastDesign = key; apply(design); }
-    if (panelMode === 'sidepanel') panel?.host.toggleAttribute('data-fullscreen', fullscreen());
+    if (panelMode === 'sidepanel') { panel?.host.toggleAttribute('data-fullscreen', fullscreen()); panel?.host.toggleAttribute('data-sidepanel-visible', sidePanelVisible); }
     panel?.render(state.view);
     editImages(active && !fullscreen() && state.view.tool !== 'browse' && state.view.tool !== 'card' ? { selectedIds: state.view.selectedIds, locked: state.view.saving, epoch: core.interactionEpoch, snapping: state.view.snapping,
       select: (id, additive, preserve) => dispatch({ type: 'select', id, additive, preserve }), begin: () => dispatch({ type: 'begin' }),
@@ -170,11 +171,12 @@ export function createCreatorEditor(doc: Document, site: SiteAdapter, baseThemeI
       if (handoff && state.view.saving) throw new Error('保存処理の完了後に切り替えてください。');
       if (handoff && core.gestureActive) await core.execute({ type: 'end', cancel: true });
       const existed = state.active, opened = core.open(); if (!opened.ok) throw new Error(opened.error);
-      remoteOwner = owner;
+      remoteOwner = owner; sidePanelVisible = false;
       try { if (!existed && resume) await core.restore(resume); refresh(); return core.snapshot(); }
       catch (error) { remoteOwner = undefined; refresh(); throw error; }
     },
-    detachStudio(owner) { if (owner !== remoteOwner) return; remoteOwner = undefined; if (core.gestureActive) dispatch({ type: 'end', cancel: true }); refresh(); },
+    detachStudio(owner) { if (owner !== remoteOwner) return; remoteOwner = undefined; sidePanelVisible = false; if (core.gestureActive) dispatch({ type: 'end', cancel: true }); refresh(); },
+    setSidePanelVisible(owner, visible) { if (owner !== remoteOwner) return; sidePanelVisible = visible; if (panelMode === 'sidepanel') panel?.host.toggleAttribute('data-sidepanel-visible', visible); },
     async command(owner, session, revision, command) { authorize(owner, session, revision); await core.execute(command); return core.snapshot(); },
     async import(owner, session, revision, files) { authorize(owner, session, revision); await core.import(files); return core.snapshot(); },
     thumbnail: (id) => captureLayerThumbnail(doc, id),

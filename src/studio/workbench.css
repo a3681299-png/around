@@ -30,6 +30,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .menu-end .dock, .menu-end .close { order: initial; margin: 0; font-size: 12px; padding: 3px 5px; }
 .toolbar { height: 28px; flex: none; display: flex; align-items: center; gap: 2px; padding: 0 5px; background: var(--ui-raised); border-bottom: 1px solid var(--ui-line); pointer-events: auto; }
 .toolbar button { height: 26px; min-height: 24px; padding: 3px 5px; }
+.toolbar-separator { flex: none; width: 1px; height: 16px; margin-inline: 4px; background: #53545b; }
 .canvas-target { color: var(--ui-muted); padding: 0 10px; border-left: 1px solid #4a4b50; white-space: nowrap; font-size: 11px; }
 .studio-connection { min-width: 0; flex: 1; pointer-events: auto; }
 
@@ -66,14 +67,19 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .property { gap: 3px; padding: 4px 0; }
 label { gap: 5px; font-size: 11px; }
 input[type="number"], input[type="text"], select { height: 24px; border-radius: 2px; border: 1px solid #484950; padding: 2px 5px; background: var(--ui-input); color: var(--ui-text); }
+input[type="number"] { max-width: 104px; }
+.image-properties input[type="text"], .image-properties input[type="range"] { max-width: 320px; }
 input:disabled, select:disabled { opacity: 1; color: #73757d; border-color: #3a3b40; background: #232427; }
 fieldset:disabled label { color: #93959c; }
 input[type="range"] { height: 16px; accent-color: #a7a8b2; }
+.image-properties[data-empty] input[type="range"] { appearance: none; background: linear-gradient(#6a6b72, #6a6b72) center / 100% 3px no-repeat; opacity: .25; }
+.image-properties[data-empty] input[type="range"]::-webkit-slider-thumb { appearance: none; visibility: hidden; width: 0; height: 0; }
+.image-properties[data-empty] input[type="range"]::-moz-range-thumb { visibility: hidden; width: 0; height: 0; border: 0; }
 input[type="color"] { height: 24px; border-radius: 2px; }
-.row { grid-template-columns: 1fr 1fr; gap: 7px; }
+.row { grid-template-columns: 1fr 1fr; gap: 7px; max-width: 320px; }
 .row label { font-size: 11px; }
-.row input { flex: 1; width: 60px; min-width: 0; }
-.property select { flex: 1; max-width: none; }
+.row input { flex: 1; width: 60px; min-width: 0; max-width: 104px; }
+.property select { flex: 1; max-width: 320px; }
 .group-help, .card-help { display: none; }
 .multi-help, .playback-help { font-size: 10px; padding: 3px 0; line-height: 1.5; }
 .arrangement-section { margin: 0 8px 8px; padding: 7px 0; }
@@ -164,6 +170,8 @@ label[data-scrub] input { cursor: text; user-select: text; }
 :host([data-sidepanel]) .editor-body { display: block; min-height: 0; }
 :host([data-sidepanel]) .studio-library, :host([data-sidepanel]) .studio-resize, :host([data-sidepanel]) .canvas-slot { display: none; }
 :host([data-sidepanel]) .studio-inspectors { position: static; width: 100%; height: 100%; display: grid; border: 0; box-shadow: none; }
+:host([data-sidepanel][data-inspectors-wide]) .studio-inspectors { grid-template-columns: minmax(0, var(--inspector-wide-ratio, 50%)) 5px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+:host([data-sidepanel][data-inspectors-wide]) .inspector-divider { height: 100%; cursor: ew-resize; }
 :host([data-sidepanel]) .studio-connection { display: none; }
 :host([data-sidepanel]) .toolbar { height: 30px; }
 :host([data-sidepanel]) .canvas-dimensions { display: none; }
@@ -173,10 +181,11 @@ label[data-scrub] input { cursor: text; user-select: text; }
 :host([data-page-toolbar]) main { height: 32px; }
 :host([data-page-toolbar]) .editor-body, :host([data-page-toolbar]) .studio-menu, :host([data-page-toolbar]) footer { display: none; }
 :host([data-page-toolbar]) .toolbar { height: 32px; border: 1px solid var(--ui-line); border-radius: 3px; overflow-x: auto; overflow-y: hidden; }
-:host([data-page-toolbar]) .interaction-tools { flex-direction: row; width: auto; padding: 0 3px; gap: 0; border-inline: 1px solid var(--ui-line); }
+:host([data-page-toolbar]) .interaction-tools { flex-direction: row; width: auto; padding: 0; gap: 0; border: 0; }
 :host([data-page-toolbar]) .interaction-tools .mask-shortcut { display: none; }
 :host([data-page-toolbar]) .dirty { padding-inline: 5px; }
 :host([data-page-toolbar][data-fullscreen]) { display: none !important; }
+:host([data-page-toolbar][data-sidepanel-visible]) { display: none !important; }
 
 :host([data-page-toolbar][data-native-overlap]) { visibility: hidden !important; pointer-events: none !important; }
 

@@ -6,7 +6,8 @@ export const STUDIO_PORT = 'web-world-themes:studio-v1';
 export const STUDIO_PROBE = 'web-world-themes:studio-probe';
 export interface StudioTarget { id: number; title: string; siteId: string; enabled: boolean; anchors: readonly DesignTarget[]; targets: readonly DesignTarget[] }
 export type StudioRequest =
-  | { id: number; type: 'attach'; owner: string; resume?: EditorCheckpoint }
+  | { id: number; type: 'attach'; owner: string; resume?: EditorCheckpoint; visible?: boolean }
+  | { id: number; type: 'surface-visibility'; visible: boolean }
   | { id: number; type: 'command'; session: string; revision: number; command: EditCommand }
   | { id: number; type: 'import'; session: string; revision: number; files: AssetWireFile[] }
   | { id: number; type: 'thumbnail'; layer: string }

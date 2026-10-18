@@ -29,6 +29,8 @@ export function icon(name: string): string {
     refresh: '<path d="M20 8A9 9 0 1 0 21 15M20 3v5h-5"/>',
     connect: '<path d="m9 15 6-6M8 17l-1 1a4 4 0 0 1-6-6l5-5a4 4 0 0 1 6 0m4 0 1-1a4 4 0 0 1 6 6l-5 5a4 4 0 0 1-6 0"/>',
     external: '<path d="M14 3h7v7m0-7L10 14m0-10H3v17h17v-8"/>',
+    workspace: '<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 8h18m-5 0v12M6 6h.01M9 6h.01"/>',
+    window: '<rect x="7" y="7" width="14" height="14" rx="1"/><path d="M7 11h14M17 7V3H3v14h4"/>',
   };
   return `<svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${paths[name] ?? paths.image}</svg>`;
 }

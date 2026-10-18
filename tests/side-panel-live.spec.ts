@@ -37,7 +37,7 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
     await page.mouse.move(300, 280); const beforeMask = await mask.evaluate((node: HTMLElement) => node.style.maskImage); await page.mouse.move(350, 300);
     await expect.poll(() => mask.evaluate((node: HTMLElement) => node.style.maskImage)).not.toBe(beforeMask); report.checks.pointerMask = true;
     await panel.click('[data-effect="video"]'); await panel.fill('[data-effect="fadeMs"]', '120');
-    await local.locator('[data-tool="browse"]').click();
+    await expect(local).not.toBeVisible(); await panel.click('[data-tool="browse"]'); report.checks.noDuplicateToolbar = true;
     async function measure(label: string) {
       await page.evaluate(() => scrollTo(0, 0)); await page.locator('#movie_player').hover();
       await expect(page.locator('#movie_player .ytp-fullscreen-button')).toBeVisible();
@@ -76,7 +76,7 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
     } else report.checks.nativePauseAndFade = 'unverified: media not playable in this run';
     await player.hover(); await player.locator('.ytp-settings-button').click(); await expect(player.locator('.ytp-settings-menu')).toBeVisible(); await player.locator('.ytp-settings-button').click(); report.checks.settingsClick = true;
     await player.locator('.ytp-size-button').click(); await expect(page.locator('ytd-watch-flexy')).toHaveAttribute('theater', ''); await measure('theater'); await player.locator('.ytp-size-button').click(); report.checks.theater = true;
-    await player.hover(); await player.locator('.ytp-fullscreen-button').click(); await expect(local).not.toBeVisible(); await expect.poll(() => page.evaluate(() => Boolean(document.fullscreenElement))).toBe(true); await page.evaluate(() => document.exitFullscreen()); await expect(local).toBeVisible(); report.checks.fullscreen = true;
+    await player.hover(); await player.locator('.ytp-fullscreen-button').click(); await expect(local).not.toBeVisible(); await expect.poll(() => page.evaluate(() => Boolean(document.fullscreenElement))).toBe(true); await page.evaluate(() => document.exitFullscreen()); await expect(local).not.toBeVisible(); await expect(local).not.toHaveAttribute('data-fullscreen', ''); report.checks.fullscreen = true;
     const first = page.locator('#web-world-themes-decorations [data-image-id]').first(), prior = (await first.boundingBox())!, playerPrior = (await player.boundingBox())!;
     await page.mouse.move(400, 350); await page.mouse.wheel(0, 220); await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);
     const next = (await first.boundingBox())!, playerNext = (await player.boundingBox())!; expect(next.y - prior.y).toBeCloseTo(playerNext.y - playerPrior.y, 0); report.checks.scrollAnchor = true;

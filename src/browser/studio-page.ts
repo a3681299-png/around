@@ -10,7 +10,7 @@ async function start() {
   const tab = sidePanel ? { id: target } : await chrome.tabs.getCurrent();
   if (tab?.id === undefined) throw new Error('Studioのタブを取得できません。');
   const app = mountStudio(document, document.querySelector<HTMLElement>('#studio')!, {
-    hostName: 'YouTube', sidePanel, connect: createStudioClient, recovery: createStudioRecovery(tab.id), preferences: browserStudioPreferences,
+    hostName: 'YouTube', sidePanel, connect: (notify, checkpoint) => createStudioClient(notify, checkpoint, sidePanel ? document : undefined), recovery: createStudioRecovery(tab.id), preferences: browserStudioPreferences,
   });
   document.body.toggleAttribute('data-sidepanel', sidePanel);
   await app.start(target);

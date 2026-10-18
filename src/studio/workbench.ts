@@ -15,11 +15,13 @@ export function createStudioWorkbench(doc: Document, host: HTMLElement, main: HT
   const body = get('.editor-body'), oldHeader = get('header'), toolbar = get('.toolbar'), footer = get('footer');
   const layers = get('.layers-pane'), inspector = get('.inspector-pane'), help = get('.help-pane'), selection = get('.selection-bar');
   const storage = options.preferences ?? transientPreferences, preferenceKey = options.sidePanel ? 'webWorldThemes.studio.sidepanel.v1' : 'webWorldThemes.studio.workbench.v2';
-  let leftWidth = 176, rightWidth = 320, ratio = .56, leftClosed: boolean | undefined, rightClosed: boolean | undefined, allClosed = false, alive = true, touched = false, preferencesReady = false;
+  let leftWidth = 176, rightWidth = 320, ratio = .56, wideRatio = .5, leftClosed: boolean | undefined, rightClosed: boolean | undefined, allClosed = false, alive = true, touched = false, preferencesReady = false;
   let state: PanelState | undefined, timer: ReturnType<typeof setTimeout> | undefined, layoutKey = '';
-  const persist = () => { timer = undefined; void storage.write(preferenceKey, { leftWidth, rightWidth, ratio, leftClosed, rightClosed, dock: host.dataset.wwDock ?? 'right', folds: [...inspector.querySelectorAll<HTMLDetailsElement>('details')].map((item) => [item.className, item.open]) }).catch(() => undefined); };
+  const persist = () => { timer = undefined; void storage.write(preferenceKey, { leftWidth, rightWidth, ratio, wideRatio, leftClosed, rightClosed, dock: host.dataset.wwDock ?? 'right', folds: [...inspector.querySelectorAll<HTMLDetailsElement>('details')].map((item) => [item.className, item.open]) }).catch(() => undefined); };
   const remember = () => { if (!alive) return; touched = true; clearTimeout(timer); timer = setTimeout(persist, 100); };
   const make = (label: string, name: string, action: () => void, key = '') => { const button = doc.createElement('button'); button.type = 'button'; buttonIcon(button, name, label, key); button.addEventListener('click', action); return button; };
+  const separator = () => { const element = doc.createElement('span'); element.className = 'toolbar-separator'; element.setAttribute('aria-hidden', 'true'); return element; };
+  const sideBySide = () => Boolean(options.sidePanel) && doc.defaultView!.innerWidth >= 720;
   const invoke = (selector: string) => { const button = get<HTMLButtonElement>(selector); if (!button.disabled) button.click(); };
 
   const menu = doc.createElement('nav'); menu.className = 'studio-menu'; menu.setAttribute('aria-label', 'Studioメニュー');
@@ -99,7 +101,7 @@ export function createStudioWorkbench(doc: Document, host: HTMLElement, main: HT
     get('.layers-section').hidden = false; get('.mask-shortcut').hidden = false; get<HTMLButtonElement>('.mask-shortcut').disabled ||= !state?.image;
     get('.group-layers').hidden = state?.image?.kind === 'group'; get('.grouping-help').hidden = !(state && state.selectedIds.length > 1 && state.groupingReason);
     get('.ungroup-help').hidden = !(state?.image?.kind === 'group' && (state.image.locked || state.image.opacity !== 1));
-    menu.querySelectorAll<HTMLButtonElement>('[data-source]').forEach((button) => { const source = get<HTMLButtonElement>('.' + button.dataset.source); button.disabled = source.disabled || Boolean(source.hidden); });
+    menu.querySelectorAll<HTMLButtonElement>('[data-source]').forEach((button) => { const source = get<HTMLButtonElement>('.' + button.dataset.source); button.disabled = source.disabled || Boolean(source.hidden); button.title = source.title; });
     help.hidden = !helpDialog.open; get('.inspector-empty').hidden = true;
     tree.setActive(!options.toolbarOnly && !host.hasAttribute('data-right-closed') && !allClosed && !host.hasAttribute('data-fullscreen'));
   }
@@ -114,7 +116,10 @@ export function createStudioWorkbench(doc: Document, host: HTMLElement, main: HT
     host.toggleAttribute('data-dock-flip', flip);
     host.style.setProperty('--right-divider-width', r && !overlay ? '4px' : '0px');
     host.style.setProperty('--library-width', `${l}px`); host.style.setProperty('--inspector-width', `${r}px`); host.style.setProperty('--panel-width', `${rightWidth}px`); host.style.setProperty('--inspector-ratio', `${Math.round(ratio * 10000) / 100}%`);
-    leftResize.setAttribute('aria-valuenow', String(leftWidth)); rightResize.setAttribute('aria-valuenow', String(rightWidth)); divider.setAttribute('aria-valuenow', String(Math.round(ratio * 100)));
+    const horizontal = sideBySide(); host.toggleAttribute('data-inspectors-wide', horizontal); host.style.setProperty('--inspector-wide-ratio', `${Math.round(wideRatio * 10000) / 100}%`);
+    leftResize.setAttribute('aria-valuenow', String(leftWidth)); rightResize.setAttribute('aria-valuenow', String(rightWidth)); divider.setAttribute('aria-valuenow', String(Math.round((horizontal ? wideRatio : ratio) * 100)));
+    divider.setAttribute('aria-orientation', horizontal ? 'vertical' : 'horizontal'); divider.setAttribute('aria-label', horizontal ? 'プロパティとレイヤーの幅' : 'プロパティとレイヤーの高さ');
+    divider.setAttribute('aria-valuemin', horizontal ? '40' : '25'); divider.setAttribute('aria-valuemax', horizontal ? '60' : '75');
     toggleLeft.setAttribute('aria-pressed', String(!lc)); toggleRight.setAttribute('aria-pressed', String(!rc)); hideAll.setAttribute('aria-pressed', String(allClosed));
     const reservedRight = overlay || !r ? 0 : r + 4, insets = { left: flip ? reservedRight : l + 4, right: flip ? l + 4 : reservedRight, top: 56, bottom: 24 };
     const next = JSON.stringify(insets); if (next !== layoutKey) { layoutKey = next; options.onLayout?.(insets); }
@@ -130,24 +135,25 @@ export function createStudioWorkbench(doc: Document, host: HTMLElement, main: HT
     element.addEventListener('keydown', (event) => { if (['ArrowLeft', 'ArrowRight'].includes(event.key)) { change((side === 'left' ? leftWidth : rightWidth) + (event.key === 'ArrowRight' ? 20 : -20)); remember(); event.preventDefault(); event.stopPropagation(); } }); return element;
   }
   const surfaces = doc.createElement('div'); surfaces.className = 'surface-actions';
-  for (const [surface, label, icon] of [['sidepanel', 'Chromeサイドパネルを開く', 'dock'], ['inpage', '従来のインページStudioへ切替', 'external'], ['window', '独立Studioへ切替', 'external']] as const) {
+  for (const [surface, label, icon] of [['sidepanel', 'Chromeサイドパネルを開く', 'dock'], ['inpage', '従来のインページStudioへ切替', 'workspace'], ['window', '独立Studioへ切替', 'window']] as const) {
     if (surface === 'sidepanel' && options.sidePanel || surface === 'inpage' && options.inPage || surface === 'window' && options.fullPage && !options.sidePanel || !options.onSurface) continue;
     surfaces.append(make(label, icon, () => options.onSurface?.(surface)));
   }
   menuEnd.prepend(surfaces);
   if (options.sidePanel || options.toolbarOnly) {
-    toolbar.replaceChildren(undo, redo, save, discard, get('.add-image'), get('.add-animation'));
-    if (options.sidePanel) toolbar.append(tools);
+    toolbar.replaceChildren(undo, redo, save, discard, separator(), get('.add-image'), get('.add-animation'), separator(), tools);
     dock.hidden = true; toggleLeft.hidden = toggleRight.hidden = hideAll.hidden = true;
     if (options.toolbarOnly) {
-      toolbar.append(tools, surfaces, dirty, close); menu.hidden = true; footer.hidden = true;
+      toolbar.append(separator(), surfaces, dirty, close); menu.hidden = true; footer.hidden = true;
     }
+    if (options.sidePanel) legacyControls.append(close);
   }
-  let heightGesture: { y: number; ratio: number } | undefined;
-  divider.addEventListener('pointerdown', (event) => { if (event.button !== 0) return; heightGesture = { y: event.clientY, ratio }; divider.setPointerCapture(event.pointerId); event.preventDefault(); });
-  divider.addEventListener('pointermove', (event) => { if (heightGesture) { ratio = Math.max(.25, Math.min(.75, heightGesture.ratio + (event.clientY - heightGesture.y) / Math.max(1, right.clientHeight))); layout(); } });
-  const endHeight = () => { if (heightGesture) remember(); heightGesture = undefined; }; divider.addEventListener('pointerup', endHeight); divider.addEventListener('pointercancel', endHeight);
-  divider.addEventListener('keydown', (event) => { if (['ArrowUp', 'ArrowDown'].includes(event.key)) { ratio = Math.max(.25, Math.min(.75, ratio + (event.key === 'ArrowDown' ? .05 : -.05))); layout(); remember(); event.preventDefault(); event.stopPropagation(); } });
+  let dividerGesture: { position: number; ratio: number; horizontal: boolean } | undefined;
+  const changeDivider = (value: number, horizontal: boolean) => { if (horizontal) wideRatio = Math.max(.4, Math.min(.6, value)); else ratio = Math.max(.25, Math.min(.75, value)); layout(); };
+  divider.addEventListener('pointerdown', (event) => { if (event.button !== 0) return; const horizontal = sideBySide(); dividerGesture = { position: horizontal ? event.clientX : event.clientY, ratio: horizontal ? wideRatio : ratio, horizontal }; divider.setPointerCapture(event.pointerId); event.preventDefault(); });
+  divider.addEventListener('pointermove', (event) => { if (dividerGesture) { const { horizontal, position, ratio: start } = dividerGesture; if (horizontal !== sideBySide()) { dividerGesture = undefined; return; } changeDivider(start + ((horizontal ? event.clientX : event.clientY) - position) / Math.max(1, horizontal ? right.clientWidth : right.clientHeight), horizontal); } });
+  const endDivider = () => { if (dividerGesture) remember(); dividerGesture = undefined; }; divider.addEventListener('pointerup', endDivider); divider.addEventListener('pointercancel', endDivider); divider.addEventListener('lostpointercapture', endDivider);
+  divider.addEventListener('keydown', (event) => { const horizontal = sideBySide(), keys = horizontal ? ['ArrowLeft', 'ArrowRight'] : ['ArrowUp', 'ArrowDown']; if (keys.includes(event.key)) { changeDivider((horizontal ? wideRatio : ratio) + (event.key === keys[1] ? .05 : -.05), horizontal); remember(); event.preventDefault(); event.stopPropagation(); } });
   main.addEventListener('click', () => queueMicrotask(() => { if (alive) enforce(); }));
   function closeMenus(event: Event) { menu.querySelectorAll<HTMLDetailsElement>('details[open]').forEach((item) => { if (!event.composedPath().includes(item)) item.open = false; }); }
   function menuKeys(event: KeyboardEvent) {
@@ -168,6 +174,7 @@ export function createStudioWorkbench(doc: Document, host: HTMLElement, main: HT
     if (typeof value.leftWidth === 'number' && Number.isFinite(value.leftWidth)) leftWidth = Math.max(120, Math.min(260, value.leftWidth));
     if (typeof value.rightWidth === 'number' && Number.isFinite(value.rightWidth)) rightWidth = Math.max(280, Math.min(440, value.rightWidth));
     if (typeof value.ratio === 'number' && Number.isFinite(value.ratio)) ratio = Math.max(.25, Math.min(.75, value.ratio));
+    if (typeof value.wideRatio === 'number' && Number.isFinite(value.wideRatio)) wideRatio = Math.max(.4, Math.min(.6, value.wideRatio));
     if (typeof value.leftClosed === 'boolean') leftClosed = value.leftClosed; if (typeof value.rightClosed === 'boolean') rightClosed = value.rightClosed;
     if (value.dock === 'left' || value.dock === 'right') host.dataset.wwDock = value.dock;
     if (Array.isArray(value.folds)) for (const entry of value.folds) {

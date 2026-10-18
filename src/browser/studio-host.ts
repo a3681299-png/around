@@ -14,7 +14,7 @@ export function connectStudioHost(doc: Document, site: SiteAdapter, editor: Crea
   };
   const onConnect = (port: chrome.runtime.Port) => {
     if (port.name !== STUDIO_PORT || !trusted(port.sender) || port.sender?.frameId && port.sender.frameId !== 0) return;
-    let owner: string | undefined, closed = false, attached = false, lastHistory = -1, publishPending = false, timer: ReturnType<typeof setTimeout> | undefined;
+    let owner: string | undefined, surface: string | undefined, closed = false, attached = false, lastHistory = -1, publishPending = false, timer: ReturnType<typeof setTimeout> | undefined;
     let queue: Promise<void> = Promise.resolve();
     const post = (message: StudioMessage) => { if (!closed) { try { port.postMessage(message); } catch { cleanup(); } } };
     const checkpoint = () => { lastHistory = editor.historyVersion; return editor.checkpoint(); };
@@ -38,19 +38,23 @@ export function connectStudioHost(doc: Document, site: SiteAdapter, editor: Crea
         try {
           if (request.type === 'attach') {
             if (typeof request.owner !== 'string' || !/^studio-[\w-]{1,100}$/.test(request.owner)) throw new Error('Studioの識別子が不正です。');
+            if (request.visible !== undefined && typeof request.visible !== 'boolean') throw new Error('Studioの表示状態が不正です。');
             if (owner && owner !== request.owner) throw new Error('接続の所有者が変わりました。');
             owner = request.owner;
-            const surface = new URL(port.sender!.url!).searchParams.get('surface') === 'sidepanel' ? 'sidepanel' : 'window';
+            surface = new URL(port.sender!.url!).searchParams.get('surface') === 'sidepanel' ? 'sidepanel' : 'window';
             const previous = activePort;
             const state = await editor.attachStudio(request.owner, request.resume, Boolean(previous && previous !== port && activeSurface !== surface));
             activePort = port; activeSurface = surface;
             if (previous && previous !== port) { try { previous.postMessage({ type: 'handoff' }); } catch { /* Already disconnected. */ } ports.get(previous)?.(); previous.disconnect(); }
-            if (surface === 'sidepanel') editor.openSidePanel();
+            if (surface === 'sidepanel') { editor.openSidePanel(); editor.setSidePanelVisible(owner, request.visible !== false); }
             if (closed) { editor.detachStudio(request.owner); return; }
             attached = true;
             post({ type: 'reply', id: request.id, ok: true, state, checkpoint: checkpoint() });
           } else if (!owner) throw new Error('先に編集対象へ接続してください。');
-          else if (request.type === 'command') {
+          else if (request.type === 'surface-visibility') {
+            if (!attached || activePort !== port || surface !== 'sidepanel' || typeof request.visible !== 'boolean') throw new Error('Studioの表示状態が不正です。');
+            editor.setSidePanelVisible(owner, request.visible); post({ type: 'reply', id: request.id, ok: true });
+          } else if (request.type === 'command') {
             const command = parseEditCommand(request.command), state = await editor.command(owner, request.session, request.revision, command);
             post({ type: 'reply', id: request.id, ok: true, state, ...(lastHistory !== editor.historyVersion ? { checkpoint: checkpoint() } : {}) });
           } else if (request.type === 'import') {

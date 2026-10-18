@@ -5,7 +5,7 @@ import { ASSET_LIMITS, bytesToBase64 } from '../assets/validation';
 import type { StudioConnectionState, StudioConnection } from '../studio/connection';
 import { requestStudioSurface } from './side-panel';
 import { CLOSE_SIDE_PANEL, OPEN_SIDE_PANEL, OPEN_STUDIO_WINDOW, OPEN_INPAGE_STUDIO, type OpenEditorResponse } from '../editor/messages';
-export function createStudioClient(notify: (value: StudioConnectionState) => void, checkpointChanged: (target: number, checkpoint: EditorCheckpoint | undefined) => void): StudioConnection {
+export function createStudioClient(notify: (value: StudioConnectionState) => void, checkpointChanged: (target: number, checkpoint: EditorCheckpoint | undefined) => void, visibilityDocument?: Document): StudioConnection {
   const owner = `studio-${crypto.randomUUID()}`;
   let port: chrome.runtime.Port | undefined, tabId: number | undefined, state: EditorSnapshot | undefined, backup: EditorCheckpoint | undefined;
   let connected = false, stopped = false, epoch = 0, serial = 0, retry: ReturnType<typeof setTimeout> | undefined, retries = 0;
@@ -61,9 +61,9 @@ export function createStudioClient(notify: (value: StudioConnectionState) => voi
         emit('再接続を待っています。未保存の編集は保持しています。');
         if (!stopped) retry = setTimeout(() => { void connect(); }, Math.min(5000, 300 * 2 ** Math.min(4, retries++)));
       });
-      await request({ type: 'attach', owner, ...(backup ? { resume: backup } : {}) } as Omit<StudioRequest, 'id'>);
+      await request({ type: 'attach', owner, ...(backup ? { resume: backup } : {}), ...(visibilityDocument ? { visible: !visibilityDocument.hidden } : {}) } as Omit<StudioRequest, 'id'>);
       if (generation !== epoch) return;
-      connected = true; retries = 0; emit('接続中');
+      connected = true; retries = 0; publishVisibility(); emit('接続中');
     } catch (error) {
       if (generation !== epoch) return;
       connected = false; emit(error instanceof Error ? error.message : '接続できません。');
@@ -80,6 +80,11 @@ export function createStudioClient(notify: (value: StudioConnectionState) => voi
   };
   const onTabRemoved = (id: number) => { if (id === tabId) { stopped = true; disconnect(); emit('対象のYouTubeタブが閉じられました。タブ一覧から編集先を選び直してください。'); } };
   chrome.tabs.onRemoved.addListener(onTabRemoved);
+  // Browser-only UI visibility, independent of document revisions and history.
+  function publishVisibility() {
+    if (visibilityDocument && connected) void request({ type: 'surface-visibility', visible: !visibilityDocument.hidden } as Omit<StudioRequest, 'id'>).catch(() => undefined);
+  }
+  visibilityDocument?.addEventListener('visibilitychange', publishVisibility);
   function enqueue(action: () => Promise<unknown>) {
     const generation = epoch;
     commands = commands.catch(() => undefined).then(async () => { if (generation !== epoch || !connected) throw new Error('接続してから操作してください。'); await action(); emit('接続中'); })
@@ -117,6 +122,6 @@ export function createStudioClient(notify: (value: StudioConnectionState) => voi
     },
     get state() { return state; }, get target() { return tabId; }, get isConnected() { return connected; },
     stop() { stopped = true; disconnect(); emit('接続を解除しました。'); },
-    destroy() { stopped = true; disconnect(); chrome.tabs.onRemoved.removeListener(onTabRemoved); },
+    destroy() { stopped = true; disconnect(); chrome.tabs.onRemoved.removeListener(onTabRemoved); visibilityDocument?.removeEventListener('visibilitychange', publishVisibility); },
   };
 }

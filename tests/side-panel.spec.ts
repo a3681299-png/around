@@ -27,7 +27,7 @@ test('native Chrome panel uses the same draft, group masks, selection, history, 
     await local.getByRole('button', { name: 'Chromeサイドパネルを開く', exact: true }).click();
     const panel = await sidePanelDriver(context, page, id);
     await expect.poll(() => panel.text('.selected-count')).toBe('3個選択中');
-    await expect(local).toHaveAttribute('data-page-toolbar', ''); await expect(page.locator('#web-world-themes-studio-layout')).toHaveCount(0);
+    await expect(local).toHaveAttribute('data-page-toolbar', ''); await expect(local).not.toBeVisible(); await expect(page.locator('#web-world-themes-studio-layout')).toHaveCount(0);
     await expect.poll(() => panel.evaluate('innerWidth')).toBeGreaterThan(250);
     await expect.poll(() => panel.evaluate('chrome.storage.session.get(null).then(xs=>Object.values(xs).some(v=>v?.draft?.decorations?.length===3))')).toBe(true);
     // Isolated fixture only: reproduce a delayed empty recovery write. The live
@@ -55,7 +55,7 @@ test('native Chrome panel uses the same draft, group masks, selection, history, 
     const stored = await popup.evaluate(async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube']);
     expect((stored as { schemaVersion: number }).schemaVersion).toBe(7);
     await page.reload(); await expect.poll(() => panel.text('.dirty')).toBe('保存済み'); await expect(page.locator('#web-world-themes-decorations [data-image-id]')).toHaveCount(3);
-    await panel.click('.close', false); await expect(page.locator('[data-ww-editing]')).toHaveCount(0); await expect(local).toHaveCount(0); await expect.poll(() => page.evaluate(() => innerWidth)).toBeGreaterThan(1750);
+    await panel.click('.studio-menu-item > summary'); await panel.click('[data-source="close"]', false); await expect(page.locator('[data-ww-editing]')).toHaveCount(0); await expect(local).toHaveCount(0); await expect.poll(() => page.evaluate(() => innerWidth)).toBeGreaterThan(1750);
     await expect(page.locator('#web-world-themes-studio-layout')).toHaveCount(0);
   } finally { await context.close(); }
 });
@@ -112,6 +112,9 @@ test('tab-specific panels isolate drafts and recovery; floating tools yield to n
     await expect.poll(() => second.evaluate('document.querySelector(".recovery-status").textContent')).toBe('');
     await page.reload(); await expect.poll(() => first.text('.dirty')).toBe('未保存の変更'); await expect.poll(() => first.text('.layer-title')).toBe('最初のタブ'); await expect.poll(() => second.text('.layer-title')).toBe('次のタブ');
     await secondPage.bringToFront();
+    // Closing only Chrome's panel must reveal the page tools and retain the draft.
+    await popup.evaluate(async (tabId) => { await chrome.sidePanel.setOptions({ tabId, enabled: false }); }, target);
+    await expect(secondLocal).toBeVisible(); await expect(secondLocal.locator('.dirty')).toHaveText('未保存の変更');
     await secondPage.locator('#movie_player .ytp-chrome-bottom').evaluate((node: HTMLElement) => { node.style.cssText = 'position:fixed;bottom:32px;left:12px;width:500px;height:32px;'; });
     await expect(secondLocal).toHaveAttribute('data-native-overlap', ''); await expect(secondLocal).not.toBeVisible();
     await secondPage.locator('#movie_player .ytp-chrome-bottom').evaluate((node: HTMLElement) => node.removeAttribute('style'));
@@ -134,6 +137,63 @@ test('the real action popup launches its active YouTube tab in the official pane
     expect(contexts).toContain('POPUP');
     await action.evaluate('document.querySelector("#creator-studio-sidepanel").click()');
     const panel = await sidePanelDriver(context, page, id); await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
-    await expect(local).toHaveAttribute('data-page-toolbar', ''); await expect.poll(() => page.evaluate(() => innerWidth)).toBeLessThan(1200);
+    await expect(local).toHaveAttribute('data-page-toolbar', ''); await expect(local).not.toBeVisible(); await expect.poll(() => page.evaluate(() => innerWidth)).toBeLessThan(1200);
+  } finally { await context.close(); }
+});
+
+test('panel tools replace floating tools; responsive inspectors and empty controls stay compact without losing edits', async () => {
+  test.setTimeout(120_000);
+  const { context, page, popup, id, local } = await setup();
+  try {
+    await mkdir('.work/verification', { recursive: true });
+    await local.getByRole('button', { name: 'Chromeサイドパネルを開く', exact: true }).click();
+    const panel = await sidePanelDriver(context, page, id);
+    await expect.poll(() => panel.text('.dirty')).toBe('保存済み'); await expect(local).not.toBeVisible();
+    const ui = 'document.querySelector("#web-world-themes-creator").shadowRoot';
+    const measure = () => panel.evaluate<{ wide: boolean; orientation: string; properties: { x: number; y: number; right: number; bottom: number }; layers: { x: number; y: number; right: number; bottom: number }; numbers: number[]; appearance: string; track: number; empty: boolean; close: number; separators: number; icons: { name: string; title: string; paths: string }[] }>(`(()=>{
+      const root=${ui}, host=root.host;
+      const rect=s=>{const r=root.querySelector(s).getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom}};
+      const slider=root.querySelector('[data-image-prop=opacity]');
+      return {wide:host.hasAttribute('data-inspectors-wide'),orientation:root.querySelector('.inspector-divider').getAttribute('aria-orientation'),properties:rect('.inspector-pane'),layers:rect('.layers-pane'),numbers:Array.from(root.querySelectorAll('.transform-section input[type=number]')).map(n=>n.getBoundingClientRect().width),appearance:getComputedStyle(slider).appearance,track:Number(getComputedStyle(slider).opacity),empty:root.querySelector('.image-properties').hasAttribute('data-empty'),close:root.querySelector('.menu-end .close')?.getClientRects().length??0,separators:root.querySelectorAll('.toolbar > .toolbar-separator').length,icons:Array.from(root.querySelectorAll('.menu-end .surface-actions button')).map(n=>({name:n.getAttribute('aria-label'),title:n.title,paths:n.querySelector('svg').innerHTML}))};
+    })()`);
+    // Emulate the panel WebContents width, not the native Chrome divider. This
+    // tests responsive UI independently of the website's real viewport/layout.
+    for (const width of [360, 940]) {
+      await panel.send('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
+      await expect.poll(() => panel.evaluate('innerWidth')).toBe(width);
+      await expect.poll(async () => (await measure()).wide).toBe(width >= 720);
+      const info = await measure();
+      await panel.screenshot(`.work/verification/sidepanel-ux-empty-${width}.png`);
+      expect(info.numbers.every((number) => number > 40 && number <= 104), JSON.stringify({ width, info })).toBe(true);
+      expect(info.close).toBe(0); expect(info.separators).toBe(2); expect(info.empty).toBe(true); expect(info.appearance).toBe('none'); expect(info.track).toBeLessThan(.4);
+      expect(info.icons.map((icon) => icon.title)).toEqual(info.icons.map((icon) => icon.name)); expect(info.icons[0]!.paths).not.toBe(info.icons[1]!.paths);
+      expect(info.orientation).toBe(width >= 720 ? 'vertical' : 'horizontal');
+      if (width >= 720) { expect(info.layers.x).toBeGreaterThanOrEqual(info.properties.right); expect(info.layers.y).toBe(info.properties.y); }
+      else expect(info.layers.y).toBeGreaterThanOrEqual(info.properties.bottom);
+    }
+    await panel.files([path.resolve('tests/fixtures/motion/petal.png')]); await expect.poll(() => panel.text('.selected-count')).toBe('1個選択中');
+    await panel.fill('[data-image-prop="opacity"]', '70'); await expect.poll(() => panel.text('.opacity-value')).toBe('70%');
+    expect((await measure()).empty).toBe(false); expect((await measure()).appearance).not.toBe('none');
+    await panel.click('.layer [data-action="lock"]'); expect((await measure()).appearance).not.toBe('none'); await panel.click('.layer [data-action="lock"]');
+    await panel.click('.undo'); await panel.click('.undo');
+    await panel.evaluate(`${ui}.querySelector('.inspector-divider').dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true}))`);
+    await expect.poll(() => panel.evaluate(`${ui}.querySelector('.inspector-divider').getAttribute('aria-valuenow')`)).toBe('55');
+    await expect.poll(() => popup.evaluate(async () => ((await chrome.storage.local.get('webWorldThemes.studio.sidepanel.v1'))['webWorldThemes.studio.sidepanel.v1'] as { wideRatio?: number } | undefined)?.wideRatio)).toBe(.55);
+    await panel.screenshot('.work/verification/sidepanel-ux-selected-wide.png');
+    await panel.send('Emulation.clearDeviceMetricsOverride');
+    const target = await panel.evaluate<number>('Number(new URL(location.href).searchParams.get("target"))');
+    await expect.poll(() => popup.evaluate(async (tabId) => ((await chrome.storage.session.get('webWorldThemes.studio.session.' + tabId))['webWorldThemes.studio.session.' + tabId] as { draft: { decorations: { opacity: number }[] } } | undefined)?.draft.decorations[0]?.opacity, target)).toBe(.7);
+    await popup.evaluate(async (tabId) => { await chrome.sidePanel.setOptions({ tabId, enabled: false }); await chrome.sidePanel.setOptions({ tabId, enabled: true }); }, target);
+    await expect(local).toBeVisible(); await expect(local.locator('.dirty')).toHaveText('未保存の変更'); await expect(page.locator('[data-ww-editing]')).toHaveCount(1);
+    await local.getByRole('button', { name: 'Chromeサイドパネルを開く', exact: true }).click();
+    const reopened = await sidePanelDriver(context, page, id); await expect(local).not.toBeVisible(); await expect.poll(() => reopened.text('.opacity-value')).toBe('70%');
+    await reopened.click('.undo'); await expect.poll(() => reopened.text('.opacity-value')).toBe('100%');
+    await reopened.click('.redo'); await expect.poll(() => reopened.text('.opacity-value')).toBe('70%');
+    await reopened.click('.save'); await expect.poll(() => reopened.text('.dirty')).toBe('保存済み');
+    await page.reload(); await expect.poll(() => reopened.evaluate('document.querySelector(".connection-status").dataset.connected')).toBe('true'); await expect.poll(() => reopened.text('.opacity-value')).toBe('70%'); await expect(local).not.toBeVisible();
+    await expect.poll(() => reopened.text('.selected-count')).toBe('1個選択中');
+    await expect.poll(() => reopened.evaluate(`${ui}.querySelector('.clear-selection').disabled`)).toBe(false);
+    await reopened.click('.clear-selection'); await expect.poll(async () => (await reopened.evaluate(`${ui}.querySelector('.image-properties').hasAttribute('data-empty')`))).toBe(true);
+    await expect.poll(() => reopened.text('.opacity-value')).toBe('—');
   } finally { await context.close(); }
 });
