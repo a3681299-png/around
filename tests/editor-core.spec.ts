@@ -7,6 +7,7 @@ import { movableMedia } from '../src/world/hierarchy';
 import { shortcutCommand } from '../src/editor-core/shortcuts';
 import type { DesignDocument } from '../src/design/types';
 import type { EditorAsset, EditorCheckpoint, EditorPorts } from '../src/editor-core/types';
+import { parseEditCommand } from '../src/studio/protocol';
 
 function harness() {
   let value: DesignDocument | undefined, serial = 0;
@@ -29,6 +30,7 @@ async function opened() { const h = harness(); await Promise.resolve(); h.editor
 test('Editor Core compiles with no browser APIs and UI modules do not import Chrome', () => {
   execFileSync(process.execPath, ['node_modules/typescript/bin/tsc', '--noEmit', '-p', 'tsconfig.editor-core.json']);
   for (const file of ['panel', 'workspace', 'layer-tree', 'effects-panel']) expect(readFileSync(`src/editor/${file}.ts`, 'utf8')).not.toMatch(/\bchrome\./);
+  for (const file of ['app', 'connection', 'preferences', 'ui-actions', 'protocol']) expect(readFileSync(`src/studio/${file}.ts`, 'utf8')).not.toMatch(/\bchrome\./);
 });
 test('the same commands select, group, move, protect, undo and save using memory-only ports', async () => {
   const { editor } = await opened(); await editor.execute({ type: 'select-all' }); await editor.execute({ type: 'group' });
@@ -61,4 +63,28 @@ test('shared shortcuts preserve modifier meanings and composing input is ignored
   expect(shortcutCommand(input, state)).toEqual({ type: 'nudge', delta: { x: 10, y: 0 } });
   expect(shortcutCommand({ ...input, key: 'z', ctrlKey: true }, state)).toEqual({ type: 'redo' });
   expect(shortcutCommand({ ...input, key: 'Delete', isComposing: true }, state)).toBeUndefined();
+});
+
+test('Host geometry notifications update views without invalidating document command revisions', async () => {
+  const { editor } = await opened(); let notifications = 0; const off = editor.subscribe(() => notifications++);
+  const before = editor.snapshot(); editor.refreshGeometry(); editor.refreshGeometry(); editor.setEnabled(true);
+  expect(notifications).toBe(2); expect(editor.snapshot().revision).toBe(before.revision);
+  await editor.execute({ type: 'snap', value: true }); expect(editor.snapshot().revision).toBeGreaterThan(before.revision);
+  off(); editor.destroy();
+});
+
+test('a delayed checkpoint validation cannot overwrite a new edit session', async () => {
+  const a = await opened(), b = harness(); await Promise.resolve(); b.editor.setEnabled(true); b.editor.open();
+  let release: () => void = () => {}; const pending = new Promise<void>((resolve) => { release = resolve; }); b.ports.storage.validate = () => pending;
+  const restoring = b.editor.restore(a.editor.checkpoint()); await Promise.resolve(); await Promise.resolve();
+  await b.editor.execute({ type: 'close' }); b.editor.open(); release(); await restoring;
+  expect(b.editor.snapshot().document.decorations).toHaveLength(0); expect(b.editor.snapshot().view.canUndo).toBe(false);
+  a.editor.destroy(); b.editor.destroy();
+});
+
+test('communication permits declarative commands and rejects malformed, executable or oversized input', () => {
+  expect(parseEditCommand({ type: 'change', id: 'image-a', patch: { name: 'script' } })).toMatchObject({ patch: { name: 'script' } });
+  for (const value of [null, { type: 'execute', script: 'alert(1)' }, { type: 'select' }, { type: 'snap', value: 1 }, { type: 'reorder', id: 'a', targetId: 'b' },
+    { type: 'nudge', delta: { x: Infinity, y: 0 } }, { type: 'placements', changes: [null] }, { type: 'change', patch: { expression: 'x + 1' } },
+    { type: 'change', patch: { name: 'a'.repeat(100_001) } }, JSON.parse('{"type":"change","patch":{"__proto__":{}}}')]) expect(() => parseEditCommand(value)).toThrow();
 });

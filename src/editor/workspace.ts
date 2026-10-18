@@ -7,10 +7,22 @@ interface TreeView { setActive(active: boolean): void }
 /** Workspace and onboarding preferences stay outside the artwork, history and Runtime. */
 export function createWorkspace(doc: Document, host: HTMLElement, main: HTMLElement, tree: TreeView, clear: () => void, selectAll: () => void, options: PanelOptions = {}) {
   const preferences = options.preferences ?? transientPreferences;
+  const fullPage = Boolean(options.fullPage), workspaceKey = 'webWorldThemes.studio.workspace.v1';
+  let touched = false, preferencesReady = false, preferenceTimer: ReturnType<typeof setTimeout> | undefined;
+  const remember = () => {
+    if (!options.persistWorkspace) return; touched = true; clearTimeout(preferenceTimer);
+    preferenceTimer = setTimeout(() => { void preferences.write(workspaceKey, { width, dock: host.dataset.wwDock ?? 'right', split, area, minimized: host.hasAttribute('data-minimized'), folds: [...main.querySelectorAll<HTMLDetailsElement>('.inspector-pane details')].map((item) => [item.className, item.open]) }).catch(() => undefined); }, 100);
+  };
   const get = <T extends HTMLElement>(selector: string) => main.querySelector<T>(selector)!;
   const body = get('.editor-body'), assets = get('.assets'), selection = get('.selection');
+  if (fullPage) {
+    get('h2').textContent = 'Web World Themes Studio'; get('.eyebrow').textContent = 'CREATOR WORKSPACE';
+    get('.dock').textContent = '左右を入れ替える'; get('.dock').title = 'レイヤーとプロパティの位置を入れ替える';
+    get('header').append(get('.toolbar'), get('.actions'));
+    host.toggleAttribute('data-split', true);
+  }
   const compact = doc.defaultView!.matchMedia('(max-width: 740px)');
-  let area: Area = 'layers', split = false, state: PanelState | undefined, lastCard = false;
+  let area: Area = 'layers', split = fullPage, state: PanelState | undefined, lastCard = false;
   let alive = true;
   const nav = doc.createElement('nav'); nav.className = 'workspace-nav'; nav.setAttribute('aria-label', '編集する領域');
   nav.innerHTML = `<div role="tablist" aria-label="作業領域"><button type="button" role="tab" id="ww-tab-layers" data-area="layers" aria-controls="ww-layers-pane">レイヤー</button><button type="button" role="tab" id="ww-tab-properties" data-area="properties" aria-controls="ww-properties-pane">プロパティ</button><button type="button" role="tab" id="ww-tab-help" data-area="help" aria-controls="ww-help-pane">使い方</button></div><button class="split" type="button" aria-pressed="false" title="一覧と設定を横に並べる">並べる</button>`;
@@ -96,37 +108,57 @@ export function createWorkspace(doc: Document, host: HTMLElement, main: HTMLElem
     get('.grouping-help').hidden = get('.group-layers').hidden;
     tree.setActive(!layersPane.hidden && !(split && compact.matches && next === 'properties') && !host.hasAttribute('data-minimized'));
   }
-  nav.addEventListener('click', (event) => { const button = (event.target as Element).closest<HTMLButtonElement>('[data-area]'); if (button) show(button.dataset.area as Area); });
+  nav.addEventListener('click', (event) => { const button = (event.target as Element).closest<HTMLButtonElement>('[data-area]'); if (button) { show(button.dataset.area as Area); remember(); } });
   const adapt = () => show(area);
   compact.addEventListener('change', adapt);
   nav.addEventListener('keydown', (event) => {
     const button = (event.target as Element).closest<HTMLButtonElement>('[data-area]'); if (!button || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
     const tabs = [...nav.querySelectorAll<HTMLButtonElement>('[data-area]')], index = tabs.indexOf(button);
     const next = event.key === 'Home' ? 0 : event.key === 'End' ? 2 : (index + (event.key === 'ArrowRight' ? 1 : -1) + 3) % 3;
-    show(tabs[next]!.dataset.area as Area); tabs[next]!.focus(); event.preventDefault();
+    show(tabs[next]!.dataset.area as Area); tabs[next]!.focus(); event.preventDefault(); remember();
   });
   get('.inspect').addEventListener('click', () => show('properties'));
   maskShortcut.addEventListener('click', () => { basic.open = false; show('properties'); const effects = get<HTMLDetailsElement>('.effects-section'); effects.open = true; effects.scrollIntoView({ block: 'start' }); });
   const splitButton = get<HTMLButtonElement>('.split');
-  splitButton.addEventListener('click', () => { split = !split; host.toggleAttribute('data-split', split); splitButton.setAttribute('aria-pressed', String(split)); splitButton.textContent = split ? '切り替え表示' : '並べる'; show(area); });
+  splitButton.setAttribute('aria-pressed', String(split)); splitButton.textContent = split ? '切り替え表示' : '並べる';
+  splitButton.addEventListener('click', () => { split = !split; host.toggleAttribute('data-split', split); splitButton.setAttribute('aria-pressed', String(split)); splitButton.textContent = split ? '切り替え表示' : '並べる'; show(area); remember(); });
   get('.clear-selection').addEventListener('click', clear);
   get('.select-all').addEventListener('click', selectAll);
   get('.dismiss-guide').addEventListener('click', () => { guide.hidden = true; void preferences.write(guideKey, true).catch(() => undefined); });
   get('.show-guide').addEventListener('click', () => { guide.hidden = false; void preferences.write(guideKey, false).catch(() => undefined); show('layers'); });
   const minimize = get<HTMLButtonElement>('.minimize');
-  minimize.addEventListener('click', () => { const value = !host.hasAttribute('data-minimized'); host.toggleAttribute('data-minimized', value); minimize.textContent = value ? '+' : '−'; minimize.setAttribute('aria-label', value ? 'パネルを展開する' : 'パネルを折りたたむ'); show(area); });
+  minimize.addEventListener('click', () => { const value = !host.hasAttribute('data-minimized'); host.toggleAttribute('data-minimized', value); minimize.textContent = value ? '+' : '−'; minimize.setAttribute('aria-label', value ? 'パネルを展開する' : 'パネルを折りたたむ'); show(area); remember(); });
   // Width adjustment also supports the keyboard. Bounds are enforced by CSS on small screens.
   const resize = doc.createElement('div'); resize.className = 'panel-resize'; resize.tabIndex = 0; resize.setAttribute('role', 'separator'); resize.setAttribute('aria-label', 'パネルの幅'); resize.setAttribute('aria-orientation', 'vertical'); resize.setAttribute('aria-valuemin', '320'); resize.setAttribute('aria-valuemax', '520');
-  let width = 360, gesture: { x: number; width: number; id: number } | undefined;
+  let width = fullPage ? 300 : 360, gesture: { x: number; width: number; id: number } | undefined;
   const setWidth = (value: number) => { width = Math.max(320, Math.min(520, value)); host.style.setProperty('--panel-width', `${width}px`); resize.setAttribute('aria-valuenow', String(width)); };
-  setWidth(width); main.append(resize);
+  setWidth(width); (fullPage ? body : main).append(resize);
   resize.addEventListener('pointerdown', (event) => { if (event.button !== 0) return; gesture = { x: event.clientX, width, id: event.pointerId }; resize.setPointerCapture(event.pointerId); event.preventDefault(); });
-  resize.addEventListener('pointermove', (event) => { if (gesture) setWidth(gesture.width + (host.dataset.wwDock === 'left' ? 1 : -1) * (event.clientX - gesture.x)); });
-  const endResize = () => { gesture = undefined; };
+  resize.addEventListener('pointermove', (event) => { if (gesture) setWidth(gesture.width + (fullPage ? host.dataset.wwDock === 'left' ? -1 : 1 : host.dataset.wwDock === 'left' ? 1 : -1) * (event.clientX - gesture.x)); });
+  const endResize = () => { if (gesture) remember(); gesture = undefined; };
   resize.addEventListener('pointerup', endResize); resize.addEventListener('pointercancel', endResize); resize.addEventListener('lostpointercapture', endResize);
-  resize.addEventListener('keydown', (event) => { if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { setWidth(width + (event.key === 'ArrowRight' ? 20 : -20)); event.preventDefault(); event.stopPropagation(); } });
+  resize.addEventListener('keydown', (event) => { if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { setWidth(width + (event.key === 'ArrowRight' ? 20 : -20)); event.preventDefault(); event.stopPropagation(); remember(); } });
   show(area);
-  return { inspect() { show('properties'); }, context(x: number, y: number) {
+  if (options.persistWorkspace) {
+    void preferences.read(workspaceKey).then((raw) => {
+      preferencesReady = true;
+      if (!alive || touched || !raw || typeof raw !== 'object') return;
+      const value = raw as Record<string, unknown>;
+      if (typeof value.width === 'number' && Number.isFinite(value.width)) setWidth(value.width);
+      if (value.dock === 'left' || value.dock === 'right') host.dataset.wwDock = value.dock;
+      if (typeof value.split === 'boolean') split = value.split;
+      host.toggleAttribute('data-split', split); splitButton.setAttribute('aria-pressed', String(split)); splitButton.textContent = split ? '切り替え表示' : '並べる';
+      if (typeof value.minimized === 'boolean') host.toggleAttribute('data-minimized', value.minimized);
+      minimize.textContent = value.minimized ? '+' : '−'; minimize.setAttribute('aria-label', value.minimized ? 'パネルを展開する' : 'パネルを折りたたむ');
+      if (Array.isArray(value.folds)) for (const entry of value.folds) {
+        if (!Array.isArray(entry) || typeof entry[0] !== 'string' || typeof entry[1] !== 'boolean') continue;
+        [...main.querySelectorAll<HTMLDetailsElement>('.inspector-pane details')].find((item) => item.className === entry[0])?.toggleAttribute('open', entry[1]);
+      }
+      show(['layers', 'properties', 'help'].includes(String(value.area)) ? value.area as Area : 'layers');
+    }, () => { preferencesReady = true; });
+    main.querySelectorAll('.inspector-pane details').forEach((item) => item.addEventListener('toggle', () => { if (preferencesReady) remember(); }));
+  }
+  return { layoutChanged: remember, inspect() { show('properties'); }, context(x: number, y: number) {
     if (!state || state.saving) return;
     menuOrigin = (host.shadowRoot?.activeElement ?? undefined) as HTMLElement | undefined;
     commands.forEach(([command]) => { const source = get<HTMLButtonElement>(`.${command}`), target = menu.querySelector<HTMLButtonElement>(`[data-command="${command}"]`)!; target.disabled = source.disabled; target.hidden = source.hidden; });
@@ -158,5 +190,5 @@ export function createWorkspace(doc: Document, host: HTMLElement, main: HTMLElem
     selection.hidden = next.selectedIds.length > 1;
     get<HTMLButtonElement>('.duplicate-image').hidden = get<HTMLButtonElement>('.delete-image').hidden = !next.selectedIds.length;
     if (next.selected && !lastCard) show('properties'); lastCard = next.selected;
-  }, destroy() { alive = false; closeMenu(); compact.removeEventListener('change', adapt); doc.removeEventListener('keydown', menuKeys, true); doc.removeEventListener('pointerdown', outside, true); } };
+  }, destroy() { alive = false; clearTimeout(preferenceTimer); closeMenu(); compact.removeEventListener('change', adapt); doc.removeEventListener('keydown', menuKeys, true); doc.removeEventListener('pointerdown', outside, true); } };
 }

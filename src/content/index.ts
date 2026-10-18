@@ -6,6 +6,7 @@ import { createSettingsPanel } from '../settings/panel';
 import { createCreatorEditor, type CreatorEditor } from '../editor/controller';
 import { OPEN_CREATOR_EDITOR } from '../editor/messages';
 import type { UserSettings } from '../storage/settings';
+import { connectStudioHost } from '../browser/studio-host';
 
 // Lives in the isolated content-script world; reinjection leaves just one controller.
 const lifetime = globalThis as typeof globalThis & {
@@ -18,6 +19,7 @@ if (site) {
   let creator: CreatorEditor | undefined;
   const controller = createThemeController(document, site, themes[DEFAULT_THEME], () => creator?.refreshSelection());
   creator = createCreatorEditor(document, site, DEFAULT_THEME, controller.updateDesign, controller.setImageEditing, controller.validateDesign);
+  const disconnectStudio = connectStudioHost(document, site, creator);
   const settingsPanel = createSettingsPanel(document);
   // The settings entry stays available independently of the theme's ON/OFF state.
   const unmountSettings = site.mountSettings(settingsPanel);
@@ -52,6 +54,7 @@ if (site) {
     window.removeEventListener('pageshow', onPageShow);
     unmountSettings();
     settingsPanel.destroy();
+    disconnectStudio();
     creator?.destroy();
     controller.destroy();
   };

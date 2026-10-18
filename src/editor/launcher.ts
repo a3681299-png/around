@@ -13,7 +13,8 @@ export function mountCreatorLauncher(container: HTMLElement): () => void {
   status.setAttribute('role', 'status');
   status.id = 'creator-launch-status';
   status.textContent = 'YouTube上でカードと画像素材を編集します。';
-  section.append(button, status);
+  const studio = doc.createElement('button'); studio.id = 'creator-studio-open'; studio.type = 'button'; studio.textContent = 'Studioを開く（別ウィンドウ）';
+  section.append(studio, button, status);
   container.append(section);
   let alive = true;
   const open = async () => {
@@ -31,7 +32,17 @@ export function mountCreatorLauncher(container: HTMLElement): () => void {
       if (alive) button.disabled = false;
     }
   };
+  const openStudio = async () => {
+    studio.disabled = true;
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      await chrome.windows.create({ url: chrome.runtime.getURL('studio/index.html') + (tab?.id === undefined ? '' : '?target=' + tab.id), type: 'popup', width: 1440, height: 900 });
+      if (alive) status.textContent = 'Studioを開きました。実際のYouTubeタブと並べて編集できます。';
+    } catch { if (alive) status.textContent = 'Studioを開けませんでした。拡張を再読み込みしてください。'; }
+    finally { if (alive) studio.disabled = false; }
+  };
+  const onStudio = () => { void openStudio(); }; studio.addEventListener('click', onStudio);
   const onClick = () => { void open(); };
   button.addEventListener('click', onClick);
-  return () => { alive = false; button.removeEventListener('click', onClick); section.remove(); };
+  return () => { alive = false; button.removeEventListener('click', onClick); studio.removeEventListener('click', onStudio); section.remove(); };
 }

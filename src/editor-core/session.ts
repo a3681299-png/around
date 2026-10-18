@@ -343,9 +343,10 @@ export function createEditorSession<Source extends { readonly length: number }>(
   let unwatch = storage.watch(accept, onStorageError);
   return { open, execute, snapshot, checkpoint, restore, import: addImages,
     subscribe(listener: (state: EditorSnapshot) => void) { listeners.add(listener); return () => listeners.delete(listener); },
-    setEnabled(value: boolean) { enabled = value; if (!enabled && active) close(); else render(); },
+    setEnabled(value: boolean) { if (enabled === value) return; enabled = value; if (!enabled && active) close(); else render(); },
     reload() { unwatch(); loaded = false; unwatch = storage.watch(accept, onStorageError); },
-    refreshGeometry() { if (active) render(); },
+    // Host geometry is live input, not a document/selection revision.
+    refreshGeometry() { if (active) { const state = snapshot(); listeners.forEach((listener) => listener(state)); } },
     get interactionEpoch() { return interactionEpoch; }, get gestureActive() { return history.active; }, get historyVersion() { return history.version; },
     fail(message: string) { status = message; error = true; render(); },
     destroy() { alive = false; unwatch(); close(); listeners.clear(); },

@@ -36,3 +36,6 @@ export const retainAssets = (session: string, ids: readonly string[]) => request
 export const releaseAssets = (session: string) => request<void>('release', { session });
 export const commitDesign = (design: DesignDocument, session: string) => request<void>('save', { design, session });
 export const checkDesignAssets = (design: DesignDocument, session: string) => request<void>('validate', { design, session });
+
+/** An extension Studio pins recovery assets for its own tab, never an indefinite -1 owner. */
+export const retainStudioAssets = (session: string, ids: readonly string[], ownerTabId: number) => request<void>('lease', { session, ids, ownerTabId });

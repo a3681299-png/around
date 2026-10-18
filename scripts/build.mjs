@@ -25,6 +25,7 @@ if (manifest.manifest_version !== 3 || manifest.version !== pkg.version) {
 await mkdir(join(outDir, 'popup'), { recursive: true });
 await mkdir(join(outDir, 'content'), { recursive: true });
 await mkdir(join(outDir, 'background'), { recursive: true });
+await mkdir(join(outDir, 'studio'), { recursive: true });
 
 async function copyStaticFiles() {
   await Promise.all([
@@ -33,6 +34,8 @@ async function copyStaticFiles() {
     copyFile(join(root, 'manifest.json'), join(outDir, 'manifest.json')),
     copyFile(join(root, 'src/popup/index.html'), join(outDir, 'popup/index.html')),
     copyFile(join(root, 'src/popup/popup.css'), join(outDir, 'popup/popup.css')),
+    copyFile(join(root, 'src/studio/index.html'), join(outDir, 'studio/index.html')),
+    copyFile(join(root, 'src/studio/studio.css'), join(outDir, 'studio/studio.css')),
   ]);
 }
 
@@ -47,6 +50,7 @@ const shared = {
 };
 
 const builds = await Promise.all([
+  context({ ...shared, entryPoints: ['src/browser/studio-page.ts'], outfile: 'dist/studio/index.js', format: 'iife', loader: { '.css': 'text' } }),
   context({
     ...shared,
     entryPoints: ['src/background/index.ts'],
@@ -75,6 +79,7 @@ if (watching) {
   const refresh = () => copyStaticFiles().catch((error) => console.error(error));
   const watchers = [
     watch(join(root, 'assets/fonts'), refresh),
+    watch(join(root, 'src/studio'), (_event, file) => { if (file === 'index.html' || file === 'studio.css') refresh(); }),
     watch(join(root, 'src/popup'), (_event, file) => {
       if (file === 'index.html' || file === 'popup.css') refresh();
     }),

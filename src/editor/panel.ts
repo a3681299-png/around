@@ -42,6 +42,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
   host.id = 'web-world-themes-creator';
   host.setAttribute('data-ww-signal-control', '');
   host.lang = 'ja';
+  host.toggleAttribute('data-studio', Boolean(options.fullPage));
   host.setAttribute('role', 'dialog');
   host.setAttribute('aria-label', 'デザインエディター');
   const shadow = host.attachShadow({ mode: 'open' });
@@ -217,7 +218,8 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
   dock.addEventListener('click', () => {
     const left = host.dataset.wwDock !== 'left';
     host.dataset.wwDock = left ? 'left' : 'right';
-    dock.textContent = left ? 'パネルを右へ' : 'パネルを左へ';
+    dock.textContent = options.fullPage ? '左右を入れ替える' : left ? 'パネルを右へ' : 'パネルを左へ';
+    workspace.layoutChanged();
   });
   get<HTMLButtonElement>('.reset').addEventListener('click', actions.reset);
   // Keep page shortcuts and native video controls out of property editing.

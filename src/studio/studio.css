@@ -1,0 +1,18 @@
+:root { color-scheme: dark; font: 12px/1.5 system-ui,sans-serif; color: #ecebf3; background: #17181f; }
+* { box-sizing: border-box; }
+html, body, #studio { height: 100%; margin: 0; overflow: hidden; }
+#studio { display: flex; flex-direction: column; }
+.connection-bar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid #444550; background: #202128; flex-wrap: wrap; }
+.connection-bar strong { margin-right: 12px; color: #cfbaff; }
+button, select { font: inherit; color: #ecebf3; border: 1px solid #51505f; background: #30313b; border-radius: 5px; padding: 6px 9px; }
+button { cursor: pointer; }
+button:hover:not(:disabled) { background: #41424f; }
+button:disabled { opacity: .4; cursor: default; }
+select { max-width: 340px; min-width: 180px; }
+button:focus-visible, select:focus-visible { outline: 2px solid #b9a0ff; outline-offset: 2px; }
+.connection-status { margin-left: auto; max-width: 470px; font-size: 11px; color: #eac68e; }
+.connection-status[data-connected="true"] { color: #a2dcbd; }
+.studio-mount { flex: 1; min-height: 0; position: relative; display: flex; }
+.connection-empty { padding: 40px; max-width: 650px; margin: auto; color: #c8c1d8; }
+.connection-empty h1 { font-size: 23px; color: #efebf9; }
+.recovery-status { margin: 0; padding: 0 14px; font-size: 11px; color: #edbd81; background: #202128; }

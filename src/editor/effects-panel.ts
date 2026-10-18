@@ -37,7 +37,10 @@ export function createEffectsPanel(doc: Document, change: (patch: ImagePatch) =>
     if (key === 'video') bindings = [...bindings.filter((binding) => binding.source !== 'video.playing'),
       ...(input.checked ? [{ source: 'video.playing', transform: { kind: 'boolean-gate', fadeMs: 350 }, target: 'mask.intensity' } satisfies MaskBinding] : [])];
     if (key === 'fadeMs') bindings = bindings.map((binding) => binding.source === 'video.playing' ? { ...binding, transform: { kind: 'boolean-gate', fadeMs: Number(input.value) } } : binding);
-    change({ effects: [{ ...mask, ...value, bindings }] });
+    const effects = [{ ...mask, ...value, bindings }];
+    // Preserve consecutive form edits while a remote Host acknowledges them.
+    current = { ...current, effects };
+    change({ effects });
   });
   return {
     fieldset,

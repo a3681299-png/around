@@ -13,8 +13,16 @@ function enqueue<T>(action: () => Promise<T>): Promise<T> {
   return result;
 }
 
-function owner(message: Record<string, unknown>, sender: chrome.runtime.MessageSender): AssetLease {
+async function owner(message: Record<string, unknown>, sender: chrome.runtime.MessageSender): Promise<AssetLease> {
   if (!isDesignId(message['session'])) throw new Error('編集セッションが不正です。');
+  if (message['ownerTabId'] !== undefined) {
+    const studioURL = chrome.runtime.getURL('studio/index.html');
+    if (sender.url?.split('?')[0] !== studioURL || !Number.isSafeInteger(message['ownerTabId'])) throw new Error('素材の保持先が不正です。');
+    const contexts = await chrome.runtime.getContexts({ tabIds: [message['ownerTabId'] as number], ...(sender.documentId ? { documentIds: [sender.documentId] } : {}) });
+    const context = contexts.find((entry) => entry.documentUrl === sender.url && entry.documentUrl?.split('?')[0] === studioURL);
+    if (!context) throw new Error('Studioのタブが見つかりません。');
+    return { session: message['session'], tabId: context.tabId, documentId: 'studio:' + context.tabId };
+  }
   return { session: message['session'], tabId: sender.tab?.id ?? -1, documentId: sender.documentId ?? sender.url ?? '' };
 }
 
@@ -96,7 +104,7 @@ async function handle(message: Record<string, unknown>, sender: chrome.runtime.M
     const { blob, leases: _leases, ...metadata } = asset;
     return { metadata, base64: bytesToBase64(new Uint8Array(await blob.arrayBuffer())) };
   }
-  const lease = owner(message, sender);
+  const lease = await owner(message, sender);
   if (message['action'] === 'import') return importBatch(message['files'], lease);
   if (message['action'] === 'lease') {
     const ids = message['ids'];
