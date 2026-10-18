@@ -1,4 +1,5 @@
 import { test as base, chromium, type BrowserContext, type Page } from '@playwright/test';
+import { execFile } from 'node:child_process';
 import { mkdir, mkdtemp, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -14,6 +15,26 @@ export async function launchExtension(profile: string, useFixture = true): Promi
     viewport: { width: 1100, height: 760 },
     args: [`--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`],
   });
+  // Bound Windows Chromium shutdown; only the test's headless profile and
+  // extension path may be terminated when normal close stops responding.
+  if (process.platform === 'win32') {
+    const browser = context.browser(), close = context.close.bind(context);
+    let closing: Promise<void> | undefined;
+    context.close = (options) => closing ??= (async () => {
+      const closeRequestedAt = Date.now();
+      let forced = false, timer: ReturnType<typeof setTimeout> | undefined;
+      const stopped = new Promise<void>((resolve, reject) => {
+        timer = setTimeout(() => {
+          forced = true; process.stderr.write('Test-only Chromium shutdown exceeded 10s; checking its owned process tree.\n');
+          execFile(path.join(process.env.SystemRoot ?? 'C:/Windows', 'System32/WindowsPowerShell/v1.0/powershell.exe'),
+            ['-NoProfile', '-NonInteractive', '-File', path.resolve('scripts/close-test-browser.ps1'), '-OwnedProfile', path.resolve(profile), '-ExtensionPath', extensionPath, '-CloseRequestedAtUnixMs', String(closeRequestedAt)],
+            { windowsHide: true, timeout: 10_000 }, (error) => error ? reject(error) : resolve());
+        }, 10_000); timer.unref();
+      });
+      try { await Promise.race([close(options).catch((error: unknown) => { if (!forced || browser?.isConnected()) throw error; }), stopped]); }
+      finally { clearTimeout(timer); if (forced) await stopped; }
+    })();
+  }
   if (!useFixture) return context;
   const html = await readFile(fixturePath, 'utf8');
   // Route only test pages; the extension still uses real Chrome APIs and its MV3 manifest.

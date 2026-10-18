@@ -16,7 +16,9 @@ export function createRasterSampler(blob: Blob, metadata: AssetMetadata, budget:
   const open = async () => {
     if (closed) throw new Error('Decoder is closed.');
     if (opening) return opening; if (decoder) return decoder;
-    if (!budget.reserve(memory, size.width * size.height * 8, 'surface')) throw new MediaBudgetUnavailable();
+    // Some Chrome codecs ignore desiredWidth/Height. Budget one original frame
+    // plus the resize destination, and explicitly downsample before caching.
+    if (!budget.reserve(memory, metadata.width * metadata.height * 4 + size.width * size.height * 4, 'surface')) throw new MediaBudgetUnavailable();
     if (!budget.reserve(encoded, blob.size, 'encoded')) { budget.release(memory); throw new MediaBudgetUnavailable(); }
     opening = (async () => {
       let next: ImageDecoder | undefined;
@@ -33,7 +35,11 @@ export function createRasterSampler(blob: Blob, metadata: AssetMetadata, budget:
   };
   return createFrameSampler(id, {
     async decode(index) { const source = await open(); const { image } = await source.decode({ frameIndex: index, completeFramesOnly: true });
-      return { source: image, bytes: image.displayWidth * image.displayHeight * 4, close: () => image.close() }; },
+      if (closed) { image.close(); throw new Error('Decoder is closed.'); }
+      try { const bitmap = await createImageBitmap(image, { resizeWidth: size.width, resizeHeight: size.height, resizeQuality: 'medium' });
+        if (closed) { bitmap.close(); throw new Error('Decoder is closed.'); }
+        return { source: bitmap, bytes: bitmap.width * bitmap.height * 4, close: () => bitmap.close() };
+      } finally { image.close(); } },
     close() { if (closed) return; closed = true; decoder?.close(); decoder = undefined; budget.release(memory); budget.release(encoded); },
   }, { count: timeline.count, frameAt: (time) => frameAtTimeline(timeline, time), timeAt: (index) => index ? timeline.endsMs[index - 1]! : 0 }, budget);
 }

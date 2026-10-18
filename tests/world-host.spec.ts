@@ -10,7 +10,7 @@ test('explicit isolated developer recording replays live fixture evaluations and
   await panel.getByLabel('円形マスクを使う').check(); await panel.getByLabel('動画の一時停止で隠す').check(); await panel.getByLabel('マスクのフェード時間').fill('100'); await save(panel); await watch(youtube);
   const runtime = await isolate(youtube, extensionId);
   expect(await runtime.evaluate('typeof globalThis.__wwWorldRuntime')).toBe('undefined');
-  await reinject(runtime, 'compare', true); await expect(youtube.locator(media)).toHaveAttribute('data-playback', 'still');
+  await reinject(runtime, 'compare', true); await expect(youtube.locator(media)).toHaveAttribute('data-playback', 'hidden');
   await expect.poll(() => runtime.evaluate('Boolean(globalThis.__wwWorldRuntime?.frame())')).toBe(true);
   expect(await youtube.evaluate(() => typeof (globalThis as typeof globalThis & { __wwWorldRuntime?: unknown }).__wwWorldRuntime)).toBe('undefined');
   expect(await runtime.evaluate<{ active: boolean }>('__wwWorldRuntime.status()')).toMatchObject({ active: false });

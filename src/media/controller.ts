@@ -45,6 +45,7 @@ export function createMediaController(doc: Document, report: (message: string) =
         source?.releaseSampler(consumer); source?.unuse(consumer);
         image?.destroy(); image = undefined; svg?.destroy(); svg = undefined;
         video?.destroy(); video = undefined;
+        source?.releaseUrl(consumer);
         if (canvas) { canvas.width = canvas.height = 1; canvas.remove(); canvas = undefined; }
         budget.release(surface); mode = undefined; lastFrame = -1; element.replaceChildren();
       };
@@ -113,10 +114,10 @@ export function createMediaController(doc: Document, report: (message: string) =
         }
         void (async () => {
           if (next === 'native' || next === 'image') {
-            image = createNativeImage(doc, source!.url, metadata); element.append(image.element); await image.ready;
+            image = createNativeImage(doc, source!.acquireUrl(consumer), metadata); element.append(image.element); await image.ready;
             if (alive && current === epoch) { element.dataset.frame = next === 'native' ? 'native' : '0'; nativeStamp = next === 'native' ? clockHost.now() : undefined; }
           } else if (next === 'video') {
-            video = createNativeVideo(doc, source!.url, metadata); element.append(video.element); const created = video;
+            video = createNativeVideo(doc, source!.acquireUrl(consumer), metadata); element.append(video.element); const created = video;
             created.element.addEventListener('ended', () => { if (alive && current === epoch) { sampleNativeTime(); state(); } });
             created.element.addEventListener('error', () => { if (alive && current === epoch) fail(new Error('動画の再生に失敗しました。')); });
             await created.ready;

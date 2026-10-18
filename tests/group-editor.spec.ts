@@ -198,6 +198,7 @@ test('PNG, GIF and Lottie share one group; parent mask/opacity/visibility suspen
   const panel = await open(popup, youtube); await watch(youtube);
   await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await ready(youtube, 1);
+  await expect(panel.getByRole('button', { name: 'アニメーションを追加', exact: true })).toBeEnabled();
   await panel.getByLabel('アニメーション素材を追加').setInputFiles([path.resolve('tests/fixtures/motion/petal.gif'), path.resolve('tests/fixtures/motion/petal.json')]); await ready(youtube, 3);
   await groupThree(panel, youtube); await panel.getByLabel('円形マスクを使う').check(); await panel.getByLabel('動画の一時停止で隠す').check(); await number(panel, 'マスクのフェード時間', 120);
   const animation = youtube.locator(`${images} .media[data-format="gif"], ${images} .media[data-format="lottie"]`);

@@ -32,6 +32,11 @@
       "file": "medium.gif",
       "bytes": 255337,
       "sha256": "1bd6e5293e244c52a680bdb79962958e4b1295a1c18b3bf2b9acf384dd6ac364"
+    },
+    {
+      "file": "large.apng",
+      "bytes": 327078,
+      "sha256": "6917bd99b25c92609c1614c6d253ed4fb1560c4505e8c3311a5827b2e8eefb06"
     }
   ]
 }

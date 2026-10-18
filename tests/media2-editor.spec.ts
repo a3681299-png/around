@@ -53,6 +53,20 @@ test('1080px GIF exceeding the old total-frame pixel limit uses native playback 
   const first = await media.getAttribute('data-frame'); await expect.poll(() => media.getAttribute('data-frame')).not.toBe(first);
 });
 
+test('4K APNG downscales explicitly when ImageDecoder ignores desired dimensions and keeps its original asset', async ({ popup, youtube }) => {
+  const panel = await open(popup, youtube); await panel.getByLabel('アニメーション素材を追加').setInputFiles(file('large.apng')); await ready(youtube, 1);
+  const media = youtube.locator(`${layers} .media`); await expect(media).toHaveAttribute('data-renderer', 'controlled');
+  await expect(media.locator('canvas')).toHaveJSProperty('width', 2048); await expect(media.locator('canvas')).toHaveJSProperty('height', 1536);
+  const first = await media.getAttribute('data-frame'); await expect.poll(() => media.getAttribute('data-frame')).not.toBe(first);
+  const stats = JSON.parse((await youtube.locator(overlay).getAttribute('data-ww-media-stats'))!); expect(stats.peakDecodedBytes).toBeLessThanOrEqual(128 * 1024 * 1024); expect(stats.cacheBytes).toBeLessThanOrEqual(32 * 1024 * 1024);
+  await save(panel); const id = (await stored(popup)).decorations[0]!.assetId;
+  expect(await popup.evaluate(async (id) => {
+    const response = await chrome.runtime.sendMessage({ type: 'web-world-themes:assets', action: 'get', id });
+    const bytes = Uint8Array.from(atob(response.value.base64), (c) => c.charCodeAt(0)), hash = await crypto.subtle.digest('SHA-256', bytes);
+    return { width: response.value.metadata.width, height: response.value.metadata.height, id: `asset-${Array.from(new Uint8Array(hash), (n) => n.toString(16).padStart(2, '0')).join('')}` };
+  }, id)).toEqual({ width: 4096, height: 3072, id });
+});
+
 test('1080p alpha WebM plays, transforms, pauses/rates/loops, saves and survives reload and browser restart', async ({ popup, youtube, context, profile, extensionId }) => {
   const panel = await open(popup, youtube); await panel.getByLabel('アニメーション素材を追加').setInputFiles(file('alpha1080.webm')); await ready(youtube, 1);
   const video = youtube.locator(`${layers} video`); await expect(video).toHaveJSProperty('videoWidth', 1920); await expect(video).toHaveJSProperty('muted', true);

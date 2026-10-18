@@ -6,7 +6,10 @@ import { launchExtension } from './fixtures';
 
 test('optional real YouTube: saved group, mask, anchors, signals, theater, fullscreen and SPA', async ({}, info) => {
   test.skip(process.env.WW_LIVE_MEDIA !== '1', 'Explicit signed-out real YouTube regression.'); test.setTimeout(120_000);
+  await mkdir('.work/verification', { recursive: true });
+  await writeFile('.work/verification/media2-live-attempt.json', JSON.stringify({ startedAt: new Date().toISOString(), status: 'starting' }));
   const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-real2-')), false);
+  context.setDefaultTimeout(10_000); context.setDefaultNavigationTimeout(30_000);
   const checks: { name: string; status: string; detail?: string }[] = [];
   const check = async (name: string, action: () => Promise<void>) => {
     try { await action(); checks.push({ name, status: 'passed' }); }
@@ -24,20 +27,21 @@ test('optional real YouTube: saved group, mask, anchors, signals, theater, fulls
     await expect(page.locator('[data-ww-surface~="player-window"]')).toBeVisible();
     await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
     const panel = page.getByRole('dialog', { name: 'デザインエディター' }); await expect(panel).toBeVisible();
-    await panel.getByLabel('画像素材を追加').setInputFiles(Array(3).fill(path.resolve('tests/fixtures/motion/petal.png')));
+    await panel.getByLabel('アニメーション素材を追加').setInputFiles(['petal.gif', 'petal.apng', 'alpha1080.webm'].map((name) => path.resolve(`tests/fixtures/motion/${name}`)));
     const overlay = '#web-world-themes-decorations', media = page.locator(`${overlay} .media`);
     await expect(media).toHaveCount(3);
+    await expect(panel.getByRole('button', { name: 'アニメーションを追加', exact: true })).toBeEnabled();
     for (let i = 0; i < 3; i++) {
-      await panel.locator('[data-kind="image"] [data-action="select"]').nth(i).click();
+      await panel.locator('[data-kind="animation"] [data-action="select"]').nth(i).click();
       await panel.getByLabel('配置の基準').selectOption('video-player');
       await panel.getByLabel('画像のX位置', { exact: true }).fill(String(35 + i * 15));
     }
-    for (let i = 0; i < 3; i++) await panel.locator('[data-kind="image"] [data-action="select"]').nth(i).click(i ? { modifiers: ['Control'] } : {});
+    for (let i = 0; i < 3; i++) await panel.locator('[data-kind="animation"] [data-action="select"]').nth(i).click(i ? { modifiers: ['Control'] } : {});
     await panel.getByRole('button', { name: '選択をグループ化', exact: true }).click();
     await panel.getByLabel('円形マスクを使う').check(); await panel.getByLabel('動画の一時停止で隠す').check(); await panel.getByLabel('マスクのフェード時間').fill('120');
     await panel.getByRole('button', { name: '保存', exact: true }).click(); await expect(panel.locator('.status')).toHaveText('保存しました。');
     await panel.getByRole('button', { name: '編集を終了' }).click();
-    checks.push({ name: 'real document, editor, player anchors, saved 3-image group', status: 'passed' });
+    checks.push({ name: 'real document, editor, player anchors, saved GIF/APNG/WebM group', status: 'passed' });
     const content = page.locator(`${overlay} .group-content`);
     await check('native video play/pause controls fade a group mask', async () => {
       const button = page.locator('#movie_player .ytp-play-button');
@@ -50,6 +54,15 @@ test('optional real YouTube: saved group, mask, anchors, signals, theater, fulls
       await expect(content).toHaveAttribute('data-mask-intensity', '1');
       await page.mouse.move(250, 320); const before = await content.evaluate((element: HTMLElement) => element.style.maskImage);
       await page.mouse.move(400, 350); await expect.poll(() => content.evaluate((element: HTMLElement) => element.style.maskImage)).not.toBe(before);
+    });
+    await check('GIF/APNG and alpha WebM play on the real document after mask resume', async () => {
+      await expect(page.locator(`${overlay} .media :is(img, canvas)`)).toHaveCount(2);
+      for (const format of ['gif', 'apng']) {
+        const raster = page.locator(`${overlay} .media[data-format="${format}"]`), frame = await raster.getAttribute('data-frame');
+        await expect.poll(() => raster.getAttribute('data-frame')).not.toBe(frame);
+      }
+      const video = page.locator(`${overlay} .media video`); await expect(video).toHaveJSProperty('videoWidth', 1920); await expect(video).toHaveJSProperty('paused', false);
+      const time = await video.evaluate((n: HTMLVideoElement) => n.currentTime); await expect.poll(() => video.evaluate((n: HTMLVideoElement) => n.currentTime)).not.toBe(time);
     });
     await check('scroll updates player anchors', async () => {
       const before = await page.locator(`${overlay} [data-image-id]`).first().boundingBox();
@@ -74,6 +87,13 @@ test('optional real YouTube: saved group, mask, anchors, signals, theater, fulls
       expect(await page.evaluate(() => performance.timeOrigin)).toBe(origin); await expect(media).toHaveCount(3);
       await page.goBack();
       await expect(page.locator('[data-ww-surface~="player-window"]')).toBeVisible();
+    });
+    await check('reload restores the saved animation group', async () => {
+      await page.reload({ waitUntil: 'domcontentloaded' }); await expect(media).toHaveCount(3);
+      await expect(page.locator('[data-ww-surface~="player-window"]')).toBeVisible();
+      if (await page.locator('#movie_player video').first().evaluate((n: HTMLVideoElement) => n.paused)) await page.locator('#movie_player .ytp-play-button').click({ timeout: 5000 });
+      await expect(content).toHaveAttribute('data-mask-intensity', '1', { timeout: 10_000 });
+      await expect(page.locator(`${overlay} .media video`)).toHaveJSProperty('paused', false);
     });
     await check('OFF removes artwork and editing handles', async () => {
       await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck(); await expect(page.locator(overlay)).toHaveCount(0);

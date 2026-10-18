@@ -170,4 +170,6 @@ YouTubeの`yt-navigate-finish`と`yt-page-data-updated`で再確認し、追加D
 
 ブラウザー起動・実サイト・スクリーンショットの実施状況と制限は`docs/verification.md`を参照してください。過去バージョンのPASSは今回の変更の実測結果を意味しません。デザインの意図は`docs/heisei-design.md`にまとめています。
 
+実験用クリエイターエディターのアニメーション素材コアは[設計](docs/animation-core.md)と[形式・制限・検証記録](docs/animation-core-verification.md)を参照してください。読み込む拡張はこのworktreeの`dist/`です。
+
 Chromeの仕様は[Content scripts](https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts)と[Storage API](https://developer.chrome.com/docs/extensions/reference/api/storage)、拡張機能の検証方法は[Playwright公式ドキュメント](https://playwright.dev/docs/chrome-extensions)を参照しています。
