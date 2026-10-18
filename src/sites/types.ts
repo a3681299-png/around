@@ -1,5 +1,6 @@
 import type { DesignTarget } from '../design/types';
 import type { PlaybackSource } from '../signals/types';
+import type { StudioHostLayout, StudioLayoutAdapter } from '../studio/layout-types';
 
 /** The theme sees semantic surfaces; the adapter owns selectors and page lifecycle. */
 export type Surface = 'page' | 'panel' | 'frame' | 'rounded' | 'window'
@@ -35,4 +36,5 @@ export interface SiteAdapter {
   readonly features?: Readonly<Record<string, SiteFeatureCapability>>;
   connect(onPageChange: () => void): () => void;
   mountSettings(entry: SettingsEntry): () => void;
+  mountStudio?(changed: (state: StudioHostLayout) => void): StudioLayoutAdapter;
 }

@@ -7,6 +7,7 @@ import { mountYouTubeDetails, mountYouTubeFocus } from './youtube-details';
 import { mountYouTubeComments } from './youtube-comments';
 import { isYouTubeVideoCard, videoCardContainer } from './youtube-cards';
 import { youtubePlaybackSource } from './youtube-signals';
+import { mountYouTubeStudio } from './youtube-studio';
 
 const SURFACE_ATTRIBUTE = 'data-ww-surface';
 
@@ -115,6 +116,7 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
     decorationAnchors: [{ id: 'video-player', surface: 'player-window', label: '動画プレイヤー' }],
     signals: { videoPlayback: youtubePlaybackSource(doc) },
     mountSettings: (entry) => mountYouTubeSettings(doc, view, entry),
+    mountStudio: (changed) => mountYouTubeStudio(doc, changed),
     features: {
       'window-chrome': { mount: () => mountYouTubeChrome(doc) },
       'daily-details': { mount: () => mountYouTubeDetails(doc) },
