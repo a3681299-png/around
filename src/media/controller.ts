@@ -5,11 +5,12 @@ import { ANIMATION_LIMITS } from '../assets/motion-types';
 import type { Decoration } from '../design/types';
 import { createLottieSource } from './lottie';
 import { createNativeImage } from './native-image';
+import { createNativeVideo } from './native-video';
 import { createMediaBudget, MediaBudgetUnavailable, type MediaBudget } from './budget';
 import { createResourceCache, type MediaResource, type ResourceEntry } from './resources';
 import { rasterSize } from './raster-sampler';
 
-type Mode = 'image' | 'native' | 'controlled' | 'lottie';
+type Mode = 'image' | 'native' | 'controlled' | 'lottie' | 'video';
 type Stats = ReturnType<MediaBudget['stats']>;
 
 /** Assets and samplers are shared; presentation, time and cancellation belong to a layer. */
@@ -28,11 +29,13 @@ export function createMediaController(doc: Document, report: (message: string) =
       let source: MediaResource | undefined, entry: ResourceEntry | undefined, assetId = '';
       let mode: Mode | undefined, ready = false, failed = false, loading = false, waiting: string | undefined;
       let image: ReturnType<typeof createNativeImage> | undefined, svg: ReturnType<typeof createLottieSource> | undefined;
+      let video: ReturnType<typeof createNativeVideo> | undefined;
       let canvas: HTMLCanvasElement | undefined, clock = initialMediaTime(), lastFrame = -1, nativeStamp: number | undefined, forceControlled = false;
       const signature = () => { const s = budget.stats(); return `${s.encodedBytes}/${s.decodedBytes}`; };
       const wanted = () => visible && !clockHost.hidden();
       const sampleNativeTime = () => {
         const now = clockHost.now();
+        if (video) clock = { elapsedMs: video.element.currentTime * 1000, finished: video.element.ended };
         if (nativeStamp !== undefined && source?.timeline && layer?.kind === 'animation')
           clock = advanceMediaTime(clock, source.metadata.animation!, layer.playback, Math.max(0, now - nativeStamp), true, source.timeline).state;
         nativeStamp = mode === 'native' && wanted() ? now : undefined;
@@ -41,6 +44,7 @@ export function createMediaController(doc: Document, report: (message: string) =
         epoch++; paintGeneration++; ready = loading = false; nativeStamp = undefined;
         source?.releaseSampler(consumer); source?.unuse(consumer);
         image?.destroy(); image = undefined; svg?.destroy(); svg = undefined;
+        video?.destroy(); video = undefined;
         if (canvas) { canvas.width = canvas.height = 1; canvas.remove(); canvas = undefined; }
         budget.release(surface); mode = undefined; lastFrame = -1; element.replaceChildren();
       };
@@ -68,7 +72,7 @@ export function createMediaController(doc: Document, report: (message: string) =
             const before = clockHost.now(), context = canvas.getContext('2d');
             if (!context) throw new Error('描画領域を確保できませんでした。');
             context.clearRect(0, 0, canvas.width, canvas.height); context.drawImage(result.frame.source, 0, 0, canvas.width, canvas.height);
-            budget.reportDraw(clockHost.now() - before); lastFrame = result.frame.index; element.dataset.frame = String(lastFrame); waiting = undefined; ready = true; state();
+            budget.reportDraw(clockHost.now() - before); lastFrame = result.frame.index ?? index; element.dataset.frame = String(lastFrame); waiting = undefined; ready = true; state();
           } catch (error) { fail(error); } finally { result.frame.close(); }
           if (alive && current === epoch && (clock.finished || !clockHost.canRun() || layer?.kind === 'animation' && !layer.playback.playing)) source?.releaseSampler(consumer);
         } else if (alive && current === epoch && generation === paintGeneration) {
@@ -79,6 +83,7 @@ export function createMediaController(doc: Document, report: (message: string) =
       const desiredMode = (): Mode => {
         if (layer?.kind !== 'animation') return 'image';
         if (layer.format === 'lottie') return 'lottie';
+        if (layer.format === 'webm') return 'video';
         const p = layer.playback;
         return p.mode === 'auto' && !forceControlled && p.playing && p.loop && p.speed === 1 && source?.metadata.animation?.loopCount === 0 && !clockHost.reducedMotion() ? 'native' : 'controlled';
       };
@@ -99,7 +104,7 @@ export function createMediaController(doc: Document, report: (message: string) =
         releaseDisplay(); mode = next; loading = true; source!.use(consumer); const current = epoch;
         element.dataset.renderer = next;
         const metadata = source!.metadata, size = next === 'controlled' ? rasterSize(metadata) : metadata;
-        const bytes = size.width * size.height * 4 * (next === 'native' ? 3 : 1);
+        const bytes = size.width * size.height * 4 * (next === 'native' || next === 'video' ? 3 : 1);
         if (!budget.reserve(surface, bytes, 'surface')) {
           releaseDisplay();
           if (next === 'native') { forceControlled = true; refresh(); return; }
@@ -109,6 +114,13 @@ export function createMediaController(doc: Document, report: (message: string) =
           if (next === 'native' || next === 'image') {
             image = createNativeImage(doc, source!.url, metadata); element.append(image.element); await image.ready;
             if (alive && current === epoch) { element.dataset.frame = next === 'native' ? 'native' : '0'; nativeStamp = next === 'native' ? clockHost.now() : undefined; }
+          } else if (next === 'video') {
+            video = createNativeVideo(doc, source!.url, metadata); element.append(video.element); const created = video;
+            created.element.addEventListener('ended', () => { if (alive && current === epoch) { sampleNativeTime(); state(); } });
+            created.element.addEventListener('error', () => { if (alive && current === epoch) fail(new Error('動画の再生に失敗しました。')); });
+            await created.ready;
+            if (clock.elapsedMs > 0) { const result = await created.request({ consumer, timeMs: clock.elapsedMs, velocity: 0 }); if ('frame' in result) result.frame.close(); else if (result.status === 'error') throw new Error(result.message); }
+            if (alive && current === epoch && layer?.kind === 'animation') { element.dataset.frame = 'native'; await created.play(layer.playback, clockHost.canRun() && !clock.finished); }
           } else if (next === 'lottie') { svg = createLottieSource(element, source!.data!); await svg.ready; await paint(clock.elapsedMs); }
           else { canvas = doc.createElement('canvas'); canvas.width = size.width; canvas.height = size.height; element.append(canvas); await paint(clock.elapsedMs); }
           if (!alive || current !== epoch) return;
@@ -131,6 +143,9 @@ export function createMediaController(doc: Document, report: (message: string) =
         if (!source) { load(); state(); return; }
         const next = desiredMode();
         if (mode !== next) { sampleNativeTime(); if (mode === 'native') forceControlled = true; setup(next); }
+        else if (video && layer?.kind === 'animation') {
+          const current = epoch; void video.play(layer.playback, clockHost.canRun() && !clock.finished).catch((error: unknown) => { if (alive && current === epoch && wanted()) fail(error); });
+        }
         else if ((mode === 'controlled' || mode === 'lottie') && (!ready || !clockHost.canRun() || !layer || layer.kind === 'animation' && !layer.playback.playing || clock.finished)) {
           if (ready) { paintGeneration++; source.releaseSampler(consumer); } void paint(clock.elapsedMs);
         }
@@ -158,7 +173,7 @@ export function createMediaController(doc: Document, report: (message: string) =
           else clock = reconcileMediaTime(clock, layer?.kind === 'animation' ? layer.playback : undefined, next.kind === 'animation' ? next.playback : undefined);
           if (next.kind === 'animation' && layer?.kind === 'animation' && next.playback.mode === 'auto' && layer.playback.mode === 'controlled') forceControlled = false;
           const configChanged = layer?.kind === 'animation' && next.kind === 'animation' && JSON.stringify(layer.playback) !== JSON.stringify(next.playback);
-          layer = next; visible = renderable; if (changed || configChanged) waiting = undefined;
+          layer = next; visible = renderable; element.dataset.format = next.kind === 'animation' ? next.format : 'image'; if (changed || configChanged) waiting = undefined;
           refresh();
         }, destroy: instance.destroy,
       };

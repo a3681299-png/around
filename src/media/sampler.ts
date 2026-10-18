@@ -4,7 +4,7 @@ export interface MediaCapabilities { seek: 'frame' | 'approximate' | 'none'; rev
 export const NATIVE_IMAGE_CAPABILITIES: MediaCapabilities = { seek: 'none', reverse: false, speed: false, pause: false, loop: false };
 export const CONTROLLED_CAPABILITIES: MediaCapabilities = { seek: 'frame', reverse: true, speed: true, pause: true, loop: true };
 export const VIDEO_CAPABILITIES: MediaCapabilities = { seek: 'approximate', reverse: false, speed: true, pause: true, loop: true };
-export interface FrameLease { source: CanvasImageSource; index: number; timeMs: number; close(): void }
+export interface FrameLease { source: CanvasImageSource; index: number | null; timeMs: number; close(): void }
 export type FrameSample = { status: 'exact' | 'fallback'; frame: FrameLease }
   | { status: 'pending'; reason: 'superseded' | 'budget' | 'decoding' | 'closed' }
   | { status: 'error'; message: string };

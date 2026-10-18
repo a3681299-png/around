@@ -27,7 +27,9 @@ await writeFile(`${root}/long.gif`,Buffer.concat([gif.subarray(0,first),...Array
 const ffmpeg=process.env.WW_FFMPEG;
 if(ffmpeg) {
   for(const [file,seconds,size] of [['alpha1080.webm',2,'1920:1080'],['long.webm',45,'64:48']]) execFileSync(ffmpeg,['-y','-v','error','-ignore_loop','0','-i',`${root}/petal.apng`,'-t',String(seconds),'-vf',`scale=${size}`,'-r','12','-c:v','libvpx-vp9','-pix_fmt','yuva420p','-auto-alt-ref','0','-deadline','realtime','-cpu-used','8','-b:v','0','-crf','40','-an',`${root}/${file}`],{stdio:'inherit'});
+  execFileSync(ffmpeg,['-y','-v','error','-ignore_loop','0','-i',`${root}/petal.apng`,'-t','3','-vf','scale=1080:1080','-r','12','-loop','0',`${root}/large.gif`],{stdio:'inherit'});
+  execFileSync(ffmpeg,['-y','-v','error','-ignore_loop','0','-i',`${root}/petal.apng`,'-t','3','-vf','scale=512:512','-r','12','-loop','0',`${root}/medium.gif`],{stdio:'inherit'});
 }
-const files=['petal.apng','long.gif',...(ffmpeg?['alpha1080.webm','long.webm']:[])];
+const files=['petal.apng','long.gif',...(ffmpeg?['alpha1080.webm','long.webm','large.gif','medium.gif']:[])];
 const provenance={generator:'scripts/generate-media-fixtures.mjs',source:'synthetic transparent RGB rectangles; repeated existing petal GIF frames',ffmpeg:ffmpeg?execFileSync(ffmpeg,['-version'],{encoding:'utf8'}).split('\n')[0]:undefined,files:await Promise.all(files.map(async file=>{const bytes=await readFile(`${root}/${file}`);return {file,bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex')};}))};
 await writeFile(`${root}/phase2-source.json`,JSON.stringify(provenance,null,2)+'\n');console.log(JSON.stringify(provenance,null,2));

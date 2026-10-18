@@ -26,7 +26,7 @@ test('v1–v5 migrate without inventing groups; v6 references existing assets an
     if (version < 5) delete legacy.decorations[0].effects;
     if (version < 3) legacy.decorations.forEach((layer: Partial<ImageDecoration>) => delete layer.locked);
     const before = JSON.stringify(legacy), parsed = parseDesign(legacy);
-    expect(parsed.schemaVersion).toBe(6); expect(parsed.groups).toBeUndefined(); expect(JSON.stringify(legacy)).toBe(before);
+    expect(parsed.schemaVersion).toBe(7); expect(parsed.groups).toBeUndefined(); expect(JSON.stringify(legacy)).toBe(before);
     expect(parsed.decorations.map((item) => item.assetId)).toEqual(input.decorations.map((item) => item.assetId));
   }
   const grouped = groupLayers(input, ids, 'group-world'); grouped.groups![0]!.effects = [defaultCircleMask()];

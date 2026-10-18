@@ -16,6 +16,8 @@ test('APNG validates chunk bounds, CRC, sequence and timing; long GIF is not exp
   expect(long.animation).toMatchObject({ frameCount: 303, durationMs: 36_360, loopCount: 0 });
   const timeline = prepareMediaTimeline(long.animation!);
   for (let time = 0; time <= long.animation!.durationMs; time += 13) expect(frameAtTimeline(timeline, time)).toBe(frameAt(long.animation!, time));
+  const large = inspectAsset(new Uint8Array(await readFile('tests/fixtures/motion/large.gif')));
+  expect(large.width).toBe(1080); expect(large.width * large.height * large.animation!.frameCount).toBeGreaterThan(8 * 1024 * 1024);
 });
 
 test('v7 modes and raster speed preserve old v6 defaults; legacy recordings remain replayable', () => {
@@ -30,4 +32,16 @@ test('v7 modes and raster speed preserve old v6 defaults; legacy recordings rema
   const recorder = createWorldRecorder(); recorder.start(scene, initialWorldState());
   recorder.capture(scene, inputs[0]!); const recording = recorder.stop()!, legacy = { ...recording, formatVersion: 1 };
   expect(parseWorldRecording(legacy).formatVersion).toBe(2); expect(replayWorld(legacy)).toEqual(replayWorld(recording));
+});
+
+test('finalized VP9 alpha WebM supports 1080p and long duration; malformed containers/MIME are rejected', async () => {
+  for (const [file, width, height, durationMs] of [['alpha1080.webm', 1920, 1080, 2000], ['long.webm', 64, 48, 45_000]] as const) {
+    const bytes = new Uint8Array(await readFile(`tests/fixtures/motion/${file}`));
+    expect(inspectAsset(bytes, 'video/webm')).toMatchObject({ mime: 'video/webm', width, height, animation: { format: 'webm', durationMs, frameCount: 0, codec: 'vp9', alpha: true } });
+    expect(() => inspectAsset(bytes, 'image/gif')).toThrow();
+    expect(() => inspectAsset(bytes.subarray(0, bytes.length - 100))).toThrow();
+    const broken = bytes.slice(); broken[4] = 0; expect(() => inspectAsset(broken)).toThrow();
+    const fake = bytes.slice(), codec = Buffer.from(fake).indexOf('V_VP9'); expect(codec).toBeGreaterThan(0); fake[codec + 4] = 49;
+    expect(() => inspectAsset(fake)).toThrow();
+  }
 });

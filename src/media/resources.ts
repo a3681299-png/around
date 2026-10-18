@@ -3,7 +3,7 @@ import { inspectLottie } from '../assets/lottie';
 import { prepareMediaTimeline } from '../world/media-time';
 import { MediaBudgetUnavailable, type MediaBudget } from './budget';
 import { createRasterSampler } from './raster-sampler';
-import type { AssetMetadata } from '../assets/validation';
+import { ASSET_LIMITS, type AssetMetadata } from '../assets/validation';
 import type { MediaTimeline } from '../world/media-time';
 import type { AsyncSampler } from './sampler';
 
@@ -18,7 +18,12 @@ export function createResourceCache(budget: MediaBudget) {
   const cache = new Map<string, ResourceEntry>(); let closed = false;
   const acquire = (id: string): ResourceEntry => {
     const existing = cache.get(id); if (existing) { existing.refs++; return existing; }
-    const entry: ResourceEntry = { refs: 1, promise: loadAsset(id).then(async ({ metadata, blob }) => {
+    const entry: ResourceEntry = { refs: 1, promise: budget.decode(async () => {
+      // Bound concurrent storage/base64 transfers before allocating their buffers.
+      const transfer = `${id}-transfer`;
+      if (!budget.reserve(transfer, ASSET_LIMITS.fileBytes, 'encoded')) throw new MediaBudgetUnavailable();
+      try { return await loadAsset(id); } finally { budget.release(transfer); }
+    }).then(async ({ metadata, blob }) => {
       let disposed = false, url: string | undefined, sampler: ReturnType<typeof createRasterSampler> | undefined;
       const active = new Set<string>(), sampling = new Set<string>(), key = `${id}-original`;
       const resource: MediaResource = { metadata, blob, get disposed() { return disposed; },

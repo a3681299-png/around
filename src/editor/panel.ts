@@ -122,6 +122,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
         <div class="property playback-speed"><label>再生速度 <input type="number" aria-label="再生速度" data-playback="speed" min="${ANIMATION_LIMITS.speedMin}" max="${ANIMATION_LIMITS.speedMax}" step="0.25" required>倍</label></div>
         <p class="hint">非表示タブ・動きを減らす設定では停止します。再読み込み後は先頭から再生します。</p>
         <p class="hint playback-help"></p>
+        <p class="hint">再生予算を超えた素材は一時待機します。ほかの素材を非表示にすると再開できます。</p>
       </fieldset>
     </fieldset>
     <p class="hint card-help">チェックを外した項目はテーマの見た目に戻ります。</p>

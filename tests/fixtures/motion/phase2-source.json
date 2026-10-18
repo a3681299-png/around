@@ -22,6 +22,16 @@
       "file": "long.webm",
       "bytes": 39988,
       "sha256": "9c5ac2e7b945f9063cbfdf91b4cc0fb13642fc435716c71d482040ead693dbba"
+    },
+    {
+      "file": "large.gif",
+      "bytes": 1070307,
+      "sha256": "9577773c40da19f5b5dde93d03fd452c3389dc8e3a19fa794caf289e16e5f0b5"
+    },
+    {
+      "file": "medium.gif",
+      "bytes": 255337,
+      "sha256": "1bd6e5293e244c52a680bdb79962958e4b1295a1c18b3bf2b9acf384dd6ac364"
     }
   ]
 }

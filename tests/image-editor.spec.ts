@@ -90,7 +90,7 @@ test('import a transparent image, drag and resize it, save, reload and restart w
   expect(resized.width / resized.height).toBeCloseTo(original.width / original.height, 2);
   await save(dialog);
   const design = await stored(popup);
-  expect(design.schemaVersion).toBe(6);
+  expect(design.schemaVersion).toBe(7);
   expect(design.decorations).toHaveLength(1);
   expect(JSON.stringify(design)).not.toMatch(/data:image|base64|blob:/);
   expect(await assets(context)).toHaveLength(1);
@@ -213,7 +213,7 @@ test('invalid files and missing assets fail without saving corrupt JSON or distu
   await dialog.getByLabel('画像素材を追加').setInputFiles({ name: 'script.png', mimeType: 'image/png', buffer: Buffer.from('<svg onload="alert(1)"></svg>') });
   await expect(dialog.locator('.status')).toContainText('静止PNG');
   await expect(youtube.locator(layers)).toHaveCount(0);
-  await dialog.getByLabel('画像素材を追加').setInputFiles({ name: 'huge.png', mimeType: 'image/png', buffer: Buffer.alloc(4 * 1024 * 1024 + 1) });
+  await dialog.getByLabel('画像素材を追加').setInputFiles({ name: 'huge.png', mimeType: 'image/png', buffer: Buffer.alloc(32 * 1024 * 1024 + 1) });
   await expect(dialog.locator('.status')).toContainText('32MB');
   expect(await popup.evaluate(async (designKey) => (await chrome.storage.local.get(designKey))[designKey], key)).toBeUndefined();
   const response = await popup.evaluate(async () => chrome.runtime.sendMessage({ type: 'web-world-themes:assets', action: 'save', session: 'session-test', design: {
