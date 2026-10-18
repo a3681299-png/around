@@ -11,6 +11,7 @@ export interface StudioConnection {
   import(files: readonly File[]): Promise<void>;
   thumbnail(id: string): Promise<string | undefined>;
   focusTarget(): Promise<void>;
+  openWorkspace(): Promise<void>;
   readonly state: EditorSnapshot | undefined;
   readonly target: number | undefined;
   readonly isConnected: boolean;

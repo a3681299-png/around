@@ -6,11 +6,18 @@ import { createEffectsPanel } from './effects-panel';
 import { childrenOf, effectivelyLocked, groupMovable, parentGroup } from '../design/hierarchy';
 import { createLayerTree } from './layer-tree';
 import { createWorkspace } from './workspace';
+import { createStudioWorkbench } from '../studio/workbench';
+import { buttonIcon } from './icons';
+import type { EditorTool } from '../editor-core/types';
+import type { StudioHostLayout, StudioInsets } from '../studio/layout-types';
 
 export type { EditorView as PanelState } from '../editor-core/types';
 import type { EditorView as PanelState } from '../editor-core/types';
 import type { StudioPreferences } from '../studio/preferences';
-export interface PanelOptions { preferences?: StudioPreferences; fullPage?: boolean; persistWorkspace?: boolean }
+export interface PanelOptions {
+  preferences?: StudioPreferences; fullPage?: boolean; persistWorkspace?: boolean; inPage?: boolean;
+  onLayout?(insets: StudioInsets): void;
+}
 
 export interface PanelActions {
   change(style: SurfaceStyle): void;
@@ -33,6 +40,7 @@ export interface PanelActions {
   ungroup(): void;
   clearSelection(): void;
   selectAll(): void;
+  tool(tool: EditorTool): void;
   thumbnail(id: string): Promise<string | undefined>;
 }
 
@@ -123,6 +131,12 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
     <p class="status" role="status" aria-live="polite"></p></footer>`;
   shadow.append(sheet, main);
   const get = <T extends HTMLElement>(selector: string) => main.querySelector<T>(selector)!;
+  const tools = doc.createElement('div'); tools.className = 'interaction-tools'; tools.setAttribute('aria-label', '操作ツール');
+  for (const [tool, label, key] of [['select', '選択・変形', 'V'], ['browse', 'サイト操作', 'H'], ['card', '動画カードを編集', 'C']] as const) {
+    const button = doc.createElement('button'); button.type = 'button'; button.dataset.tool = tool; buttonIcon(button, tool, label, key);
+    button.addEventListener('click', () => actions.tool(tool)); tools.append(button);
+  }
+  get('.toolbar').append(tools);
   const backgroundToggle = get<HTMLInputElement>('[data-override="backgroundColor"]');
   const borderToggle = get<HTMLInputElement>('[data-override="border"]');
   const radiusToggle = get<HTMLInputElement>('[data-override="borderRadiusPx"]');
@@ -174,7 +188,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
   addAnimation.addEventListener('click', () => animationInput.click());
   animationInput.addEventListener('change', () => { actions.imageImport([...animationInput.files ?? []]); animationInput.value = ''; });
   fileInput.addEventListener('change', () => { actions.imageImport([...fileInput.files ?? []]); fileInput.value = ''; });
-  let workspace: ReturnType<typeof createWorkspace>;
+  let workspace: ReturnType<typeof createWorkspace> & { setHostLayout?(value: StudioHostLayout): void };
   const tree = createLayerTree(doc, layers, { select: actions.imageSelect, change: actions.layerChange, reorder: actions.reorder,
     thumbnail: actions.thumbnail,
     context: (id, x, y) => {
@@ -183,7 +197,8 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       if (current?.selectedIds.includes(id)) workspace.context(x, y);
       else pendingContext = { id, x, y };
     } });
-  workspace = createWorkspace(doc, host, main, tree, actions.clearSelection, actions.selectAll, options);
+  workspace = options.fullPage || options.inPage ? createStudioWorkbench(doc, host, main, tree, actions, options)
+    : createWorkspace(doc, host, main, tree, actions.clearSelection, actions.selectAll, options);
   const layerName = get<HTMLInputElement>('.layer-name');
   layerName.addEventListener('change', () => {
     const name = layerName.value.trim();
@@ -235,11 +250,13 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
 
   return {
     host,
-    focus() { close.focus(); },
+    setHostLayout(value: StudioHostLayout) { workspace.setHostLayout?.(value); },
+    focus() { if (options.inPage || options.fullPage) get<HTMLButtonElement>('[data-tool="select"]').focus(); else close.focus(); },
     render(state: PanelState) {
       current = state;
-      imageProperties.hidden = !state.image;
-      imageProperties.disabled = state.saving || Boolean(state.image?.locked) || state.inheritedLocked;
+      imageProperties.hidden = !state.image && !(options.fullPage || options.inPage) || state.selected;
+      imageProperties.disabled = !state.image || state.saving || Boolean(state.image?.locked) || state.inheritedLocked;
+      tools.querySelectorAll<HTMLButtonElement>('[data-tool]').forEach((button) => { button.setAttribute('aria-pressed', String(button.dataset.tool === (state.tool ?? 'select'))); });
       const isGroup = state.image?.kind === 'group';
       imageProperties.setAttribute('aria-label', isGroup ? 'グループのプロパティ' : '画像のプロパティ');
       get<HTMLElement>('.group-help').hidden = !isGroup;
@@ -308,6 +325,8 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
         }
         get<HTMLInputElement>('[data-image-prop="opacity"]').value = String(Math.round(image.opacity * 100));
         setText(get<HTMLOutputElement>('.opacity-value'), `${Math.round(image.opacity * 100)}%`);
+      } else if (options.fullPage || options.inPage) {
+        imageProperties.querySelectorAll<HTMLInputElement>('input[type="text"],input[type="number"]').forEach((input) => { input.value = ''; }); get<HTMLOutputElement>('.opacity-value').value = '—';
       }
       properties.disabled = !state.selected || state.saving;
       backgroundToggle.checked = state.style.backgroundColor !== undefined;

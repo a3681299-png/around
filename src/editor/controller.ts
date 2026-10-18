@@ -11,9 +11,10 @@ import { shortcutCommand } from '../editor-core/shortcuts';
 import { createBrowserEditorStorage } from '../browser/storage-adapter';
 import { browserStudioPreferences } from '../browser/preferences';
 import { studioActions } from '../studio/ui-actions';
+import type { StudioLayoutAdapter } from '../studio/layout-types';
 
 export interface CreatorEditor {
-  open(): OpenEditorResponse; setEnabled(enabled: boolean): void; refreshSelection(): void; reload(): void; destroy(): void;
+  open(): OpenEditorResponse; openStudio(): OpenEditorResponse; setEnabled(enabled: boolean): void; refreshSelection(): void; reload(): void; destroy(): void;
   snapshot(): EditorSnapshot; checkpoint(): EditorCheckpoint; readonly historyVersion: number;
   subscribe(listener: (state: EditorSnapshot) => void): () => void;
   attachStudio(owner: string, resume?: EditorCheckpoint): Promise<EditorSnapshot>;
@@ -23,7 +24,7 @@ export interface CreatorEditor {
   thumbnail(id: string): Promise<string | undefined>;
 }
 const PICK_EVENTS = ['pointerdown', 'pointerup', 'mousedown', 'mouseup', 'click', 'auxclick', 'dblclick'] as const;
-const SELECTION_CSS = `html[data-ww-editing] [data-ww-surface~="video-card"] { cursor:crosshair !important; }
+const SELECTION_CSS = `html[data-ww-editor-card-picking] [data-ww-surface~="video-card"] { cursor:crosshair !important; }
 html[data-ww-editing] [data-ww-editor-selected] { outline:2px dashed #695089 !important; outline-offset:3px !important; }`;
 
 /** Browser Host. Core owns documents/history; this adapter owns DOM and rendering. */
@@ -32,6 +33,7 @@ export function createCreatorEditor(doc: Document, site: SiteAdapter, baseThemeI
   validate: (design: DesignDocument | undefined) => void): CreatorEditor {
   let panel: ReturnType<typeof createCreatorPanel> | undefined, selectionStyle: HTMLStyleElement | undefined, selectedElement: Element | undefined;
   let remoteOwner: string | undefined, badge: HTMLElement | undefined, installed = false, destroyed = false;
+  let layout: StudioLayoutAdapter | undefined, panelMode: 'quick' | 'inpage' = 'quick';
   const consumedKeys = new Set<string>();
   let lastDesign = '', geometryKey = '';
   const core = createEditorSession({ siteId: site.id, baseThemeId, targets: site.designTargets ?? [], storage: createBrowserEditorStorage(site.id), validate,
@@ -40,9 +42,10 @@ export function createCreatorEditor(doc: Document, site: SiteAdapter, baseThemeI
       frameFor: (placement) => placementFrame(doc, site.decorationAnchors ?? [], placement),
       samples: (design, ids) => editableSceneSamples(doc, site.decorationAnchors ?? [], design.decorations, design.groups ?? [], ids),
       importFrame(point) {
-        const width = doc.defaultView!.innerWidth, height = doc.defaultView!.innerHeight, origin = point ?? { x: width * .45, y: height * .45 };
+        const width = doc.defaultView!.innerWidth, height = doc.defaultView!.innerHeight;
+        const canvas = layout?.state().canvas, origin = point ?? (canvas ? { x: canvas.left + canvas.width * .5, y: canvas.top + canvas.height * .48 } : { x: width * .45, y: height * .45 });
         const bounds = panel?.host.getBoundingClientRect();
-        if (!point && bounds && origin.x >= bounds.left && origin.x <= bounds.right && origin.y >= bounds.top && origin.y <= bounds.bottom) {
+        if (!layout && !point && bounds && origin.x >= bounds.left && origin.x <= bounds.right && origin.y >= bounds.top && origin.y <= bounds.bottom) {
           origin.x = bounds.left >= width - bounds.right ? bounds.left / 2 : bounds.right + (width - bounds.right) / 2;
         }
         return { width, height, origin };
@@ -51,6 +54,7 @@ export function createCreatorEditor(doc: Document, site: SiteAdapter, baseThemeI
   });
   let state = core.snapshot();
   const editing = () => state.active && Boolean(panel || remoteOwner);
+  const fullscreen = () => Boolean(doc.fullscreenElement || layout?.state().mode === 'fullscreen');
   const dispatch = (command: EditCommand) => { void core.execute(command).catch((error: unknown) => {
     if (!destroyed && state.active) core.fail(error instanceof Error ? error.message : '編集操作を実行できませんでした。');
   }); };
@@ -63,46 +67,58 @@ export function createCreatorEditor(doc: Document, site: SiteAdapter, baseThemeI
       PICK_EVENTS.forEach((name) => doc.addEventListener(name, onPick, true));
       doc.addEventListener('keydown', onKeyDown, true); doc.addEventListener('keyup', onKeyUp, true);
       doc.addEventListener('dragover', onDragOver, true); doc.addEventListener('drop', onDrop, true);
+      doc.addEventListener('fullscreenchange', onFullscreen);
     } else {
       PICK_EVENTS.forEach((name) => doc.removeEventListener(name, onPick, true));
       doc.removeEventListener('keydown', onKeyDown, true); doc.removeEventListener('keyup', onKeyUp, true);
       doc.removeEventListener('dragover', onDragOver, true); doc.removeEventListener('drop', onDrop, true);
-      consumedKeys.clear(); removeSelection(); selectionStyle?.remove(); selectionStyle = undefined; doc.documentElement.removeAttribute('data-ww-editing');
+      doc.removeEventListener('fullscreenchange', onFullscreen);
+      consumedKeys.clear(); removeSelection(); selectionStyle?.remove(); selectionStyle = undefined; doc.documentElement.removeAttribute('data-ww-editing'); doc.documentElement.removeAttribute('data-ww-editor-tool'); doc.documentElement.removeAttribute('data-ww-editor-card-picking');
     }
   }
   function refresh(next = core.snapshot()) {
     state = next;
-    if (!state.active) { panel?.destroy(); panel = undefined; remoteOwner = undefined; }
+    if (!state.active) { panel?.destroy(); panel = undefined; layout?.destroy(); layout = undefined; remoteOwner = undefined; }
     if (!state.selectedTarget) removeSelection();
     const active = editing(); bind(active);
-    if (remoteOwner && state.active && !badge) {
+    if (active) { doc.documentElement.setAttribute('data-ww-editor-tool', state.view.tool ?? 'select'); doc.documentElement.toggleAttribute('data-ww-editor-card-picking', state.view.tool !== 'browse' && (panelMode === 'quick' || state.view.tool === 'card')); }
+    if (remoteOwner && state.active && !panel && !badge) {
       badge = doc.createElement('div'); badge.id = 'web-world-themes-studio-link'; badge.setAttribute('data-ww-signal-control', '');
       badge.style.cssText = 'position:fixed;bottom:12px;left:12px;z-index:2147483001;background:#242331;color:white;padding:8px;border:1px solid #baa0f8;border-radius:8px;font:12px system-ui;';
       const label = doc.createElement('span'); label.textContent = 'Studioで編集中 '; const quick = doc.createElement('button'); quick.textContent = 'クイック編集を表示';
       quick.addEventListener('click', () => open()); const stop = doc.createElement('button'); stop.textContent = '編集を終了'; stop.addEventListener('click', () => dispatch({ type: 'close' }));
       badge.append(label, quick, stop); (doc.body ?? doc.documentElement).append(badge);
-    } else if (!remoteOwner || !state.active) { badge?.remove(); badge = undefined; }
+    } else if (!remoteOwner || !state.active || panel) { badge?.remove(); badge = undefined; }
     const design = active && state.view.dirty ? state.document : state.saved, key = JSON.stringify(design) ?? 'empty';
     if (key !== lastDesign) { lastDesign = key; apply(design); }
     panel?.render(state.view);
-    editImages(active ? { selectedIds: state.view.selectedIds, locked: state.view.saving, epoch: core.interactionEpoch, snapping: state.view.snapping,
+    editImages(active && !fullscreen() && state.view.tool !== 'browse' && state.view.tool !== 'card' ? { selectedIds: state.view.selectedIds, locked: state.view.saving, epoch: core.interactionEpoch, snapping: state.view.snapping,
       select: (id, additive, preserve) => dispatch({ type: 'select', id, additive, preserve }), begin: () => dispatch({ type: 'begin' }),
       change: (changes) => dispatch({ type: 'placements', changes }), end: (cancel = false) => { if (!state.view.saving) dispatch({ type: 'end', cancel }); }, error: (message) => core.fail(message),
     } : undefined);
   }
   const unsubscribe = core.subscribe(refresh);
-  function open(): OpenEditorResponse {
+  function onFullscreen() { refresh(); }
+  function open(mode: 'quick' | 'inpage' = 'quick'): OpenEditorResponse {
     if (!site.designTargets?.length) return { ok: false, error: 'このサイトには編集できる対象がありません。' };
     const result = core.open(); if (!result.ok) return result;
+    if (panel && mode !== panelMode) { panel.destroy(); panel = undefined; layout?.destroy(); layout = undefined; }
     if (!panel) {
+      panelMode = mode;
+      if (mode === 'inpage') {
+        layout = site.mountStudio?.((value) => { if (panel) { panel.setHostLayout(value); core.refreshGeometry(); refresh(); } });
+        if (!layout) return { ok: false, error: 'このサイトにはStudioの表示領域を確保するAdapterがありません。' };
+      }
       panel = createCreatorPanel(doc, studioActions(dispatch, (files) => { void core.import(files); }, (id) => captureLayerThumbnail(doc, id)), site.decorationAnchors,
-        { preferences: browserStudioPreferences });
+        { preferences: browserStudioPreferences, inPage: mode === 'inpage', persistWorkspace: mode === 'inpage', onLayout: (value) => layout?.update(value) });
       (doc.body ?? doc.documentElement).append(panel.host);
+      if (layout) panel.setHostLayout(layout.state());
     }
     refresh(); panel.focus(); return { ok: true };
   }
   function pickTarget(event: Event) {
-    if (!editing() || event.composedPath().some((node) => node instanceof Element && node.hasAttribute('data-ww-signal-control'))) return;
+    if (!editing() || fullscreen() || state.view.tool === 'browse' || panelMode === 'inpage' && state.view.tool !== 'card'
+      || event.composedPath().some((node) => node instanceof Element && node.hasAttribute('data-ww-signal-control'))) return;
     const node = event.target instanceof Element ? event.target : undefined;
     for (const target of site.designTargets ?? []) { const element = node?.closest(`[data-ww-surface~="${target.surface}"]`); if (element) return { element, target }; }
   }
@@ -112,8 +128,9 @@ export function createCreatorEditor(doc: Document, site: SiteAdapter, baseThemeI
     removeSelection(); dispatch({ type: 'select-target', target: target.target.id }); selectedElement = target.element; selectedElement.setAttribute('data-ww-editor-selected', '');
   }
   function onKeyDown(event: KeyboardEvent) {
-    if (!editing() || event.isComposing || event.composedPath().some((node) => node instanceof HTMLElement && (node.matches('input,textarea,select,[role="tab"],[role="separator"],[role="menuitem"]') || node.isContentEditable))) return;
-    const command = shortcutCommand(event, state.view);
+    if (!editing() || fullscreen() || event.isComposing || event.composedPath().some((node) => node instanceof HTMLElement && (node.matches('input,textarea,select,[role="tab"],[role="separator"],[role="menuitem"]') || node.isContentEditable))) return;
+    if (state.view.tool === 'browse' && !['v', 'h'].includes(event.key.toLowerCase())) return;
+    const command = shortcutCommand(event, state.view, true);
     if (command) dispatch(command);
     else if ((event.key === 'Enter' || event.key === ' ') && pickTarget(event)) {
       const target = pickTarget(event)!; removeSelection(); dispatch({ type: 'select-target', target: target.target.id }); selectedElement = target.element; selectedElement.setAttribute('data-ww-editor-selected', '');
@@ -130,7 +147,7 @@ export function createCreatorEditor(doc: Document, site: SiteAdapter, baseThemeI
     if (owner !== remoteOwner || session !== state.sessionId || revision !== state.revision || !state.active) throw new Error('編集状態が変わりました。最新の状態を同期して、もう一度操作してください。');
   };
   return {
-    open, snapshot: core.snapshot, checkpoint: core.checkpoint, subscribe: core.subscribe, get historyVersion() { return core.historyVersion; },
+    open: () => open(), openStudio: () => open('inpage'), snapshot: core.snapshot, checkpoint: core.checkpoint, subscribe: core.subscribe, get historyVersion() { return core.historyVersion; },
     setEnabled: core.setEnabled,
     refreshSelection() { if (selectedElement && (!selectedElement.isConnected || !site.designTargets?.some((target) => target.id === state.selectedTarget && selectedElement!.matches(`[data-ww-surface~="${target.surface}"]`)))) {
       removeSelection(); if (state.active) dispatch({ type: 'select-target' });
@@ -154,6 +171,6 @@ export function createCreatorEditor(doc: Document, site: SiteAdapter, baseThemeI
     async command(owner, session, revision, command) { authorize(owner, session, revision); await core.execute(command); return core.snapshot(); },
     async import(owner, session, revision, files) { authorize(owner, session, revision); await core.import(files); return core.snapshot(); },
     thumbnail: (id) => captureLayerThumbnail(doc, id),
-    destroy() { destroyed = true; core.destroy(); unsubscribe(); bind(false); panel?.destroy(); badge?.remove(); },
+    destroy() { destroyed = true; core.destroy(); unsubscribe(); bind(false); panel?.destroy(); layout?.destroy(); badge?.remove(); },
   };
 }

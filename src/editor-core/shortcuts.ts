@@ -2,9 +2,10 @@ import type { EditCommand, EditorView } from './types';
 
 export interface ShortcutInput { key: string; ctrlKey: boolean; metaKey: boolean; shiftKey: boolean; altKey: boolean; isComposing: boolean }
 /** Same meanings in every Host; text/composition and DOM focus guards belong to the UI adapter. */
-export function shortcutCommand(input: ShortcutInput, state: Pick<EditorView, 'selectedIds' | 'saving'>): EditCommand | undefined {
+export function shortcutCommand(input: ShortcutInput, state: Pick<EditorView, 'selectedIds' | 'saving'>, tools = false): EditCommand | undefined {
   if (input.isComposing) return;
   const command = (input.ctrlKey || input.metaKey) && !input.altKey, key = input.key.toLowerCase();
+  if (tools && !command && !input.altKey && ['v', 'h', 'c'].includes(key)) return { type: 'tool', tool: key === 'h' ? 'browse' : key === 'c' ? 'card' : 'select' };
   if (command && (key === 'z' || key === 'y')) return { type: key === 'y' || input.shiftKey ? 'redo' : 'undo' };
   if (command && key === 'd' && state.selectedIds.length) return { type: 'duplicate' };
   if (input.key === 'Delete' && state.selectedIds.length) return { type: 'delete' };

@@ -12,5 +12,6 @@ export function studioActions(dispatch: (command: EditCommand) => void, files: (
     duplicate: (id) => dispatch({ type: 'duplicate', ...(id ? { id } : {}) }), reorder: (id, targetId, after) => dispatch({ type: 'reorder', id, targetId, after }),
     undo: () => dispatch({ type: 'undo' }), redo: () => dispatch({ type: 'redo' }), snap: (value) => dispatch({ type: 'snap', value }), layout: (mode) => dispatch({ type: 'layout', mode }),
     group: () => dispatch({ type: 'group' }), ungroup: () => dispatch({ type: 'ungroup' }), clearSelection: () => dispatch({ type: 'clear-selection' }), selectAll: () => dispatch({ type: 'select-all' }), thumbnail,
+    tool: (tool) => dispatch({ type: 'tool', tool }),
   };
 }

@@ -1,4 +1,4 @@
-import { OPEN_CREATOR_EDITOR, type OpenEditorResponse } from './messages';
+import { OPEN_CREATOR_EDITOR, OPEN_INPAGE_STUDIO, type OpenEditorResponse } from './messages';
 
 /** Only the active tab ID is needed, so no tabs/activeTab permission is added. */
 export function mountCreatorLauncher(container: HTMLElement): () => void {
@@ -14,16 +14,17 @@ export function mountCreatorLauncher(container: HTMLElement): () => void {
   status.id = 'creator-launch-status';
   status.textContent = 'YouTube上でカードと画像素材を編集します。';
   const studio = doc.createElement('button'); studio.id = 'creator-studio-open'; studio.type = 'button'; studio.textContent = 'Studioを開く（別ウィンドウ）';
-  section.append(studio, button, status);
-  container.append(section);
+  const inpage = doc.createElement('button'); inpage.id = 'creator-studio-inpage'; inpage.type = 'button'; inpage.textContent = 'Studioを開く（このタブ）';
+  section.append(inpage, studio, button, status);
+  container.insertBefore(section, container.querySelector('.ww-editor-body'));
   let alive = true;
-  const open = async () => {
+  const open = async (message = OPEN_CREATOR_EDITOR) => {
     button.disabled = true;
     status.textContent = '編集モードを開いています…';
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
       if (tab?.id === undefined) throw new Error('タブが見つかりません。');
-      const response = await chrome.tabs.sendMessage<{ type: string }, OpenEditorResponse>(tab.id, { type: OPEN_CREATOR_EDITOR });
+      const response = await chrome.tabs.sendMessage<{ type: string }, OpenEditorResponse>(tab.id, { type: message });
       if (!alive) return;
       status.textContent = response?.ok ? 'YouTubeでカードを選ぶか、画像を追加してください。' : response?.error ?? '編集モードを開けませんでした。';
     } catch {
@@ -43,6 +44,7 @@ export function mountCreatorLauncher(container: HTMLElement): () => void {
   };
   const onStudio = () => { void openStudio(); }; studio.addEventListener('click', onStudio);
   const onClick = () => { void open(); };
+  const onInpage = () => { void open(OPEN_INPAGE_STUDIO); }; inpage.addEventListener('click', onInpage);
   button.addEventListener('click', onClick);
-  return () => { alive = false; button.removeEventListener('click', onClick); studio.removeEventListener('click', onStudio); section.remove(); };
+  return () => { alive = false; button.removeEventListener('click', onClick); inpage.removeEventListener('click', onInpage); studio.removeEventListener('click', onStudio); section.remove(); };
 }

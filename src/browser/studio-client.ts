@@ -3,6 +3,7 @@ import type { EditCommand, EditorCheckpoint, EditorSnapshot } from '../editor-co
 import { ASSET_LIMITS, bytesToBase64 } from '../assets/validation';
 
 import type { StudioConnectionState, StudioConnection } from '../studio/connection';
+import { OPEN_INPAGE_STUDIO, type OpenEditorResponse } from '../editor/messages';
 export function createStudioClient(notify: (value: StudioConnectionState) => void, checkpointChanged: (target: number, checkpoint: EditorCheckpoint | undefined) => void): StudioConnection {
   const owner = `studio-${crypto.randomUUID()}`;
   let port: chrome.runtime.Port | undefined, tabId: number | undefined, state: EditorSnapshot | undefined, backup: EditorCheckpoint | undefined;
@@ -18,7 +19,7 @@ export function createStudioClient(notify: (value: StudioConnectionState) => voi
     else {
       if (checkpoint) backup = checkpoint;
       if (backup) {
-        backup = { ...backup, draft: next.document, ...(next.saved ? { saved: next.saved } : {}), selectedIds: [...next.view.selectedIds], snapping: next.view.snapping };
+        backup = { ...backup, draft: next.document, ...(next.saved ? { saved: next.saved } : {}), selectedIds: [...next.view.selectedIds], tool: next.view.tool ?? 'select', snapping: next.view.snapping };
         if (!next.saved) delete backup.saved;
         if (next.selectedTarget) backup.selectedTarget = next.selectedTarget; else delete backup.selectedTarget;
         if (tabId !== undefined) checkpointChanged(tabId, backup);
@@ -83,6 +84,7 @@ export function createStudioClient(notify: (value: StudioConnectionState) => voi
       .catch((error: unknown) => { if (generation === epoch) emit(error instanceof Error ? error.message : '操作に失敗しました。'); });
     return commands;
   }
+  const focusTarget = async () => { if (tabId === undefined) return; const tab = await chrome.tabs.update(tabId, { active: true }); if (tab?.windowId !== undefined) await chrome.windows.update(tab.windowId, { focused: true }); };
   return {
     async targets(): Promise<StudioTarget[]> {
       const tabs = await chrome.tabs.query({});
@@ -102,7 +104,13 @@ export function createStudioClient(notify: (value: StudioConnectionState) => voi
       });
     },
     async thumbnail(id: string) { if (!connected) return; try { return (await request({ type: 'thumbnail', layer: id } as Omit<StudioRequest, 'id'>)).thumbnail; } catch { return; } },
-    async focusTarget() { if (tabId === undefined) return; const tab = await chrome.tabs.update(tabId, { active: true }); if (tab?.windowId !== undefined) await chrome.windows.update(tab.windowId, { focused: true }); },
+    focusTarget,
+    async openWorkspace() {
+      if (tabId === undefined || !connected) throw new Error('先に編集対象へ接続してください。');
+      const response = await chrome.tabs.sendMessage<{ type: string }, OpenEditorResponse>(tabId, { type: OPEN_INPAGE_STUDIO });
+      if (!response?.ok) throw new Error(response?.error ?? '制作画面を開けませんでした。');
+      await focusTarget();
+    },
     get state() { return state; }, get target() { return tabId; }, get isConnected() { return connected; },
     stop() { stopped = true; disconnect(); emit('接続を解除しました。'); },
     destroy() { stopped = true; disconnect(); chrome.tabs.onRemoved.removeListener(onTabRemoved); },

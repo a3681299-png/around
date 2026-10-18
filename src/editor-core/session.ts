@@ -6,7 +6,7 @@ import { alignSamples, distributeSamples, type Alignment, type Distribution } fr
 import { createHistory } from '../editor/history';
 import { selectLayer } from '../editor/layers';
 import { deleteDocumentLayers, duplicateDocumentLayers, groupLayers, groupingReason, reorderDocument, ungroupLayers } from '../editor/groups';
-import type { EditCommand, EditorCheckpoint, EditorPorts, EditorSnapshot, EditorView } from './types';
+import type { EditCommand, EditorCheckpoint, EditorPorts, EditorSnapshot, EditorView, EditorTool } from './types';
 
 /** Portable, authoritative edit session. All environment access comes through ports. */
 export function createEditorSession<Source extends { readonly length: number }>(ports: EditorPorts<Source>) {
@@ -15,6 +15,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
   const checkDesignAssets = storage.validate, commitDesign = storage.save;
   let saved: DesignDocument | undefined, draft = emptyDesign(ports.siteId, ports.baseThemeId), pendingSave: DesignDocument | undefined;
   let active = false, enabled = false, loaded = false, alive = true, loadError: string | undefined;
+  let tool: EditorTool = 'select';
   let selectedTarget: string | undefined, selectedImageIds: string[] = [], snapping = false;
   let dirty = false, saving = false, importing = false, status = '', error = false;
   let interactionEpoch = 0, storageEpoch = 0, importEpoch = 0, assetSession: string | undefined, leased = '';
@@ -32,7 +33,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     return { selected: Boolean(selectedTarget), style: draft.rules.find((rule) => rule.target === selectedTarget)?.style ?? {}, dirty, saving: saving || importing, status, error,
       images: draft.decorations, groups, image, inheritedLocked: Boolean(image && parentGroup(groups, image.id)?.locked),
       groupPositionAvailable: Boolean(!group || group.visible && groupMovable(group, draft.decorations) && image && frameFor(image.placement)),
-      groupingReason: groupingReason(draft, selectedImageIds), selectedIds: [...selectedImageIds], canUndo: history.canUndo, canRedo: history.canRedo, snapping };
+      groupingReason: groupingReason(draft, selectedImageIds), selectedIds: [...selectedImageIds], canUndo: history.canUndo, canRedo: history.canRedo, snapping, tool };
   }
   function snapshot(): EditorSnapshot { return { sessionId, revision, active, enabled, view: JSON.parse(JSON.stringify(view())) as EditorView,
     document: parseDesign(draft), ...(saved ? { saved: parseDesign(saved) } : {}), ...(selectedTarget ? { selectedTarget } : {}) }; }
@@ -189,7 +190,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
         before = undefined; selectedImageIds = previousSelection;
         throw new Error('別のタブの保存値が変わったため、素材の追加を中止しました。もう一度読み込んでください。');
       }
-      clearSelection(); updateDraft(next, false);
+      tool = 'select'; clearSelection(); updateDraft(next, false);
       leased = ''; await syncAssets();
       if (epoch !== importEpoch || !active) return;
       history.record(before, draft); settleAssets();
@@ -289,13 +290,16 @@ export function createEditorSession<Source extends { readonly length: number }>(
     if (loadError) return { ok: false, error: loadError };
     if (active) return { ok: true };
     draft = initial(); history.reset(); interactionEpoch++; selectedImageIds = []; clearSelection(); dirty = false;
-    active = true; assetSession = ports.makeId('session'); sessionId = assetSession; leased = ''; importEpoch++;
+    tool = 'select'; active = true; assetSession = ports.makeId('session'); sessionId = assetSession; leased = ''; importEpoch++;
     status = 'カードを選ぶか、画像を追加してください。'; error = false; render(); settleAssets(); return { ok: true };
   }
   async function execute(command: EditCommand): Promise<void> {
     if (!active) throw new Error('編集セッションが開かれていません。');
-    if ((saving || importing) && command.type !== 'close') throw new Error('処理中です。完了を待ってください。');
+    if ((saving || importing) && command.type !== 'close' && command.type !== 'tool') throw new Error('処理中です。完了を待ってください。');
     switch (command.type) {
+      case 'tool':
+        if (!['select', 'browse', 'card'].includes(command.tool)) throw new Error('未対応のツールです。');
+        finishGesture(true); tool = command.tool; render(); break;
       case 'select': selectImage(command.id, command.additive, command.preserve); break;
       case 'select-target':
         if (command.target !== undefined && !ports.targets.some((target) => target.id === command.target)) throw new Error('編集できない対象です。');
@@ -323,11 +327,12 @@ export function createEditorSession<Source extends { readonly length: number }>(
     }
   }
   function checkpoint(): EditorCheckpoint { return { version: 1, siteId: ports.siteId, draft: parseDesign(draft), ...(saved ? { saved: parseDesign(saved) } : {}),
-    selectedIds: [...selectedImageIds], ...(selectedTarget ? { selectedTarget } : {}), snapping, history: history.checkpoint() }; }
+    selectedIds: [...selectedImageIds], tool, ...(selectedTarget ? { selectedTarget } : {}), snapping, history: history.checkpoint() }; }
   async function restore(value: EditorCheckpoint) {
     if (!active || saving || importing || value.version !== 1 || value.siteId !== ports.siteId) throw new Error('この編集セッションに復元できません。');
     const restoringSession = sessionId;
     const next = parseDesign(value.draft);
+    if (value.tool !== undefined && !['select', 'browse', 'card'].includes(value.tool)) throw new Error('復旧ツールが不正です。');
     if (next.siteId !== ports.siteId || !Array.isArray(value.selectedIds) || value.selectedIds.length > 48 || value.selectedIds.some((id) => typeof id !== 'string') || typeof value.snapping !== 'boolean'
       || value.selectedTarget !== undefined && !ports.targets.some((target) => target.id === value.selectedTarget)) throw new Error('復旧データが不正です。');
     const restored = createHistory<DesignDocument>(parseDesign, sameDesign); restored.restore(value.history);
@@ -336,7 +341,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     await retainAssets(assetSession!, ids); await checkDesignAssets(next, assetSession!);
     if (!active || restoringSession !== sessionId) return;
     history.restore(restored.checkpoint()); if (history.active) history.commit(next);
-    draft = next; selectedImageIds = normalizeSelection(value.selectedIds, draft.decorations, draft.groups ?? []); selectedTarget = value.selectedTarget; snapping = value.snapping;
+    draft = next; selectedImageIds = normalizeSelection(value.selectedIds, draft.decorations, draft.groups ?? []); selectedTarget = value.selectedTarget; snapping = value.snapping; tool = value.tool ?? 'select';
     dirty = !sameDesign(draft, initial()); interactionEpoch++;
     error = !sameDesign(value.saved, saved); status = error ? '復旧中に保存済みデザインが変わりました。プレビューを保持しています。保存すると上書きし、破棄すると最新の保存値に戻ります。' : '編集セッションとUndo履歴を復元しました。'; render(); settleAssets();
   }

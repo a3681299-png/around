@@ -4,7 +4,7 @@ import { DEFAULT_THEME, themes } from '../themes';
 import { createThemeController } from '../themes/controller';
 import { createSettingsPanel } from '../settings/panel';
 import { createCreatorEditor, type CreatorEditor } from '../editor/controller';
-import { OPEN_CREATOR_EDITOR } from '../editor/messages';
+import { OPEN_CREATOR_EDITOR, OPEN_INPAGE_STUDIO } from '../editor/messages';
 import type { UserSettings } from '../storage/settings';
 import { connectStudioHost } from '../browser/studio-host';
 
@@ -35,8 +35,8 @@ if (site) {
   let unwatch = watchSettings(update, reportError);
   const onMessage = (message: unknown, sender: chrome.runtime.MessageSender, respond: (value: unknown) => void) => {
     if (sender.id !== chrome.runtime.id || !message || typeof message !== 'object'
-      || !('type' in message) || message.type !== OPEN_CREATOR_EDITOR) return false;
-    respond(creator?.open());
+      || !('type' in message) || ![OPEN_CREATOR_EDITOR, OPEN_INPAGE_STUDIO].includes(String(message.type))) return false;
+    respond(message.type === OPEN_INPAGE_STUDIO ? creator?.openStudio() : creator?.open());
     return false;
   };
   chrome.runtime.onMessage.addListener(onMessage);
