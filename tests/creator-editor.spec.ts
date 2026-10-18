@@ -265,7 +265,7 @@ test('unknown versions remain stored, disable editing and recover after a suppor
   await openEditor(popup, youtube);
 });
 
-test('resetting overrides restores retro and persists the reset; no new permissions are requested', async ({ popup, youtube }) => {
+test('resetting overrides restores retro and persists the reset; only storage and the approved official sidePanel permission are requested', async ({ popup, youtube }) => {
   await enable(popup, youtube);
   const dialog = await openEditor(popup, youtube);
   const card = await selectCard(youtube);
@@ -279,6 +279,6 @@ test('resetting overrides restores retro and persists the reset; no new permissi
   await youtube.reload();
   await expect(youtube.locator(cards).first()).toHaveCSS('border-radius', '0px');
   const manifest = await popup.evaluate(() => chrome.runtime.getManifest());
-  expect(manifest.permissions).toEqual(['storage']);
+  expect(manifest.permissions).toEqual(['storage', 'sidePanel']);
   expect(manifest.host_permissions).toBeUndefined();
 });

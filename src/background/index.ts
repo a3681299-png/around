@@ -1,3 +1,4 @@
+import { installSidePanelHost } from '../browser/side-panel';
 import { ASSET_MESSAGE, type AssetWireFile } from '../assets/protocol';
 import { changeAssets, getAsset, type AssetLease, type StoredAsset } from '../assets/repository';
 import { ASSET_LIMITS, base64ToBytes, bytesToBase64, type AssetMetadata } from '../assets/validation';
@@ -18,6 +19,15 @@ async function owner(message: Record<string, unknown>, sender: chrome.runtime.Me
   if (message['ownerTabId'] !== undefined) {
     const studioURL = chrome.runtime.getURL('studio/index.html');
     if (sender.url?.split('?')[0] !== studioURL || !Number.isSafeInteger(message['ownerTabId'])) throw new Error('素材の保持先が不正です。');
+    const sidePanel = new URL(sender.url!).searchParams.get('surface') === 'sidepanel';
+    if (sidePanel) {
+      if (new URL(sender.url!).searchParams.get('target') !== String(message['ownerTabId'])) throw new Error('サイドパネルの保持先が不正です。');
+      const contexts = await chrome.runtime.getContexts({ contextTypes: [chrome.runtime.ContextType.SIDE_PANEL], ...(sender.documentId ? { documentIds: [sender.documentId] } : {}) });
+      const context = contexts.find((entry) => entry.documentUrl === sender.url);
+      if (!context) throw new Error('サイドパネルが見つかりません。');
+      await chrome.tabs.get(message['ownerTabId'] as number);
+      return { session: message['session'], tabId: message['ownerTabId'] as number, documentId: 'studio:sidepanel:' + message['ownerTabId'] };
+    }
     const contexts = await chrome.runtime.getContexts({ tabIds: [message['ownerTabId'] as number], ...(sender.documentId ? { documentIds: [sender.documentId] } : {}) });
     const context = contexts.find((entry) => entry.documentUrl === sender.url && entry.documentUrl?.split('?')[0] === studioURL);
     if (!context) throw new Error('Studioのタブが見つかりません。');
@@ -39,7 +49,7 @@ async function prune(current?: AssetLease): Promise<void> {
     const put: StoredAsset[] = [], remove: string[] = [];
     for (const row of rows) {
       const leases = row.leases.filter((lease) => (lease.tabId === -1 || tabs.has(lease.tabId))
-        && !(current && lease.tabId === current.tabId && lease.documentId !== current.documentId));
+        && !(current && lease.tabId === current.tabId && lease.documentId !== current.documentId && !lease.documentId.startsWith('studio:')));
       if (leases.length || references.has(row.id)) put.push({ ...row, leases });
       else remove.push(row.id);
     }
@@ -136,3 +146,5 @@ chrome.runtime.onMessage.addListener((input: unknown, sender, respond) => {
   return true;
 });
 chrome.tabs.onRemoved.addListener(() => { void enqueue(() => prune()).catch(() => undefined); });
+
+installSidePanelHost();

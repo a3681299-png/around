@@ -3,6 +3,8 @@ import type { ImageEditing } from '../design/image-renderer';
 import { editableSceneSamples, placementFrame } from '../design/frames';
 import type { SiteAdapter } from '../sites/types';
 import { createCreatorPanel } from './panel';
+import { CLOSE_SIDE_PANEL, OPEN_SIDE_PANEL, OPEN_STUDIO_WINDOW } from './messages';
+import { requestStudioSurface } from '../browser/side-panel';
 import type { OpenEditorResponse } from './messages';
 import { captureLayerThumbnail } from '../renderers/dom/thumbnail';
 import { createEditorSession } from '../editor-core/session';
@@ -14,10 +16,10 @@ import { studioActions } from '../studio/ui-actions';
 import type { StudioLayoutAdapter } from '../studio/layout-types';
 
 export interface CreatorEditor {
-  open(): OpenEditorResponse; openStudio(): OpenEditorResponse; setEnabled(enabled: boolean): void; refreshSelection(): void; reload(): void; destroy(): void;
+  open(): OpenEditorResponse; openStudio(): OpenEditorResponse; openSidePanel(): OpenEditorResponse; setEnabled(enabled: boolean): void; refreshSelection(): void; reload(): void; destroy(): void;
   snapshot(): EditorSnapshot; checkpoint(): EditorCheckpoint; readonly historyVersion: number;
   subscribe(listener: (state: EditorSnapshot) => void): () => void;
-  attachStudio(owner: string, resume?: EditorCheckpoint): Promise<EditorSnapshot>;
+  attachStudio(owner: string, resume?: EditorCheckpoint, handoff?: boolean): Promise<EditorSnapshot>;
   detachStudio(owner: string): void;
   command(owner: string, session: string, revision: number, command: EditCommand): Promise<EditorSnapshot>;
   import(owner: string, session: string, revision: number, files: readonly File[]): Promise<EditorSnapshot>;
@@ -33,7 +35,8 @@ export function createCreatorEditor(doc: Document, site: SiteAdapter, baseThemeI
   validate: (design: DesignDocument | undefined) => void): CreatorEditor {
   let panel: ReturnType<typeof createCreatorPanel> | undefined, selectionStyle: HTMLStyleElement | undefined, selectedElement: Element | undefined;
   let remoteOwner: string | undefined, badge: HTMLElement | undefined, installed = false, destroyed = false;
-  let layout: StudioLayoutAdapter | undefined, panelMode: 'quick' | 'inpage' = 'quick';
+  let unprotectToolbar: (() => void) | undefined;
+  let layout: StudioLayoutAdapter | undefined, panelMode: 'quick' | 'inpage' | 'sidepanel' = 'quick';
   const consumedKeys = new Set<string>();
   let lastDesign = '', geometryKey = '';
   const core = createEditorSession({ siteId: site.id, baseThemeId, targets: site.designTargets ?? [], storage: createBrowserEditorStorage(site.id), validate,
@@ -78,7 +81,7 @@ export function createCreatorEditor(doc: Document, site: SiteAdapter, baseThemeI
   }
   function refresh(next = core.snapshot()) {
     state = next;
-    if (!state.active) { panel?.destroy(); panel = undefined; layout?.destroy(); layout = undefined; remoteOwner = undefined; }
+    if (!state.active) { if (panelMode === 'sidepanel' && panel) void chrome.runtime.sendMessage({ type: CLOSE_SIDE_PANEL }).catch(() => undefined); unprotectToolbar?.(); unprotectToolbar = undefined; panel?.destroy(); panel = undefined; layout?.destroy(); layout = undefined; remoteOwner = undefined; }
     if (!state.selectedTarget) removeSelection();
     const active = editing(); bind(active);
     if (active) { doc.documentElement.setAttribute('data-ww-editor-tool', state.view.tool ?? 'select'); doc.documentElement.toggleAttribute('data-ww-editor-card-picking', state.view.tool !== 'browse' && (panelMode === 'quick' || state.view.tool === 'card')); }
@@ -91,6 +94,7 @@ export function createCreatorEditor(doc: Document, site: SiteAdapter, baseThemeI
     } else if (!remoteOwner || !state.active || panel) { badge?.remove(); badge = undefined; }
     const design = active && state.view.dirty ? state.document : state.saved, key = JSON.stringify(design) ?? 'empty';
     if (key !== lastDesign) { lastDesign = key; apply(design); }
+    if (panelMode === 'sidepanel') panel?.host.toggleAttribute('data-fullscreen', fullscreen());
     panel?.render(state.view);
     editImages(active && !fullscreen() && state.view.tool !== 'browse' && state.view.tool !== 'card' ? { selectedIds: state.view.selectedIds, locked: state.view.saving, epoch: core.interactionEpoch, snapping: state.view.snapping,
       select: (id, additive, preserve) => dispatch({ type: 'select', id, additive, preserve }), begin: () => dispatch({ type: 'begin' }),
@@ -99,10 +103,10 @@ export function createCreatorEditor(doc: Document, site: SiteAdapter, baseThemeI
   }
   const unsubscribe = core.subscribe(refresh);
   function onFullscreen() { refresh(); }
-  function open(mode: 'quick' | 'inpage' = 'quick'): OpenEditorResponse {
+  function open(mode: 'quick' | 'inpage' | 'sidepanel' = 'quick'): OpenEditorResponse {
     if (!site.designTargets?.length) return { ok: false, error: 'このサイトには編集できる対象がありません。' };
     const result = core.open(); if (!result.ok) return result;
-    if (panel && mode !== panelMode) { panel.destroy(); panel = undefined; layout?.destroy(); layout = undefined; }
+    if (panel && mode !== panelMode) { if (panelMode === 'sidepanel') void chrome.runtime.sendMessage({ type: CLOSE_SIDE_PANEL }).catch(() => undefined); unprotectToolbar?.(); unprotectToolbar = undefined; panel.destroy(); panel = undefined; layout?.destroy(); layout = undefined; }
     if (!panel) {
       panelMode = mode;
       if (mode === 'inpage') {
@@ -110,14 +114,15 @@ export function createCreatorEditor(doc: Document, site: SiteAdapter, baseThemeI
         if (!layout) return { ok: false, error: 'このサイトにはStudioの表示領域を確保するAdapterがありません。' };
       }
       panel = createCreatorPanel(doc, studioActions(dispatch, (files) => { void core.import(files); }, (id) => captureLayerThumbnail(doc, id)), site.decorationAnchors,
-        { preferences: browserStudioPreferences, hostLabel: site.id === 'youtube' ? 'YouTube' : site.id, inPage: mode === 'inpage', persistWorkspace: mode === 'inpage', onLayout: (value) => layout?.update(value) });
+        { preferences: browserStudioPreferences, hostLabel: site.id === 'youtube' ? 'YouTube' : site.id, inPage: mode === 'inpage', toolbarOnly: mode === 'sidepanel', persistWorkspace: mode === 'inpage', onSurface: (surface) => { if (surface === 'inpage') open('inpage'); else void requestStudioSurface(surface === 'sidepanel' ? OPEN_SIDE_PANEL : OPEN_STUDIO_WINDOW).catch((error: unknown) => core.fail(error instanceof Error ? error.message : 'Studioを開けませんでした。')); }, onLayout: (value) => layout?.update(value) });
       (doc.body ?? doc.documentElement).append(panel.host);
+      if (mode === 'sidepanel') unprotectToolbar = site.protectStudioToolbar?.(panel.host);
       if (layout) panel.setHostLayout(layout.state());
     }
     refresh(); panel.focus(); return { ok: true };
   }
   function pickTarget(event: Event) {
-    if (!editing() || fullscreen() || state.view.tool === 'browse' || panelMode === 'inpage' && state.view.tool !== 'card'
+    if (!editing() || fullscreen() || state.view.tool === 'browse' || panelMode !== 'quick' && state.view.tool !== 'card'
       || event.composedPath().some((node) => node instanceof Element && node.hasAttribute('data-ww-signal-control'))) return;
     const node = event.target instanceof Element ? event.target : undefined;
     for (const target of site.designTargets ?? []) { const element = node?.closest(`[data-ww-surface~="${target.surface}"]`); if (element) return { element, target }; }
@@ -147,7 +152,7 @@ export function createCreatorEditor(doc: Document, site: SiteAdapter, baseThemeI
     if (owner !== remoteOwner || session !== state.sessionId || revision !== state.revision || !state.active) throw new Error('編集状態が変わりました。最新の状態を同期して、もう一度操作してください。');
   };
   return {
-    open: () => open(), openStudio: () => open('inpage'), snapshot: core.snapshot, checkpoint: core.checkpoint, subscribe: core.subscribe, get historyVersion() { return core.historyVersion; },
+    open: () => open(), openStudio: () => open('inpage'), openSidePanel: () => open('sidepanel'), snapshot: core.snapshot, checkpoint: core.checkpoint, subscribe: core.subscribe, get historyVersion() { return core.historyVersion; },
     setEnabled: core.setEnabled,
     refreshSelection() { if (selectedElement && (!selectedElement.isConnected || !site.designTargets?.some((target) => target.id === state.selectedTarget && selectedElement!.matches(`[data-ww-surface~="${target.surface}"]`)))) {
       removeSelection(); if (state.active) dispatch({ type: 'select-target' });
@@ -160,8 +165,10 @@ export function createCreatorEditor(doc: Document, site: SiteAdapter, baseThemeI
       }
     },
     reload: core.reload,
-    async attachStudio(owner, resume) {
-      if (remoteOwner && remoteOwner !== owner) throw new Error('このYouTubeは別のStudioで編集中です。そちらの接続を解除してください。');
+    async attachStudio(owner, resume, handoff = false) {
+      if (remoteOwner && remoteOwner !== owner && !handoff) throw new Error('このYouTubeは別のStudioで編集中です。そちらの接続を解除してください。');
+      if (handoff && state.view.saving) throw new Error('保存処理の完了後に切り替えてください。');
+      if (handoff && core.gestureActive) await core.execute({ type: 'end', cancel: true });
       const existed = state.active, opened = core.open(); if (!opened.ok) throw new Error(opened.error);
       remoteOwner = owner;
       try { if (!existed && resume) await core.restore(resume); refresh(); return core.snapshot(); }
@@ -171,6 +178,6 @@ export function createCreatorEditor(doc: Document, site: SiteAdapter, baseThemeI
     async command(owner, session, revision, command) { authorize(owner, session, revision); await core.execute(command); return core.snapshot(); },
     async import(owner, session, revision, files) { authorize(owner, session, revision); await core.import(files); return core.snapshot(); },
     thumbnail: (id) => captureLayerThumbnail(doc, id),
-    destroy() { destroyed = true; core.destroy(); unsubscribe(); bind(false); panel?.destroy(); layout?.destroy(); badge?.remove(); },
+    destroy() { destroyed = true; core.destroy(); unsubscribe(); bind(false); unprotectToolbar?.(); panel?.destroy(); layout?.destroy(); badge?.remove(); },
   };
 }

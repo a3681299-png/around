@@ -17,3 +17,7 @@ button:focus-visible, select:focus-visible { outline: 2px solid #b6a4e5; outline
 .connection-empty { padding: 28px; max-width: 550px; margin: auto; color: #a5a7af; }
 .connection-empty h1 { font-size: 16px; font-weight: 600; color: #e3e4e8; }
 .recovery-status { margin: 0; padding: 0 8px; font-size: 11px; color: #dfb87a; background: #202123; }
+
+body[data-sidepanel] .connection-bar label, body[data-sidepanel] .refresh-targets, body[data-sidepanel] .focus-target, body[data-sidepanel] .disconnect-target { display: none; }
+body[data-sidepanel] .connection-bar { height: auto; min-height: 28px; padding: 3px 8px; }
+body[data-sidepanel] .connection-status { max-width: 100%; }

@@ -75,6 +75,6 @@ test('pinned Lottie light player is reproducible, has no dynamic code evaluation
   expect(code.toString()).not.toMatch(/\beval\s*\(|\bnew\s+Function\s*\(/);
   expect(code.toString()).toContain('var Nt=null;');
   const manifest = JSON.parse(await readFile('dist/manifest.json', 'utf8'));
-  expect(manifest.permissions).toEqual(['storage']);
+  expect(manifest.permissions).toEqual(['storage', 'sidePanel']);
   expect(manifest.content_security_policy.extension_pages).toBe("script-src 'self'; object-src 'none'");
 });

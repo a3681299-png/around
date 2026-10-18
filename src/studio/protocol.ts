@@ -13,7 +13,7 @@ export type StudioRequest =
   | { id: number; type: 'detach' };
 export interface StudioUpdate { type: 'state'; state: EditorSnapshot; checkpoint?: EditorCheckpoint }
 export interface StudioReply { type: 'reply'; id: number; ok: boolean; error?: string; state?: EditorSnapshot; checkpoint?: EditorCheckpoint; thumbnail?: string }
-export type StudioMessage = StudioUpdate | StudioReply;
+export type StudioMessage = StudioUpdate | StudioReply | { type: 'handoff' };
 
 /** Reject unrecognized command keys, executable values and unbounded messages. */
 export function parseEditCommand(value: unknown): EditCommand {

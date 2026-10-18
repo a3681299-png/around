@@ -10,11 +10,11 @@ import type { StudioHostLayout } from './layout-types';
 export function createStudioWorkbench(doc: Document, host: HTMLElement, main: HTMLElement, tree: { setActive(active: boolean): void }, actions: PanelActions, options: PanelOptions) {
   const base = createWorkspace(doc, host, main, tree, actions.clearSelection, actions.selectAll, options.preferences ? { preferences: options.preferences } : {});
   const sheet = doc.createElement('style'); sheet.textContent = styles; host.shadowRoot!.append(sheet);
-  host.setAttribute('data-workbench', ''); host.toggleAttribute('data-inpage', Boolean(options.inPage)); host.removeAttribute('data-split');
+  host.setAttribute('data-workbench', ''); host.toggleAttribute('data-inpage', Boolean(options.inPage)); host.removeAttribute('data-split'); host.toggleAttribute('data-sidepanel', Boolean(options.sidePanel)); host.toggleAttribute('data-page-toolbar', Boolean(options.toolbarOnly));
   const get = <T extends HTMLElement>(selector: string) => main.querySelector<T>(selector)!;
   const body = get('.editor-body'), oldHeader = get('header'), toolbar = get('.toolbar'), footer = get('footer');
   const layers = get('.layers-pane'), inspector = get('.inspector-pane'), help = get('.help-pane'), selection = get('.selection-bar');
-  const storage = options.preferences ?? transientPreferences, preferenceKey = 'webWorldThemes.studio.workbench.v2';
+  const storage = options.preferences ?? transientPreferences, preferenceKey = options.sidePanel ? 'webWorldThemes.studio.sidepanel.v1' : 'webWorldThemes.studio.workbench.v2';
   let leftWidth = 176, rightWidth = 320, ratio = .56, leftClosed: boolean | undefined, rightClosed: boolean | undefined, allClosed = false, alive = true, touched = false, preferencesReady = false;
   let state: PanelState | undefined, timer: ReturnType<typeof setTimeout> | undefined, layoutKey = '';
   const persist = () => { timer = undefined; void storage.write(preferenceKey, { leftWidth, rightWidth, ratio, leftClosed, rightClosed, dock: host.dataset.wwDock ?? 'right', folds: [...inspector.querySelectorAll<HTMLDetailsElement>('details')].map((item) => [item.className, item.open]) }).catch(() => undefined); };
@@ -99,15 +99,15 @@ export function createStudioWorkbench(doc: Document, host: HTMLElement, main: HT
     get('.ungroup-help').hidden = !(state?.image?.kind === 'group' && (state.image.locked || state.image.opacity !== 1));
     menu.querySelectorAll<HTMLButtonElement>('[data-source]').forEach((button) => { const source = get<HTMLButtonElement>('.' + button.dataset.source); button.disabled = source.disabled || Boolean(source.hidden); });
     help.hidden = !helpDialog.open; get('.inspector-empty').hidden = true;
-    tree.setActive(!host.hasAttribute('data-right-closed') && !allClosed && !host.hasAttribute('data-fullscreen'));
+    tree.setActive(!options.toolbarOnly && !host.hasAttribute('data-right-closed') && !allClosed && !host.hasAttribute('data-fullscreen'));
   }
   function toggle(side: 'left' | 'right') { allClosed = false; if (side === 'left') leftClosed = !host.hasAttribute('data-left-closed'); else rightClosed = !host.hasAttribute('data-right-closed'); layout(); remember(); }
   function layout() {
     if (!alive) return;
     const width = doc.defaultView!.innerWidth, flip = host.dataset.wwDock === 'left' && width >= 860;
     const fallback = host.hasAttribute('data-layout-fallback');
-    const lc = fallback || allClosed || (leftClosed ?? width < 1100), rc = fallback || allClosed || (rightClosed ?? width < 860);
-    const l = lc ? 36 : leftWidth, r = rc ? 0 : rightWidth, overlay = width - l - r < 480;
+    const lc = options.sidePanel ? false : fallback || allClosed || (leftClosed ?? width < 1100), rc = options.sidePanel ? false : fallback || allClosed || (rightClosed ?? width < 860);
+    const l = lc ? 36 : leftWidth, r = rc ? 0 : rightWidth, overlay = !options.sidePanel && width - l - r < 480;
     host.toggleAttribute('data-left-closed', lc); host.toggleAttribute('data-right-closed', rc); host.toggleAttribute('data-overlay-right', overlay);
     host.toggleAttribute('data-dock-flip', flip);
     host.style.setProperty('--right-divider-width', r && !overlay ? '4px' : '0px');
@@ -126,6 +126,20 @@ export function createStudioWorkbench(doc: Document, host: HTMLElement, main: HT
     element.addEventListener('pointermove', (event) => { if (gesture) change(gesture.start + (side === 'left' ? 1 : -1) * (host.dataset.wwDock === 'left' ? -1 : 1) * (event.clientX - gesture.x)); });
     const end = () => { if (gesture) remember(); gesture = undefined; }; element.addEventListener('pointerup', end); element.addEventListener('pointercancel', end); element.addEventListener('lostpointercapture', end);
     element.addEventListener('keydown', (event) => { if (['ArrowLeft', 'ArrowRight'].includes(event.key)) { change((side === 'left' ? leftWidth : rightWidth) + (event.key === 'ArrowRight' ? 20 : -20)); remember(); event.preventDefault(); event.stopPropagation(); } }); return element;
+  }
+  const surfaces = doc.createElement('div'); surfaces.className = 'surface-actions';
+  for (const [surface, label, icon] of [['sidepanel', 'Chromeサイドパネルを開く', 'dock'], ['inpage', '従来のインページStudioへ切替', 'external'], ['window', '独立Studioへ切替', 'external']] as const) {
+    if (surface === 'sidepanel' && options.sidePanel || surface === 'inpage' && options.inPage || !options.onSurface) continue;
+    surfaces.append(make(label, icon, () => options.onSurface?.(surface)));
+  }
+  menuEnd.prepend(surfaces);
+  if (options.sidePanel || options.toolbarOnly) {
+    toolbar.replaceChildren(undo, redo, save, discard, get('.add-image'), get('.add-animation'));
+    if (options.sidePanel) toolbar.append(tools);
+    dock.hidden = true; toggleLeft.hidden = toggleRight.hidden = hideAll.hidden = true;
+    if (options.toolbarOnly) {
+      toolbar.append(tools, surfaces, dirty, close); menu.hidden = true; footer.hidden = true;
+    }
   }
   let heightGesture: { y: number; ratio: number } | undefined;
   divider.addEventListener('pointerdown', (event) => { if (event.button !== 0) return; heightGesture = { y: event.clientY, ratio }; divider.setPointerCapture(event.pointerId); event.preventDefault(); });
@@ -164,7 +178,7 @@ export function createStudioWorkbench(doc: Document, host: HTMLElement, main: HT
     layoutChanged() { buttonIcon(dock, 'dock', '左右を入れ替える'); layout(); remember(); },
     inspect() { base.inspect(); enforce(); }, context: base.context,
     render(next: PanelState) {
-      state = next; base.render(next); enforce(); libraryView.render(next);
+      state = next; base.render(next); enforce(); if (!options.sidePanel && !options.toolbarOnly) libraryView.render(next);
       get('.object-type').textContent = next.image ? next.image.kind === 'group' ? 'グループ' : next.image.kind === 'animation' ? next.image.format.toUpperCase() : '画像' : next.selected ? '動画カード' : next.selectedIds.length > 1 ? `${next.selectedIds.length}個選択` : '未選択';
       get('.status').title = next.status;
       inspector.querySelector<HTMLElement>('[aria-label="マスクと振る舞い"]')!.hidden = !next.image;

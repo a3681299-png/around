@@ -3,7 +3,8 @@ import type { EditCommand, EditorCheckpoint, EditorSnapshot } from '../editor-co
 import { ASSET_LIMITS, bytesToBase64 } from '../assets/validation';
 
 import type { StudioConnectionState, StudioConnection } from '../studio/connection';
-import { OPEN_INPAGE_STUDIO, type OpenEditorResponse } from '../editor/messages';
+import { requestStudioSurface } from './side-panel';
+import { CLOSE_SIDE_PANEL, OPEN_SIDE_PANEL, OPEN_STUDIO_WINDOW, OPEN_INPAGE_STUDIO, type OpenEditorResponse } from '../editor/messages';
 export function createStudioClient(notify: (value: StudioConnectionState) => void, checkpointChanged: (target: number, checkpoint: EditorCheckpoint | undefined) => void): StudioConnection {
   const owner = `studio-${crypto.randomUUID()}`;
   let port: chrome.runtime.Port | undefined, tabId: number | undefined, state: EditorSnapshot | undefined, backup: EditorCheckpoint | undefined;
@@ -42,6 +43,7 @@ export function createStudioClient(notify: (value: StudioConnectionState) => voi
       const next = chrome.tabs.connect(target, { name: STUDIO_PORT, frameId: 0 }); port = next;
       next.onMessage.addListener((message: StudioMessage) => {
         if (generation !== epoch || port !== next || !message || typeof message !== 'object') return;
+        if (message.type === 'handoff') { stopped = true; disconnect(); emit('別のStudioへ編集を引き継ぎました。未保存の変更と履歴は対象タブで保持しています。'); return; }
         if (message.type === 'state') { useState(message.state, message.checkpoint); emit(message.state.active ? '接続中' : message.state.enabled ? '編集を終了しました。接続ボタンで再開できます。' : 'テーマがOFFまたは強さ0%です。'); }
         else if (message.type === 'reply') {
           const entry = pending.get(message.id); if (!entry) return; pending.delete(message.id); clearTimeout(entry.timer);
@@ -105,9 +107,11 @@ export function createStudioClient(notify: (value: StudioConnectionState) => voi
     },
     async thumbnail(id: string) { if (!connected) return; try { return (await request({ type: 'thumbnail', layer: id } as Omit<StudioRequest, 'id'>)).thumbnail; } catch { return; } },
     focusTarget,
-    async openWorkspace() {
+    async openWorkspace(surface = 'inpage') {
       if (tabId === undefined || !connected) throw new Error('先に編集対象へ接続してください。');
+      if (surface === 'sidepanel' || surface === 'window') { await requestStudioSurface(surface === 'sidepanel' ? OPEN_SIDE_PANEL : OPEN_STUDIO_WINDOW, tabId); return; }
       const response = await chrome.tabs.sendMessage<{ type: string }, OpenEditorResponse>(tabId, { type: OPEN_INPAGE_STUDIO });
+      await chrome.runtime.sendMessage({ type: CLOSE_SIDE_PANEL, tabId });
       if (!response?.ok) throw new Error(response?.error ?? '制作画面を開けませんでした。');
       await focusTarget();
     },

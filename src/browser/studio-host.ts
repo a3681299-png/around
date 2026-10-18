@@ -6,6 +6,7 @@ import { ASSET_LIMITS, base64ToBytes } from '../assets/validation';
 /** Authenticated extension Port; no window messages or page-script command bridge. */
 export function connectStudioHost(doc: Document, site: SiteAdapter, editor: CreatorEditor) {
   const ports = new Map<chrome.runtime.Port, () => void>();
+  let activePort: chrome.runtime.Port | undefined, activeSurface: string | undefined;
   const trusted = (sender: chrome.runtime.MessageSender | undefined) => sender?.id === chrome.runtime.id && sender.url?.split('?')[0] === chrome.runtime.getURL('studio/index.html');
   const onProbe = (message: unknown, sender: chrome.runtime.MessageSender, respond: (value: unknown) => void) => {
     if (!trusted(sender) || !message || typeof message !== 'object' || !('type' in message) || message.type !== STUDIO_PROBE) return false;
@@ -17,11 +18,15 @@ export function connectStudioHost(doc: Document, site: SiteAdapter, editor: Crea
     let queue: Promise<void> = Promise.resolve();
     const post = (message: StudioMessage) => { if (!closed) { try { port.postMessage(message); } catch { cleanup(); } } };
     const checkpoint = () => { lastHistory = editor.historyVersion; return editor.checkpoint(); };
-    const unsubscribe = editor.subscribe(() => {
-      if (!attached || !owner || timer) return;
-      timer = setTimeout(() => { timer = undefined; post({ type: 'state', state: editor.snapshot(), ...(lastHistory !== editor.historyVersion ? { checkpoint: checkpoint() } : {}) }); }, 25);
+    const unsubscribe = editor.subscribe((state) => {
+      if (!attached || !owner) return;
+      const publish = () => { timer = undefined; post({ type: 'state', state: editor.snapshot(), ...(lastHistory !== editor.historyVersion ? { checkpoint: checkpoint() } : {}) }); };
+      // End-of-gesture/history updates must reach Studio before the next Undo.
+      // Keep ordinary pointer samples coalesced, but never delay a committed edit.
+      if (!state.active || lastHistory !== editor.historyVersion) { clearTimeout(timer); publish(); }
+      else if (!timer) timer = setTimeout(publish, 25);
     });
-    function cleanup() { if (closed) return; closed = true; clearTimeout(timer); unsubscribe(); if (owner) editor.detachStudio(owner); ports.delete(port); }
+    function cleanup() { if (closed) return; closed = true; clearTimeout(timer); unsubscribe(); if (owner) editor.detachStudio(owner); ports.delete(port); if (activePort === port) { activePort = undefined; activeSurface = undefined; } }
     ports.set(port, cleanup);
     const receive = (raw: unknown) => {
       queue = queue.catch(() => undefined).then(async () => {
@@ -33,7 +38,12 @@ export function connectStudioHost(doc: Document, site: SiteAdapter, editor: Crea
             if (typeof request.owner !== 'string' || !/^studio-[\w-]{1,100}$/.test(request.owner)) throw new Error('Studioの識別子が不正です。');
             if (owner && owner !== request.owner) throw new Error('接続の所有者が変わりました。');
             owner = request.owner;
-            const state = await editor.attachStudio(request.owner, request.resume);
+            const surface = new URL(port.sender!.url!).searchParams.get('surface') === 'sidepanel' ? 'sidepanel' : 'window';
+            const previous = activePort;
+            const state = await editor.attachStudio(request.owner, request.resume, Boolean(previous && previous !== port && activeSurface !== surface));
+            activePort = port; activeSurface = surface;
+            if (previous && previous !== port) { try { previous.postMessage({ type: 'handoff' }); } catch { /* Already disconnected. */ } ports.get(previous)?.(); previous.disconnect(); }
+            if (surface === 'sidepanel') editor.openSidePanel();
             if (closed) { editor.detachStudio(request.owner); return; }
             attached = true;
             post({ type: 'reply', id: request.id, ok: true, state, checkpoint: checkpoint() });

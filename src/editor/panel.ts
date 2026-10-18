@@ -16,7 +16,8 @@ export type { EditorView as PanelState } from '../editor-core/types';
 import type { EditorView as PanelState } from '../editor-core/types';
 import type { StudioPreferences } from '../studio/preferences';
 export interface PanelOptions {
-  preferences?: StudioPreferences; fullPage?: boolean; persistWorkspace?: boolean; inPage?: boolean;
+  preferences?: StudioPreferences; fullPage?: boolean; persistWorkspace?: boolean; inPage?: boolean; sidePanel?: boolean; toolbarOnly?: boolean;
+  onSurface?(surface: 'sidepanel' | 'inpage' | 'window'): void;
   hostLabel?: string; onLayout?(insets: StudioInsets): void;
 }
 
@@ -199,7 +200,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       if (current?.selectedIds.includes(id)) workspace.context(x, y);
       else pendingContext = { id, x, y };
     } });
-  workspace = options.fullPage || options.inPage ? createStudioWorkbench(doc, host, main, tree, actions, options)
+  workspace = options.fullPage || options.inPage || options.sidePanel || options.toolbarOnly ? createStudioWorkbench(doc, host, main, tree, actions, options)
     : createWorkspace(doc, host, main, tree, actions.clearSelection, actions.selectAll, options);
   const layerName = get<HTMLInputElement>('.layer-name');
   layerName.addEventListener('change', () => {
@@ -257,7 +258,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
     focus() { if (options.inPage || options.fullPage) get<HTMLButtonElement>('[data-tool="select"]').focus(); else close.focus(); },
     render(state: PanelState) {
       current = state;
-      imageProperties.hidden = !state.image && !(options.fullPage || options.inPage) || state.selected;
+      imageProperties.hidden = !state.image && !(options.fullPage || options.inPage || options.sidePanel || options.toolbarOnly) || state.selected;
       imageProperties.disabled = !state.image || state.saving || Boolean(state.image?.locked) || state.inheritedLocked;
       tools.querySelectorAll<HTMLButtonElement>('[data-tool]').forEach((button) => { button.setAttribute('aria-pressed', String(button.dataset.tool === (state.tool ?? 'select'))); });
       const isGroup = state.image?.kind === 'group';

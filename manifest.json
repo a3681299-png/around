@@ -5,7 +5,8 @@
   "description": "YouTubeのUIを着せ替える拡張機能。仮のretroテーマをON/OFFし、強さを調整できます。",
   "minimum_chrome_version": "120",
   "permissions": [
-    "storage"
+    "storage",
+    "sidePanel"
   ],
   "background": {
     "service_worker": "background/index.js"

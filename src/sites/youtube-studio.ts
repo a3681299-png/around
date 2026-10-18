@@ -54,3 +54,23 @@ export function mountYouTubeStudio(doc: Document, changed: (state: StudioHostLay
     },
   };
 }
+
+/** A floating toolbar must yield even to faded native controls on short windows. */
+export function protectYouTubeStudioToolbar(doc: Document, toolbar: HTMLElement): () => void {
+  const view = doc.defaultView!;
+  let frame: number | undefined, alive = true, controls: Element | null = null;
+  const resize = new ResizeObserver(schedule); resize.observe(toolbar);
+  function measure() {
+    frame = undefined; if (!alive) return;
+    const next = doc.querySelector('#movie_player .ytp-chrome-bottom');
+    if (next !== controls) { if (controls) resize.unobserve(controls); controls = next; if (controls) resize.observe(controls); }
+    const a = toolbar.getBoundingClientRect(), b = controls?.getBoundingClientRect();
+    const overlap = Boolean(b && b.width && b.height && a.width && a.height && a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top);
+    toolbar.toggleAttribute('data-native-overlap', overlap);
+  }
+  function schedule() { if (alive && frame === undefined) frame = view.requestAnimationFrame(measure); }
+  const events = ['yt-navigate-finish', 'yt-page-data-updated', 'fullscreenchange'];
+  events.forEach((name) => doc.addEventListener(name, schedule));
+  view.addEventListener('scroll', schedule, { passive: true }); view.addEventListener('resize', schedule); schedule();
+  return () => { alive = false; if (frame !== undefined) view.cancelAnimationFrame(frame); resize.disconnect(); events.forEach((name) => doc.removeEventListener(name, schedule)); view.removeEventListener('scroll', schedule); view.removeEventListener('resize', schedule); toolbar.removeAttribute('data-native-overlap'); };
+}

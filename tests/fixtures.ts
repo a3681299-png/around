@@ -6,18 +6,18 @@ import path from 'node:path';
 const extensionPath = path.resolve('dist');
 const fixturePath = path.resolve('tests/fixtures/youtube.html');
 
-export async function launchExtension(profile: string, useFixture = true): Promise<BrowserContext> {
+export async function launchExtension(profile: string, useFixture = true, options: { headed?: boolean; width?: number; height?: number } = {}): Promise<BrowserContext> {
   const context = await chromium.launchPersistentContext(profile, {
     ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
       ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH }
       : { channel: 'chromium' }),
-    headless: true,
-    viewport: { width: 1100, height: 760 },
-    args: [`--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`],
+    headless: !options.headed,
+    viewport: options.headed ? null : { width: 1100, height: 760 },
+    args: [`--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`, ...(options.headed ? [`--window-size=${options.width ?? 1366},${options.height ?? 1000}`, '--force-device-scale-factor=1'] : [])],
   });
   // Bound Windows Chromium shutdown; only the test's headless profile and
   // extension path may be terminated when normal close stops responding.
-  if (process.platform === 'win32') {
+  if (process.platform === 'win32' && !options.headed) {
     const browser = context.browser(), close = context.close.bind(context);
     let closing: Promise<void> | undefined;
     context.close = (options) => closing ??= (async () => {

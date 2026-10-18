@@ -8,7 +8,7 @@ import { studioActions } from './ui-actions';
 import { buttonIcon } from '../editor/icons';
 
 interface StudioPorts {
-  hostName: string;
+  hostName: string; sidePanel?: boolean;
   connect(notify: (value: StudioConnectionState) => void, checkpoint: (target: number, value: EditorCheckpoint | undefined) => void): StudioConnection;
   recovery: StudioRecovery;
   preferences: StudioPreferences;
@@ -41,26 +41,29 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
   });
   const dispatch = (command: EditCommand) => {
     if (!connection.isConnected || !connection.state?.active) return;
-    pendingCommands++;
-    void connection.dispatch(command).finally(() => { pendingCommands--; if (!pendingCommands && latest) render(latest); });
+    pendingCommands++; panel?.host.setAttribute('aria-busy', 'true');
+    void connection.dispatch(command).finally(() => { pendingCommands--; panel?.host.setAttribute('aria-busy', String(pendingCommands > 0)); if (!pendingCommands && latest) render(latest); });
   };
   function render(value: StudioConnectionState) {
     if (!alive) return;
     latest = value;
-    message.textContent = value.message; message.dataset.connected = String(value.connected);
+    message.textContent = (ports.sidePanel && value.target !== undefined ? ports.hostName + ' #' + value.target + ' · ' : '') + value.message; message.dataset.connected = String(value.connected);
     get<HTMLButtonElement>('.disconnect-target').disabled = !value.connected;
     get<HTMLButtonElement>('.focus-target').disabled = value.target === undefined;
     if (!value.state || pendingCommands && value.connected && value.target === paneTarget) return;
     if (!panel || paneTarget !== value.target) {
       panel?.destroy(); mount.replaceChildren(); paneTarget = value.target;
       panel = createCreatorPanel(doc, studioActions(dispatch, (files) => { if (connection.isConnected) void connection.import(files); }, (id) => connection.thumbnail(id)),
-        targets.find((target) => target.id === value.target)?.anchors ?? [], { preferences: ports.preferences, hostLabel: ports.hostName, fullPage: true, persistWorkspace: true });
+        targets.find((target) => target.id === value.target)?.anchors ?? [], { preferences: ports.preferences, hostLabel: ports.hostName, fullPage: true, sidePanel: Boolean(ports.sidePanel), persistWorkspace: true, onSurface: (surface) => { void connection.openWorkspace(surface).catch((error: unknown) => { message.textContent = error instanceof Error ? error.message : '切替できませんでした。'; }); } });
       mount.append(panel.host); connectionBar.slot = 'connection'; message.slot = 'connection-status'; panel.host.append(connectionBar, message);
-      stage = doc.createElement('section'); stage.className = 'studio-stage'; stage.setAttribute('aria-label', '素材とプレビュー');
-      stage.innerHTML = `<div class="preview-link"><strong>ライブキャンバス</strong><p>${hostName}の画面に制作UIを配置して、作品を直接編集できます。</p><button class="stage-inpage" type="button">${hostName}でStudioを開く</button><button class="stage-focus" type="button">${hostName}を表示</button></div>`;
-      panel.host.shadowRoot!.querySelector('.canvas-slot')!.append(stage);
-      stage.querySelector('.stage-focus')!.addEventListener('click', focusTarget);
-      stage.querySelector('.stage-inpage')!.addEventListener('click', () => { void connection.openWorkspace().catch((error: unknown) => { message.textContent = error instanceof Error ? error.message : '制作画面を開けませんでした。'; }); });
+      if (!ports.sidePanel) {
+        stage = doc.createElement('section'); stage.className = 'studio-stage'; stage.setAttribute('aria-label', '素材とプレビュー');
+        stage.innerHTML = `<div class="preview-link"><button class="stage-sidepanel" type="button">Chromeサイドパネルで編集</button><strong>ライブキャンバス</strong><p>${hostName}の画面に制作UIを配置して、作品を直接編集できます。</p><button class="stage-inpage" type="button">${hostName}でStudioを開く</button><button class="stage-focus" type="button">${hostName}を表示</button></div>`;
+        panel.host.shadowRoot!.querySelector('.canvas-slot')!.append(stage);
+        stage.querySelector('.stage-sidepanel')!.addEventListener('click', () => { void connection.openWorkspace('sidepanel').catch((error: unknown) => { message.textContent = error instanceof Error ? error.message : 'サイドパネルを開けませんでした。'; }); });
+        stage.querySelector('.stage-focus')!.addEventListener('click', focusTarget);
+        stage.querySelector('.stage-inpage')!.addEventListener('click', () => { void connection.openWorkspace().catch((error: unknown) => { message.textContent = error instanceof Error ? error.message : '制作画面を開けませんでした。'; }); });
+      }
     }
     const ready = value.connected && value.state.active;
     panel.host.toggleAttribute('data-disconnected', !ready);
@@ -70,7 +73,7 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
   async function refreshTargets() {
     const epoch = ++refreshEpoch;
     try {
-      const list = await connection.targets(); if (!alive || epoch !== refreshEpoch) return;
+      const list = (await connection.targets()).filter((item) => !ports.sidePanel || connection.target === undefined || item.id === connection.target); if (!alive || epoch !== refreshEpoch) return;
       const previous = connection.target ?? Number(targetSelect.value);
       targets = list;
       targetSelect.replaceChildren(new Option('対象を選ぶ', ''));
@@ -106,7 +109,7 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
   // Bubble phase lets menus and focused input controls own their shortcuts first.
   doc.addEventListener('keydown', keydown, true); doc.addEventListener('keyup', keyup, true); doc.addEventListener('dragover', dragover); doc.addEventListener('drop', drop, true);
   return {
-    async start(target?: number) { await refreshTargets(); if (!alive) return; const selected = targets.find((item) => item.id === target) ?? (targets.length === 1 ? targets[0] : undefined); if (selected) { targetSelect.value = String(selected.id); await selectTarget(selected.id); } },
+    async start(target?: number) { await refreshTargets(); if (!alive) return; const selected = targets.find((item) => item.id === target) ?? (!ports.sidePanel && targets.length === 1 ? targets[0] : undefined); if (selected) { targetSelect.value = String(selected.id); await selectTarget(selected.id); } },
     destroy() { persist(); alive = false; connection.destroy(); panel?.destroy(); doc.removeEventListener('keydown', keydown, true); doc.removeEventListener('keyup', keyup, true); doc.removeEventListener('dragover', dragover); doc.removeEventListener('drop', drop, true); },
   };
 }

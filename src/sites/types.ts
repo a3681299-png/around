@@ -36,5 +36,6 @@ export interface SiteAdapter {
   readonly features?: Readonly<Record<string, SiteFeatureCapability>>;
   connect(onPageChange: () => void): () => void;
   mountSettings(entry: SettingsEntry): () => void;
+  protectStudioToolbar?(toolbar: HTMLElement): () => void;
   mountStudio?(changed: (state: StudioHostLayout) => void): StudioLayoutAdapter;
 }

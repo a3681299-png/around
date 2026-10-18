@@ -4,7 +4,7 @@ import { DEFAULT_THEME, themes } from '../themes';
 import { createThemeController } from '../themes/controller';
 import { createSettingsPanel } from '../settings/panel';
 import { createCreatorEditor, type CreatorEditor } from '../editor/controller';
-import { OPEN_CREATOR_EDITOR, OPEN_INPAGE_STUDIO } from '../editor/messages';
+import { OPEN_CREATOR_EDITOR, OPEN_INPAGE_STUDIO, OPEN_SIDE_PANEL_TOOLS, PREPARE_SIDE_PANEL } from '../editor/messages';
 import type { UserSettings } from '../storage/settings';
 import { connectStudioHost } from '../browser/studio-host';
 
@@ -20,6 +20,7 @@ if (site) {
   const controller = createThemeController(document, site, themes[DEFAULT_THEME], () => creator?.refreshSelection());
   creator = createCreatorEditor(document, site, DEFAULT_THEME, controller.updateDesign, controller.setImageEditing, controller.validateDesign);
   const disconnectStudio = connectStudioHost(document, site, creator);
+  void chrome.runtime.sendMessage({ type: PREPARE_SIDE_PANEL }).catch(() => undefined);
   const settingsPanel = createSettingsPanel(document);
   // The settings entry stays available independently of the theme's ON/OFF state.
   const unmountSettings = site.mountSettings(settingsPanel);
@@ -35,8 +36,8 @@ if (site) {
   let unwatch = watchSettings(update, reportError);
   const onMessage = (message: unknown, sender: chrome.runtime.MessageSender, respond: (value: unknown) => void) => {
     if (sender.id !== chrome.runtime.id || !message || typeof message !== 'object'
-      || !('type' in message) || ![OPEN_CREATOR_EDITOR, OPEN_INPAGE_STUDIO].includes(String(message.type))) return false;
-    respond(message.type === OPEN_INPAGE_STUDIO ? creator?.openStudio() : creator?.open());
+      || !('type' in message) || ![OPEN_CREATOR_EDITOR, OPEN_INPAGE_STUDIO, OPEN_SIDE_PANEL_TOOLS].includes(String(message.type))) return false;
+    respond(message.type === OPEN_SIDE_PANEL_TOOLS ? creator?.openSidePanel() : message.type === OPEN_INPAGE_STUDIO ? creator?.openStudio() : creator?.open());
     return false;
   };
   chrome.runtime.onMessage.addListener(onMessage);

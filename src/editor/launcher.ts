@@ -1,4 +1,5 @@
-import { OPEN_CREATOR_EDITOR, OPEN_INPAGE_STUDIO, type OpenEditorResponse } from './messages';
+import { requestStudioSurface } from '../browser/side-panel';
+import { OPEN_CREATOR_EDITOR, OPEN_INPAGE_STUDIO, OPEN_SIDE_PANEL, PREPARE_SIDE_PANEL, type OpenEditorResponse } from './messages';
 
 /** Only the active tab ID is needed, so no tabs/activeTab permission is added. */
 export function mountCreatorLauncher(container: HTMLElement): () => void {
@@ -15,9 +16,20 @@ export function mountCreatorLauncher(container: HTMLElement): () => void {
   status.textContent = 'YouTube上でカードと画像素材を編集します。';
   const studio = doc.createElement('button'); studio.id = 'creator-studio-open'; studio.type = 'button'; studio.textContent = 'Studioを開く（別ウィンドウ）';
   const inpage = doc.createElement('button'); inpage.id = 'creator-studio-inpage'; inpage.type = 'button'; inpage.textContent = 'Studioを開く（このタブ）';
-  section.append(inpage, studio, button, status);
+  const sidepanel = doc.createElement('button'); sidepanel.id = 'creator-studio-sidepanel'; sidepanel.type = 'button'; sidepanel.textContent = 'Studioを開く（Chromeサイドパネル）'; sidepanel.disabled = true;
+  inpage.textContent = '従来のインページStudio（切り戻し）';
+  section.append(sidepanel, inpage, studio, button, status);
   container.insertBefore(section, container.querySelector('.ww-editor-body'));
-  let alive = true;
+  let alive = true, targetTab: number | undefined;
+  void chrome.tabs.query({ active: true, currentWindow: true }).then(async ([tab]) => {
+    targetTab = tab?.id;
+    if (targetTab !== undefined) {
+      const result = await chrome.runtime.sendMessage({ type: PREPARE_SIDE_PANEL, tabId: targetTab }) as OpenEditorResponse;
+      if (alive) sidepanel.disabled = !result?.ok;
+    }
+  }).catch(() => { if (alive) status.textContent = 'サイドパネルの準備に失敗しました。拡張を再読み込みしてください。'; });
+  const onSidePanel = () => { void requestStudioSurface(OPEN_SIDE_PANEL, targetTab).then(() => { if (alive) status.textContent = 'Chromeサイドパネルで編集中です。'; }, (error: unknown) => { if (alive) status.textContent = error instanceof Error ? error.message : 'サイドパネルを開けませんでした。'; }); };
+  sidepanel.addEventListener('click', onSidePanel);
   const open = async (message = OPEN_CREATOR_EDITOR) => {
     button.disabled = true;
     status.textContent = '編集モードを開いています…';
@@ -46,5 +58,5 @@ export function mountCreatorLauncher(container: HTMLElement): () => void {
   const onClick = () => { void open(); };
   const onInpage = () => { void open(OPEN_INPAGE_STUDIO); }; inpage.addEventListener('click', onInpage);
   button.addEventListener('click', onClick);
-  return () => { alive = false; button.removeEventListener('click', onClick); inpage.removeEventListener('click', onInpage); studio.removeEventListener('click', onStudio); section.remove(); };
+  return () => { alive = false; sidepanel.removeEventListener('click', onSidePanel); button.removeEventListener('click', onClick); inpage.removeEventListener('click', onInpage); studio.removeEventListener('click', onStudio); section.remove(); };
 }

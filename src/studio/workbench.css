@@ -156,3 +156,29 @@ label[data-scrub] { cursor: ew-resize; user-select: none; touch-action: none; }
 label[data-scrub]:has(input:disabled) { cursor: default; }
 label[data-scrub] input { cursor: text; user-select: text; }
 .local-connection { color: var(--ui-muted); font-size: 10px; white-space: nowrap; }
+
+/* The native Side Panel owns width. These rules never style the host website. */
+:host([data-sidepanel]) .studio-menu { padding-inline: 2px; }
+:host([data-sidepanel]) .studio-brand, :host([data-sidepanel]) .menu-end > .dock { display: none; }
+:host([data-sidepanel]) .studio-menu-item > summary { padding-inline: 5px; }
+:host([data-sidepanel]) .editor-body { display: block; min-height: 0; }
+:host([data-sidepanel]) .studio-library, :host([data-sidepanel]) .studio-resize, :host([data-sidepanel]) .canvas-slot { display: none; }
+:host([data-sidepanel]) .studio-inspectors { position: static; width: 100%; height: 100%; display: grid; border: 0; box-shadow: none; }
+:host([data-sidepanel]) .studio-connection { display: none; }
+:host([data-sidepanel]) .toolbar { height: 30px; }
+:host([data-sidepanel]) .canvas-dimensions { display: none; }
+:host([data-sidepanel]) footer { gap: 6px; }
+.surface-actions { display: inline-flex; gap: 1px; }
+:host([data-page-toolbar]) { position: fixed !important; inset: auto auto 32px 12px !important; width: max-content !important; max-width: calc(100vw - 24px) !important; height: 32px !important; z-index: 2147483001 !important; }
+:host([data-page-toolbar]) main { height: 32px; }
+:host([data-page-toolbar]) .editor-body, :host([data-page-toolbar]) .studio-menu, :host([data-page-toolbar]) footer { display: none; }
+:host([data-page-toolbar]) .toolbar { height: 32px; border: 1px solid var(--ui-line); border-radius: 3px; overflow-x: auto; overflow-y: hidden; }
+:host([data-page-toolbar]) .interaction-tools { flex-direction: row; width: auto; padding: 0 3px; gap: 0; border-inline: 1px solid var(--ui-line); }
+:host([data-page-toolbar]) .interaction-tools .mask-shortcut { display: none; }
+:host([data-page-toolbar]) .dirty { padding-inline: 5px; }
+:host([data-page-toolbar][data-fullscreen]) { display: none !important; }
+
+:host([data-page-toolbar][data-native-overlap]) { visibility: hidden !important; pointer-events: none !important; }
+
+:host([data-sidepanel]) .toolbar .interaction-tools { flex-direction: row; width: auto; padding: 0; border: 0; }
+:host([data-sidepanel]) .toolbar .mask-shortcut { display: none; }
