@@ -102,6 +102,9 @@ test('fullscreen suspends authoring and help, then SPA/scroll and strength zero 
   const panel = await open(popup, youtube); await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await panel.getByLabel('配置の基準', { exact: true }).selectOption('video-player');
   await panel.getByRole('button', { name: '使い方', exact: true }).click(); await expect(panel.locator('.studio-help')).toBeVisible();
+  await youtube.keyboard.press('Control+d'); await expect(youtube.locator(images)).toHaveCount(1);
+  await youtube.keyboard.press('Escape'); await expect(panel.locator('.studio-help')).not.toBeVisible(); await expect(panel.locator('.selected-count')).toHaveText('1個選択中');
+  await panel.getByRole('button', { name: '使い方', exact: true }).click();
   await youtube.locator('#movie_player').evaluate((node) => node.requestFullscreen());
   await expect(youtube.locator('#web-world-themes-creator')).toHaveAttribute('data-fullscreen', ''); await expect(panel).not.toBeVisible();
   await expect(youtube.locator('#web-world-themes-creator').locator('.studio-help')).not.toHaveAttribute('open', '');

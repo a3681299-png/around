@@ -96,7 +96,7 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
   get('.focus-target').addEventListener('click', focusTarget);
   const consumedKeys = new Set<string>();
   const keydown = (event: KeyboardEvent) => {
-    if (!connection.isConnected || !connection.state?.active || panel?.host.hasAttribute('data-ww-scrubbing') || event.isComposing || event.composedPath().some((node) => node instanceof HTMLElement && (node.matches('input,textarea,select,summary,[role="tab"],[role="separator"],[role="menuitem"]') || node.isContentEditable))) return;
+    if (!connection.isConnected || !connection.state?.active || panel?.host.hasAttribute('data-ww-scrubbing') || event.isComposing || event.composedPath().some((node) => node instanceof HTMLElement && (node.matches('input,textarea,select,summary,dialog,[role="tab"],[role="separator"],[role="menuitem"]') || node.isContentEditable))) return;
     const command = shortcutCommand(event, connection.state.view, true); if (!command) return;
     dispatch(command); consumedKeys.add(event.code || event.key); event.preventDefault(); event.stopImmediatePropagation();
   };
