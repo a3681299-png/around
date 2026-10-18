@@ -1,3 +1,4 @@
+import { exposeEditorControls } from './helpers/editor-workspace';
 import { test, expect } from '@playwright/test';
 import { mkdtemp, mkdir, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -26,7 +27,7 @@ test('optional real YouTube: saved group, mask, anchors, signals, theater, fulls
     await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check(); await page.bringToFront();
     await expect(page.locator('[data-ww-surface~="player-window"]')).toBeVisible();
     await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-    const panel = page.getByRole('dialog', { name: 'デザインエディター' }); await expect(panel).toBeVisible();
+    const panel = page.getByRole('dialog', { name: 'デザインエディター' }); await expect(panel).toBeVisible(); await exposeEditorControls(panel);
     await panel.getByLabel('アニメーション素材を追加').setInputFiles(['petal.gif', 'petal.apng', 'alpha1080.webm'].map((name) => path.resolve(`tests/fixtures/motion/${name}`)));
     const overlay = '#web-world-themes-decorations', media = page.locator(`${overlay} .media`);
     await expect(media).toHaveCount(3);

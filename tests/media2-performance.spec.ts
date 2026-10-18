@@ -1,3 +1,4 @@
+import { exposeEditorControls } from './helpers/editor-workspace';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { execFile } from 'node:child_process';
@@ -19,6 +20,7 @@ for (const [index, scenario] of cases.entries()) test(`media benchmark: ${scenar
   const panel = youtube.getByRole('dialog', { name: 'デザインエディター' });
   await expect(async () => { if (!await panel.isVisible()) await popup.locator('#creator-editor-open').evaluate((n: HTMLButtonElement) => n.click());
     await expect(panel).toBeVisible({ timeout: 1000 }); }).toPass({ timeout: 10_000 });
+  await exposeEditorControls(panel);
   if (scenario.scroll) { await youtube.locator('#navigate').evaluate((n: HTMLButtonElement) => n.click()); await expect(youtube.locator('[data-ww-surface~="player-window"]')).toBeVisible(); }
   for (let remaining = scenario.count; remaining > 0; remaining -= 8) {
     await panel.getByLabel('アニメーション素材を追加').setInputFiles(Array(Math.min(8, remaining)).fill(path.resolve(`tests/fixtures/motion/${scenario.file}`)));

@@ -1,3 +1,4 @@
+import { exposeEditorControls } from './helpers/editor-workspace';
 import path from 'node:path';
 import { build } from 'esbuild';
 import { readFile } from 'node:fs/promises';
@@ -10,7 +11,7 @@ const file = (name: string) => path.resolve(`tests/fixtures/motion/${name}`);
 async function open(popup: Page, page: Page) {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check(); await page.bringToFront();
   await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const panel = page.getByRole('dialog', { name: 'デザインエディター' }); await expect(panel).toBeVisible(); return panel;
+  const panel = page.getByRole('dialog', { name: 'デザインエディター' }); await expect(panel).toBeVisible(); await exposeEditorControls(panel); return panel;
 }
 async function ready(page: Page, count: number) {
   await expect(page.locator(layers)).toHaveCount(count);
@@ -141,13 +142,13 @@ test('APNG/WebM/image share player-anchored groups, mask signals, history, reduc
 
 test('scene budget defers excess 1080p videos and resumes waiting layers after hidden resources are released', async ({ popup, youtube }) => {
   const panel = await open(popup, youtube); await panel.getByLabel('アニメーション素材を追加').setInputFiles(file('alpha1080.webm')); await ready(youtube, 1);
-  for (let i = 0; i < 5; i++) await panel.getByRole('button', { name: '選択を複製', exact: true }).click();
+  for (let i = 0; i < 5; i++) await panel.getByRole('button', { name: '複製', exact: true }).click();
   await expect(youtube.locator(layers)).toHaveCount(6);
   await expect(youtube.locator(`${layers} .media[data-playback="waiting"]`)).toHaveCount(1);
   await expect(youtube.locator(`${layers} video`)).toHaveCount(5);
   const stats = async () => JSON.parse((await youtube.locator(overlay).getAttribute('data-ww-media-stats'))!) as { decodedBytes: number; encodedBytes: number; cacheBytes: number; peakDecodedBytes: number };
   expect((await stats()).decodedBytes).toBeLessThanOrEqual(128 * 1024 * 1024); expect((await stats()).peakDecodedBytes).toBeLessThanOrEqual(128 * 1024 * 1024);
-  await panel.locator('[data-layer-id]').last().locator('[data-action="select"]').click(); await panel.getByLabel('画像を表示', { exact: true }).uncheck();
+  await panel.locator('[data-layer-id]').last().locator('[data-action="select"]').click(); await panel.locator('[data-layer-id]').last().getByRole('button', { name: '非表示にする', exact: true }).click();
   await expect(youtube.locator(`${layers} .media[data-playback="waiting"]`)).toHaveCount(0); await expect(youtube.locator(`${layers} video`)).toHaveCount(5);
   expect((await stats()).decodedBytes).toBeLessThanOrEqual(128 * 1024 * 1024);
   await save(panel); expect(new Set((await stored(popup)).decorations.map((n) => n.assetId)).size).toBe(1);

@@ -1,3 +1,4 @@
+import { exposeEditorControls, withCanvas, clickCanvas } from './helpers/editor-workspace';
 import type { Page, Locator } from '@playwright/test';
 import { test, expect } from './fixtures';
 import type { DesignDocument } from '../src/design/types';
@@ -13,7 +14,7 @@ async function open(popup: Page, page: Page) {
   await page.bringToFront();
   await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
   const dialog = page.getByRole('dialog', { name: 'デザインエディター' });
-  await expect(dialog).toBeVisible(); return dialog;
+  await expect(dialog).toBeVisible(); await exposeEditorControls(dialog); return dialog;
 }
 async function importOne(dialog: Locator, page: Page) {
   const data = await page.evaluate(() => {
@@ -44,8 +45,10 @@ const image = (page: Page, id: number) => page.locator(`${images}[data-image-id=
 const row = (dialog: Locator, id: number) => dialog.locator(`${rows}[data-layer-id="image-${id}"]`);
 async function point(node: Locator) { const b = (await node.boundingBox())!; return { x: b.x + b.width / 2, y: b.y + b.height / 2 }; }
 async function drag(page: Page, node: Locator, dx: number, dy: number) {
-  const p = await point(node); await page.mouse.move(p.x, p.y); await page.mouse.down();
-  await page.mouse.move(p.x + dx, p.y + dy, { steps: 15 }); await page.mouse.up();
+  await withCanvas(page, async () => {
+    const p = await point(node); await page.mouse.move(p.x, p.y); await page.mouse.down();
+    await page.mouse.move(p.x + dx, p.y + dy, { steps: 15 }); await page.mouse.up();
+  });
 }
 async function assetExists(popup: Page, id: string) {
   return popup.evaluate(async (assetId) => (await chrome.runtime.sendMessage({ type: 'web-world-themes:assets', action: 'get', id: assetId })).ok as boolean, id);
@@ -64,8 +67,8 @@ test('layer panel renames, reorders by drag, synchronizes selection, locks, dupl
   await row(dialog, 0).getByRole('button', { name: 'ロック', exact: true }).click();
   const before = await point(image(youtube, 0));
   await expect(dialog.getByLabel('画像の幅', { exact: true })).toBeDisabled();
-  await expect(row(dialog, 0).getByRole('button', { name: '削除', exact: true })).toBeDisabled();
-  await expect(row(dialog, 0).getByRole('button', { name: '複製', exact: true })).toBeDisabled();
+  await expect(dialog.getByRole('button', { name: '画像を削除', exact: true })).toBeDisabled();
+  await expect(dialog.getByRole('button', { name: '複製', exact: true })).toBeDisabled();
   await youtube.keyboard.press('ArrowRight'); await youtube.keyboard.press('Delete'); await youtube.keyboard.press('Control+d');
   expect(await point(image(youtube, 0))).toEqual(before); await expect(youtube.locator(images)).toHaveCount(3);
   await row(dialog, 0).getByRole('button', { name: '非表示にする' }).click();
@@ -76,13 +79,14 @@ test('layer panel renames, reorders by drag, synchronizes selection, locks, dupl
   const again = await open(popup, youtube);
   await row(again, 0).getByRole('button', { name: '表示する' }).click();
   await row(again, 0).getByRole('button', { name: 'ロック解除' }).click();
-  await row(again, 0).getByRole('button', { name: '複製', exact: true }).click(); await expect(youtube.locator(images)).toHaveCount(4);
+  await row(again, 0).getByRole('button', { name: '花びら', exact: true }).click();
+  await again.getByRole('button', { name: '複製', exact: true }).click(); await expect(youtube.locator(images)).toHaveCount(4);
   await expect(again.locator('.selection')).toContainText('花びら コピー');
 });
 
 test('canvas Ctrl/Shift selection moves a group, nudges by pixels, duplicates, deletes, undoes and deselects', async ({ popup, youtube }) => {
   const dialog = await seed(popup, youtube);
-  await image(youtube, 0).click(); await image(youtube, 1).click({ modifiers: ['Control'] });
+  await clickCanvas(image(youtube, 0)); await clickCanvas(image(youtube, 1), { modifiers: ['Control'] });
   await expect(dialog.locator(`${rows}[data-selected]`)).toHaveCount(2);
   await expect(youtube.locator(`${images}[data-selected]`)).toHaveCount(2);
   await expect(youtube.locator(`${overlay} .handle:visible`)).toHaveCount(0);
@@ -95,7 +99,7 @@ test('canvas Ctrl/Shift selection moves a group, nudges by pixels, duplicates, d
   await youtube.keyboard.press('ArrowRight'); await youtube.keyboard.press('Shift+ArrowDown');
   expect((await point(image(youtube, 0))).x).toBeCloseTo(a.x + 31, 3);
   expect((await point(image(youtube, 1))).y).toBeCloseTo(b.y + 35, 3);
-  await image(youtube, 2).click({ modifiers: ['Shift'] }); await expect(dialog.locator(`${rows}[data-selected]`)).toHaveCount(3);
+  await clickCanvas(image(youtube, 2), { modifiers: ['Shift'] }); await expect(dialog.locator(`${rows}[data-selected]`)).toHaveCount(3);
   await youtube.keyboard.press('Control+d'); await expect(youtube.locator(images)).toHaveCount(6);
   await expect(youtube.locator(`${images}[data-selected]`)).toHaveCount(3);
   await youtube.keyboard.press('Delete'); await expect(youtube.locator(images)).toHaveCount(3);
@@ -134,7 +138,7 @@ test('32 layers combine hidden and locked selection without moving or deleting p
 
 test('optional snapping shows guides at screen/player/other layer bounds and Alt keeps free placement', async ({ popup, youtube }) => {
   const dialog = await seed(popup, youtube, 2); const first = image(youtube, 0), other = image(youtube, 1);
-  await first.click(); await dialog.getByRole('checkbox', { name: 'スナップを有効にする' }).check();
+  await clickCanvas(first); await dialog.getByRole('checkbox', { name: 'スナップを有効にする' }).check();
   const initial = await point(first);
   await youtube.mouse.move(initial.x, initial.y); await youtube.mouse.down(); await youtube.mouse.move(546, 432, { steps: 15 });
   expect((await point(first)).x).toBeCloseTo(550, 3);
@@ -165,7 +169,7 @@ test('alignment and equal gaps filter locked/hidden layers and each undo as one 
   const dialog = await seed(popup, youtube, 5);
   await row(dialog, 3).getByRole('button', { name: 'ロック', exact: true }).click();
   await row(dialog, 4).getByRole('button', { name: '非表示にする' }).click();
-  await image(youtube, 1).click(); await dialog.getByLabel('画像のX位置').fill('25'); await dialog.getByLabel('画像のY位置').fill('60');
+  await clickCanvas(image(youtube, 1)); await dialog.getByLabel('画像のX位置').fill('25'); await dialog.getByLabel('画像のY位置').fill('60');
   for (const id of [0, 2, 3, 4]) await row(dialog, id).locator('[data-action="select"]').click({ modifiers: ['Control'] });
   const locked = await point(image(youtube, 3)), a = await point(image(youtube, 0)), b = await point(image(youtube, 1)), c = await point(image(youtube, 2));
   await dialog.getByRole('button', { name: '上揃え', exact: true }).click();
@@ -178,20 +182,20 @@ test('alignment and equal gaps filter locked/hidden layers and each undo as one 
 });
 
 test('Escape and pointer cancellation restore an in-flight drag without consuming earlier Undo history', async ({ popup, youtube }) => {
-  const dialog = await seed(popup, youtube, 1); const first = image(youtube, 0); await first.click();
+  const dialog = await seed(popup, youtube, 1); const first = image(youtube, 0); await clickCanvas(first);
   await youtube.keyboard.press('ArrowRight'); const afterNudge = await point(first);
   await youtube.mouse.move(afterNudge.x, afterNudge.y); await youtube.mouse.down(); await youtube.mouse.move(afterNudge.x + 80, afterNudge.y + 45, { steps: 10 });
   await youtube.keyboard.press('Escape'); await youtube.mouse.up(); expect(await point(first)).toEqual(afterNudge);
   await expect(youtube.locator(`${images}[data-selected]`)).toHaveCount(0);
   await youtube.keyboard.press('Control+z'); expect((await point(first)).x).toBeCloseTo(afterNudge.x - 1, 3);
-  await first.click(); const initial = await point(first);
+  await clickCanvas(first); const initial = await point(first);
   await youtube.mouse.move(initial.x, initial.y); await youtube.mouse.down(); await youtube.mouse.move(initial.x + 80, initial.y + 45, { steps: 10 });
   await first.dispatchEvent('pointercancel', { pointerId: 1, bubbles: true }); await youtube.mouse.up(); expect(await point(first)).toEqual(initial);
   await expect(dialog).toBeVisible();
 });
 
 test('resize and rotation each undo as one gesture; save baseline and discard stay consistent', async ({ popup, youtube }) => {
-  const dialog = await seed(popup, youtube, 1); await image(youtube, 0).click();
+  const dialog = await seed(popup, youtube, 1); await clickCanvas(image(youtube, 0));
   const frame = youtube.locator(`${overlay} [data-frame-id="image-0"]`);
   const original = (await stored(popup)).decorations[0]!.placement;
   await drag(youtube, frame.getByRole('button', { name: '右下でサイズ変更' }), 60, 40);
@@ -216,7 +220,7 @@ test('Undo of imports and saved deletions retains immutable asset bytes until th
   await dialog.getByRole('button', { name: '元に戻す', exact: true }).click(); await expect(youtube.locator(images)).toHaveCount(0);
   expect(await assetExists(popup, assetId)).toBe(true);
   await dialog.getByRole('button', { name: 'やり直す', exact: true }).click(); await expect(youtube.locator(images).locator('img')).toBeVisible();
-  await youtube.locator(images).click(); await youtube.keyboard.press('Delete'); await save(dialog);
+  await clickCanvas(youtube.locator(images)); await youtube.keyboard.press('Delete'); await save(dialog);
   expect(await assetExists(popup, assetId)).toBe(true);
   await youtube.keyboard.press('Control+z'); await expect(youtube.locator(images).locator('img')).toBeVisible();
   await dialog.getByRole('button', { name: '変更を破棄', exact: true }).click(); await expect(youtube.locator(images)).toHaveCount(0);
@@ -224,7 +228,7 @@ test('Undo of imports and saved deletions retains immutable asset bytes until th
 });
 
 test('input editing and normal YouTube keyboard events remain independent of layer shortcuts', async ({ popup, youtube }) => {
-  const dialog = await seed(popup, youtube, 1); await image(youtube, 0).click();
+  const dialog = await seed(popup, youtube, 1); await clickCanvas(image(youtube, 0));
   const before = await point(image(youtube, 0));
   await youtube.evaluate(() => {
     document.documentElement.dataset.arrowEvents = '';
@@ -258,7 +262,7 @@ test('Undo restores equal-z painting order even when a deleted node is recreated
   dialog = await open(popup, youtube);
   await row(dialog, 0).locator('[data-action="select"]').click(); await youtube.keyboard.press('Delete'); await youtube.keyboard.press('Control+z');
   await expect(youtube.locator(images)).toHaveCount(3);
-  await youtube.keyboard.press('Escape'); await image(youtube, 2).click();
+  await youtube.keyboard.press('Escape'); await clickCanvas(image(youtube, 2));
   await expect(image(youtube, 2)).toHaveAttribute('data-selected', '');
   await expect(dialog.locator(`${rows}[data-selected]`)).toHaveAttribute('data-layer-id', 'image-2');
 });
@@ -275,7 +279,8 @@ test('history retains more than 32 distinct assets while the active document sta
     await expect(dialog.getByRole('button', { name: '保存', exact: true })).toBeEnabled();
   }
   await youtube.keyboard.press('Escape');
-  for (const button of await dialog.locator('[data-action="select"]').all()) await button.click({ modifiers: ['Control'] });
+  await dialog.getByRole('button', { name: 'すべて選択', exact: true }).click();
+  await expect(dialog.locator('.selected-count')).toHaveText('32個選択中');
   await youtube.keyboard.press('Delete'); await expect(youtube.locator(images)).toHaveCount(0);
   await dialog.getByLabel('画像素材を追加').setInputFiles({ name: 'asset-32.png', mimeType: 'image/png', buffer: Buffer.from(payloads[32]!, 'base64') });
   await expect(youtube.locator(images)).toHaveCount(1);

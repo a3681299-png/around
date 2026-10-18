@@ -1,3 +1,4 @@
+import { exposeEditorControls, withCanvas } from './helpers/editor-workspace';
 import type { CDPSession, Locator, Page } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -12,7 +13,7 @@ async function open(popup: Page, page: Page) {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check(); await page.bringToFront();
   await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const panel = page.getByRole('dialog', { name: 'デザインエディター' }); await expect(panel).toBeVisible(); return panel;
+  const panel = page.getByRole('dialog', { name: 'デザインエディター' }); await expect(panel).toBeVisible(); await exposeEditorControls(panel); return panel;
 }
 const row = (panel: Locator, name: string) => panel.locator('[data-layer-id]').filter({ has: panel.page().getByRole('button', { name, exact: true }) });
 async function number(panel: Locator, label: string, value: number) { await panel.getByLabel(label, { exact: true }).fill(String(value)); }
@@ -89,7 +90,7 @@ test('three images group, move as one, share a mouse/video mask, save, restart a
   const content = youtube.locator(`${compositions} .group-content`);
   for (const image of await youtube.locator(images).all()) {
     const rect = (await image.boundingBox())!, point = { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
-    await youtube.mouse.move(point.x, point.y);
+    await withCanvas(youtube, () => youtube.mouse.move(point.x, point.y));
     await expect.poll(() => content.evaluate((element: HTMLElement, point) => {
       const match = element.style.maskImage.match(/at ([\d.e+-]+)px ([\d.e+-]+)px/)!, rect = element.getBoundingClientRect();
       return Math.abs(rect.left + Number(match[1]) - point.x) + Math.abs(rect.top + Number(match[2]) - point.y);
@@ -117,12 +118,12 @@ test('three images group, move as one, share a mouse/video mask, save, restart a
 });
 
 test('group opacity and mask are applied once to overlapping pixels, with child effects composed inside', async ({ popup, youtube }) => {
-  const panel = await open(popup, youtube); await youtube.mouse.move(20, 20); const baseline = await youtube.screenshot();
+  const panel = await open(popup, youtube); await youtube.mouse.move(20, 20); const baseline = await withCanvas(youtube, () => youtube.screenshot());
   await addThree(panel, youtube, true); await groupThree(panel, youtube);
   await panel.getByLabel('グループの不透明度').fill('50'); await panel.getByLabel('円形マスクを使う').check(); await panel.getByLabel('マウスに追従').uncheck();
   await number(panel, '光の半径', 65); await number(panel, '境界のぼかし', 10); await panel.getByLabel('マスクの表示強度').fill('50');
   await expect(panel.getByRole('button', { name: 'グループを解除', exact: true })).toBeDisabled();
-  await youtube.mouse.move(20, 20); const masked = await youtube.screenshot();
+  await youtube.mouse.move(20, 20); const masked = await withCanvas(youtube, () => youtube.screenshot());
   const background = await pixel(youtube, baseline, 385, 304), actual = await pixel(youtube, masked, 385, 304), top = [66, 118, 237];
   for (let i = 0; i < 3; i++) expect(actual[i]).toBeCloseTo(Math.round(top[i]! * .25 + background[i]! * .75), -1);
   expect(await pixel(youtube, masked, 485, 304)).toEqual(await pixel(youtube, baseline, 485, 304));

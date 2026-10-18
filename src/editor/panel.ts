@@ -5,6 +5,7 @@ import type { Alignment, Distribution } from '../design/layout';
 import { createEffectsPanel } from './effects-panel';
 import { childrenOf, effectivelyLocked, groupMovable, parentGroup } from '../design/hierarchy';
 import { createLayerTree } from './layer-tree';
+import { createWorkspace } from './workspace';
 
 export interface PanelState {
   selected: boolean;
@@ -44,6 +45,9 @@ export interface PanelActions {
   layout(mode: Alignment | Distribution): void;
   group(): void;
   ungroup(): void;
+  clearSelection(): void;
+  selectAll(): void;
+  thumbnail(id: string): Promise<string | undefined>;
 }
 
 /** This UI has no site selectors, theme CSS or persistence logic. */
@@ -59,7 +63,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
   sheet.textContent = styles;
   const main = doc.createElement('main');
   main.innerHTML = `
-    <header><h2>デザインを編集</h2><button class="dock" type="button">パネルを左へ</button><button class="close" type="button" aria-label="編集を終了">×</button></header>
+    <header><div><span class="eyebrow">WORLD CREATOR</span><h2>デザインを編集</h2></div><button class="dock" type="button" title="YouTubeの見たい場所に合わせて左右を切り替え">パネルを左へ</button><button class="minimize" type="button" aria-label="パネルを折りたたむ" title="プレビューを広く見る">−</button><button class="close" type="button" aria-label="編集を終了" title="未保存の変更を破棄して終了">×</button></header>
     <div class="toolbar"><button class="undo" type="button" title="Ctrl＋Z">元に戻す</button><button class="redo" type="button" title="Ctrl＋Shift＋Z / Ctrl＋Y">やり直す</button><span class="dirty" role="status"></span></div>
     <div class="editor-body">
     <section class="assets">
@@ -67,17 +71,17 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       <button class="add-animation" type="button">アニメーションを追加</button>
       <input class="file" type="file" accept="image/png,image/webp" multiple aria-label="画像素材を追加" hidden>
       <input class="animation-file" type="file" accept="image/gif,image/png,image/apng,image/webp,video/webm,application/json,.json,.apng" multiple aria-label="アニメーション素材を追加" hidden>
-      <p class="hint">PNG・APNG・WebP・GIF・WebM・Lottie JSONを選択、またはドロップ。素材32MB／JSON 1MB、全32レイヤーまで。</p>
+      <p class="hint asset-hint">ここへ素材をドロップしても追加できます。<span title="PNG・APNG・WebP・GIF・WebM・Lottie JSON。素材32MB／JSON 1MB、全32レイヤーまで。">対応形式 ⓘ</span></p>
     </section>
     <details class="layers-section" open><summary>レイヤー <span class="layer-count"></span></summary>
-      <p class="hint">上が手前。↕をドラッグして並び替え。Ctrl／Shiftで複数選択。</p>
+      <p class="hint selection-tip">行のチェックで複数選択できます。上が手前、つまみをドラッグして並び替え。</p>
       <div class="layers" role="group" aria-label="画像レイヤー"></div>
     </details>
     <p class="selection" role="status">カードが選択されていません</p>
     <label class="snap-toggle"><input class="snap" type="checkbox">スナップを有効にする</label>
     <p class="hint">画面・プレイヤー・他レイヤーに吸着。Altを押している間は自由配置。</p>
-    <div class="selection-actions" hidden><button class="duplicate-image" type="button" title="Ctrl＋D">選択を複製</button><button class="delete-image" type="button" title="Delete">画像を削除</button><button class="group-layers" type="button">選択をグループ化</button><button class="ungroup-layers" type="button" hidden>グループを解除</button></div>
-    <p class="hint grouping-help" hidden></p>
+    <div class="selection-actions"><button class="group-layers" type="button" aria-describedby="ww-group-reason">選択をグループ化</button><button class="ungroup-layers" type="button" hidden>グループを解除</button><button class="duplicate-image" type="button" title="選択を複製（Ctrl＋D）">複製</button><button class="delete-image" type="button" title="選択を削除（Delete）" aria-label="画像を削除">削除</button><button class="inspect" type="button">プロパティを編集</button></div>
+    <p class="hint grouping-help" id="ww-group-reason"></p>
     <fieldset class="layout-tools" aria-label="整列と配置" hidden>
       <div class="align-row"><button type="button" data-align="left">左揃え</button><button type="button" data-align="center-x">左右中央揃え</button><button type="button" data-align="right">右揃え</button></div>
       <div class="align-row"><button type="button" data-align="top">上揃え</button><button type="button" data-align="center-y">上下中央揃え</button><button type="button" data-align="bottom">下揃え</button></div>
@@ -108,14 +112,12 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
         <label>X <input type="number" aria-label="画像のX位置" data-image-prop="x" min="0" max="100" step="0.01" required>%</label>
         <label>Y <input type="number" aria-label="画像のY位置" data-image-prop="y" min="0" max="100" step="0.01" required>%</label>
       </div>
-      <div class="property row">
+      <div class="property row size-property">
         <label>幅 <input type="number" aria-label="画像の幅" data-image-prop="widthPx" min="${IMAGE_LIMITS.minSize}" max="${IMAGE_LIMITS.maxSize}" step="0.1" required>px</label>
         <label>高さ <input type="number" aria-label="画像の高さ" data-image-prop="heightPx" min="${IMAGE_LIMITS.minSize}" max="${IMAGE_LIMITS.maxSize}" step="0.1" required>px</label>
       </div>
-      <div class="property"><label>角度 <input type="number" aria-label="画像の角度" data-image-prop="rotationDeg" min="-180" max="180" step="0.1" required>°</label></div>
+      <div class="property rotation-property"><label>角度 <input type="number" aria-label="画像の角度" data-image-prop="rotationDeg" min="-180" max="180" step="0.1" required>°</label></div>
       <div class="property"><label>不透明度 <output class="opacity-value"></output></label><input type="range" aria-label="画像の不透明度" data-image-prop="opacity" min="0" max="100" step="1"></div>
-      <div class="property"><label>重なり順 <input type="number" aria-label="画像の重なり順" data-image-prop="zIndex" min="-100" max="100" step="1" required></label></div>
-      <div class="property"><label><input type="checkbox" data-image-prop="visible">画像を表示</label></div>
       <fieldset class="playback" aria-label="アニメーションの再生" hidden>
         <div class="property playback-mode"><label>再生方式 <select data-playback="mode" aria-label="再生方式"><option value="auto">軽量再生（自動）</option><option value="controlled">時刻制御</option></select></label></div>
         <div class="property"><label><input type="checkbox" data-playback="playing">アニメーションを再生</label><label><input type="checkbox" data-playback="loop">ループ再生</label></div>
@@ -128,10 +130,8 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
     <p class="hint card-help">チェックを外した項目はテーマの見た目に戻ります。</p>
     <p class="hint multi-help" hidden>複数選択は一括移動に対応しています。拡縮・回転は1枚ずつ操作してください。</p>
     </details>
-    <p class="hint">矢印: 1px / Shift＋矢印: 10px / Esc: 選択解除</p>
     </div>
     <footer>
-    <p class="hint">終了すると未保存の変更を破棄します。</p>
     <div class="actions"><button class="primary save" type="button">保存</button><button class="discard" type="button">変更を破棄</button></div>
     <p class="status" role="status" aria-live="polite"></p></footer>`;
   shadow.append(sheet, main);
@@ -185,7 +185,14 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
   addAnimation.addEventListener('click', () => animationInput.click());
   animationInput.addEventListener('change', () => { actions.imageImport([...animationInput.files ?? []]); animationInput.value = ''; });
   fileInput.addEventListener('change', () => { actions.imageImport([...fileInput.files ?? []]); fileInput.value = ''; });
-  const tree = createLayerTree(doc, layers, { select: actions.imageSelect, change: actions.layerChange, duplicate: actions.duplicate, remove: actions.imageDelete, reorder: actions.reorder });
+  let workspace: ReturnType<typeof createWorkspace>;
+  const tree = createLayerTree(doc, layers, { select: actions.imageSelect, change: actions.layerChange, reorder: actions.reorder,
+    thumbnail: actions.thumbnail,
+    context: (id, x, y) => {
+      if (!current?.selectedIds.includes(id)) actions.imageSelect(id);
+      workspace.context(x, y);
+    } });
+  workspace = createWorkspace(doc, host, main, tree, actions.clearSelection, actions.selectAll);
   const layerName = get<HTMLInputElement>('.layer-name');
   layerName.addEventListener('change', () => {
     const name = layerName.value.trim();
@@ -198,9 +205,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
     if (!property) return;
     if (!input.checkValidity()) { setText(status, '画像の値を範囲内で入力してください。'); status.dataset.error = 'true'; save.disabled = true; return; }
     if (property === 'anchor') actions.imageChange({ placement: { anchor: input.value === 'viewport' ? { kind: 'viewport' } : { kind: 'surface', target: input.value } } });
-    else if (property === 'visible') actions.imageChange({ visible: (input as HTMLInputElement).checked });
     else if (property === 'opacity') actions.imageChange({ opacity: Number(input.value) / 100 });
-    else if (property === 'zIndex') actions.imageChange({ zIndex: Number(input.value) });
     else actions.imageChange({ placement: { [property]: Number(input.value) / (property === 'x' || property === 'y' ? 100 : 1) } });
   });
   get<HTMLFieldSetElement>('.playback').addEventListener('input', (event) => {
@@ -246,6 +251,8 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       const isGroup = state.image?.kind === 'group';
       imageProperties.setAttribute('aria-label', isGroup ? 'グループのプロパティ' : '画像のプロパティ');
       get<HTMLElement>('.group-help').hidden = !isGroup;
+      get<HTMLElement>('.size-property').hidden = get<HTMLElement>('.rotation-property').hidden = isGroup;
+      get<HTMLElement>('[data-image-prop="anchor"]').closest<HTMLElement>('.property')!.hidden = isGroup;
       for (const key of ['widthPx', 'heightPx', 'rotationDeg', 'anchor']) get<HTMLInputElement>(`[data-image-prop="${key}"]`).disabled = isGroup || key === 'anchor' && Boolean(state.image && parentGroup(state.groups, state.image.id));
       for (const key of ['x', 'y']) {
         const input = get<HTMLInputElement>(`[data-image-prop="${key}"]`); input.disabled = isGroup && !state.groupPositionAvailable;
@@ -254,12 +261,10 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
         input.setAttribute('aria-label', `${isGroup ? 'グループ' : '画像'}の${key.toUpperCase()}位置`);
       }
       get<HTMLInputElement>('[data-image-prop="opacity"]').setAttribute('aria-label', `${isGroup ? 'グループ' : '画像'}の不透明度`);
-      get<HTMLInputElement>('[data-image-prop="zIndex"]').setAttribute('aria-label', `${isGroup ? 'グループ' : '画像'}の重なり順`);
       effects.render(state.image);
-      properties.hidden = state.selectedIds.length > 0;
-      get<HTMLParagraphElement>('.card-help').hidden = state.selectedIds.length > 0;
+      properties.hidden = !state.selected;
+      get<HTMLParagraphElement>('.card-help').hidden = !state.selected;
       get<HTMLParagraphElement>('.multi-help').hidden = state.selectedIds.length < 2;
-      get<HTMLDivElement>('.selection-actions').hidden = state.selectedIds.length === 0;
       const selectedLayers = [...state.images, ...state.groups].filter((layer) => state.selectedIds.includes(layer.id) && (layer.kind === 'group' ? groupMovable(layer, state.images) : !effectivelyLocked(layer, state.groups)));
       const unlocked = selectedLayers.length, selectedMedia = selectedLayers.flatMap((layer) => layer.kind === 'group' ? childrenOf(layer, state.images) : [layer]);
       const animations = state.images.filter((image) => image.kind === 'animation').length;
@@ -270,8 +275,8 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       get<HTMLButtonElement>('.group-layers').hidden = isGroup;
       get<HTMLButtonElement>('.ungroup-layers').hidden = !isGroup;
       get<HTMLButtonElement>('.ungroup-layers').disabled = state.saving || !isGroup || Boolean(state.image?.locked) || state.image?.opacity !== 1;
-      get<HTMLElement>('.grouping-help').hidden = state.selectedIds.length < 2 || !state.groupingReason;
-      setText(get<HTMLElement>('.grouping-help'), state.groupingReason);
+      get<HTMLElement>('.grouping-help').hidden = isGroup;
+      setText(get<HTMLElement>('.grouping-help'), state.groupingReason || 'まとめて移動したり、同じマスクを適用できます。');
       get<HTMLButtonElement>('.undo').disabled = !state.canUndo || state.saving;
       get<HTMLButtonElement>('.redo').disabled = !state.canRedo || state.saving;
       get<HTMLInputElement>('.snap').checked = state.snapping;
@@ -282,7 +287,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
         const minimum = ['horizontal', 'vertical'].includes(button.dataset.align!) ? 3 : 2;
         button.disabled = state.saving || eligible < minimum;
       });
-      setText(get<HTMLElement>('.dirty'), state.dirty ? '未保存の変更' : '保存済み');
+      setText(get<HTMLElement>('.dirty'), state.error ? state.status.startsWith('保存でき') ? '保存失敗' : '操作失敗・要確認' : state.saving ? '処理中…' : state.dirty ? '未保存の変更' : '保存済み');
       get<HTMLElement>('.dirty').dataset.dirty = String(state.dirty);
       setText(get<HTMLElement>('.layer-count'), `${state.images.length} / ${IMAGE_LIMITS.count}${state.groups.length ? `・グループ${state.groups.length}` : ''}`);
       addImage.disabled = state.saving || state.images.length >= IMAGE_LIMITS.count;
@@ -311,8 +316,6 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
         }
         get<HTMLInputElement>('[data-image-prop="opacity"]').value = String(Math.round(image.opacity * 100));
         setText(get<HTMLOutputElement>('.opacity-value'), `${Math.round(image.opacity * 100)}%`);
-        get<HTMLInputElement>('[data-image-prop="zIndex"]').value = String(image.zIndex);
-        get<HTMLInputElement>('[data-image-prop="visible"]').checked = image.visible;
       }
       properties.disabled = !state.selected || state.saving;
       backgroundToggle.checked = state.style.backgroundColor !== undefined;
@@ -330,7 +333,8 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       setText(selection, state.image ? `${state.image.kind === 'group' ? 'グループ' : state.image.kind === 'animation' ? 'アニメーション' : '画像'}: ${state.image.name}${state.image.locked || state.inheritedLocked ? '（ロック中）' : ''}` : state.selectedIds.length > 1 ? `${state.selectedIds.length}レイヤーを選択中` : state.selected ? '動画カードを選択中' : 'カードまたは画像を選択してください');
       setText(status, state.status);
       status.dataset.error = String(state.error);
+      workspace.render(state);
     },
-    destroy() { host.remove(); },
+    destroy() { workspace.destroy(); tree.destroy(); host.remove(); },
   };
 }

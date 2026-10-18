@@ -1,3 +1,4 @@
+import { exposeEditorControls, withCanvas } from './helpers/editor-workspace';
 import type { Page, Locator, CDPSession } from '@playwright/test';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -14,7 +15,7 @@ async function open(popup: Page, page: Page) {
   await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   await page.bringToFront();
   await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const panel = page.getByRole('dialog', { name: 'デザインエディター' }); await expect(panel).toBeVisible(); return panel;
+  const panel = page.getByRole('dialog', { name: 'デザインエディター' }); await expect(panel).toBeVisible(); await exposeEditorControls(panel); return panel;
 }
 async function save(panel: Locator) {
   await panel.getByRole('button', { name: '保存', exact: true }).click(); await expect(panel.locator('.status')).toHaveText('保存しました。');
@@ -30,8 +31,10 @@ async function ready(page: Page, count: number) {
   for (const node of await page.locator(`${layers} .media`).all()) await expect(node).toHaveAttribute('data-playback', /playing|paused|reduced-motion/);
 }
 async function drag(page: Page, node: Locator, dx: number, dy: number) {
-  const b = (await node.boundingBox())!, x = b.x + b.width / 2, y = b.y + b.height / 2;
-  await page.mouse.move(x, y); await page.mouse.down(); await page.mouse.move(x + dx, y + dy, { steps: 8 }); await page.mouse.up();
+  await withCanvas(page, async () => {
+    const b = (await node.boundingBox())!, x = b.x + b.width / 2, y = b.y + b.height / 2;
+    await page.mouse.move(x, y); await page.mouse.down(); await page.mouse.move(x + dx, y + dy, { steps: 8 }); await page.mouse.up();
+  });
 }
 
 for (const [extension, format] of [['gif', 'gif'], ['apng', 'apng'], ['webp', 'animated-webp'], ['json', 'lottie']] as const) {
@@ -175,7 +178,7 @@ test('eight animations share decoders, stay bounded, respect reduced motion/hidd
   const files = ['gif', 'webp', 'json', 'gif', 'webp', 'json', 'gif', 'json'];
   await panel.getByLabel('アニメーション素材を追加').setInputFiles(files.map(fixture)); await ready(youtube, 8);
   await expect(panel.getByRole('button', { name: 'アニメーションを追加', exact: true })).toBeEnabled();
-  await expect(panel.getByRole('button', { name: '選択を複製', exact: true })).toBeEnabled();
+  await expect(panel.getByRole('button', { name: '複製', exact: true })).toBeEnabled();
   for (const row of await panel.locator('[data-layer-id]').all()) { await row.locator('[data-action="select"]').click(); if (await panel.getByLabel('再生方式', { exact: true }).isVisible()) await panel.getByLabel('再生方式', { exact: true }).selectOption('controlled'); }
   await youtube.evaluate((selector) => {
     document.documentElement.dataset.motionFrames = '0';

@@ -1,3 +1,4 @@
+import { exposeEditorControls } from './helpers/editor-workspace';
 import type { Page, Locator } from '@playwright/test';
 import { test, expect } from './fixtures';
 
@@ -18,6 +19,7 @@ async function openEditor(popup: Page, youtube: Page) {
   await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
   const dialog = youtube.getByRole('dialog', { name: dialogName });
   await expect(dialog).toBeVisible();
+  await exposeEditorControls(dialog);
   return dialog;
 }
 
@@ -142,7 +144,7 @@ test('home, search and recommendations keep the draft across SPA and release sta
   await expect(youtube.locator('ytd-video-renderer').first()).toHaveAttribute('data-ww-surface', /video-card/);
   await expect(youtube.locator(cards).first()).toHaveCSS('background-color', 'rgb(221, 238, 255)');
   await expect(youtube.locator('[data-ww-editor-selected]')).toHaveCount(0);
-  await expect(dialog.getByRole('checkbox', { name: '背景色を変更' })).toBeDisabled();
+  await expect(dialog.locator('.properties')).toBeHidden();
   await selectCard(youtube);
   await dialog.getByRole('button', { name: 'パネルを左へ' }).click();
   await youtube.locator('#navigate').click();
@@ -218,6 +220,7 @@ test('real storage quota failure preserves the preview and retry saves it', asyn
   });
   await dialog.getByRole('button', { name: '保存', exact: true }).click();
   await expect(dialog.locator('.status')).toContainText('保存できませんでした');
+  await expect(dialog.locator('.dirty')).toHaveText('保存失敗');
   await expect(youtube.locator(cards).first()).toHaveCSS('background-color', 'rgb(221, 255, 238)');
   await expect(dialog.getByRole('button', { name: '保存', exact: true })).toBeEnabled();
   await popup.evaluate(async () => { await chrome.storage.local.remove('creatorQuota'); });

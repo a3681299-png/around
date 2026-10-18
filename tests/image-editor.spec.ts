@@ -1,3 +1,4 @@
+import { exposeEditorControls, withCanvas } from './helpers/editor-workspace';
 import type { Page, Locator, BrowserContext } from '@playwright/test';
 import { test, expect, launchExtension } from './fixtures';
 import type { DesignDocument } from '../src/design/types';
@@ -13,6 +14,7 @@ async function open(popup: Page, youtube: Page) {
   await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
   const dialog = youtube.getByRole('dialog', { name: 'デザインエディター' });
   await expect(dialog).toBeVisible();
+  await exposeEditorControls(dialog);
   return dialog;
 }
 
@@ -46,11 +48,13 @@ async function stored(popup: Page): Promise<DesignDocument> {
 }
 
 async function drag(youtube: Page, element: Locator, dx: number, dy: number) {
-  const box = (await element.boundingBox())!;
-  await youtube.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-  await youtube.mouse.down();
-  await youtube.mouse.move(box.x + box.width / 2 + dx, box.y + box.height / 2 + dy, { steps: 8 });
-  await youtube.mouse.up();
+  await withCanvas(youtube, async () => {
+    const box = (await element.boundingBox())!;
+    await youtube.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await youtube.mouse.down();
+    await youtube.mouse.move(box.x + box.width / 2 + dx, box.y + box.height / 2 + dy, { steps: 8 });
+    await youtube.mouse.up();
+  });
 }
 
 async function controls(page: Page, image: Locator) {
@@ -117,13 +121,13 @@ test('file selection and drop accept multiple PNG/WebP layers and each edits ind
   await expect(youtube.locator(layers)).toHaveCount(2);
   await expect(youtube.locator(layers).last().locator('img')).toBeVisible();
   await dialog.getByLabel('画像の不透明度').fill('40');
-  await dialog.getByLabel('画像の重なり順').fill('8');
+  await dialog.locator('[data-layer-id]').first().getByRole('button', { name: 'レイヤーを並び替え' }).dragTo(dialog.locator('[data-layer-id]').last(), { targetPosition: { x: 40, y: 40 } });
   await dialog.getByLabel('画像の角度').fill('35');
   await expect(youtube.locator(layers).last().locator('.media')).toHaveCSS('opacity', '0.4');
   await expect(youtube.locator(layers).first().locator('.media')).toHaveCSS('opacity', '1');
-  await dialog.getByRole('checkbox', { name: '画像を表示', exact: true }).uncheck();
+  await dialog.locator('[data-layer-id][data-selected]').getByRole('button', { name: '非表示にする', exact: true }).click();
   await expect(youtube.locator(layers).last()).toBeHidden();
-  await dialog.getByRole('checkbox', { name: '画像を表示', exact: true }).check();
+  await dialog.locator('[data-layer-id][data-selected]').getByRole('button', { name: '表示する', exact: true }).click();
   await expect(youtube.locator(layers).last()).toBeVisible();
   await youtube.evaluate(({ base64 }) => {
     const bytes = Uint8Array.from(atob(base64), (char) => char.charCodeAt(0));
@@ -134,7 +138,7 @@ test('file selection and drop accept multiple PNG/WebP layers and each edits ind
   await expect(youtube.locator(layers).last().locator('img')).toBeVisible();
   expect(await assets(context)).toHaveLength(2); // The duplicate PNG shares one immutable asset.
   await save(dialog);
-  expect((await stored(popup)).decorations.map(({ opacity, zIndex, placement }) => [opacity, zIndex, placement.rotationDeg])).toEqual([[1, 0, 0], [.4, 8, 35], [1, 2, 0]]);
+  expect((await stored(popup)).decorations.map(({ opacity, zIndex, placement }) => [opacity, zIndex, placement.rotationDeg])).toEqual([[1, 1, 0], [.4, 0, 35], [1, 2, 0]]);
 });
 
 test('rotation handle, Delete, discard and close preserve saved layers and collect abandoned imports', async ({ popup, youtube, context }) => {
@@ -143,8 +147,10 @@ test('rotation handle, Delete, discard and close preserve saved layers and colle
   await save(dialog);
   const handle = (await controls(youtube, image)).getByRole('button', { name: '画像を回転' });
   const box = (await image.boundingBox())!, grip = (await handle.boundingBox())!;
-  await youtube.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2); await youtube.mouse.down();
-  await youtube.mouse.move(box.x + box.width + 40, box.y + box.height / 2, { steps: 8 }); await youtube.mouse.up();
+  await withCanvas(youtube, async () => {
+    await youtube.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2); await youtube.mouse.down();
+    await youtube.mouse.move(box.x + box.width + 40, box.y + box.height / 2, { steps: 8 }); await youtube.mouse.up();
+  });
   expect(Number(await dialog.getByLabel('画像の角度').inputValue())).toBeGreaterThan(60);
   await youtube.keyboard.press('Delete');
   await expect(youtube.locator(layers)).toHaveCount(0);

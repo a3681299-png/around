@@ -1,3 +1,4 @@
+import { exposeEditorControls, withCanvas } from './helpers/editor-workspace';
 import type { Page, Locator, CDPSession } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -11,7 +12,7 @@ async function open(popup: Page, youtube: Page) {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toBeVisible(); await youtube.bringToFront();
   await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const panel = youtube.getByRole('dialog', { name: 'デザインエディター' }); await expect(panel).toBeVisible(); return panel;
+  const panel = youtube.getByRole('dialog', { name: 'デザインエディター' }); await expect(panel).toBeVisible(); await exposeEditorControls(panel); return panel;
 }
 async function addImage(panel: Locator, youtube: Page) {
   await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
@@ -55,7 +56,7 @@ async function pixels(page: Page, png: Buffer, points: number[][]) {
 
 test('circle mask actually reveals pixels, feathers edges, follows the pointer and leaves handles usable', async ({ popup, youtube }, info) => {
   const panel = await open(popup, youtube), clip = { x: 185, y: 154, width: 400, height: 300 };
-  const baseline = await youtube.screenshot({ clip });
+  const baseline = await withCanvas(youtube, () => youtube.screenshot({ clip }));
   const png = await youtube.evaluate(() => {
     const canvas = document.createElement('canvas'); canvas.width = 400; canvas.height = 300;
     const ctx = canvas.getContext('2d')!; ctx.fillStyle = '#ff00ff'; ctx.fillRect(0, 0, 400, 300); return canvas.toDataURL().split(',')[1]!;
@@ -66,16 +67,19 @@ test('circle mask actually reveals pixels, feathers edges, follows the pointer a
   await panel.getByLabel('円形マスクを使う').check(); await setNumber(panel, '光の半径', 80); await setNumber(panel, '境界のぼかし', 20);
   await youtube.mouse.move(385, 304); await expect.poll(() => maskCenter(youtube)).toEqual({ x: 200, y: 150 });
   await panel.getByLabel('光の半径').hover(); await expect.poll(() => maskCenter(youtube)).toEqual({ x: 200, y: 150 });
-  const masked = await youtube.screenshot({ clip }), points = [[200, 150], [320, 150], [270, 150]];
+  const masked = await withCanvas(youtube, () => youtube.screenshot({ clip })), points = [[200, 150], [320, 150], [270, 150]];
   const base = await pixels(youtube, baseline, points), actual = await pixels(youtube, masked, points);
   expect(actual[0]).toEqual([255, 0, 255, 255]); expect(actual[1]).toEqual(base[1]);
   expect(actual[2]).not.toEqual(base[2]); expect(actual[2]).not.toEqual(actual[0]);
   await info.attach('circle-reveal', { body: masked, contentType: 'image/png' });
-  await setNumber(panel, '画像の角度', 90); await youtube.mouse.move(445, 304);
+  await setNumber(panel, '画像の角度', 90); await withCanvas(youtube, () => youtube.mouse.move(445, 304));
   await expect.poll(() => maskCenter(youtube)).toEqual({ x: 200, y: 90 });
   const handle = youtube.locator(`${overlay} [data-handle="se"]`); await expect(handle).toBeVisible();
-  const box = (await handle.boundingBox())!; await youtube.mouse.move(box.x + 7, box.y + 7); await youtube.mouse.down();
-  await youtube.mouse.move(box.x - 33, box.y + 47, { steps: 5 }); await youtube.mouse.up();
+  const box = (await handle.boundingBox())!;
+  await withCanvas(youtube, async () => {
+    await youtube.mouse.move(box.x + 7, box.y + 7); await youtube.mouse.down();
+    await youtube.mouse.move(box.x - 33, box.y + 47, { steps: 5 }); await youtube.mouse.up();
+  });
   expect(Number(await panel.getByLabel('画像の幅', { exact: true }).inputValue())).toBeGreaterThan(400);
   await panel.getByRole('button', { name: '元に戻す', exact: true }).click(); await expect(panel.getByLabel('画像の幅', { exact: true })).toHaveValue('400');
   await panel.getByLabel('マウスに追従').uncheck(); await youtube.mouse.move(10, 10);

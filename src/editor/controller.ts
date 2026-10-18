@@ -3,7 +3,7 @@ import { IMAGE_LIMITS, type DesignDocument, type DesignTarget, type SurfaceStyle
 import type { ImageEditing } from '../design/image-renderer';
 import { editableSceneSamples, placementFrame } from '../design/frames';
 import { moveGroup, reanchorPlacement, type PlacementChange } from '../design/geometry';
-import { effectivelyLocked, groupMovable, groupView, normalizeSelection, parentGroup, sameAnchor } from '../design/hierarchy';
+import { effectivelyLocked, groupMovable, groupView, normalizeSelection, parentGroup, rootLayers, sameAnchor } from '../design/hierarchy';
 import { alignSamples, distributeSamples, type Alignment, type Distribution } from '../design/layout';
 import { checkDesignAssets, commitDesign, importAssets, releaseAssets, retainAssets } from '../assets/client';
 import type { SiteAdapter } from '../sites/types';
@@ -13,6 +13,7 @@ import type { OpenEditorResponse } from './messages';
 import { createHistory } from './history';
 import { selectLayer } from './layers';
 import { deleteDocumentLayers, duplicateDocumentLayers, groupLayers, groupingReason, reorderDocument, ungroupLayers } from './groups';
+import { captureLayerThumbnail } from '../renderers/dom/thumbnail';
 
 export interface CreatorEditor {
   open(): OpenEditorResponse;
@@ -119,7 +120,7 @@ export function createCreatorEditor(
     const parent = parentGroup(groups, id);
     if (additive && parent) selectedImageIds = selectedImageIds.filter((id) => id !== parent.id);
     clearSelection(); selectedImageIds = normalizeSelection(selectLayer(selectedImageIds, id, additive, preserve), draft.decorations, groups);
-    status = 'Ctrl／Shiftで複数選択。矢印で微調整、Ctrl＋Dで複製できます。'; error = false; render();
+    status = '一覧のチェックで複数選択できます。Ctrl／Shiftクリックも使えます。'; error = false; render();
   }
   function changeImage(id: string, patch: ImagePatch) {
     if (!panel || saving || importing) return;
@@ -214,6 +215,8 @@ export function createCreatorEditor(
         const id = `group-${crypto.randomUUID()}`, next = groupLayers(draft, selectedImageIds, id);
         selectedImageIds = [id]; clearSelection(); updateDraft(next);
       }
+      status = ungroup ? `${selectedImageIds.length}個の素材に戻しました。位置は維持しています。` : 'グループにまとめました。「光とマスクを設定」から共通のマスクを作れます。';
+      render();
       settleAssets();
     } catch (reason) { status = reason instanceof Error ? reason.message : 'グループを変更できませんでした。'; error = true; render(); }
   };
@@ -231,12 +234,19 @@ export function createCreatorEditor(
       before = parseDesign(draft);
       const next = parseDesign(draft);
       const view = doc.defaultView!;
+      const origin = point ?? { x: view.innerWidth * .45, y: view.innerHeight * .45 };
+      const panelBounds = panel.host.getBoundingClientRect();
+      // Imports through the workspace should appear in the visible preview.
+      if (!point && origin.x >= panelBounds.left && origin.x <= panelBounds.right && origin.y >= panelBounds.top && origin.y <= panelBounds.bottom) {
+        const rightSpace = view.innerWidth - panelBounds.right;
+        origin.x = panelBounds.left >= rightSpace ? panelBounds.left / 2 : panelBounds.right + rightSpace / 2;
+      }
       assets.forEach((asset, index) => {
         const scale = Math.max(IMAGE_LIMITS.minSize / Math.min(asset.width, asset.height), Math.min(260 / asset.width, 200 / asset.height, view.innerWidth * .28 / asset.width, view.innerHeight * .3 / asset.height));
         const id = `image-${crypto.randomUUID()}`;
         const common = { id, assetId: asset.id, name: asset.name,
-          placement: { anchor: { kind: 'viewport' as const }, x: Math.min(.95, Math.max(.05, (point?.x ?? view.innerWidth * .45) / view.innerWidth + index * 24 / view.innerWidth)),
-            y: Math.min(.95, Math.max(.05, (point?.y ?? view.innerHeight * .45) / view.innerHeight + index * 24 / view.innerHeight)),
+          placement: { anchor: { kind: 'viewport' as const }, x: Math.min(.95, Math.max(.05, origin.x / view.innerWidth + index * 24 / view.innerWidth)),
+            y: Math.min(.95, Math.max(.05, origin.y / view.innerHeight + index * 24 / view.innerHeight)),
             widthPx: Math.round(asset.width * scale * 10) / 10, heightPx: Math.round(asset.height * scale * 10) / 10, rotationDeg: 0 },
           opacity: 1, zIndex: Math.min(100, next.decorations.length), visible: true, locked: false };
         next.decorations.push(asset.animation ? { ...common, kind: 'animation', format: asset.animation.format, playback: { playing: true, loop: true, speed: 1, mode: 'auto' } } : { ...common, kind: 'image' });
@@ -398,7 +408,7 @@ export function createCreatorEditor(
   }
   function onKeyDown(event: KeyboardEvent) {
     if (!panel || event.isComposing || event.composedPath().some((node) => node instanceof HTMLElement
-      && (node.matches('input, textarea, select') || node.isContentEditable))) return;
+      && (node.matches('input, textarea, select, [role="tab"], [role="separator"], [role="menuitem"]') || node.isContentEditable))) return;
     const command = (event.ctrlKey || event.metaKey) && !event.altKey;
     const key = event.key.toLowerCase();
     let handled = true;
@@ -438,7 +448,7 @@ export function createCreatorEditor(
   function onDrop(event: DragEvent) {
     if (!panel || !event.dataTransfer?.files.length) return;
     event.preventDefault(); event.stopImmediatePropagation();
-    void addImages([...event.dataTransfer.files], { x: event.clientX, y: event.clientY });
+    void addImages([...event.dataTransfer.files], event.composedPath().includes(panel.host) ? undefined : { x: event.clientX, y: event.clientY });
   }
 
   let unwatch = watchDesign(site.id, accept, onStorageError);
@@ -461,6 +471,9 @@ export function createCreatorEditor(
         imageChange: (patch) => { if (selectedImageIds.length === 1) changeImage(selectedImageIds[0]!, patch); },
         layerChange: changeImage, imageDelete: deleteImage, duplicate,
         group: () => groupSelection(), ungroup: () => groupSelection(true),
+        clearSelection: () => { if (!saving && !importing) { finishGesture(true); clearSelection(); selectedImageIds = []; render(); } },
+        selectAll: () => { if (!saving && !importing) { finishGesture(); clearSelection(); selectedImageIds = rootLayers(draft.decorations, draft.groups ?? []).map((layer) => layer.id); render(); } },
+        thumbnail: (id) => captureLayerThumbnail(doc, id),
         reorder: (id, targetId, after) => {
           if (saving || importing) return;
           finishGesture();
