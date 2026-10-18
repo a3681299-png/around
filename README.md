@@ -172,4 +172,6 @@ YouTubeの`yt-navigate-finish`と`yt-page-data-updated`で再確認し、追加D
 
 実験用クリエイターエディターのアニメーション素材コアは[設計](docs/animation-core.md)と[形式・制限・検証記録](docs/animation-core-verification.md)を参照してください。読み込む拡張はこのworktreeの`dist/`です。
 
+クリエイターUIの[再設計](docs/editor-ux.md)と[操作・検証結果](docs/editor-ux-verification.md)をまとめています。一覧のチェックから、キーを使わず複数選択してグループ化できます。
+
 Chromeの仕様は[Content scripts](https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts)と[Storage API](https://developer.chrome.com/docs/extensions/reference/api/storage)、拡張機能の検証方法は[Playwright公式ドキュメント](https://playwright.dev/docs/chrome-extensions)を参照しています。

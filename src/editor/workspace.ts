@@ -3,7 +3,7 @@ import type { PanelState } from './panel';
 type Area = 'layers' | 'properties' | 'help';
 interface TreeView { setActive(active: boolean): void }
 
-/** Ephemeral workspace state; never enters the artwork, history or Runtime. */
+/** Workspace and onboarding preferences stay outside the artwork, history and Runtime. */
 export function createWorkspace(doc: Document, host: HTMLElement, main: HTMLElement, tree: TreeView, clear: () => void, selectAll: () => void) {
   const get = <T extends HTMLElement>(selector: string) => main.querySelector<T>(selector)!;
   const body = get('.editor-body'), assets = get('.assets'), selection = get('.selection');
@@ -48,6 +48,7 @@ export function createWorkspace(doc: Document, host: HTMLElement, main: HTMLElem
   const basicTitle = doc.createElement('summary'); basicTitle.textContent = '位置と外観'; basic.append(basicTitle);
   [...imageProps.children].filter((node) => !node.matches('.playback, [aria-label="マスクと振る舞い"], .group-help')).forEach((node) => basic.append(node));
   imageProps.prepend(basic);
+  basic.append(get('.group-help'));
   const playback = get('.playback');
   const playbackSection = doc.createElement('details'); playbackSection.className = 'playback-section'; playbackSection.open = true;
   const playbackTitle = doc.createElement('summary'); playbackTitle.textContent = 'アニメーション再生'; playback.before(playbackSection); playbackSection.append(playbackTitle, playback);
@@ -89,6 +90,8 @@ export function createWorkspace(doc: Document, host: HTMLElement, main: HTMLElem
     help.hidden = next !== 'help'; selected.hidden = next === 'help';
     get('.inspect').hidden = next === 'properties';
     maskShortcut.hidden = next === 'properties' || !state?.image;
+    get('.group-layers').hidden = state?.image?.kind === 'group' || next === 'properties' && (state?.selectedIds.length ?? 0) < 2;
+    get('.grouping-help').hidden = get('.group-layers').hidden;
     tree.setActive(!layersPane.hidden && !(split && compact.matches && next === 'properties') && !host.hasAttribute('data-minimized'));
   }
   nav.addEventListener('click', (event) => { const button = (event.target as Element).closest<HTMLButtonElement>('[data-area]'); if (button) show(button.dataset.area as Area); });
@@ -101,7 +104,7 @@ export function createWorkspace(doc: Document, host: HTMLElement, main: HTMLElem
     show(tabs[next]!.dataset.area as Area); tabs[next]!.focus(); event.preventDefault();
   });
   get('.inspect').addEventListener('click', () => show('properties'));
-  maskShortcut.addEventListener('click', () => { show('properties'); const effects = get<HTMLDetailsElement>('.effects-section'); effects.open = true; effects.scrollIntoView({ block: 'nearest' }); });
+  maskShortcut.addEventListener('click', () => { basic.open = false; show('properties'); const effects = get<HTMLDetailsElement>('.effects-section'); effects.open = true; effects.scrollIntoView({ block: 'start' }); });
   const splitButton = get<HTMLButtonElement>('.split');
   splitButton.addEventListener('click', () => { split = !split; host.toggleAttribute('data-split', split); splitButton.setAttribute('aria-pressed', String(split)); splitButton.textContent = split ? '切り替え表示' : '並べる'; show(area); });
   get('.clear-selection').addEventListener('click', clear);
@@ -109,7 +112,7 @@ export function createWorkspace(doc: Document, host: HTMLElement, main: HTMLElem
   get('.dismiss-guide').addEventListener('click', () => { guide.hidden = true; void chrome.storage.local.set({ [guideKey]: true }).catch(() => undefined); });
   get('.show-guide').addEventListener('click', () => { guide.hidden = false; void chrome.storage.local.set({ [guideKey]: false }).catch(() => undefined); show('layers'); });
   const minimize = get<HTMLButtonElement>('.minimize');
-  minimize.addEventListener('click', () => { const value = !host.hasAttribute('data-minimized'); host.toggleAttribute('data-minimized', value); minimize.textContent = value ? '+' : '−'; minimize.setAttribute('aria-label', value ? 'パネルを展開する' : 'パネルを折りたたむ'); tree.setActive(!value && !layersPane.hidden); closeMenu(); });
+  minimize.addEventListener('click', () => { const value = !host.hasAttribute('data-minimized'); host.toggleAttribute('data-minimized', value); minimize.textContent = value ? '+' : '−'; minimize.setAttribute('aria-label', value ? 'パネルを展開する' : 'パネルを折りたたむ'); show(area); });
   // Width adjustment also supports the keyboard. Bounds are enforced by CSS on small screens.
   const resize = doc.createElement('div'); resize.className = 'panel-resize'; resize.tabIndex = 0; resize.setAttribute('role', 'separator'); resize.setAttribute('aria-label', 'パネルの幅'); resize.setAttribute('aria-orientation', 'vertical'); resize.setAttribute('aria-valuemin', '320'); resize.setAttribute('aria-valuemax', '520');
   let width = 360, gesture: { x: number; width: number; id: number } | undefined;
@@ -146,6 +149,8 @@ export function createWorkspace(doc: Document, host: HTMLElement, main: HTMLElem
     get<HTMLElement>('.status').setAttribute('role', next.error ? 'alert' : 'status');
     get('.ungroup-layers').title = next.image?.locked ? 'ロックを解除してください。' : next.image?.opacity !== 1 ? '不透明度を100%に戻してから解除してください。' : '子の位置を維持して解除します。グループのマスクは外れます。';
     get('.group-layers').title = next.groupingReason || '選択した素材をまとめます。';
+    get('.group-layers').hidden = next.image?.kind === 'group' || area === 'properties' && next.selectedIds.length < 2;
+    get('.grouping-help').hidden = get('.group-layers').hidden;
     ungroupHelp.hidden = next.image?.kind !== 'group';
     ungroupHelp.textContent = next.image?.locked ? 'ロックを解除するとグループを解除できます。' : next.image?.opacity !== 1 ? '不透明度を100%に戻してから解除してください。' : '解除するとグループのマスクが外れます。素材の位置は維持します。';
     selection.hidden = next.selectedIds.length > 1;

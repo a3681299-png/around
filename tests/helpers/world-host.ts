@@ -33,6 +33,7 @@ export async function open(popup: Page, page: Page): Promise<Locator> {
 export async function image(panel: Locator, page: Page) {
   await panel.getByLabel('画像素材を追加', { exact: true }).setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await expect(page.locator(media)).toHaveAttribute('data-playback', 'still');
+  await panel.getByRole('button', { name: 'プロパティを編集', exact: true }).click();
 }
 export async function save(panel: Locator) {
   await panel.getByRole('button', { name: '保存', exact: true }).click(); await expect(panel.locator('.status')).toHaveText('保存しました。');
