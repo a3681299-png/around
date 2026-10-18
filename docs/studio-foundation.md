@@ -1,5 +1,7 @@
 # Studioの独立化
 
+これは独立Studio導入時の記録です。現在の主要UIは[インページStudio](inpage-studio-workspace.md)で、Editor Coreと以下のHost／Storage／通信の境界を維持しています。
+
 起点は `36ecf34`。調査時の `editor/controller.ts` は編集文書、履歴、保存、素材保持とDOMイベントを所有し、`workspace.ts` はChrome Storageを直接参照していた。World Runtimeと画像・グループの純粋な計算は分離済みだった。
 
 ## 今回の境界

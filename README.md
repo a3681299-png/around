@@ -58,7 +58,7 @@ BBSの番号は現在読み込まれたコメントと返信の表示順で、�
 
 ## 開発
 
-クリエイター向け編集の実験は `codex/creator-editor-spike` と専用worktreeで進めます。Popupの「デザインを編集（実験）」から動画カードの装飾を編集したり、PNG・WebP素材を読み込んで移動・サイズ変更・回転したりできます。レイヤー一覧、ロック、複製、複数選択と一括移動、Undo／Redo、任意のスナップ、整列・等間隔配置にも対応します。GIF・アニメーションWebP・Lottie JSONは、編集画面で再生を確認し、停止・ループ・Lottieの速度を設定できます。
+クリエイター向け編集の実験は `codex/creator-editor-spike` と専用worktreeで進めます。Popupの「Studioを開く（このタブ）」で、実際のYouTubeを中央にした制作画面を開けます。「デザインを編集（実験）」のクイック編集も維持しています。動画カードの装飾を編集したり、PNG・WebP素材を読み込んで移動・サイズ変更・回転したりできます。レイヤー一覧、ロック、複製、複数選択と一括移動、Undo／Redo、任意のスナップ、整列・等間隔配置にも対応します。GIF・アニメーションWebP・Lottie JSONは、編集画面で再生を確認し、停止・ループ・Lottieの速度を設定できます。
 
 円形マスクで画像の一部を照らし、マウスに追従させたり動画の一時停止でフェードアウトさせたりできます。設定は既存の保存・履歴と共通です。構造と操作は [effects-and-signals.md](docs/effects-and-signals.md) を参照してください。
 
@@ -177,3 +177,8 @@ YouTubeの`yt-navigate-finish`と`yt-page-data-updated`で再確認し、追加D
 独立StudioはPopupの「Studioを開く（別ウィンドウ）」から起動します。編集対象のYouTubeを選び、Studioで設定しながら実サイトで直接選択・移動できます。サイト内の「デザインを編集」も同じCoreとUIを使います。[構造とDesktop Hostへの境界](docs/studio-foundation.md)、[操作と検証結果](docs/studio-verification.md)を参照してください。実験版は `.work/creator-editor/dist` をChromeへ読み込みます。通常版の `dist` は更新しません。
 
 Chromeの仕様は[Content scripts](https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts)と[Storage API](https://developer.chrome.com/docs/extensions/reference/api/storage)、拡張機能の検証方法は[Playwright公式ドキュメント](https://playwright.dev/docs/chrome-extensions)を参照しています。
+
+
+主要な制作画面は、Popupの **「Studioを開く（このタブ）」** です。本物のYouTubeを中央に置き、左の素材と右のプロパティ／レイヤーを同時に表示します。一覧のチェック → グループ化 → 左のマスクボタン → 保存、の順に制作できます。`V`は選択・変形、`H`はサイト操作です。動画カードは`C`またはツールパレットから選びます。パネル境界をドラッグして幅・高さを調整でき、狭い画面では自動で畳みます。
+
+独立Studioとクイック編集も同じCoreを使います。独立Studioからは「YouTubeでStudioを開く」でライブ制作へ移れます。[配置・共通化の設計](docs/inpage-studio-workspace.md)、[新旧画面・操作・検証結果](docs/inpage-studio-verification.md)を参照してください。読み込む拡張は専用worktreeの `.work/creator-editor/dist` です。
