@@ -19,7 +19,7 @@ test('layout feasibility on real signed-out YouTube, preserving native media and
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 20_000 });
     await page.bringToFront(); const opened = context.waitForEvent('page'); await popup.locator('#creator-studio-open').evaluate((button: HTMLButtonElement) => button.click());
     const oldStudio = await opened; await oldStudio.setViewportSize({ width: 1366, height: 900 }); await expect(oldStudio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
-    await oldStudio.screenshot({ path: '.work/verification/studio-before-1366.png' }); await oldStudio.close();
+    await oldStudio.screenshot({ path: '.work/verification/studio-layout-baseline-1366.png' }); await oldStudio.close();
     await page.bringToFront();
     const before = await page.locator('#movie_player').boundingBox();
     const player = await page.locator('#movie_player').elementHandle(), parent = await page.locator('#movie_player').evaluate((node) => node.parentElement?.id);

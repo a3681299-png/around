@@ -343,7 +343,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       borderColor.disabled = borderWidth.disabled = !borderToggle.checked;
       radius.disabled = !radiusToggle.checked;
       save.disabled = discard.disabled = !state.dirty || state.saving;
-      close.disabled = state.saving;
+      close.disabled = state.saving; close.title = state.dirty ? '編集を終了（未保存の変更を破棄）' : '編集を終了';
       setText(selection, state.image ? `${state.image.kind === 'group' ? 'グループ' : state.image.kind === 'animation' ? 'アニメーション' : '画像'}: ${state.image.name}${state.image.locked || state.inheritedLocked ? '（ロック中）' : ''}` : state.selectedIds.length > 1 ? `${state.selectedIds.length}レイヤーを選択中` : state.selected ? '動画カードを選択中' : 'カードまたは画像を選択してください');
       setText(status, state.status);
       status.dataset.error = String(state.error);

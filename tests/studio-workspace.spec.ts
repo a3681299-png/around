@@ -168,3 +168,19 @@ test('all current animation kinds use the live panels, inherited locks, groups, 
   await panel.getByRole('button', { name: '編集を終了', exact: true }).click(); await youtube.reload(); await expect(youtube.locator(images)).toHaveCount(5);
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck(); await expect(youtube.locator(overlay)).toHaveCount(0);
 });
+
+
+test('ending immediately after resizing flushes the final workspace preference without changing artwork', async ({ popup, youtube }) => {
+  await youtube.setViewportSize({ width: 1366, height: 900 }); const panel = await open(popup, youtube);
+  await panel.evaluate((host) => {
+    const shadow = host.shadowRoot!;
+    shadow.querySelector('.resize-right')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    shadow.querySelector<HTMLButtonElement>('.close')!.click();
+  });
+  await expect(panel).toHaveCount(0); await expect(youtube.locator('#web-world-themes-studio-layout')).toHaveCount(0);
+  await expect.poll(() => popup.evaluate(async () => (await chrome.storage.local.get('webWorldThemes.studio.workbench.v2'))['webWorldThemes.studio.workbench.v2'])).toMatchObject({ rightWidth: 340 });
+  expect(await popup.evaluate(async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'])).toBeUndefined();
+  await open(popup, youtube); await expect(panel).toHaveCSS('--inspector-width', '340px');
+  await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
+  await expect(panel.getByRole('button', { name: '編集を終了', exact: true })).toHaveAttribute('title', /未保存の変更を破棄/);
+});

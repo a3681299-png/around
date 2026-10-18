@@ -17,7 +17,8 @@ export function createStudioWorkbench(doc: Document, host: HTMLElement, main: HT
   const storage = options.preferences ?? transientPreferences, preferenceKey = 'webWorldThemes.studio.workbench.v2';
   let leftWidth = 176, rightWidth = 320, ratio = .56, leftClosed: boolean | undefined, rightClosed: boolean | undefined, allClosed = false, alive = true, touched = false, preferencesReady = false;
   let state: PanelState | undefined, timer: ReturnType<typeof setTimeout> | undefined, layoutKey = '';
-  const remember = () => { if (!alive) return; touched = true; clearTimeout(timer); timer = setTimeout(() => { void storage.write(preferenceKey, { leftWidth, rightWidth, ratio, leftClosed, rightClosed, dock: host.dataset.wwDock ?? 'right', folds: [...inspector.querySelectorAll<HTMLDetailsElement>('details')].map((item) => [item.className, item.open]) }).catch(() => undefined); }, 100); };
+  const persist = () => { timer = undefined; void storage.write(preferenceKey, { leftWidth, rightWidth, ratio, leftClosed, rightClosed, dock: host.dataset.wwDock ?? 'right', folds: [...inspector.querySelectorAll<HTMLDetailsElement>('details')].map((item) => [item.className, item.open]) }).catch(() => undefined); };
+  const remember = () => { if (!alive) return; touched = true; clearTimeout(timer); timer = setTimeout(persist, 100); };
   const make = (label: string, name: string, action: () => void, key = '') => { const button = doc.createElement('button'); button.type = 'button'; buttonIcon(button, name, label, key); button.addEventListener('click', action); return button; };
   const invoke = (selector: string) => { const button = get<HTMLButtonElement>(selector); if (!button.disabled) button.click(); };
 
@@ -172,6 +173,6 @@ export function createStudioWorkbench(doc: Document, host: HTMLElement, main: HT
     setHostLayout(value: StudioHostLayout) {
       if (value.mode === 'fullscreen') { if (helpDialog.open) helpDialog.close(); menu.querySelectorAll<HTMLDetailsElement>('details').forEach((item) => { item.open = false; }); contextMenu.hidden = true; }
       host.toggleAttribute('data-fullscreen', value.mode === 'fullscreen'); host.toggleAttribute('data-layout-fallback', value.mode === 'unavailable'); layout(); localConnection.textContent = (options.hostLabel ?? 'Webサイト') + (value.mode === 'reserved' ? ' · 接続中' : value.mode === 'fullscreen' ? ' · 全画面' : ' · レイアウト待機'); dimensions.textContent = `${Math.round(value.canvas.width)} × ${Math.round(value.canvas.height)}`; dimensions.title = value.mode === 'fullscreen' ? '全画面は動画操作を優先します' : 'ライブキャンバスの作業範囲'; enforce(); },
-    destroy() { alive = false; clearTimeout(timer); base.destroy(); libraryView.destroy(); if (helpDialog.open) helpDialog.close(); doc.removeEventListener('pointerdown', closeMenus, true); doc.removeEventListener('keydown', menuKeys, true); doc.defaultView!.removeEventListener('resize', layout); sheet.remove(); },
+    destroy() { alive = false; clearTimeout(timer); if (timer !== undefined) persist(); base.destroy(); libraryView.destroy(); if (helpDialog.open) helpDialog.close(); doc.removeEventListener('pointerdown', closeMenus, true); doc.removeEventListener('keydown', menuKeys, true); doc.defaultView!.removeEventListener('resize', layout); sheet.remove(); },
   };
 }
