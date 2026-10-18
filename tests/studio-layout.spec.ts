@@ -10,6 +10,8 @@ test('site layout reserves a live viewport, keeps DOM/media identities, suspends
   const bundle = await build({ entryPoints: ['src/sites/youtube-studio.ts'], bundle: true, write: false, format: 'iife', globalName: 'StudioLayoutTest', loader: { '.css': 'text' } });
   await youtube.addScriptTag({ content: bundle.outputFiles[0]!.text });
   await youtube.evaluate(() => {
+    const native = requestAnimationFrame; (globalThis as any).__layoutFrames = 0;
+    window.requestAnimationFrame = (callback) => native((time) => { if (callback.name === 'measure') (globalThis as any).__layoutFrames++; callback(time); });
     document.documentElement.style.setProperty('--ww-studio-left', '7px', 'important');
     (globalThis as any).__layoutChanges = 0;
     (globalThis as any).__layout = (globalThis as any).StudioLayoutTest.mountYouTubeStudio(document, (state: unknown) => { (globalThis as any).__layoutState = state; (globalThis as any).__layoutChanges++; });
@@ -20,6 +22,11 @@ test('site layout reserves a live viewport, keeps DOM/media identities, suspends
   expect((await youtube.locator('ytd-app').boundingBox())!.x).toBe(160);
   expect(await player!.evaluate((node) => node === document.querySelector('#movie_player') && node.parentElement?.id)).toBe(parent);
   const rect = (await youtube.locator('#movie_player').boundingBox())!; expect(rect.width / rect.height).toBeCloseTo(16 / 9, 2);
+  await youtube.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+  const frames = await youtube.evaluate(() => (globalThis as any).__layoutFrames);
+  await youtube.evaluate(() => { const noise = document.createElement('div'); noise.style.display = 'none'; document.body.append(noise); for (let i = 0; i < 100; i++) { noise.textContent = String(i); } });
+  await youtube.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+  expect(await youtube.evaluate(() => (globalThis as any).__layoutFrames)).toBe(frames);
   await youtube.locator('#movie_player [aria-label="Fullscreen"]').click();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-studio-fullscreen', '');
   expect(await youtube.evaluate(() => (globalThis as any).__layout.state())).toMatchObject({ mode: 'fullscreen', canvas: { left: 0, top: 0, width: 1366, height: 900 } });

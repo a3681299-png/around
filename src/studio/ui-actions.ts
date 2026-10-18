@@ -13,5 +13,6 @@ export function studioActions(dispatch: (command: EditCommand) => void, files: (
     undo: () => dispatch({ type: 'undo' }), redo: () => dispatch({ type: 'redo' }), snap: (value) => dispatch({ type: 'snap', value }), layout: (mode) => dispatch({ type: 'layout', mode }),
     group: () => dispatch({ type: 'group' }), ungroup: () => dispatch({ type: 'ungroup' }), clearSelection: () => dispatch({ type: 'clear-selection' }), selectAll: () => dispatch({ type: 'select-all' }), thumbnail,
     tool: (tool) => dispatch({ type: 'tool', tool }),
+    beginEdit: () => dispatch({ type: 'begin' }), endEdit: (cancel = false) => dispatch({ type: 'end', cancel }),
   };
 }

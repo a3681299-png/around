@@ -54,7 +54,7 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
     if (!panel || paneTarget !== value.target) {
       panel?.destroy(); mount.replaceChildren(); paneTarget = value.target;
       panel = createCreatorPanel(doc, studioActions(dispatch, (files) => { if (connection.isConnected) void connection.import(files); }, (id) => connection.thumbnail(id)),
-        targets.find((target) => target.id === value.target)?.anchors ?? [], { preferences: ports.preferences, fullPage: true, persistWorkspace: true });
+        targets.find((target) => target.id === value.target)?.anchors ?? [], { preferences: ports.preferences, hostLabel: ports.hostName, fullPage: true, persistWorkspace: true });
       mount.append(panel.host); connectionBar.slot = 'connection'; message.slot = 'connection-status'; panel.host.append(connectionBar, message);
       stage = doc.createElement('section'); stage.className = 'studio-stage'; stage.setAttribute('aria-label', '素材とプレビュー');
       stage.innerHTML = `<div class="preview-link"><strong>ライブキャンバス</strong><p>${hostName}の画面に制作UIを配置して、作品を直接編集できます。</p><button class="stage-inpage" type="button">${hostName}でStudioを開く</button><button class="stage-focus" type="button">${hostName}を表示</button></div>`;
@@ -96,7 +96,7 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
   get('.focus-target').addEventListener('click', focusTarget);
   const consumedKeys = new Set<string>();
   const keydown = (event: KeyboardEvent) => {
-    if (!connection.isConnected || !connection.state?.active || event.isComposing || event.composedPath().some((node) => node instanceof HTMLElement && (node.matches('input,textarea,select,[role="tab"],[role="separator"],[role="menuitem"]') || node.isContentEditable))) return;
+    if (!connection.isConnected || !connection.state?.active || panel?.host.hasAttribute('data-ww-scrubbing') || event.isComposing || event.composedPath().some((node) => node instanceof HTMLElement && (node.matches('input,textarea,select,summary,[role="tab"],[role="separator"],[role="menuitem"]') || node.isContentEditable))) return;
     const command = shortcutCommand(event, connection.state.view, true); if (!command) return;
     dispatch(command); consumedKeys.add(event.code || event.key); event.preventDefault(); event.stopImmediatePropagation();
   };

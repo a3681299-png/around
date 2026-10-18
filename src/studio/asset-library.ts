@@ -10,11 +10,15 @@ export function createAssetLibrary(doc: Document, root: HTMLElement, select: (id
     const layer = view?.images.find((item) => !cache.has(item.assetId) && (attempts.get(item.assetId) ?? 0) < 20); if (!layer) return;
     busy = true; attempts.set(layer.assetId, (attempts.get(layer.assetId) ?? 0) + 1);
     try { const url = await thumbnail(layer.id); if (alive && url) { cache.set(layer.assetId, url); key = ''; if (view) render(view); } }
+    catch { /* Missing or disconnected media keeps a format icon. */ }
     finally { busy = false; if (alive) timer = setTimeout(() => { void previews(); }, 200); }
   }
   function render(next: EditorView) {
     view = next;
     const assets = [...new Map(next.images.map((item) => [item.assetId, item])).values()];
+    const ids = new Set(assets.map((item) => item.assetId));
+    for (const id of cache.keys()) if (!ids.has(id)) cache.delete(id);
+    for (const id of attempts.keys()) if (!ids.has(id)) attempts.delete(id);
     const nextKey = JSON.stringify(assets.map((item) => [item.id, item.assetId, item.name]));
     if (key !== nextKey) {
       key = nextKey; root.replaceChildren();

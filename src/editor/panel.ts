@@ -8,6 +8,7 @@ import { createLayerTree } from './layer-tree';
 import { createWorkspace } from './workspace';
 import { createStudioWorkbench } from '../studio/workbench';
 import { buttonIcon } from './icons';
+import { mountNumberScrub } from './number-scrub';
 import type { EditorTool } from '../editor-core/types';
 import type { StudioHostLayout, StudioInsets } from '../studio/layout-types';
 
@@ -16,7 +17,7 @@ import type { EditorView as PanelState } from '../editor-core/types';
 import type { StudioPreferences } from '../studio/preferences';
 export interface PanelOptions {
   preferences?: StudioPreferences; fullPage?: boolean; persistWorkspace?: boolean; inPage?: boolean;
-  onLayout?(insets: StudioInsets): void;
+  hostLabel?: string; onLayout?(insets: StudioInsets): void;
 }
 
 export interface PanelActions {
@@ -41,6 +42,7 @@ export interface PanelActions {
   clearSelection(): void;
   selectAll(): void;
   tool(tool: EditorTool): void;
+  beginEdit(): void; endEdit(cancel?: boolean): void;
   thumbnail(id: string): Promise<string | undefined>;
 }
 
@@ -248,6 +250,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
   host.addEventListener('click', stop);
 
 
+  const stopScrub = mountNumberScrub(doc, host, main, actions.beginEdit, actions.endEdit);
   return {
     host,
     setHostLayout(value: StudioHostLayout) { workspace.setHostLayout?.(value); },
@@ -347,6 +350,6 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       workspace.render(state);
       if (pendingContext && state.selectedIds.includes(pendingContext.id)) { workspace.context(pendingContext.x, pendingContext.y); pendingContext = undefined; }
     },
-    destroy() { workspace.destroy(); tree.destroy(); host.remove(); },
+    destroy() { stopScrub(); workspace.destroy(); tree.destroy(); host.remove(); },
   };
 }

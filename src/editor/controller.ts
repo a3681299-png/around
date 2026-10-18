@@ -106,11 +106,11 @@ export function createCreatorEditor(doc: Document, site: SiteAdapter, baseThemeI
     if (!panel) {
       panelMode = mode;
       if (mode === 'inpage') {
-        layout = site.mountStudio?.((value) => { if (panel) { panel.setHostLayout(value); core.refreshGeometry(); refresh(); } });
+        layout = site.mountStudio?.((value) => { if (panel) { panel.setHostLayout(value); core.refreshGeometry(); } });
         if (!layout) return { ok: false, error: 'このサイトにはStudioの表示領域を確保するAdapterがありません。' };
       }
       panel = createCreatorPanel(doc, studioActions(dispatch, (files) => { void core.import(files); }, (id) => captureLayerThumbnail(doc, id)), site.decorationAnchors,
-        { preferences: browserStudioPreferences, inPage: mode === 'inpage', persistWorkspace: mode === 'inpage', onLayout: (value) => layout?.update(value) });
+        { preferences: browserStudioPreferences, hostLabel: site.id === 'youtube' ? 'YouTube' : site.id, inPage: mode === 'inpage', persistWorkspace: mode === 'inpage', onLayout: (value) => layout?.update(value) });
       (doc.body ?? doc.documentElement).append(panel.host);
       if (layout) panel.setHostLayout(layout.state());
     }
@@ -128,8 +128,8 @@ export function createCreatorEditor(doc: Document, site: SiteAdapter, baseThemeI
     removeSelection(); dispatch({ type: 'select-target', target: target.target.id }); selectedElement = target.element; selectedElement.setAttribute('data-ww-editor-selected', '');
   }
   function onKeyDown(event: KeyboardEvent) {
-    if (!editing() || fullscreen() || event.isComposing || event.composedPath().some((node) => node instanceof HTMLElement && (node.matches('input,textarea,select,[role="tab"],[role="separator"],[role="menuitem"]') || node.isContentEditable))) return;
-    if (state.view.tool === 'browse' && !['v', 'h'].includes(event.key.toLowerCase())) return;
+    if (!editing() || fullscreen() || panel?.host.hasAttribute('data-ww-scrubbing') || event.isComposing || event.composedPath().some((node) => node instanceof HTMLElement && (node.matches('input,textarea,select,summary,[role="tab"],[role="separator"],[role="menuitem"]') || node.isContentEditable))) return;
+    if (state.view.tool === 'browse' && !(panel && event.composedPath().includes(panel.host)) && !['v', 'h'].includes(event.key.toLowerCase())) return;
     const command = shortcutCommand(event, state.view, true);
     if (command) dispatch(command);
     else if ((event.key === 'Enter' || event.key === ' ') && pickTarget(event)) {

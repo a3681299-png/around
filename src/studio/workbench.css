@@ -151,3 +151,8 @@ footer { display: flex; align-items: center; gap: 12px; height: 24px; flex: none
 :host([data-workbench]) .preview-link strong { font-size: 13px; font-weight: 600; }
 :host([data-workbench]) .preview-link p { font-size: 12px; line-height: 1.8; color: var(--ui-muted); margin: 12px 0; }
 :host([data-workbench]) .preview-link button { border: 1px solid var(--ui-line); border-radius: 2px; background: #2c2d32; padding: 5px 8px; margin: 0 6px 0 0; font-size: 12px; }
+
+label[data-scrub] { cursor: ew-resize; user-select: none; touch-action: none; }
+label[data-scrub]:has(input:disabled) { cursor: default; }
+label[data-scrub] input { cursor: text; user-select: text; }
+.local-connection { color: var(--ui-muted); font-size: 10px; white-space: nowrap; }

@@ -29,8 +29,8 @@ async function opened() { const h = harness(); await Promise.resolve(); h.editor
 
 test('Editor Core compiles with no browser APIs and UI modules do not import Chrome', () => {
   execFileSync(process.execPath, ['node_modules/typescript/bin/tsc', '--noEmit', '-p', 'tsconfig.editor-core.json']);
-  for (const file of ['panel', 'workspace', 'layer-tree', 'effects-panel']) expect(readFileSync(`src/editor/${file}.ts`, 'utf8')).not.toMatch(/\bchrome\./);
-  for (const file of ['app', 'connection', 'preferences', 'ui-actions', 'protocol']) expect(readFileSync(`src/studio/${file}.ts`, 'utf8')).not.toMatch(/\bchrome\./);
+  for (const file of ['panel', 'workspace', 'layer-tree', 'effects-panel', 'number-scrub']) expect(readFileSync(`src/editor/${file}.ts`, 'utf8')).not.toMatch(/\bchrome\./);
+  for (const file of ['app', 'connection', 'preferences', 'ui-actions', 'protocol', 'workbench', 'asset-library']) expect(readFileSync(`src/studio/${file}.ts`, 'utf8')).not.toMatch(/\bchrome\./);
 });
 test('the same commands select, group, move, protect, undo and save using memory-only ports', async () => {
   const { editor } = await opened(); await editor.execute({ type: 'select-all' }); await editor.execute({ type: 'group' });
@@ -87,4 +87,18 @@ test('communication permits declarative commands and rejects malformed, executab
   for (const value of [null, { type: 'execute', script: 'alert(1)' }, { type: 'select' }, { type: 'snap', value: 1 }, { type: 'reorder', id: 'a', targetId: 'b' },
     { type: 'nudge', delta: { x: Infinity, y: 0 } }, { type: 'placements', changes: [null] }, { type: 'change', patch: { expression: 'x + 1' } },
     { type: 'change', patch: { name: 'a'.repeat(100_001) } }, JSON.parse('{"type":"change","patch":{"__proto__":{}}}')]) expect(() => parseEditCommand(value)).toThrow();
+});
+
+
+test('tools share commands/checkpoints without changing artwork/history, and import returns to authoring', async () => {
+  const { editor } = await opened(), before = editor.snapshot().document, history = editor.checkpoint().history;
+  await editor.execute({ type: 'tool', tool: 'browse' }); expect(editor.snapshot().view.tool).toBe('browse');
+  expect(editor.snapshot().document).toEqual(before); expect(editor.checkpoint().history).toEqual(history);
+  const checkpoint = editor.checkpoint(), b = harness(); await Promise.resolve(); b.editor.setEnabled(true); b.editor.open(); await b.editor.restore(checkpoint);
+  expect(b.editor.snapshot().view.tool).toBe('browse');
+  const { tool: _tool, ...old } = checkpoint; await b.editor.restore(old); expect(b.editor.snapshot().view.tool).toBe('select');
+  await editor.import([assets[0]!]); expect(editor.snapshot().view.tool).toBe('select');
+  expect(parseEditCommand({ type: 'tool', tool: 'card' })).toEqual({ type: 'tool', tool: 'card' });
+  expect(() => parseEditCommand({ type: 'tool', tool: 'execute' })).toThrow();
+  editor.destroy(); b.editor.destroy();
 });

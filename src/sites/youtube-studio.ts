@@ -26,10 +26,16 @@ export function mountYouTubeStudio(doc: Document, changed: (state: StudioHostLay
     root.toggleAttribute('data-ww-studio-fullscreen', fullscreen); root.toggleAttribute('data-ww-studio-compact', view.innerWidth - left - right < 1100);
     for (const [side, value] of Object.entries(insets)) { const name = `--ww-studio-${side}`, text = `${value}px`; if (root.style.getPropertyValue(name) !== text) root.style.setProperty(name, text); }
     state = { mode, canvas: { left, top, width: Math.max(0, view.innerWidth - left - right), height: Math.max(0, view.innerHeight - top - bottom) } };
-    const next = JSON.stringify(state); if (next !== key) { key = next; changed(state); }
+    const rect = player?.getBoundingClientRect();
+    const next = JSON.stringify([state, rect ? [rect.x, rect.y, rect.width, rect.height] : null]); if (next !== key) { key = next; changed(state); }
   }
   function schedule() { if (alive && frame === undefined) frame = view.requestAnimationFrame(measure); }
-  const observer = new MutationObserver(schedule);
+  const boundary = 'ytd-app, #movie_player, ytd-masthead';
+  const observer = new MutationObserver((records) => {
+    // Comments, counters and other page content do not change the workspace.
+    if (observed.some((node) => !node.isConnected) || records.some((record) => record.type === 'attributes'
+      || [...record.addedNodes].some((node) => node instanceof Element && (node.matches(boundary) || node.querySelector(boundary))))) schedule();
+  });
   observer.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ['theater', 'fullscreen'] });
   const events = ['yt-navigate-finish', 'yt-page-data-updated', 'fullscreenchange'];
   events.forEach((event) => doc.addEventListener(event, schedule)); view.addEventListener('resize', schedule); view.addEventListener('pageshow', schedule);
