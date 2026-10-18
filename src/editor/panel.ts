@@ -20,7 +20,7 @@ export interface PanelActions {
   close(): void;
   imageImport(files: readonly File[]): void;
   imageSelect(id: string, additive?: boolean): void;
-  imageChange(patch: ImagePatch): void;
+  imageChange(patch: ImagePatch, id?: string): void;
   layerChange(id: string, patch: ImagePatch): void;
   imageDelete(id?: string): void;
   duplicate(id?: string): void;
@@ -132,7 +132,8 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
   const radius = get<HTMLInputElement>('[aria-label="角丸"]');
   const properties = get<HTMLFieldSetElement>('.properties');
   const imageProperties = get<HTMLFieldSetElement>('.image-properties');
-  const effects = createEffectsPanel(doc, actions.imageChange);
+  const changeImage = (patch: ImagePatch) => actions.imageChange(patch, current?.image?.id);
+  const effects = createEffectsPanel(doc, changeImage);
   imageProperties.append(effects.fieldset);
   const fileInput = get<HTMLInputElement>('.file');
   const addImage = get<HTMLButtonElement>('.add-image');
@@ -150,6 +151,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
   const status = get<HTMLParagraphElement>('.status');
   const selection = get<HTMLParagraphElement>('.selection');
   let current: PanelState | undefined;
+  let pendingContext: { id: string; x: number; y: number } | undefined;
   const setText = (element: HTMLElement, value: string) => { if (element.textContent !== value) element.textContent = value; };
   const onInput = () => {
     background.disabled = !backgroundToggle.checked;
@@ -177,29 +179,31 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
     thumbnail: actions.thumbnail,
     context: (id, x, y) => {
       if (!current?.selectedIds.includes(id)) actions.imageSelect(id);
-      workspace.context(x, y);
+      // A remote selection must be acknowledged before the menu uses its actions.
+      if (current?.selectedIds.includes(id)) workspace.context(x, y);
+      else pendingContext = { id, x, y };
     } });
   workspace = createWorkspace(doc, host, main, tree, actions.clearSelection, actions.selectAll, options);
   const layerName = get<HTMLInputElement>('.layer-name');
   layerName.addEventListener('change', () => {
     const name = layerName.value.trim();
     if (!name || /[\u0000-\u001f]/.test(name)) { layerName.value = current?.image?.name ?? ''; return; }
-    actions.imageChange({ name });
+    changeImage({ name });
   });
   imageProperties.addEventListener('input', (event) => {
     const input = event.target as HTMLInputElement | HTMLSelectElement;
     const property = input.dataset.imageProp;
     if (!property) return;
     if (!input.checkValidity()) { setText(status, '画像の値を範囲内で入力してください。'); status.dataset.error = 'true'; save.disabled = true; return; }
-    if (property === 'anchor') actions.imageChange({ placement: { anchor: input.value === 'viewport' ? { kind: 'viewport' } : { kind: 'surface', target: input.value } } });
-    else if (property === 'opacity') actions.imageChange({ opacity: Number(input.value) / 100 });
-    else actions.imageChange({ placement: { [property]: Number(input.value) / (property === 'x' || property === 'y' ? 100 : 1) } });
+    if (property === 'anchor') changeImage({ placement: { anchor: input.value === 'viewport' ? { kind: 'viewport' } : { kind: 'surface', target: input.value } } });
+    else if (property === 'opacity') changeImage({ opacity: Number(input.value) / 100 });
+    else changeImage({ placement: { [property]: Number(input.value) / (property === 'x' || property === 'y' ? 100 : 1) } });
   });
   get<HTMLFieldSetElement>('.playback').addEventListener('input', (event) => {
     const input = event.target as HTMLInputElement;
     if (!input.checkValidity()) { setText(status, '再生速度は0.25〜3倍で入力してください。'); status.dataset.error = 'true'; save.disabled = true; return; }
     const key = input.dataset.playback;
-    if (key) actions.imageChange({ playback: { [key]: key === 'mode' ? input.value : key === 'speed' ? Number(input.value) : input.checked } });
+    if (key) changeImage({ playback: { [key]: key === 'mode' ? input.value : key === 'speed' ? Number(input.value) : input.checked } });
   });
   get<HTMLButtonElement>('.delete-image').addEventListener('click', () => actions.imageDelete());
   get<HTMLButtonElement>('.duplicate-image').addEventListener('click', () => actions.duplicate());
@@ -322,6 +326,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       setText(status, state.status);
       status.dataset.error = String(state.error);
       workspace.render(state);
+      if (pendingContext && state.selectedIds.includes(pendingContext.id)) { workspace.context(pendingContext.x, pendingContext.y); pendingContext = undefined; }
     },
     destroy() { workspace.destroy(); tree.destroy(); host.remove(); },
   };

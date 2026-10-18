@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { readFile } from 'node:fs/promises';
 import type { Page, BrowserContext, Locator } from '@playwright/test';
 import { test, expect } from './fixtures';
 import type { DesignDocument } from '../src/design/types';
@@ -27,6 +28,10 @@ test('standalone Studio edits a real extension target using shared grouping, eff
   const { studio, panel } = await launch(context, popup, youtube);
   await expect(panel.locator('.layers-pane')).toBeVisible(); await expect(panel.locator('.inspector-pane')).toBeVisible();
   await importImages(panel, youtube);
+  await panel.locator('.layer').last().getByRole('button', { name: 'petal.png', exact: true }).click({ button: 'right' });
+  await expect(panel.getByRole('menu', { name: 'レイヤーの操作' })).toBeVisible();
+  await panel.getByRole('menuitem', { name: '複製', exact: true }).click(); await expect(youtube.locator(images)).toHaveCount(4);
+  await panel.getByRole('button', { name: '元に戻す', exact: true }).click(); await expect(youtube.locator(images)).toHaveCount(3);
   await panel.getByRole('button', { name: 'すべて選択', exact: true }).click();
   await expect(panel.locator('.selected-count')).toHaveText('3個選択中');
   await panel.getByRole('button', { name: '選択をグループ化', exact: true }).click();
@@ -169,4 +174,27 @@ test('the authenticated Port rejects stale revisions and unrecognized commands w
     const output = { attached: attached.ok, snap: changed.state.view.snapping, stale: stale.ok, unsafe: unsafe.ok, document: unsafe.state.document, before: initial.document }; port.disconnect(); return output;
   });
   expect(result).toMatchObject({ attached: true, snap: true, stale: false, unsafe: false }); expect(result.document).toEqual(result.before);
+});
+
+test('a file read started before transport loss cannot import into the reconnected session; a closed target stops retries', async ({ context, popup, youtube }) => {
+  const { studio, panel } = await launch(context, popup, youtube);
+  await studio.evaluate(() => {
+    const original = File.prototype.arrayBuffer;
+    File.prototype.arrayBuffer = function () {
+      return new Promise<ArrayBuffer>((resolve, reject) => {
+        (globalThis as any).__releaseStudioRead = () => { File.prototype.arrayBuffer = original; return original.call(this).then(resolve, reject); };
+      });
+    };
+  });
+  await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
+  await expect.poll(() => studio.evaluate(() => typeof (globalThis as any).__releaseStudioRead)).toBe('function');
+  await youtube.reload(); await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
+  await studio.evaluate(() => (globalThis as any).__releaseStudioRead());
+  // A new import completes after the old read in the serial command queue.
+  await panel.getByLabel('画像素材を追加').setInputFiles({ name: '接続後.png', mimeType: 'image/png', buffer: await readFile(path.resolve('tests/fixtures/motion/petal.png')) });
+  await expect(panel.getByRole('button', { name: '接続後.png', exact: true })).toBeVisible();
+  await expect(panel.getByRole('button', { name: '画像を追加', exact: true })).toBeEnabled();
+  await expect(youtube.locator(images)).toHaveCount(1); await expect(panel.locator('.layers .layer')).toHaveCount(1);
+  await youtube.close(); await expect(studio.locator('.connection-status')).toContainText('閉じられました');
+  await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'false');
 });

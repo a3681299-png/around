@@ -7,7 +7,7 @@ export function studioActions(dispatch: (command: EditCommand) => void, files: (
   return {
     change: (style) => dispatch({ type: 'style', style }), save: () => dispatch({ type: 'save' }), discard: () => dispatch({ type: 'discard' }),
     reset: () => dispatch({ type: 'style', style: {} }), close: () => dispatch({ type: 'close' }), imageImport: files,
-    imageSelect: (id, additive = false) => dispatch({ type: 'select', id, additive }), imageChange: (patch) => dispatch({ type: 'change', patch }),
+    imageSelect: (id, additive = false) => dispatch({ type: 'select', id, additive }), imageChange: (patch, id) => dispatch({ type: 'change', patch, ...(id ? { id } : {}) }),
     layerChange: (id, patch) => dispatch({ type: 'change', id, patch }), imageDelete: (id) => dispatch({ type: 'delete', ...(id ? { id } : {}) }),
     duplicate: (id) => dispatch({ type: 'duplicate', ...(id ? { id } : {}) }), reorder: (id, targetId, after) => dispatch({ type: 'reorder', id, targetId, after }),
     undo: () => dispatch({ type: 'undo' }), redo: () => dispatch({ type: 'redo' }), snap: (value) => dispatch({ type: 'snap', value }), layout: (mode) => dispatch({ type: 'layout', mode }),

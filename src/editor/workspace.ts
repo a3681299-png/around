@@ -168,7 +168,11 @@ export function createWorkspace(doc: Document, host: HTMLElement, main: HTMLElem
     menu.style.top = `${Math.max(4, Math.min(rect.height - menuRect.height - 4, y - rect.top))}px`;
     menu.querySelector<HTMLButtonElement>('button:not(:disabled):not([hidden])')?.focus();
   }, render(next: PanelState) {
-    state = next; closeMenu();
+    // Repeated transport snapshots must not close an unchanged context menu.
+    if (!menu.hidden && state && (state.saving !== next.saving || state.selected !== next.selected
+      || state.selectedIds.join(',') !== next.selectedIds.join(',')
+      || JSON.stringify([state.images, state.groups]) !== JSON.stringify([next.images, next.groups]))) closeMenu();
+    state = next;
     get('.selected-count').textContent = `${next.selectedIds.length}個選択中`;
     get<HTMLButtonElement>('.clear-selection').disabled = next.saving || !next.selectedIds.length && !next.selected;
     get<HTMLButtonElement>('.select-all').disabled = next.saving || !next.images.length;

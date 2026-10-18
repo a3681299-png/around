@@ -51,6 +51,8 @@ export function createStudioClient(notify: (value: StudioConnectionState) => voi
       });
       next.onDisconnect.addListener(() => {
         if (generation !== epoch || port !== next) return;
+        // Queued commands and file reads belong to the disconnected document.
+        epoch++;
         port = undefined; connected = false;
         pending.forEach((entry) => { clearTimeout(entry.timer); entry.reject(new Error('YouTubeとの接続が切れました。')); }); pending.clear();
         emit('再接続を待っています。未保存の編集は保持しています。');
@@ -92,8 +94,10 @@ export function createStudioClient(notify: (value: StudioConnectionState) => voi
     dispatch(command: EditCommand) { return enqueue(async () => { const current = state!; await request({ type: 'command', session: current.sessionId, revision: current.revision, command } as Omit<StudioRequest, 'id'>); }); },
     import(files: readonly File[]) {
       return enqueue(async () => {
+        const generation = epoch;
         if (!files.length || files.length > ASSET_LIMITS.batchCount || files.reduce((n, f) => n + f.size, 0) > ASSET_LIMITS.batchBytes) throw new Error('一度に追加する素材は8個・合計32MBまでです。');
         const source = await Promise.all(files.map(async (file) => ({ name: file.name.replace(/[\u0000-\u001f]/g, '').slice(0, 120), mime: file.type, base64: bytesToBase64(new Uint8Array(await file.arrayBuffer())) })));
+        if (generation !== epoch || !connected) throw new Error('素材の読み込み中に接続が変わりました。もう一度追加してください。');
         const current = state!; await request({ type: 'import', session: current.sessionId, revision: current.revision, files: source } as Omit<StudioRequest, 'id'>);
       });
     },
