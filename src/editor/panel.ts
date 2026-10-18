@@ -66,8 +66,8 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       <button class="add-image" type="button">画像を追加</button>
       <button class="add-animation" type="button">アニメーションを追加</button>
       <input class="file" type="file" accept="image/png,image/webp" multiple aria-label="画像素材を追加" hidden>
-      <input class="animation-file" type="file" accept="image/gif,image/webp,application/json,.json" multiple aria-label="アニメーション素材を追加" hidden>
-      <p class="hint">PNG・WebP・GIF・Lottie JSONを選択、またはドロップ。素材4MB／JSON 1MB、アニメーション8枚まで。</p>
+      <input class="animation-file" type="file" accept="image/gif,image/png,image/apng,image/webp,video/webm,application/json,.json,.apng" multiple aria-label="アニメーション素材を追加" hidden>
+      <p class="hint">PNG・APNG・WebP・GIF・WebM・Lottie JSONを選択、またはドロップ。素材32MB／JSON 1MB、全32レイヤーまで。</p>
     </section>
     <details class="layers-section" open><summary>レイヤー <span class="layer-count"></span></summary>
       <p class="hint">上が手前。↕をドラッグして並び替え。Ctrl／Shiftで複数選択。</p>
@@ -117,9 +117,11 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       <div class="property"><label>重なり順 <input type="number" aria-label="画像の重なり順" data-image-prop="zIndex" min="-100" max="100" step="1" required></label></div>
       <div class="property"><label><input type="checkbox" data-image-prop="visible">画像を表示</label></div>
       <fieldset class="playback" aria-label="アニメーションの再生" hidden>
+        <div class="property playback-mode"><label>再生方式 <select data-playback="mode" aria-label="再生方式"><option value="auto">軽量再生（自動）</option><option value="controlled">時刻制御</option></select></label></div>
         <div class="property"><label><input type="checkbox" data-playback="playing">アニメーションを再生</label><label><input type="checkbox" data-playback="loop">ループ再生</label></div>
         <div class="property playback-speed"><label>再生速度 <input type="number" aria-label="再生速度" data-playback="speed" min="${ANIMATION_LIMITS.speedMin}" max="${ANIMATION_LIMITS.speedMax}" step="0.25" required>倍</label></div>
         <p class="hint">非表示タブ・動きを減らす設定では停止します。再読み込み後は先頭から再生します。</p>
+        <p class="hint playback-help"></p>
       </fieldset>
     </fieldset>
     <p class="hint card-help">チェックを外した項目はテーマの見た目に戻ります。</p>
@@ -204,7 +206,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
     const input = event.target as HTMLInputElement;
     if (!input.checkValidity()) { setText(status, '再生速度は0.25〜3倍で入力してください。'); status.dataset.error = 'true'; save.disabled = true; return; }
     const key = input.dataset.playback;
-    if (key) actions.imageChange({ playback: { [key]: key === 'speed' ? Number(input.value) : input.checked } });
+    if (key) actions.imageChange({ playback: { [key]: key === 'mode' ? input.value : key === 'speed' ? Number(input.value) : input.checked } });
   });
   get<HTMLButtonElement>('.delete-image').addEventListener('click', () => actions.imageDelete());
   get<HTMLButtonElement>('.duplicate-image').addEventListener('click', () => actions.duplicate());
@@ -289,7 +291,12 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
         get<HTMLInputElement>('[data-playback="playing"]').checked = state.image.playback.playing;
         get<HTMLInputElement>('[data-playback="loop"]').checked = state.image.playback.loop;
         get<HTMLInputElement>('[data-playback="speed"]').value = String(state.image.playback.speed);
-        get<HTMLElement>('.playback-speed').hidden = state.image.format !== 'lottie';
+        get<HTMLSelectElement>('[data-playback="mode"]').value = state.image.playback.mode ?? 'controlled';
+        get<HTMLElement>('.playback-mode').hidden = state.image.format === 'lottie' || state.image.format === 'webm';
+        get<HTMLElement>('.playback-speed').hidden = false;
+        setText(get<HTMLElement>('.playback-help'), state.image.format === 'webm' ? '動画は標準プレイヤーで再生します。シーク位置には誤差があります。'
+          : state.image.format === 'lottie' ? '対応する図形アニメーションをフレーム単位で再生します。'
+          : '軽量再生では切替時の再開位置に誤差があります。停止・速度変更時は時刻制御に切り替わります。');
       }
       tree.render(state);
       if (state.image) {

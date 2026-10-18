@@ -1,145 +1,168 @@
 import { createMediaClockHost, type MediaClockInstance } from '../host/media-clock';
-import { advanceMediaTime, initialMediaTime, reconcileMediaTime } from '../world/media-time';
+import { advanceMediaTime, frameAtTimeline, initialMediaTime, reconcileMediaTime } from '../world/media-time';
 export { frameAt } from '../world/media-time';
-import { loadAsset } from '../assets/client';
-import { inspectLottie } from '../assets/lottie';
 import { ANIMATION_LIMITS } from '../assets/motion-types';
-import type { AssetMetadata } from '../assets/validation';
 import type { Decoration } from '../design/types';
-import { createRasterSource } from './raster';
 import { createLottieSource } from './lottie';
+import { createNativeImage } from './native-image';
+import { createMediaBudget, MediaBudgetUnavailable, type MediaBudget } from './budget';
+import { createResourceCache, type MediaResource, type ResourceEntry } from './resources';
+import { rasterSize } from './raster-sampler';
 
-interface Resource {
-  metadata: AssetMetadata;
-  url?: string;
-  data?: object;
-  raster?: Awaited<ReturnType<typeof createRasterSource>>;
-  destroy(): void;
-}
-interface CacheEntry { refs: number; promise: Promise<Resource> }
+type Mode = 'image' | 'native' | 'controlled' | 'lottie';
+type Stats = ReturnType<MediaBudget['stats']>;
 
-/** Encoded assets/decoders are shared; playback time and SVG/canvas belong to a layer. */
-export function createMediaController(doc: Document, report: (message: string) => void) {
-  const cache = new Map<string, CacheEntry>(), instances = new Set<MediaClockInstance>();
-  let closed = false, decodedPixels = 0;
+/** Assets and samplers are shared; presentation, time and cancellation belong to a layer. */
+export function createMediaController(doc: Document, report: (message: string) => void, observe?: (stats: Stats) => void) {
+  const budget = createMediaBudget(), resources = createResourceCache(budget), instances = new Set<MediaClockInstance>();
   const clockHost = createMediaClockHost(doc, instances, ANIMATION_LIMITS.renderFps);
-  const { canRun, schedule } = clockHost;
-
-  const acquire = (id: string): CacheEntry => {
-    let entry = cache.get(id);
-    if (entry) { entry.refs++; return entry; }
-    const created: CacheEntry = { refs: 1, promise: loadAsset(id).then(async ({ metadata, blob }) => {
-      const pixels = metadata.animation && metadata.animation.format !== 'lottie' ? metadata.width * metadata.height * metadata.animation.frameCount : 0;
-      if (decodedPixels + pixels > ANIMATION_LIMITS.totalDecodedPixels) throw new Error('配置中のアニメーション画像は合計16M画素までです。');
-      decodedPixels += pixels;
-      let raster: Resource['raster'], url: string | undefined, data: object | undefined, disposed = false;
-      const resource: Resource = { metadata, destroy() {
-        if (disposed) return; disposed = true; decodedPixels -= pixels;
-        raster?.destroy(); if (url) URL.revokeObjectURL(url);
-      } };
-      try {
-        if (!metadata.animation) { url = URL.createObjectURL(blob); resource.url = url; }
-        else if (metadata.animation.format === 'lottie') { data = inspectLottie(new Uint8Array(await blob.arrayBuffer())).data; resource.data = data; }
-        else { raster = await createRasterSource(blob, metadata); resource.raster = raster; }
-        if (closed || created.refs === 0) { resource.destroy(); throw new Error('表示を終了しました。'); }
-        return resource;
-      } catch (reason) { resource.destroy(); throw reason; }
-    }) };
-    cache.set(id, created); return created;
-  };
-  const release = (id: string, entry: CacheEntry) => {
-    if (--entry.refs > 0) return;
-    if (cache.get(id) === entry) cache.delete(id);
-    void entry.promise.then((resource) => resource.destroy(), () => undefined);
-  };
-
+  let closed = false, serial = 0;
+  const unsubscribe = budget.subscribe(() => instances.forEach((instance) => instance.refresh()));
+  const unobserve = budget.observe(() => observe?.(budget.stats()));
+  observe?.(budget.stats());
   return {
     attach(parent: HTMLElement) {
       const element = doc.createElement('div'); element.className = 'media'; parent.append(element);
-      let layer: Decoration | undefined, visible = false, alive = true, epoch = 0, ready = false, failed = false;
-      let source: Resource | undefined, entry: CacheEntry | undefined, assetId = '';
-      let svg: ReturnType<typeof createLottieSource> | undefined, canvas: HTMLCanvasElement | undefined;
-      let clock = initialMediaTime(), lastFrame = -1, drawing = false;
-      let pendingFrame: number | undefined;
-      const refresh = () => {
-        if (!visible || !canRun() || layer?.kind === 'animation' && !layer.playback.playing) pendingFrame = undefined;
-        element.dataset.playback = failed ? 'error' : !ready ? 'loading' : layer?.kind !== 'animation' ? 'still'
-          : !visible || clockHost.hidden() ? 'hidden' : clockHost.reducedMotion() ? 'reduced-motion' : clock.finished ? 'finished' : layer.playback.playing ? 'playing' : 'paused';
-        if (clock.finished && ready && !failed && visible && canRun() && layer?.kind === 'animation' && layer.playback.playing) void paint(source!.metadata.animation!.frameCount - 1);
+      const consumer = `media-${++serial}`, surface = `${consumer}-surface`;
+      let layer: Decoration | undefined, visible = false, alive = true, epoch = 0, paintGeneration = 0;
+      let source: MediaResource | undefined, entry: ResourceEntry | undefined, assetId = '';
+      let mode: Mode | undefined, ready = false, failed = false, loading = false, waiting: string | undefined;
+      let image: ReturnType<typeof createNativeImage> | undefined, svg: ReturnType<typeof createLottieSource> | undefined;
+      let canvas: HTMLCanvasElement | undefined, clock = initialMediaTime(), lastFrame = -1, nativeStamp: number | undefined, forceControlled = false;
+      const signature = () => { const s = budget.stats(); return `${s.encodedBytes}/${s.decodedBytes}`; };
+      const wanted = () => visible && !clockHost.hidden();
+      const sampleNativeTime = () => {
+        const now = clockHost.now();
+        if (nativeStamp !== undefined && source?.timeline && layer?.kind === 'animation')
+          clock = advanceMediaTime(clock, source.metadata.animation!, layer.playback, Math.max(0, now - nativeStamp), true, source.timeline).state;
+        nativeStamp = mode === 'native' && wanted() ? now : undefined;
       };
-      const running = () => ready && !failed && visible && !clock.finished && layer?.kind === 'animation' && layer.playback.playing && source!.metadata.animation!.frameCount > 1;
-      const fail = (reason: unknown) => { if (!alive) return; failed = true; svg?.destroy(); refresh(); report(reason instanceof Error ? reason.message : '素材を表示できませんでした。'); schedule(); };
-      const paint = async (index: number) => {
-        if (lastFrame === index || !source) return;
-        if (drawing) { pendingFrame = index; return; }
-        const current = epoch; drawing = true;
-        try {
-          if (canvas) await source.raster!.paint(canvas, index); else svg?.paint(index);
-          if (alive && current === epoch) { lastFrame = index; element.dataset.frame = String(index); }
-        } catch (reason) { if (alive && current === epoch) fail(reason); }
-        finally {
-          if (current === epoch) {
-            drawing = false;
-            const pending = pendingFrame; pendingFrame = undefined;
-            // Keep only the latest request; a slow decoder must still paint a terminal frame.
-            if (pending !== undefined && alive && !failed) void paint(pending);
-          }
+      const releaseDisplay = () => {
+        epoch++; paintGeneration++; ready = loading = false; nativeStamp = undefined;
+        source?.releaseSampler(consumer); source?.unuse(consumer);
+        image?.destroy(); image = undefined; svg?.destroy(); svg = undefined;
+        if (canvas) { canvas.width = canvas.height = 1; canvas.remove(); canvas = undefined; }
+        budget.release(surface); mode = undefined; lastFrame = -1; element.replaceChildren();
+      };
+      const state = () => {
+        element.dataset.playback = failed ? 'error' : !wanted() ? 'hidden' : waiting ? 'waiting' : !ready ? 'loading' : layer?.kind !== 'animation' ? 'still'
+          : clockHost.reducedMotion() ? 'reduced-motion' : clock.finished ? 'finished' : layer.playback.playing ? 'playing' : 'paused';
+        element.style.visibility = ready ? 'visible' : 'hidden';
+      };
+      const fail = (reason: unknown) => {
+        if (!alive) return; releaseDisplay(); failed = true; waiting = undefined; state();
+        report(reason instanceof Error ? reason.message : '素材を表示できませんでした。'); clockHost.schedule();
+      };
+      const paint = async (timeMs: number) => {
+        if (!source?.timeline || !wanted() || failed) return;
+        const index = frameAtTimeline(source.timeline, timeMs);
+        if (index === lastFrame) return;
+        const generation = ++paintGeneration, current = epoch;
+        if (svg) { const before = clockHost.now(); svg.paint(index); budget.reportDraw(clockHost.now() - before); lastFrame = index; element.dataset.frame = String(index); return; }
+        if (!canvas) return;
+        const sampler = source.sampler(consumer);
+        const result = await sampler.request({ consumer, timeMs, velocity: layer?.kind === 'animation' && layer.playback.playing && clockHost.canRun() && !clock.finished ? layer.playback.speed : 0 });
+        if (result.status === 'exact' || result.status === 'fallback') {
+          try {
+            if (!alive || current !== epoch || generation !== paintGeneration || !wanted() || !canvas) return;
+            const before = clockHost.now(), context = canvas.getContext('2d');
+            if (!context) throw new Error('描画領域を確保できませんでした。');
+            context.clearRect(0, 0, canvas.width, canvas.height); context.drawImage(result.frame.source, 0, 0, canvas.width, canvas.height);
+            budget.reportDraw(clockHost.now() - before); lastFrame = result.frame.index; element.dataset.frame = String(lastFrame); waiting = undefined; ready = true; state();
+          } catch (error) { fail(error); } finally { result.frame.close(); }
+          if (alive && current === epoch && (clock.finished || !clockHost.canRun() || layer?.kind === 'animation' && !layer.playback.playing)) source?.releaseSampler(consumer);
+        } else if (alive && current === epoch && generation === paintGeneration) {
+          if (result.status === 'error') fail(new Error(result.message));
+          else if (result.status === 'pending' && result.reason === 'budget') { waiting = signature(); state(); }
         }
+      };
+      const desiredMode = (): Mode => {
+        if (layer?.kind !== 'animation') return 'image';
+        if (layer.format === 'lottie') return 'lottie';
+        const p = layer.playback;
+        return p.mode === 'auto' && !forceControlled && p.playing && p.loop && p.speed === 1 && source?.metadata.animation?.loopCount === 0 && !clockHost.reducedMotion() ? 'native' : 'controlled';
+      };
+      const load = () => {
+        loading = true; const current = epoch; entry = resources.acquire(assetId);
+        void entry.promise.then((resource) => {
+          if (!alive || current !== epoch) return;
+          source = resource; loading = false;
+          if (layer?.kind === 'image' && resource.metadata.animation || layer?.kind === 'animation' && resource.metadata.animation?.format !== layer.format) throw new Error('レイヤーと素材の形式が一致しません。');
+          element.dataset.format = resource.metadata.animation?.format ?? 'image'; refresh();
+        }).catch((error: unknown) => {
+          if (!alive || current !== epoch) return;
+          loading = false; if (entry) resources.release(assetId, entry); entry = undefined;
+          if (error instanceof MediaBudgetUnavailable) { waiting = signature(); state(); } else fail(error);
+        });
+      };
+      const setup = (next: Mode) => {
+        releaseDisplay(); mode = next; loading = true; source!.use(consumer); const current = epoch;
+        element.dataset.renderer = next;
+        const metadata = source!.metadata, size = next === 'controlled' ? rasterSize(metadata) : metadata;
+        const bytes = size.width * size.height * 4 * (next === 'native' ? 3 : 1);
+        if (!budget.reserve(surface, bytes, 'surface')) {
+          releaseDisplay();
+          if (next === 'native') { forceControlled = true; refresh(); return; }
+          waiting = signature(); state(); return;
+        }
+        void (async () => {
+          if (next === 'native' || next === 'image') {
+            image = createNativeImage(doc, source!.url, metadata); element.append(image.element); await image.ready;
+            if (alive && current === epoch) { element.dataset.frame = next === 'native' ? 'native' : '0'; nativeStamp = next === 'native' ? clockHost.now() : undefined; }
+          } else if (next === 'lottie') { svg = createLottieSource(element, source!.data!); await svg.ready; await paint(clock.elapsedMs); }
+          else { canvas = doc.createElement('canvas'); canvas.width = size.width; canvas.height = size.height; element.append(canvas); await paint(clock.elapsedMs); }
+          if (!alive || current !== epoch) return;
+          loading = false; ready = !failed && !waiting; refresh();
+        })().catch((error: unknown) => { if (alive && current === epoch) fail(error); });
+      };
+      const running = () => ready && !failed && wanted() && !clock.finished && layer?.kind === 'animation' && layer.playback.playing && (mode === 'controlled' || mode === 'lottie') && source!.metadata.animation!.frameCount > 1;
+      const refresh = () => {
+        if (!alive) return;
+        if (!wanted()) {
+          if (mode) { sampleNativeTime(); if (mode === 'native') forceControlled = true; releaseDisplay(); }
+          // A resource still loading must not later activate a hidden layer.
+          if (loading && !source) { epoch++; loading = false; if (entry) resources.release(assetId, entry); entry = undefined; }
+          state(); return;
+        }
+        if (failed || loading) { state(); return; }
+        if (waiting && waiting === signature()) { state(); return; }
+        waiting = undefined;
+        if (source?.disposed) { source = undefined; if (entry) resources.release(assetId, entry); entry = undefined; }
+        if (!source) { load(); state(); return; }
+        const next = desiredMode();
+        if (mode !== next) { sampleNativeTime(); if (mode === 'native') forceControlled = true; setup(next); }
+        else if ((mode === 'controlled' || mode === 'lottie') && (!ready || !clockHost.canRun() || !layer || layer.kind === 'animation' && !layer.playback.playing || clock.finished)) {
+          if (ready) { paintGeneration++; source.releaseSampler(consumer); } void paint(clock.elapsedMs);
+        }
+        state(); clockHost.schedule();
       };
       const instance: MediaClockInstance = {
         running, refresh,
-        tick(delta) {
+        tick(delta, time) {
           if (!running() || layer?.kind !== 'animation') return;
-          const motion = source!.metadata.animation!;
-          const advanced = advanceMediaTime(clock, motion, layer.playback, delta, true);
-          clock = advanced.state;
-          if (clock.finished) refresh();
-          void paint(advanced.frame);
+          clock = advanceMediaTime(clock, source!.metadata.animation!, layer.playback, delta, true, source!.timeline!).state;
+          if (budget.allowDraw(time) || clock.finished) void paint(clock.elapsedMs);
+          state();
         },
         destroy() {
-          if (!alive) return; alive = false; epoch++; instances.delete(instance); svg?.destroy();
-          if (entry) release(assetId, entry); entry = undefined; source = undefined; canvas = undefined;
-          element.remove(); schedule();
+          if (!alive) return; alive = false; releaseDisplay(); instances.delete(instance);
+          if (entry) resources.release(assetId, entry); entry = undefined; source = undefined; element.remove(); clockHost.schedule();
         },
       };
       instances.add(instance);
-      return {
-        element,
+      return { element,
         update(next: Decoration, renderable: boolean) {
-          if (!alive) return;
-          clock = reconcileMediaTime(clock, layer?.kind === 'animation' ? layer.playback : undefined, next.kind === 'animation' ? next.playback : undefined);
-          layer = next; visible = renderable;
-          if (assetId !== next.assetId) {
-            epoch++; const current = epoch;
-            svg?.destroy(); svg = undefined; canvas = undefined; element.replaceChildren();
-            if (entry) release(assetId, entry);
-            assetId = next.assetId; entry = acquire(assetId); ready = failed = drawing = false; clock = initialMediaTime(); lastFrame = -1; pendingFrame = undefined;
-            element.style.visibility = 'hidden';
-            void entry.promise.then(async (resource) => {
-              if (!alive || current !== epoch) return;
-              source = resource;
-              if (next.kind === 'image' && resource.metadata.animation || next.kind === 'animation' && resource.metadata.animation?.format !== next.format) throw new Error('レイヤーと素材の形式が一致しません。');
-              element.dataset.format = resource.metadata.animation?.format ?? 'image';
-              if (next.kind === 'image') {
-                const image = doc.createElement('img'); image.alt = ''; image.draggable = false; image.src = resource.url!; element.append(image); await image.decode();
-              } else {
-                if (resource.data) { svg = createLottieSource(element, resource.data); await svg.ready; }
-                else { canvas = doc.createElement('canvas'); canvas.width = resource.metadata.width; canvas.height = resource.metadata.height; element.append(canvas); }
-                await paint(0);
-              }
-              if (!alive || current !== epoch) return;
-              ready = !failed; element.style.visibility = 'visible'; refresh(); schedule();
-            }).catch((reason: unknown) => { if (alive && current === epoch) fail(reason); });
-          }
-          refresh(); schedule();
-        },
-        destroy: instance.destroy,
+          if (!alive) return; sampleNativeTime();
+          const changed = assetId !== next.assetId;
+          if (changed) { releaseDisplay(); if (entry) resources.release(assetId, entry); source = undefined; entry = undefined; assetId = next.assetId; failed = false; clock = initialMediaTime(); forceControlled = false; }
+          else clock = reconcileMediaTime(clock, layer?.kind === 'animation' ? layer.playback : undefined, next.kind === 'animation' ? next.playback : undefined);
+          if (next.kind === 'animation' && layer?.kind === 'animation' && next.playback.mode === 'auto' && layer.playback.mode === 'controlled') forceControlled = false;
+          const configChanged = layer?.kind === 'animation' && next.kind === 'animation' && JSON.stringify(layer.playback) !== JSON.stringify(next.playback);
+          layer = next; visible = renderable; if (changed || configChanged) waiting = undefined;
+          refresh();
+        }, destroy: instance.destroy,
       };
     },
-    destroy() {
-      if (closed) return; closed = true;
-      clockHost.destroy();
-      [...instances].forEach((instance) => instance.destroy());
-    },
+    destroy() { if (closed) return; closed = true; clockHost.destroy(); unsubscribe(); unobserve(); [...instances].forEach((instance) => instance.destroy()); resources.destroy(); budget.destroy(); observe?.(budget.stats()); },
   };
 }

@@ -50,7 +50,7 @@ test('recordings reject private/executable fields, unknown events, bad seeds, ge
     { ...input, events: Array(RECORDING_LIMITS.events + 1).fill({ type: 'video.play' }) },
   ]) expect(() => parseWorldInput(value)).toThrow();
   for (const value of [
-    { ...recording, runtimeVersion: 'future' }, { ...recording, formatVersion: 2 }, { ...recording, script: 'alert(1)' },
+    { ...recording, runtimeVersion: 'future' }, { ...recording, formatVersion: 3 }, { ...recording, script: 'alert(1)' },
     { ...recording, scene: { ...scene, script: 'alert(1)' } }, { ...recording, inputs: Array(RECORDING_LIMITS.frames + 1).fill(input) },
     { ...recording, initialState: { ...recording.initialState, random: 'Math.random()' } },
     { ...recording, initialState: { ...recording.initialState, effects: { fades: { missing: { from: 0, to: 1, start: 0, duration: 1 } }, visibility: {} } } },

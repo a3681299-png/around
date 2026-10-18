@@ -34,11 +34,12 @@ async function drag(page: Page, node: Locator, dx: number, dy: number) {
   await page.mouse.move(x, y); await page.mouse.down(); await page.mouse.move(x + dx, y + dy, { steps: 8 }); await page.mouse.up();
 }
 
-for (const [extension, format] of [['gif', 'gif'], ['webp', 'animated-webp'], ['json', 'lottie']] as const) {
+for (const [extension, format] of [['gif', 'gif'], ['apng', 'apng'], ['webp', 'animated-webp'], ['json', 'lottie']] as const) {
   test(`${format}: import, paint actual frames, transform, pause, loop, save, reload and restart`, async ({ popup, youtube, context, profile, extensionId }) => {
     const panel = await open(popup, youtube);
     const errors: string[] = []; youtube.on('pageerror', (error) => errors.push(error.message));
     await panel.getByLabel('アニメーション素材を追加').setInputFiles(fixture(extension)); await ready(youtube, 1);
+    if (format !== 'lottie') await panel.getByLabel('再生方式', { exact: true }).selectOption('controlled');
     const layer = youtube.locator(layers), media = layer.locator('.media');
     await expect(media).toHaveAttribute('data-format', format);
     const first = await signature(layer); expect(first).not.toBe('not-ready');
@@ -64,7 +65,7 @@ for (const [extension, format] of [['gif', 'gif'], ['webp', 'animated-webp'], ['
     await panel.getByRole('checkbox', { name: 'ループ再生', exact: true }).check();
     await panel.getByRole('checkbox', { name: 'アニメーションを再生', exact: true }).check();
     await save(panel); const saved = await stored(popup);
-    expect(saved).toMatchObject({ schemaVersion: 6, decorations: [{ kind: 'animation', format, opacity: .7, placement: { rotationDeg: 25 }, playback: { playing: true, loop: true } }] });
+    expect(saved).toMatchObject({ schemaVersion: 7, decorations: [{ kind: 'animation', format, opacity: .7, placement: { rotationDeg: 25 }, playback: { playing: true, loop: true } }] });
     expect(JSON.stringify(saved)).not.toMatch(/data:image|base64|blob:/);
     await youtube.reload(); await ready(youtube, 1); await expect(layer).not.toHaveAttribute('data-editable');
     const restartedFrame = await signature(layer); await expect.poll(() => signature(layer)).not.toBe(restartedFrame);
@@ -173,8 +174,9 @@ test('eight animations share decoders, stay bounded, respect reduced motion/hidd
     };` });
   const files = ['gif', 'webp', 'json', 'gif', 'webp', 'json', 'gif', 'json'];
   await panel.getByLabel('アニメーション素材を追加').setInputFiles(files.map(fixture)); await ready(youtube, 8);
-  await expect(panel.getByRole('button', { name: 'アニメーションを追加', exact: true })).toBeDisabled();
-  await expect(panel.getByRole('button', { name: '選択を複製', exact: true })).toBeDisabled();
+  await expect(panel.getByRole('button', { name: 'アニメーションを追加', exact: true })).toBeEnabled();
+  await expect(panel.getByRole('button', { name: '選択を複製', exact: true })).toBeEnabled();
+  for (const row of await panel.locator('[data-layer-id]').all()) { await row.locator('[data-action="select"]').click(); if (await panel.getByLabel('再生方式', { exact: true }).isVisible()) await panel.getByLabel('再生方式', { exact: true }).selectOption('controlled'); }
   await youtube.evaluate((selector) => {
     document.documentElement.dataset.motionFrames = '0';
     const root = document.querySelector(selector)!.shadowRoot!;

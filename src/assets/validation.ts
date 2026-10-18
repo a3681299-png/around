@@ -1,6 +1,6 @@
-export const ASSET_LIMITS = Object.freeze({ fileBytes: 4 * 1024 * 1024, batchBytes: 12 * 1024 * 1024, batchCount: 8, totalBytes: 48 * 1024 * 1024, count: 128, edge: 4096, pixels: 16 * 1024 * 1024 });
+export const ASSET_LIMITS = Object.freeze({ fileBytes: 32 * 1024 * 1024, batchBytes: 32 * 1024 * 1024, batchCount: 8, totalBytes: 256 * 1024 * 1024, count: 128, edge: 4096, pixels: 16 * 1024 * 1024 });
 export interface ImageInfo { mime: 'image/png' | 'image/webp'; width: number; height: number }
-export interface AssetInfo { mime: 'image/png' | 'image/webp' | 'image/gif' | 'application/json'; width: number; height: number; animation?: import('./motion-types').AnimationInfo }
+export interface AssetInfo { mime: 'image/png' | 'image/webp' | 'image/gif' | 'application/json' | 'video/webm'; width: number; height: number; animation?: import('./motion-types').AnimationInfo }
 export interface AssetMetadata extends AssetInfo { id: string; name: string; byteLength: number }
 
 const text = (data: Uint8Array, start: number, length: number) => String.fromCharCode(...data.subarray(start, start + length));
@@ -8,7 +8,7 @@ const invalid = () => new Error('静止PNG・WebP画像を選択してくださ�
 
 /** Bound dimensions before decoding; never trust an extension or MIME label alone. */
 export function inspectImage(data: Uint8Array, declaredMime = ''): ImageInfo {
-  if (data.byteLength === 0 || data.byteLength > ASSET_LIMITS.fileBytes) throw new Error('画像は1枚4MBまでです。');
+  if (data.byteLength === 0 || data.byteLength > ASSET_LIMITS.fileBytes) throw new Error('素材は1ファイル32MBまでです。');
   const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
   let info: ImageInfo | undefined;
   if (data.length >= 33 && text(data, 0, 8) === '\x89PNG\r\n\x1a\n' && text(data, 12, 4) === 'IHDR' && view.getUint32(8) === 13) {

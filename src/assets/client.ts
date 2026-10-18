@@ -12,10 +12,10 @@ async function request<T>(action: string, values: Record<string, unknown>): Prom
 
 export async function importAssets(files: readonly File[], session: string): Promise<AssetMetadata[]> {
   if (!files.length || files.length > ASSET_LIMITS.batchCount) throw new Error('一度に追加できる画像は8枚までです。');
-  if (files.reduce((size, file) => size + file.size, 0) > ASSET_LIMITS.batchBytes) throw new Error('一度に追加する画像は合計12MBまでです。');
+  if (files.reduce((size, file) => size + file.size, 0) > ASSET_LIMITS.batchBytes) throw new Error('一度に追加する素材は合計32MBまでです。');
   const wire: AssetWireFile[] = [];
   for (const file of files) {
-    if (file.size > ASSET_LIMITS.fileBytes) throw new Error('画像は1枚4MBまでです。');
+    if (file.size > ASSET_LIMITS.fileBytes) throw new Error('素材は1ファイル32MBまでです。');
     const bytes = new Uint8Array(await file.arrayBuffer());
     const info = inspectAsset(bytes, file.type);
     await validateAnimatedFrames(bytes, info);

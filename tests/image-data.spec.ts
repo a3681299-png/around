@@ -13,7 +13,7 @@ test('v1 migration preserves card rules and base theme without embedding any ima
     { kind: 'surface-style', target: 'video-card', style: { borderRadiusPx: 12 } },
   ] };
   const parsed = parseDesign(legacy);
-  expect(parsed).toMatchObject({ schemaVersion: 6, baseThemeId: 'retro', rules: legacy.rules, decorations: [] });
+  expect(parsed).toMatchObject({ schemaVersion: 7, baseThemeId: 'retro', rules: legacy.rules, decorations: [] });
   expect(legacy.schemaVersion).toBe(1);
   const withImage = { ...parsed, decorations: [image()] };
   expect(parseDesign(withImage)).toEqual(withImage);
@@ -49,7 +49,7 @@ test('raster validation checks bytes, MIME, dimensions, chunk lengths and transf
   expect(base64ToBytes(bytesToBase64(png()))).toEqual(png());
   expect(() => inspectImage(new TextEncoder().encode('<svg onload="alert(1)"></svg>'), 'image/png')).toThrow();
   expect(() => inspectImage(png(), 'image/webp')).toThrow();
-  expect(() => inspectImage(new Uint8Array(ASSET_LIMITS.fileBytes + 1))).toThrow('4MB');
+  expect(() => inspectImage(new Uint8Array(ASSET_LIMITS.fileBytes + 1))).toThrow('32MB');
   const giant = png(); new DataView(giant.buffer).setUint32(16, 10_000);
   expect(() => inspectImage(giant)).toThrow('4096');
   expect(() => inspectImage(png().subarray(0, 40))).toThrow();

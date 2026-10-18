@@ -238,7 +238,7 @@ export function createCreatorEditor(
             y: Math.min(.95, Math.max(.05, (point?.y ?? view.innerHeight * .45) / view.innerHeight + index * 24 / view.innerHeight)),
             widthPx: Math.round(asset.width * scale * 10) / 10, heightPx: Math.round(asset.height * scale * 10) / 10, rotationDeg: 0 },
           opacity: 1, zIndex: Math.min(100, next.decorations.length), visible: true, locked: false };
-        next.decorations.push(asset.animation ? { ...common, kind: 'animation', format: asset.animation.format, playback: { playing: true, loop: true, speed: 1 } } : { ...common, kind: 'image' });
+        next.decorations.push(asset.animation ? { ...common, kind: 'animation', format: asset.animation.format, playback: { playing: true, loop: true, speed: 1, mode: 'auto' } } : { ...common, kind: 'image' });
         selectedImageIds = [id];
       });
       await checkDesignAssets(next, importSession);

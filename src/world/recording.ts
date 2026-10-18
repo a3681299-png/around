@@ -6,7 +6,7 @@ import { WORLD_RUNTIME_VERSION, type WorldEvent, type WorldInput, type WorldScen
 export const RECORDING_LIMITS = Object.freeze({ frames: 3600, chars: 8 * 1024 * 1024, durationMs: 600_000, anchors: 32, events: 64 });
 export interface WorldRecording {
   format: 'ww-world-inputs';
-  formatVersion: 1;
+  formatVersion: 2;
   runtimeVersion: typeof WORLD_RUNTIME_VERSION;
   scene: WorldScene;
   initialState: WorldState;
@@ -48,9 +48,9 @@ export function parseWorldInput(value: unknown): WorldInput {
     anchors: frames, signals: { pointer: signals['pointer'] === undefined ? undefined : point(signals['pointer']), playing: boolean(signals['playing']) },
     events: events(data['events']), environment: { hidden: boolean(environment['hidden']), reducedMotion: boolean(environment['reducedMotion']) }, ...(seed === undefined ? {} : { seed }) };
 }
-export function parseWorldScene(value: unknown): WorldScene {
+export function parseWorldScene(value: unknown, legacy = false): WorldScene {
   const scene = record(value, ['decorations', 'groups']);
-  const design = parseDesign({ schemaVersion: 6, id: 'runtime-recording', siteId: 'runtime-host', baseThemeId: null, rules: [], ...scene });
+  const design = parseDesign({ schemaVersion: legacy ? 6 : 7, id: 'runtime-recording', siteId: 'runtime-host', baseThemeId: null, rules: [], ...scene });
   return { decorations: design.decorations, ...(design.groups ? { groups: design.groups } : {}) };
 }
 export function parseWorldState(value: unknown, scene: WorldScene): WorldState {
@@ -73,15 +73,15 @@ export function parseWorldState(value: unknown, scene: WorldScene): WorldState {
 export function parseWorldRecording(value: unknown): WorldRecording {
   if (typeof value === 'string') { if (value.length > RECORDING_LIMITS.chars) throw new Error('World recording is too large.'); value = JSON.parse(value); }
   const data = record(value, ['format', 'formatVersion', 'runtimeVersion', 'scene', 'initialState', 'inputs']);
-  if (data['format'] !== 'ww-world-inputs' || data['formatVersion'] !== 1 || data['runtimeVersion'] !== WORLD_RUNTIME_VERSION) throw new Error('Unsupported World recording version.');
+  if (data['format'] !== 'ww-world-inputs' || (data['formatVersion'] !== 1 && data['formatVersion'] !== 2) || data['runtimeVersion'] !== WORLD_RUNTIME_VERSION) throw new Error('Unsupported World recording version.');
   if (!Array.isArray(data['inputs']) || data['inputs'].length > RECORDING_LIMITS.frames) throw new Error('Too many World inputs.');
-  const scene = parseWorldScene(data['scene']), initialState = parseWorldState(data['initialState'], scene);
+  const scene = parseWorldScene(data['scene'], data['formatVersion'] === 1), initialState = parseWorldState(data['initialState'], scene);
   const inputs = data['inputs'].map(parseWorldInput);
   let time = initialState.timeMs ?? 0;
   for (const input of inputs) {
     if (input.timeMs < time || input.timeMs - inputs[0]!.timeMs > RECORDING_LIMITS.durationMs) throw new Error('Invalid World input timeline.'); time = input.timeMs;
   }
-  const result: WorldRecording = { format: 'ww-world-inputs', formatVersion: 1, runtimeVersion: WORLD_RUNTIME_VERSION, scene, initialState, inputs };
+  const result: WorldRecording = { format: 'ww-world-inputs', formatVersion: 2, runtimeVersion: WORLD_RUNTIME_VERSION, scene, initialState, inputs };
   if (JSON.stringify(result).length > RECORDING_LIMITS.chars) throw new Error('World recording is too large.'); return result;
 }
 
@@ -95,7 +95,7 @@ export function createWorldRecorder(maxInputs: number = RECORDING_LIMITS.frames)
     status() { return { active, frames: current?.inputs.length ?? 0, reason }; },
     start(scene: WorldScene, state: WorldState) {
       const parsed = parseWorldScene(scene);
-      current = { format: 'ww-world-inputs', formatVersion: 1, runtimeVersion: WORLD_RUNTIME_VERSION, scene: parsed, initialState: parseWorldState(state, parsed), inputs: [] };
+      current = { format: 'ww-world-inputs', formatVersion: 2, runtimeVersion: WORLD_RUNTIME_VERSION, scene: parsed, initialState: parseWorldState(state, parsed), inputs: [] };
       signature = JSON.stringify(parsed); chars = JSON.stringify(current).length; active = true; reason = undefined;
     },
     capture(scene: WorldScene, value: WorldInput): boolean {

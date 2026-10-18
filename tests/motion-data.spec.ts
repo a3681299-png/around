@@ -20,7 +20,7 @@ test('real GIF/WebP containers are detected, timed and bounded before decoding',
     expect(() => inspectAsset(data.subarray(0, data.length - 3), mime)).toThrow();
     expect(() => inspectAsset(data, 'image/png')).toThrow();
     const giant = data.slice();
-    if (format === 'gif') new DataView(giant.buffer).setUint16(6, 4096, true);
+    if (format === 'gif') new DataView(giant.buffer).setUint16(6, 8192, true);
     else { giant[24] = 255; giant[25] = 255; }
     expect(() => inspectAsset(giant, mime)).toThrow();
   }
@@ -45,12 +45,12 @@ test('Lottie vector data is accepted and executable/external/expensive content i
   expect(() => inspectLottie(new Uint8Array(1024 * 1024 + 1))).toThrow('1MB');
 });
 
-test('asset references reject mismatched media and aggregate decoder budgets while sharing duplicate assets', () => {
+test('asset references preserve large animations without counting every frame as resident memory', () => {
   const layers = Array.from({ length: 3 }, (_, i) => ({ ...layer(), id: `animation-${i}`, assetId: `asset-${String(i).repeat(64)}` }));
   const assets = new Map<string, AssetMetadata>(layers.map((l) => [l.assetId, { id: l.assetId, name: 'big.gif', byteLength: 1024, mime: 'image/gif', width: 512, height: 512,
     animation: { format: 'gif', frameCount: 32, durationMs: 3200, frameDurationsMs: Array(32).fill(100) } }]));
   expect(() => validateDesignAssets(layers.slice(0, 2), assets)).not.toThrow();
-  expect(() => validateDesignAssets(layers, assets)).toThrow('16M');
+  expect(() => validateDesignAssets(layers, assets)).not.toThrow();
   expect(() => validateDesignAssets(layers.map((l) => ({ ...l, assetId: layers[0]!.assetId })), assets)).not.toThrow();
   expect(() => validateDesignAssets([{ ...layers[0]!, format: 'lottie' }], assets)).toThrow('一致');
   expect(() => validateDesignAssets(layers, new Map())).toThrow('見つかりません');
@@ -59,12 +59,12 @@ test('asset references reject mismatched media and aggregate decoder budgets whi
 test('v4 playback settings coexist with old locked image layers and reject invalid layer/media combinations', () => {
   const legacy = { ...emptyDesign('youtube', null), schemaVersion: 3, decorations: [{ ...layer(), kind: 'image' }] };
   const old = legacy.decorations[0]!; delete (old as Partial<AnimationDecoration>).format; delete (old as Partial<AnimationDecoration>).playback;
-  expect(parseDesign(legacy)).toMatchObject({ schemaVersion: 6, decorations: [{ kind: 'image', locked: false }] });
+  expect(parseDesign(legacy)).toMatchObject({ schemaVersion: 7, decorations: [{ kind: 'image', locked: false }] });
   const doc = { ...emptyDesign('youtube', 'retro'), decorations: [layer()] };
   expect(parseDesign(doc)).toEqual(doc);
-  for (const decoration of [{ ...layer(), playback: { playing: true, loop: true, speed: 2 } }, { ...layer(), format: 'video' }, { ...layer(), playback: { playing: 'yes', loop: true, speed: 1 } },
+  for (const decoration of [{ ...layer(), playback: { playing: true, loop: true, speed: Infinity } }, { ...layer(), format: 'video' }, { ...layer(), playback: { playing: 'yes', loop: true, speed: 1 } },
     { ...layer(), format: 'lottie', playback: { playing: true, loop: true, speed: 4 } }]) expect(() => parseDesign({ ...doc, decorations: [decoration] })).toThrow();
-  expect(() => parseDesign({ ...doc, decorations: Array.from({ length: 9 }, (_, i) => ({ ...layer(), id: `animation-${i}` })) })).toThrow('8');
+  expect(() => parseDesign({ ...doc, schemaVersion: 6, decorations: Array.from({ length: 9 }, (_, i) => ({ ...layer(), id: `animation-${i}` })) })).toThrow('8');
   expect(parseDesign({ ...doc, decorations: [{ ...layer(), format: 'lottie', playback: { playing: false, loop: false, speed: .5 } }] }).decorations[0]).toMatchObject({ playback: { speed: .5 } });
 });
 

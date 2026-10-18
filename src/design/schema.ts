@@ -78,19 +78,21 @@ function image(value: unknown, version: number): Decoration {
     return { ...common, kind: 'image' };
   }
   const format = item['format'];
-  if (format !== 'gif' && format !== 'animated-webp' && format !== 'lottie') throw new Error('未対応のアニメーション形式です。');
-  const playback = record(item['playback'], ['playing', 'loop', 'speed']);
+  if (format !== 'gif' && format !== 'animated-webp' && format !== 'lottie' && !(version >= 7 && (format === 'apng' || format === 'webm'))) throw new Error('未対応のアニメーション形式です。');
+  const playback = record(item['playback'], ['playing', 'loop', 'speed', ...(version >= 7 ? ['mode'] : [])]);
   if (typeof playback['playing'] !== 'boolean' || typeof playback['loop'] !== 'boolean') throw new Error('再生設定が不正です。');
   const speed = number(playback['speed'], ANIMATION_LIMITS.speedMin, ANIMATION_LIMITS.speedMax);
-  if (format !== 'lottie' && speed !== 1) throw new Error('再生速度はLottieでのみ変更できます。');
-  return { ...common, kind: 'animation', format, playback: { playing: playback['playing'], loop: playback['loop'], speed } };
+  if (version < 7 && format !== 'lottie' && speed !== 1) throw new Error('再生速度はLottieでのみ変更できます。');
+  const mode = playback['mode'];
+  if (mode !== undefined && mode !== 'auto' && mode !== 'controlled' || format === 'webm' && mode === 'controlled') throw new Error('未対応の再生モードです。');
+  return { ...common, kind: 'animation', format, playback: { playing: playback['playing'], loop: playback['loop'], speed, ...(mode === undefined ? {} : { mode }) } };
 }
 
 /** Rebuilds trusted data; never spreads user-provided objects into CSS or markup. */
 export function parseDesign(value: unknown): DesignDocument {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('デザインの形式が不正です。');
   const version = (value as Record<string, unknown>)['schemaVersion'];
-  if (version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5 && version !== 6) throw new Error('このデザインのバージョンには対応していません。');
+  if (version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5 && version !== 6 && version !== 7) throw new Error('このデザインのバージョンには対応していません。');
   const data = record(value, version === 1 ? ['schemaVersion', 'id', 'siteId', 'baseThemeId', 'rules'] : ['schemaVersion', 'id', 'siteId', 'baseThemeId', 'rules', 'decorations', ...(version >= 6 ? ['groups'] : [])]);
   if (!isDesignId(data['id']) || !isDesignId(data['siteId'])
     || (data['baseThemeId'] !== null && !isDesignId(data['baseThemeId']))) {
@@ -121,7 +123,7 @@ export function parseDesign(value: unknown): DesignDocument {
     if (!Array.isArray(data['decorations']) || data['decorations'].length > IMAGE_LIMITS.count) throw new Error('画像は32枚まで配置できます。');
     decorations = data['decorations'].map((value) => image(value, version));
     if (new Set(decorations.map((item) => item.id)).size !== decorations.length) throw new Error('画像レイヤーのIDが重複しています。');
-    if (decorations.filter((item) => item.kind === 'animation').length > ANIMATION_LIMITS.count) throw new Error('アニメーションは8レイヤーまでです。');
+    if (decorations.filter((item) => item.kind === 'animation').length > (version < 7 ? 8 : ANIMATION_LIMITS.count)) throw new Error(version < 7 ? '旧形式のアニメーションは8枚までです。' : '素材は合計32レイヤーまでです。');
   }
   let groups: GroupLayer[] = [];
   if (Object.hasOwn(data, 'groups')) {
@@ -136,11 +138,11 @@ export function parseDesign(value: unknown): DesignDocument {
       group.children.forEach((id) => assigned.add(id));
     }
   }
-  return { schemaVersion: 6, id: data['id'], siteId: data['siteId'], baseThemeId: data['baseThemeId'], rules, decorations, ...(groups.length ? { groups } : {}) };
+  return { schemaVersion: 7, id: data['id'], siteId: data['siteId'], baseThemeId: data['baseThemeId'], rules, decorations, ...(groups.length ? { groups } : {}) };
 }
 
 export function emptyDesign(siteId: string, baseThemeId: string | null): DesignDocument {
-  return parseDesign({ schemaVersion: 6, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
+  return parseDesign({ schemaVersion: 7, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
 }
 
 export function sameDesign(a: DesignDocument | undefined, b: DesignDocument | undefined): boolean {

@@ -214,7 +214,7 @@ test('invalid files and missing assets fail without saving corrupt JSON or distu
   await expect(dialog.locator('.status')).toContainText('静止PNG');
   await expect(youtube.locator(layers)).toHaveCount(0);
   await dialog.getByLabel('画像素材を追加').setInputFiles({ name: 'huge.png', mimeType: 'image/png', buffer: Buffer.alloc(4 * 1024 * 1024 + 1) });
-  await expect(dialog.locator('.status')).toContainText('4MB');
+  await expect(dialog.locator('.status')).toContainText('32MB');
   expect(await popup.evaluate(async (designKey) => (await chrome.storage.local.get(designKey))[designKey], key)).toBeUndefined();
   const response = await popup.evaluate(async () => chrome.runtime.sendMessage({ type: 'web-world-themes:assets', action: 'save', session: 'session-test', design: {
     schemaVersion: 2, id: 'missing', siteId: 'youtube', baseThemeId: 'retro', rules: [], decorations: [{

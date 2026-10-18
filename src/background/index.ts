@@ -59,12 +59,12 @@ async function importBatch(input: unknown, lease: AssetLease): Promise<AssetMeta
       || typeof file.mime !== 'string') throw new Error('画像の形式が不正です。');
     const bytes = base64ToBytes(file.base64);
     size += bytes.length;
-    if (size > ASSET_LIMITS.batchBytes) throw new Error('一度に追加する画像は合計12MBまでです。');
+    if (size > ASSET_LIMITS.batchBytes) throw new Error('一度に追加する素材は合計32MBまでです。');
     const info = inspectAsset(bytes, file.mime);
     const blob = new Blob([new Uint8Array(bytes).buffer], { type: info.mime });
-    // ServiceWorker has no ImageDecoder. The content importer validates all
-    // frames; this boundary independently checks bounded containers and frame 0.
-    if (info.animation?.format !== 'lottie') {
+    // ServiceWorker has no ImageDecoder. Both boundaries inspect containers;
+    // images validate frame 0. Video is probed by the content importer.
+    if (info.animation?.format !== 'lottie' && info.animation?.format !== 'webm') {
       const bitmap = await createImageBitmap(blob);
       try { if (bitmap.width !== info.width || bitmap.height !== info.height) throw new Error('画像を正しく読み込めませんでした。'); }
       finally { bitmap.close(); }
@@ -81,7 +81,7 @@ async function importBatch(input: unknown, lease: AssetLease): Promise<AssetMeta
       combined.set(asset.id, existing ? { ...existing, leases: [...existing.leases.filter((entry) => entry.session !== lease.session), lease] } : asset);
     }
     if (combined.size > ASSET_LIMITS.count || [...combined.values()].reduce((sum, row) => sum + row.byteLength, 0) > ASSET_LIMITS.totalBytes) {
-      throw new Error('素材の保存上限（48MB・128素材）に達しました。不要な画像を削除して保存し、編集を終了すると空きを確保できます。');
+      throw new Error('素材の保存上限（256MB・128素材）またはブラウザーの空き容量を確認してください。不要な素材を削除して保存すると空きを確保できます。');
     }
     return { value: undefined, put: [...combined.values()] };
   });

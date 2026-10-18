@@ -1,4 +1,4 @@
-import type { MediaBudget } from './budget';
+import { MediaBudgetUnavailable, type MediaBudget } from './budget';
 
 export interface MediaCapabilities { seek: 'frame' | 'approximate' | 'none'; reverse: boolean; speed: boolean; pause: boolean; loop: boolean }
 export const NATIVE_IMAGE_CAPABILITIES: MediaCapabilities = { seek: 'none', reverse: false, speed: false, pause: false, loop: false };
@@ -70,7 +70,7 @@ export function createFrameSampler(id: string, backend: FrameBackend, timeline: 
               if (!await decode(index)) break;
             }
           }
-        } catch (error) { job.resolve(closed || generations.get(consumer) !== job.generation ? { status: 'pending', reason: closed ? 'closed' : 'superseded' }
+        } catch (error) { job.resolve(closed || generations.get(consumer) !== job.generation ? { status: 'pending', reason: closed ? 'closed' : 'superseded' } : error instanceof MediaBudgetUnavailable ? { status: 'pending', reason: 'budget' }
           : { status: 'error', message: error instanceof Error ? error.message : 'Frame decode failed.' }); }
       }
     } finally { active = false; }

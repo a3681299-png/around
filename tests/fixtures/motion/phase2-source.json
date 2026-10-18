@@ -1,0 +1,27 @@
+{
+  "generator": "scripts/generate-media-fixtures.mjs",
+  "source": "synthetic transparent RGB rectangles; repeated existing petal GIF frames",
+  "ffmpeg": "ffmpeg version N-92722-gf22fcd4483 Copyright (c) 2000-2018 the FFmpeg developers\r",
+  "files": [
+    {
+      "file": "petal.apng",
+      "bytes": 462,
+      "sha256": "1871f616dacf5db28268b509938379b31e5b7450ef3c9ac2655076650bf0a235"
+    },
+    {
+      "file": "long.gif",
+      "bytes": 201387,
+      "sha256": "1c979b2aa32c59285672425194697fe444222babf0659f5030d0fe8cb426f5a6"
+    },
+    {
+      "file": "alpha1080.webm",
+      "bytes": 160788,
+      "sha256": "3b8a674c8fcb27f4c251d91b773bcc0002d550b147e5b6aacfc56f414fe37089"
+    },
+    {
+      "file": "long.webm",
+      "bytes": 39988,
+      "sha256": "9c5ac2e7b945f9063cbfdf91b4cc0fb13642fc435716c71d482040ead693dbba"
+    }
+  ]
+}

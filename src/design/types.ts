@@ -12,7 +12,7 @@ export interface SurfaceStyleRule {
 }
 
 export interface DesignDocument {
-  schemaVersion: 6;
+  schemaVersion: 7;
   id: string;
   siteId: string;
   /** null uses native site styling; a built-in theme is an optional starting point. */
@@ -60,7 +60,7 @@ export interface ImageDecoration extends LayerState {
   assetId: string;
 }
 
-export interface PlaybackSettings { playing: boolean; loop: boolean; speed: number }
+export interface PlaybackSettings { playing: boolean; loop: boolean; speed: number; mode?: 'auto' | 'controlled' }
 export interface AnimationDecoration extends LayerState {
   kind: 'animation';
   assetId: string;

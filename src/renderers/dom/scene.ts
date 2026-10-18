@@ -43,7 +43,7 @@ const CSS = `
 .selection-frame[data-locked] { border-color:#966000; border-style:dashed; }
 .group-frame { position:absolute; border:1px dashed #6350ca; box-shadow:0 0 0 1px white; pointer-events:none; z-index:1001; }
 .guide { position:absolute; background:#ce267e; box-shadow:0 0 0 1px #ffffffbb; pointer-events:none; z-index:1002; }
-.media, img, canvas, svg { display:block; width:100%; height:100%; border:0; user-select:none; pointer-events:none; }
+.media, img, canvas, svg, video { display:block; width:100%; height:100%; border:0; user-select:none; pointer-events:none; }
 .handle { display:none; position:absolute; width:14px; height:14px; padding:0; border:2px solid #6350ca; box-shadow:0 0 0 1px white; border-radius:2px; background:white; touch-action:none; }
 .selection-frame[data-transformable] .handle { display:block; pointer-events:auto; }
 [data-handle="nw"] { left:-7px; top:-7px; cursor:nwse-resize; }
@@ -218,7 +218,7 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
     const style = doc.createElement('style');
     style.textContent = CSS;
     shadow.append(style);
-    media = createMediaController(doc, (message) => editing?.error(message));
+    media = createMediaController(doc, (message) => editing?.error(message), (stats) => { if (host) host.dataset.wwMediaStats = JSON.stringify(stats); });
     effects = createEffectController(doc, playback);
     imageLayer = doc.createElement('div'); imageLayer.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:0'; shadow.append(imageLayer);
     groupFrame = doc.createElement('div'); groupFrame.className = 'group-frame'; groupFrame.hidden = true; shadow.append(groupFrame);
