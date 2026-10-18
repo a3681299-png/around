@@ -6,7 +6,7 @@ import type { Decoration } from '../design/types';
 import { createLottieSource } from './lottie';
 import { createNativeImage } from './native-image';
 import { createNativeVideo } from './native-video';
-import { createMediaBudget, MediaBudgetUnavailable, type MediaBudget } from './budget';
+import { createMediaBudget, MediaBudgetUnavailable, MEDIA_BUDGET, type MediaBudget } from './budget';
 import { createResourceCache, type MediaResource, type ResourceEntry } from './resources';
 import { rasterSize } from './raster-sampler';
 
@@ -108,6 +108,7 @@ export function createMediaController(doc: Document, report: (message: string) =
         if (!budget.reserve(surface, bytes, 'surface')) {
           releaseDisplay();
           if (next === 'native') { forceControlled = true; refresh(); return; }
+          if (bytes > MEDIA_BUDGET.decodedBytes) { fail(new Error('この動画は1素材で再生予算を超えます。解像度を下げて書き出してください。')); return; }
           waiting = signature(); state(); return;
         }
         void (async () => {

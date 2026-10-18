@@ -50,6 +50,7 @@ export function createCreatorEditor(
   let leased = '';
   let importEpoch = 0;
   let importing = false;
+  let importAbort: AbortController | undefined;
   let leaseQueue: Promise<void> = Promise.resolve();
   const deferredReleases = new Set<string>();
   let enabled = false;
@@ -225,7 +226,7 @@ export function createCreatorEditor(
     const previousSelection = [...selectedImageIds];
     importing = true; status = '画像を読み込んでいます…'; error = false; render();
     try {
-      const assets = await importAssets(files, importSession);
+      importAbort = new AbortController(); const assets = await importAssets(files, importSession, importAbort.signal);
       if (epoch !== importEpoch || !panel) return;
       before = parseDesign(draft);
       const next = parseDesign(draft);
@@ -258,11 +259,12 @@ export function createCreatorEditor(
       leased = ''; settleAssets();
     } finally {
       void releaseAssets(importSession).catch(() => undefined);
-      if (epoch === importEpoch) { importing = false; render(); }
+      if (epoch === importEpoch) { importing = false; importAbort = undefined; render(); }
     }
   };
 
   const close = () => {
+    importAbort?.abort(); importAbort = undefined;
     importEpoch++;
     importing = false;
     if (assetSession) {

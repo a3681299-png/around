@@ -138,3 +138,24 @@ test('scene budget defers excess 1080p videos and resumes waiting layers after h
   expect((await stats()).decodedBytes).toBeLessThanOrEqual(128 * 1024 * 1024);
   await save(panel); expect(new Set((await stored(popup)).decorations.map((n) => n.assetId)).size).toBe(1);
 });
+
+test('OFF aborts an unfinished import decoder and closes its late frame without saving an asset', async ({ popup, youtube }) => {
+  const panel = await open(popup, youtube), session = await youtube.context().newCDPSession(youtube);
+  const worlds: { id: number; auxData?: { type?: string } }[] = []; session.on('Runtime.executionContextCreated', ({ context }) => worlds.push(context)); await session.send('Runtime.enable');
+  const id = worlds.find((world) => world.auxData?.type === 'isolated')!.id;
+  await session.send('Runtime.evaluate', { contextId: id, expression: `
+    globalThis.preflightCloses = 0; const Decoder = ImageDecoder;
+    globalThis.ImageDecoder = class extends Decoder {
+      async decode(options) { const result = await super.decode(options); globalThis.delayedFrame = result.image;
+        await new Promise(resolve => { globalThis.releasePreflight = resolve; }); return result; }
+      close() { globalThis.preflightCloses++; super.close(); }
+    };` });
+  await panel.getByLabel('アニメーション素材を追加').setInputFiles(file('petal.gif'));
+  await expect.poll(async () => (await session.send('Runtime.evaluate', { contextId: id, expression: 'typeof globalThis.releasePreflight', returnByValue: true })).result.value).toBe('function');
+  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck(); await expect(panel).toHaveCount(0); await expect(youtube.locator(overlay)).toHaveCount(0);
+  await expect.poll(async () => (await session.send('Runtime.evaluate', { contextId: id, expression: 'globalThis.preflightCloses', returnByValue: true })).result.value).toBe(1);
+  await session.send('Runtime.evaluate', { contextId: id, expression: 'globalThis.releasePreflight()' });
+  await expect.poll(async () => (await session.send('Runtime.evaluate', { contextId: id, expression: 'globalThis.delayedFrame.codedWidth', returnByValue: true })).result.value).toBe(0);
+  expect(await popup.evaluate(async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'])).toBeUndefined();
+  await session.detach();
+});

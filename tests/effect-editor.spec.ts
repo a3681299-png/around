@@ -105,7 +105,8 @@ test('effect edits survive undo, redo, discard, tab sync, reload and a persisten
   const restarted = await launchExtension(profile);
   try {
     const page = await restarted.newPage(); await page.goto('https://www.youtube.com/');
-    await expect(page.locator(media)).toHaveAttribute('data-playback', 'still'); await expect(page.locator(media)).toHaveAttribute('data-mask-intensity', '0');
+    // Fully masked media is unloaded; it no longer decodes an invisible poster.
+    await expect(page.locator(media)).toHaveAttribute('data-playback', 'hidden'); await expect(page.locator(media).locator('img')).toHaveCount(0); await expect(page.locator(media)).toHaveAttribute('data-mask-intensity', '0');
     const nextPopup = await restarted.newPage(); await nextPopup.goto(`chrome-extension://${extensionId}/popup/index.html`);
     const reopened = await open(nextPopup, page); await reopened.locator('[data-action="select"]').click();
     await expect(reopened.getByLabel('光の半径')).toHaveValue('150'); await expect(reopened.getByLabel('マスクの表示強度')).toHaveValue('65');
