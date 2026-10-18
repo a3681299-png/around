@@ -29,6 +29,16 @@ test('native Chrome panel uses the same draft, group masks, selection, history, 
     await expect.poll(() => panel.text('.selected-count')).toBe('3個選択中');
     await expect(local).toHaveAttribute('data-page-toolbar', ''); await expect(page.locator('#web-world-themes-studio-layout')).toHaveCount(0);
     await expect.poll(() => panel.evaluate('innerWidth')).toBeGreaterThan(250);
+    await expect.poll(() => panel.evaluate('chrome.storage.session.get(null).then(xs=>Object.values(xs).some(v=>v?.draft?.decorations?.length===3))')).toBe(true);
+    // Isolated fixture only: reproduce a delayed empty recovery write. The live
+    // page's lease must continue protecting bytes, even without a recovery pin.
+    const retained = await panel.evaluate<boolean>(`(async()=>{
+      const target=Number(new URL(location.href).searchParams.get('target'));
+      const checkpoint=(await chrome.storage.session.get('webWorldThemes.studio.session.'+target))['webWorldThemes.studio.session.'+target];
+      const id=checkpoint.draft.decorations[0].assetId;
+      await chrome.runtime.sendMessage({type:'web-world-themes:assets',action:'lease',session:'session-studio-'+target+'-'+target,ownerTabId:target,ids:[]});
+      return (await chrome.runtime.sendMessage({type:'web-world-themes:assets',action:'get',id})).ok;
+    })()`); expect(retained).toBe(true);
     await expect.poll(() => page.evaluate(() => innerWidth)).toBeLessThan(1200); const width = await page.evaluate(() => innerWidth);
     await panel.click('.group-layers'); await expect.poll(() => panel.evaluate('document.querySelector("#web-world-themes-creator").shadowRoot.querySelectorAll(".layer[data-kind=group]").length')).toBe(1);
     await panel.click('[data-effect="enabled"]');

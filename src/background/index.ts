@@ -48,8 +48,9 @@ async function prune(current?: AssetLease): Promise<void> {
   await changeAssets((rows) => {
     const put: StoredAsset[] = [], remove: string[] = [];
     for (const row of rows) {
+      // Recovery shares a tab with the live page, but cannot supersede its document.
       const leases = row.leases.filter((lease) => (lease.tabId === -1 || tabs.has(lease.tabId))
-        && !(current && lease.tabId === current.tabId && lease.documentId !== current.documentId && !lease.documentId.startsWith('studio:')));
+        && !(current && !current.documentId.startsWith('studio:') && lease.tabId === current.tabId && lease.documentId !== current.documentId && !lease.documentId.startsWith('studio:')));
       if (leases.length || references.has(row.id)) put.push({ ...row, leases });
       else remove.push(row.id);
     }
