@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "node scripts/build.mjs --watch",
     "build": "npm run typecheck && node scripts/build.mjs",
-    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.world.json",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.world.json && tsc --noEmit -p tsconfig.editor-core.json",
     "test:setup": "node scripts/test.mjs --install",
     "test": "node scripts/test.mjs",
     "check": "npm run lint && npm run build && npm test",

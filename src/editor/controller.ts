@@ -1,514 +1,159 @@
-import { emptyDesign, parseDesign, sameDesign } from '../design/schema';
-import { IMAGE_LIMITS, type DesignDocument, type DesignTarget, type SurfaceStyle, type ImagePatch } from '../design/types';
+import type { DesignDocument } from '../design/types';
 import type { ImageEditing } from '../design/image-renderer';
 import { editableSceneSamples, placementFrame } from '../design/frames';
-import { moveGroup, reanchorPlacement, type PlacementChange } from '../design/geometry';
-import { effectivelyLocked, groupMovable, groupView, normalizeSelection, parentGroup, rootLayers, sameAnchor } from '../design/hierarchy';
-import { alignSamples, distributeSamples, type Alignment, type Distribution } from '../design/layout';
-import { checkDesignAssets, commitDesign, importAssets, releaseAssets, retainAssets } from '../assets/client';
 import type { SiteAdapter } from '../sites/types';
-import { readDesign, watchDesign } from '../storage/designs';
 import { createCreatorPanel } from './panel';
 import type { OpenEditorResponse } from './messages';
-import { createHistory } from './history';
-import { selectLayer } from './layers';
-import { deleteDocumentLayers, duplicateDocumentLayers, groupLayers, groupingReason, reorderDocument, ungroupLayers } from './groups';
 import { captureLayerThumbnail } from '../renderers/dom/thumbnail';
+import { createEditorSession } from '../editor-core/session';
+import type { EditCommand, EditorCheckpoint, EditorSnapshot } from '../editor-core/types';
+import { shortcutCommand } from '../editor-core/shortcuts';
+import { createBrowserEditorStorage } from '../browser/storage-adapter';
+import { browserStudioPreferences } from '../browser/preferences';
+import { studioActions } from '../studio/ui-actions';
 
 export interface CreatorEditor {
-  open(): OpenEditorResponse;
-  setEnabled(enabled: boolean): void;
-  refreshSelection(): void;
-  reload(): void;
-  destroy(): void;
+  open(): OpenEditorResponse; setEnabled(enabled: boolean): void; refreshSelection(): void; reload(): void; destroy(): void;
+  snapshot(): EditorSnapshot; checkpoint(): EditorCheckpoint; readonly historyVersion: number;
+  subscribe(listener: (state: EditorSnapshot) => void): () => void;
+  attachStudio(owner: string, resume?: EditorCheckpoint): Promise<EditorSnapshot>;
+  detachStudio(owner: string): void;
+  command(owner: string, session: string, revision: number, command: EditCommand): Promise<EditorSnapshot>;
+  import(owner: string, session: string, revision: number, files: readonly File[]): Promise<EditorSnapshot>;
+  thumbnail(id: string): Promise<string | undefined>;
 }
-
 const PICK_EVENTS = ['pointerdown', 'pointerup', 'mousedown', 'mouseup', 'click', 'auxclick', 'dblclick'] as const;
-const SELECTION_CSS = `
-html[data-ww-editing] [data-ww-surface~="video-card"] { cursor: crosshair !important; }
-html[data-ww-editing] [data-ww-editor-selected] { outline: 2px dashed #695089 !important; outline-offset: 3px !important; }`;
+const SELECTION_CSS = `html[data-ww-editing] [data-ww-surface~="video-card"] { cursor:crosshair !important; }
+html[data-ww-editing] [data-ww-editor-selected] { outline:2px dashed #695089 !important; outline-offset:3px !important; }`;
 
-/** One tab owns its draft. Only explicit saves cross the storage boundary. */
-export function createCreatorEditor(
-  doc: Document,
-  site: SiteAdapter,
-  baseThemeId: string,
-  apply: (design: DesignDocument | undefined) => void,
-  editImages: (editing: ImageEditing | undefined) => void,
-  validate: (design: DesignDocument | undefined) => void,
-): CreatorEditor {
-  let saved: DesignDocument | undefined;
-  let draft = emptyDesign(site.id, baseThemeId);
-  let pendingSave: DesignDocument | undefined;
-  let panel: ReturnType<typeof createCreatorPanel> | undefined;
-  let selectionStyle: HTMLStyleElement | undefined;
-  let selected: { element: Element; target: DesignTarget } | undefined;
-  let selectedImageIds: string[] = [];
-  let interactionEpoch = 0;
-  let snapping = false;
-  const history = createHistory<DesignDocument>(parseDesign, sameDesign);
-  let assetSession: string | undefined;
-  let leased = '';
-  let importEpoch = 0;
-  let importing = false;
-  let importAbort: AbortController | undefined;
-  let leaseQueue: Promise<void> = Promise.resolve();
-  const deferredReleases = new Set<string>();
-  let enabled = false;
-  let loaded = false;
-  let dirty = false;
-  let saving = false;
-  let alive = true;
-  let storageEpoch = 0;
-  let loadError: string | undefined;
-  let status = '';
-  let error = false;
+/** Browser Host. Core owns documents/history; this adapter owns DOM and rendering. */
+export function createCreatorEditor(doc: Document, site: SiteAdapter, baseThemeId: string,
+  apply: (design: DesignDocument | undefined) => void, editImages: (editing: ImageEditing | undefined) => void,
+  validate: (design: DesignDocument | undefined) => void): CreatorEditor {
+  let panel: ReturnType<typeof createCreatorPanel> | undefined, selectionStyle: HTMLStyleElement | undefined, selectedElement: Element | undefined;
+  let remoteOwner: string | undefined, badge: HTMLElement | undefined, installed = false, destroyed = false;
   const consumedKeys = new Set<string>();
-  const initial = () => saved ? parseDesign(saved) : emptyDesign(site.id, baseThemeId);
-  const applyCurrent = () => apply(panel && dirty ? draft : saved);
-  const frameFor = (placement: Parameters<typeof placementFrame>[2]) => placementFrame(doc, site.decorationAnchors ?? [], placement);
-  const render = () => {
-    const groups = draft.groups ?? [];
-    selectedImageIds = normalizeSelection(selectedImageIds, draft.decorations, groups);
-    const selectedGroup = selectedImageIds.length === 1 ? groups.find((group) => group.id === selectedImageIds[0]) : undefined;
-    const image = selectedGroup ? groupView(selectedGroup, draft.decorations, frameFor)
-      : selectedImageIds.length === 1 ? draft.decorations.find((image) => image.id === selectedImageIds[0]) : undefined;
-    panel?.render({
-      selected: Boolean(selected),
-      style: draft.rules.find((rule) => rule.target === selected?.target.id)?.style ?? {},
-      dirty, saving: saving || importing, status, error, images: draft.decorations, groups,
-      selectedIds: selectedImageIds,
-      image, inheritedLocked: Boolean(image && parentGroup(groups, image.id)?.locked),
-      groupPositionAvailable: Boolean(!selectedGroup || selectedGroup.visible && groupMovable(selectedGroup, draft.decorations) && image && frameFor(image.placement)),
-      groupingReason: groupingReason(draft, selectedImageIds),
-      canUndo: history.canUndo, canRedo: history.canRedo, snapping,
-    });
-    editImages(panel ? { selectedIds: selectedImageIds, locked: saving || importing, epoch: interactionEpoch, snapping, select: selectImage,
-      begin: () => history.begin(draft), change: changePlacements, end: finishGesture,
-      error: (message) => { status = message; error = true; render(); },
-    } : undefined);
-  };
-  const clearSelection = () => { selected?.element.removeAttribute('data-ww-editor-selected'); selected = undefined; };
-  const syncAssets = (): Promise<void> => {
-    const session = assetSession;
-    if (!session) return Promise.resolve();
-    const ids = [...new Set([draft, ...history.values()].flatMap((value) => value.decorations.map((image) => image.assetId)))];
-    const key = ids.sort().join(',');
-    leaseQueue = leaseQueue.catch(() => undefined).then(async () => {
-      if (session !== assetSession || leased === key) return;
-      await retainAssets(session, ids);
-      if (session === assetSession) leased = key;
-    });
-    return leaseQueue;
-  };
-  const settleAssets = () => { void syncAssets().catch((reason: unknown) => {
-    if (!panel) return;
-    status = reason instanceof Error ? reason.message : '素材を保持できませんでした。'; error = true; render();
+  let lastDesign = '', geometryKey = '';
+  const core = createEditorSession({ siteId: site.id, baseThemeId, targets: site.designTargets ?? [], storage: createBrowserEditorStorage(site.id), validate,
+    makeId: (kind) => `${kind}-${crypto.randomUUID()}`,
+    geometry: {
+      frameFor: (placement) => placementFrame(doc, site.decorationAnchors ?? [], placement),
+      samples: (design, ids) => editableSceneSamples(doc, site.decorationAnchors ?? [], design.decorations, design.groups ?? [], ids),
+      importFrame(point) {
+        const width = doc.defaultView!.innerWidth, height = doc.defaultView!.innerHeight, origin = point ?? { x: width * .45, y: height * .45 };
+        const bounds = panel?.host.getBoundingClientRect();
+        if (!point && bounds && origin.x >= bounds.left && origin.x <= bounds.right && origin.y >= bounds.top && origin.y <= bounds.bottom) {
+          origin.x = bounds.left >= width - bounds.right ? bounds.left / 2 : bounds.right + (width - bounds.right) / 2;
+        }
+        return { width, height, origin };
+      },
+    },
+  });
+  let state = core.snapshot();
+  const editing = () => state.active && Boolean(panel || remoteOwner);
+  const dispatch = (command: EditCommand) => { void core.execute(command).catch((error: unknown) => {
+    if (!destroyed && state.active) core.fail(error instanceof Error ? error.message : '編集操作を実行できませんでした。');
   }); };
-  const updateDraft = (next: DesignDocument, record = true) => {
-    const parsed = parseDesign(next);
-    if (record) history.record(draft, parsed);
-    draft = parsed;
-    dirty = !sameDesign(draft, initial());
-    status = dirty ? 'このタブでプレビュー中です。保存すると各タブに反映します。' : '保存済みの見た目です。';
-    error = false;
-    applyCurrent(); render();
-  };
-  function selectImage(id: string, additive = false, preserve = false) {
-    const groups = draft.groups ?? [];
-    if (!panel || saving || importing || ![...draft.decorations, ...groups].some((image) => image.id === id)) return;
-    const parent = parentGroup(groups, id);
-    if (additive && parent) selectedImageIds = selectedImageIds.filter((id) => id !== parent.id);
-    clearSelection(); selectedImageIds = normalizeSelection(selectLayer(selectedImageIds, id, additive, preserve), draft.decorations, groups);
-    status = '一覧のチェックで複数選択できます。Ctrl／Shiftクリックも使えます。'; error = false; render();
+  const removeSelection = () => { selectedElement?.removeAttribute('data-ww-editor-selected'); selectedElement = undefined; };
+  function bind(active: boolean) {
+    if (installed === active) return; installed = active;
+    if (active) {
+      selectionStyle = doc.createElement('style'); selectionStyle.id = 'web-world-themes-selection-style'; selectionStyle.textContent = SELECTION_CSS;
+      (doc.head ?? doc.documentElement).append(selectionStyle); doc.documentElement.setAttribute('data-ww-editing', '');
+      PICK_EVENTS.forEach((name) => doc.addEventListener(name, onPick, true));
+      doc.addEventListener('keydown', onKeyDown, true); doc.addEventListener('keyup', onKeyUp, true);
+      doc.addEventListener('dragover', onDragOver, true); doc.addEventListener('drop', onDrop, true);
+    } else {
+      PICK_EVENTS.forEach((name) => doc.removeEventListener(name, onPick, true));
+      doc.removeEventListener('keydown', onKeyDown, true); doc.removeEventListener('keyup', onKeyUp, true);
+      doc.removeEventListener('dragover', onDragOver, true); doc.removeEventListener('drop', onDrop, true);
+      consumedKeys.clear(); removeSelection(); selectionStyle?.remove(); selectionStyle = undefined; doc.documentElement.removeAttribute('data-ww-editing');
+    }
   }
-  function changeImage(id: string, patch: ImagePatch) {
-    if (!panel || saving || importing) return;
-    const groups = draft.groups ?? [], group = groups.find((group) => group.id === id), parent = parentGroup(groups, id);
-    if (parent?.locked) return;
-    const current = group ?? draft.decorations.find((image) => image.id === id);
-    if (!current || (current.locked && Object.keys(patch).some((key) => !['locked', 'visible', 'name'].includes(key)))) return;
-    if (group) {
-      const next = parseDesign(draft), { placement, playback: _playback, ...properties } = patch;
-      if (placement) {
-        if (Object.keys(placement).some((key) => !['x', 'y'].includes(key)) || !groupMovable(group, draft.decorations)) return;
-        const view = groupView(group, draft.decorations, frameFor), frame = frameFor(view.placement);
-        if (!frame) { status = '配置基準が画面に見つかりません。'; error = true; render(); return; }
-        const changes = moveGroup(editableSceneSamples(doc, site.decorationAnchors ?? [], draft.decorations, groups, [id]),
-          { x: ((placement.x ?? view.placement.x) - view.placement.x) * frame.width, y: ((placement.y ?? view.placement.y) - view.placement.y) * frame.height });
-        const positions = new Map(changes.map((change) => [change.id, change.placement]));
-        next.decorations = next.decorations.map((image) => positions.has(image.id) ? { ...image, placement: positions.get(image.id)! } : image);
-      }
-      next.groups = next.groups!.map((group) => group.id === id ? { ...group, ...properties } : group);
-      updateDraft(next); return;
-    }
-    if (current.kind === 'group') return;
-    if (patch.placement?.anchor) {
-      if (parent && !sameAnchor(current.placement.anchor, patch.placement.anchor)) { status = 'グループ内では配置基準を変更できません。解除してから変更してください。'; error = true; render(); return; }
-      const from = placementFrame(doc, site.decorationAnchors ?? [], current.placement);
-      const to = placementFrame(doc, site.decorationAnchors ?? [], { ...current.placement, anchor: patch.placement.anchor });
-      if (!from || !to) { status = '配置基準が画面に見つかりません。'; error = true; render(); return; }
-      patch = { ...patch, placement: reanchorPlacement(current.placement, from, to, patch.placement.anchor) };
-    }
-    const next = parseDesign(draft);
-    const { playback, ...properties } = patch;
-    next.decorations = next.decorations.map((image) => image.id !== id ? image : image.kind === 'animation'
-      ? { ...image, ...properties, placement: { ...image.placement, ...patch.placement }, playback: { ...image.playback, ...playback } }
-      : { ...image, ...properties, placement: { ...image.placement, ...patch.placement } });
-    updateDraft(next);
+  function refresh(next = core.snapshot()) {
+    state = next;
+    if (!state.active) { panel?.destroy(); panel = undefined; remoteOwner = undefined; }
+    if (!state.selectedTarget) removeSelection();
+    const active = editing(); bind(active);
+    if (remoteOwner && state.active && !badge) {
+      badge = doc.createElement('div'); badge.id = 'web-world-themes-studio-link'; badge.setAttribute('data-ww-signal-control', '');
+      badge.style.cssText = 'position:fixed;bottom:12px;left:12px;z-index:2147483001;background:#242331;color:white;padding:8px;border:1px solid #baa0f8;border-radius:8px;font:12px system-ui;';
+      const label = doc.createElement('span'); label.textContent = 'Studioで編集中 '; const quick = doc.createElement('button'); quick.textContent = 'クイック編集を表示';
+      quick.addEventListener('click', () => open()); const stop = doc.createElement('button'); stop.textContent = '編集を終了'; stop.addEventListener('click', () => dispatch({ type: 'close' }));
+      badge.append(label, quick, stop); (doc.body ?? doc.documentElement).append(badge);
+    } else if (!remoteOwner || !state.active) { badge?.remove(); badge = undefined; }
+    const design = active && state.view.dirty ? state.document : state.saved, key = JSON.stringify(design) ?? 'empty';
+    if (key !== lastDesign) { lastDesign = key; apply(design); }
+    panel?.render(state.view);
+    editImages(active ? { selectedIds: state.view.selectedIds, locked: state.view.saving, epoch: core.interactionEpoch, snapping: state.view.snapping,
+      select: (id, additive, preserve) => dispatch({ type: 'select', id, additive, preserve }), begin: () => dispatch({ type: 'begin' }),
+      change: (changes) => dispatch({ type: 'placements', changes }), end: (cancel = false) => { if (!state.view.saving) dispatch({ type: 'end', cancel }); }, error: (message) => core.fail(message),
+    } : undefined);
   }
-  function changePlacements(changes: readonly PlacementChange[]) {
-    if (!panel || saving || importing) return;
-    const next = parseDesign(draft);
-    const placements = new Map(changes.map((change) => [change.id, change.placement]));
-    next.decorations = next.decorations.map((image) => !effectivelyLocked(image, next.groups ?? []) && placements.has(image.id) ? { ...image, placement: placements.get(image.id)! } : image);
-    updateDraft(next);
+  const unsubscribe = core.subscribe(refresh);
+  function open(): OpenEditorResponse {
+    if (!site.designTargets?.length) return { ok: false, error: 'このサイトには編集できる対象がありません。' };
+    const result = core.open(); if (!result.ok) return result;
+    if (!panel) {
+      panel = createCreatorPanel(doc, studioActions(dispatch, (files) => { void core.import(files); }, (id) => captureLayerThumbnail(doc, id)), site.decorationAnchors,
+        { preferences: browserStudioPreferences });
+      (doc.body ?? doc.documentElement).append(panel.host);
+    }
+    refresh(); panel.focus(); return { ok: true };
   }
-  function finishGesture(cancel = false) {
-    if (!history.active) return;
-    interactionEpoch++;
-    if (cancel) { const before = history.cancel(); if (before) updateDraft(before, false); }
-    else { history.commit(draft); render(); }
-    settleAssets();
-  }
-  const undoRedo = (redo: boolean) => {
-    if (saving || importing) return;
-    if (history.active) { finishGesture(true); return; }
-    const next = redo ? history.redo(draft) : history.undo(draft);
-    if (next) { interactionEpoch++; updateDraft(next, false); settleAssets(); }
-  };
-  const deleteImage = (id?: string) => {
-    if (saving || importing) return;
-    finishGesture();
-    const next = deleteDocumentLayers(draft, id ? [id] : selectedImageIds);
-    updateDraft(next); settleAssets();
-  };
-  const duplicate = (id?: string) => {
-    if (saving || importing) return;
-    finishGesture();
-    try {
-      const result = duplicateDocumentLayers(draft, id ? [id] : selectedImageIds, () => `image-${crypto.randomUUID()}`, frameFor);
-      if (!result.ids.length) return;
-      selectedImageIds = result.ids;
-      clearSelection(); updateDraft(result.doc); settleAssets();
-    } catch (reason) { status = reason instanceof Error ? reason.message : '複製できませんでした。'; error = true; render(); }
-  };
-  const layoutSelection = (mode: Alignment | Distribution) => {
-    if (saving || importing) return;
-    finishGesture();
-    if (draft.groups?.some((group) => selectedImageIds.includes(group.id))) { status = 'グループを含む整列は未対応です。子レイヤーを選択してください。'; error = true; render(); return; }
-    const samples = editableSceneSamples(doc, site.decorationAnchors ?? [], draft.decorations, draft.groups ?? [], selectedImageIds);
-    const distribution = mode === 'horizontal' || mode === 'vertical';
-    if (samples.length < (distribution ? 3 : 2)) { status = '表示中でロックされていないレイヤーを選択してください。'; error = true; render(); return; }
-    try { changePlacements(distribution ? distributeSamples(samples, mode) : alignSamples(samples, mode)); }
-    catch (reason) { status = reason instanceof Error ? reason.message : '整列できませんでした。'; error = true; render(); }
-  };
-  const groupSelection = (ungroup = false) => {
-    if (saving || importing) return;
-    finishGesture();
-    try {
-      if (ungroup) {
-        const group = selectedImageIds.length === 1 ? draft.groups?.find((group) => group.id === selectedImageIds[0]) : undefined;
-        if (!group) return;
-        const next = ungroupLayers(draft, group.id); selectedImageIds = [...group.children]; updateDraft(next);
-      } else {
-        const id = `group-${crypto.randomUUID()}`, next = groupLayers(draft, selectedImageIds, id);
-        selectedImageIds = [id]; clearSelection(); updateDraft(next);
-      }
-      status = ungroup ? `${selectedImageIds.length}個の素材に戻しました。位置は維持しています。` : 'グループにまとめました。「光とマスクを設定」から共通のマスクを作れます。';
-      render();
-      settleAssets();
-    } catch (reason) { status = reason instanceof Error ? reason.message : 'グループを変更できませんでした。'; error = true; render(); }
-  };
-  const addImages = async (files: readonly File[], point?: { x: number; y: number }) => {
-    if (!panel || !assetSession || saving || importing || !files.length) return;
-    if (draft.decorations.length + files.length > IMAGE_LIMITS.count) { status = '画像は32枚まで配置できます。'; error = true; render(); return; }
-    const epoch = importEpoch;
-    const importSession = `session-${crypto.randomUUID()}`;
-    let before: DesignDocument | undefined;
-    const previousSelection = [...selectedImageIds];
-    importing = true; status = '画像を読み込んでいます…'; error = false; render();
-    try {
-      importAbort = new AbortController(); const assets = await importAssets(files, importSession, importAbort.signal);
-      if (epoch !== importEpoch || !panel) return;
-      before = parseDesign(draft);
-      const next = parseDesign(draft);
-      const view = doc.defaultView!;
-      const origin = point ?? { x: view.innerWidth * .45, y: view.innerHeight * .45 };
-      const panelBounds = panel.host.getBoundingClientRect();
-      // Imports through the workspace should appear in the visible preview.
-      if (!point && origin.x >= panelBounds.left && origin.x <= panelBounds.right && origin.y >= panelBounds.top && origin.y <= panelBounds.bottom) {
-        const rightSpace = view.innerWidth - panelBounds.right;
-        origin.x = panelBounds.left >= rightSpace ? panelBounds.left / 2 : panelBounds.right + rightSpace / 2;
-      }
-      assets.forEach((asset, index) => {
-        const scale = Math.max(IMAGE_LIMITS.minSize / Math.min(asset.width, asset.height), Math.min(260 / asset.width, 200 / asset.height, view.innerWidth * .28 / asset.width, view.innerHeight * .3 / asset.height));
-        const id = `image-${crypto.randomUUID()}`;
-        const common = { id, assetId: asset.id, name: asset.name,
-          placement: { anchor: { kind: 'viewport' as const }, x: Math.min(.95, Math.max(.05, origin.x / view.innerWidth + index * 24 / view.innerWidth)),
-            y: Math.min(.95, Math.max(.05, origin.y / view.innerHeight + index * 24 / view.innerHeight)),
-            widthPx: Math.round(asset.width * scale * 10) / 10, heightPx: Math.round(asset.height * scale * 10) / 10, rotationDeg: 0 },
-          opacity: 1, zIndex: Math.min(100, next.decorations.length), visible: true, locked: false };
-        next.decorations.push(asset.animation ? { ...common, kind: 'animation', format: asset.animation.format, playback: { playing: true, loop: true, speed: 1, mode: 'auto' } } : { ...common, kind: 'image' });
-        selectedImageIds = [id];
-      });
-      await checkDesignAssets(next, importSession);
-      if (epoch !== importEpoch || !panel) return;
-      if (!sameDesign(before, draft)) {
-        before = undefined; selectedImageIds = previousSelection;
-        throw new Error('別のタブの保存値が変わったため、素材の追加を中止しました。もう一度読み込んでください。');
-      }
-      clearSelection(); updateDraft(next, false);
-      leased = ''; await syncAssets();
-      if (epoch !== importEpoch || !panel) return;
-      history.record(before, draft); settleAssets();
-    } catch (reason) {
-      if (epoch !== importEpoch || !panel) return;
-      if (before) { selectedImageIds = previousSelection; updateDraft(before, false); }
-      status = reason instanceof Error ? reason.message : '画像を読み込めませんでした。'; error = true;
-      leased = ''; settleAssets();
-    } finally {
-      void releaseAssets(importSession).catch(() => undefined);
-      if (epoch === importEpoch) { importing = false; importAbort = undefined; render(); }
-    }
-  };
-
-  const close = () => {
-    importAbort?.abort(); importAbort = undefined;
-    importEpoch++;
-    importing = false;
-    if (assetSession) {
-      if (saving) deferredReleases.add(assetSession);
-      else void releaseAssets(assetSession).catch(() => undefined);
-      assetSession = undefined;
-    }
-    leased = ''; selectedImageIds = []; interactionEpoch++; history.reset();
-    PICK_EVENTS.forEach((event) => doc.removeEventListener(event, onPick, true));
-    doc.removeEventListener('keydown', onKeyDown, true);
-    doc.removeEventListener('keyup', onKeyUp, true);
-    consumedKeys.clear();
-    doc.removeEventListener('dragover', onDragOver, true);
-    doc.removeEventListener('drop', onDrop, true);
-    clearSelection();
-    panel?.destroy();
-    panel = undefined;
-    selectionStyle?.remove();
-    selectionStyle = undefined;
-    doc.documentElement.removeAttribute('data-ww-editing');
-    draft = initial();
-    dirty = false;
-    applyCurrent();
-    editImages(undefined);
-  };
-  const discard = () => {
-    history.reset(); interactionEpoch++;
-    draft = initial();
-    dirty = false;
-    status = '変更を破棄しました。';
-    error = false;
-    applyCurrent();
-    render();
-    settleAssets();
-  };
-  const change = (style: SurfaceStyle) => {
-    if (!selected || saving || importing) return;
-    const next = parseDesign(draft);
-    next.rules = next.rules.filter((rule) => rule.target !== selected!.target.id);
-    if (Object.keys(style).length > 0) next.rules.push({ kind: 'surface-style', target: selected.target.id, style });
-    updateDraft(next);
-  };
-
-  const accept = (incoming: DesignDocument | undefined) => {
-    // Validate support before changing session state; unsupported data stays on disk.
-    const previous = saved;
-    validate(incoming);
-    saved = incoming;
-    storageEpoch++;
-    loaded = true;
-    loadError = undefined;
-    if (pendingSave && sameDesign(incoming, pendingSave)) {
-      draft = initial();
-      dirty = false;
-    } else if (!dirty) {
-      if (!sameDesign(previous, incoming)) { history.reset(); interactionEpoch++; }
-      draft = initial();
-      if (panel) { status = '保存済みのデザインを読み込みました。'; error = false; }
-    } else if (!sameDesign(previous, incoming)) {
-      status = '別のタブで保存されました。プレビューは保持しています。保存すると上書きし、破棄すると最新の保存値に戻ります。';
-      error = true;
-    }
-    applyCurrent();
-    render();
-    if (panel) settleAssets();
-  };
-  const onStorageError = (reason: unknown) => {
-    loaded = true;
-    loadError = reason instanceof Error ? reason.message : 'デザインを読み込めませんでした。';
-    saved = undefined;
-    close();
-  };
-  const save = async () => {
-    finishGesture();
-    if (!dirty || saving || importing || !assetSession) return;
-    const saveSession = assetSession;
-    const snapshot = parseDesign(draft);
-    pendingSave = snapshot;
-    saving = true;
-    status = '保存しています…';
-    error = false;
-    render();
-    try {
-      // Renew the session's complete draft/history lease before crossing the save boundary.
-      leased = '';
-      await syncAssets();
-      await commitDesign(snapshot, saveSession);
-      const epoch = storageEpoch;
-      const latest = await readDesign(site.id);
-      if (!alive) return;
-      // A newer notification beats a read that was already in flight.
-      if (epoch === storageEpoch) accept(latest);
-      status = sameDesign(saved, snapshot) ? '保存しました。' : '別のタブの新しい保存値を読み込みました。';
-      error = false;
-    } catch {
-      if (!alive) return;
-      status = '保存できませんでした。プレビューを保持しています。もう一度保存してください。';
-      error = true;
-    } finally {
-      pendingSave = undefined;
-      saving = false;
-      deferredReleases.forEach((session) => { void releaseAssets(session).catch(() => undefined); });
-      deferredReleases.clear();
-      if (alive) render();
-    }
-  };
-
-  function pickTarget(event: Event): { element: Element; target: DesignTarget } | undefined {
-    if (!panel || event.composedPath().includes(panel.host)) return undefined;
+  function pickTarget(event: Event) {
+    if (!editing() || event.composedPath().some((node) => node instanceof Element && node.hasAttribute('data-ww-signal-control'))) return;
     const node = event.target instanceof Element ? event.target : undefined;
-    for (const target of site.designTargets ?? []) {
-      const element = node?.closest(`[data-ww-surface~="${target.surface}"]`);
-      if (element) return { element, target };
-    }
-    return undefined;
+    for (const target of site.designTargets ?? []) { const element = node?.closest(`[data-ww-surface~="${target.surface}"]`); if (element) return { element, target }; }
   }
   function onPick(event: Event) {
-    const target = pickTarget(event);
-    if (!target || ('button' in event && event.button === 2)) return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    if (saving || importing) return;
-    if (event.type !== 'click' && event.type !== 'auxclick') return;
-    clearSelection();
-    selectedImageIds = [];
-    selected = target;
-    target.element.setAttribute('data-ww-editor-selected', '');
-    status = dirty ? 'この種類のカードを編集中です。' : 'プロパティを変更すると、このタブでプレビューします。';
-    error = false;
-    render();
+    const target = pickTarget(event); if (!target || 'button' in event && event.button === 2) return;
+    event.preventDefault(); event.stopImmediatePropagation(); if (state.view.saving || !['click', 'auxclick'].includes(event.type)) return;
+    removeSelection(); dispatch({ type: 'select-target', target: target.target.id }); selectedElement = target.element; selectedElement.setAttribute('data-ww-editor-selected', '');
   }
   function onKeyDown(event: KeyboardEvent) {
-    if (!panel || event.isComposing || event.composedPath().some((node) => node instanceof HTMLElement
-      && (node.matches('input, textarea, select, [role="tab"], [role="separator"], [role="menuitem"]') || node.isContentEditable))) return;
-    const command = (event.ctrlKey || event.metaKey) && !event.altKey;
-    const key = event.key.toLowerCase();
-    let handled = true;
-    if (command && (key === 'z' || key === 'y')) undoRedo(key === 'y' || event.shiftKey);
-    else if (command && key === 'd' && selectedImageIds.length) duplicate();
-    else if (event.key === 'Delete' && selectedImageIds.length) deleteImage();
-    else if (event.key === 'Escape' && !saving && !importing) {
-      finishGesture(true); clearSelection(); selectedImageIds = []; render();
-    } else if (event.key.startsWith('Arrow') && !command && !event.altKey && selectedImageIds.length) {
-      if (!saving && !importing && !history.active) {
-        const amount = event.shiftKey ? 10 : 1;
-        const delta = { x: event.key === 'ArrowRight' ? amount : event.key === 'ArrowLeft' ? -amount : 0,
-          y: event.key === 'ArrowDown' ? amount : event.key === 'ArrowUp' ? -amount : 0 };
-        changePlacements(moveGroup(editableSceneSamples(doc, site.decorationAnchors ?? [], draft.decorations, draft.groups ?? [], selectedImageIds), delta));
-      }
-    } else if ((event.key === 'Enter' || event.key === ' ') && pickTarget(event)) {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      const target = pickTarget(event)!;
-      clearSelection();
-      selectedImageIds = [];
-      selected = target;
-      target.element.setAttribute('data-ww-editor-selected', '');
-      render();
-    } else handled = false;
-    if (handled) { consumedKeys.add(event.code || event.key); event.preventDefault(); event.stopImmediatePropagation(); }
+    if (!editing() || event.isComposing || event.composedPath().some((node) => node instanceof HTMLElement && (node.matches('input,textarea,select,[role="tab"],[role="separator"],[role="menuitem"]') || node.isContentEditable))) return;
+    const command = shortcutCommand(event, state.view);
+    if (command) dispatch(command);
+    else if ((event.key === 'Enter' || event.key === ' ') && pickTarget(event)) {
+      const target = pickTarget(event)!; removeSelection(); dispatch({ type: 'select-target', target: target.target.id }); selectedElement = target.element; selectedElement.setAttribute('data-ww-editor-selected', '');
+    } else return;
+    consumedKeys.add(event.code || event.key); event.preventDefault(); event.stopImmediatePropagation();
   }
-  function onKeyUp(event: KeyboardEvent) {
-    if (!consumedKeys.delete(event.code || event.key)) return;
-    event.preventDefault(); event.stopImmediatePropagation();
-  }
-
-  function onDragOver(event: DragEvent) {
-    if (!panel || !event.dataTransfer?.types.includes('Files')) return;
-    event.preventDefault(); event.stopImmediatePropagation(); event.dataTransfer.dropEffect = 'copy';
-  }
+  function onKeyUp(event: KeyboardEvent) { if (consumedKeys.delete(event.code || event.key)) { event.preventDefault(); event.stopImmediatePropagation(); } }
+  function onDragOver(event: DragEvent) { if (editing() && event.dataTransfer?.types.includes('Files')) { event.preventDefault(); event.stopImmediatePropagation(); event.dataTransfer.dropEffect = 'copy'; } }
   function onDrop(event: DragEvent) {
-    if (!panel || !event.dataTransfer?.files.length) return;
-    event.preventDefault(); event.stopImmediatePropagation();
-    void addImages([...event.dataTransfer.files], event.composedPath().includes(panel.host) ? undefined : { x: event.clientX, y: event.clientY });
+    if (!editing() || !event.dataTransfer?.files.length) return;
+    event.preventDefault(); event.stopImmediatePropagation(); void core.import([...event.dataTransfer.files], panel && event.composedPath().includes(panel.host) ? undefined : { x: event.clientX, y: event.clientY });
   }
-
-  let unwatch = watchDesign(site.id, accept, onStorageError);
+  const authorize = (owner: string, session: string, revision: number) => {
+    if (owner !== remoteOwner || session !== state.sessionId || revision !== state.revision || !state.active) throw new Error('編集状態が変わりました。最新の状態を同期して、もう一度操作してください。');
+  };
   return {
-    open() {
-      if (!enabled) return { ok: false, error: 'テーマをONにし、強さを1%以上にしてから編集してください。' };
-      if (!loaded) return { ok: false, error: 'デザインを読み込み中です。少し待ってから開いてください。' };
-      if (loadError) return { ok: false, error: loadError };
-      if (!site.designTargets?.length) return { ok: false, error: 'このサイトには編集できる対象がありません。' };
-      if (panel) { panel.focus(); return { ok: true }; }
-      draft = initial();
-      history.reset(); interactionEpoch++; selectedImageIds = [];
-      dirty = false;
-      assetSession = `session-${crypto.randomUUID()}`; leased = ''; importEpoch++;
-      status = 'カードを選ぶか、画像を追加してください。';
-      error = false;
-      panel = createCreatorPanel(doc, {
-        change, save: () => { void save(); }, discard, reset: () => change({}), close,
-        imageImport: (files) => { void addImages(files); }, imageSelect: selectImage,
-        imageChange: (patch) => { if (selectedImageIds.length === 1) changeImage(selectedImageIds[0]!, patch); },
-        layerChange: changeImage, imageDelete: deleteImage, duplicate,
-        group: () => groupSelection(), ungroup: () => groupSelection(true),
-        clearSelection: () => { if (!saving && !importing) { finishGesture(true); clearSelection(); selectedImageIds = []; render(); } },
-        selectAll: () => { if (!saving && !importing) { finishGesture(); clearSelection(); selectedImageIds = rootLayers(draft.decorations, draft.groups ?? []).map((layer) => layer.id); render(); } },
-        thumbnail: (id) => captureLayerThumbnail(doc, id),
-        reorder: (id, targetId, after) => {
-          if (saving || importing) return;
-          finishGesture();
-          try { updateDraft(reorderDocument(draft, id, targetId, after)); }
-          catch (reason) { status = reason instanceof Error ? reason.message : '並び替えできませんでした。'; error = true; render(); }
-        },
-        undo: () => undoRedo(false), redo: () => undoRedo(true),
-        snap: (value) => { snapping = value; render(); }, layout: layoutSelection,
-      }, site.decorationAnchors);
-      selectionStyle = doc.createElement('style');
-      selectionStyle.id = 'web-world-themes-selection-style';
-      selectionStyle.textContent = SELECTION_CSS;
-      (doc.head ?? doc.documentElement).append(selectionStyle);
-      (doc.body ?? doc.documentElement).append(panel.host);
-      doc.documentElement.setAttribute('data-ww-editing', '');
-      PICK_EVENTS.forEach((event) => doc.addEventListener(event, onPick, true));
-      doc.addEventListener('keydown', onKeyDown, true);
-      doc.addEventListener('keyup', onKeyUp, true);
-      doc.addEventListener('dragover', onDragOver, true);
-      doc.addEventListener('drop', onDrop, true);
-      render();
-      settleAssets();
-      panel.focus();
-      return { ok: true };
-    },
-    setEnabled(value) { enabled = value; if (!enabled && panel) close(); },
-    refreshSelection() {
-      if (selected && (!selected.element.isConnected
-        || !selected.element.matches(`[data-ww-surface~="${selected.target.surface}"]`))) {
-        clearSelection();
-        status = 'ページが変わりました。カードを選び直してください。';
-        render();
+    open, snapshot: core.snapshot, checkpoint: core.checkpoint, subscribe: core.subscribe, get historyVersion() { return core.historyVersion; },
+    setEnabled: core.setEnabled,
+    refreshSelection() { if (selectedElement && (!selectedElement.isConnected || !site.designTargets?.some((target) => target.id === state.selectedTarget && selectedElement!.matches(`[data-ww-surface~="${target.surface}"]`)))) {
+      removeSelection(); if (state.active) dispatch({ type: 'select-target' });
+    }
+      if (state.active) {
+        const next = JSON.stringify([doc.defaultView!.innerWidth, doc.defaultView!.innerHeight, ...(site.decorationAnchors ?? []).map((target) => {
+          const rect = doc.querySelector(`[data-ww-surface~="${target.surface}"]`)?.getBoundingClientRect(); return rect ? [rect.x, rect.y, rect.width, rect.height] : null;
+        })]);
+        if (next !== geometryKey) { geometryKey = next; core.refreshGeometry(); }
       }
     },
-    reload() { unwatch(); loaded = false; unwatch = watchDesign(site.id, accept, onStorageError); },
-    destroy() { alive = false; unwatch(); close(); },
+    reload: core.reload,
+    async attachStudio(owner, resume) {
+      if (remoteOwner && remoteOwner !== owner) throw new Error('このYouTubeは別のStudioで編集中です。そちらの接続を解除してください。');
+      const existed = state.active, opened = core.open(); if (!opened.ok) throw new Error(opened.error);
+      remoteOwner = owner;
+      try { if (!existed && resume) await core.restore(resume); refresh(); return core.snapshot(); }
+      catch (error) { remoteOwner = undefined; refresh(); throw error; }
+    },
+    detachStudio(owner) { if (owner !== remoteOwner) return; remoteOwner = undefined; if (core.gestureActive) dispatch({ type: 'end', cancel: true }); refresh(); },
+    async command(owner, session, revision, command) { authorize(owner, session, revision); await core.execute(command); return core.snapshot(); },
+    async import(owner, session, revision, files) { authorize(owner, session, revision); await core.import(files); return core.snapshot(); },
+    thumbnail: (id) => captureLayerThumbnail(doc, id),
+    destroy() { destroyed = true; core.destroy(); unsubscribe(); bind(false); panel?.destroy(); badge?.remove(); },
   };
 }

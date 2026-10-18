@@ -1,5 +1,5 @@
 import styles from './panel.css';
-import { GROUP_LIMITS, IMAGE_LIMITS, STYLE_LIMITS, type SurfaceStyle, type Decoration, type ImagePatch, type DesignTarget, type GroupLayer, type EditorLayer } from '../design/types';
+import { GROUP_LIMITS, IMAGE_LIMITS, STYLE_LIMITS, type SurfaceStyle, type ImagePatch, type DesignTarget } from '../design/types';
 import { ANIMATION_LIMITS } from '../assets/motion-types';
 import type { Alignment, Distribution } from '../design/layout';
 import { createEffectsPanel } from './effects-panel';
@@ -7,24 +7,10 @@ import { childrenOf, effectivelyLocked, groupMovable, parentGroup } from '../des
 import { createLayerTree } from './layer-tree';
 import { createWorkspace } from './workspace';
 
-export interface PanelState {
-  selected: boolean;
-  style: SurfaceStyle;
-  dirty: boolean;
-  saving: boolean;
-  status: string;
-  error: boolean;
-  images: readonly Decoration[];
-  groups: readonly GroupLayer[];
-  image: EditorLayer | undefined;
-  inheritedLocked: boolean;
-  groupPositionAvailable: boolean;
-  groupingReason: string;
-  selectedIds: readonly string[];
-  canUndo: boolean;
-  canRedo: boolean;
-  snapping: boolean;
-}
+export type { EditorView as PanelState } from '../editor-core/types';
+import type { EditorView as PanelState } from '../editor-core/types';
+import type { StudioPreferences } from '../studio/preferences';
+export interface PanelOptions { preferences?: StudioPreferences; fullPage?: boolean; persistWorkspace?: boolean }
 
 export interface PanelActions {
   change(style: SurfaceStyle): void;
@@ -51,7 +37,7 @@ export interface PanelActions {
 }
 
 /** This UI has no site selectors, theme CSS or persistence logic. */
-export function createCreatorPanel(doc: Document, actions: PanelActions, anchors: readonly DesignTarget[] = []) {
+export function createCreatorPanel(doc: Document, actions: PanelActions, anchors: readonly DesignTarget[] = [], options: PanelOptions = {}) {
   const host = doc.createElement('aside');
   host.id = 'web-world-themes-creator';
   host.setAttribute('data-ww-signal-control', '');
@@ -192,7 +178,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       if (!current?.selectedIds.includes(id)) actions.imageSelect(id);
       workspace.context(x, y);
     } });
-  workspace = createWorkspace(doc, host, main, tree, actions.clearSelection, actions.selectAll);
+  workspace = createWorkspace(doc, host, main, tree, actions.clearSelection, actions.selectAll, options);
   const layerName = get<HTMLInputElement>('.layer-name');
   layerName.addEventListener('change', () => {
     const name = layerName.value.trim();

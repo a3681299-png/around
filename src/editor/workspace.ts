@@ -1,10 +1,12 @@
-import type { PanelState } from './panel';
+import type { PanelState, PanelOptions } from './panel';
+import { transientPreferences } from '../studio/preferences';
 
 type Area = 'layers' | 'properties' | 'help';
 interface TreeView { setActive(active: boolean): void }
 
 /** Workspace and onboarding preferences stay outside the artwork, history and Runtime. */
-export function createWorkspace(doc: Document, host: HTMLElement, main: HTMLElement, tree: TreeView, clear: () => void, selectAll: () => void) {
+export function createWorkspace(doc: Document, host: HTMLElement, main: HTMLElement, tree: TreeView, clear: () => void, selectAll: () => void, options: PanelOptions = {}) {
+  const preferences = options.preferences ?? transientPreferences;
   const get = <T extends HTMLElement>(selector: string) => main.querySelector<T>(selector)!;
   const body = get('.editor-body'), assets = get('.assets'), selection = get('.selection');
   const compact = doc.defaultView!.matchMedia('(max-width: 740px)');
@@ -24,7 +26,7 @@ export function createWorkspace(doc: Document, host: HTMLElement, main: HTMLElem
   const guide = doc.createElement('aside'); guide.className = 'quick-guide';
   guide.innerHTML = `<button class="dismiss-guide" type="button" aria-label="操作ガイドを閉じる">×</button><strong>はじめての制作</strong><ol><li>画像やアニメーションを追加</li><li>一覧のチェックで2個以上選択</li><li>グループ化 → 光とマスク → 保存</li></ol>`;
   const guideKey = 'webWorldThemes.creator.guideDismissed';
-  void chrome.storage.local.get(guideKey).then((value) => { if (alive && value[guideKey] === true) guide.hidden = true; }, () => undefined);
+  void preferences.read(guideKey).then((value) => { if (alive && value === true) guide.hidden = true; }, () => undefined);
   const empty = doc.createElement('div'); empty.className = 'empty-layers';
   empty.innerHTML = `<strong>最初の素材を置いてみましょう</strong><p>画像やアニメーションを追加すると、YouTubeの上でドラッグして動かせます。</p><button type="button">素材を選ぶ</button><p class="hint">このパネルへファイルをドロップしても追加できます。</p>`;
   const layerSection = get<HTMLDetailsElement>('.layers-section');
@@ -109,8 +111,8 @@ export function createWorkspace(doc: Document, host: HTMLElement, main: HTMLElem
   splitButton.addEventListener('click', () => { split = !split; host.toggleAttribute('data-split', split); splitButton.setAttribute('aria-pressed', String(split)); splitButton.textContent = split ? '切り替え表示' : '並べる'; show(area); });
   get('.clear-selection').addEventListener('click', clear);
   get('.select-all').addEventListener('click', selectAll);
-  get('.dismiss-guide').addEventListener('click', () => { guide.hidden = true; void chrome.storage.local.set({ [guideKey]: true }).catch(() => undefined); });
-  get('.show-guide').addEventListener('click', () => { guide.hidden = false; void chrome.storage.local.set({ [guideKey]: false }).catch(() => undefined); show('layers'); });
+  get('.dismiss-guide').addEventListener('click', () => { guide.hidden = true; void preferences.write(guideKey, true).catch(() => undefined); });
+  get('.show-guide').addEventListener('click', () => { guide.hidden = false; void preferences.write(guideKey, false).catch(() => undefined); show('layers'); });
   const minimize = get<HTMLButtonElement>('.minimize');
   minimize.addEventListener('click', () => { const value = !host.hasAttribute('data-minimized'); host.toggleAttribute('data-minimized', value); minimize.textContent = value ? '+' : '−'; minimize.setAttribute('aria-label', value ? 'パネルを展開する' : 'パネルを折りたたむ'); show(area); });
   // Width adjustment also supports the keyboard. Bounds are enforced by CSS on small screens.
