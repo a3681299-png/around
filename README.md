@@ -179,6 +179,8 @@ YouTubeの`yt-navigate-finish`と`yt-page-data-updated`で再確認し、追加D
 Chromeの仕様は[Content scripts](https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts)と[Storage API](https://developer.chrome.com/docs/extensions/reference/api/storage)、拡張機能の検証方法は[Playwright公式ドキュメント](https://playwright.dev/docs/chrome-extensions)を参照しています。
 
 
-主要な制作画面は、Popupの **「Studioを開く（このタブ）」** です。本物のYouTubeを中央に置き、左の素材と右のプロパティ／レイヤーを同時に表示します。一覧のチェック → グループ化 → 左のマスクボタン → 保存、の順に制作できます。`V`は選択・変形、`H`はサイト操作です。動画カードは`C`またはツールパレットから選びます。パネル境界をドラッグして幅・高さを調整でき、狭い画面では自動で畳みます。
+主要な制作画面は、Popupの **「Studioを開く（Chromeサイドパネル）」** です。プロパティ／レイヤー／マスク／振る舞いを公式パネルに置き、YouTubeはChromeが変更したビューポートで自然にレイアウトします。ページ内には共通の小型ツールバーと編集ハンドルを表示します。Vは選択・変形、Hはサイト操作、Cは動画カード編集です。
 
-独立Studioとクイック編集も同じCoreを使います。独立Studioからは「YouTubeでStudioを開く」でライブ制作へ移れます。[配置・共通化の設計](docs/inpage-studio-workspace.md)、[新旧画面・操作・検証結果](docs/inpage-studio-verification.md)を参照してください。読み込む拡張は専用worktreeの `.work/creator-editor/dist` です。
+一覧のチェック → グループ化 → プロパティの光とマスク／振る舞い → 保存、の順に制作できます。独立Studio・「従来のインページStudio（切り戻し）」・クイック編集も同じCoreを使います。切替は未保存作品とUndo履歴を維持します。旧インページ方式はブラウザー幅とCSSの予約幅が一致しない制約があるため、通常は公式パネルを使ってください。
+
+[公式パネルの設計・操作](docs/side-panel-studio.md)、[比較画像・検証結果](docs/side-panel-studio-verification.md)を参照してください。拡張を更新後、専用worktreeの `.work/creator-editor/dist` を再読み込みします。今回の追加権限は許可された `sidePanel` のみです。通常版のdistとmainは更新しません。

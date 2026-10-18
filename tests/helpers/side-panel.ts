@@ -3,12 +3,12 @@ import { expect } from '@playwright/test';
 import { writeFile } from 'node:fs/promises';
 
 /** Chrome's real panel WebContents is not a tab in Playwright. Use public CDP. */
-export async function sidePanelDriver(context: BrowserContext, page: Page, extensionId: string, targetTab?: number) {
+export async function sidePanelDriver(context: BrowserContext, page: Page, extensionId: string, targetTab?: number, surface = 'studio/index.html?surface=sidepanel') {
   const cdp = await context.newCDPSession(page);
   let targetId = '';
   await expect.poll(async () => {
     const { targetInfos } = await cdp.send('Target.getTargets');
-    targetId = targetInfos.find((target) => target.url.startsWith('chrome-extension://' + extensionId + '/studio/index.html?surface=sidepanel') && (targetTab === undefined || new URL(target.url).searchParams.get('target') === String(targetTab)))?.targetId ?? '';
+    targetId = targetInfos.find((target) => target.url.startsWith('chrome-extension://' + extensionId + '/' + surface) && !target.attached && (targetTab === undefined || new URL(target.url).searchParams.get('target') === String(targetTab)))?.targetId ?? '';
     return targetId;
   }).not.toBe('');
   const { sessionId } = await cdp.send('Target.attachToTarget', { targetId, flatten: false });
@@ -45,6 +45,8 @@ export async function sidePanelDriver(context: BrowserContext, page: Page, exten
     },
     async fill(selector: string, value: string) { await settle(); await evaluate(`(()=>{const n=${query(selector)};n.value=${JSON.stringify(value)};n.dispatchEvent(new Event('input',{bubbles:true}));n.dispatchEvent(new Event('change',{bubbles:true}));})()`); await settle(); },
     async files(paths: string[]) {
+      await settle();
+      await expect.poll(() => evaluate('document.querySelector(".connection-status")?.dataset.connected === "true" && document.querySelector("#web-world-themes-creator")?.shadowRoot.querySelector(".add-image")?.disabled === false')).toBe(true);
       const { result } = await send('Runtime.evaluate', { expression: query('.file') });
       await send('DOM.setFileInputFiles', { objectId: result.objectId, files: paths });
       await send('Runtime.releaseObject', { objectId: result.objectId });

@@ -99,8 +99,13 @@ test('tab-specific panels isolate drafts and recovery; floating tools yield to n
     await expect.poll(() => first.text('.selected-count')).toBe('1個選択中'); await first.fill('.layer-name', '最初のタブ');
     const secondPage = await context.newPage(); await secondPage.goto('https://www.youtube.com/watch?v=second'); await secondPage.bringToFront();
     const target = await popup.evaluate(async () => (await chrome.tabs.query({ active: true, currentWindow: true }))[0]!.id!);
-    await popup.locator('#creator-studio-inpage').evaluate((button: HTMLButtonElement) => button.click());
-    const secondLocal = secondPage.locator('#web-world-themes-creator'); await secondLocal.getByRole('button', { name: 'Chromeサイドパネルを開く', exact: true }).click();
+    // The native panel may already be visible on a newly enabled YouTube tab.
+    // Open that tab directly, rather than racing an unrelated legacy close/open.
+    await popup.evaluate(async (tabId) => {
+      const result = await chrome.runtime.sendMessage({ type: 'web-world-themes:open-side-panel', tabId });
+      if (!result?.ok) throw new Error(result?.error ?? 'Native panel did not open.');
+    }, target);
+    const secondLocal = secondPage.locator('#web-world-themes-creator');
     const second = await sidePanelDriver(context, secondPage, id, target); await expect.poll(() => second.text('.dirty')).toBe('保存済み');
     await second.files([path.resolve('tests/fixtures/motion/petal.png')]); await expect.poll(() => second.text('.selected-count')).toBe('1個選択中'); await second.fill('.layer-name', '次のタブ');
     await expect.poll(() => popup.evaluate(async () => Object.keys(await chrome.storage.session.get(null)).filter((key) => key.startsWith('webWorldThemes.studio.session.')).length)).toBe(2);
@@ -113,5 +118,22 @@ test('tab-specific panels isolate drafts and recovery; floating tools yield to n
     await expect(secondLocal).not.toHaveAttribute('data-native-overlap', ''); await expect(secondLocal).toBeVisible();
     await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
     for (const targetPage of [page, secondPage]) { await expect(targetPage.locator('[data-ww-editing]')).toHaveCount(0); await expect(targetPage.locator('#web-world-themes-decorations')).toHaveCount(0); }
+  } finally { await context.close(); }
+});
+
+test('the real action popup launches its active YouTube tab in the official panel', async () => {
+  test.setTimeout(60_000);
+  const { context, page, popup, id, local } = await setup();
+  try {
+    test.skip(Number.parseInt(context.browser()?.version() ?? '0') < 127, 'Only native popup automation uses the Chrome 127+ test API.');
+    await local.getByRole('button', { name: '編集を終了', exact: true }).click(); await page.bringToFront();
+    await popup.evaluate(() => chrome.action.openPopup());
+    const action = await sidePanelDriver(context, page, id, undefined, 'popup/index.html');
+    await expect.poll(() => action.evaluate('document.querySelector("#creator-studio-sidepanel")?.disabled')).toBe(false);
+    const contexts = await action.evaluate<string[]>('chrome.runtime.getContexts({}).then(xs=>xs.filter(x=>x.documentUrl===location.href).map(x=>x.contextType))');
+    expect(contexts).toContain('POPUP');
+    await action.evaluate('document.querySelector("#creator-studio-sidepanel").click()');
+    const panel = await sidePanelDriver(context, page, id); await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
+    await expect(local).toHaveAttribute('data-page-toolbar', ''); await expect.poll(() => page.evaluate(() => innerWidth)).toBeLessThan(1200);
   } finally { await context.close(); }
 });

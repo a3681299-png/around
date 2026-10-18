@@ -39,6 +39,8 @@ export function createStudioWorkbench(doc: Document, host: HTMLElement, main: HT
   ];
   const menuSources: Record<string, string> = { '画像を追加': 'add-image', 'アニメーションを追加': 'add-animation', '保存': 'save', '変更を破棄': 'discard', '編集を終了': 'close', '元に戻す': 'undo', 'やり直す': 'redo', '複製': 'duplicate-image', '削除': 'delete-image', '選択をグループ化': 'group-layers', 'グループを解除': 'ungroup-layers', 'すべて選択': 'select-all', '選択解除': 'clear-selection', 'マスクと振る舞い': 'mask-shortcut' };
   for (const [title, items] of menus) {
+    // Native Chrome owns the panel's side and width; page-docking items do not apply.
+    if (options.sidePanel && title === '表示') continue;
     const details = doc.createElement('details'); details.className = 'studio-menu-item'; const summary = doc.createElement('summary'); summary.textContent = title;
     const popup = doc.createElement('div'); popup.className = 'menu-popup'; popup.setAttribute('role', 'menu');
     for (const [label, action] of items) { const button = doc.createElement('button'); button.type = 'button'; button.textContent = label; button.setAttribute('role', 'menuitem'); if (menuSources[label]) button.dataset.source = menuSources[label]; button.addEventListener('click', () => { details.open = false; action(); }); popup.append(button); }
@@ -129,7 +131,7 @@ export function createStudioWorkbench(doc: Document, host: HTMLElement, main: HT
   }
   const surfaces = doc.createElement('div'); surfaces.className = 'surface-actions';
   for (const [surface, label, icon] of [['sidepanel', 'Chromeサイドパネルを開く', 'dock'], ['inpage', '従来のインページStudioへ切替', 'external'], ['window', '独立Studioへ切替', 'external']] as const) {
-    if (surface === 'sidepanel' && options.sidePanel || surface === 'inpage' && options.inPage || !options.onSurface) continue;
+    if (surface === 'sidepanel' && options.sidePanel || surface === 'inpage' && options.inPage || surface === 'window' && options.fullPage && !options.sidePanel || !options.onSurface) continue;
     surfaces.append(make(label, icon, () => options.onSurface?.(surface)));
   }
   menuEnd.prepend(surfaces);

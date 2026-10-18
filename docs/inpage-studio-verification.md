@@ -1,5 +1,7 @@
 # インページStudioの操作と検証
 
+> 現在の主要制作画面は[公式サイドパネル](side-panel-studio.md)です。以下は従来インページ方式の実装時点の記録で、横方向の予約幅とYouTubeの寸法計算には制約が残ります。
+
 起点は `c23bed9`、ブランチは `codex/creator-editor-spike`。2026-10-18に専用worktreeで検証した。中央は実際のYouTubeタブで、iframe・画面転送・疑似プレビューは使っていない。
 
 ## 画面の比較
