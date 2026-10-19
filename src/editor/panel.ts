@@ -2,6 +2,7 @@ import styles from './panel.css';
 import { GROUP_LIMITS, IMAGE_LIMITS, STYLE_LIMITS, type SurfaceStyle, type ImagePatch, type DesignTarget } from '../design/types';
 import { ANIMATION_LIMITS } from '../assets/motion-types';
 import type { Alignment, Distribution } from '../design/layout';
+import { createMotionPanel } from './motion-panel';
 import { createEffectsPanel } from './effects-panel';
 import { childrenOf, effectivelyLocked, groupMovable, parentGroup } from '../design/hierarchy';
 import { createLayerTree } from './layer-tree';
@@ -155,7 +156,8 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
   const imageProperties = get<HTMLFieldSetElement>('.image-properties');
   const changeImage = (patch: ImagePatch) => actions.imageChange(patch, current?.image?.id);
   const effects = createEffectsPanel(doc, changeImage);
-  imageProperties.append(effects.fieldset);
+  const motion = createMotionPanel(doc, changeImage, actions.beginEdit, actions.endEdit);
+  imageProperties.append(motion.fieldset, effects.fieldset);
   const fileInput = get<HTMLInputElement>('.file');
   const addImage = get<HTMLButtonElement>('.add-image');
   const addAnimation = get<HTMLButtonElement>('.add-animation');
@@ -265,7 +267,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       imageProperties.hidden = !state.image && !(options.fullPage || options.inPage || options.sidePanel || options.toolbarOnly) || state.selected;
       imageProperties.disabled = !state.image || state.saving || Boolean(state.image?.locked) || state.inheritedLocked;
       imageProperties.toggleAttribute('data-empty', !state.image);
-      const opacityDriven = Boolean(state.image && state.signalRules?.some((rule) => rule.enabled && rule.target.layerId === state.image!.id));
+      const opacityDriven = Boolean(state.image && state.signalRules?.some((rule) => rule.enabled && rule.target.property === 'opacity' && rule.target.layerId === state.image!.id));
       imageProperties.toggleAttribute('data-opacity-driven', opacityDriven);
       tools.querySelectorAll<HTMLButtonElement>('[data-tool]').forEach((button) => { button.setAttribute('aria-pressed', String(button.dataset.tool === (state.tool ?? 'select'))); });
       const isGroup = state.image?.kind === 'group';
@@ -281,7 +283,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
         input.setAttribute('aria-label', `${isGroup ? 'グループ' : '画像'}の${key.toUpperCase()}位置`);
       }
       get<HTMLInputElement>('[data-image-prop="opacity"]').setAttribute('aria-label', `${isGroup ? 'グループ' : '画像'}の不透明度`);
-      effects.render(state.image);
+      effects.render(state.image); motion.render(state.image);
       properties.hidden = !state.selected;
       get<HTMLParagraphElement>('.card-help').hidden = !state.selected;
       get<HTMLParagraphElement>('.multi-help').hidden = state.selectedIds.length < 2;

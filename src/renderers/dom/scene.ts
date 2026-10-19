@@ -6,13 +6,14 @@ import { assertWorldParity } from './parity';
 import { createMediaController } from '../../media/controller';
 import { createEffectController, type EffectTarget } from './effects';
 import type { PlaybackSource } from '../../signals/types';
-import { groupBounds, moveGroup, resizePlacement, rotatePlacement, type PlacementChange, type PlacementSample, type Point } from '../../world/geometry';
+import { centre, rotation, groupBounds, moveGroup, resizePlacement, rotatePlacement, type PlacementChange, type PlacementSample, type Point } from '../../world/geometry';
 import { editableSceneSamples, placementFrame, snapTargets } from '../../design/frames';
 import { effectivelyLocked, groupMovable, parentGroup, rootLayers } from '../../world/hierarchy';
 import { snapMove, type Guide } from '../../design/layout';
 import type { DesignTarget, Decoration, GroupLayer } from '../../design/types';
 import type { SignalRule } from '../../signals/keyframes';
 import type { TimelineHost } from '../../host/timeline';
+import type { WorldLayout } from '../../world/types';
 
 export interface ImageEditing {
   selectedIds: readonly string[];
@@ -74,7 +75,30 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
   let guideNodes: HTMLDivElement[] = [];
   const nodes = new Map<string, { node: HTMLDivElement; controls: HTMLDivElement; media: ReturnType<ReturnType<typeof createMediaController>['attach']> }>();
   const compositions = new Map<string, { node: HTMLDivElement; content: HTMLDivElement; controls: HTMLDivElement }>();
-  let gesture: { pointerId: number; mode: string; samples: PlacementSample[]; point: Point } | undefined;
+  let lastLayout: WorldLayout | undefined;
+  let gesture: { pointerId: number; mode: string; samples: PlacementSample[]; authored: PlacementSample[]; parentAngles: Map<string, number>; point: Point } | undefined;
+
+  const applyLayout = (layout: WorldLayout) => {
+    lastLayout = layout;
+    const parents = new Map(layout.groups.map((group) => [group.layer.id, group]));
+    for (const group of layout.groups) {
+      const entry = compositions.get(group.layer.id); if (!entry || !group.frame) continue;
+      const p = group.layer.placement, point = centre(p, group.frame);
+      const geometry = { left: `${point.x - p.widthPx / 2}px`, top: `${point.y - p.heightPx / 2}px`, width: `${p.widthPx}px`, height: `${p.heightPx}px`, transform: `rotate(${p.rotationDeg}deg)` };
+      Object.assign(entry.node.style, geometry); Object.assign(entry.controls.style, geometry);
+    }
+    for (const layer of layout.layers) {
+      const entry = nodes.get(layer.layer.id); if (!entry || !layer.frame || !layer.position || !layer.localPosition) continue;
+      const p = layer.layer.placement, local = layer.localPosition, point = layer.position;
+      const parentAngle = layer.parentId ? parents.get(layer.parentId)?.layer.placement.rotationDeg ?? 0 : 0;
+      const size = { width: `${p.widthPx}px`, height: `${p.heightPx}px` };
+      Object.assign(entry.node.style, size, { left: `${local.x}px`, top: `${local.y}px`, transform: `translate(-50%, -50%) rotate(${rotation(p.rotationDeg - parentAngle)}deg)` });
+      Object.assign(entry.controls.style, size, { left: `${point.x}px`, top: `${point.y}px`, transform: `translate(-50%, -50%) rotate(${p.rotationDeg}deg)` });
+    }
+    const selected = editing && editing.selectedIds.length > 1 ? [...layout.groups, ...layout.layers].filter((entry) => editing!.selectedIds.includes(entry.layer.id) && entry.visible && entry.frame) : [];
+    const bounds = selected.length > 1 ? groupBounds(selected.map((entry) => ({ id: entry.layer.id, placement: entry.layer.placement, frame: entry.frame! }))) : undefined;
+    if (groupFrame) { groupFrame.hidden = !bounds; if (bounds) Object.assign(groupFrame.style, { left: `${bounds.left}px`, top: `${bounds.top}px`, width: `${bounds.right - bounds.left}px`, height: `${bounds.bottom - bounds.top}px` }); }
+  };
 
   const drawGuides = (guides: readonly Guide[]) => guideNodes.forEach((node, index) => {
     const guide = guides[index]; node.hidden = !guide;
@@ -147,13 +171,8 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
       entry.controls.toggleAttribute('data-locked', locked);
       entry.controls.toggleAttribute('data-transformable', Boolean(editing && !editing.locked && !locked && editing.selectedIds.length === 1));
     }
-    effects?.update(effectTargets, { scene, geometry, layout });
-    const samples = editing ? editableSceneSamples(doc, anchors, images, groups, editing.selectedIds) : [];
-    const bounds = editing && editing.selectedIds.length > 1 && samples.length > 1 ? groupBounds(samples) : undefined;
-    if (groupFrame) {
-      groupFrame.hidden = !bounds;
-      if (bounds) Object.assign(groupFrame.style, { left: `${bounds.left}px`, top: `${bounds.top}px`, width: `${bounds.right - bounds.left}px`, height: `${bounds.bottom - bounds.top}px` });
-    }
+    applyLayout(layout);
+    effects?.update(effectTargets, { scene, geometry, layout, ...(gesture ? { holdTransforms: true } : {}) });
     if (observed.size !== nextObserved.size || [...nextObserved].some((element) => !observed.has(element))) {
       observer?.disconnect();
       nextObserved.forEach((element) => observer?.observe(element));
@@ -177,11 +196,13 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
     if (group && mode !== 'move') return;
     if (mode === 'move') editing.select(item.id, additive, true);
     if (!editing.selectedIds.includes(item.id)) return;
-    const samples = editableSceneSamples(doc, anchors, images, groups, editing.selectedIds);
+    const authored = editableSceneSamples(doc, anchors, images, groups, editing.selectedIds);
+    const samples = authored.map((sample) => { const entry = lastLayout?.layers.find((layer) => layer.layer.id === sample.id); return entry?.frame ? { ...sample, placement: { ...entry.layer.placement }, frame: entry.frame } : sample; });
     if (!samples.length || (mode !== 'move' && samples.length !== 1)) return;
     node.focus({ preventScroll: true });
     editing.begin();
-    gesture = { pointerId: event.pointerId, mode, samples, point: { x: event.clientX, y: event.clientY } };
+    const parentAngles = new Map(samples.map((sample) => { const parent = parentGroup(groups, sample.id); return [sample.id, lastLayout?.groups.find((group) => group.layer.id === parent?.id)?.layer.placement.rotationDeg ?? 0]; }));
+    gesture = { pointerId: event.pointerId, mode, samples, authored, parentAngles, point: { x: event.clientX, y: event.clientY } }; draw();
     node.setPointerCapture(event.pointerId);
   };
   const onPointerMove = (event: PointerEvent) => {
@@ -192,11 +213,16 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
     const current = { x: event.clientX, y: event.clientY };
     const delta = { x: current.x - point.x, y: current.y - point.y };
     const first = samples[0]!;
+    const change = (changes: readonly PlacementChange[]) => editing!.change(changes.map((change) => {
+      const start = samples.find((sample) => sample.id === change.id)!, base = gesture!.authored.find((sample) => sample.id === change.id)!, p = change.placement;
+      const dx = (p.x - start.placement.x) * start.frame.width, dy = (p.y - start.placement.y) * start.frame.height, angle = (gesture!.parentAngles.get(change.id) ?? 0) * Math.PI / 180;
+      return { id: change.id, placement: { ...base.placement, x: Math.max(0, Math.min(1, base.placement.x + (dx * Math.cos(angle) + dy * Math.sin(angle)) / base.frame.width)), y: Math.max(0, Math.min(1, base.placement.y + (-dx * Math.sin(angle) + dy * Math.cos(angle)) / base.frame.height)), widthPx: p.widthPx, heightPx: p.heightPx, rotationDeg: rotation(base.placement.rotationDeg + rotation(p.rotationDeg - start.placement.rotationDeg)) } };
+    }));
     if (mode === 'move') {
-      const result = editing.snapping && !event.altKey ? snapMove(samples, delta, snapTargets(doc, anchors, images, samples.map((sample) => sample.id), groups)) : { changes: moveGroup(samples, delta), guides: [] };
-      drawGuides(result.guides); editing.change(result.changes); return;
+      const result = editing.snapping && !event.altKey ? snapMove(samples, delta, snapTargets(doc, anchors, lastLayout?.layers.map((entry) => entry.layer) ?? images, samples.map((sample) => sample.id), groups)) : { changes: moveGroup(samples, delta), guides: [] };
+      drawGuides(result.guides); change(result.changes); return;
     }
-    editing.change([{ id: first.id, placement: mode === 'rotate'
+    change([{ id: first.id, placement: mode === 'rotate'
       ? rotatePlacement(first.placement, first.frame, point, current)
       : resizePlacement(first.placement, first.frame, delta, mode.endsWith('e') ? 1 : -1, mode.startsWith('s') ? 1 : -1) }]);
   };
@@ -204,7 +230,7 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
     const rect = placementFrame(doc, anchors, sample.placement);
     return !rect || (['left', 'top', 'width', 'height'] as const).some((key) => Math.abs(rect[key] - sample.frame[key]) > .000001);
   });
-  const finish = (cancel = false) => { drawGuides([]); if (gesture) { gesture = undefined; editing?.end(cancel); } };
+  const finish = (cancel = false) => { drawGuides([]); if (gesture) { gesture = undefined; editing?.end(cancel); draw(); } };
   const onPointerUp = (event: PointerEvent) => {
     if (!gesture || event.pointerId !== gesture.pointerId) return;
     event.stopPropagation();
@@ -222,7 +248,7 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
     style.textContent = CSS;
     shadow.append(style);
     media = createMediaController(doc, (message) => editing?.error(message), (stats) => { if (host) host.dataset.wwMediaStats = JSON.stringify(stats); });
-    effects = createEffectController(doc, playback, timeline);
+    effects = createEffectController(doc, playback, timeline, applyLayout);
     imageLayer = doc.createElement('div'); imageLayer.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:0'; shadow.append(imageLayer);
     groupFrame = doc.createElement('div'); groupFrame.className = 'group-frame'; groupFrame.hidden = true; shadow.append(groupFrame);
     guideNodes = Array.from({ length: 2 }, () => { const node = doc.createElement('div'); node.className = 'guide'; node.hidden = true; shadow!.append(node); return node; });
@@ -252,7 +278,7 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
     doc.removeEventListener('fullscreenchange', onViewChange);
     host?.remove(); host = undefined; shadow = undefined; groupFrame = undefined; imageLayer = undefined; guideNodes = [];
     nodes.clear();
-    compositions.clear(); images = []; groups = [];
+    compositions.clear(); images = []; groups = []; lastLayout = undefined;
   };
   return {
     update(next: readonly Decoration[], nextGroups: readonly GroupLayer[] = [], nextRules: readonly SignalRule[] = []) {

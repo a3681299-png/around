@@ -12,7 +12,7 @@ export function createSignalSources(doc: Document, playback: PlaybackSource | un
     if (!event.isPrimary || !Number.isFinite(event.clientX) || !Number.isFinite(event.clientY)) return;
     // Authoring controls keep the last canvas position so numeric edits stay visible.
     if (event.composedPath().some((node) => node instanceof Element && node.hasAttribute('data-ww-signal-control'))) return;
-    snapshot.pointer = { x: event.clientX, y: event.clientY }; changed('pointer.position');
+    snapshot.pointer = { x: event.clientX, y: event.clientY }; snapshot.pointerTimeMs = doc.defaultView!.performance.now(); changed('pointer.position');
   };
   const onClick = (event: MouseEvent) => {
     if (!Number.isFinite(event.clientX) || !Number.isFinite(event.clientY) || event.composedPath().some((node) => node instanceof Element && (node.hasAttribute('data-ww-signal-control') || node.matches('input,textarea,select,[contenteditable]')))) return;

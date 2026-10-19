@@ -34,7 +34,7 @@ function events(value: unknown): WorldEvent[] {
 export function parseWorldInput(value: unknown): WorldInput {
   const data = record(value, ['timeMs', 'deltaMs', 'viewport', 'anchors', 'signals', 'events', 'environment', 'seed']);
   const viewport = record(data['viewport'], ['width', 'height']), signals = record(data['signals'], ['pointer', 'pointerTimeMs', 'playing', 'scroll']);
-  const environment = record(data['environment'], ['hidden', 'reducedMotion']);
+  const environment = record(data['environment'], ['hidden', 'reducedMotion', 'holdTransforms']);
   const anchors = data['anchors'];
   if (!anchors || typeof anchors !== 'object' || Array.isArray(anchors) || Object.keys(anchors).length > RECORDING_LIMITS.anchors) throw new Error('Invalid recording anchors.');
   const frames = Object.fromEntries(Object.entries(anchors).map(([id, value]) => {
@@ -47,7 +47,7 @@ export function parseWorldInput(value: unknown): WorldInput {
   const scroll = signals['scroll'] === undefined ? undefined : record(signals['scroll'], ['x', 'y', 'maxX', 'maxY']);
   return { timeMs: number(data['timeMs']), deltaMs: number(data['deltaMs']), viewport: { width: number(viewport['width'], .001, 1e6), height: number(viewport['height'], .001, 1e6) },
     anchors: frames, signals: { pointer: signals['pointer'] === undefined ? undefined : point(signals['pointer']), playing: boolean(signals['playing']), ...(signals['pointerTimeMs'] === undefined ? {} : { pointerTimeMs: number(signals['pointerTimeMs']) }), ...(scroll ? { scroll: { x: number(scroll['x'], -1e7, 1e9), y: number(scroll['y'], -1e7, 1e9), maxX: number(scroll['maxX'], 0, 1e9), maxY: number(scroll['maxY'], 0, 1e9) } } : {}) },
-    events: events(data['events']), environment: { hidden: boolean(environment['hidden']), reducedMotion: boolean(environment['reducedMotion']) }, ...(seed === undefined ? {} : { seed }) };
+    events: events(data['events']), environment: { hidden: boolean(environment['hidden']), reducedMotion: boolean(environment['reducedMotion']), ...(environment['holdTransforms'] === undefined ? {} : { holdTransforms: boolean(environment['holdTransforms']) }) }, ...(seed === undefined ? {} : { seed }) };
 }
 export function parseWorldScene(value: unknown, legacy = false): WorldScene {
   const scene = record(value, ['decorations', 'groups', ...(!legacy ? ['signalRules'] : [])]);

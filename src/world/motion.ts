@@ -10,7 +10,7 @@ const approach = (from: Point, to: Point, distance: number): Point => { const x 
 /** Bounded substeps prevent large frame gaps from teleporting a pursuer. */
 export function followMotion(config: FollowMotion, previous: MotionBody | undefined, base: Point, target: Point | undefined, deltaMs: number, reduced: boolean) {
   const signature = JSON.stringify(config);
-  const body: MotionBody = previous?.signature === signature ? { ...previous, offset: { ...previous.offset }, velocity: { ...previous.velocity } } : { signature, offset: { x: 0, y: 0 }, velocity: { x: 0, y: 0 }, heading: 0 };
+  const body: MotionBody = previous ? { ...previous, signature, offset: { ...previous.offset }, velocity: { ...previous.velocity } } : { signature, offset: { x: 0, y: 0 }, velocity: { x: 0, y: 0 }, heading: 0 };
   if (!target || reduced) { body.velocity = { x: 0, y: 0 }; return { body, needsFrame: false }; }
   let position = { x: base.x + body.offset.x, y: base.y + body.offset.y };
   const start = { ...position }, distance = Math.hypot(target.x - position.x, target.y - position.y);

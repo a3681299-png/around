@@ -87,7 +87,7 @@ test('signal catalog distinguishes value/state/event; subscriptions are shared, 
   expect(SIGNAL_CATALOG['pointer.position'].category).toBe('value');
   expect(SIGNAL_CATALOG['video.playing'].category).toBe('state'); expect(SIGNAL_CATALOG['video.pause'].category).toBe('event');
   const listeners = new Set<(event: PointerEvent) => void>();
-  const doc = { addEventListener: (_: string, listener: (event: PointerEvent) => void) => listeners.add(listener),
+  const doc = { defaultView: { performance: { now: () => 100 } }, addEventListener: (_: string, listener: (event: PointerEvent) => void) => listeners.add(listener),
     removeEventListener: (_: string, listener: (event: PointerEvent) => void) => listeners.delete(listener) } as unknown as Document;
   let connected = 0, removed = 0, changes = 0, publish: ((value: PlaybackSignal) => void) | undefined;
   const playback: PlaybackSource = { connect(emit) { connected++; publish = emit; emit({ playing: true }); return { refresh() {}, destroy() { removed++; } }; } };

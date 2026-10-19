@@ -7,7 +7,7 @@ import { evaluateLayout } from '../world/layout';
 import type { WorldEvent, WorldFrame, WorldGeometry, WorldInput, WorldLayout, WorldScene, WorldState } from '../world/types';
 import type { TimelineHost } from './timeline';
 
-export interface WorldHostContext { scene: WorldScene; geometry: WorldGeometry; layout?: WorldLayout }
+export interface WorldHostContext { scene: WorldScene; geometry: WorldGeometry; layout?: WorldLayout; holdTransforms?: boolean }
 /** Browser inputs/scheduling only. The renderer receives data through apply(). */
 export function createWorldSession(doc: Document, playback: PlaybackSource | undefined, apply: (frame: WorldFrame) => void,
   compare?: (scene: WorldScene, previous: WorldState, input: WorldInput, result: ReturnType<typeof evaluateWorld>) => void, timeline?: TimelineHost) {
@@ -20,16 +20,20 @@ export function createWorldSession(doc: Document, playback: PlaybackSource | und
   let lastFrame: WorldFrame | undefined, devtools: ReturnType<typeof createWorldDevtools>;
   let raf: number | undefined, listening = false;
   let subscribed = { pointer: false, video: false, scroll: false };
-  const ruleActive = () => Boolean(context?.scene.signalRules?.some((rule) => rule.enabled));
+  let heldSignals: WorldInput['signals'] | undefined;
+  const motionActive = () => Boolean(prepared && [...prepared.groups, ...prepared.layers].some((entry) => entry.visible && entry.layer.motion?.enabled));
+  const pointerRuleActive = () => Boolean(context?.scene.signalRules?.some((rule) => rule.enabled && rule.source.signal.startsWith('pointer.')));
+  const ruleActive = () => Boolean(context?.scene.signalRules?.some((rule) => rule.enabled)) || motionActive();
   const active = (target: WorldEffectTarget) => effectActive(target, evaluatedTargets, state.effects);
   const sources = createSignalSources(doc, playback, (source) => {
-    if (source === 'pointer.position' && !devtools?.active && !wantsPointerFrame(evaluatedTargets, state.effects, sources.snapshot, view.performance.now())) return;
+    if (source === 'pointer.position' && !devtools?.active && !timeline?.observing && !timeline?.recording && !pointerRuleActive() && !motionActive() && !wantsPointerFrame(evaluatedTargets, state.effects, sources.snapshot, view.performance.now())) return;
     schedule();
   }, () => { if (devtools?.active || timeline?.recording) schedule(); });
   const cancel = () => { if (raf !== undefined) view.cancelAnimationFrame(raf); raf = undefined; };
   const syncSources = (refresh = false) => {
     const authoring = timeline?.observing || timeline?.recording;
-    const needed = timeline?.overriding ? { pointer: false, video: false, scroll: false } : { ...((devtools?.active || authoring) && !doc.hidden ? { pointer: true, video: true } : neededSignals(evaluatedTargets, state.effects, doc.hidden)), scroll: !doc.hidden && (ruleActive() || Boolean(devtools?.active) || Boolean(authoring)) };
+    const masks = neededSignals(evaluatedTargets, state.effects, doc.hidden);
+    const needed = timeline?.overriding ? { pointer: false, video: false, scroll: false } : { pointer: !doc.hidden && (masks.pointer || Boolean(devtools?.active || authoring) || pointerRuleActive() || motionActive()), video: !doc.hidden && (masks.video || Boolean(devtools?.active || authoring)), scroll: !doc.hidden && (Boolean(context?.scene.signalRules?.some((rule) => rule.enabled && rule.source.signal === 'page.scroll.progress')) || Boolean(devtools?.active) || Boolean(authoring)) };
     sources.recordClicks(Boolean(timeline?.recording && !doc.hidden));
     if (refresh || needed.pointer !== subscribed.pointer || needed.video !== subscribed.video || needed.scroll !== subscribed.scroll) { subscribed = needed; sources.configure(needed); }
   };
@@ -39,11 +43,12 @@ export function createWorldSession(doc: Document, playback: PlaybackSource | und
     // Multiple browser callbacks may carry an earlier RAF timestamp in one frame.
     const timeMs = Math.max(state.timeMs ?? 0, time);
     const events: WorldEvent[] = [...(lifecyclePending ? [{ type: 'host.lifecycle' as const }] : []), ...sources.takeEvents(), ...(devtools?.takeEvents() ?? [])].slice(-64); lifecyclePending = false;
+    if (context.holdTransforms) heldSignals ??= { ...sources.snapshot }; else heldSignals = undefined;
     const input: WorldInput = { ...context.geometry, timeMs, deltaMs: state.timeMs === null ? 0 : timeMs - state.timeMs,
-      signals: { ...sources.snapshot }, events, environment: { hidden: doc.hidden, reducedMotion: reduced.matches } };
+      signals: { ...heldSignals ?? sources.snapshot }, events, environment: { hidden: doc.hidden, reducedMotion: reduced.matches, ...(context.holdTransforms ? { holdTransforms: true } : {}) } };
     const overridden = timeline?.preview(context.scene), result = overridden ?? evaluatePreparedWorld(prepared, state, input, context.scene.signalRules);
-    if (!overridden) { if (!context.scene.signalRules?.length) compare?.(context.scene, state, input, result); devtools?.capture(context.scene, input); timeline?.capture(context.scene, state, input, result); }
-    state = result.state; lastFrame = result.frame; evaluatedTargets = context.scene.signalRules?.length ? layoutEffectTargets(result.frame.layout) : targets;
+    if (!overridden) { if (!context.scene.signalRules?.length && !motionActive()) compare?.(context.scene, state, input, result); devtools?.capture(context.scene, input); timeline?.capture(context.scene, state, input, result); }
+    state = result.state; lastFrame = result.frame; evaluatedTargets = context.scene.signalRules?.length || motionActive() ? layoutEffectTargets(result.frame.layout) : targets;
     apply(result.frame);
     syncSources();
     syncListening();

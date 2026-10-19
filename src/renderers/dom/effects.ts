@@ -7,9 +7,10 @@ import { createLegacyEffectController } from './legacy-effects';
 import { legacyWorld } from './legacy-evaluation';
 import { assertWorldParity } from './parity';
 import type { TimelineHost } from '../../host/timeline';
+import type { WorldLayout } from '../../world/types';
 
 export interface EffectTarget extends WorldEffectTarget { element: HTMLElement; visibility(value: boolean): void }
-export function createEffectController(doc: Document, playback?: PlaybackSource, timeline?: TimelineHost) {
+export function createEffectController(doc: Document, playback?: PlaybackSource, timeline?: TimelineHost, applyLayout?: (layout: WorldLayout) => void) {
   if (WORLD_MODE === 'legacy') {
     const legacy = createLegacyEffectController(doc, playback);
     return { update(next: readonly EffectTarget[], _context: WorldHostContext) { legacy.update(next); }, destroy: legacy.destroy };
@@ -28,6 +29,7 @@ export function createEffectController(doc: Document, playback?: PlaybackSource,
       } else clear(target.element);
       target.visibility(value.visible);
     }
+    applyLayout?.(frame.layout);
   }, WORLD_MODE === 'compare' ? (scene, previous, input, result) => assertWorldParity(result, legacyWorld(scene, previous, input), 'world') : undefined, timeline);
   return {
     update(next: readonly EffectTarget[], context: WorldHostContext) {

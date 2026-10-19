@@ -26,7 +26,7 @@ export function evaluateTransforms(prepared: WorldLayout, rules: readonly Signal
     const config = entry.layer.motion;
     if (!config?.enabled || !entry.frame) continue;
     const base = centre(entry.layer.placement, entry.frame), before = previous?.bodies[entry.layer.id];
-    const followed = followMotion(config, before, base, entry.visible && !input.environment.hidden ? input.signals.pointer : undefined, input.deltaMs, input.environment.reducedMotion);
+    const followed = followMotion(config, before, base, entry.visible && !input.environment.hidden && !input.environment.holdTransforms ? input.signals.pointer : undefined, input.deltaMs, input.environment.reducedMotion);
     state.bodies[entry.layer.id] = followed.body; needsFrame ||= followed.needsFrame;
     entry.layer.placement.x += followed.body.offset.x / entry.frame.width; entry.layer.placement.y += followed.body.offset.y / entry.frame.height;
     if (config.orientToMovement) entry.layer.placement.rotationDeg = rotation(entry.layer.placement.rotationDeg + followed.body.heading);
@@ -53,5 +53,5 @@ export function evaluateTransforms(prepared: WorldLayout, rules: readonly Signal
   for (const group of groups) group.renderable = group.visible && group.layer.opacity > 0 && layers.some((entry) => entry.parentId === group.layer.id && entry.renderable);
   // A speed-driven rule needs one final evaluation after the last pointer sample.
   needsFrame ||= Boolean(pointer && pointer.speed > 0 && input.timeMs - pointer.timeMs <= 100 && rules.some((rule) => rule.enabled && rule.source.signal === 'pointer.speed'));
-  return { layout: { ...prepared, groups, layers }, state, needsFrame: needsFrame && !input.environment.hidden };
+  return { layout: { ...prepared, groups, layers }, state, needsFrame: needsFrame && !input.environment.hidden && !input.environment.holdTransforms };
 }
