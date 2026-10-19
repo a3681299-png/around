@@ -18,7 +18,7 @@ export function parseSignalTake(value: unknown): SignalTake {
   if (!value || typeof value !== 'object' || Array.isArray(value) || Object.keys(value).some((key) => !['format', 'formatVersion', 'runtimeVersion', 'id', 'name', 'siteId', 'initialState', 'inputs'].includes(key))) throw new Error('テイクの形式が不正です。');
   const data = value as Record<string, unknown>;
   const id = (value: unknown): value is string => typeof value === 'string' && /^[a-z][a-z0-9-]{0,63}$/.test(value);
-  if (data['format'] !== 'ww-signal-take' || data['formatVersion'] !== 1 || ![WORLD_RUNTIME_VERSION, '1.1.0'].includes(data['runtimeVersion'] as string) || !id(data['id']) || !id(data['siteId']) || typeof data['name'] !== 'string' || !data['name'].length || data['name'].length > 80 || /[\u0000-\u001f]/.test(data['name'])) throw new Error('未対応または不正なテイクです。');
+  if (data['format'] !== 'ww-signal-take' || data['formatVersion'] !== 1 || ![WORLD_RUNTIME_VERSION, '1.2.0', '1.1.0'].includes(data['runtimeVersion'] as string) || !id(data['id']) || !id(data['siteId']) || typeof data['name'] !== 'string' || !data['name'].length || data['name'].length > 80 || /[\u0000-\u001f]/.test(data['name'])) throw new Error('未対応または不正なテイクです。');
   if (!Array.isArray(data['inputs']) || !data['inputs'].length || data['inputs'].length > TAKE_LIMITS.samples) throw new Error('テイクは1〜3600サンプルで指定してください。');
   const initialState = parseWorldState(data['initialState']), inputs = data['inputs'].map(parseWorldInput);
   let previous = initialState.timeMs ?? 0;

@@ -1,6 +1,9 @@
 import { AmbientLight, Box3, Color, DirectionalLight, Group, LoadingManager, Mesh, OrthographicCamera, Scene, Texture, Vector3, WebGLRenderer, type Object3D, type Material } from 'three';
 import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { clone } from 'three/addons/utils/SkeletonUtils.js';
+import { createRigPlayer } from './rig-player';
+import type { ModelEvaluation } from '../../world/models';
+import type { WorldFrame } from '../../world/types';
 import { loadAsset } from '../../assets/client';
 import { inspectGlb } from '../../assets/glb';
 import type { Decoration, ModelDecoration } from '../../design/types';
@@ -56,6 +59,7 @@ export function createModelRenderer(doc: Document, report: (message: string) => 
   };
   interface Instance {
     element: HTMLDivElement; canvas: HTMLCanvasElement; scene: Scene; camera: OrthographicCamera; visual: Group;
+    player?: ReturnType<typeof createRigPlayer>; inPlace?: boolean; evaluation?: ModelEvaluation;
     root?: Object3D; source?: GLTF; entry?: Resource; layer?: ModelDecoration; assetId: string; visible: boolean; dirty: boolean; alive: boolean; generation: number;
   }
   const cancel = () => { if (frame !== undefined) view.cancelAnimationFrame(frame); frame = undefined; };
@@ -68,15 +72,19 @@ export function createModelRenderer(doc: Document, report: (message: string) => 
       if (!i.alive || !i.visible || !i.root || !i.dirty || !i.layer) continue;
       try {
         const r = ensure(), p = i.layer.placement, scale = Math.min(1.5, 1024 / Math.max(p.widthPx, p.heightPx));
-        const w = Math.max(1, Math.round(p.widthPx * scale)), h = Math.max(1, Math.round(p.heightPx * scale));
+        const budgetScale = Math.min(scale, Math.sqrt(512 * 1024 / (p.widthPx * p.heightPx)));
+        const w = Math.max(1, Math.round(p.widthPx * budgetScale)), h = Math.max(1, Math.round(p.heightPx * budgetScale));
         if (w !== i.canvas.width || h !== i.canvas.height) { i.canvas.width = w; i.canvas.height = h; }
         r.setSize(w, h, false); const aspect = w / h;
         i.camera.left = -aspect * .75; i.camera.right = aspect * .75; i.camera.top = .75; i.camera.bottom = -.75; i.camera.updateProjectionMatrix();
         const m = i.layer.model; i.visual.rotation.set(m.rotationX * Math.PI / 180, m.rotationY * Math.PI / 180, m.rotationZ * Math.PI / 180);
+        if (i.inPlace !== m.inPlace || !i.player) { i.player?.destroy(); i.player = createRigPlayer(i.source!, i.root, m.inPlace); i.inPlace = m.inPlace; }
+        if (i.evaluation) i.player.paint(i.evaluation, m);
         r.render(i.scene, i.camera);
         const context = i.canvas.getContext('2d'); if (!context) throw new Error('3D描画用キャンバスを確保できませんでした。');
         context.clearRect(0, 0, w, h); context.drawImage(r.domElement, 0, 0); i.dirty = false;
-        i.element.dataset.playback = 'still'; i.element.dataset.renderer = 'three'; i.element.style.visibility = 'visible'; paints++;
+        i.element.dataset.playback = reduced.matches ? 'reduced-motion' : i.layer.model.playing && i.evaluation?.clip !== null ? 'playing' : 'paused';
+        if (i.evaluation) { i.element.dataset.modelFrame = JSON.stringify(i.evaluation); } i.element.dataset.renderer = 'three'; i.element.style.visibility = 'visible'; paints++;
       } catch (error) { i.dirty = false; i.element.dataset.playback = 'error'; report(error instanceof Error ? error.message : 'WebGLを利用できません。'); }
     }
     cpuMs = view.performance.now() - before; maxCpuMs = Math.max(maxCpuMs, cpuMs); stats(); schedule();
@@ -84,6 +92,11 @@ export function createModelRenderer(doc: Document, report: (message: string) => 
   const visibility = () => { cancel(); if (!doc.hidden) { instances.forEach((i) => { i.dirty = true; }); schedule(); } };
   doc.addEventListener('visibilitychange', visibility); reduced.addEventListener('change', visibility);
   return {
+    evaluate(world: WorldFrame) {
+      const frames = new Map(world.models?.map((f) => [f.id, f]));
+      for (const i of instances) { const value = i.layer && frames.get(i.layer.id); if (value && JSON.stringify(value) !== JSON.stringify(i.evaluation)) { i.evaluation = value; i.dirty = true; } }
+      schedule();
+    },
     attach(parent: HTMLElement): ModelSurface {
       const element = doc.createElement('div'); element.className = 'media model-media'; element.dataset.format = 'glb'; element.style.visibility = 'hidden';
       const canvas = doc.createElement('canvas'); canvas.width = canvas.height = 1; element.append(canvas); parent.append(element);
@@ -92,7 +105,7 @@ export function createModelRenderer(doc: Document, report: (message: string) => 
       const visual = new Group(); scene.add(visual);
       const i: Instance = { element, canvas, scene, camera, visual, assetId: '', visible: false, dirty: false, alive: true, generation: 0 }; instances.add(i);
       const unload = () => {
-        i.generation++; if (i.root) { i.root.traverse((o) => { const s = (o as Object3D & { skeleton?: { dispose(): void } }).skeleton; s?.dispose(); }); i.visual.clear(); delete i.root; }
+        i.generation++; i.player?.destroy(); delete i.player; if (i.root) { i.root.traverse((o) => { const s = (o as Object3D & { skeleton?: { dispose(): void } }).skeleton; s?.dispose(); }); i.visual.clear(); delete i.root; }
         if (i.entry) release(i.assetId, i.entry); delete i.entry; delete i.source;
       };
       return { element,

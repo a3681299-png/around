@@ -22,8 +22,9 @@ export function createWorldSession(doc: Document, playback: PlaybackSource | und
   let subscribed = { pointer: false, video: false, scroll: false };
   let heldSignals: WorldInput['signals'] | undefined;
   const motionActive = () => Boolean(prepared && [...prepared.groups, ...prepared.layers].some((entry) => entry.visible && entry.layer.motion?.enabled));
+  const modelActive = () => Boolean(prepared?.layers.some((entry) => entry.renderable && entry.layer.kind === 'model3d' && (entry.layer.model.playing || entry.layer.model.look.enabled)));
   const pointerRuleActive = () => Boolean(context?.scene.signalRules?.some((rule) => rule.enabled && rule.source.signal.startsWith('pointer.')));
-  const ruleActive = () => Boolean(context?.scene.signalRules?.some((rule) => rule.enabled)) || motionActive();
+  const ruleActive = () => Boolean(context?.scene.signalRules?.some((rule) => rule.enabled)) || motionActive() || modelActive();
   const active = (target: WorldEffectTarget) => effectActive(target, evaluatedTargets, state.effects);
   const sources = createSignalSources(doc, playback, (source) => {
     if (source === 'pointer.position' && !devtools?.active && !timeline?.observing && !timeline?.recording && !pointerRuleActive() && !motionActive() && !wantsPointerFrame(evaluatedTargets, state.effects, sources.snapshot, view.performance.now())) return;
@@ -47,7 +48,7 @@ export function createWorldSession(doc: Document, playback: PlaybackSource | und
     const input: WorldInput = { ...context.geometry, timeMs, deltaMs: state.timeMs === null ? 0 : timeMs - state.timeMs,
       signals: { ...heldSignals ?? sources.snapshot }, events, environment: { hidden: doc.hidden, reducedMotion: reduced.matches, ...(context.holdTransforms ? { holdTransforms: true } : {}) } };
     const overridden = timeline?.preview(context.scene), result = overridden ?? evaluatePreparedWorld(prepared, state, input, context.scene.signalRules);
-    if (!overridden) { if (!context.scene.signalRules?.length && !motionActive()) compare?.(context.scene, state, input, result); devtools?.capture(context.scene, input); timeline?.capture(context.scene, state, input, result); }
+    if (!overridden) { if (!context.scene.signalRules?.length && !motionActive() && !modelActive()) compare?.(context.scene, state, input, result); devtools?.capture(context.scene, input); timeline?.capture(context.scene, state, input, result); }
     state = result.state; lastFrame = result.frame; evaluatedTargets = context.scene.signalRules?.length || motionActive() ? layoutEffectTargets(result.frame.layout) : targets;
     apply(result.frame);
     syncSources();

@@ -3,7 +3,7 @@ import type { SignalSnapshot } from '../signals/types';
 import type { Bounds, PlacementFrame, Point } from './geometry';
 import type { EffectState, EffectEvaluation } from './effects';
 
-export const WORLD_RUNTIME_VERSION = '1.2.0' as const;
+export const WORLD_RUNTIME_VERSION = '1.3.0' as const;
 export interface WorldScene { decorations: readonly Decoration[]; groups?: readonly GroupLayer[]; signalRules?: readonly import('../signals/keyframes').SignalRule[] }
 export interface WorldGeometry {
   viewport: { width: number; height: number };
@@ -53,6 +53,7 @@ export interface WorldState {
   effects: EffectState;
   machine: WorldMachineState;
   motion?: import('./motion').MotionState;
+  models?: Record<string, import('./models').ModelState>;
 }
 export interface WorldFrame {
   timeMs: number;
@@ -61,6 +62,7 @@ export interface WorldFrame {
   machine: WorldMachineState;
   needsFrame: boolean;
   subscriptions: { pointer: boolean; video: boolean };
+  models?: import('./models').ModelEvaluation[];
 }
 export const frameFor = (placement: LayerPlacement, geometry: WorldGeometry): PlacementFrame | undefined => placement.anchor.kind === 'viewport'
   ? { left: 0, top: 0, ...geometry.viewport }

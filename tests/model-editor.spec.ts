@@ -2,6 +2,7 @@ import { test, expect } from './fixtures';
 import { exposeEditorControls, withCanvas } from './helpers/editor-workspace';
 import { modelFixture } from './helpers/model-fixture';
 import type { DesignDocument } from '../src/design/types';
+import type { ModelEvaluation } from '../src/world/models';
 const overlay = '#web-world-themes-decorations';
 
 test('GLB renders alpha, shares resources, edits/drags/duplicates/undoes, saves and restores original asset', async ({ popup, youtube, context }) => {
@@ -27,4 +28,25 @@ test('GLB renders alpha, shares resources, edits/drags/duplicates/undoes, saves 
   expect(await youtube.locator(`${overlay} [data-image-id]`).first().evaluate((e) => getComputedStyle(e).pointerEvents)).toBe('none');
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck(); await expect(youtube.locator(overlay)).toHaveCount(0);
   expect(context.serviceWorkers().length).toBeGreaterThan(0);
+});
+
+test('arbitrary clips animate pixels, pause, crossfade, change speed and preserve playback settings', async ({ popup, youtube }) => {
+  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check(); await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+  await youtube.bringToFront(); await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
+  const panel = youtube.getByRole('dialog', { name: 'デザインエディター' }); await exposeEditorControls(panel);
+  await panel.locator('.model-file').setInputFiles({ name: 'Motion.glb', mimeType: 'model/gltf-binary', buffer: modelFixture() });
+  const media = youtube.locator(`${overlay} .model-media`); await expect(media).toHaveAttribute('data-renderer', 'three');
+  expect(await panel.getByLabel('3Dクリップ', { exact: true }).locator('option').allTextContents()).toContain('Stride · 2.00s');
+  const pose = () => media.locator('canvas').evaluate((c: HTMLCanvasElement) => c.toDataURL()); const first = await pose(); await expect.poll(pose).not.toBe(first);
+  const state = () => media.evaluate((m: HTMLElement) => JSON.parse(m.dataset.modelFrame!) as ModelEvaluation);
+  await panel.getByText('3Dアニメーションを再生', { exact: true }).uncheck(); await expect(media).toHaveAttribute('data-playback', 'paused');
+  const stopped = await state(); await youtube.waitForTimeout(100); expect(await state()).toEqual(stopped);
+  await panel.getByLabel('3Dクロスフェード', { exact: true }).fill('2000'); await panel.getByLabel('3Dクロスフェード', { exact: true }).press('Tab');
+  await panel.getByText('3Dアニメーションを再生', { exact: true }).check(); await panel.getByLabel('3Dクリップ', { exact: true }).selectOption('2');
+  await expect.poll(async () => (await state()).clip).toBe(2); const transition = await state(); expect(transition.previousClip).toBe(0); expect(transition.blend).toBeLessThan(1);
+  await panel.getByLabel('3D再生速度', { exact: true }).fill('1.5'); await panel.getByLabel('3D再生速度', { exact: true }).press('Tab');
+  await panel.locator('.save').click(); await expect(panel.locator('.dirty')).toHaveText('保存済み'); await youtube.reload();
+  await expect(media).toHaveAttribute('data-playback', 'playing'); await expect.poll(async () => (await state()).clip).toBe(2);
+  const saved = await popup.evaluate(async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'] as DesignDocument);
+  expect(saved.decorations[0]).toMatchObject({ model: { clip: 2, speed: 1.5, crossFadeMs: 2000, inPlace: true } });
 });

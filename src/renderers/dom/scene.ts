@@ -251,7 +251,7 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
     shadow.append(style);
     media = createMediaController(doc, (message) => editing?.error(message), (stats) => { if (host) host.dataset.wwMediaStats = JSON.stringify(stats); });
     models = createModelRenderer(doc, (message) => editing?.error(message), (stats) => { if (host) host.dataset.wwModelStats = JSON.stringify(stats); });
-    effects = createEffectController(doc, playback, timeline, applyLayout);
+    effects = createEffectController(doc, playback, timeline, applyLayout, (frame) => models?.evaluate(frame));
     imageLayer = doc.createElement('div'); imageLayer.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:0'; shadow.append(imageLayer);
     groupFrame = doc.createElement('div'); groupFrame.className = 'group-frame'; groupFrame.hidden = true; shadow.append(groupFrame);
     guideNodes = Array.from({ length: 2 }, () => { const node = doc.createElement('div'); node.className = 'guide'; node.hidden = true; shadow!.append(node); return node; });

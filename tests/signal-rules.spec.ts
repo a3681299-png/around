@@ -58,5 +58,5 @@ test('same recorded raw inputs reproduce group/mask/opacity frames, including ba
   const frames = [0, .25, .5, .75, 1, .5, .25, 0].map((progress, index) => { const value = input(progress, index * 50); recorder.capture(scene, value); const result = evaluateWorld(scene, state, value); state = result.state; return result.frame; });
   const recording = recorder.stop()!; expect(replayWorld(JSON.stringify(recording))).toEqual({ state, frames });
   const old = { ...recording, formatVersion: 2, runtimeVersion: '1.0.0', initialState: { ...recording.initialState, runtimeVersion: '1.0.0' }, scene: { decorations: scene.decorations, groups: scene.groups } };
-  expect(parseWorldRecording(old).runtimeVersion).toBe('1.2.0');
+  expect(parseWorldRecording(old).runtimeVersion).toBe('1.3.0');
 });

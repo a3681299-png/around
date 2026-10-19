@@ -1,3 +1,4 @@
+import { parseModelStates } from './models';
 import { isDesignId, parseDesign } from '../design/schema';
 import { evaluateWorld } from './evaluate';
 import type { Fade } from './masks';
@@ -55,8 +56,8 @@ export function parseWorldScene(value: unknown, legacy = false): WorldScene {
   return { decorations: design.decorations, ...(design.groups ? { groups: design.groups } : {}), ...(design.signalRules ? { signalRules: design.signalRules } : {}) };
 }
 export function parseWorldState(value: unknown, scene?: WorldScene): WorldState {
-  const data = record(value, ['runtimeVersion', 'timeMs', 'effects', 'machine', 'motion']);
-  if (data['runtimeVersion'] !== WORLD_RUNTIME_VERSION && data['runtimeVersion'] !== '1.0.0' && data['runtimeVersion'] !== '1.1.0') throw new Error('Unsupported World Runtime version.');
+  const data = record(value, ['runtimeVersion', 'timeMs', 'effects', 'machine', 'motion', 'models']);
+  if (data['runtimeVersion'] !== WORLD_RUNTIME_VERSION && data['runtimeVersion'] !== '1.2.0' && data['runtimeVersion'] !== '1.0.0' && data['runtimeVersion'] !== '1.1.0') throw new Error('Unsupported World Runtime version.');
   const input = record(data['effects'], ['fades', 'visibility']), machine = record(data['machine'], ['video', 'events']);
   const ids = scene && new Set([...scene.decorations, ...scene.groups ?? []].map((layer) => layer.id));
   const entries = (value: unknown) => {
@@ -80,12 +81,12 @@ export function parseWorldState(value: unknown, scene?: WorldScene): WorldState 
   }
   if (machine['video'] !== 'playing' && machine['video'] !== 'paused') throw new Error('Invalid World machine state.');
   return { runtimeVersion: WORLD_RUNTIME_VERSION, timeMs: data['timeMs'] === null ? null : number(data['timeMs']), effects: { fades,
-    visibility: Object.fromEntries(entries(input['visibility']).map(([id, value]) => [id, boolean(value)])) }, machine: { video: machine['video'], events: events(machine['events']) }, ...(motion ? { motion } : {}) };
+    visibility: Object.fromEntries(entries(input['visibility']).map(([id, value]) => [id, boolean(value)])) }, machine: { video: machine['video'], events: events(machine['events']) }, ...(motion ? { motion } : {}), ...(data['models'] === undefined ? {} : { models: parseModelStates(data['models'], ids) }) };
 }
 export function parseWorldRecording(value: unknown): WorldRecording {
   if (typeof value === 'string') { if (value.length > RECORDING_LIMITS.chars) throw new Error('World recording is too large.'); value = JSON.parse(value); }
   const data = record(value, ['format', 'formatVersion', 'runtimeVersion', 'scene', 'initialState', 'inputs']);
-  if (data['format'] !== 'ww-world-inputs' || ![1, 2, 3].includes(data['formatVersion'] as number) || data['runtimeVersion'] !== WORLD_RUNTIME_VERSION && data['runtimeVersion'] !== '1.0.0' && data['runtimeVersion'] !== '1.1.0') throw new Error('Unsupported World recording version.');
+  if (data['format'] !== 'ww-world-inputs' || ![1, 2, 3].includes(data['formatVersion'] as number) || data['runtimeVersion'] !== WORLD_RUNTIME_VERSION && data['runtimeVersion'] !== '1.2.0' && data['runtimeVersion'] !== '1.0.0' && data['runtimeVersion'] !== '1.1.0') throw new Error('Unsupported World recording version.');
   if (!Array.isArray(data['inputs']) || data['inputs'].length > RECORDING_LIMITS.frames) throw new Error('Too many World inputs.');
   const scene = parseWorldScene(data['scene'], data['formatVersion'] === 1), initialState = parseWorldState(data['initialState'], scene);
   const inputs = data['inputs'].map(parseWorldInput);

@@ -101,7 +101,7 @@ export function createTimelineHost(doc: Document, siteId: string, storage: TakeS
       latest = { scene, input, state: result.state }; progress = driverValue(scene, input, result.state);
       if (mode === 'recording') {
         const signature = JSON.stringify([result.state.effects, result.state.machine.video]), boundary = signature !== persistentSignature || Boolean(input.events.length);
-        const historyDependent = [...scene.decorations, ...scene.groups ?? []].some((layer) => layer.motion?.enabled) || scene.signalRules?.some((rule) => rule.enabled && rule.source.signal === 'pointer.speed');
+        const historyDependent = [...scene.decorations, ...scene.groups ?? []].some((layer) => layer.motion?.enabled || layer.kind === 'model3d' && (layer.model.playing || layer.model.look.enabled)) || scene.signalRules?.some((rule) => rule.enabled && rule.source.signal === 'pointer.speed');
         recordInput(scene, input, boundary || Boolean(historyDependent)); persistentSignature = signature;
       }
       if (observers.size || mode === 'recording') emit(false, false);
