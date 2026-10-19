@@ -8,6 +8,7 @@ import { shortcutCommand } from '../src/editor-core/shortcuts';
 import type { DesignDocument } from '../src/design/types';
 import type { EditorAsset, EditorCheckpoint, EditorPorts } from '../src/editor-core/types';
 import { parseEditCommand } from '../src/studio/protocol';
+import { defaultScrollOpacityRule } from '../src/signals/keyframes';
 
 function harness(validateAssets: () => Promise<void> = async () => undefined) {
   let value: DesignDocument | undefined, serial = 0;
@@ -26,6 +27,26 @@ function harness(validateAssets: () => Promise<void> = async () => undefined) {
 }
 const assets = Array.from({ length: 3 }, (_, i) => ({ id: `asset-${String(i).repeat(64)}`, name: `Material ${i}`, width: 200, height: 160 }));
 async function opened() { const h = harness(); await Promise.resolve(); h.editor.setEnabled(true); expect(h.editor.open().ok).toBe(true); await h.editor.import(assets); return h; }
+
+test('signal key edits share gesture history, locks, save/discard and session recovery', async () => {
+  const { editor } = await opened(), id = editor.snapshot().document.decorations[0]!.id, rule = defaultScrollOpacityRule(id);
+  await editor.execute({ type: 'signal-rule', rule }); const before = editor.snapshot().document, count = editor.checkpoint().history.past.length;
+  await editor.execute({ type: 'begin' });
+  for (let i = 1; i <= 10; i++) { const next = structuredClone(rule); next.keyframes[1]!.value = 1 - i * .05; await editor.execute({ type: 'signal-rule', rule: next }); }
+  await editor.execute({ type: 'end' }); expect(editor.checkpoint().history.past).toHaveLength(count + 1);
+  await editor.execute({ type: 'undo' }); expect(editor.snapshot().document).toEqual(before);
+  await editor.execute({ type: 'redo' }); expect(editor.snapshot().document.signalRules![0]!.keyframes[1]!.value).toBe(.5);
+  await editor.execute({ type: 'change', id, patch: { locked: true } }); const locked = editor.snapshot().document;
+  await editor.execute({ type: 'remove-signal-rule', id: rule.id }); expect(editor.snapshot().document).toEqual(locked);
+  await editor.execute({ type: 'change', id, patch: { locked: false } }); await editor.execute({ type: 'save' });
+  await editor.execute({ type: 'remove-signal-rule', id: rule.id }); expect(editor.snapshot().document.signalRules).toBeUndefined(); await editor.execute({ type: 'discard' });
+  expect(editor.snapshot().document.signalRules).toHaveLength(1);
+  const checkpoint = editor.checkpoint(), recovered = harness(); await Promise.resolve(); recovered.editor.setEnabled(true); recovered.editor.open(); await recovered.editor.restore(checkpoint);
+  expect(recovered.editor.snapshot().document.signalRules).toEqual(editor.snapshot().document.signalRules);
+  expect(parseEditCommand({ type: 'signal-rule', rule })).toEqual({ type: 'signal-rule', rule });
+  expect(() => parseEditCommand({ type: 'signal-rule', rule: { ...rule, script: 'alert(1)' } })).toThrow();
+  editor.destroy(); recovered.editor.destroy();
+});
 
 test('Editor Core compiles with no browser APIs and UI modules do not import Chrome', () => {
   execFileSync(process.execPath, ['node_modules/typescript/bin/tsc', '--noEmit', '-p', 'tsconfig.editor-core.json']);

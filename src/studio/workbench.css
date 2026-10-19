@@ -75,6 +75,9 @@ input[type="range"] { height: 16px; accent-color: #a7a8b2; }
 .image-properties[data-empty] input[type="range"] { appearance: none; background: linear-gradient(#6a6b72, #6a6b72) center / 100% 3px no-repeat; opacity: .25; }
 .image-properties[data-empty] input[type="range"]::-webkit-slider-thumb { appearance: none; visibility: hidden; width: 0; height: 0; }
 .image-properties[data-empty] input[type="range"]::-moz-range-thumb { visibility: hidden; width: 0; height: 0; border: 0; }
+.image-properties[data-opacity-driven] [data-image-prop="opacity"] { display: none; }
+.opacity-binding-link { display: none; }
+.image-properties[data-opacity-driven] .opacity-binding-link { display: inline-flex; color: #92c9bc; }
 input[type="color"] { height: 24px; border-radius: 2px; }
 .row { grid-template-columns: 1fr 1fr; gap: 7px; max-width: 320px; }
 .row label { font-size: 11px; }

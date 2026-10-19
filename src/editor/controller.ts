@@ -134,7 +134,7 @@ export function createCreatorEditor(doc: Document, site: SiteAdapter, baseThemeI
     removeSelection(); dispatch({ type: 'select-target', target: target.target.id }); selectedElement = target.element; selectedElement.setAttribute('data-ww-editor-selected', '');
   }
   function onKeyDown(event: KeyboardEvent) {
-    if (!editing() || fullscreen() || panel?.host.hasAttribute('data-ww-scrubbing') || event.isComposing || event.composedPath().some((node) => node instanceof HTMLElement && (node.matches('input,textarea,select,summary,dialog,[role="tab"],[role="separator"],[role="menuitem"]') || node.isContentEditable))) return;
+    if (!editing() || fullscreen() || panel?.host.hasAttribute('data-ww-scrubbing') || event.isComposing || event.composedPath().some((node) => node instanceof HTMLElement && (node.hasAttribute('data-ww-timeline-control') || node.matches('input,textarea,select,summary,dialog,[role="tab"],[role="separator"],[role="menuitem"]') || node.isContentEditable))) return;
     if (state.view.tool === 'browse' && !(panel && event.composedPath().includes(panel.host)) && !['v', 'h'].includes(event.key.toLowerCase())) return;
     const command = shortcutCommand(event, state.view, true);
     if (command) dispatch(command);

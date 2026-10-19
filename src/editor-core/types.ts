@@ -3,6 +3,7 @@ import type { PlacementChange, PlacementFrame, PlacementSample, Point } from '..
 import type { Alignment, Distribution } from '../design/layout';
 import type { HistoryCheckpoint } from '../editor/history';
 import type { AnimationFormat } from '../assets/motion-types';
+import type { SignalRule } from '../signals/keyframes';
 export type EditorTool = 'select' | 'browse' | 'card';
 
 export interface EditorView {
@@ -10,6 +11,7 @@ export interface EditorView {
   images: readonly Decoration[]; groups: readonly GroupLayer[]; image: EditorLayer | undefined;
   inheritedLocked: boolean; groupPositionAvailable: boolean; groupingReason: string; selectedIds: readonly string[];
   canUndo: boolean; canRedo: boolean; snapping: boolean; tool?: EditorTool;
+  signalRules?: readonly SignalRule[];
 }
 export type EditCommand =
   | { type: 'select'; id: string; additive?: boolean; preserve?: boolean }
@@ -24,7 +26,9 @@ export type EditCommand =
   | { type: 'snap'; value: boolean }
   | { type: 'layout'; mode: Alignment | Distribution }
   | { type: 'nudge'; delta: Point }
-  | { type: 'tool'; tool: EditorTool };
+  | { type: 'tool'; tool: EditorTool }
+  | { type: 'signal-rule'; rule: SignalRule }
+  | { type: 'remove-signal-rule'; id: string };
 
 export interface EditorAsset { id: string; name: string; width: number; height: number; animation?: { format: AnimationFormat } }
 export interface EditorStorage<Source> {

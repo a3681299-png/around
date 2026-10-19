@@ -197,3 +197,20 @@ test('panel tools replace floating tools; responsive inspectors and empty contro
     await expect.poll(() => reopened.text('.opacity-value')).toBe('—');
   } finally { await context.close(); }
 });
+
+test('the official panel edits scroll keyframes through the shared Core and retains saved rules', async () => {
+  const { context, page, popup, id, local } = await setup();
+  try {
+    await local.getByRole('button', { name: 'Chromeサイドパネルを開く', exact: true }).click(); const panel = await sidePanelDriver(context, page, id);
+    await panel.files([path.resolve('tests/fixtures/motion/petal.png')]); await expect.poll(() => panel.text('.selected-count')).toBe('1個選択中');
+    await panel.click('.timeline-toggle'); await panel.click('.timeline-connect');
+    await panel.click('[data-key-id="key-middle"]'); await panel.fill('.timeline-key-value', '70');
+    await expect.poll(() => panel.evaluate('document.querySelector("#web-world-themes-creator").shadowRoot.querySelector(".timeline-key-value").value')).toBe('70');
+    await panel.click('.undo'); await expect.poll(() => panel.evaluate('document.querySelector("#web-world-themes-creator").shadowRoot.querySelector(".timeline-key-value").value')).toBe('100');
+    await panel.click('.redo'); await panel.click('.save'); await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
+    await expect(local).not.toBeVisible(); await panel.screenshot('.work/verification/signal-stage2-sidepanel.png');
+    const saved = await popup.evaluate(async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'] as { signalRules: { keyframes: { value: number }[] }[] });
+    expect(saved.signalRules[0]!.keyframes[1]!.value).toBe(.7);
+    await page.reload(); await expect.poll(() => panel.text('.opacity-value')).toBe('スクロールに接続');
+  } finally { await context.close(); }
+});

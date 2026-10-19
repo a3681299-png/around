@@ -5,11 +5,13 @@ import { buttonIcon } from '../editor/icons';
 import { createAssetLibrary } from './asset-library';
 import { transientPreferences } from './preferences';
 import type { StudioHostLayout } from './layout-types';
+import { createSignalTimeline } from './signal-timeline';
+import timelineStyles from './signal-timeline.css';
 
 /** Arrange shared forms/tree/actions, with an empty center for the actual Host. */
 export function createStudioWorkbench(doc: Document, host: HTMLElement, main: HTMLElement, tree: { setActive(active: boolean): void }, actions: PanelActions, options: PanelOptions) {
   const base = createWorkspace(doc, host, main, tree, actions.clearSelection, actions.selectAll, options.preferences ? { preferences: options.preferences } : {});
-  const sheet = doc.createElement('style'); sheet.textContent = styles; host.shadowRoot!.append(sheet);
+  const sheet = doc.createElement('style'); sheet.textContent = styles + timelineStyles; host.shadowRoot!.append(sheet);
   host.setAttribute('data-workbench', ''); host.toggleAttribute('data-inpage', Boolean(options.inPage)); host.removeAttribute('data-split'); host.toggleAttribute('data-sidepanel', Boolean(options.sidePanel)); host.toggleAttribute('data-page-toolbar', Boolean(options.toolbarOnly));
   const get = <T extends HTMLElement>(selector: string) => main.querySelector<T>(selector)!;
   const body = get('.editor-body'), oldHeader = get('header'), toolbar = get('.toolbar'), footer = get('footer');
@@ -93,6 +95,12 @@ export function createStudioWorkbench(doc: Document, host: HTMLElement, main: HT
   const dimensions = doc.createElement('span'); dimensions.className = 'canvas-dimensions';
   footer.replaceChildren(connectionStatus, dirty, status, dimensions);
   const contextMenu = get('.context-menu'); main.replaceChildren(menu, toolbar, body, footer, contextMenu, helpDialog, legacyControls);
+  const timeline = options.toolbarOnly ? undefined : createSignalTimeline(doc, actions, storage, (inset) => host.style.setProperty('--timeline-inset', `${inset}px`));
+  if (timeline) {
+    footer.before(timeline.root);
+    const bindingLink = make('Signal Timelineで不透明度を編集', 'connect', () => { if (!timeline.root.hasAttribute('data-open')) timeline.toggle(); }); bindingLink.classList.add('opacity-binding-link');
+    get('.opacity-value').closest('label')!.append(bindingLink);
+  }
   // Long explanations live in Help; the selected object keeps its actual controls.
   inspector.querySelectorAll<HTMLElement>('.hint:not(.playback-help)').forEach((node) => { node.hidden = true; });
   get('.inspector-empty').textContent = '未選択';
@@ -187,7 +195,7 @@ export function createStudioWorkbench(doc: Document, host: HTMLElement, main: HT
     layoutChanged() { buttonIcon(dock, 'dock', '左右を入れ替える'); layout(); remember(); },
     inspect() { base.inspect(); enforce(); }, context: base.context,
     render(next: PanelState) {
-      state = next; base.render(next); enforce(); if (!options.sidePanel && !options.toolbarOnly) libraryView.render(next);
+      state = next; base.render(next); enforce(); timeline?.render(next); if (!options.sidePanel && !options.toolbarOnly) libraryView.render(next);
       get('.object-type').textContent = next.image ? next.image.kind === 'group' ? 'グループ' : next.image.kind === 'animation' ? next.image.format.toUpperCase() : '画像' : next.selected ? '動画カード' : next.selectedIds.length > 1 ? `${next.selectedIds.length}個選択` : '未選択';
       get('.status').title = next.status;
       inspector.querySelector<HTMLElement>('[aria-label="マスクと振る舞い"]')!.hidden = !next.image;
@@ -196,6 +204,6 @@ export function createStudioWorkbench(doc: Document, host: HTMLElement, main: HT
     setHostLayout(value: StudioHostLayout) {
       if (value.mode === 'fullscreen') { if (helpDialog.open) helpDialog.close(); menu.querySelectorAll<HTMLDetailsElement>('details').forEach((item) => { item.open = false; }); contextMenu.hidden = true; }
       host.toggleAttribute('data-fullscreen', value.mode === 'fullscreen'); host.toggleAttribute('data-layout-fallback', value.mode === 'unavailable'); layout(); localConnection.textContent = (options.hostLabel ?? 'Webサイト') + (value.mode === 'reserved' ? ' · 接続中' : value.mode === 'fullscreen' ? ' · 全画面' : ' · レイアウト待機'); dimensions.textContent = `${Math.round(value.canvas.width)} × ${Math.round(value.canvas.height)}`; dimensions.title = value.mode === 'fullscreen' ? '全画面は動画操作を優先します' : 'ライブキャンバスの作業範囲'; enforce(); },
-    destroy() { alive = false; clearTimeout(timer); if (timer !== undefined) persist(); base.destroy(); libraryView.destroy(); if (helpDialog.open) helpDialog.close(); doc.removeEventListener('pointerdown', closeMenus, true); doc.removeEventListener('keydown', menuKeys, true); doc.defaultView!.removeEventListener('resize', layout); sheet.remove(); },
+    destroy() { alive = false; clearTimeout(timer); if (timer !== undefined) persist(); timeline?.destroy(); base.destroy(); libraryView.destroy(); if (helpDialog.open) helpDialog.close(); doc.removeEventListener('pointerdown', closeMenus, true); doc.removeEventListener('keydown', menuKeys, true); doc.defaultView!.removeEventListener('resize', layout); sheet.remove(); },
   };
 }

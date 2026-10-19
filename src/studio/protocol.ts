@@ -1,6 +1,7 @@
 import type { EditCommand, EditorCheckpoint, EditorSnapshot } from '../editor-core/types';
 import type { DesignTarget } from '../design/types';
 import type { AssetWireFile } from '../assets/protocol';
+import { parseSignalRules } from '../signals/keyframe-schema';
 
 export const STUDIO_PORT = 'web-world-themes:studio-v1';
 export const STUDIO_PROBE = 'web-world-themes:studio-probe';
@@ -20,7 +21,7 @@ export type StudioMessage = StudioUpdate | StudioReply | { type: 'handoff' };
 export function parseEditCommand(value: unknown): EditCommand {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('編集コマンドが不正です。');
   const object = value as Record<string, unknown>;
-  const fields: Record<string, readonly string[]> = { select: ['id', 'additive', 'preserve'], 'select-target': ['target'], 'select-all': [], 'clear-selection': [], group: [], ungroup: [], undo: [], redo: [], discard: [], save: [], close: [], begin: [], end: ['cancel'], change: ['id', 'patch'], style: ['style'], delete: ['id'], duplicate: ['id'], placements: ['changes'], reorder: ['id', 'targetId', 'after'], snap: ['value'], layout: ['mode'], nudge: ['delta'], tool: ['tool'] };
+  const fields: Record<string, readonly string[]> = { select: ['id', 'additive', 'preserve'], 'select-target': ['target'], 'select-all': [], 'clear-selection': [], group: [], ungroup: [], undo: [], redo: [], discard: [], save: [], close: [], begin: [], end: ['cancel'], change: ['id', 'patch'], style: ['style'], delete: ['id'], duplicate: ['id'], placements: ['changes'], reorder: ['id', 'targetId', 'after'], snap: ['value'], layout: ['mode'], nudge: ['delta'], tool: ['tool'], 'signal-rule': ['rule'], 'remove-signal-rule': ['id'] };
   if (typeof object.type !== 'string' || !Object.hasOwn(fields, object.type) || Object.keys(object).some((key) => key !== 'type' && !fields[object.type as string]!.includes(key))) throw new Error('未対応の編集コマンドです。');
   const text = JSON.stringify(object);
   function safe(input: unknown): boolean {
@@ -42,5 +43,7 @@ export function parseEditCommand(value: unknown): EditCommand {
   if (object.type === 'layout' && !['left', 'center-x', 'right', 'top', 'center-y', 'bottom', 'horizontal', 'vertical'].includes(String(object.mode))) throw new Error('整列方法が不正です。');
   if (object.type === 'change' && (!object.patch || typeof object.patch !== 'object' || Array.isArray(object.patch))) throw new Error('プロパティが不正です。');
   if (object.type === 'style' && (!object.style || typeof object.style !== 'object' || Array.isArray(object.style))) throw new Error('外観が不正です。');
+  if (object.type === 'signal-rule') { const rule = object.rule as { target?: { layerId?: unknown } } | undefined; parseSignalRules([rule], new Set(typeof rule?.target?.layerId === 'string' ? [rule.target.layerId] : [])); }
+  if (object.type === 'remove-signal-rule' && typeof object.id !== 'string') throw new Error('接続の識別子が不正です。');
   return JSON.parse(text) as EditCommand;
 }

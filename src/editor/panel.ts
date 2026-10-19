@@ -11,6 +11,7 @@ import { buttonIcon } from './icons';
 import { mountNumberScrub } from './number-scrub';
 import type { EditorTool } from '../editor-core/types';
 import type { StudioHostLayout, StudioInsets } from '../studio/layout-types';
+import type { SignalRule } from '../signals/keyframes';
 
 export type { EditorView as PanelState } from '../editor-core/types';
 import type { EditorView as PanelState } from '../editor-core/types';
@@ -44,6 +45,7 @@ export interface PanelActions {
   selectAll(): void;
   tool(tool: EditorTool): void;
   beginEdit(): void; endEdit(cancel?: boolean): void;
+  signalRule(rule: SignalRule): void; removeSignalRule(id: string): void;
   thumbnail(id: string): Promise<string | undefined>;
 }
 
@@ -261,6 +263,8 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       imageProperties.hidden = !state.image && !(options.fullPage || options.inPage || options.sidePanel || options.toolbarOnly) || state.selected;
       imageProperties.disabled = !state.image || state.saving || Boolean(state.image?.locked) || state.inheritedLocked;
       imageProperties.toggleAttribute('data-empty', !state.image);
+      const opacityDriven = Boolean(state.image && state.signalRules?.some((rule) => rule.enabled && rule.target.layerId === state.image!.id));
+      imageProperties.toggleAttribute('data-opacity-driven', opacityDriven);
       tools.querySelectorAll<HTMLButtonElement>('[data-tool]').forEach((button) => { button.setAttribute('aria-pressed', String(button.dataset.tool === (state.tool ?? 'select'))); });
       const isGroup = state.image?.kind === 'group';
       imageProperties.setAttribute('aria-label', isGroup ? 'グループのプロパティ' : '画像のプロパティ');
@@ -333,6 +337,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       } else if (options.fullPage || options.inPage) {
         imageProperties.querySelectorAll<HTMLInputElement>('input[type="text"],input[type="number"]').forEach((input) => { input.value = ''; }); get<HTMLOutputElement>('.opacity-value').value = '—';
       }
+      if (opacityDriven) setText(get<HTMLOutputElement>('.opacity-value'), 'スクロールに接続');
       properties.disabled = !state.selected || state.saving;
       backgroundToggle.checked = state.style.backgroundColor !== undefined;
       borderToggle.checked = state.style.border !== undefined;

@@ -14,5 +14,6 @@ export function studioActions(dispatch: (command: EditCommand) => void, files: (
     group: () => dispatch({ type: 'group' }), ungroup: () => dispatch({ type: 'ungroup' }), clearSelection: () => dispatch({ type: 'clear-selection' }), selectAll: () => dispatch({ type: 'select-all' }), thumbnail,
     tool: (tool) => dispatch({ type: 'tool', tool }),
     beginEdit: () => dispatch({ type: 'begin' }), endEdit: (cancel = false) => dispatch({ type: 'end', cancel }),
+    signalRule: (rule) => dispatch({ type: 'signal-rule', rule }), removeSignalRule: (id) => dispatch({ type: 'remove-signal-rule', id }),
   };
 }

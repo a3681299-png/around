@@ -7,6 +7,7 @@ import { createHistory } from '../editor/history';
 import { selectLayer } from '../editor/layers';
 import { deleteDocumentLayers, duplicateDocumentLayers, groupLayers, groupingReason, reorderDocument, ungroupLayers } from '../editor/groups';
 import type { EditCommand, EditorCheckpoint, EditorPorts, EditorSnapshot, EditorView, EditorTool } from './types';
+import type { SignalRule } from '../signals/keyframes';
 
 /** Portable, authoritative edit session. All environment access comes through ports. */
 export function createEditorSession<Source extends { readonly length: number }>(ports: EditorPorts<Source>) {
@@ -31,7 +32,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     const group = selectedImageIds.length === 1 ? groups.find((group) => group.id === selectedImageIds[0]) : undefined;
     const image = group ? groupView(group, draft.decorations, frameFor) : selectedImageIds.length === 1 ? draft.decorations.find((layer) => layer.id === selectedImageIds[0]) : undefined;
     return { selected: Boolean(selectedTarget), style: draft.rules.find((rule) => rule.target === selectedTarget)?.style ?? {}, dirty, saving: saving || importing, status, error,
-      images: draft.decorations, groups, image, inheritedLocked: Boolean(image && parentGroup(groups, image.id)?.locked),
+      images: draft.decorations, groups, signalRules: draft.signalRules ?? [], image, inheritedLocked: Boolean(image && parentGroup(groups, image.id)?.locked),
       groupPositionAvailable: Boolean(!group || group.visible && groupMovable(group, draft.decorations) && image && frameFor(image.placement)),
       groupingReason: groupingReason(draft, selectedImageIds), selectedIds: [...selectedImageIds], canUndo: history.canUndo, canRedo: history.canRedo, snapping, tool };
   }
@@ -109,6 +110,18 @@ export function createEditorSession<Source extends { readonly length: number }>(
     if (cancel) { const before = history.cancel(); if (before) updateDraft(before, false); }
     else { history.commit(draft); render(); }
     settleAssets();
+  }
+  function changeSignalRule(value: SignalRule | string) {
+    if (!active || saving || importing) return;
+    const existing = draft.signalRules?.find((rule) => rule.id === (typeof value === 'string' ? value : value.id));
+    const id = typeof value === 'string' ? existing?.target.layerId : value.target.layerId;
+    const layer = [...draft.decorations, ...draft.groups ?? []].find((layer) => layer.id === id);
+    if (!layer || layer.locked || parentGroup(draft.groups ?? [], layer.id)?.locked) return;
+    if (existing && existing.target.layerId !== id) throw new Error('既存ルールの対象を直接変更できません。接続を外してから作り直してください。');
+    const next = parseDesign(draft);
+    next.signalRules = (next.signalRules ?? []).filter((rule) => rule.id !== (typeof value === 'string' ? value : value.id));
+    if (typeof value !== 'string') next.signalRules.push(value);
+    updateDraft(next);
   }
   const undoRedo = (redo: boolean) => {
     if (saving || importing) return;
@@ -311,6 +324,8 @@ export function createEditorSession<Source extends { readonly length: number }>(
       case 'select-all': finishGesture(); clearSelection(); selectedImageIds = rootLayers(draft.decorations, draft.groups ?? []).map((layer) => layer.id); render(); break;
       case 'clear-selection': finishGesture(true); clearSelection(); selectedImageIds = []; render(); break;
       case 'change': { const id = command.id ?? (selectedImageIds.length === 1 ? selectedImageIds[0] : undefined); if (id) changeImage(id, command.patch); break; }
+      case 'signal-rule': changeSignalRule(command.rule); break;
+      case 'remove-signal-rule': changeSignalRule(command.id); break;
       case 'style': change(command.style); break;
       case 'placements': changePlacements(command.changes); break;
       case 'begin': history.begin(draft); render(); break;
