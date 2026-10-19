@@ -81,7 +81,11 @@ test('tools preserve native playback/navigation and numeric scrubbing is one can
   await youtube.keyboard.press('ArrowRight'); expect(Number(await youtube.locator('html').getAttribute('data-player-key-count'))).toBeGreaterThan(keys);
   await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await expect(panel.getByRole('button', { name: '選択・変形', exact: true })).toHaveAttribute('aria-pressed', 'true');
-  const width = panel.getByLabel('画像の幅', { exact: true }), label = width.locator('..'), before = Number(await width.inputValue()), box = (await label.boundingBox())!;
+  const width = panel.getByLabel('画像の幅', { exact: true }), label = width.locator('..');
+  // Import publishes its selection before the final asset lease finishes. Raw
+  // pointer gestures need the same enabled check that fill/click provide.
+  await expect(width).toBeEnabled(); await label.scrollIntoViewIfNeeded();
+  const before = Number(await width.inputValue()), box = (await label.boundingBox())!;
   await youtube.mouse.move(box.x + 5, box.y + box.height / 2); await youtube.mouse.down(); await youtube.mouse.move(box.x + 25, box.y + box.height / 2, { steps: 10 }); await youtube.mouse.up();
   await expect.poll(async () => Number(await width.inputValue())).toBe(before + 20);
   await panel.getByRole('button', { name: '元に戻す', exact: true }).click(); await expect.poll(async () => Number(await width.inputValue())).toBe(before);

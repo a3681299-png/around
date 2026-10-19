@@ -1,0 +1,52 @@
+{
+  "runtime": {
+    "measuredAt": "2026-10-19T06:24:54.075Z",
+    "node": "v24.16.0",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13650HX",
+    "runtimeVersion": "1.3.0",
+    "layers": 8,
+    "imagePursuit": {
+      "samples": 10800,
+      "medianMs": 0.009500000000002728,
+      "p95Ms": 0.012799999999970169
+    },
+    "modelClocksPursuitLocomotionAndLook": {
+      "samples": 10800,
+      "medianMs": 0.011599999999987176,
+      "p95Ms": 0.015700000000038017
+    },
+    "checksum": 21444205.118497886,
+    "excludes": [
+      "Three.js/rendering",
+      "GPU",
+      "DOM",
+      "asset loading/decoding",
+      "browser scheduling"
+    ]
+  },
+  "renderer": {
+    "browser": "153.0.8010.12",
+    "fixture": "Original 8-vertex / 12-triangle, two-bone rig, three clips, shared 1px embedded texture",
+    "instances": 8,
+    "durationMs": 4004.1684000000005,
+    "contexts": 1,
+    "lost": false,
+    "assets": 1,
+    "estimatedGpuAssetBytes": 490,
+    "surfaceBytes": 2880000,
+    "paints": 952,
+    "cpuMs": 3.599999997764826,
+    "maxCpuMs": 71.80000000074506,
+    "calls": 16,
+    "triangles": 192,
+    "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "fps": 28.181796470110577,
+    "p95CpuMs": 4.699999999254942,
+    "geometries": 1,
+    "textures": 9,
+    "gpuMs": 2.033902,
+    "pageTaskCpuPercent": 12.50244620081413,
+    "jsHeapUsedBytes": 11026836,
+    "gpuNote": "gpuMs is a disjoint timer query when available; null means unsupported. Not GPU utilization or peak memory."
+  }
+}

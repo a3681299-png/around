@@ -66,7 +66,7 @@ export function parseWorldState(value: unknown, scene?: WorldScene): WorldState 
   };
   const fades: Record<string, Fade> = Object.fromEntries(entries(input['fades']).map(([id, value]) => {
     const fade = record(value, ['from', 'to', 'start', 'duration']);
-    return [id, { from: number(fade['from'], 0, 1), to: number(fade['to'], 0, 1), start: number(fade['start']), duration: number(fade['duration'], 0, 5000) }];
+    return [id, { from: number(fade['from'], 0, 1), to: number(fade['to'], 0, 1), start: number(fade['start'], -5000), duration: number(fade['duration'], 0, 5000) }];
   }));
   let motion: WorldState['motion'];
   if (data['motion'] !== undefined) {

@@ -6,6 +6,7 @@ import { evaluatePreparedWorld, evaluateWorld, initialWorldState, layoutEffectTa
 import { evaluateLayout } from '../world/layout';
 import type { WorldEvent, WorldFrame, WorldGeometry, WorldInput, WorldLayout, WorldScene, WorldState } from '../world/types';
 import type { TimelineHost } from './timeline';
+import { rebaseWorldClock } from '../world/clock';
 
 export interface WorldHostContext { scene: WorldScene; geometry: WorldGeometry; layout?: WorldLayout; holdTransforms?: boolean }
 /** Browser inputs/scheduling only. The renderer receives data through apply(). */
@@ -16,6 +17,7 @@ export function createWorldSession(doc: Document, playback: PlaybackSource | und
   let evaluatedTargets: readonly WorldEffectTarget[] = [];
   let prepared: WorldLayout | undefined;
   let state = initialWorldState();
+  let wasPreview = false;
   let lifecyclePending = false;
   let lastFrame: WorldFrame | undefined, devtools: ReturnType<typeof createWorldDevtools>;
   let raf: number | undefined, listening = false;
@@ -41,6 +43,9 @@ export function createWorldSession(doc: Document, playback: PlaybackSource | und
   };
   const paint = (time: number) => {
     if (!context || !prepared) return;
+    const overridden = timeline?.preview(context.scene);
+    if (wasPreview && !overridden) state = rebaseWorldClock(state, time);
+    wasPreview = Boolean(overridden);
     if (sources.overflowed && timeline?.recording) timeline.abortRecording('イベント数の上限に達したため録画を停止しました。');
     // Multiple browser callbacks may carry an earlier RAF timestamp in one frame.
     const timeMs = Math.max(state.timeMs ?? 0, time);
@@ -48,8 +53,8 @@ export function createWorldSession(doc: Document, playback: PlaybackSource | und
     if (context.holdTransforms) heldSignals ??= { ...sources.snapshot }; else heldSignals = undefined;
     const input: WorldInput = { ...context.geometry, timeMs, deltaMs: state.timeMs === null ? 0 : timeMs - state.timeMs,
       signals: { ...heldSignals ?? sources.snapshot }, events, environment: { hidden: doc.hidden, reducedMotion: reduced.matches, ...(context.holdTransforms ? { holdTransforms: true } : {}) } };
-    const overridden = timeline?.preview(context.scene), result = overridden ?? evaluatePreparedWorld(prepared, state, input, context.scene.signalRules);
-    if (!overridden) { if (!context.scene.signalRules?.length && !motionActive() && !modelActive()) compare?.(context.scene, state, input, result); devtools?.capture(context.scene, input); timeline?.capture(context.scene, state, input, result); }
+    const result = overridden ?? evaluatePreparedWorld(prepared, state, input, context.scene.signalRules);
+    if (!overridden) { if (!context.scene.signalRules?.length && !motionActive() && !prepared.layers.some((entry) => entry.layer.kind === 'model3d')) compare?.(context.scene, state, input, result); devtools?.capture(context.scene, input); timeline?.capture(context.scene, state, input, result); }
     state = result.state; lastFrame = result.frame; evaluatedTargets = context.scene.signalRules?.length || motionActive() ? layoutEffectTargets(result.frame.layout) : targets;
     apply(result.frame);
     syncSources();

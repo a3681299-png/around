@@ -1,4 +1,16 @@
 import type { AssetInfo } from './validation';
+import { inspectGlb } from './glb';
+
+/** Validate embedded textures without a WebGL context; close every decoded bitmap. */
+export async function validateModelTextures(bytes: Uint8Array, signal?: AbortSignal): Promise<void> {
+  const { json, bin } = inspectGlb(bytes);
+  for (const image of json.images ?? []) {
+    signal?.throwIfAborted(); const v = json.bufferViews[image.bufferView], start = v.byteOffset ?? 0;
+    const bitmap = await cancellable(createImageBitmap(new Blob([bin.slice(start, start + v.byteLength).buffer], { type: image.mimeType })), signal, (b) => b.close());
+    try { if (!bitmap.width || !bitmap.height || bitmap.width > 4096 || bitmap.height > 4096) throw new Error('GLB内の画像寸法が不正です。'); }
+    finally { bitmap.close(); }
+  }
+}
 
 function cancellable<T>(task: Promise<T>, signal?: AbortSignal, releaseLate?: (value: T) => void): Promise<T> {
   if (!signal) return task;
@@ -14,6 +26,7 @@ function cancellable<T>(task: Promise<T>, signal?: AbortSignal, releaseLate?: (v
 /** Validate one frame only; later failures are bounded and handled by playback. */
 export async function validateAnimatedFrames(bytes: Uint8Array, info: AssetInfo, signal?: AbortSignal): Promise<void> {
   signal?.throwIfAborted();
+  if (info.model) { await validateModelTextures(bytes, signal); return; }
   if (!info.animation || info.animation.format === 'lottie') return;
   if (info.animation.format === 'webm') {
     const url = URL.createObjectURL(new Blob([new Uint8Array(bytes).buffer], { type: info.mime })), video = document.createElement('video');

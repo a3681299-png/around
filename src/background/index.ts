@@ -3,6 +3,7 @@ import { ASSET_MESSAGE, type AssetWireFile } from '../assets/protocol';
 import { changeAssets, getAsset, type AssetLease, type StoredAsset } from '../assets/repository';
 import { ASSET_LIMITS, base64ToBytes, bytesToBase64, type AssetMetadata } from '../assets/validation';
 import { inspectAsset } from '../assets/inspect';
+import { validateModelTextures } from '../assets/decode';
 import { validateDesignAssets } from '../assets/design-assets';
 import { isAssetId, isDesignId, parseDesign } from '../design/schema';
 import { saveDesign } from '../storage/designs';
@@ -81,6 +82,7 @@ async function importBatch(input: unknown, lease: AssetLease): Promise<AssetMeta
     size += bytes.length;
     if (size > ASSET_LIMITS.batchBytes) throw new Error('一度に追加する素材は合計32MBまでです。');
     const info = inspectAsset(bytes, file.mime);
+    if (info.model) await validateModelTextures(bytes);
     const blob = new Blob([new Uint8Array(bytes).buffer], { type: info.mime });
     // ServiceWorker has no ImageDecoder. Both boundaries inspect containers;
     // images validate frame 0. Video is probed by the content importer.

@@ -1,0 +1,43 @@
+{
+  "completed": true,
+  "checks": {
+    "stage": "SPA",
+    "browser": "153.0.8010.12",
+    "runStopIdle": true,
+    "exactModelPoseSeekAndLiveIsolation": true,
+    "reconnectStatus": {
+      "connected": "true",
+      "text": "YouTube #1902718102 · 接続中"
+    },
+    "savedReloadAndReconnect": true,
+    "widthsAndNativeSettingsClicks": [
+      1366,
+      1920,
+      1000
+    ],
+    "theater": true,
+    "fullscreen": true,
+    "scroll": true,
+    "spaDocumentPreserved": true,
+    "modelStats": {
+      "contexts": 1,
+      "lost": false,
+      "assets": 1,
+      "instances": 1,
+      "estimatedGpuAssetBytes": 490,
+      "surfaceBytes": 360000,
+      "paints": 97,
+      "cpuMs": 1.1000000014901161,
+      "maxCpuMs": 40.79999999701977,
+      "calls": 2,
+      "triangles": 24,
+      "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "fps": 7.238727190469009,
+      "p95CpuMs": 1.5,
+      "geometries": 1,
+      "textures": 2,
+      "gpuMs": 3.310833
+    },
+    "zeroCleanup": true
+  }
+}

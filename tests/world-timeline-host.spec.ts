@@ -1,3 +1,6 @@
+import { rebaseWorldClock } from '../src/world/clock';
+import { fadeValue } from '../src/world/masks';
+import { parseWorldState } from '../src/world/recording';
 import { test, expect } from '@playwright/test';
 import { createWorldSession } from '../src/host/world-session';
 import { evaluateWorld, initialWorldState, layoutEffectTargets } from '../src/world/evaluate';
@@ -25,4 +28,24 @@ test('paused take fades freeze without self-scheduling RAF; live fades keep adva
     override = false; playing = false; refresh!(); expect(frames.size).toBe(1); expect(applied!.effects[0]!.mask!.intensity).toBeLessThan(frozen.frame.effects[0]!.mask!.intensity);
   } finally { session.destroy(); }
   expect(frames.size).toBe(0);
+});
+
+test('a take from an older document cannot freeze the younger host clock when live resumes', () => {
+  const { scene, inputs } = worldScenario(2); let preview = true, refresh: (() => void) | undefined, applied: WorldFrame | undefined, now = 100;
+  const source = { ...inputs[0]!, timeMs: 100000, deltaMs: 0 }, recorded = evaluateWorld(scene, initialWorldState(), source);
+  const view = { performance: { now: () => now }, matchMedia: () => ({ matches: false, addEventListener() {}, removeEventListener() {} }), requestAnimationFrame() { return 1; }, cancelAnimationFrame() {} };
+  const doc = { hidden: false, defaultView: view, addEventListener() {}, removeEventListener() {} };
+  const timeline = { observing: false, recording: false, playing: false, get overriding() { return preview; }, attach(binding: { refresh(): void }) { refresh = binding.refresh; return () => {}; }, preview: () => preview ? { ...recorded, input: source } : undefined, capture() {} } as unknown as TimelineHost;
+  const session = createWorldSession(doc as unknown as Document, undefined, (f) => { applied = f; }, undefined, timeline);
+  try {
+    session.update(layoutEffectTargets(recorded.frame.layout), { scene, geometry: source }); expect(applied!.timeMs).toBe(100000);
+    preview = false; now = 200; refresh!(); expect(applied!.timeMs).toBe(200);
+    now = 216; refresh!(); expect(applied!.timeMs).toBe(216);
+  } finally { session.destroy(); }
+});
+
+test('rebasing preserves an in-progress fade even when its start precedes the new clock origin', () => {
+  const previous = { ...initialWorldState(), timeMs: 100000, effects: { fades: { mask: { from: 1, to: 0, start: 99800, duration: 500 } }, visibility: {} } };
+  const value = rebaseWorldClock(previous, 50); expect(value.effects.fades['mask']!.start).toBe(-150);
+  expect(fadeValue(value.effects.fades['mask']!, 50)).toBe(fadeValue(previous.effects.fades['mask']!, 100000)); expect(parseWorldState(value)).toEqual(value);
 });

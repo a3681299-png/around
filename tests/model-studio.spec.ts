@@ -1,3 +1,4 @@
+import { modelPoseError } from './helpers/model-assertions';
 import { test, expect } from './fixtures';
 import { modelFixture } from './helpers/model-fixture';
 import type { ModelEvaluation } from '../src/world/models';
@@ -26,7 +27,7 @@ test('standalone Studio configures model pursuit and clips, records/seeks poses,
   await panel.locator('.take-stop').click(); await expect(panel.locator('.take-source')).toHaveText('PREVIEW'); await panel.locator('.take-store').click(); await expect(panel.locator('.take-saved')).toHaveText('テイク保存済み');
   const take = await studio.evaluate(async () => { const list = await chrome.runtime.sendMessage({ type: 'web-world-themes:signal-takes', action: 'list', siteId: 'youtube' }); return (await chrome.runtime.sendMessage({ type: 'web-world-themes:signal-takes', action: 'get', siteId: 'youtube', id: list.value[0].id })).value as SignalTake; });
   const at = take.inputs[Math.floor(take.inputs.length / 2)]!.timeMs - take.inputs[0]!.timeMs, expected = createTakeSampler(design, take).at(at).frame.models![0]!;
-  await panel.locator('.take-position').fill(String(at / 1000)); await panel.locator('.take-position').dispatchEvent('change'); await expect.poll(pose).toEqual(expected);
+  await panel.locator('.take-position').fill(String(at / 1000)); await panel.locator('.take-position').dispatchEvent('change'); await expect.poll(async () => modelPoseError(await pose(), expected)).toBeLessThan(1e-9);
   const held = await pose(); await youtube.mouse.move(900, 650); await youtube.waitForTimeout(100); expect(await pose()).toEqual(held);
   expect((await stored()).decorations[0]!.placement).toEqual(base);
   await panel.locator('.take-live').click(); await panel.getByLabel('3D回転X', { exact: true }).fill('30'); await panel.getByLabel('3D回転X', { exact: true }).press('Tab');

@@ -1,4 +1,4 @@
-import { AnimationMixer, Euler, Quaternion, LoopOnce, LoopRepeat, PropertyBinding, type AnimationAction, type Object3D } from 'three';
+import { AnimationClip, AnimationMixer, Euler, Quaternion, LoopOnce, LoopRepeat, PropertyBinding, type AnimationAction, type Object3D } from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import type { ModelSettings } from '../../models/types';
 import type { ModelEvaluation } from '../../world/models';
@@ -6,20 +6,20 @@ import type { ModelEvaluation } from '../../world/models';
 /** Clip sampling only. Time/transition decisions are supplied by World Runtime. */
 export function createRigPlayer(gltf: GLTF, root: Object3D, inPlace: boolean) {
   const mixer = new AnimationMixer(root);
-  const clips = gltf.animations.map((source) => {
-    const clip = source.clone();
-    if (inPlace) for (const track of clip.tracks) {
-      const parsed = PropertyBinding.parseTrackName(track.name), node = PropertyBinding.findNode(root, parsed.nodeName) as Object3D | null;
-      const bone = node as (Object3D & { isBone?: boolean }) | null;
-      if (parsed.propertyName !== 'position' || !node || !(node === root || node.parent === root || bone?.isBone && !(node.parent as typeof bone)?.isBone)) continue;
-      const stride = track.values.length / track.times.length, cubic = stride === 9;
-      for (let n = 0; n < track.times.length; n++) {
-        if (cubic) { track.values[n * 9] = track.values[n * 9 + 2] = track.values[n * 9 + 6] = track.values[n * 9 + 8] = 0; }
-        const at = n * stride + (cubic ? 3 : 0); track.values[at] = node.position.x; track.values[at + 2] = node.position.z;
-      }
+  const clips = gltf.animations.map((source) => new AnimationClip(source.name, source.duration, source.tracks.map((track) => {
+    if (!inPlace) return track;
+    const parsed = PropertyBinding.parseTrackName(track.name), node = PropertyBinding.findNode(root, parsed.nodeName) as Object3D | null;
+    const bone = node as (Object3D & { isBone?: boolean }) | null;
+    if (parsed.propertyName !== 'position' || !node || !(node === root || node.parent === root || bone?.isBone && !(node.parent as typeof bone)?.isBone)) return track;
+    // Immutable tracks are shared with the asset. Copy only root translations
+    // that In-place actually edits, rather than every clip for every instance.
+    const copy = track.clone(), stride = copy.values.length / copy.times.length, cubic = stride === 9;
+    for (let n = 0; n < copy.times.length; n++) {
+      if (cubic) { copy.values[n * 9] = copy.values[n * 9 + 2] = copy.values[n * 9 + 6] = copy.values[n * 9 + 8] = 0; }
+      const at = n * stride + (cubic ? 3 : 0); copy.values[at] = node.position.x; copy.values[at + 2] = node.position.z;
     }
-    return clip;
-  });
+    return copy;
+  }), source.blendMode));
   const originals: Object3D[] = [], copies: Object3D[] = [], bones = new Map<number, Object3D>();
   gltf.scene.traverse((o) => originals.push(o)); root.traverse((o) => copies.push(o));
   originals.forEach((o, i) => { const node = gltf.parser.associations.get(o)?.nodes; if (node !== undefined && copies[i]) bones.set(node, copies[i]!); });

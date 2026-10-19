@@ -28,7 +28,19 @@ test('external URIs, custom extensions, cycles, broken buffers and decompression
     (j: any) => { j.bufferViews[0].byteLength = 1e9; },
     (j: any) => { j.accessors[0].count = 2e9; },
     (j: any) => { j.animations[0].channels[0].target.node = 99999; },
+    (j: any) => { j.animations[0].channels.push(j.animations[0].channels[0]); },
   ]) expect(() => inspectGlb(modelFixture(mutate))).toThrow();
   const truncated = modelFixture().subarray(0, -4); expect(() => inspectAsset(truncated)).toThrow();
   expect(() => inspectAsset(modelFixture(), 'image/png')).toThrow(/MIME/);
+});
+
+test('shared morph accessors cannot amplify a small file into an unbounded GPU texture', () => {
+  const vertices = 120000, bin = Buffer.alloc(vertices * 3 * 4);
+  for (let i = 0; i < vertices; i++) { bin.writeFloatLE(i % 2, i * 12); bin.writeFloatLE(i % 3, i * 12 + 4); }
+  const json = { asset: { version: '2.0' }, scene: 0, scenes: [{ nodes: [0] }], nodes: [{ mesh: 0 }], meshes: [{ primitives: [{ attributes: { POSITION: 0 }, targets: Array.from({ length: 32 }, () => ({ POSITION: 0 })) }] }],
+    buffers: [{ byteLength: bin.length }], bufferViews: [{ buffer: 0, byteLength: bin.length }], accessors: [{ bufferView: 0, componentType: 5126, type: 'VEC3', count: vertices, min: [0, 0, 0], max: [1, 2, 0] }] };
+  const raw = Buffer.from(JSON.stringify(json)), text = Buffer.concat([raw, Buffer.alloc((4 - raw.length % 4) % 4, 32)]), bytes = Buffer.alloc(28 + text.length + bin.length);
+  bytes.writeUInt32LE(0x46546c67); bytes.writeUInt32LE(2, 4); bytes.writeUInt32LE(bytes.length, 8); bytes.writeUInt32LE(text.length, 12); bytes.writeUInt32LE(0x4e4f534a, 16); text.copy(bytes, 20); bytes.writeUInt32LE(bin.length, text.length + 20); bytes.writeUInt32LE(0x004e4942, text.length + 24); bin.copy(bytes, text.length + 28);
+  expect(bytes.length).toBeLessThan(2 * 1024 * 1024); expect(() => inspectGlb(bytes)).toThrow(/モーフ.*64MiB/);
+  const small = inspectGlb(modelFixture((j) => { j.meshes[0].primitives[0].targets = [{ POSITION: 0 }]; })); expect(small.gpuBytes).toBeGreaterThan(8 * 16);
 });

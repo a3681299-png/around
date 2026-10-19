@@ -13,6 +13,8 @@ test('GLB renders alpha, shares resources, edits/drags/duplicates/undoes, saves 
   const media = youtube.locator(`${overlay} .model-media`); await expect(media).toHaveAttribute('data-renderer', 'three', { timeout: 20000 });
   const alpha = await media.locator('canvas').evaluate((c: HTMLCanvasElement) => { const d = c.getContext('2d')!.getImageData(0, 0, c.width, c.height).data; let filled = 0; for (let i = 3; i < d.length; i += 4) if (d[i]) filled++; return { corner: d[3], filled }; });
   expect(alpha.corner).toBe(0); expect(alpha.filled).toBeGreaterThan(100);
+  const center = await media.locator('canvas').evaluate((c: HTMLCanvasElement) => [...c.getContext('2d')!.getImageData(Math.floor(c.width / 2), Math.floor(c.height / 2), 1, 1).data]);
+  expect(center[1]).toBeGreaterThan(100); expect(center[0]).toBeLessThan(10); expect(center[2]).toBeLessThan(10); // Embedded green texture, not just the purple material factor.
   await panel.getByLabel('3D回転Y', { exact: true }).fill('35'); await panel.getByLabel('3D回転Y', { exact: true }).press('Tab');
   const image = youtube.locator(`${overlay} [data-image-id]`); const before = await image.boundingBox();
   await withCanvas(youtube, async () => { await youtube.mouse.move(before!.x + before!.width / 2, before!.y + before!.height / 2); await youtube.mouse.down(); await youtube.mouse.move(before!.x + before!.width / 2 - 80, before!.y + before!.height / 2 + 50, { steps: 6 }); await youtube.mouse.up(); });
@@ -64,4 +66,12 @@ test('selected head bone adds a bounded look to the paused animated pose and OFF
   await expect.poll(async () => Math.abs((await pose()).lookYaw)).toBeGreaterThan(10); expect(Math.abs((await pose()).lookYaw)).toBeLessThanOrEqual(50);
   await expect.poll(pixels).not.toBe(initial);
   await panel.locator('[data-model="look.enabled"]').uncheck(); await expect.poll(async () => (await pose()).lookYaw).toBe(0); await expect.poll(pixels).toBe(initial);
+});
+
+test('optional glTF node names are not required for cloned rig animation', async ({ popup, youtube }) => {
+  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check(); await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro'); await youtube.bringToFront();
+  await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click()); const panel = youtube.locator('#web-world-themes-creator');
+  await panel.locator('.model-file').setInputFiles({ name: 'Unnamed.glb', mimeType: 'model/gltf-binary', buffer: modelFixture((j) => { j.nodes.forEach((n: { name?: string }) => { delete n.name; }); }) });
+  const media = youtube.locator(`${overlay} .model-media`); await expect(media).toHaveAttribute('data-playback', 'playing');
+  const pixels = () => media.locator('canvas').evaluate((c: HTMLCanvasElement) => c.toDataURL()), first = await pixels(); await expect.poll(pixels).not.toBe(first);
 });

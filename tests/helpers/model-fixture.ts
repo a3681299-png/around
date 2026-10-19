@@ -1,3 +1,4 @@
+import { deflateSync } from 'node:zlib';
 /** Original test rig, authored here; no downloaded or generated character assets. */
 export function modelFixture(mutate?: (json: Record<string, any>) => void): Buffer {
   const chunks: Buffer[] = [], views: Record<string, number>[] = [], accessors: Record<string, unknown>[] = []; let offset = 0;
@@ -13,7 +14,9 @@ export function modelFixture(mutate?: (json: Record<string, any>) => void): Buff
   const idle = floats([0, 0, 0, 1, 0, 0, .08, .996795, 0, 0, 0, 1], 'VEC4', 3);
   const walk = floats([0, 0, 0, 1, 0, 0, 2, 0, 0], 'VEC3', 3);
   const run = floats([0, 0, 0, 1, 0, 0, -.25, .968246, 0, 0, 0, 1], 'VEC4', 3);
-  const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a5YQAAAAASUVORK5CYII=', 'base64');
+  const pngChunk = (kind: string, bytes: Buffer) => { const input = Buffer.concat([Buffer.from(kind), bytes]); let crc = 0xffffffff; for (const b of input) { crc ^= b; for (let k = 0; k < 8; k++) crc = (crc >>> 1) ^ (crc & 1 ? 0xedb88320 : 0); } const header = Buffer.alloc(4), tail = Buffer.alloc(4); header.writeUInt32BE(bytes.length); tail.writeUInt32BE((crc ^ 0xffffffff) >>> 0); return Buffer.concat([header, input, tail]); };
+  const ihdr = Buffer.alloc(13); ihdr.writeUInt32BE(1); ihdr.writeUInt32BE(1, 4); ihdr[8] = 8; ihdr[9] = 6;
+  const png = Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), pngChunk('IHDR', ihdr), pngChunk('IDAT', deflateSync(Buffer.from([0, 0, 255, 0, 255]))), pngChunk('IEND', Buffer.alloc(0))]);
   const imageView = data(png);
   const json: Record<string, any> = { asset: { version: '2.0', generator: 'Web World Themes original test rig' }, scene: 0, scenes: [{ nodes: [0] }],
     nodes: [{ name: 'Character', children: [1, 2] }, { name: 'Body', mesh: 0, skin: 0 }, { name: 'Hips', children: [3] }, { name: 'Head', translation: [0, .25, 0] }],

@@ -3,7 +3,7 @@ export async function captureLayerThumbnail(doc: Document, id: string): Promise<
   const root = doc.getElementById('web-world-themes-decorations')?.shadowRoot;
   const layer = [...root?.querySelectorAll<HTMLElement>('[data-image-id]') ?? []].find((node) => node.dataset.imageId === id);
   const source = layer?.querySelector<HTMLImageElement | HTMLCanvasElement | HTMLVideoElement | SVGSVGElement>('.media img, .media canvas, .media video, .media svg');
-  if (!source) return;
+  if (!source || source instanceof HTMLCanvasElement && source.closest('.model-media') && source.width <= 1) return;
   const canvas = doc.createElement('canvas'); canvas.width = 96; canvas.height = 72;
   const context = canvas.getContext('2d'); if (!context) return;
   let image: CanvasImageSource, width: number, height: number;
