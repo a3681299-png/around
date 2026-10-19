@@ -114,11 +114,12 @@ async function importBatch(input: unknown, lease: AssetLease, decoded?: Uint8Arr
 }
 
 async function handle(message: Record<string, unknown>, sender: chrome.runtime.MessageSender): Promise<unknown> {
-  if (message['action'] === 'get' || message['action'] === 'get-part') {
+  if (message['action'] === 'get' || message['action'] === 'get-part' || message['action'] === 'get-metadata') {
     if (!isAssetId(message['id'])) throw new Error('素材IDが不正です。');
     const asset = await getAsset(message['id']);
     if (!asset) throw new Error('画像素材が見つかりません。');
     const { blob, leases: _leases, ...metadata } = asset;
+    if (message['action'] === 'get-metadata') return metadata;
     if (message['action'] === 'get-part') {
       const offset = message['offset']; if (typeof offset !== 'number' || !Number.isSafeInteger(offset) || offset < 0 || offset >= blob.size || offset % ASSET_LIMITS.chunkBytes) throw new Error('素材の転送位置が不正です。');
       return bytesToBase64(new Uint8Array(await blob.slice(offset, offset + ASSET_LIMITS.chunkBytes).arrayBuffer()));

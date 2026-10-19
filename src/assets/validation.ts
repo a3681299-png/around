@@ -1,4 +1,4 @@
-export const ASSET_LIMITS = Object.freeze({ fileBytes: 32 * 1024 * 1024, modelBytes: 64 * 1024 * 1024, chunkBytes: 1024 * 1024, batchBytes: 64 * 1024 * 1024, batchCount: 8, totalBytes: 256 * 1024 * 1024, count: 128, edge: 4096, pixels: 16 * 1024 * 1024 });
+export const ASSET_LIMITS = Object.freeze({ fileBytes: 32 * 1024 * 1024, modelBytes: 64 * 1024 * 1024, chunkBytes: 4 * 1024 * 1024, batchBytes: 64 * 1024 * 1024, batchCount: 8, totalBytes: 256 * 1024 * 1024, count: 128, edge: 4096, pixels: 16 * 1024 * 1024 });
 export interface ImageInfo { mime: 'image/png' | 'image/webp'; width: number; height: number }
 export interface AssetInfo { mime: 'image/png' | 'image/webp' | 'image/gif' | 'application/json' | 'video/webm' | 'model/gltf-binary'; width: number; height: number; model?: import('../models/types').ModelInfo; animation?: import('./motion-types').AnimationInfo }
 export interface AssetMetadata extends AssetInfo { id: string; name: string; byteLength: number }
@@ -48,13 +48,19 @@ export function inspectImage(data: Uint8Array, declaredMime = ''): ImageInfo {
 }
 
 export function bytesToBase64(data: Uint8Array): string {
+  const native = data as Uint8Array & { toBase64?: () => string };
+  if (native.toBase64) return native.toBase64();
   let binary = '';
   for (let offset = 0; offset < data.length; offset += 16_384) binary += String.fromCharCode(...data.subarray(offset, offset + 16_384));
   return btoa(binary);
 }
 
 export function base64ToBytes(value: unknown): Uint8Array {
-  if (typeof value !== 'string' || value.length > Math.ceil(ASSET_LIMITS.fileBytes / 3) * 4 || !/^[A-Za-z0-9+/]*={0,2}$/.test(value)) throw invalid();
+  if (typeof value !== 'string' || value.length > Math.ceil(ASSET_LIMITS.fileBytes / 3) * 4 || value.length % 4 === 1 || !/^[A-Za-z0-9+/]*={0,2}$/.test(value)) throw invalid();
+  const native = Uint8Array as unknown as { fromBase64?: (value: string) => Uint8Array };
+  if (native.fromBase64) return native.fromBase64(value);
   const binary = atob(value);
-  return Uint8Array.from(binary, (char) => char.charCodeAt(0));
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
 }

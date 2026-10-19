@@ -29,7 +29,7 @@ export function createAssetLibrary(doc: Document, root: HTMLElement, select: (id
         const preview = doc.createElement('span'); preview.className = 'thumbnail'; const url = cache.get(item.assetId);
         if (url) { const img = doc.createElement('img'); img.src = url; img.alt = ''; preview.append(img); } else preview.innerHTML = icon(item.kind === 'model3d' ? 'model3d' : item.kind === 'animation' ? 'animation' : 'image');
         const name = doc.createElement('span'); name.className = 'asset-name'; name.textContent = item.name;
-        const kind = doc.createElement('small'); kind.textContent = item.kind === 'animation' ? item.format.toUpperCase() : item.kind === 'model3d' ? '3D · GLB' : '画像'; button.append(preview, name, kind);
+        const kind = doc.createElement('small'); kind.textContent = item.kind === 'animation' ? item.format.toUpperCase() : item.kind === 'model3d' ? `3D · ${item.source.format.toUpperCase()}` : '画像'; button.append(preview, name, kind);
         button.addEventListener('click', () => select(item.id)); root.append(button);
       });
     }

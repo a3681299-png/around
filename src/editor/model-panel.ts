@@ -27,20 +27,41 @@ export function createModelPanel(doc: Document, change: (patch: ImagePatch) => v
       <div class="property row"><label>左右 <input type="number" data-model="look.yawLimit" aria-label="視線の左右制限" min="0" max="90" step="1">°</label><label>上下 <input type="number" data-model="look.pitchLimit" aria-label="視線の上下制限" min="0" max="80" step="1">°</label></div>
       <div class="property"><label>遅延 <input type="number" data-model="look.lagMs" aria-label="視線の遅延" min="0" max="5000" step="10">ms</label></div>
       <p class="model-help">ボーンのローカルYが上、Zが正面のリグ向け。アニメーションのポーズに加算します。モデルに合わない場合はOFFにしてください。</p>
+    </details>
+    <details class="vrm-options" open><summary>VRM</summary><p class="vrm-capabilities model-help"></p>
+      <div class="property"><label><input type="checkbox" data-model="vrm.lookAt">VRMの眼球・LookAtを使う</label></div>
+      <div class="property"><label><input type="checkbox" data-model="vrm.headFollow">Humanoidの頭も追従</label></div>
+      <div class="property"><label><input type="checkbox" data-model="vrm.springBone">揺れ物（SpringBone）</label></div>
+      <div class="property"><label>表情 <select class="vrm-expression" aria-label="VRM表情"></select></label></div>
+      <div class="property"><label>強さ <input type="number" class="vrm-weight" aria-label="VRM表情の強さ" min="0" max="1" step="0.05"></label></div>
     </details>`;
   let current: ModelDecoration | undefined;
   fieldset.addEventListener('input', (event) => {
     const input = event.target as HTMLInputElement | HTMLSelectElement, path = input.dataset.model, key = path?.split('.')[0] as keyof ModelSettings | undefined;
+    if (input.classList.contains('vrm-expression')) { renderWeight(); return; }
+    if (input.classList.contains('vrm-weight') && current?.model.vrm && input.value !== '' && input.checkValidity()) { const name = fieldset.querySelector<HTMLSelectElement>('.vrm-expression')!.value; if (name) change({ model: { vrm: { expressions: { [name]: Number(input.value) } } } }); return; }
     if (!key || !current || !input.checkValidity() || input.value === '') return;
     const value = input instanceof HTMLInputElement && input.type === 'checkbox' ? input.checked : input.value === 'none' ? null : Number(input.value);
     const child = path?.split('.')[1];
     change({ model: { [key]: child ? { [child]: value } : value } });
   });
   fieldset.querySelectorAll('input[type="number"]').forEach((input) => { input.addEventListener('focus', begin); input.addEventListener('blur', () => end()); });
+  function renderWeight() { const select = fieldset.querySelector<HTMLSelectElement>('.vrm-expression')!, weight = fieldset.querySelector<HTMLInputElement>('.vrm-weight')!; weight.disabled = !select.value; weight.value = String(current?.model.vrm?.expressions[select.value] ?? 0); }
   return { fieldset, render(layer: EditorLayer | undefined) {
     fieldset.hidden = layer?.kind !== 'model3d'; current = layer?.kind === 'model3d' ? layer : undefined; if (!current) return;
     const model = current.model;
-    for (const clip of fieldset.querySelectorAll<HTMLSelectElement>('select')) {
+    const vrm = current.source.vrm; fieldset.querySelector<HTMLElement>('.vrm-options')!.hidden = !vrm;
+    fieldset.querySelector<HTMLSelectElement>('[data-model="look.bone"]')!.disabled = Boolean(vrm);
+    fieldset.querySelector('.model-help')!.textContent = vrm ? 'Humanoidの頭を自動選択。視線の角度・遅延はWorld Runtimeで制御します。' : 'ボーンのローカルYが上、Zが正面のリグ向け。アニメーションのポーズに加算します。モデルに合わない場合はOFFにしてください。';
+    if (vrm) {
+      fieldset.querySelector('.vrm-capabilities')!.textContent = `VRM ${vrm.version} · Humanoid ${vrm.humanoid.length} · ${vrm.mtoon ? 'MToon' : '標準材質'}`;
+      const select = fieldset.querySelector<HTMLSelectElement>('.vrm-expression')!, signature = JSON.stringify(vrm.expressions);
+      if (select.dataset.source !== signature) { const previous = select.value; select.dataset.source = signature; select.replaceChildren(); for (const name of vrm.expressions) { const option = doc.createElement('option'); option.value = name; option.textContent = name; select.append(option); } if (vrm.expressions.includes(previous)) select.value = previous; }
+      if ((fieldset.getRootNode() as ShadowRoot).activeElement !== fieldset.querySelector('.vrm-weight')) renderWeight();
+      fieldset.querySelector<HTMLInputElement>('[data-model="vrm.lookAt"]')!.disabled = !vrm.lookAt;
+      fieldset.querySelector<HTMLInputElement>('[data-model="vrm.springBone"]')!.disabled = !vrm.springBone;
+    }
+    for (const clip of fieldset.querySelectorAll<HTMLSelectElement>('select[data-model]')) {
       if (clip.dataset.model === 'look.bone') {
         const signature = JSON.stringify(current.source.bones); if (clip.dataset.source === signature) continue; clip.dataset.source = signature; clip.replaceChildren();
         const empty = doc.createElement('option'); empty.value = 'none'; empty.textContent = '頭や首のボーンを選択'; clip.append(empty);
@@ -54,8 +75,8 @@ export function createModelPanel(doc: Document, change: (patch: ImagePatch) => v
     fieldset.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-model]').forEach((input) => {
       if ((fieldset.getRootNode() as ShadowRoot).activeElement === input && input.tagName === 'INPUT' && (input as HTMLInputElement).type === 'number') return;
       const [key, child] = input.dataset.model!.split('.'), parent = model[key as keyof ModelSettings];
-      const value = child ? (parent as unknown as Record<string, unknown>)[child] : parent; if (input instanceof HTMLInputElement && input.type === 'checkbox') input.checked = Boolean(value); else input.value = value === null ? 'none' : String(value);
+      const value = child ? (parent as unknown as Record<string, unknown> | undefined)?.[child] : parent; if (input instanceof HTMLInputElement && input.type === 'checkbox') input.checked = Boolean(value); else input.value = value === null ? 'none' : String(value);
     });
-    fieldset.querySelector('.model-empty')!.textContent = current.source.clips.length ? '' : 'このGLBにはアニメーションクリップがありません。';
+    fieldset.querySelector('.model-empty')!.textContent = current.source.clips.length ? '' : vrm ? '内蔵クリップなし。視線・表情・揺れ物は利用できます。' : 'このGLBにはアニメーションクリップがありません。';
   } };
 }

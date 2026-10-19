@@ -197,7 +197,7 @@ export function createStudioWorkbench(doc: Document, host: HTMLElement, main: HT
     inspect() { base.inspect(); enforce(); }, context: base.context,
     render(next: PanelState) {
       state = next; base.render(next); enforce(); timeline?.render(next); if (!options.sidePanel && !options.toolbarOnly) libraryView.render(next);
-      get('.object-type').textContent = next.image ? next.image.kind === 'group' ? 'グループ' : next.image.kind === 'animation' ? next.image.format.toUpperCase() : next.image.kind === 'model3d' ? '3D · GLB' : '画像' : next.selected ? '動画カード' : next.selectedIds.length > 1 ? `${next.selectedIds.length}個選択` : '未選択';
+      get('.object-type').textContent = next.image ? next.image.kind === 'group' ? 'グループ' : next.image.kind === 'animation' ? next.image.format.toUpperCase() : next.image.kind === 'model3d' ? `3D · ${next.image.source.format.toUpperCase()}` : '画像' : next.selected ? '動画カード' : next.selectedIds.length > 1 ? `${next.selectedIds.length}個選択` : '未選択';
       get('.status').title = next.status;
       inspector.querySelector<HTMLElement>('[aria-label="マスクと振る舞い"]')!.hidden = !next.image;
       inspector.querySelector<HTMLElement>('.multi-help')!.hidden = next.selectedIds.length < 2;

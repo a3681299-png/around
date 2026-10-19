@@ -75,10 +75,10 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       <button class="add-image" type="button">画像を追加</button>
       <button class="add-animation" type="button">アニメーションを追加</button>
       <button class="add-model" type="button">3Dモデルを追加</button>
-      <input class="model-file" type="file" accept=".glb,model/gltf-binary" multiple aria-label="3Dモデルを追加" hidden>
+      <input class="model-file" type="file" accept=".glb,.vrm,model/gltf-binary,model/vrm" multiple aria-label="3Dモデルを追加" hidden>
       <input class="file" type="file" accept="image/png,image/webp" multiple aria-label="画像素材を追加" hidden>
       <input class="animation-file" type="file" accept="image/gif,image/png,image/apng,image/webp,video/webm,application/json,.json,.apng" multiple aria-label="アニメーション素材を追加" hidden>
-      <p class="hint asset-hint">ここへ素材をドロップしても追加できます。<span title="PNG・APNG・WebP・GIF・WebM・Lottie JSON・GLB。素材32MB／JSON 1MB、全32レイヤーまで。">対応形式 ⓘ</span></p>
+      <p class="hint asset-hint">ここへ素材をドロップしても追加できます。<span title="PNG・APNG・WebP・GIF・WebM・Lottie JSON・GLB・VRM。通常32MiB／3D 64MiB／JSON 1MiB、全32レイヤーまで。">対応形式 ⓘ</span></p>
     </section>
     <details class="layers-section" open><summary>レイヤー <span class="layer-count"></span></summary>
       <p class="hint selection-tip">行のチェックで複数選択できます。上が手前、つまみをドラッグして並び替え。</p>

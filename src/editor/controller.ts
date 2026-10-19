@@ -10,7 +10,7 @@ import { captureLayerThumbnail } from '../renderers/dom/thumbnail';
 import { createEditorSession } from '../editor-core/session';
 import type { EditCommand, EditorCheckpoint, EditorSnapshot } from '../editor-core/types';
 import { shortcutCommand } from '../editor-core/shortcuts';
-import { createBrowserEditorStorage } from '../browser/storage-adapter';
+import { createBrowserEditorStorage, type BrowserImportSource } from '../browser/storage-adapter';
 import { browserStudioPreferences } from '../browser/preferences';
 import { studioActions } from '../studio/ui-actions';
 import type { StudioLayoutAdapter } from '../studio/layout-types';
@@ -28,7 +28,7 @@ export interface CreatorEditor {
   subscribeTimeline(listener: (update: TimelineUpdate) => void): () => void;
   timelineCommand(owner: string, session: string, command: TimelineCommand): Promise<void>;
   command(owner: string, session: string, revision: number, command: EditCommand): Promise<EditorSnapshot>;
-  import(owner: string, session: string, revision: number, files: readonly File[]): Promise<EditorSnapshot>;
+  import(owner: string, session: string, revision: number, files: BrowserImportSource): Promise<EditorSnapshot>;
   thumbnail(id: string): Promise<string | undefined>;
 }
 const PICK_EVENTS = ['pointerdown', 'pointerup', 'mousedown', 'mouseup', 'click', 'auxclick', 'dblclick'] as const;

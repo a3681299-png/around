@@ -74,7 +74,7 @@ export function evaluateModels(layout: WorldLayout, previous: Readonly<Record<st
     }
     next.phase = phase; next.suspended = !running; state[layer.id] = next; evaluations.push({ ...next, id: layer.id, blend, speedPx });
     const duration = clip === null ? 0 : (layer.source.clips[clip]?.duration ?? 0) * 1000;
-    needsFrame ||= running && model.playing && (blend < 1 || duration > 0 && (model.loop || next.timeMs < duration));
+    needsFrame ||= running && model.playing && (Boolean(layer.source.vrm) || blend < 1 || duration > 0 && (model.loop || next.timeMs < duration));
   }
   return { state, evaluations, needsFrame };
 }

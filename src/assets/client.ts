@@ -47,6 +47,7 @@ export async function loadAsset(id: string): Promise<{ metadata: AssetMetadata; 
   const info = inspectAsset(bytes, result.metadata.mime);
   return { metadata: { ...result.metadata, ...info }, blob: new Blob([new Uint8Array(bytes).buffer], { type: info.mime }) };
 }
+export const loadAssetMetadata = (id: string) => request<AssetMetadata>('get-metadata', { id });
 
 export const retainAssets = (session: string, ids: readonly string[]) => request<void>('lease', { session, ids });
 export const releaseAssets = (session: string) => request<void>('release', { session });

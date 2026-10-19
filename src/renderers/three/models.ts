@@ -2,6 +2,8 @@ import { AmbientLight, Box3, Color, DirectionalLight, Group, LoadingManager, Mes
 import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { clone } from 'three/addons/utils/SkeletonUtils.js';
 import { createRigPlayer } from './rig-player';
+import { VRMLoaderPlugin, VRMUtils } from '@pixiv/three-vrm';
+import { createVrmPlayer, isVrm, disposeInstanceSkeletons } from './vrm-player';
 import type { ModelEvaluation } from '../../world/models';
 import type { WorldFrame } from '../../world/types';
 import { loadAsset } from '../../assets/client';
@@ -9,12 +11,18 @@ import { inspectGlb } from '../../assets/glb';
 import type { Decoration, ModelDecoration } from '../../design/types';
 
 export interface ModelSurface { element: HTMLDivElement; update(layer: Decoration, visible: boolean): void; destroy(): void }
-interface Resource { promise: Promise<GLTF>; value?: GLTF; refs: number; bytes: number; disposed: boolean }
+interface Resource { key: string; promise: Promise<GLTF>; value?: GLTF; refs: number; bytes: number; disposed: boolean }
 function dispose(gltf: GLTF) {
   const geometries = new Set<Mesh['geometry']>(), materials = new Set<Material>(), textures = new Set<Texture>(), skeletons = new Set<{ dispose(): void }>();
+  for (const texture of gltf.userData['wwTextures'] ?? []) if (texture instanceof Texture) textures.add(texture);
   gltf.scenes.forEach((scene) => scene.traverse((node) => {
     const mesh = node as Mesh & { skeleton?: { dispose(): void } }; if (!mesh.isMesh) return; geometries.add(mesh.geometry); if (mesh.skeleton) skeletons.add(mesh.skeleton);
-    (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).forEach((m) => { materials.add(m); Object.values(m).forEach((v: unknown) => { if (v instanceof Texture) textures.add(v); }); });
+    (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).forEach((m) => {
+      materials.add(m); Object.values(m).forEach((v: unknown) => { if (v instanceof Texture) textures.add(v); });
+      // MToon exposes textures through uniforms/getters rather than own fields.
+      const uniforms = (m as Material & { uniforms?: Record<string, { value?: unknown }> }).uniforms;
+      for (const uniform of Object.values(uniforms ?? {})) if (uniform.value instanceof Texture) textures.add(uniform.value);
+    });
   }));
   skeletons.forEach((s) => s.dispose()); geometries.forEach((g) => g.dispose()); materials.forEach((m) => m.dispose());
   const bitmaps = new Set<ImageBitmap>(); textures.forEach((t) => { if (typeof ImageBitmap !== 'undefined' && t.source.data instanceof ImageBitmap) bitmaps.add(t.source.data); t.dispose(); }); bitmaps.forEach((b) => b.close());
@@ -44,29 +52,38 @@ export function createModelRenderer(doc: Document, report: (message: string) => 
   };
   function onLost(event: Event) { event.preventDefault(); lost = true; queries.length = 0; gpuMs = null; cancel(); instances.forEach((i) => { i.element.dataset.playback = 'context-lost'; }); stats(); }
   function onRestored() { lost = false; instances.forEach((i) => { i.dirty = true; i.failed = false; }); schedule(); }
-  const release = (id: string, entry: Resource) => {
-    if (--entry.refs > 0) return; entry.disposed = true; if (cache.get(id) === entry) cache.delete(id); budgetBytes -= entry.bytes; entry.bytes = 0;
+  const release = (entry: Resource) => {
+    if (--entry.refs > 0) return; entry.disposed = true; if (cache.get(entry.key) === entry) cache.delete(entry.key); budgetBytes -= entry.bytes; entry.bytes = 0;
     if (entry.value) dispose(entry.value); stats();
   };
-  const acquire = (id: string) => {
-    const found = cache.get(id); if (found) { found.refs++; return found; }
-    const entry: Resource = { refs: 1, bytes: 0, disposed: false, promise: Promise.resolve(undefined as never) }; cache.set(id, entry);
+  let resourceSerial = 0;
+  const acquire = (id: string, vrm: boolean) => {
+    const key = vrm ? `${id}:vrm:${++resourceSerial}` : id;
+    const found = cache.get(key); if (found) { found.refs++; return found; }
+    const entry: Resource = { key, refs: 1, bytes: 0, disposed: false, promise: Promise.resolve(undefined as never) }; cache.set(key, entry);
     entry.promise = loadAsset(id).then(async ({ blob, metadata }) => {
       if (!metadata.model) throw new Error('GLB素材が見つかりません。');
       if (entry.disposed || closed) throw new Error('読み込みを中止しました。');
       const bytes = new Uint8Array(await blob.arrayBuffer());
       if (entry.disposed || closed) throw new Error('読み込みを中止しました。'); const { gpuBytes } = inspectGlb(bytes);
-      if (budgetBytes + gpuBytes > 128 * 1024 * 1024) throw new Error('3D描画資源の予算128MiBを超えました。ほかのモデルを削除してください。');
+      if (budgetBytes + gpuBytes > 256 * 1024 * 1024) throw new Error('3D描画資源の予算256MiBを超えました。ほかのモデルを削除してください。');
       budgetBytes += gpuBytes; entry.bytes = gpuBytes;
       const manager = new LoadingManager(); manager.setURLModifier((url) => { if (!url.startsWith('blob:')) throw new Error('GLBからの外部アクセスを拒否しました。'); return url; });
       const textures = new Set<Texture>(); let failed = false;
       const releaseTexture = (t: Texture) => { t.dispose(); if (typeof ImageBitmap !== 'undefined' && t.source.data instanceof ImageBitmap) t.source.data.close(); };
       const loader = new GLTFLoader(manager);
+      if (metadata.model.vrm) loader.register((parser) => new VRMLoaderPlugin(parser, { autoUpdateHumanBones: false }));
       loader.register((parser) => ({ name: 'WW_LOCAL_TEXTURE_GUARD', loadTexture(index: number) { return parser.loadTexture(index).then((texture) => { if (!texture) throw new Error('GLB内のテクスチャを読み込めません。'); textures.add(texture); if (failed || entry.disposed || closed) releaseTexture(texture); return texture; }); } }));
       let gltf: GLTF;
       try { gltf = await loader.parseAsync(bytes.buffer, ''); }
       catch (error) { failed = true; textures.forEach(releaseTexture); throw error; }
+      gltf.userData['wwTextures'] = [...textures];
       if (entry.disposed || closed) { dispose(gltf); throw new Error('読み込みを中止しました。'); }
+      if (metadata.model.vrm) {
+        const avatar = isVrm(gltf); if (!avatar) { dispose(gltf); throw new Error('VRMのHumanoidを読み込めませんでした。'); }
+        try { VRMUtils.removeUnnecessaryVertices(avatar.scene); VRMUtils.rotateVRM0(avatar); }
+        catch (error) { dispose(gltf); throw error; }
+      }
       // glTF permits unnamed nodes. Loader tracks then target source UUIDs,
       // which SkeletonUtils.clone regenerates. Give those targets a local name
       // before cloning; keep binary metadata and author-visible names unchanged.
@@ -74,11 +91,11 @@ export function createModelRenderer(doc: Document, report: (message: string) => 
       gltf.scenes.forEach((scene) => scene.traverse((node) => { if (!node.name) { node.name = `ww-node-${node.uuid}`; names.set(node.uuid, node.name); } }));
       gltf.animations.forEach((clip) => clip.tracks.forEach((track) => { const dot = track.name.indexOf('.'), name = names.get(track.name.slice(0, dot)); if (name) track.name = name + track.name.slice(dot); }));
       entry.value = gltf; return gltf;
-    }).catch((error: unknown) => { budgetBytes -= entry.bytes; entry.bytes = 0; if (cache.get(id) === entry) cache.delete(id); throw error; }); return entry;
+    }).catch((error: unknown) => { budgetBytes -= entry.bytes; entry.bytes = 0; if (cache.get(key) === entry) cache.delete(key); throw error; }); return entry;
   };
   interface Instance {
     element: HTMLDivElement; canvas: HTMLCanvasElement; scene: Scene; camera: OrthographicCamera; visual: Group;
-    player?: ReturnType<typeof createRigPlayer>; inPlace?: boolean; evaluation?: ModelEvaluation;
+    player?: ReturnType<typeof createRigPlayer>; vrmPlayer?: ReturnType<typeof createVrmPlayer>; inPlace?: boolean; evaluation?: ModelEvaluation; worldTime?: number;
     root?: Object3D; source?: GLTF; entry?: Resource; layer?: ModelDecoration; assetId: string; visible: boolean; dirty: boolean; failed: boolean; alive: boolean; generation: number;
   }
   const cancel = () => { if (frame !== undefined) view.cancelAnimationFrame(frame); frame = undefined; };
@@ -105,8 +122,9 @@ export function createModelRenderer(doc: Document, report: (message: string) => 
         } const aspect = w / h;
         i.camera.left = -aspect * .75; i.camera.right = aspect * .75; i.camera.top = .75; i.camera.bottom = -.75; i.camera.updateProjectionMatrix();
         const m = i.layer.model; i.visual.rotation.set(m.rotationX * Math.PI / 180, (m.rotationY + (i.evaluation?.yawDeg ?? 0) + (m.locomotion.faceMovement ? m.locomotion.forwardDeg : 0)) * Math.PI / 180, m.rotationZ * Math.PI / 180);
-        if (i.inPlace !== m.inPlace || !i.player) { i.player?.destroy(); i.player = createRigPlayer(i.source!, i.root, m.inPlace); i.inPlace = m.inPlace; }
-        if (i.evaluation) i.player.paint(i.evaluation, m);
+        const avatar = isVrm(i.source!);
+        if (i.inPlace !== m.inPlace || !i.player && !i.vrmPlayer) { i.player?.destroy(); i.vrmPlayer?.destroy(); if (avatar) i.vrmPlayer = createVrmPlayer(i.source!, avatar, m.inPlace); else i.player = createRigPlayer(i.source!, i.root, m.inPlace); i.inPlace = m.inPlace; }
+        if (i.evaluation) { if (i.vrmPlayer) i.element.dataset.vrmPose = JSON.stringify(i.vrmPlayer.paint(i.evaluation, m, i.worldTime ?? 0)); else i.player?.paint(i.evaluation, m); }
         r.render(i.scene, i.camera); calls += r.info.render.calls; triangles += r.info.render.triangles;
         const context = i.canvas.getContext('2d'); if (!context) throw new Error('3D描画用キャンバスを確保できませんでした。');
         context.clearRect(0, 0, w, h); context.drawImage(r.domElement, 0, 0); i.dirty = false;
@@ -128,7 +146,7 @@ export function createModelRenderer(doc: Document, report: (message: string) => 
   return {
     evaluate(world: WorldFrame) {
       const frames = new Map(world.models?.map((f) => [f.id, f]));
-      for (const i of instances) { const value = i.layer && frames.get(i.layer.id); if (value && JSON.stringify(value) !== JSON.stringify(i.evaluation)) { i.evaluation = value; i.dirty = true; } }
+      for (const i of instances) { const value = i.layer && frames.get(i.layer.id); if (value && (JSON.stringify(value) !== JSON.stringify(i.evaluation) || i.layer?.source.vrm && i.layer.model.playing && !value.suspended && i.worldTime !== world.timeMs)) { i.evaluation = value; i.dirty = true; } i.worldTime = world.timeMs; }
       schedule();
     },
     attach(parent: HTMLElement): ModelSurface {
@@ -139,8 +157,8 @@ export function createModelRenderer(doc: Document, report: (message: string) => 
       const visual = new Group(); scene.add(visual);
       const i: Instance = { element, canvas, scene, camera, visual, assetId: '', visible: false, dirty: false, failed: false, alive: true, generation: 0 }; instances.add(i);
       const unload = () => {
-        i.generation++; i.player?.destroy(); delete i.player; if (i.root) { i.root.traverse((o) => { const s = (o as Object3D & { skeleton?: { dispose(): void } }).skeleton; s?.dispose(); }); i.visual.clear(); delete i.root; }
-        if (i.entry) release(i.assetId, i.entry); delete i.entry; delete i.source;
+        i.generation++; i.player?.destroy(); i.vrmPlayer?.destroy(); delete i.player; delete i.vrmPlayer; if (i.root) { if (!i.source || !isVrm(i.source)) disposeInstanceSkeletons(i.root); i.visual.clear(); delete i.root; }
+        if (i.entry) release(i.entry); delete i.entry; delete i.source;
       };
       return { element,
         update(next, visible) {
@@ -150,10 +168,11 @@ export function createModelRenderer(doc: Document, report: (message: string) => 
           i.layer = next; i.dirty ||= changed || visible && !i.visible; i.visible = visible; if (!visible && canvas.width > 1) { canvas.width = canvas.height = 1; stats(); }
           if (i.assetId !== next.assetId) {
             unload(); i.failed = false; i.assetId = next.assetId; const generation = i.generation; i.element.dataset.playback = 'loading';
-            const entry = acquire(next.assetId); i.entry = entry;
+            i.element.dataset.format = next.source.format;
+            const entry = acquire(next.assetId, Boolean(next.source.vrm)); i.entry = entry;
             void entry.promise.then((gltf) => {
               if (!i.alive || generation !== i.generation) return;
-              i.source = gltf; const root = clone(gltf.scene); i.root = root;
+              i.source = gltf; const root = isVrm(gltf) ? gltf.scene : clone(gltf.scene); i.root = root;
               const bounds = new Box3().setFromObject(root), size = bounds.getSize(new Vector3()), center = bounds.getCenter(new Vector3());
               const edge = Math.max(size.x, size.y, size.z); if (!Number.isFinite(edge) || edge < 1e-8) throw new Error('GLBに表示できるメッシュがありません。');
               const normal = new Group(); normal.scale.setScalar(1 / edge); normal.position.copy(center).multiplyScalar(-1 / edge); normal.add(root); i.visual.add(normal);
