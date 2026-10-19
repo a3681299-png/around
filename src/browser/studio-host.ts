@@ -2,6 +2,7 @@ import type { CreatorEditor } from '../editor/controller';
 import type { SiteAdapter } from '../sites/types';
 import { STUDIO_PORT, STUDIO_PROBE, parseEditCommand, type StudioMessage, type StudioRequest } from '../studio/protocol';
 import { ASSET_LIMITS, base64ToBytes } from '../assets/validation';
+import { parseTimelineCommand } from '../timeline/types';
 
 /** Authenticated extension Port; no window messages or page-script command bridge. */
 export function connectStudioHost(doc: Document, site: SiteAdapter, editor: CreatorEditor) {
@@ -28,7 +29,8 @@ export function connectStudioHost(doc: Document, site: SiteAdapter, editor: Crea
         if (!publishPending) { publishPending = true; queueMicrotask(() => { publishPending = false; if (attached && owner && !closed) publish(); }); }
       } else if (!timer && !publishPending) timer = setTimeout(publish, 25);
     });
-    function cleanup() { if (closed) return; closed = true; clearTimeout(timer); unsubscribe(); if (owner) editor.detachStudio(owner); ports.delete(port); if (activePort === port) { activePort = undefined; activeSurface = undefined; } }
+    const unsubscribeTimeline = editor.subscribeTimeline((update) => { if (attached && owner) post({ type: 'timeline', update }); });
+    function cleanup() { if (closed) return; closed = true; clearTimeout(timer); unsubscribe(); unsubscribeTimeline(); if (owner) editor.detachStudio(owner); ports.delete(port); if (activePort === port) { activePort = undefined; activeSurface = undefined; } }
     ports.set(port, cleanup);
     const receive = (raw: unknown) => {
       queue = queue.catch(() => undefined).then(async () => {
@@ -50,10 +52,14 @@ export function connectStudioHost(doc: Document, site: SiteAdapter, editor: Crea
             if (closed) { editor.detachStudio(request.owner); return; }
             attached = true;
             post({ type: 'reply', id: request.id, ok: true, state, checkpoint: checkpoint() });
+            const update = editor.timelineSnapshot(); if (update) post({ type: 'timeline', update });
           } else if (!owner) throw new Error('先に編集対象へ接続してください。');
           else if (request.type === 'surface-visibility') {
             if (!attached || activePort !== port || surface !== 'sidepanel' || typeof request.visible !== 'boolean') throw new Error('Studioの表示状態が不正です。');
             editor.setSidePanelVisible(owner, request.visible); post({ type: 'reply', id: request.id, ok: true });
+          } else if (request.type === 'timeline') {
+            if (!attached || activePort !== port || typeof request.session !== 'string') throw new Error('Studioへ再接続してください。');
+            await editor.timelineCommand(owner, request.session, parseTimelineCommand(request.command)); post({ type: 'reply', id: request.id, ok: true });
           } else if (request.type === 'command') {
             const command = parseEditCommand(request.command), state = await editor.command(owner, request.session, request.revision, command);
             post({ type: 'reply', id: request.id, ok: true, state, ...(lastHistory !== editor.historyVersion ? { checkpoint: checkpoint() } : {}) });

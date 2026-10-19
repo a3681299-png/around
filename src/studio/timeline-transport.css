@@ -1,0 +1,23 @@
+.take-transport { display: flex; align-items: center; margin-left: auto; }
+.take-transport button { flex: none; width: 24px; min-width: 24px; height: 24px; min-height: 24px; padding: 3px; }
+.take-record[aria-pressed="true"] { color: #ff8a8a; background: #64373b; }
+.take-play[aria-pressed="true"] { color: #c6b3ee; background: #514660; }
+.take-details, .take-library { display: flex; flex: none; align-items: center; gap: 4px; padding: 2px 6px; min-height: 28px; border-bottom: 1px solid var(--ui-line); }
+.take-details select, .take-library select { font-size: 10px; height: 23px; min-width: 0; }
+.take-details .timeline-view { width: 116px; }
+.take-details .take-rate { width: 86px; }
+.take-time { margin-left: auto; color: #d8d4df; font-size: 10px; font-variant-numeric: tabular-nums; }
+.take-time input[type="number"] { width: 59px; height: 22px; padding: 2px; }
+.take-source { color: #92c9bc; font-size: 9px; }
+[data-recording] .take-source { color: #ff9b9b; }
+[data-input-preview] .take-source { color: #e9bc70; }
+.take-library button { font-size: 10px; flex: none; }
+.take-library-select { flex: 1; max-width: 260px; }
+.take-library .icon-button { height: 22px; min-width: 22px; min-height: 22px; }
+.take-saved { color: var(--ui-muted); font-size: 9px; white-space: nowrap; }
+.timeline-take-scroll { flex: 1; min-height: 105px; overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; }
+.take-canvas { height: 140px; position: relative; touch-action: none; }
+.take-canvas svg { width: 100%; height: 140px; }
+.take-canvas text { fill: #a3a5ae; font: 10px system-ui, sans-serif; }
+.take-wave { fill: none; stroke: #83cabb; stroke-width: 1.5; }
+@media (max-width: 620px) { .take-saved { display: none; } .signal-timeline:has(.take-transport) .timeline-connection { display: none; } }

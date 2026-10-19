@@ -7,11 +7,12 @@ import { transientPreferences } from './preferences';
 import type { StudioHostLayout } from './layout-types';
 import { createSignalTimeline } from './signal-timeline';
 import timelineStyles from './signal-timeline.css';
+import transportStyles from './timeline-transport.css';
 
 /** Arrange shared forms/tree/actions, with an empty center for the actual Host. */
 export function createStudioWorkbench(doc: Document, host: HTMLElement, main: HTMLElement, tree: { setActive(active: boolean): void }, actions: PanelActions, options: PanelOptions) {
   const base = createWorkspace(doc, host, main, tree, actions.clearSelection, actions.selectAll, options.preferences ? { preferences: options.preferences } : {});
-  const sheet = doc.createElement('style'); sheet.textContent = styles + timelineStyles; host.shadowRoot!.append(sheet);
+  const sheet = doc.createElement('style'); sheet.textContent = styles + timelineStyles + transportStyles; host.shadowRoot!.append(sheet);
   host.setAttribute('data-workbench', ''); host.toggleAttribute('data-inpage', Boolean(options.inPage)); host.removeAttribute('data-split'); host.toggleAttribute('data-sidepanel', Boolean(options.sidePanel)); host.toggleAttribute('data-page-toolbar', Boolean(options.toolbarOnly));
   const get = <T extends HTMLElement>(selector: string) => main.querySelector<T>(selector)!;
   const body = get('.editor-body'), oldHeader = get('header'), toolbar = get('.toolbar'), footer = get('footer');
@@ -95,7 +96,7 @@ export function createStudioWorkbench(doc: Document, host: HTMLElement, main: HT
   const dimensions = doc.createElement('span'); dimensions.className = 'canvas-dimensions';
   footer.replaceChildren(connectionStatus, dirty, status, dimensions);
   const contextMenu = get('.context-menu'); main.replaceChildren(menu, toolbar, body, footer, contextMenu, helpDialog, legacyControls);
-  const timeline = options.toolbarOnly ? undefined : createSignalTimeline(doc, actions, storage, (inset) => host.style.setProperty('--timeline-inset', `${inset}px`));
+  const timeline = options.toolbarOnly ? undefined : createSignalTimeline(doc, actions, storage, (inset) => host.style.setProperty('--timeline-inset', `${inset}px`), options.timeline);
   if (timeline) {
     footer.before(timeline.root);
     const bindingLink = make('Signal Timelineで不透明度を編集', 'connect', () => { if (!timeline.root.hasAttribute('data-open')) timeline.toggle(); }); bindingLink.classList.add('opacity-binding-link');

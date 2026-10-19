@@ -3,9 +3,11 @@ import type { StudioPreferences } from './preferences';
 import { defaultScrollOpacityRule, type SignalRule, type SignalKeyframe } from '../signals/keyframes';
 import { sampleKeyframes, clampUnit } from '../world/keyframes';
 import { buttonIcon } from '../editor/icons';
+import type { TimelinePort } from '../timeline/types';
+import { createTimelineTransport } from './timeline-transport';
 
 /** One authoring UI for every Studio surface; commands, never host APIs. */
-export function createSignalTimeline(doc: Document, actions: PanelActions, preferences: StudioPreferences, onHeight: (inset: number) => void = () => undefined) {
+export function createSignalTimeline(doc: Document, actions: PanelActions, preferences: StudioPreferences, onHeight: (inset: number) => void = () => undefined, timelinePort?: TimelinePort) {
   const root = doc.createElement('section'); root.className = 'signal-timeline'; root.setAttribute('aria-label', 'Signal Timeline'); root.setAttribute('data-ww-timeline-control', '');
   root.innerHTML = `<div class="timeline-resize" tabindex="0" role="separator" aria-label="タイムラインの高さ" aria-orientation="horizontal" aria-valuemin="240" aria-valuemax="480"></div>
     <div class="timeline-heading"><button type="button" class="timeline-toggle" aria-expanded="false">▸ Signal Timeline</button><span class="timeline-connection">スクロール ↔ 不透明度</span><span class="timeline-selection"></span></div>
@@ -21,7 +23,9 @@ export function createSignalTimeline(doc: Document, actions: PanelActions, prefe
   const enabled = get<HTMLInputElement>('.timeline-enabled input'), add = get<HTMLButtonElement>('.timeline-add-key'), removeKey = get<HTMLButtonElement>('.timeline-delete-key'), remove = get<HTMLButtonElement>('.timeline-remove');
   buttonIcon(add, 'add', '再生ヘッドの位置にキーを追加'); buttonIcon(removeKey, 'delete', '選択キーを削除', 'Delete'); buttonIcon(remove, 'unlink', 'スクロールとの接続を外す');
   let state: PanelState | undefined, selectedKey: string | undefined, optimistic: SignalRule | undefined, layerId: string | undefined;
-  let open = false, height = 260, zoom = 1, cursor = .5, alive = true, dirtyPreferences = false, saveTimer: ReturnType<typeof setTimeout> | undefined;
+  let open = false, height = timelinePort ? 340 : 260, zoom = 1, cursor = .5, alive = true, dirtyPreferences = false, saveTimer: ReturnType<typeof setTimeout> | undefined;
+  let transport: ReturnType<typeof createTimelineTransport> | undefined;
+  const minHeight = timelinePort ? 300 : 240;
   let frame: number | undefined, pending: SignalRule | undefined;
   let gesture: { pointer: number; id: string; x: number; y: number; key: SignalKeyframe; rule: SignalRule; moved: boolean } | undefined;
   let sizeGesture: { pointer: number; y: number; height: number } | undefined;
@@ -30,7 +34,7 @@ export function createSignalTimeline(doc: Document, actions: PanelActions, prefe
   const remember = () => { dirtyPreferences = true; clearTimeout(saveTimer); saveTimer = setTimeout(persist, 100); };
   const model = () => state?.signalRules?.find((rule) => rule.target.layerId === layerId);
   const rule = () => optimistic ?? model();
-  const locked = () => !state?.image || state.saving || state.inheritedLocked || state.image.locked;
+  const locked = () => !state?.image || state.saving || state.inheritedLocked || state.image.locked || Boolean(transport?.recording);
   const feedback = (message: string) => { get('.timeline-feedback').textContent = message; };
   const clone = (current: SignalRule): SignalRule => JSON.parse(JSON.stringify(current)) as SignalRule;
   const round = (n: number) => Math.round(clampUnit(n) * 10000) / 10000;
@@ -39,7 +43,7 @@ export function createSignalTimeline(doc: Document, actions: PanelActions, prefe
   function schedule(next: SignalRule) { pending = next; optimistic = clone(next); draw(); if (frame === undefined) frame = doc.defaultView!.requestAnimationFrame(() => { frame = undefined; flush(); }); }
   function metrics() { const width = Math.max(280, scroll.clientWidth) * zoom; return { width, left: 28, top: 14, plotWidth: width - 44, plotHeight: 90 }; }
   function position(clientX: number, clientY: number) { const m = metrics(), rect = canvas.getBoundingClientRect(); return { input: round((clientX - rect.left - m.left) / m.plotWidth), value: round(1 - (clientY - rect.top - m.top) / m.plotHeight) }; }
-  function updateOpen() { const shownHeight = Math.min(height, doc.defaultView!.innerHeight * .65); body.hidden = !open; root.toggleAttribute('data-open', open); toggle.setAttribute('aria-expanded', String(open)); toggle.textContent = `${open ? '▾' : '▸'} Signal Timeline`; root.style.setProperty('--timeline-height', `${shownHeight}px`); onHeight(open ? shownHeight + 32 : 28); get('.timeline-resize').setAttribute('aria-valuenow', String(height)); if (open) draw(); }
+  function updateOpen() { const shownHeight = Math.min(height, doc.defaultView!.innerHeight * .65); body.hidden = !open; root.toggleAttribute('data-open', open); toggle.setAttribute('aria-expanded', String(open)); toggle.textContent = `${open ? '▾' : '▸'} Signal Timeline`; root.style.setProperty('--timeline-height', `${shownHeight}px`); onHeight(open ? shownHeight + 32 : 28); get('.timeline-resize').setAttribute('aria-valuenow', String(height)); transport?.expanded(open); if (open) draw(); }
   toggle.addEventListener('click', () => { open = !open; updateOpen(); remember(); });
   connect.addEventListener('click', () => { if (locked() || !layerId) return; const next = defaultScrollOpacityRule(layerId); selectedKey = next.keyframes[1]!.id; cursor = .5; commit(next); feedback('0% → 0%、50% → 100%、100% → 0%。実ページをスクロールして確認できます。'); });
   enabled.addEventListener('change', () => { const current = rule(); if (current && !locked()) commit({ ...clone(current), enabled: enabled.checked }); });
@@ -56,16 +60,16 @@ export function createSignalTimeline(doc: Document, actions: PanelActions, prefe
   add.addEventListener('click', () => addKey(cursor));
   const deleteKey = () => { const current = rule(); if (!current || locked() || !selectedKey || current.keyframes.length < 2) return; const next = clone(current); next.keyframes = next.keyframes.filter((key) => key.id !== selectedKey); selectedKey = undefined; commit(next); feedback('キーを削除しました。'); };
   removeKey.addEventListener('click', deleteKey);
-  const selectKey = (event: Event) => { const button = (event.target as Element).closest<HTMLElement>('[data-key-id]'), key = rule()?.keyframes.find((key) => key.id === button?.dataset.keyId); if (key) { selectedKey = key.id; cursor = key.input; draw(); } };
+  const selectKey = (event: Event) => { const button = (event.target as Element).closest<HTMLElement>('[data-key-id]'), key = rule()?.keyframes.find((key) => key.id === button?.dataset.keyId); if (key) { selectedKey = key.id; cursor = key.input; if (event.type === 'click') transport?.preview(cursor); draw(); } };
   keys.addEventListener('click', selectKey); keys.addEventListener('focusin', selectKey);
   canvas.addEventListener('dblclick', (event) => { if (!(event.target as Element).closest('.timeline-key')) { const point = position(event.clientX, event.clientY); addKey(point.input, point.value); } });
   canvas.addEventListener('pointerdown', (event) => {
     if (event.button !== 0) return;
     const button = (event.target as Element).closest<HTMLElement>('[data-key-id]'), current = rule();
-    if (!button || !current) { cursor = position(event.clientX, event.clientY).input; draw(); return; }
+    if (!button || !current) { cursor = position(event.clientX, event.clientY).input; transport?.preview(cursor); draw(); return; }
     selectedKey = button.dataset.keyId; const key = current.keyframes.find((key) => key.id === selectedKey)!; cursor = key.input;
     if (!locked()) { gesture = { pointer: event.pointerId, id: key.id, x: event.clientX, y: event.clientY, key: { ...key }, rule: clone(current), moved: false }; canvas.setPointerCapture(event.pointerId); }
-    draw(); event.preventDefault(); button.focus({ preventScroll: true });
+    transport?.preview(cursor); draw(); event.preventDefault(); button.focus({ preventScroll: true });
   });
   canvas.addEventListener('pointermove', (event) => {
     if (!gesture || event.pointerId !== gesture.pointer || locked()) return;
@@ -75,7 +79,7 @@ export function createSignalTimeline(doc: Document, actions: PanelActions, prefe
     const m = metrics(), next = clone(gesture.rule), key = next.keyframes.find((key) => key.id === gesture!.id)!;
     const x = round(gesture.key.input + dx / m.plotWidth);
     key.input = next.keyframes.some((candidate) => candidate.id !== key.id && Math.abs(candidate.input - x) < .0001) ? key.input : x; key.value = round(gesture.key.value - dy / m.plotHeight);
-    next.keyframes.sort((a, b) => a.input - b.input); cursor = key.input; schedule(next); event.preventDefault();
+    next.keyframes.sort((a, b) => a.input - b.input); cursor = key.input; schedule(next); transport?.preview(cursor); event.preventDefault();
   });
   function finish(cancel = false) { const current = gesture; gesture = undefined; flush(); if (current?.moved) { actions.endEdit(cancel); if (cancel) optimistic = undefined; } if (current && canvas.hasPointerCapture(current.pointer)) canvas.releasePointerCapture(current.pointer); draw(); }
   canvas.addEventListener('pointerup', () => finish()); canvas.addEventListener('pointercancel', () => finish(true)); canvas.addEventListener('lostpointercapture', () => { if (gesture) finish(true); });
@@ -92,12 +96,13 @@ export function createSignalTimeline(doc: Document, actions: PanelActions, prefe
   get<HTMLInputElement>('.timeline-zoom').addEventListener('input', (event) => { zoom = Number((event.target as HTMLInputElement).value); draw(); remember(); });
   const resize = get('.timeline-resize');
   resize.addEventListener('pointerdown', (event) => { if (event.button !== 0) return; sizeGesture = { pointer: event.pointerId, y: event.clientY, height }; resize.setPointerCapture(event.pointerId); event.preventDefault(); });
-  resize.addEventListener('pointermove', (event) => { if (sizeGesture) { height = Math.max(240, Math.min(480, sizeGesture.height + sizeGesture.y - event.clientY)); updateOpen(); } });
+  resize.addEventListener('pointermove', (event) => { if (sizeGesture) { height = Math.max(minHeight, Math.min(480, sizeGesture.height + sizeGesture.y - event.clientY)); updateOpen(); } });
   const finishSize = () => { if (sizeGesture) remember(); sizeGesture = undefined; }; resize.addEventListener('pointerup', finishSize); resize.addEventListener('pointercancel', finishSize); resize.addEventListener('lostpointercapture', finishSize);
-  resize.addEventListener('keydown', (event) => { if (['ArrowUp', 'ArrowDown'].includes(event.key)) { height = Math.max(240, Math.min(480, height + (event.key === 'ArrowUp' ? 20 : -20))); updateOpen(); remember(); event.preventDefault(); event.stopPropagation(); } });
+  resize.addEventListener('keydown', (event) => { if (['ArrowUp', 'ArrowDown'].includes(event.key)) { height = Math.max(minHeight, Math.min(480, height + (event.key === 'ArrowUp' ? 20 : -20))); updateOpen(); remember(); event.preventDefault(); event.stopPropagation(); } });
   root.addEventListener('keydown', (event) => {
     if (event.isComposing || (event.target as Element).matches('input,select,textarea,[role=separator]')) return;
-    if ((event.ctrlKey || event.metaKey) && ['z', 'y'].includes(event.key.toLowerCase())) { if (event.shiftKey || event.key.toLowerCase() === 'y') actions.redo(); else actions.undo(); }
+    if (event.key === ' ' && transport) transport.togglePlay();
+    else if ((event.ctrlKey || event.metaKey) && ['z', 'y'].includes(event.key.toLowerCase())) { if (event.shiftKey || event.key.toLowerCase() === 'y') actions.redo(); else actions.undo(); }
     else if (event.key === 'Delete' || event.key === 'Backspace') deleteKey();
     else if (event.key === 'Escape') { if (gesture) finish(true); else { selectedKey = undefined; draw(); } }
     else if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key) && selectedKey) {
@@ -117,6 +122,7 @@ export function createSignalTimeline(doc: Document, actions: PanelActions, prefe
     if (doc.activeElement !== input && doc.activeElement?.shadowRoot?.activeElement !== input) input.value = key ? String(Math.round(key.input * 10000) / 100) : '';
     if (doc.activeElement !== value && doc.activeElement?.shadowRoot?.activeElement !== value) value.value = key ? String(Math.round(key.value * 10000) / 100) : '';
     easing.value = key?.easing ?? 'linear';
+    transport?.setEditable(Boolean(state && !state.saving)); transport?.render();
     if (!open) return;
     const m = metrics(); canvas.style.width = `${m.width}px`; graph.setAttribute('viewBox', `0 0 ${m.width} 140`);
     const x = (p: number) => m.left + p * m.plotWidth, y = (v: number) => m.top + (1 - v) * m.plotHeight;
@@ -135,10 +141,12 @@ export function createSignalTimeline(doc: Document, actions: PanelActions, prefe
       button.title = `進捗 ${Math.round(key.input * 10000) / 100}% → 不透明度 ${Math.round(key.value * 10000) / 100}%`; button.setAttribute('aria-label', button.title);
     }
   }
+  if (timelinePort) transport = createTimelineTransport(doc, root, timelinePort, { redraw: draw, cursor(progress) { cursor = progress; if (open && !transport?.timeView) { const m = metrics(), x = m.left + progress * m.plotWidth; graph.querySelector('.timeline-cursor')?.setAttribute('x1', String(x)); graph.querySelector('.timeline-cursor')?.setAttribute('x2', String(x)); } }, zoom: () => zoom });
+  get('.timeline-resize').setAttribute('aria-valuemin', String(minHeight));
   const observer = new ResizeObserver(() => { if (open) draw(); }); observer.observe(scroll);
   doc.defaultView!.addEventListener('resize', updateOpen);
-  void preferences.read(preferenceKey).then((raw) => { if (!alive || dirtyPreferences || !raw || typeof raw !== 'object') return; const saved = raw as Record<string, unknown>; if (typeof saved.open === 'boolean') open = saved.open; if (typeof saved.height === 'number' && Number.isFinite(saved.height)) height = Math.max(240, Math.min(480, saved.height)); if (typeof saved.zoom === 'number' && Number.isFinite(saved.zoom)) zoom = Math.max(1, Math.min(8, saved.zoom)); get<HTMLInputElement>('.timeline-zoom').value = String(zoom); updateOpen(); }, () => undefined);
+  void preferences.read(preferenceKey).then((raw) => { if (!alive || dirtyPreferences || !raw || typeof raw !== 'object') return; const saved = raw as Record<string, unknown>; if (typeof saved.open === 'boolean') open = saved.open; if (typeof saved.height === 'number' && Number.isFinite(saved.height)) height = Math.max(minHeight, Math.min(480, saved.height)); if (typeof saved.zoom === 'number' && Number.isFinite(saved.zoom)) zoom = Math.max(1, Math.min(8, saved.zoom)); get<HTMLInputElement>('.timeline-zoom').value = String(zoom); updateOpen(); }, () => undefined);
   updateOpen();
   return { root, render(next: PanelState) { if (layerId !== next.image?.id) { if (gesture) finish(true); optimistic = undefined; selectedKey = undefined; } state = next; layerId = next.image?.id; if (optimistic && JSON.stringify(optimistic) === JSON.stringify(model())) optimistic = undefined; draw(); },
-    toggle() { open = !open; updateOpen(); remember(); }, destroy() { finish(true); alive = false; flush(); clearTimeout(saveTimer); if (dirtyPreferences) persist(); observer.disconnect(); doc.defaultView!.removeEventListener('resize', updateOpen); root.remove(); } };
+    toggle() { open = !open; updateOpen(); remember(); }, destroy() { finish(true); alive = false; transport?.destroy(); flush(); clearTimeout(saveTimer); if (dirtyPreferences) persist(); observer.disconnect(); doc.defaultView!.removeEventListener('resize', updateOpen); root.remove(); } };
 }

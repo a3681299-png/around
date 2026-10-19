@@ -2,6 +2,7 @@ import type { EditCommand, EditorCheckpoint, EditorSnapshot } from '../editor-co
 import type { DesignTarget } from '../design/types';
 import type { AssetWireFile } from '../assets/protocol';
 import { parseSignalRules } from '../signals/keyframe-schema';
+import type { TimelineCommand, TimelineUpdate } from '../timeline/types';
 
 export const STUDIO_PORT = 'web-world-themes:studio-v1';
 export const STUDIO_PROBE = 'web-world-themes:studio-probe';
@@ -12,10 +13,11 @@ export type StudioRequest =
   | { id: number; type: 'command'; session: string; revision: number; command: EditCommand }
   | { id: number; type: 'import'; session: string; revision: number; files: AssetWireFile[] }
   | { id: number; type: 'thumbnail'; layer: string }
+  | { id: number; type: 'timeline'; session: string; command: TimelineCommand }
   | { id: number; type: 'detach' };
 export interface StudioUpdate { type: 'state'; state: EditorSnapshot; checkpoint?: EditorCheckpoint }
 export interface StudioReply { type: 'reply'; id: number; ok: boolean; error?: string; state?: EditorSnapshot; checkpoint?: EditorCheckpoint; thumbnail?: string }
-export type StudioMessage = StudioUpdate | StudioReply | { type: 'handoff' };
+export type StudioMessage = StudioUpdate | StudioReply | { type: 'handoff' } | { type: 'timeline'; update: TimelineUpdate };
 
 /** Reject unrecognized command keys, executable values and unbounded messages. */
 export function parseEditCommand(value: unknown): EditCommand {

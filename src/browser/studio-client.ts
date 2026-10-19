@@ -5,11 +5,23 @@ import { ASSET_LIMITS, bytesToBase64 } from '../assets/validation';
 import type { StudioConnectionState, StudioConnection } from '../studio/connection';
 import { requestStudioSurface } from './side-panel';
 import { CLOSE_SIDE_PANEL, OPEN_SIDE_PANEL, OPEN_STUDIO_WINDOW, OPEN_INPAGE_STUDIO, type OpenEditorResponse } from '../editor/messages';
+import type { TimelinePort, TimelineCommand, TimelineUpdate } from '../timeline/types';
 export function createStudioClient(notify: (value: StudioConnectionState) => void, checkpointChanged: (target: number, checkpoint: EditorCheckpoint | undefined) => void, visibilityDocument?: Document): StudioConnection {
   const owner = `studio-${crypto.randomUUID()}`;
   let port: chrome.runtime.Port | undefined, tabId: number | undefined, state: EditorSnapshot | undefined, backup: EditorCheckpoint | undefined;
   let connected = false, stopped = false, epoch = 0, serial = 0, retry: ReturnType<typeof setTimeout> | undefined, retries = 0;
   let commands: Promise<void> = Promise.resolve();
+  let observed = false, timelineState: TimelineUpdate = { status: { available: false, mode: 'live', source: 'live', timeMs: 0, durationMs: 0, samples: 0, progress: 0, rate: 1, saved: false, message: '', error: false }, take: null, library: [] };
+  const timelineListeners = new Set<(value: TimelineUpdate) => void>();
+  const useTimeline = (value: TimelineUpdate) => { timelineState = { ...timelineState, ...value }; timelineListeners.forEach((listener) => listener(value)); };
+  const timeline: TimelinePort = { snapshot: () => timelineState, subscribe(listener) { timelineListeners.add(listener); return () => timelineListeners.delete(listener); },
+    dispatch(value: TimelineCommand) {
+      if (value.type === 'observe') observed = value.value;
+      const generation = epoch;
+      commands = commands.catch(() => undefined).then(async () => { if (generation !== epoch || !connected || !state?.active) return; await request({ type: 'timeline', session: state.sessionId, command: value } as Omit<StudioRequest, 'id'>); })
+        .catch((reason: unknown) => { if (generation === epoch) useTimeline({ status: { ...timelineState.status, error: true, message: reason instanceof Error ? reason.message : 'タイムライン通信に失敗しました。' } }); });
+      return commands;
+    } };
   const pending = new Map<number, { resolve: (message: Extract<StudioMessage, { type: 'reply' }>) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
   const emit = (message: string) => notify({ target: tabId, connected, message, ...(state ? { state } : {}) });
   const useState = (next: EditorSnapshot, checkpoint?: EditorCheckpoint) => {
@@ -44,6 +56,7 @@ export function createStudioClient(notify: (value: StudioConnectionState) => voi
       next.onMessage.addListener((message: StudioMessage) => {
         if (generation !== epoch || port !== next || !message || typeof message !== 'object') return;
         if (message.type === 'handoff') { stopped = true; disconnect(); emit('別のStudioへ編集を引き継ぎました。未保存の変更と履歴は対象タブで保持しています。'); return; }
+        if (message.type === 'timeline') { useTimeline(message.update); return; }
         if (message.type === 'state') { useState(message.state, message.checkpoint); emit(message.state.active ? '接続中' : message.state.enabled ? '編集を終了しました。接続ボタンで再開できます。' : 'テーマがOFFまたは強さ0%です。'); }
         else if (message.type === 'reply') {
           const entry = pending.get(message.id); if (!entry) return; pending.delete(message.id); clearTimeout(entry.timer);
@@ -56,14 +69,14 @@ export function createStudioClient(notify: (value: StudioConnectionState) => voi
         if (generation !== epoch || port !== next) return;
         // Queued commands and file reads belong to the disconnected document.
         epoch++;
-        port = undefined; connected = false;
+        port = undefined; connected = false; useTimeline({ status: { ...timelineState.status, available: false, mode: 'paused', message: '編集対象との再接続を待っています。' } });
         pending.forEach((entry) => { clearTimeout(entry.timer); entry.reject(new Error('YouTubeとの接続が切れました。')); }); pending.clear();
         emit('再接続を待っています。未保存の編集は保持しています。');
         if (!stopped) retry = setTimeout(() => { void connect(); }, Math.min(5000, 300 * 2 ** Math.min(4, retries++)));
       });
       await request({ type: 'attach', owner, ...(backup ? { resume: backup } : {}), ...(visibilityDocument ? { visible: !visibilityDocument.hidden } : {}) } as Omit<StudioRequest, 'id'>);
       if (generation !== epoch) return;
-      connected = true; retries = 0; publishVisibility(); emit('接続中');
+      connected = true; retries = 0; publishVisibility(); if (observed) void timeline.dispatch({ type: 'observe', value: true }); emit('接続中');
     } catch (error) {
       if (generation !== epoch) return;
       connected = false; emit(error instanceof Error ? error.message : '接続できません。');
@@ -75,7 +88,7 @@ export function createStudioClient(notify: (value: StudioConnectionState) => voi
     }
   };
   const disconnect = () => {
-    epoch++; clearTimeout(retry); const old = port; port = undefined; connected = false;
+    epoch++; clearTimeout(retry); const old = port; port = undefined; connected = false; useTimeline({ status: { ...timelineState.status, available: false, mode: 'paused', message: '編集対象との接続を待っています。' } });
     pending.forEach((entry) => { clearTimeout(entry.timer); entry.reject(new Error('編集対象を切り替えました。')); }); pending.clear(); old?.disconnect();
   };
   const onTabRemoved = (id: number) => { if (id === tabId) { stopped = true; disconnect(); emit('対象のYouTubeタブが閉じられました。タブ一覧から編集先を選び直してください。'); } };
@@ -93,12 +106,13 @@ export function createStudioClient(notify: (value: StudioConnectionState) => voi
   }
   const focusTarget = async () => { if (tabId === undefined) return; const tab = await chrome.tabs.update(tabId, { active: true }); if (tab?.windowId !== undefined) await chrome.windows.update(tab.windowId, { focused: true }); };
   return {
+    timeline,
     async targets(): Promise<StudioTarget[]> {
       const tabs = await chrome.tabs.query({});
       const results = await Promise.all(tabs.flatMap((tab) => tab.id === undefined ? [] : [chrome.tabs.sendMessage(tab.id, { type: STUDIO_PROBE }).then((info: Omit<StudioTarget, 'id'> | undefined) => info?.siteId ? { ...info, id: tab.id! } : undefined, () => undefined)]));
       return results.filter((target): target is StudioTarget => Boolean(target));
     },
-    async select(target: number, resume?: EditorCheckpoint) { disconnect(); stopped = false; tabId = target; state = undefined; backup = resume; retries = 0; emit('接続しています…'); await connect(); },
+    async select(target: number, resume?: EditorCheckpoint) { disconnect(); useTimeline({ status: { ...timelineState.status, available: false, source: 'live', mode: 'live', timeMs: 0, durationMs: 0, samples: 0, progress: 0, saved: false, message: '' }, take: null, library: [] }); stopped = false; tabId = target; state = undefined; backup = resume; retries = 0; emit('接続しています…'); await connect(); },
     reconnect() { if (tabId !== undefined) { disconnect(); stopped = false; void connect(); } },
     dispatch(command: EditCommand) { return enqueue(async () => { const current = state!; await request({ type: 'command', session: current.sessionId, revision: current.revision, command } as Omit<StudioRequest, 'id'>); }); },
     import(files: readonly File[]) {

@@ -54,13 +54,13 @@ export function parseWorldScene(value: unknown, legacy = false): WorldScene {
   const design = parseDesign({ schemaVersion: legacy ? 6 : 8, id: 'runtime-recording', siteId: 'runtime-host', baseThemeId: null, rules: [], ...scene });
   return { decorations: design.decorations, ...(design.groups ? { groups: design.groups } : {}), ...(design.signalRules ? { signalRules: design.signalRules } : {}) };
 }
-export function parseWorldState(value: unknown, scene: WorldScene): WorldState {
+export function parseWorldState(value: unknown, scene?: WorldScene): WorldState {
   const data = record(value, ['runtimeVersion', 'timeMs', 'effects', 'machine']);
   if (data['runtimeVersion'] !== WORLD_RUNTIME_VERSION && data['runtimeVersion'] !== '1.0.0') throw new Error('Unsupported World Runtime version.');
   const input = record(data['effects'], ['fades', 'visibility']), machine = record(data['machine'], ['video', 'events']);
-  const ids = new Set([...scene.decorations, ...scene.groups ?? []].map((layer) => layer.id));
+  const ids = scene && new Set([...scene.decorations, ...scene.groups ?? []].map((layer) => layer.id));
   const entries = (value: unknown) => {
-    if (!value || typeof value !== 'object' || Array.isArray(value) || Object.keys(value).some((id) => !ids.has(id))) throw new Error('Invalid World state IDs.');
+    if (!value || typeof value !== 'object' || Array.isArray(value) || Object.keys(value).length > 48 || Object.keys(value).some((id) => !isDesignId(id) || ids && !ids.has(id))) throw new Error('Invalid World state IDs.');
     return Object.entries(value);
   };
   const fades: Record<string, Fade> = Object.fromEntries(entries(input['fades']).map(([id, value]) => {

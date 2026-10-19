@@ -12,6 +12,7 @@ import { mountNumberScrub } from './number-scrub';
 import type { EditorTool } from '../editor-core/types';
 import type { StudioHostLayout, StudioInsets } from '../studio/layout-types';
 import type { SignalRule } from '../signals/keyframes';
+import type { TimelinePort } from '../timeline/types';
 
 export type { EditorView as PanelState } from '../editor-core/types';
 import type { EditorView as PanelState } from '../editor-core/types';
@@ -20,6 +21,7 @@ export interface PanelOptions {
   preferences?: StudioPreferences; fullPage?: boolean; persistWorkspace?: boolean; inPage?: boolean; sidePanel?: boolean; toolbarOnly?: boolean;
   onSurface?(surface: 'sidepanel' | 'inpage' | 'window'): void;
   hostLabel?: string; onLayout?(insets: StudioInsets): void;
+  timeline?: TimelinePort | undefined;
 }
 
 export interface PanelActions {

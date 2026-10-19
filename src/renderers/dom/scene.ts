@@ -12,6 +12,7 @@ import { effectivelyLocked, groupMovable, parentGroup, rootLayers } from '../../
 import { snapMove, type Guide } from '../../design/layout';
 import type { DesignTarget, Decoration, GroupLayer } from '../../design/types';
 import type { SignalRule } from '../../signals/keyframes';
+import type { TimelineHost } from '../../host/timeline';
 
 export interface ImageEditing {
   selectedIds: readonly string[];
@@ -55,7 +56,7 @@ const CSS = `
 `;
 
 /** Shared layer layout/gestures; media decoding and playback live in media/. */
-export function createImageRenderer(doc: Document, anchors: readonly DesignTarget[], playback?: PlaybackSource) {
+export function createImageRenderer(doc: Document, anchors: readonly DesignTarget[], playback?: PlaybackSource, timeline?: TimelineHost) {
   const view = doc.defaultView!;
   let host: HTMLElement | undefined;
   let shadow: ShadowRoot | undefined;
@@ -221,7 +222,7 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
     style.textContent = CSS;
     shadow.append(style);
     media = createMediaController(doc, (message) => editing?.error(message), (stats) => { if (host) host.dataset.wwMediaStats = JSON.stringify(stats); });
-    effects = createEffectController(doc, playback);
+    effects = createEffectController(doc, playback, timeline);
     imageLayer = doc.createElement('div'); imageLayer.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:0'; shadow.append(imageLayer);
     groupFrame = doc.createElement('div'); groupFrame.className = 'group-frame'; groupFrame.hidden = true; shadow.append(groupFrame);
     guideNodes = Array.from({ length: 2 }, () => { const node = doc.createElement('div'); node.className = 'guide'; node.hidden = true; shadow!.append(node); return node; });

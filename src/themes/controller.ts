@@ -6,10 +6,13 @@ import { createImageRenderer, type ImageEditing } from '../design/image-renderer
 import type { SiteAdapter } from '../sites/types';
 import type { UserSettings } from '../storage/settings';
 import type { ThemeDefinition } from './types';
+import { createTimelineHost, type TimelineHost } from '../host/timeline';
+import { createTakeStorage } from '../browser/take-storage';
 
 const STYLE_ID = 'web-world-themes-style';
 
 export interface ThemeController {
+  timeline: TimelineHost;
   update(settings: UserSettings): void;
   updateDesign(design: DesignDocument | undefined): void;
   setImageEditing(editing: ImageEditing | undefined): void;
@@ -25,7 +28,8 @@ export function createThemeController(
 ): ThemeController {
   const features = createFeatureController({ document: doc, site });
   const designRenderer = createDesignRenderer(doc, site.designTargets ?? []);
-  const images = createImageRenderer(doc, site.decorationAnchors ?? [], site.signals?.videoPlayback);
+  const timeline = createTimelineHost(doc, site.id, createTakeStorage(site.id));
+  const images = createImageRenderer(doc, site.decorationAnchors ?? [], site.signals?.videoPlayback, timeline);
   const variables = new Set<string>();
   let disconnect: (() => void) | undefined;
   let style: HTMLStyleElement | undefined;
@@ -97,6 +101,7 @@ export function createThemeController(
     return next;
   };
   return {
+    timeline,
     update(settings) {
       current = settings;
       if (!settings.enabled || settings.strength === 0) { deactivate(); return; }

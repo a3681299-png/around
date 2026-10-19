@@ -54,7 +54,7 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
     if (!panel || paneTarget !== value.target) {
       panel?.destroy(); mount.replaceChildren(); paneTarget = value.target;
       panel = createCreatorPanel(doc, studioActions(dispatch, (files) => { if (connection.isConnected) void connection.import(files); }, (id) => connection.thumbnail(id)),
-        targets.find((target) => target.id === value.target)?.anchors ?? [], { preferences: ports.preferences, hostLabel: ports.hostName, fullPage: true, sidePanel: Boolean(ports.sidePanel), persistWorkspace: true, onSurface: (surface) => { void connection.openWorkspace(surface).catch((error: unknown) => { message.textContent = error instanceof Error ? error.message : '切替できませんでした。'; }); } });
+        targets.find((target) => target.id === value.target)?.anchors ?? [], { preferences: ports.preferences, timeline: connection.timeline, hostLabel: ports.hostName, fullPage: true, sidePanel: Boolean(ports.sidePanel), persistWorkspace: true, onSurface: (surface) => { void connection.openWorkspace(surface).catch((error: unknown) => { message.textContent = error instanceof Error ? error.message : '切替できませんでした。'; }); } });
       mount.append(panel.host); connectionBar.slot = 'connection'; message.slot = 'connection-status'; panel.host.append(connectionBar, message);
       if (!ports.sidePanel) {
         stage = doc.createElement('section'); stage.className = 'studio-stage'; stage.setAttribute('aria-label', '素材とプレビュー');

@@ -18,7 +18,7 @@ if (site) {
   lifetime.__webWorldThemesCleanup?.();
   let creator: CreatorEditor | undefined;
   const controller = createThemeController(document, site, themes[DEFAULT_THEME], () => creator?.refreshSelection());
-  creator = createCreatorEditor(document, site, DEFAULT_THEME, controller.updateDesign, controller.setImageEditing, controller.validateDesign);
+  creator = createCreatorEditor(document, site, DEFAULT_THEME, controller.updateDesign, controller.setImageEditing, controller.validateDesign, controller.timeline);
   const disconnectStudio = connectStudioHost(document, site, creator);
   void chrome.runtime.sendMessage({ type: PREPARE_SIDE_PANEL }).catch(() => undefined);
   const settingsPanel = createSettingsPanel(document);

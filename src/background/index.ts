@@ -6,6 +6,7 @@ import { inspectAsset } from '../assets/inspect';
 import { validateDesignAssets } from '../assets/design-assets';
 import { isAssetId, isDesignId, parseDesign } from '../design/schema';
 import { saveDesign } from '../storage/designs';
+import { installTakeStorage } from '../browser/take-repository';
 
 let queue: Promise<unknown> = Promise.resolve();
 function enqueue<T>(action: () => Promise<T>): Promise<T> {
@@ -149,3 +150,4 @@ chrome.runtime.onMessage.addListener((input: unknown, sender, respond) => {
 chrome.tabs.onRemoved.addListener(() => { void enqueue(() => prune()).catch(() => undefined); });
 
 installSidePanelHost();
+installTakeStorage();

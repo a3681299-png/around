@@ -4,6 +4,8 @@ import { mkdir, mkdtemp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { launchExtension } from './fixtures';
 import { sidePanelDriver, nativeWindow } from './helpers/side-panel';
+import { createTakeSampler, type SignalTake } from '../src/world/takes';
+import type { DesignDocument } from '../src/design/types';
 
 async function setup() {
   const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-panel-test-')), true, { headed: true });
@@ -212,5 +214,41 @@ test('the official panel edits scroll keyframes through the shared Core and reta
     const saved = await popup.evaluate(async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'] as { signalRules: { keyframes: { value: number }[] }[] });
     expect(saved.signalRules[0]!.keyframes[1]!.value).toBe(.7);
     await page.reload(); await expect.poll(() => panel.text('.opacity-value')).toBe('スクロールに接続');
+  } finally { await context.close(); }
+});
+
+test('official panel records raw signals, plays/seeks without live input, and restores independent saved takes', async () => {
+  test.setTimeout(120_000);
+  const { context, page, popup, id, local } = await setup();
+  try {
+    await page.evaluate(() => { document.body.style.minHeight = '6000px'; });
+    await local.getByRole('button', { name: 'Chromeサイドパネルを開く', exact: true }).click(); const panel = await sidePanelDriver(context, page, id);
+    await panel.files([path.resolve('tests/fixtures/motion/petal.png')]); await expect.poll(() => panel.text('.selected-count')).toBe('1個選択中');
+    await panel.click('.timeline-toggle'); await panel.click('.timeline-connect');
+    await panel.click('.save'); await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
+    await panel.click('.take-record'); const ui = 'document.querySelector("#web-world-themes-creator").shadowRoot';
+    await expect.poll(() => panel.evaluate('document.querySelector("#web-world-themes-creator").shadowRoot.querySelector(".signal-timeline").hasAttribute("data-recording")')).toBe(true);
+    for (const progress of [0, .5, 1, .5, 0]) { await page.evaluate((value) => { const root = document.scrollingElement!; scrollTo(0, Math.round((root.scrollHeight - root.clientHeight) * value)); }, progress); await page.waitForTimeout(90); }
+    await page.locator('ytd-masthead input').first().fill('PRIVATE_TIMELINE_FORM_SECRET');
+    await panel.click('.take-stop'); await expect.poll(() => panel.text('.take-source')).toBe('PREVIEW'); await panel.click('.take-store');
+    await expect.poll(() => panel.text('.take-saved')).toBe('テイク保存済み');
+    const library = await panel.evaluate<{ id: string }[]>('chrome.runtime.sendMessage({type:"web-world-themes:signal-takes",action:"list",siteId:"youtube"}).then(r=>r.value)'); expect(library).toHaveLength(1);
+    const take = await panel.evaluate<SignalTake>(`chrome.runtime.sendMessage({type:"web-world-themes:signal-takes",action:"get",siteId:"youtube",id:${JSON.stringify(library[0]!.id)}}).then(r=>r.value)`);
+    expect(take.inputs.length).toBeGreaterThan(5); expect(take.inputs.every((input) => input.signals.scroll && input.viewport.width > 0)).toBe(true);
+    expect(JSON.stringify(take)).not.toMatch(/PRIVATE_TIMELINE_FORM_SECRET|asset-|decorations|signalRules|https?:|cookie|authorization/);
+    const design = await popup.evaluate(async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'] as DesignDocument); expect(design).not.toHaveProperty('takes');
+    const sample = take.inputs.find((input) => input.signals.scroll && input.signals.scroll.y / input.signals.scroll.maxY > .4 && input.signals.scroll.y / input.signals.scroll.maxY < .6)!; expect(sample).toBeDefined();
+    const position = sample.timeMs - take.inputs[0]!.timeMs, expected = createTakeSampler(design, take).at(position).frame.layout.layers[0]!.layer.opacity;
+    await panel.fill('.take-position', String(position / 1000));
+    const media = page.locator('#web-world-themes-decorations .media'); await expect.poll(() => media.evaluate((node: HTMLElement) => Number(node.style.opacity))).toBeCloseTo(expected, 5);
+    await page.evaluate(() => scrollTo(0, 0)); await page.waitForTimeout(80); await expect.poll(() => media.evaluate((node: HTMLElement) => Number(node.style.opacity))).toBeCloseTo(expected, 5);
+    await panel.fill('.take-rate', '-1'); await panel.click('.take-play'); await expect.poll(() => panel.evaluate(`${ui}.querySelector('.take-position').valueAsNumber`)).toBeLessThan(position / 1000);
+    await panel.click('.take-play'); await panel.click('.take-live'); await expect.poll(() => panel.text('.take-source')).toBe('LIVE'); await expect(media).toHaveCSS('opacity', '0');
+    await panel.screenshot('.work/verification/signal-stage3-take.png');
+    await page.reload(); await expect.poll(() => panel.evaluate('document.querySelector(".connection-status").dataset.connected')).toBe('true');
+    await expect.poll(() => panel.evaluate(`${ui}.querySelector('.take-library-select').options.length`)).toBe(2);
+    await panel.fill('.take-library-select', take.id); await expect.poll(() => panel.text('.take-saved')).toBe('テイク保存済み'); await expect.poll(() => panel.text('.take-source')).toBe('PREVIEW');
+    await panel.click('.take-live');
+    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck(); await expect(page.locator('#web-world-themes-decorations')).toHaveCount(0);
   } finally { await context.close(); }
 });
