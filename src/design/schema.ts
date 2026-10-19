@@ -2,6 +2,7 @@ import { GROUP_LIMITS, IMAGE_LIMITS, STYLE_LIMITS, type DesignDocument, type Sur
 import { ANIMATION_LIMITS } from '../assets/motion-types';
 import { parseEffects } from '../effects/schema';
 import { sameAnchor } from './hierarchy';
+import { parseMotion } from '../signals/motion';
 import { parseSignalRules } from '../signals/keyframe-schema';
 
 export function isAssetId(value: unknown): value is string {
@@ -39,19 +40,19 @@ function number(value: unknown, min: number, max: number): number {
   return value;
 }
 
-function group(value: unknown): GroupLayer {
-  const input = record(value, ['kind', 'id', 'name', 'opacity', 'zIndex', 'visible', 'locked', 'effects', 'children']);
+function group(value: unknown, version: number): GroupLayer {
+  const input = record(value, ['kind', 'id', 'name', 'opacity', 'zIndex', 'visible', 'locked', 'effects', 'children', ...(version >= 9 ? ['motion'] : [])]);
   if (input['kind'] !== 'group' || !isDesignId(input['id']) || typeof input['name'] !== 'string' || !input['name'].length || input['name'].length > 120 || /[\u0000-\u001f]/.test(input['name'])
     || typeof input['visible'] !== 'boolean' || typeof input['locked'] !== 'boolean' || !Array.isArray(input['children']) || !input['children'].length
     || input['children'].length > IMAGE_LIMITS.count || !input['children'].every(isDesignId) || new Set(input['children']).size !== input['children'].length) throw new Error('グループの形式が不正です。');
   const zIndex = number(input['zIndex'], -IMAGE_LIMITS.maxZ, IMAGE_LIMITS.maxZ);
   if (!Number.isInteger(zIndex)) throw new Error('重なり順は整数で指定してください。');
   return { kind: 'group', id: input['id'], name: input['name'], opacity: number(input['opacity'], 0, 1), zIndex, visible: input['visible'], locked: input['locked'],
-    children: [...input['children']], ...(Object.hasOwn(input, 'effects') ? { effects: parseEffects(input['effects']) } : {}) };
+    children: [...input['children']], ...(Object.hasOwn(input, 'motion') ? { motion: parseMotion(input['motion']) } : {}), ...(Object.hasOwn(input, 'effects') ? { effects: parseEffects(input['effects']) } : {}) };
 }
 
 function image(value: unknown, version: number): Decoration {
-  const item = record(value, ['kind', 'id', 'assetId', 'name', 'placement', 'opacity', 'zIndex', 'visible', ...(version >= 3 ? ['locked'] : []), ...(version >= 4 ? ['format', 'playback'] : []), ...(version >= 5 ? ['effects'] : [])]);
+  const item = record(value, ['kind', 'id', 'assetId', 'name', 'placement', 'opacity', 'zIndex', 'visible', ...(version >= 3 ? ['locked'] : []), ...(version >= 4 ? ['format', 'playback'] : []), ...(version >= 5 ? ['effects'] : []), ...(version >= 9 ? ['motion'] : [])]);
   if (!['image', ...(version >= 4 ? ['animation'] : [])].includes(item['kind'] as string) || !isDesignId(item['id']) || !isAssetId(item['assetId'])
     || typeof item['name'] !== 'string' || item['name'].length < 1 || item['name'].length > 120 || /[\u0000-\u001f]/.test(item['name'])
     || typeof item['visible'] !== 'boolean' || (version >= 3 && typeof item['locked'] !== 'boolean')) throw new Error('画像レイヤーの形式が不正です。');
@@ -72,7 +73,7 @@ function image(value: unknown, version: number): Decoration {
       rotationDeg: number(placement['rotationDeg'], -180, 180),
     },
     opacity: number(item['opacity'], 0, 1), zIndex, visible: item['visible'], locked: version >= 3 ? item['locked'] as boolean : false,
-    ...(Object.hasOwn(item, 'effects') ? { effects: parseEffects(item['effects']) } : {}),
+    ...(Object.hasOwn(item, 'motion') ? { motion: parseMotion(item['motion']) } : {}), ...(Object.hasOwn(item, 'effects') ? { effects: parseEffects(item['effects']) } : {}),
   };
   if (item['kind'] === 'image') {
     if (Object.hasOwn(item, 'format') || Object.hasOwn(item, 'playback')) throw new Error('静止画像には再生設定を指定できません。');
@@ -93,7 +94,7 @@ function image(value: unknown, version: number): Decoration {
 export function parseDesign(value: unknown): DesignDocument {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('デザインの形式が不正です。');
   const version = (value as Record<string, unknown>)['schemaVersion'];
-  if (version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5 && version !== 6 && version !== 7 && version !== 8) throw new Error('このデザインのバージョンには対応していません。');
+  if (version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5 && version !== 6 && version !== 7 && version !== 8 && version !== 9) throw new Error('このデザインのバージョンには対応していません。');
   const data = record(value, version === 1 ? ['schemaVersion', 'id', 'siteId', 'baseThemeId', 'rules'] : ['schemaVersion', 'id', 'siteId', 'baseThemeId', 'rules', 'decorations', ...(version >= 6 ? ['groups'] : []), ...(version >= 8 ? ['signalRules'] : [])]);
   if (!isDesignId(data['id']) || !isDesignId(data['siteId'])
     || (data['baseThemeId'] !== null && !isDesignId(data['baseThemeId']))) {
@@ -129,7 +130,7 @@ export function parseDesign(value: unknown): DesignDocument {
   let groups: GroupLayer[] = [];
   if (Object.hasOwn(data, 'groups')) {
     if (!Array.isArray(data['groups']) || data['groups'].length > GROUP_LIMITS.count) throw new Error('グループは16個までです。');
-    groups = data['groups'].map(group);
+    groups = data['groups'].map((value) => group(value, version));
     const allIds = [...decorations, ...groups].map((layer) => layer.id), assigned = new Set<string>();
     if (new Set(allIds).size !== allIds.length) throw new Error('レイヤーのIDが重複しています。');
     for (const group of groups) {
@@ -139,12 +140,12 @@ export function parseDesign(value: unknown): DesignDocument {
       group.children.forEach((id) => assigned.add(id));
     }
   }
-  const signalRules = Object.hasOwn(data, 'signalRules') ? parseSignalRules(data['signalRules'], new Set([...decorations, ...groups].map((layer) => layer.id))) : [];
-  return { schemaVersion: 8, id: data['id'], siteId: data['siteId'], baseThemeId: data['baseThemeId'], rules, decorations, ...(groups.length ? { groups } : {}), ...(signalRules.length ? { signalRules } : {}) };
+  const signalRules = Object.hasOwn(data, 'signalRules') ? parseSignalRules(data['signalRules'], new Set([...decorations, ...groups].map((layer) => layer.id)), version < 9) : [];
+  return { schemaVersion: 9, id: data['id'], siteId: data['siteId'], baseThemeId: data['baseThemeId'], rules, decorations, ...(groups.length ? { groups } : {}), ...(signalRules.length ? { signalRules } : {}) };
 }
 
 export function emptyDesign(siteId: string, baseThemeId: string | null): DesignDocument {
-  return parseDesign({ schemaVersion: 8, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
+  return parseDesign({ schemaVersion: 9, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
 }
 
 export function sameDesign(a: DesignDocument | undefined, b: DesignDocument | undefined): boolean {

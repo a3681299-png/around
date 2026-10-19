@@ -101,7 +101,7 @@ test('three images group, move as one, share a mouse/video mask, save, restart a
   await info.attach('group-reveal', { body: await youtube.screenshot(), contentType: 'image/png' });
   await play(youtube, 'Pause'); await youtube.waitForTimeout(120); const middle = Number(await content.getAttribute('data-mask-intensity')); expect(middle).toBeGreaterThan(0); expect(middle).toBeLessThan(1);
   await expect(content).toHaveAttribute('data-mask-intensity', '0'); await save(panel); const saved = await stored(popup);
-  expect(saved).toMatchObject({ schemaVersion: 8, groups: [{ name: '海の世界', effects: [{ radiusPx: 120, featherPx: 25 }] }] });
+  expect(saved).toMatchObject({ schemaVersion: 9, groups: [{ name: '海の世界', effects: [{ radiusPx: 120, featherPx: 25 }] }] });
   expect(saved.decorations).toHaveLength(3); expect(saved.groups![0]!.children).toHaveLength(3); expect(await assetCount(popup)).toBe(3);
   await youtube.reload(); await ready(youtube, 3); await expect(youtube.locator(`${compositions} .group-content`)).toHaveAttribute('data-mask-intensity', '0');
   expect(await boxes(youtube)).toEqual(moved); await context.close();

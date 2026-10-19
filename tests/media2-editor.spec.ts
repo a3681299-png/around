@@ -83,7 +83,7 @@ test('1080p alpha WebM plays, transforms, pauses/rates/loops, saves and survives
   await panel.getByLabel('画像の角度', { exact: true }).fill('30'); await youtube.waitForTimeout(100); await expect(video).toHaveJSProperty('paused', true);
   await expect(youtube.locator(`${layers} .media`)).toHaveAttribute('data-playback', 'finished'); await panel.getByLabel('画像の角度', { exact: true }).fill('25');
   await panel.getByRole('checkbox', { name: 'ループ再生', exact: true }).check(); await save(panel); const saved = await stored(popup);
-  expect(saved).toMatchObject({ schemaVersion: 8, decorations: [{ format: 'webm', placement: { rotationDeg: 25, widthPx: 320 }, playback: { speed: 1.5, loop: true } }] });
+  expect(saved).toMatchObject({ schemaVersion: 9, decorations: [{ format: 'webm', placement: { rotationDeg: 25, widthPx: 320 }, playback: { speed: 1.5, loop: true } }] });
   await youtube.reload(); await ready(youtube, 1); await expect(video).toHaveJSProperty('paused', false); expect(await stored(popup)).toEqual(saved);
   await context.close(); const restarted = await launchExtension(profile);
   try { const page = await restarted.newPage(); await page.goto('https://www.youtube.com/'); await ready(page, 1); await expect(page.locator(`${layers} video`)).toHaveJSProperty('paused', false);

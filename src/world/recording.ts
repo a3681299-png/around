@@ -33,7 +33,7 @@ function events(value: unknown): WorldEvent[] {
 }
 export function parseWorldInput(value: unknown): WorldInput {
   const data = record(value, ['timeMs', 'deltaMs', 'viewport', 'anchors', 'signals', 'events', 'environment', 'seed']);
-  const viewport = record(data['viewport'], ['width', 'height']), signals = record(data['signals'], ['pointer', 'playing', 'scroll']);
+  const viewport = record(data['viewport'], ['width', 'height']), signals = record(data['signals'], ['pointer', 'pointerTimeMs', 'playing', 'scroll']);
   const environment = record(data['environment'], ['hidden', 'reducedMotion']);
   const anchors = data['anchors'];
   if (!anchors || typeof anchors !== 'object' || Array.isArray(anchors) || Object.keys(anchors).length > RECORDING_LIMITS.anchors) throw new Error('Invalid recording anchors.');
@@ -46,17 +46,17 @@ export function parseWorldInput(value: unknown): WorldInput {
   if (seed !== undefined && !Number.isInteger(seed)) throw new Error('Invalid World seed.');
   const scroll = signals['scroll'] === undefined ? undefined : record(signals['scroll'], ['x', 'y', 'maxX', 'maxY']);
   return { timeMs: number(data['timeMs']), deltaMs: number(data['deltaMs']), viewport: { width: number(viewport['width'], .001, 1e6), height: number(viewport['height'], .001, 1e6) },
-    anchors: frames, signals: { pointer: signals['pointer'] === undefined ? undefined : point(signals['pointer']), playing: boolean(signals['playing']), ...(scroll ? { scroll: { x: number(scroll['x'], -1e7, 1e9), y: number(scroll['y'], -1e7, 1e9), maxX: number(scroll['maxX'], 0, 1e9), maxY: number(scroll['maxY'], 0, 1e9) } } : {}) },
+    anchors: frames, signals: { pointer: signals['pointer'] === undefined ? undefined : point(signals['pointer']), playing: boolean(signals['playing']), ...(signals['pointerTimeMs'] === undefined ? {} : { pointerTimeMs: number(signals['pointerTimeMs']) }), ...(scroll ? { scroll: { x: number(scroll['x'], -1e7, 1e9), y: number(scroll['y'], -1e7, 1e9), maxX: number(scroll['maxX'], 0, 1e9), maxY: number(scroll['maxY'], 0, 1e9) } } : {}) },
     events: events(data['events']), environment: { hidden: boolean(environment['hidden']), reducedMotion: boolean(environment['reducedMotion']) }, ...(seed === undefined ? {} : { seed }) };
 }
 export function parseWorldScene(value: unknown, legacy = false): WorldScene {
   const scene = record(value, ['decorations', 'groups', ...(!legacy ? ['signalRules'] : [])]);
-  const design = parseDesign({ schemaVersion: legacy ? 6 : 8, id: 'runtime-recording', siteId: 'runtime-host', baseThemeId: null, rules: [], ...scene });
+  const design = parseDesign({ schemaVersion: legacy ? 6 : 9, id: 'runtime-recording', siteId: 'runtime-host', baseThemeId: null, rules: [], ...scene });
   return { decorations: design.decorations, ...(design.groups ? { groups: design.groups } : {}), ...(design.signalRules ? { signalRules: design.signalRules } : {}) };
 }
 export function parseWorldState(value: unknown, scene?: WorldScene): WorldState {
-  const data = record(value, ['runtimeVersion', 'timeMs', 'effects', 'machine']);
-  if (data['runtimeVersion'] !== WORLD_RUNTIME_VERSION && data['runtimeVersion'] !== '1.0.0') throw new Error('Unsupported World Runtime version.');
+  const data = record(value, ['runtimeVersion', 'timeMs', 'effects', 'machine', 'motion']);
+  if (data['runtimeVersion'] !== WORLD_RUNTIME_VERSION && data['runtimeVersion'] !== '1.0.0' && data['runtimeVersion'] !== '1.1.0') throw new Error('Unsupported World Runtime version.');
   const input = record(data['effects'], ['fades', 'visibility']), machine = record(data['machine'], ['video', 'events']);
   const ids = scene && new Set([...scene.decorations, ...scene.groups ?? []].map((layer) => layer.id));
   const entries = (value: unknown) => {
@@ -67,14 +67,25 @@ export function parseWorldState(value: unknown, scene?: WorldScene): WorldState 
     const fade = record(value, ['from', 'to', 'start', 'duration']);
     return [id, { from: number(fade['from'], 0, 1), to: number(fade['to'], 0, 1), start: number(fade['start']), duration: number(fade['duration'], 0, 5000) }];
   }));
+  let motion: WorldState['motion'];
+  if (data['motion'] !== undefined) {
+    const input = record(data['motion'], ['bodies', 'pointer']);
+    const bodies = Object.fromEntries(entries(input['bodies']).map(([id, value]) => {
+      const body = record(value, ['signature', 'offset', 'velocity', 'heading']);
+      if (typeof body['signature'] !== 'string' || body['signature'].length > 1024) throw new Error('Invalid motion signature.');
+      return [id, { signature: body['signature'], offset: point(body['offset']), velocity: point(body['velocity']), heading: number(body['heading'], -180, 180) }];
+    }));
+    const pointer = input['pointer'] === undefined ? undefined : record(input['pointer'], ['point', 'timeMs', 'speed']);
+    motion = { bodies, ...(pointer ? { pointer: { point: point(pointer['point']), timeMs: number(pointer['timeMs']), speed: number(pointer['speed'], 0, 1e6) } } : {}) };
+  }
   if (machine['video'] !== 'playing' && machine['video'] !== 'paused') throw new Error('Invalid World machine state.');
   return { runtimeVersion: WORLD_RUNTIME_VERSION, timeMs: data['timeMs'] === null ? null : number(data['timeMs']), effects: { fades,
-    visibility: Object.fromEntries(entries(input['visibility']).map(([id, value]) => [id, boolean(value)])) }, machine: { video: machine['video'], events: events(machine['events']) } };
+    visibility: Object.fromEntries(entries(input['visibility']).map(([id, value]) => [id, boolean(value)])) }, machine: { video: machine['video'], events: events(machine['events']) }, ...(motion ? { motion } : {}) };
 }
 export function parseWorldRecording(value: unknown): WorldRecording {
   if (typeof value === 'string') { if (value.length > RECORDING_LIMITS.chars) throw new Error('World recording is too large.'); value = JSON.parse(value); }
   const data = record(value, ['format', 'formatVersion', 'runtimeVersion', 'scene', 'initialState', 'inputs']);
-  if (data['format'] !== 'ww-world-inputs' || ![1, 2, 3].includes(data['formatVersion'] as number) || data['runtimeVersion'] !== WORLD_RUNTIME_VERSION && data['runtimeVersion'] !== '1.0.0') throw new Error('Unsupported World recording version.');
+  if (data['format'] !== 'ww-world-inputs' || ![1, 2, 3].includes(data['formatVersion'] as number) || data['runtimeVersion'] !== WORLD_RUNTIME_VERSION && data['runtimeVersion'] !== '1.0.0' && data['runtimeVersion'] !== '1.1.0') throw new Error('Unsupported World recording version.');
   if (!Array.isArray(data['inputs']) || data['inputs'].length > RECORDING_LIMITS.frames) throw new Error('Too many World inputs.');
   const scene = parseWorldScene(data['scene'], data['formatVersion'] === 1), initialState = parseWorldState(data['initialState'], scene);
   const inputs = data['inputs'].map(parseWorldInput);

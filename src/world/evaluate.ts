@@ -3,6 +3,7 @@ import { evaluateLayout } from './layout';
 import { WORLD_RUNTIME_VERSION, type WorldScene, type WorldState, type WorldInput, type WorldLayout, type WorldFrame } from './types';
 import { evaluateRuleLayout } from './keyframes';
 import type { SignalRule } from '../signals/keyframes';
+import { evaluateTransforms } from './transforms';
 
 export const initialWorldState = (): WorldState => ({ runtimeVersion: WORLD_RUNTIME_VERSION, timeMs: null,
   effects: emptyEffectState(), machine: { video: 'paused', events: [] } });
@@ -20,10 +21,12 @@ export function evaluatePreparedWorld(prepared: WorldLayout, previous: WorldStat
   if (!Number.isFinite(input.timeMs) || !Number.isFinite(input.deltaMs) || input.timeMs < 0 || input.deltaMs < 0
     || previous.timeMs !== null && input.timeMs < previous.timeMs) throw new Error('World Runtime requires monotonic finite time.');
   const effects = input.events.some((event) => event.type === 'host.lifecycle') ? emptyEffectState() : previous.effects;
-  const layout = rules.length ? evaluateRuleLayout(prepared, rules, input) : prepared;
+  const dynamic = rules.some((rule) => rule.enabled && rule.source.signal !== 'page.scroll.progress' || rule.enabled && rule.target.property !== 'opacity') || [...prepared.groups, ...prepared.layers].some((entry) => entry.layer.motion?.enabled);
+  const transformed = dynamic ? evaluateTransforms(prepared, rules, previous.timeMs === null ? { ...input, deltaMs: 0 } : input, previous.motion) : undefined;
+  const layout = transformed?.layout ?? (rules.length ? evaluateRuleLayout(prepared, rules, input) : prepared);
   const evaluated = evaluateEffects(layoutEffectTargets(layout), effects, input);
   const machine = { video: input.signals.playing ? 'playing' as const : 'paused' as const,
     events: input.events.map((event) => event.type === 'pointer.click' ? { ...event, point: { ...event.point } } : { ...event }) };
-  return { state: { runtimeVersion: WORLD_RUNTIME_VERSION, timeMs: input.timeMs, effects: evaluated.state, machine },
-    frame: { timeMs: input.timeMs, layout, effects: evaluated.effects, machine, needsFrame: evaluated.needsFrame, subscriptions: evaluated.subscriptions } };
+  return { state: { runtimeVersion: WORLD_RUNTIME_VERSION, timeMs: input.timeMs, effects: evaluated.state, machine, ...(transformed ? { motion: transformed.state } : {}) },
+    frame: { timeMs: input.timeMs, layout, effects: evaluated.effects, machine, needsFrame: evaluated.needsFrame || Boolean(transformed?.needsFrame), subscriptions: evaluated.subscriptions } };
 }

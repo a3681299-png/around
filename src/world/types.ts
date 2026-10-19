@@ -3,7 +3,7 @@ import type { SignalSnapshot } from '../signals/types';
 import type { Bounds, PlacementFrame, Point } from './geometry';
 import type { EffectState, EffectEvaluation } from './effects';
 
-export const WORLD_RUNTIME_VERSION = '1.1.0' as const;
+export const WORLD_RUNTIME_VERSION = '1.2.0' as const;
 export interface WorldScene { decorations: readonly Decoration[]; groups?: readonly GroupLayer[]; signalRules?: readonly import('../signals/keyframes').SignalRule[] }
 export interface WorldGeometry {
   viewport: { width: number; height: number };
@@ -27,6 +27,7 @@ export interface LayerEvaluation {
   bounds?: Bounds;
   position?: Point;
   localPosition?: Point;
+  localRotationDeg?: number;
   parentId?: string;
   visible: boolean;
   renderable: boolean;
@@ -51,6 +52,7 @@ export interface WorldState {
   timeMs: number | null;
   effects: EffectState;
   machine: WorldMachineState;
+  motion?: import('./motion').MotionState;
 }
 export interface WorldFrame {
   timeMs: number;

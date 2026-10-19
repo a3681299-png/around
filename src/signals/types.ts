@@ -3,6 +3,11 @@ import type { Point } from '../design/geometry';
 /** Values are sampled; states persist; events are occurrences, not latched booleans. */
 export const SIGNAL_CATALOG = Object.freeze({
   'pointer.position': { category: 'value', valueType: 'point' },
+  'pointer.x': { category: 'value', valueType: 'number' },
+  'pointer.y': { category: 'value', valueType: 'number' },
+  'pointer.distance': { category: 'value', valueType: 'number' },
+  'pointer.angle': { category: 'value', valueType: 'number' },
+  'pointer.speed': { category: 'value', valueType: 'number' },
   'page.scroll.progress': { category: 'value', valueType: 'number' },
   'video.playing': { category: 'state', valueType: 'boolean' },
   'video.play': { category: 'event' },
@@ -11,7 +16,7 @@ export const SIGNAL_CATALOG = Object.freeze({
 } as const);
 
 export interface ScrollSignal { x: number; y: number; maxX: number; maxY: number }
-export interface SignalSnapshot { pointer: Point | undefined; playing: boolean; scroll?: ScrollSignal }
+export interface SignalSnapshot { pointer: Point | undefined; pointerTimeMs?: number; playing: boolean; scroll?: ScrollSignal }
 export interface PlaybackSignal {
   playing: boolean;
   event?: 'video.play' | 'video.pause' | 'video.ended';

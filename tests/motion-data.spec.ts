@@ -59,7 +59,7 @@ test('asset references preserve large animations without counting every frame as
 test('v4 playback settings coexist with old locked image layers and reject invalid layer/media combinations', () => {
   const legacy = { ...emptyDesign('youtube', null), schemaVersion: 3, decorations: [{ ...layer(), kind: 'image' }] };
   const old = legacy.decorations[0]!; delete (old as Partial<AnimationDecoration>).format; delete (old as Partial<AnimationDecoration>).playback;
-  expect(parseDesign(legacy)).toMatchObject({ schemaVersion: 8, decorations: [{ kind: 'image', locked: false }] });
+  expect(parseDesign(legacy)).toMatchObject({ schemaVersion: 9, decorations: [{ kind: 'image', locked: false }] });
   const doc = { ...emptyDesign('youtube', 'retro'), decorations: [layer()] };
   expect(parseDesign(doc)).toEqual(doc);
   for (const decoration of [{ ...layer(), playback: { playing: true, loop: true, speed: Infinity } }, { ...layer(), format: 'video' }, { ...layer(), playback: { playing: 'yes', loop: true, speed: 1 } },
