@@ -41,3 +41,14 @@ Bundled locally from [mrdoob/three.js](https://github.com/mrdoob/three.js/tree/r
 Copyright © 2010–2026 three.js authors. MIT license, preserved in
 `assets/licenses/three-MIT.txt`. GLTFLoader and SkeletonUtils use the same license.
 No CDN, remote decoder or third-party executable asset is loaded at runtime.
+
+## @pixiv/three-vrm 3.5.5
+
+Bundled locally from [pixiv/three-vrm](https://github.com/pixiv/three-vrm).
+Copyright (c) 2019-2026 pixiv Inc. MIT license, preserved verbatim in
+`assets/licenses/three-vrm-MIT.txt`. The bundled core, MToon, HDR emissive,
+VRM 0.x material compatibility, node constraint and spring bone packages
+use the same upstream license. Package versions are pinned in package-lock.json.
+
+No third-party avatar, model texture or avatar screenshot is included.
+An avatar's own license remains separate from these software licenses.

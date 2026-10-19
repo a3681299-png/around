@@ -1,6 +1,6 @@
 import { test as base, chromium, type BrowserContext, type Page } from '@playwright/test';
 import { execFile } from 'node:child_process';
-import { mkdir, mkdtemp, readFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 
 const extensionPath = path.resolve('dist');
@@ -51,11 +51,19 @@ export async function launchExtension(profile: string, useFixture = true, option
 }
 
 export const test = base.extend<{ profile: string; extensionId: string; popup: Page; youtube: Page }>({
-  profile: async ({}, use) => {
+  profile: async ({}, use, info) => {
     const work = path.resolve(process.env.WW_TEST_PROFILE_ROOT ?? '.work');
     await mkdir(work, { recursive: true });
     // Chrome Storage's LevelDB can fail on Windows when test-title paths exceed MAX_PATH.
-    await use(await mkdtemp(path.join(work, 'p-')));
+    const profile = await mkdtemp(path.join(work, 'p-'));
+    try { await use(profile); }
+    finally {
+      // Chrome is closed by the dependent context fixture first. Only remove
+      // this fixture's generated child directory; retain failed profiles.
+      if (info.status === info.expectedStatus && path.dirname(profile) === work && path.basename(profile).startsWith('p-')) {
+        await rm(profile, { recursive: true, force: true, maxRetries: 3, retryDelay: 200 }).catch((error: unknown) => { process.stderr.write('Test profile cleanup: ' + String(error) + '\n'); });
+      }
+    }
   },
   context: async ({ profile }, use) => {
     const context = await launchExtension(profile);

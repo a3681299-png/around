@@ -123,7 +123,7 @@ export function createStudioClient(notify: (value: StudioConnectionState) => voi
         if (!files.length || files.length > ASSET_LIMITS.batchCount || files.reduce((n, f) => n + f.size, 0) > (large ? ASSET_LIMITS.batchBytes : ASSET_LIMITS.fileBytes)) throw new Error('一度の追加は8個・通常32MiB、大容量3Dを含む場合は64MiBまでです。');
         if (large) {
           const lease = `studio-upload-${crypto.randomUUID()}`;
-          const surface = new URL(visibilityDocument?.URL ?? '').searchParams.get('surface');
+          const surface = visibilityDocument ? new URL(visibilityDocument.URL).searchParams.get('surface') : undefined;
           const ownerTab = surface === 'sidepanel' ? tabId : (await chrome.tabs.getCurrent())?.id;
           if (ownerTab === undefined) throw new Error('Studioの保持先が見つかりません。');
           try {

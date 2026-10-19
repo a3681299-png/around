@@ -1,0 +1,64 @@
+{
+  "completed": true,
+  "checks": {
+    "stage": "SPA",
+    "browser": "153.0.8010.12",
+    "importAndFirstPaintMs": 8702,
+    "actualHumanoidHeadAndEyesRespond": true,
+    "alpha": {
+      "corner": 0,
+      "painted": 48826
+    },
+    "source": {
+      "format": "vrm",
+      "version": "0.x",
+      "bones": 309,
+      "humanoid": 53,
+      "expressions": 17,
+      "mtoon": true,
+      "springBone": true
+    },
+    "performanceSample": {
+      "durationMs": 5009,
+      "pageTaskCpuPercentOfOneCore": 22.918910308289508,
+      "jsHeapUsedBytes": 70116116,
+      "nativeBase64": true
+    },
+    "renderStats": {
+      "contexts": 1,
+      "lost": false,
+      "assets": 1,
+      "instances": 1,
+      "estimatedGpuAssetBytes": 176450404,
+      "surfaceBytes": 2059200,
+      "paints": 204,
+      "cpuMs": 1.5999999977648258,
+      "maxCpuMs": 1252.0999999977648,
+      "calls": 10,
+      "triangles": 126470,
+      "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "fps": 28.326588907403,
+      "p95CpuMs": 4.899999998509884,
+      "geometries": 5,
+      "textures": 8,
+      "gpuMs": 6.474686
+    },
+    "youtubePlayback": {
+      "readyState": 4,
+      "paused": false,
+      "error": null,
+      "message": ""
+    },
+    "savedReloadAndReconnect": true,
+    "widthsAndNativeSettingsClicks": [
+      1366,
+      1920,
+      1000
+    ],
+    "theater": true,
+    "fullscreen": true,
+    "scroll": true,
+    "spaDocumentPreserved": true,
+    "zeroCleanup": true
+  }
+}

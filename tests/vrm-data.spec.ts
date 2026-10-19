@@ -6,6 +6,7 @@ import { createAssetTransfers } from '../src/assets/transfers';
 import { ASSET_LIMITS } from '../src/assets/validation';
 import { vrmFixture } from './helpers/vrm-fixture';
 import { modelFixture } from './helpers/model-fixture';
+import { evaluateWorld, initialWorldState } from '../src/world/evaluate';
 
 test('VRM1 preserves humanoid, expression, spring and MToon capabilities with v11 roundtrip', () => {
   const source = inspectAsset(vrmFixture(), 'model/vrm').model!; expect(source.format).toBe('vrm'); expect(source.vrm).toMatchObject({ version: '1.0', expressions: ['happy', 'blink'], mtoon: true, lookAt: true, springBone: true });
@@ -14,11 +15,26 @@ test('VRM1 preserves humanoid, expression, spring and MToon capabilities with v1
   expect(parseDesign(JSON.parse(JSON.stringify(doc)))).toEqual(doc);
   const updated = patchModel(settings, { vrm: { expressions: { happy: .6 } } }, source); expect(updated.vrm).toMatchObject({ lookAt: true, headFollow: true, springBone: true, expressions: { happy: .6 } });
   expect(() => patchModel(updated, { vrm: { expressions: { script: 1 } } }, source)).toThrow(); expect(() => patchModel(updated, { vrm: { expressions: { happy: Infinity } } }, source)).toThrow();
+  const run = () => { let state = initialWorldState(); return Array.from({ length: 30 }, (_, index) => {
+    const result = evaluateWorld(doc, state, { timeMs: index * 16, deltaMs: index ? 16 : 0, viewport: { width: 1100, height: 760 }, anchors: {}, signals: { playing: false, pointer: { x: 200 + index * 20, y: 300 } }, events: [], environment: { hidden: false, reducedMotion: false } }); state = result.state; return result;
+  }); };
+  expect(run()).toEqual(run()); expect(run().at(-1)?.frame.models?.[0]?.lookYaw).not.toBe(0);
 });
 
 test('existing v10 GLB settings migrate without losing authored clips, assets or transforms', () => {
   const source = inspectAsset(modelFixture()).model!, doc = { ...emptyDesign('youtube', 'retro'), schemaVersion: 10, decorations: [{ kind: 'model3d', id: 'rig', assetId: `asset-${'b'.repeat(64)}`, name: 'Rig', opacity: .8, visible: true, locked: false, zIndex: 0, source, model: defaultModelSettings(source), placement: { anchor: { kind: 'viewport' }, x: .3, y: .7, widthPx: 250, heightPx: 290, rotationDeg: 25 } }] };
   const before = JSON.stringify(doc), migrated = parseDesign(doc); expect(migrated.schemaVersion).toBe(11); expect(migrated.decorations).toEqual(doc.decorations); expect(JSON.stringify(doc)).toBe(before);
+});
+
+test('legacy VRM0 metadata uses the same three-vrm expression names without relabeling it VRM1', () => {
+  const bytes = vrmFixture((j) => {
+    const modern = j.extensions.VRMC_vrm;
+    j.extensionsUsed = ['VRM', 'KHR_materials_unlit']; delete j.materials[0].extensions.VRMC_materials_mtoon;
+    j.extensions = { VRM: { specVersion: '0.0', humanoid: { humanBones: Object.entries(modern.humanoid.humanBones).map(([bone, v]: [string, any]) => ({ bone, node: v.node })) },
+      meta: { title: 'Original test box', author: 'Tests', licenseName: 'CC0' }, firstPerson: { lookAtTypeName: 'Bone', firstPersonBone: 3 },
+      blendShapeMaster: { blendShapeGroups: [{ name: 'Joy', presetName: 'joy', binds: [{ mesh: 0, index: 0, weight: 40 }] }, { name: 'A', presetName: 'a', binds: [] }] }, secondaryAnimation: { boneGroups: [], colliderGroups: [] }, materialProperties: [] } };
+  });
+  expect(inspectAsset(bytes).model?.vrm).toMatchObject({ version: '0.x', expressions: ['happy', 'aa'], lookAt: true });
 });
 
 for (const [label, mutate] of [
