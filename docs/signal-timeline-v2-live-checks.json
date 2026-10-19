@@ -1,0 +1,332 @@
+{
+  "motion": {
+    "completed": true,
+    "checks": {
+      "stage": "resize and native controls",
+      "delayedPursuitStopAndHeading": true,
+      "cssNumericErrorPx": 0.0003983479855378391,
+      "takeReplayAndLiveIsolation": true,
+      "savedReload": true,
+      "windowWidthsAndSettingsClicks": [
+        1366,
+        1920,
+        1000
+      ],
+      "zeroCleanup": true
+    },
+    "browser": "153.0.8010.12"
+  },
+  "sidePanel": {
+    "completed": true,
+    "checks": {
+      "pointerMask": true,
+      "noDuplicateToolbar": true,
+      "nativePanelResize": "not run: manual native panel divider drag; native window resize is tested automatically",
+      "nativePauseAndFade": true,
+      "settingsClick": true,
+      "theater": true,
+      "fullscreen": true,
+      "scrollAnchor": true,
+      "savedReload": true,
+      "spa": true,
+      "strengthZeroCleanup": true
+    },
+    "geometry": [
+      {
+        "label": "1366",
+        "innerWidth": 964,
+        "outerWidth": 1366,
+        "resizeCount": 2,
+        "controls": [
+          {
+            "selector": ".ytp-play-button",
+            "rect": {
+              "x": 12,
+              "y": 627.25,
+              "width": 40,
+              "height": 40,
+              "right": 52,
+              "bottom": 667.25
+            },
+            "hit": true
+          },
+          {
+            "selector": ".ytp-settings-button",
+            "rect": {
+              "x": 789,
+              "y": 627.25,
+              "width": 48,
+              "height": 40,
+              "right": 837,
+              "bottom": 667.25
+            },
+            "hit": true
+          },
+          {
+            "selector": ".ytp-size-button",
+            "rect": {
+              "x": 837,
+              "y": 627.25,
+              "width": 48,
+              "height": 40,
+              "right": 885,
+              "bottom": 667.25
+            },
+            "hit": true
+          },
+          {
+            "selector": ".ytp-fullscreen-button",
+            "rect": {
+              "x": 885,
+              "y": 627.25,
+              "width": 48,
+              "height": 40,
+              "right": 933,
+              "bottom": 667.25
+            },
+            "hit": true
+          }
+        ]
+      },
+      {
+        "label": "1920",
+        "innerWidth": 1518,
+        "outerWidth": 1920,
+        "resizeCount": 3,
+        "controls": [
+          {
+            "selector": ".ytp-play-button",
+            "rect": {
+              "x": 28,
+              "y": 685.265625,
+              "width": 40,
+              "height": 40,
+              "right": 68,
+              "bottom": 725.265625
+            },
+            "hit": true
+          },
+          {
+            "selector": ".ytp-settings-button",
+            "rect": {
+              "x": 902,
+              "y": 685.265625,
+              "width": 48,
+              "height": 40,
+              "right": 950,
+              "bottom": 725.265625
+            },
+            "hit": true
+          },
+          {
+            "selector": ".ytp-size-button",
+            "rect": {
+              "x": 950,
+              "y": 685.265625,
+              "width": 48,
+              "height": 40,
+              "right": 998,
+              "bottom": 725.265625
+            },
+            "hit": true
+          },
+          {
+            "selector": ".ytp-fullscreen-button",
+            "rect": {
+              "x": 998,
+              "y": 685.265625,
+              "width": 48,
+              "height": 40,
+              "right": 1046,
+              "bottom": 725.265625
+            },
+            "hit": true
+          }
+        ]
+      },
+      {
+        "label": "1000",
+        "innerWidth": 598,
+        "outerWidth": 1000,
+        "resizeCount": 4,
+        "controls": [
+          {
+            "selector": ".ytp-play-button",
+            "rect": {
+              "x": 12,
+              "y": 421.375,
+              "width": 40,
+              "height": 40,
+              "right": 52,
+              "bottom": 461.375
+            },
+            "hit": true
+          },
+          {
+            "selector": ".ytp-settings-button",
+            "rect": {
+              "x": 423,
+              "y": 421.375,
+              "width": 48,
+              "height": 40,
+              "right": 471,
+              "bottom": 461.375
+            },
+            "hit": true
+          },
+          {
+            "selector": ".ytp-size-button",
+            "rect": {
+              "x": 471,
+              "y": 421.375,
+              "width": 48,
+              "height": 40,
+              "right": 519,
+              "bottom": 461.375
+            },
+            "hit": true
+          },
+          {
+            "selector": ".ytp-fullscreen-button",
+            "rect": {
+              "x": 519,
+              "y": 421.375,
+              "width": 48,
+              "height": 40,
+              "right": 567,
+              "bottom": 461.375
+            },
+            "hit": true
+          }
+        ]
+      },
+      {
+        "label": "before-resize",
+        "innerWidth": 1518,
+        "outerWidth": 1920,
+        "resizeCount": 5,
+        "controls": [
+          {
+            "selector": ".ytp-play-button",
+            "rect": {
+              "x": 28,
+              "y": 685.265625,
+              "width": 40,
+              "height": 40,
+              "right": 68,
+              "bottom": 725.265625
+            },
+            "hit": true
+          },
+          {
+            "selector": ".ytp-settings-button",
+            "rect": {
+              "x": 902,
+              "y": 685.265625,
+              "width": 48,
+              "height": 40,
+              "right": 950,
+              "bottom": 725.265625
+            },
+            "hit": true
+          },
+          {
+            "selector": ".ytp-size-button",
+            "rect": {
+              "x": 950,
+              "y": 685.265625,
+              "width": 48,
+              "height": 40,
+              "right": 998,
+              "bottom": 725.265625
+            },
+            "hit": true
+          },
+          {
+            "selector": ".ytp-fullscreen-button",
+            "rect": {
+              "x": 998,
+              "y": 685.265625,
+              "width": 48,
+              "height": 40,
+              "right": 1046,
+              "bottom": 725.265625
+            },
+            "hit": true
+          }
+        ]
+      },
+      {
+        "label": "theater",
+        "innerWidth": 1518,
+        "outerWidth": 1920,
+        "resizeCount": 5,
+        "controls": [
+          {
+            "selector": ".ytp-play-button",
+            "rect": {
+              "x": 12,
+              "y": 813,
+              "width": 40,
+              "height": 40,
+              "right": 52,
+              "bottom": 853
+            },
+            "hit": true
+          },
+          {
+            "selector": ".ytp-settings-button",
+            "rect": {
+              "x": 1343,
+              "y": 813,
+              "width": 48,
+              "height": 40,
+              "right": 1391,
+              "bottom": 853
+            },
+            "hit": true
+          },
+          {
+            "selector": ".ytp-size-button",
+            "rect": {
+              "x": 1391,
+              "y": 813,
+              "width": 48,
+              "height": 40,
+              "right": 1439,
+              "bottom": 853
+            },
+            "hit": true
+          },
+          {
+            "selector": ".ytp-fullscreen-button",
+            "rect": {
+              "x": 1439,
+              "y": 813,
+              "width": 48,
+              "height": 40,
+              "right": 1487,
+              "bottom": 853
+            },
+            "hit": true
+          }
+        ]
+      }
+    ],
+    "browser": "153.0.8010.12"
+  },
+  "timelineV1": {
+    "completed": true,
+    "checks": {
+      "stage": "record",
+      "gifRuleEditedAndSaved": true,
+      "scrollSpeedAndDirectionIndependent": true,
+      "liveInputIsolated": true,
+      "ghostProjection": true,
+      "reverseWithoutPageActions": true,
+      "savedRuleAndTakeReload": true,
+      "offCleanup": true
+    },
+    "browser": "153.0.8010.12"
+  }
+}

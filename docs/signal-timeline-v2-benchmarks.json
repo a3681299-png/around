@@ -1,0 +1,173 @@
+{
+  "motion": {
+    "measuredAt": "2026-10-19T04:50:38.000Z",
+    "runtimeVersion": "1.2.0",
+    "node": "v24.16.0",
+    "platform": "win32 x64",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13650HX",
+    "scene": {
+      "media": 32,
+      "groups": 16,
+      "masks": 48,
+      "rules": 48,
+      "motionControllers": 48
+    },
+    "evaluation": {
+      "sourceInputs": 360,
+      "warmupRounds": 10,
+      "measuredRounds": 30,
+      "existingScroll": {
+        "samples": 10800,
+        "medianMs": 0.025,
+        "p95Ms": 0.031,
+        "meanMs": 0.027
+      },
+      "pointerKeysAndPursuit": {
+        "samples": 10800,
+        "medianMs": 0.092,
+        "p95Ms": 0.109,
+        "meanMs": 0.094
+      }
+    },
+    "seek": {
+      "samples": 3600,
+      "durationMs": 59983.333333333336,
+      "jsonCharacters": 1501662,
+      "prepareMs": 8.662699999999859,
+      "coldEndSeekMs": 367.83749999999986,
+      "random": {
+        "samples": 256,
+        "medianMs": 1.648,
+        "p95Ms": 3.309,
+        "meanMs": 1.727
+      },
+      "checkpoints": 113,
+      "heapDeltaBytes": 41816768,
+      "heapNote": "Uncollected JS heap delta; not retained size, peak memory or browser memory."
+    },
+    "checksum": 13230285.982068604,
+    "excludes": [
+      "DOM/style/layout/paint",
+      "GPU",
+      "media decoding",
+      "browser scheduling",
+      "process CPU utilization and peak memory"
+    ]
+  },
+  "world": {
+    "measuredAt": "2026-10-19T04:50:42.130Z",
+    "runtimeVersion": "1.2.0",
+    "node": "v24.16.0",
+    "platform": "win32 x64",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13650HX",
+    "baseline": "1d23ec0 draw/paint numeric reference with equivalent returned data; shared unchanged geometry and mask primitives",
+    "excludes": [
+      "DOM/layout/style application",
+      "decoding",
+      "GPU",
+      "browser scheduling"
+    ],
+    "workloads": [
+      {
+        "label": "mixed-visibility",
+        "media": 32,
+        "groups": 16,
+        "inputSteps": 180,
+        "warmupRounds": 20,
+        "measuredRounds": 50,
+        "legacy": {
+          "samples": 9000,
+          "medianUs": 47.9,
+          "p95Us": 63,
+          "meanUs": 50.442
+        },
+        "runtime": {
+          "samples": 9000,
+          "medianUs": 46.1,
+          "p95Us": 61.9,
+          "meanUs": 48.651
+        },
+        "medianRatio": 0.962
+      },
+      {
+        "label": "all-visible",
+        "media": 32,
+        "groups": 16,
+        "inputSteps": 180,
+        "warmupRounds": 20,
+        "measuredRounds": 50,
+        "legacy": {
+          "samples": 9000,
+          "medianUs": 52.3,
+          "p95Us": 140.6,
+          "meanUs": 74.408
+        },
+        "runtime": {
+          "samples": 9000,
+          "medianUs": 49.4,
+          "p95Us": 133.6,
+          "meanUs": 70.349
+        },
+        "medianRatio": 0.945
+      }
+    ],
+    "checksum": 22435.200000000103
+  },
+  "timeline": {
+    "measuredAt": "2026-10-19T04:50:43.583Z",
+    "runtimeVersion": "1.2.0",
+    "node": "v24.16.0",
+    "platform": "win32 x64",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13650HX",
+    "scene": {
+      "media": 32,
+      "groups": 16,
+      "masks": 48,
+      "rules": 48
+    },
+    "evaluation": {
+      "inputSteps": 180,
+      "warmupRounds": 20,
+      "measuredRounds": 50,
+      "withoutRules": {
+        "samples": 9000,
+        "medianMs": 0.015,
+        "p95Ms": 0.018,
+        "meanMs": 0.015
+      },
+      "withRules": {
+        "samples": 9000,
+        "medianMs": 0.022,
+        "p95Ms": 0.027,
+        "meanMs": 0.023
+      }
+    },
+    "seek": {
+      "samples": 3600,
+      "durationMs": 179950,
+      "jsonCharacters": 1198733,
+      "prepareMs": 7.1477000000001,
+      "coldEndSeekMs": 114.76499999999999,
+      "warmRandom": {
+        "samples": 512,
+        "medianMs": 0.473,
+        "p95Ms": 0.965,
+        "meanMs": 0.501
+      },
+      "stateCheckpoints": 113,
+      "cacheStride": 32
+    },
+    "projection": {
+      "ghosts": 80,
+      "timeMs": 4.832900000000109
+    },
+    "checksum": 16643.12314299963,
+    "excludes": [
+      "DOM/style/layout/paint",
+      "GPU",
+      "media decoding",
+      "browser/communication scheduling",
+      "process memory and CPU utilization"
+    ]
+  }
+}

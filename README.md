@@ -60,6 +60,8 @@ BBSの番号は現在読み込まれたコメントと返信の表示順で、�
 
 クリエイター向け編集の実験は `codex/creator-editor-spike` と専用worktreeで進めます。Popupの「Studioを開く（このタブ）」で、実際のYouTubeを中央にした制作画面を開けます。「デザインを編集（実験）」のクイック編集も維持しています。動画カードの装飾を編集したり、PNG・WebP素材を読み込んで移動・サイズ変更・回転したりできます。レイヤー一覧、ロック、複製、複数選択と一括移動、Undo／Redo、任意のスナップ、整列・等間隔配置にも対応します。GIF・アニメーションWebP・Lottie JSONは、編集画面で再生を確認し、停止・ループ・Lottieの速度を設定できます。
 
+Signal Timeline v2では「モーション → マウスを追いかける」で、遅延・最高速度・加減速・停止距離・移動方向への回転を設定できます。Timelineの「対象」「入力」からマウス位置・距離・角度・速度を位置／回転／不透明度へ接続します。基本配置は保持し、位置と回転にはオフセットを加えます。操作テイクの録画・再生・シーク、別保存にも対応します。操作・構造は [signal-timeline-v2.md](docs/signal-timeline-v2.md)、検証結果と制約は [signal-timeline-v2-verification.md](docs/signal-timeline-v2-verification.md) を参照してください。
+
 円形マスクで画像の一部を照らし、マウスに追従させたり動画の一時停止でフェードアウトさせたりできます。設定は既存の保存・履歴と共通です。構造と操作は [effects-and-signals.md](docs/effects-and-signals.md) を参照してください。
 
 複数素材をグループ化し、階層表示と全体移動・不透明度・共通マスクを設定できます。使い方と制約は [group-layers.md](docs/group-layers.md) にまとめています。素材は拡張専用IndexedDB、デザインはバージョン付きJSONで保存します。使い方は [creator-editor.md](docs/creator-editor.md)、アニメーションの制限は [animations.md](docs/animations.md) を参照してください。実験用worktreeの `dist` は、別のChromeプロファイルへ読み込みます。

@@ -16,7 +16,8 @@
     "check": "npm run lint && npm run build && npm test",
     "lint": "node scripts/lint.mjs",
     "benchmark:world": "node scripts/benchmark-world.mjs",
-    "benchmark:timeline": "node scripts/benchmark-signal-timeline.mjs"
+    "benchmark:timeline": "node scripts/benchmark-signal-timeline.mjs",
+    "benchmark:motion": "node scripts/benchmark-signal-motion.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",

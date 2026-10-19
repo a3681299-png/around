@@ -1,4 +1,5 @@
 import { takeSignalSeries } from '../world/take-signals';
+import { signalPreset } from '../signals/presets';
 import { propertyLabel } from '../signals/keyframes';
 import type { WorldScene } from '../world/types';
 import { buttonIcon } from '../editor/icons';
@@ -25,7 +26,7 @@ export function createTimelineTransport(doc: Document, root: HTMLElement, port: 
   const view = get<HTMLSelectElement>('.timeline-view'), rate = get<HTMLSelectElement>('.take-rate'), library = get<HTMLSelectElement>('.take-library-select');
   buttonIcon(get<HTMLButtonElement>('.take-library-refresh'), 'refresh', '保存したテイクを更新'); buttonIcon(get<HTMLButtonElement>('.take-library-delete'), 'delete', '選んだ保存テイクを削除');
   const takeScroll = doc.createElement('div'); takeScroll.className = 'timeline-take-scroll'; takeScroll.hidden = true;
-  const canvas = doc.createElement('div'); canvas.className = 'take-canvas'; const svg = doc.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('aria-label', '記録時間とスクロール進捗の波形'); canvas.append(svg); takeScroll.append(canvas); get('.timeline-scroll').before(takeScroll);
+  const canvas = doc.createElement('div'); canvas.className = 'take-canvas'; const svg = doc.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('aria-label', '記録時間と入力シグナル・マウスX/Yの波形'); canvas.append(svg); takeScroll.append(canvas); get('.timeline-scroll').before(takeScroll);
   let update = port.snapshot(), take = update.take ?? undefined, editable = true, alive = true, expanded = false, message = '', libraryKey = '', graphKey = '';
   let visual: { timeMs: number; progress: number }[] = [], drag = false, seekFrame: number | undefined, requestedTime: number | undefined, sending = false;
   let line: SVGLineElement | undefined, tracked = '';
@@ -94,7 +95,7 @@ export function createTimelineTransport(doc: Document, root: HTMLElement, port: 
         node('text', { x: '130', y: String(height - 3), class: 'take-projection-label' }, `${propertyLabel(current.target.property)} · ◇ ${ghosts.length}${ghosts.length > 256 ? '（先頭256個）' : ''}`);
         for (const ghost of ghosts.slice(0, 256)) {
           const key = current.keyframes.find((key) => key.id === ghost.keyId)!, px = x(ghost.timeMs), py = y(outputRatio(key.value));
-          const group = node('g', { class: 'take-ghost', 'data-ghost-key': key.id, tabindex: '0', role: 'button', 'aria-label': `${(ghost.timeMs / 1000).toFixed(2)}秒の投影キー。元の進捗 ${(current.source.inputRange[0] + key.input * (current.source.inputRange[1] - current.source.inputRange[0])) * 100}%を編集` });
+          const group = node('g', { class: 'take-ghost', 'data-ghost-key': key.id, tabindex: '0', role: 'button', 'aria-label': `${(ghost.timeMs / 1000).toFixed(2)}秒の投影キー。元の進捗 ${Math.round((current.source.inputRange[0] + key.input * (current.source.inputRange[1] - current.source.inputRange[0])) * (signalPreset(current.source).unit === '%' ? 10000 : 100)) / 100}${signalPreset(current.source).unit}を編集` });
           const hit = node('rect', { x: String(px - 8), y: String(py - 8), width: '16', height: '16', fill: 'transparent' });
           const diamond = node('path', { d: `M${px} ${py - 5}l5 5 -5 5 -5 -5Z` }); group.append(hit, diamond);
           const title = doc.createElementNS('http://www.w3.org/2000/svg', 'title'); title.textContent = '元のキーをシグナル空間で編集。ゴースト自体は保存されません。'; group.append(title);
