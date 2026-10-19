@@ -9,9 +9,10 @@ import type { WorldFrame } from '../../world/types';
 import { loadAsset } from '../../assets/client';
 import { inspectGlb } from '../../assets/glb';
 import type { Decoration, ModelDecoration } from '../../design/types';
+import { ASSET_PROFILE, assetProfile, profileAsync, profileSync, profileEnd, flushAssetProfile } from '../../diagnostics/asset-profile';
 
 export interface ModelSurface { element: HTMLDivElement; update(layer: Decoration, visible: boolean): void; destroy(): void }
-interface Resource { key: string; promise: Promise<GLTF>; value?: GLTF; refs: number; bytes: number; disposed: boolean }
+interface Resource { key: string; promise: Promise<GLTF>; value?: GLTF; refs: number; bytes: number; disposed: boolean; trace?: string }
 function dispose(gltf: GLTF) {
   const geometries = new Set<Mesh['geometry']>(), materials = new Set<Material>(), textures = new Set<Texture>(), skeletons = new Set<{ dispose(): void }>();
   for (const texture of gltf.userData['wwTextures'] ?? []) if (texture instanceof Texture) textures.add(texture);
@@ -29,7 +30,7 @@ function dispose(gltf: GLTF) {
 }
 
 /** One WebGL context; copied surfaces preserve the existing DOM composition/masks. */
-export function createModelRenderer(doc: Document, report: (message: string) => void, observe: (stats: Record<string, unknown>) => void, parent: ShadowRoot) {
+export function createModelRenderer(doc: Document, report: (message: string) => void, observe: (stats: Record<string, unknown>) => void, parent: ShadowRoot, readAsset: typeof loadAsset = loadAsset) {
   const view = doc.defaultView!, cache = new Map<string, Resource>(), instances = new Set<Instance>();
   let renderer: WebGLRenderer | undefined, closed = false, lost = false, frame: number | undefined, budgetBytes = 0;
   let lastPaint = -Infinity, paints = 0, cpuMs = 0, maxCpuMs = 0;
@@ -41,9 +42,9 @@ export function createModelRenderer(doc: Document, report: (message: string) => 
     calls, triangles, backend, fps: paintTimes.length > 1 ? (paintTimes.length - 1) * 1000 / (paintTimes.at(-1)! - paintTimes[0]!) : 0,
     p95CpuMs: [...cpuSamples].sort((a, b) => a - b)[Math.floor(cpuSamples.length * .95)] ?? 0, geometries: renderer?.info.memory.geometries ?? 0, textures: renderer?.info.memory.textures ?? 0, gpuMs });
   const reduced = view.matchMedia('(prefers-reduced-motion: reduce)');
-  const ensure = () => {
+  const ensure = (trace?: string) => {
     if (renderer) return renderer;
-    renderer = new WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power', premultipliedAlpha: true });
+    renderer = profileSync(trace, 'gpu.create-context', () => new WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power', premultipliedAlpha: true }));
     renderer.domElement.hidden = true; renderer.domElement.dataset.wwThreeBackend = ''; parent.append(renderer.domElement);
     const gl = renderer.getContext(), debug = gl.getExtension('WEBGL_debug_renderer_info'); backend = String(gl.getParameter(debug?.UNMASKED_RENDERER_WEBGL ?? gl.RENDERER));
     renderer.setClearColor(new Color(0), 0); renderer.setPixelRatio(1);
@@ -61,27 +62,34 @@ export function createModelRenderer(doc: Document, report: (message: string) => 
     const key = vrm ? `${id}:vrm:${++resourceSerial}` : id;
     const found = cache.get(key); if (found) { found.refs++; return found; }
     const entry: Resource = { key, refs: 1, bytes: 0, disposed: false, promise: Promise.resolve(undefined as never) }; cache.set(key, entry);
-    entry.promise = loadAsset(id).then(async ({ blob, metadata }) => {
+    const readStart = ASSET_PROFILE ? performance.now() : 0;
+    entry.promise = readAsset(id).then(async ({ blob, metadata }) => {
+      const trace = assetProfile(id); if (trace) entry.trace = trace;
+      profileEnd(trace, 'renderer.source-load', readStart);
       if (!metadata.model) throw new Error('GLB素材が見つかりません。');
       if (entry.disposed || closed) throw new Error('読み込みを中止しました。');
-      const bytes = new Uint8Array(await blob.arrayBuffer());
-      if (entry.disposed || closed) throw new Error('読み込みを中止しました。'); const { gpuBytes } = inspectGlb(bytes);
+      const bytes = new Uint8Array(await profileAsync(trace, 'renderer.blob-read', () => blob.arrayBuffer(), { bytes: blob.size }));
+      if (entry.disposed || closed) throw new Error('読み込みを中止しました。'); const { gpuBytes } = profileSync(trace, 'renderer.inspect', () => inspectGlb(bytes));
       if (budgetBytes + gpuBytes > 256 * 1024 * 1024) throw new Error('3D描画資源の予算256MiBを超えました。ほかのモデルを削除してください。');
       budgetBytes += gpuBytes; entry.bytes = gpuBytes;
       const manager = new LoadingManager(); manager.setURLModifier((url) => { if (!url.startsWith('blob:')) throw new Error('GLBからの外部アクセスを拒否しました。'); return url; });
       const textures = new Set<Texture>(); let failed = false;
       const releaseTexture = (t: Texture) => { t.dispose(); if (typeof ImageBitmap !== 'undefined' && t.source.data instanceof ImageBitmap) t.source.data.close(); };
       const loader = new GLTFLoader(manager);
-      if (metadata.model.vrm) loader.register((parser) => new VRMLoaderPlugin(parser, { autoUpdateHumanBones: false }));
-      loader.register((parser) => ({ name: 'WW_LOCAL_TEXTURE_GUARD', loadTexture(index: number) { return parser.loadTexture(index).then((texture) => { if (!texture) throw new Error('GLB内のテクスチャを読み込めません。'); textures.add(texture); if (failed || entry.disposed || closed) releaseTexture(texture); return texture; }); } }));
+      if (metadata.model.vrm) loader.register((parser) => {
+        const plugin = new VRMLoaderPlugin(parser, { autoUpdateHumanBones: false });
+        if (ASSET_PROFILE && trace) { const afterRoot = plugin.afterRoot.bind(plugin); plugin.afterRoot = (gltf) => profileAsync(trace, 'parse.vrm-after-root', () => afterRoot(gltf)); }
+        return plugin;
+      });
+      loader.register((parser) => ({ name: 'WW_LOCAL_TEXTURE_GUARD', loadTexture(index: number) { return profileAsync(trace, 'parse.texture', () => parser.loadTexture(index), { count: 1 }).then((texture) => { if (!texture) throw new Error('GLB内のテクスチャを読み込めません。'); textures.add(texture); if (failed || entry.disposed || closed) releaseTexture(texture); return texture; }); } }));
       let gltf: GLTF;
-      try { gltf = await loader.parseAsync(bytes.buffer, ''); }
+      try { gltf = await profileAsync(trace, 'parse.gltf-inclusive', () => loader.parseAsync(bytes.buffer, '')); }
       catch (error) { failed = true; textures.forEach(releaseTexture); throw error; }
       gltf.userData['wwTextures'] = [...textures];
       if (entry.disposed || closed) { dispose(gltf); throw new Error('読み込みを中止しました。'); }
       if (metadata.model.vrm) {
         const avatar = isVrm(gltf); if (!avatar) { dispose(gltf); throw new Error('VRMのHumanoidを読み込めませんでした。'); }
-        try { VRMUtils.removeUnnecessaryVertices(avatar.scene); VRMUtils.rotateVRM0(avatar); }
+        try { profileSync(trace, 'parse.vrm-postprocess', () => { VRMUtils.removeUnnecessaryVertices(avatar.scene); VRMUtils.rotateVRM0(avatar); }); }
         catch (error) { dispose(gltf); throw error; }
       }
       // glTF permits unnamed nodes. Loader tracks then target source UUIDs,
@@ -96,7 +104,7 @@ export function createModelRenderer(doc: Document, report: (message: string) => 
   interface Instance {
     element: HTMLDivElement; canvas: HTMLCanvasElement; scene: Scene; camera: OrthographicCamera; visual: Group;
     player?: ReturnType<typeof createRigPlayer>; vrmPlayer?: ReturnType<typeof createVrmPlayer>; inPlace?: boolean; evaluation?: ModelEvaluation; worldTime?: number;
-    root?: Object3D; source?: GLTF; entry?: Resource; layer?: ModelDecoration; assetId: string; visible: boolean; dirty: boolean; failed: boolean; alive: boolean; generation: number;
+    root?: Object3D; source?: GLTF; entry?: Resource; layer?: ModelDecoration; assetId: string; visible: boolean; dirty: boolean; failed: boolean; alive: boolean; generation: number; profiled?: boolean;
   }
   const cancel = () => { if (frame !== undefined) view.cancelAnimationFrame(frame); frame = undefined; };
   function schedule() { if (!closed && !lost && !doc.hidden && frame === undefined && [...instances].some((i) => i.visible && i.root && i.dirty && !i.failed)) frame = view.requestAnimationFrame(paint); }
@@ -109,7 +117,9 @@ export function createModelRenderer(doc: Document, report: (message: string) => 
     for (const i of instances) {
       if (!i.alive || !i.visible || !i.root || !i.dirty || i.failed || !i.layer) continue;
       try {
-        const r = ensure(), p = i.layer.placement, scale = Math.min(1.5, 1024 / Math.max(p.widthPx, p.heightPx));
+        const trace = ASSET_PROFILE && !i.profiled ? i.entry?.trace : undefined;
+        const firstStart = trace ? performance.now() : 0;
+        const r = ensure(trace), p = i.layer.placement, scale = Math.min(1.5, 1024 / Math.max(p.widthPx, p.heightPx));
         const budgetScale = Math.min(scale, Math.sqrt(512 * 1024 / (p.widthPx * p.heightPx)));
         const w = Math.max(1, Math.round(p.widthPx * budgetScale)), h = Math.max(1, Math.round(p.heightPx * budgetScale));
         if (w !== i.canvas.width || h !== i.canvas.height) { i.canvas.width = w; i.canvas.height = h; }
@@ -123,13 +133,25 @@ export function createModelRenderer(doc: Document, report: (message: string) => 
         i.camera.left = -aspect * .75; i.camera.right = aspect * .75; i.camera.top = .75; i.camera.bottom = -.75; i.camera.updateProjectionMatrix();
         const m = i.layer.model; i.visual.rotation.set(m.rotationX * Math.PI / 180, (m.rotationY + (i.evaluation?.yawDeg ?? 0) + (m.locomotion.faceMovement ? m.locomotion.forwardDeg : 0)) * Math.PI / 180, m.rotationZ * Math.PI / 180);
         const avatar = isVrm(i.source!);
+        const playerStart = trace ? performance.now() : 0;
         if (i.inPlace !== m.inPlace || !i.player && !i.vrmPlayer) { i.player?.destroy(); i.vrmPlayer?.destroy(); if (avatar) i.vrmPlayer = createVrmPlayer(i.source!, avatar, m.inPlace); else i.player = createRigPlayer(i.source!, i.root, m.inPlace); i.inPlace = m.inPlace; }
+        if (ASSET_PROFILE && trace) profileEnd(trace, 'first.player-create', playerStart);
         if (i.evaluation) { if (i.vrmPlayer) i.element.dataset.vrmPose = JSON.stringify(i.vrmPlayer.paint(i.evaluation, m, i.worldTime ?? 0)); else i.player?.paint(i.evaluation, m); }
-        r.render(i.scene, i.camera); calls += r.info.render.calls; triangles += r.info.render.triangles;
+        if (ASSET_PROFILE && trace) profileSync(trace, 'first.webgl-render-inclusive', () => r.render(i.scene, i.camera)); else r.render(i.scene, i.camera);
+        calls += r.info.render.calls; triangles += r.info.render.triangles;
         const context = i.canvas.getContext('2d'); if (!context) throw new Error('3D描画用キャンバスを確保できませんでした。');
-        context.clearRect(0, 0, w, h); context.drawImage(r.domElement, 0, 0); i.dirty = false;
+        if (ASSET_PROFILE && trace) profileSync(trace, 'first.canvas-copy', () => { context.clearRect(0, 0, w, h); context.drawImage(r.domElement, 0, 0); });
+        else { context.clearRect(0, 0, w, h); context.drawImage(r.domElement, 0, 0); } i.dirty = false;
         i.element.dataset.playback = reduced.matches ? 'reduced-motion' : i.layer.model.playing && i.evaluation?.clip !== null ? 'playing' : 'paused';
         if (i.evaluation) { i.element.dataset.modelFrame = JSON.stringify(i.evaluation); } i.element.dataset.renderer = 'three'; i.element.style.visibility = 'visible'; paints++;
+        if (ASSET_PROFILE && trace) {
+          const generation = i.generation; i.profiled = true; profileEnd(trace, 'first.paint-inclusive', firstStart);
+          view.requestAnimationFrame(() => view.requestAnimationFrame(() => {
+            if (!i.alive || closed || generation !== i.generation) return;
+            profileEnd(trace, 'first.presentation-proxy-inclusive', firstStart);
+            i.element.dataset.profileReady = trace; void flushAssetProfile();
+          }));
+        }
       } catch (error) { i.dirty = false; i.failed = true; i.element.dataset.playback = 'error'; report(error instanceof Error ? error.message : 'WebGLを利用できません。'); }
     }
     if (gpu && !gpu.gl.isContextLost()) { gpu.gl.endQuery(gpu.target); queries.push(gpu.query); }
@@ -157,7 +179,8 @@ export function createModelRenderer(doc: Document, report: (message: string) => 
       const visual = new Group(); scene.add(visual);
       const i: Instance = { element, canvas, scene, camera, visual, assetId: '', visible: false, dirty: false, failed: false, alive: true, generation: 0 }; instances.add(i);
       const unload = () => {
-        i.generation++; i.player?.destroy(); i.vrmPlayer?.destroy(); delete i.player; delete i.vrmPlayer; if (i.root) { if (!i.source || !isVrm(i.source)) disposeInstanceSkeletons(i.root); i.visual.clear(); delete i.root; }
+        if (ASSET_PROFILE) delete element.dataset.profileReady;
+        i.generation++; delete i.profiled; i.player?.destroy(); i.vrmPlayer?.destroy(); delete i.player; delete i.vrmPlayer; if (i.root) { if (!i.source || !isVrm(i.source)) disposeInstanceSkeletons(i.root); i.visual.clear(); delete i.root; }
         if (i.entry) release(i.entry); delete i.entry; delete i.source;
       };
       return { element,
@@ -173,7 +196,7 @@ export function createModelRenderer(doc: Document, report: (message: string) => 
             void entry.promise.then((gltf) => {
               if (!i.alive || generation !== i.generation) return;
               i.source = gltf; const root = isVrm(gltf) ? gltf.scene : clone(gltf.scene); i.root = root;
-              const bounds = new Box3().setFromObject(root), size = bounds.getSize(new Vector3()), center = bounds.getCenter(new Vector3());
+              const bounds = profileSync(entry.trace, 'renderer.bounds', () => new Box3().setFromObject(root)), size = bounds.getSize(new Vector3()), center = bounds.getCenter(new Vector3());
               const edge = Math.max(size.x, size.y, size.z); if (!Number.isFinite(edge) || edge < 1e-8) throw new Error('GLBに表示できるメッシュがありません。');
               const normal = new Group(); normal.scale.setScalar(1 / edge); normal.position.copy(center).multiplyScalar(-1 / edge); normal.add(root); i.visual.add(normal);
               i.dirty = true; schedule();

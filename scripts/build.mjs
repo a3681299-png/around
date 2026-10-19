@@ -6,7 +6,10 @@ import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
-const outDir = join(root, 'dist');
+const profiling = process.env.WW_ASSET_PROFILE === '1';
+const outputName = profiling ? '.work/asset-profile-dist' : process.env.WW_BUILD_OUT ?? 'dist';
+if (!/^(dist|\.work\/[a-zA-Z0-9_-]+)$/.test(outputName)) throw new Error('WW_BUILD_OUT must be dist or a direct .work child.');
+const outDir = join(root, outputName);
 const watching = process.argv.includes('--watch');
 const worldMode = process.env.WW_WORLD_MODE ?? 'runtime';
 if (!['legacy', 'compare', 'runtime'].includes(worldMode)) throw new Error('WW_WORLD_MODE must be legacy, compare or runtime.');
@@ -26,17 +29,19 @@ await mkdir(join(outDir, 'popup'), { recursive: true });
 await mkdir(join(outDir, 'content'), { recursive: true });
 await mkdir(join(outDir, 'background'), { recursive: true });
 await mkdir(join(outDir, 'studio'), { recursive: true });
+if (profiling) await mkdir(join(outDir, 'diagnostics'), { recursive: true });
 
 async function copyStaticFiles() {
   await Promise.all([
     cp(join(root, 'assets'), join(outDir, 'assets'), { recursive: true }),
     copyFile(join(root, 'THIRD_PARTY_NOTICES.md'), join(outDir, 'THIRD_PARTY_NOTICES.md')),
-    copyFile(join(root, 'manifest.json'), join(outDir, 'manifest.json')),
+    profiling ? import('node:fs/promises').then(({ writeFile }) => writeFile(join(outDir, 'manifest.json'), JSON.stringify({ ...manifest, web_accessible_resources: [...manifest.web_accessible_resources, { resources: ['diagnostics/asset-benchmark.html'], matches: ['https://www.youtube.com/*'] }] }, null, 2))) : copyFile(join(root, 'manifest.json'), join(outDir, 'manifest.json')),
     copyFile(join(root, 'src/popup/index.html'), join(outDir, 'popup/index.html')),
     copyFile(join(root, 'src/popup/popup.css'), join(outDir, 'popup/popup.css')),
     copyFile(join(root, 'src/studio/index.html'), join(outDir, 'studio/index.html')),
     copyFile(join(root, 'src/studio/studio.css'), join(outDir, 'studio/studio.css')),
   ]);
+  if (profiling) await copyFile(join(root, 'src/diagnostics/asset-benchmark.html'), join(outDir, 'diagnostics/asset-benchmark.html'));
 }
 
 const shared = {
@@ -46,28 +51,29 @@ const shared = {
   charset: 'utf8',
   legalComments: 'none',
   logLevel: 'info',
-  define: { __WW_WORLD_MODE__: JSON.stringify(worldMode), __WW_WORLD_DEVTOOLS__: String(process.env.WW_WORLD_DEVTOOLS === '1') },
+  define: { __WW_WORLD_MODE__: JSON.stringify(worldMode), __WW_WORLD_DEVTOOLS__: String(process.env.WW_WORLD_DEVTOOLS === '1'), __WW_ASSET_PROFILE__: String(profiling) },
 };
 
 const builds = await Promise.all([
-  context({ ...shared, entryPoints: ['src/browser/studio-page.ts'], outfile: 'dist/studio/index.js', format: 'iife', loader: { '.css': 'text' } }),
+  ...(profiling ? [context({ ...shared, entryPoints: ['src/diagnostics/asset-benchmark.ts'], outfile: join(outDir, 'diagnostics/asset-benchmark.js'), format: 'iife' })] : []),
+  context({ ...shared, entryPoints: ['src/browser/studio-page.ts'], outfile: join(outDir, 'studio/index.js'), format: 'iife', loader: { '.css': 'text' } }),
   context({
     ...shared,
     entryPoints: ['src/background/index.ts'],
-    outfile: 'dist/background/index.js',
+    outfile: join(outDir, 'background/index.js'),
     format: 'iife',
   }),
   context({
     ...shared,
     entryPoints: ['src/content/index.ts'],
-    outfile: 'dist/content/index.js',
+    outfile: join(outDir, 'content/index.js'),
     format: 'iife',
     loader: { '.css': 'text' },
   }),
   context({
     ...shared,
     entryPoints: ['src/popup/index.ts'],
-    outfile: 'dist/popup/index.js',
+    outfile: join(outDir, 'popup/index.js'),
     format: 'iife',
     loader: { '.css': 'text' },
   }),
@@ -98,7 +104,7 @@ if (watching) {
   try {
     await Promise.all(builds.map((build) => build.rebuild()));
     await copyStaticFiles();
-    console.log('dist/ にChromeへ読み込める拡張機能を作成しました。');
+    console.log(`${outputName}/ にChromeへ読み込める拡張機能を作成しました。`);
   } finally {
     await Promise.all(builds.map((build) => build.dispose()));
   }

@@ -1,0 +1,3486 @@
+{
+  "date": "2026-10-19",
+  "sourceCommit": "90926a6",
+  "measuredBytes": 57185776,
+  "reports": {
+    "baseline": {
+      "browser": "153.0.8010.12",
+      "profiling": false,
+      "conditions": {
+        "A_real_youtube": [
+          {
+            "run": 1,
+            "cache": "first-profile",
+            "totalMs": 14784.418000000001,
+            "trace": null,
+            "taskCpuMs": 7363.997,
+            "scriptCpuMs": 2262.714,
+            "jsHeapBefore": 90696320,
+            "jsHeapAfter": 137559260,
+            "jsHeapPeak": null,
+            "gpuUtilization": null,
+            "actualVramBytes": null,
+            "placement": [
+              300,
+              300
+            ],
+            "stats": {
+              "contexts": 1,
+              "lost": false,
+              "assets": 1,
+              "instances": 1,
+              "estimatedGpuAssetBytes": 176450404,
+              "surfaceBytes": 360000,
+              "paints": 4,
+              "cpuMs": 3,
+              "maxCpuMs": 1154.1000000014901,
+              "calls": 10,
+              "triangles": 126470,
+              "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+              "fps": 1.9822915290075307,
+              "p95CpuMs": 1154.1000000014901,
+              "geometries": 5,
+              "textures": 8,
+              "gpuMs": 3.227082
+            },
+            "stages": {},
+            "parseTextureUnionMs": 0,
+            "bulkRpcCount": 0,
+            "binaryPayloadRpcCount": 0,
+            "base64PayloadChars": 0
+          },
+          {
+            "run": 2,
+            "cache": "warm-process",
+            "totalMs": 6530.9655999999995,
+            "trace": null,
+            "taskCpuMs": 2657.1940000000004,
+            "scriptCpuMs": 334.2369999999999,
+            "jsHeapBefore": 79651696,
+            "jsHeapAfter": 97077016,
+            "jsHeapPeak": null,
+            "gpuUtilization": null,
+            "actualVramBytes": null,
+            "placement": [
+              300,
+              300
+            ],
+            "stats": {
+              "contexts": 1,
+              "lost": false,
+              "assets": 1,
+              "instances": 1,
+              "estimatedGpuAssetBytes": 176450404,
+              "surfaceBytes": 360000,
+              "paints": 3,
+              "cpuMs": 2.199999999254942,
+              "maxCpuMs": 249.30000000074506,
+              "calls": 10,
+              "triangles": 126470,
+              "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+              "fps": 3.839508542906524,
+              "p95CpuMs": 249.30000000074506,
+              "geometries": 5,
+              "textures": 8,
+              "gpuMs": 31.98354
+            },
+            "stages": {},
+            "parseTextureUnionMs": 0,
+            "bulkRpcCount": 0,
+            "binaryPayloadRpcCount": 0,
+            "base64PayloadChars": 0
+          },
+          {
+            "run": 3,
+            "cache": "warm-process",
+            "totalMs": 6903.389199999998,
+            "trace": null,
+            "taskCpuMs": 3274.7220000000007,
+            "scriptCpuMs": 1194.938,
+            "jsHeapBefore": 99401620,
+            "jsHeapAfter": 96960564,
+            "jsHeapPeak": null,
+            "gpuUtilization": null,
+            "actualVramBytes": null,
+            "placement": [
+              300,
+              300
+            ],
+            "stats": {
+              "contexts": 1,
+              "lost": false,
+              "assets": 1,
+              "instances": 1,
+              "estimatedGpuAssetBytes": 176450404,
+              "surfaceBytes": 360000,
+              "paints": 3,
+              "cpuMs": 2.800000000745058,
+              "maxCpuMs": 1104.800000000745,
+              "calls": 10,
+              "triangles": 126470,
+              "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+              "fps": 1.4477017734346724,
+              "p95CpuMs": 1104.800000000745,
+              "geometries": 5,
+              "textures": 8,
+              "gpuMs": 29.63229
+            },
+            "stages": {},
+            "parseTextureUnionMs": 0,
+            "bulkRpcCount": 0,
+            "binaryPayloadRpcCount": 0,
+            "base64PayloadChars": 0
+          }
+        ]
+      },
+      "iframe": null,
+      "youtube": {
+        "readyState": 4,
+        "paused": true,
+        "error": null
+      },
+      "notes": [
+        "First = new Chrome profile/context; OS file/driver cache is not flushed.",
+        "Warm = same process, a newly parsed model and a fresh WebGL context, not resource reuse.",
+        "CPU is only the measured page target, not the service worker or the GPU process."
+      ]
+    },
+    "profile": {
+      "browser": "153.0.8010.12",
+      "profiling": true,
+      "conditions": {
+        "A_real_youtube": [
+          {
+            "run": 1,
+            "cache": "first-profile",
+            "totalMs": 8276.4682,
+            "trace": "ap-96783de0-4419-4a18-bd08-ca307ee30e1a",
+            "alphaPixels": 7371,
+            "taskCpuMs": 5752.076000000001,
+            "scriptCpuMs": 1963.2050000000002,
+            "jsHeapBefore": 74472664,
+            "jsHeapAfter": 67483352,
+            "jsHeapPeak": null,
+            "gpuUtilization": null,
+            "actualVramBytes": null,
+            "placement": [
+              300,
+              300
+            ],
+            "stats": {
+              "contexts": 1,
+              "lost": false,
+              "assets": 1,
+              "instances": 1,
+              "estimatedGpuAssetBytes": 176450404,
+              "surfaceBytes": 360000,
+              "paints": 14,
+              "cpuMs": 1.699999999254942,
+              "maxCpuMs": 1210.300000000745,
+              "calls": 10,
+              "triangles": 126470,
+              "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+              "fps": 6.569970182443016,
+              "p95CpuMs": 1210.300000000745,
+              "geometries": 5,
+              "textures": 8,
+              "gpuMs": 6.28078
+            },
+            "stages": {
+              "worker:queue.upload-start": {
+                "ms": 0.10000000149011612,
+                "samples": 1
+              },
+              "worker:store.owner-check": {
+                "ms": 90.69999999925494,
+                "samples": 23
+              },
+              "worker:service.upload-start": {
+                "ms": 1.199999999254942,
+                "samples": 1
+              },
+              "worker:queue.upload-part": {
+                "ms": 32.69999999552965,
+                "samples": 14
+              },
+              "worker:upload.decode-base64": {
+                "ms": 273.4999999925494,
+                "samples": 14
+              },
+              "worker:upload.reassemble": {
+                "ms": 29.5,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "worker:service.upload-part": {
+                "ms": 333.9000000022352,
+                "samples": 14
+              },
+              "worker:queue.upload-finish": {
+                "ms": 0,
+                "samples": 1
+              },
+              "worker:store.inspect": {
+                "ms": 162.29999999701977,
+                "samples": 1
+              },
+              "worker:validation.inspect": {
+                "ms": 240.70000000298023,
+                "samples": 1
+              },
+              "worker:validation.bitmap": {
+                "ms": 166.5000000037253,
+                "samples": 6,
+                "bytes": 7371783
+              },
+              "worker:store.validate-textures": {
+                "ms": 412,
+                "samples": 1
+              },
+              "worker:store.clone-blob": {
+                "ms": 45.30000000074506,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "worker:store.hash-with-copy": {
+                "ms": 88.80000000074506,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "worker:store.prune": {
+                "ms": 1.3999999985098839,
+                "samples": 1
+              },
+              "worker:store.idb-write-transaction": {
+                "ms": 60.400000002235174,
+                "samples": 1
+              },
+              "worker:service.upload-finish": {
+                "ms": 771,
+                "samples": 1
+              },
+              "extension:import.file-read": {
+                "ms": 153.80000000074506,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:import.inspect": {
+                "ms": 171.80000000074506,
+                "samples": 1
+              },
+              "extension:validation.inspect": {
+                "ms": 206.60000000149012,
+                "samples": 1
+              },
+              "extension:validation.bitmap": {
+                "ms": 257.09999999403954,
+                "samples": 6,
+                "bytes": 7371783
+              },
+              "extension:import.validate-textures": {
+                "ms": 470,
+                "samples": 1
+              },
+              "extension:rpc.upload-start": {
+                "ms": 4.099999997764826,
+                "samples": 1,
+                "wireChars": 36
+              },
+              "extension:upload.encode-base64": {
+                "ms": 35.099999994039536,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "extension:rpc.upload-part": {
+                "ms": 1742.5000000037253,
+                "samples": 14,
+                "wireChars": 76247736
+              },
+              "extension:upload.parts-total": {
+                "ms": 1777.800000000745,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:rpc.upload-finish": {
+                "ms": 772.5,
+                "samples": 1
+              },
+              "extension:import.file-to-stored": {
+                "ms": 3350.199999999255,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "worker:queue.get-metadata": {
+                "ms": 0,
+                "samples": 1
+              },
+              "worker:store.idb-read": {
+                "ms": 11.099999997764826,
+                "samples": 16
+              },
+              "worker:service.get-metadata": {
+                "ms": 0.8999999985098839,
+                "samples": 1
+              },
+              "worker:queue.lease": {
+                "ms": 426.20000000298023,
+                "samples": 4
+              },
+              "worker:store.lease-rewrite": {
+                "ms": 290.0999999977648,
+                "samples": 4
+              },
+              "worker:store.prune-after-command": {
+                "ms": 526.5,
+                "samples": 6
+              },
+              "worker:service.lease": {
+                "ms": 733,
+                "samples": 4
+              },
+              "worker:queue.validate": {
+                "ms": 0,
+                "samples": 1
+              },
+              "worker:service.validate": {
+                "ms": 2,
+                "samples": 1
+              },
+              "worker:queue.get": {
+                "ms": 0,
+                "samples": 1
+              },
+              "worker:service.get": {
+                "ms": 0.6000000014901161,
+                "samples": 1
+              },
+              "worker:queue.get-part": {
+                "ms": 761.4000000059605,
+                "samples": 14
+              },
+              "worker:download.blob-read": {
+                "ms": 109.80000000074506,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "worker:download.encode-base64": {
+                "ms": 24.19999999552965,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "worker:service.get-part": {
+                "ms": 144.10000000149012,
+                "samples": 14
+              },
+              "worker:queue.release": {
+                "ms": 517,
+                "samples": 2
+              },
+              "worker:store.release-rewrite": {
+                "ms": 172.5,
+                "samples": 2
+              },
+              "worker:service.release": {
+                "ms": 315,
+                "samples": 2
+              },
+              "content:rpc.get-metadata": {
+                "ms": 2.5,
+                "samples": 1
+              },
+              "content:rpc.lease": {
+                "ms": 395.79999999701977,
+                "samples": 2
+              },
+              "content:rpc.validate": {
+                "ms": 3.599999997764826,
+                "samples": 1
+              },
+              "content:rpc.get": {
+                "ms": 17.5,
+                "samples": 1
+              },
+              "content:rpc.get-part": {
+                "ms": 1860.5000000037253,
+                "samples": 14,
+                "wireChars": 76247736
+              },
+              "content:download.decode-base64": {
+                "ms": 238.89999999850988,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "content:download.reassemble": {
+                "ms": 16.899999994784594,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "content:rpc.release": {
+                "ms": 367.3999999985099,
+                "samples": 1
+              },
+              "content:download.parts-total": {
+                "ms": 2117.10000000149,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "content:download.inspect": {
+                "ms": 156.59999999776483,
+                "samples": 1
+              },
+              "content:download.clone-blob": {
+                "ms": 37.20000000298023,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "content:renderer.source-load": {
+                "ms": 2328.699999999255,
+                "samples": 1
+              },
+              "content:renderer.blob-read": {
+                "ms": 147.5,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "content:renderer.inspect": {
+                "ms": 181.20000000298023,
+                "samples": 1
+              },
+              "content:parse.texture": {
+                "ms": 480.69999999925494,
+                "samples": 5
+              },
+              "content:parse.vrm-after-root": {
+                "ms": 11.199999999254942,
+                "samples": 1
+              },
+              "content:parse.gltf-inclusive": {
+                "ms": 161.89999999850988,
+                "samples": 1
+              },
+              "content:parse.vrm-postprocess": {
+                "ms": 146.90000000223517,
+                "samples": 1
+              },
+              "content:renderer.bounds": {
+                "ms": 31.799999997019768,
+                "samples": 1
+              },
+              "content:gpu.create-context": {
+                "ms": 16.800000000745058,
+                "samples": 1
+              },
+              "content:first.player-create": {
+                "ms": 1.199999999254942,
+                "samples": 1
+              },
+              "content:first.webgl-render-inclusive": {
+                "ms": 1185.0999999977648,
+                "samples": 1
+              },
+              "content:first.canvas-copy": {
+                "ms": 0.5,
+                "samples": 1
+              },
+              "content:first.paint-inclusive": {
+                "ms": 1210.300000000745,
+                "samples": 1
+              },
+              "content:first.presentation-proxy-inclusive": {
+                "ms": 1371.699999999255,
+                "samples": 1
+              }
+            },
+            "parseTextureUnionMs": 101.80000000074506,
+            "bulkRpcCount": 31,
+            "binaryPayloadRpcCount": 28,
+            "base64PayloadChars": 152495472
+          },
+          {
+            "run": 2,
+            "cache": "warm-process",
+            "totalMs": 4212.4876,
+            "trace": "ap-26fe8bf1-b909-4281-a16d-0c685a73e5b0",
+            "alphaPixels": 7631,
+            "taskCpuMs": 1378.6359999999993,
+            "scriptCpuMs": 223.37600000000003,
+            "jsHeapBefore": 69250876,
+            "jsHeapAfter": 69783180,
+            "jsHeapPeak": null,
+            "gpuUtilization": null,
+            "actualVramBytes": null,
+            "placement": [
+              300,
+              300
+            ],
+            "stats": {
+              "contexts": 1,
+              "lost": false,
+              "assets": 1,
+              "instances": 1,
+              "estimatedGpuAssetBytes": 176450404,
+              "surfaceBytes": 360000,
+              "paints": 6,
+              "cpuMs": 1.199999999254942,
+              "maxCpuMs": 157.40000000223517,
+              "calls": 10,
+              "triangles": 126470,
+              "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+              "fps": 13.58695652173913,
+              "p95CpuMs": 157.40000000223517,
+              "geometries": 5,
+              "textures": 8,
+              "gpuMs": 4.135051
+            },
+            "stages": {
+              "worker:queue.upload-start": {
+                "ms": 0,
+                "samples": 1
+              },
+              "worker:store.owner-check": {
+                "ms": 43.29999999701977,
+                "samples": 22
+              },
+              "worker:service.upload-start": {
+                "ms": 1.5999999977648258,
+                "samples": 1
+              },
+              "worker:queue.upload-part": {
+                "ms": 22.50000000745058,
+                "samples": 14
+              },
+              "worker:upload.decode-base64": {
+                "ms": 186.29999999329448,
+                "samples": 14
+              },
+              "worker:upload.reassemble": {
+                "ms": 14.900000002235174,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "worker:service.upload-part": {
+                "ms": 225.19999999552965,
+                "samples": 14
+              },
+              "worker:queue.upload-finish": {
+                "ms": 0,
+                "samples": 1
+              },
+              "worker:store.inspect": {
+                "ms": 134.79999999701977,
+                "samples": 1
+              },
+              "worker:validation.inspect": {
+                "ms": 46.30000000074506,
+                "samples": 1
+              },
+              "worker:validation.bitmap": {
+                "ms": 94.69999999925494,
+                "samples": 6,
+                "bytes": 7371783
+              },
+              "worker:store.validate-textures": {
+                "ms": 143.60000000149012,
+                "samples": 1
+              },
+              "worker:store.clone-blob": {
+                "ms": 20.199999999254942,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "worker:store.hash-with-copy": {
+                "ms": 60.400000002235174,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "worker:store.prune": {
+                "ms": 47.600000001490116,
+                "samples": 1
+              },
+              "worker:store.idb-write-transaction": {
+                "ms": 43.5,
+                "samples": 1
+              },
+              "worker:service.upload-finish": {
+                "ms": 450.69999999925494,
+                "samples": 1
+              },
+              "extension:import.file-read": {
+                "ms": 69.59999999776483,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:import.inspect": {
+                "ms": 312,
+                "samples": 1
+              },
+              "extension:validation.inspect": {
+                "ms": 84.30000000074506,
+                "samples": 1
+              },
+              "extension:validation.bitmap": {
+                "ms": 158.09999999403954,
+                "samples": 6,
+                "bytes": 7371783
+              },
+              "extension:import.validate-textures": {
+                "ms": 246.90000000223517,
+                "samples": 1
+              },
+              "extension:rpc.upload-start": {
+                "ms": 2.899999998509884,
+                "samples": 1,
+                "wireChars": 36
+              },
+              "extension:upload.encode-base64": {
+                "ms": 21.99999999627471,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "extension:rpc.upload-part": {
+                "ms": 1104.7000000067055,
+                "samples": 14,
+                "wireChars": 76247736
+              },
+              "extension:upload.parts-total": {
+                "ms": 1127,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:rpc.upload-finish": {
+                "ms": 451.4000000022352,
+                "samples": 1
+              },
+              "extension:import.file-to-stored": {
+                "ms": 2210,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "worker:queue.get-metadata": {
+                "ms": 0,
+                "samples": 1
+              },
+              "worker:store.idb-read": {
+                "ms": 6.200000014156103,
+                "samples": 16
+              },
+              "worker:service.get-metadata": {
+                "ms": 0.30000000074505806,
+                "samples": 1
+              },
+              "worker:queue.lease": {
+                "ms": 31.699999999254942,
+                "samples": 3
+              },
+              "worker:store.lease-rewrite": {
+                "ms": 192.60000000149012,
+                "samples": 3
+              },
+              "worker:store.prune-after-command": {
+                "ms": 198.79999999701977,
+                "samples": 5
+              },
+              "worker:service.lease": {
+                "ms": 336.4000000022352,
+                "samples": 3
+              },
+              "worker:queue.validate": {
+                "ms": 0,
+                "samples": 1
+              },
+              "worker:service.validate": {
+                "ms": 0.7000000029802322,
+                "samples": 1
+              },
+              "worker:queue.get": {
+                "ms": 0,
+                "samples": 1
+              },
+              "worker:service.get": {
+                "ms": 0.4000000022351742,
+                "samples": 1
+              },
+              "worker:queue.get-part": {
+                "ms": 320.0000000074506,
+                "samples": 14
+              },
+              "worker:download.blob-read": {
+                "ms": 61.30000000074506,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "worker:download.encode-base64": {
+                "ms": 11.799999993294477,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "worker:service.get-part": {
+                "ms": 79,
+                "samples": 14
+              },
+              "worker:queue.release": {
+                "ms": 132.5000000037253,
+                "samples": 2
+              },
+              "worker:store.release-rewrite": {
+                "ms": 91.29999999701977,
+                "samples": 2
+              },
+              "worker:service.release": {
+                "ms": 164.09999999776483,
+                "samples": 2
+              },
+              "content:rpc.get-metadata": {
+                "ms": 0.8999999985098839,
+                "samples": 1
+              },
+              "content:rpc.lease": {
+                "ms": 168,
+                "samples": 2
+              },
+              "content:rpc.validate": {
+                "ms": 1.6000000014901161,
+                "samples": 1
+              },
+              "content:rpc.get": {
+                "ms": 9.399999998509884,
+                "samples": 1
+              },
+              "content:rpc.get-part": {
+                "ms": 1010.3000000119209,
+                "samples": 14,
+                "wireChars": 76247736
+              },
+              "content:download.decode-base64": {
+                "ms": 132.09999999776483,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "content:download.reassemble": {
+                "ms": 11.49999999254942,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "content:rpc.release": {
+                "ms": 110.5,
+                "samples": 1
+              },
+              "content:download.parts-total": {
+                "ms": 1154.3999999985099,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "content:download.inspect": {
+                "ms": 147.30000000074506,
+                "samples": 1
+              },
+              "content:download.clone-blob": {
+                "ms": 20.899999998509884,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "content:renderer.source-load": {
+                "ms": 1332.0999999977648,
+                "samples": 1
+              },
+              "content:renderer.blob-read": {
+                "ms": 55.099999997764826,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "content:renderer.inspect": {
+                "ms": 128.60000000149012,
+                "samples": 1
+              },
+              "content:parse.texture": {
+                "ms": 234.5,
+                "samples": 5
+              },
+              "content:parse.vrm-after-root": {
+                "ms": 1.699999999254942,
+                "samples": 1
+              },
+              "content:parse.gltf-inclusive": {
+                "ms": 76.80000000074506,
+                "samples": 1
+              },
+              "content:parse.vrm-postprocess": {
+                "ms": 41.5,
+                "samples": 1
+              },
+              "content:renderer.bounds": {
+                "ms": 13.600000001490116,
+                "samples": 1
+              },
+              "content:gpu.create-context": {
+                "ms": 5.100000001490116,
+                "samples": 1
+              },
+              "content:first.player-create": {
+                "ms": 0.3999999985098839,
+                "samples": 1
+              },
+              "content:first.webgl-render-inclusive": {
+                "ms": 149.70000000298023,
+                "samples": 1
+              },
+              "content:first.canvas-copy": {
+                "ms": 0.19999999925494194,
+                "samples": 1
+              },
+              "content:first.paint-inclusive": {
+                "ms": 157.40000000223517,
+                "samples": 1
+              },
+              "content:first.presentation-proxy-inclusive": {
+                "ms": 169.20000000298023,
+                "samples": 1
+              }
+            },
+            "parseTextureUnionMs": 51.19999999925494,
+            "bulkRpcCount": 31,
+            "binaryPayloadRpcCount": 28,
+            "base64PayloadChars": 152495472
+          },
+          {
+            "run": 3,
+            "cache": "warm-process",
+            "totalMs": 5879.9984,
+            "trace": "ap-e5e0fcf0-7e26-4d29-a1d9-77e2c825a5b7",
+            "alphaPixels": 7373,
+            "taskCpuMs": 2157.9439999999986,
+            "scriptCpuMs": 387.84700000000026,
+            "jsHeapBefore": 71666476,
+            "jsHeapAfter": 91783596,
+            "jsHeapPeak": null,
+            "gpuUtilization": null,
+            "actualVramBytes": null,
+            "placement": [
+              300,
+              300
+            ],
+            "stats": {
+              "contexts": 1,
+              "lost": false,
+              "assets": 1,
+              "instances": 1,
+              "estimatedGpuAssetBytes": 176450404,
+              "surfaceBytes": 360000,
+              "paints": 18,
+              "cpuMs": 2.900000002235174,
+              "maxCpuMs": 247.5,
+              "calls": 10,
+              "triangles": 126470,
+              "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+              "fps": 17.749008143662508,
+              "p95CpuMs": 247.5,
+              "geometries": 5,
+              "textures": 8,
+              "gpuMs": 5.013228
+            },
+            "stages": {
+              "worker:queue.upload-start": {
+                "ms": 0,
+                "samples": 1
+              },
+              "worker:store.owner-check": {
+                "ms": 66.80000000819564,
+                "samples": 22
+              },
+              "worker:service.upload-start": {
+                "ms": 0.6000000014901161,
+                "samples": 1
+              },
+              "worker:queue.upload-part": {
+                "ms": 15.099999990314245,
+                "samples": 14
+              },
+              "worker:upload.decode-base64": {
+                "ms": 159.39999999850988,
+                "samples": 14
+              },
+              "worker:upload.reassemble": {
+                "ms": 12.699999999254942,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "worker:service.upload-part": {
+                "ms": 208.5000000037253,
+                "samples": 14
+              },
+              "worker:queue.upload-finish": {
+                "ms": 0.09999999776482582,
+                "samples": 1
+              },
+              "worker:store.inspect": {
+                "ms": 195.89999999850988,
+                "samples": 1
+              },
+              "worker:validation.inspect": {
+                "ms": 83.90000000223517,
+                "samples": 1
+              },
+              "worker:validation.bitmap": {
+                "ms": 160.59999999403954,
+                "samples": 6,
+                "bytes": 7371783
+              },
+              "worker:store.validate-textures": {
+                "ms": 249.30000000074506,
+                "samples": 1
+              },
+              "worker:store.clone-blob": {
+                "ms": 55.899999998509884,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "worker:store.hash-with-copy": {
+                "ms": 86.40000000223517,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "worker:store.prune": {
+                "ms": 101.60000000149012,
+                "samples": 1
+              },
+              "worker:store.idb-write-transaction": {
+                "ms": 95,
+                "samples": 1
+              },
+              "worker:service.upload-finish": {
+                "ms": 785.1999999992549,
+                "samples": 1
+              },
+              "extension:import.file-read": {
+                "ms": 37.70000000298023,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:import.inspect": {
+                "ms": 145.09999999776483,
+                "samples": 1
+              },
+              "extension:validation.inspect": {
+                "ms": 44.900000002235174,
+                "samples": 1
+              },
+              "extension:validation.bitmap": {
+                "ms": 112.10000000149012,
+                "samples": 6,
+                "bytes": 7371783
+              },
+              "extension:import.validate-textures": {
+                "ms": 158.90000000223517,
+                "samples": 1
+              },
+              "extension:rpc.upload-start": {
+                "ms": 1.199999999254942,
+                "samples": 1,
+                "wireChars": 36
+              },
+              "extension:upload.encode-base64": {
+                "ms": 14.300000000745058,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "extension:rpc.upload-part": {
+                "ms": 990.1000000014901,
+                "samples": 14,
+                "wireChars": 76247736
+              },
+              "extension:upload.parts-total": {
+                "ms": 1004.7000000029802,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:rpc.upload-finish": {
+                "ms": 786.3999999985099,
+                "samples": 1
+              },
+              "extension:import.file-to-stored": {
+                "ms": 2134.10000000149,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "worker:queue.get-metadata": {
+                "ms": 0,
+                "samples": 1
+              },
+              "worker:store.idb-read": {
+                "ms": 9.50000000745058,
+                "samples": 16
+              },
+              "worker:service.get-metadata": {
+                "ms": 0.6000000014901161,
+                "samples": 1
+              },
+              "worker:queue.lease": {
+                "ms": 205.39999999850988,
+                "samples": 3
+              },
+              "worker:store.lease-rewrite": {
+                "ms": 265.69999999925494,
+                "samples": 3
+              },
+              "worker:store.prune-after-command": {
+                "ms": 379.80000000074506,
+                "samples": 5
+              },
+              "worker:service.lease": {
+                "ms": 523.0999999977648,
+                "samples": 3
+              },
+              "worker:queue.validate": {
+                "ms": 0.09999999776482582,
+                "samples": 1
+              },
+              "worker:service.validate": {
+                "ms": 1.699999999254942,
+                "samples": 1
+              },
+              "worker:queue.get": {
+                "ms": 0.09999999776482582,
+                "samples": 1
+              },
+              "worker:service.get": {
+                "ms": 0.4000000022351742,
+                "samples": 1
+              },
+              "worker:queue.get-part": {
+                "ms": 565.1000000052154,
+                "samples": 14
+              },
+              "worker:download.blob-read": {
+                "ms": 113.30000000074506,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "worker:download.encode-base64": {
+                "ms": 24.899999998509884,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "worker:service.get-part": {
+                "ms": 147.40000000223517,
+                "samples": 14
+              },
+              "worker:queue.release": {
+                "ms": 241.39999999850988,
+                "samples": 2
+              },
+              "worker:store.release-rewrite": {
+                "ms": 169.60000000149012,
+                "samples": 2
+              },
+              "worker:service.release": {
+                "ms": 321.70000000298023,
+                "samples": 2
+              },
+              "content:rpc.get-metadata": {
+                "ms": 1.800000000745058,
+                "samples": 1
+              },
+              "content:rpc.lease": {
+                "ms": 355.4999999962747,
+                "samples": 2
+              },
+              "content:rpc.validate": {
+                "ms": 3.7000000029802322,
+                "samples": 1
+              },
+              "content:rpc.get": {
+                "ms": 13.800000000745058,
+                "samples": 1
+              },
+              "content:rpc.get-part": {
+                "ms": 1765.3999999947846,
+                "samples": 14,
+                "wireChars": 76247736
+              },
+              "content:download.decode-base64": {
+                "ms": 297.80000000447035,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "content:download.reassemble": {
+                "ms": 19.599999997764826,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "content:rpc.release": {
+                "ms": 212.60000000149012,
+                "samples": 1
+              },
+              "content:download.parts-total": {
+                "ms": 2083.300000000745,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "content:download.inspect": {
+                "ms": 243.80000000074506,
+                "samples": 1
+              },
+              "content:download.clone-blob": {
+                "ms": 40.899999998509884,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "content:renderer.source-load": {
+                "ms": 2381.900000002235,
+                "samples": 1
+              },
+              "content:renderer.blob-read": {
+                "ms": 72.79999999701977,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "content:renderer.inspect": {
+                "ms": 90.20000000298023,
+                "samples": 1
+              },
+              "content:parse.texture": {
+                "ms": 444,
+                "samples": 5
+              },
+              "content:parse.vrm-after-root": {
+                "ms": 2.7999999970197678,
+                "samples": 1
+              },
+              "content:parse.gltf-inclusive": {
+                "ms": 138.39999999850988,
+                "samples": 1
+              },
+              "content:parse.vrm-postprocess": {
+                "ms": 72.5,
+                "samples": 1
+              },
+              "content:renderer.bounds": {
+                "ms": 23.399999998509884,
+                "samples": 1
+              },
+              "content:gpu.create-context": {
+                "ms": 8.600000001490116,
+                "samples": 1
+              },
+              "content:first.player-create": {
+                "ms": 0.5,
+                "samples": 1
+              },
+              "content:first.webgl-render-inclusive": {
+                "ms": 234.90000000223517,
+                "samples": 1
+              },
+              "content:first.canvas-copy": {
+                "ms": 0.30000000074505806,
+                "samples": 1
+              },
+              "content:first.paint-inclusive": {
+                "ms": 247.5,
+                "samples": 1
+              },
+              "content:first.presentation-proxy-inclusive": {
+                "ms": 290,
+                "samples": 1
+              }
+            },
+            "parseTextureUnionMs": 93.90000000223517,
+            "bulkRpcCount": 31,
+            "binaryPayloadRpcCount": 28,
+            "base64PayloadChars": 152495472
+          }
+        ],
+        "transport": [
+          {
+            "run": 1,
+            "cache": "first-profile",
+            "mode": "transport",
+            "trace": "ap-3592bd15-be11-406a-9787-95ef19fb905b",
+            "byteLength": 57185776,
+            "vrmVersion": "0.x",
+            "totalMs": 3745.5,
+            "alphaPixels": 7360,
+            "canvas": [
+              300,
+              300
+            ],
+            "stats": {
+              "contexts": 1,
+              "lost": false,
+              "assets": 1,
+              "instances": 1,
+              "estimatedGpuAssetBytes": 176450404,
+              "surfaceBytes": 360000,
+              "paints": 1,
+              "cpuMs": 583.6000000014901,
+              "maxCpuMs": 583.6000000014901,
+              "calls": 10,
+              "triangles": 126470,
+              "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+              "fps": 0,
+              "p95CpuMs": 583.6000000014901,
+              "geometries": 5,
+              "textures": 8,
+              "gpuMs": null
+            },
+            "taskCpuMs": 1736.532,
+            "scriptCpuMs": 587.2239999999999,
+            "jsHeapBefore": 2916960,
+            "jsHeapAfter": 7244484,
+            "jsHeapPeak": null,
+            "gpuUtilization": null,
+            "actualVramBytes": null,
+            "stages": {
+              "worker:queue.upload-start": {
+                "ms": 0,
+                "samples": 1
+              },
+              "worker:store.owner-check": {
+                "ms": 0.19999999925494194,
+                "samples": 16
+              },
+              "worker:service.upload-start": {
+                "ms": 3.5,
+                "samples": 1
+              },
+              "worker:queue.upload-part": {
+                "ms": 11.00000000745058,
+                "samples": 14
+              },
+              "worker:upload.decode-base64": {
+                "ms": 121.09999999776483,
+                "samples": 14
+              },
+              "worker:upload.reassemble": {
+                "ms": 11.300000000745058,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "worker:service.upload-part": {
+                "ms": 132.99999999254942,
+                "samples": 14
+              },
+              "worker:queue.upload-finish": {
+                "ms": 0,
+                "samples": 1
+              },
+              "worker:store.inspect": {
+                "ms": 81.60000000149012,
+                "samples": 1
+              },
+              "worker:validation.inspect": {
+                "ms": 122.80000000074506,
+                "samples": 1
+              },
+              "worker:validation.bitmap": {
+                "ms": 93.89999999850988,
+                "samples": 6,
+                "bytes": 7371783
+              },
+              "worker:store.validate-textures": {
+                "ms": 218.69999999925494,
+                "samples": 1
+              },
+              "worker:store.clone-blob": {
+                "ms": 26.199999999254942,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "worker:store.hash-with-copy": {
+                "ms": 64.30000000074506,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "worker:store.prune": {
+                "ms": 77.30000000074506,
+                "samples": 1
+              },
+              "worker:store.idb-write-transaction": {
+                "ms": 31.5,
+                "samples": 1
+              },
+              "worker:service.upload-finish": {
+                "ms": 499.69999999925494,
+                "samples": 1
+              },
+              "extension:import.file-read": {
+                "ms": 124.29999999701977,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:import.inspect": {
+                "ms": 110.80000000074506,
+                "samples": 1
+              },
+              "extension:validation.inspect": {
+                "ms": 132,
+                "samples": 1
+              },
+              "extension:validation.bitmap": {
+                "ms": 112.40000000596046,
+                "samples": 6,
+                "bytes": 7371783
+              },
+              "extension:import.validate-textures": {
+                "ms": 247.19999999925494,
+                "samples": 1
+              },
+              "extension:rpc.upload-start": {
+                "ms": 4.400000002235174,
+                "samples": 1,
+                "wireChars": 36
+              },
+              "extension:upload.encode-base64": {
+                "ms": 15.299999993294477,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "extension:rpc.upload-part": {
+                "ms": 705.1000000052154,
+                "samples": 14,
+                "wireChars": 76247736
+              },
+              "extension:upload.parts-total": {
+                "ms": 721.1999999992549,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:rpc.upload-finish": {
+                "ms": 500.70000000298023,
+                "samples": 1
+              },
+              "extension:import.file-to-stored": {
+                "ms": 1709.199999999255,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "worker:queue.get-metadata": {
+                "ms": 0.10000000149011612,
+                "samples": 1
+              },
+              "worker:store.idb-read": {
+                "ms": 7.999999992549419,
+                "samples": 16
+              },
+              "worker:service.get-metadata": {
+                "ms": 0.3999999985098839,
+                "samples": 1
+              },
+              "worker:queue.get": {
+                "ms": 0,
+                "samples": 1
+              },
+              "worker:service.get": {
+                "ms": 0.19999999925494194,
+                "samples": 1
+              },
+              "worker:queue.get-part": {
+                "ms": 0.4000000022351742,
+                "samples": 14
+              },
+              "worker:download.blob-read": {
+                "ms": 65.59999999776483,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "worker:download.encode-base64": {
+                "ms": 12.800000000745058,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "worker:service.get-part": {
+                "ms": 85.79999999329448,
+                "samples": 14
+              },
+              "extension:rpc.get-metadata": {
+                "ms": 1.300000000745058,
+                "samples": 1
+              },
+              "extension:rpc.get": {
+                "ms": 1,
+                "samples": 1
+              },
+              "extension:rpc.get-part": {
+                "ms": 782.3999999985099,
+                "samples": 14,
+                "wireChars": 76247736
+              },
+              "extension:download.decode-base64": {
+                "ms": 122.40000000596046,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "extension:download.reassemble": {
+                "ms": 11.600000005215406,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "extension:download.parts-total": {
+                "ms": 917.3000000007451,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:download.inspect": {
+                "ms": 166.5,
+                "samples": 1
+              },
+              "extension:download.clone-blob": {
+                "ms": 29.199999999254942,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:renderer.source-load": {
+                "ms": 1114.0999999977648,
+                "samples": 1
+              },
+              "extension:renderer.blob-read": {
+                "ms": 60,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:renderer.inspect": {
+                "ms": 54.70000000298023,
+                "samples": 1
+              },
+              "extension:parse.texture": {
+                "ms": 282.2999999932945,
+                "samples": 5
+              },
+              "extension:parse.vrm-after-root": {
+                "ms": 5.199999999254942,
+                "samples": 1
+              },
+              "extension:parse.gltf-inclusive": {
+                "ms": 95.89999999850988,
+                "samples": 1
+              },
+              "extension:parse.vrm-postprocess": {
+                "ms": 50.69999999925494,
+                "samples": 1
+              },
+              "extension:renderer.bounds": {
+                "ms": 14.299999997019768,
+                "samples": 1
+              },
+              "extension:gpu.create-context": {
+                "ms": 7.699999999254942,
+                "samples": 1
+              },
+              "extension:first.player-create": {
+                "ms": 0.5,
+                "samples": 1
+              },
+              "extension:first.webgl-render-inclusive": {
+                "ms": 571.5,
+                "samples": 1
+              },
+              "extension:first.canvas-copy": {
+                "ms": 0.9000000022351742,
+                "samples": 1
+              },
+              "extension:first.paint-inclusive": {
+                "ms": 583.6000000014901,
+                "samples": 1
+              },
+              "extension:first.presentation-proxy-inclusive": {
+                "ms": 589.5,
+                "samples": 1
+              },
+              "extension:benchmark.total": {
+                "ms": 3727.5,
+                "samples": 1,
+                "bytes": 57185776
+              }
+            },
+            "parseTextureUnionMs": 60.5,
+            "bulkRpcCount": 31,
+            "binaryPayloadRpcCount": 28,
+            "base64PayloadChars": 152495472
+          },
+          {
+            "run": 2,
+            "cache": "warm-process",
+            "mode": "transport",
+            "trace": "ap-2c48889f-f78c-41c0-a32a-a50e20ed9c95",
+            "byteLength": 57185776,
+            "vrmVersion": "0.x",
+            "totalMs": 3600.5,
+            "alphaPixels": 7360,
+            "canvas": [
+              300,
+              300
+            ],
+            "stats": {
+              "contexts": 1,
+              "lost": false,
+              "assets": 1,
+              "instances": 1,
+              "estimatedGpuAssetBytes": 176450404,
+              "surfaceBytes": 360000,
+              "paints": 1,
+              "cpuMs": 122.30000000074506,
+              "maxCpuMs": 122.30000000074506,
+              "calls": 10,
+              "triangles": 126470,
+              "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+              "fps": 0,
+              "p95CpuMs": 122.30000000074506,
+              "geometries": 5,
+              "textures": 8,
+              "gpuMs": null
+            },
+            "taskCpuMs": 1330.003,
+            "scriptCpuMs": 126.93799999999999,
+            "jsHeapBefore": 7244484,
+            "jsHeapAfter": 7764608,
+            "jsHeapPeak": null,
+            "gpuUtilization": null,
+            "actualVramBytes": null,
+            "stages": {
+              "worker:queue.upload-start": {
+                "ms": 0,
+                "samples": 1
+              },
+              "worker:store.owner-check": {
+                "ms": 0.09999999776482582,
+                "samples": 16
+              },
+              "worker:service.upload-start": {
+                "ms": 0.19999999925494194,
+                "samples": 1
+              },
+              "worker:queue.upload-part": {
+                "ms": 12.599999997764826,
+                "samples": 14
+              },
+              "worker:upload.decode-base64": {
+                "ms": 124.60000001266599,
+                "samples": 14
+              },
+              "worker:upload.reassemble": {
+                "ms": 12.299999997019768,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "worker:service.upload-part": {
+                "ms": 137.1000000052154,
+                "samples": 14
+              },
+              "worker:queue.upload-finish": {
+                "ms": 0,
+                "samples": 1
+              },
+              "worker:store.inspect": {
+                "ms": 136.90000000223517,
+                "samples": 1
+              },
+              "worker:validation.inspect": {
+                "ms": 51.899999998509884,
+                "samples": 1
+              },
+              "worker:validation.bitmap": {
+                "ms": 103.70000000298023,
+                "samples": 6,
+                "bytes": 7371783
+              },
+              "worker:store.validate-textures": {
+                "ms": 157.59999999776483,
+                "samples": 1
+              },
+              "worker:store.clone-blob": {
+                "ms": 25.900000002235174,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "worker:store.hash-with-copy": {
+                "ms": 65.69999999925494,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "worker:store.prune": {
+                "ms": 88.80000000074506,
+                "samples": 1
+              },
+              "worker:store.idb-write-transaction": {
+                "ms": 71,
+                "samples": 1
+              },
+              "worker:service.upload-finish": {
+                "ms": 546.3000000007451,
+                "samples": 1
+              },
+              "extension:import.file-read": {
+                "ms": 59.100000001490116,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:import.inspect": {
+                "ms": 128.69999999925494,
+                "samples": 1
+              },
+              "extension:validation.inspect": {
+                "ms": 47.30000000074506,
+                "samples": 1
+              },
+              "extension:validation.bitmap": {
+                "ms": 113.70000000298023,
+                "samples": 6,
+                "bytes": 7371783
+              },
+              "extension:import.validate-textures": {
+                "ms": 163.60000000149012,
+                "samples": 1
+              },
+              "extension:rpc.upload-start": {
+                "ms": 1.5,
+                "samples": 1,
+                "wireChars": 36
+              },
+              "extension:upload.encode-base64": {
+                "ms": 16.19999999552965,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "extension:rpc.upload-part": {
+                "ms": 885.2000000029802,
+                "samples": 14,
+                "wireChars": 76247736
+              },
+              "extension:upload.parts-total": {
+                "ms": 901.3999999985099,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:rpc.upload-finish": {
+                "ms": 547.6000000014901,
+                "samples": 1
+              },
+              "extension:import.file-to-stored": {
+                "ms": 1801.9000000022352,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "worker:queue.get-metadata": {
+                "ms": 0,
+                "samples": 1
+              },
+              "worker:store.idb-read": {
+                "ms": 8.5,
+                "samples": 16
+              },
+              "worker:service.get-metadata": {
+                "ms": 0.6000000014901161,
+                "samples": 1
+              },
+              "worker:queue.get": {
+                "ms": 0,
+                "samples": 1
+              },
+              "worker:service.get": {
+                "ms": 0.30000000074505806,
+                "samples": 1
+              },
+              "worker:queue.get-part": {
+                "ms": 0.7000000067055225,
+                "samples": 14
+              },
+              "worker:download.blob-read": {
+                "ms": 75.60000000149012,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "worker:download.encode-base64": {
+                "ms": 13.100000001490116,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "worker:service.get-part": {
+                "ms": 96.30000000074506,
+                "samples": 14
+              },
+              "extension:rpc.get-metadata": {
+                "ms": 1.3999999985098839,
+                "samples": 1
+              },
+              "extension:rpc.get": {
+                "ms": 1.1000000014901161,
+                "samples": 1
+              },
+              "extension:rpc.get-part": {
+                "ms": 912.4000000022352,
+                "samples": 14,
+                "wireChars": 76247736
+              },
+              "extension:download.decode-base64": {
+                "ms": 131.49999999254942,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "extension:download.reassemble": {
+                "ms": 13.100000001490116,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "extension:download.parts-total": {
+                "ms": 1057.300000000745,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:download.inspect": {
+                "ms": 121.80000000074506,
+                "samples": 1
+              },
+              "extension:download.clone-blob": {
+                "ms": 27.5,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:renderer.source-load": {
+                "ms": 1207.7000000029802,
+                "samples": 1
+              },
+              "extension:renderer.blob-read": {
+                "ms": 77.79999999701977,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:renderer.inspect": {
+                "ms": 167.5,
+                "samples": 1
+              },
+              "extension:parse.texture": {
+                "ms": 388.0999999977648,
+                "samples": 5
+              },
+              "extension:parse.vrm-after-root": {
+                "ms": 1.800000000745058,
+                "samples": 1
+              },
+              "extension:parse.gltf-inclusive": {
+                "ms": 121,
+                "samples": 1
+              },
+              "extension:parse.vrm-postprocess": {
+                "ms": 41.20000000298023,
+                "samples": 1
+              },
+              "extension:renderer.bounds": {
+                "ms": 15.5,
+                "samples": 1
+              },
+              "extension:gpu.create-context": {
+                "ms": 5.800000000745058,
+                "samples": 1
+              },
+              "extension:first.player-create": {
+                "ms": 0.19999999925494194,
+                "samples": 1
+              },
+              "extension:first.webgl-render-inclusive": {
+                "ms": 114.10000000149012,
+                "samples": 1
+              },
+              "extension:first.canvas-copy": {
+                "ms": 0.09999999776482582,
+                "samples": 1
+              },
+              "extension:first.paint-inclusive": {
+                "ms": 122.30000000074506,
+                "samples": 1
+              },
+              "extension:first.presentation-proxy-inclusive": {
+                "ms": 129.60000000149012,
+                "samples": 1
+              },
+              "extension:benchmark.total": {
+                "ms": 3593.699999999255,
+                "samples": 1,
+                "bytes": 57185776
+              }
+            },
+            "parseTextureUnionMs": 83.5,
+            "bulkRpcCount": 31,
+            "binaryPayloadRpcCount": 28,
+            "base64PayloadChars": 152495472
+          },
+          {
+            "run": 3,
+            "cache": "warm-process",
+            "mode": "transport",
+            "trace": "ap-c79f91fb-ec65-46c2-8ce9-a5d29c334bf9",
+            "byteLength": 57185776,
+            "vrmVersion": "0.x",
+            "totalMs": 3513.300000000745,
+            "alphaPixels": 7360,
+            "canvas": [
+              300,
+              300
+            ],
+            "stats": {
+              "contexts": 1,
+              "lost": false,
+              "assets": 1,
+              "instances": 1,
+              "estimatedGpuAssetBytes": 176450404,
+              "surfaceBytes": 360000,
+              "paints": 1,
+              "cpuMs": 125.30000000074506,
+              "maxCpuMs": 125.30000000074506,
+              "calls": 10,
+              "triangles": 126470,
+              "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+              "fps": 0,
+              "p95CpuMs": 125.30000000074506,
+              "geometries": 5,
+              "textures": 8,
+              "gpuMs": null
+            },
+            "taskCpuMs": 1174.8449999999996,
+            "scriptCpuMs": 129.656,
+            "jsHeapBefore": 7764608,
+            "jsHeapAfter": 7920388,
+            "jsHeapPeak": null,
+            "gpuUtilization": null,
+            "actualVramBytes": null,
+            "stages": {
+              "worker:queue.upload-start": {
+                "ms": 0,
+                "samples": 1
+              },
+              "worker:store.owner-check": {
+                "ms": 0,
+                "samples": 16
+              },
+              "worker:service.upload-start": {
+                "ms": 0.19999999925494194,
+                "samples": 1
+              },
+              "worker:queue.upload-part": {
+                "ms": 13.100000001490116,
+                "samples": 14
+              },
+              "worker:upload.decode-base64": {
+                "ms": 129.4999999962747,
+                "samples": 14
+              },
+              "worker:upload.reassemble": {
+                "ms": 13.300000004470348,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "worker:service.upload-part": {
+                "ms": 142.80000000074506,
+                "samples": 14
+              },
+              "worker:queue.upload-finish": {
+                "ms": 0,
+                "samples": 1
+              },
+              "worker:store.inspect": {
+                "ms": 91,
+                "samples": 1
+              },
+              "worker:validation.inspect": {
+                "ms": 46.599999997764826,
+                "samples": 1
+              },
+              "worker:validation.bitmap": {
+                "ms": 102.30000000074506,
+                "samples": 6,
+                "bytes": 7371783
+              },
+              "worker:store.validate-textures": {
+                "ms": 151,
+                "samples": 1
+              },
+              "worker:store.clone-blob": {
+                "ms": 25.800000000745058,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "worker:store.hash-with-copy": {
+                "ms": 56.19999999925494,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "worker:store.prune": {
+                "ms": 104.89999999850988,
+                "samples": 1
+              },
+              "worker:store.idb-write-transaction": {
+                "ms": 119.40000000223517,
+                "samples": 1
+              },
+              "worker:service.upload-finish": {
+                "ms": 548.6999999992549,
+                "samples": 1
+              },
+              "extension:import.file-read": {
+                "ms": 64.30000000074506,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:import.inspect": {
+                "ms": 92.59999999776483,
+                "samples": 1
+              },
+              "extension:validation.inspect": {
+                "ms": 41.30000000074506,
+                "samples": 1
+              },
+              "extension:validation.bitmap": {
+                "ms": 119.79999999701977,
+                "samples": 6,
+                "bytes": 7371783
+              },
+              "extension:import.validate-textures": {
+                "ms": 163.60000000149012,
+                "samples": 1
+              },
+              "extension:rpc.upload-start": {
+                "ms": 1.5999999977648258,
+                "samples": 1,
+                "wireChars": 36
+              },
+              "extension:upload.encode-base64": {
+                "ms": 15.100000001490116,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "extension:rpc.upload-part": {
+                "ms": 959.0999999977648,
+                "samples": 14,
+                "wireChars": 76247736
+              },
+              "extension:upload.parts-total": {
+                "ms": 974.4000000022352,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:rpc.upload-finish": {
+                "ms": 551.0999999977648,
+                "samples": 1
+              },
+              "extension:import.file-to-stored": {
+                "ms": 1847.5999999977648,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "worker:queue.get-metadata": {
+                "ms": 0,
+                "samples": 1
+              },
+              "worker:store.idb-read": {
+                "ms": 11.099999994039536,
+                "samples": 16
+              },
+              "worker:service.get-metadata": {
+                "ms": 1.300000000745058,
+                "samples": 1
+              },
+              "worker:queue.get": {
+                "ms": 0,
+                "samples": 1
+              },
+              "worker:service.get": {
+                "ms": 0.5,
+                "samples": 1
+              },
+              "worker:queue.get-part": {
+                "ms": 0.4000000022351742,
+                "samples": 14
+              },
+              "worker:download.blob-read": {
+                "ms": 73.90000000596046,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "worker:download.encode-base64": {
+                "ms": 13.799999997019768,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "worker:service.get-part": {
+                "ms": 97.19999999552965,
+                "samples": 14
+              },
+              "extension:rpc.get-metadata": {
+                "ms": 3.399999998509884,
+                "samples": 1
+              },
+              "extension:rpc.get": {
+                "ms": 1.800000000745058,
+                "samples": 1
+              },
+              "extension:rpc.get-part": {
+                "ms": 859.2999999970198,
+                "samples": 14,
+                "wireChars": 76247736
+              },
+              "extension:download.decode-base64": {
+                "ms": 132.79999999701977,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "extension:download.reassemble": {
+                "ms": 12.099999997764826,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "extension:download.parts-total": {
+                "ms": 1004.8999999985099,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:download.inspect": {
+                "ms": 88.30000000074506,
+                "samples": 1
+              },
+              "extension:download.clone-blob": {
+                "ms": 31.199999999254942,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:renderer.source-load": {
+                "ms": 1126.300000000745,
+                "samples": 1
+              },
+              "extension:renderer.blob-read": {
+                "ms": 91.10000000149012,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:renderer.inspect": {
+                "ms": 139.5,
+                "samples": 1
+              },
+              "extension:parse.texture": {
+                "ms": 304.19999999552965,
+                "samples": 5
+              },
+              "extension:parse.vrm-after-root": {
+                "ms": 1.4000000022351742,
+                "samples": 1
+              },
+              "extension:parse.gltf-inclusive": {
+                "ms": 86.10000000149012,
+                "samples": 1
+              },
+              "extension:parse.vrm-postprocess": {
+                "ms": 40.30000000074506,
+                "samples": 1
+              },
+              "extension:renderer.bounds": {
+                "ms": 10.699999999254942,
+                "samples": 1
+              },
+              "extension:gpu.create-context": {
+                "ms": 5.199999999254942,
+                "samples": 1
+              },
+              "extension:first.player-create": {
+                "ms": 0.4000000022351742,
+                "samples": 1
+              },
+              "extension:first.webgl-render-inclusive": {
+                "ms": 118.10000000149012,
+                "samples": 1
+              },
+              "extension:first.canvas-copy": {
+                "ms": 0.19999999925494194,
+                "samples": 1
+              },
+              "extension:first.paint-inclusive": {
+                "ms": 125.30000000074506,
+                "samples": 1
+              },
+              "extension:first.presentation-proxy-inclusive": {
+                "ms": 129.30000000074506,
+                "samples": 1
+              },
+              "extension:benchmark.total": {
+                "ms": 3508.599999997765,
+                "samples": 1,
+                "bytes": 57185776
+              }
+            },
+            "parseTextureUnionMs": 64.69999999925494,
+            "bulkRpcCount": 31,
+            "binaryPayloadRpcCount": 28,
+            "base64PayloadChars": 152495472
+          }
+        ],
+        "direct": [
+          {
+            "run": 1,
+            "cache": "first-profile",
+            "mode": "direct",
+            "trace": "ap-cdf03ef0-f17b-4907-858e-bab7b34cd907",
+            "byteLength": 57185776,
+            "vrmVersion": "0.x",
+            "totalMs": 1102.2999999970198,
+            "alphaPixels": 7360,
+            "canvas": [
+              300,
+              300
+            ],
+            "stats": {
+              "contexts": 1,
+              "lost": false,
+              "assets": 1,
+              "instances": 1,
+              "estimatedGpuAssetBytes": 176450404,
+              "surfaceBytes": 360000,
+              "paints": 1,
+              "cpuMs": 581.1999999992549,
+              "maxCpuMs": 581.1999999992549,
+              "calls": 10,
+              "triangles": 126470,
+              "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+              "fps": 0,
+              "p95CpuMs": 581.1999999992549,
+              "geometries": 5,
+              "textures": 8,
+              "gpuMs": null
+            },
+            "taskCpuMs": 1025.007,
+            "scriptCpuMs": 582.586,
+            "jsHeapBefore": 2916960,
+            "jsHeapAfter": 8246628,
+            "jsHeapPeak": null,
+            "gpuUtilization": null,
+            "actualVramBytes": null,
+            "stages": {
+              "extension:direct.file-read": {
+                "ms": 32.5,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:direct.inspect": {
+                "ms": 116,
+                "samples": 1
+              },
+              "extension:direct.blob-wrap": {
+                "ms": 13.900000002235174,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:renderer.source-load": {
+                "ms": 0.19999999925494194,
+                "samples": 1
+              },
+              "extension:renderer.blob-read": {
+                "ms": 45,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:renderer.inspect": {
+                "ms": 101.60000000149012,
+                "samples": 1
+              },
+              "extension:parse.texture": {
+                "ms": 249.8999999947846,
+                "samples": 5
+              },
+              "extension:parse.vrm-after-root": {
+                "ms": 5.799999997019768,
+                "samples": 1
+              },
+              "extension:parse.gltf-inclusive": {
+                "ms": 85,
+                "samples": 1
+              },
+              "extension:parse.vrm-postprocess": {
+                "ms": 51.69999999925494,
+                "samples": 1
+              },
+              "extension:renderer.bounds": {
+                "ms": 15.5,
+                "samples": 1
+              },
+              "extension:gpu.create-context": {
+                "ms": 8,
+                "samples": 1
+              },
+              "extension:first.player-create": {
+                "ms": 0.3999999985098839,
+                "samples": 1
+              },
+              "extension:first.webgl-render-inclusive": {
+                "ms": 568.8000000007451,
+                "samples": 1
+              },
+              "extension:first.canvas-copy": {
+                "ms": 0.6999999992549419,
+                "samples": 1
+              },
+              "extension:first.paint-inclusive": {
+                "ms": 581.1999999992549,
+                "samples": 1
+              },
+              "extension:first.presentation-proxy-inclusive": {
+                "ms": 584.1000000014901,
+                "samples": 1
+              },
+              "extension:benchmark.total": {
+                "ms": 1084.699999999255,
+                "samples": 1,
+                "bytes": 57185776
+              }
+            },
+            "parseTextureUnionMs": 54.899999998509884,
+            "bulkRpcCount": 0,
+            "binaryPayloadRpcCount": 0,
+            "base64PayloadChars": 0
+          },
+          {
+            "run": 2,
+            "cache": "warm-process",
+            "mode": "direct",
+            "trace": "ap-06c98853-c541-4347-a25a-54d8eae2b1df",
+            "byteLength": 57185776,
+            "vrmVersion": "0.x",
+            "totalMs": 710.1999999992549,
+            "alphaPixels": 7360,
+            "canvas": [
+              300,
+              300
+            ],
+            "stats": {
+              "contexts": 1,
+              "lost": false,
+              "assets": 1,
+              "instances": 1,
+              "estimatedGpuAssetBytes": 176450404,
+              "surfaceBytes": 360000,
+              "paints": 1,
+              "cpuMs": 126.09999999776483,
+              "maxCpuMs": 126.09999999776483,
+              "calls": 10,
+              "triangles": 126470,
+              "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+              "fps": 0,
+              "p95CpuMs": 126.09999999776483,
+              "geometries": 5,
+              "textures": 8,
+              "gpuMs": null
+            },
+            "taskCpuMs": 649.4230000000001,
+            "scriptCpuMs": 126.97399999999992,
+            "jsHeapBefore": 8246628,
+            "jsHeapAfter": 7069116,
+            "jsHeapPeak": null,
+            "gpuUtilization": null,
+            "actualVramBytes": null,
+            "stages": {
+              "extension:direct.file-read": {
+                "ms": 31.5,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:direct.inspect": {
+                "ms": 187.19999999925494,
+                "samples": 1
+              },
+              "extension:direct.blob-wrap": {
+                "ms": 12.400000002235174,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:renderer.source-load": {
+                "ms": 0.09999999776482582,
+                "samples": 1
+              },
+              "extension:renderer.blob-read": {
+                "ms": 47.900000002235174,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:renderer.inspect": {
+                "ms": 136,
+                "samples": 1
+              },
+              "extension:parse.texture": {
+                "ms": 221.8999999947846,
+                "samples": 5
+              },
+              "extension:parse.vrm-after-root": {
+                "ms": 1.3999999985098839,
+                "samples": 1
+              },
+              "extension:parse.gltf-inclusive": {
+                "ms": 74.90000000223517,
+                "samples": 1
+              },
+              "extension:parse.vrm-postprocess": {
+                "ms": 38.80000000074506,
+                "samples": 1
+              },
+              "extension:renderer.bounds": {
+                "ms": 14.5,
+                "samples": 1
+              },
+              "extension:gpu.create-context": {
+                "ms": 6.699999999254942,
+                "samples": 1
+              },
+              "extension:first.player-create": {
+                "ms": 0.19999999925494194,
+                "samples": 1
+              },
+              "extension:first.webgl-render-inclusive": {
+                "ms": 117.5,
+                "samples": 1
+              },
+              "extension:first.canvas-copy": {
+                "ms": 0.19999999925494194,
+                "samples": 1
+              },
+              "extension:first.paint-inclusive": {
+                "ms": 126.09999999776483,
+                "samples": 1
+              },
+              "extension:first.presentation-proxy-inclusive": {
+                "ms": 133.80000000074506,
+                "samples": 1
+              },
+              "extension:benchmark.total": {
+                "ms": 707.5,
+                "samples": 1,
+                "bytes": 57185776
+              }
+            },
+            "parseTextureUnionMs": 48.69999999925494,
+            "bulkRpcCount": 0,
+            "binaryPayloadRpcCount": 0,
+            "base64PayloadChars": 0
+          },
+          {
+            "run": 3,
+            "cache": "warm-process",
+            "mode": "direct",
+            "trace": "ap-660e444a-879d-43a4-959c-f6771eb9cf85",
+            "byteLength": 57185776,
+            "vrmVersion": "0.x",
+            "totalMs": 496.20000000298023,
+            "alphaPixels": 7360,
+            "canvas": [
+              300,
+              300
+            ],
+            "stats": {
+              "contexts": 1,
+              "lost": false,
+              "assets": 1,
+              "instances": 1,
+              "estimatedGpuAssetBytes": 176450404,
+              "surfaceBytes": 360000,
+              "paints": 1,
+              "cpuMs": 116.89999999850988,
+              "maxCpuMs": 116.89999999850988,
+              "calls": 10,
+              "triangles": 126470,
+              "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+              "fps": 0,
+              "p95CpuMs": 116.89999999850988,
+              "geometries": 5,
+              "textures": 8,
+              "gpuMs": null
+            },
+            "taskCpuMs": 424.0919999999999,
+            "scriptCpuMs": 117.69300000000004,
+            "jsHeapBefore": 7069116,
+            "jsHeapAfter": 10273616,
+            "jsHeapPeak": null,
+            "gpuUtilization": null,
+            "actualVramBytes": null,
+            "stages": {
+              "extension:direct.file-read": {
+                "ms": 28.400000002235174,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:direct.inspect": {
+                "ms": 90.19999999925494,
+                "samples": 1
+              },
+              "extension:direct.blob-wrap": {
+                "ms": 10.600000001490116,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:renderer.source-load": {
+                "ms": 0.10000000149011612,
+                "samples": 1
+              },
+              "extension:renderer.blob-read": {
+                "ms": 41.600000001490116,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:renderer.inspect": {
+                "ms": 45.69999999925494,
+                "samples": 1
+              },
+              "extension:parse.texture": {
+                "ms": 203.60000000149012,
+                "samples": 5
+              },
+              "extension:parse.vrm-after-root": {
+                "ms": 1.300000000745058,
+                "samples": 1
+              },
+              "extension:parse.gltf-inclusive": {
+                "ms": 66.39999999850988,
+                "samples": 1
+              },
+              "extension:parse.vrm-postprocess": {
+                "ms": 38.400000002235174,
+                "samples": 1
+              },
+              "extension:renderer.bounds": {
+                "ms": 11.400000002235174,
+                "samples": 1
+              },
+              "extension:gpu.create-context": {
+                "ms": 5,
+                "samples": 1
+              },
+              "extension:first.player-create": {
+                "ms": 0.19999999925494194,
+                "samples": 1
+              },
+              "extension:first.webgl-render-inclusive": {
+                "ms": 109.80000000074506,
+                "samples": 1
+              },
+              "extension:first.canvas-copy": {
+                "ms": 0.30000000074505806,
+                "samples": 1
+              },
+              "extension:first.paint-inclusive": {
+                "ms": 116.80000000074506,
+                "samples": 1
+              },
+              "extension:first.presentation-proxy-inclusive": {
+                "ms": 125.30000000074506,
+                "samples": 1
+              },
+              "extension:benchmark.total": {
+                "ms": 491.30000000074506,
+                "samples": 1,
+                "bytes": 57185776
+              }
+            },
+            "parseTextureUnionMs": 45.19999999925494,
+            "bulkRpcCount": 0,
+            "binaryPayloadRpcCount": 0,
+            "base64PayloadChars": 0
+          }
+        ],
+        "stored": [
+          {
+            "run": 1,
+            "cache": "first-profile",
+            "mode": "stored",
+            "trace": "ap-dbf78233-d1f6-4213-9b53-e91cf1430951",
+            "byteLength": 57185776,
+            "vrmVersion": "0.x",
+            "totalMs": 996.6999999992549,
+            "alphaPixels": 7360,
+            "canvas": [
+              300,
+              300
+            ],
+            "stats": {
+              "contexts": 1,
+              "lost": false,
+              "assets": 1,
+              "instances": 1,
+              "estimatedGpuAssetBytes": 176450404,
+              "surfaceBytes": 360000,
+              "paints": 1,
+              "cpuMs": 568.1999999992549,
+              "maxCpuMs": 568.1999999992549,
+              "calls": 10,
+              "triangles": 126470,
+              "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+              "fps": 0,
+              "p95CpuMs": 568.1999999992549,
+              "geometries": 5,
+              "textures": 8,
+              "gpuMs": null
+            },
+            "taskCpuMs": 948.012,
+            "scriptCpuMs": 569.566,
+            "jsHeapBefore": 26771332,
+            "jsHeapAfter": 5976208,
+            "jsHeapPeak": null,
+            "gpuUtilization": null,
+            "actualVramBytes": null,
+            "stages": {
+              "extension:direct.idb-read": {
+                "ms": 0.8000000007450581,
+                "samples": 1
+              },
+              "extension:renderer.source-load": {
+                "ms": 0.19999999925494194,
+                "samples": 1
+              },
+              "extension:renderer.blob-read": {
+                "ms": 28.400000002235174,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:renderer.inspect": {
+                "ms": 189,
+                "samples": 1
+              },
+              "extension:parse.texture": {
+                "ms": 248.90000000968575,
+                "samples": 5
+              },
+              "extension:parse.vrm-after-root": {
+                "ms": 4.800000000745058,
+                "samples": 1
+              },
+              "extension:parse.gltf-inclusive": {
+                "ms": 87.30000000074506,
+                "samples": 1
+              },
+              "extension:parse.vrm-postprocess": {
+                "ms": 52.30000000074506,
+                "samples": 1
+              },
+              "extension:renderer.bounds": {
+                "ms": 14.200000002980232,
+                "samples": 1
+              },
+              "extension:gpu.create-context": {
+                "ms": 8.099999997764826,
+                "samples": 1
+              },
+              "extension:first.player-create": {
+                "ms": 0.3999999985098839,
+                "samples": 1
+              },
+              "extension:first.webgl-render-inclusive": {
+                "ms": 556.2000000029802,
+                "samples": 1
+              },
+              "extension:first.canvas-copy": {
+                "ms": 0.6000000014901161,
+                "samples": 1
+              },
+              "extension:first.paint-inclusive": {
+                "ms": 568.1999999992549,
+                "samples": 1
+              },
+              "extension:first.presentation-proxy-inclusive": {
+                "ms": 574.1999999992549,
+                "samples": 1
+              },
+              "extension:benchmark.total": {
+                "ms": 980.9000000022352,
+                "samples": 1,
+                "bytes": 57185776
+              }
+            },
+            "parseTextureUnionMs": 54.20000000298023,
+            "bulkRpcCount": 0,
+            "binaryPayloadRpcCount": 0,
+            "base64PayloadChars": 0
+          },
+          {
+            "run": 2,
+            "cache": "warm-process",
+            "mode": "stored",
+            "trace": "ap-3ae9e839-0a63-4046-9d48-9a5619a76638",
+            "byteLength": 57185776,
+            "vrmVersion": "0.x",
+            "totalMs": 450,
+            "alphaPixels": 7360,
+            "canvas": [
+              300,
+              300
+            ],
+            "stats": {
+              "contexts": 1,
+              "lost": false,
+              "assets": 1,
+              "instances": 1,
+              "estimatedGpuAssetBytes": 176450404,
+              "surfaceBytes": 360000,
+              "paints": 1,
+              "cpuMs": 118,
+              "maxCpuMs": 118,
+              "calls": 10,
+              "triangles": 126470,
+              "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+              "fps": 0,
+              "p95CpuMs": 118,
+              "geometries": 5,
+              "textures": 8,
+              "gpuMs": null
+            },
+            "taskCpuMs": 407.8600000000001,
+            "scriptCpuMs": 118.57499999999999,
+            "jsHeapBefore": 5976208,
+            "jsHeapAfter": 6543644,
+            "jsHeapPeak": null,
+            "gpuUtilization": null,
+            "actualVramBytes": null,
+            "stages": {
+              "extension:direct.idb-read": {
+                "ms": 0.5,
+                "samples": 1
+              },
+              "extension:renderer.source-load": {
+                "ms": 0,
+                "samples": 1
+              },
+              "extension:renderer.blob-read": {
+                "ms": 32.100000001490116,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:renderer.inspect": {
+                "ms": 134.39999999850988,
+                "samples": 1
+              },
+              "extension:parse.texture": {
+                "ms": 241.09999999776483,
+                "samples": 5
+              },
+              "extension:parse.vrm-after-root": {
+                "ms": 1.5,
+                "samples": 1
+              },
+              "extension:parse.gltf-inclusive": {
+                "ms": 73.60000000149012,
+                "samples": 1
+              },
+              "extension:parse.vrm-postprocess": {
+                "ms": 36.19999999925494,
+                "samples": 1
+              },
+              "extension:renderer.bounds": {
+                "ms": 12.399999998509884,
+                "samples": 1
+              },
+              "extension:gpu.create-context": {
+                "ms": 5.800000000745058,
+                "samples": 1
+              },
+              "extension:first.player-create": {
+                "ms": 0.19999999925494194,
+                "samples": 1
+              },
+              "extension:first.webgl-render-inclusive": {
+                "ms": 110.39999999850988,
+                "samples": 1
+              },
+              "extension:first.canvas-copy": {
+                "ms": 0.19999999925494194,
+                "samples": 1
+              },
+              "extension:first.paint-inclusive": {
+                "ms": 118,
+                "samples": 1
+              },
+              "extension:first.presentation-proxy-inclusive": {
+                "ms": 122,
+                "samples": 1
+              },
+              "extension:benchmark.total": {
+                "ms": 446.9000000022352,
+                "samples": 1,
+                "bytes": 57185776
+              }
+            },
+            "parseTextureUnionMs": 52.5,
+            "bulkRpcCount": 0,
+            "binaryPayloadRpcCount": 0,
+            "base64PayloadChars": 0
+          },
+          {
+            "run": 3,
+            "cache": "warm-process",
+            "mode": "stored",
+            "trace": "ap-9e59343a-a344-4a30-8e54-da56606dd869",
+            "byteLength": 57185776,
+            "vrmVersion": "0.x",
+            "totalMs": 390.80000000074506,
+            "alphaPixels": 7360,
+            "canvas": [
+              300,
+              300
+            ],
+            "stats": {
+              "contexts": 1,
+              "lost": false,
+              "assets": 1,
+              "instances": 1,
+              "estimatedGpuAssetBytes": 176450404,
+              "surfaceBytes": 360000,
+              "paints": 1,
+              "cpuMs": 115,
+              "maxCpuMs": 115,
+              "calls": 10,
+              "triangles": 126470,
+              "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+              "fps": 0,
+              "p95CpuMs": 115,
+              "geometries": 5,
+              "textures": 8,
+              "gpuMs": null
+            },
+            "taskCpuMs": 347.904,
+            "scriptCpuMs": 115.55499999999996,
+            "jsHeapBefore": 6543644,
+            "jsHeapAfter": 6579888,
+            "jsHeapPeak": null,
+            "gpuUtilization": null,
+            "actualVramBytes": null,
+            "stages": {
+              "extension:direct.idb-read": {
+                "ms": 0.5999999977648258,
+                "samples": 1
+              },
+              "extension:renderer.source-load": {
+                "ms": 0,
+                "samples": 1
+              },
+              "extension:renderer.blob-read": {
+                "ms": 28.5,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:renderer.inspect": {
+                "ms": 91.59999999776483,
+                "samples": 1
+              },
+              "extension:parse.texture": {
+                "ms": 194.0000000037253,
+                "samples": 5
+              },
+              "extension:parse.vrm-after-root": {
+                "ms": 1.4000000022351742,
+                "samples": 1
+              },
+              "extension:parse.gltf-inclusive": {
+                "ms": 68.19999999925494,
+                "samples": 1
+              },
+              "extension:parse.vrm-postprocess": {
+                "ms": 34.900000002235174,
+                "samples": 1
+              },
+              "extension:renderer.bounds": {
+                "ms": 11,
+                "samples": 1
+              },
+              "extension:gpu.create-context": {
+                "ms": 5.300000000745058,
+                "samples": 1
+              },
+              "extension:first.player-create": {
+                "ms": 0.30000000074505806,
+                "samples": 1
+              },
+              "extension:first.webgl-render-inclusive": {
+                "ms": 107.59999999776483,
+                "samples": 1
+              },
+              "extension:first.canvas-copy": {
+                "ms": 0.10000000149011612,
+                "samples": 1
+              },
+              "extension:first.paint-inclusive": {
+                "ms": 114.90000000223517,
+                "samples": 1
+              },
+              "extension:first.presentation-proxy-inclusive": {
+                "ms": 116.70000000298023,
+                "samples": 1
+              },
+              "extension:benchmark.total": {
+                "ms": 386.80000000074506,
+                "samples": 1,
+                "bytes": 57185776
+              }
+            },
+            "parseTextureUnionMs": 42.399999998509884,
+            "bulkRpcCount": 0,
+            "binaryPayloadRpcCount": 0,
+            "base64PayloadChars": 0
+          }
+        ]
+      },
+      "iframe": {
+        "granted": true,
+        "error": null,
+        "render": {
+          "mode": "stored",
+          "trace": "ap-8bd0bbe9-89e3-48dc-8a9b-7f5de456ed7c",
+          "byteLength": 57185776,
+          "vrmVersion": "0.x",
+          "totalMs": 926.8000000007451,
+          "alphaPixels": 7360,
+          "canvas": [
+            300,
+            300
+          ],
+          "stats": {
+            "contexts": 1,
+            "lost": false,
+            "assets": 1,
+            "instances": 1,
+            "estimatedGpuAssetBytes": 176450404,
+            "surfaceBytes": 360000,
+            "paints": 1,
+            "cpuMs": 365.20000000298023,
+            "maxCpuMs": 365.20000000298023,
+            "calls": 10,
+            "triangles": 126470,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "fps": 0,
+            "p95CpuMs": 365.20000000298023,
+            "geometries": 5,
+            "textures": 8,
+            "gpuMs": null
+          },
+          "stages": {
+            "extension:direct.idb-read": {
+              "ms": 11.800000000745058,
+              "samples": 1
+            },
+            "extension:renderer.source-load": {
+              "ms": 0.5999999977648258,
+              "samples": 1
+            },
+            "extension:renderer.blob-read": {
+              "ms": 51.100000001490116,
+              "samples": 1,
+              "bytes": 57185776
+            },
+            "extension:renderer.inspect": {
+              "ms": 158.80000000074506,
+              "samples": 1
+            },
+            "extension:parse.texture": {
+              "ms": 465.90000000596046,
+              "samples": 5
+            },
+            "extension:parse.vrm-after-root": {
+              "ms": 10.100000001490116,
+              "samples": 1
+            },
+            "extension:parse.gltf-inclusive": {
+              "ms": 163.30000000074506,
+              "samples": 1
+            },
+            "extension:parse.vrm-postprocess": {
+              "ms": 115.39999999850988,
+              "samples": 1
+            },
+            "extension:renderer.bounds": {
+              "ms": 28.900000002235174,
+              "samples": 1
+            },
+            "extension:gpu.create-context": {
+              "ms": 15.300000000745058,
+              "samples": 1
+            },
+            "extension:first.player-create": {
+              "ms": 1,
+              "samples": 1
+            },
+            "extension:first.webgl-render-inclusive": {
+              "ms": 339.3999999985099,
+              "samples": 1
+            },
+            "extension:first.canvas-copy": {
+              "ms": 2.2000000029802322,
+              "samples": 1
+            },
+            "extension:first.paint-inclusive": {
+              "ms": 365.20000000298023,
+              "samples": 1
+            },
+            "extension:first.presentation-proxy-inclusive": {
+              "ms": 372.4000000022352,
+              "samples": 1
+            },
+            "extension:benchmark.total": {
+              "ms": 913.0999999977648,
+              "samples": 1,
+              "bytes": 57185776
+            }
+          },
+          "parseTextureUnionMs": 100.40000000223517,
+          "bulkRpcCount": 0,
+          "binaryPayloadRpcCount": 0,
+          "base64PayloadChars": 0
+        },
+        "extensionOrigin": {
+          "origin": "chrome-extension://kkcfnbloknmndgkmplfafmdkmnahdhoi",
+          "chromeId": "kkcfnbloknmndgkmplfafmdkmnahdhoi",
+          "transparentBackground": "rgba(0, 0, 0, 0)"
+        },
+        "isolatedWorldFound": true,
+        "binaryTransfers": [
+          {
+            "ms": 133.89999999850988,
+            "received": 57185776,
+            "detached": true
+          },
+          {
+            "ms": 178,
+            "received": 57185776,
+            "detached": true
+          },
+          {
+            "ms": 166.39999999850988,
+            "received": 57185776,
+            "detached": true
+          }
+        ],
+        "nativeControlsClickable": true,
+        "bodyFrameInsideFullscreen": true,
+        "fullscreenElement": {
+          "tag": "HTML",
+          "id": ""
+        },
+        "bodyFrameRetained": true,
+        "playerFrameInsideFullscreen": true,
+        "failure": "Error: frame.evaluate: Target page, context or browser has been closed"
+      },
+      "youtube": {
+        "readyState": 4,
+        "paused": false,
+        "error": null
+      },
+      "notes": [
+        "First = new Chrome profile/context; OS file/driver cache is not flushed.",
+        "Warm = same process, a newly parsed model and a fresh WebGL context, not resource reuse.",
+        "CPU is only the measured page target, not the service worker or the GPU process.",
+        "Controlled comparison repeated after explicitly releasing ModelSurface and its bitmaps between trials. Real YouTube measurements are retained."
+      ]
+    },
+    "queue": {
+      "browser": "153.0.8010.12",
+      "profiling": true,
+      "conditions": {
+        "A_real_youtube": [
+          {
+            "run": 1,
+            "cache": "first-profile",
+            "totalMs": 9092.1994,
+            "trace": "ap-5d975df1-295e-4dc6-babd-b464ad3ff04e",
+            "taskCpuMs": 8325.585000000001,
+            "scriptCpuMs": 3581.9100000000003,
+            "jsHeapBefore": 55360044,
+            "jsHeapAfter": 80882184,
+            "jsHeapPeak": null,
+            "gpuUtilization": null,
+            "actualVramBytes": null,
+            "placement": [
+              300,
+              300
+            ],
+            "stats": {
+              "contexts": 1,
+              "lost": false,
+              "assets": 1,
+              "instances": 1,
+              "estimatedGpuAssetBytes": 176450404,
+              "surfaceBytes": 360000,
+              "paints": 18,
+              "cpuMs": 1.699999999254942,
+              "maxCpuMs": 1378.5,
+              "calls": 10,
+              "triangles": 126470,
+              "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+              "fps": 7.3736716547386685,
+              "p95CpuMs": 1378.5,
+              "geometries": 5,
+              "textures": 8,
+              "gpuMs": 5.475832
+            },
+            "stages": {
+              "worker:queue.upload-start": {
+                "ms": 0,
+                "samples": 1
+              },
+              "worker:store.owner-check": {
+                "ms": 32.79999999329448,
+                "samples": 22
+              },
+              "worker:service.upload-start": {
+                "ms": 1.5,
+                "samples": 1
+              },
+              "worker:queue.upload-part": {
+                "ms": 26.00000000372529,
+                "samples": 14
+              },
+              "worker:upload.decode-base64": {
+                "ms": 253.9999999962747,
+                "samples": 14
+              },
+              "worker:upload.reassemble": {
+                "ms": 19.400000013411045,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "worker:service.upload-part": {
+                "ms": 303.5,
+                "samples": 14
+              },
+              "worker:queue.upload-finish": {
+                "ms": 0,
+                "samples": 1
+              },
+              "worker:store.inspect": {
+                "ms": 189.69999999925494,
+                "samples": 1
+              },
+              "worker:validation.inspect": {
+                "ms": 327.1000000014901,
+                "samples": 1
+              },
+              "worker:validation.bitmap": {
+                "ms": 234.49999999254942,
+                "samples": 6,
+                "bytes": 7371783
+              },
+              "worker:store.validate-textures": {
+                "ms": 567.9000000022352,
+                "samples": 1
+              },
+              "worker:store.clone-blob": {
+                "ms": 56.5,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "worker:store.hash-with-copy": {
+                "ms": 110.59999999776483,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "worker:store.prune": {
+                "ms": 1.0999999977648258,
+                "samples": 1
+              },
+              "worker:store.idb-write-transaction": {
+                "ms": 78.30000000074506,
+                "samples": 1
+              },
+              "worker:service.upload-finish": {
+                "ms": 1005.4000000022352,
+                "samples": 1
+              },
+              "extension:import.file-read": {
+                "ms": 80.30000000074506,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:import.inspect": {
+                "ms": 168,
+                "samples": 1
+              },
+              "extension:validation.inspect": {
+                "ms": 203.30000000074506,
+                "samples": 1
+              },
+              "extension:validation.bitmap": {
+                "ms": 208,
+                "samples": 6,
+                "bytes": 7371783
+              },
+              "extension:import.validate-textures": {
+                "ms": 416.69999999925494,
+                "samples": 1
+              },
+              "extension:rpc.upload-start": {
+                "ms": 3.5,
+                "samples": 1,
+                "wireChars": 36
+              },
+              "extension:upload.encode-base64": {
+                "ms": 36.80000000074506,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "extension:rpc.upload-part": {
+                "ms": 1642.6000000014901,
+                "samples": 14,
+                "wireChars": 76247736
+              },
+              "extension:upload.parts-total": {
+                "ms": 1679.699999999255,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "extension:rpc.upload-finish": {
+                "ms": 1007.1000000014901,
+                "samples": 1
+              },
+              "extension:import.file-to-stored": {
+                "ms": 3355.89999999851,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "worker:queue.get-metadata": {
+                "ms": 0.10000000149011612,
+                "samples": 1
+              },
+              "worker:store.idb-read": {
+                "ms": 10.200000002980232,
+                "samples": 16
+              },
+              "worker:service.get-metadata": {
+                "ms": 0.6999999992549419,
+                "samples": 1
+              },
+              "worker:queue.lease": {
+                "ms": 363.5,
+                "samples": 3
+              },
+              "worker:store.lease-rewrite": {
+                "ms": 224.19999999552965,
+                "samples": 3
+              },
+              "worker:store.prune-after-command": {
+                "ms": 433.19999999925494,
+                "samples": 5
+              },
+              "worker:service.lease": {
+                "ms": 512.0999999977648,
+                "samples": 3
+              },
+              "worker:queue.validate": {
+                "ms": 0.09999999776482582,
+                "samples": 1
+              },
+              "worker:service.validate": {
+                "ms": 1.7000000029802322,
+                "samples": 1
+              },
+              "worker:queue.get": {
+                "ms": 0.09999999776482582,
+                "samples": 1
+              },
+              "worker:service.get": {
+                "ms": 0.4000000022351742,
+                "samples": 1
+              },
+              "worker:queue.get-part": {
+                "ms": 698.9000000059605,
+                "samples": 14
+              },
+              "worker:download.blob-read": {
+                "ms": 101.40000000596046,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "worker:download.encode-base64": {
+                "ms": 27.099999997764826,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "worker:service.get-part": {
+                "ms": 138.30000000074506,
+                "samples": 14
+              },
+              "worker:queue.release": {
+                "ms": 688.3000000007451,
+                "samples": 2
+              },
+              "worker:store.release-rewrite": {
+                "ms": 167.89999999850988,
+                "samples": 2
+              },
+              "worker:service.release": {
+                "ms": 314.0999999977648,
+                "samples": 2
+              },
+              "content:rpc.get-metadata": {
+                "ms": 10.800000000745058,
+                "samples": 1
+              },
+              "content:rpc.lease": {
+                "ms": 377.9999999962747,
+                "samples": 2
+              },
+              "content:rpc.validate": {
+                "ms": 11.900000002235174,
+                "samples": 1
+              },
+              "content:rpc.get": {
+                "ms": 29.5,
+                "samples": 1
+              },
+              "content:rpc.get-part": {
+                "ms": 2110.5000000037253,
+                "samples": 14,
+                "wireChars": 76247736
+              },
+              "content:download.decode-base64": {
+                "ms": 253.899999987334,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "content:download.reassemble": {
+                "ms": 20.30000000447035,
+                "samples": 14,
+                "bytes": 57185776
+              },
+              "content:rpc.release": {
+                "ms": 454.30000000074506,
+                "samples": 1
+              },
+              "content:download.parts-total": {
+                "ms": 2385.199999999255,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "content:download.inspect": {
+                "ms": 150.90000000223517,
+                "samples": 1
+              },
+              "content:download.clone-blob": {
+                "ms": 41,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "content:renderer.source-load": {
+                "ms": 2607.099999997765,
+                "samples": 1
+              },
+              "content:renderer.blob-read": {
+                "ms": 108.10000000149012,
+                "samples": 1,
+                "bytes": 57185776
+              },
+              "content:renderer.inspect": {
+                "ms": 278,
+                "samples": 1
+              },
+              "content:parse.texture": {
+                "ms": 1029.5999999977648,
+                "samples": 5
+              },
+              "content:parse.vrm-after-root": {
+                "ms": 9.799999997019768,
+                "samples": 1
+              },
+              "content:parse.gltf-inclusive": {
+                "ms": 289.70000000298023,
+                "samples": 1
+              },
+              "content:parse.vrm-postprocess": {
+                "ms": 130.60000000149012,
+                "samples": 1
+              },
+              "content:renderer.bounds": {
+                "ms": 56.69999999925494,
+                "samples": 1
+              },
+              "content:gpu.create-context": {
+                "ms": 35.80000000074506,
+                "samples": 1
+              },
+              "content:first.player-create": {
+                "ms": 1.699999999254942,
+                "samples": 1
+              },
+              "content:first.webgl-render-inclusive": {
+                "ms": 1326,
+                "samples": 1
+              },
+              "content:first.canvas-copy": {
+                "ms": 3.699999999254942,
+                "samples": 1
+              },
+              "content:first.paint-inclusive": {
+                "ms": 1378.4000000022352,
+                "samples": 1
+              },
+              "content:first.presentation-proxy-inclusive": {
+                "ms": 1525.800000000745,
+                "samples": 1
+              }
+            },
+            "parseTextureUnionMs": 223.39999999850988,
+            "bulkRpcCount": 31,
+            "binaryPayloadRpcCount": 28,
+            "base64PayloadChars": 152495472
+          }
+        ]
+      },
+      "iframe": null,
+      "youtube": {
+        "readyState": 4,
+        "paused": false,
+        "error": null
+      },
+      "notes": [
+        "First = new Chrome profile/context; OS file/driver cache is not flushed.",
+        "Warm = same process, a newly parsed model and a fresh WebGL context, not resource reuse.",
+        "CPU is only the measured page target, not the service worker or the GPU process."
+      ]
+    }
+  },
+  "preliminaryObservation": {
+    "source": "Captured console aggregates from the preliminary profile run; full spans were superseded by the final run.",
+    "totalMs": 16138.6637,
+    "getQueueMs": 689.5,
+    "getPartQueueMs": 7020.7,
+    "gltfParseMs": 166,
+    "firstRenderMs": 1345.6
+  },
+  "iframeFollowup": {
+    "granted": true,
+    "error": null,
+    "extensionOrigin": {
+      "origin": "chrome-extension://kkcfnbloknmndgkmplfafmdkmnahdhoi",
+      "chromeId": "kkcfnbloknmndgkmplfafmdkmnahdhoi",
+      "transparentBackground": "rgba(0, 0, 0, 0)"
+    },
+    "isolatedWorldFound": true,
+    "binaryTransfers": [
+      {
+        "ms": 169.09999999776483,
+        "received": 57185776,
+        "detached": true
+      },
+      {
+        "ms": 128.80000000074506,
+        "received": 57185776,
+        "detached": true
+      },
+      {
+        "ms": 125.30000000074506,
+        "received": 57185776,
+        "detached": true
+      }
+    ],
+    "nativeControlsClickable": true,
+    "bodyFrameInsideFullscreen": true,
+    "fullscreenElement": {
+      "tag": "HTML",
+      "id": ""
+    },
+    "bodyFrameRetained": true,
+    "playerFrameInsideFullscreen": true,
+    "playerFrameState": {
+      "ready": false,
+      "error": "Error: invalid probe grant"
+    },
+    "playerFrameRetained": false,
+    "render": {
+      "mode": "stored",
+      "trace": "ap-e76ea18d-a505-4133-a4b1-d4c16435bb2c",
+      "byteLength": 57185776,
+      "vrmVersion": "0.x",
+      "totalMs": 2865.60000000149,
+      "alphaPixels": 7360,
+      "canvas": [
+        300,
+        300
+      ],
+      "stats": {
+        "contexts": 1,
+        "lost": false,
+        "assets": 1,
+        "instances": 1,
+        "estimatedGpuAssetBytes": 176450404,
+        "surfaceBytes": 360000,
+        "paints": 1,
+        "cpuMs": 1686.199999999255,
+        "maxCpuMs": 1686.199999999255,
+        "calls": 10,
+        "triangles": 126470,
+        "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "fps": 0,
+        "p95CpuMs": 1686.199999999255,
+        "geometries": 5,
+        "textures": 8,
+        "gpuMs": null
+      },
+      "stages": {
+        "extension:direct.idb-read": {
+          "ms": 1.5,
+          "samples": 1
+        },
+        "extension:renderer.source-load": {
+          "ms": 0.3999999985098839,
+          "samples": 1
+        },
+        "extension:renderer.blob-read": {
+          "ms": 62.600000001490116,
+          "samples": 1,
+          "bytes": 57185776
+        },
+        "extension:renderer.inspect": {
+          "ms": 163.5,
+          "samples": 1
+        },
+        "extension:parse.texture": {
+          "ms": 650.1999999992549,
+          "samples": 5
+        },
+        "extension:parse.vrm-after-root": {
+          "ms": 10.099999997764826,
+          "samples": 1
+        },
+        "extension:parse.gltf-inclusive": {
+          "ms": 218.69999999925494,
+          "samples": 1
+        },
+        "extension:parse.vrm-postprocess": {
+          "ms": 92,
+          "samples": 1
+        },
+        "extension:renderer.bounds": {
+          "ms": 37.400000002235174,
+          "samples": 1
+        },
+        "extension:gpu.create-context": {
+          "ms": 261.80000000074506,
+          "samples": 1
+        },
+        "extension:first.player-create": {
+          "ms": 1,
+          "samples": 1
+        },
+        "extension:first.webgl-render-inclusive": {
+          "ms": 1371.300000000745,
+          "samples": 1
+        },
+        "extension:first.canvas-copy": {
+          "ms": 6.5,
+          "samples": 1
+        },
+        "extension:first.paint-inclusive": {
+          "ms": 1686,
+          "samples": 1
+        },
+        "extension:first.presentation-proxy-inclusive": {
+          "ms": 1751,
+          "samples": 1
+        },
+        "extension:benchmark.total": {
+          "ms": 2831.10000000149,
+          "samples": 1,
+          "bytes": 57185776
+        }
+      },
+      "parseTextureUnionMs": 142.89999999850988,
+      "bulkRpcCount": 0,
+      "binaryPayloadRpcCount": 0,
+      "base64PayloadChars": 0
+    }
+  }
+}

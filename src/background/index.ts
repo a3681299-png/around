@@ -9,8 +9,12 @@ import { isAssetId, isDesignId, parseDesign } from '../design/schema';
 import { saveDesign } from '../storage/designs';
 import { installTakeStorage } from '../browser/take-repository';
 import { createAssetTransfers } from '../assets/transfers';
+import { ASSET_PROFILE, PROFILE_MESSAGE, assetProfile, linkAssetProfile, validProfile, profileAsync, profileSync, profileEnd, profileSnapshot, profileIngest, profileClear } from '../diagnostics/asset-profile';
 
 const transfers = createAssetTransfers();
+// Development iframe probe only: a selected asset, one tab, one use, 60 seconds.
+const profileGrants = new Map<string, { id: string; tab: number; expires: number }>();
+const profileSessions = new Map<string, string>();
 
 let queue: Promise<unknown> = Promise.resolve();
 function enqueue<T>(action: () => Promise<T>): Promise<T> {
@@ -72,7 +76,7 @@ async function leaseAssets(lease: AssetLease, ids: readonly string[]): Promise<v
   });
 }
 
-async function importBatch(input: unknown, lease: AssetLease, decoded?: Uint8Array): Promise<AssetMetadata[]> {
+async function importBatch(input: unknown, lease: AssetLease, decoded?: Uint8Array, trace?: string): Promise<AssetMetadata[]> {
   if (!Array.isArray(input) || !input.length || input.length > ASSET_LIMITS.batchCount) throw new Error('一度に追加できる画像は8枚までです。');
   const assets: StoredAsset[] = [];
   let size = 0;
@@ -84,9 +88,9 @@ async function importBatch(input: unknown, lease: AssetLease, decoded?: Uint8Arr
     const bytes = decoded ?? base64ToBytes(file.base64);
     size += bytes.length;
     if (size > (decoded ? ASSET_LIMITS.modelBytes : ASSET_LIMITS.fileBytes)) throw new Error('素材の転送容量が上限を超えました。');
-    const info = inspectAsset(bytes, file.mime);
-    if (info.model) await validateModelTextures(bytes);
-    const blob = new Blob([new Uint8Array(bytes).buffer], { type: info.mime });
+    const info = profileSync(trace, 'store.inspect', () => inspectAsset(bytes, file.mime));
+    if (info.model) await profileAsync(trace, 'store.validate-textures', () => validateModelTextures(bytes, undefined, trace));
+    const blob = profileSync(trace, 'store.clone-blob', () => new Blob([new Uint8Array(bytes).buffer], { type: info.mime }), { bytes: bytes.length });
     // ServiceWorker has no ImageDecoder. Both boundaries inspect containers;
     // images validate frame 0. Video is probed by the content importer.
     if (!info.model && info.animation?.format !== 'lottie' && info.animation?.format !== 'webm') {
@@ -94,12 +98,13 @@ async function importBatch(input: unknown, lease: AssetLease, decoded?: Uint8Arr
       try { if (bitmap.width !== info.width || bitmap.height !== info.height) throw new Error('画像を正しく読み込めませんでした。'); }
       finally { bitmap.close(); }
     }
-    const hash = await crypto.subtle.digest('SHA-256', new Uint8Array(bytes).buffer);
+    const hash = await profileAsync(trace, 'store.hash-with-copy', () => crypto.subtle.digest('SHA-256', new Uint8Array(bytes).buffer), { bytes: bytes.length });
     const id = `asset-${[...new Uint8Array(hash)].map((byte) => byte.toString(16).padStart(2, '0')).join('')}`;
     assets.push({ ...info, id, name: file.name, byteLength: bytes.length, blob, leases: [lease] });
+    linkAssetProfile(id, trace);
   }
-  await prune(lease);
-  await changeAssets((rows) => {
+  await profileAsync(trace, 'store.prune', () => prune(lease));
+  await profileAsync(trace, 'store.idb-write-transaction', () => changeAssets((rows) => {
     const combined = new Map(rows.map((row) => [row.id, row]));
     for (const asset of assets) {
       const existing = combined.get(asset.id);
@@ -109,41 +114,43 @@ async function importBatch(input: unknown, lease: AssetLease, decoded?: Uint8Arr
       throw new Error('素材の保存上限（256MB・128素材）またはブラウザーの空き容量を確認してください。不要な素材を削除して保存すると空きを確保できます。');
     }
     return { value: undefined, put: [...combined.values()] };
-  });
+  }));
   return assets.map(({ blob: _blob, leases: _leases, ...metadata }) => metadata);
 }
 
-async function handle(message: Record<string, unknown>, sender: chrome.runtime.MessageSender): Promise<unknown> {
+async function handle(message: Record<string, unknown>, sender: chrome.runtime.MessageSender, trace?: string): Promise<unknown> {
   if (message['action'] === 'get' || message['action'] === 'get-part' || message['action'] === 'get-metadata') {
     if (!isAssetId(message['id'])) throw new Error('素材IDが不正です。');
-    const asset = await getAsset(message['id']);
+    const asset = await profileAsync(trace, 'store.idb-read', () => getAsset(message['id'] as string));
     if (!asset) throw new Error('画像素材が見つかりません。');
     const { blob, leases: _leases, ...metadata } = asset;
     if (message['action'] === 'get-metadata') return metadata;
     if (message['action'] === 'get-part') {
       const offset = message['offset']; if (typeof offset !== 'number' || !Number.isSafeInteger(offset) || offset < 0 || offset >= blob.size || offset % ASSET_LIMITS.chunkBytes) throw new Error('素材の転送位置が不正です。');
-      return bytesToBase64(new Uint8Array(await blob.slice(offset, offset + ASSET_LIMITS.chunkBytes).arrayBuffer()));
+      const bytes = new Uint8Array(await profileAsync(trace, 'download.blob-read', () => blob.slice(offset, offset + ASSET_LIMITS.chunkBytes).arrayBuffer(), { bytes: Math.min(ASSET_LIMITS.chunkBytes, blob.size - offset) }));
+      return profileSync(trace, 'download.encode-base64', () => bytesToBase64(bytes), { bytes: bytes.length });
     }
     if (blob.size > ASSET_LIMITS.fileBytes) return { metadata, chunked: true };
     return { metadata, base64: bytesToBase64(new Uint8Array(await blob.arrayBuffer())) };
   }
-  const lease = await owner(message, sender);
+  const lease = await profileAsync(trace, 'store.owner-check', () => owner(message, sender));
   const transferOwner = JSON.stringify([lease.session, lease.tabId, sender.documentId ?? sender.url]);
   if (message['action'] === 'upload-start') return transfers.start(crypto.randomUUID(), transferOwner, message['size'], message['name'], message['mime'], Date.now());
   if (message['action'] === 'upload-part') {
     if (typeof message['base64'] !== 'string' || message['base64'].length > Math.ceil(ASSET_LIMITS.chunkBytes / 3) * 4) throw new Error('素材の転送断片が大きすぎます。');
-    transfers.append(message['upload'], transferOwner, message['offset'], base64ToBytes(message['base64']), Date.now()); return undefined;
+    const bytes = profileSync(trace, 'upload.decode-base64', () => base64ToBytes(message['base64']));
+    profileSync(trace, 'upload.reassemble', () => transfers.append(message['upload'], transferOwner, message['offset'], bytes, Date.now()), { bytes: bytes.length }); return undefined;
   }
   if (message['action'] === 'upload-abort') { transfers.abort(message['upload'], transferOwner, Date.now()); return undefined; }
-  if (message['action'] === 'upload-finish') { const file = transfers.finish(message['upload'], transferOwner, Date.now()); return importBatch([{ name: file.name, mime: file.mime, base64: '' }], lease, file.bytes); }
-  if (message['action'] === 'import') return importBatch(message['files'], lease);
+  if (message['action'] === 'upload-finish') { const file = transfers.finish(message['upload'], transferOwner, Date.now()); return importBatch([{ name: file.name, mime: file.mime, base64: '' }], lease, file.bytes, trace); }
+  if (message['action'] === 'import') return importBatch(message['files'], lease, undefined, trace);
   if (message['action'] === 'lease') {
     const ids = message['ids'];
     // Undo/redo can retain assets absent from the current 32-layer document.
     if (!Array.isArray(ids) || ids.length > ASSET_LIMITS.count || !ids.every(isAssetId)) throw new Error('素材IDが不正です。');
-    await leaseAssets(lease, ids);
+    await profileAsync(trace, 'store.lease-rewrite', () => leaseAssets(lease, ids));
   } else if (message['action'] === 'release') {
-    await leaseAssets(lease, []);
+    await profileAsync(trace, 'store.release-rewrite', () => leaseAssets(lease, []));
   } else if (message['action'] === 'save' || message['action'] === 'validate') {
     const design = parseDesign(message['design']);
     const assets = new Map<string, AssetMetadata>();
@@ -153,15 +160,45 @@ async function handle(message: Record<string, unknown>, sender: chrome.runtime.M
     await saveDesign(design);
   } else throw new Error('未対応の素材操作です。');
   // Cleanup is secondary to a successful save; a failed cleanup retains assets.
-  await prune(lease).catch(() => undefined);
+  await profileAsync(trace, 'store.prune-after-command', () => prune(lease)).catch(() => undefined);
   return undefined;
 }
 
 chrome.runtime.onMessage.addListener((input: unknown, sender, respond) => {
+  if (ASSET_PROFILE && sender.id === chrome.runtime.id && input && typeof input === 'object' && 'type' in input && input.type === PROFILE_MESSAGE) {
+    const message = input as Record<string, unknown>, extension = sender.url?.startsWith(chrome.runtime.getURL(''));
+    if (!extension && !(sender.origin === 'https://www.youtube.com' && sender.frameId === 0 && message['action'] === 'ingest')) return false;
+    if (extension && message['action'] === 'grant' && sender.frameId === 0 && isAssetId(message['id']) && Number.isSafeInteger(message['tab'])) {
+      profileGrants.forEach((grant, key) => { if (grant.expires < Date.now()) profileGrants.delete(key); });
+      if (profileGrants.size >= 8) { respond({ error: 'probe grant limit' }); return false; }
+      const nonce = crypto.randomUUID(); profileGrants.set(nonce, { id: message['id'], tab: message['tab'] as number, expires: Date.now() + 60000 }); respond({ nonce }); return false;
+    }
+    if (extension && message['action'] === 'claim') {
+      const grant = typeof message['nonce'] === 'string' ? profileGrants.get(message['nonce']) : undefined;
+      if (!grant || grant.expires < Date.now() || sender.tab?.id !== grant.tab || !sender.frameId) { respond({ error: 'invalid probe grant' }); return false; }
+      profileGrants.delete(message['nonce'] as string); respond({ id: grant.id }); return false;
+    }
+    if (message['action'] === 'ingest') profileIngest(message['spans']);
+    else if (extension && message['action'] === 'clear') { profileClear(); profileSessions.clear(); }
+    respond({ spans: message['action'] === 'snapshot' && extension ? profileSnapshot() : [] }); return false;
+  }
   if (sender.id !== chrome.runtime.id || !input || typeof input !== 'object' || !('type' in input) || input.type !== ASSET_MESSAGE) return false;
   if (!sender.url?.startsWith(chrome.runtime.getURL('')) && !(sender.origin === 'https://www.youtube.com' && sender.frameId === 0)) return false;
-  void enqueue(() => handle(input as Record<string, unknown>, sender)).then(
-    (value) => respond({ ok: true, value }),
+  const message = input as Record<string, unknown>;
+  let trace = ASSET_PROFILE ? (typeof message['id'] === 'string' ? assetProfile(message['id']) : undefined) ?? (validProfile(message['__profile']) ? message['__profile'] : undefined) : undefined;
+  if (ASSET_PROFILE) {
+    if (!trace && Array.isArray(message['ids'])) trace = message['ids'].flatMap((id) => typeof id === 'string' && assetProfile(id) ? [assetProfile(id)!] : [])[0];
+    const design = message['design'] as { decorations?: { assetId?: string }[] } | undefined;
+    if (!trace && Array.isArray(design?.decorations)) trace = design.decorations.flatMap((item) => typeof item?.assetId === 'string' && assetProfile(item.assetId) ? [assetProfile(item.assetId)!] : [])[0];
+    const session = message['session'];
+    if (typeof session === 'string') {
+      trace ??= profileSessions.get(session);
+      if (trace) { if (profileSessions.size >= 128) profileSessions.delete(profileSessions.keys().next().value!); profileSessions.set(session, trace); }
+    }
+  }
+  const arrived = ASSET_PROFILE ? performance.now() : 0;
+  void enqueue(() => { profileEnd(trace, 'queue.' + message['action'], arrived); return profileAsync(trace, 'service.' + message['action'], () => handle(message, sender, trace)); }).then(
+    (value) => respond({ ok: true, value, ...(trace ? { __profile: trace } : {}) }),
     (error: unknown) => respond({ ok: false, error: error instanceof Error ? error.message : '画像の保存に失敗しました。' }),
   );
   return true;

@@ -1,12 +1,13 @@
 import type { AssetInfo } from './validation';
 import { inspectGlb } from './glb';
+import { profileAsync, profileSync } from '../diagnostics/asset-profile';
 
 /** Validate embedded textures without a WebGL context; close every decoded bitmap. */
-export async function validateModelTextures(bytes: Uint8Array, signal?: AbortSignal): Promise<void> {
-  const { json, bin } = inspectGlb(bytes);
+export async function validateModelTextures(bytes: Uint8Array, signal?: AbortSignal, trace?: string): Promise<void> {
+  const { json, bin } = profileSync(trace, 'validation.inspect', () => inspectGlb(bytes));
   for (const image of json.images ?? []) {
     signal?.throwIfAborted(); const v = json.bufferViews[image.bufferView], start = v.byteOffset ?? 0;
-    const bitmap = await cancellable(createImageBitmap(new Blob([bin.slice(start, start + v.byteLength).buffer], { type: image.mimeType })), signal, (b) => b.close());
+    const bitmap = await profileAsync(trace, 'validation.bitmap', () => cancellable(createImageBitmap(new Blob([bin.slice(start, start + v.byteLength).buffer], { type: image.mimeType })), signal, (b) => b.close()), { bytes: v.byteLength, count: 1 });
     try { if (!bitmap.width || !bitmap.height || bitmap.width > 4096 || bitmap.height > 4096) throw new Error('GLB内の画像寸法が不正です。'); }
     finally { bitmap.close(); }
   }
@@ -24,9 +25,9 @@ function cancellable<T>(task: Promise<T>, signal?: AbortSignal, releaseLate?: (v
 }
 
 /** Validate one frame only; later failures are bounded and handled by playback. */
-export async function validateAnimatedFrames(bytes: Uint8Array, info: AssetInfo, signal?: AbortSignal): Promise<void> {
+export async function validateAnimatedFrames(bytes: Uint8Array, info: AssetInfo, signal?: AbortSignal, trace?: string): Promise<void> {
   signal?.throwIfAborted();
-  if (info.model) { await validateModelTextures(bytes, signal); return; }
+  if (info.model) { await validateModelTextures(bytes, signal, trace); return; }
   if (!info.animation || info.animation.format === 'lottie') return;
   if (info.animation.format === 'webm') {
     const url = URL.createObjectURL(new Blob([new Uint8Array(bytes).buffer], { type: info.mime })), video = document.createElement('video');

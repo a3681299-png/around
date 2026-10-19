@@ -3,7 +3,7 @@ import { execFile } from 'node:child_process';
 import { mkdir, mkdtemp, readFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 
-const extensionPath = path.resolve('dist');
+const extensionPath = path.resolve(process.env.WW_TEST_EXTENSION_PATH ?? 'dist');
 const fixturePath = path.resolve('tests/fixtures/youtube.html');
 
 export async function launchExtension(profile: string, useFixture = true, options: { headed?: boolean; width?: number; height?: number } = {}): Promise<BrowserContext> {
