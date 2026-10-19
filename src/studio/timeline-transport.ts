@@ -1,11 +1,14 @@
+import { takeSignalSeries } from '../world/take-signals';
+import { propertyLabel } from '../signals/keyframes';
+import type { WorldScene } from '../world/types';
 import { buttonIcon } from '../editor/icons';
 import type { TimelinePort, TimelineCommand, TimelineUpdate } from '../timeline/types';
-import { projectGhosts, sampleTakeInput, takeDuration } from '../world/takes';
-import { ruleInput, sampleKeyframes, scrollProgress } from '../world/keyframes';
+import { projectGhosts, takeDuration } from '../world/takes';
+import { scrollProgress } from '../world/keyframes';
 import type { SignalRule } from '../signals/keyframes';
 
 /** Input playback controls. Artwork edits continue to use the Editor Core. */
-export function createTimelineTransport(doc: Document, root: HTMLElement, port: TimelinePort, hooks: { redraw(): void; cursor(progress: number): void; zoom(): number; rule(): SignalRule | undefined; selectKey(id: string): void }) {
+export function createTimelineTransport(doc: Document, root: HTMLElement, port: TimelinePort, hooks: { redraw(): void; cursor(progress: number): void; zoom(): number; rule(): SignalRule | undefined; selectKey(id: string): void; scene?(): WorldScene; outputRatio?(value: number): number }) {
   const get = <T extends HTMLElement>(selector: string) => root.querySelector<T>(selector)!;
   const controls = doc.createElement('div'); controls.className = 'take-transport';
   const button = (icon: string, label: string, action: () => void) => { const node = doc.createElement('button'); node.type = 'button'; buttonIcon(node, icon, label); node.addEventListener('click', action); controls.append(node); return node; };
@@ -25,7 +28,8 @@ export function createTimelineTransport(doc: Document, root: HTMLElement, port: 
   const canvas = doc.createElement('div'); canvas.className = 'take-canvas'; const svg = doc.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('aria-label', '記録時間とスクロール進捗の波形'); canvas.append(svg); takeScroll.append(canvas); get('.timeline-scroll').before(takeScroll);
   let update = port.snapshot(), take = update.take ?? undefined, editable = true, alive = true, expanded = false, message = '', libraryKey = '', graphKey = '';
   let visual: { timeMs: number; progress: number }[] = [], drag = false, seekFrame: number | undefined, requestedTime: number | undefined, sending = false;
-  let line: SVGLineElement | undefined;
+  let line: SVGLineElement | undefined, tracked = '';
+  const outputRatio = (value: number) => hooks.outputRatio?.(value) ?? value;
   const feedback = (text: string) => { const node = get('.timeline-feedback'); node.textContent = text; node.title = text; };
   const send = (command: TimelineCommand) => { void port.dispatch(command); };
   function togglePlay() { send(update.status.mode === 'playing' ? { type: 'pause' } : { type: 'play', rate: Number(rate.value) }); }
@@ -45,7 +49,7 @@ export function createTimelineTransport(doc: Document, root: HTMLElement, port: 
     if (next.library) { const signature = JSON.stringify(next.library); if (signature !== libraryKey) { libraryKey = signature; library.replaceChildren(new Option('保存したテイク', ''), ...next.library.map((item) => new Option(`${item.name} · ${(item.durationMs / 1000).toFixed(1)}s`, item.id))); } }
     if (next.status.mode === 'recording') {
       if (previous !== 'recording') { visual = []; graphKey = ''; }
-      visual.push({ timeMs: next.status.timeMs, progress: next.status.progress }); if (visual.length > 3600) visual.shift();
+      const range = hooks.rule()?.source.inputRange ?? [0, 1]; visual.push({ timeMs: next.status.timeMs, progress: Math.max(0, Math.min(1, (next.status.progress - range[0]) / (range[1] - range[0]))) }); if (visual.length > 3600) visual.shift();
     }
     if (message !== next.status.message) { message = next.status.message; if (message) feedback(message); }
     hooks.cursor(next.status.progress); if (previous !== next.status.mode) hooks.redraw(); render();
@@ -71,22 +75,25 @@ export function createTimelineTransport(doc: Document, root: HTMLElement, port: 
     const duration = Math.max(1000, recording ? Math.ceil(update.status.timeMs / 1000) * 1000 : take ? takeDuration(take) : 1000), width = Math.max(280, takeScroll.clientWidth) * hooks.zoom();
     const height = Math.max(140, takeScroll.clientHeight - 14), bottom = height - 36, current = hooks.rule();
     const x = (time: number) => 28 + time / duration * (width - 44), y = (progress: number) => 14 + (1 - progress) * (bottom - 14);
-    const signature = `${take?.id}:${count}:${recording ? update.status.timeMs : 0}:${width}:${height}:${JSON.stringify(current)}`;
+    const signature = `${take?.id}:${count}:${recording ? update.status.timeMs : 0}:${width}:${height}:${JSON.stringify(current)}:${current?.source.space === 'layer' || current?.source.space === 'anchor' ? JSON.stringify(hooks.scene?.()) : ''}`;
     if (signature !== graphKey) {
       graphKey = signature; canvas.style.width = `${width}px`; canvas.style.height = `${height}px`; svg.setAttribute('viewBox', `0 0 ${width} ${height}`); svg.replaceChildren();
-      const points = recording ? visual : take?.inputs.map((input) => ({ timeMs: input.timeMs - take!.inputs[0]!.timeMs, progress: scrollProgress(input.signals) })) ?? [];
+      const series = take && current ? takeSignalSeries(take, current, hooks.scene?.()) : undefined;
+      const points = recording ? visual : series ? series.map((point) => ({ timeMs: point.timeMs, progress: point.input ?? 0 })) : take?.inputs.map((input) => ({ timeMs: input.timeMs - take!.inputs[0]!.timeMs, progress: scrollProgress(input.signals) })) ?? [];
       const node = (name: string, attributes: Record<string, string>, text?: string) => { const n = doc.createElementNS('http://www.w3.org/2000/svg', name); for (const [key, value] of Object.entries(attributes)) n.setAttribute(key, value); if (text) n.textContent = text; svg.append(n); return n; };
       for (const tick of [0, .25, .5, .75, 1]) { node('line', { x1: String(x(duration * tick)), x2: String(x(duration * tick)), y1: '14', y2: String(bottom), class: 'timeline-grid' }); node('text', { x: String(x(duration * tick)), y: String(bottom + 18), 'text-anchor': 'middle' }, `${(duration * tick / 1000).toFixed(1)}s`); }
       for (const value of [0, .5, 1]) node('line', { x1: '28', x2: String(width - 16), y1: String(y(value)), y2: String(y(value)), class: 'timeline-grid' });
       node('path', { d: points.map((point, index) => `${index ? 'L' : 'M'}${x(point.timeMs)} ${y(point.progress)}`).join(' '), class: 'take-wave' });
-      node('text', { x: '30', y: String(height - 3), class: 'take-wave-label' }, 'スクロール');
+      node('text', { x: '30', y: String(height - 3), class: 'take-wave-label' }, current?.source.signal.startsWith('pointer.') ? '入力' : 'スクロール');
+      if (!recording && take) for (const axis of ['x', 'y'] as const) { const path = take.inputs.map((input, index) => `${index ? 'L' : 'M'}${x(input.timeMs - take!.inputs[0]!.timeMs)} ${y(Math.max(0, Math.min(1, (input.signals.pointer?.[axis] ?? 0) / (axis === 'x' ? input.viewport.width : input.viewport.height))))}`).join(' '); node('path', { d: path, class: `take-pointer-${axis}` }); }
+      node('text', { x: '84', y: String(height - 3), class: 'take-pointer-label' }, 'X / Y');
       if (!recording && take && current?.enabled) {
-        const sampled = take, opacity = (time: number) => sampleKeyframes(current.keyframes, ruleInput(current, sampleTakeInput(sampled, time).signals));
-        node('path', { d: Array.from({ length: 201 }, (_, index) => { const time = takeDuration(sampled) * index / 200; return `${index ? 'L' : 'M'}${x(time)} ${y(opacity(time))}`; }).join(' '), class: 'timeline-curve take-projection' });
-        const ghosts = projectGhosts(sampled, current);
-        node('text', { x: '104', y: String(height - 3), class: 'take-projection-label' }, `不透明度 · ◇ ${ghosts.length}${ghosts.length > 256 ? '（先頭256個）' : ''}`);
+        const values = series ?? takeSignalSeries(take, current, hooks.scene?.());
+        node('path', { d: values.map((point, index) => `${index ? 'L' : 'M'}${x(point.timeMs)} ${y(outputRatio(point.value ?? 0))}`).join(' '), class: 'timeline-curve take-projection' });
+        const ghosts = projectGhosts(take, current, hooks.scene?.());
+        node('text', { x: '130', y: String(height - 3), class: 'take-projection-label' }, `${propertyLabel(current.target.property)} · ◇ ${ghosts.length}${ghosts.length > 256 ? '（先頭256個）' : ''}`);
         for (const ghost of ghosts.slice(0, 256)) {
-          const key = current.keyframes.find((key) => key.id === ghost.keyId)!, px = x(ghost.timeMs), py = y(key.value);
+          const key = current.keyframes.find((key) => key.id === ghost.keyId)!, px = x(ghost.timeMs), py = y(outputRatio(key.value));
           const group = node('g', { class: 'take-ghost', 'data-ghost-key': key.id, tabindex: '0', role: 'button', 'aria-label': `${(ghost.timeMs / 1000).toFixed(2)}秒の投影キー。元の進捗 ${(current.source.inputRange[0] + key.input * (current.source.inputRange[1] - current.source.inputRange[0])) * 100}%を編集` });
           const hit = node('rect', { x: String(px - 8), y: String(py - 8), width: '16', height: '16', fill: 'transparent' });
           const diamond = node('path', { d: `M${px} ${py - 5}l5 5 -5 5 -5 -5Z` }); group.append(hit, diamond);
@@ -112,9 +119,9 @@ export function createTimelineTransport(doc: Document, root: HTMLElement, port: 
   const selectGhost = (event: Event) => { const key = (event.target as Element).closest<SVGElement>('[data-ghost-key]')?.dataset.ghostKey; if (!key) return; view.value = 'signal'; hooks.selectKey(key); updateView(); feedback('同じ進捗を通過した位置の投影です。元のキーを編集します。'); event.preventDefault(); event.stopPropagation(); };
   canvas.addEventListener('click', selectGhost); canvas.addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') selectGhost(event); });
   const observer = new ResizeObserver(draw); observer.observe(takeScroll); render();
-  return { get recording() { return update.status.mode === 'recording'; }, get timeView() { return view.value === 'take'; },
+  return { track(rule: SignalRule | undefined) { const signature = JSON.stringify(expanded ? rule ?? null : null); if (signature !== tracked) { tracked = signature; send({ type: 'track', rule: expanded ? rule ?? null : null }); } }, get recording() { return update.status.mode === 'recording'; }, get timeView() { return view.value === 'take'; },
     setEditable(value: boolean) { editable = value; },
-    preview(progress: number) { if (update.status.mode !== 'recording') send({ type: 'preview', progress }); }, togglePlay, render,
+    preview(progress: number) { if (update.status.mode !== 'recording') { const rule = hooks.rule(); send({ type: 'preview', progress, ...(rule ? { rule } : {}) }); } }, togglePlay, render,
     expanded(value: boolean) { if (expanded !== value) { expanded = value; send({ type: 'observe', value }); } draw(); },
     destroy() { alive = false; unsubscribe(); send({ type: 'observe', value: false }); if (seekFrame !== undefined) doc.defaultView!.cancelAnimationFrame(seekFrame); observer.disconnect(); controls.remove(); details.remove(); libraryRow.remove(); takeScroll.remove(); } };
 }

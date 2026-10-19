@@ -1,3 +1,4 @@
+import { ungroupingReason } from './groups';
 import type { PanelState, PanelOptions } from './panel';
 import { transientPreferences } from '../studio/preferences';
 
@@ -60,7 +61,7 @@ export function createWorkspace(doc: Document, host: HTMLElement, main: HTMLElem
   const imageProps = get('.image-properties');
   const basic = doc.createElement('details'); basic.open = true; basic.className = 'transform-section';
   const basicTitle = doc.createElement('summary'); basicTitle.textContent = '位置と外観'; basic.append(basicTitle);
-  [...imageProps.children].filter((node) => !node.matches('.playback, [aria-label="マスクと振る舞い"], .group-help')).forEach((node) => basic.append(node));
+  [...imageProps.children].filter((node) => !node.matches('.playback, .motion-panel, [aria-label="マスクと振る舞い"], .group-help')).forEach((node) => basic.append(node));
   imageProps.prepend(basic);
   basic.append(get('.group-help'));
   const playback = get('.playback');
@@ -187,12 +188,13 @@ export function createWorkspace(doc: Document, host: HTMLElement, main: HTMLElem
     layout.hidden = !next.selectedIds.length;
     get<HTMLElement>('.dirty').dataset.error = String(next.error);
     get<HTMLElement>('.status').setAttribute('role', next.error ? 'alert' : 'status');
-    get('.ungroup-layers').title = next.image?.locked ? 'ロックを解除してください。' : next.image?.opacity !== 1 ? '不透明度を100%に戻してから解除してください。' : '子の位置を維持して解除します。グループのマスクは外れます。';
+    const ungroupReason = ungroupingReason(next.image?.kind === 'group' ? next.image : undefined, next.signalRules ? [...next.signalRules] : []);
+    get('.ungroup-layers').title = ungroupReason || '子の基本配置を維持して解除します。グループのマスクは外れます。';
     get('.group-layers').title = next.groupingReason || '選択した素材をまとめます。';
     get('.group-layers').hidden = next.image?.kind === 'group' || area === 'properties' && next.selectedIds.length < 2;
     get('.grouping-help').hidden = get('.group-layers').hidden;
     ungroupHelp.hidden = next.image?.kind !== 'group';
-    ungroupHelp.textContent = next.image?.locked ? 'ロックを解除するとグループを解除できます。' : next.image?.opacity !== 1 ? '不透明度を100%に戻してから解除してください。' : '解除するとグループのマスクが外れます。素材の位置は維持します。';
+    ungroupHelp.textContent = ungroupReason || '解除するとグループのマスクが外れます。素材の基本配置は維持します。';
     selection.hidden = next.selectedIds.length > 1;
     get<HTMLButtonElement>('.duplicate-image').hidden = get<HTMLButtonElement>('.delete-image').hidden = !next.selectedIds.length;
     if (next.selected && !lastCard) show('properties'); lastCard = next.selected;

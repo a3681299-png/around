@@ -69,6 +69,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     const current = group ?? draft.decorations.find((image) => image.id === id);
     if (!current || (current.locked && Object.keys(patch).some((key) => !['locked', 'visible', 'name'].includes(key)))) return;
     if (group) {
+      if (patch.motion && !groupMovable(group, draft.decorations)) return;
       const next = parseDesign(draft), { placement, playback: _playback, ...properties } = patch;
       if (placement) {
         if (Object.keys(placement).some((key) => !['x', 'y'].includes(key)) || !groupMovable(group, draft.decorations)) return;

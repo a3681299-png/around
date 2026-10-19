@@ -1,7 +1,7 @@
 import { parseDesign } from '../design/schema';
 import { childrenOf, effectivelyLocked, frontToBack, groupMovable, normalizeSelection, parentGroup, rootLayers, sameAnchor } from '../design/hierarchy';
 import { moveGroup, type PlacementFrame } from '../design/geometry';
-import { GROUP_LIMITS, IMAGE_LIMITS, type DesignDocument, type LayerNode, type LayerPlacement } from '../design/types';
+import { GROUP_LIMITS, IMAGE_LIMITS, type DesignDocument, type GroupLayer, type LayerNode, type LayerPlacement } from '../design/types';
 import { deleteLayers, duplicateLayers, reorderLayers } from './layers';
 
 function pruneRules(doc: DesignDocument) {
@@ -42,10 +42,16 @@ export function groupLayers(input: DesignDocument, ids: readonly string[], id: s
   return parseDesign(doc);
 }
 
+export function ungroupingReason(group: GroupLayer | undefined, rules: DesignDocument['signalRules'] = []): string {
+  if (!group || group.locked) return '解除するグループを選び、ロック解除してください。';
+  if (group.opacity !== 1) return '重なりの見た目を保つため、不透明度を100%に戻してから解除してください。';
+  if (group.motion?.enabled || rules.some((rule) => rule.enabled && rule.target.layerId === group.id && rule.target.property !== 'opacity')) return '基本配置を保つため、グループの追跡と位置・回転の接続をOFFにしてから解除してください。';
+  return '';
+}
+
 export function ungroupLayers(input: DesignDocument, id: string): DesignDocument {
   const doc = parseDesign(input), group = doc.groups?.find((group) => group.id === id);
-  if (!group || group.locked) throw new Error('解除するグループを選び、ロック解除してください。');
-  if (group.opacity !== 1) throw new Error('重なりの見た目を保つため、不透明度を100%に戻してから解除してください。');
+  const reason = ungroupingReason(group, doc.signalRules); if (reason || !group) throw new Error(reason);
   const roots = frontToBack(rootLayers(doc.decorations, doc.groups ?? [])).reverse(), index = roots.findIndex((layer) => layer.id === id);
   roots.splice(index, 1, ...frontToBack(childrenOf(group, doc.decorations)).reverse());
   doc.decorations = doc.decorations.map((layer) => group.children.includes(layer.id) ? { ...layer, visible: layer.visible && group.visible } : layer);

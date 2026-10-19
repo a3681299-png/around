@@ -3,6 +3,7 @@ import { GROUP_LIMITS, IMAGE_LIMITS, STYLE_LIMITS, type SurfaceStyle, type Image
 import { ANIMATION_LIMITS } from '../assets/motion-types';
 import type { Alignment, Distribution } from '../design/layout';
 import { createMotionPanel } from './motion-panel';
+import { ungroupingReason } from './groups';
 import { createEffectsPanel } from './effects-panel';
 import { childrenOf, effectivelyLocked, groupMovable, parentGroup } from '../design/hierarchy';
 import { createLayerTree } from './layer-tree';
@@ -284,6 +285,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       }
       get<HTMLInputElement>('[data-image-prop="opacity"]').setAttribute('aria-label', `${isGroup ? 'グループ' : '画像'}の不透明度`);
       effects.render(state.image); motion.render(state.image);
+      motion.fieldset.disabled = Boolean(isGroup && state.image?.kind === 'group' && !groupMovable(state.image, state.images));
       properties.hidden = !state.selected;
       get<HTMLParagraphElement>('.card-help').hidden = !state.selected;
       get<HTMLParagraphElement>('.multi-help').hidden = state.selectedIds.length < 2;
@@ -296,7 +298,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       get<HTMLButtonElement>('.group-layers').disabled = state.saving || Boolean(state.groupingReason);
       get<HTMLButtonElement>('.group-layers').hidden = isGroup;
       get<HTMLButtonElement>('.ungroup-layers').hidden = !isGroup;
-      get<HTMLButtonElement>('.ungroup-layers').disabled = state.saving || !isGroup || Boolean(state.image?.locked) || state.image?.opacity !== 1;
+      get<HTMLButtonElement>('.ungroup-layers').disabled = state.saving || !isGroup || Boolean(ungroupingReason(state.image?.kind === 'group' ? state.image : undefined, state.signalRules ? [...state.signalRules] : []));
       get<HTMLElement>('.grouping-help').hidden = isGroup;
       setText(get<HTMLElement>('.grouping-help'), state.groupingReason || 'まとめて移動したり、同じマスクを適用できます。');
       get<HTMLButtonElement>('.undo').disabled = !state.canUndo || state.saving;
@@ -341,7 +343,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       } else if (options.fullPage || options.inPage) {
         imageProperties.querySelectorAll<HTMLInputElement>('input[type="text"],input[type="number"]').forEach((input) => { input.value = ''; }); get<HTMLOutputElement>('.opacity-value').value = '—';
       }
-      if (opacityDriven) setText(get<HTMLOutputElement>('.opacity-value'), 'スクロールに接続');
+      if (opacityDriven) setText(get<HTMLOutputElement>('.opacity-value'), state.signalRules?.find((rule) => rule.enabled && rule.target.property === 'opacity' && rule.target.layerId === state.image?.id)?.source.signal === 'page.scroll.progress' ? 'スクロールに接続' : 'シグナルに接続');
       get<HTMLInputElement>('[data-image-prop="opacity"]').disabled = opacityDriven;
       properties.disabled = !state.selected || state.saving;
       backgroundToggle.checked = state.style.backgroundColor !== undefined;

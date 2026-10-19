@@ -7,6 +7,16 @@
 .timeline-lane, .timeline-tools { display: flex; align-items: center; gap: 5px; padding: 2px 6px; flex: none; border-bottom: 1px solid var(--ui-line); min-height: 27px; }
 .timeline-source { color: #92c9bc; font-size: 10px; }
 .timeline-lane .timeline-remove { margin-left: auto; }
+.timeline-routing, .timeline-range { display: flex; align-items: center; gap: 6px; padding: 2px 6px; flex: none; border-bottom: 1px solid var(--ui-line); min-height: 27px; }
+.timeline-routing label { display: flex; align-items: center; gap: 4px; min-width: 0; font-size: 10px; }
+.timeline-routing label:last-child { flex: 1; }
+.timeline-routing select { height: 24px; min-width: 0; max-width: 100%; }
+.timeline-driver { width: 100%; }
+.timeline-range label { display: flex; align-items: center; gap: 4px; font-size: 10px; }
+.timeline-range input { width: 68px; max-width: 68px; height: 22px; }
+.timeline-connection { overflow: hidden; text-overflow: ellipsis; }
+:host([data-inpage]) .timeline-connection { display: none; }
+@media (max-width: 680px) { .timeline-connection { display: none; } }
 .timeline-tools label { margin-left: auto; font-size: 10px; }
 .timeline-tools input[type="range"] { width: 86px; }
 .timeline-scroll { flex: 1; min-height: 105px; overflow-x: auto; overflow-y: hidden; overscroll-behavior: contain; scrollbar-width: thin; }

@@ -1,3 +1,4 @@
+import { takeSignalSeries, projectNumericGhosts } from './take-signals';
 import { parseWorldInput, parseWorldState } from './recording';
 import { evaluateWorld, evaluatePreparedWorld } from './evaluate';
 import { evaluateLayout } from './layout';
@@ -32,6 +33,7 @@ function between(left: WorldInput, right: WorldInput | undefined, timeMs: number
   const mix = (a: number, b: number) => a + (b - a) * amount;
   const a = left.signals.scroll, b = right?.signals.scroll, p = left.signals.pointer, q = right?.signals.pointer;
   return { ...left, timeMs, deltaMs: previousTime === null ? 0 : Math.max(0, timeMs - previousTime), events: [], signals: { ...left.signals,
+    ...(left.signals.pointerTimeMs !== undefined && right?.signals.pointerTimeMs !== undefined ? { pointerTimeMs: mix(left.signals.pointerTimeMs, right.signals.pointerTimeMs) } : {}),
     ...(p && q ? { pointer: { x: mix(p.x, q.x), y: mix(p.y, q.y) } } : {}),
     ...(a && b ? { scroll: { x: mix(a.x, b.x), y: mix(a.y, b.y), maxX: mix(a.maxX, b.maxX), maxY: mix(a.maxY, b.maxY) } } : {}) } };
 }
@@ -50,8 +52,9 @@ export function sampleTakeInput(take: SignalTake, positionMs: number): WorldInpu
 
 export interface GhostKeyframe { keyId: string; timeMs: number; input: number }
 /** Derived crossings only. Changing a take never creates independent artwork keys. */
-export function projectGhosts(take: SignalTake, rule: SignalRule): GhostKeyframe[] {
+export function projectGhosts(take: SignalTake, rule: SignalRule, scene?: WorldScene): GhostKeyframe[] {
   if (!rule.enabled) return [];
+  if (rule.source.signal !== 'page.scroll.progress') return projectNumericGhosts(takeSignalSeries(take, rule, scene), rule, TAKE_LIMITS.ghosts);
   const ghosts: GhostKeyframe[] = [], seen = new Set<string>(), start = take.inputs[0]!.timeMs;
   const add = (keyId: string, input: number, timeMs: number) => {
     const signature = `${keyId}:${timeMs.toFixed(3)}`;

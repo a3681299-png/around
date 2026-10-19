@@ -14,7 +14,7 @@ export function followMotion(config: FollowMotion, previous: MotionBody | undefi
   if (!target || reduced) { body.velocity = { x: 0, y: 0 }; return { body, needsFrame: false }; }
   let position = { x: base.x + body.offset.x, y: base.y + body.offset.y };
   const start = { ...position }, distance = Math.hypot(target.x - position.x, target.y - position.y);
-  if (config.mode === 'direct') position = approach(position, target, Math.max(0, distance - config.stopRadius));
+  if (config.mode === 'direct') { position = approach(position, target, Math.max(0, distance - config.stopRadius)); body.velocity = { x: 0, y: 0 }; }
   else {
     let remaining = Math.min(250, deltaMs) / 1000;
     while (remaining > 1e-9) {
@@ -23,6 +23,7 @@ export function followMotion(config: FollowMotion, previous: MotionBody | undefi
       const speed = config.mode === 'smooth' ? gap / Math.max(.001, config.lagMs / 1000) : Math.min(config.maxSpeed, Math.sqrt(2 * config.deceleration * gap), config.lagMs > 0 ? gap / (config.lagMs / 1000) : Infinity);
       const desired = { x: d > 0 ? dx / d * speed : 0, y: d > 0 ? dy / d * speed : 0 };
       body.velocity = config.mode === 'smooth' ? desired : approach(body.velocity, desired, (Math.hypot(body.velocity.x, body.velocity.y) > speed ? config.deceleration : config.acceleration) * dt);
+      if (config.mode === 'pursuit') body.velocity = approach({ x: 0, y: 0 }, body.velocity, config.maxSpeed);
       const movement = config.mode === 'smooth' ? gap * (1 - Math.exp(-dt / Math.max(.001, config.lagMs / 1000))) : Math.hypot(body.velocity.x, body.velocity.y) * dt;
       const v = Math.hypot(body.velocity.x, body.velocity.y), step = Math.min(gap, movement);
       if (gap < .01) { body.velocity = { x: 0, y: 0 }; break; }

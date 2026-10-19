@@ -27,3 +27,7 @@
 .take-ghost:hover > path, .take-ghost:focus > path { fill-opacity: 1; stroke: white; stroke-opacity: 1; }
 .take-ghost:focus { outline: none; }
 @media (max-width: 620px) { .take-saved { display: none; } .signal-timeline:has(.take-transport) .timeline-connection { display: none; } }
+.take-pointer-x, .take-pointer-y { fill: none; stroke-width: 1; opacity: .65; }
+.take-pointer-x { stroke: #69bddd; }
+.take-pointer-y { stroke: #d6a665; }
+.take-pointer-label { fill: #69bddd; font: 10px system-ui, sans-serif; }

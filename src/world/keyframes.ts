@@ -1,6 +1,7 @@
 import type { SignalRule, SignalKeyframe, KeyframeEasing } from '../signals/keyframes';
 import type { SignalSnapshot } from '../signals/types';
 import type { WorldLayout, WorldInput } from './types';
+import { signalValue, type PointerMemory } from './signals';
 
 export const clampUnit = (value: number) => Math.max(0, Math.min(1, Number.isFinite(value) ? value : 0));
 export function scrollProgress(signals: SignalSnapshot): number {
@@ -22,7 +23,10 @@ export function sampleKeyframes(keys: readonly SignalKeyframe[], input: number):
   }
   return keys.at(-1)!.value;
 }
-export const ruleInput = (rule: SignalRule, signals: SignalSnapshot) => clampUnit((scrollProgress(signals) - rule.source.inputRange[0]) / (rule.source.inputRange[1] - rule.source.inputRange[0]));
+export function ruleInput(rule: SignalRule, input: SignalSnapshot | WorldInput, layout?: WorldLayout, pointer?: PointerMemory): number {
+  const value = 'signals' in input ? signalValue(rule, input, layout, pointer) : rule.source.signal === 'page.scroll.progress' ? scrollProgress(input) : undefined;
+  return clampUnit(((value ?? 0) - rule.source.inputRange[0]) / (rule.source.inputRange[1] - rule.source.inputRange[0]));
+}
 /** Copies only evaluated state. Saved layers and cached placement geometry stay intact. */
 export function evaluateRuleLayout(layout: WorldLayout, rules: readonly SignalRule[], input: WorldInput): WorldLayout {
   const values = new Map(rules.filter((rule) => rule.enabled).map((rule) => [rule.target.layerId, sampleKeyframes(rule.keyframes, ruleInput(rule, input.signals))]));

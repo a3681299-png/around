@@ -26,7 +26,8 @@ export function evaluateTransforms(prepared: WorldLayout, rules: readonly Signal
     const config = entry.layer.motion;
     if (!config?.enabled || !entry.frame) continue;
     const base = centre(entry.layer.placement, entry.frame), before = previous?.bodies[entry.layer.id];
-    const followed = followMotion(config, before, base, entry.visible && !input.environment.hidden && !input.environment.holdTransforms ? input.signals.pointer : undefined, input.deltaMs, input.environment.reducedMotion);
+    const visible = entry.visible && (entry.layer.kind !== 'group' || layers.some((child) => child.parentId === entry.layer.id && child.visible));
+    const followed = followMotion(config, before, base, visible && !input.environment.hidden && !input.environment.holdTransforms ? input.signals.pointer : undefined, input.deltaMs, input.environment.reducedMotion);
     state.bodies[entry.layer.id] = followed.body; needsFrame ||= followed.needsFrame;
     entry.layer.placement.x += followed.body.offset.x / entry.frame.width; entry.layer.placement.y += followed.body.offset.y / entry.frame.height;
     if (config.orientToMovement) entry.layer.placement.rotationDeg = rotation(entry.layer.placement.rotationDeg + followed.body.heading);

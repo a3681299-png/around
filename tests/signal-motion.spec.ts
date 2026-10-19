@@ -10,6 +10,11 @@ import { createWorldRecorder, replayWorld, parseWorldState } from '../src/world/
 import { createTakeSampler, parseSignalTake } from '../src/world/takes';
 import type { WorldInput, WorldScene } from '../src/world/types';
 import { worldScenario } from './helpers/world-scenario';
+import { previewSignalInput } from '../src/world/signal-preview';
+import { takeSignalSeries } from '../src/world/take-signals';
+import { projectGhosts } from '../src/world/takes';
+import { parseTimelineCommand } from '../src/timeline/types';
+import { groupLayers, ungroupLayers } from '../src/editor/groups';
 
 function setup() {
   const { scene: source, inputs } = worldScenario(2);
@@ -97,4 +102,33 @@ test('record/replay and backward seeking reproduce every motion state at recorde
   const take = parseSignalTake({ format: 'ww-signal-take', formatVersion: 1, runtimeVersion: '1.2.0', id: 'test-take', name: 'Motion', siteId: 'youtube', initialState: recording.initialState, inputs: recording.inputs }), sampler = createTakeSampler(scene, take);
   for (const index of [119, 5, 90, 1, 60, 119]) expect(sampler.at(take.inputs[index]!.timeMs).frame).toEqual(frames[index]);
   expect(centre(scene.decorations[0]!.placement, input(0).anchors['player']!)).toEqual({ x: 250, y: 300 });
+});
+
+test('v8 artwork and Runtime 1.1 takes migrate without mutation; malformed motions and executable drivers fail', () => {
+  const { scene, input } = setup(), doc = { ...emptyDesign('youtube', null), ...scene, schemaVersion: 8, signalRules: [defaultScrollOpacityRule('image-0')] }, before = JSON.stringify(doc);
+  expect(parseDesign(doc).schemaVersion).toBe(9); expect(JSON.stringify(doc)).toBe(before);
+  const old = { format: 'ww-signal-take', formatVersion: 1, runtimeVersion: '1.1.0', id: 'old-take', name: 'v1', siteId: 'youtube', initialState: { ...initialWorldState(), runtimeVersion: '1.1.0' }, inputs: [input(0)] };
+  expect(parseSignalTake(old).runtimeVersion).toBe('1.2.0');
+  for (const motion of [{ ...defaultFollowMotion(), maxSpeed: Infinity }, { ...defaultFollowMotion(), acceleration: 0 }, { ...defaultFollowMotion(), stopRadius: -1 }, { ...defaultFollowMotion(), script: 'alert(1)' }]) expect(() => parseDesign({ ...doc, schemaVersion: 9, decorations: [{ ...scene.decorations[0]!, motion }] })).toThrow();
+  expect(() => parseDesign({ ...doc, decorations: [{ ...scene.decorations[0]!, motion: defaultFollowMotion() }] })).toThrow();
+  expect(() => parseTimelineCommand({ type: 'track', rule: { ...defaultScrollOpacityRule('image-0'), source: { signal: 'window.eval' } } })).toThrow();
+});
+
+test('mouse ghost projections use raw normalized values and skip angle wrap; signal preview does not alter recorded inputs', () => {
+  const { scene, input } = setup(), rule = defaultSignalRule('image-0', 'position.x', { signal: 'pointer.x', axis: 'x', space: 'viewport', inputRange: [0, 1] });
+  rule.keyframes.splice(1, 0, { id: 'middle', input: .5, value: 0, easing: 'ease-in' });
+  const inputs = [input(0, 100), input(100, 900), input(200, 100)], take = parseSignalTake({ format: 'ww-signal-take', formatVersion: 1, runtimeVersion: '1.2.0', id: 'mouse-take', name: 'Mouse', siteId: 'youtube', initialState: initialWorldState(), inputs });
+  const series = takeSignalSeries(take, rule, scene); expect(series.map((point) => point.input)).toEqual([.1, .9, .1]);
+  expect(projectGhosts(take, rule, scene).filter((key) => key.keyId === 'middle').map((key) => key.timeMs)).toEqual([50, 150]);
+  const before = JSON.stringify(take); const preview = previewSignalInput(inputs[0]!, { ...rule, source: { signal: 'pointer.distance', axis: 'y', space: 'layer', inputRange: [0, 1] } }, .25, evaluateLayout(scene, inputs[0]!));
+  expect(preview.input.signals.pointer).not.toEqual(inputs[0]!.signals.pointer); expect(JSON.stringify(take)).toBe(before);
+});
+
+test('group ungrouping protects an active transform controller and retains base placement after disabling it', () => {
+  const { scene } = setup(), doc = groupLayers(parseDesign({ ...emptyDesign('youtube', null), ...scene }), ['image-0', 'image-1'], 'group-0');
+  doc.groups![0]!.motion = defaultFollowMotion(); expect(() => ungroupLayers(doc, 'group-0')).toThrow(/OFF/);
+  doc.groups![0]!.motion!.enabled = false;
+  const rule = defaultSignalRule('group-0', 'position.x', { signal: 'pointer.x', axis: 'x', space: 'viewport', inputRange: [0, 1] }); doc.signalRules = [rule];
+  expect(() => ungroupLayers(doc, 'group-0')).toThrow(/OFF/); rule.enabled = false;
+  expect(ungroupLayers(doc, 'group-0').decorations.map((layer) => layer.placement)).toEqual(scene.decorations.map((layer) => layer.placement));
 });

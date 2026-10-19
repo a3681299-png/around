@@ -1,5 +1,9 @@
 import { createWorldRecorder } from '../world/recording';
 import { createTakeSampler, parseSignalTake, takeDuration, TAKE_LIMITS, type SignalTake } from '../world/takes';
+import type { SignalRule } from '../signals/keyframes';
+import { signalValue } from '../world/signals';
+import { evaluateLayout } from '../world/layout';
+import { previewSignalInput } from '../world/signal-preview';
 import { scrollProgress } from '../world/keyframes';
 import { evaluateWorld, initialWorldState } from '../world/evaluate';
 import { WORLD_RUNTIME_VERSION, type WorldInput, type WorldScene, type WorldState, type WorldFrame, type WorldEvent } from '../world/types';
@@ -17,6 +21,8 @@ export function createTimelineHost(doc: Document, siteId: string, storage: TakeS
   let lastCaptured = -Infinity, pendingInput: WorldInput | undefined, pendingEvents: WorldEvent[] = [], recordedChars = 0, recordingId = '';
   let sampler: ReturnType<typeof createTakeSampler> | undefined, samplerScene: WorldScene | undefined;
   let persistentSignature = '';
+  let trackedRule: SignalRule | undefined, previewRule: SignalRule | undefined;
+  const driverValue = (scene: WorldScene, input: WorldInput, state: WorldState) => trackedRule ? signalValue(trackedRule, input, evaluateLayout(scene, input), state.motion?.pointer) ?? 0 : scrollProgress(input.signals);
   const status = () => ({ available: Boolean(binding), mode, source, timeMs: positionMs, durationMs: mode === 'recording' ? positionMs : take ? takeDuration(take) : 0, samples: mode === 'recording' ? recorder.status().frames : take?.inputs.length ?? 0, progress, rate, saved, message, error });
   const snapshot = (includeTake = false): TimelineUpdate => ({ status: status(), ...(includeTake ? { take: take ?? null, library } : {}) });
   const emit = (includeTake = false, force = true) => {
@@ -64,8 +70,9 @@ export function createTimelineHost(doc: Document, siteId: string, storage: TakeS
   }
   const hidden = () => { if (!doc.hidden) { refresh(); return; } if (mode === 'recording') finishRecording('タブが非表示になったため録画を停止しました。'); if (mode === 'playing') { tick(); mode = 'paused'; message = 'タブが非表示になったため一時停止しました。'; } cancel(); emit(); };
   async function command(owner: string, raw: TimelineCommand) {
-    const value = parseTimelineCommand(raw); error = false; const operation = value.type === 'observe' ? operationEpoch : ++operationEpoch;
+    const value = parseTimelineCommand(raw); error = false; const operation = value.type === 'observe' || value.type === 'track' ? operationEpoch : ++operationEpoch;
     try {
+      if (value.type === 'track') { trackedRule = value.rule ?? undefined; if (latest && source === 'live') progress = driverValue(latest.scene, latest.input, latest.state); refresh(); emit(); return; }
       if (value.type === 'observe') { if (value.value) observers.add(owner); else observers.delete(owner); refresh(); if (value.value) library = await storage.list(); emit(true); return; }
       if (value.type === 'list') { library = await storage.list(); emit(true); return; }
       if (value.type === 'store') { if (!take) throw new Error('保存するテイクがありません。'); const stored = take; await storage.put(stored); if (take === stored) saved = true; library = await storage.list(); message = 'テイクを作品とは別に保存しました。'; emit(true); return; }
@@ -85,16 +92,17 @@ export function createTimelineHost(doc: Document, siteId: string, storage: TakeS
         if (rate > 0 && positionMs >= takeDuration(take)) positionMs = 0; if (rate < 0 && positionMs <= 0) positionMs = takeDuration(take);
         originClock = view.performance.now(); originPosition = positionMs; mode = 'playing'; source = 'take'; message = '記録入力でプレビュー中。実ページの操作は再送しません。'; tick(); emit();
       } else if (value.type === 'seek') { if (!take) throw new Error('テイクがありません。'); if (mode === 'recording') finishRecording(); cancel(); positionMs = Math.max(0, Math.min(takeDuration(take), value.timeMs)); mode = 'paused'; source = 'take'; refresh(); emit(); }
-      else if (value.type === 'preview') { if (mode === 'recording') finishRecording(); cancel(); signalPosition = progress = value.progress; mode = 'paused'; source = 'signal'; message = 'シグナル空間のプレビュー中。ライブに戻すと実スクロールへ追従します。'; refresh(); emit(); }
+      else if (value.type === 'preview') { if (mode === 'recording') finishRecording(); cancel(); previewRule = value.rule ?? trackedRule; signalPosition = progress = value.progress; mode = 'paused'; source = 'signal'; message = 'シグナル空間のプレビュー中。ライブに戻すと実ページの入力へ追従します。'; refresh(); emit(); }
     } catch (reason) { error = true; message = reason instanceof Error ? reason.message : 'タイムライン操作に失敗しました。'; emit(); }
   }
   return {
     attach(next: Binding) { binding = next; doc.addEventListener('visibilitychange', hidden); return () => { if (binding !== next) return; operationEpoch++; if (mode === 'recording') finishRecording('描画を終了したため録画を停止しました。'); cancel(); binding = undefined; latest = undefined; mode = 'live'; source = 'live'; doc.removeEventListener('visibilitychange', hidden); emit(); }; },
     capture(scene: WorldScene, _previous: WorldState, input: WorldInput, result: { state: WorldState; frame: WorldFrame }) {
-      latest = { scene, input, state: result.state }; progress = scrollProgress(input.signals);
+      latest = { scene, input, state: result.state }; progress = driverValue(scene, input, result.state);
       if (mode === 'recording') {
         const signature = JSON.stringify([result.state.effects, result.state.machine.video]), boundary = signature !== persistentSignature || Boolean(input.events.length);
-        recordInput(scene, input, boundary); persistentSignature = signature;
+        const historyDependent = [...scene.decorations, ...scene.groups ?? []].some((layer) => layer.motion?.enabled) || scene.signalRules?.some((rule) => rule.enabled && rule.source.signal === 'pointer.speed');
+        recordInput(scene, input, boundary || Boolean(historyDependent)); persistentSignature = signature;
       }
       if (observers.size || mode === 'recording') emit(false, false);
     },
@@ -102,12 +110,14 @@ export function createTimelineHost(doc: Document, siteId: string, storage: TakeS
       if (source === 'live') return undefined;
       if (source === 'signal') {
         if (!latest) return undefined;
-        const input = { ...latest.input, timeMs: 0, deltaMs: 0, events: [], signals: { ...latest.input.signals, scroll: { x: 0, y: signalPosition * Math.max(1, latest.input.signals.scroll?.maxY ?? 1), maxX: 0, maxY: Math.max(1, latest.input.signals.scroll?.maxY ?? 1) } } };
-        progress = signalPosition; return { ...evaluateWorld(scene, initialWorldState(), input), input };
+        const preview = previewSignalInput(latest.input, previewRule, signalPosition, evaluateLayout(scene, latest.input));
+        const state = initialWorldState(); if (preview.pointer) state.motion = { bodies: {}, pointer: preview.pointer };
+        const result = evaluateWorld(scene, state, preview.input); progress = signalPosition;
+        return { ...result, input: preview.input };
       }
       if (!take) return undefined;
       if (!sampler || samplerScene?.decorations !== scene.decorations || samplerScene?.groups !== scene.groups || samplerScene?.signalRules !== scene.signalRules) { sampler = createTakeSampler(scene, take); samplerScene = scene; }
-      const result = sampler.at(positionMs); progress = scrollProgress(result.input.signals); emit(false, false); return result;
+      const result = sampler.at(positionMs); progress = driverValue(scene, result.input, result.state); emit(false, false); return result;
     },
     get observing() { return observers.size > 0; }, get recording() { return mode === 'recording'; }, get overriding() { return source !== 'live'; }, get playing() { return mode === 'playing'; },
     command, snapshot: () => snapshot(true), abortRecording: finishRecording,
