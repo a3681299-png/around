@@ -17,7 +17,7 @@ test('legacy documents migrate without adding effects or changing assets; shared
     const layer = image(); if (version === 2) delete (layer as Partial<Decoration>).locked;
     const legacy = { ...document(), schemaVersion: version, decorations: [layer] };
     const before = JSON.stringify(legacy), parsed = parseDesign(legacy);
-    expect(parsed.schemaVersion).toBe(9); expect(parsed.decorations[0]).not.toHaveProperty('effects');
+    expect(parsed.schemaVersion).toBe(10); expect(parsed.decorations[0]).not.toHaveProperty('effects');
     expect(parsed.decorations[0]?.assetId).toBe(layer.assetId); expect(JSON.stringify(legacy)).toBe(before);
   }
   const mask = defaultCircleMask();

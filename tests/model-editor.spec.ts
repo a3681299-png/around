@@ -1,0 +1,30 @@
+import { test, expect } from './fixtures';
+import { exposeEditorControls, withCanvas } from './helpers/editor-workspace';
+import { modelFixture } from './helpers/model-fixture';
+import type { DesignDocument } from '../src/design/types';
+const overlay = '#web-world-themes-decorations';
+
+test('GLB renders alpha, shares resources, edits/drags/duplicates/undoes, saves and restores original asset', async ({ popup, youtube, context }) => {
+  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check(); await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+  await youtube.bringToFront(); await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
+  const panel = youtube.getByRole('dialog', { name: 'デザインエディター' }); await expect(panel).toBeVisible(); await exposeEditorControls(panel);
+  await panel.locator('.model-file').setInputFiles({ name: 'Rig.glb', mimeType: 'model/gltf-binary', buffer: modelFixture() });
+  const media = youtube.locator(`${overlay} .model-media`); await expect(media).toHaveAttribute('data-renderer', 'three', { timeout: 20000 });
+  const alpha = await media.locator('canvas').evaluate((c: HTMLCanvasElement) => { const d = c.getContext('2d')!.getImageData(0, 0, c.width, c.height).data; let filled = 0; for (let i = 3; i < d.length; i += 4) if (d[i]) filled++; return { corner: d[3], filled }; });
+  expect(alpha.corner).toBe(0); expect(alpha.filled).toBeGreaterThan(100);
+  await panel.getByLabel('3D回転Y', { exact: true }).fill('35'); await panel.getByLabel('3D回転Y', { exact: true }).press('Tab');
+  const image = youtube.locator(`${overlay} [data-image-id]`); const before = await image.boundingBox();
+  await withCanvas(youtube, async () => { await youtube.mouse.move(before!.x + before!.width / 2, before!.y + before!.height / 2); await youtube.mouse.down(); await youtube.mouse.move(before!.x + before!.width / 2 - 80, before!.y + before!.height / 2 + 50, { steps: 6 }); await youtube.mouse.up(); });
+  expect((await image.boundingBox())!.x).toBeCloseTo(before!.x - 80, 0);
+  await panel.locator('.duplicate-image').click(); await expect(media).toHaveCount(2); await expect(media.last()).toHaveAttribute('data-renderer', 'three');
+  const stats = () => youtube.locator(overlay).evaluate((h: HTMLElement) => JSON.parse(h.dataset.wwModelStats!));
+  expect(await stats()).toMatchObject({ contexts: 1, assets: 1, instances: 2 });
+  await panel.locator('.undo').click(); await expect(media).toHaveCount(1); await panel.locator('.redo').click(); await expect(media).toHaveCount(2);
+  await panel.locator('.save').click(); await expect(panel.locator('.dirty')).toHaveText('保存済み');
+  const saved = await popup.evaluate(async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'] as DesignDocument);
+  expect(saved.schemaVersion).toBe(10); expect(saved.decorations[0]).toMatchObject({ kind: 'model3d', model: { rotationY: 35 } }); expect(saved.decorations[0]!.assetId).toBe(saved.decorations[1]!.assetId);
+  await youtube.reload(); await expect(media.first()).toHaveAttribute('data-renderer', 'three', { timeout: 20000 });
+  expect(await youtube.locator(`${overlay} [data-image-id]`).first().evaluate((e) => getComputedStyle(e).pointerEvents)).toBe('none');
+  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck(); await expect(youtube.locator(overlay)).toHaveCount(0);
+  expect(context.serviceWorkers().length).toBeGreaterThan(0);
+});

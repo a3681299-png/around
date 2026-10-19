@@ -61,7 +61,7 @@ export function createWorkspace(doc: Document, host: HTMLElement, main: HTMLElem
   const imageProps = get('.image-properties');
   const basic = doc.createElement('details'); basic.open = true; basic.className = 'transform-section';
   const basicTitle = doc.createElement('summary'); basicTitle.textContent = '位置と外観'; basic.append(basicTitle);
-  [...imageProps.children].filter((node) => !node.matches('.playback, .motion-panel, [aria-label="マスクと振る舞い"], .group-help')).forEach((node) => basic.append(node));
+  [...imageProps.children].filter((node) => !node.matches('.playback, .model-panel, .motion-panel, [aria-label="マスクと振る舞い"], .group-help')).forEach((node) => basic.append(node));
   imageProps.prepend(basic);
   basic.append(get('.group-help'));
   const playback = get('.playback');

@@ -12,7 +12,7 @@ export interface SurfaceStyleRule {
 }
 
 export interface DesignDocument {
-  schemaVersion: 9;
+  schemaVersion: 10;
   id: string;
   siteId: string;
   /** null uses native site styling; a built-in theme is an optional starting point. */
@@ -69,9 +69,10 @@ export interface AnimationDecoration extends LayerState {
   format: import('../assets/motion-types').AnimationFormat;
   playback: PlaybackSettings;
 }
-export type Decoration = ImageDecoration | AnimationDecoration;
+export interface ModelDecoration extends LayerState { kind: 'model3d'; assetId: string; source: import('../models/types').ModelInfo; model: import('../models/types').ModelSettings }
+export type Decoration = ImageDecoration | AnimationDecoration | ModelDecoration;
 
-export type ImagePatch = Partial<Pick<LayerState, 'name' | 'opacity' | 'zIndex' | 'visible' | 'locked' | 'effects' | 'motion'>> & { placement?: Partial<LayerPlacement>; playback?: Partial<PlaybackSettings> };
+export type ImagePatch = Partial<Pick<LayerState, 'name' | 'opacity' | 'zIndex' | 'visible' | 'locked' | 'effects' | 'motion'>> & { placement?: Partial<LayerPlacement>; playback?: Partial<PlaybackSettings>; model?: Partial<import('../models/types').ModelSettings> };
 
 export interface DesignTarget {
   readonly id: string;

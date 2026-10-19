@@ -48,7 +48,7 @@ test('standalone Studio edits a real extension target using shared grouping, eff
   await panel.getByLabel('円形マスクを使う', { exact: true }).check(); await panel.getByLabel('光の半径', { exact: true }).fill('180');
   await expect.poll(() => youtube.locator(`${overlay} .group-content`).evaluate((node: HTMLElement) => node.style.maskImage)).toContain('180px');
   await panel.getByLabel('動画の一時停止で隠す', { exact: true }).check();
-  await save(panel); const saved = await stored(popup); expect(saved.schemaVersion).toBe(9); expect(saved.groups?.[0]?.effects?.[0]).toMatchObject({ radiusPx: 180 });
+  await save(panel); const saved = await stored(popup); expect(saved.schemaVersion).toBe(10); expect(saved.groups?.[0]?.effects?.[0]).toMatchObject({ radiusPx: 180 });
   await studio.screenshot({ path: info.outputPath('studio-workspace.png') });
   // Quick editing shares the selected group and same Undo stack.
   await youtube.locator('#web-world-themes-studio-link button').first().click();

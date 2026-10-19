@@ -51,7 +51,7 @@ export function parseWorldInput(value: unknown): WorldInput {
 }
 export function parseWorldScene(value: unknown, legacy = false): WorldScene {
   const scene = record(value, ['decorations', 'groups', ...(!legacy ? ['signalRules'] : [])]);
-  const design = parseDesign({ schemaVersion: legacy ? 6 : 9, id: 'runtime-recording', siteId: 'runtime-host', baseThemeId: null, rules: [], ...scene });
+  const design = parseDesign({ schemaVersion: legacy ? 6 : 10, id: 'runtime-recording', siteId: 'runtime-host', baseThemeId: null, rules: [], ...scene });
   return { decorations: design.decorations, ...(design.groups ? { groups: design.groups } : {}), ...(design.signalRules ? { signalRules: design.signalRules } : {}) };
 }
 export function parseWorldState(value: unknown, scene?: WorldScene): WorldState {

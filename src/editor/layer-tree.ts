@@ -138,7 +138,7 @@ export function createLayerTree(doc: Document, container: HTMLElement, actions: 
         if (layer.kind !== 'group') preview.dataset.thumbnail = layer.assetId;
         const text = doc.createElement('span'); text.className = 'layer-text';
         const name = doc.createElement('span'); name.className = 'layer-title'; name.textContent = layer.name;
-        const kind = doc.createElement('span'); kind.className = 'layer-type'; kind.textContent = (layer.kind === 'group' ? `グループ · ${layer.children.length}素材` : layer.kind === 'animation' ? `▶ ${layer.format.toUpperCase()}` : '画像') + (layer.effects?.some((effect) => effect.enabled) ? ' · マスク' : '');
+        const kind = doc.createElement('span'); kind.className = 'layer-type'; kind.textContent = (layer.kind === 'group' ? `グループ · ${layer.children.length}素材` : layer.kind === 'animation' ? `▶ ${layer.format.toUpperCase()}` : layer.kind === 'model3d' ? '3D · GLB' : '画像') + (layer.effects?.some((effect) => effect.enabled) ? ' · マスク' : '');
         kind.title = kind.textContent;
         text.append(name, kind); select.append(preview, text);
         const grip = add('reorder', 'grip', 'レイヤーを並び替え', true); grip.draggable = true; grip.dataset.reorder = '';

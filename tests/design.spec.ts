@@ -24,7 +24,7 @@ test('versioned data is sparse, canonical, independent of retro, and copied with
 test('unsupported versions, executable fields, arbitrary CSS and invalid dimensions are rejected', () => {
   const input = sample();
   for (const value of [
-    { ...input, schemaVersion: 10 }, { ...input, script: 'alert(1)' },
+    { ...input, schemaVersion: 11 }, { ...input, script: 'alert(1)' },
     { ...input, rules: [{ kind: 'javascript', target: 'video-card', style: {} }] },
     { ...input, rules: [{ kind: 'surface-style', target: 'video-card', selector: '*', style: {} }] },
     { ...input, rules: [{ kind: 'surface-style', target: 'video-card', style: { backgroundColor: 'url(https://example.com)' } }] },
@@ -114,7 +114,7 @@ test('a storage event wins over a stale initial read, and deletion resets the de
 
 test('unknown versions remain on disk and write failures propagate without changing saved data', async () => {
   const key = designKey('youtube');
-  const unknown = { ...sample(), schemaVersion: 109 };
+  const unknown = { ...sample(), schemaVersion: 119 };
   const storage = fakeStorage({ [key]: unknown });
   await expect(readDesign('youtube')).rejects.toThrow('バージョン');
   expect(storage.stored[key]).toBe(unknown);

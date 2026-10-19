@@ -2,6 +2,7 @@ import styles from './panel.css';
 import { GROUP_LIMITS, IMAGE_LIMITS, STYLE_LIMITS, type SurfaceStyle, type ImagePatch, type DesignTarget } from '../design/types';
 import { ANIMATION_LIMITS } from '../assets/motion-types';
 import type { Alignment, Distribution } from '../design/layout';
+import { createModelPanel } from './model-panel';
 import { createMotionPanel } from './motion-panel';
 import { ungroupingReason } from './groups';
 import { createEffectsPanel } from './effects-panel';
@@ -73,9 +74,11 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
     <section class="assets">
       <button class="add-image" type="button">画像を追加</button>
       <button class="add-animation" type="button">アニメーションを追加</button>
+      <button class="add-model" type="button">3Dモデルを追加</button>
+      <input class="model-file" type="file" accept=".glb,model/gltf-binary" multiple aria-label="3Dモデルを追加" hidden>
       <input class="file" type="file" accept="image/png,image/webp" multiple aria-label="画像素材を追加" hidden>
       <input class="animation-file" type="file" accept="image/gif,image/png,image/apng,image/webp,video/webm,application/json,.json,.apng" multiple aria-label="アニメーション素材を追加" hidden>
-      <p class="hint asset-hint">ここへ素材をドロップしても追加できます。<span title="PNG・APNG・WebP・GIF・WebM・Lottie JSON。素材32MB／JSON 1MB、全32レイヤーまで。">対応形式 ⓘ</span></p>
+      <p class="hint asset-hint">ここへ素材をドロップしても追加できます。<span title="PNG・APNG・WebP・GIF・WebM・Lottie JSON・GLB。素材32MB／JSON 1MB、全32レイヤーまで。">対応形式 ⓘ</span></p>
     </section>
     <details class="layers-section" open><summary>レイヤー <span class="layer-count"></span></summary>
       <p class="hint selection-tip">行のチェックで複数選択できます。上が手前、つまみをドラッグして並び替え。</p>
@@ -158,11 +161,16 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
   const changeImage = (patch: ImagePatch) => actions.imageChange(patch, current?.image?.id);
   const effects = createEffectsPanel(doc, changeImage);
   const motion = createMotionPanel(doc, changeImage, actions.beginEdit, actions.endEdit);
-  imageProperties.append(motion.fieldset, effects.fieldset);
+  const model = createModelPanel(doc, changeImage, actions.beginEdit, actions.endEdit);
+  imageProperties.append(model.fieldset, motion.fieldset, effects.fieldset);
+  const modelInput = get<HTMLInputElement>('.model-file'), addModel = get<HTMLButtonElement>('.add-model');
+  addModel.addEventListener('click', () => modelInput.click());
+  modelInput.addEventListener('change', () => { actions.imageImport([...modelInput.files ?? []]); modelInput.value = ''; });
   const fileInput = get<HTMLInputElement>('.file');
   const addImage = get<HTMLButtonElement>('.add-image');
   const addAnimation = get<HTMLButtonElement>('.add-animation');
   const animationInput = get<HTMLInputElement>('.animation-file');
+  buttonIcon(addImage, 'image', '画像を追加'); buttonIcon(addAnimation, 'animation', 'アニメーションを追加'); buttonIcon(addModel, 'model3d', '3Dモデルを追加');
   const layers = get<HTMLDivElement>('.layers');
   const anchorSelect = get<HTMLSelectElement>('[data-image-prop="anchor"]');
   for (const anchor of anchors) {
@@ -284,7 +292,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
         input.setAttribute('aria-label', `${isGroup ? 'グループ' : '画像'}の${key.toUpperCase()}位置`);
       }
       get<HTMLInputElement>('[data-image-prop="opacity"]').setAttribute('aria-label', `${isGroup ? 'グループ' : '画像'}の不透明度`);
-      effects.render(state.image); motion.render(state.image);
+      effects.render(state.image); motion.render(state.image); model.render(state.image);
       motion.fieldset.disabled = Boolean(isGroup && state.image?.kind === 'group' && !groupMovable(state.image, state.images));
       properties.hidden = !state.selected;
       get<HTMLParagraphElement>('.card-help').hidden = !state.selected;
@@ -315,6 +323,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       get<HTMLElement>('.dirty').dataset.dirty = String(state.dirty);
       setText(get<HTMLElement>('.layer-count'), `${state.images.length} / ${IMAGE_LIMITS.count}${state.groups.length ? `・グループ${state.groups.length}` : ''}`);
       addImage.disabled = state.saving || state.images.length >= IMAGE_LIMITS.count;
+      addModel.disabled = addImage.disabled || state.images.filter((layer) => layer.kind === 'model3d').length >= 8;
       addAnimation.disabled = addImage.disabled || state.images.filter((image) => image.kind === 'animation').length >= ANIMATION_LIMITS.count;
       get<HTMLFieldSetElement>('.playback').hidden = state.image?.kind !== 'animation';
       if (state.image?.kind === 'animation') {

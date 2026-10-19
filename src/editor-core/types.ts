@@ -30,7 +30,7 @@ export type EditCommand =
   | { type: 'signal-rule'; rule: SignalRule }
   | { type: 'remove-signal-rule'; id: string };
 
-export interface EditorAsset { id: string; name: string; width: number; height: number; animation?: { format: AnimationFormat } }
+export interface EditorAsset { id: string; name: string; width: number; height: number; model?: import('../models/types').ModelInfo; animation?: { format: AnimationFormat } }
 export interface EditorStorage<Source> {
   read(): Promise<DesignDocument | undefined>;
   watch(accept: (doc: DesignDocument | undefined) => void, error: (error: unknown) => void): () => void;

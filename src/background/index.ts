@@ -84,7 +84,7 @@ async function importBatch(input: unknown, lease: AssetLease): Promise<AssetMeta
     const blob = new Blob([new Uint8Array(bytes).buffer], { type: info.mime });
     // ServiceWorker has no ImageDecoder. Both boundaries inspect containers;
     // images validate frame 0. Video is probed by the content importer.
-    if (info.animation?.format !== 'lottie' && info.animation?.format !== 'webm') {
+    if (!info.model && info.animation?.format !== 'lottie' && info.animation?.format !== 'webm') {
       const bitmap = await createImageBitmap(blob);
       try { if (bitmap.width !== info.width || bitmap.height !== info.height) throw new Error('画像を正しく読み込めませんでした。'); }
       finally { bitmap.close(); }

@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 9,
+  "id": "youtube-custom",
+  "siteId": "youtube",
+  "baseThemeId": "retro",
+  "rules": [],
+  "decorations": [
+    {
+      "kind": "animation",
+      "id": "image-0",
+      "name": "world-0.png",
+      "assetId": "asset-0000000000000000000000000000000000000000000000000000000000000000",
+      "placement": {
+        "anchor": {
+          "kind": "viewport"
+        },
+        "x": 0.3,
+        "y": 0.4,
+        "widthPx": 100,
+        "heightPx": 80,
+        "rotationDeg": 0
+      },
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "zIndex": 0,
+      "format": "webm",
+      "playback": {
+        "playing": true,
+        "loop": true,
+        "speed": 1,
+        "mode": "auto"
+      },
+      "motion": {
+        "kind": "pointer-follow",
+        "enabled": false,
+        "mode": "pursuit",
+        "lagMs": 180,
+        "maxSpeed": 400,
+        "acceleration": 1200,
+        "deceleration": 1600,
+        "stopRadius": 48,
+        "orientToMovement": true,
+        "rotationOffsetDeg": 0
+      }
+    },
+    {
+      "kind": "image",
+      "id": "image-1",
+      "name": "world-1.png",
+      "assetId": "asset-1111111111111111111111111111111111111111111111111111111111111111",
+      "placement": {
+        "anchor": {
+          "kind": "viewport"
+        },
+        "x": 0.5,
+        "y": 0.4,
+        "widthPx": 100,
+        "heightPx": 80,
+        "rotationDeg": 0
+      },
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "zIndex": 1
+    },
+    {
+      "kind": "image",
+      "id": "image-2",
+      "name": "world-2.png",
+      "assetId": "asset-2222222222222222222222222222222222222222222222222222222222222222",
+      "placement": {
+        "anchor": {
+          "kind": "viewport"
+        },
+        "x": 0.7,
+        "y": 0.4,
+        "widthPx": 100,
+        "heightPx": 80,
+        "rotationDeg": 0
+      },
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "zIndex": 2
+    }
+  ],
+  "groups": [
+    {
+      "kind": "group",
+      "id": "group-world",
+      "name": "世界",
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "zIndex": 0,
+      "children": [
+        "image-0",
+        "image-1",
+        "image-2"
+      ]
+    }
+  ],
+  "signalRules": [
+    {
+      "id": "scroll-image-0",
+      "enabled": true,
+      "source": {
+        "signal": "page.scroll.progress",
+        "axis": "y",
+        "space": "page",
+        "inputRange": [
+          0,
+          1
+        ]
+      },
+      "target": {
+        "layerId": "image-0",
+        "property": "opacity"
+      },
+      "keyframes": [
+        {
+          "id": "key-start",
+          "input": 0,
+          "value": 0,
+          "easing": "linear"
+        },
+        {
+          "id": "key-middle",
+          "input": 0.5,
+          "value": 1,
+          "easing": "linear"
+        },
+        {
+          "id": "key-end",
+          "input": 1,
+          "value": 0,
+          "easing": "linear"
+        }
+      ],
+      "evaluation": {
+        "mode": "follow",
+        "smoothing": {
+          "kind": "none"
+        }
+      },
+      "blend": {
+        "mode": "replace",
+        "priority": 0
+      }
+    }
+  ]
+}

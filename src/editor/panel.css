@@ -61,7 +61,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .inspector-pane, .help-pane { flex: 1; min-width: 0; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 14px 12px; scrollbar-width: thin; }
 :host([data-split]) .layers-pane { border-right: 1px solid #444550; }
 :host([data-split]) .inspector-pane { flex: 0 0 310px; }
-.assets { padding: 12px 12px 5px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; flex: none; }
+.assets { padding: 12px 12px 5px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; flex: none; }
 .assets button { font-size: 11px; }
 .asset-hint { grid-column: 1 / -1; margin: 1px 0 4px; font-size: 10px; }
 .asset-hint span { color: #bba5ee; cursor: help; }

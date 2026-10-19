@@ -32,7 +32,7 @@ test('groups, child rules and masks compose without mutating cached artwork; zer
 });
 test('validated rules roundtrip and reject unknown fields, targets, duplicates, modes, executable values and huge curves', () => {
   const { scene } = scenario(), design = { ...emptyDesign('youtube', null), ...scene }, parsed = parseDesign(design);
-  expect(parsed.schemaVersion).toBe(9); expect(parseDesign(JSON.parse(JSON.stringify(parsed)))).toEqual(parsed);
+  expect(parsed.schemaVersion).toBe(10); expect(parseDesign(JSON.parse(JSON.stringify(parsed)))).toEqual(parsed);
   const rule = scene.signalRules[0]!;
   const malformed = [
     { ...rule, script: 'alert(1)' }, { ...rule, target: { layerId: 'missing', property: 'opacity' } },

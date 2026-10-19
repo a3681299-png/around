@@ -1,3 +1,4 @@
+import { defaultModelSettings } from '../models/types';
 import { emptyDesign, parseDesign, sameDesign } from '../design/schema';
 import { IMAGE_LIMITS, type DesignDocument, type SurfaceStyle, type ImagePatch } from '../design/types';
 import { moveGroup, reanchorPlacement, type PlacementChange } from '../world/geometry';
@@ -70,7 +71,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     if (!current || (current.locked && Object.keys(patch).some((key) => !['locked', 'visible', 'name'].includes(key)))) return;
     if (group) {
       if (patch.motion && !groupMovable(group, draft.decorations)) return;
-      const next = parseDesign(draft), { placement, playback: _playback, ...properties } = patch;
+      const next = parseDesign(draft), { placement, playback: _playback, model: _model, ...properties } = patch;
       if (placement) {
         if (Object.keys(placement).some((key) => !['x', 'y'].includes(key)) || !groupMovable(group, draft.decorations)) return;
         const view = groupView(group, draft.decorations, frameFor), frame = frameFor(view.placement);
@@ -92,8 +93,8 @@ export function createEditorSession<Source extends { readonly length: number }>(
       patch = { ...patch, placement: reanchorPlacement(current.placement, from, to, patch.placement.anchor) };
     }
     const next = parseDesign(draft);
-    const { playback, ...properties } = patch;
-    next.decorations = next.decorations.map((image) => image.id !== id ? image : image.kind === 'animation'
+    const { playback, model, ...properties } = patch;
+    next.decorations = next.decorations.map((image) => image.id !== id ? image : image.kind === 'model3d' ? { ...image, ...properties, placement: { ...image.placement, ...patch.placement }, model: { ...image.model, ...model } } : image.kind === 'animation'
       ? { ...image, ...properties, placement: { ...image.placement, ...patch.placement }, playback: { ...image.playback, ...playback } }
       : { ...image, ...properties, placement: { ...image.placement, ...patch.placement } });
     updateDraft(next);
@@ -196,7 +197,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
             y: Math.min(.95, Math.max(.05, origin.y / height + index * 24 / height)),
             widthPx: Math.round(asset.width * scale * 10) / 10, heightPx: Math.round(asset.height * scale * 10) / 10, rotationDeg: 0 },
           opacity: 1, zIndex: Math.min(100, next.decorations.length), visible: true, locked: false };
-        next.decorations.push(asset.animation ? { ...common, kind: 'animation', format: asset.animation.format, playback: { playing: true, loop: true, speed: 1, mode: 'auto' } } : { ...common, kind: 'image' });
+        next.decorations.push(asset.model ? { ...common, kind: 'model3d', source: asset.model, model: defaultModelSettings(asset.model) } : asset.animation ? { ...common, kind: 'animation', format: asset.animation.format, playback: { playing: true, loop: true, speed: 1, mode: 'auto' } } : { ...common, kind: 'image' });
         importedSelection = id;
       });
       await checkDesignAssets(next, importSession);

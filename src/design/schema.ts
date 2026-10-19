@@ -1,4 +1,5 @@
 import { GROUP_LIMITS, IMAGE_LIMITS, STYLE_LIMITS, type DesignDocument, type SurfaceStyle, type Decoration, type PlacementAnchor, type GroupLayer } from './types';
+import { MODEL_LIMITS, parseModelInfo, parseModelSettings } from '../models/types';
 import { ANIMATION_LIMITS } from '../assets/motion-types';
 import { parseEffects } from '../effects/schema';
 import { sameAnchor } from './hierarchy';
@@ -52,8 +53,8 @@ function group(value: unknown, version: number): GroupLayer {
 }
 
 function image(value: unknown, version: number): Decoration {
-  const item = record(value, ['kind', 'id', 'assetId', 'name', 'placement', 'opacity', 'zIndex', 'visible', ...(version >= 3 ? ['locked'] : []), ...(version >= 4 ? ['format', 'playback'] : []), ...(version >= 5 ? ['effects'] : []), ...(version >= 9 ? ['motion'] : [])]);
-  if (!['image', ...(version >= 4 ? ['animation'] : [])].includes(item['kind'] as string) || !isDesignId(item['id']) || !isAssetId(item['assetId'])
+  const item = record(value, ['kind', 'id', 'assetId', 'name', 'placement', 'opacity', 'zIndex', 'visible', ...(version >= 3 ? ['locked'] : []), ...(version >= 4 ? ['format', 'playback'] : []), ...(version >= 5 ? ['effects'] : []), ...(version >= 9 ? ['motion'] : []), ...(version >= 10 ? ['model', 'source'] : [])]);
+  if (!['image', ...(version >= 4 ? ['animation'] : []), ...(version >= 10 ? ['model3d'] : [])].includes(item['kind'] as string) || !isDesignId(item['id']) || !isAssetId(item['assetId'])
     || typeof item['name'] !== 'string' || item['name'].length < 1 || item['name'].length > 120 || /[\u0000-\u001f]/.test(item['name'])
     || typeof item['visible'] !== 'boolean' || (version >= 3 && typeof item['locked'] !== 'boolean')) throw new Error('画像レイヤーの形式が不正です。');
   const placement = record(item['placement'], ['anchor', 'x', 'y', 'widthPx', 'heightPx', 'rotationDeg']);
@@ -75,6 +76,12 @@ function image(value: unknown, version: number): Decoration {
     opacity: number(item['opacity'], 0, 1), zIndex, visible: item['visible'], locked: version >= 3 ? item['locked'] as boolean : false,
     ...(Object.hasOwn(item, 'motion') ? { motion: parseMotion(item['motion']) } : {}), ...(Object.hasOwn(item, 'effects') ? { effects: parseEffects(item['effects']) } : {}),
   };
+  if (item['kind'] === 'model3d') {
+    if (Object.hasOwn(item, 'format') || Object.hasOwn(item, 'playback')) throw new Error('3D素材の設定が不正です。');
+    const source = parseModelInfo(item['source']);
+    return { ...common, kind: 'model3d', source, model: parseModelSettings(item['model'], source) };
+  }
+  if (Object.hasOwn(item, 'model') || Object.hasOwn(item, 'source')) throw new Error('3D素材以外には3D設定を指定できません。');
   if (item['kind'] === 'image') {
     if (Object.hasOwn(item, 'format') || Object.hasOwn(item, 'playback')) throw new Error('静止画像には再生設定を指定できません。');
     return { ...common, kind: 'image' };
@@ -94,7 +101,7 @@ function image(value: unknown, version: number): Decoration {
 export function parseDesign(value: unknown): DesignDocument {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('デザインの形式が不正です。');
   const version = (value as Record<string, unknown>)['schemaVersion'];
-  if (version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5 && version !== 6 && version !== 7 && version !== 8 && version !== 9) throw new Error('このデザインのバージョンには対応していません。');
+  if (version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5 && version !== 6 && version !== 7 && version !== 8 && version !== 9 && version !== 10) throw new Error('このデザインのバージョンには対応していません。');
   const data = record(value, version === 1 ? ['schemaVersion', 'id', 'siteId', 'baseThemeId', 'rules'] : ['schemaVersion', 'id', 'siteId', 'baseThemeId', 'rules', 'decorations', ...(version >= 6 ? ['groups'] : []), ...(version >= 8 ? ['signalRules'] : [])]);
   if (!isDesignId(data['id']) || !isDesignId(data['siteId'])
     || (data['baseThemeId'] !== null && !isDesignId(data['baseThemeId']))) {
@@ -124,6 +131,7 @@ export function parseDesign(value: unknown): DesignDocument {
   if (version >= 2) {
     if (!Array.isArray(data['decorations']) || data['decorations'].length > IMAGE_LIMITS.count) throw new Error('画像は32枚まで配置できます。');
     decorations = data['decorations'].map((value) => image(value, version));
+    if (decorations.filter((item) => item.kind === 'model3d').length > MODEL_LIMITS.count) throw new Error('3D素材は8レイヤーまでです。');
     if (new Set(decorations.map((item) => item.id)).size !== decorations.length) throw new Error('画像レイヤーのIDが重複しています。');
     if (decorations.filter((item) => item.kind === 'animation').length > (version < 7 ? 8 : ANIMATION_LIMITS.count)) throw new Error(version < 7 ? '旧形式のアニメーションは8枚までです。' : '素材は合計32レイヤーまでです。');
   }
@@ -141,11 +149,11 @@ export function parseDesign(value: unknown): DesignDocument {
     }
   }
   const signalRules = Object.hasOwn(data, 'signalRules') ? parseSignalRules(data['signalRules'], new Set([...decorations, ...groups].map((layer) => layer.id)), version < 9) : [];
-  return { schemaVersion: 9, id: data['id'], siteId: data['siteId'], baseThemeId: data['baseThemeId'], rules, decorations, ...(groups.length ? { groups } : {}), ...(signalRules.length ? { signalRules } : {}) };
+  return { schemaVersion: 10, id: data['id'], siteId: data['siteId'], baseThemeId: data['baseThemeId'], rules, decorations, ...(groups.length ? { groups } : {}), ...(signalRules.length ? { signalRules } : {}) };
 }
 
 export function emptyDesign(siteId: string, baseThemeId: string | null): DesignDocument {
-  return parseDesign({ schemaVersion: 9, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
+  return parseDesign({ schemaVersion: 10, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
 }
 
 export function sameDesign(a: DesignDocument | undefined, b: DesignDocument | undefined): boolean {

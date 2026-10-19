@@ -52,7 +52,7 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
     const library = await panel.evaluate<{ id: string }[]>('chrome.runtime.sendMessage({type:"web-world-themes:signal-takes",action:"list",siteId:"youtube"}).then(r=>r.value)');
     const take = await panel.evaluate<SignalTake>(`chrome.runtime.sendMessage({type:"web-world-themes:signal-takes",action:"get",siteId:"youtube",id:${JSON.stringify(library[0]!.id)}}).then(r=>r.value)`);
     const design = await popup.evaluate(async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'] as DesignDocument);
-    expect(design.schemaVersion).toBe(9); expect(design).not.toHaveProperty('takes'); expect(JSON.stringify(take)).not.toMatch(/https?:|cookie|asset-|signalRules|decorations/);
+    expect(design.schemaVersion).toBe(10); expect(design).not.toHaveProperty('takes'); expect(JSON.stringify(take)).not.toMatch(/https?:|cookie|asset-|signalRules|decorations/);
     const middle = take.inputs.find((input) => input.signals.scroll && input.signals.scroll.maxY > 0 && input.signals.scroll.y / input.signals.scroll.maxY > .4 && input.signals.scroll.y / input.signals.scroll.maxY < .6)!; expect(middle).toBeDefined();
     const time = middle.timeMs - take.inputs[0]!.timeMs, expected = createTakeSampler(design, take).at(time).frame.layout.layers[0]!.layer.opacity;
     await panel.fill('.take-position', String(time / 1000)); await expect.poll(() => media.evaluate((node: HTMLElement) => Number(node.style.opacity))).toBeCloseTo(expected, 5);

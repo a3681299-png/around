@@ -34,3 +34,10 @@ unlimited permission to use, copy and distribute the fonts, with or without
 modification, commercially or noncommercially, without warranty. The font
 continues to be distributed under its upstream license; the extension's own
 license does not replace it.
+
+## Three.js 0.186.1
+
+Bundled locally from [mrdoob/three.js](https://github.com/mrdoob/three.js/tree/r186).
+Copyright © 2010–2026 three.js authors. MIT license, preserved in
+`assets/licenses/three-MIT.txt`. GLTFLoader and SkeletonUtils use the same license.
+No CDN, remote decoder or third-party executable asset is loaded at runtime.

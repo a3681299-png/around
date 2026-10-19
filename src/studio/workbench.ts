@@ -36,13 +36,13 @@ export function createStudioWorkbench(doc: Document, host: HTMLElement, main: HT
   helpDialog.append(closeHelp, help, get('.quick-guide'));
   const openHelp = () => { help.hidden = false; if (!helpDialog.open) helpDialog.showModal(); };
   const menus: [string, [string, () => void][]][] = [
-    ['ファイル', [['画像を追加', () => invoke('.add-image')], ['アニメーションを追加', () => invoke('.add-animation')], ['保存', () => invoke('.save')], ['変更を破棄', () => invoke('.discard')], ['編集を終了', () => invoke('.close')]]],
+    ['ファイル', [['画像を追加', () => invoke('.add-image')], ['アニメーションを追加', () => invoke('.add-animation')], ['3Dモデルを追加', () => invoke('.add-model')], ['保存', () => invoke('.save')], ['変更を破棄', () => invoke('.discard')], ['編集を終了', () => invoke('.close')]]],
     ['編集', [['元に戻す', () => invoke('.undo')], ['やり直す', () => invoke('.redo')], ['複製', () => invoke('.duplicate-image')], ['削除', () => invoke('.delete-image')]]],
     ['レイヤー', [['選択をグループ化', () => invoke('.group-layers')], ['グループを解除', () => invoke('.ungroup-layers')], ['すべて選択', actions.selectAll], ['選択解除', actions.clearSelection], ['マスクと振る舞い', () => invoke('.mask-shortcut')]]],
     ['表示', [['素材パネルを開閉', () => toggle('left')], ['プロパティとレイヤーを開閉', () => toggle('right')], ['パネルをまとめて開閉', () => { allClosed = !allClosed; layout(); }], ['左右を入れ替える', () => invoke('.dock')], ['配置をリセット', () => { leftWidth = 176; rightWidth = 320; ratio = .56; leftClosed = rightClosed = undefined; allClosed = false; host.dataset.wwDock = 'right'; layout(); remember(); }]]],
     ['ヘルプ', [['使い方とショートカット', openHelp]]],
   ];
-  const menuSources: Record<string, string> = { '画像を追加': 'add-image', 'アニメーションを追加': 'add-animation', '保存': 'save', '変更を破棄': 'discard', '編集を終了': 'close', '元に戻す': 'undo', 'やり直す': 'redo', '複製': 'duplicate-image', '削除': 'delete-image', '選択をグループ化': 'group-layers', 'グループを解除': 'ungroup-layers', 'すべて選択': 'select-all', '選択解除': 'clear-selection', 'マスクと振る舞い': 'mask-shortcut' };
+  const menuSources: Record<string, string> = { '画像を追加': 'add-image', 'アニメーションを追加': 'add-animation', '3Dモデルを追加': 'add-model', '保存': 'save', '変更を破棄': 'discard', '編集を終了': 'close', '元に戻す': 'undo', 'やり直す': 'redo', '複製': 'duplicate-image', '削除': 'delete-image', '選択をグループ化': 'group-layers', 'グループを解除': 'ungroup-layers', 'すべて選択': 'select-all', '選択解除': 'clear-selection', 'マスクと振る舞い': 'mask-shortcut' };
   for (const [title, items] of menus) {
     // Native Chrome owns the panel's side and width; page-docking items do not apply.
     if (options.sidePanel && title === '表示') continue;
@@ -55,7 +55,7 @@ export function createStudioWorkbench(doc: Document, host: HTMLElement, main: HT
   const menuEnd = doc.createElement('div'); menuEnd.className = 'menu-end';
   const dock = get<HTMLButtonElement>('.dock'), close = get<HTMLButtonElement>('.close');
   buttonIcon(dock, 'dock', '左右を入れ替える'); buttonIcon(close, 'close', '編集を終了'); menuEnd.append(dock, make('使い方', 'help', openHelp), close); menu.append(menuEnd);
-  const commands: [string, string, string][] = [['undo', 'undo', 'Ctrl+Z'], ['redo', 'redo', 'Ctrl+Shift+Z / Ctrl+Y'], ['save', 'save', ''], ['discard', 'discard', ''], ['add-image', 'image', ''], ['add-animation', 'animation', ''], ['group-layers', 'group', ''], ['ungroup-layers', 'ungroup', ''], ['duplicate-image', 'duplicate', 'Ctrl+D'], ['delete-image', 'delete', 'Delete'], ['select-all', 'select', ''], ['clear-selection', 'close', 'Esc'], ['mask-shortcut', 'mask', '']];
+  const commands: [string, string, string][] = [['undo', 'undo', 'Ctrl+Z'], ['redo', 'redo', 'Ctrl+Shift+Z / Ctrl+Y'], ['save', 'save', ''], ['discard', 'discard', ''], ['add-image', 'image', ''], ['add-animation', 'animation', ''], ['add-model', 'model3d', ''], ['group-layers', 'group', ''], ['ungroup-layers', 'ungroup', ''], ['duplicate-image', 'duplicate', 'Ctrl+D'], ['delete-image', 'delete', 'Delete'], ['select-all', 'select', ''], ['clear-selection', 'close', 'Esc'], ['mask-shortcut', 'mask', '']];
   commands.forEach(([selector, name, shortcut]) => buttonIcon(get<HTMLButtonElement>(`.${selector}`), name, undefined, shortcut, selector === 'group-layers' ? 'グループ化' : selector === 'ungroup-layers' ? '解除' : ''));
   const tools = get('.interaction-tools');
   const undo = get('.undo'), redo = get('.redo'), dirty = get('.dirty'), save = get('.save'), discard = get('.discard');
@@ -70,8 +70,8 @@ export function createStudioWorkbench(doc: Document, host: HTMLElement, main: HT
   tools.append(get('.mask-shortcut'));
   const library = doc.createElement('section'); library.className = 'library-pane';
   const libraryHeader = doc.createElement('div'); libraryHeader.className = 'pane-heading'; libraryHeader.innerHTML = '<strong>素材</strong>';
-  libraryHeader.append(get('.add-image'), get('.add-animation'));
-  const assetList = doc.createElement('div'); assetList.className = 'asset-library'; library.append(libraryHeader, get('.file'), get('.animation-file'), assetList);
+  libraryHeader.append(get('.add-image'), get('.add-animation'), get('.add-model'));
+  const assetList = doc.createElement('div'); assetList.className = 'asset-library'; library.append(libraryHeader, get('.file'), get('.animation-file'), get('.model-file'), assetList);
   left.append(tools, library); get('.assets').remove();
   const libraryView = createAssetLibrary(doc, assetList, (id) => actions.imageSelect(id), actions.thumbnail);
   const right = doc.createElement('aside'); right.className = 'studio-inspectors'; right.setAttribute('aria-label', 'プロパティとレイヤー');
@@ -150,7 +150,7 @@ export function createStudioWorkbench(doc: Document, host: HTMLElement, main: HT
   }
   menuEnd.prepend(surfaces);
   if (options.sidePanel || options.toolbarOnly) {
-    toolbar.replaceChildren(undo, redo, save, discard, separator(), get('.add-image'), get('.add-animation'), separator(), tools);
+    toolbar.replaceChildren(undo, redo, save, discard, separator(), get('.add-image'), get('.add-animation'), get('.add-model'), separator(), tools);
     dock.hidden = true; toggleLeft.hidden = toggleRight.hidden = hideAll.hidden = true;
     if (options.toolbarOnly) {
       toolbar.append(separator(), surfaces, dirty, close); menu.hidden = true; footer.hidden = true;
@@ -197,7 +197,7 @@ export function createStudioWorkbench(doc: Document, host: HTMLElement, main: HT
     inspect() { base.inspect(); enforce(); }, context: base.context,
     render(next: PanelState) {
       state = next; base.render(next); enforce(); timeline?.render(next); if (!options.sidePanel && !options.toolbarOnly) libraryView.render(next);
-      get('.object-type').textContent = next.image ? next.image.kind === 'group' ? 'グループ' : next.image.kind === 'animation' ? next.image.format.toUpperCase() : '画像' : next.selected ? '動画カード' : next.selectedIds.length > 1 ? `${next.selectedIds.length}個選択` : '未選択';
+      get('.object-type').textContent = next.image ? next.image.kind === 'group' ? 'グループ' : next.image.kind === 'animation' ? next.image.format.toUpperCase() : next.image.kind === 'model3d' ? '3D · GLB' : '画像' : next.selected ? '動画カード' : next.selectedIds.length > 1 ? `${next.selectedIds.length}個選択` : '未選択';
       get('.status').title = next.status;
       inspector.querySelector<HTMLElement>('[aria-label="マスクと振る舞い"]')!.hidden = !next.image;
       inspector.querySelector<HTMLElement>('.multi-help')!.hidden = next.selectedIds.length < 2;

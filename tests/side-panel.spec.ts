@@ -55,7 +55,7 @@ test('native Chrome panel uses the same draft, group masks, selection, history, 
     await panel.click('.redo'); await panel.click('.save'); await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
     await nativeWindow(panel.cdp, 1920); await expect.poll(() => page.evaluate(() => innerWidth)).toBeGreaterThan(width);
     const stored = await popup.evaluate(async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube']);
-    expect((stored as { schemaVersion: number }).schemaVersion).toBe(9);
+    expect((stored as { schemaVersion: number }).schemaVersion).toBe(10);
     await page.reload(); await expect.poll(() => panel.text('.dirty')).toBe('保存済み'); await expect(page.locator('#web-world-themes-decorations [data-image-id]')).toHaveCount(3);
     await panel.click('.studio-menu-item > summary'); await panel.click('[data-source="close"]', false); await expect(page.locator('[data-ww-editing]')).toHaveCount(0); await expect(local).toHaveCount(0); await expect.poll(() => page.evaluate(() => innerWidth)).toBeGreaterThan(1750);
     await expect(page.locator('#web-world-themes-studio-layout')).toHaveCount(0);

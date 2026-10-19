@@ -3,6 +3,7 @@ import { WORLD_MODE } from '../../host/world-options';
 import { evaluateLayout } from '../../world/layout';
 import { legacyLayout } from './legacy-evaluation';
 import { assertWorldParity } from './parity';
+import { createModelRenderer } from '../three/models';
 import { createMediaController } from '../../media/controller';
 import { createEffectController, type EffectTarget } from './effects';
 import type { PlaybackSource } from '../../signals/types';
@@ -69,6 +70,7 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
   let observer: ResizeObserver | undefined;
   let observed = new Set<Element>();
   let media: ReturnType<typeof createMediaController> | undefined;
+  let models: ReturnType<typeof createModelRenderer> | undefined;
   let effects: ReturnType<typeof createEffectController> | undefined;
   let groupFrame: HTMLDivElement | undefined;
   let imageLayer: HTMLDivElement | undefined;
@@ -248,6 +250,7 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
     style.textContent = CSS;
     shadow.append(style);
     media = createMediaController(doc, (message) => editing?.error(message), (stats) => { if (host) host.dataset.wwMediaStats = JSON.stringify(stats); });
+    models = createModelRenderer(doc, (message) => editing?.error(message), (stats) => { if (host) host.dataset.wwModelStats = JSON.stringify(stats); });
     effects = createEffectController(doc, playback, timeline, applyLayout);
     imageLayer = doc.createElement('div'); imageLayer.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:0'; shadow.append(imageLayer);
     groupFrame = doc.createElement('div'); groupFrame.className = 'group-frame'; groupFrame.hidden = true; shadow.append(groupFrame);
@@ -267,6 +270,8 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
   const destroy = () => {
     if (!host && nodes.size === 0) { images = []; groups = []; return; }
     effects?.destroy(); effects = undefined;
+    nodes.forEach((entry) => entry.media.destroy());
+    models?.destroy(); models = undefined;
     media?.destroy(); media = undefined;
     gesture = undefined;
     if (frame !== undefined) view.cancelAnimationFrame(frame);
@@ -308,7 +313,7 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
           const node = doc.createElement('div');
           node.className = 'image'; node.dataset.imageId = item.id;
           node.setAttribute('role', 'img'); node.setAttribute('aria-label', item.name);
-          const content = media!.attach(node);
+          const content = item.kind === 'model3d' ? models!.attach(node) : media!.attach(node);
           const controls = doc.createElement('div'); controls.className = 'selection-frame'; controls.dataset.frameId = item.id;
           for (const [mode, label] of [['nw', '左上でサイズ変更'], ['ne', '右上でサイズ変更'], ['sw', '左下でサイズ変更'], ['se', '右下でサイズ変更'], ['rotate', '画像を回転']]) {
             const handle = doc.createElement('button'); handle.type = 'button'; handle.className = 'handle';

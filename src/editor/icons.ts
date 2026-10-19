@@ -3,6 +3,7 @@ export function icon(name: string): string {
   const paths: Record<string, string> = {
     image: '<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1"/><path d="m3 17 6-6 4 4 3-3 5 5"/>',
     animation: '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="m10 8 6 4-6 4Z"/>',
+    model3d: '<path d="m12 2 9 5v10l-9 5-9-5V7Zm0 10 9-5M12 12 3 7m9 5v10"/>',
     group: '<path d="M3 7V5h7l2 2h9v13H3Z"/>',
     visible: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
     hidden: '<path d="m3 3 18 18M9 5c7-2 13 7 13 7l-3 4M6 6l-4 6s4 7 10 7l3-1"/>',
