@@ -1,4 +1,4 @@
-import { AnimationMixer, LoopOnce, LoopRepeat, PropertyBinding, type AnimationAction, type Object3D } from 'three';
+import { AnimationMixer, Euler, Quaternion, LoopOnce, LoopRepeat, PropertyBinding, type AnimationAction, type Object3D } from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import type { ModelSettings } from '../../models/types';
 import type { ModelEvaluation } from '../../world/models';
@@ -20,9 +20,15 @@ export function createRigPlayer(gltf: GLTF, root: Object3D, inPlace: boolean) {
     }
     return clip;
   });
+  const originals: Object3D[] = [], copies: Object3D[] = [], bones = new Map<number, Object3D>();
+  gltf.scene.traverse((o) => originals.push(o)); root.traverse((o) => copies.push(o));
+  originals.forEach((o, i) => { const node = gltf.parser.associations.get(o)?.nodes; if (node !== undefined && copies[i]) bones.set(node, copies[i]!); });
+  let lookNode: Object3D | undefined, beforeLook: Quaternion | undefined;
+  const restoreLook = () => { if (lookNode && beforeLook) lookNode.quaternion.copy(beforeLook); lookNode = undefined; beforeLook = undefined; };
   const actions: AnimationAction[] = clips.map((clip) => mixer.clipAction(clip));
   return {
     paint(frame: ModelEvaluation, model: ModelSettings) {
+      restoreLook();
       actions.forEach((action, index) => {
         const active = index === frame.clip || index === frame.previousClip;
         if (!active) { action.enabled = false; return; }
@@ -33,7 +39,10 @@ export function createRigPlayer(gltf: GLTF, root: Object3D, inPlace: boolean) {
       });
       if (frame.clip === null && frame.previousClip === null) mixer.stopAllAction();
       mixer.update(0);
+      if (model.look.enabled && model.look.bone !== null) {
+        lookNode = bones.get(model.look.bone); if (lookNode) { beforeLook = lookNode.quaternion.clone(); lookNode.quaternion.multiply(new Quaternion().setFromEuler(new Euler(frame.lookPitch * Math.PI / 180, frame.lookYaw * Math.PI / 180, 0, 'YXZ'))); }
+      }
     },
-    destroy() { mixer.stopAllAction(); mixer.uncacheRoot(root); clips.forEach((clip) => mixer.uncacheClip(clip)); },
+    destroy() { restoreLook(); mixer.stopAllAction(); mixer.uncacheRoot(root); clips.forEach((clip) => mixer.uncacheClip(clip)); },
   };
 }

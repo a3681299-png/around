@@ -49,10 +49,29 @@ export function evaluateModels(layout: WorldLayout, previous: Readonly<Record<st
     const blend = next.fadeDurationMs === 0 ? 1 : Math.min(1, next.fadeElapsedMs / next.fadeDurationMs);
     if (blend >= 1) { next.previousClip = null; next.previousTimeMs = 0; }
     const facing = layer.motion?.enabled && layer.motion.orientToMovement && l.faceMovement;
-    const targetYaw = facing && body ? wrap(90 - body.heading) : 0;
+    const targetYaw = facing && body ? speedPx > .001 || before?.yawDeg ? wrap(90 - body.heading) : next.yawDeg : 0;
     const turn = wrap(targetYaw - next.yawDeg);
     if (facing && running) next.yawDeg = wrap(next.yawDeg + turn * (1 - Math.exp(-dt / 120))); else if (!facing) next.yawDeg = 0;
     needsFrame ||= running && Boolean(facing) && Math.abs(turn) > .01;
+    const look = model.look, pointer = input.signals.pointer;
+    let lookYaw = 0, lookPitch = 0;
+    if (look.enabled && look.bone !== null && pointer && entry.position) {
+      const p = layer.placement, angle = p.rotationDeg * Math.PI / 180, dx = pointer.x - entry.position.x, dy = pointer.y - entry.position.y;
+      let x = (dx * Math.cos(angle) + dy * Math.sin(angle)) * 1.5 / p.heightPx, y = (dx * Math.sin(angle) - dy * Math.cos(angle)) * 1.5 / p.heightPx, z = 1.5;
+      // Inverse XYZ model orientation, then local yaw/pitch about the author's bone.
+      const rx = -model.rotationX * Math.PI / 180, ry = -(model.rotationY + next.yawDeg + (l.faceMovement ? l.forwardDeg : 0)) * Math.PI / 180, rz = -model.rotationZ * Math.PI / 180;
+      [y, z] = [y * Math.cos(rx) - z * Math.sin(rx), y * Math.sin(rx) + z * Math.cos(rx)];
+      [x, z] = [x * Math.cos(ry) + z * Math.sin(ry), -x * Math.sin(ry) + z * Math.cos(ry)];
+      [x, y] = [x * Math.cos(rz) - y * Math.sin(rz), x * Math.sin(rz) + y * Math.cos(rz)];
+      lookYaw = Math.max(-look.yawLimit, Math.min(look.yawLimit, Math.atan2(x, z) * 180 / Math.PI));
+      lookPitch = Math.max(-look.pitchLimit, Math.min(look.pitchLimit, -Math.atan2(y, Math.hypot(x, z)) * 180 / Math.PI));
+    }
+    if (!look.enabled || look.bone === null) { next.lookYaw = next.lookPitch = 0; }
+    else if (running) {
+      const amount = look.lagMs === 0 ? 1 : 1 - Math.exp(-dt / look.lagMs);
+      next.lookYaw += (lookYaw - next.lookYaw) * amount; next.lookPitch += (lookPitch - next.lookPitch) * amount;
+      needsFrame ||= Math.abs(lookYaw - next.lookYaw) + Math.abs(lookPitch - next.lookPitch) > .01;
+    }
     next.phase = phase; next.suspended = !running; state[layer.id] = next; evaluations.push({ ...next, id: layer.id, blend, speedPx });
     const duration = clip === null ? 0 : (layer.source.clips[clip]?.duration ?? 0) * 1000;
     needsFrame ||= running && model.playing && (blend < 1 || duration > 0 && (model.loop || next.timeMs < duration));

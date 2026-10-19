@@ -23,18 +23,19 @@ export function createWorldSession(doc: Document, playback: PlaybackSource | und
   let heldSignals: WorldInput['signals'] | undefined;
   const motionActive = () => Boolean(prepared && [...prepared.groups, ...prepared.layers].some((entry) => entry.visible && entry.layer.motion?.enabled));
   const modelActive = () => Boolean(prepared?.layers.some((entry) => entry.renderable && entry.layer.kind === 'model3d' && (entry.layer.model.playing || entry.layer.model.look.enabled)));
+  const lookActive = () => Boolean(prepared?.layers.some((entry) => entry.renderable && entry.layer.kind === 'model3d' && entry.layer.model.look.enabled && entry.layer.model.look.bone !== null));
   const pointerRuleActive = () => Boolean(context?.scene.signalRules?.some((rule) => rule.enabled && rule.source.signal.startsWith('pointer.')));
   const ruleActive = () => Boolean(context?.scene.signalRules?.some((rule) => rule.enabled)) || motionActive() || modelActive();
   const active = (target: WorldEffectTarget) => effectActive(target, evaluatedTargets, state.effects);
   const sources = createSignalSources(doc, playback, (source) => {
-    if (source === 'pointer.position' && !devtools?.active && !timeline?.observing && !timeline?.recording && !pointerRuleActive() && !motionActive() && !wantsPointerFrame(evaluatedTargets, state.effects, sources.snapshot, view.performance.now())) return;
+    if (source === 'pointer.position' && !devtools?.active && !timeline?.observing && !timeline?.recording && !pointerRuleActive() && !motionActive() && !lookActive() && !wantsPointerFrame(evaluatedTargets, state.effects, sources.snapshot, view.performance.now())) return;
     schedule();
   }, () => { if (devtools?.active || timeline?.recording) schedule(); });
   const cancel = () => { if (raf !== undefined) view.cancelAnimationFrame(raf); raf = undefined; };
   const syncSources = (refresh = false) => {
     const authoring = timeline?.observing || timeline?.recording;
     const masks = neededSignals(evaluatedTargets, state.effects, doc.hidden);
-    const needed = timeline?.overriding ? { pointer: false, video: false, scroll: false } : { pointer: !doc.hidden && (masks.pointer || Boolean(devtools?.active || authoring) || pointerRuleActive() || motionActive()), video: !doc.hidden && (masks.video || Boolean(devtools?.active || authoring)), scroll: !doc.hidden && (Boolean(context?.scene.signalRules?.some((rule) => rule.enabled && rule.source.signal === 'page.scroll.progress')) || Boolean(devtools?.active) || Boolean(authoring)) };
+    const needed = timeline?.overriding ? { pointer: false, video: false, scroll: false } : { pointer: !doc.hidden && (masks.pointer || Boolean(devtools?.active || authoring) || pointerRuleActive() || motionActive() || lookActive()), video: !doc.hidden && (masks.video || Boolean(devtools?.active || authoring)), scroll: !doc.hidden && (Boolean(context?.scene.signalRules?.some((rule) => rule.enabled && rule.source.signal === 'page.scroll.progress')) || Boolean(devtools?.active) || Boolean(authoring)) };
     sources.recordClicks(Boolean(timeline?.recording && !doc.hidden));
     if (refresh || needed.pointer !== subscribed.pointer || needed.video !== subscribed.video || needed.scroll !== subscribed.scroll) { subscribed = needed; sources.configure(needed); }
   };

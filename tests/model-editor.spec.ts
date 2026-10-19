@@ -50,3 +50,18 @@ test('arbitrary clips animate pixels, pause, crossfade, change speed and preserv
   const saved = await popup.evaluate(async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'] as DesignDocument);
   expect(saved.decorations[0]).toMatchObject({ model: { clip: 2, speed: 1.5, crossFadeMs: 2000, inPlace: true } });
 });
+
+test('selected head bone adds a bounded look to the paused animated pose and OFF restores its pixels', async ({ popup, youtube }) => {
+  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check(); await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro'); await youtube.bringToFront();
+  await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click()); const panel = youtube.locator('#web-world-themes-creator'); await exposeEditorControls(panel);
+  await panel.locator('.model-file').setInputFiles({ name: 'Look.glb', mimeType: 'model/gltf-binary', buffer: modelFixture() });
+  const media = youtube.locator(`${overlay} .model-media`); await expect(media).toHaveAttribute('data-playback', 'playing');
+  await panel.locator('[data-model="playing"]').uncheck(); await expect(media).toHaveAttribute('data-playback', 'paused');
+  const pixels = () => media.locator('canvas').evaluate((c: HTMLCanvasElement) => c.toDataURL()), initial = await pixels();
+  await panel.locator('.model-look summary').click(); await panel.getByLabel('視線ボーン', { exact: true }).selectOption('3'); await panel.locator('[data-model="look.enabled"]').check();
+  await withCanvas(youtube, () => youtube.mouse.move(850, 230));
+  const pose = () => media.evaluate((m: HTMLElement) => JSON.parse(m.dataset.modelFrame!) as ModelEvaluation);
+  await expect.poll(async () => Math.abs((await pose()).lookYaw)).toBeGreaterThan(10); expect(Math.abs((await pose()).lookYaw)).toBeLessThanOrEqual(50);
+  await expect.poll(pixels).not.toBe(initial);
+  await panel.locator('[data-model="look.enabled"]').uncheck(); await expect.poll(async () => (await pose()).lookYaw).toBe(0); await expect.poll(pixels).toBe(initial);
+});

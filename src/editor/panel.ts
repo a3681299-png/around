@@ -302,7 +302,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       const animations = state.images.filter((image) => image.kind === 'animation').length;
       const selectedAnimations = selectedMedia.filter((image) => image.kind === 'animation').length;
       get<HTMLButtonElement>('.delete-image').disabled = !unlocked || state.saving;
-      get<HTMLButtonElement>('.duplicate-image').disabled = !unlocked || state.saving || state.images.length + selectedMedia.length > IMAGE_LIMITS.count || animations + selectedAnimations > ANIMATION_LIMITS.count || state.groups.length + selectedLayers.filter((layer) => layer.kind === 'group').length > GROUP_LIMITS.count;
+      get<HTMLButtonElement>('.duplicate-image').disabled = !unlocked || state.saving || state.images.length + selectedMedia.length > IMAGE_LIMITS.count || animations + selectedAnimations > ANIMATION_LIMITS.count || state.images.filter((i) => i.kind === 'model3d').length + selectedMedia.filter((i) => i.kind === 'model3d').length > 8 || state.groups.length + selectedLayers.filter((layer) => layer.kind === 'group').length > GROUP_LIMITS.count;
       get<HTMLButtonElement>('.group-layers').disabled = state.saving || Boolean(state.groupingReason);
       get<HTMLButtonElement>('.group-layers').hidden = isGroup;
       get<HTMLButtonElement>('.ungroup-layers').hidden = !isGroup;

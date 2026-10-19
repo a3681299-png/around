@@ -33,3 +33,16 @@ test('pursuit and clip/heading histories replay and reverse-seek exactly, includ
   for (const n of [179, 50, 80, 0, 140]) expect(sampler.at(take.inputs[n]!.timeMs).frame).toEqual(frames[n]);
   expect(frames[80]!.models![0]!.timeMs).toBe(frames[79]!.models![0]!.timeMs);
 });
+
+test('authored bone look uses shared pointer/anchor coordinates, clamps, smooths and deterministically freezes', () => {
+  const { scene, layer, input } = scenario(); delete layer.motion; layer.model.playing = false; layer.model.locomotion.enabled = false;
+  layer.model.look = { enabled: true, bone: 3, yawLimit: 35, pitchLimit: 20, lagMs: 160 };
+  let state = initialWorldState(), result = evaluateWorld(scene, state, input(0)); state = result.state;
+  expect(result.frame.models![0]!.lookYaw).toBe(0);
+  for (let n = 1; n <= 120; n++) { result = evaluateWorld(scene, state, input(n)); state = result.state; }
+  expect(Math.abs(result.frame.models![0]!.lookYaw)).toBeLessThanOrEqual(35); expect(result.frame.models![0]!.lookYaw).toBeGreaterThan(10);
+  expect(Math.abs(result.frame.models![0]!.lookPitch)).toBeLessThanOrEqual(20); expect(result.frame.needsFrame).toBe(false);
+  const frozen = evaluateWorld(scene, state, { ...input(130), environment: { hidden: true, reducedMotion: false } });
+  expect(frozen.frame.models![0]!.lookYaw).toBe(result.frame.models![0]!.lookYaw);
+  const restored = evaluateWorld(scene, state, input(130)); expect(restored).toEqual(evaluateWorld(scene, state, input(130)));
+});

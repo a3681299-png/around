@@ -20,6 +20,13 @@ export function createModelPanel(doc: Document, change: (patch: ImagePatch) => v
       <div class="property row"><label>歩く速さ <input type="number" data-model="locomotion.walkSpeed" aria-label="歩行しきい値" min="0.1" max="10000" step="0.1">px/s</label><label>走る速さ <input type="number" data-model="locomotion.runSpeed" aria-label="走行しきい値" min="0.1" max="10000" step="0.1">px/s</label></div>
       <div class="property"><label><input type="checkbox" data-model="locomotion.faceMovement">3Dで進む向きに回転</label></div>
       <div class="property"><label>正面の補正 <input type="number" data-model="locomotion.forwardDeg" aria-label="モデル正面の補正" min="-180" max="180" step="1">°</label></div>
+    </details>
+    <details class="model-look"><summary>頭・首の視線</summary>
+      <div class="property"><label><input type="checkbox" data-model="look.enabled">カーソルへ顔を向ける</label></div>
+      <div class="property"><label>ボーン <select data-model="look.bone" aria-label="視線ボーン"></select></label></div>
+      <div class="property row"><label>左右 <input type="number" data-model="look.yawLimit" aria-label="視線の左右制限" min="0" max="90" step="1">°</label><label>上下 <input type="number" data-model="look.pitchLimit" aria-label="視線の上下制限" min="0" max="80" step="1">°</label></div>
+      <div class="property"><label>遅延 <input type="number" data-model="look.lagMs" aria-label="視線の遅延" min="0" max="5000" step="10">ms</label></div>
+      <p class="model-help">ボーンのローカルYが上、Zが正面のリグ向け。アニメーションのポーズに加算します。モデルに合わない場合はOFFにしてください。</p>
     </details>`;
   let current: ModelDecoration | undefined;
   fieldset.addEventListener('input', (event) => {
@@ -34,6 +41,11 @@ export function createModelPanel(doc: Document, change: (patch: ImagePatch) => v
     fieldset.hidden = layer?.kind !== 'model3d'; current = layer?.kind === 'model3d' ? layer : undefined; if (!current) return;
     const model = current.model;
     for (const clip of fieldset.querySelectorAll<HTMLSelectElement>('select')) {
+      if (clip.dataset.model === 'look.bone') {
+        const signature = JSON.stringify(current.source.bones); if (clip.dataset.source === signature) continue; clip.dataset.source = signature; clip.replaceChildren();
+        const empty = doc.createElement('option'); empty.value = 'none'; empty.textContent = '頭や首のボーンを選択'; clip.append(empty);
+        current.source.bones.forEach((b) => { const option = doc.createElement('option'); option.value = String(b.node); option.textContent = `${b.name || 'Bone'} · #${b.node}`; clip.append(option); }); continue;
+      }
       const signature = JSON.stringify(current.source.clips); if (clip.dataset.source === signature) continue;
       clip.dataset.source = signature; clip.replaceChildren(); const empty = doc.createElement('option'); empty.value = 'none'; empty.textContent = clip.dataset.model === 'clip' ? '静止ポーズ' : '基本クリップを使う'; clip.append(empty);
       current.source.clips.forEach((c, i) => { const option = doc.createElement('option'); option.value = String(i); option.textContent = `${c.name || `Clip ${i + 1}`} · ${c.duration.toFixed(2)}s`; clip.append(option); });
