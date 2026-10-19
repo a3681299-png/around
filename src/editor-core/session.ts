@@ -94,7 +94,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     }
     const next = parseDesign(draft);
     const { playback, model, ...properties } = patch;
-    next.decorations = next.decorations.map((image) => image.id !== id ? image : image.kind === 'model3d' ? { ...image, ...properties, placement: { ...image.placement, ...patch.placement }, model: { ...image.model, ...model } } : image.kind === 'animation'
+    next.decorations = next.decorations.map((image) => image.id !== id ? image : image.kind === 'model3d' ? { ...image, ...properties, placement: { ...image.placement, ...patch.placement }, model: { ...image.model, ...model, locomotion: { ...image.model.locomotion, ...model?.locomotion }, look: { ...image.model.look, ...model?.look } } } : image.kind === 'animation'
       ? { ...image, ...properties, placement: { ...image.placement, ...patch.placement }, playback: { ...image.playback, ...playback } }
       : { ...image, ...properties, placement: { ...image.placement, ...patch.placement } });
     updateDraft(next);

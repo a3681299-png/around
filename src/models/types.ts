@@ -50,3 +50,5 @@ export function parseModelSettings(value: unknown, info: ModelInfo): ModelSettin
     locomotion: { enabled: bool(l['enabled']), idle: clip(l['idle']), walk: clip(l['walk']), run: clip(l['run']), walkSpeed, runSpeed, faceMovement: bool(l['faceMovement']), forwardDeg: numeric(l['forwardDeg'], -180, 180) },
     look: { enabled: bool(look['enabled']), bone: bone as number | null, yawLimit: numeric(look['yawLimit'], 0, 90), pitchLimit: numeric(look['pitchLimit'], 0, 80), lagMs: numeric(look['lagMs'], 0, 5000) } };
 }
+
+export type ModelPatch = Partial<Omit<ModelSettings, 'locomotion' | 'look'>> & { locomotion?: Partial<ModelSettings['locomotion']>; look?: Partial<ModelSettings['look']> };

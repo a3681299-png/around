@@ -77,7 +77,7 @@ export function createModelRenderer(doc: Document, report: (message: string) => 
         if (w !== i.canvas.width || h !== i.canvas.height) { i.canvas.width = w; i.canvas.height = h; }
         r.setSize(w, h, false); const aspect = w / h;
         i.camera.left = -aspect * .75; i.camera.right = aspect * .75; i.camera.top = .75; i.camera.bottom = -.75; i.camera.updateProjectionMatrix();
-        const m = i.layer.model; i.visual.rotation.set(m.rotationX * Math.PI / 180, m.rotationY * Math.PI / 180, m.rotationZ * Math.PI / 180);
+        const m = i.layer.model; i.visual.rotation.set(m.rotationX * Math.PI / 180, (m.rotationY + (i.evaluation?.yawDeg ?? 0) + (m.locomotion.faceMovement ? m.locomotion.forwardDeg : 0)) * Math.PI / 180, m.rotationZ * Math.PI / 180);
         if (i.inPlace !== m.inPlace || !i.player) { i.player?.destroy(); i.player = createRigPlayer(i.source!, i.root, m.inPlace); i.inPlace = m.inPlace; }
         if (i.evaluation) i.player.paint(i.evaluation, m);
         r.render(i.scene, i.camera);

@@ -1,5 +1,6 @@
 import type { ModelDecoration } from '../design/types';
 import type { WorldInput, WorldLayout } from './types';
+import type { MotionState } from './motion';
 import { object, numeric } from '../models/types';
 
 export interface ModelState {
@@ -26,14 +27,18 @@ function advance(layer: ModelDecoration, clip: number | null, time: number, delt
   return duration <= 0 ? 0 : layer.model.loop ? (time + delta) % duration : Math.min(duration, time + delta);
 }
 /** Explicit clock/state only. Renderer never owns clip time or transitions. */
-export function evaluateModels(layout: WorldLayout, previous: Readonly<Record<string, ModelState>> | undefined, input: WorldInput, visible?: ReadonlySet<string>) {
+export function evaluateModels(layout: WorldLayout, previous: Readonly<Record<string, ModelState>> | undefined, input: WorldInput, visible?: ReadonlySet<string>, motion?: MotionState) {
   const state: Record<string, ModelState> = {}, evaluations: ModelEvaluation[] = []; let needsFrame = false;
   for (const entry of layout.layers) {
     if (entry.layer.kind !== 'model3d') continue;
     const layer = entry.layer, model = layer.model, before = previous?.[layer.id];
     const running = entry.renderable && (!visible || visible.has(layer.id)) && !input.environment.hidden && !input.environment.reducedMotion;
     const dt = running && before && !before.suspended ? input.deltaMs : 0, delta = model.playing ? dt * model.speed : 0;
-    const clip = model.clip;
+    const body = motion?.bodies[layer.id] ?? (entry.parentId ? motion?.bodies[entry.parentId] : undefined);
+    const speedPx = body ? Math.hypot(body.velocity.x, body.velocity.y) : 0, l = model.locomotion;
+    const phase: ModelState['phase'] = !l.enabled ? 'manual' : speedPx >= l.runSpeed || before?.phase === 'run' && speedPx >= l.runSpeed * .9 ? 'run'
+      : speedPx >= l.walkSpeed || before?.phase === 'walk' && speedPx >= l.walkSpeed * .8 ? 'walk' : 'idle';
+    const clip = phase === 'manual' ? model.clip : phase === 'idle' ? l.idle ?? model.clip : phase === 'run' ? l.run ?? l.walk ?? model.clip : l.walk ?? model.clip;
     let next: ModelState = before ? { ...before } : { clip, timeMs: 0, previousClip: null, previousTimeMs: 0, fadeElapsedMs: model.crossFadeMs, fadeDurationMs: model.crossFadeMs, yawDeg: 0, lookYaw: 0, lookPitch: 0, suspended: !running, phase: 'manual' };
     if (clip !== next.clip) next = { ...next, clip, timeMs: 0, previousClip: next.clip, previousTimeMs: advance(layer, next.clip, next.timeMs, delta), fadeElapsedMs: 0, fadeDurationMs: model.playing ? model.crossFadeMs : 0 };
     else {
@@ -43,7 +48,12 @@ export function evaluateModels(layout: WorldLayout, previous: Readonly<Record<st
     }
     const blend = next.fadeDurationMs === 0 ? 1 : Math.min(1, next.fadeElapsedMs / next.fadeDurationMs);
     if (blend >= 1) { next.previousClip = null; next.previousTimeMs = 0; }
-    next.suspended = !running; next.yawDeg = wrap(next.yawDeg); state[layer.id] = next; evaluations.push({ ...next, id: layer.id, blend, speedPx: 0 });
+    const facing = layer.motion?.enabled && layer.motion.orientToMovement && l.faceMovement;
+    const targetYaw = facing && body ? wrap(90 - body.heading) : 0;
+    const turn = wrap(targetYaw - next.yawDeg);
+    if (facing && running) next.yawDeg = wrap(next.yawDeg + turn * (1 - Math.exp(-dt / 120))); else if (!facing) next.yawDeg = 0;
+    needsFrame ||= running && Boolean(facing) && Math.abs(turn) > .01;
+    next.phase = phase; next.suspended = !running; state[layer.id] = next; evaluations.push({ ...next, id: layer.id, blend, speedPx });
     const duration = clip === null ? 0 : (layer.source.clips[clip]?.duration ?? 0) * 1000;
     needsFrame ||= running && model.playing && (blend < 1 || duration > 0 && (model.loop || next.timeMs < duration));
   }

@@ -72,7 +72,7 @@ export interface AnimationDecoration extends LayerState {
 export interface ModelDecoration extends LayerState { kind: 'model3d'; assetId: string; source: import('../models/types').ModelInfo; model: import('../models/types').ModelSettings }
 export type Decoration = ImageDecoration | AnimationDecoration | ModelDecoration;
 
-export type ImagePatch = Partial<Pick<LayerState, 'name' | 'opacity' | 'zIndex' | 'visible' | 'locked' | 'effects' | 'motion'>> & { placement?: Partial<LayerPlacement>; playback?: Partial<PlaybackSettings>; model?: Partial<import('../models/types').ModelSettings> };
+export type ImagePatch = Partial<Pick<LayerState, 'name' | 'opacity' | 'zIndex' | 'visible' | 'locked' | 'effects' | 'motion'>> & { placement?: Partial<LayerPlacement>; playback?: Partial<PlaybackSettings>; model?: import('../models/types').ModelPatch };
 
 export interface DesignTarget {
   readonly id: string;

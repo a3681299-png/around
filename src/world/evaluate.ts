@@ -26,7 +26,7 @@ export function evaluatePreparedWorld(prepared: WorldLayout, previous: WorldStat
   const transformed = dynamic ? evaluateTransforms(prepared, rules, previous.timeMs === null ? { ...input, deltaMs: 0 } : input, previous.motion) : undefined;
   const layout = transformed?.layout ?? (rules.length ? evaluateRuleLayout(prepared, rules, input) : prepared);
   const evaluated = evaluateEffects(layoutEffectTargets(layout), effects, input);
-  const models = layout.layers.some((e) => e.layer.kind === 'model3d') ? evaluateModels(layout, previous.models, previous.timeMs === null ? { ...input, deltaMs: 0 } : input, new Set(evaluated.effects.filter((e) => e.visible).map((e) => e.id))) : undefined;
+  const models = layout.layers.some((e) => e.layer.kind === 'model3d') ? evaluateModels(layout, previous.models, previous.timeMs === null ? { ...input, deltaMs: 0 } : input, new Set(evaluated.effects.filter((e) => e.visible).map((e) => e.id)), transformed?.state) : undefined;
   const machine = { video: input.signals.playing ? 'playing' as const : 'paused' as const,
     events: input.events.map((event) => event.type === 'pointer.click' ? { ...event, point: { ...event.point } } : { ...event }) };
   return { state: { runtimeVersion: WORLD_RUNTIME_VERSION, timeMs: input.timeMs, effects: evaluated.state, machine, ...(transformed ? { motion: transformed.state } : {}), ...(models ? { models: models.state } : {}) },
