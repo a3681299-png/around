@@ -237,6 +237,12 @@ test('official panel records raw signals, plays/seeks without live input, and re
     expect(take.inputs.length).toBeGreaterThan(5); expect(take.inputs.every((input) => input.signals.scroll && input.viewport.width > 0)).toBe(true);
     expect(JSON.stringify(take)).not.toMatch(/PRIVATE_TIMELINE_FORM_SECRET|asset-|decorations|signalRules|https?:|cookie|authorization/);
     const design = await popup.evaluate(async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'] as DesignDocument); expect(design).not.toHaveProperty('takes');
+    await expect.poll(() => panel.evaluate(`${ui}.querySelectorAll('.take-ghost').length`)).toBeGreaterThan(3);
+    expect(await panel.evaluate(`${ui}.querySelectorAll('.take-projection').length`)).toBe(1);
+    await panel.evaluate(`${ui}.querySelector('.take-ghost[data-ghost-key="key-middle"]').dispatchEvent(new MouseEvent('click',{bubbles:true}))`);
+    expect(await panel.evaluate(`${ui}.querySelector('.timeline-view').value`)).toBe('signal');
+    expect(await panel.evaluate(`${ui}.querySelector('.timeline-key[data-selected]').dataset.keyId`)).toBe('key-middle');
+    expect(await panel.text('.dirty')).toBe('保存済み'); await panel.fill('.timeline-view', 'take');
     const sample = take.inputs.find((input) => input.signals.scroll && input.signals.scroll.y / input.signals.scroll.maxY > .4 && input.signals.scroll.y / input.signals.scroll.maxY < .6)!; expect(sample).toBeDefined();
     const position = sample.timeMs - take.inputs[0]!.timeMs, expected = createTakeSampler(design, take).at(position).frame.layout.layers[0]!.layer.opacity;
     await panel.fill('.take-position', String(position / 1000));

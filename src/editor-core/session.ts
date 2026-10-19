@@ -350,7 +350,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
   async function restore(value: EditorCheckpoint) {
     if (!active || saving || importing || value.version !== 1 || value.siteId !== ports.siteId) throw new Error('この編集セッションに復元できません。');
     const restoringSession = sessionId;
-    const next = parseDesign(value.draft);
+    const next = parseDesign(value.draft), restoredSaved = value.saved === undefined ? undefined : parseDesign(value.saved);
     if (value.tool !== undefined && !['select', 'browse', 'card'].includes(value.tool)) throw new Error('復旧ツールが不正です。');
     if (next.siteId !== ports.siteId || !Array.isArray(value.selectedIds) || value.selectedIds.length > 48 || value.selectedIds.some((id) => typeof id !== 'string') || typeof value.snapping !== 'boolean'
       || value.selectedTarget !== undefined && !ports.targets.some((target) => target.id === value.selectedTarget)) throw new Error('復旧データが不正です。');
@@ -362,7 +362,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     history.restore(restored.checkpoint()); if (history.active) history.commit(next);
     draft = next; selectedImageIds = normalizeSelection(value.selectedIds, draft.decorations, draft.groups ?? []); selectedTarget = value.selectedTarget; snapping = value.snapping; tool = value.tool ?? 'select';
     dirty = !sameDesign(draft, initial()); interactionEpoch++;
-    error = !sameDesign(value.saved, saved); status = error ? '復旧中に保存済みデザインが変わりました。プレビューを保持しています。保存すると上書きし、破棄すると最新の保存値に戻ります。' : '編集セッションとUndo履歴を復元しました。'; render(); settleAssets();
+    error = !sameDesign(restoredSaved, saved); status = error ? '復旧中に保存済みデザインが変わりました。プレビューを保持しています。保存すると上書きし、破棄すると最新の保存値に戻ります。' : '編集セッションとUndo履歴を復元しました。'; render(); settleAssets();
   }
   let unwatch = storage.watch(accept, onStorageError);
   return { open, execute, snapshot, checkpoint, restore, import: addImages,

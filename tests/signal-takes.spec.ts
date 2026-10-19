@@ -1,10 +1,11 @@
 import { test, expect } from '@playwright/test';
-import { createTakeSampler, parseSignalTake, takeDuration, TAKE_LIMITS, type SignalTake } from '../src/world/takes';
+import { createTakeSampler, parseSignalTake, projectGhosts, sampleTakeInput, takeDuration, TAKE_LIMITS, type SignalTake } from '../src/world/takes';
 import { evaluateWorld, initialWorldState } from '../src/world/evaluate';
 import { WORLD_RUNTIME_VERSION, type WorldScene } from '../src/world/types';
 import { defaultScrollOpacityRule } from '../src/signals/keyframes';
 import { worldScenario } from './helpers/world-scenario';
 import { parseTimelineCommand } from '../src/timeline/types';
+import { ruleInput, scrollProgress } from '../src/world/keyframes';
 
 export function sampleTake(): { take: SignalTake; scene: WorldScene } {
   const { scene, inputs } = worldScenario(6); scene.decorations.forEach((layer) => { layer.visible = true; layer.opacity = 1; }); scene.groups!.forEach((group) => { group.visible = true; group.opacity = 1; });
@@ -36,4 +37,26 @@ test('takes re-evaluate edited rules without pinning old artwork; layout and opa
   scene.signalRules![0]!.keyframes.forEach((key) => { key.value = .25; });
   const changed = createTakeSampler(scene, take).at(720); expect(changed.frame.layout.layers[0]!.layer.opacity).toBe(.25); expect(old.frame.layout.layers[0]!.layer.opacity).not.toBe(.25);
   expect(JSON.stringify(take)).toBe(before);
+});
+
+test('ghosts project all forward/back crossings, custom input ranges and plateaus without saving keys', () => {
+  const { take, scene } = sampleTake(), rule = scene.signalRules![0]!, before = JSON.stringify({ take, rule });
+  const ghosts = projectGhosts(take, rule); expect(ghosts).toHaveLength(4);
+  expect(ghosts.filter((key) => key.keyId === 'key-middle').map((key) => key.timeMs)).toEqual([720, 2160]);
+  for (const ghost of ghosts) expect(ruleInput(rule, sampleTakeInput(take, ghost.timeMs).signals)).toBeCloseTo(ghost.input, 9);
+  const custom = { ...rule, source: { ...rule.source, inputRange: [.2, .8] as [number, number] } };
+  expect(projectGhosts(take, custom)).toHaveLength(6); expect(projectGhosts(take, { ...custom, enabled: false })).toEqual([]);
+  expect(JSON.stringify({ take, rule })).toBe(before);
+  const plateau = structuredClone(take); plateau.inputs.forEach((input) => { input.signals.scroll!.y = 1000; });
+  expect(projectGhosts(plateau, rule)).toEqual([{ keyId: 'key-middle', input: .5, timeMs: 0 }]);
+});
+
+test('projection interpolates raw context correctly when page height changes and handles non-scrollable input', () => {
+  const { take, scene } = sampleTake(), rule = scene.signalRules![0]!;
+  const small = { ...take, inputs: [0, 1000].map((timeMs, index) => ({ ...take.inputs[index]!, timeMs, deltaMs: timeMs, signals: { ...take.inputs[index]!.signals, scroll: { x: 0, y: index * 200, maxX: 0, maxY: 100 + index * 100 } } })) };
+  const middle = projectGhosts(small, rule).find((ghost) => ghost.keyId === 'key-middle')!;
+  expect(middle.timeMs).toBeCloseTo(1000 / 3, 9); expect(scrollProgress(sampleTakeInput(small, middle.timeMs).signals)).toBeCloseTo(.5, 9);
+  small.inputs.forEach((input) => { input.signals.scroll!.maxY = 0; input.signals.scroll!.y = 0; });
+  expect(projectGhosts(small, rule)).toEqual([{ keyId: 'key-start', input: 0, timeMs: 0 }]);
+  expect(scrollProgress(sampleTakeInput(small, 500).signals)).toBe(0);
 });

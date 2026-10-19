@@ -44,10 +44,10 @@ export async function sidePanelDriver(context: BrowserContext, page: Page, exten
       if (waitAfter) await settle();
     },
     async fill(selector: string, value: string) { await settle(); await evaluate(`(()=>{const n=${query(selector)};n.value=${JSON.stringify(value)};n.dispatchEvent(new Event('input',{bubbles:true}));n.dispatchEvent(new Event('change',{bubbles:true}));})()`); await settle(); },
-    async files(paths: string[]) {
+    async files(paths: string[], selector = '.file') {
       await settle();
       await expect.poll(() => evaluate('document.querySelector(".connection-status")?.dataset.connected === "true" && document.querySelector("#web-world-themes-creator")?.shadowRoot.querySelector(".add-image")?.disabled === false')).toBe(true);
-      const { result } = await send('Runtime.evaluate', { expression: query('.file') });
+      const { result } = await send('Runtime.evaluate', { expression: query(selector) });
       await send('DOM.setFileInputFiles', { objectId: result.objectId, files: paths });
       await send('Runtime.releaseObject', { objectId: result.objectId });
     },

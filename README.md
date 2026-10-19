@@ -184,3 +184,5 @@ Chromeの仕様は[Content scripts](https://developer.chrome.com/docs/extensions
 一覧のチェック → グループ化 → プロパティの光とマスク／振る舞い → 保存、の順に制作できます。独立Studio・「従来のインページStudio（切り戻し）」・クイック編集も同じCoreを使います。切替は未保存作品とUndo履歴を維持します。旧インページ方式はブラウザー幅とCSSの予約幅が一致しない制約があるため、通常は公式パネルを使ってください。
 
 [公式パネルの設計・操作](docs/side-panel-studio.md)、[比較画像・検証結果](docs/side-panel-studio-verification.md)を参照してください。拡張を更新後、専用worktreeの `.work/creator-editor/dist` を再読み込みします。今回の追加権限は許可された `sidePanel` のみです。通常版のdistとmainは更新しません。
+
+Signal Timeline v1は、レイヤーを選んで下端の **Signal Timeline → スクロールに接続** から使えます。0%・50%・100%のキーで不透明度を編集し、実スクロールへ追従させられます。明示録画した操作をテイクとして別保存し、再生・逆再生・シーク、波形とルールの投影を確認できます。キーを触った後のPREVIEWからはライブアイコンでLIVEへ戻ります。[設計・操作・制限](docs/signal-timeline-v1.md)、[実サイト・自動テスト・性能の記録](docs/signal-timeline-verification.md)を参照してください。作品はv8へ移行し、旧v1〜v7の読み込みを維持します。

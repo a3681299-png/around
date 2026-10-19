@@ -1,0 +1,160 @@
+{
+  "core": {
+    "measuredAt": "2026-10-19T02:30:05.053Z",
+    "runtimeVersion": "1.1.0",
+    "node": "v24.16.0",
+    "platform": "win32 x64",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13650HX",
+    "scene": {
+      "media": 32,
+      "groups": 16,
+      "masks": 48,
+      "rules": 48
+    },
+    "evaluation": {
+      "inputSteps": 180,
+      "warmupRounds": 20,
+      "measuredRounds": 50,
+      "withoutRules": {
+        "samples": 9000,
+        "medianMs": 0.02,
+        "p95Ms": 0.044,
+        "meanMs": 0.025
+      },
+      "withRules": {
+        "samples": 9000,
+        "medianMs": 0.029,
+        "p95Ms": 0.068,
+        "meanMs": 0.037
+      }
+    },
+    "seek": {
+      "samples": 3600,
+      "durationMs": 179950,
+      "jsonCharacters": 1198733,
+      "prepareMs": 12.343099999999936,
+      "coldEndSeekMs": 144.3006999999999,
+      "warmRandom": {
+        "samples": 512,
+        "medianMs": 0.56,
+        "p95Ms": 1.535,
+        "meanMs": 0.645
+      },
+      "stateCheckpoints": 113,
+      "cacheStride": 32
+    },
+    "projection": {
+      "ghosts": 80,
+      "timeMs": 5.851899999999887
+    },
+    "checksum": 16643.12314299963,
+    "excludes": [
+      "DOM/style/layout/paint",
+      "GPU",
+      "media decoding",
+      "browser/communication scheduling",
+      "process memory and CPU utilization"
+    ]
+  },
+  "isolation": {
+    "main": "022a576e5fb486b5c2fe5632feee66fcb018c953",
+    "rootDistFiles": 12,
+    "branch": "codex/creator-editor-spike",
+    "rootDistHashesUnchanged": true
+  },
+  "legacyParity": {
+    "measuredAt": "2026-10-19T02:30:09.621Z",
+    "runtimeVersion": "1.1.0",
+    "node": "v24.16.0",
+    "platform": "win32 x64",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13650HX",
+    "baseline": "1d23ec0 draw/paint numeric reference with equivalent returned data; shared unchanged geometry and mask primitives",
+    "excludes": [
+      "DOM/layout/style application",
+      "decoding",
+      "GPU",
+      "browser scheduling"
+    ],
+    "workloads": [
+      {
+        "label": "mixed-visibility",
+        "media": 32,
+        "groups": 16,
+        "inputSteps": 180,
+        "warmupRounds": 20,
+        "measuredRounds": 50,
+        "legacy": {
+          "samples": 9000,
+          "medianUs": 49.7,
+          "p95Us": 79.8,
+          "meanUs": 55.112
+        },
+        "runtime": {
+          "samples": 9000,
+          "medianUs": 47.6,
+          "p95Us": 68.8,
+          "meanUs": 51.846
+        },
+        "medianRatio": 0.958
+      },
+      {
+        "label": "all-visible",
+        "media": 32,
+        "groups": 16,
+        "inputSteps": 180,
+        "warmupRounds": 20,
+        "measuredRounds": 50,
+        "legacy": {
+          "samples": 9000,
+          "medianUs": 84.3,
+          "p95Us": 179.6,
+          "meanUs": 93.075
+        },
+        "runtime": {
+          "samples": 9000,
+          "medianUs": 79.7,
+          "p95Us": 173.9,
+          "meanUs": 89.289
+        },
+        "medianRatio": 0.945
+      }
+    ],
+    "checksum": 22435.200000000103
+  },
+  "scroll": {
+    "browser": "153.0.8010.12",
+    "media": 32,
+    "groupMasks": 16,
+    "rules": 32,
+    "scrollSteps": 120,
+    "before": {
+      "evaluations": 240,
+      "totalMs": 12.2999999942258,
+      "medianMs": 0,
+      "p95Ms": 0.19999999925494194
+    },
+    "coalesced": {
+      "evaluations": 120,
+      "totalMs": 17.800000003539026,
+      "medianMs": 0.10000000055879354,
+      "p95Ms": 0.2999999998137355
+    },
+    "includes": "numeric World evaluation only, isolated-world performance.now",
+    "excludes": "DOM writes, layout, paint, GPU, decoding, browser wait; timer precision applies"
+  },
+  "samplerBeforeGeometryReuse": {
+    "samples": 3600,
+    "durationMs": 179950,
+    "jsonCharacters": 1198733,
+    "prepareMs": 10.236799999999903,
+    "coldEndSeekMs": 265.70270000000005,
+    "warmRandom": {
+      "samples": 512,
+      "medianMs": 1.086,
+      "p95Ms": 2.254,
+      "meanMs": 1.157
+    },
+    "stateCheckpoints": 113,
+    "cacheStride": 32
+  }
+}

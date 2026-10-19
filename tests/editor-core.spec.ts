@@ -86,6 +86,17 @@ test('shared shortcuts preserve modifier meanings and composing input is ignored
   expect(shortcutCommand({ ...input, key: 'Delete', isComposing: true }, state)).toBeUndefined();
 });
 
+test('legacy v7 saved checkpoints migrate before conflict comparison and failed migration cannot mutate a draft', async () => {
+  const a = await opened(); await a.editor.execute({ type: 'save' });
+  const legacy = JSON.parse(JSON.stringify(a.editor.checkpoint()).replaceAll('"schemaVersion":8', '"schemaVersion":7')) as EditorCheckpoint, before = JSON.stringify(legacy);
+  const b = harness(); await Promise.resolve(); b.set(legacy.saved!); b.editor.setEnabled(true); b.editor.open(); await b.editor.restore(legacy);
+  expect(b.editor.snapshot().document.schemaVersion).toBe(8); expect(b.editor.snapshot().view.dirty).toBe(false); expect(b.editor.snapshot().view.error).toBe(false);
+  expect(JSON.stringify(legacy)).toBe(before);
+  const invalid = structuredClone(legacy); Object.assign(invalid.saved!, { schemaVersion: 9 }); const current = b.editor.snapshot().document;
+  await expect(b.editor.restore(invalid)).rejects.toThrow(); expect(b.editor.snapshot().document).toEqual(current);
+  a.editor.destroy(); b.editor.destroy();
+});
+
 test('Host geometry notifications update views without invalidating document command revisions', async () => {
   const { editor } = await opened(); let notifications = 0; const off = editor.subscribe(() => notifications++);
   const before = editor.snapshot(); editor.refreshGeometry(); editor.refreshGeometry(); editor.setEnabled(true);

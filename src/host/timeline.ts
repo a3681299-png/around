@@ -13,14 +13,19 @@ export function createTimelineHost(doc: Document, siteId: string, storage: TakeS
   let take: SignalTake | undefined, library: TakeSummary[] = [], saved = false, message = '', error = false;
   let mode: 'live' | 'recording' | 'playing' | 'paused' = 'live', source: 'live' | 'take' | 'signal' = 'live', progress = 0, positionMs = 0, rate = 1, signalPosition = 0;
   let timer: ReturnType<typeof setTimeout> | undefined, originClock = 0, originPosition = 0, lastPublish = -Infinity, changed = false, operationEpoch = 0;
+  let publishTimer: ReturnType<typeof setTimeout> | undefined;
   let lastCaptured = -Infinity, pendingInput: WorldInput | undefined, pendingEvents: WorldEvent[] = [], recordedChars = 0, recordingId = '';
   let sampler: ReturnType<typeof createTakeSampler> | undefined, samplerScene: WorldScene | undefined;
   let persistentSignature = '';
   const status = () => ({ available: Boolean(binding), mode, source, timeMs: positionMs, durationMs: mode === 'recording' ? positionMs : take ? takeDuration(take) : 0, samples: mode === 'recording' ? recorder.status().frames : take?.inputs.length ?? 0, progress, rate, saved, message, error });
   const snapshot = (includeTake = false): TimelineUpdate => ({ status: status(), ...(includeTake ? { take: take ?? null, library } : {}) });
-  const emit = (includeTake = false, force = true) => { const now = view.performance.now(); if (!force && now - lastPublish < 100) return; lastPublish = now; const update = snapshot(includeTake); listeners.forEach((listener) => listener(update)); };
+  const emit = (includeTake = false, force = true) => {
+    const now = view.performance.now();
+    if (!force && now - lastPublish < 100) { publishTimer ??= setTimeout(() => { publishTimer = undefined; emit(false); }, 100 - (now - lastPublish)); return; }
+    clearTimeout(publishTimer); publishTimer = undefined; lastPublish = now; const update = snapshot(includeTake); listeners.forEach((listener) => listener(update));
+  };
   const refresh = () => { if (changed) return; changed = true; queueMicrotask(() => { changed = false; binding?.refresh(); }); };
-  const cancel = () => { clearTimeout(timer); timer = undefined; };
+  const cancel = () => { clearTimeout(timer); timer = undefined; clearTimeout(publishTimer); publishTimer = undefined; };
   function recordInput(scene: WorldScene, input: WorldInput, force = false) {
     if (!recorder.active) return;
     pendingInput = input; pendingEvents.push(...input.events);
@@ -80,7 +85,7 @@ export function createTimelineHost(doc: Document, siteId: string, storage: TakeS
         if (rate > 0 && positionMs >= takeDuration(take)) positionMs = 0; if (rate < 0 && positionMs <= 0) positionMs = takeDuration(take);
         originClock = view.performance.now(); originPosition = positionMs; mode = 'playing'; source = 'take'; message = '記録入力でプレビュー中。実ページの操作は再送しません。'; tick(); emit();
       } else if (value.type === 'seek') { if (!take) throw new Error('テイクがありません。'); if (mode === 'recording') finishRecording(); cancel(); positionMs = Math.max(0, Math.min(takeDuration(take), value.timeMs)); mode = 'paused'; source = 'take'; refresh(); emit(); }
-      else if (value.type === 'preview') { if (mode === 'recording') finishRecording(); cancel(); signalPosition = value.progress; mode = 'paused'; source = 'signal'; message = 'シグナル空間のプレビュー中。ライブに戻すと実スクロールへ追従します。'; refresh(); emit(); }
+      else if (value.type === 'preview') { if (mode === 'recording') finishRecording(); cancel(); signalPosition = progress = value.progress; mode = 'paused'; source = 'signal'; message = 'シグナル空間のプレビュー中。ライブに戻すと実スクロールへ追従します。'; refresh(); emit(); }
     } catch (reason) { error = true; message = reason instanceof Error ? reason.message : 'タイムライン操作に失敗しました。'; emit(); }
   }
   return {

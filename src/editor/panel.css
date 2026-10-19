@@ -189,6 +189,7 @@ footer { flex: none; padding: 10px 12px 9px; border-top: 1px solid #44434f; bord
 .preview-link p { color: #c6bdd4; font-size: 13px; line-height: 1.8; }
 .preview-link button { margin: 10px 0; color: #e0d0ff; border-color: #7d679e; }
 .asset-shelf { max-width: 900px; margin: auto; }
+[data-opacity-driven] input[data-image-prop="opacity"] { display: none; }
 .asset-shelf h3 { font-size: 15px; }
 .asset-library { display: grid; grid-template-columns: repeat(auto-fill, minmax(125px, 1fr)); gap: 12px; margin-top: 20px; }
 .asset-card { display: flex; flex-direction: column; gap: 8px; min-width: 0; text-align: left; padding: 12px; }

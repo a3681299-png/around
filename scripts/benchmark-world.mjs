@@ -13,8 +13,9 @@ export { evaluateWorld, initialWorldState } from './src/world/evaluate';
 export { legacyWorld } from './src/renderers/dom/legacy-evaluation';
 export { assertWorldParity } from './src/renderers/dom/parity';
 export { worldScenario } from './tests/helpers/world-scenario';
+export { WORLD_RUNTIME_VERSION } from './src/world/types';
 ` }, bundle: true, platform: 'node', format: 'esm', outfile: output, logLevel: 'silent' });
-const { evaluateWorld, initialWorldState, legacyWorld, assertWorldParity, worldScenario } = await import(pathToFileURL(output));
+const { evaluateWorld, initialWorldState, legacyWorld, assertWorldParity, worldScenario, WORLD_RUNTIME_VERSION } = await import(pathToFileURL(output));
 const rounds = 50, warmup = 20;
 let checksum = 0;
 const workloads = [];
@@ -53,7 +54,7 @@ for (const label of ['mixed-visibility', 'all-visible']) {
   workloads.push({ label, media: 32, groups: 16, inputSteps: inputs.length, warmupRounds: warmup, measuredRounds: rounds,
     legacy, runtime, medianRatio: Math.round(runtime.medianUs / legacy.medianUs * 1000) / 1000 });
 }
-const report = { measuredAt: new Date().toISOString(), runtimeVersion: '1.0.0', node: process.version, platform: `${platform()} ${arch()}`, cpu: cpus()[0]?.model,
+const report = { measuredAt: new Date().toISOString(), runtimeVersion: WORLD_RUNTIME_VERSION, node: process.version, platform: `${platform()} ${arch()}`, cpu: cpus()[0]?.model,
   baseline: '1d23ec0 draw/paint numeric reference with equivalent returned data; shared unchanged geometry and mask primitives',
   excludes: ['DOM/layout/style application', 'decoding', 'GPU', 'browser scheduling'], workloads, checksum };
 await writeFile(path.join(work, 'world-benchmark.json'), JSON.stringify(report, null, 2) + '\n');

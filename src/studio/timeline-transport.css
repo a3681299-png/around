@@ -17,7 +17,13 @@
 .take-saved { color: var(--ui-muted); font-size: 9px; white-space: nowrap; }
 .timeline-take-scroll { flex: 1; min-height: 105px; overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; }
 .take-canvas { height: 140px; position: relative; touch-action: none; }
-.take-canvas svg { width: 100%; height: 140px; }
+.take-canvas svg { width: 100%; height: 100%; }
 .take-canvas text { fill: #a3a5ae; font: 10px system-ui, sans-serif; }
 .take-wave { fill: none; stroke: #83cabb; stroke-width: 1.5; }
+.take-canvas .take-wave-label { fill: #83cabb; }
+.take-canvas .take-projection-label { fill: #c8b8ed; }
+.take-ghost { cursor: pointer; }
+.take-ghost > path { fill: #b6a4e5; fill-opacity: .38; stroke: #d4c5f5; stroke-opacity: .65; }
+.take-ghost:hover > path, .take-ghost:focus > path { fill-opacity: 1; stroke: white; stroke-opacity: 1; }
+.take-ghost:focus { outline: none; }
 @media (max-width: 620px) { .take-saved { display: none; } .signal-timeline:has(.take-transport) .timeline-connection { display: none; } }

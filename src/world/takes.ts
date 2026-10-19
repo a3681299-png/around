@@ -1,7 +1,9 @@
 import { parseWorldInput, parseWorldState } from './recording';
-import { evaluateWorld } from './evaluate';
+import { evaluateWorld, evaluatePreparedWorld } from './evaluate';
+import { evaluateLayout } from './layout';
 import { WORLD_RUNTIME_VERSION, type WorldInput, type WorldScene, type WorldState } from './types';
-import { clampUnit } from './keyframes';
+import { clampUnit, scrollProgress } from './keyframes';
+import type { SignalRule } from '../signals/keyframes';
 
 export const TAKE_LIMITS = Object.freeze({ samples: 3600, chars: 4 * 1024 * 1024, durationMs: 180_000, intervalMs: 50, storedCount: 8, storedChars: 16 * 1024 * 1024, ghosts: 4096 });
 /** Inputs only: rules and asset references belong to the artwork, never the take. */
@@ -33,20 +35,66 @@ function between(left: WorldInput, right: WorldInput | undefined, timeMs: number
     ...(p && q ? { pointer: { x: mix(p.x, q.x), y: mix(p.y, q.y) } } : {}),
     ...(a && b ? { scroll: { x: mix(a.x, b.x), y: mix(a.y, b.y), maxX: mix(a.maxX, b.maxX), maxY: mix(a.maxY, b.maxY) } } : {}) } };
 }
-/** Sparse state checkpoints bound reverse/seek work; cached states never include frames. */
+/** Upper bound keeps simultaneous events in their original recorded order. */
+function inputEnd(take: SignalTake, timeMs: number): number {
+  let low = 0, high = take.inputs.length;
+  while (low < high) { const middle = (low + high) >>> 1; if (take.inputs[middle]!.timeMs <= timeMs) low = middle + 1; else high = middle; }
+  return low;
+}
+/** Stateless signal projection, without evaluating the scene or allocating frames. */
+export function sampleTakeInput(take: SignalTake, positionMs: number): WorldInput {
+  const timeMs = take.inputs[0]!.timeMs + Math.max(0, Math.min(takeDuration(take), Number.isFinite(positionMs) ? positionMs : 0));
+  const end = inputEnd(take, timeMs), left = take.inputs[Math.max(0, end - 1)]!;
+  return left.timeMs === timeMs ? left : between(left, take.inputs[end], timeMs, left.timeMs);
+}
+
+export interface GhostKeyframe { keyId: string; timeMs: number; input: number }
+/** Derived crossings only. Changing a take never creates independent artwork keys. */
+export function projectGhosts(take: SignalTake, rule: SignalRule): GhostKeyframe[] {
+  if (!rule.enabled) return [];
+  const ghosts: GhostKeyframe[] = [], seen = new Set<string>(), start = take.inputs[0]!.timeMs;
+  const add = (keyId: string, input: number, timeMs: number) => {
+    const signature = `${keyId}:${timeMs.toFixed(3)}`;
+    if (ghosts.length < TAKE_LIMITS.ghosts && !seen.has(signature)) { seen.add(signature); ghosts.push({ keyId, input, timeMs }); }
+  };
+  for (const key of rule.keyframes) {
+    const progress = rule.source.inputRange[0] + key.input * (rule.source.inputRange[1] - rule.source.inputRange[0]);
+    if (Math.abs(scrollProgress(take.inputs[0]!.signals) - progress) < 1e-9) add(key.id, key.input, 0);
+    for (let index = 1; index < take.inputs.length && ghosts.length < TAKE_LIMITS.ghosts; index++) {
+      const left = take.inputs[index - 1]!, right = take.inputs[index]!, a = left.signals.scroll, b = right.signals.scroll;
+      if (!a || !b || right.timeMs <= left.timeMs) continue;
+      const before = scrollProgress(left.signals), after = scrollProgress(right.signals);
+      if (Math.abs(after - before) < 1e-9 || progress < Math.min(before, after) - 1e-9 || progress > Math.max(before, after) + 1e-9) continue;
+      // Interpolated raw y/range is rational when the page height changes.
+      const divisor = b.y - a.y - progress * (b.maxY - a.maxY);
+      if (Math.abs(divisor) < 1e-12) continue;
+      const amount = (progress * a.maxY - a.y) / divisor;
+      if (amount < -1e-9 || amount > 1 + 1e-9 || a.maxY + (b.maxY - a.maxY) * amount <= 0) continue;
+      add(key.id, key.input, left.timeMs - start + clampUnit(amount) * (right.timeMs - left.timeMs));
+    }
+  }
+  return ghosts.sort((a, b) => a.timeMs - b.timeMs);
+}
+/** One scene revision per sampler. Sparse state caches never include frames. */
 export function createTakeSampler(scene: WorldScene, source: SignalTake) {
   const take = parseSignalTake(source), checkpoints = new Map<number, WorldState>([[0, take.initialState]]);
+  let prepared: ReturnType<typeof evaluateLayout> | undefined, geometry = '';
+  const step = (state: WorldState, input: WorldInput) => {
+    const signature = JSON.stringify([input.viewport, input.anchors]);
+    if (!prepared || signature !== geometry) { prepared = evaluateLayout(scene, input); geometry = signature; }
+    return evaluatePreparedWorld(prepared, state, input, scene.signalRules);
+  };
   return {
     at(positionMs: number) {
       const timeMs = take.inputs[0]!.timeMs + Math.max(0, Math.min(takeDuration(take), Number.isFinite(positionMs) ? positionMs : 0));
-      let end = 0; while (end < take.inputs.length && take.inputs[end]!.timeMs <= timeMs) end++;
+      const end = inputEnd(take, timeMs);
       let start = Math.floor(Math.max(0, end - 1) / 32) * 32; while (!checkpoints.has(start)) start -= 32;
       let state = checkpoints.get(start)!, result: ReturnType<typeof evaluateWorld> | undefined;
-      for (let index = start; index < end; index++) { result = evaluateWorld(scene, state, take.inputs[index]!); state = result.state; if ((index + 1) % 32 === 0) checkpoints.set(index + 1, state); }
+      for (let index = start; index < end; index++) { result = step(state, take.inputs[index]!); state = result.state; if ((index + 1) % 32 === 0) checkpoints.set(index + 1, state); }
       const last = take.inputs[Math.max(0, end - 1)]!, input = between(last, take.inputs[end], timeMs, state.timeMs);
       // A sample at its exact timestamp must retain that sample's event occurrence.
       if (last.timeMs === timeMs && result) return { ...result, input: last };
-      const evaluated = evaluateWorld(scene, state, input); return { ...evaluated, input };
+      const evaluated = step(state, input); return { ...evaluated, input };
     },
     get checkpoints() { return checkpoints.size; },
   };

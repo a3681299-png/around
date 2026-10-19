@@ -8,6 +8,8 @@ test('signal space keys edit with mouse/numbers, one-step drag history, key-only
   await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await panel.locator('.timeline-toggle').click(); await panel.locator('.timeline-connect').click();
   await expect(panel.locator('.timeline-key')).toHaveCount(3); await expect(panel.locator('.opacity-value')).toHaveText('スクロールに接続');
+  await panel.locator('.take-record').focus(); await youtube.keyboard.press('Space'); await expect(panel.locator('.signal-timeline')).toHaveAttribute('data-recording', '');
+  await panel.locator('.take-stop').click(); await expect(panel.locator('.take-source')).toHaveText('PREVIEW'); await panel.locator('.timeline-view').selectOption('signal'); await panel.locator('.take-live').click();
   const middle = panel.locator('.timeline-key[data-key-id="key-middle"]'); await middle.click();
   await panel.getByLabel('キーの不透明度', { exact: true }).fill('80'); await panel.getByLabel('キーの不透明度', { exact: true }).press('Tab');
   await panel.getByLabel('キーから次への補間', { exact: true }).selectOption('ease-in-out');

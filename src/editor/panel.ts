@@ -340,6 +340,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
         imageProperties.querySelectorAll<HTMLInputElement>('input[type="text"],input[type="number"]').forEach((input) => { input.value = ''; }); get<HTMLOutputElement>('.opacity-value').value = '—';
       }
       if (opacityDriven) setText(get<HTMLOutputElement>('.opacity-value'), 'スクロールに接続');
+      get<HTMLInputElement>('[data-image-prop="opacity"]').disabled = opacityDriven;
       properties.disabled = !state.selected || state.saving;
       backgroundToggle.checked = state.style.backgroundColor !== undefined;
       borderToggle.checked = state.style.border !== undefined;

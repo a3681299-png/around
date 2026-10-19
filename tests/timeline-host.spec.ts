@@ -46,3 +46,13 @@ test('continuous recording stays bounded, hidden tabs stop it, and late load can
     expect(h.host.snapshot().status.source).toBe('live');
   } finally { h.detach(); }
 });
+
+test('preview publishes its new progress immediately and throttled live telemetry delivers the final value once', async () => {
+  const h = harness(), progress: number[] = [], off = h.host.subscribe((update) => progress.push(update.status.progress));
+  try {
+    await h.host.command('test', { type: 'observe', value: true }); h.step(10); h.step(20);
+    await new Promise((resolve) => setTimeout(resolve, 120)); expect(progress.at(-1)).toBe(.01);
+    await h.host.command('test', { type: 'preview', progress: .5 }); expect(progress.at(-1)).toBe(.5); expect(h.host.snapshot().status.source).toBe('signal');
+    h.host.resumeLive(); await Promise.resolve(); await new Promise((resolve) => setTimeout(resolve, 120)); expect(progress.at(-1)).toBe(.01);
+  } finally { off(); h.detach(); }
+});

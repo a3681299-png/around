@@ -8,6 +8,7 @@ import { sidePanelDriver, nativeWindow } from './helpers/side-panel';
 test('official side panel on real YouTube preserves controls, layout, authoring and resize anchors', async () => {
   test.skip(process.env.WW_LIVE_SIDE_PANEL !== '1', 'Explicit real YouTube + native Chrome UI verification.'); test.setTimeout(240_000);
   const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-panel-live-')), false, { headed: true, width: 1920 });
+  context.setDefaultTimeout(15_000); context.setDefaultNavigationTimeout(30_000);
   const report: { browser?: string; completed: boolean; checks: Record<string, unknown>; geometry: unknown[] } = { completed: false, checks: {}, geometry: [] };
   await mkdir('.work/verification', { recursive: true });
   try {
@@ -18,7 +19,9 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
     const popup = await context.newPage(); await popup.goto(`chrome-extension://${id}/popup/index.html`);
     const page = await context.newPage(); await page.goto('https://www.youtube.com/watch?v=LC1a-DwUhls&list=RDGMEM0s70dY0afCwh3LqQ-Bx1vgMLC1a-DwUhls&start_radio=1', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 25_000 }); await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+    await expect(page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
     await page.bringToFront(); await popup.locator('#creator-studio-inpage').evaluate((button: HTMLButtonElement) => button.click());
+    await expect(popup.locator('#creator-launch-status')).toHaveText('YouTubeでカードを選ぶか、画像を追加してください。');
     const local = page.locator('#web-world-themes-creator');
     await local.getByRole('button', { name: 'Chromeサイドパネルを開く', exact: true }).click();
     const panel = await sidePanelDriver(context, page, id);

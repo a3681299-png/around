@@ -47,7 +47,9 @@ export function createWorldSession(doc: Document, playback: PlaybackSource | und
     apply(result.frame);
     syncSources();
     syncListening();
-    if (result.frame.needsFrame) schedule();
+    // An overridden input has its own clock. A paused fade must not spin RAF,
+    // and playing takes advance only when that clock requests another sample.
+    if (result.frame.needsFrame && !overridden) schedule();
   };
   function schedule() {
     if (!doc.hidden && raf === undefined && (devtools?.active || ruleActive() || timeline?.recording || timeline?.playing || timeline?.observing || evaluatedTargets.some(active))) raf = view.requestAnimationFrame((time) => { raf = undefined; paint(time); });
@@ -62,9 +64,12 @@ export function createWorldSession(doc: Document, playback: PlaybackSource | und
     }
   };
   const reconcile = () => {
+    cancel();
     syncSources(true);
     syncListening();
-    if (!enabledTargets().length && !devtools?.active && !ruleActive() && !timeline?.recording && !timeline?.playing && !timeline?.observing || doc.hidden) cancel();
+    // A scene geometry refresh already includes any pending signal callback.
+    // Cancel before paint, which may schedule the next frame of a real fade.
+    cancel();
     paint(view.performance.now());
   };
   function lifecycle() { cancel(); lifecyclePending = true; reconcile(); }
