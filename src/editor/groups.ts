@@ -4,6 +4,16 @@ import { moveGroup, type PlacementFrame } from '../design/geometry';
 import { GROUP_LIMITS, IMAGE_LIMITS, type DesignDocument, type LayerNode, type LayerPlacement } from '../design/types';
 import { deleteLayers, duplicateLayers, reorderLayers } from './layers';
 
+function pruneRules(doc: DesignDocument) {
+  if (!doc.signalRules) return;
+  const ids = new Set([...doc.decorations, ...doc.groups ?? []].map((layer) => layer.id));
+  doc.signalRules = doc.signalRules.filter((rule) => ids.has(rule.target.layerId));
+}
+function copyRules(doc: DesignDocument, sourceId: string, targetId: string) {
+  const copies = doc.signalRules?.filter((rule) => rule.target.layerId === sourceId).map((rule, index) => ({ ...rule, id: `signal-${index}-${targetId.slice(-52)}`, target: { ...rule.target, layerId: targetId } }));
+  if (copies?.length) doc.signalRules = [...doc.signalRules ?? [], ...copies];
+}
+
 function rank(doc: DesignDocument, backToFront: readonly LayerNode[]) {
   const ranks = new Map(backToFront.map((layer, index) => [layer.id, index]));
   doc.decorations = doc.decorations.map((layer) => ranks.has(layer.id) ? { ...layer, zIndex: ranks.get(layer.id)! } : layer);
@@ -39,7 +49,7 @@ export function ungroupLayers(input: DesignDocument, id: string): DesignDocument
   const roots = frontToBack(rootLayers(doc.decorations, doc.groups ?? [])).reverse(), index = roots.findIndex((layer) => layer.id === id);
   roots.splice(index, 1, ...frontToBack(childrenOf(group, doc.decorations)).reverse());
   doc.decorations = doc.decorations.map((layer) => group.children.includes(layer.id) ? { ...layer, visible: layer.visible && group.visible } : layer);
-  doc.groups = doc.groups!.filter((group) => group.id !== id); rank(doc, roots);
+  doc.groups = doc.groups!.filter((group) => group.id !== id); rank(doc, roots); pruneRules(doc);
   return parseDesign(doc);
 }
 
@@ -58,7 +68,7 @@ export function reorderDocument(input: DesignDocument, id: string, targetId: str
 
 export function deleteDocumentLayers(input: DesignDocument, ids: readonly string[]): DesignDocument {
   const doc = parseDesign(input), groups = doc.groups ?? [];
-  if (!groups.length) { doc.decorations = deleteLayers(doc.decorations, ids); return doc; }
+  if (!groups.length) { doc.decorations = deleteLayers(doc.decorations, ids); pruneRules(doc); return doc; }
   const removed = new Set<string>(), removedGroups = new Set<string>();
   for (const id of normalizeSelection(ids, doc.decorations, groups)) {
     const group = groups.find((group) => group.id === id);
@@ -67,6 +77,7 @@ export function deleteDocumentLayers(input: DesignDocument, ids: readonly string
   }
   doc.decorations = doc.decorations.filter((image) => !removed.has(image.id));
   doc.groups = groups.filter((group) => !removedGroups.has(group.id)).map((group) => ({ ...group, children: group.children.filter((id) => !removed.has(id)) })).filter((group) => group.children.length > 0);
+  pruneRules(doc);
   return parseDesign(doc);
 }
 
@@ -76,7 +87,10 @@ export function duplicateDocumentLayers(input: DesignDocument, ids: readonly str
     const result = duplicateLayers(doc.decorations, ids, makeId, (layer) => {
       const frame = frameFor(layer.placement);
       return frame ? moveGroup([{ id: layer.id, placement: layer.placement, frame }], { x: 16, y: 16 })[0]!.placement : { ...layer.placement };
-    }); doc.decorations = result.layers; return { doc: parseDesign(doc), ids: result.ids };
+    });
+    const sources = frontToBack(doc.decorations).reverse().filter((layer) => ids.includes(layer.id) && !layer.locked);
+    result.ids.forEach((id, index) => { if (sources[index]) copyRules(doc, sources[index]!.id, id); });
+    doc.decorations = result.layers; return { doc: parseDesign(doc), ids: result.ids };
   }
   const selected = normalizeSelection(ids, doc.decorations, groups), newIds: string[] = [];
   const roots = frontToBack(rootLayers(doc.decorations, groups)).reverse();
@@ -89,9 +103,11 @@ export function duplicateDocumentLayers(input: DesignDocument, ids: readonly str
     const placements = new Map(moveGroup(samples, { x: 16, y: 16 }).map((value) => [value.id, value.placement]));
     const copies = sources.map((layer) => ({ ...layer, id: makeId(), name: `${layer.name.slice(0, 116)} コピー`, placement: placements.get(layer.id) ?? { ...layer.placement } }));
     doc.decorations.push(...copies);
+    copies.forEach((copy, index) => copyRules(doc, sources[index]!.id, copy.id));
     if (group) {
       const copy = { ...group, id: makeId(), name: `${group.name.slice(0, 116)} コピー`, children: copies.map((layer) => layer.id) };
       doc.groups!.push(copy); roots.push(copy); newIds.push(copy.id);
+      copyRules(doc, group.id, copy.id);
     } else {
       const parent = parentGroup(groups, id);
       if (parent) { parent.children.push(copies[0]!.id); rank(doc, [...frontToBack(childrenOf(parent, doc.decorations)).reverse().filter((layer) => layer.id !== copies[0]!.id), copies[0]!]); }

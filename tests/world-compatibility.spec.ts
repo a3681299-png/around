@@ -3,10 +3,10 @@ import { readFile } from 'node:fs/promises';
 import { parseDesign } from '../src/design/schema';
 import { evaluateWorld, initialWorldState } from '../src/world/evaluate';
 
-for (let version = 1; version <= 6; version++) test(`historical v${version} test data migrates purely to v7 and evaluates without changing assets`, async () => {
+for (let version = 1; version <= 7; version++) test(`historical v${version} test data migrates purely to v8 and evaluates without changing assets`, async () => {
   const input = JSON.parse(await readFile(`tests/fixtures/designs/v${version}.json`, 'utf8'));
   const before = JSON.stringify(input), parsed = parseDesign(input);
-  expect(input.schemaVersion).toBe(version); expect(parsed.schemaVersion).toBe(7); expect(JSON.stringify(input)).toBe(before);
+  expect(input.schemaVersion).toBe(version); expect(parsed.schemaVersion).toBe(8); expect(JSON.stringify(input)).toBe(before);
   expect(parsed.rules).toEqual(input.rules.map((rule: { style: { backgroundColor?: string } }) => rule.style.backgroundColor
     ? { ...rule, style: { ...rule.style, backgroundColor: rule.style.backgroundColor.toLowerCase() } } : rule));
   expect(parsed.decorations.map((layer) => layer.assetId)).toEqual((input.decorations ?? []).map((layer: { assetId: string }) => layer.assetId));
@@ -21,7 +21,7 @@ for (let version = 1; version <= 6; version++) test(`historical v${version} test
   expect(evaluateWorld(parsed, initialWorldState(), inputFrame)).toEqual(evaluateWorld(parsed, initialWorldState(), inputFrame));
 });
 
-test('unknown future DesignDocument remains unchanged and v8 remains unsupported', async () => {
-  const input = JSON.parse(await readFile('tests/fixtures/designs/v6.json', 'utf8')); input.schemaVersion = 8;
+test('unknown future DesignDocument remains unchanged and v9 remains unsupported', async () => {
+  const input = JSON.parse(await readFile('tests/fixtures/designs/v6.json', 'utf8')); input.schemaVersion = 9;
   const before = JSON.stringify(input); expect(() => parseDesign(input)).toThrow(/バージョン/); expect(JSON.stringify(input)).toBe(before);
 });

@@ -11,6 +11,7 @@ import { editableSceneSamples, placementFrame, snapTargets } from '../../design/
 import { effectivelyLocked, groupMovable, parentGroup, rootLayers } from '../../world/hierarchy';
 import { snapMove, type Guide } from '../../design/layout';
 import type { DesignTarget, Decoration, GroupLayer } from '../../design/types';
+import type { SignalRule } from '../../signals/keyframes';
 
 export interface ImageEditing {
   selectedIds: readonly string[];
@@ -61,6 +62,7 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
   let editing: ImageEditing | undefined;
   let images: readonly Decoration[] = [];
   let groups: readonly GroupLayer[] = [];
+  let signalRules: readonly SignalRule[] = [];
   let frame: number | undefined;
   let observer: ResizeObserver | undefined;
   let observed = new Set<Element>();
@@ -88,7 +90,7 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
     if (host.parentElement !== parent) parent.append(host);
     const nextObserved = new Set<Element>();
     const effectTargets: EffectTarget[] = [];
-    const geometry = captureGeometry(doc, anchors), scene = { decorations: images, groups };
+    const geometry = captureGeometry(doc, anchors), scene = { decorations: images, groups, ...(signalRules.length ? { signalRules } : {}) };
     const layout = WORLD_MODE === 'legacy' ? legacyLayout(scene, geometry) : evaluateLayout(scene, geometry);
     if (WORLD_MODE === 'compare') assertWorldParity(layout, legacyLayout(scene, geometry), 'layout');
     const layouts = new Map(layout.groups.map((group) => [group.layer.id, group]));
@@ -252,10 +254,11 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
     compositions.clear(); images = []; groups = [];
   };
   return {
-    update(next: readonly Decoration[], nextGroups: readonly GroupLayer[] = []) {
+    update(next: readonly Decoration[], nextGroups: readonly GroupLayer[] = [], nextRules: readonly SignalRule[] = []) {
       if (!next.length) { destroy(); return; }
       images = next;
       groups = nextGroups;
+      signalRules = nextRules;
       if (!host) mount();
       const wanted = new Set(next.map((item) => item.id));
       for (const [id, entry] of nodes) if (!wanted.has(id)) { entry.media.destroy(); entry.node.remove(); entry.controls.remove(); nodes.delete(id); }

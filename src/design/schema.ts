@@ -2,6 +2,7 @@ import { GROUP_LIMITS, IMAGE_LIMITS, STYLE_LIMITS, type DesignDocument, type Sur
 import { ANIMATION_LIMITS } from '../assets/motion-types';
 import { parseEffects } from '../effects/schema';
 import { sameAnchor } from './hierarchy';
+import { parseSignalRules } from '../signals/keyframe-schema';
 
 export function isAssetId(value: unknown): value is string {
   return typeof value === 'string' && /^asset-[a-f0-9]{64}$/.test(value);
@@ -92,8 +93,8 @@ function image(value: unknown, version: number): Decoration {
 export function parseDesign(value: unknown): DesignDocument {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('デザインの形式が不正です。');
   const version = (value as Record<string, unknown>)['schemaVersion'];
-  if (version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5 && version !== 6 && version !== 7) throw new Error('このデザインのバージョンには対応していません。');
-  const data = record(value, version === 1 ? ['schemaVersion', 'id', 'siteId', 'baseThemeId', 'rules'] : ['schemaVersion', 'id', 'siteId', 'baseThemeId', 'rules', 'decorations', ...(version >= 6 ? ['groups'] : [])]);
+  if (version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5 && version !== 6 && version !== 7 && version !== 8) throw new Error('このデザインのバージョンには対応していません。');
+  const data = record(value, version === 1 ? ['schemaVersion', 'id', 'siteId', 'baseThemeId', 'rules'] : ['schemaVersion', 'id', 'siteId', 'baseThemeId', 'rules', 'decorations', ...(version >= 6 ? ['groups'] : []), ...(version >= 8 ? ['signalRules'] : [])]);
   if (!isDesignId(data['id']) || !isDesignId(data['siteId'])
     || (data['baseThemeId'] !== null && !isDesignId(data['baseThemeId']))) {
     throw new Error('デザインの識別子が不正です。');
@@ -138,11 +139,12 @@ export function parseDesign(value: unknown): DesignDocument {
       group.children.forEach((id) => assigned.add(id));
     }
   }
-  return { schemaVersion: 7, id: data['id'], siteId: data['siteId'], baseThemeId: data['baseThemeId'], rules, decorations, ...(groups.length ? { groups } : {}) };
+  const signalRules = Object.hasOwn(data, 'signalRules') ? parseSignalRules(data['signalRules'], new Set([...decorations, ...groups].map((layer) => layer.id))) : [];
+  return { schemaVersion: 8, id: data['id'], siteId: data['siteId'], baseThemeId: data['baseThemeId'], rules, decorations, ...(groups.length ? { groups } : {}), ...(signalRules.length ? { signalRules } : {}) };
 }
 
 export function emptyDesign(siteId: string, baseThemeId: string | null): DesignDocument {
-  return parseDesign({ schemaVersion: 7, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
+  return parseDesign({ schemaVersion: 8, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
 }
 
 export function sameDesign(a: DesignDocument | undefined, b: DesignDocument | undefined): boolean {

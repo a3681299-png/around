@@ -31,7 +31,7 @@ test('v7 modes and raster speed preserve old v6 defaults; legacy recordings rema
   expect(parseDesign({ ...base, schemaVersion: 6, decorations: [old] }).decorations[0]).not.toHaveProperty('playback.mode');
   const recorder = createWorldRecorder(); recorder.start(scene, initialWorldState());
   recorder.capture(scene, inputs[0]!); const recording = recorder.stop()!, legacy = { ...recording, formatVersion: 1 };
-  expect(parseWorldRecording(legacy).formatVersion).toBe(2); expect(replayWorld(legacy)).toEqual(replayWorld(recording));
+  expect(parseWorldRecording(legacy).formatVersion).toBe(3); expect(replayWorld(legacy)).toEqual(replayWorld(recording));
 });
 
 test('finalized VP9 alpha WebM supports 1080p and long duration; malformed containers/MIME are rejected', async () => {

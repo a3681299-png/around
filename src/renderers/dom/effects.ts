@@ -17,8 +17,10 @@ export function createEffectController(doc: Document, playback?: PlaybackSource)
   const clear = (element: HTMLElement) => { element.style.removeProperty('mask-image'); element.removeAttribute('data-mask-intensity'); };
   const session = createWorldSession(doc, playback, (frame) => {
     const byId = new Map(frame.effects.map((effect) => [effect.id, effect]));
+    const evaluatedLayers = new Map([...frame.layout.groups, ...frame.layout.layers].map((value) => [value.layer.id, value.layer]));
     for (const target of targets) {
       const value = byId.get(target.layer.id)!;
+      target.element.style.opacity = String(evaluatedLayers.get(target.layer.id)?.opacity ?? target.layer.opacity);
       if (value.mask) {
         target.element.style.maskImage = maskGradient({ ...value.mask, intensity: 1 }, value.mask.center, value.mask.intensity);
         target.element.dataset.maskIntensity = String(value.mask.intensity);

@@ -12,7 +12,7 @@ export interface SurfaceStyleRule {
 }
 
 export interface DesignDocument {
-  schemaVersion: 7;
+  schemaVersion: 8;
   id: string;
   siteId: string;
   /** null uses native site styling; a built-in theme is an optional starting point. */
@@ -21,6 +21,7 @@ export interface DesignDocument {
   decorations: Decoration[];
   /** Composition nodes reference existing media; assets are never duplicated here. */
   groups?: GroupLayer[];
+  signalRules?: import('../signals/keyframes').SignalRule[];
 }
 
 export type PlacementAnchor = { kind: 'viewport' } | { kind: 'surface'; target: string };

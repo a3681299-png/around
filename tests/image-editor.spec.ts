@@ -94,7 +94,7 @@ test('import a transparent image, drag and resize it, save, reload and restart w
   expect(resized.width / resized.height).toBeCloseTo(original.width / original.height, 2);
   await save(dialog);
   const design = await stored(popup);
-  expect(design.schemaVersion).toBe(7);
+  expect(design.schemaVersion).toBe(8);
   expect(design.decorations).toHaveLength(1);
   expect(JSON.stringify(design)).not.toMatch(/data:image|base64|blob:/);
   expect(await assets(context)).toHaveLength(1);

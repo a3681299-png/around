@@ -93,7 +93,7 @@ test('effect edits survive undo, redo, discard, tab sync, reload and a persisten
   await panel.getByLabel('円形マスクを使う').check(); await setNumber(panel, '光の半径', 130); await setNumber(panel, '境界のぼかし', 25);
   await panel.getByLabel('マスクの表示強度').fill('65'); await panel.getByLabel('動画の一時停止で隠す').check(); await setNumber(panel, 'マスクのフェード時間', 220);
   await save(panel); const saved = await stored(popup);
-  expect(saved).toMatchObject({ schemaVersion: 7, decorations: [{ effects: [{ kind: 'mask', radiusPx: 130, featherPx: 25, intensity: .65 }] }] });
+  expect(saved).toMatchObject({ schemaVersion: 8, decorations: [{ effects: [{ kind: 'mask', radiusPx: 130, featherPx: 25, intensity: .65 }] }] });
   for (let i = 0; i < 8; i++) await youtube.mouse.move(200 + i * 20, 300);
   await expect(panel.locator('.dirty')).toHaveText('保存済み'); await expect(panel.getByRole('button', { name: '保存', exact: true })).toBeDisabled();
   await panel.getByRole('button', { name: '元に戻す', exact: true }).click(); await expect(panel.getByLabel('マスクのフェード時間')).toHaveValue('350');

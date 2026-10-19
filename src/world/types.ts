@@ -3,8 +3,8 @@ import type { SignalSnapshot } from '../signals/types';
 import type { Bounds, PlacementFrame, Point } from './geometry';
 import type { EffectState, EffectEvaluation } from './effects';
 
-export const WORLD_RUNTIME_VERSION = '1.0.0' as const;
-export interface WorldScene { decorations: readonly Decoration[]; groups?: readonly GroupLayer[] }
+export const WORLD_RUNTIME_VERSION = '1.1.0' as const;
+export interface WorldScene { decorations: readonly Decoration[]; groups?: readonly GroupLayer[]; signalRules?: readonly import('../signals/keyframes').SignalRule[] }
 export interface WorldGeometry {
   viewport: { width: number; height: number };
   /** Semantic IDs only; absence means the host cannot currently resolve an anchor. */

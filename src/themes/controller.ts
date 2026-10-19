@@ -80,7 +80,7 @@ export function createThemeController(
       features.refresh();
     }
     designRenderer.update(design);
-    images.update(design?.decorations ?? [], design?.groups ?? []);
+    images.update(design?.decorations ?? [], design?.groups ?? [], design?.signalRules ?? []);
     onSurfacesChanged?.();
   };
 

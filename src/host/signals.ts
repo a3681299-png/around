@@ -2,9 +2,10 @@ import type { PlaybackSource, SignalSnapshot } from '../signals/types';
 import type { WorldEvent } from '../world/types';
 
 /** A shared lazy subscription per tab. No polling, page API calls or pixel reads. */
-export function createSignalSources(doc: Document, playback: PlaybackSource | undefined, changed: (source: 'pointer.position' | 'video.playing') => void, occurred?: () => void) {
+export function createSignalSources(doc: Document, playback: PlaybackSource | undefined, changed: (source: 'pointer.position' | 'video.playing' | 'page.scroll.progress') => void, occurred?: () => void) {
   const snapshot: SignalSnapshot = { pointer: undefined, playing: false };
   let pointer = false;
+  let scroll = false, resize: ResizeObserver | undefined;
   let events: WorldEvent[] = [];
   let video: ReturnType<PlaybackSource['connect']> | undefined;
   const onPointer = (event: PointerEvent) => {
@@ -13,10 +14,26 @@ export function createSignalSources(doc: Document, playback: PlaybackSource | un
     if (event.composedPath().some((node) => node instanceof Element && node.hasAttribute('data-ww-signal-control'))) return;
     snapshot.pointer = { x: event.clientX, y: event.clientY }; changed('pointer.position');
   };
+  const sampleScroll = (notify = true) => {
+    const root = doc.scrollingElement ?? doc.documentElement;
+    const next = { x: root.scrollLeft, y: root.scrollTop, maxX: Math.max(0, root.scrollWidth - root.clientWidth), maxY: Math.max(0, root.scrollHeight - root.clientHeight) };
+    const before = snapshot.scroll; snapshot.scroll = next;
+    if (notify && (!before || Object.keys(next).some((key) => next[key as keyof typeof next] !== before[key as keyof typeof next]))) changed('page.scroll.progress');
+  };
+  const onScroll = (event: Event) => { if (event.target === doc || event.target === doc.scrollingElement) sampleScroll(); };
+  const onResize = () => sampleScroll();
   return {
     snapshot,
     takeEvents() { const next = events; events = []; return next; },
-    configure(needed: { pointer: boolean; video: boolean }) {
+    configure(needed: { pointer: boolean; video: boolean; scroll?: boolean }) {
+      if (scroll !== Boolean(needed.scroll)) {
+        scroll = Boolean(needed.scroll);
+        if (scroll) {
+          doc.addEventListener('scroll', onScroll, { capture: true, passive: true }); doc.defaultView!.addEventListener('resize', onResize);
+          resize = new ResizeObserver(onResize); resize.observe(doc.documentElement); if (doc.body) resize.observe(doc.body);
+        } else { doc.removeEventListener('scroll', onScroll, true); doc.defaultView!.removeEventListener('resize', onResize); resize?.disconnect(); resize = undefined; delete snapshot.scroll; }
+      }
+      if (scroll) sampleScroll(false);
       if (pointer !== needed.pointer) {
         pointer = needed.pointer;
         if (pointer) doc.addEventListener('pointermove', onPointer, { capture: true, passive: true });
@@ -30,6 +47,6 @@ export function createSignalSources(doc: Document, playback: PlaybackSource | un
       });
       else video?.refresh();
     },
-    destroy() { doc.removeEventListener('pointermove', onPointer, true); pointer = false; video?.destroy(); video = undefined; snapshot.playing = false; events = []; },
+    destroy() { doc.removeEventListener('pointermove', onPointer, true); if (scroll) { doc.removeEventListener('scroll', onScroll, true); doc.defaultView!.removeEventListener('resize', onResize); } resize?.disconnect(); resize = undefined; scroll = false; delete snapshot.scroll; pointer = false; video?.destroy(); video = undefined; snapshot.playing = false; events = []; },
   };
 }
