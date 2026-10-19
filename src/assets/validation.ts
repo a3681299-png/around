@@ -1,4 +1,4 @@
-export const ASSET_LIMITS = Object.freeze({ fileBytes: 32 * 1024 * 1024, batchBytes: 32 * 1024 * 1024, batchCount: 8, totalBytes: 256 * 1024 * 1024, count: 128, edge: 4096, pixels: 16 * 1024 * 1024 });
+export const ASSET_LIMITS = Object.freeze({ fileBytes: 32 * 1024 * 1024, modelBytes: 64 * 1024 * 1024, chunkBytes: 1024 * 1024, batchBytes: 64 * 1024 * 1024, batchCount: 8, totalBytes: 256 * 1024 * 1024, count: 128, edge: 4096, pixels: 16 * 1024 * 1024 });
 export interface ImageInfo { mime: 'image/png' | 'image/webp'; width: number; height: number }
 export interface AssetInfo { mime: 'image/png' | 'image/webp' | 'image/gif' | 'application/json' | 'video/webm' | 'model/gltf-binary'; width: number; height: number; model?: import('../models/types').ModelInfo; animation?: import('./motion-types').AnimationInfo }
 export interface AssetMetadata extends AssetInfo { id: string; name: string; byteLength: number }

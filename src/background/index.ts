@@ -8,6 +8,9 @@ import { validateDesignAssets } from '../assets/design-assets';
 import { isAssetId, isDesignId, parseDesign } from '../design/schema';
 import { saveDesign } from '../storage/designs';
 import { installTakeStorage } from '../browser/take-repository';
+import { createAssetTransfers } from '../assets/transfers';
+
+const transfers = createAssetTransfers();
 
 let queue: Promise<unknown> = Promise.resolve();
 function enqueue<T>(action: () => Promise<T>): Promise<T> {
@@ -69,7 +72,7 @@ async function leaseAssets(lease: AssetLease, ids: readonly string[]): Promise<v
   });
 }
 
-async function importBatch(input: unknown, lease: AssetLease): Promise<AssetMetadata[]> {
+async function importBatch(input: unknown, lease: AssetLease, decoded?: Uint8Array): Promise<AssetMetadata[]> {
   if (!Array.isArray(input) || !input.length || input.length > ASSET_LIMITS.batchCount) throw new Error('一度に追加できる画像は8枚までです。');
   const assets: StoredAsset[] = [];
   let size = 0;
@@ -78,9 +81,9 @@ async function importBatch(input: unknown, lease: AssetLease): Promise<AssetMeta
     const file = raw as AssetWireFile;
     if (typeof file.name !== 'string' || !file.name.length || file.name.length > 120 || /[\u0000-\u001f]/.test(file.name)
       || typeof file.mime !== 'string') throw new Error('画像の形式が不正です。');
-    const bytes = base64ToBytes(file.base64);
+    const bytes = decoded ?? base64ToBytes(file.base64);
     size += bytes.length;
-    if (size > ASSET_LIMITS.batchBytes) throw new Error('一度に追加する素材は合計32MBまでです。');
+    if (size > (decoded ? ASSET_LIMITS.modelBytes : ASSET_LIMITS.fileBytes)) throw new Error('素材の転送容量が上限を超えました。');
     const info = inspectAsset(bytes, file.mime);
     if (info.model) await validateModelTextures(bytes);
     const blob = new Blob([new Uint8Array(bytes).buffer], { type: info.mime });
@@ -111,14 +114,27 @@ async function importBatch(input: unknown, lease: AssetLease): Promise<AssetMeta
 }
 
 async function handle(message: Record<string, unknown>, sender: chrome.runtime.MessageSender): Promise<unknown> {
-  if (message['action'] === 'get') {
+  if (message['action'] === 'get' || message['action'] === 'get-part') {
     if (!isAssetId(message['id'])) throw new Error('素材IDが不正です。');
     const asset = await getAsset(message['id']);
     if (!asset) throw new Error('画像素材が見つかりません。');
     const { blob, leases: _leases, ...metadata } = asset;
+    if (message['action'] === 'get-part') {
+      const offset = message['offset']; if (typeof offset !== 'number' || !Number.isSafeInteger(offset) || offset < 0 || offset >= blob.size || offset % ASSET_LIMITS.chunkBytes) throw new Error('素材の転送位置が不正です。');
+      return bytesToBase64(new Uint8Array(await blob.slice(offset, offset + ASSET_LIMITS.chunkBytes).arrayBuffer()));
+    }
+    if (blob.size > ASSET_LIMITS.fileBytes) return { metadata, chunked: true };
     return { metadata, base64: bytesToBase64(new Uint8Array(await blob.arrayBuffer())) };
   }
   const lease = await owner(message, sender);
+  const transferOwner = JSON.stringify([lease.session, lease.tabId, sender.documentId ?? sender.url]);
+  if (message['action'] === 'upload-start') return transfers.start(crypto.randomUUID(), transferOwner, message['size'], message['name'], message['mime'], Date.now());
+  if (message['action'] === 'upload-part') {
+    if (typeof message['base64'] !== 'string' || message['base64'].length > Math.ceil(ASSET_LIMITS.chunkBytes / 3) * 4) throw new Error('素材の転送断片が大きすぎます。');
+    transfers.append(message['upload'], transferOwner, message['offset'], base64ToBytes(message['base64']), Date.now()); return undefined;
+  }
+  if (message['action'] === 'upload-abort') { transfers.abort(message['upload'], transferOwner, Date.now()); return undefined; }
+  if (message['action'] === 'upload-finish') { const file = transfers.finish(message['upload'], transferOwner, Date.now()); return importBatch([{ name: file.name, mime: file.mime, base64: '' }], lease, file.bytes); }
   if (message['action'] === 'import') return importBatch(message['files'], lease);
   if (message['action'] === 'lease') {
     const ids = message['ids'];

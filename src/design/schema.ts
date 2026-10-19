@@ -79,6 +79,7 @@ function image(value: unknown, version: number): Decoration {
   if (item['kind'] === 'model3d') {
     if (Object.hasOwn(item, 'format') || Object.hasOwn(item, 'playback')) throw new Error('3D素材の設定が不正です。');
     const source = parseModelInfo(item['source']);
+    if (source.vrm && version < 11) throw new Error('VRMにはDesignDocument v11が必要です。');
     return { ...common, kind: 'model3d', source, model: parseModelSettings(item['model'], source) };
   }
   if (Object.hasOwn(item, 'model') || Object.hasOwn(item, 'source')) throw new Error('3D素材以外には3D設定を指定できません。');
@@ -101,7 +102,7 @@ function image(value: unknown, version: number): Decoration {
 export function parseDesign(value: unknown): DesignDocument {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('デザインの形式が不正です。');
   const version = (value as Record<string, unknown>)['schemaVersion'];
-  if (version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5 && version !== 6 && version !== 7 && version !== 8 && version !== 9 && version !== 10) throw new Error('このデザインのバージョンには対応していません。');
+  if (version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5 && version !== 6 && version !== 7 && version !== 8 && version !== 9 && version !== 10 && version !== 11) throw new Error('このデザインのバージョンには対応していません。');
   const data = record(value, version === 1 ? ['schemaVersion', 'id', 'siteId', 'baseThemeId', 'rules'] : ['schemaVersion', 'id', 'siteId', 'baseThemeId', 'rules', 'decorations', ...(version >= 6 ? ['groups'] : []), ...(version >= 8 ? ['signalRules'] : [])]);
   if (!isDesignId(data['id']) || !isDesignId(data['siteId'])
     || (data['baseThemeId'] !== null && !isDesignId(data['baseThemeId']))) {
@@ -149,11 +150,11 @@ export function parseDesign(value: unknown): DesignDocument {
     }
   }
   const signalRules = Object.hasOwn(data, 'signalRules') ? parseSignalRules(data['signalRules'], new Set([...decorations, ...groups].map((layer) => layer.id)), version < 9) : [];
-  return { schemaVersion: 10, id: data['id'], siteId: data['siteId'], baseThemeId: data['baseThemeId'], rules, decorations, ...(groups.length ? { groups } : {}), ...(signalRules.length ? { signalRules } : {}) };
+  return { schemaVersion: 11, id: data['id'], siteId: data['siteId'], baseThemeId: data['baseThemeId'], rules, decorations, ...(groups.length ? { groups } : {}), ...(signalRules.length ? { signalRules } : {}) };
 }
 
 export function emptyDesign(siteId: string, baseThemeId: string | null): DesignDocument {
-  return parseDesign({ schemaVersion: 10, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
+  return parseDesign({ schemaVersion: 11, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
 }
 
 export function sameDesign(a: DesignDocument | undefined, b: DesignDocument | undefined): boolean {

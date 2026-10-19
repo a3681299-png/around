@@ -50,7 +50,7 @@ test('mouse-only first creation: import, check selection, group, mask, behavior,
   await panel.getByRole('checkbox', { name: '動画の一時停止で隠す', exact: true }).check();
   await expect(panel.getByLabel('画像の幅', { exact: true })).toBeHidden();
   await expect(panel.locator('.dirty')).toHaveText('未保存の変更');
-  await save(panel); const saved = await stored(popup); expect(saved.schemaVersion).toBe(10);
+  await save(panel); const saved = await stored(popup); expect(saved.schemaVersion).toBe(11);
   expect(saved.groups?.[0]?.effects?.[0]).toMatchObject({ enabled: true, radiusPx: 180 });
   await youtube.screenshot({ path: info.outputPath('02-group-inspector.png') });
   await youtube.reload(); const again = await open(popup, youtube);

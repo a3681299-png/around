@@ -1,12 +1,13 @@
 import { MODEL_LIMITS, type ModelInfo } from '../models/types';
 import type { AssetInfo } from './validation';
+import { inspectVrm, VRM_EXTENSIONS } from './vrm';
 
 type Obj = Record<string, any>; // glTF is untrusted; every used index/range is checked below.
 const bad = (message = 'GLBが破損しているか、初版で未対応の構造です。') => new Error(message);
 const int = (n: unknown, max: number) => { if (typeof n !== 'number' || !Number.isSafeInteger(n) || n < 0 || n > max) throw bad(); return n; };
 const list = (n: unknown, max: number): Obj[] => { if (n === undefined) return []; if (!Array.isArray(n) || n.length > max || n.some((v) => !v || typeof v !== 'object' || Array.isArray(v))) throw bad(); return n; };
 const name = (n: unknown, fallback: string) => typeof n === 'string' ? n.replace(/[\u0000-\u001f]/g, '').slice(0, 120) : fallback;
-const allowedExtensions = new Set(['KHR_materials_unlit', 'KHR_texture_transform', 'KHR_mesh_quantization', 'KHR_materials_ior', 'KHR_materials_specular', 'KHR_materials_clearcoat', 'KHR_materials_emissive_strength']);
+const allowedExtensions = new Set(['KHR_materials_unlit', 'KHR_texture_transform', 'KHR_mesh_quantization', 'KHR_materials_ior', 'KHR_materials_specular', 'KHR_materials_clearcoat', 'KHR_materials_emissive_strength', ...VRM_EXTENSIONS]);
 
 /** Bounded, self-contained GLB 2.0. No URI is handed to Three.js unchecked. */
 export function inspectGlb(bytes: Uint8Array): { info: AssetInfo; json: Obj; bin: Uint8Array; gpuBytes: number } {
@@ -21,6 +22,7 @@ export function inspectGlb(bytes: Uint8Array): { info: AssetInfo; json: Obj; bin
     else throw bad(); at += size;
   }
   if (at !== bytes.length || !json || json.asset?.version !== '2.0' || json.asset?.minVersion && json.asset.minVersion !== '2.0') throw bad();
+  const isVrm = Boolean(json.extensions?.VRMC_vrm || json.extensions?.VRM), morphLimit = isVrm ? 128 : 32;
   let entries = 0;
   function scan(value: unknown, depth = 0) {
     if (++entries > 200000 || depth > 40) throw bad('GLBの構造が複雑すぎます。');
@@ -62,16 +64,24 @@ export function inspectGlb(bytes: Uint8Array): { info: AssetInfo; json: Obj; bin
       const n = int(index, accessors.length - 1); if (gpuAccessors.has(n)) continue; gpuAccessors.add(n); const a = accessors[n]!;
       geometryBytes += a.count * components[a.type]! * component[a.componentType]!;
     }
-    const targets = list(p.targets, 32), slots = targets.some((t) => t.NORMAL !== undefined) ? 2 : 1;
+    const targets = list(p.targets, morphLimit), slots = targets.some((t) => t.NORMAL !== undefined) ? 2 : 1;
+    let morphVertices = position.count;
+    if (isVrm && p.indices !== undefined) {
+      const a = ref(p.indices, accessors), v = values(a), used = new Set<number>(), data = new DataView(bin.buffer, bin.byteOffset);
+      if (a.type !== 'SCALAR' || ![5121, 5123, 5125].includes(a.componentType)) throw bad();
+      for (let n = 0; n < a.count; n++) { const at = v.offset + n * v.stride; used.add(v.size === 1 ? data.getUint8(at) : v.size === 2 ? data.getUint16(at, true) : data.getUint32(at, true)); }
+      // VRM Renderer must run removeUnnecessaryVertices before the first draw.
+      morphVertices = used.size;
+    }
     // Morph target texture layers can amplify shared binary accessors. Allow
     // row padding conservatively; do not rely on encoded file size alone.
-    morphBytes += position.count * targets.length * slots * 16 * 2;
-    if (morphBytes > 64 * 1024 * 1024) throw bad('モーフの展開予算64MiBを超えています。');
+    morphBytes += morphVertices * targets.length * slots * 16 * 2;
+    if (morphBytes > (isVrm ? 128 : 64) * 1024 * 1024) throw bad(`モーフの展開予算${isVrm ? 128 : 64}MiBを超えています。`);
     const indices = p.indices === undefined ? position : ref(p.indices, accessors);
     vertices += position.count; triangles += indices.count / 3;
     if (vertices > MODEL_LIMITS.vertices || triangles > MODEL_LIMITS.triangles || !Number.isInteger(indices.count / 3)) throw bad('GLBの頂点・三角形数が上限を超えています。');
     if (p.indices !== undefined) { if (indices.type !== 'SCALAR' || ![5121, 5123, 5125].includes(indices.componentType)) throw bad(); const v = values(indices), data = new DataView(bin.buffer, bin.byteOffset); for (let i = 0; i < indices.count; i++) { const offset = v.offset + i * v.stride, n = v.size === 1 ? data.getUint8(offset) : v.size === 2 ? data.getUint16(offset, true) : data.getUint32(offset, true); if (n >= position.count) throw bad(); } }
-    for (const target of list(p.targets, 32)) for (const index of Object.values(target)) if (ref(index, accessors).count !== position.count) throw bad();
+    for (const target of list(p.targets, morphLimit)) for (const index of Object.values(target)) if (ref(index, accessors).count !== position.count) throw bad();
   }
   const parents = new Set<number>();
   for (const node of nodes) {
@@ -89,7 +99,7 @@ export function inspectGlb(bytes: Uint8Array): { info: AssetInfo; json: Obj; bin
   }
   if (!sceneTriangles || sceneVertices > MODEL_LIMITS.vertices || sceneTriangles > MODEL_LIMITS.triangles) throw bad('モデル内のインスタンスを含む描画量が上限を超えています。');
   const skins = list(json.skins, 64), boneIds = new Set<number>();
-  for (const skin of skins) { if (!Array.isArray(skin.joints) || !skin.joints.length || skin.joints.length > MODEL_LIMITS.bones) throw bad(); for (const n of skin.joints) { ref(n, nodes); boneIds.add(n); } if (skin.inverseBindMatrices !== undefined) { const a = ref(skin.inverseBindMatrices, accessors); if (a.type !== 'MAT4' || a.count !== skin.joints.length) throw bad(); } }
+  for (const skin of skins) { if (!Array.isArray(skin.joints) || !skin.joints.length || skin.joints.length > (isVrm ? MODEL_LIMITS.bones : 256)) throw bad(); for (const n of skin.joints) { ref(n, nodes); boneIds.add(n); } if (skin.inverseBindMatrices !== undefined) { const a = ref(skin.inverseBindMatrices, accessors); if (a.type !== 'MAT4' || a.count !== skin.joints.length) throw bad(); } }
   if (boneIds.size > MODEL_LIMITS.bones) throw bad(); for (const node of nodes) if (node.skin !== undefined) ref(node.skin, skins);
   for (const node of nodes) if (node.skin !== undefined && node.mesh !== undefined) {
     const skin = skins[node.skin]!, mesh = meshes[node.mesh]!;
@@ -137,8 +147,9 @@ export function inspectGlb(bytes: Uint8Array): { info: AssetInfo; json: Obj; bin
   const checkTextures = (item: Obj) => { for (const [key, value] of Object.entries(item)) if (value && typeof value === 'object') { if (key.endsWith('Texture')) ref(value.index, textures); checkTextures(value); } };
   materials.forEach(checkTextures);
   for (const mesh of meshes) for (const p of mesh.primitives) if (p.material !== undefined) ref(p.material, materials);
-  const info: AssetInfo = { mime: 'model/gltf-binary', width: 256, height: 256, model: { format: 'glb', clips, bones: [...boneIds].map((node) => ({ node, name: name(nodes[node]!.name, `Bone ${node}`) })), vertices, triangles, textureBytes } };
+  const vrm = inspectVrm(json); vrm?.humanoid.forEach((b) => boneIds.add(b.node)); if (boneIds.size > MODEL_LIMITS.bones) throw bad();
+  const info: AssetInfo = { mime: 'model/gltf-binary', width: 256, height: 256, model: { format: vrm ? 'vrm' : 'glb', ...(vrm ? { vrm } : {}), clips, bones: [...boneIds].map((node) => ({ node, name: name(nodes[node]!.name, `Bone ${node}`) })), vertices, triangles, textureBytes } };
   const gpuBytes = geometryBytes + morphBytes + Math.ceil(textureBytes * 4 / 3) + boneIds.size * 64;
-  if (gpuBytes > 96 * 1024 * 1024) throw bad('GLBの推定描画資源が96MiBを超えています。');
+  if (gpuBytes > (vrm ? 192 : 96) * 1024 * 1024) throw bad(`3Dの推定描画資源が${vrm ? 192 : 96}MiBを超えています。`);
   return { info, json, bin, gpuBytes };
 }

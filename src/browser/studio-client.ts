@@ -1,6 +1,7 @@
 import { STUDIO_PORT, STUDIO_PROBE, type StudioMessage, type StudioRequest, type StudioTarget } from '../studio/protocol';
 import type { EditCommand, EditorCheckpoint, EditorSnapshot } from '../editor-core/types';
 import { ASSET_LIMITS, bytesToBase64 } from '../assets/validation';
+import { importAssets, releaseAssets } from '../assets/client';
 
 import type { StudioConnectionState, StudioConnection } from '../studio/connection';
 import { requestStudioSurface } from './side-panel';
@@ -118,7 +119,20 @@ export function createStudioClient(notify: (value: StudioConnectionState) => voi
     import(files: readonly File[]) {
       return enqueue(async () => {
         const generation = epoch;
-        if (!files.length || files.length > ASSET_LIMITS.batchCount || files.reduce((n, f) => n + f.size, 0) > ASSET_LIMITS.batchBytes) throw new Error('一度に追加する素材は8個・合計32MBまでです。');
+        const large = files.some((f) => f.size > ASSET_LIMITS.fileBytes);
+        if (!files.length || files.length > ASSET_LIMITS.batchCount || files.reduce((n, f) => n + f.size, 0) > (large ? ASSET_LIMITS.batchBytes : ASSET_LIMITS.fileBytes)) throw new Error('一度の追加は8個・通常32MiB、大容量3Dを含む場合は64MiBまでです。');
+        if (large) {
+          const lease = `studio-upload-${crypto.randomUUID()}`;
+          const surface = new URL(visibilityDocument?.URL ?? '').searchParams.get('surface');
+          const ownerTab = surface === 'sidepanel' ? tabId : (await chrome.tabs.getCurrent())?.id;
+          if (ownerTab === undefined) throw new Error('Studioの保持先が見つかりません。');
+          try {
+            const assets = await importAssets(files, lease, undefined, ownerTab);
+            if (generation !== epoch || !connected) throw new Error('素材の読み込み中に接続が変わりました。');
+            const current = state!; await request({ type: 'import-assets', session: current.sessionId, revision: current.revision, assets: assets.map((a) => a.id) } as Omit<StudioRequest, 'id'>);
+          } finally { await releaseAssets(lease).catch(() => undefined); }
+          return;
+        }
         const source = await Promise.all(files.map(async (file) => ({ name: file.name.replace(/[\u0000-\u001f]/g, '').slice(0, 120), mime: file.type, base64: bytesToBase64(new Uint8Array(await file.arrayBuffer())) })));
         if (generation !== epoch || !connected) throw new Error('素材の読み込み中に接続が変わりました。もう一度追加してください。');
         const current = state!; await request({ type: 'import', session: current.sessionId, revision: current.revision, files: source } as Omit<StudioRequest, 'id'>);

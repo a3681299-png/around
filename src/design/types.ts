@@ -12,7 +12,7 @@ export interface SurfaceStyleRule {
 }
 
 export interface DesignDocument {
-  schemaVersion: 10;
+  schemaVersion: 11;
   id: string;
   siteId: string;
   /** null uses native site styling; a built-in theme is an optional starting point. */

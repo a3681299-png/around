@@ -106,10 +106,10 @@ test('record/replay and backward seeking reproduce every motion state at recorde
 
 test('v8 artwork and Runtime 1.1 takes migrate without mutation; malformed motions and executable drivers fail', () => {
   const { scene, input } = setup(), doc = { ...emptyDesign('youtube', null), ...scene, schemaVersion: 8, signalRules: [defaultScrollOpacityRule('image-0')] }, before = JSON.stringify(doc);
-  expect(parseDesign(doc).schemaVersion).toBe(10); expect(JSON.stringify(doc)).toBe(before);
+  expect(parseDesign(doc).schemaVersion).toBe(11); expect(JSON.stringify(doc)).toBe(before);
   const old = { format: 'ww-signal-take', formatVersion: 1, runtimeVersion: '1.1.0', id: 'old-take', name: 'v1', siteId: 'youtube', initialState: { ...initialWorldState(), runtimeVersion: '1.1.0' }, inputs: [input(0)] };
   expect(parseSignalTake(old).runtimeVersion).toBe('1.3.0');
-  for (const motion of [{ ...defaultFollowMotion(), maxSpeed: Infinity }, { ...defaultFollowMotion(), acceleration: 0 }, { ...defaultFollowMotion(), stopRadius: -1 }, { ...defaultFollowMotion(), script: 'alert(1)' }]) expect(() => parseDesign({ ...doc, schemaVersion: 10, decorations: [{ ...scene.decorations[0]!, motion }] })).toThrow();
+  for (const motion of [{ ...defaultFollowMotion(), maxSpeed: Infinity }, { ...defaultFollowMotion(), acceleration: 0 }, { ...defaultFollowMotion(), stopRadius: -1 }, { ...defaultFollowMotion(), script: 'alert(1)' }]) expect(() => parseDesign({ ...doc, schemaVersion: 11, decorations: [{ ...scene.decorations[0]!, motion }] })).toThrow();
   expect(() => parseDesign({ ...doc, decorations: [{ ...scene.decorations[0]!, motion: defaultFollowMotion() }] })).toThrow();
   expect(() => parseTimelineCommand({ type: 'track', rule: { ...defaultScrollOpacityRule('image-0'), source: { signal: 'window.eval' } } })).toThrow();
 });

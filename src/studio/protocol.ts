@@ -12,6 +12,7 @@ export type StudioRequest =
   | { id: number; type: 'surface-visibility'; visible: boolean }
   | { id: number; type: 'command'; session: string; revision: number; command: EditCommand }
   | { id: number; type: 'import'; session: string; revision: number; files: AssetWireFile[] }
+  | { id: number; type: 'import-assets'; session: string; revision: number; assets: string[] }
   | { id: number; type: 'thumbnail'; layer: string }
   | { id: number; type: 'timeline'; session: string; command: TimelineCommand }
   | { id: number; type: 'detach' };

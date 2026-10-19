@@ -25,7 +25,7 @@ test('GLB renders alpha, shares resources, edits/drags/duplicates/undoes, saves 
   await panel.locator('.undo').click(); await expect(media).toHaveCount(1); await panel.locator('.redo').click(); await expect(media).toHaveCount(2);
   await panel.locator('.save').click(); await expect(panel.locator('.dirty')).toHaveText('保存済み');
   const saved = await popup.evaluate(async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'] as DesignDocument);
-  expect(saved.schemaVersion).toBe(10); expect(saved.decorations[0]).toMatchObject({ kind: 'model3d', model: { rotationY: 35 } }); expect(saved.decorations[0]!.assetId).toBe(saved.decorations[1]!.assetId);
+  expect(saved.schemaVersion).toBe(11); expect(saved.decorations[0]).toMatchObject({ kind: 'model3d', model: { rotationY: 35 } }); expect(saved.decorations[0]!.assetId).toBe(saved.decorations[1]!.assetId);
   await youtube.reload(); await expect(media.first()).toHaveAttribute('data-renderer', 'three', { timeout: 20000 });
   expect(await youtube.locator(`${overlay} [data-image-id]`).first().evaluate((e) => getComputedStyle(e).pointerEvents)).toBe('none');
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck(); await expect(youtube.locator(overlay)).toHaveCount(0);

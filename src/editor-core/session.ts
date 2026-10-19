@@ -1,4 +1,4 @@
-import { defaultModelSettings } from '../models/types';
+import { defaultModelSettings, patchModel } from '../models/types';
 import { emptyDesign, parseDesign, sameDesign } from '../design/schema';
 import { IMAGE_LIMITS, type DesignDocument, type SurfaceStyle, type ImagePatch } from '../design/types';
 import { moveGroup, reanchorPlacement, type PlacementChange } from '../world/geometry';
@@ -94,7 +94,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     }
     const next = parseDesign(draft);
     const { playback, model, ...properties } = patch;
-    next.decorations = next.decorations.map((image) => image.id !== id ? image : image.kind === 'model3d' ? { ...image, ...properties, placement: { ...image.placement, ...patch.placement }, model: { ...image.model, ...model, locomotion: { ...image.model.locomotion, ...model?.locomotion }, look: { ...image.model.look, ...model?.look } } } : image.kind === 'animation'
+    next.decorations = next.decorations.map((image) => image.id !== id ? image : image.kind === 'model3d' ? { ...image, ...properties, placement: { ...image.placement, ...patch.placement }, model: patchModel(image.model, model, image.source) } : image.kind === 'animation'
       ? { ...image, ...properties, placement: { ...image.placement, ...patch.placement }, playback: { ...image.playback, ...playback } }
       : { ...image, ...properties, placement: { ...image.placement, ...patch.placement } });
     updateDraft(next);
