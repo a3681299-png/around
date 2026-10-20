@@ -6,13 +6,14 @@ import { VRMLoaderPlugin, VRMUtils } from '@pixiv/three-vrm';
 import { createVrmPlayer, isVrm, disposeInstanceSkeletons } from './vrm-player';
 import type { ModelEvaluation } from '../../world/models';
 import type { WorldFrame } from '../../world/types';
-import { loadAsset } from '../../assets/client';
+import { loadAsset, clearAssetSources } from '../../assets/client';
+import { verifiedModelBytes } from '../../assets/verified-source';
 import { inspectGlb } from '../../assets/glb';
 import type { Decoration, ModelDecoration } from '../../design/types';
 import { ASSET_PROFILE, assetProfile, profileAsync, profileSync, profileEnd, flushAssetProfile } from '../../diagnostics/asset-profile';
 
 export interface ModelSurface { element: HTMLDivElement; update(layer: Decoration, visible: boolean): void; destroy(): void }
-interface Resource { key: string; promise: Promise<GLTF>; value?: GLTF; refs: number; bytes: number; disposed: boolean; trace?: string }
+interface Resource { key: string; promise: Promise<GLTF>; controller: AbortController; value?: GLTF; refs: number; bytes: number; disposed: boolean; trace?: string }
 function dispose(gltf: GLTF) {
   const geometries = new Set<Mesh['geometry']>(), materials = new Set<Material>(), textures = new Set<Texture>(), skeletons = new Set<{ dispose(): void }>();
   for (const texture of gltf.userData['wwTextures'] ?? []) if (texture instanceof Texture) textures.add(texture);
@@ -54,22 +55,23 @@ export function createModelRenderer(doc: Document, report: (message: string) => 
   function onLost(event: Event) { event.preventDefault(); lost = true; queries.length = 0; gpuMs = null; cancel(); instances.forEach((i) => { i.element.dataset.playback = 'context-lost'; }); stats(); }
   function onRestored() { lost = false; instances.forEach((i) => { i.dirty = true; i.failed = false; }); schedule(); }
   const release = (entry: Resource) => {
-    if (--entry.refs > 0) return; entry.disposed = true; if (cache.get(entry.key) === entry) cache.delete(entry.key); budgetBytes -= entry.bytes; entry.bytes = 0;
+    if (--entry.refs > 0) return; entry.disposed = true; entry.controller.abort(); if (cache.get(entry.key) === entry) cache.delete(entry.key); budgetBytes -= entry.bytes; entry.bytes = 0;
     if (entry.value) dispose(entry.value); stats();
   };
   let resourceSerial = 0;
   const acquire = (id: string, vrm: boolean) => {
     const key = vrm ? `${id}:vrm:${++resourceSerial}` : id;
     const found = cache.get(key); if (found) { found.refs++; return found; }
-    const entry: Resource = { key, refs: 1, bytes: 0, disposed: false, promise: Promise.resolve(undefined as never) }; cache.set(key, entry);
+    const entry: Resource = { key, controller: new AbortController(), refs: 1, bytes: 0, disposed: false, promise: Promise.resolve(undefined as never) }; cache.set(key, entry);
     const readStart = ASSET_PROFILE ? performance.now() : 0;
-    entry.promise = readAsset(id).then(async ({ blob, metadata }) => {
+    entry.promise = readAsset(id, entry.controller.signal).then(async ({ blob, metadata }) => {
       const trace = assetProfile(id); if (trace) entry.trace = trace;
       profileEnd(trace, 'renderer.source-load', readStart);
       if (!metadata.model) throw new Error('GLB素材が見つかりません。');
       if (entry.disposed || closed) throw new Error('読み込みを中止しました。');
       const bytes = new Uint8Array(await profileAsync(trace, 'renderer.blob-read', () => blob.arrayBuffer(), { bytes: blob.size }));
-      if (entry.disposed || closed) throw new Error('読み込みを中止しました。'); const { gpuBytes } = profileSync(trace, 'renderer.inspect', () => inspectGlb(bytes));
+      if (entry.disposed || closed) throw new Error('読み込みを中止しました。');
+      const gpuBytes = verifiedModelBytes(blob) ?? profileSync(trace, 'renderer.inspect', () => inspectGlb(bytes).gpuBytes);
       if (budgetBytes + gpuBytes > 256 * 1024 * 1024) throw new Error('3D描画資源の予算256MiBを超えました。ほかのモデルを削除してください。');
       budgetBytes += gpuBytes; entry.bytes = gpuBytes;
       const manager = new LoadingManager(); manager.setURLModifier((url) => { if (!url.startsWith('blob:')) throw new Error('GLBからの外部アクセスを拒否しました。'); return url; });
@@ -210,6 +212,7 @@ export function createModelRenderer(doc: Document, report: (message: string) => 
     destroy() {
       if (closed) return; closed = true; cancel(); doc.removeEventListener('visibilitychange', visibility); reduced.removeEventListener('change', visibility);
       dropRenderer();
+      if (readAsset === loadAsset) clearAssetSources();
       stats();
     },
   };

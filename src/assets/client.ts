@@ -4,6 +4,8 @@ import { inspectAsset } from './inspect';
 import { validateAnimatedFrames } from './decode';
 import { ASSET_MESSAGE, type AssetWireFile } from './protocol';
 import { ASSET_PROFILE, assetProfile, newAssetProfile, linkAssetProfile, profileAsync, profileSync, profileEnd, flushAssetProfile } from '../diagnostics/asset-profile';
+import { createSourceCache } from './source-cache';
+import { rememberVerifiedSource } from './verified-source';
 
 async function request<T>(action: string, values: Record<string, unknown>): Promise<T> {
   const trace = ASSET_PROFILE ? (values['__profile'] as string | undefined) ?? (typeof values['id'] === 'string' ? assetProfile(values['id']) : undefined) : undefined;
@@ -52,20 +54,29 @@ export async function importAssets(files: readonly File[], session: string, sign
   return imported;
 }
 
-export async function loadAsset(id: string): Promise<{ metadata: AssetMetadata; blob: Blob }> {
+async function fetchAsset(id: string, signal: AbortSignal): Promise<{ metadata: AssetMetadata; blob: Blob }> {
+  signal.throwIfAborted();
   const result = await request<{ metadata: AssetMetadata; base64?: string; chunked?: boolean }>('get', { id });
   const trace = assetProfile(id), started = ASSET_PROFILE ? performance.now() : 0;
   let bytes: Uint8Array;
   if (result.chunked) {
     if (!Number.isSafeInteger(result.metadata.byteLength) || result.metadata.byteLength > ASSET_LIMITS.modelBytes || result.metadata.byteLength <= 0) throw new Error('素材容量が不正です。');
     bytes = new Uint8Array(result.metadata.byteLength);
-    for (let offset = 0; offset < bytes.length; offset += ASSET_LIMITS.chunkBytes) { const wire = await request<string>('get-part', { id, offset }); const part = profileSync(trace, 'download.decode-base64', () => base64ToBytes(wire), { bytes: Math.min(ASSET_LIMITS.chunkBytes, bytes.length - offset) }); if (part.length !== Math.min(ASSET_LIMITS.chunkBytes, bytes.length - offset)) throw new Error('素材の転送が中断されました。'); profileSync(trace, 'download.reassemble', () => bytes.set(part, offset), { bytes: part.length }); }
+    for (let offset = 0; offset < bytes.length; offset += ASSET_LIMITS.chunkBytes) { signal.throwIfAborted(); const wire = await request<string>('get-part', { id, offset }); signal.throwIfAborted(); const part = profileSync(trace, 'download.decode-base64', () => base64ToBytes(wire), { bytes: Math.min(ASSET_LIMITS.chunkBytes, bytes.length - offset) }); if (part.length !== Math.min(ASSET_LIMITS.chunkBytes, bytes.length - offset)) throw new Error('素材の転送が中断されました。'); profileSync(trace, 'download.reassemble', () => bytes.set(part, offset), { bytes: part.length }); }
   } else bytes = base64ToBytes(result.base64);
   profileEnd(trace, 'download.parts-total', started, { bytes: bytes.length });
+  signal.throwIfAborted();
   const info = profileSync(trace, 'download.inspect', () => inspectAsset(bytes, result.metadata.mime));
-  const blob = profileSync(trace, 'download.clone-blob', () => new Blob([new Uint8Array(bytes).buffer], { type: info.mime }), { bytes: bytes.length });
+  const blob = profileSync(trace, 'download.clone-blob', () => new Blob([bytes as Uint8Array<ArrayBuffer>], { type: info.mime }), { bytes: bytes.length });
+  rememberVerifiedSource(blob, info);
   return { metadata: { ...result.metadata, ...info }, blob };
 }
+const sources = createSourceCache({ load: fetchAsset, size: (asset) => asset.blob.size, now: () => performance.now(), maxBytes: 96 * 1024 * 1024, idleMs: 30000 });
+export async function loadAsset(id: string, signal?: AbortSignal): Promise<{ metadata: AssetMetadata; blob: Blob }> {
+  const asset = await sources.get(id, signal);
+  return { metadata: structuredClone(asset.metadata), blob: asset.blob };
+}
+export const clearAssetSources = () => sources.clear();
 export const loadAssetMetadata = (id: string) => request<AssetMetadata>('get-metadata', { id });
 
 export const retainAssets = (session: string, ids: readonly string[]) => request<void>('lease', { session, ids });

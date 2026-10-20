@@ -1,7 +1,7 @@
 import { installSidePanelHost } from '../browser/side-panel';
 import { ASSET_MESSAGE, type AssetWireFile } from '../assets/protocol';
 import { changeAssets, getAsset, type AssetLease, type StoredAsset } from '../assets/repository';
-import { ASSET_LIMITS, base64ToBytes, bytesToBase64, type AssetMetadata } from '../assets/validation';
+import { ASSET_LIMITS, base64ToBytes, bytesToBase64, type AssetMetadata, type AssetInfo } from '../assets/validation';
 import { inspectAsset } from '../assets/inspect';
 import { validateModelTextures } from '../assets/decode';
 import { validateDesignAssets } from '../assets/design-assets';
@@ -9,6 +9,8 @@ import { isAssetId, isDesignId, parseDesign } from '../design/schema';
 import { saveDesign } from '../storage/designs';
 import { installTakeStorage } from '../browser/take-repository';
 import { createAssetTransfers } from '../assets/transfers';
+import { createWorkQueue } from '../assets/work-queue';
+import { createSourceCache } from '../assets/source-cache';
 import { ASSET_PROFILE, PROFILE_MESSAGE, assetProfile, linkAssetProfile, validProfile, profileAsync, profileSync, profileEnd, profileSnapshot, profileIngest, profileClear } from '../diagnostics/asset-profile';
 
 const transfers = createAssetTransfers();
@@ -16,12 +18,11 @@ const transfers = createAssetTransfers();
 const profileGrants = new Map<string, { id: string; tab: number; expires: number }>();
 const profileSessions = new Map<string, string>();
 
-let queue: Promise<unknown> = Promise.resolve();
-function enqueue<T>(action: () => Promise<T>): Promise<T> {
-  const result = queue.then(action);
-  queue = result.catch(() => undefined);
-  return result;
-}
+const mutations = createWorkQueue(1), reads = createWorkQueue(2);
+const enqueue = <T>(action: () => Promise<T>) => mutations.run(action);
+const verified = new Map<string, AssetInfo>(); // Worker-lifetime receipts, populated only after full validation.
+const sourceRows = createSourceCache({ load: async (id: string) => { const row = await getAsset(id); if (!row) throw new Error('画像素材が見つかりません。'); return row; },
+  size: (row) => row.blob.size, now: () => performance.now(), maxBytes: 96 * 1024 * 1024, idleMs: 5000 });
 
 async function owner(message: Record<string, unknown>, sender: chrome.runtime.MessageSender): Promise<AssetLease> {
   if (!isDesignId(message['session'])) throw new Error('編集セッションが不正です。');
@@ -60,8 +61,8 @@ async function prune(current?: AssetLease): Promise<void> {
       // Recovery shares a tab with the live page, but cannot supersede its document.
       const leases = row.leases.filter((lease) => (lease.tabId === -1 || tabs.has(lease.tabId))
         && !(current && !current.documentId.startsWith('studio:') && lease.tabId === current.tabId && lease.documentId !== current.documentId && !lease.documentId.startsWith('studio:')));
-      if (leases.length || references.has(row.id)) put.push({ ...row, leases });
-      else remove.push(row.id);
+      if (leases.length || references.has(row.id)) { if (leases.length !== row.leases.length) put.push({ ...row, leases }); }
+      else { remove.push(row.id); sourceRows.delete(row.id); verified.delete(row.id); }
     }
     return { value: undefined, put, remove };
   });
@@ -70,9 +71,13 @@ async function prune(current?: AssetLease): Promise<void> {
 async function leaseAssets(lease: AssetLease, ids: readonly string[]): Promise<void> {
   await changeAssets((rows) => {
     if (ids.some((id) => !rows.some((row) => row.id === id))) throw new Error('画像素材が見つかりません。もう一度読み込んでください。');
-    return { value: undefined, put: rows.map((row) => ({ ...row, leases: [
-      ...row.leases.filter((entry) => entry.session !== lease.session), ...(ids.includes(row.id) ? [lease] : []),
-    ] })) };
+    const put: StoredAsset[] = [];
+    for (const row of rows) {
+      const existing = row.leases.find((entry) => entry.session === lease.session), needed = ids.includes(row.id);
+      if (needed && existing?.tabId === lease.tabId && existing.documentId === lease.documentId || !needed && !existing) continue;
+      put.push({ ...row, leases: [...row.leases.filter((entry) => entry.session !== lease.session), ...(needed ? [lease] : [])] });
+    }
+    return { value: undefined, put };
   });
 }
 
@@ -88,32 +93,39 @@ async function importBatch(input: unknown, lease: AssetLease, decoded?: Uint8Arr
     const bytes = decoded ?? base64ToBytes(file.base64);
     size += bytes.length;
     if (size > (decoded ? ASSET_LIMITS.modelBytes : ASSET_LIMITS.fileBytes)) throw new Error('素材の転送容量が上限を超えました。');
-    const info = profileSync(trace, 'store.inspect', () => inspectAsset(bytes, file.mime));
-    if (info.model) await profileAsync(trace, 'store.validate-textures', () => validateModelTextures(bytes, undefined, trace));
-    const blob = profileSync(trace, 'store.clone-blob', () => new Blob([new Uint8Array(bytes).buffer], { type: info.mime }), { bytes: bytes.length });
+    const hash = await profileAsync(trace, 'store.hash', () => crypto.subtle.digest('SHA-256', bytes as Uint8Array<ArrayBuffer>), { bytes: bytes.length });
+    const id = `asset-${[...new Uint8Array(hash)].map((byte) => byte.toString(16).padStart(2, '0')).join('')}`;
+    const cached = verified.get(id);
+    // A different MIME declaration still passes the original boundary check.
+    const reusable = cached && (!file.mime || cached.mime === file.mime || cached.model && ['application/octet-stream', 'model/vrm', 'application/vrm'].includes(file.mime));
+    const info = reusable ? profileSync(trace, 'store.verified-hit', () => structuredClone(cached)) : profileSync(trace, 'store.inspect', () => inspectAsset(bytes, file.mime));
+    if (!reusable && info.model) await profileAsync(trace, 'store.validate-textures', () => validateModelTextures(bytes, undefined, trace));
+    const blob = profileSync(trace, 'store.clone-blob', () => new Blob([bytes as Uint8Array<ArrayBuffer>], { type: info.mime }), { bytes: bytes.length });
     // ServiceWorker has no ImageDecoder. Both boundaries inspect containers;
     // images validate frame 0. Video is probed by the content importer.
-    if (!info.model && info.animation?.format !== 'lottie' && info.animation?.format !== 'webm') {
+    if (!reusable && !info.model && info.animation?.format !== 'lottie' && info.animation?.format !== 'webm') {
       const bitmap = await createImageBitmap(blob);
       try { if (bitmap.width !== info.width || bitmap.height !== info.height) throw new Error('画像を正しく読み込めませんでした。'); }
       finally { bitmap.close(); }
     }
-    const hash = await profileAsync(trace, 'store.hash-with-copy', () => crypto.subtle.digest('SHA-256', new Uint8Array(bytes).buffer), { bytes: bytes.length });
-    const id = `asset-${[...new Uint8Array(hash)].map((byte) => byte.toString(16).padStart(2, '0')).join('')}`;
+    if (verified.size >= ASSET_LIMITS.count) verified.delete(verified.keys().next().value!);
+    verified.set(id, structuredClone(info));
     assets.push({ ...info, id, name: file.name, byteLength: bytes.length, blob, leases: [lease] });
     linkAssetProfile(id, trace);
   }
   await profileAsync(trace, 'store.prune', () => prune(lease));
   await profileAsync(trace, 'store.idb-write-transaction', () => changeAssets((rows) => {
     const combined = new Map(rows.map((row) => [row.id, row]));
+    const put = new Map<string, StoredAsset>();
     for (const asset of assets) {
       const existing = combined.get(asset.id);
-      combined.set(asset.id, existing ? { ...existing, leases: [...existing.leases.filter((entry) => entry.session !== lease.session), lease] } : asset);
+      const next = existing ? { ...existing, leases: [...existing.leases.filter((entry) => entry.session !== lease.session), lease] } : asset;
+      combined.set(asset.id, next); put.set(asset.id, next);
     }
     if (combined.size > ASSET_LIMITS.count || [...combined.values()].reduce((sum, row) => sum + row.byteLength, 0) > ASSET_LIMITS.totalBytes) {
       throw new Error('素材の保存上限（256MB・128素材）またはブラウザーの空き容量を確認してください。不要な素材を削除して保存すると空きを確保できます。');
     }
-    return { value: undefined, put: [...combined.values()] };
+    return { value: undefined, put: [...put.values()] };
   }));
   return assets.map(({ blob: _blob, leases: _leases, ...metadata }) => metadata);
 }
@@ -121,7 +133,7 @@ async function importBatch(input: unknown, lease: AssetLease, decoded?: Uint8Arr
 async function handle(message: Record<string, unknown>, sender: chrome.runtime.MessageSender, trace?: string): Promise<unknown> {
   if (message['action'] === 'get' || message['action'] === 'get-part' || message['action'] === 'get-metadata') {
     if (!isAssetId(message['id'])) throw new Error('素材IDが不正です。');
-    const asset = await profileAsync(trace, 'store.idb-read', () => getAsset(message['id'] as string));
+    const asset = await profileAsync(trace, 'store.idb-read-or-cached', () => sourceRows.get(message['id'] as string));
     if (!asset) throw new Error('画像素材が見つかりません。');
     const { blob, leases: _leases, ...metadata } = asset;
     if (message['action'] === 'get-metadata') return metadata;
@@ -197,7 +209,8 @@ chrome.runtime.onMessage.addListener((input: unknown, sender, respond) => {
     }
   }
   const arrived = ASSET_PROFILE ? performance.now() : 0;
-  void enqueue(() => { profileEnd(trace, 'queue.' + message['action'], arrived); return profileAsync(trace, 'service.' + message['action'], () => handle(message, sender, trace)); }).then(
+  const scheduler = ['get', 'get-part', 'get-metadata'].includes(String(message['action'])) ? reads : mutations;
+  void scheduler.run(() => { profileEnd(trace, 'queue.' + message['action'], arrived); return profileAsync(trace, 'service.' + message['action'], () => handle(message, sender, trace)); }).then(
     (value) => respond({ ok: true, value, ...(trace ? { __profile: trace } : {}) }),
     (error: unknown) => respond({ ok: false, error: error instanceof Error ? error.message : '画像の保存に失敗しました。' }),
   );

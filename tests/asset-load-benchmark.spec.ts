@@ -42,7 +42,10 @@ test('private local avatar: real YouTube A and controlled A-prime/B/C load perfo
   const profiling = process.env.WW_ASSET_BENCH_BASELINE !== '1', file = path.resolve(process.env.WW_VRM_FILE!);
   let report: Record<string, any> = { sourceCommit: '90926a6', profiling, bytes: 57185776, conditions: {}, notes: ['First = new Chrome profile/context; OS file/driver cache is not flushed.', 'Warm = same process, a newly parsed model and a fresh WebGL context, not resource reuse.', 'CPU is only the measured page target, not the service worker or the GPU process.'] };
   const queueOnly = process.env.WW_ASSET_BENCH_QUEUE === '1';
-  const artifact = '.work/verification/asset-load-' + (queueOnly ? 'queue' : profiling ? 'profile' : 'baseline') + '.json'; await mkdir('.work/verification', { recursive: true });
+  const repeats = Math.max(3, Math.min(10, Number(process.env.WW_ASSET_REPEATS) || 3));
+  const label = process.env.WW_ASSET_RUN_LABEL;
+  if (label && !/^[a-z0-9-]+$/.test(label)) throw new Error('Invalid benchmark label');
+  const artifact = '.work/verification/asset-load-' + (label ?? (queueOnly ? 'queue' : profiling ? 'profile' : 'baseline')) + '.json'; await mkdir('.work/verification', { recursive: true });
   const persist = () => writeFile(artifact, JSON.stringify(report, null, 2));
   const controlsOnly = profiling && !queueOnly && process.env.WW_ASSET_BENCH_CONTROLS === '1';
   if (controlsOnly) { report = JSON.parse(await readFile(artifact, 'utf8')); report.notes.push('Controlled comparison repeated after explicitly releasing ModelSurface and its bitmaps between trials. Real YouTube measurements are retained.'); }
@@ -59,7 +62,7 @@ test('private local avatar: real YouTube A and controlled A-prime/B/C load perfo
     const cdp = await context.newCDPSession(page); await cdp.send('Performance.enable');
     const query = (action: string) => panel.evaluate<any>(`chrome.runtime.sendMessage({type:'ww.asset-profile.v1',action:${JSON.stringify(action)}})`);
     const runs: any[] = []; report.conditions.A_real_youtube = runs;
-    for (let n = 0; n < (queueOnly ? 1 : 3); n++) {
+    for (let n = 0; n < (queueOnly ? 1 : repeats); n++) {
       if (n) { await panel.click('.delete-image'); await expect(page.locator('#web-world-themes-decorations .model-media')).toHaveCount(0); }
       if (profiling) await query('clear'); const before = await metrics(cdp), start = performance.now(); console.log(`Asset load A run ${n + 1}`);
       await panel.files([file], '.model-file'); const media = page.locator('#web-world-themes-decorations .model-media');
@@ -73,7 +76,7 @@ test('private local avatar: real YouTube A and controlled A-prime/B/C load perfo
     }
     await panel.click('.save'); await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
     report.youtube = await page.locator('video').first().evaluate((v: HTMLVideoElement) => ({ readyState: v.readyState, paused: v.paused, error: v.error?.code ?? null }));
-    if (profiling && !queueOnly) {
+    if (profiling && !queueOnly && process.env.WW_ASSET_SKIP_OLD_IFRAME !== '1') {
       const saved = await popup.evaluate(async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'] as import('../src/design/types').DesignDocument);
       const asset = saved.decorations[0]!.assetId, target = Number(await panel.evaluate('new URL(location.href).searchParams.get("target")')); report.iframe = await iframeProbe(context, page, id, asset, target);
     }
@@ -88,7 +91,7 @@ test('private local avatar: real YouTube A and controlled A-prime/B/C load perfo
       const page = await browser.newPage(), id = await extensionId(page); await page.goto(`chrome-extension://${id}/diagnostics/asset-benchmark.html`); await page.bringToFront();
       await page.locator('#file').setInputFiles(file); if (mode === 'stored') await page.evaluate(() => (globalThis as any).wwAssetBench.seed());
       const cdp = await browser.newCDPSession(page); await cdp.send('Performance.enable'); const runs: any[] = []; report.conditions[mode] = runs;
-      for (let n = 0; n < 3; n++) {
+      for (let n = 0; n < repeats; n++) {
         console.log(`Asset load ${mode} run ${n + 1}`); const before = await metrics(cdp);
         const result = await page.evaluate((mode) => (globalThis as any).wwAssetBench.run(mode), mode); const after = await metrics(cdp);
         expect(result.alphaPixels).toBeGreaterThan(1000); runs.push({ run: n + 1, cache: n ? 'warm-process' : 'first-profile', ...result, ...metricDelta(before, after) }); await persist();

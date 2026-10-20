@@ -9,16 +9,16 @@ const list = (n: unknown, max: number): Obj[] => { if (n === undefined) return [
 const name = (n: unknown, fallback: string) => typeof n === 'string' ? n.replace(/[\u0000-\u001f]/g, '').slice(0, 120) : fallback;
 const allowedExtensions = new Set(['KHR_materials_unlit', 'KHR_texture_transform', 'KHR_mesh_quantization', 'KHR_materials_ior', 'KHR_materials_specular', 'KHR_materials_clearcoat', 'KHR_materials_emissive_strength', ...VRM_EXTENSIONS]);
 
-/** Bounded, self-contained GLB 2.0. No URI is handed to Three.js unchecked. */
+/** Bounded, self-contained GLB 2.0. The returned BIN is a read-only view of the input. */
 export function inspectGlb(bytes: Uint8Array): { info: AssetInfo; json: Obj; bin: Uint8Array; gpuBytes: number } {
   const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   if (bytes.length < 28 || dv.getUint32(0, true) !== 0x46546c67 || dv.getUint32(4, true) !== 2 || dv.getUint32(8, true) !== bytes.length) throw bad();
-  let at = 12, json: Obj | undefined, bin = new Uint8Array(), chunks = 0;
+  let at = 12, json: Obj | undefined, bin: Uint8Array = new Uint8Array(), chunks = 0;
   while (at + 8 <= bytes.length && ++chunks <= 2) {
     const size = dv.getUint32(at, true), type = dv.getUint32(at + 4, true); at += 8;
     if (size % 4 || size > bytes.length - at) throw bad();
     if (type === 0x4e4f534a && chunks === 1 && size <= 2 * 1024 * 1024) { try { json = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes.subarray(at, at + size))) as Obj; } catch { throw bad(); } }
-    else if (type === 0x004e4942 && chunks === 2) bin = bytes.slice(at, at + size);
+    else if (type === 0x004e4942 && chunks === 2) bin = bytes.subarray(at, at + size);
     else throw bad(); at += size;
   }
   if (at !== bytes.length || !json || json.asset?.version !== '2.0' || json.asset?.minVersion && json.asset.minVersion !== '2.0') throw bad();
