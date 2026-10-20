@@ -1,6 +1,8 @@
 import styles from './panel.css';
 import { GROUP_LIMITS, IMAGE_LIMITS, STYLE_LIMITS, type SurfaceStyle, type ImagePatch, type DesignTarget } from '../design/types';
 import { ANIMATION_LIMITS } from '../assets/motion-types';
+import { MODEL_LIMITS } from '../models/types';
+import { ASSET_MESSAGES } from '../assets/limits';
 import type { Alignment, Distribution } from '../design/layout';
 import { createModelPanel } from './model-panel';
 import { createMotionPanel } from './motion-panel';
@@ -78,7 +80,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       <input class="model-file" type="file" accept=".glb,.vrm,model/gltf-binary,model/vrm" multiple aria-label="3Dモデルを追加" hidden>
       <input class="file" type="file" accept="image/png,image/webp" multiple aria-label="画像素材を追加" hidden>
       <input class="animation-file" type="file" accept="image/gif,image/png,image/apng,image/webp,video/webm,application/json,.json,.apng" multiple aria-label="アニメーション素材を追加" hidden>
-      <p class="hint asset-hint">ここへ素材をドロップしても追加できます。<span title="PNG・APNG・WebP・GIF・WebM・Lottie JSON・GLB・VRM。通常32MiB／3D 64MiB／JSON 1MiB、全32レイヤーまで。">対応形式 ⓘ</span></p>
+      <p class="hint asset-hint">ここへ素材をドロップしても追加できます。<span title="${ASSET_MESSAGES.formats}">対応形式 ⓘ</span></p>
     </section>
     <details class="layers-section" open><summary>レイヤー <span class="layer-count"></span></summary>
       <p class="hint selection-tip">行のチェックで複数選択できます。上が手前、つまみをドラッグして並び替え。</p>
@@ -302,7 +304,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       const animations = state.images.filter((image) => image.kind === 'animation').length;
       const selectedAnimations = selectedMedia.filter((image) => image.kind === 'animation').length;
       get<HTMLButtonElement>('.delete-image').disabled = !unlocked || state.saving;
-      get<HTMLButtonElement>('.duplicate-image').disabled = !unlocked || state.saving || state.images.length + selectedMedia.length > IMAGE_LIMITS.count || animations + selectedAnimations > ANIMATION_LIMITS.count || state.images.filter((i) => i.kind === 'model3d').length + selectedMedia.filter((i) => i.kind === 'model3d').length > 8 || state.groups.length + selectedLayers.filter((layer) => layer.kind === 'group').length > GROUP_LIMITS.count;
+      get<HTMLButtonElement>('.duplicate-image').disabled = !unlocked || state.saving || state.images.length + selectedMedia.length > IMAGE_LIMITS.count || animations + selectedAnimations > ANIMATION_LIMITS.count || state.images.filter((i) => i.kind === 'model3d').length + selectedMedia.filter((i) => i.kind === 'model3d').length > MODEL_LIMITS.count || state.groups.length + selectedLayers.filter((layer) => layer.kind === 'group').length > GROUP_LIMITS.count;
       get<HTMLButtonElement>('.group-layers').disabled = state.saving || Boolean(state.groupingReason);
       get<HTMLButtonElement>('.group-layers').hidden = isGroup;
       get<HTMLButtonElement>('.ungroup-layers').hidden = !isGroup;
@@ -323,7 +325,7 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       get<HTMLElement>('.dirty').dataset.dirty = String(state.dirty);
       setText(get<HTMLElement>('.layer-count'), `${state.images.length} / ${IMAGE_LIMITS.count}${state.groups.length ? `・グループ${state.groups.length}` : ''}`);
       addImage.disabled = state.saving || state.images.length >= IMAGE_LIMITS.count;
-      addModel.disabled = addImage.disabled || state.images.filter((layer) => layer.kind === 'model3d').length >= 8;
+      addModel.disabled = addImage.disabled || state.images.filter((layer) => layer.kind === 'model3d').length >= MODEL_LIMITS.count;
       addAnimation.disabled = addImage.disabled || state.images.filter((image) => image.kind === 'animation').length >= ANIMATION_LIMITS.count;
       get<HTMLFieldSetElement>('.playback').hidden = state.image?.kind !== 'animation';
       if (state.image?.kind === 'animation') {

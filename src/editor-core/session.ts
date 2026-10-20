@@ -1,4 +1,5 @@
 import { defaultModelSettings, patchModel } from '../models/types';
+import { ASSET_MESSAGES } from '../assets/limits';
 import { emptyDesign, parseDesign, sameDesign } from '../design/schema';
 import { IMAGE_LIMITS, type DesignDocument, type SurfaceStyle, type ImagePatch } from '../design/types';
 import { moveGroup, reanchorPlacement, type PlacementChange } from '../world/geometry';
@@ -176,7 +177,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
   };
   const addImages = async (files: Source, point?: { x: number; y: number }) => {
     if (!active || !assetSession || saving || importing || !files.length) return;
-    if (draft.decorations.length + files.length > IMAGE_LIMITS.count) { status = '画像は32枚まで配置できます。'; error = true; render(); return; }
+    if (draft.decorations.length + files.length > IMAGE_LIMITS.count) { status = ASSET_MESSAGES.layerCount; error = true; render(); return; }
     const epoch = importEpoch;
     const importSession = ports.makeId('session');
     let before: DesignDocument | undefined;

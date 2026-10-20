@@ -46,6 +46,6 @@ export async function changeAssets<T>(change: (rows: StoredAsset[]) => { value: 
       } catch (error) { failure = error; tx.abort(); }
     };
     tx.oncomplete = () => resolve(result);
-    tx.onabort = tx.onerror = () => reject(failure ?? tx.error ?? new Error('画像を保存できませんでした。'));
+    tx.onabort = tx.onerror = () => reject(failure ?? tx.error ?? new Error('素材を保存できませんでした。'));
   });
 }

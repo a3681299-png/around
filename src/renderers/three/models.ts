@@ -8,6 +8,7 @@ import type { ModelEvaluation } from '../../world/models';
 import type { WorldFrame } from '../../world/types';
 import { loadAsset } from '../../assets/client';
 import { verifiedModelBytes } from '../../assets/verified-source';
+import { ASSET_MESSAGES, MODEL_RESOURCE_LIMITS } from '../../assets/limits';
 import { inspectGlb } from '../../assets/glb';
 import type { Decoration, ModelDecoration } from '../../design/types';
 import { ASSET_PROFILE, assetProfile, profileAsync, profileSync, profileEnd, flushAssetProfile } from '../../diagnostics/asset-profile';
@@ -80,7 +81,7 @@ export function createModelRenderer(doc: Document, report: (message: string) => 
       const gpuBytes = verifiedModelBytes(blob) ?? profileSync(trace, 'renderer.inspect', () => inspectGlb(bytes).gpuBytes);
       if (options?.shared) entry.shared = options.shared.reserve(id, gpuBytes, metadata.model.bones.length * 64);
       const ownBytes = entry.shared?.privateBytes ?? gpuBytes;
-      if (budgetBytes + ownBytes + (options?.shared?.stats().sharedBytes ?? 0) > 256 * 1024 * 1024) throw new Error('3D描画資源の予算256MiBを超えました。ほかのモデルを削除してください。');
+      if (budgetBytes + ownBytes + (options?.shared?.stats().sharedBytes ?? 0) > MODEL_RESOURCE_LIMITS.pageGpuBytes) throw new Error(ASSET_MESSAGES.pageGpuSize);
       budgetBytes += ownBytes; entry.bytes = ownBytes;
       const manager = new LoadingManager(); manager.setURLModifier((url) => { if (!url.startsWith('blob:')) throw new Error('GLBからの外部アクセスを拒否しました。'); return url; });
       const textures = new Set<Texture>(); let failed = false;

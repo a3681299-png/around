@@ -1,4 +1,5 @@
-export const ASSET_LIMITS = Object.freeze({ fileBytes: 32 * 1024 * 1024, modelBytes: 64 * 1024 * 1024, chunkBytes: 4 * 1024 * 1024, batchBytes: 64 * 1024 * 1024, batchCount: 8, totalBytes: 256 * 1024 * 1024, count: 128, edge: 4096, pixels: 16 * 1024 * 1024 });
+import { ASSET_LIMITS, ASSET_MESSAGES } from './limits';
+export { ASSET_LIMITS } from './limits';
 export interface ImageInfo { mime: 'image/png' | 'image/webp'; width: number; height: number }
 export interface AssetInfo { mime: 'image/png' | 'image/webp' | 'image/gif' | 'application/json' | 'video/webm' | 'model/gltf-binary'; width: number; height: number; model?: import('../models/types').ModelInfo; animation?: import('./motion-types').AnimationInfo }
 export interface AssetMetadata extends AssetInfo { id: string; name: string; byteLength: number }
@@ -8,7 +9,7 @@ const invalid = () => new Error('静止PNG・WebP画像を選択してくださ�
 
 /** Bound dimensions before decoding; never trust an extension or MIME label alone. */
 export function inspectImage(data: Uint8Array, declaredMime = ''): ImageInfo {
-  if (data.byteLength === 0 || data.byteLength > ASSET_LIMITS.fileBytes) throw new Error('素材は1ファイル32MBまでです。');
+  if (data.byteLength === 0 || data.byteLength > ASSET_LIMITS.fileBytes) throw new Error(ASSET_MESSAGES.fileSize);
   const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
   let info: ImageInfo | undefined;
   if (data.length >= 33 && text(data, 0, 8) === '\x89PNG\r\n\x1a\n' && text(data, 12, 4) === 'IHDR' && view.getUint32(8) === 13) {
@@ -42,7 +43,7 @@ export function inspectImage(data: Uint8Array, declaredMime = ''): ImageInfo {
   }
   if (!info || (declaredMime !== '' && declaredMime !== info.mime)) throw invalid();
   if (info.width < 1 || info.height < 1 || info.width > ASSET_LIMITS.edge || info.height > ASSET_LIMITS.edge || info.width * info.height > ASSET_LIMITS.pixels) {
-    throw new Error('画像の大きさは4096×4096px以内にしてください。');
+    throw new Error(ASSET_MESSAGES.imageDimensions);
   }
   return info;
 }
@@ -56,7 +57,7 @@ export function bytesToBase64(data: Uint8Array): string {
 }
 
 export function base64ToBytes(value: unknown): Uint8Array {
-  if (typeof value !== 'string' || value.length > Math.ceil(ASSET_LIMITS.fileBytes / 3) * 4 || value.length % 4 === 1 || !/^[A-Za-z0-9+/]*={0,2}$/.test(value)) throw invalid();
+  if (typeof value !== 'string' || value.length > Math.ceil(ASSET_LIMITS.fileBytes / 3) * 4 || value.length % 4 === 1 || !/^[A-Za-z0-9+/]*={0,2}$/.test(value)) throw new Error('素材の転送データが不正です。');
   const native = Uint8Array as unknown as { fromBase64?: (value: string) => Uint8Array };
   if (native.fromBase64) return native.fromBase64(value);
   const binary = atob(value);

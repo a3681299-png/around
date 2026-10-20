@@ -5,10 +5,11 @@ import { inspectApng } from './apng';
 import { inspectWebm } from './webm';
 import { ASSET_LIMITS, inspectImage, type AssetInfo } from './validation';
 import { rememberModelInspection } from './verified-source';
+import { ASSET_MESSAGES } from './limits';
 
 export function inspectAsset(data: Uint8Array, mime = ''): AssetInfo {
   const model = data[0] === 0x67 && data[1] === 0x6c && data[2] === 0x54 && data[3] === 0x46;
-  if (!data.length || data.length > (model ? ASSET_LIMITS.modelBytes : ASSET_LIMITS.fileBytes)) throw new Error('通常素材は32MiB、GLB・VRMは64MiBまでです。');
+  if (!data.length || data.length > (model ? ASSET_LIMITS.modelBytes : ASSET_LIMITS.fileBytes)) throw new Error(ASSET_MESSAGES.fileSizes);
   let info: AssetInfo;
   if (model) { const result = inspectGlb(data); info = result.info; rememberModelInspection(info, result.gpuBytes); }
   else if (data[0] === 0x47 && data[1] === 0x49 && data[2] === 0x46) info = inspectGif(data);

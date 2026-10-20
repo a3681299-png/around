@@ -1,6 +1,7 @@
 import { STUDIO_PORT, STUDIO_PROBE, type StudioMessage, type StudioRequest, type StudioTarget } from '../studio/protocol';
 import type { EditCommand, EditorCheckpoint, EditorSnapshot } from '../editor-core/types';
 import { ASSET_LIMITS, bytesToBase64 } from '../assets/validation';
+import { ASSET_MESSAGES } from '../assets/limits';
 import { importAssets, releaseAssets } from '../assets/client';
 
 import type { StudioConnectionState, StudioConnection } from '../studio/connection';
@@ -120,7 +121,7 @@ export function createStudioClient(notify: (value: StudioConnectionState) => voi
       return enqueue(async () => {
         const generation = epoch;
         const large = files.some((f) => f.size > ASSET_LIMITS.fileBytes);
-        if (!files.length || files.length > ASSET_LIMITS.batchCount || files.reduce((n, f) => n + f.size, 0) > (large ? ASSET_LIMITS.batchBytes : ASSET_LIMITS.fileBytes)) throw new Error('一度の追加は8個・通常32MiB、大容量3Dを含む場合は64MiBまでです。');
+        if (!files.length || files.length > ASSET_LIMITS.batchCount || files.reduce((n, f) => n + f.size, 0) > (large ? ASSET_LIMITS.batchBytes : ASSET_LIMITS.fileBytes)) throw new Error(ASSET_MESSAGES.batch);
         if (large) {
           const lease = `studio-upload-${crypto.randomUUID()}`;
           const surface = visibilityDocument ? new URL(visibilityDocument.URL).searchParams.get('surface') : undefined;

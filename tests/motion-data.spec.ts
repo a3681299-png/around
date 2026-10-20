@@ -42,7 +42,7 @@ test('Lottie vector data is accepted and executable/external/expensive content i
     JSON.parse('{"v":"5.13.0","w":64,"h":48,"ip":0,"op":24,"fr":24,"layers":[],"__proto__":{}}'),
   ];
   for (const value of variants) expect(() => inspectLottie(bytes(value))).toThrow();
-  expect(() => inspectLottie(new Uint8Array(1024 * 1024 + 1))).toThrow('1MB');
+  expect(() => inspectLottie(new Uint8Array(1024 * 1024 + 1))).toThrow('1MiB');
 });
 
 test('asset references preserve large animations without counting every frame as resident memory', () => {

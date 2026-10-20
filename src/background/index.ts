@@ -12,6 +12,7 @@ import { createAssetTransfers } from '../assets/transfers';
 import { createWorkQueue } from '../assets/work-queue';
 import { createSourceCache } from '../assets/source-cache';
 import { canReuseImportInspection } from '../assets/import-validation';
+import { ASSET_MESSAGES } from '../assets/limits';
 import { installAssetRuntimeBroker } from '../diagnostics/asset-runtime-broker';
 import { ASSET_PROFILE, PROFILE_MESSAGE, assetProfile, linkAssetProfile, validProfile, profileAsync, profileSync, profileEnd, profileSnapshot, profileIngest, profileClear } from '../diagnostics/asset-profile';
 
@@ -24,7 +25,7 @@ const profileSessions = new Map<string, string>();
 const mutations = createWorkQueue(1, Infinity), reads = createWorkQueue(2);
 const enqueue = <T>(action: () => Promise<T>) => mutations.run(action);
 const verified = new Map<string, AssetInfo>(); // Worker-lifetime receipts, populated only after full validation.
-const sourceRows = createSourceCache({ load: async (id: string) => { const row = await getAsset(id); if (!row) throw new Error('画像素材が見つかりません。'); return row; },
+const sourceRows = createSourceCache({ load: async (id: string) => { const row = await getAsset(id); if (!row) throw new Error('素材が見つかりません。'); return row; },
   size: (row) => row.blob.size, now: () => performance.now(), maxBytes: 96 * 1024 * 1024, idleMs: 5000 });
 
 async function owner(message: Record<string, unknown>, sender: chrome.runtime.MessageSender): Promise<AssetLease> {
@@ -73,7 +74,7 @@ async function prune(current?: AssetLease): Promise<void> {
 
 async function leaseAssets(lease: AssetLease, ids: readonly string[]): Promise<void> {
   await changeAssets((rows) => {
-    if (ids.some((id) => !rows.some((row) => row.id === id))) throw new Error('画像素材が見つかりません。もう一度読み込んでください。');
+    if (ids.some((id) => !rows.some((row) => row.id === id))) throw new Error('素材が見つかりません。もう一度読み込んでください。');
     const put: StoredAsset[] = [];
     for (const row of rows) {
       const existing = row.leases.find((entry) => entry.session === lease.session), needed = ids.includes(row.id);
@@ -85,17 +86,17 @@ async function leaseAssets(lease: AssetLease, ids: readonly string[]): Promise<v
 }
 
 async function importBatch(input: unknown, lease: AssetLease, decoded?: Uint8Array, trace?: string): Promise<AssetMetadata[]> {
-  if (!Array.isArray(input) || !input.length || input.length > ASSET_LIMITS.batchCount) throw new Error('一度に追加できる画像は8枚までです。');
+  if (!Array.isArray(input) || !input.length || input.length > ASSET_LIMITS.batchCount) throw new Error(ASSET_MESSAGES.batchCount);
   const assets: StoredAsset[] = [];
   let size = 0;
   for (const raw of input) {
-    if (!raw || typeof raw !== 'object') throw new Error('画像の形式が不正です。');
+    if (!raw || typeof raw !== 'object') throw new Error('素材の形式が不正です。');
     const file = raw as AssetWireFile;
     if (typeof file.name !== 'string' || !file.name.length || file.name.length > 120 || /[\u0000-\u001f]/.test(file.name)
-      || typeof file.mime !== 'string') throw new Error('画像の形式が不正です。');
+      || typeof file.mime !== 'string') throw new Error('素材の形式が不正です。');
     const bytes = decoded ?? base64ToBytes(file.base64);
     size += bytes.length;
-    if (size > (decoded ? ASSET_LIMITS.modelBytes : ASSET_LIMITS.fileBytes)) throw new Error('素材の転送容量が上限を超えました。');
+    if (size > (decoded ? ASSET_LIMITS.modelBytes : ASSET_LIMITS.fileBytes)) throw new Error(ASSET_MESSAGES.transferSize(Boolean(decoded)));
     const hash = await profileAsync(trace, 'store.hash', () => crypto.subtle.digest('SHA-256', bytes as Uint8Array<ArrayBuffer>), { bytes: bytes.length });
     const id = `asset-${[...new Uint8Array(hash)].map((byte) => byte.toString(16).padStart(2, '0')).join('')}`;
     const cached = verified.get(id);
@@ -126,7 +127,7 @@ async function importBatch(input: unknown, lease: AssetLease, decoded?: Uint8Arr
       combined.set(asset.id, next); put.set(asset.id, next);
     }
     if (combined.size > ASSET_LIMITS.count || [...combined.values()].reduce((sum, row) => sum + row.byteLength, 0) > ASSET_LIMITS.totalBytes) {
-      throw new Error('素材の保存上限（256MB・128素材）またはブラウザーの空き容量を確認してください。不要な素材を削除して保存すると空きを確保できます。');
+      throw new Error(ASSET_MESSAGES.storage);
     }
     return { value: undefined, put: [...put.values()] };
   }));
@@ -137,7 +138,7 @@ async function handle(message: Record<string, unknown>, sender: chrome.runtime.M
   if (message['action'] === 'get' || message['action'] === 'get-part' || message['action'] === 'get-metadata') {
     if (!isAssetId(message['id'])) throw new Error('素材IDが不正です。');
     const asset = await profileAsync(trace, 'store.idb-read-or-cached', () => sourceRows.get(message['id'] as string));
-    if (!asset) throw new Error('画像素材が見つかりません。');
+    if (!asset) throw new Error('素材が見つかりません。');
     const { blob, leases: _leases, ...metadata } = asset;
     if (message['action'] === 'get-metadata') return metadata;
     if (message['action'] === 'get-part') {
@@ -215,7 +216,7 @@ chrome.runtime.onMessage.addListener((input: unknown, sender, respond) => {
   const scheduler = ['get', 'get-part', 'get-metadata'].includes(String(message['action'])) ? reads : mutations;
   void scheduler.run(() => { profileEnd(trace, 'queue.' + message['action'], arrived); return profileAsync(trace, 'service.' + message['action'], () => handle(message, sender, trace)); }).then(
     (value) => respond({ ok: true, value, ...(trace ? { __profile: trace } : {}) }),
-    (error: unknown) => respond({ ok: false, error: error instanceof Error ? error.message : '画像の保存に失敗しました。' }),
+    (error: unknown) => respond({ ok: false, error: error instanceof Error ? error.message : '素材の保存に失敗しました。' }),
   );
   return true;
 });

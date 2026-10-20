@@ -1,4 +1,5 @@
 import { IMAGE_LIMITS, type LayerState, type LayerAppearance } from '../design/types';
+import { ASSET_MESSAGES } from '../assets/limits';
 import { frontToBack } from '../design/hierarchy';
 export { frontToBack } from '../design/hierarchy';
 
@@ -23,7 +24,7 @@ export function reorderLayers<T extends LayerAppearance>(layers: readonly T[], i
 
 export function duplicateLayers<T extends LayerState>(layers: readonly T[], ids: readonly string[], makeId: () => string, offset: (layer: T) => T['placement']): { layers: T[]; ids: string[] } {
   const sources = frontToBack(layers).reverse().filter((layer) => ids.includes(layer.id) && !layer.locked);
-  if (layers.length + sources.length > IMAGE_LIMITS.count) throw new Error('レイヤーは32枚まで配置できます。');
+  if (layers.length + sources.length > IMAGE_LIMITS.count) throw new Error(ASSET_MESSAGES.layerCount);
   const copies = sources.map((layer) => ({ ...layer, id: makeId(), name: `${layer.name.slice(0, 116)} コピー`, placement: offset(layer) }));
   const order = frontToBack(layers).reverse();
   for (const copy of copies) order.push(copy);

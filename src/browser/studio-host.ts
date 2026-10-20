@@ -2,6 +2,7 @@ import type { CreatorEditor } from '../editor/controller';
 import type { SiteAdapter } from '../sites/types';
 import { STUDIO_PORT, STUDIO_PROBE, parseEditCommand, type StudioMessage, type StudioRequest } from '../studio/protocol';
 import { ASSET_LIMITS, base64ToBytes } from '../assets/validation';
+import { ASSET_MESSAGES } from '../assets/limits';
 import { parseTimelineCommand } from '../timeline/types';
 import { loadAssetMetadata } from '../assets/client';
 import { isAssetId } from '../design/schema';
@@ -68,15 +69,15 @@ export function connectStudioHost(doc: Document, site: SiteAdapter, editor: Crea
           } else if (request.type === 'import-assets') {
             if (!Array.isArray(request.assets) || !request.assets.length || request.assets.length > ASSET_LIMITS.batchCount || !request.assets.every(isAssetId)) throw new Error('素材IDが不正です。');
             const items = []; let total = 0;
-            for (const id of request.assets) { const metadata = await loadAssetMetadata(id); total += metadata.byteLength; if (total > ASSET_LIMITS.batchBytes) throw new Error('素材は合計64MiBまでです。'); items.push(metadata); }
+            for (const id of request.assets) { const metadata = await loadAssetMetadata(id); total += metadata.byteLength; if (total > ASSET_LIMITS.batchBytes) throw new Error(ASSET_MESSAGES.transferSize(true)); items.push(metadata); }
             const state = await editor.import(owner, request.session, request.revision, { kind: 'stored-assets', items, length: items.length });
             post({ type: 'reply', id: request.id, ok: true, state, checkpoint: checkpoint() });
           } else if (request.type === 'import') {
-            if (!Array.isArray(request.files) || !request.files.length || request.files.length > ASSET_LIMITS.batchCount) throw new Error('素材の数が不正です。');
+            if (!Array.isArray(request.files) || !request.files.length || request.files.length > ASSET_LIMITS.batchCount) throw new Error(ASSET_MESSAGES.batchCount);
             let total = 0;
             const files = request.files.map((file) => {
               if (typeof file.name !== 'string' || file.name.length > 120 || typeof file.mime !== 'string' || typeof file.base64 !== 'string' || file.base64.length > Math.ceil(ASSET_LIMITS.fileBytes / 3) * 4) throw new Error('素材が不正です。');
-              const bytes = base64ToBytes(file.base64); total += bytes.length; if (total > ASSET_LIMITS.batchBytes) throw new Error('素材は合計32MBまでです。');
+              const bytes = base64ToBytes(file.base64); total += bytes.length; if (total > ASSET_LIMITS.batchBytes) throw new Error(ASSET_MESSAGES.transferSize(true));
               return new File([new Uint8Array(bytes).buffer], file.name, { type: file.mime });
             });
             const state = await editor.import(owner, request.session, request.revision, files); post({ type: 'reply', id: request.id, ok: true, state, checkpoint: checkpoint() });

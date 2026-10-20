@@ -1,4 +1,5 @@
 import { ANIMATION_LIMITS } from './motion-types';
+import { ASSET_MESSAGES } from './limits';
 import type { AssetInfo } from './validation';
 
 type RecordData = Record<string, unknown>;
@@ -10,7 +11,7 @@ const TYPES = new Set(['gr', 'sh', 'el', 'rc', 'fl', 'st', 'gf', 'gs', 'tr', 'tm
 
 /** Only vector data reaches the expression-free player; no paths, fonts or images. */
 export function inspectLottie(bytes: Uint8Array): { info: AssetInfo; data: RecordData } {
-  if (bytes.byteLength > ANIMATION_LIMITS.lottieBytes) fail('Lottie JSONは1MBまでです。');
+  if (bytes.byteLength > ANIMATION_LIMITS.lottieBytes) fail(ASSET_MESSAGES.lottieSize);
   let parsed: unknown;
   try { parsed = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes)); } catch { fail(); }
   const data = object(parsed);

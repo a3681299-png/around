@@ -1,4 +1,5 @@
 import { MODEL_LIMITS, type ModelInfo } from '../models/types';
+import { ASSET_MESSAGES, MODEL_RESOURCE_LIMITS } from './limits';
 import type { AssetInfo } from './validation';
 import { inspectVrm, VRM_EXTENSIONS } from './vrm';
 
@@ -76,7 +77,7 @@ export function inspectGlb(bytes: Uint8Array): { info: AssetInfo; json: Obj; bin
     // Morph target texture layers can amplify shared binary accessors. Allow
     // row padding conservatively; do not rely on encoded file size alone.
     morphBytes += morphVertices * targets.length * slots * 16 * 2;
-    if (morphBytes > (isVrm ? 128 : 64) * 1024 * 1024) throw bad(`モーフの展開予算${isVrm ? 128 : 64}MiBを超えています。`);
+    if (morphBytes > (isVrm ? MODEL_RESOURCE_LIMITS.vrmMorphBytes : MODEL_RESOURCE_LIMITS.morphBytes)) throw bad(ASSET_MESSAGES.morphSize(isVrm));
     const indices = p.indices === undefined ? position : ref(p.indices, accessors);
     vertices += position.count; triangles += indices.count / 3;
     if (vertices > MODEL_LIMITS.vertices || triangles > MODEL_LIMITS.triangles || !Number.isInteger(indices.count / 3)) throw bad('GLBの頂点・三角形数が上限を超えています。');
@@ -125,7 +126,7 @@ export function inspectGlb(bytes: Uint8Array): { info: AssetInfo; json: Obj; bin
       const node = ref(c.target.node, nodes), a = ref(s.input, accessors), b = ref(s.output, accessors), factor = s.interpolation === 'CUBICSPLINE' ? 3 : 1;
       const morphs = c.target.path === 'weights' ? ref(node.mesh, meshes).primitives?.[0]?.targets?.length : 1;
       animationBytes += a.count * 4 + b.count * components[b.type]! * 4;
-      if (animationBytes > 64 * 1024 * 1024) throw bad('アニメーションの展開予算64MiBを超えています。');
+      if (animationBytes > MODEL_RESOURCE_LIMITS.animationBytes) throw bad(ASSET_MESSAGES.modelAnimationSize);
       if (!morphs || b.componentType !== 5126 || b.count !== a.count * factor * morphs || b.type !== (c.target.path === 'weights' ? 'SCALAR' : c.target.path === 'rotation' ? 'VEC4' : 'VEC3')) throw bad('アニメーションのチャンネルとキー配列が一致しません。');
     }
     clips.push({ name: name(animation.name, `Clip ${i + 1}`), duration });
@@ -140,7 +141,7 @@ export function inspectGlb(bytes: Uint8Array): { info: AssetInfo; json: Obj; bin
       let p = 2; while (p + 4 < data.length) { if (data[p++] !== 255) throw bad(); const marker = data[p++]!; if (marker === 0xda || marker === 0xd9) break; const len = d.getUint16(p); if (len < 2 || p + len > data.length) throw bad(); if ([0xc0, 0xc1, 0xc2].includes(marker) && len >= 7) { height = d.getUint16(p + 3); width = d.getUint16(p + 5); break; } p += len; }
     } else throw bad('GLB内のテクスチャはPNGまたはJPEGで埋め込んでください。');
     if (!width || !height || width > 4096 || height > 4096) throw bad('テクスチャは4096px以下にしてください。'); textureBytes += width * height * 4;
-    if (textureBytes > MODEL_LIMITS.textureBytes) throw bad('テクスチャの展開量は合計64MiBまでです。');
+    if (textureBytes > MODEL_LIMITS.textureBytes) throw bad(ASSET_MESSAGES.textureSize);
   }
   for (const t of list(json.textures, 32)) ref(t.source, images);
   const textures = list(json.textures, 32), materials = list(json.materials, 128);
@@ -150,6 +151,6 @@ export function inspectGlb(bytes: Uint8Array): { info: AssetInfo; json: Obj; bin
   const vrm = inspectVrm(json); vrm?.humanoid.forEach((b) => boneIds.add(b.node)); if (boneIds.size > MODEL_LIMITS.bones) throw bad();
   const info: AssetInfo = { mime: 'model/gltf-binary', width: 256, height: 256, model: { format: vrm ? 'vrm' : 'glb', ...(vrm ? { vrm } : {}), clips, bones: [...boneIds].map((node) => ({ node, name: name(nodes[node]!.name, `Bone ${node}`) })), vertices, triangles, textureBytes } };
   const gpuBytes = geometryBytes + morphBytes + Math.ceil(textureBytes * 4 / 3) + boneIds.size * 64;
-  if (gpuBytes > (vrm ? 192 : 96) * 1024 * 1024) throw bad(`3Dの推定描画資源が${vrm ? 192 : 96}MiBを超えています。`);
+  if (gpuBytes > (vrm ? MODEL_RESOURCE_LIMITS.vrmGpuBytes : MODEL_RESOURCE_LIMITS.gpuBytes)) throw bad(ASSET_MESSAGES.modelGpuSize(Boolean(vrm)));
   return { info, json, bin, gpuBytes };
 }

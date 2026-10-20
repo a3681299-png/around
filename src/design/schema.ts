@@ -1,5 +1,6 @@
 import { GROUP_LIMITS, IMAGE_LIMITS, STYLE_LIMITS, type DesignDocument, type SurfaceStyle, type Decoration, type PlacementAnchor, type GroupLayer } from './types';
 import { MODEL_LIMITS, parseModelInfo, parseModelSettings } from '../models/types';
+import { ASSET_LIMITS, ASSET_MESSAGES } from '../assets/limits';
 import { ANIMATION_LIMITS } from '../assets/motion-types';
 import { parseEffects } from '../effects/schema';
 import { sameAnchor } from './hierarchy';
@@ -56,13 +57,13 @@ function image(value: unknown, version: number): Decoration {
   const item = record(value, ['kind', 'id', 'assetId', 'name', 'placement', 'opacity', 'zIndex', 'visible', ...(version >= 3 ? ['locked'] : []), ...(version >= 4 ? ['format', 'playback'] : []), ...(version >= 5 ? ['effects'] : []), ...(version >= 9 ? ['motion'] : []), ...(version >= 10 ? ['model', 'source'] : [])]);
   if (!['image', ...(version >= 4 ? ['animation'] : []), ...(version >= 10 ? ['model3d'] : [])].includes(item['kind'] as string) || !isDesignId(item['id']) || !isAssetId(item['assetId'])
     || typeof item['name'] !== 'string' || item['name'].length < 1 || item['name'].length > 120 || /[\u0000-\u001f]/.test(item['name'])
-    || typeof item['visible'] !== 'boolean' || (version >= 3 && typeof item['locked'] !== 'boolean')) throw new Error('画像レイヤーの形式が不正です。');
+    || typeof item['visible'] !== 'boolean' || (version >= 3 && typeof item['locked'] !== 'boolean')) throw new Error('素材レイヤーの形式が不正です。');
   const placement = record(item['placement'], ['anchor', 'x', 'y', 'widthPx', 'heightPx', 'rotationDeg']);
   const inputAnchor = record(placement['anchor'], ['kind', 'target']);
   let anchor: PlacementAnchor;
   if (inputAnchor['kind'] === 'viewport' && !Object.hasOwn(inputAnchor, 'target')) anchor = { kind: 'viewport' };
   else if (inputAnchor['kind'] === 'surface' && isDesignId(inputAnchor['target'])) anchor = { kind: 'surface', target: inputAnchor['target'] };
-  else throw new Error('画像の配置基準が不正です。');
+  else throw new Error('素材の配置基準が不正です。');
   const zIndex = number(item['zIndex'], -IMAGE_LIMITS.maxZ, IMAGE_LIMITS.maxZ);
   if (!Number.isInteger(zIndex)) throw new Error('重なり順は整数で指定してください。');
   const common = {
@@ -130,11 +131,11 @@ export function parseDesign(value: unknown): DesignDocument {
   });
   let decorations: Decoration[] = [];
   if (version >= 2) {
-    if (!Array.isArray(data['decorations']) || data['decorations'].length > IMAGE_LIMITS.count) throw new Error('画像は32枚まで配置できます。');
+    if (!Array.isArray(data['decorations']) || data['decorations'].length > IMAGE_LIMITS.count) throw new Error(ASSET_MESSAGES.layerCount);
     decorations = data['decorations'].map((value) => image(value, version));
-    if (decorations.filter((item) => item.kind === 'model3d').length > MODEL_LIMITS.count) throw new Error('3D素材は8レイヤーまでです。');
-    if (new Set(decorations.map((item) => item.id)).size !== decorations.length) throw new Error('画像レイヤーのIDが重複しています。');
-    if (decorations.filter((item) => item.kind === 'animation').length > (version < 7 ? 8 : ANIMATION_LIMITS.count)) throw new Error(version < 7 ? '旧形式のアニメーションは8枚までです。' : '素材は合計32レイヤーまでです。');
+    if (decorations.filter((item) => item.kind === 'model3d').length > MODEL_LIMITS.count) throw new Error(ASSET_MESSAGES.modelCount);
+    if (new Set(decorations.map((item) => item.id)).size !== decorations.length) throw new Error('素材レイヤーのIDが重複しています。');
+    if (decorations.filter((item) => item.kind === 'animation').length > (version < 7 ? ASSET_LIMITS.legacyAnimationCount : ANIMATION_LIMITS.count)) throw new Error(version < 7 ? ASSET_MESSAGES.legacyAnimationCount : ASSET_MESSAGES.layerCount);
   }
   let groups: GroupLayer[] = [];
   if (Object.hasOwn(data, 'groups')) {
