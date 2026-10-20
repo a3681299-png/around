@@ -35,6 +35,135 @@ async function stored(popup: Page) {
   return popup.evaluate(async (key) => (await chrome.storage.local.get(key))[key] as DesignDocument, key);
 }
 
+interface StudioImportProbe {
+  portImports: { type: string; keys: string[]; assets?: string[] }[];
+  uploads: { action: string; session: string }[];
+  stored: boolean;
+  resume?: () => void;
+}
+async function observeImports(studio: Page, holdStored = false) {
+  await studio.addInitScript((hold) => {
+    const probe: StudioImportProbe = { portImports: [], uploads: [], stored: false };
+    (globalThis as any).__studioImportProbe = probe;
+    const connect = chrome.tabs.connect;
+    chrome.tabs.connect = function (...args) {
+      const port = Reflect.apply(connect, chrome.tabs, args) as chrome.runtime.Port,
+        post = port.postMessage;
+      port.postMessage = (message: Record<string, any>) => {
+        if (message.type === 'import' || message.type === 'import-assets')
+          probe.portImports.push({ type: message.type, keys: Object.keys(message), assets: message.assets });
+        post.call(port, message);
+      };
+      return port;
+    };
+    const send = chrome.runtime.sendMessage;
+    chrome.runtime.sendMessage = function (...args: unknown[]) {
+      const message = args[0] as Record<string, any>,
+        result = Reflect.apply(send, chrome.runtime, args);
+      if (message?.type === 'web-world-themes:assets' && message.session?.startsWith('studio-upload-')) {
+        probe.uploads.push({ action: message.action, session: message.session });
+        if (hold && message.action === 'import')
+          return Promise.resolve(result).then(async (response) => {
+            if (response?.ok) {
+              probe.stored = true;
+              await new Promise<void>((resolve) => {
+                probe.resume = resolve;
+              });
+            }
+            return response;
+          });
+      }
+      return result;
+    } as typeof chrome.runtime.sendMessage;
+  }, holdStored);
+  await studio.reload();
+  await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
+}
+async function uploadLeases(popup: Page) {
+  return popup.evaluate(
+    () =>
+      new Promise<string[]>((resolve, reject) => {
+        const open = indexedDB.open('web-world-themes-assets', 1);
+        open.onerror = () => reject(open.error);
+        open.onsuccess = () => {
+          const db = open.result,
+            request = db.transaction('assets').objectStore('assets').getAll();
+          request.onerror = () => {
+            db.close();
+            reject(request.error);
+          };
+          request.onsuccess = () => {
+            db.close();
+            resolve(
+              request.result.flatMap((row: { leases: { session: string }[] }) =>
+                row.leases.filter((lease) => lease.session.startsWith('studio-upload-')).map((lease) => lease.session),
+              ),
+            );
+          };
+        };
+      }),
+  );
+}
+
+test('Studio uploads small files directly, sends only asset IDs and preserves saved history', async ({
+  context,
+  popup,
+  youtube,
+}) => {
+  const { studio, panel } = await launch(context, popup, youtube);
+  await observeImports(studio);
+  await importImages(panel, youtube, 1);
+  await expect.poll(() => uploadLeases(popup)).toEqual([]);
+  const probe = await studio.evaluate(() => (globalThis as any).__studioImportProbe as StudioImportProbe);
+  expect(probe.portImports).toHaveLength(1);
+  expect(probe.portImports[0]).toMatchObject({ type: 'import-assets', assets: [expect.stringMatching(/^asset-/)] });
+  expect(probe.portImports[0]!.keys.sort()).toEqual(['assets', 'id', 'revision', 'session', 'type']);
+  expect(probe.uploads.map((entry) => entry.action)).toEqual(['import', 'release']);
+  await panel.locator('.undo').click();
+  await expect(youtube.locator(images)).toHaveCount(0);
+  await panel.locator('.redo').click();
+  await expect(youtube.locator(images)).toHaveCount(1);
+  await save(panel);
+  await youtube.reload();
+  await expect(youtube.locator(images)).toHaveCount(1);
+  await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
+});
+
+for (const action of ['disconnect', 'switch target'] as const)
+  test(`Studio releases its stored upload when interrupted by ${action}`, async ({ context, popup, youtube }) => {
+    const other = await context.newPage();
+    await other.goto('https://www.youtube.com/watch?v=other-import-target');
+    const { studio, panel } = await launch(context, popup, youtube);
+    await observeImports(studio, true);
+    await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
+    await expect.poll(() => studio.evaluate(() => (globalThis as any).__studioImportProbe.stored)).toBe(true);
+    expect(await uploadLeases(popup)).toHaveLength(1);
+    if (action === 'disconnect') {
+      await studio.getByRole('button', { name: '接続を解除', exact: true }).click();
+      await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'false');
+    } else {
+      const select = studio.getByLabel('編集するYouTubeタブ'),
+        current = await select.inputValue();
+      const target = await select
+        .locator('option')
+        .evaluateAll(
+          (options, previous) =>
+            options.map((option) => (option as HTMLOptionElement).value).find((id) => id && id !== previous),
+          current,
+        );
+      expect(target).toBeTruthy();
+      await select.selectOption(target!);
+      await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
+    }
+    // Cleanup must finish even while the upload reply is still held in Studio.
+    await expect.poll(() => uploadLeases(popup)).toEqual([]);
+    await studio.evaluate(() => (globalThis as any).__studioImportProbe.resume());
+    await expect.poll(() => uploadLeases(popup)).toEqual([]);
+    expect(await studio.evaluate(() => (globalThis as any).__studioImportProbe.portImports)).toEqual([]);
+    await expect(youtube.locator(images)).toHaveCount(0);
+    await expect(other.locator(images)).toHaveCount(0);
+  });
+
 test('standalone Studio edits a real extension target using shared grouping, effects, history and direct selection', async ({
   context,
   popup,
@@ -301,64 +430,76 @@ test('the authenticated Port rejects stale revisions and unrecognized commands w
   await expect(control.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
   await control.getByRole('button', { name: '接続を解除', exact: true }).click();
   await expect(youtube.locator('[data-ww-editing]')).toHaveCount(0);
-  const result = await control.evaluate(async () => {
-    const tabs = await chrome.tabs.query({}),
-      probe = 'web-world-themes:studio-probe';
-    let target: number | undefined;
-    for (const tab of tabs)
-      if (tab.id !== undefined) {
-        try {
-          if ((await chrome.tabs.sendMessage(tab.id, { type: probe }))?.siteId === 'youtube') target = tab.id;
-        } catch {
-          /* Unsupported tabs never receive editing commands. */
-        }
-      }
-    const port = chrome.tabs.connect(target!, { name: 'web-world-themes:studio-v1' });
-    let serial = 0;
-    const request = (body: Record<string, unknown>) =>
-      new Promise<Record<string, any>>((resolve) => {
-        const id = ++serial;
-        const listener = (message: Record<string, any>) => {
-          if (message.type === 'reply' && message.id === id) {
-            port.onMessage.removeListener(listener);
-            resolve(message);
+  const result = await control.evaluate(
+    async (base64) => {
+      const tabs = await chrome.tabs.query({}),
+        probe = 'web-world-themes:studio-probe';
+      let target: number | undefined;
+      for (const tab of tabs)
+        if (tab.id !== undefined) {
+          try {
+            if ((await chrome.tabs.sendMessage(tab.id, { type: probe }))?.siteId === 'youtube') target = tab.id;
+          } catch {
+            /* Unsupported tabs never receive editing commands. */
           }
-        };
-        port.onMessage.addListener(listener);
-        port.postMessage({ id, ...body });
+        }
+      const port = chrome.tabs.connect(target!, { name: 'web-world-themes:studio-v1' });
+      let serial = 0;
+      const request = (body: Record<string, unknown>) =>
+        new Promise<Record<string, any>>((resolve) => {
+          const id = ++serial;
+          const listener = (message: Record<string, any>) => {
+            if (message.type === 'reply' && message.id === id) {
+              port.onMessage.removeListener(listener);
+              resolve(message);
+            }
+          };
+          port.onMessage.addListener(listener);
+          port.postMessage({ id, ...body });
+        });
+      const attached = await request({ type: 'attach', owner: 'studio-protocol-test' }),
+        initial = attached.state;
+      const changed = await request({
+        type: 'command',
+        session: initial.sessionId,
+        revision: initial.revision,
+        command: { type: 'snap', value: true },
       });
-    const attached = await request({ type: 'attach', owner: 'studio-protocol-test' }),
-      initial = attached.state;
-    const changed = await request({
-      type: 'command',
-      session: initial.sessionId,
-      revision: initial.revision,
-      command: { type: 'snap', value: true },
-    });
-    const stale = await request({
-      type: 'command',
-      session: initial.sessionId,
-      revision: initial.revision,
-      command: { type: 'style', style: { backgroundColor: '#123456' } },
-    });
-    const unsafe = await request({
-      type: 'command',
-      session: changed.state.sessionId,
-      revision: changed.state.revision,
-      command: { type: 'execute', script: 'alert(1)' },
-    });
-    const output = {
-      attached: attached.ok,
-      snap: changed.state.view.snapping,
-      stale: stale.ok,
-      unsafe: unsafe.ok,
-      document: unsafe.state.document,
-      before: initial.document,
-    };
-    port.disconnect();
-    return output;
-  });
-  expect(result).toMatchObject({ attached: true, snap: true, stale: false, unsafe: false });
+      const stale = await request({
+        type: 'command',
+        session: initial.sessionId,
+        revision: initial.revision,
+        command: { type: 'style', style: { backgroundColor: '#123456' } },
+      });
+      const unsafe = await request({
+        type: 'command',
+        session: changed.state.sessionId,
+        revision: changed.state.revision,
+        command: { type: 'execute', script: 'alert(1)' },
+      });
+      const legacyImport = await request({
+        type: 'import',
+        session: changed.state.sessionId,
+        revision: changed.state.revision,
+        files: [{ name: 'legacy.png', mime: 'image/png', base64 }],
+      });
+      const output = {
+        attached: attached.ok,
+        snap: changed.state.view.snapping,
+        stale: stale.ok,
+        unsafe: unsafe.ok,
+        legacyImport: legacyImport.ok,
+        legacyError: legacyImport.error,
+        document: legacyImport.state.document,
+        before: initial.document,
+      };
+      port.disconnect();
+      return output;
+    },
+    (await readFile(path.resolve('tests/fixtures/motion/petal.png'))).toString('base64'),
+  );
+  expect(result).toMatchObject({ attached: true, snap: true, stale: false, unsafe: false, legacyImport: false });
+  expect(result.legacyError).toBe('未対応のStudio操作です。');
   expect(result.document).toEqual(result.before);
 });
 

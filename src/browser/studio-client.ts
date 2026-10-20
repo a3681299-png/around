@@ -6,7 +6,7 @@ import {
   type StudioTarget,
 } from '../studio/protocol';
 import type { EditCommand, EditorCheckpoint, EditorSnapshot } from '../editor-core/types';
-import { ASSET_LIMITS, bytesToBase64 } from '../assets/validation';
+import { ASSET_LIMITS } from '../assets/validation';
 import { ASSET_MESSAGES } from '../assets/limits';
 import { importAssets, releaseAssets } from '../assets/client';
 
@@ -37,6 +37,15 @@ export function createStudioClient(
     retry: ReturnType<typeof setTimeout> | undefined,
     retries = 0;
   let commands: Promise<void> = Promise.resolve();
+  let pendingImport: { controller: AbortController; lease: string } | undefined;
+  const cancelImport = () => {
+    if (!pendingImport) return;
+    pendingImport.controller.abort();
+    // Do not wait for a file read or an in-flight worker reply before cleanup.
+    // Worker mutations serialize this release after any already-sent upload;
+    // the import's finally also releases it after the reply settles.
+    void releaseAssets(pendingImport.lease).catch(() => undefined);
+  };
   let observed = false,
     timelineState: TimelineUpdate = {
       status: {
@@ -184,6 +193,7 @@ export function createStudioClient(
         if (generation !== epoch || port !== next) return;
         // Queued commands and file reads belong to the disconnected document.
         epoch++;
+        cancelImport();
         port = undefined;
         connected = false;
         useTimeline({
@@ -240,6 +250,7 @@ export function createStudioClient(
   };
   const disconnect = () => {
     epoch++;
+    cancelImport();
     clearTimeout(retry);
     const old = port;
     port = undefined;
@@ -365,40 +376,28 @@ export function createStudioClient(
           files.reduce((n, f) => n + f.size, 0) > (large ? ASSET_LIMITS.batchBytes : ASSET_LIMITS.fileBytes)
         )
           throw new Error(ASSET_MESSAGES.batch);
-        if (large) {
-          const lease = `studio-upload-${crypto.randomUUID()}`;
+        const lease = `studio-upload-${crypto.randomUUID()}`,
+          controller = new AbortController(),
+          target = tabId;
+        pendingImport = { controller, lease };
+        try {
           const surface = visibilityDocument ? new URL(visibilityDocument.URL).searchParams.get('surface') : undefined;
-          const ownerTab = surface === 'sidepanel' ? tabId : (await chrome.tabs.getCurrent())?.id;
+          const ownerTab = surface === 'sidepanel' ? target : (await chrome.tabs.getCurrent())?.id;
+          controller.signal.throwIfAborted();
           if (ownerTab === undefined) throw new Error('Studioの保持先が見つかりません。');
-          try {
-            const assets = await importAssets(files, lease, undefined, ownerTab);
-            if (generation !== epoch || !connected) throw new Error('素材の読み込み中に接続が変わりました。');
-            const current = state!;
-            await request({
-              type: 'import-assets',
-              session: current.sessionId,
-              revision: current.revision,
-              assets: assets.map((a) => a.id),
-            } as Omit<StudioRequest, 'id'>);
-          } finally {
-            await releaseAssets(lease).catch(() => undefined);
-          }
-          return;
+          const assets = await importAssets(files, lease, controller.signal, ownerTab);
+          if (generation !== epoch || !connected) throw new Error('素材の読み込み中に接続が変わりました。');
+          const current = state!;
+          await request({
+            type: 'import-assets',
+            session: current.sessionId,
+            revision: current.revision,
+            assets: assets.map((a) => a.id),
+          } as Omit<StudioRequest, 'id'>);
+        } finally {
+          if (pendingImport?.controller === controller) pendingImport = undefined;
+          await releaseAssets(lease).catch(() => undefined);
         }
-        const source = await Promise.all(
-          files.map(async (file) => ({
-            name: file.name.replace(/[\u0000-\u001f]/g, '').slice(0, 120),
-            mime: file.type,
-            base64: bytesToBase64(new Uint8Array(await file.arrayBuffer())),
-          })),
-        );
-        if (generation !== epoch || !connected)
-          throw new Error('素材の読み込み中に接続が変わりました。もう一度追加してください。');
-        const current = state!;
-        await request({ type: 'import', session: current.sessionId, revision: current.revision, files: source } as Omit<
-          StudioRequest,
-          'id'
-        >);
       });
     },
     async thumbnail(id: string) {

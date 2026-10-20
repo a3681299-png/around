@@ -1,6 +1,5 @@
 import type { EditCommand, EditorCheckpoint, EditorSnapshot } from '../editor-core/types';
 import type { DesignTarget } from '../design/types';
-import type { AssetWireFile } from '../assets/protocol';
 import { parseSignalRules } from '../signals/keyframe-schema';
 import type { TimelineCommand, TimelineUpdate } from '../timeline/types';
 
@@ -18,7 +17,6 @@ export type StudioRequest =
   | { id: number; type: 'attach'; owner: string; resume?: EditorCheckpoint; visible?: boolean }
   | { id: number; type: 'surface-visibility'; visible: boolean }
   | { id: number; type: 'command'; session: string; revision: number; command: EditCommand }
-  | { id: number; type: 'import'; session: string; revision: number; files: AssetWireFile[] }
   | { id: number; type: 'import-assets'; session: string; revision: number; assets: string[] }
   | { id: number; type: 'thumbnail'; layer: string }
   | { id: number; type: 'timeline'; session: string; command: TimelineCommand }
