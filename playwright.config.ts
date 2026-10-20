@@ -23,6 +23,6 @@ export default defineConfig({
   projects: [
     { name: 'unit', testMatch: unitSpecs, fullyParallel: true, outputDir: './.work/test-results/unit' },
     // Browser benchmarks and native Chrome windows share host resources.
-    { name: 'e2e', testIgnore: unitSpecs, fullyParallel: false, workers: 1, outputDir: './.work/test-results/e2e' },
+    { name: 'e2e', testIgnore: unitSpecs, fullyParallel: false, workers: 1, outputDir: './.work/test-results/e2e', use: { trace: 'retain-on-failure', screenshot: 'only-on-failure' } },
   ],
 });

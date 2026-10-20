@@ -2,6 +2,7 @@ import { test as base, chromium, type BrowserContext, type Page } from '@playwri
 import { execFile } from 'node:child_process';
 import { mkdir, mkdtemp, readFile, rm } from 'node:fs/promises';
 import path from 'node:path';
+import { renderDiagnostics } from './helpers/render-diagnostics';
 
 const extensionPath = path.resolve(process.env.WW_TEST_EXTENSION_PATH ?? 'dist');
 const fixturePath = path.resolve('tests/fixtures/youtube.html');
@@ -65,10 +66,13 @@ export const test = base.extend<{ profile: string; extensionId: string; popup: P
       }
     }
   },
-  context: async ({ profile }, use) => {
+  context: async ({ profile }, use, info) => {
     const context = await launchExtension(profile);
     try { await use(context); }
-    finally { await context.close(); }
+    finally {
+      if (info.status !== info.expectedStatus) await info.attach('render-diagnostics', { body: JSON.stringify(await renderDiagnostics(context), null, 2), contentType: 'application/json' });
+      await context.close();
+    }
   },
   extensionId: async ({ context }, use) => {
     // No production background worker is needed just to expose an ID for testing.
