@@ -20,7 +20,8 @@ for (const viewport of [{ width: 1920, height: 1080 }, { width: 1100, height: 76
     await info.attach('layout-and-fonts', { path: diagnostics, contentType: 'application/json' });
     // A sliver of a row can accept a click on one platform while another font
     // hides it entirely. Keep at least one complete row in the scroll viewport.
-    await expect.poll(() => panel.locator('.layers').evaluate((node) => node.clientHeight)).toBeGreaterThanOrEqual(34);
+    const rowHeight = await panel.locator('.layer').first().evaluate((node) => Math.ceil(node.getBoundingClientRect().height));
+    await expect.poll(() => panel.locator('.layers').evaluate((node) => node.clientHeight)).toBeGreaterThanOrEqual(rowHeight);
     await panel.locator('.layer [data-action="lock"]').click();
     await expect(panel.locator('.timeline-key').first()).toBeDisabled();
     await panel.locator('.layer [data-action="lock"]').click();

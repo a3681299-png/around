@@ -50,7 +50,22 @@ for (const large of [false, true]) test(`standalone Studio imports a ${large ? '
     });
     expect(renderer, 'Opt-in large VRM test must use a real GPU.').not.toMatch(/swiftshader|llvmpipe|softpipe|software|microsoft basic render/i);
   }
-  const file = info.outputPath(large ? 'original-padded.vrm' : 'original-small.vrm'); await mkdir(path.dirname(file), { recursive: true }); await writeFile(file, large ? largeVrmFixture() : vrmFixture());
+  // A path-only .vrm input uses the OS MIME database, which can identify this
+  // extension as legacy VRML. This generated VRM fixture has an explicit MIME;
+  // production MIME/signature validation remains exercised without relaxation.
+  const file = { name: large ? 'original-padded.vrm' : 'original-small.vrm', mimeType: 'model/vrm', buffer: large ? largeVrmFixture() : vrmFixture() };
+  if (!large) {
+    // Keep the platform's path-only MIME result as CI evidence, separately from
+    // the controlled rendering fixture. Never relax production MIME checks.
+    const probeFile = info.outputPath('os-mime-probe.vrm'); await mkdir(path.dirname(probeFile), { recursive: true }); await writeFile(probeFile, file.buffer);
+    const probe = await context.newPage();
+    try {
+      await probe.setContent('<input type="file">'); await probe.locator('input').setInputFiles(probeFile);
+      const mime = await probe.locator('input').evaluate((node: HTMLInputElement) => node.files![0]!.type);
+      const report = info.outputPath('vrm-fixture-mime.json'); await writeFile(report, JSON.stringify({ pathOnlyMime: mime, renderingMime: file.mimeType, bytes: file.buffer.length }, null, 2));
+      await info.attach('vrm-fixture-mime', { path: report, contentType: 'application/json' });
+    } finally { await probe.close(); }
+  }
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check(); await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro'); await youtube.bringToFront();
   const opened = context.waitForEvent('page'); await popup.locator('#creator-studio-open').evaluate((b: HTMLButtonElement) => b.click()); const studio = await opened; await studio.setViewportSize({ width: 1440, height: 1000 }); await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
   const panel = studio.locator('#web-world-themes-creator'); await panel.locator('.model-file').setInputFiles(file); const media = youtube.locator('#web-world-themes-decorations .model-media'); await expect(media).toHaveAttribute('data-renderer', 'three', large ? { timeout: 40000 } : {});

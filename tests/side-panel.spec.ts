@@ -230,7 +230,8 @@ test('timeline keeps layer controls reachable in narrow and wide native panels',
     for (const width of [360, 940]) {
       await panel.send('Emulation.setDeviceMetricsOverride', { width, height: 760, deviceScaleFactor: 1, mobile: false });
       const ui = 'document.querySelector("#web-world-themes-creator").shadowRoot';
-      await expect.poll(() => panel.evaluate(`${ui}.querySelector('.layers').clientHeight`)).toBeGreaterThanOrEqual(34);
+      const rowHeight = await panel.evaluate<number>(`Math.ceil(${ui}.querySelector('.layer').getBoundingClientRect().height)`);
+      await expect.poll(() => panel.evaluate(`${ui}.querySelector('.layers').clientHeight`)).toBeGreaterThanOrEqual(rowHeight);
       const lock = `${ui}.querySelector('.layer [data-action="lock"]')`;
       await panel.evaluate(`${lock}.scrollIntoView({block:'nearest'})`);
       // Use real pointer input, rather than DOM click(), to verify hit testing.

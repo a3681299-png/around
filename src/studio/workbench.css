@@ -98,9 +98,10 @@ input[type="color"] { height: 24px; border-radius: 2px; }
 .layers-section > summary { display: none; }
 /* Reserve a complete row even when Timeline or a wrapped hint consumes the pane.
    The pane scrolls as a whole when its header, list and actions no longer fit. */
-.layers-section[open]::details-content { display: grid; grid-template-rows: auto minmax(34px, 1fr); min-height: min-content; }
+.layers-section[open]::details-content { display: grid; grid-template-rows: auto minmax(40px, 1fr); min-height: min-content; }
 .selection-tip { font-size: 9px; line-height: 1.4; margin: 4px; }
-.layers { min-height: 0; padding: 0 1px; }
+/* Child rows must not inflate the pane's intrinsic minimum; keep list scrolling. */
+.layers { min-height: 0; padding: 0 1px; contain: size; }
 .layer { grid-template-columns: 14px 10px minmax(50px, 1fr) 16px 21px 21px 18px; gap: 1px; min-height: 34px; border-radius: 1px; padding: 2px; margin-bottom: 1px; background: #2a2b2e; }
 .layer[data-kind="group"] { background: #303136; }
 .layer[data-selected] { background: #463c53; border-color: #9c85bc; }
