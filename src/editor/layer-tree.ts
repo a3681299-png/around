@@ -44,6 +44,9 @@ export function createLayerTree(doc: Document, container: HTMLElement, actions: 
       layer = id ? find(id) : undefined;
     if (!id || !layer || !current || current.saving || button?.disabled) return;
     switch (button?.dataset.action) {
+      // Row padding and selection checkboxes have no button action.
+      case undefined:
+        return;
       case 'select':
         actions.select(id, event.ctrlKey || event.metaKey || event.shiftKey);
         break;

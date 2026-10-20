@@ -126,7 +126,13 @@ test('signal key edits share gesture history, locks, save/discard and session re
 });
 
 test('Editor Core compiles with no browser APIs and UI modules do not import Chrome', () => {
-  execFileSync(process.execPath, ['node_modules/typescript/bin/tsc', '--noEmit', '-p', 'tsconfig.editor-core.json']);
+  // The typescript alias supplies ESLint's 6.x API; compilation stays on 7.x.
+  execFileSync(process.execPath, [
+    'node_modules/@typescript/native/bin/tsc',
+    '--noEmit',
+    '-p',
+    'tsconfig.editor-core.json',
+  ]);
   for (const file of ['panel', 'workspace', 'layer-tree', 'effects-panel', 'number-scrub'])
     expect(readFileSync(`src/editor/${file}.ts`, 'utf8')).not.toMatch(/\bchrome\./);
   for (const file of ['app', 'connection', 'preferences', 'ui-actions', 'protocol', 'workbench', 'asset-library'])

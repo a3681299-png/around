@@ -26,7 +26,7 @@ export function createWorkQueue(concurrency: number, capacity = 64) {
             return;
           }
           active++;
-          Promise.resolve()
+          void Promise.resolve()
             .then(task)
             .then(resolve, reject)
             .finally(() => {

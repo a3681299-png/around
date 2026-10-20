@@ -7,5 +7,5 @@ test-results/
 *.zip
 # Keep pinned third-party bytes, generated assets and media fixtures intact.
 src/vendor/
-assets/
+/assets/
 tests/fixtures/

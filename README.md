@@ -6,7 +6,7 @@
 
 ## はじめ方
 
-Node.js 22以上を使います。このプロジェクトはNode.js 24で検証しています。
+Node.js 22.13以降の22系、または24以上を使います。ESLint 10の要件に合わせています。このプロジェクトはNode.js 24で検証しています。
 
 ```powershell
 cd C:\Users\sm787\GitHub-Projects\web-world-themes
@@ -86,6 +86,8 @@ npm run test:e2e
 `test:unit`はビルドやブラウザーのインストールなしで動き、4ワーカーで並列実行します。Chrome Storageなどの単体テスト用スタブは各ワーカー内で作成・復元します。ブラウザーを使うテストは`test:e2e`で1件ずつ実行し、`npm test`は両方のprojectを実行します。分類は`playwright.config.ts`の`unitSpecs`で管理し、それ以外のspecはe2eに入ります。
 
 `test:setup`はe2e用のPlaywright公式Chromiumを`.work/browsers`へダウンロードします。上の例ではテスト用拡張を`.work/test-dist`へ出力します。e2eは独立したブラウザープロファイルを使い、ユーザーのChromeプロファイルは変更しません。CIもunitとe2eを別jobで実行し、タイムアウトはそれぞれ8分と25分です。実サイト・非公開素材・診断ビルドを使う既存のオプトイン検証は、必要な環境変数を指定した場合に実行します。
+
+VRMの通常テストは小さな自作データで描画を確認します。33MiBのVRMは、実GPU環境で`WW_REAL_GPU_VRM=1`を指定した場合にだけ実行します。SwiftShaderなどのソフトウェア描画では実行できません。整形・lintの使い方は[tooling.md](docs/tooling.md)を参照してください。
 
 ## ファイル構成
 

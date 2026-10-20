@@ -96,7 +96,7 @@ export function createSourceCache<T>(options: {
         };
         const abort = () => finish(signal?.reason ?? new DOMException('Aborted', 'AbortError'));
         signal?.addEventListener('abort', abort, { once: true });
-        entry.promise.then(
+        void entry.promise.then(
           (value) => finish(undefined, value),
           (error: unknown) => finish(error),
         );

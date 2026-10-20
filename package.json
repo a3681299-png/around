@@ -5,7 +5,7 @@
   "description": "A theme-first Chrome extension for dressing existing websites in another world.",
   "type": "module",
   "engines": {
-    "node": ">=22"
+    "node": "^22.13.0 || >=24.0.0"
   },
   "scripts": {
     "dev": "node scripts/build.mjs --watch",
@@ -16,7 +16,7 @@
     "test:unit": "node scripts/test.mjs --project=unit",
     "test:e2e": "node scripts/test.mjs --project=e2e",
     "check": "npm run lint && npm run build && npm test",
-    "lint": "node scripts/lint.mjs",
+    "lint": "npm run format:check && node scripts/lint.mjs && eslint src tests playwright.config.ts --max-warnings=0",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "benchmark:world": "node scripts/benchmark-world.mjs",
@@ -28,9 +28,12 @@
     "@types/chrome": "0.3.4",
     "@types/node": "^24.0.0",
     "@types/three": "0.186.0",
+    "@typescript/native": "npm:typescript@7.0.2",
     "esbuild": "0.28.2",
+    "eslint": "10.13.0",
     "prettier": "3.9.10",
-    "typescript": "7.0.2"
+    "typescript": "npm:@typescript/typescript6@6.0.2",
+    "typescript-eslint": "8.72.0"
   },
   "dependencies": {
     "@pixiv/three-vrm": "3.5.5",
