@@ -35,13 +35,13 @@ async function copyStaticFiles() {
   await Promise.all([
     cp(join(root, 'assets'), join(outDir, 'assets'), { recursive: true }),
     copyFile(join(root, 'THIRD_PARTY_NOTICES.md'), join(outDir, 'THIRD_PARTY_NOTICES.md')),
-    profiling ? import('node:fs/promises').then(({ writeFile }) => writeFile(join(outDir, 'manifest.json'), JSON.stringify({ ...manifest, web_accessible_resources: [...manifest.web_accessible_resources, { resources: ['diagnostics/asset-benchmark.html'], matches: ['https://www.youtube.com/*'] }] }, null, 2))) : copyFile(join(root, 'manifest.json'), join(outDir, 'manifest.json')),
+    profiling ? import('node:fs/promises').then(({ writeFile }) => writeFile(join(outDir, 'manifest.json'), JSON.stringify({ ...manifest, web_accessible_resources: [...manifest.web_accessible_resources, { resources: ['diagnostics/asset-benchmark.html', 'diagnostics/asset-runtime-lab.html'], matches: ['https://www.youtube.com/*'] }] }, null, 2))) : copyFile(join(root, 'manifest.json'), join(outDir, 'manifest.json')),
     copyFile(join(root, 'src/popup/index.html'), join(outDir, 'popup/index.html')),
     copyFile(join(root, 'src/popup/popup.css'), join(outDir, 'popup/popup.css')),
     copyFile(join(root, 'src/studio/index.html'), join(outDir, 'studio/index.html')),
     copyFile(join(root, 'src/studio/studio.css'), join(outDir, 'studio/studio.css')),
   ]);
-  if (profiling) await copyFile(join(root, 'src/diagnostics/asset-benchmark.html'), join(outDir, 'diagnostics/asset-benchmark.html'));
+  if (profiling) await Promise.all(['asset-benchmark', 'asset-runtime-lab'].map((name) => copyFile(join(root, 'src/diagnostics/' + name + '.html'), join(outDir, 'diagnostics/' + name + '.html'))));
 }
 
 const shared = {
@@ -55,7 +55,7 @@ const shared = {
 };
 
 const builds = await Promise.all([
-  ...(profiling ? [context({ ...shared, entryPoints: ['src/diagnostics/asset-benchmark.ts'], outfile: join(outDir, 'diagnostics/asset-benchmark.js'), format: 'iife' })] : []),
+  ...(profiling ? ['asset-benchmark', 'asset-runtime-lab'].map((name) => context({ ...shared, entryPoints: ['src/diagnostics/' + name + '.ts'], outfile: join(outDir, 'diagnostics/' + name + '.js'), format: 'iife' })) : []),
   context({ ...shared, entryPoints: ['src/browser/studio-page.ts'], outfile: join(outDir, 'studio/index.js'), format: 'iife', loader: { '.css': 'text' } }),
   context({
     ...shared,

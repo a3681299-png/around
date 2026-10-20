@@ -11,6 +11,7 @@ import { installTakeStorage } from '../browser/take-repository';
 import { createAssetTransfers } from '../assets/transfers';
 import { createWorkQueue } from '../assets/work-queue';
 import { createSourceCache } from '../assets/source-cache';
+import { installAssetRuntimeBroker } from '../diagnostics/asset-runtime-broker';
 import { ASSET_PROFILE, PROFILE_MESSAGE, assetProfile, linkAssetProfile, validProfile, profileAsync, profileSync, profileEnd, profileSnapshot, profileIngest, profileClear } from '../diagnostics/asset-profile';
 
 const transfers = createAssetTransfers();
@@ -220,3 +221,4 @@ chrome.tabs.onRemoved.addListener(() => { void enqueue(() => prune()).catch(() =
 
 installSidePanelHost();
 installTakeStorage();
+if (ASSET_PROFILE) installAssetRuntimeBroker();

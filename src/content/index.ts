@@ -7,6 +7,10 @@ import { createCreatorEditor, type CreatorEditor } from '../editor/controller';
 import { OPEN_CREATOR_EDITOR, OPEN_INPAGE_STUDIO, OPEN_SIDE_PANEL_TOOLS, PREPARE_SIDE_PANEL } from '../editor/messages';
 import type { UserSettings } from '../storage/settings';
 import { connectStudioHost } from '../browser/studio-host';
+import { ASSET_PROFILE } from '../diagnostics/asset-profile';
+import { installAssetRuntimeHost } from '../diagnostics/asset-runtime-host';
+
+if (ASSET_PROFILE) installAssetRuntimeHost(document);
 
 // Lives in the isolated content-script world; reinjection leaves just one controller.
 const lifetime = globalThis as typeof globalThis & {
