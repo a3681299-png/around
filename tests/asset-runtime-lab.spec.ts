@@ -9,6 +9,17 @@ test('opt-in resident iframe uses IDB, rejects page messages and reconnects with
   try {
     const result = await lab.call('show', 'resident', lab.asset.id, 3); expect(result.alphaPixels).toBeGreaterThan(100); expect(result.stats.instances).toBe(3); expect(result.binaryBytes).toBe(0);
     expect(await lab.page.locator('#ww-asset-runtime-lab').evaluate((e) => getComputedStyle(e).pointerEvents)).toBe('none');
+    // Verify the supported band boundary using our original fixture, not the private avatar.
+    const point = await lab.page.frameLocator('#ww-asset-runtime-lab').locator('.model-media canvas').first().evaluate((c: HTMLCanvasElement) => {
+      const p = c.getContext('2d')!.getImageData(0, 0, c.width, c.height).data, r = c.getBoundingClientRect();
+      for (let y = Math.floor(c.height / 2); y < c.height; y++) for (let x = Math.floor(c.width / 2); x < c.width; x++) if (p[(y * c.width + x) * 4 + 3]! > 250) return { x: r.left + (x + .5) * r.width / c.width, y: r.top + (y + .5) * r.height / c.height };
+      throw new Error('Opaque fixture pixel missing');
+    });
+    await lab.page.evaluate((p) => { for (const [id, color, z] of [['below', 'rgb(255,0,0)', 2147483643], ['above', 'rgb(0,0,255)', 2147483645]] as const) {
+      const e = document.createElement('div'); e.id = 'lab-' + id; e.style.cssText = `position:fixed;left:${Math.floor(p.x) - 4}px;top:${Math.floor(p.y) - 4}px;width:9px;height:9px;background:${color};z-index:${z};pointer-events:none`; document.body.append(e);
+    } }, point);
+    const pixel = async () => lab.control.evaluate(async (base64) => { const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0)), bitmap = await createImageBitmap(new Blob([bytes], { type: 'image/png' })); const c = document.createElement('canvas'); c.width = c.height = 1; const ctx = c.getContext('2d')!; ctx.drawImage(bitmap, 0, 0); bitmap.close(); return [...ctx.getImageData(0, 0, 1, 1).data].slice(0, 3); }, (await lab.page.screenshot({ clip: { x: Math.floor(point.x), y: Math.floor(point.y), width: 1, height: 1 } })).toString('base64'));
+    expect(await pixel()).toEqual([0, 0, 255]); await lab.page.locator('#lab-above').evaluate((e) => e.remove()); expect(await pixel()).not.toEqual([255, 0, 0]); await lab.page.locator('#lab-below').evaluate((e) => e.remove());
     const invalid = await lab.control.evaluate(async () => chrome.runtime.sendMessage({ type: 'ww.asset-runtime.lab.v1', action: 'claim', ticket: 'forged' })); expect(invalid.ok).toBe(false);
     let generation = result.generation;
     for (let n = 0; n < 5; n++) { const r = await lab.call('restart'); expect(r.alphaPixels).toBeGreaterThan(100); expect(r.generation).toBeGreaterThan(generation); generation = r.generation; }

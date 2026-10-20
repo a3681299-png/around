@@ -22,7 +22,7 @@ async function seed() {
   const file = fileInput.files?.[0]; if (!file) throw new Error('Fileを選択してください。');
   const [asset] = await importAssets([file], session); assetInput.value = asset!.id; return asset!.id;
 }
-async function run(mode: 'transport' | 'direct' | 'stored') {
+async function run(mode: 'transport' | 'direct' | 'stored', warmup: 'none' | 'textures' | 'compile' | 'both' = 'none') {
   if (running) throw new Error('計測中です。');
   running = true; stop(); await clear();
   const started = performance.now(); let trace = newAssetProfile()!;
@@ -46,7 +46,7 @@ async function run(mode: 'transport' | 'direct' | 'stored') {
     const placement = { anchor: { kind: 'viewport' as const }, x: .5, y: .5, widthPx: 200, heightPx: 200, rotationDeg: 0 };
     const layer: ModelDecoration = { id: 'image-benchmark', name: 'local-model', kind: 'model3d', assetId: metadata.id, source: metadata.model, model: defaultModelSettings(metadata.model), placement, opacity: 1, zIndex: 0, visible: true, locked: false };
     let failure: string | undefined;
-    renderer = createModelRenderer(document, (message) => { failure = message; }, (value) => { stats = value; }, shadow, blob ? async () => ({ metadata, blob: blob! }) : loadAsset);
+    renderer = createModelRenderer(document, (message) => { failure = message; }, (value) => { stats = value; }, shadow, blob ? async () => ({ metadata, blob: blob! }) : loadAsset, { warmup, gpuBreakdown: true });
     const surface = renderer.attach(shadow.appendChild(document.createElement('div'))); activeSurface = surface; surface.update(layer, true);
     renderer.evaluate({ timeMs: 0, layout: { layers: [], groups: [], roots: [] }, effects: [], machine: { video: 'paused', events: [] }, needsFrame: false, subscriptions: { pointer: false, video: false },
       models: [{ id: layer.id, clip: layer.model.clip, timeMs: 0, previousClip: null, previousTimeMs: 0, fadeElapsedMs: 0, fadeDurationMs: 0, yawDeg: 0, lookYaw: 0, lookPitch: 0, suspended: false, phase: 'manual', blend: 1, speedPx: 0 }] });

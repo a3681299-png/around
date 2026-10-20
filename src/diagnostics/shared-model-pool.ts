@@ -12,6 +12,7 @@ export interface SharedModelLease {
 
 /** Experimental only. Materials, Texture transforms and VRM components stay private. */
 export function createSharedModelPool(maxBytes = 224 * 1024 * 1024) {
+  if (!Number.isSafeInteger(maxBytes) || maxBytes <= 0) throw new Error('Invalid shared resource budget');
   interface Entry { refs: number; bytes: number; used: number; geometries: Set<BufferGeometry>; slots: Map<number, BufferGeometry>; sources: Map<number, Texture['source']>; bitmaps: Set<ImageBitmap>; anchors: Map<string, Texture> }
   const entries = new Map<string, Entry>(); let bytes = 0, tick = 0;
   function evict(id: string, e: Entry) {
@@ -27,6 +28,7 @@ export function createSharedModelPool(maxBytes = 224 * 1024 * 1024) {
   };
   return {
     reserve(id: string, estimatedBytes: number, privateBytes: number): SharedModelLease {
+      if (!Number.isSafeInteger(estimatedBytes) || !Number.isSafeInteger(privateBytes) || privateBytes < 0 || estimatedBytes <= 0 || privateBytes > estimatedBytes) throw new Error('Invalid resource estimate');
       id += ':' + SHARED_MODEL_VERSION;
       let e = entries.get(id); const sharedBytes = Math.max(0, estimatedBytes - privateBytes);
       if (!e) {

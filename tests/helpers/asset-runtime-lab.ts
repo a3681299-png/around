@@ -7,13 +7,19 @@ import { vrmFixture } from './vrm-fixture';
 
 export async function isolatedLab(page: Page, cdp: CDPSession, id: string) {
   const contexts: any[] = []; cdp.on('Runtime.executionContextCreated', (e) => contexts.push(e.context)); await cdp.send('Runtime.enable');
+  const checked = new Set<number>();
+  for (let round = 0; round < 50; round++) {
   for (const c of contexts.filter((c) => c.auxData?.isDefault === false)) {
-    const r = await cdp.send('Runtime.evaluate', { contextId: c.id, expression: 'typeof chrome!=="undefined"&&chrome.runtime?.id', returnByValue: true });
+    if (checked.has(c.id)) continue; checked.add(c.id);
+    const r = await cdp.send('Runtime.evaluate', { contextId: c.id, expression: 'typeof chrome!=="undefined"&&chrome.runtime?.id', returnByValue: true }).catch(() => undefined);
+    if (!r) continue;
     if (r.result.value !== id) continue;
     return async (method: string, ...args: unknown[]) => {
       const r = await cdp.send('Runtime.evaluate', { contextId: c.id, expression: `globalThis.wwAssetRuntimeHost[${JSON.stringify(method)}](...${JSON.stringify(args)})`, returnByValue: true, awaitPromise: true });
       if (r.exceptionDetails) throw new Error(r.exceptionDetails.exception?.description ?? r.exceptionDetails.text); return r.result.value as any;
     };
+  }
+    await page.waitForTimeout(100);
   }
   throw new Error('Isolated extension context missing: ' + page.url());
 }

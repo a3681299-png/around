@@ -11,7 +11,7 @@ import { verifiedModelBytes } from '../../assets/verified-source';
 import { inspectGlb } from '../../assets/glb';
 import type { Decoration, ModelDecoration } from '../../design/types';
 import { ASSET_PROFILE, assetProfile, profileAsync, profileSync, profileEnd, flushAssetProfile } from '../../diagnostics/asset-profile';
-import { prepareAssetGpu, type AssetWarmup } from '../../diagnostics/asset-gpu-preparation';
+import { prepareAssetGpu, measureAssetGpuApi, type AssetWarmup } from '../../diagnostics/asset-gpu-preparation';
 import type { SharedModelPool, SharedModelLease } from '../../diagnostics/shared-model-pool';
 
 export interface ModelSurface { element: HTMLDivElement; update(layer: Decoration, visible: boolean): void; destroy(): void }
@@ -31,7 +31,7 @@ function dispose(gltf: GLTF, shared?: SharedModelLease) {
   skeletons.forEach((s) => s.dispose()); geometries.forEach((g) => { if (!shared?.geometries.has(g)) g.dispose(); }); materials.forEach((m) => m.dispose());
   const bitmaps = new Set<ImageBitmap>(); textures.forEach((t) => { if (typeof ImageBitmap !== 'undefined' && t.source.data instanceof ImageBitmap) bitmaps.add(t.source.data); t.dispose(); }); bitmaps.forEach((b) => { if (!shared?.bitmaps.has(b)) b.close(); });
 }
-export interface ModelRendererLabOptions { warmup?: AssetWarmup; shared?: SharedModelPool; keepContext?: boolean }
+export interface ModelRendererLabOptions { warmup?: AssetWarmup; shared?: SharedModelPool; keepContext?: boolean; gpuBreakdown?: boolean }
 
 /** One WebGL context; copied surfaces preserve the existing DOM composition/masks. */
 export function createModelRenderer(doc: Document, report: (message: string) => void, observe: (stats: Record<string, unknown>) => void, parent: ShadowRoot, readAsset: typeof loadAsset = loadAsset, labOptions?: ModelRendererLabOptions) {
@@ -42,16 +42,18 @@ export function createModelRenderer(doc: Document, report: (message: string) => 
   const cpuSamples: number[] = [], paintTimes: number[] = [];
   let calls = 0, triangles = 0, gpuMs: number | null = null, backend = '', preparation: Awaited<ReturnType<typeof prepareAssetGpu>> | undefined;
   const queries: WebGLQuery[] = [];
+  let gpuApi: ReturnType<typeof measureAssetGpuApi> | undefined, firstRenderApi: Record<string, { calls: number; cpuMs: number }> | undefined;
   const stats = () => observe({ contexts: renderer ? 1 : 0, lost, assets: cache.size, instances: instances.size, estimatedGpuAssetBytes: budgetBytes + (options?.shared?.stats().sharedBytes ?? 0), ...(options?.shared ? { shared: options.shared.stats() } : {}), ...(preparation ? { preparation } : {}),
     surfaceBytes: [...instances].reduce((n, i) => n + i.canvas.width * i.canvas.height * 4, 0), paints, cpuMs, maxCpuMs,
     calls, triangles, backend, fps: paintTimes.length > 1 ? (paintTimes.length - 1) * 1000 / (paintTimes.at(-1)! - paintTimes[0]!) : 0,
-    p95CpuMs: [...cpuSamples].sort((a, b) => a - b)[Math.floor(cpuSamples.length * .95)] ?? 0, geometries: renderer?.info.memory.geometries ?? 0, textures: renderer?.info.memory.textures ?? 0, gpuMs });
+    p95CpuMs: [...cpuSamples].sort((a, b) => a - b)[Math.floor(cpuSamples.length * .95)] ?? 0, geometries: renderer?.info.memory.geometries ?? 0, textures: renderer?.info.memory.textures ?? 0, programs: renderer?.info.programs?.length ?? 0, gpuMs, ...(gpuApi ? { gpuApi: gpuApi.snapshot(), firstRenderApi } : {}) });
   const reduced = view.matchMedia('(prefers-reduced-motion: reduce)');
   const ensure = (trace?: string) => {
     if (renderer) return renderer;
     renderer = profileSync(trace, 'gpu.create-context', () => new WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power', premultipliedAlpha: true }));
     renderer.domElement.hidden = true; renderer.domElement.dataset.wwThreeBackend = ''; parent.append(renderer.domElement);
     const gl = renderer.getContext(), debug = gl.getExtension('WEBGL_debug_renderer_info'); backend = String(gl.getParameter(debug?.UNMASKED_RENDERER_WEBGL ?? gl.RENDERER));
+    if (options?.gpuBreakdown) gpuApi = measureAssetGpuApi(gl);
     renderer.setClearColor(new Color(0), 0); renderer.setPixelRatio(1);
     renderer.domElement.addEventListener('webglcontextlost', onLost); renderer.domElement.addEventListener('webglcontextrestored', onRestored);
     return renderer;
@@ -146,7 +148,9 @@ export function createModelRenderer(doc: Document, report: (message: string) => 
         if (i.inPlace !== m.inPlace || !i.player && !i.vrmPlayer) { i.player?.destroy(); i.vrmPlayer?.destroy(); if (avatar) i.vrmPlayer = createVrmPlayer(i.source!, avatar, m.inPlace); else i.player = createRigPlayer(i.source!, i.root, m.inPlace); i.inPlace = m.inPlace; }
         if (ASSET_PROFILE && trace) profileEnd(trace, 'first.player-create', playerStart);
         if (i.evaluation) { if (i.vrmPlayer) i.element.dataset.vrmPose = JSON.stringify(i.vrmPlayer.paint(i.evaluation, m, i.worldTime ?? 0)); else i.player?.paint(i.evaluation, m); }
+        const beforeApi = trace && gpuApi?.snapshot();
         if (ASSET_PROFILE && trace) profileSync(trace, 'first.webgl-render-inclusive', () => r.render(i.scene, i.camera)); else r.render(i.scene, i.camera);
+        if (beforeApi && gpuApi) firstRenderApi = Object.fromEntries(Object.entries(gpuApi.snapshot()).map(([name, value]) => [name, { calls: value.calls - beforeApi[name]!.calls, cpuMs: value.cpuMs - beforeApi[name]!.cpuMs }]));
         calls += r.info.render.calls; triangles += r.info.render.triangles;
         const context = i.canvas.getContext('2d'); if (!context) throw new Error('3D描画用キャンバスを確保できませんでした。');
         if (ASSET_PROFILE && trace) profileSync(trace, 'first.canvas-copy', () => { context.clearRect(0, 0, w, h); context.drawImage(r.domElement, 0, 0); });
@@ -170,6 +174,7 @@ export function createModelRenderer(doc: Document, report: (message: string) => 
   const dropRenderer = () => {
     if (!renderer) return; const gl = renderer.getContext() as WebGL2RenderingContext; queries.splice(0).forEach((q) => gl.deleteQuery(q));
     renderer.domElement.removeEventListener('webglcontextlost', onLost); renderer.domElement.removeEventListener('webglcontextrestored', onRestored);
+    gpuApi?.restore(); gpuApi = undefined; firstRenderApi = undefined;
     renderer.domElement.remove(); renderer.dispose(); renderer.forceContextLoss(); renderer = undefined; lost = false; gpuMs = null;
   };
   const visibility = () => { cancel(); if (!doc.hidden) { instances.forEach((i) => { i.dirty = true; i.failed = false; }); schedule(); } };

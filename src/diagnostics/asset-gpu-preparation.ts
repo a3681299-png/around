@@ -1,6 +1,17 @@
 import { Mesh, Texture, type Camera, type Material, type Scene, type WebGLRenderer } from 'three';
 
 export type AssetWarmup = 'none' | 'textures' | 'compile' | 'both';
+export function measureAssetGpuApi(gl: WebGLRenderingContext | WebGL2RenderingContext) {
+  const values: Record<string, { calls: number; cpuMs: number }> = {}, restore: (() => void)[] = [];
+  const target = gl as unknown as Record<string, (...args: any[]) => any>;
+  for (const name of ['compileShader', 'linkProgram', 'getProgramParameter', 'getShaderParameter', 'getProgramInfoLog', 'getShaderInfoLog', 'useProgram', 'getActiveUniform', 'getUniformLocation', 'getAttribLocation', 'texStorage2D', 'texStorage3D', 'texImage2D', 'texSubImage2D', 'texImage3D', 'texSubImage3D', 'generateMipmap', 'bufferData', 'bufferSubData', 'drawElements', 'drawArrays']) {
+    const original = target[name]; if (!original) continue;
+    const counter = values[name] = { calls: 0, cpuMs: 0 };
+    target[name] = (...args) => { const start = performance.now(); try { return Reflect.apply(original, gl, args); } finally { counter.calls++; counter.cpuMs += performance.now() - start; } };
+    restore.push(() => { target[name] = original; });
+  }
+  return { snapshot: () => structuredClone(values), restore: () => restore.forEach((fn) => fn()) };
+}
 /** API wall times and optional GPU command elapsed time, never physical VRAM bytes. */
 export async function prepareAssetGpu(renderer: WebGLRenderer, scene: Scene, camera: Camera, mode: AssetWarmup) {
   const gl = renderer.getContext() as WebGL2RenderingContext;
