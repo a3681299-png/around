@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { openAssetLab, compactLabResult } from './helpers/asset-runtime-lab';
+import { vrmFixture } from './helpers/vrm-fixture';
 
 test('opt-in resident iframe uses IDB, rejects page messages and reconnects with new generations', async () => {
   test.skip(process.env.WW_ASSET_LAB_TEST !== '1', 'Explicit profiling build only'); test.setTimeout(180000);
@@ -73,6 +74,62 @@ test('opt-in private original: matched saved-source chunks, binary and resident 
         report.modes[mode].push({ trial: n + 1, cache: n ? 'warm-process-fresh-model' : 'first-route-session', ...compactLabResult(r) }); await persist();
       }
     }
+  } catch (error) { report.failure = String(error); await persist(); throw error; }
+  finally { await lab.context.close(); }
+});
+
+test('opt-in shared VRM geometry/textures keep independent expressions and release references', async () => {
+  test.skip(process.env.WW_ASSET_LAB_TEST !== '1', 'Explicit profiling build only'); test.setTimeout(120000);
+  const lab = await openAssetLab();
+  try {
+    await lab.call('configure', { shared: true });
+    const result = await lab.call('show', 'resident', lab.asset.id, 3);
+    expect(result.stats.instances).toBe(3); expect(result.stats.shared.refs).toBe(3); expect(result.stats.shared.sharedAssets).toBe(1);
+    expect(result.stats.shared.sharedGeometries).toBe(1); expect(result.stats.geometries).toBe(1);
+    await lab.call('pose', 0, 1);
+    const media = lab.page.frameLocator('#ww-asset-runtime-lab').locator('.model-media');
+    await expect.poll(async () => JSON.parse((await media.nth(0).getAttribute('data-vrm-pose')) ?? '{}').expressions?.happy).toBe(1);
+    expect(JSON.parse((await media.nth(1).getAttribute('data-vrm-pose'))!).expressions.happy ?? 0).toBe(0);
+    await lab.call('clear'); const idle = await lab.call('inspect'); expect(idle.contexts).toBe(1); expect(idle.shared.refs).toBe(0);
+    const again = await lab.call('show', 'resident', lab.asset.id, 3); expect(again.alphaPixels).toBeGreaterThan(100); expect(again.stats.shared.sharedAssets).toBe(1);
+    await lab.call('configure', { shared: false }); const empty = await lab.call('inspect'); expect(empty.contexts).toBe(0); expect(empty.shared.sharedAssets).toBe(0);
+  } finally { await lab.context.close(); }
+});
+
+test('opt-in private cache: three avatars, mixed five-model scene, 20 add/remove cycles', async () => {
+  test.skip(process.env.WW_ASSET_CACHE_LIVE !== '1' || !process.env.WW_VRM_FILE, 'Explicit real-site/private-file benchmark'); test.setTimeout(900000);
+  const lab = await openAssetLab(true, process.env.WW_VRM_FILE), report: Record<string, any> = { browser: lab.context.browser()?.version(), bytes: lab.asset.byteLength, duplicate3: [], cycles: [], mixed: [], forcedGc: true, actualGpuMemoryBytes: null };
+  const persist = async () => { await mkdir('.work/verification', { recursive: true }); await writeFile('.work/verification/asset-runtime-cache.json', JSON.stringify(report, null, 2)); };
+  try {
+    await lab.page.locator('video').first().evaluate((v: HTMLVideoElement) => v.pause());
+    const frame = lab.page.frames().find((f) => f.url().includes('asset-runtime-lab.html?ticket='))!, gpuTarget = await lab.context.newCDPSession(frame);
+    const memory = async () => { await gpuTarget.send('HeapProfiler.collectGarbage'); return gpuTarget.send('Runtime.getHeapUsage'); };
+    report.coldMemory = await memory();
+    await lab.call('configure', { shared: true });
+    for (let n = 0; n < 5; n++) { const r = await lab.call('show', 'resident', lab.asset.id, 3); expect(r.stats.instances).toBe(3); expect(r.alphaPixels).toBeGreaterThan(20000); report.duplicate3.push({ trial: n + 1, ...compactLabResult(r) }); await persist(); }
+    await lab.call('clear'); report.residentIdleBefore = await memory();
+    for (let n = 0; n < 20; n++) {
+      const r = await lab.call('show', 'resident', lab.asset.id); await lab.call('clear');
+      report.cycles.push({ cycle: n + 1, displayMs: r.endToEndMs, memory: await memory(), stats: await lab.call('inspect') }); await persist();
+    }
+    report.residentIdleAfter = await memory();
+    // Self-authored small variants are distinct original assets, not private avatar copies.
+    await lab.control.locator('#file').setInputFiles([0, 1].map((n) => ({ name: `fixture-${n}.vrm`, mimeType: 'model/vrm', buffer: vrmFixture((j) => { j.materials[0].pbrMetallicRoughness.baseColorFactor = n ? [.2, .8, .4, 1] : [.8, .3, .2, 1]; }) })));
+    const other = await lab.control.evaluate(() => (globalThis as any).wwAssetLab.seedMany());
+    const ids = [lab.asset.id, ...other.map((a: any) => a.id)];
+    const { session } = await lab.control.evaluate(({ ids, tab }) => (globalThis as any).wwAssetLab.open(ids, tab), { ids, tab: lab.tab });
+    await lab.call('start', session); await lab.call('configure', { shared: true });
+    for (let n = 0; n < 5; n++) {
+      const r = await lab.call('show', 'resident', [lab.asset.id, lab.asset.id, lab.asset.id, other[0].id, other[1].id]);
+      await lab.call('add2D', 20); await lab.call('resetObservations'); const steadyStart = performance.now();
+      await lab.call('animate', true); await lab.page.waitForTimeout(2000); await lab.call('animate', false); const steadyMs = performance.now() - steadyStart;
+      const steadyStats = await lab.call('inspect');
+      report.mixed.push({ trial: n + 1, ...compactLabResult(r), steadyStats, steadyMs, averageModelFps: steadyStats.paints / 5 * 1000 / steadyMs, twoDimensionalImages: 20, lightsPerModelScene: 2 }); await persist();
+    }
+    await lab.call('configure', { shared: false }); report.afterFullRelease = await lab.call('inspect');
+    const finalFrame = lab.page.frames().find((f) => f.url().includes('asset-runtime-lab.html?ticket='))!, finalTarget = await lab.context.newCDPSession(finalFrame);
+    await finalTarget.send('HeapProfiler.collectGarbage'); report.afterFullReleaseMemory = await finalTarget.send('Runtime.getHeapUsage');
+    await persist();
   } catch (error) { report.failure = String(error); await persist(); throw error; }
   finally { await lab.context.close(); }
 });

@@ -9,7 +9,8 @@ export function installAssetRuntimeHost(doc: Document) {
   const origin = new URL(chrome.runtime.getURL('')).origin;
   let session = '', generation = 0, serial = 0, frame: HTMLIFrameElement | undefined, port: MessagePort | undefined;
   let container: HTMLDivElement | undefined, scene: ReturnType<typeof createAssetLabScene> | undefined;
-  let last: { mode: 'resident' | 'binary' | 'chunks'; id: string; count: number } | undefined, restarting: Promise<unknown> | undefined;
+  let last: { mode: 'resident' | 'binary' | 'chunks'; id: string | string[]; count: number } | undefined, restarting: Promise<unknown> | undefined;
+  let settings: { shared?: boolean; warmup?: 'none' | 'textures' | 'compile' | 'both' } = {};
   const pending = new Map<number, { resolve(value: any): void; reject(error: unknown): void; timer: ReturnType<typeof setTimeout> }>();
   let messages = 0, binaryBytes = 0, smallBytes = 0, senderDetached: boolean | null = null;
   const worker = async (values: Record<string, unknown>) => { const r = await chrome.runtime.sendMessage({ type: ASSET_LAB_MESSAGE, session, ...values }); if (!r?.ok) throw new Error(r?.error ?? 'Lab unavailable'); return r.value; };
@@ -53,10 +54,11 @@ export function installAssetRuntimeHost(doc: Document) {
       (doc.fullscreenElement ?? doc.body).append(f);
     });
   }
-  async function show(mode: 'resident' | 'binary' | 'chunks', id: string, count = 1) {
+  async function show(mode: 'resident' | 'binary' | 'chunks', id: string | string[], count = 1) {
     const started = performance.now(); last = { mode, id, count }; messages = binaryBytes = smallBytes = 0; senderDetached = null;
     scene?.destroy(); scene = undefined; container?.remove(); container = undefined;
-    if (mode === 'resident') { const r = await command('snapshot', { id, count }); return { ...r, endToEndMs: performance.now() - started, messages, binaryBytes, smallBytes, generation }; }
+    if (mode === 'resident') { const r = await command('snapshot', { id: Array.isArray(id) ? id[0] : id, ...(Array.isArray(id) ? { ids: id } : {}), count, settings }); return { ...r, endToEndMs: performance.now() - started, messages, binaryBytes, smallBytes, generation }; }
+    if (Array.isArray(id)) throw new Error('Multi-asset binary probe is unsupported');
     await command('clear'); const fetchStart = performance.now(), trace = newAssetProfile()!; linkAssetProfile(id, trace);
     if (mode === 'chunks') clearAssetSources();
     const source = mode === 'chunks' ? await loadAsset(id) : await command('binary', { id });
@@ -66,6 +68,7 @@ export function installAssetRuntimeHost(doc: Document) {
     const blob: Blob = mode === 'chunks' ? source.blob : new Blob([source.buffer], { type: source.metadata.mime }), metadata = source.metadata as AssetMetadata;
     container = doc.createElement('div'); container.id = 'ww-asset-runtime-binary'; container.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:2147483643'; (doc.fullscreenElement ?? doc.body).append(container);
     scene = createAssetLabScene(container, async () => ({ blob, metadata }));
+    scene.configure(settings);
     const result = await scene.show(metadata, count, trace), endToEndMs = performance.now() - started;
     const logs = await command('profile');
     return { ...result, ...logs, assetFetchMs, sourceMs: source.sourceMs, blobReadMs: source.blobReadMs, endToEndMs, messages, binaryBytes, smallBytes, senderDetached, generation };
@@ -85,6 +88,12 @@ export function installAssetRuntimeHost(doc: Document) {
   Object.assign(globalThis, { wwAssetRuntimeHost: {
     async start(secret: string) { destroy(); session = secret; await worker({ action: 'attach' }); await connect(); observer.observe(doc.documentElement, { attributes: true, attributeFilter: ['data-ww-theme'] }); return { generation }; },
     show, restart, destroy,
+    async configure(value: typeof settings) { settings = value; return command('configure', { settings }); },
+    inspect: () => command('stats'),
+    resetObservations: () => command('reset-stats'),
+    animate: (enabled: boolean) => command('animate', { enabled }),
+    pose: (index: number, happy: number) => command('pose', { index, happy }),
+    add2D: (count: number) => command('add2d', { count }),
     async clear() { last = undefined; scene?.destroy(); scene = undefined; container?.remove(); container = undefined; return command('clear'); },
     state: () => ({ generation, connected: Boolean(port), messages, binaryBytes, smallBytes, last }),
   } });
