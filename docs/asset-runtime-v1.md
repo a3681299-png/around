@@ -1,6 +1,7 @@
 # Asset Runtime v1
 
 起点: `bd29d00`。既存Renderer、DesignDocument、Chrome権限を維持する。
+実測値、採用判断、制約は [asset-runtime-results.md](asset-runtime-results.md) にまとめる。
 
 ## 実装する範囲
 

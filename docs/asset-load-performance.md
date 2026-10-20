@@ -1,5 +1,7 @@
 # VRM読み込み性能調査
 
+後続の実装・5回以上の比較・常駐キャッシュ検証は [Asset Runtime v1 検証結果](asset-runtime-results.md) を参照。この報告と2026-10-19のJSONは、改善前の記録として残す。
+
 調査日: 2026-10-19。起点: `codex/creator-editor-spike` / `90926a6`。
 
 ## 結果
