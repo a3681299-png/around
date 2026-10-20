@@ -13,12 +13,12 @@
 
 ## データと所有権
 
-| 種類 | 識別・寿命 | 共有するもの |
-| --- | --- | --- |
-| Source | 既存 `asset-SHA256(原本)` / IndexedDB。作品・Undo・回復用leaseで保持 | 変更不能な原本Blob |
-| Prepared | `source hash + validator/compiler version + options`。版変更時は原本から再生成 | メタデータ、将来のサムネイル。GPUオブジェクトは永続化しない |
-| Shared Resource | Renderer世代内のsource IDと準備条件。参照数0は予算/LRUに従い解放 | 変更しないgeometry / texture。materialは可変パラメーターを分離できた場合のみ |
-| Instance State | layer ID / Runtime時刻・編集状態 | bone、skeleton、morph、expression、LookAt、SpringBone、mixer、MToonの可変uniformは個別 |
+| 種類            | 識別・寿命                                                                     | 共有するもの                                                                           |
+| --------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| Source          | 既存 `asset-SHA256(原本)` / IndexedDB。作品・Undo・回復用leaseで保持           | 変更不能な原本Blob                                                                     |
+| Prepared        | `source hash + validator/compiler version + options`。版変更時は原本から再生成 | メタデータ、将来のサムネイル。GPUオブジェクトは永続化しない                            |
+| Shared Resource | Renderer世代内のsource IDと準備条件。参照数0は予算/LRUに従い解放               | 変更しないgeometry / texture。materialは可変パラメーターを分離できた場合のみ           |
+| Instance State  | layer ID / Runtime時刻・編集状態                                               | bone、skeleton、morph、expression、LookAt、SpringBone、mixer、MToonの可変uniformは個別 |
 
 今回の準備状態は `loading → ready / error` とキャンセル。将来の仮表示・低品質は `representation` として追加し、未生成のプレビューを完成済みと報告しない。
 

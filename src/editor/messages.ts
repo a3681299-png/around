@@ -1,7 +1,10 @@
 export const OPEN_CREATOR_EDITOR = 'web-world-themes:open-creator-editor';
 export const OPEN_INPAGE_STUDIO = 'web-world-themes:open-inpage-studio';
 
-export interface OpenEditorResponse { ok: boolean; error?: string }
+export interface OpenEditorResponse {
+  ok: boolean;
+  error?: string;
+}
 
 export const PREPARE_SIDE_PANEL = 'web-world-themes:prepare-side-panel';
 export const OPEN_SIDE_PANEL = 'web-world-themes:open-side-panel';

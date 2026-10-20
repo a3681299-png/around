@@ -14,7 +14,7 @@ export const PALETTE_PRESETS = Object.freeze({
 
 export const DEFAULT_PALETTE: Readonly<PaletteSettings> = PALETTE_PRESETS.silver;
 export const PALETTE_CHANNELS = ['hue', 'saturation', 'brightness'] as const;
-export type PaletteChannel = typeof PALETTE_CHANNELS[number];
+export type PaletteChannel = (typeof PALETTE_CHANNELS)[number];
 
 export function normalizePaletteChannel(channel: PaletteChannel, value: unknown): number {
   return typeof value === 'number' && Number.isFinite(value)
@@ -23,19 +23,25 @@ export function normalizePaletteChannel(channel: PaletteChannel, value: unknown)
 }
 
 export function normalizePalette(value: Partial<PaletteSettings> = {}): PaletteSettings {
-  return Object.fromEntries(PALETTE_CHANNELS.map((channel) => [
-    channel, normalizePaletteChannel(channel, value[channel]),
-  ])) as unknown as PaletteSettings;
+  return Object.fromEntries(
+    PALETTE_CHANNELS.map((channel) => [channel, normalizePaletteChannel(channel, value[channel])]),
+  ) as unknown as PaletteSettings;
 }
 
 function hsl(hue: number, saturation: number, lightness: number): string {
   const h = (hue % 360) / 60;
   const c = (1 - Math.abs(2 * lightness - 1)) * saturation;
-  const x = c * (1 - Math.abs(h % 2 - 1));
+  const x = c * (1 - Math.abs((h % 2) - 1));
   const m = lightness - c / 2;
-  const rgb = h < 1 ? [c, x, 0] : h < 2 ? [x, c, 0] : h < 3 ? [0, c, x]
-    : h < 4 ? [0, x, c] : h < 5 ? [x, 0, c] : [c, 0, x];
-  return `#${rgb.map((channel) => Math.round((channel + m) * 255).toString(16).padStart(2, '0')).join('')}`;
+  const rgb =
+    h < 1 ? [c, x, 0] : h < 2 ? [x, c, 0] : h < 3 ? [0, c, x] : h < 4 ? [0, x, c] : h < 5 ? [x, 0, c] : [c, 0, x];
+  return `#${rgb
+    .map((channel) =>
+      Math.round((channel + m) * 255)
+        .toString(16)
+        .padStart(2, '0'),
+    )
+    .join('')}`;
 }
 
 /** WCAG sRGB contrast for the opaque colors emitted below. */
@@ -59,7 +65,7 @@ export function createPalette(input: PaletteSettings): Readonly<Record<string, s
   const b = brightness / 100;
   const color = (sat: number, lightness: number) => hsl(hue, sat, lightness);
   const panel = color(s * 0.28, 0.82 + b * 0.1);
-  const page = color(s * 0.25, 0.80 + b * 0.13);
+  const page = color(s * 0.25, 0.8 + b * 0.13);
   const paper = color(s * 0.16, 0.94 + b * 0.045);
   const glassTop = color(s * 0.35, 0.96 + b * 0.02);
   const glassMid = color(s * 0.36, 0.83 + b * 0.08);
@@ -78,10 +84,10 @@ export function createPalette(input: PaletteSettings): Readonly<Record<string, s
   const accent = readable(0.12 + s * 0.42, 0.34);
   const titleTop = readable(0.06 + s * 0.32, 0.36, ['#ffffff']);
   const titleMid = readable(0.08 + s * 0.34, 0.29, ['#ffffff']);
-  const titleBottom = readable(0.10 + s * 0.32, 0.20, ['#ffffff']);
+  const titleBottom = readable(0.1 + s * 0.32, 0.2, ['#ffffff']);
   const titleInk = '#ffffff';
-  const inactive = readable(s * 0.10, 0.39, ['#ffffff']);
-  const selection = readable(0.10 + s * 0.32, 0.28, ['#ffffff']);
+  const inactive = readable(s * 0.1, 0.39, ['#ffffff']);
+  const selection = readable(0.1 + s * 0.32, 0.28, ['#ffffff']);
   const pane = `linear-gradient(180deg, ${glassTop} 0%, ${glassMid} 49%, ${glassBottom} 50%, ${panel} 100%)`;
   return Object.freeze({
     '--ww-retro-page': page,
@@ -104,7 +110,7 @@ export function createPalette(input: PaletteSettings): Readonly<Record<string, s
     '--ww-lcd-ink': '#d5e7d1',
     '--ww-lcd-muted': '#c0d0bc',
     '--ww-lcd-line': '#69776c',
-    '--ww-led': color(0.16 + s * 0.30, 0.80),
+    '--ww-led': color(0.16 + s * 0.3, 0.8),
     '--ww-titlebar': `linear-gradient(180deg, ${titleTop} 0%, ${titleMid} 49%, ${titleBottom} 50%, ${titleMid} 100%)`,
     '--ww-titlebar-flat': titleMid,
     '--ww-titlebar-ink': titleInk,
@@ -118,7 +124,7 @@ export function createPalette(input: PaletteSettings): Readonly<Record<string, s
     '--ww-pane-titlebar-flat': panel,
     '--ww-pane-titlebar-inactive': panel,
     '--ww-pane-titlebar-inactive-ink': ink,
-    '--ww-link': readable(0.25 + s * 0.32, 0.30),
+    '--ww-link': readable(0.25 + s * 0.32, 0.3),
     '--ww-error': '#721d2f',
   });
 }

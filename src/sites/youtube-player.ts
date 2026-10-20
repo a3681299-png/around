@@ -5,11 +5,7 @@ const controlsSelector = '#movie_player .ytp-right-controls';
 const playerSelector = '.html5-video-player';
 const refreshEvents = ['yt-navigate-finish', 'yt-page-data-updated'] as const;
 
-export function mountYouTubeSettings(
-  doc: Document,
-  view: Window,
-  entry: SettingsEntry,
-): () => void {
+export function mountYouTubeSettings(doc: Document, view: Window, entry: SettingsEntry): () => void {
   let controls: Element | null = null;
   let player: Element | null = null;
   let frame: number | undefined;
@@ -17,8 +13,13 @@ export function mountYouTubeSettings(
 
   const refresh = () => {
     frame = undefined;
-    if (player?.isConnected && controls?.isConnected
-      && controls.firstElementChild === entry.button && entry.panel.parentElement === player) return;
+    if (
+      player?.isConnected &&
+      controls?.isConnected &&
+      controls.firstElementChild === entry.button &&
+      entry.panel.parentElement === player
+    )
+      return;
 
     const nextControls = doc.querySelector(controlsSelector);
     const nextPlayer = nextControls?.closest(playerSelector) ?? null;

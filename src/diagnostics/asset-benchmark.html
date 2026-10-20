@@ -1,11 +1,58 @@
 <!doctype html>
-<html lang="ja"><head><meta charset="utf-8"><title>WWT Asset Load Benchmark</title>
-<style>
-:root{color-scheme:dark;font:14px system-ui}body{margin:16px;background:#202124;color:#eee}button,input{margin:4px;padding:6px}#stage{height:560px;position:relative;background:transparent}#stage canvas{max-width:100%}pre{white-space:pre-wrap}body.framed{margin:0;background:transparent}body.framed #controls,body.framed #result{display:none}body.framed #stage{height:100vh}
-</style></head><body>
-<section id="controls"><h1>Asset Load Benchmark（開発用）</h1>
-<p>モデルはローカルで処理します。数値ログだけを出力します。Aは既存の転送経路、BはFile直接、Cは保存済みBlob直接です。</p>
-<input id="file" type="file" accept=".vrm,.glb"><button id="transport">A′ 転送経路</button><button id="direct">B File直接</button>
-<input id="asset" aria-label="保存済みasset ID" placeholder="asset-…"><button id="stored">C IndexedDB直接</button><button id="seed">Cの準備（保存のみ）</button><button id="stop">描画を撤去</button>
-</section><div id="stage"></div><pre id="result" role="status">ファイルを選択してください。Aの実YouTube全体計測は別の実サイトテストで行います。</pre>
-<script src="asset-benchmark.js"></script></body></html>
+<html lang="ja"
+  ><head
+    ><meta charset="utf-8" /><title>WWT Asset Load Benchmark</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font: 14px system-ui;
+      }
+      body {
+        margin: 16px;
+        background: #202124;
+        color: #eee;
+      }
+      button,
+      input {
+        margin: 4px;
+        padding: 6px;
+      }
+      #stage {
+        height: 560px;
+        position: relative;
+        background: transparent;
+      }
+      #stage canvas {
+        max-width: 100%;
+      }
+      pre {
+        white-space: pre-wrap;
+      }
+      body.framed {
+        margin: 0;
+        background: transparent;
+      }
+      body.framed #controls,
+      body.framed #result {
+        display: none;
+      }
+      body.framed #stage {
+        height: 100vh;
+      }
+    </style></head
+  ><body>
+    <section id="controls"
+      ><h1>Asset Load Benchmark（開発用）</h1>
+      <p
+        >モデルはローカルで処理します。数値ログだけを出力します。Aは既存の転送経路、BはFile直接、Cは保存済みBlob直接です。</p
+      >
+      <input id="file" type="file" accept=".vrm,.glb" /><button id="transport">A′ 転送経路</button
+      ><button id="direct">B File直接</button>
+      <input id="asset" aria-label="保存済みasset ID" placeholder="asset-…" /><button id="stored"
+        >C IndexedDB直接</button
+      ><button id="seed">Cの準備（保存のみ）</button><button id="stop">描画を撤去</button> </section
+    ><div id="stage"></div
+    ><pre id="result" role="status">
+ファイルを選択してください。Aの実YouTube全体計測は別の実サイトテストで行います。</pre>
+    <script src="asset-benchmark.js"></script></body
+></html>

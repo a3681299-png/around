@@ -13,10 +13,19 @@ test('calendar details are stable during a day, vary daily, and repeat determini
 test('focus lifecycle follows real focus and visibility after event settlement and ignores synthetic activation', () => {
   const attributes = new Map<string, string>();
   const root = {
-    toggleAttribute(name: string, value: boolean) { if (value) attributes.set(name, ''); else attributes.delete(name); },
-    setAttribute(name: string, value: string) { attributes.set(name, value); },
-    removeAttribute(name: string) { attributes.delete(name); },
-    getAttribute(name: string) { return attributes.get(name) ?? null; },
+    toggleAttribute(name: string, value: boolean) {
+      if (value) attributes.set(name, '');
+      else attributes.delete(name);
+    },
+    setAttribute(name: string, value: string) {
+      attributes.set(name, value);
+    },
+    removeAttribute(name: string) {
+      attributes.delete(name);
+    },
+    getAttribute(name: string) {
+      return attributes.get(name) ?? null;
+    },
   };
   let focused = true;
   let nextTimer = 0;
@@ -24,18 +33,28 @@ test('focus lifecycle follows real focus and visibility after event settlement a
   const view = Object.assign(new EventTarget(), {
     Element: class {},
     queueMicrotask,
-    setTimeout(callback: () => void) { const id = ++nextTimer; timers.set(id, callback); return id; },
-    clearTimeout(id: number) { timers.delete(id); },
+    setTimeout(callback: () => void) {
+      const id = ++nextTimer;
+      timers.set(id, callback);
+      return id;
+    },
+    clearTimeout(id: number) {
+      timers.delete(id);
+    },
   });
   const doc = Object.assign(new EventTarget(), {
-    documentElement: root, defaultView: view, activeElement: null, body: {}, hidden: false,
+    documentElement: root,
+    defaultView: view,
+    activeElement: null,
+    body: {},
+    hidden: false,
     hasFocus: () => focused,
     querySelector: () => null,
   });
   const flushTasks = () => {
     const callbacks = [...timers.values()];
     timers.clear();
-    callbacks.forEach(callback => callback());
+    callbacks.forEach((callback) => callback());
   };
   const instance = mountYouTubeFocus(doc as unknown as Document);
   expect(attributes.has('data-ww-document-active')).toBe(true);

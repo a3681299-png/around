@@ -17,18 +17,18 @@ PNG／WebPを最初の用途とし、同じレイヤー属性と合成段階をG
 
 ## 入力と接続
 
-| 分類 | ソース | 意味 |
-| --- | --- | --- |
-| 値 | `pointer.position` | 最新の画面内マウス座標。新しいサンプルで置き換える |
-| 状態 | `video.playing` | メインプレイヤーの `!paused && !ended`。不在はfalse |
-| 出来事 | `video.play` / `video.pause` / `video.ended` | ネイティブイベントが発生した1回の通知 |
+| 分類   | ソース                                       | 意味                                                |
+| ------ | -------------------------------------------- | --------------------------------------------------- |
+| 値     | `pointer.position`                           | 最新の画面内マウス座標。新しいサンプルで置き換える  |
+| 状態   | `video.playing`                              | メインプレイヤーの `!paused && !ended`。不在はfalse |
+| 出来事 | `video.play` / `video.pause` / `video.ended` | ネイティブイベントが発生した1回の通知               |
 
 状態と出来事を混同しない。今回の保存可能な接続は値と状態の2種類だけ。出来事はAdapterの通知とカタログに定義し、イベントからの条件分岐やタイムラインは後の拡張に残す。
 
-| ソース → 変換 → ターゲット | 動作 |
-| --- | --- |
-| `pointer.position` → `layer-local` → `mask.center` | 現在のアンカー矩形と画像の回転を逆変換し、レイヤー内のpx座標を求める |
-| `video.playing` → `boolean-gate` → `mask.intensity` | true=1／false=0の係数へ変換し、設定時間でフェードする |
+| ソース → 変換 → ターゲット                          | 動作                                                                 |
+| --------------------------------------------------- | -------------------------------------------------------------------- |
+| `pointer.position` → `layer-local` → `mask.center`  | 現在のアンカー矩形と画像の回転を逆変換し、レイヤー内のpx座標を求める |
+| `video.playing` → `boolean-gate` → `mask.intensity` | true=1／false=0の係数へ変換し、設定時間でフェードする                |
 
 入力を直接位置へ書き込まない。画像の不透明度、マスクの表示強度、シグナルの係数を掛け合わせて描画する。再生・停止を途中で切り替えた場合は現在値からフェードを反転し、マウス移動ではフェードを再開しない。
 
@@ -38,27 +38,29 @@ DesignDocument v5の各レイヤーに、任意の `effects` を追加する。�
 
 ```json
 {
-  "effects": [{
-    "kind": "mask",
-    "shape": "circle",
-    "enabled": true,
-    "center": { "x": 0.5, "y": 0.5 },
-    "radiusPx": 160,
-    "featherPx": 40,
-    "intensity": 1,
-    "bindings": [
-      {
-        "source": "pointer.position",
-        "transform": { "kind": "layer-local" },
-        "target": "mask.center"
-      },
-      {
-        "source": "video.playing",
-        "transform": { "kind": "boolean-gate", "fadeMs": 350 },
-        "target": "mask.intensity"
-      }
-    ]
-  }]
+  "effects": [
+    {
+      "kind": "mask",
+      "shape": "circle",
+      "enabled": true,
+      "center": { "x": 0.5, "y": 0.5 },
+      "radiusPx": 160,
+      "featherPx": 40,
+      "intensity": 1,
+      "bindings": [
+        {
+          "source": "pointer.position",
+          "transform": { "kind": "layer-local" },
+          "target": "mask.center"
+        },
+        {
+          "source": "video.playing",
+          "transform": { "kind": "boolean-gate", "fadeMs": 350 },
+          "target": "mask.intensity"
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -68,16 +70,16 @@ DesignDocument v5の各レイヤーに、任意の `effects` を追加する。�
 
 ## 責務
 
-| モジュール | 責務 |
-| --- | --- |
-| `sites/youtube-signals.ts` | メイン動画の発見・交換、ネイティブ状態と出来事の通知。hover previewを除外 |
-| `signals/types.ts` / `sources.ts` | 入力の分類、最新サンプル、必要なソースの共有・接続・解除 |
-| `effects/types.ts` / `schema.ts` | 素材形式に依存しないエフェクトと宣言的接続、保存入力の検証 |
-| `effects/evaluate.ts` | ソースの変換、座標計算、連続したフェード、マスクの計算 |
-| `effects/controller.ts` | 合成と実行時状態、必要なフレーム予約、媒体への表示状態通知 |
-| `design/image-renderer.ts` | 既存のアンカー追従・選択枠・ジェスチャーと、共通の合成段階を接続 |
-| `media/controller.ts` | 素材の復号・再生。マスクの強度が0になったアニメーションの時計を止める |
-| `editor/effects-panel.ts` | 設定フォーム。draft・履歴・保存は既存のcontrollerへ委譲 |
+| モジュール                        | 責務                                                                      |
+| --------------------------------- | ------------------------------------------------------------------------- |
+| `sites/youtube-signals.ts`        | メイン動画の発見・交換、ネイティブ状態と出来事の通知。hover previewを除外 |
+| `signals/types.ts` / `sources.ts` | 入力の分類、最新サンプル、必要なソースの共有・接続・解除                  |
+| `effects/types.ts` / `schema.ts`  | 素材形式に依存しないエフェクトと宣言的接続、保存入力の検証                |
+| `effects/evaluate.ts`             | ソースの変換、座標計算、連続したフェード、マスクの計算                    |
+| `effects/controller.ts`           | 合成と実行時状態、必要なフレーム予約、媒体への表示状態通知                |
+| `design/image-renderer.ts`        | 既存のアンカー追従・選択枠・ジェスチャーと、共通の合成段階を接続          |
+| `media/controller.ts`             | 素材の復号・再生。マスクの強度が0になったアニメーションの時計を止める     |
+| `editor/effects-panel.ts`         | 設定フォーム。draft・履歴・保存は既存のcontrollerへ委譲                   |
 
 マスクはメディアのコンテナへ適用し、選択枠から分離する。将来の別素材もLayerStateと合成段階を共有できる。UIレイヤーや3Dでは描画先に合う合成実装を別途追加する必要があり、今回それらの表示対応を実装したわけではない。接続構造はフォームに依存せず、将来別の編集UIからも作れる。
 

@@ -39,14 +39,14 @@ v1〜v7は純粋なparseDesignでv8へ再構築する。ルールなしの見た
 
 ## モジュール
 
-| 境界 | 主なファイル | 責務 |
-|---|---|---|
-| 作品・検証 | `signals/keyframes.ts`, `signals/keyframe-schema.ts`, `design/schema.ts` | v8の宣言的ルール、v1〜v7移行、上限・参照・未対応モードの拒否 |
-| World Runtime | `world/keyframes.ts`, `world/takes.ts` | 純粋な補間、raw入力の正規化、記録シーク・状態復元、派生ゴースト |
-| Host | `host/signals.ts`, `host/timeline.ts`, `host/world-session.ts` | 遅延購読、明示録画、時計・可視性、入力切替、1フレーム内の評価集約 |
-| Editor Core | `editor-core/session.ts`, `editor/groups.ts` | 共通ルールコマンド、Undo、保存・復旧、複製・削除時の参照整合 |
-| Studio | `studio/signal-timeline.ts`, `studio/timeline-transport.ts` | キー編集、波形・投影、テイク操作。Chrome APIを使わない |
-| 通信・保存 | `studio/protocol.ts`, `browser/studio-{client,host}.ts`, `browser/take-{storage,repository}.ts` | 認証済み通信、薄いテレメトリー、テイク専用IndexedDB |
+| 境界          | 主なファイル                                                                                    | 責務                                                              |
+| ------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| 作品・検証    | `signals/keyframes.ts`, `signals/keyframe-schema.ts`, `design/schema.ts`                        | v8の宣言的ルール、v1〜v7移行、上限・参照・未対応モードの拒否      |
+| World Runtime | `world/keyframes.ts`, `world/takes.ts`                                                          | 純粋な補間、raw入力の正規化、記録シーク・状態復元、派生ゴースト   |
+| Host          | `host/signals.ts`, `host/timeline.ts`, `host/world-session.ts`                                  | 遅延購読、明示録画、時計・可視性、入力切替、1フレーム内の評価集約 |
+| Editor Core   | `editor-core/session.ts`, `editor/groups.ts`                                                    | 共通ルールコマンド、Undo、保存・復旧、複製・削除時の参照整合      |
+| Studio        | `studio/signal-timeline.ts`, `studio/timeline-transport.ts`                                     | キー編集、波形・投影、テイク操作。Chrome APIを使わない            |
+| 通信・保存    | `studio/protocol.ts`, `browser/studio-{client,host}.ts`, `browser/take-{storage,repository}.ts` | 認証済み通信、薄いテレメトリー、テイク専用IndexedDB               |
 
 `world/takes.ts`は32入力ごとの状態キャッシュと同じジオメトリの配置再利用で逆方向・シークを復元する。フレームの丸ごとキャッシュはしない。ゴーストはrawスクロール位置と範囲を補間して交点を求めるので、ページ高さが変わる場合も単純な進捗の線形補間に置き換えない。投影キーの描画は最大256個、純粋な計算は4096個まで。紫の投影曲線は201点の表示用サンプリングで、Runtime評価や元のテイクを間引かない。静的グラフはテレメトリーごとに作り直さない。記録入力の時計で評価している間はWorld側のフェードRAFを自己予約せず、一時停止の不要な連続評価を防ぐ。
 

@@ -1,5 +1,12 @@
 import styles from './panel.css';
-import { GROUP_LIMITS, IMAGE_LIMITS, STYLE_LIMITS, type SurfaceStyle, type ImagePatch, type DesignTarget } from '../design/types';
+import {
+  GROUP_LIMITS,
+  IMAGE_LIMITS,
+  STYLE_LIMITS,
+  type SurfaceStyle,
+  type ImagePatch,
+  type DesignTarget,
+} from '../design/types';
 import { ANIMATION_LIMITS } from '../assets/motion-types';
 import { MODEL_LIMITS } from '../models/types';
 import { ASSET_MESSAGES } from '../assets/limits';
@@ -23,9 +30,15 @@ export type { EditorView as PanelState } from '../editor-core/types';
 import type { EditorView as PanelState } from '../editor-core/types';
 import type { StudioPreferences } from '../studio/preferences';
 export interface PanelOptions {
-  preferences?: StudioPreferences; fullPage?: boolean; persistWorkspace?: boolean; inPage?: boolean; sidePanel?: boolean; toolbarOnly?: boolean;
+  preferences?: StudioPreferences;
+  fullPage?: boolean;
+  persistWorkspace?: boolean;
+  inPage?: boolean;
+  sidePanel?: boolean;
+  toolbarOnly?: boolean;
   onSurface?(surface: 'sidepanel' | 'inpage' | 'window'): void;
-  hostLabel?: string; onLayout?(insets: StudioInsets): void;
+  hostLabel?: string;
+  onLayout?(insets: StudioInsets): void;
   timeline?: TimelinePort | undefined;
 }
 
@@ -51,13 +64,20 @@ export interface PanelActions {
   clearSelection(): void;
   selectAll(): void;
   tool(tool: EditorTool): void;
-  beginEdit(): void; endEdit(cancel?: boolean): void;
-  signalRule(rule: SignalRule): void; removeSignalRule(id: string): void;
+  beginEdit(): void;
+  endEdit(cancel?: boolean): void;
+  signalRule(rule: SignalRule): void;
+  removeSignalRule(id: string): void;
   thumbnail(id: string): Promise<string | undefined>;
 }
 
 /** This UI has no site selectors, theme CSS or persistence logic. */
-export function createCreatorPanel(doc: Document, actions: PanelActions, anchors: readonly DesignTarget[] = [], options: PanelOptions = {}) {
+export function createCreatorPanel(
+  doc: Document,
+  actions: PanelActions,
+  anchors: readonly DesignTarget[] = [],
+  options: PanelOptions = {},
+) {
   const host = doc.createElement('aside');
   host.id = 'web-world-themes-creator';
   host.setAttribute('data-ww-signal-control', '');
@@ -145,10 +165,20 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
     <p class="status" role="status" aria-live="polite"></p></footer>`;
   shadow.append(sheet, main);
   const get = <T extends HTMLElement>(selector: string) => main.querySelector<T>(selector)!;
-  const tools = doc.createElement('div'); tools.className = 'interaction-tools'; tools.setAttribute('aria-label', '操作ツール');
-  for (const [tool, label, key] of [['select', '選択・変形', 'V'], ['browse', 'サイト操作', 'H'], ['card', '動画カードを編集', 'C']] as const) {
-    const button = doc.createElement('button'); button.type = 'button'; button.dataset.tool = tool; buttonIcon(button, tool, label, key);
-    button.addEventListener('click', () => actions.tool(tool)); tools.append(button);
+  const tools = doc.createElement('div');
+  tools.className = 'interaction-tools';
+  tools.setAttribute('aria-label', '操作ツール');
+  for (const [tool, label, key] of [
+    ['select', '選択・変形', 'V'],
+    ['browse', 'サイト操作', 'H'],
+    ['card', '動画カードを編集', 'C'],
+  ] as const) {
+    const button = doc.createElement('button');
+    button.type = 'button';
+    button.dataset.tool = tool;
+    buttonIcon(button, tool, label, key);
+    button.addEventListener('click', () => actions.tool(tool));
+    tools.append(button);
   }
   get('.toolbar').append(tools);
   const backgroundToggle = get<HTMLInputElement>('[data-override="backgroundColor"]');
@@ -165,18 +195,27 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
   const motion = createMotionPanel(doc, changeImage, actions.beginEdit, actions.endEdit);
   const model = createModelPanel(doc, changeImage, actions.beginEdit, actions.endEdit);
   imageProperties.append(model.fieldset, motion.fieldset, effects.fieldset);
-  const modelInput = get<HTMLInputElement>('.model-file'), addModel = get<HTMLButtonElement>('.add-model');
+  const modelInput = get<HTMLInputElement>('.model-file'),
+    addModel = get<HTMLButtonElement>('.add-model');
   addModel.addEventListener('click', () => modelInput.click());
-  modelInput.addEventListener('change', () => { actions.imageImport([...modelInput.files ?? []]); modelInput.value = ''; });
+  modelInput.addEventListener('change', () => {
+    actions.imageImport([...(modelInput.files ?? [])]);
+    modelInput.value = '';
+  });
   const fileInput = get<HTMLInputElement>('.file');
   const addImage = get<HTMLButtonElement>('.add-image');
   const addAnimation = get<HTMLButtonElement>('.add-animation');
   const animationInput = get<HTMLInputElement>('.animation-file');
-  buttonIcon(addImage, 'image', '画像を追加'); buttonIcon(addAnimation, 'animation', 'アニメーションを追加'); buttonIcon(addModel, 'model3d', '3Dモデルを追加');
+  buttonIcon(addImage, 'image', '画像を追加');
+  buttonIcon(addAnimation, 'animation', 'アニメーションを追加');
+  buttonIcon(addModel, 'model3d', '3Dモデルを追加');
   const layers = get<HTMLDivElement>('.layers');
   const anchorSelect = get<HTMLSelectElement>('[data-image-prop="anchor"]');
   for (const anchor of anchors) {
-    const option = doc.createElement('option'); option.value = anchor.id; option.textContent = anchor.label; anchorSelect.append(option);
+    const option = doc.createElement('option');
+    option.value = anchor.id;
+    option.textContent = anchor.label;
+    anchorSelect.append(option);
   }
   const save = get<HTMLButtonElement>('.save');
   const discard = get<HTMLButtonElement>('.discard');
@@ -186,7 +225,9 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
   const selection = get<HTMLParagraphElement>('.selection');
   let current: PanelState | undefined;
   let pendingContext: { id: string; x: number; y: number } | undefined;
-  const setText = (element: HTMLElement, value: string) => { if (element.textContent !== value) element.textContent = value; };
+  const setText = (element: HTMLElement, value: string) => {
+    if (element.textContent !== value) element.textContent = value;
+  };
   const onInput = () => {
     background.disabled = !backgroundToggle.checked;
     borderColor.disabled = borderWidth.disabled = !borderToggle.checked;
@@ -206,39 +247,75 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
   properties.addEventListener('input', onInput);
   addImage.addEventListener('click', () => fileInput.click());
   addAnimation.addEventListener('click', () => animationInput.click());
-  animationInput.addEventListener('change', () => { actions.imageImport([...animationInput.files ?? []]); animationInput.value = ''; });
-  fileInput.addEventListener('change', () => { actions.imageImport([...fileInput.files ?? []]); fileInput.value = ''; });
+  animationInput.addEventListener('change', () => {
+    actions.imageImport([...(animationInput.files ?? [])]);
+    animationInput.value = '';
+  });
+  fileInput.addEventListener('change', () => {
+    actions.imageImport([...(fileInput.files ?? [])]);
+    fileInput.value = '';
+  });
   let workspace: ReturnType<typeof createWorkspace> & { setHostLayout?(value: StudioHostLayout): void };
-  const tree = createLayerTree(doc, layers, { select: actions.imageSelect, change: actions.layerChange, reorder: actions.reorder,
+  const tree = createLayerTree(doc, layers, {
+    select: actions.imageSelect,
+    change: actions.layerChange,
+    reorder: actions.reorder,
     thumbnail: actions.thumbnail,
     context: (id, x, y) => {
       if (!current?.selectedIds.includes(id)) actions.imageSelect(id);
       // A remote selection must be acknowledged before the menu uses its actions.
       if (current?.selectedIds.includes(id)) workspace.context(x, y);
       else pendingContext = { id, x, y };
-    } });
-  workspace = options.fullPage || options.inPage || options.sidePanel || options.toolbarOnly ? createStudioWorkbench(doc, host, main, tree, actions, options)
-    : createWorkspace(doc, host, main, tree, actions.clearSelection, actions.selectAll, options);
+    },
+  });
+  workspace =
+    options.fullPage || options.inPage || options.sidePanel || options.toolbarOnly
+      ? createStudioWorkbench(doc, host, main, tree, actions, options)
+      : createWorkspace(doc, host, main, tree, actions.clearSelection, actions.selectAll, options);
   const layerName = get<HTMLInputElement>('.layer-name');
   layerName.addEventListener('change', () => {
     const name = layerName.value.trim();
-    if (!name || /[\u0000-\u001f]/.test(name)) { layerName.value = current?.image?.name ?? ''; return; }
+    if (!name || /[\u0000-\u001f]/.test(name)) {
+      layerName.value = current?.image?.name ?? '';
+      return;
+    }
     changeImage({ name });
   });
   imageProperties.addEventListener('input', (event) => {
     const input = event.target as HTMLInputElement | HTMLSelectElement;
     const property = input.dataset.imageProp;
     if (!property) return;
-    if (!input.checkValidity()) { setText(status, '画像の値を範囲内で入力してください。'); status.dataset.error = 'true'; save.disabled = true; return; }
-    if (property === 'anchor') changeImage({ placement: { anchor: input.value === 'viewport' ? { kind: 'viewport' } : { kind: 'surface', target: input.value } } });
+    if (!input.checkValidity()) {
+      setText(status, '画像の値を範囲内で入力してください。');
+      status.dataset.error = 'true';
+      save.disabled = true;
+      return;
+    }
+    if (property === 'anchor')
+      changeImage({
+        placement: {
+          anchor: input.value === 'viewport' ? { kind: 'viewport' } : { kind: 'surface', target: input.value },
+        },
+      });
     else if (property === 'opacity') changeImage({ opacity: Number(input.value) / 100 });
-    else changeImage({ placement: { [property]: Number(input.value) / (property === 'x' || property === 'y' ? 100 : 1) } });
+    else
+      changeImage({
+        placement: { [property]: Number(input.value) / (property === 'x' || property === 'y' ? 100 : 1) },
+      });
   });
   get<HTMLFieldSetElement>('.playback').addEventListener('input', (event) => {
     const input = event.target as HTMLInputElement;
-    if (!input.checkValidity()) { setText(status, '再生速度は0.25〜3倍で入力してください。'); status.dataset.error = 'true'; save.disabled = true; return; }
+    if (!input.checkValidity()) {
+      setText(status, '再生速度は0.25〜3倍で入力してください。');
+      status.dataset.error = 'true';
+      save.disabled = true;
+      return;
+    }
     const key = input.dataset.playback;
-    if (key) changeImage({ playback: { [key]: key === 'mode' ? input.value : key === 'speed' ? Number(input.value) : input.checked } });
+    if (key)
+      changeImage({
+        playback: { [key]: key === 'mode' ? input.value : key === 'speed' ? Number(input.value) : input.checked },
+      });
   });
   get<HTMLButtonElement>('.delete-image').addEventListener('click', () => actions.imageDelete());
   get<HTMLButtonElement>('.duplicate-image').addEventListener('click', () => actions.duplicate());
@@ -246,9 +323,14 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
   get<HTMLButtonElement>('.ungroup-layers').addEventListener('click', actions.ungroup);
   get<HTMLButtonElement>('.undo').addEventListener('click', actions.undo);
   get<HTMLButtonElement>('.redo').addEventListener('click', actions.redo);
-  get<HTMLInputElement>('.snap').addEventListener('change', (event) => actions.snap((event.target as HTMLInputElement).checked));
+  get<HTMLInputElement>('.snap').addEventListener('change', (event) =>
+    actions.snap((event.target as HTMLInputElement).checked),
+  );
   get<HTMLFieldSetElement>('.layout-tools').addEventListener('click', (event) => {
-    const mode = event.target instanceof HTMLElement ? event.target.dataset.align as Alignment | Distribution | undefined : undefined;
+    const mode =
+      event.target instanceof HTMLElement
+        ? (event.target.dataset.align as Alignment | Distribution | undefined)
+        : undefined;
     if (mode) actions.layout(mode);
   });
   save.addEventListener('click', actions.save);
@@ -267,66 +349,145 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
   host.addEventListener('keyup', stop);
   host.addEventListener('click', stop);
 
-
   const stopScrub = mountNumberScrub(doc, host, main, actions.beginEdit, actions.endEdit);
   return {
     host,
-    setHostLayout(value: StudioHostLayout) { workspace.setHostLayout?.(value); },
-    focus() { if (options.inPage || options.fullPage) get<HTMLButtonElement>('[data-tool="select"]').focus(); else close.focus(); },
+    setHostLayout(value: StudioHostLayout) {
+      workspace.setHostLayout?.(value);
+    },
+    focus() {
+      if (options.inPage || options.fullPage) get<HTMLButtonElement>('[data-tool="select"]').focus();
+      else close.focus();
+    },
     render(state: PanelState) {
       current = state;
-      imageProperties.hidden = !state.image && !(options.fullPage || options.inPage || options.sidePanel || options.toolbarOnly) || state.selected;
+      imageProperties.hidden =
+        (!state.image && !(options.fullPage || options.inPage || options.sidePanel || options.toolbarOnly)) ||
+        state.selected;
       imageProperties.disabled = !state.image || state.saving || Boolean(state.image?.locked) || state.inheritedLocked;
       imageProperties.toggleAttribute('data-empty', !state.image);
-      const opacityDriven = Boolean(state.image && state.signalRules?.some((rule) => rule.enabled && rule.target.property === 'opacity' && rule.target.layerId === state.image!.id));
+      const opacityDriven = Boolean(
+        state.image &&
+        state.signalRules?.some(
+          (rule) => rule.enabled && rule.target.property === 'opacity' && rule.target.layerId === state.image!.id,
+        ),
+      );
       imageProperties.toggleAttribute('data-opacity-driven', opacityDriven);
-      tools.querySelectorAll<HTMLButtonElement>('[data-tool]').forEach((button) => { button.setAttribute('aria-pressed', String(button.dataset.tool === (state.tool ?? 'select'))); });
+      tools.querySelectorAll<HTMLButtonElement>('[data-tool]').forEach((button) => {
+        button.setAttribute('aria-pressed', String(button.dataset.tool === (state.tool ?? 'select')));
+      });
       const isGroup = state.image?.kind === 'group';
       imageProperties.setAttribute('aria-label', isGroup ? 'グループのプロパティ' : '画像のプロパティ');
       get<HTMLElement>('.group-help').hidden = !isGroup;
       get<HTMLElement>('.size-property').hidden = get<HTMLElement>('.rotation-property').hidden = isGroup;
       get<HTMLElement>('[data-image-prop="anchor"]').closest<HTMLElement>('.property')!.hidden = isGroup;
-      for (const key of ['widthPx', 'heightPx', 'rotationDeg', 'anchor']) get<HTMLInputElement>(`[data-image-prop="${key}"]`).disabled = isGroup || key === 'anchor' && Boolean(state.image && parentGroup(state.groups, state.image.id));
+      for (const key of ['widthPx', 'heightPx', 'rotationDeg', 'anchor'])
+        get<HTMLInputElement>(`[data-image-prop="${key}"]`).disabled =
+          isGroup || (key === 'anchor' && Boolean(state.image && parentGroup(state.groups, state.image.id)));
       for (const key of ['x', 'y']) {
-        const input = get<HTMLInputElement>(`[data-image-prop="${key}"]`); input.disabled = isGroup && !state.groupPositionAvailable;
-        if (isGroup) { input.removeAttribute('min'); input.removeAttribute('max'); }
-        else { input.min = '0'; input.max = '100'; }
+        const input = get<HTMLInputElement>(`[data-image-prop="${key}"]`);
+        input.disabled = isGroup && !state.groupPositionAvailable;
+        if (isGroup) {
+          input.removeAttribute('min');
+          input.removeAttribute('max');
+        } else {
+          input.min = '0';
+          input.max = '100';
+        }
         input.setAttribute('aria-label', `${isGroup ? 'グループ' : '画像'}の${key.toUpperCase()}位置`);
       }
-      get<HTMLInputElement>('[data-image-prop="opacity"]').setAttribute('aria-label', `${isGroup ? 'グループ' : '画像'}の不透明度`);
-      effects.render(state.image); motion.render(state.image); model.render(state.image);
-      motion.fieldset.disabled = Boolean(isGroup && state.image?.kind === 'group' && !groupMovable(state.image, state.images));
+      get<HTMLInputElement>('[data-image-prop="opacity"]').setAttribute(
+        'aria-label',
+        `${isGroup ? 'グループ' : '画像'}の不透明度`,
+      );
+      effects.render(state.image);
+      motion.render(state.image);
+      model.render(state.image);
+      motion.fieldset.disabled = Boolean(
+        isGroup && state.image?.kind === 'group' && !groupMovable(state.image, state.images),
+      );
       properties.hidden = !state.selected;
       get<HTMLParagraphElement>('.card-help').hidden = !state.selected;
       get<HTMLParagraphElement>('.multi-help').hidden = state.selectedIds.length < 2;
-      const selectedLayers = [...state.images, ...state.groups].filter((layer) => state.selectedIds.includes(layer.id) && (layer.kind === 'group' ? groupMovable(layer, state.images) : !effectivelyLocked(layer, state.groups)));
-      const unlocked = selectedLayers.length, selectedMedia = selectedLayers.flatMap((layer) => layer.kind === 'group' ? childrenOf(layer, state.images) : [layer]);
+      const selectedLayers = [...state.images, ...state.groups].filter(
+        (layer) =>
+          state.selectedIds.includes(layer.id) &&
+          (layer.kind === 'group' ? groupMovable(layer, state.images) : !effectivelyLocked(layer, state.groups)),
+      );
+      const unlocked = selectedLayers.length,
+        selectedMedia = selectedLayers.flatMap((layer) =>
+          layer.kind === 'group' ? childrenOf(layer, state.images) : [layer],
+        );
       const animations = state.images.filter((image) => image.kind === 'animation').length;
       const selectedAnimations = selectedMedia.filter((image) => image.kind === 'animation').length;
       get<HTMLButtonElement>('.delete-image').disabled = !unlocked || state.saving;
-      get<HTMLButtonElement>('.duplicate-image').disabled = !unlocked || state.saving || state.images.length + selectedMedia.length > IMAGE_LIMITS.count || animations + selectedAnimations > ANIMATION_LIMITS.count || state.images.filter((i) => i.kind === 'model3d').length + selectedMedia.filter((i) => i.kind === 'model3d').length > MODEL_LIMITS.count || state.groups.length + selectedLayers.filter((layer) => layer.kind === 'group').length > GROUP_LIMITS.count;
+      get<HTMLButtonElement>('.duplicate-image').disabled =
+        !unlocked ||
+        state.saving ||
+        state.images.length + selectedMedia.length > IMAGE_LIMITS.count ||
+        animations + selectedAnimations > ANIMATION_LIMITS.count ||
+        state.images.filter((i) => i.kind === 'model3d').length +
+          selectedMedia.filter((i) => i.kind === 'model3d').length >
+          MODEL_LIMITS.count ||
+        state.groups.length + selectedLayers.filter((layer) => layer.kind === 'group').length > GROUP_LIMITS.count;
       get<HTMLButtonElement>('.group-layers').disabled = state.saving || Boolean(state.groupingReason);
       get<HTMLButtonElement>('.group-layers').hidden = isGroup;
       get<HTMLButtonElement>('.ungroup-layers').hidden = !isGroup;
-      get<HTMLButtonElement>('.ungroup-layers').disabled = state.saving || !isGroup || Boolean(ungroupingReason(state.image?.kind === 'group' ? state.image : undefined, state.signalRules ? [...state.signalRules] : []));
+      get<HTMLButtonElement>('.ungroup-layers').disabled =
+        state.saving ||
+        !isGroup ||
+        Boolean(
+          ungroupingReason(
+            state.image?.kind === 'group' ? state.image : undefined,
+            state.signalRules ? [...state.signalRules] : [],
+          ),
+        );
       get<HTMLElement>('.grouping-help').hidden = isGroup;
-      setText(get<HTMLElement>('.grouping-help'), state.groupingReason || 'まとめて移動したり、同じマスクを適用できます。');
+      setText(
+        get<HTMLElement>('.grouping-help'),
+        state.groupingReason || 'まとめて移動したり、同じマスクを適用できます。',
+      );
       get<HTMLButtonElement>('.undo').disabled = !state.canUndo || state.saving;
       get<HTMLButtonElement>('.redo').disabled = !state.canRedo || state.saving;
       get<HTMLInputElement>('.snap').checked = state.snapping;
       get<HTMLInputElement>('.snap').disabled = state.saving;
       get<HTMLFieldSetElement>('.layout-tools').hidden = state.selectedIds.length < 2;
-      const eligible = state.groups.some((group) => state.selectedIds.includes(group.id)) ? 0 : state.images.filter((image) => state.selectedIds.includes(image.id) && image.visible && !effectivelyLocked(image, state.groups) && parentGroup(state.groups, image.id)?.visible !== false).length;
+      const eligible = state.groups.some((group) => state.selectedIds.includes(group.id))
+        ? 0
+        : state.images.filter(
+            (image) =>
+              state.selectedIds.includes(image.id) &&
+              image.visible &&
+              !effectivelyLocked(image, state.groups) &&
+              parentGroup(state.groups, image.id)?.visible !== false,
+          ).length;
       main.querySelectorAll<HTMLButtonElement>('[data-align]').forEach((button) => {
         const minimum = ['horizontal', 'vertical'].includes(button.dataset.align!) ? 3 : 2;
         button.disabled = state.saving || eligible < minimum;
       });
-      setText(get<HTMLElement>('.dirty'), state.error ? state.status.startsWith('保存でき') ? '保存失敗' : '操作失敗・要確認' : state.saving ? '処理中…' : state.dirty ? '未保存の変更' : '保存済み');
+      setText(
+        get<HTMLElement>('.dirty'),
+        state.error
+          ? state.status.startsWith('保存でき')
+            ? '保存失敗'
+            : '操作失敗・要確認'
+          : state.saving
+            ? '処理中…'
+            : state.dirty
+              ? '未保存の変更'
+              : '保存済み',
+      );
       get<HTMLElement>('.dirty').dataset.dirty = String(state.dirty);
-      setText(get<HTMLElement>('.layer-count'), `${state.images.length} / ${IMAGE_LIMITS.count}${state.groups.length ? `・グループ${state.groups.length}` : ''}`);
+      setText(
+        get<HTMLElement>('.layer-count'),
+        `${state.images.length} / ${IMAGE_LIMITS.count}${state.groups.length ? `・グループ${state.groups.length}` : ''}`,
+      );
       addImage.disabled = state.saving || state.images.length >= IMAGE_LIMITS.count;
-      addModel.disabled = addImage.disabled || state.images.filter((layer) => layer.kind === 'model3d').length >= MODEL_LIMITS.count;
-      addAnimation.disabled = addImage.disabled || state.images.filter((image) => image.kind === 'animation').length >= ANIMATION_LIMITS.count;
+      addModel.disabled =
+        addImage.disabled || state.images.filter((layer) => layer.kind === 'model3d').length >= MODEL_LIMITS.count;
+      addAnimation.disabled =
+        addImage.disabled ||
+        state.images.filter((image) => image.kind === 'animation').length >= ANIMATION_LIMITS.count;
       get<HTMLFieldSetElement>('.playback').hidden = state.image?.kind !== 'animation';
       if (state.image?.kind === 'animation') {
         get<HTMLInputElement>('[data-playback="playing"]').checked = state.image.playback.playing;
@@ -335,9 +496,14 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
         get<HTMLSelectElement>('[data-playback="mode"]').value = state.image.playback.mode ?? 'controlled';
         get<HTMLElement>('.playback-mode').hidden = state.image.format === 'lottie' || state.image.format === 'webm';
         get<HTMLElement>('.playback-speed').hidden = false;
-        setText(get<HTMLElement>('.playback-help'), state.image.format === 'webm' ? '動画は標準プレイヤーで再生します。シーク位置には誤差があります。'
-          : state.image.format === 'lottie' ? '対応する図形アニメーションをフレーム単位で再生します。'
-          : '軽量再生では切替時の再開位置に誤差があります。停止・速度変更時は時刻制御に切り替わります。');
+        setText(
+          get<HTMLElement>('.playback-help'),
+          state.image.format === 'webm'
+            ? '動画は標準プレイヤーで再生します。シーク位置には誤差があります。'
+            : state.image.format === 'lottie'
+              ? '対応する図形アニメーションをフレーム単位で再生します。'
+              : '軽量再生では切替時の再開位置に誤差があります。停止・速度変更時は時刻制御に切り替わります。',
+        );
       }
       tree.render(state);
       if (state.image) {
@@ -347,14 +513,30 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
         for (const [property, value] of Object.entries(image.placement)) {
           if (property === 'anchor') continue;
           const input = get<HTMLInputElement>(`[data-image-prop="${property}"]`);
-          input.value = String(Math.round(Number(value) * (property === 'x' || property === 'y' ? 10_000 : 10)) / (property === 'x' || property === 'y' ? 100 : 10));
+          input.value = String(
+            Math.round(Number(value) * (property === 'x' || property === 'y' ? 10_000 : 10)) /
+              (property === 'x' || property === 'y' ? 100 : 10),
+          );
         }
         get<HTMLInputElement>('[data-image-prop="opacity"]').value = String(Math.round(image.opacity * 100));
         setText(get<HTMLOutputElement>('.opacity-value'), `${Math.round(image.opacity * 100)}%`);
       } else if (options.fullPage || options.inPage) {
-        imageProperties.querySelectorAll<HTMLInputElement>('input[type="text"],input[type="number"]').forEach((input) => { input.value = ''; }); get<HTMLOutputElement>('.opacity-value').value = '—';
+        imageProperties
+          .querySelectorAll<HTMLInputElement>('input[type="text"],input[type="number"]')
+          .forEach((input) => {
+            input.value = '';
+          });
+        get<HTMLOutputElement>('.opacity-value').value = '—';
       }
-      if (opacityDriven) setText(get<HTMLOutputElement>('.opacity-value'), state.signalRules?.find((rule) => rule.enabled && rule.target.property === 'opacity' && rule.target.layerId === state.image?.id)?.source.signal === 'page.scroll.progress' ? 'スクロールに接続' : 'シグナルに接続');
+      if (opacityDriven)
+        setText(
+          get<HTMLOutputElement>('.opacity-value'),
+          state.signalRules?.find(
+            (rule) => rule.enabled && rule.target.property === 'opacity' && rule.target.layerId === state.image?.id,
+          )?.source.signal === 'page.scroll.progress'
+            ? 'スクロールに接続'
+            : 'シグナルに接続',
+        );
       get<HTMLInputElement>('[data-image-prop="opacity"]').disabled = opacityDriven;
       properties.disabled = !state.selected || state.saving;
       backgroundToggle.checked = state.style.backgroundColor !== undefined;
@@ -368,13 +550,31 @@ export function createCreatorPanel(doc: Document, actions: PanelActions, anchors
       borderColor.disabled = borderWidth.disabled = !borderToggle.checked;
       radius.disabled = !radiusToggle.checked;
       save.disabled = discard.disabled = !state.dirty || state.saving;
-      close.disabled = state.saving; close.title = state.dirty ? '編集を終了（未保存の変更を破棄）' : '編集を終了';
-      setText(selection, state.image ? `${state.image.kind === 'group' ? 'グループ' : state.image.kind === 'animation' ? 'アニメーション' : '画像'}: ${state.image.name}${state.image.locked || state.inheritedLocked ? '（ロック中）' : ''}` : state.selectedIds.length > 1 ? `${state.selectedIds.length}レイヤーを選択中` : state.selected ? '動画カードを選択中' : 'カードまたは画像を選択してください');
+      close.disabled = state.saving;
+      close.title = state.dirty ? '編集を終了（未保存の変更を破棄）' : '編集を終了';
+      setText(
+        selection,
+        state.image
+          ? `${state.image.kind === 'group' ? 'グループ' : state.image.kind === 'animation' ? 'アニメーション' : '画像'}: ${state.image.name}${state.image.locked || state.inheritedLocked ? '（ロック中）' : ''}`
+          : state.selectedIds.length > 1
+            ? `${state.selectedIds.length}レイヤーを選択中`
+            : state.selected
+              ? '動画カードを選択中'
+              : 'カードまたは画像を選択してください',
+      );
       setText(status, state.status);
       status.dataset.error = String(state.error);
       workspace.render(state);
-      if (pendingContext && state.selectedIds.includes(pendingContext.id)) { workspace.context(pendingContext.x, pendingContext.y); pendingContext = undefined; }
+      if (pendingContext && state.selectedIds.includes(pendingContext.id)) {
+        workspace.context(pendingContext.x, pendingContext.y);
+        pendingContext = undefined;
+      }
     },
-    destroy() { stopScrub(); workspace.destroy(); tree.destroy(); host.remove(); },
+    destroy() {
+      stopScrub();
+      workspace.destroy();
+      tree.destroy();
+      host.remove();
+    },
   };
 }

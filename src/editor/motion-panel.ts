@@ -2,8 +2,15 @@ import type { ImagePatch, LayerState } from '../design/types';
 import { defaultFollowMotion, type FollowMotion } from '../signals/motion';
 
 /** Shared by the quick editor, side panel and independent Studio. */
-export function createMotionPanel(doc: Document, change: (patch: ImagePatch) => void, begin: () => void, end: () => void) {
-  const fieldset = doc.createElement('fieldset'); fieldset.className = 'motion-panel'; fieldset.setAttribute('aria-label', 'レイヤーのモーション');
+export function createMotionPanel(
+  doc: Document,
+  change: (patch: ImagePatch) => void,
+  begin: () => void,
+  end: () => void,
+) {
+  const fieldset = doc.createElement('fieldset');
+  fieldset.className = 'motion-panel';
+  fieldset.setAttribute('aria-label', 'レイヤーのモーション');
   fieldset.innerHTML = `<details class="motion-section" open><summary>モーション</summary>
     <div class="property"><label><input type="checkbox" data-motion="enabled" aria-label="レイヤーのマウス追跡">マウスを追いかける</label></div>
     <div class="motion-settings" hidden>
@@ -16,23 +23,37 @@ export function createMotionPanel(doc: Document, change: (patch: ImagePatch) => 
     </div></details>`;
   let current: LayerState | undefined;
   const render = (layer: LayerState | undefined) => {
-    current = layer; const config = layer?.motion ?? { ...defaultFollowMotion(), enabled: false };
+    current = layer;
+    const config = layer?.motion ?? { ...defaultFollowMotion(), enabled: false };
     fieldset.querySelector<HTMLElement>('.motion-settings')!.hidden = !config.enabled;
     fieldset.querySelector<HTMLElement>('.motion-pursuit')!.hidden = config.mode !== 'pursuit';
     for (const input of fieldset.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-motion]')) {
       const key = input.dataset.motion as keyof FollowMotion;
       if (input instanceof HTMLInputElement && input.type === 'checkbox') input.checked = Boolean(config[key]);
-      else if (input.getRootNode() !== doc || doc.activeElement !== input) { if ((input.getRootNode() as ShadowRoot).activeElement !== input) input.value = String(config[key]); }
-      input.disabled = key === 'lagMs' && config.mode === 'direct' || key === 'rotationOffsetDeg' && !config.orientToMovement;
+      else if (input.getRootNode() !== doc || doc.activeElement !== input) {
+        if ((input.getRootNode() as ShadowRoot).activeElement !== input) input.value = String(config[key]);
+      }
+      input.disabled =
+        (key === 'lagMs' && config.mode === 'direct') || (key === 'rotationOffsetDeg' && !config.orientToMovement);
     }
   };
   fieldset.addEventListener('input', (event) => {
-    const input = event.target as HTMLInputElement | HTMLSelectElement, key = input.dataset.motion as keyof FollowMotion;
+    const input = event.target as HTMLInputElement | HTMLSelectElement,
+      key = input.dataset.motion as keyof FollowMotion;
     if (!current || !key || !input.checkValidity()) return;
-    const value = input instanceof HTMLInputElement && input.type === 'checkbox' ? input.checked : input instanceof HTMLInputElement ? input.valueAsNumber : input.value;
-    const motion = { ...current.motion ?? defaultFollowMotion(), [key]: value } as FollowMotion;
-    change({ motion }); render({ ...current, motion });
+    const value =
+      input instanceof HTMLInputElement && input.type === 'checkbox'
+        ? input.checked
+        : input instanceof HTMLInputElement
+          ? input.valueAsNumber
+          : input.value;
+    const motion = { ...(current.motion ?? defaultFollowMotion()), [key]: value } as FollowMotion;
+    change({ motion });
+    render({ ...current, motion });
   });
-  for (const input of fieldset.querySelectorAll('input[type="number"]')) { input.addEventListener('focus', () => begin()); input.addEventListener('blur', () => end()); }
+  for (const input of fieldset.querySelectorAll('input[type="number"]')) {
+    input.addEventListener('focus', () => begin());
+    input.addEventListener('blur', () => end());
+  }
   return { fieldset, render };
 }

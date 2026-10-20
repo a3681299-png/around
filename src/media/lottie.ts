@@ -11,19 +11,45 @@ export function createLottieSource(container: HTMLElement, data: object) {
     const { default: lottie } = await import('../vendor/lottie-light.js');
     if (closed) throw new Error('表示を終了しました。');
     lottie.useWebWorker(false);
-    player = lottie.loadAnimation({ container, renderer: 'svg', autoplay: false, loop: false,
-      animationData: structuredClone(data), rendererSettings: { progressiveLoad: false, preserveAspectRatio: 'xMidYMid meet', hideOnTransparent: false } });
+    player = lottie.loadAnimation({
+      container,
+      renderer: 'svg',
+      autoplay: false,
+      loop: false,
+      animationData: structuredClone(data),
+      rendererSettings: { progressiveLoad: false, preserveAspectRatio: 'xMidYMid meet', hideOnTransparent: false },
+    });
     await new Promise<void>((resolve, reject) => {
       rejectReady = reject;
-      const loaded = () => { if (timer) clearTimeout(timer); timer = undefined; resolve(); };
-      const failed = () => { if (timer) clearTimeout(timer); timer = undefined; reject(new Error('Lottieを描画できませんでした。書き出し設定を確認してください。')); };
-      player!.addEventListener('DOMLoaded', loaded); player!.addEventListener('data_failed', failed); player!.addEventListener('error', failed);
-      if (player!.isLoaded) loaded(); else timer = setTimeout(failed, 5000);
+      const loaded = () => {
+        if (timer) clearTimeout(timer);
+        timer = undefined;
+        resolve();
+      };
+      const failed = () => {
+        if (timer) clearTimeout(timer);
+        timer = undefined;
+        reject(new Error('Lottieを描画できませんでした。書き出し設定を確認してください。'));
+      };
+      player!.addEventListener('DOMLoaded', loaded);
+      player!.addEventListener('data_failed', failed);
+      player!.addEventListener('error', failed);
+      if (player!.isLoaded) loaded();
+      else timer = setTimeout(failed, 5000);
     });
   })();
   return {
     ready,
-    paint(index: number) { if (!closed) player?.goToAndStop(index, true); },
-    destroy() { if (closed) return; closed = true; if (timer) clearTimeout(timer); timer = undefined; rejectReady?.(new Error('表示を終了しました。')); player?.destroy(); },
+    paint(index: number) {
+      if (!closed) player?.goToAndStop(index, true);
+    },
+    destroy() {
+      if (closed) return;
+      closed = true;
+      if (timer) clearTimeout(timer);
+      timer = undefined;
+      rejectReady?.(new Error('表示を終了しました。'));
+      player?.destroy();
+    },
   };
 }

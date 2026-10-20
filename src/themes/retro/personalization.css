@@ -1,15 +1,18 @@
 /* Texture is painted underneath content, never an overlay over media or controls. */
-html[data-ww-theme="retro"][data-ww-feature-surface-noise]:not([data-ww-feature-transparent-background]) [data-ww-surface~="page"] {
+html[data-ww-theme='retro'][data-ww-feature-surface-noise]:not([data-ww-feature-transparent-background])
+  [data-ww-surface~='page'] {
   background-image: var(--ww-dither-pattern) !important;
   background-size: 3px 3px !important;
 }
-html[data-ww-theme="retro"][data-ww-feature-surface-noise] .ww-menubar,
-html[data-ww-theme="retro"][data-ww-feature-surface-noise] #web-world-themes-statusbar {
+html[data-ww-theme='retro'][data-ww-feature-surface-noise] .ww-menubar,
+html[data-ww-theme='retro'][data-ww-feature-surface-noise] #web-world-themes-statusbar {
   background-image: var(--ww-dither-pattern), var(--ww-silver);
-  background-size: 3px 3px, auto;
+  background-size:
+    3px 3px,
+    auto;
 }
-html[data-ww-theme="retro"][data-ww-feature-readable-votes] [data-ww-surface~="comment-vote"],
-html[data-ww-theme="retro"][data-ww-feature-readable-votes] [data-ww-surface~="comment-vote"] * {
+html[data-ww-theme='retro'][data-ww-feature-readable-votes] [data-ww-surface~='comment-vote'],
+html[data-ww-theme='retro'][data-ww-feature-readable-votes] [data-ww-surface~='comment-vote'] * {
   color: var(--ww-ink) !important;
   opacity: 1 !important;
   text-shadow: none !important;
@@ -19,15 +22,21 @@ html[data-ww-theme="retro"][data-ww-feature-readable-votes] [data-ww-surface~="c
 }
 /* Public alpha hook affects only the desktop canvas, never media or cards.
    Do not reset background images supplied by another extension. */
-html[data-ww-theme="retro"][data-ww-feature-transparent-background],
-html[data-ww-theme="retro"][data-ww-feature-transparent-background] [data-ww-surface~="page"] {
-  background-color: color-mix(in srgb, var(--ww-page) calc(var(--ww-background-surface-opacity, 0) * 100%), transparent) !important;
+html[data-ww-theme='retro'][data-ww-feature-transparent-background],
+html[data-ww-theme='retro'][data-ww-feature-transparent-background] [data-ww-surface~='page'] {
+  background-color: color-mix(
+    in srgb,
+    var(--ww-page) calc(var(--ww-background-surface-opacity, 0) * 100%),
+    transparent
+  ) !important;
 }
 /* Give reading areas their own opaque paper even when the desktop is transparent. */
-html[data-ww-theme="retro"][data-ww-feature-transparent-background] [data-ww-surface~="comments"],
-html[data-ww-theme="retro"][data-ww-feature-transparent-background] [data-ww-surface~="reading-panel"] {
+html[data-ww-theme='retro'][data-ww-feature-transparent-background] [data-ww-surface~='comments'],
+html[data-ww-theme='retro'][data-ww-feature-transparent-background] [data-ww-surface~='reading-panel'] {
   background-color: var(--ww-paper) !important;
 }
 @media (forced-colors: active) {
-  html[data-ww-theme="retro"][data-ww-feature-surface-noise] [data-ww-surface~="page"] { background-image: none !important; }
+  html[data-ww-theme='retro'][data-ww-feature-surface-noise] [data-ww-surface~='page'] {
+    background-image: none !important;
+  }
 }

@@ -16,9 +16,13 @@ const unmountCreator = mountCreatorLauncher(editor);
 const onClose = () => window.close();
 const closeButton = editor.querySelector<HTMLButtonElement>('.close')!;
 closeButton.addEventListener('click', onClose);
-window.addEventListener('unload', () => {
-  unbind();
-  unmountCreator();
-  unmountFont();
-  closeButton.removeEventListener('click', onClose);
-}, { once: true });
+window.addEventListener(
+  'unload',
+  () => {
+    unbind();
+    unmountCreator();
+    unmountFont();
+    closeButton.removeEventListener('click', onClose);
+  },
+  { once: true },
+);

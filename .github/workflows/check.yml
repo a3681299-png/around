@@ -2,7 +2,14 @@ name: Theme checks
 
 on:
   push:
-    branches: [feat/heisei-silver-blue, feat/heisei-silver-shell, fix/youtube-silver-native-surfaces, codex/extension-completion, codex/creator-editor-spike]
+    branches:
+      [
+        feat/heisei-silver-blue,
+        feat/heisei-silver-shell,
+        fix/youtube-silver-native-surfaces,
+        codex/extension-completion,
+        codex/creator-editor-spike,
+      ]
   pull_request:
 
 permissions:

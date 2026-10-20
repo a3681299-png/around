@@ -3,10 +3,7 @@ import { personalizationFeatures } from './personalization';
 import type { FeatureDefinition, FeaturePreferences } from './types';
 
 /** Add a module here to expose its default, saved toggle, and lifecycle together. */
-export const FEATURE_REGISTRY: readonly FeatureDefinition[] = Object.freeze([
-  windowChrome,
-  ...personalizationFeatures,
-]);
+export const FEATURE_REGISTRY: readonly FeatureDefinition[] = Object.freeze([windowChrome, ...personalizationFeatures]);
 
 export function defaultFeaturePreferences(): FeaturePreferences {
   return Object.fromEntries(FEATURE_REGISTRY.map((feature) => [feature.id, feature.defaultEnabled]));

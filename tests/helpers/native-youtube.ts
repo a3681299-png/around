@@ -8,11 +8,12 @@ import type { Page } from '@playwright/test';
  */
 export async function installNativeYouTube(page: Page, dark: boolean, options: { errorOverlay?: boolean } = {}) {
   await page.goto('https://www.youtube.com/watch?v=fixture&list=fixture');
-  await page.evaluate(({ dark, errorOverlay }) => {
-    document.documentElement.toggleAttribute('dark', dark);
-    const style = document.createElement('style');
-    style.id = 'fixture-native-youtube-css';
-    style.textContent = `
+  await page.evaluate(
+    ({ dark, errorOverlay }) => {
+      document.documentElement.toggleAttribute('dark', dark);
+      const style = document.createElement('style');
+      style.id = 'fixture-native-youtube-css';
+      style.textContent = `
       :root {
         --t3e41d7b17b187f69: #fff;
         --tffc2fd3a644f6275: #0f0f0f;
@@ -83,108 +84,156 @@ export async function installNativeYouTube(page: Page, dark: boolean, options: {
       ytd-playlist-panel-renderer[collapsible][collapsed] > #container { height: auto; }
       ytd-playlist-panel-renderer[collapsed] #items { display: none; }
     `;
-    document.head.append(style);
-    const masthead = document.querySelector('ytd-masthead')!;
-    const guide = masthead.querySelector('.header-icon')!;
-    guide.innerHTML = '<yt-icon id="guide-icon" class="ytd-masthead"><svg viewBox="0 0 24 24"><path d="M3 5h18v2H3zM3 11h18v2H3zM3 17h18v2H3z"/></svg></yt-icon>';
-    const brand = masthead.querySelector('.brand')!;
-    // Schematic paths reproduce the live inheritance boundaries, not official logo artwork.
-    brand.innerHTML = `<ytd-topbar-logo-renderer><svg id="yt-ringo2-svg_yt5" viewBox="0 0 93 24">
+      document.head.append(style);
+      const masthead = document.querySelector('ytd-masthead')!;
+      const guide = masthead.querySelector('.header-icon')!;
+      guide.innerHTML =
+        '<yt-icon id="guide-icon" class="ytd-masthead"><svg viewBox="0 0 24 24"><path d="M3 5h18v2H3zM3 11h18v2H3zM3 17h18v2H3z"/></svg></yt-icon>';
+      const brand = masthead.querySelector('.brand')!;
+      // Schematic paths reproduce the live inheritance boundaries, not official logo artwork.
+      brand.innerHTML = `<ytd-topbar-logo-renderer><svg id="yt-ringo2-svg_yt5" viewBox="0 0 93 24">
       <g><path id="fixture-play-red" fill="#FF0033" d="M0 2h30v20H0z"/><path id="fixture-play-white" fill="white" d="M12 7v10l9-5z"/></g>
       <g id="youtube-paths_yt5"><path d="M34 5h3l2 5 2-5h3l-4 9v5h-3v-5z"/><path d="M44 9h6v10h-6z"/><path d="M51 9h3v8h2V9h3v10h-8z"/><path d="M60 5h10v3h-3v11h-3V8h-4z"/><path d="M70 9h3v8h2V9h3v10h-8z"/><path d="M79 5h3v4h4v10h-7z"/><path d="M87 9h6v6h-3v2h3v2h-6z"/></g>
     </svg></ytd-topbar-logo-renderer>`;
 
-    const flexy = document.querySelector('ytd-watch-flexy')!;
-    flexy.setAttribute('elevated-watch-ambient', '');
-    const columns = flexy.querySelector<HTMLElement>('.watch-grid')!;
-    columns.id = 'columns'; columns.classList.add('ytd-watch-flexy');
-    const primary = columns.querySelector<HTMLElement>('.watch-main')!;
-    primary.id = 'primary'; primary.classList.add('ytd-watch-flexy');
-    columns.querySelector('aside')!.id = 'secondary';
-    const primaryInner = document.createElement('div');
-    primaryInner.id = 'primary-inner'; primaryInner.className = 'ytd-watch-flexy';
-    primaryInner.append(...primary.childNodes); primary.append(primaryInner);
-    const below = document.createElement('div');
-    below.id = 'below'; below.className = 'ytd-watch-flexy';
-    below.append(primaryInner.querySelector('ytd-watch-metadata')!, primaryInner.querySelector('ytd-comments')!);
-    primaryInner.append(below);
-    const ambient = document.createElement('div');
-    ambient.id = 'cinematics'; ambient.className = 'ytd-watch-flexy';
-    ambient.innerHTML = '<div class="box"></div>'; flexy.prepend(ambient);
-    const tail = document.createElement('div'); tail.id = 'fixture-scroll-tail'; below.append(tail);
+      const flexy = document.querySelector('ytd-watch-flexy')!;
+      flexy.setAttribute('elevated-watch-ambient', '');
+      const columns = flexy.querySelector<HTMLElement>('.watch-grid')!;
+      columns.id = 'columns';
+      columns.classList.add('ytd-watch-flexy');
+      const primary = columns.querySelector<HTMLElement>('.watch-main')!;
+      primary.id = 'primary';
+      primary.classList.add('ytd-watch-flexy');
+      columns.querySelector('aside')!.id = 'secondary';
+      const primaryInner = document.createElement('div');
+      primaryInner.id = 'primary-inner';
+      primaryInner.className = 'ytd-watch-flexy';
+      primaryInner.append(...primary.childNodes);
+      primary.append(primaryInner);
+      const below = document.createElement('div');
+      below.id = 'below';
+      below.className = 'ytd-watch-flexy';
+      below.append(primaryInner.querySelector('ytd-watch-metadata')!, primaryInner.querySelector('ytd-comments')!);
+      primaryInner.append(below);
+      const ambient = document.createElement('div');
+      ambient.id = 'cinematics';
+      ambient.className = 'ytd-watch-flexy';
+      ambient.innerHTML = '<div class="box"></div>';
+      flexy.prepend(ambient);
+      const tail = document.createElement('div');
+      tail.id = 'fixture-scroll-tail';
+      below.append(tail);
 
-    const mount = document.querySelector<HTMLElement>('#player-mount')!;
-    mount.id = 'player'; mount.className = 'ytd-watch-flexy';
-    const player = mount.querySelector('#movie_player')!;
-    const outer = document.createElement('div'); outer.id = 'player-container-outer'; outer.className = 'ytd-watch-flexy';
-    const inner = document.createElement('div'); inner.id = 'player-container-inner'; inner.className = 'ytd-watch-flexy';
-    const container = document.createElement('div'); container.id = 'player-container'; container.className = 'ytd-watch-flexy';
-    const nativePlayer = document.createElement('ytd-player'); nativePlayer.id = 'ytd-player';
-    const nativePlayerContainer = document.createElement('div');
-    nativePlayerContainer.id = 'container'; nativePlayerContainer.className = 'style-scope ytd-player';
-    outer.append(inner); inner.append(container); container.append(nativePlayer);
-    nativePlayer.append(nativePlayerContainer); nativePlayerContainer.append(player); mount.append(outer);
-    if (errorOverlay) {
-      // Observed native playback-error branch: this absolute sibling covers all of
-      // #player, including a titlebar wrongly mounted inside that boundary.
-      const error = document.createElement('yt-playability-error-supported-renderers');
-      error.id = 'error-screen'; error.className = 'style-scope ytd-watch-flexy';
-      error.innerHTML = '<div><p>Sign in to confirm you’re not a bot</p><button aria-label="Retry fixture playback">Try again</button></div>';
-      error.querySelector('button')!.addEventListener('click', () => {
-        error.dataset.retryCount = String(Number(error.dataset.retryCount ?? 0) + 1);
+      const mount = document.querySelector<HTMLElement>('#player-mount')!;
+      mount.id = 'player';
+      mount.className = 'ytd-watch-flexy';
+      const player = mount.querySelector('#movie_player')!;
+      const outer = document.createElement('div');
+      outer.id = 'player-container-outer';
+      outer.className = 'ytd-watch-flexy';
+      const inner = document.createElement('div');
+      inner.id = 'player-container-inner';
+      inner.className = 'ytd-watch-flexy';
+      const container = document.createElement('div');
+      container.id = 'player-container';
+      container.className = 'ytd-watch-flexy';
+      const nativePlayer = document.createElement('ytd-player');
+      nativePlayer.id = 'ytd-player';
+      const nativePlayerContainer = document.createElement('div');
+      nativePlayerContainer.id = 'container';
+      nativePlayerContainer.className = 'style-scope ytd-player';
+      outer.append(inner);
+      inner.append(container);
+      container.append(nativePlayer);
+      nativePlayer.append(nativePlayerContainer);
+      nativePlayerContainer.append(player);
+      mount.append(outer);
+      if (errorOverlay) {
+        // Observed native playback-error branch: this absolute sibling covers all of
+        // #player, including a titlebar wrongly mounted inside that boundary.
+        const error = document.createElement('yt-playability-error-supported-renderers');
+        error.id = 'error-screen';
+        error.className = 'style-scope ytd-watch-flexy';
+        error.innerHTML =
+          '<div><p>Sign in to confirm you’re not a bot</p><button aria-label="Retry fixture playback">Try again</button></div>';
+        error.querySelector('button')!.addEventListener('click', () => {
+          error.dataset.retryCount = String(Number(error.dataset.retryCount ?? 0) + 1);
+        });
+        mount.append(error);
+      }
+
+      const owner = document.querySelector('.watch-actions')!;
+      owner.id = 'owner';
+      owner.querySelector('.channel-info')!.id = 'channel-name';
+      const heading = document.querySelector('.comment-heading')!;
+      const nativeHeading = document.createElement('ytd-comments-header-renderer');
+      nativeHeading.className = heading.className;
+      nativeHeading.append(...heading.childNodes);
+      heading.replaceWith(nativeHeading);
+      nativeHeading.querySelector('h2')!.id = 'title';
+      document.querySelector('ytd-comment-thread-renderer b')!.id = 'author-text';
+      const playlist = document.querySelector('ytd-playlist-panel-renderer')!;
+      playlist.setAttribute('collapsible', '');
+      const playlistContainer = document.createElement('div');
+      playlistContainer.id = 'container';
+      playlistContainer.append(...playlist.childNodes);
+      playlist.append(playlistContainer);
+      // Live rows also have #container. It must remain a genuine painted box so a
+      // broad panel selector reproduces white selected text over an inner silver fill.
+      playlist.querySelectorAll('ytd-playlist-panel-video-renderer').forEach((row) => {
+        const link = row.querySelector('a')!;
+        link.id = 'wc-endpoint';
+        const rowContainer = document.createElement('div');
+        rowContainer.id = 'container';
+        rowContainer.className = 'style-scope ytd-playlist-panel-video-renderer';
+        const index = link.querySelector('#index')!;
+        const indexContainer = document.createElement('div');
+        indexContainer.id = 'index-container';
+        index.before(indexContainer);
+        indexContainer.append(index);
+        link.querySelector('.thumbnail-box')!.id = 'thumbnail-container';
+        link.lastElementChild!.id = 'meta';
+        rowContainer.append(...link.childNodes);
+        link.append(rowContainer);
       });
-      mount.append(error);
-    }
-
-    const owner = document.querySelector('.watch-actions')!; owner.id = 'owner';
-    owner.querySelector('.channel-info')!.id = 'channel-name';
-    const heading = document.querySelector('.comment-heading')!;
-    const nativeHeading = document.createElement('ytd-comments-header-renderer');
-    nativeHeading.className = heading.className; nativeHeading.append(...heading.childNodes);
-    heading.replaceWith(nativeHeading);
-    nativeHeading.querySelector('h2')!.id = 'title';
-    document.querySelector('ytd-comment-thread-renderer b')!.id = 'author-text';
-    const playlist = document.querySelector('ytd-playlist-panel-renderer')!;
-    playlist.setAttribute('collapsible', '');
-    const playlistContainer = document.createElement('div'); playlistContainer.id = 'container';
-    playlistContainer.append(...playlist.childNodes); playlist.append(playlistContainer);
-    // Live rows also have #container. It must remain a genuine painted box so a
-    // broad panel selector reproduces white selected text over an inner silver fill.
-    playlist.querySelectorAll('ytd-playlist-panel-video-renderer').forEach(row => {
-      const link = row.querySelector('a')!; link.id = 'wc-endpoint';
-      const rowContainer = document.createElement('div');
-      rowContainer.id = 'container'; rowContainer.className = 'style-scope ytd-playlist-panel-video-renderer';
-      const index = link.querySelector('#index')!;
-      const indexContainer = document.createElement('div'); indexContainer.id = 'index-container';
-      index.before(indexContainer); indexContainer.append(index);
-      link.querySelector('.thumbnail-box')!.id = 'thumbnail-container';
-      link.lastElementChild!.id = 'meta';
-      rowContainer.append(...link.childNodes); link.append(rowContainer);
-    });
-    document.dispatchEvent(new Event('yt-page-data-updated'));
-  }, { dark, errorOverlay: options.errorOverlay ?? false });
-  await page.evaluate(async () => { await document.fonts.ready; });
+      document.dispatchEvent(new Event('yt-page-data-updated'));
+    },
+    { dark, errorOverlay: options.errorOverlay ?? false },
+  );
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+  });
 }
 
 export async function setNativeTheme(popup: Page, enabled: boolean, strength: number) {
-  await popup.evaluate(async ({ enabled, strength }) => {
-    await chrome.storage.local.set({ 'webWorldThemes.enabled': enabled, 'webWorldThemes.strength': strength });
-  }, { enabled, strength });
+  await popup.evaluate(
+    async ({ enabled, strength }) => {
+      await chrome.storage.local.set({ 'webWorldThemes.enabled': enabled, 'webWorldThemes.strength': strength });
+    },
+    { enabled, strength },
+  );
 }
 
 /** Decode only through the browser's own canvas; no new image dependency or network. */
 export async function pixels(page: Page, png: Buffer, points: Array<{ x: number; y: number }>) {
-  return page.evaluate(async ({ data, points }) => {
-    const image = new Image(); image.src = `data:image/png;base64,${data}`;
-    await image.decode();
-    const canvas = document.createElement('canvas'); canvas.width = image.width; canvas.height = image.height;
-    const context = canvas.getContext('2d')!; context.drawImage(image, 0, 0);
-    return points.map(({ x, y }) => Array.from(context.getImageData(x, y, 1, 1).data).slice(0, 3));
-  }, { data: png.toString('base64'), points });
+  return page.evaluate(
+    async ({ data, points }) => {
+      const image = new Image();
+      image.src = `data:image/png;base64,${data}`;
+      await image.decode();
+      const canvas = document.createElement('canvas');
+      canvas.width = image.width;
+      canvas.height = image.height;
+      const context = canvas.getContext('2d')!;
+      context.drawImage(image, 0, 0);
+      return points.map(({ x, y }) => Array.from(context.getImageData(x, y, 1, 1).data).slice(0, 3));
+    },
+    { data: png.toString('base64'), points },
+  );
 }
 
 export function luminance(rgb: number[]) {
-  const channels = rgb.map(channel => {
+  const channels = rgb.map((channel) => {
     const value = channel / 255;
     return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
   });
@@ -198,30 +247,47 @@ export function luminance(rgb: number[]) {
  */
 export async function contrastAt(page: Page, selector: string, svg = false) {
   const target = page.locator(selector).first();
-  await target.evaluate(element => element.scrollIntoView({ block: 'center', inline: 'nearest' }));
+  await target.evaluate((element) => element.scrollIntoView({ block: 'center', inline: 'nearest' }));
   const probe = await target.evaluate((element, svg) => {
     const style = getComputedStyle(element);
-    const range = document.createRange(); range.selectNodeContents(element);
-    const rect = (svg ? element.getBoundingClientRect() : [...range.getClientRects()].find(rect => rect.width > 0 && rect.height > 0)) ?? element.getBoundingClientRect();
-    const x = Math.floor(rect.left + rect.width / 2), y = Math.floor(rect.top + rect.height / 2);
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    const rect =
+      (svg
+        ? element.getBoundingClientRect()
+        : [...range.getClientRects()].find((rect) => rect.width > 0 && rect.height > 0)) ??
+      element.getBoundingClientRect();
+    const x = Math.floor(rect.left + rect.width / 2),
+      y = Math.floor(rect.top + rect.height / 2);
     const hit = document.elementFromPoint(x, y);
-    const canvas = document.createElement('canvas'); canvas.width = canvas.height = 1;
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 1;
     const context = canvas.getContext('2d')!;
-    context.fillStyle = svg ? style.fill : style.color; context.fillRect(0, 0, 1, 1);
+    context.fillStyle = svg ? style.fill : style.color;
+    context.fillRect(0, 0, 1, 1);
     const ink = Array.from(context.getImageData(0, 0, 1, 1).data).slice(0, 3);
     const ancestors = [];
     let opacity = 1;
     for (let current: Element | null = element; current; current = current.parentElement) {
-      const computed = getComputedStyle(current); opacity *= Number(computed.opacity);
-      ancestors.push({ tag: current.tagName, id: current.id, background: computed.backgroundColor, backgroundImage: computed.backgroundImage, opacity: computed.opacity });
+      const computed = getComputedStyle(current);
+      opacity *= Number(computed.opacity);
+      ancestors.push({
+        tag: current.tagName,
+        id: current.id,
+        background: computed.backgroundColor,
+        backgroundImage: computed.backgroundImage,
+        opacity: computed.opacity,
+      });
     }
     // Pointer hit testing excludes SVGs with no painted fill after the mask, so
     // capture it now while original native/extension paint is still present.
     const unobscured = Boolean(hit && (element.contains(hit) || hit.contains(element)));
-    const mask = document.createElement('style'); mask.id = 'fixture-contrast-mask';
+    const mask = document.createElement('style');
+    mask.id = 'fixture-contrast-mask';
     element.setAttribute('data-fixture-contrast-target', '');
     // Outrank theme !important SVG fill rules without removing any background.
-    mask.textContent = ':root:root:root:root:root [data-fixture-contrast-target], :root:root:root:root:root [data-fixture-contrast-target] * { -webkit-text-fill-color: transparent !important; text-shadow: none !important; fill: transparent !important; stroke: transparent !important; }';
+    mask.textContent =
+      ':root:root:root:root:root [data-fixture-contrast-target], :root:root:root:root:root [data-fixture-contrast-target] * { -webkit-text-fill-color: transparent !important; text-shadow: none !important; fill: transparent !important; stroke: transparent !important; }';
     document.head.append(mask);
     return { x, y, ink, opacity, unobscured, hit: hit ? `${hit.tagName}#${hit.id}` : null, ancestors };
   }, svg);
@@ -230,9 +296,20 @@ export async function contrastAt(page: Page, selector: string, svg = false) {
     const png = await page.screenshot({ fullPage: false, scale: 'css', animations: 'disabled' });
     background = (await pixels(page, png, [{ x: probe.x, y: probe.y }]))[0]!;
   } finally {
-    await target.evaluate(element => { element.removeAttribute('data-fixture-contrast-target'); document.querySelector('#fixture-contrast-mask')?.remove(); });
+    await target.evaluate((element) => {
+      element.removeAttribute('data-fixture-contrast-target');
+      document.querySelector('#fixture-contrast-mask')?.remove();
+    });
   }
-  const paintedInk = probe.ink.map((channel, index) => channel * probe.opacity + background[index]! * (1 - probe.opacity));
-  const light = luminance(paintedInk), dark = luminance(background);
-  return { ...probe, background, ratio: (Math.max(light, dark) + 0.05) / (Math.min(light, dark) + 0.05), backgroundLuminance: dark };
+  const paintedInk = probe.ink.map(
+    (channel, index) => channel * probe.opacity + background[index]! * (1 - probe.opacity),
+  );
+  const light = luminance(paintedInk),
+    dark = luminance(background);
+  return {
+    ...probe,
+    background,
+    ratio: (Math.max(light, dark) + 0.05) / (Math.min(light, dark) + 0.05),
+    backgroundLuminance: dark,
+  };
 }

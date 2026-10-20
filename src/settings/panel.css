@@ -20,5 +20,6 @@
   font: 13px/1.5 var(--ww-font) !important;
   text-align: left !important;
 }
-:host([hidden]) { display: none !important; }
-
+:host([hidden]) {
+  display: none !important;
+}

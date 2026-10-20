@@ -4,12 +4,7 @@
   "groups": 16,
   "measuredPointerFramesPerRound": 80,
   "warmupFramesPerRound": 15,
-  "order": [
-    "legacy",
-    "runtime",
-    "runtime",
-    "legacy"
-  ],
+  "order": ["legacy", "runtime", "runtime", "legacy"],
   "includes": "actual extension RAF callback: numeric evaluation, CSS writes and visibility callbacks",
   "excludes": "asynchronous layout/paint, GPU, decoding, input dispatch and RAF wait",
   "timing": "isolated-world performance.now; browser timer precision applies",

@@ -33,17 +33,24 @@ async function installNativeChips(page: Page) {
       const row = document.querySelector('.chip-row');
       if (!row || row.parentElement?.matches('ytd-feed-filter-chip-bar-renderer')) return;
       const host = document.createElement('ytd-feed-filter-chip-bar-renderer');
-      row.before(host); host.append(row);
-      row.id = 'chips-wrapper'; row.classList.add('ytd-feed-filter-chip-bar-renderer');
+      row.before(host);
+      host.append(row);
+      row.id = 'chips-wrapper';
+      row.classList.add('ytd-feed-filter-chip-bar-renderer');
       host.toggleAttribute('not-sticky', scrollY === 0);
-      const tail = document.createElement('div'); tail.id = 'fixture-chip-scroll-tail';
+      const tail = document.createElement('div');
+      tail.id = 'fixture-chip-scroll-tail';
       document.querySelector('ytd-page-manager')!.append(tail);
     };
     install();
     document.addEventListener('yt-navigate-finish', install);
-    addEventListener('scroll', () => {
-      document.querySelector('ytd-feed-filter-chip-bar-renderer')?.toggleAttribute('not-sticky', scrollY === 0);
-    }, { passive: true });
+    addEventListener(
+      'scroll',
+      () => {
+        document.querySelector('ytd-feed-filter-chip-bar-renderer')?.toggleAttribute('not-sticky', scrollY === 0);
+      },
+      { passive: true },
+    );
     document.dispatchEvent(new Event('yt-page-data-updated'));
   });
 }
@@ -51,25 +58,31 @@ async function installNativeChips(page: Page) {
 async function assertChipPosition(page: Page, top: boolean) {
   if (top) await expect(page.locator('ytd-feed-filter-chip-bar-renderer')).toHaveAttribute('not-sticky', '');
   else await expect(page.locator('ytd-feed-filter-chip-bar-renderer')).not.toHaveAttribute('not-sticky');
-  await expect.poll(() => page.evaluate(() => {
-    const masthead = document.querySelector('ytd-masthead')!.getBoundingClientRect();
-    const chips = document.querySelector('#chips-wrapper')!.getBoundingClientRect();
-    const hit = document.elementFromPoint(chips.left + 15, chips.top + chips.height / 2);
-    return Math.abs(chips.top - masthead.bottom) < 1
-      && Boolean(hit?.closest('#chips-wrapper'));
-  })).toBe(true);
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const masthead = document.querySelector('ytd-masthead')!.getBoundingClientRect();
+        const chips = document.querySelector('#chips-wrapper')!.getBoundingClientRect();
+        const hit = document.elementFromPoint(chips.left + 15, chips.top + chips.height / 2);
+        return Math.abs(chips.top - masthead.bottom) < 1 && Boolean(hit?.closest('#chips-wrapper'));
+      }),
+    )
+    .toBe(true);
 }
 
 for (const dark of [false, true]) {
-  test(`Home native ${dark ? 'dark' : 'light'} chips remain directly below the header at top/down/up and SPA back`, async ({ youtube, popup }, testInfo) => {
+  test(`Home native ${dark ? 'dark' : 'light'} chips remain directly below the header at top/down/up and SPA back`, async ({
+    youtube,
+    popup,
+  }, testInfo) => {
     await youtube.setViewportSize({ width: 1917, height: 917 });
-    await youtube.evaluate(dark => document.documentElement.toggleAttribute('dark', dark), dark);
+    await youtube.evaluate((dark) => document.documentElement.toggleAttribute('dark', dark), dark);
     await installNativeChips(youtube);
     await enable(popup);
     for (const width of [1917, 900, 1917]) {
       await youtube.setViewportSize({ width, height: 917 });
       for (const y of [0, 1, 250, 800, 250, 1, 0]) {
-        await youtube.evaluate(y => scrollTo(0, y), y);
+        await youtube.evaluate((y) => scrollTo(0, y), y);
         await assertChipPosition(youtube, y === 0);
       }
     }
@@ -77,7 +90,9 @@ for (const dark of [false, true]) {
     await youtube.locator('ytd-rich-grid-media a[data-fixture-nav]').first().click();
     await expect(youtube.locator('#web-world-themes-player-titlebar')).toBeVisible();
     await youtube.getByRole('button', { name: 'Play', exact: true }).click();
-    await expect.poll(() => youtube.locator('video').evaluate(element => (element as HTMLVideoElement).paused)).toBe(false);
+    await expect
+      .poll(() => youtube.locator('video').evaluate((element) => (element as HTMLVideoElement).paused))
+      .toBe(false);
     await youtube.goBack();
     await youtube.evaluate(() => scrollTo(0, 0));
     await assertChipPosition(youtube, true);
@@ -103,17 +118,26 @@ for (const dark of [false, true]) {
 }
 
 for (const dark of [false, true]) {
-  test(`watch native ${dark ? 'dark' : 'light'} autohide and frosted states preserve themed header controls`, async ({ youtube, popup }, testInfo) => {
+  test(`watch native ${dark ? 'dark' : 'light'} autohide and frosted states preserve themed header controls`, async ({
+    youtube,
+    popup,
+  }, testInfo) => {
     await youtube.goto('https://www.youtube.com/watch?v=fixture');
     await youtube.setViewportSize({ width: 1917, height: 917 });
-    await youtube.evaluate(dark => {
+    await youtube.evaluate((dark) => {
       document.documentElement.toggleAttribute('dark', dark);
       const app = document.querySelector('ytd-app')!;
       const masthead = document.querySelector('ytd-masthead')!;
-      const wrapper = document.createElement('div'); wrapper.id = 'masthead-container';
-      masthead.before(wrapper); wrapper.append(masthead);
-      const backdrop = document.createElement('div'); backdrop.id = 'background'; masthead.append(backdrop);
-      const frost = document.createElement('div'); frost.id = 'frosted-glass'; app.prepend(frost);
+      const wrapper = document.createElement('div');
+      wrapper.id = 'masthead-container';
+      masthead.before(wrapper);
+      wrapper.append(masthead);
+      const backdrop = document.createElement('div');
+      backdrop.id = 'background';
+      masthead.append(backdrop);
+      const frost = document.createElement('div');
+      frost.id = 'frosted-glass';
+      app.prepend(frost);
       const style = document.createElement('style');
       style.textContent = `
         #masthead-container { position:fixed;top:0;left:0;right:0;z-index:2020; }
@@ -134,25 +158,36 @@ for (const dark of [false, true]) {
     await enable(popup);
     await youtube.getByRole('button', { name: 'Play', exact: true }).click();
     for (const mode of ['none', 'without-chipbar', 'with-chipbar']) {
-      await youtube.locator('ytd-masthead').evaluate((element, mode) => element.setAttribute('frosted-glass-mode', mode), mode);
+      await youtube
+        .locator('ytd-masthead')
+        .evaluate((element, mode) => element.setAttribute('frosted-glass-mode', mode), mode);
       for (const y of [0, 1, 40, 454, 900, 40, 0]) {
-        await youtube.evaluate(y => scrollTo(0, y), y);
+        await youtube.evaluate((y) => scrollTo(0, y), y);
         await expect(youtube.locator('#masthead-container')).toHaveCSS('opacity', '1');
         await expect(youtube.locator('#masthead-container')).toHaveCSS('transform', 'none');
         await expect(youtube.locator('ytd-masthead > #background')).toHaveCSS('display', 'none');
         await expect(youtube.locator('ytd-app > #frosted-glass')).toHaveCSS('display', 'none');
-        await expect.poll(() => youtube.evaluate(() => ['input[name="search_query"]', '[aria-label="Guide"]', '.search-submit'].every(selector => {
-          const element = document.querySelector(selector)!;
-          for (let node: Element | null = element; node; node = node.parentElement) {
-            const style = getComputedStyle(node);
-            if (Number(style.opacity) < 0.99 || style.visibility !== 'visible' || style.display === 'none') return false;
-          }
-          const rect = element.getBoundingClientRect();
-          const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
-          return Boolean(hit && (element.contains(hit) || hit.contains(element)));
-        }))).toBe(true);
+        await expect
+          .poll(() =>
+            youtube.evaluate(() =>
+              ['input[name="search_query"]', '[aria-label="Guide"]', '.search-submit'].every((selector) => {
+                const element = document.querySelector(selector)!;
+                for (let node: Element | null = element; node; node = node.parentElement) {
+                  const style = getComputedStyle(node);
+                  if (Number(style.opacity) < 0.99 || style.visibility !== 'visible' || style.display === 'none')
+                    return false;
+                }
+                const rect = element.getBoundingClientRect();
+                const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                return Boolean(hit && (element.contains(hit) || hit.contains(element)));
+              }),
+            ),
+          )
+          .toBe(true);
         await expect(youtube.locator('yt-searchbox .ytSearchboxComponentInputBox')).toHaveCSS('box-shadow', /inset/);
-        await expect.poll(() => youtube.locator('video').evaluate(element => (element as HTMLVideoElement).paused)).toBe(false);
+        await expect
+          .poll(() => youtube.locator('video').evaluate((element) => (element as HTMLVideoElement).paused))
+          .toBe(false);
       }
     }
     await youtube.evaluate(() => scrollTo(0, 40));
@@ -164,7 +199,10 @@ for (const dark of [false, true]) {
       await expect(youtube.locator('#masthead-container')).toHaveCSS('opacity', '1');
       await expect(youtube.getByRole('textbox', { name: 'Search', exact: true })).toBeVisible();
     }
-    await youtube.evaluate(() => { (document.activeElement as HTMLElement)?.blur(); scrollTo(0, 0); });
+    await youtube.evaluate(() => {
+      (document.activeElement as HTMLElement)?.blur();
+      scrollTo(0, 0);
+    });
     await youtube.bringToFront();
     await youtube.getByRole('button', { name: 'Fullscreen', exact: true }).click();
     await expect.poll(() => youtube.evaluate(() => document.fullscreenElement?.id)).toBe('movie_player');
@@ -172,7 +210,10 @@ for (const dark of [false, true]) {
     await expect(youtube.locator('ytd-masthead')).not.toBeVisible();
     await youtube.evaluate(() => document.exitFullscreen());
     await expect(youtube.locator('ytd-masthead')).toBeVisible();
-    await youtube.evaluate(() => { (document.activeElement as HTMLElement)?.blur(); scrollTo(0, 250); });
+    await youtube.evaluate(() => {
+      (document.activeElement as HTMLElement)?.blur();
+      scrollTo(0, 250);
+    });
     await popup.getByRole('switch', { name: 'Window chrome' }).uncheck();
     await expect(youtube.locator('#masthead-container')).toHaveCSS('opacity', '0');
     await expect(youtube.locator('ytd-app > #frosted-glass')).toHaveCSS('display', 'block');

@@ -15,8 +15,18 @@ export const SIGNAL_CATALOG = Object.freeze({
   'video.ended': { category: 'event' },
 } as const);
 
-export interface ScrollSignal { x: number; y: number; maxX: number; maxY: number }
-export interface SignalSnapshot { pointer: Point | undefined; pointerTimeMs?: number; playing: boolean; scroll?: ScrollSignal }
+export interface ScrollSignal {
+  x: number;
+  y: number;
+  maxX: number;
+  maxY: number;
+}
+export interface SignalSnapshot {
+  pointer: Point | undefined;
+  pointerTimeMs?: number;
+  playing: boolean;
+  scroll?: ScrollSignal;
+}
 export interface PlaybackSignal {
   playing: boolean;
   event?: 'video.play' | 'video.pause' | 'video.ended';

@@ -2,7 +2,11 @@ import { test, expect, launchExtension } from './fixtures';
 
 const themeStyle = '#web-world-themes-style';
 
-test('popup changes reach existing YouTube tabs and OFF restores native styles', async ({ context, popup, youtube }) => {
+test('popup changes reach existing YouTube tabs and OFF restores native styles', async ({
+  context,
+  popup,
+  youtube,
+}) => {
   const toggle = popup.getByRole('switch', { name: 'Theme ON / OFF' });
   const slider = popup.getByRole('slider', { name: 'Effect Strength' });
   await expect(toggle).toBeEnabled();
@@ -39,7 +43,13 @@ test('popup changes reach existing YouTube tabs and OFF restores native styles',
   await expect(youtube.locator('yt-thumbnail-view-model')).toHaveCSS('border-radius', '12px');
 });
 
-test('settings survive popup closure, page reload, and a browser restart', async ({ context, popup, youtube, extensionId, profile }) => {
+test('settings survive popup closure, page reload, and a browser restart', async ({
+  context,
+  popup,
+  youtube,
+  extensionId,
+  profile,
+}) => {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   const slider = popup.getByRole('slider', { name: 'Effect Strength' });
   await slider.press('Home');
@@ -66,7 +76,10 @@ test('settings survive popup closure, page reload, and a browser restart', async
   }
 });
 
-test('SPA replacement, lazy DOM insertion, changing IDs, and removed stylesheet recover', async ({ popup, youtube }) => {
+test('SPA replacement, lazy DOM insertion, changing IDs, and removed stylesheet recover', async ({
+  popup,
+  youtube,
+}) => {
   const errors: string[] = [];
   youtube.on('pageerror', (error) => errors.push(error.message));
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
@@ -75,15 +88,22 @@ test('SPA replacement, lazy DOM insertion, changing IDs, and removed stylesheet 
   await youtube.getByRole('button', { name: 'SPA navigation' }).click();
   await expect(youtube).toHaveURL(/\/watch\?v=fixture$/);
   await expect(youtube.getByRole('heading', { name: 'Watch' })).toBeVisible();
-  await expect(youtube.locator('ytd-watch-metadata #description')).toHaveAttribute('data-ww-surface', 'panel frame rounded text');
+  await expect(youtube.locator('ytd-watch-metadata #description')).toHaveAttribute(
+    'data-ww-surface',
+    'panel frame rounded text',
+  );
   await expect(youtube.locator('ytd-thumbnail #thumbnail')).toHaveCSS('border-radius', '0px');
 
   await youtube.getByRole('button', { name: 'Load another thumbnail' }).click();
   await expect(youtube.locator('ytd-thumbnail #thumbnail')).toHaveCount(2);
   await expect(youtube.locator('ytd-thumbnail #thumbnail').last()).toHaveCSS('border-radius', '0px');
-  await youtube.locator('ytd-searchbox #container').evaluate((element) => { element.id = 'changed-container'; });
+  await youtube.locator('ytd-searchbox #container').evaluate((element) => {
+    element.id = 'changed-container';
+  });
   await expect(youtube.locator('#changed-container')).not.toHaveAttribute('data-ww-surface', /.+/);
-  await youtube.locator('#changed-container').evaluate((element) => { element.id = 'container'; });
+  await youtube.locator('#changed-container').evaluate((element) => {
+    element.id = 'container';
+  });
   await expect(youtube.locator('ytd-searchbox #container')).toHaveAttribute('data-ww-surface', 'input frame rounded');
 
   await youtube.locator(themeStyle).evaluate((element) => element.remove());
@@ -92,7 +112,10 @@ test('SPA replacement, lazy DOM insertion, changing IDs, and removed stylesheet 
   expect(errors).toEqual([]);
 });
 
-test('zero restores native appearance and native dark mode never changes the silver palette', async ({ popup, youtube }) => {
+test('zero restores native appearance and native dark mode never changes the silver palette', async ({
+  popup,
+  youtube,
+}) => {
   const toggle = popup.getByRole('switch', { name: 'Theme ON / OFF' });
   const slider = popup.getByRole('slider', { name: 'Effect Strength' });
   await toggle.check();
@@ -108,21 +131,33 @@ test('zero restores native appearance and native dark mode never changes the sil
   const dark = await youtube.locator('body').evaluate((element) => getComputedStyle(element).backgroundColor);
   expect(dark).toBe(light);
   // Source-authored rich text must inherit the readable silver-theme foreground.
-  await expect.poll(() => youtube.locator('#description span').evaluate(element =>
-    getComputedStyle(element).color === getComputedStyle(element.parentElement!).color,
-  )).toBe(true);
+  await expect
+    .poll(() =>
+      youtube
+        .locator('#description span')
+        .evaluate((element) => getComputedStyle(element).color === getComputedStyle(element.parentElement!).color),
+    )
+    .toBe(true);
   await toggle.uncheck();
   await expect(youtube.locator('body')).toHaveCSS('background-color', 'rgb(15, 15, 15)');
 });
 
-test('invalid settings are normalized and other hosts / excluded YouTube pages stay untouched', async ({ context, popup, youtube }) => {
+test('invalid settings are normalized and other hosts / excluded YouTube pages stay untouched', async ({
+  context,
+  popup,
+  youtube,
+}) => {
   await expect(popup.getByRole('switch', { name: 'Theme ON / OFF' })).toBeEnabled();
   await popup.evaluate(async () => {
     await chrome.storage.local.set({ 'webWorldThemes.enabled': true, 'webWorldThemes.strength': 999 });
   });
   await expect(popup.getByRole('slider', { name: 'Effect Strength' })).toHaveValue('100');
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
-  for (const url of ['https://example.com/', 'https://www.youtube.com/embed/fixture', 'https://www.youtube.com/live_chat?v=fixture']) {
+  for (const url of [
+    'https://example.com/',
+    'https://www.youtube.com/embed/fixture',
+    'https://www.youtube.com/live_chat?v=fixture',
+  ]) {
     const page = await context.newPage();
     await page.goto(url);
     await expect(page.locator(themeStyle)).toHaveCount(0);
@@ -142,7 +177,9 @@ test('a storage write failure shows an error and restores the saved popup state'
   await expect(toggle).toBeEnabled();
   // Fault injection only; all other tests use the actual extension storage APIs.
   await popup.evaluate(() => {
-    chrome.storage.local.set = async () => { throw new Error('Injected write failure'); };
+    chrome.storage.local.set = async () => {
+      throw new Error('Injected write failure');
+    };
   });
   await toggle.click();
   await expect(popup.locator('#save-status')).toHaveText('保存できませんでした。もう一度操作してください。');
@@ -150,7 +187,11 @@ test('a storage write failure shows an error and restores the saved popup state'
   await expect(youtube.locator(themeStyle)).toHaveCount(0);
 });
 
-test('the first right-hand player icon opens shared settings even when the theme is OFF', async ({ context, popup, youtube }) => {
+test('the first right-hand player icon opens shared settings even when the theme is OFF', async ({
+  context,
+  popup,
+  youtube,
+}) => {
   await youtube.goto('https://www.youtube.com/watch?v=fixture');
   const icon = youtube.getByRole('button', { name: 'Web World Themes の設定', exact: true });
   const panel = youtube.getByRole('dialog', { name: 'Web World Themes の設定' });
@@ -208,7 +249,10 @@ test('the first right-hand player icon opens shared settings even when the theme
   await expect(panel).not.toBeVisible();
 });
 
-test('player replacement and control-bar rebuild keep one icon at the left edge; fullscreen keeps the editor', async ({ popup, youtube }) => {
+test('player replacement and control-bar rebuild keep one icon at the left edge; fullscreen keeps the editor', async ({
+  popup,
+  youtube,
+}) => {
   await youtube.getByRole('button', { name: 'SPA navigation' }).click();
   const icon = youtube.getByRole('button', { name: 'Web World Themes の設定', exact: true });
   const panel = youtube.getByRole('dialog', { name: 'Web World Themes の設定' });
@@ -221,7 +265,9 @@ test('player replacement and control-bar rebuild keep one icon at the left edge;
   await expect(youtube.locator('.ytp-right-controls > :first-child')).toHaveAttribute('data-ww-settings-button', '');
 
   await youtube.locator('.ytp-right-controls').evaluate((element) => {
-    element.replaceChildren(...Array.from(element.children).filter((child) => !child.hasAttribute('data-ww-settings-button')));
+    element.replaceChildren(
+      ...Array.from(element.children).filter((child) => !child.hasAttribute('data-ww-settings-button')),
+    );
   });
   await expect(icon).toHaveCount(1);
   await expect(youtube.locator('.ytp-right-controls > :first-child')).toHaveAttribute('data-ww-settings-button', '');
@@ -241,7 +287,10 @@ test('player replacement and control-bar rebuild keep one icon at the left edge;
   await expect(youtube.locator('[data-ww-settings-button]')).toHaveCount(0);
 });
 
-test('window chrome recovers once after DOM replacement and OFF restores the native header placement', async ({ popup, youtube }) => {
+test('window chrome recovers once after DOM replacement and OFF restores the native header placement', async ({
+  popup,
+  youtube,
+}) => {
   const toggle = popup.getByRole('switch', { name: 'Theme ON / OFF' });
   const nativeHeader = await youtube.locator('ytd-masthead').boundingBox();
   const nativePage = await youtube.locator('ytd-page-manager').boundingBox();
@@ -271,8 +320,10 @@ test('window chrome recovers once after DOM replacement and OFF restores the nat
   expect(restoredPage!.y).toBe(nativePage!.y);
 });
 
-
-test('repeated theme ON, OFF, and zero strength leave no stale surfaces or layout offsets', async ({ popup, youtube }) => {
+test('repeated theme ON, OFF, and zero strength leave no stale surfaces or layout offsets', async ({
+  popup,
+  youtube,
+}) => {
   const toggle = popup.getByRole('switch', { name: 'Theme ON / OFF' });
   const slider = popup.getByRole('slider', { name: 'Effect Strength' });
   const root = youtube.locator('html');
@@ -282,10 +333,20 @@ test('repeated theme ON, OFF, and zero strength leave no stale surfaces or layou
     await expect(youtube.locator(themeStyle)).toHaveCount(0);
     await expect(youtube.locator('[data-ww-surface]')).toHaveCount(0);
     await expect(youtube.locator('#web-world-themes-window-chrome')).toHaveCount(0);
-    for (const name of ['data-ww-theme', 'data-ww-site', 'data-ww-mode', 'data-ww-window-chrome', 'data-ww-fullscreen']) {
+    for (const name of [
+      'data-ww-theme',
+      'data-ww-site',
+      'data-ww-mode',
+      'data-ww-window-chrome',
+      'data-ww-fullscreen',
+    ]) {
       expect(await root.getAttribute(name)).toBeNull();
     }
-    expect(await root.evaluate(element => Array.from((element as HTMLElement).style).filter(name => name.startsWith('--ww-')))).toEqual([]);
+    expect(
+      await root.evaluate((element) =>
+        Array.from((element as HTMLElement).style).filter((name) => name.startsWith('--ww-')),
+      ),
+    ).toEqual([]);
     expect((await youtube.locator('ytd-masthead').boundingBox())!.height).toBe(nativeHeader!.height);
     expect((await youtube.locator('ytd-page-manager').boundingBox())!.y).toBe(nativePage!.y);
   };
@@ -304,14 +365,17 @@ test('repeated theme ON, OFF, and zero strength leave no stale surfaces or layou
   }
   // Mutations and native mode changes while disabled must not remount a feature or theme.
   await youtube.getByRole('button', { name: 'Load another thumbnail' }).click();
-  await root.evaluate(element => element.setAttribute('dark', ''));
+  await root.evaluate((element) => element.setAttribute('dark', ''));
   await assertNative();
   await toggle.check();
   await expect(root).toHaveAttribute('data-ww-mode', 'dark');
   await expect(youtube.locator('ytd-thumbnail #thumbnail').last()).toHaveCSS('border-radius', '0px');
 });
 
-test('feature preference independently mounts and cleans up window chrome in both settings surfaces', async ({ popup, youtube }) => {
+test('feature preference independently mounts and cleans up window chrome in both settings surfaces', async ({
+  popup,
+  youtube,
+}) => {
   const toggle = popup.getByRole('switch', { name: 'Theme ON / OFF' });
   const feature = popup.getByRole('switch', { name: 'Window chrome', exact: true });
   const chrome = youtube.locator('#web-world-themes-window-chrome');
@@ -348,9 +412,12 @@ test('feature preference independently mounts and cleans up window chrome in bot
   await expect(popup.getByRole('switch', { name: 'Theme ON / OFF' })).not.toBeChecked();
 });
 
-test('native search, history navigation, comment typing, and local video playback survive theming', async ({ popup, youtube }) => {
+test('native search, history navigation, comment typing, and local video playback survive theming', async ({
+  popup,
+  youtube,
+}) => {
   const errors: string[] = [];
-  youtube.on('pageerror', error => errors.push(error.message));
+  youtube.on('pageerror', (error) => errors.push(error.message));
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
   const search = youtube.getByRole('textbox', { name: 'Search', exact: true });
@@ -367,15 +434,17 @@ test('native search, history navigation, comment typing, and local video playbac
   await expect(comment).toHaveText('Nice colors! こんにちは');
   const video = youtube.locator('video');
   await youtube.getByRole('button', { name: 'Play', exact: true }).click();
-  await expect.poll(() => video.evaluate(element => (element as HTMLVideoElement).paused)).toBe(false);
-  await expect.poll(() => video.evaluate(element => (element as HTMLVideoElement).currentTime)).toBeGreaterThan(0);
-  const initialTime = await video.evaluate(element => (element as HTMLVideoElement).currentTime);
+  await expect.poll(() => video.evaluate((element) => (element as HTMLVideoElement).paused)).toBe(false);
+  await expect.poll(() => video.evaluate((element) => (element as HTMLVideoElement).currentTime)).toBeGreaterThan(0);
+  const initialTime = await video.evaluate((element) => (element as HTMLVideoElement).currentTime);
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
   await expect(youtube.locator(themeStyle)).toHaveCount(0);
   await expect(comment).toHaveText('Nice colors! こんにちは');
-  await expect.poll(() => video.evaluate(element => (element as HTMLVideoElement).currentTime)).toBeGreaterThan(initialTime);
+  await expect
+    .poll(() => video.evaluate((element) => (element as HTMLVideoElement).currentTime))
+    .toBeGreaterThan(initialTime);
   await youtube.getByRole('button', { name: 'Pause', exact: true }).click();
-  await expect.poll(() => video.evaluate(element => (element as HTMLVideoElement).paused)).toBe(true);
+  await expect.poll(() => video.evaluate((element) => (element as HTMLVideoElement).paused)).toBe(true);
   await youtube.goBack();
   await expect(youtube.getByRole('heading', { name: 'Search results' })).toBeVisible();
   await youtube.goForward();
@@ -387,20 +456,42 @@ test('native search, history navigation, comment typing, and local video playbac
 test('theme transitions never filter, replace, or rewrite native images and media', async ({ popup, youtube }) => {
   await youtube.goto('https://www.youtube.com/watch?v=fixture');
   const native = await youtube.evaluateHandle(() => ({
-    images: Array.from(document.images).map(image => ({ element: image, parent: image.parentElement, src: image.getAttribute('src'), alt: image.alt })),
+    images: Array.from(document.images).map((image) => ({
+      element: image,
+      parent: image.parentElement,
+      src: image.getAttribute('src'),
+      alt: image.alt,
+    })),
     video: document.querySelector('video')!,
     stream: document.querySelector('video')!.srcObject,
     player: document.querySelector('#movie_player'),
   }));
   const assertMedia = async () => {
-    expect(await youtube.evaluate(({ images, video, stream, player }) => ({
-      imagesUnchanged: images.every(({ element, parent, src, alt }) => element.isConnected && element.parentElement === parent && element.getAttribute('src') === src && element.alt === alt),
-      mediaUnchanged: document.querySelector('video') === video && video.srcObject === stream && video.parentElement === player,
-      stylesUntouched: [...images.map(item => item.element), video].every(element => {
-        const style = getComputedStyle(element);
-        return style.filter === 'none' && style.transform === 'none' && style.opacity === '1' && style.mixBlendMode === 'normal';
-      }),
-    }), native)).toEqual({ imagesUnchanged: true, mediaUnchanged: true, stylesUntouched: true });
+    expect(
+      await youtube.evaluate(
+        ({ images, video, stream, player }) => ({
+          imagesUnchanged: images.every(
+            ({ element, parent, src, alt }) =>
+              element.isConnected &&
+              element.parentElement === parent &&
+              element.getAttribute('src') === src &&
+              element.alt === alt,
+          ),
+          mediaUnchanged:
+            document.querySelector('video') === video && video.srcObject === stream && video.parentElement === player,
+          stylesUntouched: [...images.map((item) => item.element), video].every((element) => {
+            const style = getComputedStyle(element);
+            return (
+              style.filter === 'none' &&
+              style.transform === 'none' &&
+              style.opacity === '1' &&
+              style.mixBlendMode === 'normal'
+            );
+          }),
+        }),
+        native,
+      ),
+    ).toEqual({ imagesUnchanged: true, mediaUnchanged: true, stylesUntouched: true });
   };
   await assertMedia();
   for (let cycle = 0; cycle < 2; cycle++) {
@@ -408,7 +499,7 @@ test('theme transitions never filter, replace, or rewrite native images and medi
     await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
     await expect(youtube.locator(themeStyle)).toHaveCount(1);
     await assertMedia();
-    await youtube.locator('html').evaluate(element => element.toggleAttribute('dark'));
+    await youtube.locator('html').evaluate((element) => element.toggleAttribute('dark'));
     await assertMedia();
     await popup.getByRole('slider', { name: 'Effect Strength' }).press('Home');
     await expect(youtube.locator(themeStyle)).toHaveCount(0);
@@ -426,7 +517,7 @@ test('native and in-page fullscreen hide window chrome and restore offsets on ex
   const root = youtube.locator('html');
   const page = youtube.locator('ytd-page-manager');
   await expect(chrome).toBeVisible();
-  const margin = await page.evaluate(element => getComputedStyle(element).marginTop);
+  const margin = await page.evaluate((element) => getComputedStyle(element).marginTop);
   for (let cycle = 0; cycle < 2; cycle++) {
     await youtube.getByRole('button', { name: 'Fullscreen', exact: true }).click();
     await expect(root).toHaveAttribute('data-ww-fullscreen', '');
@@ -440,23 +531,28 @@ test('native and in-page fullscreen hide window chrome and restore offsets on ex
     await expect(chrome).toBeVisible();
     await expect(page).toHaveCSS('margin-top', margin);
   }
-  await youtube.locator('ytd-watch-flexy').evaluate(element => element.setAttribute('fullscreen', ''));
+  await youtube.locator('ytd-watch-flexy').evaluate((element) => element.setAttribute('fullscreen', ''));
   await expect(root).toHaveAttribute('data-ww-fullscreen', '');
   await expect(chrome).not.toBeVisible();
   await expect(page).toHaveCSS('margin-top', '0px');
-  await youtube.locator('ytd-watch-flexy').evaluate(element => element.removeAttribute('fullscreen'));
+  await youtube.locator('ytd-watch-flexy').evaluate((element) => element.removeAttribute('fullscreen'));
   await expect(root).not.toHaveAttribute('data-ww-fullscreen', '');
   await expect(chrome).toBeVisible();
   await expect(page).toHaveCSS('margin-top', margin);
 });
 
-test('a failed feature save restores the saved preference without changing the active theme', async ({ popup, youtube }) => {
+test('a failed feature save restores the saved preference without changing the active theme', async ({
+  popup,
+  youtube,
+}) => {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   const feature = popup.getByRole('switch', { name: 'Window chrome', exact: true });
   await expect(feature).toBeChecked();
   await expect(youtube.locator('#web-world-themes-window-chrome')).toHaveCount(1);
   await popup.evaluate(() => {
-    chrome.storage.local.set = async () => { throw new Error('Injected feature write failure'); };
+    chrome.storage.local.set = async () => {
+      throw new Error('Injected feature write failure');
+    };
   });
   // A failed save immediately restores checked=true; click without uncheck's postcondition.
   await feature.click();
@@ -467,10 +563,9 @@ test('a failed feature save restores the saved preference without changing the a
   await expect(youtube.locator(themeStyle)).toHaveCount(1);
 });
 
-
 test('nested chip shapes follow aria-pressed state without hiding the selected glass', async ({ popup, youtube }) => {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await youtube.locator('.chip-row').evaluate(element => {
+  await youtube.locator('.chip-row').evaluate((element) => {
     const chip = document.createElement('yt-chip-cloud-chip-renderer');
     chip.id = 'nested-chip';
     chip.innerHTML = '<button aria-pressed="false"><div class="ytChipShapeChip">Nested chip</div></button>';
@@ -480,9 +575,9 @@ test('nested chip shapes follow aria-pressed state without hiding the selected g
   const shape = youtube.locator('#nested-chip .ytChipShapeChip');
   await expect(shape).toHaveAttribute('data-ww-surface', /button/);
   await expect(shape).not.toHaveAttribute('data-ww-surface', /selected/);
-  await button.evaluate(element => element.setAttribute('aria-pressed', 'true'));
+  await button.evaluate((element) => element.setAttribute('aria-pressed', 'true'));
   await expect(shape).toHaveAttribute('data-ww-surface', /selected/);
   await expect(button).not.toHaveAttribute('data-ww-surface', /selected/);
-  await button.evaluate(element => element.setAttribute('aria-pressed', 'false'));
+  await button.evaluate((element) => element.setAttribute('aria-pressed', 'false'));
   await expect(shape).not.toHaveAttribute('data-ww-surface', /selected/);
 });

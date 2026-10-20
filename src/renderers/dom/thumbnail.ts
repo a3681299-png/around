@@ -1,11 +1,18 @@
 /** Capture already rendered pixels. Never starts a second media player/decoder. */
 export async function captureLayerThumbnail(doc: Document, id: string): Promise<string | undefined> {
   const root = doc.getElementById('web-world-themes-decorations')?.shadowRoot;
-  const layer = [...root?.querySelectorAll<HTMLElement>('[data-image-id]') ?? []].find((node) => node.dataset.imageId === id);
-  const source = layer?.querySelector<HTMLImageElement | HTMLCanvasElement | HTMLVideoElement | SVGSVGElement>('.media img, .media canvas, .media video, .media svg');
-  if (!source || source instanceof HTMLCanvasElement && source.closest('.model-media') && source.width <= 1) return;
-  const canvas = doc.createElement('canvas'); canvas.width = 96; canvas.height = 72;
-  const context = canvas.getContext('2d'); if (!context) return;
+  const layer = [...(root?.querySelectorAll<HTMLElement>('[data-image-id]') ?? [])].find(
+    (node) => node.dataset.imageId === id,
+  );
+  const source = layer?.querySelector<HTMLImageElement | HTMLCanvasElement | HTMLVideoElement | SVGSVGElement>(
+    '.media img, .media canvas, .media video, .media svg',
+  );
+  if (!source || (source instanceof HTMLCanvasElement && source.closest('.model-media') && source.width <= 1)) return;
+  const canvas = doc.createElement('canvas');
+  canvas.width = 96;
+  canvas.height = 72;
+  const context = canvas.getContext('2d');
+  if (!context) return;
   let image: CanvasImageSource, width: number, height: number;
   try {
     if (source instanceof SVGSVGElement) {
@@ -13,14 +20,24 @@ export async function captureLayerThumbnail(doc: Document, id: string): Promise<
       return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(new XMLSerializer().serializeToString(source))}`;
     } else if (source instanceof HTMLImageElement) {
       if (!source.complete || !source.naturalWidth) return;
-      image = source; width = source.naturalWidth; height = source.naturalHeight;
+      image = source;
+      width = source.naturalWidth;
+      height = source.naturalHeight;
     } else if (source instanceof HTMLVideoElement) {
       if (source.readyState < 2) return;
-      image = source; width = source.videoWidth; height = source.videoHeight;
-    } else { image = source; width = source.width; height = source.height; }
+      image = source;
+      width = source.videoWidth;
+      height = source.videoHeight;
+    } else {
+      image = source;
+      width = source.width;
+      height = source.height;
+    }
     if (!width || !height) return;
     const scale = Math.min(96 / width, 72 / height);
     context.drawImage(image, (96 - width * scale) / 2, (72 - height * scale) / 2, width * scale, height * scale);
     return canvas.toDataURL('image/png');
-  } catch { return; }
+  } catch {
+    return;
+  }
 }

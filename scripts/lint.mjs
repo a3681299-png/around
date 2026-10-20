@@ -8,7 +8,10 @@ const errors = [];
 async function check(directory) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
     const file = join(directory, entry.name);
-    if (entry.isDirectory()) { await check(file); continue; }
+    if (entry.isDirectory()) {
+      await check(file);
+      continue;
+    }
     if (!/\.(css|ts)$/.test(file)) continue;
     const source = await readFile(file, 'utf8');
     const label = relative(root, file).replaceAll('\\', '/');
@@ -18,7 +21,7 @@ async function check(directory) {
     }
     if (!file.endsWith('.css')) continue;
     const result = await transform(source, { loader: 'css', sourcefile: label, logLevel: 'silent' });
-    errors.push(...result.warnings.map(warning => `${label}: ${warning.text}`));
+    errors.push(...result.warnings.map((warning) => `${label}: ${warning.text}`));
     if (label.startsWith('src/themes/') && /\b(?:ytd|ytm|yt)-[a-z]/.test(source)) {
       errors.push(`${label}: keep YouTube selectors inside the site adapter`);
     }

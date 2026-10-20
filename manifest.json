@@ -4,10 +4,7 @@
   "version": "0.1.0",
   "description": "YouTubeのUIを着せ替える拡張機能。仮のretroテーマをON/OFFし、強さを調整できます。",
   "minimum_chrome_version": "120",
-  "permissions": [
-    "storage",
-    "sidePanel"
-  ],
+  "permissions": ["storage", "sidePanel"],
   "background": {
     "service_worker": "background/index.js"
   },
@@ -17,16 +14,9 @@
   },
   "content_scripts": [
     {
-      "matches": [
-        "https://www.youtube.com/*"
-      ],
-      "exclude_matches": [
-        "https://www.youtube.com/embed/*",
-        "https://www.youtube.com/live_chat*"
-      ],
-      "js": [
-        "content/index.js"
-      ],
+      "matches": ["https://www.youtube.com/*"],
+      "exclude_matches": ["https://www.youtube.com/embed/*", "https://www.youtube.com/live_chat*"],
+      "js": ["content/index.js"],
       "run_at": "document_idle",
       "all_frames": false
     }
@@ -36,12 +26,8 @@
   },
   "web_accessible_resources": [
     {
-      "resources": [
-        "assets/fonts/PixelMplus12-Regular.woff2"
-      ],
-      "matches": [
-        "https://www.youtube.com/*"
-      ]
+      "resources": ["assets/fonts/PixelMplus12-Regular.woff2"],
+      "matches": ["https://www.youtube.com/*"]
     }
   ]
 }

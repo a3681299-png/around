@@ -20,7 +20,14 @@ export type LayerEffect = CircleMask;
 export const EFFECT_LIMITS = Object.freeze({ count: 1, radius: 4096, feather: 4096, fadeMs: 5000 });
 
 export function defaultCircleMask(): CircleMask {
-  return { kind: 'mask', shape: 'circle', enabled: true, center: { x: .5, y: .5 },
-    radiusPx: 160, featherPx: 40, intensity: 1,
-    bindings: [{ source: 'pointer.position', transform: { kind: 'layer-local' }, target: 'mask.center' }] };
+  return {
+    kind: 'mask',
+    shape: 'circle',
+    enabled: true,
+    center: { x: 0.5, y: 0.5 },
+    radiusPx: 160,
+    featherPx: 40,
+    intensity: 1,
+    bindings: [{ source: 'pointer.position', transform: { kind: 'layer-local' }, target: 'mask.center' }],
+  };
 }

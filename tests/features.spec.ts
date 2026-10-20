@@ -36,25 +36,29 @@ function fakeStorage(initial: StorageData = {}) {
     get: async (keys: string[]): Promise<StorageData> => Object.fromEntries(keys.map((key) => [key, stored[key]])),
     set: async (values: StorageData): Promise<void> => {
       writes.push({ ...values });
-      const changes = Object.fromEntries(Object.entries(values).map(([key, value]) => [
-        key, { oldValue: stored[key], newValue: value },
-      ]));
+      const changes = Object.fromEntries(
+        Object.entries(values).map(([key, value]) => [key, { oldValue: stored[key], newValue: value }]),
+      );
       Object.assign(stored, values);
       emit(changes);
     },
   };
   globalThis.chrome = {
-    storage: { local, onChanged: {
-      addListener: (listener: StorageListener) => listeners.add(listener),
-      removeListener: (listener: StorageListener) => listeners.delete(listener),
-    } },
+    storage: {
+      local,
+      onChanged: {
+        addListener: (listener: StorageListener) => listeners.add(listener),
+        removeListener: (listener: StorageListener) => listeners.delete(listener),
+      },
+    },
   } as unknown as typeof chrome;
   return { stored, writes, local, emit, listeners };
 }
 
 function fakeSite(overrides: Partial<SiteAdapter> = {}): SiteAdapter {
   return {
-    id: 'fixture', stylesheet: '',
+    id: 'fixture',
+    stylesheet: '',
     connect: () => () => {},
     mountSettings: () => () => {},
     ...overrides,
@@ -84,11 +88,10 @@ test('feature writes use their own keys and ignore unknown feature IDs', async (
     updateSettings({ strength: 88 }),
     updateSettings({ features: { 'window-chrome': false, 'unregistered-feature': true } }),
   ]);
-  expect(storage.writes).toEqual([
-    { [SETTINGS_KEYS.strength]: 88 },
-    { [chromeKey]: false },
-  ]);
-  expect(await readSettings()).toEqual(mergeSettings(DEFAULT_SETTINGS, { enabled: true, strength: 88, features: { 'window-chrome': false } }));
+  expect(storage.writes).toEqual([{ [SETTINGS_KEYS.strength]: 88 }, { [chromeKey]: false }]);
+  expect(await readSettings()).toEqual(
+    mergeSettings(DEFAULT_SETTINGS, { enabled: true, strength: 88, features: { 'window-chrome': false } }),
+  );
   await updateSettings({ features: { 'unknown-only': true } });
   expect(storage.writes).toHaveLength(2);
 });
@@ -105,10 +108,16 @@ test('settings merge retains unrelated feature values and never mutates defaults
 test('initial read merges intervening feature and global changes and ignores foreign keys', async () => {
   const storage = fakeStorage();
   let finishRead!: (value: StorageData) => void;
-  storage.local.get = () => new Promise((resolve) => { finishRead = resolve; });
+  storage.local.get = () =>
+    new Promise((resolve) => {
+      finishRead = resolve;
+    });
   const snapshots: UserSettings[] = [];
   const errors: unknown[] = [];
-  const stop = watchSettings((settings) => snapshots.push(settings), (error) => errors.push(error));
+  const stop = watchSettings(
+    (settings) => snapshots.push(settings),
+    (error) => errors.push(error),
+  );
   storage.emit({ [chromeKey]: { newValue: false } });
   storage.emit({ [SETTINGS_KEYS.enabled]: { newValue: true } });
   storage.emit({ [SETTINGS_KEYS.strength]: { newValue: 91 } });
@@ -116,9 +125,13 @@ test('initial read merges intervening feature and global changes and ignores for
   storage.emit({ [chromeKey]: { newValue: true } }, 'sync');
   finishRead({ [SETTINGS_KEYS.enabled]: false, [SETTINGS_KEYS.strength]: 12, [chromeKey]: true });
   await expect.poll(() => snapshots.length).toBe(1);
-  expect(snapshots[0]).toEqual(mergeSettings(DEFAULT_SETTINGS, { enabled: true, strength: 91, features: { 'window-chrome': false } }));
+  expect(snapshots[0]).toEqual(
+    mergeSettings(DEFAULT_SETTINGS, { enabled: true, strength: 91, features: { 'window-chrome': false } }),
+  );
   storage.emit({ [SETTINGS_KEYS.strength]: { newValue: 45 } });
-  expect(snapshots[1]).toEqual(mergeSettings(DEFAULT_SETTINGS, { enabled: true, strength: 45, features: { 'window-chrome': false } }));
+  expect(snapshots[1]).toEqual(
+    mergeSettings(DEFAULT_SETTINGS, { enabled: true, strength: 45, features: { 'window-chrome': false } }),
+  );
   // The consumer cannot accidentally mutate the watcher's feature snapshot.
   Object.assign(snapshots[1]!.features, { 'window-chrome': true });
   storage.emit({ [SETTINGS_KEYS.strength]: { newValue: 46 } });
@@ -136,9 +149,15 @@ test('initial read merges intervening feature and global changes and ignores for
 test('unsubscribing before the initial read resolves prevents late application', async () => {
   const storage = fakeStorage();
   let finishRead!: (value: StorageData) => void;
-  storage.local.get = () => new Promise((resolve) => { finishRead = resolve; });
+  storage.local.get = () =>
+    new Promise((resolve) => {
+      finishRead = resolve;
+    });
   const snapshots: UserSettings[] = [];
-  const stop = watchSettings((settings) => snapshots.push(settings), () => {});
+  const stop = watchSettings(
+    (settings) => snapshots.push(settings),
+    () => {},
+  );
   stop();
   finishRead({ [SETTINGS_KEYS.enabled]: true });
   await Promise.resolve();
@@ -150,12 +169,22 @@ test('unsubscribing before the initial read resolves prevents late application',
 test('registry lifecycle mounts once, independently toggles modules, and cleans up once', () => {
   const counts: Record<string, { mounts: number; refreshes: number; destroys: number }> = {};
   const definitions: FeatureDefinition[] = ['first', 'second'].map((id) => {
-    const count = counts[id] = { mounts: 0, refreshes: 0, destroys: 0 };
+    const count = (counts[id] = { mounts: 0, refreshes: 0, destroys: 0 });
     return {
-      id, label: id, description: id, defaultEnabled: true,
+      id,
+      label: id,
+      description: id,
+      defaultEnabled: true,
       mount: () => {
         count.mounts++;
-        return { refresh: () => { count.refreshes++; }, destroy: () => { count.destroys++; } };
+        return {
+          refresh: () => {
+            count.refreshes++;
+          },
+          destroy: () => {
+            count.destroys++;
+          },
+        };
       },
     };
   });
@@ -181,13 +210,27 @@ test('registry lifecycle mounts once, independently toggles modules, and cleans 
 
 test('the registered feature defaults on and gracefully skips an unsupported adapter', () => {
   const unsupported = createFeatureController({ document: fakeDocument().doc, site: fakeSite() });
-  expect(() => { unsupported.update(); unsupported.refresh(); unsupported.destroy(); }).not.toThrow();
+  expect(() => {
+    unsupported.update();
+    unsupported.refresh();
+    unsupported.destroy();
+  }).not.toThrow();
   let mounts = 0;
   let destroys = 0;
-  const site = fakeSite({ features: { 'window-chrome': { mount: () => {
-    mounts++;
-    return { destroy: () => { destroys++; } };
-  } } } });
+  const site = fakeSite({
+    features: {
+      'window-chrome': {
+        mount: () => {
+          mounts++;
+          return {
+            destroy: () => {
+              destroys++;
+            },
+          };
+        },
+      },
+    },
+  });
   const supported = createFeatureController({ document: fakeDocument().doc, site });
   supported.update({ 'window-chrome': false });
   expect(mounts).toBe(0);
@@ -197,8 +240,16 @@ test('the registered feature defaults on and gracefully skips an unsupported ada
   supported.destroy();
   expect(destroys).toBe(1);
   expect(FEATURE_REGISTRY.map(({ id }) => id)).toEqual([
-    'window-chrome', 'palette', 'glossy-titlebars', 'focus-titlebars', 'daily-details',
-    'surface-noise', 'bbs-comments', 'transparent-background', 'lcd-durations', 'readable-votes',
+    'window-chrome',
+    'palette',
+    'glossy-titlebars',
+    'focus-titlebars',
+    'daily-details',
+    'surface-noise',
+    'bbs-comments',
+    'transparent-background',
+    'lcd-durations',
+    'readable-votes',
   ]);
 });
 
@@ -218,9 +269,18 @@ function fakeDocument() {
   };
   const doc = {
     documentElement: root,
-    head: { append: (style: { isConnected: boolean }) => { style.isConnected = true; } },
+    head: {
+      append: (style: { isConnected: boolean }) => {
+        style.isConnected = true;
+      },
+    },
     createElement: () => {
-      const style = { isConnected: false, remove() { this.isConnected = false; } };
+      const style = {
+        isConnected: false,
+        remove() {
+          this.isConnected = false;
+        },
+      };
       styles.push(style);
       return style;
     },
@@ -240,14 +300,33 @@ test('theme OFF, zero, and repeated destroy clean feature and adapter lifetimes'
     connect: (callback) => {
       connections++;
       onPageChange = callback;
-      return () => { disconnections++; onPageChange = undefined; };
+      return () => {
+        disconnections++;
+        onPageChange = undefined;
+      };
     },
-    features: { 'window-chrome': { mount: () => {
-      mounts++;
-      return { refresh: () => { refreshes++; }, destroy: () => { destroys++; } };
-    } } },
+    features: {
+      'window-chrome': {
+        mount: () => {
+          mounts++;
+          return {
+            refresh: () => {
+              refreshes++;
+            },
+            destroy: () => {
+              destroys++;
+            },
+          };
+        },
+      },
+    },
   });
-  const controller = createThemeController(doc, site, { id: 'fixture', name: 'Fixture', stylesheets: [], editorStylesheets: [] });
+  const controller = createThemeController(doc, site, {
+    id: 'fixture',
+    name: 'Fixture',
+    stylesheets: [],
+    editorStylesheets: [],
+  });
   const active = { ...DEFAULT_SETTINGS, enabled: true };
   controller.update(active);
   controller.update({ ...active, strength: 90 });
@@ -278,21 +357,27 @@ test('theme OFF, zero, and repeated destroy clean feature and adapter lifetimes'
   expect(styles.every((style) => !style.isConnected)).toBe(true);
 });
 
-
 function fakeForm() {
   const control = () => {
     const listeners = new Map<string, Set<(event: Event) => void>>();
     const element = {
-      checked: false, disabled: true, value: '', textContent: '', dataset: {} as Record<string, string>,
+      checked: false,
+      disabled: true,
+      value: '',
+      textContent: '',
+      dataset: {} as Record<string, string>,
       attributes: {} as Record<string, string>,
-      setAttribute(name: string, value: string) { this.attributes[name] = value; },
+      setAttribute(name: string, value: string) {
+        this.attributes[name] = value;
+      },
       addEventListener: (type: string, listener: (event: Event) => void) => {
         const entries = listeners.get(type) ?? new Set();
         entries.add(listener);
         listeners.set(type, entries);
       },
       removeEventListener: (type: string, listener: (event: Event) => void) => listeners.get(type)?.delete(listener),
-      dispatch: (type: string) => listeners.get(type)?.forEach((listener) => listener({ currentTarget: element } as unknown as Event)),
+      dispatch: (type: string) =>
+        listeners.get(type)?.forEach((listener) => listener({ currentTarget: element } as unknown as Event)),
       listenerCount: () => [...listeners.values()].reduce((count, entries) => count + entries.size, 0),
     };
     return element;
@@ -304,29 +389,45 @@ function fakeForm() {
   const strengthValue = control();
   const status = control();
   const noise = control();
-  const palettes = Object.fromEntries(PALETTE_CHANNELS.map((channel) => {
-    const input = control();
-    input.dataset.paletteChannel = channel;
-    return [channel, input];
-  })) as Record<typeof PALETTE_CHANNELS[number], ReturnType<typeof control>>;
-  const presets = Object.fromEntries(Object.keys(PALETTE_PRESETS).map((preset) => {
-    const button = control();
-    button.dataset.palettePreset = preset;
-    return [preset, button];
-  })) as Record<keyof typeof PALETTE_PRESETS, ReturnType<typeof control>>;
+  const palettes = Object.fromEntries(
+    PALETTE_CHANNELS.map((channel) => {
+      const input = control();
+      input.dataset.paletteChannel = channel;
+      return [channel, input];
+    }),
+  ) as Record<(typeof PALETTE_CHANNELS)[number], ReturnType<typeof control>>;
+  const presets = Object.fromEntries(
+    Object.keys(PALETTE_PRESETS).map((preset) => {
+      const button = control();
+      button.dataset.palettePreset = preset;
+      return [preset, button];
+    }),
+  ) as Record<keyof typeof PALETTE_PRESETS, ReturnType<typeof control>>;
   chrome.dataset.featureId = 'window-chrome';
   const elements = new Map([
-    ['#theme-enabled', enabled], ['#effect-strength', strength], ['#theme-state', themeState],
-    ['#strength-value', strengthValue], ['#save-status', status],
-    ['#noise-strength', noise], ['#noise-strength-value', control()],
-    ...PALETTE_CHANNELS.flatMap((channel) => [
-      [`#palette-${channel}`, palettes[channel]], [`#palette-${channel}-value`, control()],
-    ] as Array<[string, ReturnType<typeof control>]>),
+    ['#theme-enabled', enabled],
+    ['#effect-strength', strength],
+    ['#theme-state', themeState],
+    ['#strength-value', strengthValue],
+    ['#save-status', status],
+    ['#noise-strength', noise],
+    ['#noise-strength-value', control()],
+    ...PALETTE_CHANNELS.flatMap(
+      (channel) =>
+        [
+          [`#palette-${channel}`, palettes[channel]],
+          [`#palette-${channel}-value`, control()],
+        ] as Array<[string, ReturnType<typeof control>]>,
+    ),
   ]);
   const root = {
     querySelector: (selector: string) => elements.get(selector),
-    querySelectorAll: (selector: string) => selector === 'input[data-feature-id]' ? [chrome]
-      : selector === '[data-palette-preset]' ? Object.values(presets) : [],
+    querySelectorAll: (selector: string) =>
+      selector === 'input[data-feature-id]'
+        ? [chrome]
+        : selector === '[data-palette-preset]'
+          ? Object.values(presets)
+          : [],
   } as unknown as ParentNode;
   return { root, enabled, strength, chrome, status, palettes, presets, noise };
 }
@@ -338,10 +439,11 @@ test('shared editor reconciles independent changes when older saves finish last'
   await expect.poll(() => form.enabled.disabled).toBe(false);
   expect(form.chrome.checked).toBe(true);
   const finish: Array<() => void> = [];
-  storage.local.set = (values) => new Promise((resolve) => {
-    Object.assign(storage.stored, values);
-    finish.push(resolve);
-  });
+  storage.local.set = (values) =>
+    new Promise((resolve) => {
+      Object.assign(storage.stored, values);
+      finish.push(resolve);
+    });
   form.chrome.checked = false;
   form.chrome.dispatch('change');
   form.strength.value = '33';
@@ -371,13 +473,14 @@ test('an earlier feature save failure is visible even when the later slider save
   await expect.poll(() => form.enabled.disabled).toBe(false);
   let failFeature!: () => void;
   let finishStrength!: () => void;
-  storage.local.set = (values) => new Promise((resolve, reject) => {
-    if (chromeKey in values) failFeature = () => reject(new Error('Injected failure'));
-    else {
-      Object.assign(storage.stored, values);
-      finishStrength = resolve;
-    }
-  });
+  storage.local.set = (values) =>
+    new Promise((resolve, reject) => {
+      if (chromeKey in values) failFeature = () => reject(new Error('Injected failure'));
+      else {
+        Object.assign(storage.stored, values);
+        finishStrength = resolve;
+      }
+    });
   form.chrome.checked = false;
   form.chrome.dispatch('change');
   form.strength.value = '44';
@@ -391,14 +494,16 @@ test('an earlier feature save failure is visible even when the later slider save
   unbind();
 });
 
-
 test('a slow final read cannot rewind a newer cross-editor storage update', async () => {
   const storage = fakeStorage();
   const form = fakeForm();
   const unbind = bindSettingsForm(form.root);
   await expect.poll(() => form.enabled.disabled).toBe(false);
   let finishRead: ((value: StorageData) => void) | undefined;
-  storage.local.get = () => new Promise((resolve) => { finishRead = resolve; });
+  storage.local.get = () =>
+    new Promise((resolve) => {
+      finishRead = resolve;
+    });
   form.chrome.checked = false;
   form.chrome.dispatch('change');
   await expect.poll(() => Boolean(finishRead)).toBe(true);
@@ -412,11 +517,13 @@ test('a slow final read cannot rewind a newer cross-editor storage update', asyn
   unbind();
 });
 
-
 test('palette and noise writes are granular and preserve global, feature, and unrelated settings', async () => {
   const storage = fakeStorage({
-    [SETTINGS_KEYS.enabled]: true, [SETTINGS_KEYS.strength]: 37, [chromeKey]: false,
-    [PALETTE_SETTINGS_KEYS.brightness]: 63, 'anotherExtension.preference': 'keep',
+    [SETTINGS_KEYS.enabled]: true,
+    [SETTINGS_KEYS.strength]: 37,
+    [chromeKey]: false,
+    [PALETTE_SETTINGS_KEYS.brightness]: 63,
+    'anotherExtension.preference': 'keep',
   });
   await Promise.all([
     updateSettings({ palette: { hue: 140 } }),
@@ -424,13 +531,19 @@ test('palette and noise writes are granular and preserve global, feature, and un
     updateSettings({ noiseStrength: 74 }),
   ]);
   expect(storage.writes).toEqual([
-    { [PALETTE_SETTINGS_KEYS.hue]: 140 }, { [PALETTE_SETTINGS_KEYS.saturation]: 28 },
+    { [PALETTE_SETTINGS_KEYS.hue]: 140 },
+    { [PALETTE_SETTINGS_KEYS.saturation]: 28 },
     { [SETTINGS_KEYS.noiseStrength]: 74 },
   ]);
-  expect(await readSettings()).toEqual(mergeSettings(DEFAULT_SETTINGS, {
-    enabled: true, strength: 37, features: { 'window-chrome': false },
-    palette: { hue: 140, saturation: 28, brightness: 63 }, noiseStrength: 74,
-  }));
+  expect(await readSettings()).toEqual(
+    mergeSettings(DEFAULT_SETTINGS, {
+      enabled: true,
+      strength: 37,
+      features: { 'window-chrome': false },
+      palette: { hue: 140, saturation: 28, brightness: 63 },
+      noiseStrength: 74,
+    }),
+  );
   expect(storage.stored['anotherExtension.preference']).toBe('keep');
   await updateSettings({ enabled: false });
   expect((await readSettings()).palette).toEqual({ hue: 140, saturation: 28, brightness: 63 });
@@ -439,9 +552,15 @@ test('palette and noise writes are granular and preserve global, feature, and un
 test('palette, noise, and feature changes during initial read merge independently', async () => {
   const storage = fakeStorage();
   let finishRead!: (value: StorageData) => void;
-  storage.local.get = () => new Promise((resolve) => { finishRead = resolve; });
+  storage.local.get = () =>
+    new Promise((resolve) => {
+      finishRead = resolve;
+    });
   const snapshots: UserSettings[] = [];
-  const stop = watchSettings((value) => snapshots.push(value), () => {});
+  const stop = watchSettings(
+    (value) => snapshots.push(value),
+    () => {},
+  );
   storage.emit({ [PALETTE_SETTINGS_KEYS.hue]: { newValue: 99 } });
   storage.emit({ [PALETTE_SETTINGS_KEYS.saturation]: { newValue: 22 } });
   storage.emit({ [SETTINGS_KEYS.noiseStrength]: { newValue: 36 } });
@@ -474,9 +593,17 @@ test('invalid stored channels and noise use bounded defaults without rewriting s
 
 test('palette and noise variables follow independent toggles and leave nothing after OFF or zero', () => {
   const { doc, properties } = fakeDocument();
-  const controller = createThemeController(doc, fakeSite(), { id: 'fixture', name: 'Fixture', stylesheets: [], editorStylesheets: [], variables: retroVariables });
+  const controller = createThemeController(doc, fakeSite(), {
+    id: 'fixture',
+    name: 'Fixture',
+    stylesheets: [],
+    editorStylesheets: [],
+    variables: retroVariables,
+  });
   const active = mergeSettings(DEFAULT_SETTINGS, {
-    enabled: true, palette: PALETTE_PRESETS.mint, noiseStrength: 41,
+    enabled: true,
+    palette: PALETTE_PRESETS.mint,
+    noiseStrength: 41,
     features: { palette: true, 'surface-noise': true },
   });
   controller.update(active);

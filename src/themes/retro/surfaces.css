@@ -1,30 +1,38 @@
 /* Semantic surfaces only. The adapter owns every site selector and DOM decision. */
-html[data-ww-theme="retro"] [data-ww-surface~="page"] {
+html[data-ww-theme='retro'] [data-ww-surface~='page'] {
   background-color: var(--ww-page) !important;
   color: var(--ww-ink) !important;
   font-family: var(--ww-font) !important;
 }
-html[data-ww-theme="retro"] [data-ww-surface~="panel"] { background-color: var(--ww-panel) !important; }
-html[data-ww-theme="retro"] [data-ww-surface~="frame"] { box-shadow: var(--ww-raised) !important; }
-html[data-ww-theme="retro"] [data-ww-surface~="window"],
-html[data-ww-theme="retro"] [data-ww-surface~="sidebar"] {
+html[data-ww-theme='retro'] [data-ww-surface~='panel'] {
+  background-color: var(--ww-panel) !important;
+}
+html[data-ww-theme='retro'] [data-ww-surface~='frame'] {
+  box-shadow: var(--ww-raised) !important;
+}
+html[data-ww-theme='retro'] [data-ww-surface~='window'],
+html[data-ww-theme='retro'] [data-ww-surface~='sidebar'] {
   color: var(--ww-ink) !important;
   font-family: var(--ww-font) !important;
   border-radius: 0 !important;
 }
-html[data-ww-theme="retro"] [data-ww-surface~="toolbar"] {
+html[data-ww-theme='retro'] [data-ww-surface~='toolbar'] {
   background-image: var(--ww-silver) !important;
-  box-shadow: inset 0 1px var(--ww-light), inset 0 -1px var(--ww-border) !important;
+  box-shadow:
+    inset 0 1px var(--ww-light),
+    inset 0 -1px var(--ww-border) !important;
 }
-html[data-ww-theme="retro"] [data-ww-surface~="sidebar"] {
+html[data-ww-theme='retro'] [data-ww-surface~='sidebar'] {
   background-image: linear-gradient(90deg, var(--ww-paper), var(--ww-panel)) !important;
 }
 /* Flat section dividers avoid nested, heavy boxes and preserve the site's layout. */
-html[data-ww-theme="retro"] [data-ww-surface~="section"] {
+html[data-ww-theme='retro'] [data-ww-surface~='section'] {
   background-color: transparent !important;
-  box-shadow: inset 0 -1px var(--ww-border), 0 1px var(--ww-light) !important;
+  box-shadow:
+    inset 0 -1px var(--ww-border),
+    0 1px var(--ww-light) !important;
 }
-html[data-ww-theme="retro"] [data-ww-surface~="card"] {
+html[data-ww-theme='retro'] [data-ww-surface~='card'] {
   background: var(--ww-silver) !important;
   box-shadow: var(--ww-card-shadow) !important;
   padding: var(--ww-card-padding) !important;
@@ -32,10 +40,12 @@ html[data-ww-theme="retro"] [data-ww-surface~="card"] {
   color: var(--ww-ink) !important;
   font-family: var(--ww-font) !important;
 }
-html[data-ww-theme="retro"] [data-ww-surface~="card"]:hover {
-  box-shadow: var(--ww-card-shadow), inset 0 0 0 1px var(--ww-accent) !important;
+html[data-ww-theme='retro'] [data-ww-surface~='card']:hover {
+  box-shadow:
+    var(--ww-card-shadow),
+    inset 0 0 0 1px var(--ww-accent) !important;
 }
-html[data-ww-theme="retro"] [data-ww-surface~="heading"] {
+html[data-ww-theme='retro'] [data-ww-surface~='heading'] {
   font-family: var(--ww-font) !important;
   font-weight: 400 !important;
   font-size: 14px !important;
@@ -43,87 +53,186 @@ html[data-ww-theme="retro"] [data-ww-surface~="heading"] {
   color: var(--ww-ink) !important;
   text-shadow: none !important;
 }
-html[data-ww-theme="retro"] [data-ww-surface~="metadata"] { color: var(--ww-muted) !important; }
-html[data-ww-theme="retro"] [data-ww-surface~="input"] {
+html[data-ww-theme='retro'] [data-ww-surface~='metadata'] {
+  color: var(--ww-muted) !important;
+}
+html[data-ww-theme='retro'] [data-ww-surface~='input'] {
   background: var(--ww-paper) !important;
   box-shadow: var(--ww-sunken) !important;
   color: var(--ww-ink) !important;
 }
-html[data-ww-theme="retro"] [data-ww-surface~="input"]:focus-within {
+html[data-ww-theme='retro'] [data-ww-surface~='input']:focus-within {
   outline: var(--ww-focus) !important;
   outline-offset: 1px !important;
 }
-html[data-ww-theme="retro"] [data-ww-surface~="button"] {
+html[data-ww-theme='retro'] [data-ww-surface~='button'] {
   background: var(--ww-silver) !important;
   box-shadow: var(--ww-raised) !important;
   color: var(--ww-ink) !important;
   font: var(--ww-display-size)/1.5 var(--ww-display-font) !important;
 }
-html[data-ww-theme="retro"] [data-ww-surface~="button"]:hover { background: var(--ww-glass) !important; color: var(--ww-selected-ink) !important; }
-html[data-ww-theme="retro"] [data-ww-surface~="button"]:active { box-shadow: var(--ww-sunken) !important; }
-html[data-ww-theme="retro"] [data-ww-surface~="navigation"] {
+html[data-ww-theme='retro'] [data-ww-surface~='button']:hover {
+  background: var(--ww-glass) !important;
+  color: var(--ww-selected-ink) !important;
+}
+html[data-ww-theme='retro'] [data-ww-surface~='button']:active {
+  box-shadow: var(--ww-sunken) !important;
+}
+html[data-ww-theme='retro'] [data-ww-surface~='navigation'] {
   color: var(--ww-ink) !important;
   font-family: var(--ww-font) !important;
 }
-html[data-ww-theme="retro"] [data-ww-surface~="navigation"]:hover { background: var(--ww-accent-soft) !important; }
-html[data-ww-theme="retro"] [data-ww-surface~="selected"] {
+html[data-ww-theme='retro'] [data-ww-surface~='navigation']:hover {
+  background: var(--ww-accent-soft) !important;
+}
+html[data-ww-theme='retro'] [data-ww-surface~='selected'] {
   background: var(--ww-glass) !important;
   color: var(--ww-selected-ink) !important;
-  box-shadow: var(--ww-raised), inset 3px 0 var(--ww-accent) !important;
+  box-shadow:
+    var(--ww-raised),
+    inset 3px 0 var(--ww-accent) !important;
 }
-html[data-ww-theme="retro"] [data-ww-surface~="button"]:focus-visible,
-html[data-ww-theme="retro"] [data-ww-surface~="navigation"]:focus-visible {
+html[data-ww-theme='retro'] [data-ww-surface~='button']:focus-visible,
+html[data-ww-theme='retro'] [data-ww-surface~='navigation']:focus-visible {
   outline: var(--ww-focus) !important;
   outline-offset: -3px !important;
 }
 /* A restrained stationery-like surround; comment text/editors stay native. */
-html[data-ww-theme="retro"] [data-ww-surface~="comments"] {
+html[data-ww-theme='retro'] [data-ww-surface~='comments'] {
   border-top: 1px solid var(--ww-border) !important;
   box-shadow: inset 0 1px var(--ww-light) !important;
 }
-html[data-ww-theme="retro"] [data-ww-surface~="text"] { color: var(--ww-ink) !important; }
-html[data-ww-theme="retro"] [data-ww-surface~="text"] * { color: inherit !important; }
-html[data-ww-theme="retro"] [data-ww-surface~="text"] a { color: var(--ww-link) !important; }
-html[data-ww-theme="retro"] [data-ww-surface~="rounded"] { border-radius: var(--ww-radius) !important; }
-@media (forced-colors: active) {
-  html[data-ww-theme="retro"] [data-ww-surface~="button"],
-  html[data-ww-theme="retro"] [data-ww-surface~="input"] { outline: 1px solid ButtonText !important; }
+html[data-ww-theme='retro'] [data-ww-surface~='text'] {
+  color: var(--ww-ink) !important;
 }
-html[data-ww-theme="retro"] [data-ww-surface~="chip"] :focus-visible { outline: var(--ww-focus) !important; outline-offset: 2px !important; }
+html[data-ww-theme='retro'] [data-ww-surface~='text'] * {
+  color: inherit !important;
+}
+html[data-ww-theme='retro'] [data-ww-surface~='text'] a {
+  color: var(--ww-link) !important;
+}
+html[data-ww-theme='retro'] [data-ww-surface~='rounded'] {
+  border-radius: var(--ww-radius) !important;
+}
+@media (forced-colors: active) {
+  html[data-ww-theme='retro'] [data-ww-surface~='button'],
+  html[data-ww-theme='retro'] [data-ww-surface~='input'] {
+    outline: 1px solid ButtonText !important;
+  }
+}
+html[data-ww-theme='retro'] [data-ww-surface~='chip'] :focus-visible {
+  outline: var(--ww-focus) !important;
+  outline-offset: 2px !important;
+}
 
 /* Square UI chrome, including nested thumbnail masks and current component internals.
    Only clipping changes: no media size, object-fit, filter, transform, or source edits. */
-html[data-ww-theme="retro"] [data-ww-surface~="page"] :where(*, *::before, *::after) { border-radius: 0 !important; }
-html[data-ww-theme="retro"] [data-ww-surface~="heading"] * { font: inherit !important; color: inherit !important; }
-html[data-ww-theme="retro"] [data-ww-surface~="primary-heading"] { font-size: 16px !important; }
-html[data-ww-theme="retro"] [data-ww-surface~="comment-text"],
-html[data-ww-theme="retro"] [data-ww-surface~="comment-text"] * { font-family: var(--ww-font) !important; font-size: 13px !important; font-weight: 400 !important; line-height: 1.65 !important; color: var(--ww-ink) !important; }
-html[data-ww-theme="retro"] [data-ww-surface~="label"],
-html[data-ww-theme="retro"] [data-ww-surface~="navigation"] { font: var(--ww-display-size)/1.5 var(--ww-display-font) !important; font-synthesis: none !important; }
-html[data-ww-theme="retro"] [data-ww-surface~="label"] * { color: var(--ww-ink) !important; font-family: inherit !important; font-size: inherit !important; font-weight: 400 !important; }
-html[data-ww-theme="retro"] [data-ww-surface~="playlist-window"] { background: var(--ww-panel) var(--ww-silver) !important; box-shadow: var(--ww-raised) !important; color: var(--ww-ink) !important; }
-html[data-ww-theme="retro"] [data-ww-surface~="playlist-row"] { background: var(--ww-panel) !important; color: var(--ww-ink) !important; box-shadow: inset 0 -1px var(--ww-border), inset 0 1px var(--ww-light) !important; }
-html[data-ww-theme="retro"] [data-ww-surface~="playlist-row"]:hover { background: var(--ww-accent-soft) !important; }
-html[data-ww-theme="retro"] [data-ww-surface~="playlist-row"][data-ww-surface~="selected"] { background: var(--ww-selection) !important; color: var(--ww-selection-ink) !important; box-shadow: inset 2px 0 var(--ww-light) !important; }
-html[data-ww-theme="retro"] [data-ww-surface~="playlist-row"][data-ww-surface~="selected"] * { color: var(--ww-selection-ink) !important; }
-html[data-ww-theme="retro"][data-ww-feature-lcd-durations] [data-ww-surface~="duration"],
-html[data-ww-theme="retro"][data-ww-feature-lcd-durations] [data-ww-surface~="duration"] * { color: var(--ww-lcd-ink) !important; background: var(--ww-lcd) !important; font: var(--ww-display-size)/1 var(--ww-display-font) !important; font-variant-numeric: tabular-nums !important; font-synthesis: none !important; }
-html[data-ww-theme="retro"][data-ww-feature-lcd-durations] [data-ww-surface~="duration"] { padding: 3px 4px !important; box-shadow: inset 1px 1px var(--ww-lcd-line) !important; }
-html[data-ww-theme="retro"][data-ww-window-chrome] [data-ww-surface~="player-window"] { outline: 1px solid var(--ww-dark) !important; outline-offset: 0 !important; box-shadow: 0 0 0 2px var(--ww-light) !important; }
-html[data-ww-theme="retro"][data-ww-fullscreen] [data-ww-surface~="player-window"] { outline: none !important; box-shadow: none !important; }
+html[data-ww-theme='retro'] [data-ww-surface~='page'] :where(*, *::before, *::after) {
+  border-radius: 0 !important;
+}
+html[data-ww-theme='retro'] [data-ww-surface~='heading'] * {
+  font: inherit !important;
+  color: inherit !important;
+}
+html[data-ww-theme='retro'] [data-ww-surface~='primary-heading'] {
+  font-size: 16px !important;
+}
+html[data-ww-theme='retro'] [data-ww-surface~='comment-text'],
+html[data-ww-theme='retro'] [data-ww-surface~='comment-text'] * {
+  font-family: var(--ww-font) !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  line-height: 1.65 !important;
+  color: var(--ww-ink) !important;
+}
+html[data-ww-theme='retro'] [data-ww-surface~='label'],
+html[data-ww-theme='retro'] [data-ww-surface~='navigation'] {
+  font: var(--ww-display-size)/1.5 var(--ww-display-font) !important;
+  font-synthesis: none !important;
+}
+html[data-ww-theme='retro'] [data-ww-surface~='label'] * {
+  color: var(--ww-ink) !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  font-weight: 400 !important;
+}
+html[data-ww-theme='retro'] [data-ww-surface~='playlist-window'] {
+  background: var(--ww-panel) var(--ww-silver) !important;
+  box-shadow: var(--ww-raised) !important;
+  color: var(--ww-ink) !important;
+}
+html[data-ww-theme='retro'] [data-ww-surface~='playlist-row'] {
+  background: var(--ww-panel) !important;
+  color: var(--ww-ink) !important;
+  box-shadow:
+    inset 0 -1px var(--ww-border),
+    inset 0 1px var(--ww-light) !important;
+}
+html[data-ww-theme='retro'] [data-ww-surface~='playlist-row']:hover {
+  background: var(--ww-accent-soft) !important;
+}
+html[data-ww-theme='retro'] [data-ww-surface~='playlist-row'][data-ww-surface~='selected'] {
+  background: var(--ww-selection) !important;
+  color: var(--ww-selection-ink) !important;
+  box-shadow: inset 2px 0 var(--ww-light) !important;
+}
+html[data-ww-theme='retro'] [data-ww-surface~='playlist-row'][data-ww-surface~='selected'] * {
+  color: var(--ww-selection-ink) !important;
+}
+html[data-ww-theme='retro'][data-ww-feature-lcd-durations] [data-ww-surface~='duration'],
+html[data-ww-theme='retro'][data-ww-feature-lcd-durations] [data-ww-surface~='duration'] * {
+  color: var(--ww-lcd-ink) !important;
+  background: var(--ww-lcd) !important;
+  font: var(--ww-display-size)/1 var(--ww-display-font) !important;
+  font-variant-numeric: tabular-nums !important;
+  font-synthesis: none !important;
+}
+html[data-ww-theme='retro'][data-ww-feature-lcd-durations] [data-ww-surface~='duration'] {
+  padding: 3px 4px !important;
+  box-shadow: inset 1px 1px var(--ww-lcd-line) !important;
+}
+html[data-ww-theme='retro'][data-ww-window-chrome] [data-ww-surface~='player-window'] {
+  outline: 1px solid var(--ww-dark) !important;
+  outline-offset: 0 !important;
+  box-shadow: 0 0 0 2px var(--ww-light) !important;
+}
+html[data-ww-theme='retro'][data-ww-fullscreen] [data-ww-surface~='player-window'] {
+  outline: none !important;
+  box-shadow: none !important;
+}
 
-html[data-ww-theme="retro"][data-ww-feature-lcd-durations] [data-ww-surface~="playlist-row"][data-ww-surface~="selected"] [data-ww-surface~="duration"],
-html[data-ww-theme="retro"][data-ww-feature-lcd-durations] [data-ww-surface~="playlist-row"][data-ww-surface~="selected"] [data-ww-surface~="duration"] * { color: var(--ww-lcd-ink) !important; }
+html[data-ww-theme='retro'][data-ww-feature-lcd-durations]
+  [data-ww-surface~='playlist-row'][data-ww-surface~='selected']
+  [data-ww-surface~='duration'],
+html[data-ww-theme='retro'][data-ww-feature-lcd-durations]
+  [data-ww-surface~='playlist-row'][data-ww-surface~='selected']
+  [data-ww-surface~='duration']
+  * {
+  color: var(--ww-lcd-ink) !important;
+}
 
-html[data-ww-theme="retro"] [data-ww-surface~="button"] *,
-html[data-ww-theme="retro"] [data-ww-surface~="navigation"] * { font-family: var(--ww-display-font) !important; font-size: var(--ww-display-size) !important; font-weight: 400 !important; font-synthesis: none !important; }
+html[data-ww-theme='retro'] [data-ww-surface~='button'] *,
+html[data-ww-theme='retro'] [data-ww-surface~='navigation'] * {
+  font-family: var(--ww-display-font) !important;
+  font-size: var(--ww-display-size) !important;
+  font-weight: 400 !important;
+  font-synthesis: none !important;
+}
 
 /* Native controls can assign their own dark-mode colors to nested labels/icons. */
-html[data-ww-theme="retro"] [data-ww-surface~="button"] *,
-html[data-ww-theme="retro"] [data-ww-surface~="navigation"] *,
-html[data-ww-theme="retro"] [data-ww-surface~="metadata"] * { color: inherit !important; }
-html[data-ww-theme="retro"] [data-ww-surface~="icon"] { color: var(--ww-ink) !important; }
-html[data-ww-theme="retro"] [data-ww-surface~="icon"] * { color: inherit !important; }
+html[data-ww-theme='retro'] [data-ww-surface~='button'] *,
+html[data-ww-theme='retro'] [data-ww-surface~='navigation'] *,
+html[data-ww-theme='retro'] [data-ww-surface~='metadata'] * {
+  color: inherit !important;
+}
+html[data-ww-theme='retro'] [data-ww-surface~='icon'] {
+  color: var(--ww-ink) !important;
+}
+html[data-ww-theme='retro'] [data-ww-surface~='icon'] * {
+  color: inherit !important;
+}
 /* The adapter identifies only the wordmark group, never the red/white play mark. */
-html[data-ww-theme="retro"] [data-ww-surface~="wordmark"],
-html[data-ww-theme="retro"] [data-ww-surface~="wordmark"] * { fill: var(--ww-ink) !important; }
+html[data-ww-theme='retro'] [data-ww-surface~='wordmark'],
+html[data-ww-theme='retro'] [data-ww-surface~='wordmark'] * {
+  fill: var(--ww-ink) !important;
+}

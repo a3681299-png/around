@@ -22,7 +22,15 @@ if (site) {
   lifetime.__webWorldThemesCleanup?.();
   let creator: CreatorEditor | undefined;
   const controller = createThemeController(document, site, themes[DEFAULT_THEME], () => creator?.refreshSelection());
-  creator = createCreatorEditor(document, site, DEFAULT_THEME, controller.updateDesign, controller.setImageEditing, controller.validateDesign, controller.timeline);
+  creator = createCreatorEditor(
+    document,
+    site,
+    DEFAULT_THEME,
+    controller.updateDesign,
+    controller.setImageEditing,
+    controller.validateDesign,
+    controller.timeline,
+  );
   const disconnectStudio = connectStudioHost(document, site, creator);
   void chrome.runtime.sendMessage({ type: PREPARE_SIDE_PANEL }).catch(() => undefined);
   const settingsPanel = createSettingsPanel(document);
@@ -39,9 +47,21 @@ if (site) {
   };
   let unwatch = watchSettings(update, reportError);
   const onMessage = (message: unknown, sender: chrome.runtime.MessageSender, respond: (value: unknown) => void) => {
-    if (sender.id !== chrome.runtime.id || !message || typeof message !== 'object'
-      || !('type' in message) || ![OPEN_CREATOR_EDITOR, OPEN_INPAGE_STUDIO, OPEN_SIDE_PANEL_TOOLS].includes(String(message.type))) return false;
-    respond(message.type === OPEN_SIDE_PANEL_TOOLS ? creator?.openSidePanel() : message.type === OPEN_INPAGE_STUDIO ? creator?.openStudio() : creator?.open());
+    if (
+      sender.id !== chrome.runtime.id ||
+      !message ||
+      typeof message !== 'object' ||
+      !('type' in message) ||
+      ![OPEN_CREATOR_EDITOR, OPEN_INPAGE_STUDIO, OPEN_SIDE_PANEL_TOOLS].includes(String(message.type))
+    )
+      return false;
+    respond(
+      message.type === OPEN_SIDE_PANEL_TOOLS
+        ? creator?.openSidePanel()
+        : message.type === OPEN_INPAGE_STUDIO
+          ? creator?.openStudio()
+          : creator?.open(),
+    );
     return false;
   };
   chrome.runtime.onMessage.addListener(onMessage);

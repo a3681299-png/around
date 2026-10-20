@@ -1,13 +1,13 @@
 /* The comments capability supplies semantic annotations; all native text and
    controls remain in their original DOM positions and retain their handlers. */
-html[data-ww-theme="retro"][data-ww-bbs] [data-ww-bbs-board] {
+html[data-ww-theme='retro'][data-ww-bbs] [data-ww-bbs-board] {
   background: var(--ww-paper) !important;
   color: var(--ww-ink) !important;
   border: 1px solid var(--ww-border) !important;
   padding: 12px !important;
   box-sizing: border-box !important;
 }
-html[data-ww-theme="retro"] [data-ww-bbs-row] {
+html[data-ww-theme='retro'] [data-ww-bbs-row] {
   background: var(--ww-paper) !important;
   color: var(--ww-ink) !important;
   border-top: 1px dotted var(--ww-border) !important;
@@ -16,12 +16,12 @@ html[data-ww-theme="retro"] [data-ww-bbs-row] {
   box-sizing: border-box !important;
   min-width: 0;
 }
-html[data-ww-theme="retro"] [data-ww-bbs-reply] {
+html[data-ww-theme='retro'] [data-ww-bbs-reply] {
   border-top-style: dashed !important;
   border-inline-start: 2px solid var(--ww-border) !important;
   padding-inline-start: 10px !important;
 }
-html[data-ww-theme="retro"] [data-ww-bbs-header] {
+html[data-ww-theme='retro'] [data-ww-bbs-header] {
   display: flex !important;
   align-items: baseline !important;
   flex-wrap: wrap !important;
@@ -29,7 +29,7 @@ html[data-ww-theme="retro"] [data-ww-bbs-header] {
   row-gap: 2px !important;
   min-width: 0;
 }
-html[data-ww-theme="retro"] [data-ww-bbs-number] {
+html[data-ww-theme='retro'] [data-ww-bbs-number] {
   display: inline-block;
   flex: 0 0 auto;
   color: var(--ww-link) !important;
@@ -40,8 +40,10 @@ html[data-ww-theme="retro"] [data-ww-bbs-number] {
   user-select: none;
   pointer-events: none;
 }
-html[data-ww-theme="retro"] [data-ww-bbs-number]::after { content: ":"; }
-html[data-ww-theme="retro"] [data-ww-bbs-date] {
+html[data-ww-theme='retro'] [data-ww-bbs-number]::after {
+  content: ':';
+}
+html[data-ww-theme='retro'] [data-ww-bbs-date] {
   display: inline-block;
   color: var(--ww-muted) !important;
   font: var(--ww-display-size)/1.5 var(--ww-display-font) !important;
@@ -50,5 +52,7 @@ html[data-ww-theme="retro"] [data-ww-bbs-date] {
   white-space: nowrap;
 }
 @media (max-width: 640px) {
-  html[data-ww-theme="retro"][data-ww-bbs] [data-ww-bbs-board] { padding: 8px !important; }
+  html[data-ww-theme='retro'][data-ww-bbs] [data-ww-bbs-board] {
+    padding: 8px !important;
+  }
 }

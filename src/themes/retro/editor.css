@@ -1,41 +1,239 @@
 /* The popup and player editor share a small silver control panel. */
-.ww-editor { box-sizing: border-box; padding: 4px; background: var(--ww-silver); color: var(--ww-ink); box-shadow: var(--ww-raised); font: 13px/1.5 var(--ww-font); }
-.ww-editor * { box-sizing: border-box; }
-.ww-editor h2 { flex: 1; margin: 0; overflow: hidden; font: inherit; white-space: nowrap; }
-.ww-editor .close { display: grid; place-items: center; width: 20px; height: 20px; padding: 0; border: 0; background: var(--ww-silver); color: var(--ww-ink); box-shadow: var(--ww-raised); border-radius: 0; font: 17px/1 var(--ww-font); cursor: pointer; }
-.ww-editor-menu { display: flex; align-items: center; gap: 2px; height: 28px; padding: 0 3px; box-shadow: inset 0 -1px var(--ww-border), inset 0 -2px var(--ww-light); }
-.ww-editor-menu button { border: 0; padding: 3px 6px; background: transparent; color: inherit; font: var(--ww-display-size)/1.5 var(--ww-display-font); cursor: pointer; }
-.ww-editor-menu button:hover { background: var(--ww-glass); box-shadow: var(--ww-raised); }
-.ww-editor-menu span { margin-left: auto; padding-right: 4px; font: var(--ww-display-size) var(--ww-display-font); color: var(--ww-muted); }
-.ww-editor-body { padding: 14px 12px 10px; }
-.ww-editor .ww-group { min-width: 0; margin: 0 0 12px; padding: 10px 12px 14px; border: 1px solid var(--ww-border); border-radius: 0; box-shadow: inset 0 1px var(--ww-light), 0 1px var(--ww-light); }
-.ww-editor legend { padding: 0 6px; font-size: 11px; color: var(--ww-muted); }
-.ww-theme-name { margin: 0 0 14px; padding: 10px; color: var(--ww-lcd-ink); background: var(--ww-lcd); border: 1px solid var(--ww-lcd-line); border-radius: 0; font: var(--ww-display-size)/1.5 var(--ww-display-font); letter-spacing: .04em; }
-.ww-editor .control-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-.ww-editor label { font-size: 13px; }
-.ww-editor .toggle-group { display: flex; align-items: center; gap: 8px; }
-.ww-editor output { font: var(--ww-display-size) var(--ww-display-font); font-variant-numeric: tabular-nums; }
-.ww-editor input[type="checkbox"] { appearance: none; flex-shrink: 0; width: 18px; height: 18px; margin: 0; border: 0; border-radius: 0; background: var(--ww-paper); box-shadow: var(--ww-sunken); cursor: pointer; }
-.ww-editor input[type="checkbox"]:checked { background: var(--ww-glass); }
-.ww-editor input[type="checkbox"]:checked::after { content: "✓"; display: block; text-align: center; color: var(--ww-retro-selected-ink); font: bold 14px/18px var(--ww-font); }
-.ww-editor input[type="range"] { appearance: none; width: 100%; height: 24px; margin: 15px 0 4px; border: 0; background: transparent; cursor: pointer; }
-.ww-editor input[type="range"]::-webkit-slider-runnable-track { height: 6px; background: var(--ww-paper); box-shadow: var(--ww-sunken); }
-.ww-editor input[type="range"]::-webkit-slider-thumb { appearance: none; width: 14px; height: 23px; margin-top: -8px; background: var(--ww-glass); border: 0; border-radius: 0; box-shadow: var(--ww-raised); }
-.ww-editor .range-hints { display: flex; justify-content: space-between; color: var(--ww-muted); font: var(--ww-display-size) var(--ww-display-font); }
-.ww-editor .status { min-height: 34px; margin: 0; padding: 6px 8px; background: var(--ww-paper); box-shadow: var(--ww-sunken); color: var(--ww-muted); font-size: 11px; line-height: 1.5; }
-.ww-editor .status[data-error="true"] { color: var(--ww-error); }
-.ww-editor :is(button, input):focus-visible { outline: var(--ww-focus); outline-offset: 2px; }
-.ww-editor .close:active { box-shadow: var(--ww-sunken); }
-.ww-editor :is(input, button):disabled { cursor: wait; opacity: 0.6; }
-.ww-editor .feature-description { margin: 6px 0 0; color: var(--ww-muted); font-size: 11px; line-height: 1.5; }
-.ww-editor .feature-control + .feature-control { margin-top: 12px; }
+.ww-editor {
+  box-sizing: border-box;
+  padding: 4px;
+  background: var(--ww-silver);
+  color: var(--ww-ink);
+  box-shadow: var(--ww-raised);
+  font: 13px/1.5 var(--ww-font);
+}
+.ww-editor * {
+  box-sizing: border-box;
+}
+.ww-editor h2 {
+  flex: 1;
+  margin: 0;
+  overflow: hidden;
+  font: inherit;
+  white-space: nowrap;
+}
+.ww-editor .close {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  background: var(--ww-silver);
+  color: var(--ww-ink);
+  box-shadow: var(--ww-raised);
+  border-radius: 0;
+  font: 17px/1 var(--ww-font);
+  cursor: pointer;
+}
+.ww-editor-menu {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 28px;
+  padding: 0 3px;
+  box-shadow:
+    inset 0 -1px var(--ww-border),
+    inset 0 -2px var(--ww-light);
+}
+.ww-editor-menu button {
+  border: 0;
+  padding: 3px 6px;
+  background: transparent;
+  color: inherit;
+  font: var(--ww-display-size)/1.5 var(--ww-display-font);
+  cursor: pointer;
+}
+.ww-editor-menu button:hover {
+  background: var(--ww-glass);
+  box-shadow: var(--ww-raised);
+}
+.ww-editor-menu span {
+  margin-left: auto;
+  padding-right: 4px;
+  font: var(--ww-display-size) var(--ww-display-font);
+  color: var(--ww-muted);
+}
+.ww-editor-body {
+  padding: 14px 12px 10px;
+}
+.ww-editor .ww-group {
+  min-width: 0;
+  margin: 0 0 12px;
+  padding: 10px 12px 14px;
+  border: 1px solid var(--ww-border);
+  border-radius: 0;
+  box-shadow:
+    inset 0 1px var(--ww-light),
+    0 1px var(--ww-light);
+}
+.ww-editor legend {
+  padding: 0 6px;
+  font-size: 11px;
+  color: var(--ww-muted);
+}
+.ww-theme-name {
+  margin: 0 0 14px;
+  padding: 10px;
+  color: var(--ww-lcd-ink);
+  background: var(--ww-lcd);
+  border: 1px solid var(--ww-lcd-line);
+  border-radius: 0;
+  font: var(--ww-display-size)/1.5 var(--ww-display-font);
+  letter-spacing: 0.04em;
+}
+.ww-editor .control-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.ww-editor label {
+  font-size: 13px;
+}
+.ww-editor .toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ww-editor output {
+  font: var(--ww-display-size) var(--ww-display-font);
+  font-variant-numeric: tabular-nums;
+}
+.ww-editor input[type='checkbox'] {
+  appearance: none;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--ww-paper);
+  box-shadow: var(--ww-sunken);
+  cursor: pointer;
+}
+.ww-editor input[type='checkbox']:checked {
+  background: var(--ww-glass);
+}
+.ww-editor input[type='checkbox']:checked::after {
+  content: '✓';
+  display: block;
+  text-align: center;
+  color: var(--ww-retro-selected-ink);
+  font: bold 14px/18px var(--ww-font);
+}
+.ww-editor input[type='range'] {
+  appearance: none;
+  width: 100%;
+  height: 24px;
+  margin: 15px 0 4px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.ww-editor input[type='range']::-webkit-slider-runnable-track {
+  height: 6px;
+  background: var(--ww-paper);
+  box-shadow: var(--ww-sunken);
+}
+.ww-editor input[type='range']::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 23px;
+  margin-top: -8px;
+  background: var(--ww-glass);
+  border: 0;
+  border-radius: 0;
+  box-shadow: var(--ww-raised);
+}
+.ww-editor .range-hints {
+  display: flex;
+  justify-content: space-between;
+  color: var(--ww-muted);
+  font: var(--ww-display-size) var(--ww-display-font);
+}
+.ww-editor .status {
+  min-height: 34px;
+  margin: 0;
+  padding: 6px 8px;
+  background: var(--ww-paper);
+  box-shadow: var(--ww-sunken);
+  color: var(--ww-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.ww-editor .status[data-error='true'] {
+  color: var(--ww-error);
+}
+.ww-editor :is(button, input):focus-visible {
+  outline: var(--ww-focus);
+  outline-offset: 2px;
+}
+.ww-editor .close:active {
+  box-shadow: var(--ww-sunken);
+}
+.ww-editor :is(input, button):disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+.ww-editor .feature-description {
+  margin: 6px 0 0;
+  color: var(--ww-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.ww-editor .feature-control + .feature-control {
+  margin-top: 12px;
+}
 
-.ww-editor :is(label, legend, .feature-description, .status) { font-family: var(--ww-display-font); font-size: var(--ww-display-size); font-synthesis: none; }
+.ww-editor :is(label, legend, .feature-description, .status) {
+  font-family: var(--ww-display-font);
+  font-size: var(--ww-display-size);
+  font-synthesis: none;
+}
 
 /* Compact presets and native range semantics work in both popup and player panel. */
-.ww-editor .palette-presets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin-bottom: 14px; }
-.ww-editor .palette-presets button { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 29px; border: 0; padding: 4px; background: var(--ww-silver); color: var(--ww-ink); box-shadow: var(--ww-raised); font: var(--ww-display-size)/1.5 var(--ww-display-font); cursor: pointer; }
-.ww-editor .palette-presets button::before { content: ""; display: inline-block; width: 11px; height: 11px; border: 1px solid var(--ww-border); background: var(--ww-preset-swatch); }
-.ww-editor .palette-presets button[aria-pressed="true"] { box-shadow: var(--ww-sunken); outline: 1px solid var(--ww-accent); outline-offset: -3px; }
-.ww-editor .palette-channel + .palette-channel { margin-top: 9px; }
-.ww-editor .palette-channel input[type="range"] { margin-top: 6px; }
+.ww-editor .palette-presets {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.ww-editor .palette-presets button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 29px;
+  border: 0;
+  padding: 4px;
+  background: var(--ww-silver);
+  color: var(--ww-ink);
+  box-shadow: var(--ww-raised);
+  font: var(--ww-display-size)/1.5 var(--ww-display-font);
+  cursor: pointer;
+}
+.ww-editor .palette-presets button::before {
+  content: '';
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border: 1px solid var(--ww-border);
+  background: var(--ww-preset-swatch);
+}
+.ww-editor .palette-presets button[aria-pressed='true'] {
+  box-shadow: var(--ww-sunken);
+  outline: 1px solid var(--ww-accent);
+  outline-offset: -3px;
+}
+.ww-editor .palette-channel + .palette-channel {
+  margin-top: 9px;
+}
+.ww-editor .palette-channel input[type='range'] {
+  margin-top: 6px;
+}

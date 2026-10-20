@@ -9,13 +9,29 @@ import { ASSET_MESSAGES } from './limits';
 
 export function inspectAsset(data: Uint8Array, mime = ''): AssetInfo {
   const model = data[0] === 0x67 && data[1] === 0x6c && data[2] === 0x54 && data[3] === 0x46;
-  if (!data.length || data.length > (model ? ASSET_LIMITS.modelBytes : ASSET_LIMITS.fileBytes)) throw new Error(ASSET_MESSAGES.fileSizes);
+  if (!data.length || data.length > (model ? ASSET_LIMITS.modelBytes : ASSET_LIMITS.fileBytes))
+    throw new Error(ASSET_MESSAGES.fileSizes);
   let info: AssetInfo;
-  if (model) { const result = inspectGlb(data); info = result.info; rememberModelInspection(info, result.gpuBytes); }
-  else if (data[0] === 0x47 && data[1] === 0x49 && data[2] === 0x46) info = inspectGif(data);
+  if (model) {
+    const result = inspectGlb(data);
+    info = result.info;
+    rememberModelInspection(info, result.gpuBytes);
+  } else if (data[0] === 0x47 && data[1] === 0x49 && data[2] === 0x46) info = inspectGif(data);
   else if (data[0] === 0x1a && data[1] === 0x45 && data[2] === 0xdf && data[3] === 0xa3) info = inspectWebm(data);
-  else if (mime === 'application/json' || mime === 'text/plain' || [0x7b, 0x20, 0x09, 0x0a, 0x0d, 0xef].includes(data[0]!)) info = inspectLottie(data).info;
+  else if (
+    mime === 'application/json' ||
+    mime === 'text/plain' ||
+    [0x7b, 0x20, 0x09, 0x0a, 0x0d, 0xef].includes(data[0]!)
+  )
+    info = inspectLottie(data).info;
   else info = inspectApng(data) ?? inspectAnimatedWebp(data) ?? inspectImage(data, mime);
-  if (mime && mime !== info.mime && !(info.model && ['application/octet-stream', 'model/vrm', 'application/vrm'].includes(mime)) && !(info.mime === 'application/json' && mime === 'text/plain') && !(info.animation?.format === 'apng' && mime === 'image/apng')) throw new Error('素材の形式とMIMEが一致しません。');
+  if (
+    mime &&
+    mime !== info.mime &&
+    !(info.model && ['application/octet-stream', 'model/vrm', 'application/vrm'].includes(mime)) &&
+    !(info.mime === 'application/json' && mime === 'text/plain') &&
+    !(info.animation?.format === 'apng' && mime === 'image/apng')
+  )
+    throw new Error('素材の形式とMIMEが一致しません。');
   return info;
 }

@@ -8608,10 +8608,7 @@
         "element": "HTML"
       }
     ],
-    "permissions": [
-      "storage",
-      "sidePanel"
-    ]
+    "permissions": ["storage", "sidePanel"]
   },
   "binary": {
     "browser": "153.0.8010.12",
@@ -11147,10 +11144,7 @@
           "vrmVersion": "0.x",
           "totalMs": 1135.5,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -11373,10 +11367,7 @@
           "vrmVersion": "0.x",
           "totalMs": 681,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -11599,10 +11590,7 @@
           "vrmVersion": "0.x",
           "totalMs": 736,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -11825,10 +11813,7 @@
           "vrmVersion": "0.x",
           "totalMs": 514,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -12051,10 +12036,7 @@
           "vrmVersion": "0.x",
           "totalMs": 501,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -12277,10 +12259,7 @@
           "vrmVersion": "0.x",
           "totalMs": 612.1999999997206,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -12503,10 +12482,7 @@
           "vrmVersion": "0.x",
           "totalMs": 718.3999999999069,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -12729,10 +12705,7 @@
           "vrmVersion": "0.x",
           "totalMs": 677.3000000002794,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -12955,10 +12928,7 @@
           "vrmVersion": "0.x",
           "totalMs": 476,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -13181,10 +13151,7 @@
           "vrmVersion": "0.x",
           "totalMs": 537.1000000000931,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -13409,10 +13376,7 @@
           "vrmVersion": "0.x",
           "totalMs": 1107.1000000000931,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -13642,10 +13606,7 @@
           "vrmVersion": "0.x",
           "totalMs": 711.3999999999069,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -13875,10 +13836,7 @@
           "vrmVersion": "0.x",
           "totalMs": 623.2000000001863,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -14108,10 +14066,7 @@
           "vrmVersion": "0.x",
           "totalMs": 604.3999999999069,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -14341,10 +14296,7 @@
           "vrmVersion": "0.x",
           "totalMs": 505.1999999997206,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -14574,10 +14526,7 @@
           "vrmVersion": "0.x",
           "totalMs": 659.8000000002794,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -14807,10 +14756,7 @@
           "vrmVersion": "0.x",
           "totalMs": 699,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -15040,10 +14986,7 @@
           "vrmVersion": "0.x",
           "totalMs": 690.7000000001863,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -15273,10 +15216,7 @@
           "vrmVersion": "0.x",
           "totalMs": 490.39999999990687,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -15506,10 +15446,7 @@
           "vrmVersion": "0.x",
           "totalMs": 506.40000000037253,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -15741,10 +15678,7 @@
           "vrmVersion": "0.x",
           "totalMs": 995.1000000000931,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -15974,10 +15908,7 @@
           "vrmVersion": "0.x",
           "totalMs": 714.8999999999069,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -16207,10 +16138,7 @@
           "vrmVersion": "0.x",
           "totalMs": 699.7000000001863,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -16440,10 +16368,7 @@
           "vrmVersion": "0.x",
           "totalMs": 484.6999999997206,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -16673,10 +16598,7 @@
           "vrmVersion": "0.x",
           "totalMs": 518,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -16906,10 +16828,7 @@
           "vrmVersion": "0.x",
           "totalMs": 618.7999999998137,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -17139,10 +17058,7 @@
           "vrmVersion": "0.x",
           "totalMs": 671.5,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -17372,10 +17288,7 @@
           "vrmVersion": "0.x",
           "totalMs": 695,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -17605,10 +17518,7 @@
           "vrmVersion": "0.x",
           "totalMs": 453.29999999981374,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -17838,10 +17748,7 @@
           "vrmVersion": "0.x",
           "totalMs": 525.5999999996275,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -18073,10 +17980,7 @@
           "vrmVersion": "0.x",
           "totalMs": 935.6000000000931,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -18306,10 +18210,7 @@
           "vrmVersion": "0.x",
           "totalMs": 690.3999999999069,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -18539,10 +18440,7 @@
           "vrmVersion": "0.x",
           "totalMs": 609.5,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -18772,10 +18670,7 @@
           "vrmVersion": "0.x",
           "totalMs": 591.1000000000931,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -19005,10 +18900,7 @@
           "vrmVersion": "0.x",
           "totalMs": 526.8999999999069,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -19238,10 +19130,7 @@
           "vrmVersion": "0.x",
           "totalMs": 652,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -19471,10 +19360,7 @@
           "vrmVersion": "0.x",
           "totalMs": 685.2999999998137,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -19704,10 +19590,7 @@
           "vrmVersion": "0.x",
           "totalMs": 580.6000000000931,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -19937,10 +19820,7 @@
           "vrmVersion": "0.x",
           "totalMs": 539.6000000000931,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -20170,10 +20050,7 @@
           "vrmVersion": "0.x",
           "totalMs": 459.5,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,

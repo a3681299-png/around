@@ -5,12 +5,7 @@
   "platform": "win32 x64",
   "cpu": "13th Gen Intel(R) Core(TM) i7-13650HX",
   "baseline": "1d23ec0 draw/paint numeric reference with equivalent returned data; shared unchanged geometry and mask primitives",
-  "excludes": [
-    "DOM/layout/style application",
-    "decoding",
-    "GPU",
-    "browser scheduling"
-  ],
+  "excludes": ["DOM/layout/style application", "decoding", "GPU", "browser scheduling"],
   "workloads": [
     {
       "label": "mixed-visibility",

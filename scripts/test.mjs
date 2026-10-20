@@ -17,4 +17,6 @@ child.once('error', (error) => {
   console.error(error);
   process.exitCode = 1;
 });
-child.once('exit', (code) => { process.exitCode = code ?? 1; });
+child.once('exit', (code) => {
+  process.exitCode = code ?? 1;
+});

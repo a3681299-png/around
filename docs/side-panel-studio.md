@@ -8,13 +8,13 @@
 
 2026-10-18、隔離プロファイルの headed Chromium 153、実 YouTube（ログアウト、指定された動画。YouTube 自身が mix の URL を正規化）で最小パネルを試した。画面倍率を 1 に固定した。
 
-| 外枠幅 | 表示 | innerWidth | player右端 / 関連欄左端 | resize |
-| --- | --- | --- | --- | --- |
-| 1920 | 通常 | 1904 | 1342 / 1358 | 幅変更時のみ |
-| 1920 | retro | 1904 | 1342 / 1358 | テーマ切替では増えない |
-| 1920 | 従来Studio | 1904 | 1049 / 1034 | Studio開始では増えない |
-| 1920 | 公式パネル | 1518 | 1062 / 1078 | 開閉・幅変更で発火 |
-| 1366 | 公式パネル | 964 | YouTubeが一列へ切替 | 同上 |
+| 外枠幅 | 表示       | innerWidth | player右端 / 関連欄左端 | resize                 |
+| ------ | ---------- | ---------- | ----------------------- | ---------------------- |
+| 1920   | 通常       | 1904       | 1342 / 1358             | 幅変更時のみ           |
+| 1920   | retro      | 1904       | 1342 / 1358             | テーマ切替では増えない |
+| 1920   | 従来Studio | 1904       | 1049 / 1034             | Studio開始では増えない |
+| 1920   | 公式パネル | 1518       | 1062 / 1078             | 開閉・幅変更で発火     |
+| 1366   | 公式パネル | 964        | YouTubeが一列へ切替     | 同上                   |
 
 数値は CSS px、丸めあり。再生・設定・シアター・全画面の中心点で elementFromPoint を検査。公式パネルでは全て対象ボタンに命中した。retro 単独の横方向の重なりは今回再現せず、retro CSS は推測で書き換えない。ログイン時のプレイリストと YouTube の全 A/B レイアウトは未保証。
 
@@ -39,14 +39,14 @@
 
 ## 実装された境界
 
-| モジュール | 責務 |
-| --- | --- |
-| src/browser/side-panel.ts | タブ単位の公式 API 起動・終了、ユーザー操作制約 |
-| src/browser/studio-page.ts / studio-client.ts / studio-host.ts | 同じ Studio ページの構成、認証済み Port、切替・再接続 |
-| src/studio/workbench.ts / workbench.css | 共通フォームをウィンドウ・インページ・サイドパネル・ツールバーへ配置 |
-| src/editor/controller.ts | 一つの Core を維持した表示切替と直接編集 |
-| src/sites/youtube-studio.ts | 既存インページ用予約と、動画操作部に重なる小型ツールバーの退避 |
-| src/background/index.ts | IndexedDB の既存 lease 管理。パネルの context を確認して復旧素材を保持 |
+| モジュール                                                     | 責務                                                                   |
+| -------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| src/browser/side-panel.ts                                      | タブ単位の公式 API 起動・終了、ユーザー操作制約                        |
+| src/browser/studio-page.ts / studio-client.ts / studio-host.ts | 同じ Studio ページの構成、認証済み Port、切替・再接続                  |
+| src/studio/workbench.ts / workbench.css                        | 共通フォームをウィンドウ・インページ・サイドパネル・ツールバーへ配置   |
+| src/editor/controller.ts                                       | 一つの Core を維持した表示切替と直接編集                               |
+| src/sites/youtube-studio.ts                                    | 既存インページ用予約と、動画操作部に重なる小型ツールバーの退避         |
+| src/background/index.ts                                        | IndexedDB の既存 lease 管理。パネルの context を確認して復旧素材を保持 |
 
 World Runtime、作品 JSON、asset ID は変更していない。Editor Coreの素材検証中の選択公開タイミングだけを修正した。今回追加した権限は許可された sidePanel のみ。storage と従来の CSP を維持する。Chrome の実装仕様は [公式 Side Panel API](https://developer.chrome.com/docs/extensions/reference/api/sidePanel) を確認した。
 

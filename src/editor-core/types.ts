@@ -1,4 +1,13 @@
-import type { DesignDocument, DesignTarget, Decoration, GroupLayer, EditorLayer, ImagePatch, LayerPlacement, SurfaceStyle } from '../design/types';
+import type {
+  DesignDocument,
+  DesignTarget,
+  Decoration,
+  GroupLayer,
+  EditorLayer,
+  ImagePatch,
+  LayerPlacement,
+  SurfaceStyle,
+} from '../design/types';
 import type { PlacementChange, PlacementFrame, PlacementSample, Point } from '../world/geometry';
 import type { Alignment, Distribution } from '../design/layout';
 import type { HistoryCheckpoint } from '../editor/history';
@@ -7,16 +16,41 @@ import type { SignalRule } from '../signals/keyframes';
 export type EditorTool = 'select' | 'browse' | 'card';
 
 export interface EditorView {
-  selected: boolean; style: SurfaceStyle; dirty: boolean; saving: boolean; status: string; error: boolean;
-  images: readonly Decoration[]; groups: readonly GroupLayer[]; image: EditorLayer | undefined;
-  inheritedLocked: boolean; groupPositionAvailable: boolean; groupingReason: string; selectedIds: readonly string[];
-  canUndo: boolean; canRedo: boolean; snapping: boolean; tool?: EditorTool;
+  selected: boolean;
+  style: SurfaceStyle;
+  dirty: boolean;
+  saving: boolean;
+  status: string;
+  error: boolean;
+  images: readonly Decoration[];
+  groups: readonly GroupLayer[];
+  image: EditorLayer | undefined;
+  inheritedLocked: boolean;
+  groupPositionAvailable: boolean;
+  groupingReason: string;
+  selectedIds: readonly string[];
+  canUndo: boolean;
+  canRedo: boolean;
+  snapping: boolean;
+  tool?: EditorTool;
   signalRules?: readonly SignalRule[];
 }
 export type EditCommand =
   | { type: 'select'; id: string; additive?: boolean; preserve?: boolean }
   | { type: 'select-target'; target?: string }
-  | { type: 'select-all' | 'clear-selection' | 'group' | 'ungroup' | 'undo' | 'redo' | 'discard' | 'save' | 'close' | 'begin' }
+  | {
+      type:
+        | 'select-all'
+        | 'clear-selection'
+        | 'group'
+        | 'ungroup'
+        | 'undo'
+        | 'redo'
+        | 'discard'
+        | 'save'
+        | 'close'
+        | 'begin';
+    }
   | { type: 'end'; cancel?: boolean }
   | { type: 'change'; id?: string; patch: ImagePatch }
   | { type: 'style'; style: SurfaceStyle }
@@ -30,7 +64,14 @@ export type EditCommand =
   | { type: 'signal-rule'; rule: SignalRule }
   | { type: 'remove-signal-rule'; id: string };
 
-export interface EditorAsset { id: string; name: string; width: number; height: number; model?: import('../models/types').ModelInfo; animation?: { format: AnimationFormat } }
+export interface EditorAsset {
+  id: string;
+  name: string;
+  width: number;
+  height: number;
+  model?: import('../models/types').ModelInfo;
+  animation?: { format: AnimationFormat };
+}
 export interface EditorStorage<Source> {
   read(): Promise<DesignDocument | undefined>;
   watch(accept: (doc: DesignDocument | undefined) => void, error: (error: unknown) => void): () => void;
@@ -47,13 +88,32 @@ export interface EditorGeometry {
   importFrame(point?: Point): { width: number; height: number; origin: Point };
 }
 export interface EditorPorts<Source> {
-  siteId: string; baseThemeId: string; targets: readonly DesignTarget[];
+  siteId: string;
+  baseThemeId: string;
+  targets: readonly DesignTarget[];
   makeId(kind: 'image' | 'group' | 'session'): string;
-  geometry: EditorGeometry; storage: EditorStorage<Source>;
+  geometry: EditorGeometry;
+  storage: EditorStorage<Source>;
   validate(doc: DesignDocument | undefined): void;
 }
 export interface EditorCheckpoint {
-  version: 1; siteId: string; draft: DesignDocument; saved?: DesignDocument;
-  selectedIds: string[]; selectedTarget?: string; tool?: EditorTool; snapping: boolean; history: HistoryCheckpoint<DesignDocument>;
+  version: 1;
+  siteId: string;
+  draft: DesignDocument;
+  saved?: DesignDocument;
+  selectedIds: string[];
+  selectedTarget?: string;
+  tool?: EditorTool;
+  snapping: boolean;
+  history: HistoryCheckpoint<DesignDocument>;
 }
-export interface EditorSnapshot { sessionId: string; revision: number; active: boolean; enabled: boolean; view: EditorView; document: DesignDocument; saved?: DesignDocument; selectedTarget?: string }
+export interface EditorSnapshot {
+  sessionId: string;
+  revision: number;
+  active: boolean;
+  enabled: boolean;
+  view: EditorView;
+  document: DesignDocument;
+  saved?: DesignDocument;
+  selectedTarget?: string;
+}

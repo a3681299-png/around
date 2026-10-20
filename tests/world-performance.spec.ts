@@ -4,17 +4,53 @@ import { image, isolate, media, open, reinject, save, watch } from './helpers/wo
 import { defaultCircleMask } from '../src/effects/types';
 import type { DesignDocument } from '../src/design/types';
 
-test('measure old/new browser callbacks with identical 32-media / 16-group pointer traces', async ({ popup, youtube, extensionId }, info) => {
+test('measure old/new browser callbacks with identical 32-media / 16-group pointer traces', async ({
+  popup,
+  youtube,
+  extensionId,
+}, info) => {
   test.setTimeout(90_000);
-  const panel = await open(popup, youtube); await image(panel, youtube); await save(panel); await watch(youtube);
+  const panel = await open(popup, youtube);
+  await image(panel, youtube);
+  await save(panel);
+  await watch(youtube);
   const key = 'webWorldThemes.design.youtube';
-  const original = await popup.evaluate(async (key) => (await chrome.storage.local.get(key))[key] as DesignDocument, key);
-  const decorations = Array.from({ length: 32 }, (_, i) => ({ ...original.decorations[0]!, id: `image-${i}`, name: `world-${i}`,
-    placement: { anchor: { kind: 'viewport' as const }, x: .15 + (i % 8) * .1, y: .2 + Math.floor(i / 8) * .18, widthPx: 90, heightPx: 70, rotationDeg: i * 5 },
-    visible: true, opacity: 1, zIndex: i % 3, effects: [defaultCircleMask()] }));
-  const groups = Array.from({ length: 16 }, (_, i) => ({ kind: 'group' as const, id: `group-${i}`, name: `world-${i}`, children: [`image-${i * 2}`, `image-${i * 2 + 1}`],
-    visible: true, locked: false, opacity: .8, zIndex: i % 3, effects: [defaultCircleMask()] }));
-  await popup.evaluate(async ({ key, value }) => chrome.storage.local.set({ [key]: value }), { key, value: { ...original, baseThemeId: null, decorations, groups } });
+  const original = await popup.evaluate(
+    async (key) => (await chrome.storage.local.get(key))[key] as DesignDocument,
+    key,
+  );
+  const decorations = Array.from({ length: 32 }, (_, i) => ({
+    ...original.decorations[0]!,
+    id: `image-${i}`,
+    name: `world-${i}`,
+    placement: {
+      anchor: { kind: 'viewport' as const },
+      x: 0.15 + (i % 8) * 0.1,
+      y: 0.2 + Math.floor(i / 8) * 0.18,
+      widthPx: 90,
+      heightPx: 70,
+      rotationDeg: i * 5,
+    },
+    visible: true,
+    opacity: 1,
+    zIndex: i % 3,
+    effects: [defaultCircleMask()],
+  }));
+  const groups = Array.from({ length: 16 }, (_, i) => ({
+    kind: 'group' as const,
+    id: `group-${i}`,
+    name: `world-${i}`,
+    children: [`image-${i * 2}`, `image-${i * 2 + 1}`],
+    visible: true,
+    locked: false,
+    opacity: 0.8,
+    zIndex: i % 3,
+    effects: [defaultCircleMask()],
+  }));
+  await popup.evaluate(async ({ key, value }) => chrome.storage.local.set({ [key]: value }), {
+    key,
+    value: { ...original, baseThemeId: null, decorations, groups },
+  });
   await expect(youtube.locator(media)).toHaveCount(32);
   const runtime = await isolate(youtube, extensionId);
   await runtime.evaluate(`(() => {
@@ -38,21 +74,44 @@ test('measure old/new browser callbacks with identical 32-media / 16-group point
       }
       return __wwPerfSamples;
     })()`);
-    expect(values.length).toBeGreaterThanOrEqual(80); expect(values.every((value) => Number.isFinite(value) && value >= 0)).toBe(true);
+    expect(values.length).toBeGreaterThanOrEqual(80);
+    expect(values.every((value) => Number.isFinite(value) && value >= 0)).toBe(true);
     samples[mode].push(...values);
-    const painted = await youtube.locator('#web-world-themes-decorations .group-content, #web-world-themes-decorations .media').evaluateAll((nodes) => nodes.map((node) => (node as HTMLElement).style.maskImage));
+    const painted = await youtube
+      .locator('#web-world-themes-decorations .group-content, #web-world-themes-decorations .media')
+      .evaluateAll((nodes) => nodes.map((node) => (node as HTMLElement).style.maskImage));
     expect(painted).toHaveLength(48);
-    if (baseline) expect(painted).toEqual(baseline); else baseline = painted;
+    if (baseline) expect(painted).toEqual(baseline);
+    else baseline = painted;
   }
   const stats = (values: number[]) => {
-    const sorted = [...values].sort((a, b) => a - b), round = (value: number) => Math.round(value * 1000) / 1000;
-    return { samples: sorted.length, medianMs: round(sorted[Math.floor(sorted.length / 2)]!), p95Ms: round(sorted[Math.floor(sorted.length * .95)]!),
-      meanMs: round(sorted.reduce((a, b) => a + b, 0) / sorted.length) };
+    const sorted = [...values].sort((a, b) => a - b),
+      round = (value: number) => Math.round(value * 1000) / 1000;
+    return {
+      samples: sorted.length,
+      medianMs: round(sorted[Math.floor(sorted.length / 2)]!),
+      p95Ms: round(sorted[Math.floor(sorted.length * 0.95)]!),
+      meanMs: round(sorted.reduce((a, b) => a + b, 0) / sorted.length),
+    };
   };
-  const report = { browser: youtube.context().browser()?.version(), media: 32, groups: 16, measuredPointerFramesPerRound: 80, warmupFramesPerRound: 15, order,
+  const report = {
+    browser: youtube.context().browser()?.version(),
+    media: 32,
+    groups: 16,
+    measuredPointerFramesPerRound: 80,
+    warmupFramesPerRound: 15,
+    order,
     includes: 'actual extension RAF callback: numeric evaluation, CSS writes and visibility callbacks',
     excludes: 'asynchronous layout/paint, GPU, decoding, input dispatch and RAF wait',
-    timing: 'isolated-world performance.now; browser timer precision applies', legacy: stats(samples.legacy), runtime: stats(samples.runtime) };
-  await mkdir('.work/verification', { recursive: true }); await writeFile('.work/verification/world-browser-benchmark.json', JSON.stringify(report, null, 2) + '\n');
-  await info.attach('world-browser-benchmark', { body: JSON.stringify(report, null, 2), contentType: 'application/json' }); await runtime.session.detach();
+    timing: 'isolated-world performance.now; browser timer precision applies',
+    legacy: stats(samples.legacy),
+    runtime: stats(samples.runtime),
+  };
+  await mkdir('.work/verification', { recursive: true });
+  await writeFile('.work/verification/world-browser-benchmark.json', JSON.stringify(report, null, 2) + '\n');
+  await info.attach('world-browser-benchmark', {
+    body: JSON.stringify(report, null, 2),
+    contentType: 'application/json',
+  });
+  await runtime.session.detach();
 });

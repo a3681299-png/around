@@ -1,6 +1,11 @@
 import { FEATURE_REGISTRY, defaultFeaturePreferences, featureEnabled } from '../features';
 import type { FeaturePreferences } from '../features';
-import { DEFAULT_PALETTE, PALETTE_CHANNELS, normalizePaletteChannel, type PaletteSettings } from '../themes/retro/palette';
+import {
+  DEFAULT_PALETTE,
+  PALETTE_CHANNELS,
+  normalizePaletteChannel,
+  type PaletteSettings,
+} from '../themes/retro/palette';
 
 export interface UserSettings {
   enabled: boolean;
@@ -55,12 +60,19 @@ export function normalizeNoiseStrength(value: unknown): number {
 }
 
 export function mergeSettings(settings: UserSettings, patch: SettingsPatch): UserSettings {
-  return { ...settings, ...patch, features: { ...settings.features, ...patch.features }, palette: { ...settings.palette, ...patch.palette } };
+  return {
+    ...settings,
+    ...patch,
+    features: { ...settings.features, ...patch.features },
+    palette: { ...settings.palette, ...patch.palette },
+  };
 }
 
 export async function readSettings(): Promise<UserSettings> {
   const stored = await chrome.storage.local.get([
-    ...Object.values(SETTINGS_KEYS), ...Object.values(FEATURE_SETTINGS_KEYS), ...Object.values(PALETTE_SETTINGS_KEYS),
+    ...Object.values(SETTINGS_KEYS),
+    ...Object.values(FEATURE_SETTINGS_KEYS),
+    ...Object.values(PALETTE_SETTINGS_KEYS),
   ]);
   return {
     enabled: normalizeEnabled(stored[SETTINGS_KEYS.enabled]),
@@ -71,9 +83,12 @@ export async function readSettings(): Promise<UserSettings> {
       saturation: normalizePaletteChannel('saturation', stored[PALETTE_SETTINGS_KEYS.saturation]),
       brightness: normalizePaletteChannel('brightness', stored[PALETTE_SETTINGS_KEYS.brightness]),
     },
-    features: Object.fromEntries(FEATURE_REGISTRY.map((feature) => [
-      feature.id, featureEnabled(feature, stored[FEATURE_SETTINGS_KEYS[feature.id]!]),
-    ])),
+    features: Object.fromEntries(
+      FEATURE_REGISTRY.map((feature) => [
+        feature.id,
+        featureEnabled(feature, stored[FEATURE_SETTINGS_KEYS[feature.id]!]),
+      ]),
+    ),
   };
 }
 
@@ -106,10 +121,7 @@ export function watchSettings(
   let current: UserSettings = mergeSettings(DEFAULT_SETTINGS, {});
   let buffered: SettingsPatch = {};
 
-  const onChanged = (
-    changes: Record<string, chrome.storage.StorageChange>,
-    area: string,
-  ): void => {
+  const onChanged = (changes: Record<string, chrome.storage.StorageChange>, area: string): void => {
     if (area !== 'local' || !active) return;
     const patch: SettingsPatch = {};
     const enabled = changes[SETTINGS_KEYS.enabled];
@@ -133,7 +145,12 @@ export function watchSettings(
     if (Object.keys(features).length > 0) patch.features = features;
     if (Object.keys(patch).length === 0) return;
     if (!initialized) {
-      buffered = { ...buffered, ...patch, features: { ...buffered.features, ...patch.features }, palette: { ...buffered.palette, ...patch.palette } };
+      buffered = {
+        ...buffered,
+        ...patch,
+        features: { ...buffered.features, ...patch.features },
+        palette: { ...buffered.palette, ...patch.palette },
+      };
       return;
     }
     current = mergeSettings(current, patch);
@@ -141,15 +158,17 @@ export function watchSettings(
   };
 
   chrome.storage.onChanged.addListener(onChanged);
-  void readSettings().then((stored) => {
-    if (!active) return;
-    current = mergeSettings(stored, buffered);
-    initialized = true;
-    buffered = {};
-    listener(mergeSettings(current, {}));
-  }).catch((error: unknown) => {
-    if (active) onError(error);
-  });
+  void readSettings()
+    .then((stored) => {
+      if (!active) return;
+      current = mergeSettings(stored, buffered);
+      initialized = true;
+      buffered = {};
+      listener(mergeSettings(current, {}));
+    })
+    .catch((error: unknown) => {
+      if (active) onError(error);
+    });
 
   return () => {
     active = false;

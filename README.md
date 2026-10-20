@@ -139,17 +139,17 @@ ON/OFFと強さは別々のキーに保存します。複数のPopupから異な
 
 YouTube用Adapterが対象要素に`data-ww-surface`を付けます。テーマはYouTubeのセレクタやDOM操作を持たず、この共通属性とCSS変数を使います。
 
-| 共通surface | 役割 |
-| --- | --- |
-| `page` | ページの背景 |
-| `panel` | ヘッダーや説明欄などの背景 |
-| `frame` | レイアウト寸法を変えない内側の枠線 |
-| `rounded` | サムネイルなどの角丸 |
-| `window` / `titlebar` / `menubar` | ウィンドウの外枠と追加バー |
-| `input` / `button` | 凹んだ入力欄と立体ボタン |
-| `card` / `section` / `sidebar` | 動画カードや一覧、サイドバーのボックス |
-| `navigation` / `selected` | ナビゲーションと選択された項目 |
-| `text` | 説明欄の文字とリンクの色 |
+| 共通surface                       | 役割                                   |
+| --------------------------------- | -------------------------------------- |
+| `page`                            | ページの背景                           |
+| `panel`                           | ヘッダーや説明欄などの背景             |
+| `frame`                           | レイアウト寸法を変えない内側の枠線     |
+| `rounded`                         | サムネイルなどの角丸                   |
+| `window` / `titlebar` / `menubar` | ウィンドウの外枠と追加バー             |
+| `input` / `button`                | 凹んだ入力欄と立体ボタン               |
+| `card` / `section` / `sidebar`    | 動画カードや一覧、サイドバーのボックス |
+| `navigation` / `selected`         | ナビゲーションと選択された項目         |
+| `text`                            | 説明欄の文字とリンクの色               |
 
 AdapterはYouTubeのライト／ダーク状態を記録しますが、retroはどちらでも同じ選択中のUIパレットを使います。色・影・寸法はCSS変数へ集約しています。ON時だけテーマ用のCSSとDOM監視を有効にし、OFFまたは0%でテーマのCSS、付与属性、CSS変数、Observer、時計タイマーとイベント監視を撤去します。設定UI用のローカルフォントだけはOFFでも必要なため独立して保持します。動画や画像自体の加工、元の要素の移動はしません。
 
@@ -184,7 +184,6 @@ YouTubeの`yt-navigate-finish`と`yt-page-data-updated`で再確認し、追加D
 独立StudioはPopupの「Studioを開く（別ウィンドウ）」から起動します。編集対象のYouTubeを選び、Studioで設定しながら実サイトで直接選択・移動できます。サイト内の「デザインを編集」も同じCoreとUIを使います。[構造とDesktop Hostへの境界](docs/studio-foundation.md)、[操作と検証結果](docs/studio-verification.md)を参照してください。実験版は `.work/creator-editor/dist` をChromeへ読み込みます。通常版の `dist` は更新しません。
 
 Chromeの仕様は[Content scripts](https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts)と[Storage API](https://developer.chrome.com/docs/extensions/reference/api/storage)、拡張機能の検証方法は[Playwright公式ドキュメント](https://playwright.dev/docs/chrome-extensions)を参照しています。
-
 
 主要な制作画面は、Popupの **「Studioを開く（Chromeサイドパネル）」** です。プロパティ／レイヤー／マスク／振る舞いを公式パネルに置き、YouTubeはChromeが変更したビューポートで自然にレイアウトします。ページ内には共通の小型ツールバーと編集ハンドルを表示します。Vは選択・変形、Hはサイト操作、Cは動画カード編集です。
 

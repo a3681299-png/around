@@ -33,18 +33,18 @@ Desktop版は今回実装しない。後からStorage、アンカー／ポイン
 
 ## 実装したモジュール
 
-| モジュール | 責務 |
-| --- | --- |
-| `editor-core/session.ts` | 文書・選択・履歴・編集セッションの唯一の正本、保存・破棄、素材保持 |
-| `editor-core/types.ts`, `shortcuts.ts` | Host非依存のコマンド、入力ポート、状態、共有ショートカット |
-| `studio/app.ts`, `connection.ts` | 独立Studioの組み立て、対象選択、接続表示、素材棚。通信・復旧保存・UI設定は注入 |
-| `editor/panel.ts`, `workspace.ts`, `layer-tree.ts`, `effects-panel.ts` | クイック編集とStudioで共有する制作UI |
-| `browser/studio-page.ts` | Chrome版のcomposition root。Host名・通信・保存を共通UIへ渡す |
-| `browser/studio-client.ts`, `studio-host.ts` | Chrome Portと対象タブの接続、直列コマンド、状態通知、切断・再接続 |
-| `studio/protocol.ts` | 通信形式v1、コマンド許可リスト、入力検証。Chrome APIへの依存なし |
-| `browser/storage-adapter.ts`, `preferences.ts`, `studio-recovery.ts` | 作品・原本素材・UI設定・復旧データの保存先を接続 |
-| `editor/controller.ts` | Browser Host。DOM選択、キー、ドロップ、アンカー矩形をCoreと既存Rendererへ接続 |
-| `world/`, `renderers/`, `host/` | 既存World Runtimeと描画。今回描画方式や評価形式を変更していない |
+| モジュール                                                             | 責務                                                                           |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `editor-core/session.ts`                                               | 文書・選択・履歴・編集セッションの唯一の正本、保存・破棄、素材保持             |
+| `editor-core/types.ts`, `shortcuts.ts`                                 | Host非依存のコマンド、入力ポート、状態、共有ショートカット                     |
+| `studio/app.ts`, `connection.ts`                                       | 独立Studioの組み立て、対象選択、接続表示、素材棚。通信・復旧保存・UI設定は注入 |
+| `editor/panel.ts`, `workspace.ts`, `layer-tree.ts`, `effects-panel.ts` | クイック編集とStudioで共有する制作UI                                           |
+| `browser/studio-page.ts`                                               | Chrome版のcomposition root。Host名・通信・保存を共通UIへ渡す                   |
+| `browser/studio-client.ts`, `studio-host.ts`                           | Chrome Portと対象タブの接続、直列コマンド、状態通知、切断・再接続              |
+| `studio/protocol.ts`                                                   | 通信形式v1、コマンド許可リスト、入力検証。Chrome APIへの依存なし               |
+| `browser/storage-adapter.ts`, `preferences.ts`, `studio-recovery.ts`   | 作品・原本素材・UI設定・復旧データの保存先を接続                               |
+| `editor/controller.ts`                                                 | Browser Host。DOM選択、キー、ドロップ、アンカー矩形をCoreと既存Rendererへ接続  |
+| `world/`, `renderers/`, `host/`                                        | 既存World Runtimeと描画。今回描画方式や評価形式を変更していない                |
 
 ```mermaid
 flowchart LR

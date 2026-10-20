@@ -46,7 +46,8 @@ export function mountYouTubeChrome(doc: Document): SiteFeatureInstance {
   const status = doc.createElement('div');
   status.id = 'web-world-themes-statusbar';
   status.setAttribute('aria-live', 'off');
-  status.innerHTML = '<span class="ww-status-message ww-status-cell">YouTube.exe / Ready</span><span class="ww-status-cell ww-status-detail" aria-hidden="true">SILVER DESKTOP</span><time id="web-world-themes-clock" aria-label="現在時刻"></time>';
+  status.innerHTML =
+    '<span class="ww-status-message ww-status-cell">YouTube.exe / Ready</span><span class="ww-status-cell ww-status-detail" aria-hidden="true">SILVER DESKTOP</span><time id="web-world-themes-clock" aria-label="現在時刻"></time>';
   const clock = status.querySelector<HTMLTimeElement>('time')!;
   let timer: number | undefined;
   let masthead: HTMLElement | null = null;
@@ -69,9 +70,13 @@ export function mountYouTubeChrome(doc: Document): SiteFeatureInstance {
     if (geometryFrame !== undefined) view.cancelAnimationFrame(geometryFrame);
     geometryFrame = undefined;
     geometryObserver.disconnect();
-    collisionObserver?.disconnect(); collisionObserver = undefined;
-    observedObstacles = []; collisionKey = '';
-    watchedGeometry = []; obstacles = []; reservedHeight = 0;
+    collisionObserver?.disconnect();
+    collisionObserver = undefined;
+    observedObstacles = [];
+    collisionKey = '';
+    watchedGeometry = [];
+    obstacles = [];
+    reservedHeight = 0;
     root.style.removeProperty('--ww-statusbar-reserved-height');
     root.style.removeProperty('--ww-player-viewport-height');
     status.removeAttribute('data-ww-obstructed');
@@ -99,27 +104,43 @@ export function mountYouTubeChrome(doc: Document): SiteFeatureInstance {
     const stripTop = Math.max(0, Math.floor(top));
     const stripBottom = Math.max(0, Math.floor(view.innerHeight - viewportBottom));
     const key = `${stripTop}:${stripBottom}`;
-    if (key !== collisionKey || obstacles.length !== observedObstacles.length
-      || obstacles.some((element, index) => element !== observedObstacles[index])) {
+    if (
+      key !== collisionKey ||
+      obstacles.length !== observedObstacles.length ||
+      obstacles.some((element, index) => element !== observedObstacles[index])
+    ) {
       collisionObserver?.disconnect();
       // Browser-managed intersection catches geometry-only native transitions
       // (theater classes, menus, animated miniplayers) with no polling loop.
       collisionObserver = new IntersectionObserver(scheduleGeometry, {
         rootMargin: `-${stripTop}px 0px -${stripBottom}px 0px`,
       });
-      obstacles.forEach(element => collisionObserver!.observe(element));
-      observedObstacles = [...obstacles]; collisionKey = key;
+      obstacles.forEach((element) => collisionObserver!.observe(element));
+      observedObstacles = [...obstacles];
+      collisionKey = key;
     }
     const intersects = (element: Element) => {
       if (!element.isConnected || status.contains(element) || chrome.contains(element)) return false;
       const box = element.getBoundingClientRect();
-      return box.width > 0 && box.height > 0 && box.bottom > top && box.top < viewportBottom
-        && box.right > rect.left && box.left < rect.right;
+      return (
+        box.width > 0 &&
+        box.height > 0 &&
+        box.bottom > top &&
+        box.top < viewportBottom &&
+        box.right > rect.left &&
+        box.left < rect.right
+      );
     };
     // A decorative footer must never win over native interaction. Checking whole
     // players also protects currently faded-out controls and floating miniplayers.
-    const obstruction = obstacles.some(intersects)
-      || Boolean(doc.activeElement && intersects(doc.activeElement) && doc.activeElement !== doc.body && doc.activeElement !== root);
+    const obstruction =
+      obstacles.some(intersects) ||
+      Boolean(
+        doc.activeElement &&
+        intersects(doc.activeElement) &&
+        doc.activeElement !== doc.body &&
+        doc.activeElement !== root,
+      );
     status.toggleAttribute('data-ww-obstructed', obstruction);
   };
   const scheduleGeometry = () => {
@@ -133,14 +154,21 @@ export function mountYouTubeChrome(doc: Document): SiteFeatureInstance {
   };
   const geometryObserver = new ResizeObserver(yieldThenMeasure);
   const refreshGeometry = () => {
-    obstacles = [...doc.querySelectorAll(
-      '#movie_player, .html5-video-player, ytd-miniplayer, video, iframe, button, input, select, textarea, a[href], [role="button"], [contenteditable="true"], [tabindex]:not([tabindex="-1"])',
-    )];
-    const nodes = [status, masthead, playerBar, doc.querySelector('#movie_player'), doc.querySelector('ytd-page-manager')]
-      .filter((node): node is Element => Boolean(node));
+    obstacles = [
+      ...doc.querySelectorAll(
+        '#movie_player, .html5-video-player, ytd-miniplayer, video, iframe, button, input, select, textarea, a[href], [role="button"], [contenteditable="true"], [tabindex]:not([tabindex="-1"])',
+      ),
+    ];
+    const nodes = [
+      status,
+      masthead,
+      playerBar,
+      doc.querySelector('#movie_player'),
+      doc.querySelector('ytd-page-manager'),
+    ].filter((node): node is Element => Boolean(node));
     if (nodes.length !== watchedGeometry.length || nodes.some((node, index) => node !== watchedGeometry[index])) {
       geometryObserver.disconnect();
-      nodes.forEach(node => geometryObserver.observe(node));
+      nodes.forEach((node) => geometryObserver.observe(node));
       watchedGeometry = nodes;
     }
     scheduleGeometry();
@@ -155,7 +183,10 @@ export function mountYouTubeChrome(doc: Document): SiteFeatureInstance {
     }
   };
   const syncClock = () => {
-    if (timer !== undefined) { view.clearInterval(timer); timer = undefined; }
+    if (timer !== undefined) {
+      view.clearInterval(timer);
+      timer = undefined;
+    }
     if (destroyed || !status.isConnected) return;
     updateClock();
     if (doc.hidden) return;
@@ -163,14 +194,22 @@ export function mountYouTubeChrome(doc: Document): SiteFeatureInstance {
   };
   const setTitle = (bar: HTMLElement, text: string) => {
     const label = bar.querySelector<HTMLElement>('.ww-pane-title')!;
-    if (label.textContent !== text) { label.textContent = text; bar.title = text; }
+    if (label.textContent !== text) {
+      label.textContent = text;
+      bar.title = text;
+    }
   };
-  const playerTitle = () => doc.querySelector('ytd-watch-metadata h1')
-    ?? doc.querySelector('ytd-video-primary-info-renderer h1')
-    ?? doc.querySelector('.ytp-title-link');
-  const playlistTitle = () => doc.querySelector('ytd-playlist-panel-renderer #title, ytd-playlist-panel-renderer .title');
+  const playerTitle = () =>
+    doc.querySelector('ytd-watch-metadata h1') ??
+    doc.querySelector('ytd-video-primary-info-renderer h1') ??
+    doc.querySelector('.ytp-title-link');
+  const playlistTitle = () =>
+    doc.querySelector('ytd-playlist-panel-renderer #title, ytd-playlist-panel-renderer .title');
   const refreshTitles = () => {
-    setTitle(playerBar, playerTitle()?.textContent?.trim() || doc.title.replace(/\s*[-–]\s*YouTube\s*$/, '') || 'YouTube');
+    setTitle(
+      playerBar,
+      playerTitle()?.textContent?.trim() || doc.title.replace(/\s*[-–]\s*YouTube\s*$/, '') || 'YouTube',
+    );
     setTitle(playlistBar, playlistTitle()?.textContent?.trim() || '再生リスト');
   };
   const titleObserver = new MutationObserver(refreshTitles);
@@ -178,9 +217,13 @@ export function mountYouTubeChrome(doc: Document): SiteFeatureInstance {
     if (destroyed) return;
     const next = doc.querySelector<HTMLElement>('ytd-masthead');
     if (!next) {
-      chrome.remove(); status.remove(); playerBar.remove(); playlistBar.remove();
+      chrome.remove();
+      status.remove();
+      playerBar.remove();
+      playlistBar.remove();
       masthead = null;
-      titleObserver.disconnect(); titleNodes = [];
+      titleObserver.disconnect();
+      titleNodes = [];
       root.removeAttribute('data-ww-window-chrome');
       root.style.removeProperty('--ww-native-header-height');
       clearGeometry();
@@ -194,7 +237,10 @@ export function mountYouTubeChrome(doc: Document): SiteFeatureInstance {
     }
     if (next.firstElementChild !== chrome) next.prepend(chrome);
     root.setAttribute('data-ww-window-chrome', '');
-    if (!status.isConnected) { (doc.body ?? root).append(status); syncClock(); }
+    if (!status.isConnected) {
+      (doc.body ?? root).append(status);
+      syncClock();
+    }
     chrome.querySelectorAll<HTMLAnchorElement>('a').forEach((link) => {
       if (new URL(link.href, doc.URL).pathname === doc.location.pathname) {
         if (link.getAttribute('aria-current') !== 'page') link.setAttribute('aria-current', 'page');
@@ -203,7 +249,11 @@ export function mountYouTubeChrome(doc: Document): SiteFeatureInstance {
     // Stay outside the complete native player boundary, including its absolute
     // error/ad overlays. Never reparent or resize the player or video.
     const player = doc.querySelector('#movie_player');
-    const anchor = player?.closest('#player') ?? player?.closest('#player-container-outer') ?? player?.closest('ytd-player') ?? player;
+    const anchor =
+      player?.closest('#player') ??
+      player?.closest('#player-container-outer') ??
+      player?.closest('ytd-player') ??
+      player;
     if (anchor?.parentElement && doc.location.pathname === '/watch') {
       if (anchor.previousElementSibling !== playerBar) anchor.before(playerBar);
     } else playerBar.remove();
@@ -211,10 +261,12 @@ export function mountYouTubeChrome(doc: Document): SiteFeatureInstance {
     if (playlist) {
       if (playlist.firstElementChild !== playlistBar) playlist.prepend(playlistBar);
     } else playlistBar.remove();
-    const nodes = [playerTitle(), playlistTitle(), doc.querySelector('head > title')].filter((node): node is Element => Boolean(node));
+    const nodes = [playerTitle(), playlistTitle(), doc.querySelector('head > title')].filter((node): node is Element =>
+      Boolean(node),
+    );
     if (nodes.length !== titleNodes.length || nodes.some((node, index) => node !== titleNodes[index])) {
       titleObserver.disconnect();
-      nodes.forEach(node => titleObserver.observe(node, { childList: true, characterData: true, subtree: true }));
+      nodes.forEach((node) => titleObserver.observe(node, { childList: true, characterData: true, subtree: true }));
       titleNodes = nodes;
     }
     refreshTitles();
@@ -234,7 +286,8 @@ export function mountYouTubeChrome(doc: Document): SiteFeatureInstance {
       destroyed = true;
       if (timer !== undefined) view.clearInterval(timer);
       timer = undefined;
-      titleObserver.disconnect(); titleNodes = [];
+      titleObserver.disconnect();
+      titleNodes = [];
       doc.removeEventListener('visibilitychange', syncClock);
       doc.removeEventListener('scroll', yieldThenMeasure, true);
       doc.removeEventListener('focusin', yieldThenMeasure);
@@ -243,7 +296,10 @@ export function mountYouTubeChrome(doc: Document): SiteFeatureInstance {
       view.visualViewport?.removeEventListener('resize', yieldThenMeasure);
       view.visualViewport?.removeEventListener('scroll', yieldThenMeasure);
       clearGeometry();
-      chrome.remove(); playerBar.remove(); playlistBar.remove(); status.remove();
+      chrome.remove();
+      playerBar.remove();
+      playlistBar.remove();
+      status.remove();
       masthead = null;
       root.removeAttribute('data-ww-window-chrome');
       root.style.removeProperty('--ww-native-header-height');

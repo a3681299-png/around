@@ -30,8 +30,18 @@ export function bindSettingsForm(root: ParentNode): () => void {
   }));
   const presetButtons = root.querySelectorAll<HTMLButtonElement>('[data-palette-preset]');
   const featureControls = root.querySelectorAll<HTMLInputElement>('input[data-feature-id]');
-  const controls = [enabled, strength, noise, ...paletteControls.map(({ input }) => input), ...presetButtons, ...featureControls];
-  const setDisabled = (disabled: boolean) => controls.forEach((control) => { control.disabled = disabled; });
+  const controls = [
+    enabled,
+    strength,
+    noise,
+    ...paletteControls.map(({ input }) => input),
+    ...presetButtons,
+    ...featureControls,
+  ];
+  const setDisabled = (disabled: boolean) =>
+    controls.forEach((control) => {
+      control.disabled = disabled;
+    });
   const status = required<HTMLParagraphElement>('#save-status');
   let settings: UserSettings = mergeSettings(DEFAULT_SETTINGS, {});
   let savesInFlight = 0;
@@ -57,7 +67,10 @@ export function bindSettingsForm(root: ParentNode): () => void {
     });
     presetButtons.forEach((button) => {
       const preset = PALETTE_PRESETS[button.dataset.palettePreset as keyof typeof PALETTE_PRESETS];
-      button.setAttribute('aria-pressed', String(Boolean(preset) && PALETTE_CHANNELS.every((channel) => settings.palette[channel] === preset[channel])));
+      button.setAttribute(
+        'aria-pressed',
+        String(Boolean(preset) && PALETTE_CHANNELS.every((channel) => settings.palette[channel] === preset[channel])),
+      );
     });
     featureControls.forEach((control) => {
       const id = control.dataset.featureId;
@@ -67,19 +80,22 @@ export function bindSettingsForm(root: ParentNode): () => void {
   setDisabled(true);
   setStatus('設定を読み込んでいます…');
 
-  const unwatch = watchSettings((stored) => {
-    storageRevision++;
-    // Keep the current slider gesture stable while its writes are completing.
-    if (savesInFlight === 0) {
-      settings = stored;
-      render();
-    }
-    setDisabled(false);
-    if (revision === 0) setStatus('設定は自動保存されます。');
-  }, () => {
-    setDisabled(true);
-    setStatus('設定を読み込めません。拡張機能を再読み込みしてください。', true);
-  });
+  const unwatch = watchSettings(
+    (stored) => {
+      storageRevision++;
+      // Keep the current slider gesture stable while its writes are completing.
+      if (savesInFlight === 0) {
+        settings = stored;
+        render();
+      }
+      setDisabled(false);
+      if (revision === 0) setStatus('設定は自動保存されます。');
+    },
+    () => {
+      setDisabled(true);
+      setStatus('設定を読み込めません。拡張機能を再読み込みしてください。', true);
+    },
+  );
 
   const finishSave = async (failed: boolean) => {
     savesInFlight--;
@@ -113,7 +129,10 @@ export function bindSettingsForm(root: ParentNode): () => void {
     savesInFlight++;
     setStatus('保存しています…');
     // Start every write immediately, including when the panel closes mid-gesture.
-    void updateSettings(patch).then(() => finishSave(false), () => finishSave(true));
+    void updateSettings(patch).then(
+      () => finishSave(false),
+      () => finishSave(true),
+    );
   };
   const onToggle = () => commit({ enabled: enabled.checked });
   const onStrength = () => commit({ strength: Number(strength.value) });
@@ -158,4 +177,3 @@ export function bindSettingsForm(root: ParentNode): () => void {
     focusButtons.forEach((button) => button.removeEventListener('click', onFocusControl));
   };
 }
-

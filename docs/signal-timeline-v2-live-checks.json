@@ -7,11 +7,7 @@
       "cssNumericErrorPx": 0.0003983479855378391,
       "takeReplayAndLiveIsolation": true,
       "savedReload": true,
-      "windowWidthsAndSettingsClicks": [
-        1366,
-        1920,
-        1000
-      ],
+      "windowWidthsAndSettingsClicks": [1366, 1920, 1000],
       "zeroCleanup": true
     },
     "browser": "153.0.8010.12"

@@ -6,53 +6,128 @@ import { defaultScrollOpacityRule } from '../src/signals/keyframes';
 import { defaultCircleMask } from '../src/effects/types';
 import type { DesignDocument } from '../src/design/types';
 
-test('scroll geometry and signal callbacks share one evaluation; 32 layers / 16 group masks keep identical output', async ({ popup, youtube, extensionId }, info) => {
+test('scroll geometry and signal callbacks share one evaluation; 32 layers / 16 group masks keep identical output', async ({
+  popup,
+  youtube,
+  extensionId,
+}, info) => {
   test.setTimeout(90_000);
-  const panel = await open(popup, youtube); await image(panel, youtube); await save(panel); await watch(youtube);
-  const key = 'webWorldThemes.design.youtube', original = await popup.evaluate(async (key) => (await chrome.storage.local.get(key))[key] as DesignDocument, key);
-  const decorations = Array.from({ length: 32 }, (_, i) => ({ ...original.decorations[0]!, id: `image-${i}`, visible: true, opacity: 1,
-    placement: { anchor: { kind: 'viewport' as const }, x: .1 + i % 8 * .1, y: .2 + Math.floor(i / 8) * .15, widthPx: 90, heightPx: 70, rotationDeg: 0 }, zIndex: i % 2 }));
-  const groups = Array.from({ length: 16 }, (_, i) => ({ kind: 'group' as const, id: `group-${i}`, name: `World ${i}`, children: [`image-${i * 2}`, `image-${i * 2 + 1}`], visible: true, locked: false, opacity: .8, zIndex: i, effects: [defaultCircleMask()] }));
-  await popup.evaluate(async ({ key, value }) => chrome.storage.local.set({ [key]: value }), { key, value: { ...original, baseThemeId: null, decorations, groups, signalRules: decorations.map((layer) => defaultScrollOpacityRule(layer.id)) } });
-  await expect(youtube.locator(media)).toHaveCount(32); await youtube.evaluate(() => { document.body.style.minHeight = '12000px'; });
-  const runtime = await isolate(youtube, extensionId), results: Record<string, { samples: number[]; opacity: string[] }> = {};
+  const panel = await open(popup, youtube);
+  await image(panel, youtube);
+  await save(panel);
+  await watch(youtube);
+  const key = 'webWorldThemes.design.youtube',
+    original = await popup.evaluate(async (key) => (await chrome.storage.local.get(key))[key] as DesignDocument, key);
+  const decorations = Array.from({ length: 32 }, (_, i) => ({
+    ...original.decorations[0]!,
+    id: `image-${i}`,
+    visible: true,
+    opacity: 1,
+    placement: {
+      anchor: { kind: 'viewport' as const },
+      x: 0.1 + (i % 8) * 0.1,
+      y: 0.2 + Math.floor(i / 8) * 0.15,
+      widthPx: 90,
+      heightPx: 70,
+      rotationDeg: 0,
+    },
+    zIndex: i % 2,
+  }));
+  const groups = Array.from({ length: 16 }, (_, i) => ({
+    kind: 'group' as const,
+    id: `group-${i}`,
+    name: `World ${i}`,
+    children: [`image-${i * 2}`, `image-${i * 2 + 1}`],
+    visible: true,
+    locked: false,
+    opacity: 0.8,
+    zIndex: i,
+    effects: [defaultCircleMask()],
+  }));
+  await popup.evaluate(async ({ key, value }) => chrome.storage.local.set({ [key]: value }), {
+    key,
+    value: {
+      ...original,
+      baseThemeId: null,
+      decorations,
+      groups,
+      signalRules: decorations.map((layer) => defaultScrollOpacityRule(layer.id)),
+    },
+  });
+  await expect(youtube.locator(media)).toHaveCount(32);
+  await youtube.evaluate(() => {
+    document.body.style.minHeight = '12000px';
+  });
+  const runtime = await isolate(youtube, extensionId),
+    results: Record<string, { samples: number[]; opacity: string[] }> = {};
   try {
     for (const mode of ['before', 'coalesced']) {
       await runtime.evaluate('globalThis.__wwSignalSamples = []');
-      const bundle = await build({ entryPoints: ['src/content/index.ts'], bundle: true, write: false, target: 'chrome120', format: 'iife', loader: { '.css': 'text' },
-        plugins: [{ name: 'test-only-evaluation-meter', setup(builder) {
-          // Reproduce both parts of the historical baseline: synchronous scroll
-          // sampling and uncancelled signal/geometry evaluations. RAF sampling
-          // itself now coalesces those callbacks even without reconcile.cancel().
-          if (mode === 'before') builder.onLoad({ filter: /[\\/]host[\\/]signals\.ts$/ }, async ({ path }) => {
-            // Compare canonical JS so source formatting cannot silently change
-            // this historical baseline. Keep the exact-match guards below.
-            let contents = (await transform(await readFile(path, 'utf8'), { loader: 'ts', target: 'chrome120' })).code;
-            const replacements = [
-              ['const onScroll = (event: Event) => { if (event.target === doc || event.target === doc.scrollingElement) markScroll(); };', 'const onScroll = (event: Event) => { if (event.target === doc || event.target === doc.scrollingElement) sampleScroll(); };'],
-              ['const onResize = () => markScroll();', 'const onResize = () => sampleScroll();'],
-            ] as const;
-            for (const [current, historical] of replacements) {
-              const currentJS = (await transform(current, { loader: 'ts', target: 'chrome120' })).code.trim().replaceAll('\n', '\n  ');
-              const historicalJS = (await transform(historical, { loader: 'ts', target: 'chrome120' })).code.trim().replaceAll('\n', '\n  ');
-              if (!contents.includes(currentJS)) throw new Error('Historical scroll baseline must be updated');
-              contents = contents.replace(currentJS, historicalJS);
-            }
-            return { contents, loader: 'ts' };
-          });
-          builder.onLoad({ filter: /[\\/]host[\\/]world-session\.ts$/ }, async ({ path }) => {
-          let contents = (await transform(await readFile(path, 'utf8'), { loader: 'ts', target: 'chrome120' })).code;
-          if (mode === 'before') {
-            const block = contents.match(/const reconcile = \(\) => \{[\s\S]*?\n  \};/)?.[0];
-            if (!block || block.split('    cancel();\n').length !== 3) throw new Error('Historical scheduling baseline must be updated');
-            contents = contents.replace(block, block.replaceAll('    cancel();\n', ''));
-          }
-          const expression = 'overridden ?? evaluatePreparedWorld(prepared, state, input, context.scene.signalRules)';
-          if (!contents.includes(expression)) throw new Error('Evaluation meter must be updated');
-          contents = contents.replace(expression, `(() => { const start = performance.now(); const result = ${expression}; (globalThis as any).__wwSignalSamples.push(performance.now() - start); return result; })()`);
-          return { contents, loader: 'ts' };
-        }); } }], logLevel: 'silent' });
-      await runtime.evaluate(bundle.outputFiles[0]!.text); await expect(youtube.locator(media)).toHaveCount(32); await youtube.waitForTimeout(120);
+      const bundle = await build({
+        entryPoints: ['src/content/index.ts'],
+        bundle: true,
+        write: false,
+        target: 'chrome120',
+        format: 'iife',
+        loader: { '.css': 'text' },
+        plugins: [
+          {
+            name: 'test-only-evaluation-meter',
+            setup(builder) {
+              // Reproduce both parts of the historical baseline: synchronous scroll
+              // sampling and uncancelled signal/geometry evaluations. RAF sampling
+              // itself now coalesces those callbacks even without reconcile.cancel().
+              if (mode === 'before')
+                builder.onLoad({ filter: /[\\/]host[\\/]signals\.ts$/ }, async ({ path }) => {
+                  // Compare canonical JS so source formatting cannot silently change
+                  // this historical baseline. Keep the exact-match guards below.
+                  let contents = (await transform(await readFile(path, 'utf8'), { loader: 'ts', target: 'chrome120' }))
+                    .code;
+                  const replacements = [
+                    [
+                      'const onScroll = (event: Event) => { if (event.target === doc || event.target === doc.scrollingElement) markScroll(); };',
+                      'const onScroll = (event: Event) => { if (event.target === doc || event.target === doc.scrollingElement) sampleScroll(); };',
+                    ],
+                    ['const onResize = () => markScroll();', 'const onResize = () => sampleScroll();'],
+                  ] as const;
+                  for (const [current, historical] of replacements) {
+                    const currentJS = (await transform(current, { loader: 'ts', target: 'chrome120' })).code
+                      .trim()
+                      .replaceAll('\n', '\n  ');
+                    const historicalJS = (await transform(historical, { loader: 'ts', target: 'chrome120' })).code
+                      .trim()
+                      .replaceAll('\n', '\n  ');
+                    if (!contents.includes(currentJS)) throw new Error('Historical scroll baseline must be updated');
+                    contents = contents.replace(currentJS, historicalJS);
+                  }
+                  return { contents, loader: 'ts' };
+                });
+              builder.onLoad({ filter: /[\\/]host[\\/]world-session\.ts$/ }, async ({ path }) => {
+                let contents = (await transform(await readFile(path, 'utf8'), { loader: 'ts', target: 'chrome120' }))
+                  .code;
+                if (mode === 'before') {
+                  const block = contents.match(/const reconcile = \(\) => \{[\s\S]*?\n  \};/)?.[0];
+                  if (!block || block.split('    cancel();\n').length !== 3)
+                    throw new Error('Historical scheduling baseline must be updated');
+                  contents = contents.replace(block, block.replaceAll('    cancel();\n', ''));
+                }
+                const expression =
+                  'overridden ?? evaluatePreparedWorld(prepared, state, input, context.scene.signalRules)';
+                if (!contents.includes(expression)) throw new Error('Evaluation meter must be updated');
+                contents = contents.replace(
+                  expression,
+                  `(() => { const start = performance.now(); const result = ${expression}; (globalThis as any).__wwSignalSamples.push(performance.now() - start); return result; })()`,
+                );
+                return { contents, loader: 'ts' };
+              });
+            },
+          },
+        ],
+        logLevel: 'silent',
+      });
+      await runtime.evaluate(bundle.outputFiles[0]!.text);
+      await expect(youtube.locator(media)).toHaveCount(32);
+      await youtube.waitForTimeout(120);
       results[mode] = await runtime.evaluate(`(async () => {
         globalThis.__wwSignalSamples = []; const opacity = [];
         for (let i = 1; i <= 120; i++) {
@@ -63,13 +138,35 @@ test('scroll geometry and signal callbacks share one evaluation; 32 layers / 16 
         return { samples: globalThis.__wwSignalSamples, opacity };
       })()`);
     }
-    const before = results['before']!, current = results['coalesced']!;
-    expect(current.opacity).toEqual(before.opacity); expect(current.samples.length).toBeGreaterThanOrEqual(118);
-    expect(current.samples.length).toBeLessThan(before.samples.length * .75);
-    const stats = (samples: number[]) => { const sorted = [...samples].sort((a, b) => a - b); return { evaluations: samples.length, totalMs: samples.reduce((a, b) => a + b, 0), medianMs: sorted[Math.floor(sorted.length / 2)], p95Ms: sorted[Math.floor(sorted.length * .95)] }; };
-    const report = { browser: youtube.context().browser()?.version(), media: 32, groupMasks: 16, rules: 32, scrollSteps: 120, before: stats(before.samples), coalesced: stats(current.samples),
-      includes: 'numeric World evaluation only, isolated-world performance.now', excludes: 'DOM writes, layout, paint, GPU, decoding, browser wait; timer precision applies' };
-    await mkdir('.work/verification', { recursive: true }); await writeFile('.work/verification/signal-browser-benchmark.json', JSON.stringify(report, null, 2));
+    const before = results['before']!,
+      current = results['coalesced']!;
+    expect(current.opacity).toEqual(before.opacity);
+    expect(current.samples.length).toBeGreaterThanOrEqual(118);
+    expect(current.samples.length).toBeLessThan(before.samples.length * 0.75);
+    const stats = (samples: number[]) => {
+      const sorted = [...samples].sort((a, b) => a - b);
+      return {
+        evaluations: samples.length,
+        totalMs: samples.reduce((a, b) => a + b, 0),
+        medianMs: sorted[Math.floor(sorted.length / 2)],
+        p95Ms: sorted[Math.floor(sorted.length * 0.95)],
+      };
+    };
+    const report = {
+      browser: youtube.context().browser()?.version(),
+      media: 32,
+      groupMasks: 16,
+      rules: 32,
+      scrollSteps: 120,
+      before: stats(before.samples),
+      coalesced: stats(current.samples),
+      includes: 'numeric World evaluation only, isolated-world performance.now',
+      excludes: 'DOM writes, layout, paint, GPU, decoding, browser wait; timer precision applies',
+    };
+    await mkdir('.work/verification', { recursive: true });
+    await writeFile('.work/verification/signal-browser-benchmark.json', JSON.stringify(report, null, 2));
     await info.attach('scroll-evaluations', { body: JSON.stringify(report, null, 2), contentType: 'application/json' });
-  } finally { await runtime.session.detach(); }
+  } finally {
+    await runtime.session.detach();
+  }
 });

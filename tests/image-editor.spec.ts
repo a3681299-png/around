@@ -20,12 +20,20 @@ async function open(popup: Page, youtube: Page) {
 
 async function raster(youtube: Page, mime: 'image/png' | 'image/webp' = 'image/png') {
   const data = await youtube.evaluate((format) => {
-    const canvas = document.createElement('canvas'); canvas.width = 64; canvas.height = 48;
-    const context = canvas.getContext('2d')!; context.clearRect(0, 0, 64, 48);
-    context.fillStyle = '#e84f83'; context.fillRect(16, 0, 48, 48);
+    const canvas = document.createElement('canvas');
+    canvas.width = 64;
+    canvas.height = 48;
+    const context = canvas.getContext('2d')!;
+    context.clearRect(0, 0, 64, 48);
+    context.fillStyle = '#e84f83';
+    context.fillRect(16, 0, 48, 48);
     return canvas.toDataURL(format);
   }, mime);
-  return { name: mime === 'image/png' ? 'flower.png' : 'sticker.webp', mimeType: mime, buffer: Buffer.from(data.split(',')[1]!, 'base64') };
+  return {
+    name: mime === 'image/png' ? 'flower.png' : 'sticker.webp',
+    mimeType: mime,
+    buffer: Buffer.from(data.split(',')[1]!, 'base64'),
+  };
 }
 
 async function importImage(dialog: Locator, youtube: Page, mime: 'image/png' | 'image/webp' = 'image/png') {
@@ -44,7 +52,10 @@ async function save(dialog: Locator) {
 }
 
 async function stored(popup: Page): Promise<DesignDocument> {
-  return popup.evaluate(async (designKey) => (await chrome.storage.local.get(designKey))[designKey] as DesignDocument, key);
+  return popup.evaluate(
+    async (designKey) => (await chrome.storage.local.get(designKey))[designKey] as DesignDocument,
+    key,
+  );
 }
 
 async function drag(youtube: Page, element: Locator, dx: number, dy: number) {
@@ -62,24 +73,52 @@ async function controls(page: Page, image: Locator) {
 }
 
 async function assets(context: BrowserContext) {
-  const worker = context.serviceWorkers().find((entry) => entry.url().includes('background/index.js')) ?? await context.waitForEvent('serviceworker');
-  return worker.evaluate(async () => new Promise<Array<{ id: string; bytes: number; mime: string; leases: number }>>((resolve, reject) => {
-    const request = indexedDB.open('web-world-themes-assets', 1);
-    request.onerror = () => reject(request.error);
-    request.onsuccess = () => {
-      const db = request.result, rows = db.transaction('assets').objectStore('assets').getAll();
-      rows.onsuccess = () => { resolve(rows.result.map((row) => ({ id: row.id as string, bytes: (row.blob as Blob).size, mime: row.mime as string, leases: (row.leases as unknown[]).length }))); db.close(); };
-      rows.onerror = () => { reject(rows.error); db.close(); };
-    };
-  }));
+  const worker =
+    context.serviceWorkers().find((entry) => entry.url().includes('background/index.js')) ??
+    (await context.waitForEvent('serviceworker'));
+  return worker.evaluate(
+    async () =>
+      new Promise<Array<{ id: string; bytes: number; mime: string; leases: number }>>((resolve, reject) => {
+        const request = indexedDB.open('web-world-themes-assets', 1);
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => {
+          const db = request.result,
+            rows = db.transaction('assets').objectStore('assets').getAll();
+          rows.onsuccess = () => {
+            resolve(
+              rows.result.map((row) => ({
+                id: row.id as string,
+                bytes: (row.blob as Blob).size,
+                mime: row.mime as string,
+                leases: (row.leases as unknown[]).length,
+              })),
+            );
+            db.close();
+          };
+          rows.onerror = () => {
+            reject(rows.error);
+            db.close();
+          };
+        };
+      }),
+  );
 }
 
-test('import a transparent image, drag and resize it, save, reload and restart with extension-owned image data', async ({ popup, youtube, context, profile, extensionId }) => {
+test('import a transparent image, drag and resize it, save, reload and restart with extension-owned image data', async ({
+  popup,
+  youtube,
+  context,
+  profile,
+  extensionId,
+}) => {
   const dialog = await open(popup, youtube);
   const image = await importImage(dialog, youtube);
   const alpha = await image.locator('img').evaluate((node: HTMLImageElement) => {
-    const canvas = document.createElement('canvas'); canvas.width = node.naturalWidth; canvas.height = node.naturalHeight;
-    const ctx = canvas.getContext('2d')!; ctx.drawImage(node, 0, 0);
+    const canvas = document.createElement('canvas');
+    canvas.width = node.naturalWidth;
+    canvas.height = node.naturalHeight;
+    const ctx = canvas.getContext('2d')!;
+    ctx.drawImage(node, 0, 0);
     return [ctx.getImageData(0, 0, 1, 1).data[3], ctx.getImageData(32, 20, 1, 1).data[3]];
   });
   expect(alpha).toEqual([0, 255]);
@@ -106,50 +145,85 @@ test('import a transparent image, drag and resize it, save, reload and restart w
   await context.close();
   const restarted = await launchExtension(profile);
   try {
-    const page = await restarted.newPage(); await page.goto('https://www.youtube.com/');
+    const page = await restarted.newPage();
+    await page.goto('https://www.youtube.com/');
     await expect(page.locator(layers).locator('img')).toBeVisible();
     expect((await page.locator(layers).boundingBox())!.width).toBeCloseTo(persisted.placement.widthPx, 0);
-    const nextPopup = await restarted.newPage(); await nextPopup.goto(`chrome-extension://${extensionId}/popup/index.html`);
+    const nextPopup = await restarted.newPage();
+    await nextPopup.goto(`chrome-extension://${extensionId}/popup/index.html`);
     expect((await stored(nextPopup)).decorations[0]).toEqual(persisted);
-  } finally { await restarted.close(); }
+  } finally {
+    await restarted.close();
+  }
 });
 
-test('file selection and drop accept multiple PNG/WebP layers and each edits independently', async ({ popup, youtube, context }) => {
+test('file selection and drop accept multiple PNG/WebP layers and each edits independently', async ({
+  popup,
+  youtube,
+  context,
+}) => {
   const dialog = await open(popup, youtube);
-  const png = await raster(youtube), webp = await raster(youtube, 'image/webp');
+  const png = await raster(youtube),
+    webp = await raster(youtube, 'image/webp');
   await dialog.getByLabel('画像素材を追加').setInputFiles([png, webp]);
   await expect(youtube.locator(layers)).toHaveCount(2);
   await expect(youtube.locator(layers).last().locator('img')).toBeVisible();
   await dialog.getByLabel('画像の不透明度').fill('40');
-  await dialog.locator('[data-layer-id]').first().getByRole('button', { name: 'レイヤーを並び替え' }).dragTo(dialog.locator('[data-layer-id]').last(), { targetPosition: { x: 40, y: 40 } });
+  await dialog
+    .locator('[data-layer-id]')
+    .first()
+    .getByRole('button', { name: 'レイヤーを並び替え' })
+    .dragTo(dialog.locator('[data-layer-id]').last(), { targetPosition: { x: 40, y: 40 } });
   await dialog.getByLabel('画像の角度').fill('35');
   await expect(youtube.locator(layers).last().locator('.media')).toHaveCSS('opacity', '0.4');
   await expect(youtube.locator(layers).first().locator('.media')).toHaveCSS('opacity', '1');
-  await dialog.locator('[data-layer-id][data-selected]').getByRole('button', { name: '非表示にする', exact: true }).click();
+  await dialog
+    .locator('[data-layer-id][data-selected]')
+    .getByRole('button', { name: '非表示にする', exact: true })
+    .click();
   await expect(youtube.locator(layers).last()).toBeHidden();
   await dialog.locator('[data-layer-id][data-selected]').getByRole('button', { name: '表示する', exact: true }).click();
   await expect(youtube.locator(layers).last()).toBeVisible();
-  await youtube.evaluate(({ base64 }) => {
-    const bytes = Uint8Array.from(atob(base64), (char) => char.charCodeAt(0));
-    const transfer = new DataTransfer(); transfer.items.add(new File([bytes], 'dropped.png', { type: 'image/png' }));
-    document.dispatchEvent(new DragEvent('drop', { dataTransfer: transfer, clientX: 300, clientY: 300, bubbles: true, cancelable: true }));
-  }, { base64: png.buffer.toString('base64') });
+  await youtube.evaluate(
+    ({ base64 }) => {
+      const bytes = Uint8Array.from(atob(base64), (char) => char.charCodeAt(0));
+      const transfer = new DataTransfer();
+      transfer.items.add(new File([bytes], 'dropped.png', { type: 'image/png' }));
+      document.dispatchEvent(
+        new DragEvent('drop', { dataTransfer: transfer, clientX: 300, clientY: 300, bubbles: true, cancelable: true }),
+      );
+    },
+    { base64: png.buffer.toString('base64') },
+  );
   await expect(youtube.locator(layers)).toHaveCount(3);
   await expect(youtube.locator(layers).last().locator('img')).toBeVisible();
   expect(await assets(context)).toHaveLength(2); // The duplicate PNG shares one immutable asset.
   await save(dialog);
-  expect((await stored(popup)).decorations.map(({ opacity, zIndex, placement }) => [opacity, zIndex, placement.rotationDeg])).toEqual([[1, 1, 0], [.4, 0, 35], [1, 2, 0]]);
+  expect(
+    (await stored(popup)).decorations.map(({ opacity, zIndex, placement }) => [opacity, zIndex, placement.rotationDeg]),
+  ).toEqual([
+    [1, 1, 0],
+    [0.4, 0, 35],
+    [1, 2, 0],
+  ]);
 });
 
-test('rotation handle, Delete, discard and close preserve saved layers and collect abandoned imports', async ({ popup, youtube, context }) => {
+test('rotation handle, Delete, discard and close preserve saved layers and collect abandoned imports', async ({
+  popup,
+  youtube,
+  context,
+}) => {
   const dialog = await open(popup, youtube);
   let image = await importImage(dialog, youtube);
   await save(dialog);
   const handle = (await controls(youtube, image)).getByRole('button', { name: '画像を回転' });
-  const box = (await image.boundingBox())!, grip = (await handle.boundingBox())!;
+  const box = (await image.boundingBox())!,
+    grip = (await handle.boundingBox())!;
   await withCanvas(youtube, async () => {
-    await youtube.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2); await youtube.mouse.down();
-    await youtube.mouse.move(box.x + box.width + 40, box.y + box.height / 2, { steps: 8 }); await youtube.mouse.up();
+    await youtube.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2);
+    await youtube.mouse.down();
+    await youtube.mouse.move(box.x + box.width + 40, box.y + box.height / 2, { steps: 8 });
+    await youtube.mouse.up();
   });
   expect(Number(await dialog.getByLabel('画像の角度').inputValue())).toBeGreaterThan(60);
   await youtube.keyboard.press('Delete');
@@ -163,24 +237,29 @@ test('rotation handle, Delete, discard and close preserve saved layers and colle
   await expect.poll(async () => (await assets(context)).length).toBe(1);
   const again = await open(popup, youtube);
   await again.getByRole('group', { name: '画像レイヤー' }).getByRole('button').first().click();
-  await again.getByRole('button', { name: '画像を削除' }).click(); await save(again);
+  await again.getByRole('button', { name: '画像を削除' }).click();
+  await save(again);
   await expect(youtube.locator(overlay)).toHaveCount(0);
   expect(await assets(context)).toHaveLength(1); // Retained for Undo even after saving.
   await again.getByRole('button', { name: '編集を終了' }).click();
   await expect.poll(async () => (await assets(context)).length).toBe(0);
 });
 
-test('normal decoration is click-through; OFF and zero remove images and ON restores saved geometry', async ({ popup, youtube }) => {
+test('normal decoration is click-through; OFF and zero remove images and ON restores saved geometry', async ({
+  popup,
+  youtube,
+}) => {
   const dialog = await open(popup, youtube);
   await importImage(dialog, youtube);
   const link = youtube.locator('[data-ww-surface~="video-card"]').first().locator('a').first();
   const box = (await link.boundingBox())!;
-  await dialog.getByLabel('画像のX位置').fill(String(Math.round((box.x + box.width / 2) / 1100 * 10_000) / 100));
-  await dialog.getByLabel('画像のY位置').fill(String(Math.round((box.y + box.height / 2) / 760 * 10_000) / 100));
+  await dialog.getByLabel('画像のX位置').fill(String(Math.round(((box.x + box.width / 2) / 1100) * 10_000) / 100));
+  await dialog.getByLabel('画像のY位置').fill(String(Math.round(((box.y + box.height / 2) / 760) * 10_000) / 100));
   await save(dialog);
   await dialog.getByRole('button', { name: '編集を終了' }).click();
   await expect(youtube.locator(`${overlay} .handle`).first()).toBeHidden();
-  await link.click(); await expect(youtube).toHaveURL(/\/watch\?/);
+  await link.click();
+  await expect(youtube).toHaveURL(/\/watch\?/);
   await expect(youtube.locator(layers).locator('img')).toBeVisible();
   for (const boundary of ['off', 'zero'] as const) {
     if (boundary === 'off') await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
@@ -192,18 +271,27 @@ test('normal decoration is click-through; OFF and zero remove images and ON rest
   }
 });
 
-test('viewport placement follows resizing without scroll drift; player anchors follow SPA and disappear when absent', async ({ popup, youtube }) => {
+test('viewport placement follows resizing without scroll drift; player anchors follow SPA and disappear when absent', async ({
+  popup,
+  youtube,
+}) => {
   const dialog = await open(popup, youtube);
   const image = await importImage(dialog, youtube);
   await save(dialog);
   const placement = (await stored(popup)).decorations[0]!.placement;
   await youtube.setViewportSize({ width: 1360, height: 920 });
-  await expect.poll(async () => { const box = (await image.boundingBox())!; return Math.round(box.x + box.width / 2); }).toBe(Math.round(1360 * placement.x));
+  await expect
+    .poll(async () => {
+      const box = (await image.boundingBox())!;
+      return Math.round(box.x + box.width / 2);
+    })
+    .toBe(Math.round(1360 * placement.x));
   const resized = (await image.boundingBox())!;
   await youtube.evaluate(() => window.scrollTo(0, 300));
   expect((await image.boundingBox())!.y).toBeCloseTo(resized.y, 0);
   await dialog.getByRole('button', { name: 'パネルを左へ' }).click();
-  await youtube.locator('#navigate').click(); await expect(youtube).toHaveURL(/\/watch\?/);
+  await youtube.locator('#navigate').click();
+  await expect(youtube).toHaveURL(/\/watch\?/);
   const beforeAnchor = (await image.boundingBox())!;
   await dialog.getByLabel('配置の基準').selectOption('video-player');
   await save(dialog);
@@ -214,33 +302,71 @@ test('viewport placement follows resizing without scroll drift; player anchors f
   await expect(image).toBeHidden();
 });
 
-test('invalid files and missing assets fail without saving corrupt JSON or disturbing existing content', async ({ popup, youtube }) => {
+test('invalid files and missing assets fail without saving corrupt JSON or disturbing existing content', async ({
+  popup,
+  youtube,
+}) => {
   const dialog = await open(popup, youtube);
-  await dialog.getByLabel('画像素材を追加').setInputFiles({ name: 'script.png', mimeType: 'image/png', buffer: Buffer.from('<svg onload="alert(1)"></svg>') });
+  await dialog
+    .getByLabel('画像素材を追加')
+    .setInputFiles({ name: 'script.png', mimeType: 'image/png', buffer: Buffer.from('<svg onload="alert(1)"></svg>') });
   await expect(dialog.locator('.status')).toContainText('静止PNG');
   await expect(youtube.locator(layers)).toHaveCount(0);
-  await dialog.getByLabel('画像素材を追加').setInputFiles({ name: 'huge.png', mimeType: 'image/png', buffer: Buffer.alloc(32 * 1024 * 1024 + 1) });
+  await dialog
+    .getByLabel('画像素材を追加')
+    .setInputFiles({ name: 'huge.png', mimeType: 'image/png', buffer: Buffer.alloc(32 * 1024 * 1024 + 1) });
   await expect(dialog.locator('.status')).toContainText('32MiB');
-  expect(await popup.evaluate(async (designKey) => (await chrome.storage.local.get(designKey))[designKey], key)).toBeUndefined();
-  const response = await popup.evaluate(async () => chrome.runtime.sendMessage({ type: 'web-world-themes:assets', action: 'save', session: 'session-test', design: {
-    schemaVersion: 2, id: 'missing', siteId: 'youtube', baseThemeId: 'retro', rules: [], decorations: [{
-      kind: 'image', id: 'image-missing', assetId: `asset-${'0'.repeat(64)}`, name: 'missing.png',
-      placement: { anchor: { kind: 'viewport' }, x: .5, y: .5, widthPx: 100, heightPx: 100, rotationDeg: 0 }, opacity: 1, zIndex: 0, visible: true,
-    }],
-  } }));
+  expect(
+    await popup.evaluate(async (designKey) => (await chrome.storage.local.get(designKey))[designKey], key),
+  ).toBeUndefined();
+  const response = await popup.evaluate(async () =>
+    chrome.runtime.sendMessage({
+      type: 'web-world-themes:assets',
+      action: 'save',
+      session: 'session-test',
+      design: {
+        schemaVersion: 2,
+        id: 'missing',
+        siteId: 'youtube',
+        baseThemeId: 'retro',
+        rules: [],
+        decorations: [
+          {
+            kind: 'image',
+            id: 'image-missing',
+            assetId: `asset-${'0'.repeat(64)}`,
+            name: 'missing.png',
+            placement: { anchor: { kind: 'viewport' }, x: 0.5, y: 0.5, widthPx: 100, heightPx: 100, rotationDeg: 0 },
+            opacity: 1,
+            zIndex: 0,
+            visible: true,
+          },
+        ],
+      },
+    }),
+  );
   expect(response.ok).toBe(false);
-  expect(await popup.evaluate(async (designKey) => (await chrome.storage.local.get(designKey))[designKey], key)).toBeUndefined();
+  expect(
+    await popup.evaluate(async (designKey) => (await chrome.storage.local.get(designKey))[designKey], key),
+  ).toBeUndefined();
 });
 
-test('saved images sync across tabs and a foreign deletion cannot collect another tab draft', async ({ popup, youtube, context }) => {
+test('saved images sync across tabs and a foreign deletion cannot collect another tab draft', async ({
+  popup,
+  youtube,
+  context,
+}) => {
   const first = await open(popup, youtube);
-  await importImage(first, youtube); await save(first);
-  const secondPage = await context.newPage(); await secondPage.goto('https://www.youtube.com/');
+  await importImage(first, youtube);
+  await save(first);
+  const secondPage = await context.newPage();
+  await secondPage.goto('https://www.youtube.com/');
   await expect(secondPage.locator(layers).locator('img')).toBeVisible();
   const second = await open(popup, secondPage);
   await second.getByRole('group', { name: '画像レイヤー' }).getByRole('button').first().click();
   await second.getByLabel('画像の不透明度').fill('60');
-  await first.getByRole('button', { name: '画像を削除' }).click(); await save(first);
+  await first.getByRole('button', { name: '画像を削除' }).click();
+  await save(first);
   await expect(second.locator('.status')).toContainText('別のタブで保存されました');
   await expect(secondPage.locator(layers).locator('.media')).toHaveCSS('opacity', '0.6');
   expect(await assets(context)).toHaveLength(1);
@@ -251,7 +377,11 @@ test('saved images sync across tabs and a foreign deletion cannot collect anothe
   await expect.poll(async () => (await assets(context)).length).toBe(0);
 });
 
-test('turning the theme OFF while a save waits for asset retention still completes that save', async ({ popup, youtube, context }) => {
+test('turning the theme OFF while a save waits for asset retention still completes that save', async ({
+  popup,
+  youtube,
+  context,
+}) => {
   const dialog = await open(popup, youtube);
   await dialog.getByLabel('画像素材を追加').setInputFiles([await raster(youtube), await raster(youtube, 'image/webp')]);
   await expect(youtube.locator(layers)).toHaveCount(2);
@@ -263,17 +393,27 @@ test('turning the theme OFF while a save waits for asset retention still complet
     chrome.tabs.query = (async (query: chrome.tabs.QueryInfo) => {
       if (!held) {
         held = true;
-        await new Promise<void>((resolve) => { (globalThis as typeof globalThis & { resumeAssetPrune?: () => void }).resumeAssetPrune = resolve; });
+        await new Promise<void>((resolve) => {
+          (globalThis as typeof globalThis & { resumeAssetPrune?: () => void }).resumeAssetPrune = resolve;
+        });
       }
       return original(query);
     }) as typeof chrome.tabs.query;
   });
   await dialog.getByRole('button', { name: '画像を削除' }).click();
   await dialog.getByRole('button', { name: '保存', exact: true }).click();
-  await expect.poll(() => worker.evaluate(() => Boolean((globalThis as typeof globalThis & { resumeAssetPrune?: () => void }).resumeAssetPrune))).toBe(true);
+  await expect
+    .poll(() =>
+      worker.evaluate(() =>
+        Boolean((globalThis as typeof globalThis & { resumeAssetPrune?: () => void }).resumeAssetPrune),
+      ),
+    )
+    .toBe(true);
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
   await expect(youtube.locator(overlay)).toHaveCount(0);
-  await worker.evaluate(() => { (globalThis as typeof globalThis & { resumeAssetPrune?: () => void }).resumeAssetPrune?.(); });
+  await worker.evaluate(() => {
+    (globalThis as typeof globalThis & { resumeAssetPrune?: () => void }).resumeAssetPrune?.();
+  });
   await expect.poll(async () => (await stored(popup)).decorations.length).toBe(1);
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   await expect(youtube.locator(layers)).toHaveCount(1);

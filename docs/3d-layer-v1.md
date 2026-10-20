@@ -35,15 +35,15 @@ Three.js 0.186.1と型定義0.186.0を固定し、拡張機能内へバンドル
 
 ## 実装した構造
 
-| モジュール | 責務 |
-| --- | --- |
-| `src/assets/glb.ts`, `decode.ts` | GLBの境界・参照・展開量の検査、埋め込み画像の実デコードと解放 |
-| `src/models/types.ts` | クリップ・ボーン情報と作者設定の検証。DOM/Chrome/Three.jsに依存しない |
-| `src/world/models.ts` | クリップの時計、二つのクリップのフェード、速度による切替、向きと視線の評価 |
-| `src/world/clock.ts` | 再読み込み前のテイクから若いHost時計へ戻る場合の時刻補正 |
-| `src/renderers/three/models.ts` | ページ共有WebGL、アセット参照数、透明面への転送、予算、復旧・解放、計測 |
-| `src/renderers/three/rig-player.ts` | Runtimeの時刻をAnimationMixerへ反映。In-place処理と視線の加算 |
-| `src/editor/model-panel.ts` | 全Studioで共用する3D設定。既存の編集コマンドと履歴を使う |
+| モジュール                          | 責務                                                                       |
+| ----------------------------------- | -------------------------------------------------------------------------- |
+| `src/assets/glb.ts`, `decode.ts`    | GLBの境界・参照・展開量の検査、埋め込み画像の実デコードと解放              |
+| `src/models/types.ts`               | クリップ・ボーン情報と作者設定の検証。DOM/Chrome/Three.jsに依存しない      |
+| `src/world/models.ts`               | クリップの時計、二つのクリップのフェード、速度による切替、向きと視線の評価 |
+| `src/world/clock.ts`                | 再読み込み前のテイクから若いHost時計へ戻る場合の時刻補正                   |
+| `src/renderers/three/models.ts`     | ページ共有WebGL、アセット参照数、透明面への転送、予算、復旧・解放、計測    |
+| `src/renderers/three/rig-player.ts` | Runtimeの時刻をAnimationMixerへ反映。In-place処理と視線の加算              |
+| `src/editor/model-panel.ts`         | 全Studioで共用する3D設定。既存の編集コマンドと履歴を使う                   |
 
 Runtimeは1.3.0。既存の1.0/1.1/1.2開発記録、1.1/1.2テイクを読み込む。新しいモデル状態を含まない2D作品では、旧評価との比較テストを維持している。通常の再読み込みでは選択クリップを先頭から再生し、途中のポーズを確認したい場合は保存したテイクを使う。
 

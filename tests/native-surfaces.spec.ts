@@ -17,12 +17,19 @@ const textSelectors = [
   'ytd-playlist-panel-video-renderer[selected] #byline',
 ];
 const geometrySelectors = [
-  '#player-container-outer', '#player-container-inner', '#player-container',
-  'ytd-player', 'ytd-player > #container', '#movie_player', '.html5-main-video',
+  '#player-container-outer',
+  '#player-container-inner',
+  '#player-container',
+  'ytd-player',
+  'ytd-player > #container',
+  '#movie_player',
+  '.html5-main-video',
 ];
 
 async function capture(page: Page, testInfo: TestInfo, name: string) {
-  await page.evaluate(async () => { await document.fonts.ready; });
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+  });
   const path = testInfo.outputPath(`${name}.png`);
   await page.screenshot({ path, fullPage: false, animations: 'disabled' });
   await testInfo.attach(name, { path, contentType: 'image/png' });
@@ -36,29 +43,36 @@ async function assertContrast(page: Page, selector: string, minimum = 4.5, svg =
 }
 
 async function brandPaint(page: Page) {
-  return page.locator('#fixture-play-red, #fixture-play-white').evaluateAll(elements => elements.map(element => ({
-    fill: getComputedStyle(element).fill, filter: getComputedStyle(element).filter,
-  })));
+  return page.locator('#fixture-play-red, #fixture-play-white').evaluateAll((elements) =>
+    elements.map((element) => ({
+      fill: getComputedStyle(element).fill,
+      filter: getComputedStyle(element).filter,
+    })),
+  );
 }
 
 async function videoPixels(page: Page) {
-  await page.locator('video').evaluate(element => element.scrollIntoView({ block: 'center' }));
+  await page.locator('video').evaluate((element) => element.scrollIntoView({ block: 'center' }));
   const rect = await page.locator('video').boundingBox();
   expect(rect).not.toBeNull();
   // Stay well inside media pixels, away from frames, native buttons, and overlays.
-  const points = [0.2, 0.4, 0.6].flatMap(y => [0.2, 0.4, 0.6].map(x => ({
-    x: Math.floor(rect!.x + rect!.width * x), y: Math.floor(rect!.y + rect!.height * y),
-  })));
+  const points = [0.2, 0.4, 0.6].flatMap((y) =>
+    [0.2, 0.4, 0.6].map((x) => ({
+      x: Math.floor(rect!.x + rect!.width * x),
+      y: Math.floor(rect!.y + rect!.height * y),
+    })),
+  );
   return pixels(page, await page.screenshot({ scale: 'css', animations: 'disabled' }), points);
 }
 
 async function assertPanePainted(page: Page, selector: string) {
   const bar = page.locator(selector);
   await bar.scrollIntoViewIfNeeded();
-  const probes = await bar.evaluate(element => {
+  const probes = await bar.evaluate((element) => {
     const rect = element.getBoundingClientRect();
-    return [0.1, 0.5, 0.9].map(fraction => {
-      const x = rect.left + rect.width * fraction, y = rect.top + rect.height / 2;
+    return [0.1, 0.5, 0.9].map((fraction) => {
+      const x = rect.left + rect.width * fraction,
+        y = rect.top + rect.height / 2;
       const hit = document.elementFromPoint(x, y);
       return { x, y, painted: Boolean(hit && element.contains(hit)), hit: hit ? `${hit.tagName}#${hit.id}` : null };
     });
@@ -71,7 +85,7 @@ async function assertPlaylistFit(page: Page, collapsed: boolean) {
   await panel.evaluate((element, collapsed) => element.toggleAttribute('collapsed', collapsed), collapsed);
   await panel.scrollIntoViewIfNeeded();
   await assertPanePainted(page, '#web-world-themes-playlist-titlebar');
-  const measurements = await panel.evaluate(element => {
+  const measurements = await panel.evaluate((element) => {
     const bar = element.querySelector<HTMLElement>('#web-world-themes-playlist-titlebar')!;
     const container = element.querySelector<HTMLElement>(':scope > #container')!;
     const header = element.querySelector<HTMLElement>('.header')!;
@@ -81,13 +95,21 @@ async function assertPlaylistFit(page: Page, collapsed: boolean) {
       return { top: box.top, bottom: box.bottom, left: box.left, right: box.right, height: box.height };
     };
     const title = bar.querySelector('.ww-pane-title')!;
-    const titleRange = document.createRange(); titleRange.selectNodeContents(title);
+    const titleRange = document.createRange();
+    titleRange.selectNodeContents(title);
     const titleBox = titleRange.getBoundingClientRect();
     return {
-      panel: rect(element), bar: rect(bar), container: rect(container), header: rect(header), items: rect(items),
-      expectedBarHeight: Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ww-pane-titlebar-height')),
+      panel: rect(element),
+      bar: rect(bar),
+      container: rect(container),
+      header: rect(header),
+      items: rect(items),
+      expectedBarHeight: Number.parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue('--ww-pane-titlebar-height'),
+      ),
       title: { top: titleBox.top, bottom: titleBox.bottom },
-      itemsClientHeight: items.clientHeight, itemsScrollHeight: items.scrollHeight,
+      itemsClientHeight: items.clientHeight,
+      itemsScrollHeight: items.scrollHeight,
     };
   });
   expect(measurements.bar.height).toBeCloseTo(measurements.expectedBarHeight, 1);
@@ -114,8 +136,13 @@ async function assertHeaderAndWidth(page: Page) {
     const chrome = document.querySelector('#web-world-themes-window-chrome')!.getBoundingClientRect();
     const manager = document.querySelector('ytd-page-manager')!.getBoundingClientRect();
     return {
-      scrollY, headerTop: header.top, headerBottom: header.bottom, toolbarTop: toolbar.top,
-      chromeBottom: chrome.bottom, managerTop: manager.top, width: innerWidth,
+      scrollY,
+      headerTop: header.top,
+      headerBottom: header.bottom,
+      toolbarTop: toolbar.top,
+      chromeBottom: chrome.bottom,
+      managerTop: manager.top,
+      width: innerWidth,
       scrollWidth: document.documentElement.scrollWidth,
     };
   });
@@ -127,12 +154,15 @@ async function assertHeaderAndWidth(page: Page) {
 
 for (const dark of [false, true]) {
   for (const strength of [1, 60, 100]) {
-    test(`native ${dark ? 'dark' : 'light'} surfaces keep real paint readable at ${strength}%`, async ({ popup, youtube }, testInfo) => {
+    test(`native ${dark ? 'dark' : 'light'} surfaces keep real paint readable at ${strength}%`, async ({
+      popup,
+      youtube,
+    }, testInfo) => {
       test.setTimeout(90_000);
       await youtube.setViewportSize({ width: 1360, height: 920 });
       await installNativeYouTube(youtube, dark);
       const nativeBrand = await brandPaint(youtube);
-      expect(nativeBrand.map(part => part.fill)).toEqual(['rgb(255, 0, 51)', 'rgb(255, 255, 255)']);
+      expect(nativeBrand.map((part) => part.fill)).toEqual(['rgb(255, 0, 51)', 'rgb(255, 255, 255)']);
       await setNativeTheme(popup, true, strength);
       await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
       await expect(youtube.locator('html')).toHaveAttribute('data-ww-mode', dark ? 'dark' : 'light');
@@ -166,51 +196,111 @@ for (const dark of [false, true]) {
 }
 
 for (const dark of [false, true]) {
-  test(`native ${dark ? 'dark' : 'light'} geometry and paint restore after zero and OFF`, async ({ popup, youtube }, testInfo) => {
+  test(`native ${dark ? 'dark' : 'light'} geometry and paint restore after zero and OFF`, async ({
+    popup,
+    youtube,
+  }, testInfo) => {
     test.setTimeout(90_000);
     await youtube.setViewportSize({ width: 1360, height: 920 });
     await installNativeYouTube(youtube, dark);
     await youtube.getByRole('button', { name: 'Play', exact: true }).click();
-    await expect.poll(() => youtube.locator('video').evaluate(element => (element as HTMLVideoElement).currentTime)).toBeGreaterThan(0);
+    await expect
+      .poll(() => youtube.locator('video').evaluate((element) => (element as HTMLVideoElement).currentTime))
+      .toBeGreaterThan(0);
     await youtube.getByRole('button', { name: 'Pause', exact: true }).click();
     const nativePixels = await videoPixels(youtube);
-    expect(new Set(nativePixels.map(pixel => pixel.join(','))).size, 'The media probe must contain actual artwork, not an all-black frame').toBeGreaterThan(1);
-    const native = await youtube.evaluateHandle(selectors => selectors.map(selector => {
-      const element = document.querySelector(selector)!;
-      const { width, height } = element.getBoundingClientRect();
-      const style = getComputedStyle(element);
-      return { element, parent: element.parentElement, width, height, filter: style.filter, transform: style.transform, objectFit: style.objectFit };
-    }), geometrySelectors);
-    const snapshot = () => youtube.evaluate(() => {
-      const selectors = [
-        'ytd-app', '#columns', '#primary', '#below', '#cinematics', '#cinematics .box',
-        '#guide-icon', '#youtube-paths_yt5', '#fixture-current-title', '#owner',
-        'ytd-comments-header-renderer', 'ytd-playlist-panel-renderer',
-        'ytd-playlist-panel-video-renderer:not([selected]) #byline',
-      ];
-      return selectors.map(selector => {
-        const node = document.querySelector(selector)!;
-        const style = getComputedStyle(node);
-        return { selector, color: style.color, background: style.backgroundColor, fill: style.fill, display: style.display, borderRadius: style.borderRadius };
+    expect(
+      new Set(nativePixels.map((pixel) => pixel.join(','))).size,
+      'The media probe must contain actual artwork, not an all-black frame',
+    ).toBeGreaterThan(1);
+    const native = await youtube.evaluateHandle(
+      (selectors) =>
+        selectors.map((selector) => {
+          const element = document.querySelector(selector)!;
+          const { width, height } = element.getBoundingClientRect();
+          const style = getComputedStyle(element);
+          return {
+            element,
+            parent: element.parentElement,
+            width,
+            height,
+            filter: style.filter,
+            transform: style.transform,
+            objectFit: style.objectFit,
+          };
+        }),
+      geometrySelectors,
+    );
+    const snapshot = () =>
+      youtube.evaluate(() => {
+        const selectors = [
+          'ytd-app',
+          '#columns',
+          '#primary',
+          '#below',
+          '#cinematics',
+          '#cinematics .box',
+          '#guide-icon',
+          '#youtube-paths_yt5',
+          '#fixture-current-title',
+          '#owner',
+          'ytd-comments-header-renderer',
+          'ytd-playlist-panel-renderer',
+          'ytd-playlist-panel-video-renderer:not([selected]) #byline',
+        ];
+        return selectors.map((selector) => {
+          const node = document.querySelector(selector)!;
+          const style = getComputedStyle(node);
+          return {
+            selector,
+            color: style.color,
+            background: style.backgroundColor,
+            fill: style.fill,
+            display: style.display,
+            borderRadius: style.borderRadius,
+          };
+        });
       });
-    });
     const nativePaint = await snapshot();
     const nativeBrand = await brandPaint(youtube);
     const assertGeometry = async () => {
-      expect(await youtube.evaluate(records => records.map(({ element, parent, width, height, filter, transform, objectFit }) => {
-        const box = element.getBoundingClientRect(), style = getComputedStyle(element);
-        return {
-          connected: element.isConnected, sameParent: element.parentElement === parent,
-          widthDelta: Math.abs(box.width - width), heightDelta: Math.abs(box.height - height),
-          sameFilter: style.filter === filter, sameTransform: style.transform === transform, sameObjectFit: style.objectFit === objectFit,
-        };
-      }), native)).toEqual(geometrySelectors.map(() => ({
-        connected: true, sameParent: true, widthDelta: 0, heightDelta: 0,
-        sameFilter: true, sameTransform: true, sameObjectFit: true,
-      })));
+      expect(
+        await youtube.evaluate(
+          (records) =>
+            records.map(({ element, parent, width, height, filter, transform, objectFit }) => {
+              const box = element.getBoundingClientRect(),
+                style = getComputedStyle(element);
+              return {
+                connected: element.isConnected,
+                sameParent: element.parentElement === parent,
+                widthDelta: Math.abs(box.width - width),
+                heightDelta: Math.abs(box.height - height),
+                sameFilter: style.filter === filter,
+                sameTransform: style.transform === transform,
+                sameObjectFit: style.objectFit === objectFit,
+              };
+            }),
+          native,
+        ),
+      ).toEqual(
+        geometrySelectors.map(() => ({
+          connected: true,
+          sameParent: true,
+          widthDelta: 0,
+          heightDelta: 0,
+          sameFilter: true,
+          sameTransform: true,
+          sameObjectFit: true,
+        })),
+      );
       const layout = await youtube.evaluate(() => {
         const rect = (selector: string) => document.querySelector(selector)?.getBoundingClientRect();
-        return { playerBottom: rect('#movie_player')!.bottom, belowTop: rect('#below')!.top, barBottom: rect('#web-world-themes-player-titlebar')?.bottom ?? null, outerTop: rect('#player-container-outer')!.top };
+        return {
+          playerBottom: rect('#movie_player')!.bottom,
+          belowTop: rect('#below')!.top,
+          barBottom: rect('#web-world-themes-player-titlebar')?.bottom ?? null,
+          outerTop: rect('#player-container-outer')!.top,
+        };
       });
       expect(layout.belowTop).toBeGreaterThanOrEqual(layout.playerBottom - 1);
       if (layout.barBottom !== null) expect(layout.barBottom).toBeLessThanOrEqual(layout.outerTop + 1);
@@ -219,13 +309,20 @@ for (const dark of [false, true]) {
     for (const strength of [1, 60, 100]) {
       await setNativeTheme(popup, true, strength);
       await expect(youtube.locator('#web-world-themes-player-titlebar')).toBeVisible();
-      expect(await youtube.locator('#web-world-themes-player-titlebar').evaluate(element => element.nextElementSibling?.id)).toBe('player');
+      expect(
+        await youtube
+          .locator('#web-world-themes-player-titlebar')
+          .evaluate((element) => element.nextElementSibling?.id),
+      ).toBe('player');
       await expect(youtube.locator('#player-container-outer #web-world-themes-player-titlebar')).toHaveCount(0);
       await expect(youtube.locator('#cinematics')).not.toBeVisible();
       await assertPanePainted(youtube, '#web-world-themes-player-titlebar');
       await assertGeometry();
     }
-    for (const state of [{ enabled: true, strength: 0, label: 'zero' }, { enabled: false, strength: 60, label: 'off' }]) {
+    for (const state of [
+      { enabled: true, strength: 0, label: 'zero' },
+      { enabled: false, strength: 60, label: 'off' },
+    ]) {
       await setNativeTheme(popup, true, 60);
       await expect(youtube.locator('#web-world-themes-player-titlebar')).toHaveCount(1);
       await setNativeTheme(popup, state.enabled, state.strength);
@@ -236,7 +333,7 @@ for (const dark of [false, true]) {
       }
       expect(await snapshot()).toEqual(nativePaint);
       expect(await brandPaint(youtube)).toEqual(nativeBrand);
-      expect(await youtube.locator('html').evaluate(element => element.hasAttribute('dark'))).toBe(dark);
+      expect(await youtube.locator('html').evaluate((element) => element.hasAttribute('dark'))).toBe(dark);
       await assertGeometry();
       const nativeText = await assertContrast(youtube, '#fixture-current-title');
       if (dark) expect(nativeText.backgroundLuminance).toBeLessThan(0.05);
@@ -247,7 +344,10 @@ for (const dark of [false, true]) {
   });
 }
 
-test('native narrow watch remains readable and unclipped at 900px while scrolling', async ({ popup, youtube }, testInfo) => {
+test('native narrow watch remains readable and unclipped at 900px while scrolling', async ({
+  popup,
+  youtube,
+}, testInfo) => {
   test.setTimeout(90_000);
   await youtube.setViewportSize({ width: 900, height: 760 });
   await installNativeYouTube(youtube, true);
@@ -278,7 +378,6 @@ test('native narrow watch remains readable and unclipped at 900px while scrollin
   await capture(youtube, testInfo, 'native-dark-900-scroll-454');
 });
 
-
 test('native playback-error overlay cannot cover the added player titlebar', async ({ popup, youtube }, testInfo) => {
   test.setTimeout(60_000);
   await youtube.setViewportSize({ width: 1360, height: 920 });
@@ -300,22 +399,35 @@ test('native playback-error overlay cannot cover the added player titlebar', asy
       const playerRect = errorParent!.getBoundingClientRect();
       const barRect = document.querySelector('#web-world-themes-player-titlebar')!.getBoundingClientRect();
       return {
-        sameVideo: document.querySelector('video') === video, sameParent: video.parentElement === parent,
-        sameError: document.querySelector('#error-screen') === error, sameErrorParent: error.parentElement === errorParent,
-        widthDelta: videoRect.width - width, heightDelta: videoRect.height - height,
-        barBottom: barRect.bottom, errorTop: errorRect.top,
-        errorMatchesPlayer: errorRect.top === playerRect.top && errorRect.bottom === playerRect.bottom
-          && errorRect.left === playerRect.left && errorRect.right === playerRect.right,
+        sameVideo: document.querySelector('video') === video,
+        sameParent: video.parentElement === parent,
+        sameError: document.querySelector('#error-screen') === error,
+        sameErrorParent: error.parentElement === errorParent,
+        widthDelta: videoRect.width - width,
+        heightDelta: videoRect.height - height,
+        barBottom: barRect.bottom,
+        errorTop: errorRect.top,
+        errorMatchesPlayer:
+          errorRect.top === playerRect.top &&
+          errorRect.bottom === playerRect.bottom &&
+          errorRect.left === playerRect.left &&
+          errorRect.right === playerRect.right,
       };
     }, native);
     expect(geometry.sameVideo && geometry.sameParent && geometry.sameError && geometry.sameErrorParent).toBe(true);
     expect(geometry.widthDelta).toBe(0);
     expect(geometry.heightDelta).toBe(0);
     expect(geometry.errorTop).toBeGreaterThanOrEqual(geometry.barBottom - 1);
-    expect(geometry.errorMatchesPlayer, 'Keep the native error and its controls confined to their original player region').toBe(true);
+    expect(
+      geometry.errorMatchesPlayer,
+      'Keep the native error and its controls confined to their original player region',
+    ).toBe(true);
     const retry = youtube.getByRole('button', { name: 'Retry fixture playback' });
     await retry.click();
-    await expect(youtube.locator('#error-screen')).toHaveAttribute('data-retry-count', String([1, 60, 100].indexOf(strength) + 1));
+    await expect(youtube.locator('#error-screen')).toHaveAttribute(
+      'data-retry-count',
+      String([1, 60, 100].indexOf(strength) + 1),
+    );
     await capture(youtube, testInfo, `native-playback-error-${strength}-titlebar`);
   }
   await setNativeTheme(popup, false, 100);

@@ -3,24 +3,39 @@ import { DEFAULT_PALETTE, PALETTE_CHANNELS, PALETTE_PRESETS } from '../themes/re
 
 const paletteLabels = { hue: '色相 / Hue', saturation: '彩度 / Saturation', brightness: '明るさ / Brightness' };
 const presetLabels = { silver: 'Silver', lavender: 'Lavender', mint: 'Mint', pink: 'Pink' };
-const paletteControls = PALETTE_CHANNELS.map((channel) => `
+const paletteControls = PALETTE_CHANNELS.map(
+  (channel) => `
       <div class="palette-channel">
         <div class="control-row">
           <label for="palette-${channel}">${paletteLabels[channel]}</label>
           <output id="palette-${channel}-value" for="palette-${channel}">${DEFAULT_PALETTE[channel]}${channel === 'hue' ? '°' : '%'}</output>
         </div>
         <input id="palette-${channel}" data-palette-channel="${channel}" type="range" min="0" max="${channel === 'hue' ? 360 : 100}" step="1" value="${DEFAULT_PALETTE[channel]}" aria-describedby="palette-help" disabled />
-      </div>`).join('');
-const presetButtons = Object.keys(PALETTE_PRESETS).map((preset) => `
-      <button type="button" data-palette-preset="${preset}" aria-pressed="${preset === 'silver'}" disabled>${presetLabels[preset as keyof typeof presetLabels]}</button>`).join('');
+      </div>`,
+).join('');
+const presetButtons = Object.keys(PALETTE_PRESETS)
+  .map(
+    (preset) => `
+      <button type="button" data-palette-preset="${preset}" aria-pressed="${preset === 'silver'}" disabled>${presetLabels[preset as keyof typeof presetLabels]}</button>`,
+  )
+  .join('');
 
 function escapeMarkup(value: string): string {
-  return value.replace(/[&<>"']/g, (character) => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
-  })[character]!);
+  return value.replace(
+    /[&<>"']/g,
+    (character) =>
+      ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+      })[character]!,
+  );
 }
 
-const featureControls = FEATURE_REGISTRY.map((feature) => `
+const featureControls = FEATURE_REGISTRY.map(
+  (feature) => `
       <div class="feature-control">
         <div class="control-row">
           <label for="feature-${escapeMarkup(feature.id)}">${escapeMarkup(feature.label)}</label>
@@ -29,7 +44,8 @@ const featureControls = FEATURE_REGISTRY.map((feature) => `
             aria-describedby="feature-description-${escapeMarkup(feature.id)}" disabled />
         </div>
         <p id="feature-description-${escapeMarkup(feature.id)}" class="feature-description">${escapeMarkup(feature.description)}</p>
-      </div>`).join('');
+      </div>`,
+).join('');
 
 /** One markup template for both editors; theme-specific visuals live in themes/. */
 export const SETTINGS_MARKUP = `
@@ -86,4 +102,3 @@ export const SETTINGS_MARKUP = `
     </fieldset>
     <p id="save-status" class="status" role="status" aria-live="polite">設定を読み込んでいます…</p>
   </div>`;
-

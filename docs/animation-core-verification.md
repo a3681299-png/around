@@ -4,16 +4,16 @@
 
 ## モジュール
 
-| 場所 | 責務 |
-| --- | --- |
-| `world/media-time.ts` | 純粋な時刻評価、累積時刻の二分探索。DOMや時計を参照しない |
-| `host/media-clock.ts` | 共通RAF、可視性、reduced-motion、順番を回した描画要求 |
-| `media/controller.ts` | レイヤー固有の時刻・表示・世代管理。必要に応じて再生方式を切替 |
-| `media/native-image.ts`, `native-video.ts` | ブラウザー要素の再生。能力情報と非同期サンプルのfallbackを返す |
-| `media/sampler.ts`, `raster-sampler.ts` | フレーム要求、latest-only、先読み、lease、縮小と解放 |
-| `media/resources.ts`, `budget.ts` | 原本・URL・decoderの共有、LRU、メモリ見積もり、同時処理と描画予算 |
-| `assets/apng.ts`, `webm.ts`, `animated-raster.ts`, `decode.ts` | コンテナー検査、先頭フレーム検証、中断 |
-| `design/schema.ts`, `world/recording.ts` | v1〜v6→v7と入力記録v1→v2の純粋な読み込み移行 |
+| 場所                                                           | 責務                                                              |
+| -------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `world/media-time.ts`                                          | 純粋な時刻評価、累積時刻の二分探索。DOMや時計を参照しない         |
+| `host/media-clock.ts`                                          | 共通RAF、可視性、reduced-motion、順番を回した描画要求             |
+| `media/controller.ts`                                          | レイヤー固有の時刻・表示・世代管理。必要に応じて再生方式を切替    |
+| `media/native-image.ts`, `native-video.ts`                     | ブラウザー要素の再生。能力情報と非同期サンプルのfallbackを返す    |
+| `media/sampler.ts`, `raster-sampler.ts`                        | フレーム要求、latest-only、先読み、lease、縮小と解放              |
+| `media/resources.ts`, `budget.ts`                              | 原本・URL・decoderの共有、LRU、メモリ見積もり、同時処理と描画予算 |
+| `assets/apng.ts`, `webm.ts`, `animated-raster.ts`, `decode.ts` | コンテナー検査、先頭フレーム検証、中断                            |
+| `design/schema.ts`, `world/recording.ts`                       | v1〜v6→v7と入力記録v1→v2の純粋な読み込み移行                      |
 
 ## 操作と形式
 
@@ -89,13 +89,13 @@ CPU時間はコア数で正規化した利用率ではない。GPUプロセスCP
 
 WW_GPU_METRICS=1を明示して、同じfixtureの5負荷を計測した。各3サンプル、下表は観測最大。CDP列挙プロセスの正のPIDだけをOSメモリの対象として集計した。ブラウザー親プロセスはCDPでPID 0として報告されるためOSメモリ合計に含まない。
 
-| ケース | OS採取期間 ms | 最大エンジン使用率 % | 対象プロセスprivate commit合計 MiB | GPUプロセス別メモリカウンター合計 MiB |
-| --- | ---: | ---: | ---: | ---: |
-| 10 GIF / native | 7042 | 0 | 512.15 | 75.22 |
-| 10 GIF / controlled | 3398 | 4 | 662.82 | 226.56 |
-| 3 alpha WebM / 1080p | 2118 | 7 | 830.71 | 190.11 |
-| 45s WebM / scrolling player anchor | 2031 | 6 | 549.1 | 101.24 |
-| 10 GIF / native / scrolling player anchor | 3044 | 14 | 653.66 | 120.88 |
+| ケース                                    | OS採取期間 ms | 最大エンジン使用率 % | 対象プロセスprivate commit合計 MiB | GPUプロセス別メモリカウンター合計 MiB |
+| ----------------------------------------- | ------------: | -------------------: | ---------------------------------: | ------------------------------------: |
+| 10 GIF / native                           |          7042 |                    0 |                             512.15 |                                 75.22 |
+| 10 GIF / controlled                       |          3398 |                    4 |                             662.82 |                                226.56 |
+| 3 alpha WebM / 1080p                      |          2118 |                    7 |                             830.71 |                                190.11 |
+| 45s WebM / scrolling player anchor        |          2031 |                    6 |                              549.1 |                                101.24 |
+| 10 GIF / native / scrolling player anchor |          3044 |                   14 |                             653.66 |                                120.88 |
 
 GPUメモリはDedicatedUsageとSharedUsageのプロセス別カウンターを合算した値で、共有資源の重複計上を含み得る。物理VRAMの実使用量とは扱わない。使用率は短い整数サンプルで、0%も無負荷の保証にはしない。定義は[MicrosoftのGPU計測説明](https://devblogs.microsoft.com/directx/gpus-in-the-task-manager/)を参照。GPU採取を含む実行はCPU計測窓が延びるため、上の約1.8秒CPU表とは分けた。生データはmedia2-performance-gpu-run.json。最後のスクロールケースは起動直後の編集準備待ちを修正して単独で再計測した（media2-gpu-scroll-final.log）。
 

@@ -6,12 +6,12 @@
 
 現在の `design/image-renderer.ts` は配置の評価とDOM描画を、`effects/controller.ts` はシグナルの購読・フェード計算・CSS反映を兼ねている。`media/controller.ts` は素材の非同期デコードと再生時刻を管理する。編集履歴と保存はこれらの外側にある。
 
-| 境界 | 担当 | 今回の扱い |
-| --- | --- | --- |
-| Host (`sites/`, `host/`) | サイト固有の監視、セマンティックアンカー、ブラウザーイベント、時刻、可視性、シグナル | DOMから数値の入力を作る。セレクターはRuntimeへ渡さない |
-| World Runtime (`world/`) | 座標、グループ階層、マスク、宣言的な接続、フェード、再生時間、評価状態、記録の検証・再生 | 純粋関数。DOM、ブラウザーAPI、現在時刻、乱数生成に依存しない |
-| Renderer (`renderers/dom/`, `media/`) | 評価値から既存のDOM/CSSへ反映、素材ロード・デコード・フレーム描画 | 描画方式と非同期デコーダーを維持。次のバックエンドも数値の評価結果を受け取れる |
-| Editor / Storage | draft、選択、Undo/Redo、保存、IndexedDBの素材・lease | 保存形式や履歴の契約を変えない。評価状態は作品データに書き戻さない |
+| 境界                                  | 担当                                                                                     | 今回の扱い                                                                     |
+| ------------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Host (`sites/`, `host/`)              | サイト固有の監視、セマンティックアンカー、ブラウザーイベント、時刻、可視性、シグナル     | DOMから数値の入力を作る。セレクターはRuntimeへ渡さない                         |
+| World Runtime (`world/`)              | 座標、グループ階層、マスク、宣言的な接続、フェード、再生時間、評価状態、記録の検証・再生 | 純粋関数。DOM、ブラウザーAPI、現在時刻、乱数生成に依存しない                   |
+| Renderer (`renderers/dom/`, `media/`) | 評価値から既存のDOM/CSSへ反映、素材ロード・デコード・フレーム描画                        | 描画方式と非同期デコーダーを維持。次のバックエンドも数値の評価結果を受け取れる |
+| Editor / Storage                      | draft、選択、Undo/Redo、保存、IndexedDBの素材・lease                                     | 保存形式や履歴の契約を変えない。評価状態は作品データに書き戻さない             |
 
 既存の公開モジュールには互換用の再exportを残す。依存方向はHost/RendererからRuntimeへ向ける。RuntimeからHost/Rendererは参照しない。
 
@@ -42,14 +42,14 @@
 
 Gitの各導入コミットで実在する型、パーサー、テストのデータ生成関数を確認した。
 
-| 形式 | 導入コミット | 差分 |
-| --- | --- | --- |
-| v1 | `ec75f59` | surface-style、任意のbaseThemeId/null。decorationsなし |
-| v2 | `bcda6b5` | 画像とasset ID、正規化中心座標。lockedなし |
-| v3 | `082c59c` | locked追加。v2の画像はfalseへ移行 |
-| v4 | `68290f4` | GIF/WebP/Lottieとplayback追加 |
-| v5 | `e2fb4b8` | 任意のeffects、宣言的なマスク接続追加 |
-| v6 | `1d23ec0` | 任意のgroups。子は既存のmedia IDを参照 |
+| 形式 | 導入コミット | 差分                                                   |
+| ---- | ------------ | ------------------------------------------------------ |
+| v1   | `ec75f59`    | surface-style、任意のbaseThemeId/null。decorationsなし |
+| v2   | `bcda6b5`    | 画像とasset ID、正規化中心座標。lockedなし             |
+| v3   | `082c59c`    | locked追加。v2の画像はfalseへ移行                      |
+| v4   | `68290f4`    | GIF/WebP/Lottieとplayback追加                          |
+| v5   | `e2fb4b8`    | 任意のeffects、宣言的なマスク接続追加                  |
+| v6   | `1d23ec0`    | 任意のgroups。子は既存のmedia IDを参照                 |
 
 現在の `parseDesign` は純粋に検証・再構築してv6を返す。読込だけで保存を書き換えず、未知のバージョンは拒否して元データを残す。この処理を維持する。回帰fixtureは各コミットの実際のテスト生成関数から取り出し、当時のパーサーで受理されることを確認する。利用者の過去の保存ファイルはリポジトリに存在しないため、その実ファイルでの互換性は未確認とする。
 
@@ -75,18 +75,18 @@ Gitの各導入コミットで実在する型、パーサー、テストのデ�
 
 ## Phase 1bの構成
 
-| モジュール | 役割 |
-| --- | --- |
-| `host/anchors.ts`, `host/signals.ts` | セマンティック矩形の数値化、pointer/videoの共有・遅延購読 |
-| `host/world-session.ts` | 時計・ライフサイクル・入力スナップショット・評価の呼び出し。描画は渡されたapply関数へ委ねる |
-| `host/media-clock.ts` | 既存の30fps共有RAF、背景タブとreduced-motionの停止 |
-| `world/geometry.ts`, `hierarchy.ts`, `layout.ts` | 配置変換、親子関係、ワールド/親に対する座標と可視性 |
-| `world/masks.ts`, `effects.ts`, `evaluate.ts`, `types.ts` | 宣言的な接続と親子共通エフェクト、フェード状態、型付きの評価契約 |
-| `world/media-time.ts` | GIF/WebP/Lottieの再生時間・ループ・終了・再開・フレーム番号の純粋な評価 |
-| `world/recording.ts` | 記録データの厳密な検証、明示的な記録、headless再生 |
-| `host/world-devtools.ts` | 開発ビルドのisolated worldだけに公開する記録API |
-| `renderers/dom/scene.ts`, `effects.ts`, `mask.ts` | 既存のDOM/CSS、選択枠、操作ハンドルとマスクCSS反映 |
-| `media/controller.ts` | IndexedDB素材の共有・非同期準備・SVG/canvas/img描画。再生計算はRuntimeへ委ねる |
+| モジュール                                                | 役割                                                                                        |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `host/anchors.ts`, `host/signals.ts`                      | セマンティック矩形の数値化、pointer/videoの共有・遅延購読                                   |
+| `host/world-session.ts`                                   | 時計・ライフサイクル・入力スナップショット・評価の呼び出し。描画は渡されたapply関数へ委ねる |
+| `host/media-clock.ts`                                     | 既存の30fps共有RAF、背景タブとreduced-motionの停止                                          |
+| `world/geometry.ts`, `hierarchy.ts`, `layout.ts`          | 配置変換、親子関係、ワールド/親に対する座標と可視性                                         |
+| `world/masks.ts`, `effects.ts`, `evaluate.ts`, `types.ts` | 宣言的な接続と親子共通エフェクト、フェード状態、型付きの評価契約                            |
+| `world/media-time.ts`                                     | GIF/WebP/Lottieの再生時間・ループ・終了・再開・フレーム番号の純粋な評価                     |
+| `world/recording.ts`                                      | 記録データの厳密な検証、明示的な記録、headless再生                                          |
+| `host/world-devtools.ts`                                  | 開発ビルドのisolated worldだけに公開する記録API                                             |
+| `renderers/dom/scene.ts`, `effects.ts`, `mask.ts`         | 既存のDOM/CSS、選択枠、操作ハンドルとマスクCSS反映                                          |
+| `media/controller.ts`                                     | IndexedDB素材の共有・非同期準備・SVG/canvas/img描画。再生計算はRuntimeへ委ねる              |
 
 過渡期の `legacy-effects.ts` / `legacy-evaluation.ts` は比較と切り戻し用。旧パスの再exportも残している。RuntimeをDOM型なしでコンパイルし、依存グラフと禁止グローバルをテストする。HostのsessionはRendererやデコーダーをimportしない。
 

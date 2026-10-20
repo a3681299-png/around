@@ -29,14 +29,47 @@ export function createEffectsPanel(doc: Document, change: (patch: ImagePatch) =>
     if (!current || !input.dataset.effect || !input.checkValidity()) return;
     const mask = current.effects?.[0] ?? defaultCircleMask();
     const key = input.dataset.effect;
-    const value = key === 'enabled' ? { enabled: input.checked } : key === 'intensity' ? { intensity: Number(input.value) / 100 }
-      : ['radiusPx', 'featherPx'].includes(key) ? { [key]: Number(input.value) } : {};
+    const value =
+      key === 'enabled'
+        ? { enabled: input.checked }
+        : key === 'intensity'
+          ? { intensity: Number(input.value) / 100 }
+          : ['radiusPx', 'featherPx'].includes(key)
+            ? { [key]: Number(input.value) }
+            : {};
     let bindings = [...mask.bindings];
-    if (key === 'pointer') bindings = [...bindings.filter((binding) => binding.source !== 'pointer.position'),
-      ...(input.checked ? [{ source: 'pointer.position', transform: { kind: 'layer-local' }, target: 'mask.center' } satisfies MaskBinding] : [])];
-    if (key === 'video') bindings = [...bindings.filter((binding) => binding.source !== 'video.playing'),
-      ...(input.checked ? [{ source: 'video.playing', transform: { kind: 'boolean-gate', fadeMs: 350 }, target: 'mask.intensity' } satisfies MaskBinding] : [])];
-    if (key === 'fadeMs') bindings = bindings.map((binding) => binding.source === 'video.playing' ? { ...binding, transform: { kind: 'boolean-gate', fadeMs: Number(input.value) } } : binding);
+    if (key === 'pointer')
+      bindings = [
+        ...bindings.filter((binding) => binding.source !== 'pointer.position'),
+        ...(input.checked
+          ? [
+              {
+                source: 'pointer.position',
+                transform: { kind: 'layer-local' },
+                target: 'mask.center',
+              } satisfies MaskBinding,
+            ]
+          : []),
+      ];
+    if (key === 'video')
+      bindings = [
+        ...bindings.filter((binding) => binding.source !== 'video.playing'),
+        ...(input.checked
+          ? [
+              {
+                source: 'video.playing',
+                transform: { kind: 'boolean-gate', fadeMs: 350 },
+                target: 'mask.intensity',
+              } satisfies MaskBinding,
+            ]
+          : []),
+      ];
+    if (key === 'fadeMs')
+      bindings = bindings.map((binding) =>
+        binding.source === 'video.playing'
+          ? { ...binding, transform: { kind: 'boolean-gate', fadeMs: Number(input.value) } }
+          : binding,
+      );
     const effects = [{ ...mask, ...value, bindings }];
     // Preserve consecutive form edits while a remote Host acknowledges them.
     current = { ...current, effects };
@@ -52,13 +85,15 @@ export function createEffectsPanel(doc: Document, change: (patch: ImagePatch) =>
       fieldset.querySelector<HTMLElement>('.binding-settings')!.hidden = !mask?.enabled;
       fieldset.querySelector<HTMLElement>('.behavior-empty')!.hidden = Boolean(mask?.enabled);
       if (!mask) return;
-      get('radiusPx').value = String(mask.radiusPx); get('featherPx').value = String(mask.featherPx);
+      get('radiusPx').value = String(mask.radiusPx);
+      get('featherPx').value = String(mask.featherPx);
       get('intensity').value = String(Math.round(mask.intensity * 100));
       fieldset.querySelector<HTMLOutputElement>('.mask-value')!.value = `${Math.round(mask.intensity * 100)}%`;
       get('pointer').checked = mask.bindings.some((binding) => binding.source === 'pointer.position');
       const gate = mask.bindings.find((binding) => binding.source === 'video.playing');
       get('video').checked = Boolean(gate);
-      get('fadeMs').value = String(gate?.transform.fadeMs ?? 350); get('fadeMs').disabled = !gate;
+      get('fadeMs').value = String(gate?.transform.fadeMs ?? 350);
+      get('fadeMs').disabled = !gate;
     },
   };
 }

@@ -1,6 +1,14 @@
 import type { SiteFeatureInstance } from './types';
 
-const DETAILS = ['(・ω・)  .:*:.', '(^_^)  [::]', '(o_o)  +--+', '( -_- )  ...', '(=^.^=)  ~*~', '(^-^)  <[]>', '(・_・)  *.+'];
+const DETAILS = [
+  '(・ω・)  .:*:.',
+  '(^_^)  [::]',
+  '(o_o)  +--+',
+  '( -_- )  ...',
+  '(=^.^=)  ~*~',
+  '(^-^)  <[]>',
+  '(・_・)  *.+',
+];
 
 /** A local-calendar-day choice: no storage, randomness, network, or user tracking. */
 export function dailyYouTubeDetail(date: Date): string {
@@ -30,11 +38,14 @@ export function mountYouTubeDetails(doc: Document): SiteFeatureInstance {
     if (timer !== undefined || destroyed || doc.hidden) return;
     const now = new Date();
     const nextDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-    timer = view.setTimeout(() => {
-      timer = undefined;
-      updateText();
-      scheduleDay();
-    }, Math.max(1000, nextDay.getTime() - now.getTime()));
+    timer = view.setTimeout(
+      () => {
+        timer = undefined;
+        updateText();
+        scheduleDay();
+      },
+      Math.max(1000, nextDay.getTime() - now.getTime()),
+    );
   };
   const place = () => {
     frame = undefined;
@@ -42,7 +53,8 @@ export function mountYouTubeDetails(doc: Document): SiteFeatureInstance {
     const status = doc.querySelector<HTMLElement>('.ww-window-status');
     if (status && view.getComputedStyle(status).display !== 'none') {
       detail.classList.remove('ww-detail-in-header');
-      detail.style.removeProperty('left'); detail.style.removeProperty('top');
+      detail.style.removeProperty('left');
+      detail.style.removeProperty('top');
       if (detail.parentElement !== status) status.append(detail);
       return;
     }
@@ -50,10 +62,15 @@ export function mountYouTubeDetails(doc: Document): SiteFeatureInstance {
     // gap in the native masthead only if there is room; never squeeze controls.
     const masthead = doc.querySelector('ytd-masthead');
     const container = masthead?.querySelector(':scope > #container');
-    if (!masthead || !container) { detail.remove(); return; }
+    if (!masthead || !container) {
+      detail.remove();
+      return;
+    }
     const bounds = container.getBoundingClientRect();
-    const occupied = [...container.children].filter(child => child !== detail)
-      .map(child => child.getBoundingClientRect()).filter(box => box.width && box.height)
+    const occupied = [...container.children]
+      .filter((child) => child !== detail)
+      .map((child) => child.getBoundingClientRect())
+      .filter((box) => box.width && box.height)
       .sort((a, b) => a.left - b.left);
     let left = bounds.left + 8;
     let gap: { left: number; width: number } | undefined;
@@ -61,7 +78,10 @@ export function mountYouTubeDetails(doc: Document): SiteFeatureInstance {
       if (box.left - left >= 140 && (!gap || box.left - left > gap.width)) gap = { left, width: box.left - left };
       left = Math.max(left, box.right + 8);
     }
-    if (!gap || bounds.height < 20) { detail.remove(); return; }
+    if (!gap || bounds.height < 20) {
+      detail.remove();
+      return;
+    }
     detail.classList.add('ww-detail-in-header');
     const x = `${Math.round(gap.left + (gap.width - 132) / 2)}px`;
     const y = `${Math.round(bounds.top + (bounds.height - 12) / 2)}px`;
@@ -113,7 +133,8 @@ export function mountYouTubeFocus(doc: Document): SiteFeatureInstance {
   const paneFor = (target: EventTarget | null): Pane | undefined => {
     if (!(target instanceof view.Element)) return undefined;
     if (target.closest('ytd-playlist-panel-renderer, #web-world-themes-playlist-titlebar')) return 'playlist';
-    if (target.closest('#movie_player, #player, #player-container-outer, #web-world-themes-player-titlebar')) return 'player';
+    if (target.closest('#movie_player, #player, #player-container-outer, #web-world-themes-player-titlebar'))
+      return 'player';
     if (target.closest('ytd-masthead')) return 'header';
     return undefined;
   };
@@ -122,9 +143,14 @@ export function mountYouTubeFocus(doc: Document): SiteFeatureInstance {
     if (destroyed) return;
     const active = doc.hasFocus() && !doc.hidden;
     root.toggleAttribute('data-ww-document-active', active);
-    const paneExists = pane === 'player' ? doc.querySelector('#movie_player')
-      : pane === 'playlist' ? doc.querySelector('ytd-playlist-panel-renderer')
-        : pane === 'header' ? doc.querySelector('ytd-masthead') : null;
+    const paneExists =
+      pane === 'player'
+        ? doc.querySelector('#movie_player')
+        : pane === 'playlist'
+          ? doc.querySelector('ytd-playlist-panel-renderer')
+          : pane === 'header'
+            ? doc.querySelector('ytd-masthead')
+            : null;
     if (!paneExists) pane = undefined;
     if (active && pane) {
       if (root.getAttribute('data-ww-active-pane') !== pane) root.setAttribute('data-ww-active-pane', pane);
@@ -146,12 +172,13 @@ export function mountYouTubeFocus(doc: Document): SiteFeatureInstance {
     pane = paneFor(event.composedPath()[0] ?? event.target);
     refresh();
   };
-  const focusOut = () => view.queueMicrotask(() => {
-    if (!destroyed && doc.activeElement !== doc.body) {
-      pane = paneFor(doc.activeElement);
-      refresh();
-    }
-  });
+  const focusOut = () =>
+    view.queueMicrotask(() => {
+      if (!destroyed && doc.activeElement !== doc.body) {
+        pane = paneFor(doc.activeElement);
+        refresh();
+      }
+    });
   doc.addEventListener('pointerdown', activate, true);
   doc.addEventListener('focusin', activate, true);
   doc.addEventListener('focusout', focusOut, true);

@@ -1,7 +1,8 @@
 /** Local, decorative UI icons. No asset or network dependency. */
 export function icon(name: string): string {
   const paths: Record<string, string> = {
-    image: '<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1"/><path d="m3 17 6-6 4 4 3-3 5 5"/>',
+    image:
+      '<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1"/><path d="m3 17 6-6 4 4 3-3 5 5"/>',
     animation: '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="m10 8 6 4-6 4Z"/>',
     model3d: '<path d="m12 2 9 5v10l-9 5-9-5V7Zm0 10 9-5M12 12 3 7m9 5v10"/>',
     group: '<path d="M3 7V5h7l2 2h9v13H3Z"/>',
@@ -19,7 +20,8 @@ export function icon(name: string): string {
     delete: '<path d="M3 6h18M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7m4-7v7"/>',
     ungroup: '<path d="M3 3h7v7H3Zm11 11h7v7h-7ZM14 3h7v7M3 14v7h7"/>',
     select: '<path d="m5 3 14 10-7 1-3 7Z"/>',
-    browse: '<path d="M8 12V5a2 2 0 0 1 4 0v7-8a2 2 0 0 1 4 0v8-6a2 2 0 0 1 4 0v8c0 5-2 7-7 7-4 0-5-2-8-6l-2-3c-1-2 2-4 4-1l1 1Z"/>',
+    browse:
+      '<path d="M8 12V5a2 2 0 0 1 4 0v7-8a2 2 0 0 1 4 0v8-6a2 2 0 0 1 4 0v8c0 5-2 7-7 7-4 0-5-2-8-6l-2-3c-1-2 2-4 4-1l1 1Z"/>',
     card: '<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 14h18m-14 3h5m-1-10 5 3-5 3Z"/>',
     mask: '<circle cx="12" cy="12" r="7"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1 1m12 12 1 1M5 19l1-1M18 6l1-1"/>',
     help: '<circle cx="12" cy="12" r="10"/><path d="M9 8a3 3 0 1 1 5 2c-2 1-2 2-2 3m0 4h0"/>',
@@ -41,8 +43,21 @@ export function icon(name: string): string {
   return `<svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${paths[name] ?? paths.image}</svg>`;
 }
 
-export function buttonIcon(button: HTMLButtonElement, name: string, label = button.getAttribute('aria-label') ?? button.textContent!.trim(), shortcut = '', text = '') {
-  button.setAttribute('aria-label', label); button.title = `${label}${shortcut ? ` (${shortcut})` : ''}`;
-  button.classList.add('icon-button'); button.innerHTML = icon(name);
-  if (text) { const span = button.ownerDocument.createElement('span'); span.textContent = text; span.setAttribute('aria-hidden', 'true'); button.append(span); }
+export function buttonIcon(
+  button: HTMLButtonElement,
+  name: string,
+  label = button.getAttribute('aria-label') ?? button.textContent!.trim(),
+  shortcut = '',
+  text = '',
+) {
+  button.setAttribute('aria-label', label);
+  button.title = `${label}${shortcut ? ` (${shortcut})` : ''}`;
+  button.classList.add('icon-button');
+  button.innerHTML = icon(name);
+  if (text) {
+    const span = button.ownerDocument.createElement('span');
+    span.textContent = text;
+    span.setAttribute('aria-hidden', 'true');
+    button.append(span);
+  }
 }

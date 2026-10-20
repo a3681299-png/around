@@ -16,13 +16,7 @@
       "p95Ms": 0.015700000000038017
     },
     "checksum": 21444205.118497886,
-    "excludes": [
-      "Three.js/rendering",
-      "GPU",
-      "DOM",
-      "asset loading/decoding",
-      "browser scheduling"
-    ]
+    "excludes": ["Three.js/rendering", "GPU", "DOM", "asset loading/decoding", "browser scheduling"]
   },
   "renderer": {
     "browser": "153.0.8010.12",

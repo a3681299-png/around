@@ -37,11 +37,20 @@ export function watchDesign(
       const design = value === undefined ? undefined : parseDesign(value);
       if (design && design.siteId !== siteId) throw new Error('デザインの対象サイトが一致しません。');
       listener(design);
-    } catch (error) { onError(error); }
+    } catch (error) {
+      onError(error);
+    }
   };
   chrome.storage.onChanged.addListener(onChanged);
-  void readDesign(siteId).then((design) => {
-    if (active && !changed) listener(design);
-  }).catch((error: unknown) => { if (active && !changed) onError(error); });
-  return () => { active = false; chrome.storage.onChanged.removeListener(onChanged); };
+  void readDesign(siteId)
+    .then((design) => {
+      if (active && !changed) listener(design);
+    })
+    .catch((error: unknown) => {
+      if (active && !changed) onError(error);
+    });
+  return () => {
+    active = false;
+    chrome.storage.onChanged.removeListener(onChanged);
+  };
 }

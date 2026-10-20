@@ -94,8 +94,15 @@ export function createThemeController(
       throw new Error('このサイトまたは基底テーマには対応していません。');
     }
     if (next) compileDesign(next, site.designTargets ?? []);
-    if (next?.decorations.some((item) => item.placement.anchor.kind === 'surface'
-      && !site.decorationAnchors?.some((anchor) => item.placement.anchor.kind === 'surface' && anchor.id === item.placement.anchor.target))) {
+    if (
+      next?.decorations.some(
+        (item) =>
+          item.placement.anchor.kind === 'surface' &&
+          !site.decorationAnchors?.some(
+            (anchor) => item.placement.anchor.kind === 'surface' && anchor.id === item.placement.anchor.target,
+          ),
+      )
+    ) {
       throw new Error('このサイトでは画像の配置基準を利用できません。');
     }
     return next;
@@ -104,7 +111,10 @@ export function createThemeController(
     timeline,
     update(settings) {
       current = settings;
-      if (!settings.enabled || settings.strength === 0) { deactivate(); return; }
+      if (!settings.enabled || settings.strength === 0) {
+        deactivate();
+        return;
+      }
       disconnect ??= site.connect(render);
       render();
     },
@@ -112,9 +122,15 @@ export function createThemeController(
       design = validateDesign(input);
       render();
     },
-    setImageEditing(editing) { images.edit(editing); },
-    validateDesign(input) { validateDesign(input); },
-    destroy() { current = undefined; deactivate(); },
+    setImageEditing(editing) {
+      images.edit(editing);
+    },
+    validateDesign(input) {
+      validateDesign(input);
+    },
+    destroy() {
+      current = undefined;
+      deactivate();
+    },
   };
 }
-

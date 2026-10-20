@@ -1,23 +1,131 @@
-:root { color-scheme: dark; font: 12px/1.4 system-ui,sans-serif; color: #e3e4e8; background: #202123; }
-* { box-sizing: border-box; }
-html, body, #studio { height: 100%; margin: 0; overflow: hidden; }
-#studio { display: flex; flex-direction: column; }
-.connection-bar { display: flex; align-items: center; gap: 3px; padding: 0; margin: 0; background: transparent; border: 0; min-width: 0; font-size: 11px; height: 26px; }
-.connection-bar label { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #a5a7af; }
-button, select { font: inherit; color: #e3e4e8; background: transparent; border: 0; border-radius: 2px; height: 24px; padding: 3px 5px; }
-button { cursor: pointer; }
-.icon-button { display: inline-flex; align-items: center; justify-content: center; width: 26px; min-width: 26px; }
-button:hover:not(:disabled) { background: #414248; }
-button:disabled { opacity: .4; cursor: default; }
-select { min-width: 130px; max-width: 290px; width: min(24vw, 290px); background: #242528; border: 1px solid #484950; }
-button:focus-visible, select:focus-visible { outline: 2px solid #b6a4e5; outline-offset: -2px; }
-.connection-status { display: block; max-width: 350px; font-size: 10px; color: #d0b387; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
-.connection-status[data-connected="true"] { color: #b3c7b7; }
-.studio-mount { flex: 1; min-height: 0; position: relative; display: flex; }
-.connection-empty { padding: 28px; max-width: 550px; margin: auto; color: #a5a7af; }
-.connection-empty h1 { font-size: 16px; font-weight: 600; color: #e3e4e8; }
-.recovery-status { margin: 0; padding: 0 8px; font-size: 11px; color: #dfb87a; background: #202123; }
+:root {
+  color-scheme: dark;
+  font:
+    12px/1.4 system-ui,
+    sans-serif;
+  color: #e3e4e8;
+  background: #202123;
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body,
+#studio {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+#studio {
+  display: flex;
+  flex-direction: column;
+}
+.connection-bar {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: 0;
+  min-width: 0;
+  font-size: 11px;
+  height: 26px;
+}
+.connection-bar label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: #a5a7af;
+}
+button,
+select {
+  font: inherit;
+  color: #e3e4e8;
+  background: transparent;
+  border: 0;
+  border-radius: 2px;
+  height: 24px;
+  padding: 3px 5px;
+}
+button {
+  cursor: pointer;
+}
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  min-width: 26px;
+}
+button:hover:not(:disabled) {
+  background: #414248;
+}
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+select {
+  min-width: 130px;
+  max-width: 290px;
+  width: min(24vw, 290px);
+  background: #242528;
+  border: 1px solid #484950;
+}
+button:focus-visible,
+select:focus-visible {
+  outline: 2px solid #b6a4e5;
+  outline-offset: -2px;
+}
+.connection-status {
+  display: block;
+  max-width: 350px;
+  font-size: 10px;
+  color: #d0b387;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.connection-status[data-connected='true'] {
+  color: #b3c7b7;
+}
+.studio-mount {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: flex;
+}
+.connection-empty {
+  padding: 28px;
+  max-width: 550px;
+  margin: auto;
+  color: #a5a7af;
+}
+.connection-empty h1 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #e3e4e8;
+}
+.recovery-status {
+  margin: 0;
+  padding: 0 8px;
+  font-size: 11px;
+  color: #dfb87a;
+  background: #202123;
+}
 
-body[data-sidepanel] .connection-bar label, body[data-sidepanel] .refresh-targets, body[data-sidepanel] .focus-target, body[data-sidepanel] .disconnect-target { display: none; }
-body[data-sidepanel] .connection-bar { height: auto; min-height: 28px; padding: 3px 8px; }
-body[data-sidepanel] .connection-status { max-width: 100%; }
+body[data-sidepanel] .connection-bar label,
+body[data-sidepanel] .refresh-targets,
+body[data-sidepanel] .focus-target,
+body[data-sidepanel] .disconnect-target {
+  display: none;
+}
+body[data-sidepanel] .connection-bar {
+  height: auto;
+  min-height: 28px;
+  padding: 3px 8px;
+}
+body[data-sidepanel] .connection-status {
+  max-width: 100%;
+}

@@ -6,9 +6,20 @@ import { designKey, readDesign, saveDesign, watchDesign } from '../src/storage/d
 
 const targets = [{ id: 'video-card', surface: 'video-card', label: '動画カード' }];
 function sample(): DesignDocument {
-  return { ...emptyDesign('youtube', 'retro'), rules: [{ kind: 'surface-style', target: 'video-card', style: {
-    backgroundColor: '#ABCDEF', border: { color: '#443366', widthPx: 4 }, borderRadiusPx: 12,
-  } }] };
+  return {
+    ...emptyDesign('youtube', 'retro'),
+    rules: [
+      {
+        kind: 'surface-style',
+        target: 'video-card',
+        style: {
+          backgroundColor: '#ABCDEF',
+          border: { color: '#443366', widthPx: 4 },
+          borderRadiusPx: 12,
+        },
+      },
+    ],
+  };
 }
 
 test('versioned data is sparse, canonical, independent of retro, and copied without mutation', () => {
@@ -24,16 +35,26 @@ test('versioned data is sparse, canonical, independent of retro, and copied with
 test('unsupported versions, executable fields, arbitrary CSS and invalid dimensions are rejected', () => {
   const input = sample();
   for (const value of [
-    { ...input, schemaVersion: 12 }, { ...input, script: 'alert(1)' },
+    { ...input, schemaVersion: 12 },
+    { ...input, script: 'alert(1)' },
     { ...input, rules: [{ kind: 'javascript', target: 'video-card', style: {} }] },
     { ...input, rules: [{ kind: 'surface-style', target: 'video-card', selector: '*', style: {} }] },
-    { ...input, rules: [{ kind: 'surface-style', target: 'video-card', style: { backgroundColor: 'url(https://example.com)' } }] },
+    {
+      ...input,
+      rules: [{ kind: 'surface-style', target: 'video-card', style: { backgroundColor: 'url(https://example.com)' } }],
+    },
     { ...input, rules: [{ kind: 'surface-style', target: 'video-card', style: { borderRadiusPx: 49 } }] },
     { ...input, rules: [{ kind: 'surface-style', target: 'video-card', style: { borderRadiusPx: -1 } }] },
     { ...input, rules: [{ kind: 'surface-style', target: 'video-card', style: { borderRadiusPx: 1.5 } }] },
-    { ...input, rules: [{ kind: 'surface-style', target: 'video-card', style: { border: { color: '#000000', widthPx: Infinity } } }] },
+    {
+      ...input,
+      rules: [
+        { kind: 'surface-style', target: 'video-card', style: { border: { color: '#000000', widthPx: Infinity } } },
+      ],
+    },
     { ...input, rules: [...input.rules, ...input.rules] },
-  ]) expect(() => parseDesign(value)).toThrow();
+  ])
+    expect(() => parseDesign(value)).toThrow();
 });
 
 test('renderer uses registered semantic targets, replaces gradients and hover bevels, and never changes geometry', () => {
@@ -60,15 +81,22 @@ function fakeStorage(initial: Record<string, unknown> = {}) {
   const local = {
     get: async (key: string): Promise<Record<string, unknown>> => ({ [key]: stored[key] }),
     set: async (values: Record<string, unknown>) => {
-      const changes = Object.fromEntries(Object.entries(values).map(([key, value]) => [key, { oldValue: stored[key], newValue: value }]));
+      const changes = Object.fromEntries(
+        Object.entries(values).map(([key, value]) => [key, { oldValue: stored[key], newValue: value }]),
+      );
       Object.assign(stored, values);
       emit(changes);
     },
   };
-  globalThis.chrome = { storage: { local, onChanged: {
-    addListener: (listener: (changes: Change, area: string) => void) => listeners.add(listener),
-    removeListener: (listener: (changes: Change, area: string) => void) => listeners.delete(listener),
-  } } } as unknown as typeof chrome;
+  globalThis.chrome = {
+    storage: {
+      local,
+      onChanged: {
+        addListener: (listener: (changes: Change, area: string) => void) => listeners.add(listener),
+        removeListener: (listener: (changes: Change, area: string) => void) => listeners.delete(listener),
+      },
+    },
+  } as unknown as typeof chrome;
   return { stored, emit, local, listeners };
 }
 test.afterEach(() => {
@@ -81,8 +109,16 @@ test('design storage leaves legacy settings untouched and notifies multiple subs
   const a: Array<DesignDocument | undefined> = [];
   const b: Array<DesignDocument | undefined> = [];
   const errors: unknown[] = [];
-  const stopA = watchDesign('youtube', (value) => a.push(value), (value) => errors.push(value));
-  const stopB = watchDesign('youtube', (value) => b.push(value), (value) => errors.push(value));
+  const stopA = watchDesign(
+    'youtube',
+    (value) => a.push(value),
+    (value) => errors.push(value),
+  );
+  const stopB = watchDesign(
+    'youtube',
+    (value) => b.push(value),
+    (value) => errors.push(value),
+  );
   await saveDesign(sample());
   await Promise.resolve();
   expect(a.at(-1)).toEqual(parseDesign(sample()));
@@ -91,19 +127,30 @@ test('design storage leaves legacy settings untouched and notifies multiple subs
   expect(storage.stored['webWorldThemes.strength']).toBe(37);
   expect(storage.stored['webWorldThemes.enabled']).toBe(true);
   expect(errors).toEqual([]);
-  stopA(); stopB();
+  stopA();
+  stopB();
   expect(storage.listeners.size).toBe(0);
 });
 
 test('a storage event wins over a stale initial read, and deletion resets the design', async () => {
   const storage = fakeStorage();
   let finish!: (value: Record<string, unknown>) => void;
-  storage.local.get = () => new Promise((resolve) => { finish = resolve; });
+  storage.local.get = () =>
+    new Promise((resolve) => {
+      finish = resolve;
+    });
   const values: Array<DesignDocument | undefined> = [];
-  const stop = watchDesign('youtube', (value) => values.push(value), () => { throw new Error('Unexpected error'); });
+  const stop = watchDesign(
+    'youtube',
+    (value) => values.push(value),
+    () => {
+      throw new Error('Unexpected error');
+    },
+  );
   storage.emit({ [designKey('youtube')]: { newValue: sample() } });
   finish({});
-  await Promise.resolve(); await Promise.resolve();
+  await Promise.resolve();
+  await Promise.resolve();
   expect(values).toEqual([parseDesign(sample())]);
   storage.emit({ [designKey('youtube')]: { newValue: undefined } }, 'sync');
   expect(values).toHaveLength(1);
@@ -118,7 +165,9 @@ test('unknown versions remain on disk and write failures propagate without chang
   const storage = fakeStorage({ [key]: unknown });
   await expect(readDesign('youtube')).rejects.toThrow('バージョン');
   expect(storage.stored[key]).toBe(unknown);
-  storage.local.set = async () => { throw new Error('quota'); };
+  storage.local.set = async () => {
+    throw new Error('quota');
+  };
   await expect(saveDesign(sample())).rejects.toThrow('quota');
   expect(storage.stored[key]).toBe(unknown);
   expect(() => designKey('../settings')).toThrow();

@@ -2,8 +2,16 @@ import type { EditorLayer, ImagePatch, ModelDecoration } from '../design/types';
 import type { ModelSettings } from '../models/types';
 
 /** The same controls/commands in every Studio surface. Metadata is worker-verified. */
-export function createModelPanel(doc: Document, change: (patch: ImagePatch) => void, begin: () => void, end: () => void) {
-  const fieldset = doc.createElement('fieldset'); fieldset.className = 'model-panel'; fieldset.hidden = true; fieldset.setAttribute('aria-label', '3Dモデル');
+export function createModelPanel(
+  doc: Document,
+  change: (patch: ImagePatch) => void,
+  begin: () => void,
+  end: () => void,
+) {
+  const fieldset = doc.createElement('fieldset');
+  fieldset.className = 'model-panel';
+  fieldset.hidden = true;
+  fieldset.setAttribute('aria-label', '3Dモデル');
   fieldset.innerHTML = `<details open><summary>3Dモデルの向き</summary><div class="property row">${['X', 'Y', 'Z'].map((axis) => `<label>${axis} <input type="number" data-model="rotation${axis}" aria-label="3D回転${axis}" min="-180" max="180" step="1">°</label>`).join('')}</div></details>
     <details open><summary>3Dアニメーション</summary>
       <div class="property"><label>クリップ <select data-model="clip" aria-label="3Dクリップ"></select></label></div>
@@ -37,46 +45,125 @@ export function createModelPanel(doc: Document, change: (patch: ImagePatch) => v
     </details>`;
   let current: ModelDecoration | undefined;
   fieldset.addEventListener('input', (event) => {
-    const input = event.target as HTMLInputElement | HTMLSelectElement, path = input.dataset.model, key = path?.split('.')[0] as keyof ModelSettings | undefined;
-    if (input.classList.contains('vrm-expression')) { renderWeight(); return; }
-    if (input.classList.contains('vrm-weight') && current?.model.vrm && input.value !== '' && input.checkValidity()) { const name = fieldset.querySelector<HTMLSelectElement>('.vrm-expression')!.value; if (name) change({ model: { vrm: { expressions: { [name]: Number(input.value) } } } }); return; }
+    const input = event.target as HTMLInputElement | HTMLSelectElement,
+      path = input.dataset.model,
+      key = path?.split('.')[0] as keyof ModelSettings | undefined;
+    if (input.classList.contains('vrm-expression')) {
+      renderWeight();
+      return;
+    }
+    if (input.classList.contains('vrm-weight') && current?.model.vrm && input.value !== '' && input.checkValidity()) {
+      const name = fieldset.querySelector<HTMLSelectElement>('.vrm-expression')!.value;
+      if (name) change({ model: { vrm: { expressions: { [name]: Number(input.value) } } } });
+      return;
+    }
     if (!key || !current || !input.checkValidity() || input.value === '') return;
-    const value = input instanceof HTMLInputElement && input.type === 'checkbox' ? input.checked : input.value === 'none' ? null : Number(input.value);
+    const value =
+      input instanceof HTMLInputElement && input.type === 'checkbox'
+        ? input.checked
+        : input.value === 'none'
+          ? null
+          : Number(input.value);
     const child = path?.split('.')[1];
     change({ model: { [key]: child ? { [child]: value } : value } });
   });
-  fieldset.querySelectorAll('input[type="number"]').forEach((input) => { input.addEventListener('focus', begin); input.addEventListener('blur', () => end()); });
-  function renderWeight() { const select = fieldset.querySelector<HTMLSelectElement>('.vrm-expression')!, weight = fieldset.querySelector<HTMLInputElement>('.vrm-weight')!; weight.disabled = !select.value; weight.value = String(current?.model.vrm?.expressions[select.value] ?? 0); }
-  return { fieldset, render(layer: EditorLayer | undefined) {
-    fieldset.hidden = layer?.kind !== 'model3d'; current = layer?.kind === 'model3d' ? layer : undefined; if (!current) return;
-    const model = current.model;
-    const vrm = current.source.vrm; fieldset.querySelector<HTMLElement>('.vrm-options')!.hidden = !vrm;
-    fieldset.querySelector<HTMLSelectElement>('[data-model="look.bone"]')!.disabled = Boolean(vrm);
-    fieldset.querySelector('.model-help')!.textContent = vrm ? 'Humanoidの頭を自動選択。視線の角度・遅延はWorld Runtimeで制御します。' : 'ボーンのローカルYが上、Zが正面のリグ向け。アニメーションのポーズに加算します。モデルに合わない場合はOFFにしてください。';
-    if (vrm) {
-      fieldset.querySelector('.vrm-capabilities')!.textContent = `VRM ${vrm.version} · Humanoid ${vrm.humanoid.length} · ${vrm.mtoon ? 'MToon' : '標準材質'}`;
-      const select = fieldset.querySelector<HTMLSelectElement>('.vrm-expression')!, signature = JSON.stringify(vrm.expressions);
-      if (select.dataset.source !== signature) { const previous = select.value; select.dataset.source = signature; select.replaceChildren(); for (const name of vrm.expressions) { const option = doc.createElement('option'); option.value = name; option.textContent = name; select.append(option); } if (vrm.expressions.includes(previous)) select.value = previous; }
-      if ((fieldset.getRootNode() as ShadowRoot).activeElement !== fieldset.querySelector('.vrm-weight')) renderWeight();
-      fieldset.querySelector<HTMLInputElement>('[data-model="vrm.lookAt"]')!.disabled = !vrm.lookAt;
-      fieldset.querySelector<HTMLInputElement>('[data-model="vrm.springBone"]')!.disabled = !vrm.springBone;
-    }
-    for (const clip of fieldset.querySelectorAll<HTMLSelectElement>('select[data-model]')) {
-      if (clip.dataset.model === 'look.bone') {
-        const signature = JSON.stringify(current.source.bones); if (clip.dataset.source === signature) continue; clip.dataset.source = signature; clip.replaceChildren();
-        const empty = doc.createElement('option'); empty.value = 'none'; empty.textContent = '頭や首のボーンを選択'; clip.append(empty);
-        current.source.bones.forEach((b) => { const option = doc.createElement('option'); option.value = String(b.node); option.textContent = `${b.name || 'Bone'} · #${b.node}`; clip.append(option); }); continue;
+  fieldset.querySelectorAll('input[type="number"]').forEach((input) => {
+    input.addEventListener('focus', begin);
+    input.addEventListener('blur', () => end());
+  });
+  function renderWeight() {
+    const select = fieldset.querySelector<HTMLSelectElement>('.vrm-expression')!,
+      weight = fieldset.querySelector<HTMLInputElement>('.vrm-weight')!;
+    weight.disabled = !select.value;
+    weight.value = String(current?.model.vrm?.expressions[select.value] ?? 0);
+  }
+  return {
+    fieldset,
+    render(layer: EditorLayer | undefined) {
+      fieldset.hidden = layer?.kind !== 'model3d';
+      current = layer?.kind === 'model3d' ? layer : undefined;
+      if (!current) return;
+      const model = current.model;
+      const vrm = current.source.vrm;
+      fieldset.querySelector<HTMLElement>('.vrm-options')!.hidden = !vrm;
+      fieldset.querySelector<HTMLSelectElement>('[data-model="look.bone"]')!.disabled = Boolean(vrm);
+      fieldset.querySelector('.model-help')!.textContent = vrm
+        ? 'Humanoidの頭を自動選択。視線の角度・遅延はWorld Runtimeで制御します。'
+        : 'ボーンのローカルYが上、Zが正面のリグ向け。アニメーションのポーズに加算します。モデルに合わない場合はOFFにしてください。';
+      if (vrm) {
+        fieldset.querySelector('.vrm-capabilities')!.textContent =
+          `VRM ${vrm.version} · Humanoid ${vrm.humanoid.length} · ${vrm.mtoon ? 'MToon' : '標準材質'}`;
+        const select = fieldset.querySelector<HTMLSelectElement>('.vrm-expression')!,
+          signature = JSON.stringify(vrm.expressions);
+        if (select.dataset.source !== signature) {
+          const previous = select.value;
+          select.dataset.source = signature;
+          select.replaceChildren();
+          for (const name of vrm.expressions) {
+            const option = doc.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            select.append(option);
+          }
+          if (vrm.expressions.includes(previous)) select.value = previous;
+        }
+        if ((fieldset.getRootNode() as ShadowRoot).activeElement !== fieldset.querySelector('.vrm-weight'))
+          renderWeight();
+        fieldset.querySelector<HTMLInputElement>('[data-model="vrm.lookAt"]')!.disabled = !vrm.lookAt;
+        fieldset.querySelector<HTMLInputElement>('[data-model="vrm.springBone"]')!.disabled = !vrm.springBone;
       }
-      const signature = JSON.stringify(current.source.clips); if (clip.dataset.source === signature) continue;
-      clip.dataset.source = signature; clip.replaceChildren(); const empty = doc.createElement('option'); empty.value = 'none'; empty.textContent = clip.dataset.model === 'clip' ? '静止ポーズ' : '基本クリップを使う'; clip.append(empty);
-      current.source.clips.forEach((c, i) => { const option = doc.createElement('option'); option.value = String(i); option.textContent = `${c.name || `Clip ${i + 1}`} · ${c.duration.toFixed(2)}s`; clip.append(option); });
-    }
-    fieldset.querySelector<HTMLSelectElement>('[data-model="clip"]')!.disabled = model.locomotion.enabled;
-    fieldset.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-model]').forEach((input) => {
-      if ((fieldset.getRootNode() as ShadowRoot).activeElement === input && input.tagName === 'INPUT' && (input as HTMLInputElement).type === 'number') return;
-      const [key, child] = input.dataset.model!.split('.'), parent = model[key as keyof ModelSettings];
-      const value = child ? (parent as unknown as Record<string, unknown> | undefined)?.[child] : parent; if (input instanceof HTMLInputElement && input.type === 'checkbox') input.checked = Boolean(value); else input.value = value === null ? 'none' : String(value);
-    });
-    fieldset.querySelector('.model-empty')!.textContent = current.source.clips.length ? '' : vrm ? '内蔵クリップなし。視線・表情・揺れ物は利用できます。' : 'このGLBにはアニメーションクリップがありません。';
-  } };
+      for (const clip of fieldset.querySelectorAll<HTMLSelectElement>('select[data-model]')) {
+        if (clip.dataset.model === 'look.bone') {
+          const signature = JSON.stringify(current.source.bones);
+          if (clip.dataset.source === signature) continue;
+          clip.dataset.source = signature;
+          clip.replaceChildren();
+          const empty = doc.createElement('option');
+          empty.value = 'none';
+          empty.textContent = '頭や首のボーンを選択';
+          clip.append(empty);
+          current.source.bones.forEach((b) => {
+            const option = doc.createElement('option');
+            option.value = String(b.node);
+            option.textContent = `${b.name || 'Bone'} · #${b.node}`;
+            clip.append(option);
+          });
+          continue;
+        }
+        const signature = JSON.stringify(current.source.clips);
+        if (clip.dataset.source === signature) continue;
+        clip.dataset.source = signature;
+        clip.replaceChildren();
+        const empty = doc.createElement('option');
+        empty.value = 'none';
+        empty.textContent = clip.dataset.model === 'clip' ? '静止ポーズ' : '基本クリップを使う';
+        clip.append(empty);
+        current.source.clips.forEach((c, i) => {
+          const option = doc.createElement('option');
+          option.value = String(i);
+          option.textContent = `${c.name || `Clip ${i + 1}`} · ${c.duration.toFixed(2)}s`;
+          clip.append(option);
+        });
+      }
+      fieldset.querySelector<HTMLSelectElement>('[data-model="clip"]')!.disabled = model.locomotion.enabled;
+      fieldset.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-model]').forEach((input) => {
+        if (
+          (fieldset.getRootNode() as ShadowRoot).activeElement === input &&
+          input.tagName === 'INPUT' &&
+          (input as HTMLInputElement).type === 'number'
+        )
+          return;
+        const [key, child] = input.dataset.model!.split('.'),
+          parent = model[key as keyof ModelSettings];
+        const value = child ? (parent as unknown as Record<string, unknown> | undefined)?.[child] : parent;
+        if (input instanceof HTMLInputElement && input.type === 'checkbox') input.checked = Boolean(value);
+        else input.value = value === null ? 'none' : String(value);
+      });
+      fieldset.querySelector('.model-empty')!.textContent = current.source.clips.length
+        ? ''
+        : vrm
+          ? '内蔵クリップなし。視線・表情・揺れ物は利用できます。'
+          : 'このGLBにはアニメーションクリップがありません。';
+    },
+  };
 }

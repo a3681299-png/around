@@ -7,34 +7,72 @@ import { renderDiagnostics } from './helpers/render-diagnostics';
 const extensionPath = path.resolve(process.env.WW_TEST_EXTENSION_PATH ?? 'dist');
 const fixturePath = path.resolve('tests/fixtures/youtube.html');
 
-export async function launchExtension(profile: string, useFixture = true, options: { headed?: boolean; width?: number; height?: number } = {}): Promise<BrowserContext> {
+export async function launchExtension(
+  profile: string,
+  useFixture = true,
+  options: { headed?: boolean; width?: number; height?: number } = {},
+): Promise<BrowserContext> {
   const context = await chromium.launchPersistentContext(profile, {
     ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
       ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH }
       : { channel: 'chromium' }),
     headless: !options.headed,
     viewport: options.headed ? null : { width: 1100, height: 760 },
-    args: [`--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`, ...(options.headed ? [`--window-size=${options.width ?? 1366},${options.height ?? 1000}`, '--force-device-scale-factor=1'] : [])],
+    args: [
+      `--disable-extensions-except=${extensionPath}`,
+      `--load-extension=${extensionPath}`,
+      ...(options.headed
+        ? [`--window-size=${options.width ?? 1366},${options.height ?? 1000}`, '--force-device-scale-factor=1']
+        : []),
+    ],
   });
   // Bound Windows Chromium shutdown; only the test's headless profile and
   // extension path may be terminated when normal close stops responding.
   if (process.platform === 'win32' && !options.headed) {
-    const browser = context.browser(), close = context.close.bind(context);
+    const browser = context.browser(),
+      close = context.close.bind(context);
     let closing: Promise<void> | undefined;
-    context.close = (options) => closing ??= (async () => {
-      const closeRequestedAt = Date.now();
-      let forced = false, timer: ReturnType<typeof setTimeout> | undefined;
-      const stopped = new Promise<void>((resolve, reject) => {
-        timer = setTimeout(() => {
-          forced = true; process.stderr.write('Test-only Chromium shutdown exceeded 10s; checking its owned process tree.\n');
-          execFile(path.join(process.env.SystemRoot ?? 'C:/Windows', 'System32/WindowsPowerShell/v1.0/powershell.exe'),
-            ['-NoProfile', '-NonInteractive', '-File', path.resolve('scripts/close-test-browser.ps1'), '-OwnedProfile', path.resolve(profile), '-ExtensionPath', extensionPath, '-CloseRequestedAtUnixMs', String(closeRequestedAt)],
-            { windowsHide: true, timeout: 10_000 }, (error) => error ? reject(error) : resolve());
-        }, 10_000); timer.unref();
-      });
-      try { await Promise.race([close(options).catch((error: unknown) => { if (!forced || browser?.isConnected()) throw error; }), stopped]); }
-      finally { clearTimeout(timer); if (forced) await stopped; }
-    })();
+    context.close = (options) =>
+      (closing ??= (async () => {
+        const closeRequestedAt = Date.now();
+        let forced = false,
+          timer: ReturnType<typeof setTimeout> | undefined;
+        const stopped = new Promise<void>((resolve, reject) => {
+          timer = setTimeout(() => {
+            forced = true;
+            process.stderr.write('Test-only Chromium shutdown exceeded 10s; checking its owned process tree.\n');
+            execFile(
+              path.join(process.env.SystemRoot ?? 'C:/Windows', 'System32/WindowsPowerShell/v1.0/powershell.exe'),
+              [
+                '-NoProfile',
+                '-NonInteractive',
+                '-File',
+                path.resolve('scripts/close-test-browser.ps1'),
+                '-OwnedProfile',
+                path.resolve(profile),
+                '-ExtensionPath',
+                extensionPath,
+                '-CloseRequestedAtUnixMs',
+                String(closeRequestedAt),
+              ],
+              { windowsHide: true, timeout: 10_000 },
+              (error) => (error ? reject(error) : resolve()),
+            );
+          }, 10_000);
+          timer.unref();
+        });
+        try {
+          await Promise.race([
+            close(options).catch((error: unknown) => {
+              if (!forced || browser?.isConnected()) throw error;
+            }),
+            stopped,
+          ]);
+        } finally {
+          clearTimeout(timer);
+          if (forced) await stopped;
+        }
+      })());
   }
   if (!useFixture) return context;
   const html = await readFile(fixturePath, 'utf8');
@@ -57,20 +95,32 @@ export const test = base.extend<{ profile: string; extensionId: string; popup: P
     await mkdir(work, { recursive: true });
     // Chrome Storage's LevelDB can fail on Windows when test-title paths exceed MAX_PATH.
     const profile = await mkdtemp(path.join(work, 'p-'));
-    try { await use(profile); }
-    finally {
+    try {
+      await use(profile);
+    } finally {
       // Chrome is closed by the dependent context fixture first. Only remove
       // this fixture's generated child directory; retain failed profiles.
-      if (info.status === info.expectedStatus && path.dirname(profile) === work && path.basename(profile).startsWith('p-')) {
-        await rm(profile, { recursive: true, force: true, maxRetries: 3, retryDelay: 200 }).catch((error: unknown) => { process.stderr.write('Test profile cleanup: ' + String(error) + '\n'); });
+      if (
+        info.status === info.expectedStatus &&
+        path.dirname(profile) === work &&
+        path.basename(profile).startsWith('p-')
+      ) {
+        await rm(profile, { recursive: true, force: true, maxRetries: 3, retryDelay: 200 }).catch((error: unknown) => {
+          process.stderr.write('Test profile cleanup: ' + String(error) + '\n');
+        });
       }
     }
   },
   context: async ({ profile }, use, info) => {
     const context = await launchExtension(profile);
-    try { await use(context); }
-    finally {
-      if (info.status !== info.expectedStatus) await info.attach('render-diagnostics', { body: JSON.stringify(await renderDiagnostics(context), null, 2), contentType: 'application/json' });
+    try {
+      await use(context);
+    } finally {
+      if (info.status !== info.expectedStatus)
+        await info.attach('render-diagnostics', {
+          body: JSON.stringify(await renderDiagnostics(context), null, 2),
+          contentType: 'application/json',
+        });
       await context.close();
     }
   },
@@ -102,4 +152,3 @@ export const test = base.extend<{ profile: string; extensionId: string; popup: P
 });
 
 export { expect } from '@playwright/test';
-

@@ -22,7 +22,8 @@ export function createSettingsPanel(doc: Document): SettingsPanel {
   button.setAttribute('aria-controls', 'web-world-themes-panel');
   button.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;color:#fff;';
   // Temporary sliders icon, independent of a theme's eventual visual identity.
-  button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/><path d="M8 3v6M16 9v6M10 15v6" stroke-width="4"/></g></svg>';
+  button.innerHTML =
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/><path d="M8 3v6M16 9v6M10 15v6" stroke-width="4"/></g></svg>';
 
   const panel = doc.createElement('div');
   panel.id = 'web-world-themes-panel';
@@ -89,7 +90,9 @@ export function createSettingsPanel(doc: Document): SettingsPanel {
   panel.addEventListener('click', stopPropagation);
 
   return {
-    button, panel, close,
+    button,
+    panel,
+    close,
     destroy() {
       close();
       unmountFont();

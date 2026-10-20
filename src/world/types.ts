@@ -4,14 +4,18 @@ import type { Bounds, PlacementFrame, Point } from './geometry';
 import type { EffectState, EffectEvaluation } from './effects';
 
 export const WORLD_RUNTIME_VERSION = '1.3.0' as const;
-export interface WorldScene { decorations: readonly Decoration[]; groups?: readonly GroupLayer[]; signalRules?: readonly import('../signals/keyframes').SignalRule[] }
+export interface WorldScene {
+  decorations: readonly Decoration[];
+  groups?: readonly GroupLayer[];
+  signalRules?: readonly import('../signals/keyframes').SignalRule[];
+}
 export interface WorldGeometry {
   viewport: { width: number; height: number };
   /** Semantic IDs only; absence means the host cannot currently resolve an anchor. */
   anchors: Readonly<Record<string, PlacementFrame>>;
 }
-export type WorldEvent = { type: 'video.play' | 'video.pause' | 'video.ended' | 'host.lifecycle' }
-  | { type: 'pointer.click'; point: Point };
+export type WorldEvent =
+  { type: 'video.play' | 'video.pause' | 'video.ended' | 'host.lifecycle' } | { type: 'pointer.click'; point: Point };
 export interface WorldInput extends WorldGeometry {
   timeMs: number;
   deltaMs: number;
@@ -41,7 +45,11 @@ export interface GroupEvaluation {
   visible: boolean;
   renderable: boolean;
 }
-export interface WorldLayout { layers: LayerEvaluation[]; groups: GroupEvaluation[]; roots: string[] }
+export interface WorldLayout {
+  layers: LayerEvaluation[];
+  groups: GroupEvaluation[];
+  roots: string[];
+}
 export interface WorldMachineState {
   video: 'playing' | 'paused';
   /** Occurrences are consumed once per evaluation, never used as persistent booleans. */
@@ -64,6 +72,9 @@ export interface WorldFrame {
   subscriptions: { pointer: boolean; video: boolean };
   models?: import('./models').ModelEvaluation[];
 }
-export const frameFor = (placement: LayerPlacement, geometry: WorldGeometry): PlacementFrame | undefined => placement.anchor.kind === 'viewport'
-  ? { left: 0, top: 0, ...geometry.viewport }
-  : Object.hasOwn(geometry.anchors, placement.anchor.target) ? geometry.anchors[placement.anchor.target] : undefined;
+export const frameFor = (placement: LayerPlacement, geometry: WorldGeometry): PlacementFrame | undefined =>
+  placement.anchor.kind === 'viewport'
+    ? { left: 0, top: 0, ...geometry.viewport }
+    : Object.hasOwn(geometry.anchors, placement.anchor.target)
+      ? geometry.anchors[placement.anchor.target]
+      : undefined;

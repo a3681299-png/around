@@ -4,8 +4,10 @@ import type { ModelEvaluation } from '../../src/world/models';
 export function modelPoseError(actual: ModelEvaluation, expected: ModelEvaluation) {
   let error = 0;
   for (const key of Object.keys(expected) as (keyof ModelEvaluation)[]) {
-    const a = actual[key], b = expected[key];
-    if (typeof a === 'number' && typeof b === 'number') error = Math.max(error, Math.abs(a - b)); else expect(a).toEqual(b);
+    const a = actual[key],
+      b = expected[key];
+    if (typeof a === 'number' && typeof b === 'number') error = Math.max(error, Math.abs(a - b));
+    else expect(a).toEqual(b);
   }
   return error;
 }

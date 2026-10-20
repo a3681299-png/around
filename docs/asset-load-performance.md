@@ -54,17 +54,17 @@ flowchart TD
   GPU --> C[レイヤーごとの2D canvasにdrawImage → DOM/CSS・マスク合成]
 ```
 
-| 場所 | 実際の関数・役割 |
-|---|---|
-| `src/editor/panel.ts` | `.model-file`のchange → `actions.imageImport` |
-| `src/studio/app.ts`, `src/browser/studio-client.ts` | 共通UIからconnection.import。32MiB超ではStudio自身がimportAssetsを呼び、保存後にasset IDだけをHostへ送る |
-| `src/assets/client.ts` | `importAssets`, `request`, `loadAsset`, `loadAssetMetadata`。原本のBase64送信・取得と再結合 |
-| `src/assets/validation.ts`, `transfers.ts` | ネイティブtoBase64/fromBase64、検証用正規表現、4MiB断片、順序検査、事前確保バッファ |
-| `src/background/index.ts` | `enqueue`, `handle`, `importBatch`, `owner`, `leaseAssets`, `prune`。読み出しと書き込み・保持・整理が同じPromiseキューに入る |
-| `src/assets/repository.ts` | `getAsset`, `changeAssets`。DB `web-world-themes-assets` v1 / object store `assets`。Blobとleaseを同じ行で保持 |
-| `src/assets/inspect.ts`, `glb.ts`, `vrm.ts`, `decode.ts` | コンテナ、参照、URI、資源予算の検証。`inspectGlb`はBINをsliceしてコピー。`validateModelTextures`は再びinspectし、埋め込み画像をcreateImageBitmapで検証・close |
-| `src/browser/studio-host.ts`, `storage-adapter.ts`, `src/editor-core/session.ts` | `import-assets` → stored-assets参照、lease、作品全体照合、model3d追加。54.5MiB原本をHostから再アップロードする経路は既に除去されている |
-| `src/renderers/three/models.ts`, `vrm-player.ts` | `acquire`, `attach`, `paint`。GLTF/VRM構築、bounds、1個のWebGLコンテキスト、レイヤーcanvasへのコピー、VRM固有更新 |
+| 場所                                                                             | 実際の関数・役割                                                                                                                                              |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/editor/panel.ts`                                                            | `.model-file`のchange → `actions.imageImport`                                                                                                                 |
+| `src/studio/app.ts`, `src/browser/studio-client.ts`                              | 共通UIからconnection.import。32MiB超ではStudio自身がimportAssetsを呼び、保存後にasset IDだけをHostへ送る                                                      |
+| `src/assets/client.ts`                                                           | `importAssets`, `request`, `loadAsset`, `loadAssetMetadata`。原本のBase64送信・取得と再結合                                                                   |
+| `src/assets/validation.ts`, `transfers.ts`                                       | ネイティブtoBase64/fromBase64、検証用正規表現、4MiB断片、順序検査、事前確保バッファ                                                                           |
+| `src/background/index.ts`                                                        | `enqueue`, `handle`, `importBatch`, `owner`, `leaseAssets`, `prune`。読み出しと書き込み・保持・整理が同じPromiseキューに入る                                  |
+| `src/assets/repository.ts`                                                       | `getAsset`, `changeAssets`。DB `web-world-themes-assets` v1 / object store `assets`。Blobとleaseを同じ行で保持                                                |
+| `src/assets/inspect.ts`, `glb.ts`, `vrm.ts`, `decode.ts`                         | コンテナ、参照、URI、資源予算の検証。`inspectGlb`はBINをsliceしてコピー。`validateModelTextures`は再びinspectし、埋め込み画像をcreateImageBitmapで検証・close |
+| `src/browser/studio-host.ts`, `storage-adapter.ts`, `src/editor-core/session.ts` | `import-assets` → stored-assets参照、lease、作品全体照合、model3d追加。54.5MiB原本をHostから再アップロードする経路は既に除去されている                        |
+| `src/renderers/three/models.ts`, `vrm-player.ts`                                 | `acquire`, `attach`, `paint`。GLTF/VRM構築、bounds、1個のWebGLコンテキスト、レイヤーcanvasへのコピー、VRM固有更新                                             |
 
 小容量（32MiB以下）の独立Studio importには、Studio PortでBase64をHostへ送り、Fileを作り直してimportAssetsを呼ぶ別経路がある。今回の54.5MiB実測とは分ける。クイック/インページ編集ではFileが初めからContent Scriptにあり、importAssetsがそこから始まる。
 
@@ -72,13 +72,13 @@ Chrome runtime/Portの通常通信はJSONシリアライズであり、ArrayBuff
 
 ## 全体の比較（ms）
 
-| 条件 | 初回 | 2回目 | 3回目 | 中央値 |
-|---|---:|---:|---:|---:|
-| A: 実YouTube・現行経路・計測ON | 8,276 | 4,212 | 5,880 | 5,880 |
-| A′: 拡張ページ・現行の保存/取得経路 | 3,746 | 3,601 | 3,513 | 3,601 |
-| B: 拡張ページ・File直接 | 1,102 | 710 | 496 | 710 |
-| C: 拡張ページ・IndexedDB Blob直接 | 997 | 450 | 391 | 450 |
-| 参考: 既存dist・実YouTube・計測OFF | 14,784 | 6,531 | 6,903 | 6,903 |
+| 条件                                |   初回 | 2回目 | 3回目 | 中央値 |
+| ----------------------------------- | -----: | ----: | ----: | -----: |
+| A: 実YouTube・現行経路・計測ON      |  8,276 | 4,212 | 5,880 |  5,880 |
+| A′: 拡張ページ・現行の保存/取得経路 |  3,746 | 3,601 | 3,513 |  3,601 |
+| B: 拡張ページ・File直接             |  1,102 |   710 |   496 |    710 |
+| C: 拡張ページ・IndexedDB Blob直接   |    997 |   450 |   391 |    450 |
+| 参考: 既存dist・実YouTube・計測OFF  | 14,784 | 6,531 | 6,903 |  6,903 |
 
 A′とB/Cは描画部分を共用し、B/Cにはチャンク・Base64がない。Bは安全検査のため一度Fileを読み、共通Rendererに渡すBlobを作るため、Renderer内でも再度arrayBufferを読む。これは最も攻めた直接経路より保守的な比較である。Cは準備として同じimportAssetsで保存し、その準備時間を別にして測る。保存済み作品の再表示に相当し、初回の保存を無料扱いした比較ではない。各試行の間にModelSurface.destroyでgeometry/material/bitmapを明示解放し、Renderer/contextも破棄した。表の全体値には表示後のピクセル確認・診断ログ回収も含む。JSONの`extension:benchmark.total`はその回収前、2RAF後の区切りである。
 
@@ -88,33 +88,33 @@ A′とB/Cは描画部分を共用し、B/Cにはチャンク・Base64がない�
 
 行には包含関係がある。**全行の合計は全体時間にならない。** 小数第1位まで丸めた。
 
-| 区間 | 初回 | 2回目 | 3回目 |
-|---|---:|---:|---:|
-| File.arrayBuffer | 153.8 | 69.6 | 37.7 |
-| Studio inspectAsset | 171.8 | 312.0 | 145.1 |
-| Studioテクスチャ検証（内部の再inspect含む） | 470.0 | 246.9 | 158.9 |
-| アップロード断片全体（変換・RPC・Worker待ち含む） | 1,777.8 | 1,127.0 | 1,004.7 |
-| upload-finish往復（再検証・保存等含む） | 772.5 | 451.4 | 786.4 |
-| ↳ IndexedDB書き込みトランザクション | 60.4 | 43.5 | 95.0 |
-| IndexedDB取得API累計（metadata/get/14断片） | 11.1 | 6.2 | 9.5 |
-| 取得断片がWorkerキューで待った累計 | 761.4 | 320.0 | 565.1 |
-| ダウンロード断片全体（RPC・変換・再結合） | 2,117.1 | 1,154.4 | 2,083.3 |
-| ↳ Content Script Base64デコード | 238.9 | 132.1 | 297.8 |
-| ↳ bytes.set再結合 | 16.9 | 11.5 | 19.6 |
-| ダウンロード後inspectAsset | 156.6 | 147.3 | 243.8 |
-| 全体コピーとBlob作成 | 37.2 | 20.9 | 40.9 |
-| Renderer Blob.arrayBuffer | 147.5 | 55.1 | 72.8 |
-| Renderer inspectGlb | 181.2 | 128.6 | 90.2 |
-| GLTFLoader.parseAsync全体 | 161.9 | 76.8 | 138.4 |
-| ↳ テクスチャ待ちの和集合（5件並行・parse内） | 101.8 | 51.2 | 93.9 |
-| ↳ VRMLoaderPlugin.afterRoot（parse内） | 11.2 | 1.7 | 2.8 |
-| VRMUtils後処理 | 146.9 | 41.5 | 72.5 |
-| bounds計算 | 31.8 | 13.6 | 23.4 |
-| WebGLRenderer/context作成 | 16.8 | 5.1 | 8.6 |
-| 最初のrender（シェーダー・GPU転送を含むCPU側待ち） | 1,185.1 | 149.7 | 234.9 |
-| 最初の2Dコピー | 0.5 | 0.2 | 0.3 |
-| 最初のpaint開始→2RAF後（上記描画を含む） | 1,371.7 | 169.2 | 290.0 |
-| File選択操作→表示確認まで | **8,276.5** | **4,212.5** | **5,880.0** |
+| 区間                                               |        初回 |       2回目 |       3回目 |
+| -------------------------------------------------- | ----------: | ----------: | ----------: |
+| File.arrayBuffer                                   |       153.8 |        69.6 |        37.7 |
+| Studio inspectAsset                                |       171.8 |       312.0 |       145.1 |
+| Studioテクスチャ検証（内部の再inspect含む）        |       470.0 |       246.9 |       158.9 |
+| アップロード断片全体（変換・RPC・Worker待ち含む）  |     1,777.8 |     1,127.0 |     1,004.7 |
+| upload-finish往復（再検証・保存等含む）            |       772.5 |       451.4 |       786.4 |
+| ↳ IndexedDB書き込みトランザクション                |        60.4 |        43.5 |        95.0 |
+| IndexedDB取得API累計（metadata/get/14断片）        |        11.1 |         6.2 |         9.5 |
+| 取得断片がWorkerキューで待った累計                 |       761.4 |       320.0 |       565.1 |
+| ダウンロード断片全体（RPC・変換・再結合）          |     2,117.1 |     1,154.4 |     2,083.3 |
+| ↳ Content Script Base64デコード                    |       238.9 |       132.1 |       297.8 |
+| ↳ bytes.set再結合                                  |        16.9 |        11.5 |        19.6 |
+| ダウンロード後inspectAsset                         |       156.6 |       147.3 |       243.8 |
+| 全体コピーとBlob作成                               |        37.2 |        20.9 |        40.9 |
+| Renderer Blob.arrayBuffer                          |       147.5 |        55.1 |        72.8 |
+| Renderer inspectGlb                                |       181.2 |       128.6 |        90.2 |
+| GLTFLoader.parseAsync全体                          |       161.9 |        76.8 |       138.4 |
+| ↳ テクスチャ待ちの和集合（5件並行・parse内）       |       101.8 |        51.2 |        93.9 |
+| ↳ VRMLoaderPlugin.afterRoot（parse内）             |        11.2 |         1.7 |         2.8 |
+| VRMUtils後処理                                     |       146.9 |        41.5 |        72.5 |
+| bounds計算                                         |        31.8 |        13.6 |        23.4 |
+| WebGLRenderer/context作成                          |        16.8 |         5.1 |         8.6 |
+| 最初のrender（シェーダー・GPU転送を含むCPU側待ち） |     1,185.1 |       149.7 |       234.9 |
+| 最初の2Dコピー                                     |         0.5 |         0.2 |         0.3 |
+| 最初のpaint開始→2RAF後（上記描画を含む）           |     1,371.7 |       169.2 |       290.0 |
+| File選択操作→表示確認まで                          | **8,276.5** | **4,212.5** | **5,880.0** |
 
 初回8,276msのうち、**断片のアップロード＋ダウンロード区間が3,895ms**、GLTF解析162ms、VRM後処理＋bounds179ms、最初の描画から表示確認可能まで1,372msだった。残りはファイル・繰り返す検証・コピー・保存・Host/UI同期など。上記転送区間はキュー待ちや変換を含む壁時計時間であり、IPCの純粋な搬送時間とは呼ばない。
 
@@ -149,14 +149,14 @@ CPU使用率全体、Worker/GPUプロセスCPU、真のピークメモリ、GPU�
 
 ## 方式の比較
 
-| 方式 | 確認したこと | 期待する効果と代償 | 判断 |
-|---|---|---|---|
-| A. 現行チャンクを改善 | 変換は初回約572ms、再結合は両方向計約46ms。JSON/待ちの方が大きい | 読み出しを整理処理から分離、重複leaseの抑制、pruneの集約、読み出し用Blob参照の短期保持。単なる断片サイズ変更では頭打ち。削除とleaseの競合は引き続き直列化が必要 | 最初の小さな改善候補 |
-| B. MessageChannel + ArrayBuffer | 実Content Scriptのisolated world→拡張iframeへ57,185,776 bytesの合成ゼロバッファを所有権移譲し、受信数と送信元detachを確認。3回134/178/166ms | Chrome runtimeの直接代替ではなく、別の通信橋が必要。合成データのACK往復であり、実VRMのFile I/O・検査・保存・描画や両方向転送を含まない。内部の物理コピーゼロも保証しない。認証/再接続/要求世代の設計が要る | バイナリ橋の候補。単独で採用決定しない |
-| C. 拡張iframe + IDB直接 | 実YouTube内で原本を直接読み、透明なMToon表示まで927ms。別の新規プロファイルでの追加試行は2,866ms。変更前と同じMV3 CSP、Chrome ID、IDB原本を利用。クリック透過で動画設定ボタンを操作できた | ページとの原本往復を排除できる。代わりに合成面・全画面・再接続・座標・権限境界の設計が必要。単一iframeのcanvasではDOMの2Dと任意に挟み込めない | 効果は実証。全Renderer移設にはまだ進まない |
-| D. OPFS + AssetStore | OPFS性能は未測定。現行IDBの直接Cは既に速い | 将来の巨大原本、範囲I/O、Worker内同期I/O、デスクトップFileStoreへの境界に適する。quota、原子更新、GC、IDBからの移行が増える。GLTFLoader.parseAsyncの全体ArrayBuffer要求も消えない | AssetStore境界を先に作り、媒体交換は後 |
-| E. ResourceCache | GLBはasset IDで共有。VRMはserial付きキーで毎回独立パースする | 原本/検査結果、CPUの不変geometry/texture、GPU資源、VRM可変instanceを分離。再追加/複製/Undo時の繰り返しを減らせる。表情/ボーン/LookAt/Springのインスタンス状態を共有してはいけない | 大容量を何体も扱うには重要 |
-| F. Worker / OffscreenCanvas / compileAsync | Workerへのモデル移設、compileAsyncのA/B実測は未実施。初回renderの同期負担は実測した | 検証・準備のWorker化はUIの応答性に有効。GPU総仕事量やIPCを自動的には減らさない。Three/VRMのDOM依存、画像デコード、コンテキスト復旧と資源の所有権を監査する必要がある | 部分的なWorker化、シェーダー準備を別々に検証 |
+| 方式                                       | 確認したこと                                                                                                                                                                              | 期待する効果と代償                                                                                                                                                                                         | 判断                                         |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| A. 現行チャンクを改善                      | 変換は初回約572ms、再結合は両方向計約46ms。JSON/待ちの方が大きい                                                                                                                          | 読み出しを整理処理から分離、重複leaseの抑制、pruneの集約、読み出し用Blob参照の短期保持。単なる断片サイズ変更では頭打ち。削除とleaseの競合は引き続き直列化が必要                                            | 最初の小さな改善候補                         |
+| B. MessageChannel + ArrayBuffer            | 実Content Scriptのisolated world→拡張iframeへ57,185,776 bytesの合成ゼロバッファを所有権移譲し、受信数と送信元detachを確認。3回134/178/166ms                                               | Chrome runtimeの直接代替ではなく、別の通信橋が必要。合成データのACK往復であり、実VRMのFile I/O・検査・保存・描画や両方向転送を含まない。内部の物理コピーゼロも保証しない。認証/再接続/要求世代の設計が要る | バイナリ橋の候補。単独で採用決定しない       |
+| C. 拡張iframe + IDB直接                    | 実YouTube内で原本を直接読み、透明なMToon表示まで927ms。別の新規プロファイルでの追加試行は2,866ms。変更前と同じMV3 CSP、Chrome ID、IDB原本を利用。クリック透過で動画設定ボタンを操作できた | ページとの原本往復を排除できる。代わりに合成面・全画面・再接続・座標・権限境界の設計が必要。単一iframeのcanvasではDOMの2Dと任意に挟み込めない                                                              | 効果は実証。全Renderer移設にはまだ進まない   |
+| D. OPFS + AssetStore                       | OPFS性能は未測定。現行IDBの直接Cは既に速い                                                                                                                                                | 将来の巨大原本、範囲I/O、Worker内同期I/O、デスクトップFileStoreへの境界に適する。quota、原子更新、GC、IDBからの移行が増える。GLTFLoader.parseAsyncの全体ArrayBuffer要求も消えない                          | AssetStore境界を先に作り、媒体交換は後       |
+| E. ResourceCache                           | GLBはasset IDで共有。VRMはserial付きキーで毎回独立パースする                                                                                                                              | 原本/検査結果、CPUの不変geometry/texture、GPU資源、VRM可変instanceを分離。再追加/複製/Undo時の繰り返しを減らせる。表情/ボーン/LookAt/Springのインスタンス状態を共有してはいけない                          | 大容量を何体も扱うには重要                   |
+| F. Worker / OffscreenCanvas / compileAsync | Workerへのモデル移設、compileAsyncのA/B実測は未実施。初回renderの同期負担は実測した                                                                                                       | 検証・準備のWorker化はUIの応答性に有効。GPU総仕事量やIPCを自動的には減らさない。Three/VRMのDOM依存、画像デコード、コンテキスト復旧と資源の所有権を監査する必要がある                                       | 部分的なWorker化、シェーダー準備を別々に検証 |
 
 MessagePortにはtransfer listがあるが、転送後は送信側の所有権を失う。[HTML標準](https://html.spec.whatwg.org/multipage/web-messaging.html)
 
@@ -170,15 +170,15 @@ Three.jsには`compileAsync`があり、`KHR_parallel_shader_compile`を利用�
 
 拡張iframeが上位の拡張オリジンのIDBを参照できることは今回の原本で実証した。Chromeの拡張オリジンに対するストレージ分割の例外とも一致する。[ChromeのStorage仕様](https://developer.chrome.com/docs/extensions/develop/concepts/storage-and-cookies) / [Web Accessible Resources](https://developer.chrome.com/docs/extensions/reference/manifest/web-accessible-resources) / [拡張CSP](https://developer.chrome.com/docs/extensions/reference/manifest/content-security-policy)
 
-| 論点 | 今回の結果 / 残ること |
-|---|---|
-| オリジン・透過・CSP | chrome-extensionオリジン、同じchrome.runtime.id、body背景rgba(0,0,0,0)、原本の非透明描画を確認。IDB共有のための権限追加は不要だった |
-| クリック透過 | iframe側pointer-events:none。実YouTubeの設定ボタンと設定メニューをクリックできた。編集ハンドルは今後もページ側に置く必要がある |
-| 全画面 | 今回のYouTubeはHTML要素が全画面対象。body直下のiframeは全画面中もready状態を維持した。player内へ作り直す試行では旧Frame参照が閉じた。現在のiframeをFrameLocatorで取り直す追加試験でも、全画面切り替え後に`ready:false / Error: invalid probe grant`を確認。新しいdocumentが同じnonceを再claimし、使い切ったgrantを拒否された。単なるテスト参照の問題ではなく、player配下のiframeの再読み込みと認証再接続が未対応。再読み込みを起こした内部要因までは特定していない |
-| スタッキング・マスク | bodyの1枚iframeでDOMの画像と3Dを任意に交互配置できることは検証していない。親のopacity/クリップだけで既存のグループマスク全てを再現できるとはしない。子のcontentへページが直接アクセスできないため、現行canvasの単純な移動では済まない |
-| 通信の安全性 | Workerから選択済みasset IDに対するタブ限定・1回・60秒のgrantを発行し、iframeがclaimする。windowメッセージはparent/source/origin/nonceを検査し、プローブはバイト数だけを返信。原本や任意Chromeコマンドは返さない。ただしDOM上のnonceはページからも見える。本番の編集命令の認証をnonceとwindow.postMessageだけに委ねてはいけない |
-| GPU負荷 | iframeも1個のWebGL contextを作り、同じ推定168.3MiBを必要とする。現行表示と並行させたプローブでは2つのcontext/モデルが存在し、資源は共有されない。iframe化だけでGPU/VRAMを節約できるとはしない |
-| SPA・移動・復旧 | iframe方式についてはSPA/全ての全画面対象/通常Chromeプロファイル/マルチモデルの長時間試験は未実施。取り外すとWebContentsと資源を失う前提で、世代管理と再ロードが必要 |
+| 論点                 | 今回の結果 / 残ること                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| オリジン・透過・CSP  | chrome-extensionオリジン、同じchrome.runtime.id、body背景rgba(0,0,0,0)、原本の非透明描画を確認。IDB共有のための権限追加は不要だった                                                                                                                                                                                                                                                                                                                                |
+| クリック透過         | iframe側pointer-events:none。実YouTubeの設定ボタンと設定メニューをクリックできた。編集ハンドルは今後もページ側に置く必要がある                                                                                                                                                                                                                                                                                                                                     |
+| 全画面               | 今回のYouTubeはHTML要素が全画面対象。body直下のiframeは全画面中もready状態を維持した。player内へ作り直す試行では旧Frame参照が閉じた。現在のiframeをFrameLocatorで取り直す追加試験でも、全画面切り替え後に`ready:false / Error: invalid probe grant`を確認。新しいdocumentが同じnonceを再claimし、使い切ったgrantを拒否された。単なるテスト参照の問題ではなく、player配下のiframeの再読み込みと認証再接続が未対応。再読み込みを起こした内部要因までは特定していない |
+| スタッキング・マスク | bodyの1枚iframeでDOMの画像と3Dを任意に交互配置できることは検証していない。親のopacity/クリップだけで既存のグループマスク全てを再現できるとはしない。子のcontentへページが直接アクセスできないため、現行canvasの単純な移動では済まない                                                                                                                                                                                                                              |
+| 通信の安全性         | Workerから選択済みasset IDに対するタブ限定・1回・60秒のgrantを発行し、iframeがclaimする。windowメッセージはparent/source/origin/nonceを検査し、プローブはバイト数だけを返信。原本や任意Chromeコマンドは返さない。ただしDOM上のnonceはページからも見える。本番の編集命令の認証をnonceとwindow.postMessageだけに委ねてはいけない                                                                                                                                     |
+| GPU負荷              | iframeも1個のWebGL contextを作り、同じ推定168.3MiBを必要とする。現行表示と並行させたプローブでは2つのcontext/モデルが存在し、資源は共有されない。iframe化だけでGPU/VRAMを節約できるとはしない                                                                                                                                                                                                                                                                      |
+| SPA・移動・復旧      | iframe方式についてはSPA/全ての全画面対象/通常Chromeプロファイル/マルチモデルの長時間試験は未実施。取り外すとWebContentsと資源を失う前提で、世代管理と再ロードが必要                                                                                                                                                                                                                                                                                                |
 
 再現: プロファイル用拡張を読み込む → 原本を保存 → 実YouTube用にgrantを発行 → bodyへiframeを作成してstored表示 → 全画面・解除 → 原iframeを削除 → 新grantでmovie_player配下へ作成 → 全画面。自動プローブは`tests/asset-load-benchmark.spec.ts`の`iframeProbe`。`WW_ASSET_IFRAME_TEST=1`で単独実行できる。成功した部分と、player配下の失敗をJSONへ別々に残す。今回の単独プローブはplayerFrameRetainedのassertで1件失敗した。安全な再接続を実装せずに、grantの使い回しで通す変更は行っていない。これは全画面対応済みの製品実装ではない。
 

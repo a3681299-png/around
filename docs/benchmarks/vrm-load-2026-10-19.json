@@ -20,10 +20,7 @@
             "jsHeapPeak": null,
             "gpuUtilization": null,
             "actualVramBytes": null,
-            "placement": [
-              300,
-              300
-            ],
+            "placement": [300, 300],
             "stats": {
               "contexts": 1,
               "lost": false,
@@ -61,10 +58,7 @@
             "jsHeapPeak": null,
             "gpuUtilization": null,
             "actualVramBytes": null,
-            "placement": [
-              300,
-              300
-            ],
+            "placement": [300, 300],
             "stats": {
               "contexts": 1,
               "lost": false,
@@ -102,10 +96,7 @@
             "jsHeapPeak": null,
             "gpuUtilization": null,
             "actualVramBytes": null,
-            "placement": [
-              300,
-              300
-            ],
+            "placement": [300, 300],
             "stats": {
               "contexts": 1,
               "lost": false,
@@ -163,10 +154,7 @@
             "jsHeapPeak": null,
             "gpuUtilization": null,
             "actualVramBytes": null,
-            "placement": [
-              300,
-              300
-            ],
+            "placement": [300, 300],
             "stats": {
               "contexts": 1,
               "lost": false,
@@ -509,10 +497,7 @@
             "jsHeapPeak": null,
             "gpuUtilization": null,
             "actualVramBytes": null,
-            "placement": [
-              300,
-              300
-            ],
+            "placement": [300, 300],
             "stats": {
               "contexts": 1,
               "lost": false,
@@ -855,10 +840,7 @@
             "jsHeapPeak": null,
             "gpuUtilization": null,
             "actualVramBytes": null,
-            "placement": [
-              300,
-              300
-            ],
+            "placement": [300, 300],
             "stats": {
               "contexts": 1,
               "lost": false,
@@ -1199,10 +1181,7 @@
             "vrmVersion": "0.x",
             "totalMs": 3745.5,
             "alphaPixels": 7360,
-            "canvas": [
-              300,
-              300
-            ],
+            "canvas": [300, 300],
             "stats": {
               "contexts": 1,
               "lost": false,
@@ -1505,10 +1484,7 @@
             "vrmVersion": "0.x",
             "totalMs": 3600.5,
             "alphaPixels": 7360,
-            "canvas": [
-              300,
-              300
-            ],
+            "canvas": [300, 300],
             "stats": {
               "contexts": 1,
               "lost": false,
@@ -1811,10 +1787,7 @@
             "vrmVersion": "0.x",
             "totalMs": 3513.300000000745,
             "alphaPixels": 7360,
-            "canvas": [
-              300,
-              300
-            ],
+            "canvas": [300, 300],
             "stats": {
               "contexts": 1,
               "lost": false,
@@ -2119,10 +2092,7 @@
             "vrmVersion": "0.x",
             "totalMs": 1102.2999999970198,
             "alphaPixels": 7360,
-            "canvas": [
-              300,
-              300
-            ],
+            "canvas": [300, 300],
             "stats": {
               "contexts": 1,
               "lost": false,
@@ -2241,10 +2211,7 @@
             "vrmVersion": "0.x",
             "totalMs": 710.1999999992549,
             "alphaPixels": 7360,
-            "canvas": [
-              300,
-              300
-            ],
+            "canvas": [300, 300],
             "stats": {
               "contexts": 1,
               "lost": false,
@@ -2363,10 +2330,7 @@
             "vrmVersion": "0.x",
             "totalMs": 496.20000000298023,
             "alphaPixels": 7360,
-            "canvas": [
-              300,
-              300
-            ],
+            "canvas": [300, 300],
             "stats": {
               "contexts": 1,
               "lost": false,
@@ -2487,10 +2451,7 @@
             "vrmVersion": "0.x",
             "totalMs": 996.6999999992549,
             "alphaPixels": 7360,
-            "canvas": [
-              300,
-              300
-            ],
+            "canvas": [300, 300],
             "stats": {
               "contexts": 1,
               "lost": false,
@@ -2599,10 +2560,7 @@
             "vrmVersion": "0.x",
             "totalMs": 450,
             "alphaPixels": 7360,
-            "canvas": [
-              300,
-              300
-            ],
+            "canvas": [300, 300],
             "stats": {
               "contexts": 1,
               "lost": false,
@@ -2711,10 +2669,7 @@
             "vrmVersion": "0.x",
             "totalMs": 390.80000000074506,
             "alphaPixels": 7360,
-            "canvas": [
-              300,
-              300
-            ],
+            "canvas": [300, 300],
             "stats": {
               "contexts": 1,
               "lost": false,
@@ -2826,10 +2781,7 @@
           "vrmVersion": "0.x",
           "totalMs": 926.8000000007451,
           "alphaPixels": 7360,
-          "canvas": [
-            300,
-            300
-          ],
+          "canvas": [300, 300],
           "stats": {
             "contexts": 1,
             "lost": false,
@@ -2984,10 +2936,7 @@
             "jsHeapPeak": null,
             "gpuUtilization": null,
             "actualVramBytes": null,
-            "placement": [
-              300,
-              300
-            ],
+            "placement": [300, 300],
             "stats": {
               "contexts": 1,
               "lost": false,
@@ -3386,10 +3335,7 @@
       "vrmVersion": "0.x",
       "totalMs": 2865.60000000149,
       "alphaPixels": 7360,
-      "canvas": [
-        300,
-        300
-      ],
+      "canvas": [300, 300],
       "stats": {
         "contexts": 1,
         "lost": false,

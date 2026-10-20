@@ -49,10 +49,17 @@ export interface LayerAppearance {
   motion?: import('../signals/motion').FollowMotion;
 }
 
-export interface LayerState extends LayerAppearance { placement: LayerPlacement }
-export interface GroupLayer extends LayerAppearance { kind: 'group'; children: string[] }
+export interface LayerState extends LayerAppearance {
+  placement: LayerPlacement;
+}
+export interface GroupLayer extends LayerAppearance {
+  kind: 'group';
+  children: string[];
+}
 /** Group geometry is derived from its children, never a second saved coordinate system. */
-export interface GroupView extends GroupLayer { placement: LayerPlacement }
+export interface GroupView extends GroupLayer {
+  placement: LayerPlacement;
+}
 export type LayerNode = Decoration | GroupLayer;
 export type EditorLayer = Decoration | GroupView;
 
@@ -62,17 +69,33 @@ export interface ImageDecoration extends LayerState {
   assetId: string;
 }
 
-export interface PlaybackSettings { playing: boolean; loop: boolean; speed: number; mode?: 'auto' | 'controlled' }
+export interface PlaybackSettings {
+  playing: boolean;
+  loop: boolean;
+  speed: number;
+  mode?: 'auto' | 'controlled';
+}
 export interface AnimationDecoration extends LayerState {
   kind: 'animation';
   assetId: string;
   format: import('../assets/motion-types').AnimationFormat;
   playback: PlaybackSettings;
 }
-export interface ModelDecoration extends LayerState { kind: 'model3d'; assetId: string; source: import('../models/types').ModelInfo; model: import('../models/types').ModelSettings }
+export interface ModelDecoration extends LayerState {
+  kind: 'model3d';
+  assetId: string;
+  source: import('../models/types').ModelInfo;
+  model: import('../models/types').ModelSettings;
+}
 export type Decoration = ImageDecoration | AnimationDecoration | ModelDecoration;
 
-export type ImagePatch = Partial<Pick<LayerState, 'name' | 'opacity' | 'zIndex' | 'visible' | 'locked' | 'effects' | 'motion'>> & { placement?: Partial<LayerPlacement>; playback?: Partial<PlaybackSettings>; model?: import('../models/types').ModelPatch };
+export type ImagePatch = Partial<
+  Pick<LayerState, 'name' | 'opacity' | 'zIndex' | 'visible' | 'locked' | 'effects' | 'motion'>
+> & {
+  placement?: Partial<LayerPlacement>;
+  playback?: Partial<PlaybackSettings>;
+  model?: import('../models/types').ModelPatch;
+};
 
 export interface DesignTarget {
   readonly id: string;

@@ -50,19 +50,24 @@ document.addEventListener('click', event => {
 window.addEventListener('pagehide', () => unbind(), {once:true});
 `,
   },
-  plugins: [{
-    name: 'offline-preview-host-only',
-    setup(build) {
-      build.onLoad({ filter: /src[\\/]sites[\\/]index\.ts$/ }, async ({ path: filename }) => ({
-        contents: (await readFile(filename, 'utf8')).replace('supportsYouTube(new URL(view.location.href))', 'true'),
-        loader: 'ts',
-      }));
-      build.onLoad({ filter: /src[\\/]sites[\\/]youtube-chrome\.ts$/ }, async ({ path: filename }) => ({
-        contents: (await readFile(filename, 'utf8')).replace("doc.location.pathname === '/watch'", "doc.location.hash.startsWith('#/watch')"),
-        loader: 'ts',
-      }));
+  plugins: [
+    {
+      name: 'offline-preview-host-only',
+      setup(build) {
+        build.onLoad({ filter: /src[\\/]sites[\\/]index\.ts$/ }, async ({ path: filename }) => ({
+          contents: (await readFile(filename, 'utf8')).replace('supportsYouTube(new URL(view.location.href))', 'true'),
+          loader: 'ts',
+        }));
+        build.onLoad({ filter: /src[\\/]sites[\\/]youtube-chrome\.ts$/ }, async ({ path: filename }) => ({
+          contents: (await readFile(filename, 'utf8')).replace(
+            "doc.location.pathname === '/watch'",
+            "doc.location.hash.startsWith('#/watch')",
+          ),
+          loader: 'ts',
+        }));
+      },
     },
-  }],
+  ],
   bundle: true,
   target: 'chrome120',
   format: 'iife',
@@ -90,18 +95,35 @@ globalThis.chrome = {runtime: {getURL: () => "data:font/woff2;base64,${previewFo
 `;
 let html = await readFile(path.join(root, 'tests/fixtures/youtube.html'), 'utf8');
 html = html.replace('YouTube adapter fixture', 'Web World Themes · offline silver-blue preview');
-html = html.replace('const videos = [', "let fixturePathname = location.hash.startsWith('#/') ? new URL(location.hash.slice(1), 'https://www.youtube.com').pathname : '/';\n      const videos = [");
-html = html.replaceAll("location.pathname ===", "fixturePathname ===");
-html = html.replace("history.pushState({}, '', url);", "fixturePathname = new URL(url, 'https://www.youtube.com').pathname;\n        history.pushState({ fixturePathname }, '', '#' + url);");
-html = html.replace("window.addEventListener('popstate', () => { renderPage();", "window.addEventListener('popstate', () => { fixturePathname = location.hash.startsWith('#/') ? new URL(location.hash.slice(1), 'https://www.youtube.com').pathname : '/'; renderPage();");
-html = html.replace('</style>', `
+html = html.replace(
+  'const videos = [',
+  "let fixturePathname = location.hash.startsWith('#/') ? new URL(location.hash.slice(1), 'https://www.youtube.com').pathname : '/';\n      const videos = [",
+);
+html = html.replaceAll('location.pathname ===', 'fixturePathname ===');
+html = html.replace(
+  "history.pushState({}, '', url);",
+  "fixturePathname = new URL(url, 'https://www.youtube.com').pathname;\n        history.pushState({ fixturePathname }, '', '#' + url);",
+);
+html = html.replace(
+  "window.addEventListener('popstate', () => { renderPage();",
+  "window.addEventListener('popstate', () => { fixturePathname = location.hash.startsWith('#/') ? new URL(location.hash.slice(1), 'https://www.youtube.com').pathname : '/'; renderPage();",
+);
+html = html.replace(
+  '</style>',
+  `
       #preview-toolbar { position:fixed; bottom:26px; left:0; z-index:90; display:flex; align-items:center; gap:10px; padding:9px 12px; background:#0d2134; color:#eaf8ff; font:11px Arial,sans-serif; border-top:1px solid #5a869f; }
       #preview-toolbar strong { font:10px monospace; letter-spacing:.08em; color:#99d7f2; }
       #preview-toolbar button { padding:5px 8px; background:#d9eafa; color:#16374d; border:1px solid #789aae; border-radius:2px; }
       @media(max-width:750px) { #preview-toolbar span { display:none; } }
-    </style>`);
-html = html.replace('</body>', `<script>${storageShim.replaceAll('</script', '<\\/script')}</script>\n<script>${result.outputFiles[0].text.replaceAll('</script', '<\\/script')}</script>\n</body>`);
+    </style>`,
+);
+html = html.replace(
+  '</body>',
+  `<script>${storageShim.replaceAll('</script', '<\\/script')}</script>\n<script>${result.outputFiles[0].text.replaceAll('</script', '<\\/script')}</script>\n</body>`,
+);
 await mkdir(path.dirname(output), { recursive: true });
 await writeFile(output, html);
 console.log(`Offline fixture preview: ${output}`);
-console.log('Uses real theme, adapter, settings, and feature modules; mock storage and explicit host-gate bypass for local review only.');
+console.log(
+  'Uses real theme, adapter, settings, and feature modules; mock storage and explicit host-gate bypass for local review only.',
+);

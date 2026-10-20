@@ -2,7 +2,12 @@ import type { EditCommand, EditorCheckpoint, EditorSnapshot } from '../editor-co
 import type { StudioTarget } from './protocol';
 import type { TimelinePort } from '../timeline/types';
 
-export interface StudioConnectionState { target: number | undefined; connected: boolean; message: string; state?: EditorSnapshot }
+export interface StudioConnectionState {
+  target: number | undefined;
+  connected: boolean;
+  message: string;
+  state?: EditorSnapshot;
+}
 /** A Studio uses commands and snapshots, never a Chrome tab or site DOM. */
 export interface StudioConnection {
   readonly timeline?: TimelinePort;
