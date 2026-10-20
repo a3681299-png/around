@@ -8,6 +8,14 @@ import { vrmFixture } from './helpers/vrm-fixture';
 import { modelFixture } from './helpers/model-fixture';
 import { evaluateWorld, initialWorldState } from '../src/world/evaluate';
 
+for (const mime of ['model/vrml', '', 'application/octet-stream']) {
+  test(`VRM accepts the OS MIME ${JSON.stringify(mime)} after structure validation`, () => {
+    const info = inspectAsset(vrmFixture(), mime);
+    expect(info.mime).toBe('model/gltf-binary');
+    expect(info.model).toMatchObject({ format: 'vrm', vrm: { version: '1.0' } });
+  });
+}
+
 test('VRM1 preserves humanoid, expression, spring and MToon capabilities with v11 roundtrip', () => {
   const source = inspectAsset(vrmFixture(), 'model/vrm').model!;
   expect(source.format).toBe('vrm');
@@ -161,7 +169,12 @@ for (const [label, mutate] of [
     },
   ],
 ] as const)
-  test(`VRM rejects ${label}`, () => expect(() => inspectAsset(vrmFixture(mutate))).toThrow());
+  test(`VRM rejects ${label}`, () => {
+    const bytes = vrmFixture(mutate);
+    for (const mime of ['', 'model/vrml', 'application/octet-stream']) {
+      expect(() => inspectAsset(bytes, mime), mime).toThrow();
+    }
+  });
 
 test('chunked uploads are bounded, ordered, isolated by owner, cancellable and expiring', () => {
   const t = createAssetTransfers(),

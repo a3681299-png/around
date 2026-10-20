@@ -8,16 +8,17 @@ import path from 'node:path';
 test('VRM1 renders MToon with alpha, follows the pointer, edits expressions and shares save/history/group operations', async ({
   popup,
   youtube,
-}) => {
+}, info) => {
+  const file = info.outputPath('original.vrm');
+  await mkdir(path.dirname(file), { recursive: true });
+  await writeFile(file, vrmFixture());
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
   await youtube.bringToFront();
   await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
   const panel = youtube.locator('#web-world-themes-creator');
   await exposeEditorControls(panel);
-  await panel
-    .locator('.model-file')
-    .setInputFiles({ name: 'original.vrm', mimeType: 'model/vrm', buffer: vrmFixture() });
+  await panel.locator('.model-file').setInputFiles(file);
   const media = youtube.locator('#web-world-themes-decorations .model-media');
   await expect(media).toHaveAttribute('data-renderer', 'three');
   await expect(media).toHaveAttribute('data-format', 'vrm');
@@ -158,35 +159,10 @@ for (const large of [false, true])
         /swiftshader|llvmpipe|softpipe|software|microsoft basic render/i,
       );
     }
-    // A path-only .vrm input uses the OS MIME database, which can identify this
-    // extension as legacy VRML. This generated VRM fixture has an explicit MIME;
-    // production MIME/signature validation remains exercised without relaxation.
-    const file = {
-      name: large ? 'original-padded.vrm' : 'original-small.vrm',
-      mimeType: 'model/vrm',
-      buffer: large ? largeVrmFixture() : vrmFixture(),
-    };
-    if (!large) {
-      // Keep the platform's path-only MIME result as CI evidence, separately from
-      // the controlled rendering fixture. Never relax production MIME checks.
-      const probeFile = info.outputPath('os-mime-probe.vrm');
-      await mkdir(path.dirname(probeFile), { recursive: true });
-      await writeFile(probeFile, file.buffer);
-      const probe = await context.newPage();
-      try {
-        await probe.setContent('<input type="file">');
-        await probe.locator('input').setInputFiles(probeFile);
-        const mime = await probe.locator('input').evaluate((node: HTMLInputElement) => node.files![0]!.type);
-        const report = info.outputPath('vrm-fixture-mime.json');
-        await writeFile(
-          report,
-          JSON.stringify({ pathOnlyMime: mime, renderingMime: file.mimeType, bytes: file.buffer.length }, null, 2),
-        );
-        await info.attach('vrm-fixture-mime', { path: report, contentType: 'application/json' });
-      } finally {
-        await probe.close();
-      }
-    }
+    const bytes = large ? largeVrmFixture() : vrmFixture(),
+      file = info.outputPath(large ? 'original-padded.vrm' : 'original-small.vrm');
+    await mkdir(path.dirname(file), { recursive: true });
+    await writeFile(file, bytes);
     await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
     await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
     await youtube.bringToFront();
@@ -196,7 +172,23 @@ for (const large of [false, true])
     await studio.setViewportSize({ width: 1440, height: 1000 });
     await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
     const panel = studio.locator('#web-world-themes-creator');
+    // Capture before the panel's change handler clears the input. The real file
+    // goes through the OS MIME database and the actual import/rendering path.
+    await panel.locator('.model-file').evaluate((input: HTMLInputElement) => {
+      input.addEventListener(
+        'change',
+        () => {
+          input.dataset.importMime = input.files![0]!.type;
+        },
+        { once: true, capture: true },
+      );
+    });
     await panel.locator('.model-file').setInputFiles(file);
+    const mime = await panel.locator('.model-file').getAttribute('data-import-mime'),
+      report = info.outputPath('vrm-fixture-mime.json');
+    expect(mime).not.toBeNull();
+    await writeFile(report, JSON.stringify({ pathOnlyMime: mime, bytes: bytes.length }, null, 2));
+    await info.attach('vrm-fixture-mime', { path: report, contentType: 'application/json' });
     const media = youtube.locator('#web-world-themes-decorations .model-media');
     await expect(media).toHaveAttribute('data-renderer', 'three', large ? { timeout: 40000 } : {});
     await panel.locator('.duplicate-image').click();

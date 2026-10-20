@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { canReuseImportInspection } from '../src/assets/import-validation';
 import { inspectAsset } from '../src/assets/inspect';
 import { vrmFixture } from './helpers/vrm-fixture';
+import { modelFixture } from './helpers/model-fixture';
 
 for (const [name, bytes, reusableMimes] of [
   ['png', readFileSync('tests/fixtures/motion/petal.png'), ['', 'image/png']],
@@ -10,7 +11,6 @@ for (const [name, bytes, reusableMimes] of [
   ['apng', readFileSync('tests/fixtures/motion/petal.apng'), ['', 'image/png']],
   ['webm', readFileSync('tests/fixtures/motion/long.webm'), ['', 'video/webm']],
   ['lottie', readFileSync('tests/fixtures/motion/petal.json'), ['', 'application/json']],
-  ['vrm', vrmFixture(), ['', 'model/gltf-binary', 'application/octet-stream', 'model/vrm', 'application/vrm']],
 ] as const) {
   test(`worker import receipts preserve the ${name} MIME boundary`, () => {
     const cached = inspectAsset(bytes);
@@ -27,6 +27,7 @@ for (const [name, bytes, reusableMimes] of [
       'model/gltf-binary',
       'application/octet-stream',
       'model/vrm',
+      'model/vrml',
       'application/vrm',
       'text/html',
     ]) {
@@ -45,5 +46,34 @@ for (const [name, bytes, reusableMimes] of [
       expect(inspectAsset(bytes, 'image/apng')).toEqual(cached);
     }
     expect(() => inspectAsset(bytes, 'text/html')).toThrow();
+    // A model declaration must never turn non-model bytes into a model receipt.
+    for (const mime of ['model/gltf-binary', 'model/vrm', 'model/vrml', 'application/octet-stream']) {
+      expect(canReuseImportInspection(cached, mime), mime).toBe(false);
+      expect(() => inspectAsset(bytes, mime), mime).toThrow();
+    }
+  });
+}
+
+for (const [name, bytes] of [
+  ['glb', modelFixture()],
+  ['vrm', vrmFixture()],
+] as const) {
+  test(`worker reuses structurally validated ${name} regardless of the declared MIME`, () => {
+    const cached = inspectAsset(bytes);
+    for (const mime of [
+      '',
+      'model/gltf-binary',
+      'model/vrm',
+      'application/vrm',
+      'model/vrml',
+      'application/octet-stream',
+      'image/png',
+      'text/html',
+    ]) {
+      expect(canReuseImportInspection(undefined, mime), mime).toBe(false);
+      expect(canReuseImportInspection(cached, mime), mime).toBe(true);
+      expect(inspectAsset(bytes, mime), mime).toEqual(cached);
+      expect(() => inspectAsset(bytes.subarray(0, -4), mime), mime).toThrow();
+    }
   });
 }

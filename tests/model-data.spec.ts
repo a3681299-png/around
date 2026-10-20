@@ -69,7 +69,6 @@ test('external URIs, custom extensions, cycles, broken buffers and decompression
     expect(() => inspectGlb(modelFixture(mutate))).toThrow();
   const truncated = modelFixture().subarray(0, -4);
   expect(() => inspectAsset(truncated)).toThrow();
-  expect(() => inspectAsset(modelFixture(), 'image/png')).toThrow(/MIME/);
 });
 
 test('shared morph accessors cannot amplify a small file into an unbounded GPU texture', () => {

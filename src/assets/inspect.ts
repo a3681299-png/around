@@ -25,10 +25,11 @@ export function inspectAsset(data: Uint8Array, mime = ''): AssetInfo {
   )
     info = inspectLottie(data).info;
   else info = inspectApng(data) ?? inspectAnimatedWebp(data) ?? inspectImage(data, mime);
+  // Models have passed GLB/VRM structure validation; OS MIME labels vary by platform.
   if (
+    !info.model &&
     mime &&
     mime !== info.mime &&
-    !(info.model && ['application/octet-stream', 'model/vrm', 'application/vrm'].includes(mime)) &&
     !(info.mime === 'application/json' && mime === 'text/plain') &&
     !(info.animation?.format === 'apng' && mime === 'image/apng')
   )
