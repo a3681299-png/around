@@ -24,6 +24,16 @@ test('bounded queue cancels pending requests without consuming an execution slot
   gate.resolve(1); await active; expect(await next).toBe(3);
 });
 
+test('serial mutation work accepts bursts beyond 64 pending requests in order', async () => {
+  const queue = createWorkQueue(1, Infinity), gate = deferred<number>(), order: number[] = [];
+  const first = queue.run(() => gate.promise);
+  const pending = Array.from({ length: 130 }, (_, i) => queue.run(async () => { order.push(i); return i; }));
+  const result = Promise.all(pending);
+  try { expect(queue.stats()).toEqual({ active: 1, pending: 130 }); }
+  finally { gate.resolve(-1); }
+  expect(await first).toBe(-1); expect(await result).toEqual(Array.from({ length: 130 }, (_, i) => i)); expect(order).toEqual(await result);
+});
+
 test('concurrent consumers share one source; cancelling one does not cancel the others', async () => {
   let loads = 0, cancelled = false, time = 0; const gate = deferred<{ bytes: number }>();
   const cache = createSourceCache({ load: async (_id: string, signal) => { loads++; signal.addEventListener('abort', () => { cancelled = true; }); return gate.promise; }, size: (v) => v.bytes, now: () => time, maxBytes: 10, idleMs: 100 });
@@ -44,15 +54,42 @@ test('last consumer cancellation stops shared work and errors can be retried', a
 });
 
 test('unused LRU sources are evicted under the byte budget; active sources survive', async () => {
-  let time = 0; const cache = createSourceCache({ load: async (id: string) => id, size: () => 6, now: () => ++time, maxBytes: 10, idleMs: 100 });
-  await cache.get('a'); await cache.get('b'); expect(cache.stats().retainedBytes).toBe(6); expect(cache.stats().entries).toBe(1);
-  cache.clear(); expect(cache.stats().entries).toBe(0);
+  let time = 0, activeLoads = 0, aborted = false; const gate = deferred<string>();
+  const cache = createSourceCache({ load: async (id: string, signal) => {
+    if (id !== 'active') return id;
+    activeLoads++; signal.addEventListener('abort', () => { aborted = true; }); return gate.promise;
+  }, size: () => 6, now: () => ++time, maxBytes: 10, idleMs: 100 });
+  const active = cache.get('active');
+  try {
+    await cache.get('a'); await cache.get('b'); expect(cache.stats().retainedBytes).toBe(6); expect(cache.stats().entries).toBe(2);
+    const same = cache.get('active'); expect(activeLoads).toBe(1); expect(aborted).toBe(false);
+    gate.resolve('active'); expect(await active).toBe('active'); expect(await same).toBe('active');
+    expect(await cache.get('active')).toBe('active'); expect(activeLoads).toBe(1); expect(aborted).toBe(false);
+  } finally { gate.resolve('active'); cache.clear(); }
+  expect(cache.stats().entries).toBe(0);
+});
+
+test('idle sources expire without another get while an active request survives the timer', async () => {
+  const gate = deferred<string>(); let loads = 0, aborted = false;
+  const cache = createSourceCache({ load: async (id: string, signal) => {
+    if (id !== 'active') return id;
+    loads++; signal.addEventListener('abort', () => { aborted = true; }); return gate.promise;
+  }, size: () => 1, now: () => performance.now(), maxBytes: 10, idleMs: 20 });
+  const active = cache.get('active');
+  try {
+    await cache.get('idle');
+    await expect.poll(() => cache.stats().entries, { intervals: [5, 10] }).toBe(1);
+    expect(cache.stats().retainedBytes).toBe(0); expect(aborted).toBe(false);
+    const same = cache.get('active'); gate.resolve('ready'); expect(await active).toBe('ready'); expect(await same).toBe('ready'); expect(loads).toBe(1);
+    await expect.poll(() => cache.stats().entries, { intervals: [5, 10] }).toBe(0);
+  } finally { gate.resolve('ready'); cache.clear(); }
 });
 
 test('failed source preparation is not cached and the next request retries', async () => {
   let attempt = 0;
   const cache = createSourceCache({ load: async (_id: string) => { if (++attempt === 1) throw new Error('temporary failure'); return 5; }, size: () => 1, now: () => 0, maxBytes: 10, idleMs: 100 });
   await expect(cache.get('retry')).rejects.toThrow('temporary failure'); expect(await cache.get('retry')).toBe(5); expect(attempt).toBe(2);
+  cache.clear();
 });
 
 test('only an inspected immutable Blob carries a reusable model receipt', () => {

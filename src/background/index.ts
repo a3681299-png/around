@@ -11,6 +11,7 @@ import { installTakeStorage } from '../browser/take-repository';
 import { createAssetTransfers } from '../assets/transfers';
 import { createWorkQueue } from '../assets/work-queue';
 import { createSourceCache } from '../assets/source-cache';
+import { canReuseImportInspection } from '../assets/import-validation';
 import { installAssetRuntimeBroker } from '../diagnostics/asset-runtime-broker';
 import { ASSET_PROFILE, PROFILE_MESSAGE, assetProfile, linkAssetProfile, validProfile, profileAsync, profileSync, profileEnd, profileSnapshot, profileIngest, profileClear } from '../diagnostics/asset-profile';
 
@@ -19,7 +20,8 @@ const transfers = createAssetTransfers();
 const profileGrants = new Map<string, { id: string; tab: number; expires: number }>();
 const profileSessions = new Map<string, string>();
 
-const mutations = createWorkQueue(1), reads = createWorkQueue(2);
+// Lease/release/save must not be dropped when a burst exceeds the read queue's cap.
+const mutations = createWorkQueue(1, Infinity), reads = createWorkQueue(2);
 const enqueue = <T>(action: () => Promise<T>) => mutations.run(action);
 const verified = new Map<string, AssetInfo>(); // Worker-lifetime receipts, populated only after full validation.
 const sourceRows = createSourceCache({ load: async (id: string) => { const row = await getAsset(id); if (!row) throw new Error('画像素材が見つかりません。'); return row; },
@@ -98,7 +100,7 @@ async function importBatch(input: unknown, lease: AssetLease, decoded?: Uint8Arr
     const id = `asset-${[...new Uint8Array(hash)].map((byte) => byte.toString(16).padStart(2, '0')).join('')}`;
     const cached = verified.get(id);
     // A different MIME declaration still passes the original boundary check.
-    const reusable = cached && (!file.mime || cached.mime === file.mime || cached.model && ['application/octet-stream', 'model/vrm', 'application/vrm'].includes(file.mime));
+    const reusable = canReuseImportInspection(cached, file.mime);
     const info = reusable ? profileSync(trace, 'store.verified-hit', () => structuredClone(cached)) : profileSync(trace, 'store.inspect', () => inspectAsset(bytes, file.mime));
     if (!reusable && info.model) await profileAsync(trace, 'store.validate-textures', () => validateModelTextures(bytes, undefined, trace));
     const blob = profileSync(trace, 'store.clone-blob', () => new Blob([bytes as Uint8Array<ArrayBuffer>], { type: info.mime }), { bytes: bytes.length });

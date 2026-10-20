@@ -1,4 +1,4 @@
-/** Bounded scheduling; reads use their own queue and mutations remain serial. */
+/** Reads are bounded by default; capacity Infinity keeps mutations lossless and serial. */
 export function createWorkQueue(concurrency: number, capacity = 64) {
   if (!Number.isInteger(concurrency) || concurrency < 1) throw new Error('Invalid queue concurrency');
   let active = 0;

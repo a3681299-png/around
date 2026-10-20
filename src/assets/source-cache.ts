@@ -4,15 +4,24 @@ import { createWorkQueue } from './work-queue';
 export function createSourceCache<T>(options: { load(id: string, signal: AbortSignal): Promise<T>; size(value: T): number; now(): number; maxBytes: number; idleMs: number; concurrency?: number }) {
   interface Entry { controller: AbortController; promise: Promise<T>; users: number; value?: T; bytes: number; used: number }
   const entries = new Map<string, Entry>(), queue = createWorkQueue(options.concurrency ?? 2, 32);
-  let retained = 0;
+  let retained = 0, timer: ReturnType<typeof setTimeout> | undefined;
+  function cancelTimer() { if (timer !== undefined) clearTimeout(timer); timer = undefined; }
+  function scheduleTrim() {
+    cancelTimer();
+    let expires = Infinity;
+    for (const e of entries.values()) if (!e.users && e.value !== undefined) expires = Math.min(expires, e.used + options.idleMs);
+    if (expires !== Infinity) timer = setTimeout(() => { timer = undefined; trim(); }, Math.max(1, Math.ceil(expires - options.now())));
+  }
   function remove(id: string, e: Entry) {
     if (entries.get(id) !== e) return;
     entries.delete(id); retained -= e.bytes; e.controller.abort(new DOMException('Source released', 'AbortError'));
   }
   function trim() {
+    const now = options.now();
     for (const [id, e] of [...entries].sort((a, b) => a[1].used - b[1].used)) {
-      if (!e.users && e.value !== undefined && (options.now() - e.used >= options.idleMs || retained > options.maxBytes)) remove(id, e);
+      if (!e.users && e.value !== undefined && (now - e.used >= options.idleMs || retained > options.maxBytes)) remove(id, e);
     }
+    scheduleTrim();
   }
   return {
     get(id: string, signal?: AbortSignal): Promise<T> {
@@ -27,7 +36,7 @@ export function createSourceCache<T>(options: { load(id: string, signal: AbortSi
           entry.value = value; entry.bytes = options.size(value); retained += entry.bytes; return value;
         }).catch((error: unknown) => { remove(id, entry); throw error; });
       }
-      const entry = e; entry.users++; entry.used = options.now();
+      const entry = e; entry.users++; entry.used = options.now(); scheduleTrim();
       return new Promise<T>((resolve, reject) => {
         let done = false;
         const finish = (error: unknown, value?: T) => {
@@ -39,8 +48,8 @@ export function createSourceCache<T>(options: { load(id: string, signal: AbortSi
         signal?.addEventListener('abort', abort, { once: true }); entry.promise.then((value) => finish(undefined, value), (error: unknown) => finish(error));
       });
     },
-    clear() { for (const [id, e] of entries) remove(id, e); },
-    delete(id: string) { const e = entries.get(id); if (e) remove(id, e); },
+    clear() { cancelTimer(); for (const [id, e] of entries) remove(id, e); },
+    delete(id: string) { const e = entries.get(id); if (e) remove(id, e); scheduleTrim(); },
     stats: () => ({ entries: entries.size, retainedBytes: retained, ...queue.stats() }),
   };
 }

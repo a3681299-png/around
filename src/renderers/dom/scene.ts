@@ -5,6 +5,7 @@ import { legacyLayout } from './legacy-evaluation';
 import { assertWorldParity } from './parity';
 import { createModelRenderer } from '../three/models';
 import { createMediaController } from '../../media/controller';
+import { clearAssetSources } from '../../assets/client';
 import { createEffectController, type EffectTarget } from './effects';
 import type { PlaybackSource } from '../../signals/types';
 import { centre, rotation, groupBounds, moveGroup, resizePlacement, rotatePlacement, type PlacementChange, type PlacementSample, type Point } from '../../world/geometry';
@@ -273,6 +274,7 @@ export function createImageRenderer(doc: Document, anchors: readonly DesignTarge
     nodes.forEach((entry) => entry.media.destroy());
     models?.destroy(); models = undefined;
     media?.destroy(); media = undefined;
+    clearAssetSources();
     gesture = undefined;
     if (frame !== undefined) view.cancelAnimationFrame(frame);
     frame = undefined;

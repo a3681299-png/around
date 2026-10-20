@@ -6,7 +6,7 @@ import { VRMLoaderPlugin, VRMUtils } from '@pixiv/three-vrm';
 import { createVrmPlayer, isVrm, disposeInstanceSkeletons } from './vrm-player';
 import type { ModelEvaluation } from '../../world/models';
 import type { WorldFrame } from '../../world/types';
-import { loadAsset, clearAssetSources } from '../../assets/client';
+import { loadAsset } from '../../assets/client';
 import { verifiedModelBytes } from '../../assets/verified-source';
 import { inspectGlb } from '../../assets/glb';
 import type { Decoration, ModelDecoration } from '../../design/types';
@@ -231,7 +231,6 @@ export function createModelRenderer(doc: Document, report: (message: string) => 
     destroy() {
       if (closed) return; closed = true; cancel(); doc.removeEventListener('visibilitychange', visibility); reduced.removeEventListener('change', visibility);
       dropRenderer();
-      if (readAsset === loadAsset) clearAssetSources();
       stats();
     },
   };
