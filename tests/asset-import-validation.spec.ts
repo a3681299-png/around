@@ -4,20 +4,20 @@ import { canReuseImportInspection } from '../src/assets/import-validation';
 import { inspectAsset } from '../src/assets/inspect';
 import { vrmFixture } from './helpers/vrm-fixture';
 
-for (const [name, bytes] of [
-  ['png', readFileSync('tests/fixtures/motion/petal.png')],
-  ['gif', readFileSync('tests/fixtures/motion/petal.gif')],
-  ['apng', readFileSync('tests/fixtures/motion/petal.apng')],
-  ['webm', readFileSync('tests/fixtures/motion/long.webm')],
-  ['lottie', readFileSync('tests/fixtures/motion/petal.json')],
-  ['vrm', vrmFixture()],
+for (const [name, bytes, reusableMimes] of [
+  ['png', readFileSync('tests/fixtures/motion/petal.png'), ['', 'image/png']],
+  ['gif', readFileSync('tests/fixtures/motion/petal.gif'), ['', 'image/gif']],
+  ['apng', readFileSync('tests/fixtures/motion/petal.apng'), ['', 'image/png']],
+  ['webm', readFileSync('tests/fixtures/motion/long.webm'), ['', 'video/webm']],
+  ['lottie', readFileSync('tests/fixtures/motion/petal.json'), ['', 'application/json']],
+  ['vrm', vrmFixture(), ['', 'model/gltf-binary', 'application/octet-stream', 'model/vrm', 'application/vrm']],
 ] as const) {
   test(`worker import receipts preserve the ${name} MIME boundary`, () => {
     const cached = inspectAsset(bytes);
     expect(canReuseImportInspection(undefined, cached.mime)).toBe(false);
     for (const mime of ['', cached.mime, 'image/png', 'image/gif', 'image/apng', 'video/webm', 'application/json', 'text/plain', 'model/gltf-binary', 'application/octet-stream', 'model/vrm', 'application/vrm', 'text/html']) {
       const reusable = canReuseImportInspection(cached, mime);
-      const expected = !mime || mime === cached.mime || Boolean(cached.model && ['application/octet-stream', 'model/vrm', 'application/vrm'].includes(mime));
+      const expected = (reusableMimes as readonly string[]).includes(mime);
       expect(reusable, mime).toBe(expected);
       if (reusable) expect(inspectAsset(bytes, mime)).toEqual(cached);
     }

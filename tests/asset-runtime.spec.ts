@@ -65,6 +65,11 @@ test('unused LRU sources are evicted under the byte budget; active sources survi
     const same = cache.get('active'); expect(activeLoads).toBe(1); expect(aborted).toBe(false);
     gate.resolve('active'); expect(await active).toBe('active'); expect(await same).toBe('active');
     expect(await cache.get('active')).toBe('active'); expect(activeLoads).toBe(1); expect(aborted).toBe(false);
+    // Hold a read of an already prepared value across the next expiry trim.
+    const held = cache.get('active'); time += 101;
+    const next = cache.get('c');
+    expect(cache.stats().entries).toBe(2); expect(cache.stats().retainedBytes).toBe(6); expect(aborted).toBe(false);
+    expect(await held).toBe('active'); await next;
   } finally { gate.resolve('active'); cache.clear(); }
   expect(cache.stats().entries).toBe(0);
 });
