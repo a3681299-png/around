@@ -6,6 +6,7 @@ export function createSignalSources(doc: Document, playback: PlaybackSource | un
   const snapshot: SignalSnapshot = { pointer: undefined, playing: false };
   let pointer = false, clicks = false, overflow = false;
   let scroll = false, resize: ResizeObserver | undefined;
+  let scrollDirty = false, scrollFrame: number | undefined;
   let events: WorldEvent[] = [];
   let video: ReturnType<PlaybackSource['connect']> | undefined;
   const onPointer = (event: PointerEvent) => {
@@ -24,8 +25,19 @@ export function createSignalSources(doc: Document, playback: PlaybackSource | un
     const before = snapshot.scroll; snapshot.scroll = next;
     if (notify && (!before || Object.keys(next).some((key) => next[key as keyof typeof next] !== before[key as keyof typeof next]))) changed('page.scroll.progress');
   };
-  const onScroll = (event: Event) => { if (event.target === doc || event.target === doc.scrollingElement) sampleScroll(); };
-  const onResize = () => sampleScroll();
+  const markScroll = () => {
+    scrollDirty = true;
+    if (scrollFrame === undefined) scrollFrame = doc.defaultView!.requestAnimationFrame(() => {
+      scrollFrame = undefined;
+      if (scroll && scrollDirty) { scrollDirty = false; sampleScroll(); }
+    });
+  };
+  const cancelScroll = () => {
+    if (scrollFrame !== undefined) doc.defaultView!.cancelAnimationFrame(scrollFrame);
+    scrollFrame = undefined; scrollDirty = false;
+  };
+  const onScroll = (event: Event) => { if (event.target === doc || event.target === doc.scrollingElement) markScroll(); };
+  const onResize = () => markScroll();
   return {
     snapshot,
     get overflowed() { return overflow; },
@@ -37,7 +49,7 @@ export function createSignalSources(doc: Document, playback: PlaybackSource | un
         if (scroll) {
           doc.addEventListener('scroll', onScroll, { capture: true, passive: true }); doc.defaultView!.addEventListener('resize', onResize);
           resize = new ResizeObserver(onResize); resize.observe(doc.documentElement); if (doc.body) resize.observe(doc.body);
-        } else { doc.removeEventListener('scroll', onScroll, true); doc.defaultView!.removeEventListener('resize', onResize); resize?.disconnect(); resize = undefined; delete snapshot.scroll; }
+        } else { doc.removeEventListener('scroll', onScroll, true); doc.defaultView!.removeEventListener('resize', onResize); resize?.disconnect(); resize = undefined; cancelScroll(); delete snapshot.scroll; }
       }
       if (scroll) sampleScroll(false);
       if (pointer !== needed.pointer) {
@@ -53,6 +65,6 @@ export function createSignalSources(doc: Document, playback: PlaybackSource | un
       });
       else video?.refresh();
     },
-    destroy() { doc.removeEventListener('pointermove', onPointer, true); if (clicks) doc.removeEventListener('click', onClick, true); clicks = false; if (scroll) { doc.removeEventListener('scroll', onScroll, true); doc.defaultView!.removeEventListener('resize', onResize); } resize?.disconnect(); resize = undefined; scroll = false; delete snapshot.scroll; pointer = false; video?.destroy(); video = undefined; snapshot.playing = false; events = []; },
+    destroy() { doc.removeEventListener('pointermove', onPointer, true); if (clicks) doc.removeEventListener('click', onClick, true); clicks = false; if (scroll) { doc.removeEventListener('scroll', onScroll, true); doc.defaultView!.removeEventListener('resize', onResize); } resize?.disconnect(); resize = undefined; scroll = false; cancelScroll(); delete snapshot.scroll; pointer = false; video?.destroy(); video = undefined; snapshot.playing = false; events = []; },
   };
 }
