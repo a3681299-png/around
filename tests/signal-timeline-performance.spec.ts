@@ -20,9 +20,29 @@ test('scroll geometry and signal callbacks share one evaluation; 32 layers / 16 
     for (const mode of ['before', 'coalesced']) {
       await runtime.evaluate('globalThis.__wwSignalSamples = []');
       const bundle = await build({ entryPoints: ['src/content/index.ts'], bundle: true, write: false, target: 'chrome120', format: 'iife', loader: { '.css': 'text' },
-        plugins: [{ name: 'test-only-evaluation-meter', setup(builder) { builder.onLoad({ filter: /[\\/]host[\\/]world-session\.ts$/ }, async ({ path }) => {
+        plugins: [{ name: 'test-only-evaluation-meter', setup(builder) {
+          // Reproduce both parts of the historical baseline: synchronous scroll
+          // sampling and uncancelled signal/geometry evaluations. RAF sampling
+          // itself now coalesces those callbacks even without reconcile.cancel().
+          if (mode === 'before') builder.onLoad({ filter: /[\\/]host[\\/]signals\.ts$/ }, async ({ path }) => {
+            let contents = await readFile(path, 'utf8');
+            const replacements = [
+              ['const onScroll = (event: Event) => { if (event.target === doc || event.target === doc.scrollingElement) markScroll(); };', 'const onScroll = (event: Event) => { if (event.target === doc || event.target === doc.scrollingElement) sampleScroll(); };'],
+              ['const onResize = () => markScroll();', 'const onResize = () => sampleScroll();'],
+            ] as const;
+            for (const [current, historical] of replacements) {
+              if (!contents.includes(current)) throw new Error('Historical scroll baseline must be updated');
+              contents = contents.replace(current, historical);
+            }
+            return { contents, loader: 'ts' };
+          });
+          builder.onLoad({ filter: /[\\/]host[\\/]world-session\.ts$/ }, async ({ path }) => {
           let contents = await readFile(path, 'utf8');
-          if (mode === 'before') contents = contents.replace(/const reconcile = \(\) => \{[\s\S]*?\n  \};/, (block) => block.replaceAll('    cancel();\n', ''));
+          if (mode === 'before') {
+            const block = contents.match(/const reconcile = \(\) => \{[\s\S]*?\n  \};/)?.[0];
+            if (!block || block.split('    cancel();\n').length !== 3) throw new Error('Historical scheduling baseline must be updated');
+            contents = contents.replace(block, block.replaceAll('    cancel();\n', ''));
+          }
           const expression = 'overridden ?? evaluatePreparedWorld(prepared, state, input, context.scene.signalRules)';
           if (!contents.includes(expression)) throw new Error('Evaluation meter must be updated');
           contents = contents.replace(expression, `(() => { const start = performance.now(); const result = ${expression}; (globalThis as any).__wwSignalSamples.push(performance.now() - start); return result; })()`);
