@@ -75,12 +75,17 @@ TypeScriptとCSSの変更を監視して`dist`を更新します。変更後は`
 ```powershell
 npm run lint
 npm run typecheck
+npm run test:unit
+$env:WW_BUILD_OUT = '.work/test-dist'
+$env:WW_TEST_EXTENSION_PATH = '.work/test-dist'
 npm run build
 npm run test:setup
-npm test
+npm run test:e2e
 ```
 
-`test:setup`はPlaywright公式のChromiumを`.work/browsers`へダウンロードします。テストは独立したブラウザープロファイルを使い、ユーザーのChromeプロファイルは変更しません。
+`test:unit`はビルドやブラウザーのインストールなしで動き、4ワーカーで並列実行します。Chrome Storageなどの単体テスト用スタブは各ワーカー内で作成・復元します。ブラウザーを使うテストは`test:e2e`で1件ずつ実行し、`npm test`は両方のprojectを実行します。分類は`playwright.config.ts`の`unitSpecs`で管理し、それ以外のspecはe2eに入ります。
+
+`test:setup`はe2e用のPlaywright公式Chromiumを`.work/browsers`へダウンロードします。上の例ではテスト用拡張を`.work/test-dist`へ出力します。e2eは独立したブラウザープロファイルを使い、ユーザーのChromeプロファイルは変更しません。CIもunitとe2eを別jobで実行し、タイムアウトはそれぞれ8分と25分です。実サイト・非公開素材・診断ビルドを使う既存のオプトイン検証は、必要な環境変数を指定した場合に実行します。
 
 ## ファイル構成
 

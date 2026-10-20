@@ -13,6 +13,8 @@
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.world.json && tsc --noEmit -p tsconfig.editor-core.json",
     "test:setup": "node scripts/test.mjs --install",
     "test": "node scripts/test.mjs",
+    "test:unit": "node scripts/test.mjs --project=unit",
+    "test:e2e": "node scripts/test.mjs --project=e2e",
     "check": "npm run lint && npm run build && npm test",
     "lint": "node scripts/lint.mjs",
     "benchmark:world": "node scripts/benchmark-world.mjs",

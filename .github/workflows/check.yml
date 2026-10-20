@@ -9,11 +9,35 @@ permissions:
   contents: read
 
 jobs:
-  check:
+  unit:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test:unit
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: theme-unit-results
+          path: .work/test-results/unit/
+          include-hidden-files: true
+          retention-days: 7
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
     env:
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.work/browsers
+      WW_BUILD_OUT: .work/test-dist
+      WW_TEST_EXTENSION_PATH: .work/test-dist
     steps:
       - uses: actions/checkout@v6
         with:
@@ -24,18 +48,19 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium --no-shell
+      - run: npm run build
       # Native Chrome Side Panel tests need a real window and display server.
-      - run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" npm run check
+      - run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" npm run test:e2e
       - name: Optional public YouTube inspection
         if: github.ref_name == 'fix/youtube-silver-native-surfaces'
         continue-on-error: true
-        run: WW_LIVE_YOUTUBE=1 npm test -- tests/live-youtube.spec.ts --output=.work/live-results
+        run: WW_LIVE_YOUTUBE=1 npm run test:e2e -- tests/live-youtube.spec.ts --output=.work/live-results
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: theme-test-results
+          name: theme-e2e-results
           path: |
-            .work/test-results/
+            .work/test-results/e2e/
             .work/live-results/
           include-hidden-files: true
           retention-days: 7
