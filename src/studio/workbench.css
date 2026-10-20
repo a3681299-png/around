@@ -89,14 +89,16 @@ input[type="color"] { height: 24px; border-radius: 2px; }
 .arrangement-section summary { font-size: 11px; }
 .snap-toggle { margin-top: 6px; }
 .align-row button { border: 1px solid var(--ui-line); font-size: 10px; min-height: 22px; }
-.layers-pane { min-height: 0; min-width: 0; overflow: clip; display: flex; flex-direction: column; background: var(--ui-pane); }
+.layers-pane { min-height: 0; min-width: 0; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; background: var(--ui-pane); scrollbar-width: thin; }
 .layer-heading { flex-wrap: nowrap; }
 .layer-heading .selected-count { margin-left: auto; color: var(--ui-muted); font-size: 10px; font-weight: normal; }
 .layer-heading .layer-count { float: none; font-size: 9px; color: var(--ui-muted); }
 .layer-heading button { min-height: 22px; height: 22px; min-width: 22px; }
-.layers-section { padding: 0 4px; flex: 1; min-height: 0; }
+.layers-section { padding: 0 4px; flex: 1; min-height: min-content; }
 .layers-section > summary { display: none; }
-.layers-section::details-content { min-height: 0; }
+/* Reserve a complete row even when Timeline or a wrapped hint consumes the pane.
+   The pane scrolls as a whole when its header, list and actions no longer fit. */
+.layers-section[open]::details-content { display: grid; grid-template-rows: auto minmax(34px, 1fr); min-height: min-content; }
 .selection-tip { font-size: 9px; line-height: 1.4; margin: 4px; }
 .layers { min-height: 0; padding: 0 1px; }
 .layer { grid-template-columns: 14px 10px minmax(50px, 1fr) 16px 21px 21px 18px; gap: 1px; min-height: 34px; border-radius: 1px; padding: 2px; margin-bottom: 1px; background: #2a2b2e; }
@@ -109,8 +111,8 @@ input[type="color"] { height: 24px; border-radius: 2px; }
 .layer-type { font-size: 9px; line-height: 1.1; color: var(--ui-muted); }
 .layer button { min-height: 22px; height: auto; padding: 2px 0; }
 .layer input[type="checkbox"] { width: 12px; height: 12px; }
-.selection-actions { flex: none; display: flex; flex-wrap: nowrap; gap: 2px; padding: 4px; border-top: 1px solid var(--ui-line); }
-.selection-actions button { min-height: 24px; height: 24px; padding: 3px 5px; font-size: 10px; }
+.selection-actions { flex: none; display: flex; flex-wrap: wrap; gap: 2px; padding: 4px; border-top: 1px solid var(--ui-line); }
+.selection-actions button { min-height: 24px; height: auto; padding: 3px 5px; font-size: 10px; }
 .grouping-help, .ungroup-help { margin: 0; padding: 2px 7px 5px; font-size: 10px; line-height: 1.4; color: #cbb98d; flex: none; }
 .empty-layers { flex: none; padding: 8px; margin: 0; font-size: 10px; }
 .empty-layers strong { font-size: 11px; font-weight: normal; }

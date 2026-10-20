@@ -19,8 +19,11 @@ export async function renderDiagnostics(context: BrowserContext) {
       const session = await context.newCDPSession(page);
       try {
         await session.send('DOM.enable'); await session.send('CSS.enable'); await session.send('DOM.getDocument', { depth: -1, pierce: true });
-        const { result } = await session.send('Runtime.evaluate', { expression: "document.querySelector('#web-world-themes-creator')?.shadowRoot?.querySelector('.layer-title')" });
-        const fonts = result.objectId ? await session.send('CSS.getPlatformFontsForNode', await session.send('DOM.requestNode', { objectId: result.objectId })) : undefined;
+        const fonts: Record<string, unknown> = {};
+        for (const selector of ['.layer-title', '.selection-tip']) {
+          const { result } = await session.send('Runtime.evaluate', { expression: `document.querySelector('#web-world-themes-creator')?.shadowRoot?.querySelector(${JSON.stringify(selector)})` });
+          if (result.objectId) fonts[selector] = await session.send('CSS.getPlatformFontsForNode', await session.send('DOM.requestNode', { objectId: result.objectId }));
+        }
         return { url: page.url(), ...layout, fonts };
       } finally { await session.detach(); }
     } catch (error) { return { url: page.url(), error: String(error) }; }

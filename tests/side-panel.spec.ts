@@ -217,6 +217,37 @@ test('the official panel edits scroll keyframes through the shared Core and reta
   } finally { await context.close(); }
 });
 
+test('timeline keeps layer controls reachable in narrow and wide native panels', async ({}, info) => {
+  const { context, page, popup, id, local } = await setup();
+  try {
+    await local.getByRole('button', { name: 'Chromeサイドパネルを開く', exact: true }).click();
+    const panel = await sidePanelDriver(context, page, id);
+    await panel.files([path.resolve('tests/fixtures/motion/petal.png')]);
+    await expect.poll(() => panel.text('.selected-count')).toBe('1個選択中');
+    await panel.click('.timeline-toggle');
+    await expect.poll(() => panel.evaluate('document.querySelector("#web-world-themes-creator").shadowRoot.querySelector(".timeline-connect").disabled')).toBe(false);
+    await panel.click('.timeline-connect');
+    for (const width of [360, 940]) {
+      await panel.send('Emulation.setDeviceMetricsOverride', { width, height: 760, deviceScaleFactor: 1, mobile: false });
+      const ui = 'document.querySelector("#web-world-themes-creator").shadowRoot';
+      await expect.poll(() => panel.evaluate(`${ui}.querySelector('.layers').clientHeight`)).toBeGreaterThanOrEqual(34);
+      const lock = `${ui}.querySelector('.layer [data-action="lock"]')`;
+      await panel.evaluate(`${lock}.scrollIntoView({block:'nearest'})`);
+      // Use real pointer input, rather than DOM click(), to verify hit testing.
+      const measure = () => panel.evaluate<{ x: number; y: number; reachable: boolean }>(`(()=>{const node=${lock},rect=node.getBoundingClientRect(),x=rect.x+rect.width/2,y=rect.y+rect.height/2;return {x,y,reachable:!node.disabled&&node.contains(${ui}.elementFromPoint(x,y))}})()`);
+      await expect.poll(async () => (await measure()).reachable).toBe(true);
+      const point = await measure();
+      await panel.send('Input.dispatchMouseEvent', { type: 'mousePressed', x: point.x, y: point.y, button: 'left', clickCount: 1 });
+      await panel.send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: point.x, y: point.y, button: 'left', clickCount: 1 });
+      await expect.poll(() => panel.evaluate(`${ui}.querySelector('.timeline-key').disabled`)).toBe(true);
+      await panel.screenshot(info.outputPath(`timeline-sidepanel-${width}.png`));
+      await panel.click('.layer [data-action="lock"]');
+    }
+    await expect(local).not.toBeVisible();
+    await expect(popup.getByRole('switch', { name: 'Theme ON / OFF' })).toBeChecked();
+  } finally { await context.close(); }
+});
+
 test('official panel records raw signals, plays/seeks without live input, and restores independent saved takes', async () => {
   test.setTimeout(120_000);
   const { context, page, popup, id, local } = await setup();
