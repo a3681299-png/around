@@ -1,0 +1,11 @@
+node_modules/
+.work/
+dist/
+playwright-report/
+test-results/
+*.log
+*.zip
+# Keep pinned third-party bytes, generated assets and media fixtures intact.
+src/vendor/
+assets/
+tests/fixtures/
