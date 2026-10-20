@@ -1,4 +1,4 @@
-import { build } from 'esbuild';
+import { build, transform } from 'esbuild';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { test, expect } from './fixtures';
 import { image, isolate, media, open, save, watch } from './helpers/world-host';
@@ -25,19 +25,23 @@ test('scroll geometry and signal callbacks share one evaluation; 32 layers / 16 
           // sampling and uncancelled signal/geometry evaluations. RAF sampling
           // itself now coalesces those callbacks even without reconcile.cancel().
           if (mode === 'before') builder.onLoad({ filter: /[\\/]host[\\/]signals\.ts$/ }, async ({ path }) => {
-            let contents = await readFile(path, 'utf8');
+            // Compare canonical JS so source formatting cannot silently change
+            // this historical baseline. Keep the exact-match guards below.
+            let contents = (await transform(await readFile(path, 'utf8'), { loader: 'ts', target: 'chrome120' })).code;
             const replacements = [
               ['const onScroll = (event: Event) => { if (event.target === doc || event.target === doc.scrollingElement) markScroll(); };', 'const onScroll = (event: Event) => { if (event.target === doc || event.target === doc.scrollingElement) sampleScroll(); };'],
               ['const onResize = () => markScroll();', 'const onResize = () => sampleScroll();'],
             ] as const;
             for (const [current, historical] of replacements) {
-              if (!contents.includes(current)) throw new Error('Historical scroll baseline must be updated');
-              contents = contents.replace(current, historical);
+              const currentJS = (await transform(current, { loader: 'ts', target: 'chrome120' })).code.trim().replaceAll('\n', '\n  ');
+              const historicalJS = (await transform(historical, { loader: 'ts', target: 'chrome120' })).code.trim().replaceAll('\n', '\n  ');
+              if (!contents.includes(currentJS)) throw new Error('Historical scroll baseline must be updated');
+              contents = contents.replace(currentJS, historicalJS);
             }
             return { contents, loader: 'ts' };
           });
           builder.onLoad({ filter: /[\\/]host[\\/]world-session\.ts$/ }, async ({ path }) => {
-          let contents = await readFile(path, 'utf8');
+          let contents = (await transform(await readFile(path, 'utf8'), { loader: 'ts', target: 'chrome120' })).code;
           if (mode === 'before') {
             const block = contents.match(/const reconcile = \(\) => \{[\s\S]*?\n  \};/)?.[0];
             if (!block || block.split('    cancel();\n').length !== 3) throw new Error('Historical scheduling baseline must be updated');
