@@ -1,15 +1,17 @@
 import { ASSET_LAB_MESSAGE } from './asset-runtime-broker';
 import { createAssetLabScene } from './asset-runtime-scene';
 import type { AssetMetadata } from '../assets/validation';
+import { loadAsset, clearAssetSources } from '../assets/client';
+import { newAssetProfile, linkAssetProfile, profileEnd } from './asset-profile';
 
 /** Experimental isolated-world bridge. Never installed by the ordinary build. */
 export function installAssetRuntimeHost(doc: Document) {
   const origin = new URL(chrome.runtime.getURL('')).origin;
   let session = '', generation = 0, serial = 0, frame: HTMLIFrameElement | undefined, port: MessagePort | undefined;
   let container: HTMLDivElement | undefined, scene: ReturnType<typeof createAssetLabScene> | undefined;
-  let last: { mode: 'resident' | 'binary'; id: string; count: number } | undefined, restarting: Promise<unknown> | undefined;
+  let last: { mode: 'resident' | 'binary' | 'chunks'; id: string; count: number } | undefined, restarting: Promise<unknown> | undefined;
   const pending = new Map<number, { resolve(value: any): void; reject(error: unknown): void; timer: ReturnType<typeof setTimeout> }>();
-  let messages = 0, binaryBytes = 0, smallBytes = 0;
+  let messages = 0, binaryBytes = 0, smallBytes = 0, senderDetached: boolean | null = null;
   const worker = async (values: Record<string, unknown>) => { const r = await chrome.runtime.sendMessage({ type: ASSET_LAB_MESSAGE, session, ...values }); if (!r?.ok) throw new Error(r?.error ?? 'Lab unavailable'); return r.value; };
   function disconnect() {
     for (const p of pending.values()) { clearTimeout(p.timer); p.reject(new Error('Renderer disconnected')); } pending.clear(); port?.close(); port = undefined; frame?.remove(); frame = undefined;
@@ -40,6 +42,7 @@ export function installAssetRuntimeHost(doc: Document) {
             const m = e.data; if (m?.generation !== generation) return;
             messages++;
             if (m.type === 'ready') { clearTimeout(timer); resolve(); return; }
+            if (m.type === 'released-source') { senderDetached = m.detached === true; return; }
             const request = pending.get(m.request); if (!request) return; pending.delete(m.request); clearTimeout(request.timer);
             if (m.value?.buffer instanceof ArrayBuffer) binaryBytes += m.value.buffer.byteLength;
             if (m.error) request.reject(new Error(m.error)); else request.resolve(m.value);
@@ -50,17 +53,22 @@ export function installAssetRuntimeHost(doc: Document) {
       (doc.fullscreenElement ?? doc.body).append(f);
     });
   }
-  async function show(mode: 'resident' | 'binary', id: string, count = 1) {
-    const started = performance.now(); last = { mode, id, count }; messages = binaryBytes = smallBytes = 0;
+  async function show(mode: 'resident' | 'binary' | 'chunks', id: string, count = 1) {
+    const started = performance.now(); last = { mode, id, count }; messages = binaryBytes = smallBytes = 0; senderDetached = null;
     scene?.destroy(); scene = undefined; container?.remove(); container = undefined;
     if (mode === 'resident') { const r = await command('snapshot', { id, count }); return { ...r, endToEndMs: performance.now() - started, messages, binaryBytes, smallBytes, generation }; }
-    await command('clear'); const fetchStart = performance.now(), source = await command('binary', { id });
+    await command('clear'); const fetchStart = performance.now(), trace = newAssetProfile()!; linkAssetProfile(id, trace);
+    if (mode === 'chunks') clearAssetSources();
+    const source = mode === 'chunks' ? await loadAsset(id) : await command('binary', { id });
     const assetFetchMs = performance.now() - fetchStart;
-    if (!(source.buffer instanceof ArrayBuffer) || source.buffer.byteLength !== source.metadata.byteLength) throw new Error('Invalid binary source');
-    const blob = new Blob([source.buffer], { type: source.metadata.mime }), metadata = source.metadata as AssetMetadata;
+    profileEnd(trace, 'lab.asset-fetch', fetchStart);
+    if (mode === 'binary' && (!(source.buffer instanceof ArrayBuffer) || source.buffer.byteLength !== source.metadata.byteLength)) throw new Error('Invalid binary source');
+    const blob: Blob = mode === 'chunks' ? source.blob : new Blob([source.buffer], { type: source.metadata.mime }), metadata = source.metadata as AssetMetadata;
     container = doc.createElement('div'); container.id = 'ww-asset-runtime-binary'; container.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:2147483643'; (doc.fullscreenElement ?? doc.body).append(container);
     scene = createAssetLabScene(container, async () => ({ blob, metadata }));
-    const result = await scene.show(metadata, count); return { ...result, assetFetchMs, sourceMs: source.sourceMs, blobReadMs: source.blobReadMs, endToEndMs: performance.now() - started, messages, binaryBytes, smallBytes, generation };
+    const result = await scene.show(metadata, count, trace), endToEndMs = performance.now() - started;
+    const logs = await command('profile');
+    return { ...result, ...logs, assetFetchMs, sourceMs: source.sourceMs, blobReadMs: source.blobReadMs, endToEndMs, messages, binaryBytes, smallBytes, senderDetached, generation };
   }
   async function restart(): Promise<unknown> {
     if (restarting) return restarting;

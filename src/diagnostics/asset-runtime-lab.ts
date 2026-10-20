@@ -3,6 +3,7 @@ import { getAsset } from '../assets/repository';
 import { ASSET_LIMITS } from '../assets/validation';
 import { ASSET_LAB_MESSAGE } from './asset-runtime-broker';
 import { createAssetLabScene } from './asset-runtime-scene';
+import { PROFILE_MESSAGE } from './asset-profile';
 
 const stage = document.querySelector<HTMLElement>('#stage')!, output = document.querySelector<HTMLElement>('#output')!;
 const session = 'asset-lab-' + crypto.randomUUID();
@@ -24,7 +25,8 @@ if (parent !== window) {
       const m = event.data;
       if (!m || m.generation !== generation || !Number.isSafeInteger(m.request)) return;
       const reply = (value: unknown, transfer: Transferable[] = []) => connected.postMessage({ request: m.request, generation, value }, transfer);
-      if (m.action === 'clear') { scene.clear(); reply({ cleared: true }); return; }
+      if (m.action === 'clear') { scene.clear(); void chrome.runtime.sendMessage({ type: PROFILE_MESSAGE, action: 'clear' }).then(() => reply({ cleared: true })); return; }
+      if (m.action === 'profile') { void chrome.runtime.sendMessage({ type: PROFILE_MESSAGE, action: 'snapshot' }).then((value) => reply(value)); return; }
       if (busy || !allowed.includes(m.id)) { connected.postMessage({ request: m.request, generation, error: 'Busy or forbidden asset' }); return; }
       busy = true;
       void (async () => {
@@ -32,7 +34,8 @@ if (parent !== window) {
         if (m.action === 'binary') {
           if (asset.blob.size > ASSET_LIMITS.modelBytes) throw new Error('Source over budget');
           const before = performance.now(), buffer = await asset.blob.arrayBuffer();
-          reply({ metadata: asset.metadata, sourceMs, blobReadMs: performance.now() - before, buffer }, [buffer]); return;
+          reply({ metadata: asset.metadata, sourceMs, blobReadMs: performance.now() - before, buffer }, [buffer]);
+          connected.postMessage({ type: 'released-source', generation, detached: buffer.byteLength === 0 }); return;
         }
         if (m.action !== 'snapshot') throw new Error('Unknown renderer command');
         const result = await scene.show(asset.metadata, m.count); reply({ ...result, sourceMs });

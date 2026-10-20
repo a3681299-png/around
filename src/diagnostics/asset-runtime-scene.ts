@@ -3,7 +3,7 @@ import { defaultModelSettings } from '../models/types';
 import type { ModelDecoration } from '../design/types';
 import type { AssetMetadata } from '../assets/validation';
 import type { loadAsset } from '../assets/client';
-import { newAssetProfile, linkAssetProfile, profileEnd, flushAssetProfile, PROFILE_MESSAGE } from './asset-profile';
+import { newAssetProfile, linkAssetProfile, profileEnd, flushAssetProfile, profileSnapshot, PROFILE_MESSAGE } from './asset-profile';
 
 /** Uses the existing DOM/Three renderer; no second model renderer implementation. */
 export function createAssetLabScene(parent: HTMLElement, read: typeof loadAsset) {
@@ -11,9 +11,9 @@ export function createAssetLabScene(parent: HTMLElement, read: typeof loadAsset)
   let renderer: ReturnType<typeof createModelRenderer> | undefined, surfaces: ModelSurface[] = [], error = '', stats: Record<string, unknown> = {}, epoch = 0;
   function clear() { epoch++; for (const s of surfaces) s.destroy(); surfaces = []; renderer?.destroy(); renderer = undefined; shadow.replaceChildren(); }
   return {
-    async show(metadata: AssetMetadata, count = 1) {
+    async show(metadata: AssetMetadata, count = 1, profileId?: string) {
       clear(); if (!metadata.model || !Number.isInteger(count) || count < 1 || count > 5) throw new Error('Invalid model count');
-      const current = epoch, started = performance.now(), trace = newAssetProfile()!; linkAssetProfile(metadata.id, trace); error = '';
+      const current = epoch, started = performance.now(), trace = profileId ?? newAssetProfile()!; linkAssetProfile(metadata.id, trace); error = '';
       renderer = createModelRenderer(parent.ownerDocument, (message) => { error = message; }, (value) => { stats = value; }, shadow, read);
       for (let n = 0; n < count; n++) {
         const layer: ModelDecoration = { id: 'image-lab-' + n, name: 'lab', kind: 'model3d', assetId: metadata.id, source: metadata.model, model: defaultModelSettings(metadata.model),
@@ -28,8 +28,9 @@ export function createAssetLabScene(parent: HTMLElement, read: typeof loadAsset)
       });
       let alphaPixels = 0;
       for (const surface of surfaces) { const c = surface.element.querySelector('canvas')!, p = c.getContext('2d')!.getImageData(0, 0, c.width, c.height).data; for (let n = 3; n < p.length; n += 4) if (p[n]) alphaPixels++; }
-      profileEnd(trace, 'lab.source-to-display', started); await flushAssetProfile();
-      return { totalMs: performance.now() - started, trace, alphaPixels, stats, ...(await chrome.runtime.sendMessage({ type: PROFILE_MESSAGE, action: 'snapshot' })) };
+      profileEnd(trace, 'lab.source-to-display', started); const local = profileSnapshot(); await flushAssetProfile();
+      const logs = location.protocol === 'chrome-extension:' ? await chrome.runtime.sendMessage({ type: PROFILE_MESSAGE, action: 'snapshot' }) : { spans: local };
+      return { totalMs: performance.now() - started, trace, alphaPixels, stats, ...logs };
     },
     clear,
     destroy() { clear(); host.remove(); },
