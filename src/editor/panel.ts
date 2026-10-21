@@ -397,12 +397,14 @@ export function createCreatorPanel(
       properties.hidden = !state.selected;
       get<HTMLParagraphElement>('.card-help').hidden = !state.selected;
       get<HTMLParagraphElement>('.multi-help').hidden = state.selectedIds.length < 2;
-      get<HTMLButtonElement>('.delete-image').disabled = !state.canDelete.allowed;
-      get<HTMLButtonElement>('.duplicate-image').disabled = !state.canDuplicate.allowed;
-      get<HTMLButtonElement>('.group-layers').disabled = !state.canGroup.allowed;
+      // Studio also uses saving to lock its surface while disconnected. That
+      // transport lock can be newer than the last authoritative capabilities.
+      get<HTMLButtonElement>('.delete-image').disabled = state.saving || !state.canDelete.allowed;
+      get<HTMLButtonElement>('.duplicate-image').disabled = state.saving || !state.canDuplicate.allowed;
+      get<HTMLButtonElement>('.group-layers').disabled = state.saving || !state.canGroup.allowed;
       get<HTMLButtonElement>('.group-layers').hidden = isGroup;
       get<HTMLButtonElement>('.ungroup-layers').hidden = !isGroup;
-      get<HTMLButtonElement>('.ungroup-layers').disabled = !state.canUngroup.allowed;
+      get<HTMLButtonElement>('.ungroup-layers').disabled = state.saving || !state.canUngroup.allowed;
       get<HTMLElement>('.grouping-help').hidden = isGroup;
       setText(
         get<HTMLElement>('.grouping-help'),
@@ -417,7 +419,7 @@ export function createCreatorPanel(
         const availability = ['horizontal', 'vertical'].includes(button.dataset.align!)
           ? state.canDistribute
           : state.canAlign;
-        button.disabled = !availability.allowed;
+        button.disabled = state.saving || !availability.allowed;
       });
       setText(
         get<HTMLElement>('.dirty'),
@@ -436,9 +438,9 @@ export function createCreatorPanel(
         get<HTMLElement>('.layer-count'),
         `${state.images.length} / ${IMAGE_LIMITS.count}${state.groups.length ? `・グループ${state.groups.length}` : ''}`,
       );
-      addImage.disabled = !state.canAddImage.allowed;
-      addModel.disabled = !state.canAddModel.allowed;
-      addAnimation.disabled = !state.canAddAnimation.allowed;
+      addImage.disabled = state.saving || !state.canAddImage.allowed;
+      addModel.disabled = state.saving || !state.canAddModel.allowed;
+      addAnimation.disabled = state.saving || !state.canAddAnimation.allowed;
       get<HTMLFieldSetElement>('.playback').hidden = state.image?.kind !== 'animation';
       if (state.image?.kind === 'animation') {
         get<HTMLInputElement>('[data-playback="playing"]').checked = state.image.playback.playing;
