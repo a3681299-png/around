@@ -10,6 +10,7 @@ const unitSpecs = [
   'comment-timestamps',
   'design',
   'editor-core',
+  'editor-benchmark',
   'effect-data',
   'features',
   'group-data',
