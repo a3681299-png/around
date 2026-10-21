@@ -11,6 +11,7 @@ import { parseEditCommand } from '../src/studio/protocol';
 import { defaultScrollOpacityRule } from '../src/signals/keyframes';
 import { createStudioStateEncoder, createStudioStateDecoder } from '../src/studio/state-sync';
 import { packCheckpoint, unpackCheckpoint } from '../src/studio/checkpoint-codec';
+import { defaultModelSettings } from '../src/models/types';
 
 function harness(validateAssets: () => Promise<void> = async () => undefined) {
   let value: DesignDocument | undefined,
@@ -271,6 +272,62 @@ test('compact recovery reads legacy v1 unchanged and rejects cyclic or out-of-ra
   await expect(editor.restore(unpackCheckpoint(packCheckpoint(invalid))!)).rejects.toThrow();
   expect(editor.checkpoint()).toEqual(legacy);
   editor.destroy();
+});
+
+test('core views explain duplicate/import/group/layout capabilities including protected descendants and limits', async () => {
+  const { editor } = await opened();
+  expect(editor.snapshot().view.canDuplicate.allowed).toBe(true);
+  await editor.execute({ type: 'clear-selection' });
+  expect(editor.snapshot().view.canDuplicate).toMatchObject({ allowed: false, reason: /選択/ });
+  await editor.execute({ type: 'select-all' });
+  expect(editor.snapshot().view.canGroup.allowed).toBe(true);
+  expect(editor.snapshot().view.canAlign.allowed).toBe(true);
+  expect(editor.snapshot().view.canDistribute.allowed).toBe(true);
+  await editor.execute({ type: 'group' });
+  let view = editor.snapshot().view;
+  expect(view.canUngroup.allowed).toBe(true);
+  expect(view.canAlign.allowed).toBe(false);
+  expect(view.canChangeAnchor.allowed).toBe(false);
+  await editor.execute({ type: 'change', id: view.image!.id, patch: { opacity: 0.5 } });
+  expect(editor.snapshot().view.canUngroup).toMatchObject({ allowed: false, reason: /100%/ });
+  await editor.execute({ type: 'change', id: view.images[0]!.id, patch: { locked: true } });
+  view = editor.snapshot().view;
+  expect(view.canDuplicate.allowed).toBe(false);
+  expect(view.canDelete.allowed).toBe(false);
+  expect(view.canChangeMotion.allowed).toBe(false);
+  const layer = view.images[0]!;
+  const full = emptyDesign('youtube', 'retro');
+  full.decorations = Array.from({ length: 32 }, (_, i) => ({ ...layer, id: `image-${i}`, locked: false }));
+  const limited = harness();
+  limited.set(full);
+  limited.editor.setEnabled(true);
+  limited.editor.open();
+  view = limited.editor.snapshot().view;
+  for (const value of [view.canAddImage, view.canAddModel, view.canAddAnimation]) {
+    expect(value.allowed).toBe(false);
+    expect(value.reason).toContain('32');
+  }
+  const source = { format: 'glb' as const, clips: [], bones: [], vertices: 0, triangles: 0, textureBytes: 0 };
+  const modelDoc = emptyDesign('youtube', 'retro');
+  modelDoc.decorations = Array.from({ length: 8 }, (_, i) => ({
+    ...layer,
+    id: `model-${i}`,
+    kind: 'model3d',
+    locked: false,
+    source,
+    model: defaultModelSettings(source),
+  }));
+  const models = harness();
+  models.set(modelDoc);
+  models.editor.setEnabled(true);
+  models.editor.open();
+  view = models.editor.snapshot().view;
+  expect(view.canAddImage.allowed).toBe(true);
+  expect(view.canAddAnimation.allowed).toBe(true);
+  expect(view.canAddModel).toMatchObject({ allowed: false, reason: /8レイヤー/ });
+  editor.destroy();
+  limited.editor.destroy();
+  models.editor.destroy();
 });
 
 test('signal key edits share gesture history, locks, save/discard and session recovery', async () => {

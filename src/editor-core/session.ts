@@ -1,4 +1,5 @@
 import { parseEditCommand } from './commands';
+import { editorCapabilities } from './capabilities';
 import { defaultModelSettings, patchModel } from '../models/types';
 import { ASSET_MESSAGES } from '../assets/limits';
 import { emptyDesign, sameDesign } from '../design/schema';
@@ -82,6 +83,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
         ? draft.decorations.find((layer) => layer.id === selectedImageIds[0])
         : undefined;
     return {
+      ...editorCapabilities(draft, selectedImageIds, saving || importing),
       selected: Boolean(selectedTarget),
       style: draft.rules.find((rule) => rule.target === selectedTarget)?.style ?? {},
       dirty,

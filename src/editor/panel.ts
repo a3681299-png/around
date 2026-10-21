@@ -1,21 +1,11 @@
 import styles from './panel.css';
-import {
-  GROUP_LIMITS,
-  IMAGE_LIMITS,
-  STYLE_LIMITS,
-  type SurfaceStyle,
-  type ImagePatch,
-  type DesignTarget,
-} from '../design/types';
+import { IMAGE_LIMITS, STYLE_LIMITS, type SurfaceStyle, type ImagePatch, type DesignTarget } from '../design/types';
 import { ANIMATION_LIMITS } from '../assets/motion-types';
-import { MODEL_LIMITS } from '../models/types';
 import { ASSET_MESSAGES } from '../assets/limits';
 import type { Alignment, Distribution } from '../design/layout';
 import { createModelPanel } from './model-panel';
 import { createMotionPanel } from './motion-panel';
-import { ungroupingReason } from './groups';
 import { createEffectsPanel } from './effects-panel';
-import { childrenOf, effectivelyLocked, groupMovable, parentGroup } from '../design/hierarchy';
 import { createLayerTree } from './layer-tree';
 import { createWorkspace } from './workspace';
 import { createStudioWorkbench } from '../studio/workbench';
@@ -383,7 +373,7 @@ export function createCreatorPanel(
       get<HTMLElement>('[data-image-prop="anchor"]').closest<HTMLElement>('.property')!.hidden = isGroup;
       for (const key of ['widthPx', 'heightPx', 'rotationDeg', 'anchor'])
         get<HTMLInputElement>(`[data-image-prop="${key}"]`).disabled =
-          isGroup || (key === 'anchor' && Boolean(state.image && parentGroup(state.groups, state.image.id)));
+          isGroup || (key === 'anchor' && !state.canChangeAnchor.allowed);
       for (const key of ['x', 'y']) {
         const input = get<HTMLInputElement>(`[data-image-prop="${key}"]`);
         input.disabled = isGroup && !state.groupPositionAvailable;
@@ -403,45 +393,16 @@ export function createCreatorPanel(
       effects.render(state.image);
       motion.render(state.image);
       model.render(state.image);
-      motion.fieldset.disabled = Boolean(
-        isGroup && state.image?.kind === 'group' && !groupMovable(state.image, state.images),
-      );
+      motion.fieldset.disabled = !state.canChangeMotion.allowed;
       properties.hidden = !state.selected;
       get<HTMLParagraphElement>('.card-help').hidden = !state.selected;
       get<HTMLParagraphElement>('.multi-help').hidden = state.selectedIds.length < 2;
-      const selectedLayers = [...state.images, ...state.groups].filter(
-        (layer) =>
-          state.selectedIds.includes(layer.id) &&
-          (layer.kind === 'group' ? groupMovable(layer, state.images) : !effectivelyLocked(layer, state.groups)),
-      );
-      const unlocked = selectedLayers.length,
-        selectedMedia = selectedLayers.flatMap((layer) =>
-          layer.kind === 'group' ? childrenOf(layer, state.images) : [layer],
-        );
-      const animations = state.images.filter((image) => image.kind === 'animation').length;
-      const selectedAnimations = selectedMedia.filter((image) => image.kind === 'animation').length;
-      get<HTMLButtonElement>('.delete-image').disabled = !unlocked || state.saving;
-      get<HTMLButtonElement>('.duplicate-image').disabled =
-        !unlocked ||
-        state.saving ||
-        state.images.length + selectedMedia.length > IMAGE_LIMITS.count ||
-        animations + selectedAnimations > ANIMATION_LIMITS.count ||
-        state.images.filter((i) => i.kind === 'model3d').length +
-          selectedMedia.filter((i) => i.kind === 'model3d').length >
-          MODEL_LIMITS.count ||
-        state.groups.length + selectedLayers.filter((layer) => layer.kind === 'group').length > GROUP_LIMITS.count;
-      get<HTMLButtonElement>('.group-layers').disabled = state.saving || Boolean(state.groupingReason);
+      get<HTMLButtonElement>('.delete-image').disabled = !state.canDelete.allowed;
+      get<HTMLButtonElement>('.duplicate-image').disabled = !state.canDuplicate.allowed;
+      get<HTMLButtonElement>('.group-layers').disabled = !state.canGroup.allowed;
       get<HTMLButtonElement>('.group-layers').hidden = isGroup;
       get<HTMLButtonElement>('.ungroup-layers').hidden = !isGroup;
-      get<HTMLButtonElement>('.ungroup-layers').disabled =
-        state.saving ||
-        !isGroup ||
-        Boolean(
-          ungroupingReason(
-            state.image?.kind === 'group' ? state.image : undefined,
-            state.signalRules ? [...state.signalRules] : [],
-          ),
-        );
+      get<HTMLButtonElement>('.ungroup-layers').disabled = !state.canUngroup.allowed;
       get<HTMLElement>('.grouping-help').hidden = isGroup;
       setText(
         get<HTMLElement>('.grouping-help'),
@@ -452,18 +413,11 @@ export function createCreatorPanel(
       get<HTMLInputElement>('.snap').checked = state.snapping;
       get<HTMLInputElement>('.snap').disabled = state.saving;
       get<HTMLFieldSetElement>('.layout-tools').hidden = state.selectedIds.length < 2;
-      const eligible = state.groups.some((group) => state.selectedIds.includes(group.id))
-        ? 0
-        : state.images.filter(
-            (image) =>
-              state.selectedIds.includes(image.id) &&
-              image.visible &&
-              !effectivelyLocked(image, state.groups) &&
-              parentGroup(state.groups, image.id)?.visible !== false,
-          ).length;
       main.querySelectorAll<HTMLButtonElement>('[data-align]').forEach((button) => {
-        const minimum = ['horizontal', 'vertical'].includes(button.dataset.align!) ? 3 : 2;
-        button.disabled = state.saving || eligible < minimum;
+        const availability = ['horizontal', 'vertical'].includes(button.dataset.align!)
+          ? state.canDistribute
+          : state.canAlign;
+        button.disabled = !availability.allowed;
       });
       setText(
         get<HTMLElement>('.dirty'),
@@ -482,12 +436,9 @@ export function createCreatorPanel(
         get<HTMLElement>('.layer-count'),
         `${state.images.length} / ${IMAGE_LIMITS.count}${state.groups.length ? `・グループ${state.groups.length}` : ''}`,
       );
-      addImage.disabled = state.saving || state.images.length >= IMAGE_LIMITS.count;
-      addModel.disabled =
-        addImage.disabled || state.images.filter((layer) => layer.kind === 'model3d').length >= MODEL_LIMITS.count;
-      addAnimation.disabled =
-        addImage.disabled ||
-        state.images.filter((image) => image.kind === 'animation').length >= ANIMATION_LIMITS.count;
+      addImage.disabled = !state.canAddImage.allowed;
+      addModel.disabled = !state.canAddModel.allowed;
+      addAnimation.disabled = !state.canAddAnimation.allowed;
       get<HTMLFieldSetElement>('.playback').hidden = state.image?.kind !== 'animation';
       if (state.image?.kind === 'animation') {
         get<HTMLInputElement>('[data-playback="playing"]').checked = state.image.playback.playing;

@@ -15,7 +15,24 @@ import type { AnimationFormat } from '../assets/motion-types';
 import type { SignalRule } from '../signals/keyframes';
 export type EditorTool = 'select' | 'browse' | 'card';
 
-export interface EditorView {
+export interface EditorCapability {
+  allowed: boolean;
+  reason: string;
+}
+export interface EditorCapabilities {
+  canDuplicate: EditorCapability;
+  canDelete: EditorCapability;
+  canGroup: EditorCapability;
+  canUngroup: EditorCapability;
+  canAddImage: EditorCapability;
+  canAddModel: EditorCapability;
+  canAddAnimation: EditorCapability;
+  canAlign: EditorCapability;
+  canDistribute: EditorCapability;
+  canChangeMotion: EditorCapability;
+  canChangeAnchor: EditorCapability;
+}
+export interface EditorView extends EditorCapabilities {
   selected: boolean;
   style: SurfaceStyle;
   dirty: boolean;
