@@ -1,0 +1,4496 @@
+{
+  "date": "2026-10-21",
+  "beforeHead": "a81e63b",
+  "afterHead": "c2c003d",
+  "sourceBytes": 57185776,
+  "imageBytes": 30000000,
+  "trialsPerCondition": 5,
+  "requestedWindow": {
+    "width": 1920,
+    "height": 1080
+  },
+  "conditions": "Windows, Chrome for Testing 153.0.8010.12, Intel UHD Graphics / ANGLE Direct3D11; real YouTube; production DOM/Three renderer in profiling build; driver and OS caches not cleared. Reload starts at original fetch; redisplay starts at re-add instruction; completion is canvas copy/decode plus two RAFs, not physical presentation.",
+  "results": {
+    "before": {
+      "browser": "153.0.8010.12",
+      "summary": [
+        {
+          "kind": "vrm",
+          "cache": "reload",
+          "fetchMs": {
+            "medianMs": 700.5,
+            "maxMs": 885.6
+          },
+          "displayMs": {
+            "medianMs": 2929.2,
+            "maxMs": 6227.9
+          },
+          "stages": {
+            "renderer.blob-read": {
+              "medianMs": 291.7,
+              "maxMs": 2928.3
+            },
+            "parse.gltf-inclusive": {
+              "medianMs": 277.6,
+              "maxMs": 295.7
+            },
+            "parse.vrm-postprocess": {
+              "medianMs": 143.3,
+              "maxMs": 166.2
+            },
+            "renderer.bounds": {
+              "medianMs": 39.9,
+              "maxMs": 59.6
+            },
+            "first.webgl-render-inclusive": {
+              "medianMs": 1409.8,
+              "maxMs": 1791.5
+            },
+            "first.presentation-proxy-inclusive": {
+              "medianMs": 1580.7,
+              "maxMs": 1948.2
+            }
+          }
+        },
+        {
+          "kind": "vrm",
+          "cache": "same-tab",
+          "fetchMs": {
+            "medianMs": 0,
+            "maxMs": 0
+          },
+          "displayMs": {
+            "medianMs": 1296.1,
+            "maxMs": 3352.2
+          },
+          "stages": {
+            "renderer.blob-read": {
+              "medianMs": 286.7,
+              "maxMs": 2359.6
+            },
+            "parse.gltf-inclusive": {
+              "medianMs": 230.1,
+              "maxMs": 262.1
+            },
+            "parse.vrm-postprocess": {
+              "medianMs": 130.9,
+              "maxMs": 179.3
+            },
+            "renderer.bounds": {
+              "medianMs": 39.3,
+              "maxMs": 42.5
+            },
+            "first.webgl-render-inclusive": {
+              "medianMs": 323.9,
+              "maxMs": 1641.8
+            },
+            "first.presentation-proxy-inclusive": {
+              "medianMs": 384.3,
+              "maxMs": 1772
+            }
+          }
+        },
+        {
+          "kind": "image",
+          "cache": "reload",
+          "fetchMs": {
+            "medianMs": 295.6,
+            "maxMs": 310.1
+          },
+          "displayMs": {
+            "medianMs": 896,
+            "maxMs": 989.6
+          }
+        },
+        {
+          "kind": "image",
+          "cache": "same-tab",
+          "fetchMs": {
+            "medianMs": 0,
+            "maxMs": 0
+          },
+          "displayMs": {
+            "medianMs": 606.4,
+            "maxMs": 771.3
+          }
+        }
+      ],
+      "trials": [
+        {
+          "kind": "vrm",
+          "cache": "reload",
+          "run": 1,
+          "fetchMs": 885.5999999940395,
+          "displayMs": 6227.899999991059,
+          "paintAtMs": 8911.199999988079,
+          "sourceStartMs": 2683.2999999970198,
+          "bytes": 57185776,
+          "cacheHit": false,
+          "route": "array-buffer",
+          "spans": [
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "download.transport.array-buffer",
+              "startMs": 2683.2999999970198,
+              "durationMs": 626.7999999970198,
+              "bytes": 57185776,
+              "count": 1
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "download.inspect",
+              "startMs": 3310.0999999940395,
+              "durationMs": 212.40000000596046
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "download.clone-blob",
+              "startMs": 3522.5,
+              "durationMs": 46.3999999910593,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "download.validated-source",
+              "startMs": 2683.2999999970198,
+              "durationMs": 885.5999999940395,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "renderer.blob-read",
+              "startMs": 3569.7999999970198,
+              "durationMs": 2928.2999999970198,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "parse.texture",
+              "startMs": 6547.399999991059,
+              "durationMs": 166.29999999701977,
+              "count": 1
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "parse.texture",
+              "startMs": 6549.29999999702,
+              "durationMs": 175.79999999701977,
+              "count": 1
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "parse.texture",
+              "startMs": 6549,
+              "durationMs": 187.19999998807907,
+              "count": 1
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "parse.texture",
+              "startMs": 6549.199999988079,
+              "durationMs": 202.1000000089407,
+              "count": 1
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "parse.texture",
+              "startMs": 6549.0999999940395,
+              "durationMs": 215.29999999701977,
+              "count": 1
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "parse.vrm-after-root",
+              "startMs": 6778.899999991059,
+              "durationMs": 14.799999997019768
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "parse.gltf-inclusive",
+              "startMs": 6498.5,
+              "durationMs": 295.69999998807907
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "parse.vrm-postprocess",
+              "startMs": 6794.29999999702,
+              "durationMs": 137.5
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "renderer.bounds",
+              "startMs": 6932.29999999702,
+              "durationMs": 59.599999994039536
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "gpu.create-context",
+              "startMs": 6997.5999999940395,
+              "durationMs": 35.400000005960464
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "first.player-create",
+              "startMs": 7037.899999991059,
+              "durationMs": 1.7999999970197678
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "first.webgl-render-inclusive",
+              "startMs": 7043.399999991059,
+              "durationMs": 1715.7999999970198
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "first.canvas-copy",
+              "startMs": 8759.5,
+              "durationMs": 4.899999991059303
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "first.paint-inclusive",
+              "startMs": 6997.5,
+              "durationMs": 1767.0999999940395
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "first.presentation-proxy-inclusive",
+              "startMs": 6997.5,
+              "durationMs": 1913.5
+            }
+          ]
+        },
+        {
+          "kind": "vrm",
+          "cache": "same-tab",
+          "run": 1,
+          "fetchMs": 0,
+          "displayMs": 2381.2000000029802,
+          "paintAtMs": 12633.29999999702,
+          "bytes": 57185776,
+          "cacheHit": true,
+          "route": "cache",
+          "spans": [
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "renderer.source-load",
+              "startMs": 10318.39999999106,
+              "durationMs": 1.5
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "renderer.blob-read",
+              "startMs": 10320,
+              "durationMs": 131.59999999403954,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "parse.texture",
+              "startMs": 10488.79999999702,
+              "durationMs": 163.20000000298023,
+              "count": 1
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "parse.texture",
+              "startMs": 10489.5,
+              "durationMs": 165.29999999701977,
+              "count": 1
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "parse.texture",
+              "startMs": 10489,
+              "durationMs": 183,
+              "count": 1
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "parse.texture",
+              "startMs": 10489.29999999702,
+              "durationMs": 186.09999999403954,
+              "count": 1
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "parse.texture",
+              "startMs": 10489.29999999702,
+              "durationMs": 190.20000000298023,
+              "count": 1
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "parse.vrm-after-root",
+              "startMs": 10692.199999988079,
+              "durationMs": 3.1000000089406967
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "parse.gltf-inclusive",
+              "startMs": 10451.699999988079,
+              "durationMs": 243.90000000596046
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "parse.vrm-postprocess",
+              "startMs": 10695.59999999404,
+              "durationMs": 124.90000000596046
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "renderer.bounds",
+              "startMs": 10820.59999999404,
+              "durationMs": 39.79999999701977
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "gpu.create-context",
+              "startMs": 10861,
+              "durationMs": 13.899999991059303
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "first.player-create",
+              "startMs": 10878.89999999106,
+              "durationMs": 0.6000000089406967
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "first.webgl-render-inclusive",
+              "startMs": 10880.699999988079,
+              "durationMs": 1641.800000011921
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "first.canvas-copy",
+              "startMs": 12522.59999999404,
+              "durationMs": 0.20000000298023224
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "first.paint-inclusive",
+              "startMs": 10861,
+              "durationMs": 1661.8999999910593
+            },
+            {
+              "id": "ap-0dff7dd4-7961-4b15-9ca6-b7e1af2a20f5",
+              "context": "content",
+              "contextInstance": "a6c07620-66c9-4ad4-94ab-c0b11c403c48",
+              "name": "first.presentation-proxy-inclusive",
+              "startMs": 10861,
+              "durationMs": 1772
+            }
+          ]
+        },
+        {
+          "kind": "vrm",
+          "cache": "reload",
+          "run": 2,
+          "fetchMs": 719.5,
+          "displayMs": 5570.600000008941,
+          "paintAtMs": 8564,
+          "sourceStartMs": 2993.3999999910593,
+          "bytes": 57185776,
+          "cacheHit": false,
+          "route": "array-buffer",
+          "spans": [
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "download.transport.array-buffer",
+              "startMs": 2993.3999999910593,
+              "durationMs": 498.6000000089407,
+              "bytes": 57185776,
+              "count": 1
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "download.inspect",
+              "startMs": 3492,
+              "durationMs": 190.70000000298023
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "download.clone-blob",
+              "startMs": 3682.7000000029802,
+              "durationMs": 30.19999998807907,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "download.validated-source",
+              "startMs": 2993.3999999910593,
+              "durationMs": 719.5,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "renderer.blob-read",
+              "startMs": 3713.5999999940395,
+              "durationMs": 2420.2999999970198,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "parse.texture",
+              "startMs": 6197.399999991059,
+              "durationMs": 168.1000000089407,
+              "count": 1
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "parse.texture",
+              "startMs": 6198.20000000298,
+              "durationMs": 176.8999999910593,
+              "count": 1
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "parse.texture",
+              "startMs": 6197.79999999702,
+              "durationMs": 181.5,
+              "count": 1
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "parse.texture",
+              "startMs": 6198.0999999940395,
+              "durationMs": 190.29999999701977,
+              "count": 1
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "parse.texture",
+              "startMs": 6197.899999991059,
+              "durationMs": 194.30000001192093,
+              "count": 1
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "parse.vrm-after-root",
+              "startMs": 6406.29999999702,
+              "durationMs": 7.9000000059604645
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "parse.gltf-inclusive",
+              "startMs": 6134.0999999940395,
+              "durationMs": 280.6000000089407
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "parse.vrm-postprocess",
+              "startMs": 6414.70000000298,
+              "durationMs": 166.19999998807907
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "renderer.bounds",
+              "startMs": 6581.20000000298,
+              "durationMs": 32.3999999910593
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "gpu.create-context",
+              "startMs": 6615.399999991059,
+              "durationMs": 13.300000011920929
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "first.player-create",
+              "startMs": 6631.5,
+              "durationMs": 0.5999999940395355
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "first.webgl-render-inclusive",
+              "startMs": 6633.899999991059,
+              "durationMs": 1791.5
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "first.canvas-copy",
+              "startMs": 8425.59999999404,
+              "durationMs": 0.9000000059604645
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "first.paint-inclusive",
+              "startMs": 6615.399999991059,
+              "durationMs": 1811.6000000089407
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "first.presentation-proxy-inclusive",
+              "startMs": 6615.399999991059,
+              "durationMs": 1948.2000000029802
+            }
+          ]
+        },
+        {
+          "kind": "vrm",
+          "cache": "same-tab",
+          "run": 2,
+          "fetchMs": 0,
+          "displayMs": 908.3000000119209,
+          "paintAtMs": 10782.70000000298,
+          "bytes": 57185776,
+          "cacheHit": true,
+          "route": "cache",
+          "spans": [
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "renderer.source-load",
+              "startMs": 9934.79999999702,
+              "durationMs": 1.2999999970197678
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "renderer.blob-read",
+              "startMs": 9936.09999999404,
+              "durationMs": 92,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "parse.texture",
+              "startMs": 10067.09999999404,
+              "durationMs": 144.20000000298023,
+              "count": 1
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "parse.texture",
+              "startMs": 10067.29999999702,
+              "durationMs": 146.90000000596046,
+              "count": 1
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "parse.texture",
+              "startMs": 10067.20000000298,
+              "durationMs": 150.59999999403954,
+              "count": 1
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "parse.texture",
+              "startMs": 10067.20000000298,
+              "durationMs": 153.29999999701977,
+              "count": 1
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "parse.texture",
+              "startMs": 10067.20000000298,
+              "durationMs": 165.3999999910593,
+              "count": 1
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "parse.vrm-after-root",
+              "startMs": 10244,
+              "durationMs": 4.200000002980232
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "parse.gltf-inclusive",
+              "startMs": 10028.20000000298,
+              "durationMs": 220.19999998807907
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "parse.vrm-postprocess",
+              "startMs": 10248.39999999106,
+              "durationMs": 117.20000000298023
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "renderer.bounds",
+              "startMs": 10365.79999999702,
+              "durationMs": 31.799999997019768
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "gpu.create-context",
+              "startMs": 10398.20000000298,
+              "durationMs": 14.699999988079071
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "first.player-create",
+              "startMs": 10415.5,
+              "durationMs": 0.8999999910593033
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "first.webgl-render-inclusive",
+              "startMs": 10417.20000000298,
+              "durationMs": 323.8999999910593
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "first.canvas-copy",
+              "startMs": 10741.20000000298,
+              "durationMs": 0.5999999940395355
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "first.paint-inclusive",
+              "startMs": 10398.20000000298,
+              "durationMs": 343.69999998807907
+            },
+            {
+              "id": "ap-9b4a2439-405f-497b-8663-8c8bb2ac907f",
+              "context": "content",
+              "contextInstance": "8503bf6d-ef92-4524-a3dc-70a174006bdf",
+              "name": "first.presentation-proxy-inclusive",
+              "startMs": 10398.20000000298,
+              "durationMs": 384.29999999701977
+            }
+          ]
+        },
+        {
+          "kind": "vrm",
+          "cache": "reload",
+          "run": 3,
+          "fetchMs": 700.5,
+          "displayMs": 1735.9000000059605,
+          "paintAtMs": 4415,
+          "sourceStartMs": 2679.0999999940395,
+          "bytes": 57185776,
+          "cacheHit": false,
+          "route": "array-buffer",
+          "spans": [
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "download.transport.array-buffer",
+              "startMs": 2679.0999999940395,
+              "durationMs": 447.20000000298023,
+              "bytes": 57185776,
+              "count": 1
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "download.inspect",
+              "startMs": 3126.2999999970198,
+              "durationMs": 223.70000000298023
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "download.clone-blob",
+              "startMs": 3350,
+              "durationMs": 29.599999994039536,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "download.validated-source",
+              "startMs": 2679.0999999940395,
+              "durationMs": 700.5,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "renderer.blob-read",
+              "startMs": 3380.2999999970198,
+              "durationMs": 220.8999999910593,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "parse.texture",
+              "startMs": 3656.2999999970198,
+              "durationMs": 137.09999999403954,
+              "count": 1
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "parse.texture",
+              "startMs": 3656.8999999910593,
+              "durationMs": 140.79999999701977,
+              "count": 1
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "parse.texture",
+              "startMs": 3656.5999999940395,
+              "durationMs": 174.20000000298023,
+              "count": 1
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "parse.texture",
+              "startMs": 3656.7999999970198,
+              "durationMs": 177.59999999403954,
+              "count": 1
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "parse.texture",
+              "startMs": 3656.699999988079,
+              "durationMs": 180.1000000089407,
+              "count": 1
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "parse.vrm-after-root",
+              "startMs": 3849.0999999940395,
+              "durationMs": 8.5
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "parse.gltf-inclusive",
+              "startMs": 3601.2999999970198,
+              "durationMs": 256.8999999910593
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "parse.vrm-postprocess",
+              "startMs": 3858.199999988079,
+              "durationMs": 143.30000001192093
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "renderer.bounds",
+              "startMs": 4002.0999999940395,
+              "durationMs": 39.5
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "gpu.create-context",
+              "startMs": 4042.8999999910593,
+              "durationMs": 15.400000005960464
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "first.player-create",
+              "startMs": 4062.199999988079,
+              "durationMs": 0.7000000029802322
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "first.webgl-render-inclusive",
+              "startMs": 4064.5999999940395,
+              "durationMs": 320.90000000596046
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "first.canvas-copy",
+              "startMs": 4385.5999999940395,
+              "durationMs": 0.20000000298023224
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "first.paint-inclusive",
+              "startMs": 4042.8999999910593,
+              "durationMs": 343
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "first.presentation-proxy-inclusive",
+              "startMs": 4042.8999999910593,
+              "durationMs": 371.79999999701977
+            }
+          ]
+        },
+        {
+          "kind": "vrm",
+          "cache": "same-tab",
+          "run": 3,
+          "fetchMs": 0,
+          "displayMs": 3352.2000000029802,
+          "paintAtMs": 7997.79999999702,
+          "bytes": 57185776,
+          "cacheHit": true,
+          "route": "cache",
+          "spans": [
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "renderer.source-load",
+              "startMs": 4855.399999991059,
+              "durationMs": 2.2000000029802322
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "renderer.blob-read",
+              "startMs": 4857.5999999940395,
+              "durationMs": 2359.5999999940395,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "parse.texture",
+              "startMs": 7250,
+              "durationMs": 148.3999999910593,
+              "count": 1
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "parse.texture",
+              "startMs": 7250.199999988079,
+              "durationMs": 159.20000000298023,
+              "count": 1
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "parse.texture",
+              "startMs": 7250.0999999940395,
+              "durationMs": 163,
+              "count": 1
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "parse.texture",
+              "startMs": 7250.199999988079,
+              "durationMs": 173.30000001192093,
+              "count": 1
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "parse.texture",
+              "startMs": 7250.199999988079,
+              "durationMs": 177.20000000298023,
+              "count": 1
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "parse.vrm-after-root",
+              "startMs": 7442.899999991059,
+              "durationMs": 4.4000000059604645
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "parse.gltf-inclusive",
+              "startMs": 7217.399999991059,
+              "durationMs": 230.1000000089407
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "parse.vrm-postprocess",
+              "startMs": 7447.5999999940395,
+              "durationMs": 130.90000000596046
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "renderer.bounds",
+              "startMs": 7578.699999988079,
+              "durationMs": 39.30000001192093
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "gpu.create-context",
+              "startMs": 7619.79999999702,
+              "durationMs": 12.299999997019768
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "first.player-create",
+              "startMs": 7635.699999988079,
+              "durationMs": 0.800000011920929
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "first.webgl-render-inclusive",
+              "startMs": 7637.199999988079,
+              "durationMs": 290.40000000596046
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "first.canvas-copy",
+              "startMs": 7927.699999988079,
+              "durationMs": 0.20000000298023224
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "first.paint-inclusive",
+              "startMs": 7619.79999999702,
+              "durationMs": 308.09999999403954
+            },
+            {
+              "id": "ap-14c9b7e1-0a94-41fe-abe6-063f716829e1",
+              "context": "content",
+              "contextInstance": "7f709622-a4ed-47af-9d8f-4bcabd69d57b",
+              "name": "first.presentation-proxy-inclusive",
+              "startMs": 7619.79999999702,
+              "durationMs": 377.70000000298023
+            }
+          ]
+        },
+        {
+          "kind": "vrm",
+          "cache": "reload",
+          "run": 4,
+          "fetchMs": 617.7999999970198,
+          "displayMs": 1718,
+          "paintAtMs": 4595.5,
+          "sourceStartMs": 2877.5,
+          "bytes": 57185776,
+          "cacheHit": false,
+          "route": "array-buffer",
+          "spans": [
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "download.transport.array-buffer",
+              "startMs": 2877.5,
+              "durationMs": 330.59999999403954,
+              "bytes": 57185776,
+              "count": 1
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "download.inspect",
+              "startMs": 3208.0999999940395,
+              "durationMs": 268.80000001192093
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "download.clone-blob",
+              "startMs": 3476.9000000059605,
+              "durationMs": 18.299999997019768,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "download.validated-source",
+              "startMs": 2877.5,
+              "durationMs": 617.7999999970198,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "renderer.blob-read",
+              "startMs": 3495.9000000059605,
+              "durationMs": 291.69999998807907,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "parse.texture",
+              "startMs": 3855.4000000059605,
+              "durationMs": 177,
+              "count": 1
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "parse.texture",
+              "startMs": 3855.9000000059605,
+              "durationMs": 179.59999999403954,
+              "count": 1
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "parse.texture",
+              "startMs": 3855.7000000029802,
+              "durationMs": 183.5,
+              "count": 1
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "parse.texture",
+              "startMs": 3855.7999999970198,
+              "durationMs": 187.20000000298023,
+              "count": 1
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "parse.texture",
+              "startMs": 3855.7000000029802,
+              "durationMs": 190,
+              "count": 1
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "parse.vrm-after-root",
+              "startMs": 4056.7999999970198,
+              "durationMs": 7.9000000059604645
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "parse.gltf-inclusive",
+              "startMs": 3787.5999999940395,
+              "durationMs": 277.6000000089407
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "parse.vrm-postprocess",
+              "startMs": 4065.2000000029802,
+              "durationMs": 140.79999999701977
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "renderer.bounds",
+              "startMs": 4206.29999999702,
+              "durationMs": 39.900000005960464
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "gpu.create-context",
+              "startMs": 4246.9000000059605,
+              "durationMs": 16.19999998807907
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "first.player-create",
+              "startMs": 4266.70000000298,
+              "durationMs": 0.5
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "first.webgl-render-inclusive",
+              "startMs": 4269.70000000298,
+              "durationMs": 276.8999999910593
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "first.canvas-copy",
+              "startMs": 4546.79999999702,
+              "durationMs": 0.4000000059604645
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "first.paint-inclusive",
+              "startMs": 4246.9000000059605,
+              "durationMs": 300.3999999910593
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "first.presentation-proxy-inclusive",
+              "startMs": 4246.9000000059605,
+              "durationMs": 348.09999999403954
+            }
+          ]
+        },
+        {
+          "kind": "vrm",
+          "cache": "same-tab",
+          "run": 4,
+          "fetchMs": 0,
+          "displayMs": 1264.5,
+          "paintAtMs": 8428.70000000298,
+          "bytes": 57185776,
+          "cacheHit": true,
+          "route": "cache",
+          "spans": [
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "renderer.source-load",
+              "startMs": 7299.70000000298,
+              "durationMs": 0.8999999910593033
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "renderer.blob-read",
+              "startMs": 7300.5999999940395,
+              "durationMs": 286.70000000298023,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "parse.texture",
+              "startMs": 7630,
+              "durationMs": 174.5,
+              "count": 1
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "parse.texture",
+              "startMs": 7630.4000000059605,
+              "durationMs": 184.5,
+              "count": 1
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "parse.texture",
+              "startMs": 7630.20000000298,
+              "durationMs": 188.8999999910593,
+              "count": 1
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "parse.texture",
+              "startMs": 7630.29999999702,
+              "durationMs": 199.20000000298023,
+              "count": 1
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "parse.texture",
+              "startMs": 7630.4000000059605,
+              "durationMs": 202.8999999910593,
+              "count": 1
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "parse.vrm-after-root",
+              "startMs": 7845.4000000059605,
+              "durationMs": 4.0999999940395355
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "parse.gltf-inclusive",
+              "startMs": 7587.5,
+              "durationMs": 262.09999999403954
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "parse.vrm-postprocess",
+              "startMs": 7849.5999999940395,
+              "durationMs": 179.30000001192093
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "renderer.bounds",
+              "startMs": 8029,
+              "durationMs": 33
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "gpu.create-context",
+              "startMs": 8063.5,
+              "durationMs": 10.099999994039536
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "first.player-create",
+              "startMs": 8075.9000000059605,
+              "durationMs": 0.5
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "first.webgl-render-inclusive",
+              "startMs": 8076.9000000059605,
+              "durationMs": 292.5
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "first.canvas-copy",
+              "startMs": 8369.5,
+              "durationMs": 0.20000000298023224
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "first.paint-inclusive",
+              "startMs": 8063.5,
+              "durationMs": 306.20000000298023
+            },
+            {
+              "id": "ap-fba7e685-5389-4c3b-ae25-186e476a8115",
+              "context": "content",
+              "contextInstance": "29d868d5-b465-43f6-9c7d-0a410acb5a49",
+              "name": "first.presentation-proxy-inclusive",
+              "startMs": 8063.5,
+              "durationMs": 365
+            }
+          ]
+        },
+        {
+          "kind": "vrm",
+          "cache": "reload",
+          "run": 5,
+          "fetchMs": 654.7999999970198,
+          "displayMs": 2929.199999988079,
+          "paintAtMs": 5698.899999991059,
+          "sourceStartMs": 2769.7000000029802,
+          "bytes": 57185776,
+          "cacheHit": false,
+          "route": "array-buffer",
+          "spans": [
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "download.transport.array-buffer",
+              "startMs": 2769.7000000029802,
+              "durationMs": 376.09999999403954,
+              "bytes": 57185776,
+              "count": 1
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "download.inspect",
+              "startMs": 3145.7999999970198,
+              "durationMs": 262
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "download.clone-blob",
+              "startMs": 3407.7999999970198,
+              "durationMs": 16.700000002980232,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "download.validated-source",
+              "startMs": 2769.7000000029802,
+              "durationMs": 654.7999999970198,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "renderer.blob-read",
+              "startMs": 3425.0999999940395,
+              "durationMs": 273.70000000298023,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "parse.texture",
+              "startMs": 3739.3999999910593,
+              "durationMs": 143.90000000596046,
+              "count": 1
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "parse.texture",
+              "startMs": 3739.7999999970198,
+              "durationMs": 147.20000000298023,
+              "count": 1
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "parse.texture",
+              "startMs": 3739.5999999940395,
+              "durationMs": 150,
+              "count": 1
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "parse.texture",
+              "startMs": 3739.7999999970198,
+              "durationMs": 153.09999999403954,
+              "count": 1
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "parse.texture",
+              "startMs": 3739.7999999970198,
+              "durationMs": 155.59999999403954,
+              "count": 1
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "parse.vrm-after-root",
+              "startMs": 3906.7000000029802,
+              "durationMs": 7.299999997019768
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "parse.gltf-inclusive",
+              "startMs": 3699,
+              "durationMs": 215.29999999701977
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "parse.vrm-postprocess",
+              "startMs": 3914.2999999970198,
+              "durationMs": 161.5
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "renderer.bounds",
+              "startMs": 4075.8999999910593,
+              "durationMs": 41.30000001192093
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "gpu.create-context",
+              "startMs": 4117.79999999702,
+              "durationMs": 18.799999997019768
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "first.player-create",
+              "startMs": 4140.70000000298,
+              "durationMs": 0.7999999970197678
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "first.webgl-render-inclusive",
+              "startMs": 4144.0999999940395,
+              "durationMs": 1409.7999999970198
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "first.canvas-copy",
+              "startMs": 5554.0999999940395,
+              "durationMs": 0.4000000059604645
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "first.paint-inclusive",
+              "startMs": 4117.79999999702,
+              "durationMs": 1436.7999999970198
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "first.presentation-proxy-inclusive",
+              "startMs": 4117.79999999702,
+              "durationMs": 1580.7000000029802
+            }
+          ]
+        },
+        {
+          "kind": "vrm",
+          "cache": "same-tab",
+          "run": 5,
+          "fetchMs": 0,
+          "displayMs": 1296.1000000089407,
+          "paintAtMs": 9678,
+          "bytes": 57185776,
+          "cacheHit": true,
+          "route": "cache",
+          "spans": [
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "renderer.source-load",
+              "startMs": 8533.70000000298,
+              "durationMs": 1.5
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "renderer.blob-read",
+              "startMs": 8535.20000000298,
+              "durationMs": 329.09999999403954,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "parse.texture",
+              "startMs": 8889.5,
+              "durationMs": 120,
+              "count": 1
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "parse.texture",
+              "startMs": 8889.79999999702,
+              "durationMs": 123.90000000596046,
+              "count": 1
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "parse.texture",
+              "startMs": 8889.59999999404,
+              "durationMs": 134.1000000089407,
+              "count": 1
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "parse.texture",
+              "startMs": 8889.79999999702,
+              "durationMs": 144.5,
+              "count": 1
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "parse.texture",
+              "startMs": 8889.79999999702,
+              "durationMs": 153.40000000596046,
+              "count": 1
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "parse.vrm-after-root",
+              "startMs": 9058.5,
+              "durationMs": 6
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "parse.gltf-inclusive",
+              "startMs": 8864.39999999106,
+              "durationMs": 200.30000001192093
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "parse.vrm-postprocess",
+              "startMs": 9064.70000000298,
+              "durationMs": 135.59999999403954
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "renderer.bounds",
+              "startMs": 9200.5,
+              "durationMs": 42.5
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "gpu.create-context",
+              "startMs": 9246.39999999106,
+              "durationMs": 14.5
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "first.player-create",
+              "startMs": 9264.39999999106,
+              "durationMs": 0.9000000059604645
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "first.webgl-render-inclusive",
+              "startMs": 9266.39999999106,
+              "durationMs": 341.80000001192093
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "first.canvas-copy",
+              "startMs": 9608.29999999702,
+              "durationMs": 0.29999999701976776
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "first.paint-inclusive",
+              "startMs": 9246.39999999106,
+              "durationMs": 362.20000000298023
+            },
+            {
+              "id": "ap-b0d1751b-f4a4-4a6e-b8c2-194e571c5ecc",
+              "context": "content",
+              "contextInstance": "c2f3b035-7760-4d34-9123-4f3c8cb4f368",
+              "name": "first.presentation-proxy-inclusive",
+              "startMs": 9246.39999999106,
+              "durationMs": 431.40000000596046
+            }
+          ]
+        },
+        {
+          "kind": "image",
+          "cache": "reload",
+          "run": 1,
+          "fetchMs": 295.6000000089407,
+          "displayMs": 964,
+          "paintAtMs": 3895.7999999970198,
+          "sourceStartMs": 2931.7999999970198,
+          "bytes": 30000000,
+          "cacheHit": false,
+          "route": "array-buffer",
+          "spans": [
+            {
+              "id": "ap-474b83bb-7e25-4ae6-8c09-381c4d756d0a",
+              "context": "content",
+              "contextInstance": "ccff636f-67d4-4d15-bb13-5392f12514d4",
+              "name": "download.validated-source",
+              "startMs": 2931.7999999970198,
+              "durationMs": 295.6000000089407,
+              "bytes": 30000000
+            }
+          ]
+        },
+        {
+          "kind": "image",
+          "cache": "same-tab",
+          "run": 1,
+          "fetchMs": 0,
+          "displayMs": 620.8999999910593,
+          "paintAtMs": 7361.79999999702,
+          "bytes": 30000000,
+          "cacheHit": true,
+          "route": "cache",
+          "spans": []
+        },
+        {
+          "kind": "image",
+          "cache": "reload",
+          "run": 2,
+          "fetchMs": 297,
+          "displayMs": 989.5999999940395,
+          "paintAtMs": 3819.4000000059605,
+          "sourceStartMs": 2829.800000011921,
+          "bytes": 30000000,
+          "cacheHit": false,
+          "route": "array-buffer",
+          "spans": [
+            {
+              "id": "ap-e7b3590f-f52f-481e-af79-129f97d851db",
+              "context": "content",
+              "contextInstance": "dd6d5b32-832f-406d-962c-cdf2f5bfd5c1",
+              "name": "download.validated-source",
+              "startMs": 2829.800000011921,
+              "durationMs": 297,
+              "bytes": 30000000
+            }
+          ]
+        },
+        {
+          "kind": "image",
+          "cache": "same-tab",
+          "run": 2,
+          "fetchMs": 0,
+          "displayMs": 532.2000000029802,
+          "paintAtMs": 7095.9000000059605,
+          "bytes": 30000000,
+          "cacheHit": true,
+          "route": "cache",
+          "spans": []
+        },
+        {
+          "kind": "image",
+          "cache": "reload",
+          "run": 3,
+          "fetchMs": 283.8999999910593,
+          "displayMs": 857.2000000029802,
+          "paintAtMs": 3676.800000011921,
+          "sourceStartMs": 2819.6000000089407,
+          "bytes": 30000000,
+          "cacheHit": false,
+          "route": "array-buffer",
+          "spans": [
+            {
+              "id": "ap-076a130b-eead-4dba-9b3a-71d35a056b2b",
+              "context": "content",
+              "contextInstance": "8edf32f1-04c9-45ed-b25d-ec21f1f12acd",
+              "name": "download.validated-source",
+              "startMs": 2819.6000000089407,
+              "durationMs": 283.8999999910593,
+              "bytes": 30000000
+            }
+          ]
+        },
+        {
+          "kind": "image",
+          "cache": "same-tab",
+          "run": 3,
+          "fetchMs": 0,
+          "displayMs": 606.3999999910593,
+          "paintAtMs": 6953.5,
+          "bytes": 30000000,
+          "cacheHit": true,
+          "route": "cache",
+          "spans": []
+        },
+        {
+          "kind": "image",
+          "cache": "reload",
+          "run": 4,
+          "fetchMs": 278.29999999701977,
+          "displayMs": 874.2000000029802,
+          "paintAtMs": 3770.6000000089407,
+          "sourceStartMs": 2896.4000000059605,
+          "bytes": 30000000,
+          "cacheHit": false,
+          "route": "array-buffer",
+          "spans": [
+            {
+              "id": "ap-04050a0f-7040-497f-9ad7-c6808dcb86d7",
+              "context": "content",
+              "contextInstance": "36029d6b-153c-4ee3-a8f1-279e5639f43d",
+              "name": "download.validated-source",
+              "startMs": 2896.4000000059605,
+              "durationMs": 278.29999999701977,
+              "bytes": 30000000
+            }
+          ]
+        },
+        {
+          "kind": "image",
+          "cache": "same-tab",
+          "run": 4,
+          "fetchMs": 0,
+          "displayMs": 590.5999999940395,
+          "paintAtMs": 7081.9000000059605,
+          "bytes": 30000000,
+          "cacheHit": true,
+          "route": "cache",
+          "spans": []
+        },
+        {
+          "kind": "image",
+          "cache": "reload",
+          "run": 5,
+          "fetchMs": 310.09999999403954,
+          "displayMs": 896,
+          "paintAtMs": 3730.300000011921,
+          "sourceStartMs": 2834.300000011921,
+          "bytes": 30000000,
+          "cacheHit": false,
+          "route": "array-buffer",
+          "spans": [
+            {
+              "id": "ap-59e8eae7-7264-4021-a8c1-0df786312eec",
+              "context": "content",
+              "contextInstance": "056003fc-3e22-46f1-a575-ffff5624894e",
+              "name": "download.validated-source",
+              "startMs": 2834.300000011921,
+              "durationMs": 310.09999999403954,
+              "bytes": 30000000
+            }
+          ]
+        },
+        {
+          "kind": "image",
+          "cache": "same-tab",
+          "run": 5,
+          "fetchMs": 0,
+          "displayMs": 771.3000000119209,
+          "paintAtMs": 7276.300000011921,
+          "bytes": 30000000,
+          "cacheHit": true,
+          "route": "cache",
+          "spans": []
+        }
+      ]
+    },
+    "after": {
+      "browser": "153.0.8010.12",
+      "summary": [
+        {
+          "kind": "vrm",
+          "cache": "reload",
+          "fetchMs": {
+            "medianMs": 631.9,
+            "maxMs": 693.2
+          },
+          "displayMs": {
+            "medianMs": 1693.8,
+            "maxMs": 3135.3
+          },
+          "stages": {
+            "renderer.blob-read": {
+              "medianMs": 0,
+              "maxMs": 0
+            },
+            "parse.gltf-inclusive": {
+              "medianMs": 280.5,
+              "maxMs": 487.9
+            },
+            "parse.vrm-postprocess": {
+              "medianMs": 150.7,
+              "maxMs": 193.3
+            },
+            "renderer.bounds": {
+              "medianMs": 42.9,
+              "maxMs": 48.4
+            },
+            "first.webgl-render-inclusive": {
+              "medianMs": 383,
+              "maxMs": 1667.6
+            },
+            "first.presentation-proxy-inclusive": {
+              "medianMs": 438.4,
+              "maxMs": 1829.7
+            }
+          }
+        },
+        {
+          "kind": "vrm",
+          "cache": "same-tab",
+          "fetchMs": {
+            "medianMs": 0,
+            "maxMs": 0
+          },
+          "displayMs": {
+            "medianMs": 1065,
+            "maxMs": 1131.1
+          },
+          "stages": {
+            "renderer.blob-read": {
+              "medianMs": 0,
+              "maxMs": 0
+            },
+            "parse.gltf-inclusive": {
+              "medianMs": 358.3,
+              "maxMs": 420.6
+            },
+            "parse.vrm-postprocess": {
+              "medianMs": 132.4,
+              "maxMs": 161.4
+            },
+            "renderer.bounds": {
+              "medianMs": 40.2,
+              "maxMs": 52.1
+            },
+            "first.webgl-render-inclusive": {
+              "medianMs": 310.2,
+              "maxMs": 331.9
+            },
+            "first.presentation-proxy-inclusive": {
+              "medianMs": 375.2,
+              "maxMs": 404.1
+            }
+          }
+        },
+        {
+          "kind": "image",
+          "cache": "reload",
+          "fetchMs": {
+            "medianMs": 301.2,
+            "maxMs": 487.3
+          },
+          "displayMs": {
+            "medianMs": 948.2,
+            "maxMs": 1028.4
+          }
+        },
+        {
+          "kind": "image",
+          "cache": "same-tab",
+          "fetchMs": {
+            "medianMs": 0,
+            "maxMs": 0
+          },
+          "displayMs": {
+            "medianMs": 588.5,
+            "maxMs": 769.2
+          }
+        }
+      ],
+      "trials": [
+        {
+          "kind": "vrm",
+          "cache": "reload",
+          "run": 1,
+          "fetchMs": 460.09999999403954,
+          "displayMs": 2783,
+          "paintAtMs": 5188.20000000298,
+          "sourceStartMs": 2405.2000000029802,
+          "bytes": 57185776,
+          "cacheHit": false,
+          "route": "array-buffer",
+          "modelStats": {
+            "contexts": 1,
+            "lost": false,
+            "assets": 1,
+            "instances": 1,
+            "estimatedGpuAssetBytes": 176450404,
+            "surfaceBytes": 360000,
+            "paints": 15,
+            "cpuMs": 1.7999999970197678,
+            "maxCpuMs": 1699.6000000089407,
+            "calls": 10,
+            "triangles": 126470,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "fps": 2.8005040907363323,
+            "p95CpuMs": 1699.6000000089407,
+            "geometries": 5,
+            "textures": 8,
+            "programs": 6,
+            "gpuMs": 9.996925
+          },
+          "spans": [
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "download.transport.array-buffer",
+              "startMs": 2405.2000000029802,
+              "durationMs": 356,
+              "bytes": 57185776,
+              "count": 1
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "download.inspect",
+              "startMs": 2761.2000000029802,
+              "durationMs": 104
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "download.validated-source",
+              "startMs": 2405.2000000029802,
+              "durationMs": 460.09999999403954,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "renderer.buffer-source",
+              "startMs": 2865.7000000029802,
+              "durationMs": 0,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "parse.texture",
+              "startMs": 2914,
+              "durationMs": 156.5,
+              "count": 1
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "parse.texture",
+              "startMs": 2917,
+              "durationMs": 160.29999999701977,
+              "count": 1
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "parse.texture",
+              "startMs": 2916.5,
+              "durationMs": 167.5,
+              "count": 1
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "parse.texture",
+              "startMs": 2916.7999999970198,
+              "durationMs": 179.6000000089407,
+              "count": 1
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "parse.texture",
+              "startMs": 2916.7000000029802,
+              "durationMs": 182.29999999701977,
+              "count": 1
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "parse.vrm-after-root",
+              "startMs": 3114.9000000059605,
+              "durationMs": 16.899999991059303
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "parse.gltf-inclusive",
+              "startMs": 2865.9000000059605,
+              "durationMs": 266.69999998807907
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "parse.vrm-postprocess",
+              "startMs": 3132.5999999940395,
+              "durationMs": 193.30000001192093
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "renderer.bounds",
+              "startMs": 3326.4000000059605,
+              "durationMs": 48.3999999910593
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "gpu.create-context",
+              "startMs": 3377.7000000029802,
+              "durationMs": 23.899999991059303
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "first.player-create",
+              "startMs": 3405.2000000029802,
+              "durationMs": 1.5
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "first.webgl-render-inclusive",
+              "startMs": 3409.9000000059605,
+              "durationMs": 1666.7999999970198
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "first.canvas-copy",
+              "startMs": 5076.9000000059605,
+              "durationMs": 0.29999999701976776
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "first.paint-inclusive",
+              "startMs": 3377.5999999940395,
+              "durationMs": 1699.6000000089407
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "first.presentation-proxy-inclusive",
+              "startMs": 3377.5999999940395,
+              "durationMs": 1810.300000011921
+            }
+          ]
+        },
+        {
+          "kind": "vrm",
+          "cache": "same-tab",
+          "run": 1,
+          "fetchMs": 0,
+          "displayMs": 1025.2000000029802,
+          "paintAtMs": 9560.40000000596,
+          "bytes": 57185776,
+          "cacheHit": true,
+          "route": "cache",
+          "modelStats": {
+            "contexts": 1,
+            "lost": false,
+            "assets": 1,
+            "instances": 1,
+            "estimatedGpuAssetBytes": 176450404,
+            "surfaceBytes": 360000,
+            "paints": 34,
+            "cpuMs": 2,
+            "maxCpuMs": 1699.6000000089407,
+            "calls": 10,
+            "triangles": 126470,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "fps": 4.429351838181013,
+            "p95CpuMs": 305.69999998807907,
+            "geometries": 5,
+            "textures": 8,
+            "programs": 6,
+            "gpuMs": 5.682291
+          },
+          "idleModelStats": {
+            "contexts": 1,
+            "lost": false,
+            "assets": 0,
+            "instances": 0,
+            "estimatedGpuAssetBytes": 0,
+            "surfaceBytes": 0,
+            "paints": 16,
+            "cpuMs": 4.100000008940697,
+            "maxCpuMs": 1699.6000000089407,
+            "calls": 10,
+            "triangles": 126470,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "fps": 2.9353058588704943,
+            "p95CpuMs": 1699.6000000089407,
+            "geometries": 0,
+            "textures": 0,
+            "programs": 0,
+            "gpuMs": 16.698384
+          },
+          "spans": [
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "renderer.source-load",
+              "startMs": 8735,
+              "durationMs": 1.7000000029802322
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "renderer.buffer-source",
+              "startMs": 8736.70000000298,
+              "durationMs": 0,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "parse.texture",
+              "startMs": 8798.40000000596,
+              "durationMs": 186.69999998807907,
+              "count": 1
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "parse.texture",
+              "startMs": 8798.90000000596,
+              "durationMs": 207.09999999403954,
+              "count": 1
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "parse.texture",
+              "startMs": 8798.5,
+              "durationMs": 210.40000000596046,
+              "count": 1
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "parse.texture",
+              "startMs": 8798.59999999404,
+              "durationMs": 232.20000000298023,
+              "count": 1
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "parse.texture",
+              "startMs": 8798.70000000298,
+              "durationMs": 237.5,
+              "count": 1
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "parse.vrm-after-root",
+              "startMs": 9052,
+              "durationMs": 4.0999999940395355
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "parse.gltf-inclusive",
+              "startMs": 8736.70000000298,
+              "durationMs": 319.3999999910593
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "parse.vrm-postprocess",
+              "startMs": 9056.09999999404,
+              "durationMs": 99.80000001192093
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "renderer.bounds",
+              "startMs": 9156,
+              "durationMs": 30.599999994039536
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "first.player-create",
+              "startMs": 9189,
+              "durationMs": 0.5999999940395355
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "first.webgl-render-inclusive",
+              "startMs": 9190.40000000596,
+              "durationMs": 303.29999999701977
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "first.canvas-copy",
+              "startMs": 9493.70000000298,
+              "durationMs": 0.5999999940395355
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "first.paint-inclusive",
+              "startMs": 9188.90000000596,
+              "durationMs": 305.59999999403954
+            },
+            {
+              "id": "ap-309b7f5b-8ed9-4c6a-949a-77847d99b5eb",
+              "context": "content",
+              "contextInstance": "876679bc-6a14-4f01-854b-7eb7cfe6af14",
+              "name": "first.presentation-proxy-inclusive",
+              "startMs": 9188.90000000596,
+              "durationMs": 371
+            }
+          ]
+        },
+        {
+          "kind": "vrm",
+          "cache": "reload",
+          "run": 2,
+          "fetchMs": 628.7999999970198,
+          "displayMs": 3135.2999999970198,
+          "paintAtMs": 6932.0999999940395,
+          "sourceStartMs": 3796.7999999970198,
+          "bytes": 57185776,
+          "cacheHit": false,
+          "route": "array-buffer",
+          "modelStats": {
+            "contexts": 1,
+            "lost": false,
+            "assets": 1,
+            "instances": 1,
+            "estimatedGpuAssetBytes": 176450404,
+            "surfaceBytes": 360000,
+            "paints": 20,
+            "cpuMs": 2,
+            "maxCpuMs": 1694.2000000029802,
+            "calls": 10,
+            "triangles": 126470,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "fps": 3.8377635937626247,
+            "p95CpuMs": 1694.2000000029802,
+            "geometries": 5,
+            "textures": 8,
+            "programs": 6,
+            "gpuMs": 7.865936
+          },
+          "spans": [
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "download.transport.array-buffer",
+              "startMs": 3796.7999999970198,
+              "durationMs": 365.5,
+              "bytes": 57185776,
+              "count": 1
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "download.inspect",
+              "startMs": 4162.29999999702,
+              "durationMs": 263.20000000298023
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "download.validated-source",
+              "startMs": 3796.7999999970198,
+              "durationMs": 628.7999999970198,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "renderer.buffer-source",
+              "startMs": 4426.20000000298,
+              "durationMs": 0,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "parse.texture",
+              "startMs": 4453.899999991059,
+              "durationMs": 416.6000000089407,
+              "count": 1
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "parse.texture",
+              "startMs": 4454.5,
+              "durationMs": 418.8999999910593,
+              "count": 1
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "parse.texture",
+              "startMs": 4454.20000000298,
+              "durationMs": 425.59999999403954,
+              "count": 1
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "parse.texture",
+              "startMs": 4454.399999991059,
+              "durationMs": 429.30000001192093,
+              "count": 1
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "parse.texture",
+              "startMs": 4454.29999999702,
+              "durationMs": 438.90000000596046,
+              "count": 1
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "parse.vrm-after-root",
+              "startMs": 4905.70000000298,
+              "durationMs": 7.899999991059303
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "parse.gltf-inclusive",
+              "startMs": 4426.29999999702,
+              "durationMs": 487.90000000596046
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "parse.vrm-postprocess",
+              "startMs": 4914.20000000298,
+              "durationMs": 143.5
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "renderer.bounds",
+              "startMs": 5058.0999999940395,
+              "durationMs": 42.900000005960464
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "gpu.create-context",
+              "startMs": 5102.0999999940395,
+              "durationMs": 19.900000005960464
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "first.player-create",
+              "startMs": 5125,
+              "durationMs": 0.8999999910593033
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "first.webgl-render-inclusive",
+              "startMs": 5128.399999991059,
+              "durationMs": 1667.6000000089407
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "first.canvas-copy",
+              "startMs": 6796.0999999940395,
+              "durationMs": 0.10000000894069672
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "first.paint-inclusive",
+              "startMs": 5102.0999999940395,
+              "durationMs": 1694.1000000089407
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "first.presentation-proxy-inclusive",
+              "startMs": 5102.0999999940395,
+              "durationMs": 1829.7000000029802
+            }
+          ]
+        },
+        {
+          "kind": "vrm",
+          "cache": "same-tab",
+          "run": 2,
+          "fetchMs": 0,
+          "displayMs": 1065,
+          "paintAtMs": 11337,
+          "bytes": 57185776,
+          "cacheHit": true,
+          "route": "cache",
+          "modelStats": {
+            "contexts": 1,
+            "lost": false,
+            "assets": 1,
+            "instances": 1,
+            "estimatedGpuAssetBytes": 176450404,
+            "surfaceBytes": 360000,
+            "paints": 38,
+            "cpuMs": 3,
+            "maxCpuMs": 1694.2000000029802,
+            "calls": 10,
+            "triangles": 126470,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "fps": 5.229164605622059,
+            "p95CpuMs": 313.1000000089407,
+            "geometries": 5,
+            "textures": 8,
+            "programs": 6,
+            "gpuMs": 8.235728
+          },
+          "idleModelStats": {
+            "contexts": 1,
+            "lost": false,
+            "assets": 0,
+            "instances": 0,
+            "estimatedGpuAssetBytes": 0,
+            "surfaceBytes": 0,
+            "paints": 21,
+            "cpuMs": 4.299999997019768,
+            "maxCpuMs": 1694.2000000029802,
+            "calls": 10,
+            "triangles": 126470,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "fps": 3.9402655738996812,
+            "p95CpuMs": 5.600000008940697,
+            "geometries": 0,
+            "textures": 0,
+            "programs": 0,
+            "gpuMs": 8.661249
+          },
+          "spans": [
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "renderer.source-load",
+              "startMs": 10363.20000000298,
+              "durationMs": 1.3999999910593033
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "renderer.buffer-source",
+              "startMs": 10364.59999999404,
+              "durationMs": 0,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "parse.texture",
+              "startMs": 10400.59999999404,
+              "durationMs": 303.70000000298023,
+              "count": 1
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "parse.texture",
+              "startMs": 10400.89999999106,
+              "durationMs": 349.5,
+              "count": 1
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "parse.texture",
+              "startMs": 10400.70000000298,
+              "durationMs": 356.69999998807907,
+              "count": 1
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "parse.texture",
+              "startMs": 10400.79999999702,
+              "durationMs": 360.90000000596046,
+              "count": 1
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "parse.texture",
+              "startMs": 10400.89999999106,
+              "durationMs": 365.70000000298023,
+              "count": 1
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "parse.vrm-after-root",
+              "startMs": 10780.79999999702,
+              "durationMs": 4.4000000059604645
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "parse.gltf-inclusive",
+              "startMs": 10364.70000000298,
+              "durationMs": 420.59999999403954
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "parse.vrm-postprocess",
+              "startMs": 10785.29999999702,
+              "durationMs": 135.29999999701977
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "renderer.bounds",
+              "startMs": 10920.59999999404,
+              "durationMs": 38.5
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "first.player-create",
+              "startMs": 10961.79999999702,
+              "durationMs": 0.7000000029802322
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "first.webgl-render-inclusive",
+              "startMs": 10964.29999999702,
+              "durationMs": 310.20000000298023
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "first.canvas-copy",
+              "startMs": 11274.59999999404,
+              "durationMs": 0.10000000894069672
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "first.paint-inclusive",
+              "startMs": 10961.59999999404,
+              "durationMs": 313.1000000089407
+            },
+            {
+              "id": "ap-2bc7315d-2c75-40d5-b1ae-425f4a8307e5",
+              "context": "content",
+              "contextInstance": "c6b3c180-42c6-4ffd-8154-14d0c9dc69ac",
+              "name": "first.presentation-proxy-inclusive",
+              "startMs": 10961.59999999404,
+              "durationMs": 375.20000000298023
+            }
+          ]
+        },
+        {
+          "kind": "vrm",
+          "cache": "reload",
+          "run": 3,
+          "fetchMs": 693.2000000029802,
+          "displayMs": 1529,
+          "paintAtMs": 4981.70000000298,
+          "sourceStartMs": 3452.7000000029802,
+          "bytes": 57185776,
+          "cacheHit": false,
+          "route": "array-buffer",
+          "modelStats": {
+            "contexts": 1,
+            "lost": false,
+            "assets": 1,
+            "instances": 1,
+            "estimatedGpuAssetBytes": 176450404,
+            "surfaceBytes": 360000,
+            "paints": 18,
+            "cpuMs": 3.7000000029802322,
+            "maxCpuMs": 288.59999999403954,
+            "calls": 10,
+            "triangles": 126470,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "fps": 5.4166002867611915,
+            "p95CpuMs": 288.59999999403954,
+            "geometries": 5,
+            "textures": 8,
+            "programs": 6,
+            "gpuMs": 12.406249
+          },
+          "spans": [
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "download.transport.array-buffer",
+              "startMs": 3452.7000000029802,
+              "durationMs": 402.5,
+              "bytes": 57185776,
+              "count": 1
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "download.inspect",
+              "startMs": 3855.2000000029802,
+              "durationMs": 290.70000000298023
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "download.validated-source",
+              "startMs": 3452.7000000029802,
+              "durationMs": 693.2000000029802,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "renderer.buffer-source",
+              "startMs": 4146.70000000298,
+              "durationMs": 0,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "parse.texture",
+              "startMs": 4189.9000000059605,
+              "durationMs": 187.70000000298023,
+              "count": 1
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "parse.texture",
+              "startMs": 4190.300000011921,
+              "durationMs": 196.8999999910593,
+              "count": 1
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "parse.texture",
+              "startMs": 4190.5,
+              "durationMs": 200.70000000298023,
+              "count": 1
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "parse.texture",
+              "startMs": 4190.5,
+              "durationMs": 212,
+              "count": 1
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "parse.texture",
+              "startMs": 4190.4000000059605,
+              "durationMs": 215,
+              "count": 1
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "parse.vrm-after-root",
+              "startMs": 4418.100000008941,
+              "durationMs": 8.5
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "parse.gltf-inclusive",
+              "startMs": 4146.70000000298,
+              "durationMs": 280.5
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "parse.vrm-postprocess",
+              "startMs": 4427.300000011921,
+              "durationMs": 168.3999999910593
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "renderer.bounds",
+              "startMs": 4596,
+              "durationMs": 39.80000001192093
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "gpu.create-context",
+              "startMs": 4636.300000011921,
+              "durationMs": 16.799999997019768
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "first.player-create",
+              "startMs": 4655.600000008941,
+              "durationMs": 0.8999999910593033
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "first.webgl-render-inclusive",
+              "startMs": 4659.20000000298,
+              "durationMs": 263.79999999701977
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "first.canvas-copy",
+              "startMs": 4923.20000000298,
+              "durationMs": 1.5
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "first.paint-inclusive",
+              "startMs": 4636.300000011921,
+              "durationMs": 288.59999999403954
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "first.presentation-proxy-inclusive",
+              "startMs": 4636.300000011921,
+              "durationMs": 345
+            }
+          ]
+        },
+        {
+          "kind": "vrm",
+          "cache": "same-tab",
+          "run": 3,
+          "fetchMs": 0,
+          "displayMs": 1075.3999999910593,
+          "paintAtMs": 9097.20000000298,
+          "bytes": 57185776,
+          "cacheHit": true,
+          "route": "cache",
+          "modelStats": {
+            "contexts": 1,
+            "lost": false,
+            "assets": 1,
+            "instances": 1,
+            "estimatedGpuAssetBytes": 176450404,
+            "surfaceBytes": 360000,
+            "paints": 38,
+            "cpuMs": 2.2999999970197678,
+            "maxCpuMs": 333.3999999910593,
+            "calls": 10,
+            "triangles": 126470,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "fps": 6.474870502589948,
+            "p95CpuMs": 288.59999999403954,
+            "geometries": 5,
+            "textures": 8,
+            "programs": 6,
+            "gpuMs": 37.622707
+          },
+          "idleModelStats": {
+            "contexts": 1,
+            "lost": false,
+            "assets": 0,
+            "instances": 0,
+            "estimatedGpuAssetBytes": 0,
+            "surfaceBytes": 0,
+            "paints": 20,
+            "cpuMs": 3.5,
+            "maxCpuMs": 288.59999999403954,
+            "calls": 10,
+            "triangles": 126470,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "fps": 5.748691416296028,
+            "p95CpuMs": 288.59999999403954,
+            "geometries": 0,
+            "textures": 0,
+            "programs": 0,
+            "gpuMs": 5.91729
+          },
+          "spans": [
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "renderer.source-load",
+              "startMs": 8137.800000011921,
+              "durationMs": 2.0999999940395355
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "renderer.buffer-source",
+              "startMs": 8139.9000000059605,
+              "durationMs": 0,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "parse.texture",
+              "startMs": 8167.4000000059605,
+              "durationMs": 275.29999999701977,
+              "count": 1
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "parse.texture",
+              "startMs": 8167.600000008941,
+              "durationMs": 286.20000000298023,
+              "count": 1
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "parse.texture",
+              "startMs": 8167.5,
+              "durationMs": 297.1000000089407,
+              "count": 1
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "parse.texture",
+              "startMs": 8167.600000008941,
+              "durationMs": 307.29999999701977,
+              "count": 1
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "parse.texture",
+              "startMs": 8167.600000008941,
+              "durationMs": 312.59999999403954,
+              "count": 1
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "parse.vrm-after-root",
+              "startMs": 8493.20000000298,
+              "durationMs": 4.9000000059604645
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "parse.gltf-inclusive",
+              "startMs": 8140,
+              "durationMs": 358.30000001192093
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "parse.vrm-postprocess",
+              "startMs": 8498.300000011921,
+              "durationMs": 161.3999999910593
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "renderer.bounds",
+              "startMs": 8659.90000000596,
+              "durationMs": 51.900000005960464
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "first.player-create",
+              "startMs": 8714.20000000298,
+              "durationMs": 0.4000000059604645
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "first.webgl-render-inclusive",
+              "startMs": 8715.10000000894,
+              "durationMs": 331.8999999910593
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "first.canvas-copy",
+              "startMs": 9047.10000000894,
+              "durationMs": 0.20000000298023224
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "first.paint-inclusive",
+              "startMs": 8714.10000000894,
+              "durationMs": 333.29999999701977
+            },
+            {
+              "id": "ap-28c289aa-ff25-4cc3-a124-88cf7edd3697",
+              "context": "content",
+              "contextInstance": "cbcf829b-eecf-4646-ac79-606259a391a5",
+              "name": "first.presentation-proxy-inclusive",
+              "startMs": 8714.10000000894,
+              "durationMs": 382.79999999701977
+            }
+          ]
+        },
+        {
+          "kind": "vrm",
+          "cache": "reload",
+          "run": 4,
+          "fetchMs": 631.8999999910593,
+          "displayMs": 1693.7999999970198,
+          "paintAtMs": 4861.70000000298,
+          "sourceStartMs": 3167.9000000059605,
+          "bytes": 57185776,
+          "cacheHit": false,
+          "route": "array-buffer",
+          "modelStats": {
+            "contexts": 1,
+            "lost": false,
+            "assets": 1,
+            "instances": 1,
+            "estimatedGpuAssetBytes": 176450404,
+            "surfaceBytes": 360000,
+            "paints": 19,
+            "cpuMs": 3.4000000059604645,
+            "maxCpuMs": 327.40000000596046,
+            "calls": 10,
+            "triangles": 126470,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "fps": 5.400378026461853,
+            "p95CpuMs": 327.40000000596046,
+            "geometries": 5,
+            "textures": 8,
+            "programs": 6,
+            "gpuMs": 6.520051
+          },
+          "spans": [
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "download.transport.array-buffer",
+              "startMs": 3167.9000000059605,
+              "durationMs": 351.3999999910593,
+              "bytes": 57185776,
+              "count": 1
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "download.inspect",
+              "startMs": 3519.4000000059605,
+              "durationMs": 280.3999999910593
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "download.validated-source",
+              "startMs": 3167.9000000059605,
+              "durationMs": 631.8999999910593,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "renderer.buffer-source",
+              "startMs": 3800.4000000059605,
+              "durationMs": 0,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "parse.texture",
+              "startMs": 3841.1000000089407,
+              "durationMs": 402.59999999403954,
+              "count": 1
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "parse.texture",
+              "startMs": 3841.9000000059605,
+              "durationMs": 406.8999999910593,
+              "count": 1
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "parse.texture",
+              "startMs": 3841.4000000059605,
+              "durationMs": 417.3999999910593,
+              "count": 1
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "parse.texture",
+              "startMs": 3841.6000000089407,
+              "durationMs": 421.59999999403954,
+              "count": 1
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "parse.texture",
+              "startMs": 3841.7000000029802,
+              "durationMs": 423.70000000298023,
+              "count": 1
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "parse.vrm-after-root",
+              "startMs": 4277.70000000298,
+              "durationMs": 7.5
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "parse.gltf-inclusive",
+              "startMs": 3800.5,
+              "durationMs": 485.1000000089407
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "parse.vrm-postprocess",
+              "startMs": 4285.600000008941,
+              "durationMs": 150.69999998807907
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "renderer.bounds",
+              "startMs": 4436.4000000059605,
+              "durationMs": 44.599999994039536
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "gpu.create-context",
+              "startMs": 4481.79999999702,
+              "durationMs": 16.5
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "first.player-create",
+              "startMs": 4502,
+              "durationMs": 0.7000000029802322
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "first.webgl-render-inclusive",
+              "startMs": 4505.5,
+              "durationMs": 303
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "first.canvas-copy",
+              "startMs": 4808.70000000298,
+              "durationMs": 0.29999999701976776
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "first.paint-inclusive",
+              "startMs": 4481.79999999702,
+              "durationMs": 327.30000001192093
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "first.presentation-proxy-inclusive",
+              "startMs": 4481.79999999702,
+              "durationMs": 379.6000000089407
+            }
+          ]
+        },
+        {
+          "kind": "vrm",
+          "cache": "same-tab",
+          "run": 4,
+          "fetchMs": 0,
+          "displayMs": 1030.300000011921,
+          "paintAtMs": 9117.60000000894,
+          "bytes": 57185776,
+          "cacheHit": true,
+          "route": "cache",
+          "modelStats": {
+            "contexts": 1,
+            "lost": false,
+            "assets": 1,
+            "instances": 1,
+            "estimatedGpuAssetBytes": 176450404,
+            "surfaceBytes": 360000,
+            "paints": 37,
+            "cpuMs": 3.1000000089406967,
+            "maxCpuMs": 327.40000000596046,
+            "calls": 10,
+            "triangles": 126470,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "fps": 6.171887054466904,
+            "p95CpuMs": 310.80000001192093,
+            "geometries": 5,
+            "textures": 8,
+            "programs": 6,
+            "gpuMs": 4.362759
+          },
+          "idleModelStats": {
+            "contexts": 1,
+            "lost": false,
+            "assets": 0,
+            "instances": 0,
+            "estimatedGpuAssetBytes": 0,
+            "surfaceBytes": 0,
+            "paints": 20,
+            "cpuMs": 4.300000011920929,
+            "maxCpuMs": 327.40000000596046,
+            "calls": 10,
+            "triangles": 126470,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "fps": 5.472192621180266,
+            "p95CpuMs": 327.40000000596046,
+            "geometries": 0,
+            "textures": 0,
+            "programs": 0,
+            "gpuMs": 10.67229
+          },
+          "spans": [
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "renderer.source-load",
+              "startMs": 8254.10000000894,
+              "durationMs": 1.3999999910593033
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "renderer.buffer-source",
+              "startMs": 8255.5,
+              "durationMs": 0,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "parse.texture",
+              "startMs": 8295,
+              "durationMs": 221.79999999701977,
+              "count": 1
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "parse.texture",
+              "startMs": 8295.20000000298,
+              "durationMs": 238.09999999403954,
+              "count": 1
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "parse.texture",
+              "startMs": 8295,
+              "durationMs": 242.40000000596046,
+              "count": 1
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "parse.texture",
+              "startMs": 8295.20000000298,
+              "durationMs": 252.5,
+              "count": 1
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "parse.texture",
+              "startMs": 8295.20000000298,
+              "durationMs": 256.09999999403954,
+              "count": 1
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "parse.vrm-after-root",
+              "startMs": 8565.29999999702,
+              "durationMs": 3.5
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "parse.gltf-inclusive",
+              "startMs": 8255.5,
+              "durationMs": 313.5
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "parse.vrm-postprocess",
+              "startMs": 8569,
+              "durationMs": 132.40000000596046
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "renderer.bounds",
+              "startMs": 8701.5,
+              "durationMs": 52.1000000089407
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "first.player-create",
+              "startMs": 8757.40000000596,
+              "durationMs": 1
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "first.webgl-render-inclusive",
+              "startMs": 8759.70000000298,
+              "durationMs": 308
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "first.canvas-copy",
+              "startMs": 9067.79999999702,
+              "durationMs": 0.20000000298023224
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "first.paint-inclusive",
+              "startMs": 8757.29999999702,
+              "durationMs": 310.80000001192093
+            },
+            {
+              "id": "ap-2986e5c9-157d-474c-bf00-c0a5200a2acd",
+              "context": "content",
+              "contextInstance": "fb12da95-7672-4475-9e5c-dffa84dbf2b0",
+              "name": "first.presentation-proxy-inclusive",
+              "startMs": 8757.29999999702,
+              "durationMs": 359.80000001192093
+            }
+          ]
+        },
+        {
+          "kind": "vrm",
+          "cache": "reload",
+          "run": 5,
+          "fetchMs": 678.2999999970198,
+          "displayMs": 1526.3999999910593,
+          "paintAtMs": 4606.0999999940395,
+          "sourceStartMs": 3079.7000000029802,
+          "bytes": 57185776,
+          "cacheHit": false,
+          "route": "array-buffer",
+          "modelStats": {
+            "contexts": 1,
+            "lost": false,
+            "assets": 1,
+            "instances": 1,
+            "estimatedGpuAssetBytes": 176450404,
+            "surfaceBytes": 360000,
+            "paints": 12,
+            "cpuMs": 2.5,
+            "maxCpuMs": 406.3999999910593,
+            "calls": 10,
+            "triangles": 126470,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "fps": 4.328493290835399,
+            "p95CpuMs": 406.3999999910593,
+            "geometries": 5,
+            "textures": 8,
+            "programs": 6,
+            "gpuMs": 2.932863
+          },
+          "spans": [
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "download.transport.array-buffer",
+              "startMs": 3079.7000000029802,
+              "durationMs": 512.2000000029802,
+              "bytes": 57185776,
+              "count": 1
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "download.inspect",
+              "startMs": 3591.9000000059605,
+              "durationMs": 166.09999999403954
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "download.validated-source",
+              "startMs": 3079.7000000029802,
+              "durationMs": 678.2999999970198,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "renderer.buffer-source",
+              "startMs": 3758.7000000029802,
+              "durationMs": 0,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "parse.texture",
+              "startMs": 3790.5,
+              "durationMs": 158.29999999701977,
+              "count": 1
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "parse.texture",
+              "startMs": 3791.2999999970198,
+              "durationMs": 162,
+              "count": 1
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "parse.texture",
+              "startMs": 3790.9000000059605,
+              "durationMs": 194.8999999910593,
+              "count": 1
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "parse.texture",
+              "startMs": 3791.2000000029802,
+              "durationMs": 198.70000000298023,
+              "count": 1
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "parse.texture",
+              "startMs": 3791.0999999940395,
+              "durationMs": 202.70000000298023,
+              "count": 1
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "parse.vrm-after-root",
+              "startMs": 4005.2999999970198,
+              "durationMs": 6.700000002980232
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "parse.gltf-inclusive",
+              "startMs": 3758.7000000029802,
+              "durationMs": 253.8999999910593
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "parse.vrm-postprocess",
+              "startMs": 4012.5999999940395,
+              "durationMs": 116.80000001192093
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "renderer.bounds",
+              "startMs": 4129.5999999940395,
+              "durationMs": 37
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "gpu.create-context",
+              "startMs": 4167.4000000059605,
+              "durationMs": 15
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "first.player-create",
+              "startMs": 4187.29999999702,
+              "durationMs": 0.6000000089406967
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "first.webgl-render-inclusive",
+              "startMs": 4190,
+              "durationMs": 383
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "first.canvas-copy",
+              "startMs": 4573.20000000298,
+              "durationMs": 0.3999999910593033
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "first.paint-inclusive",
+              "startMs": 4167.4000000059605,
+              "durationMs": 406.29999999701977
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "first.presentation-proxy-inclusive",
+              "startMs": 4167.4000000059605,
+              "durationMs": 438.3999999910593
+            }
+          ]
+        },
+        {
+          "kind": "vrm",
+          "cache": "same-tab",
+          "run": 5,
+          "fetchMs": 0,
+          "displayMs": 1131.1000000089407,
+          "paintAtMs": 8419.70000000298,
+          "bytes": 57185776,
+          "cacheHit": true,
+          "route": "cache",
+          "modelStats": {
+            "contexts": 1,
+            "lost": false,
+            "assets": 1,
+            "instances": 1,
+            "estimatedGpuAssetBytes": 176450404,
+            "surfaceBytes": 360000,
+            "paints": 34,
+            "cpuMs": 2.300000011920929,
+            "maxCpuMs": 406.3999999910593,
+            "calls": 10,
+            "triangles": 126470,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "fps": 6.353851781966614,
+            "p95CpuMs": 331.70000000298023,
+            "geometries": 5,
+            "textures": 8,
+            "programs": 6,
+            "gpuMs": 4.729373
+          },
+          "idleModelStats": {
+            "contexts": 1,
+            "lost": false,
+            "assets": 0,
+            "instances": 0,
+            "estimatedGpuAssetBytes": 0,
+            "surfaceBytes": 0,
+            "paints": 13,
+            "cpuMs": 2.3999999910593033,
+            "maxCpuMs": 406.3999999910593,
+            "calls": 10,
+            "triangles": 126470,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "fps": 4.419889502762431,
+            "p95CpuMs": 406.3999999910593,
+            "geometries": 0,
+            "textures": 0,
+            "programs": 0,
+            "gpuMs": 9.270519
+          },
+          "spans": [
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "renderer.source-load",
+              "startMs": 7432.5,
+              "durationMs": 1.4000000059604645
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "renderer.buffer-source",
+              "startMs": 7433.9000000059605,
+              "durationMs": 0,
+              "bytes": 57185776
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "parse.texture",
+              "startMs": 7508.0999999940395,
+              "durationMs": 286.40000000596046,
+              "count": 1
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "parse.texture",
+              "startMs": 7508.4000000059605,
+              "durationMs": 301.19999998807907,
+              "count": 1
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "parse.texture",
+              "startMs": 7508.29999999702,
+              "durationMs": 304.40000000596046,
+              "count": 1
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "parse.texture",
+              "startMs": 7508.29999999702,
+              "durationMs": 315.20000000298023,
+              "count": 1
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "parse.texture",
+              "startMs": 7508.29999999702,
+              "durationMs": 319.40000000596046,
+              "count": 1
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "parse.vrm-after-root",
+              "startMs": 7843.20000000298,
+              "durationMs": 4.0999999940395355
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "parse.gltf-inclusive",
+              "startMs": 7434,
+              "durationMs": 413.5
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "parse.vrm-postprocess",
+              "startMs": 7847.5,
+              "durationMs": 125.20000000298023
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "renderer.bounds",
+              "startMs": 7972.9000000059605,
+              "durationMs": 40.19999998807907
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "first.player-create",
+              "startMs": 8015.4000000059605,
+              "durationMs": 0.699999988079071
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "first.webgl-render-inclusive",
+              "startMs": 8016.9000000059605,
+              "durationMs": 329.5
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "first.canvas-copy",
+              "startMs": 8346.5,
+              "durationMs": 0.29999999701976776
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "first.paint-inclusive",
+              "startMs": 8015.29999999702,
+              "durationMs": 331.6000000089407
+            },
+            {
+              "id": "ap-ac0f56e7-0573-440f-8c1c-c609d3624db7",
+              "context": "content",
+              "contextInstance": "c63400b4-00a1-4af1-9f6b-78e2571f6b5f",
+              "name": "first.presentation-proxy-inclusive",
+              "startMs": 8015.29999999702,
+              "durationMs": 404.1000000089407
+            }
+          ]
+        },
+        {
+          "kind": "image",
+          "cache": "reload",
+          "run": 1,
+          "fetchMs": 290.5,
+          "displayMs": 929.2999999970198,
+          "paintAtMs": 3786.2999999970198,
+          "sourceStartMs": 2857,
+          "bytes": 30000000,
+          "cacheHit": false,
+          "route": "array-buffer",
+          "spans": [
+            {
+              "id": "ap-d91899e0-db25-43a4-aeeb-27fe52a33156",
+              "context": "content",
+              "contextInstance": "11393efd-2430-4a9d-bad5-6b75085d5894",
+              "name": "download.validated-source",
+              "startMs": 2857,
+              "durationMs": 290.5,
+              "bytes": 30000000
+            }
+          ]
+        },
+        {
+          "kind": "image",
+          "cache": "same-tab",
+          "run": 1,
+          "fetchMs": 0,
+          "displayMs": 588.5,
+          "paintAtMs": 7162.20000000298,
+          "bytes": 30000000,
+          "cacheHit": true,
+          "route": "cache",
+          "spans": []
+        },
+        {
+          "kind": "image",
+          "cache": "reload",
+          "run": 2,
+          "fetchMs": 301.20000000298023,
+          "displayMs": 948.2000000029802,
+          "paintAtMs": 4010.7000000029802,
+          "sourceStartMs": 3062.5,
+          "bytes": 30000000,
+          "cacheHit": false,
+          "route": "array-buffer",
+          "spans": [
+            {
+              "id": "ap-d8dad897-e62d-4b78-ab09-7052cb28c83c",
+              "context": "content",
+              "contextInstance": "15f96e81-f721-40f8-a32e-912bf038477c",
+              "name": "download.validated-source",
+              "startMs": 3062.5,
+              "durationMs": 301.20000000298023,
+              "bytes": 30000000
+            }
+          ]
+        },
+        {
+          "kind": "image",
+          "cache": "same-tab",
+          "run": 2,
+          "fetchMs": 0,
+          "displayMs": 769.2000000029802,
+          "paintAtMs": 7600.70000000298,
+          "bytes": 30000000,
+          "cacheHit": true,
+          "route": "cache",
+          "spans": []
+        },
+        {
+          "kind": "image",
+          "cache": "reload",
+          "run": 3,
+          "fetchMs": 336.3999999910593,
+          "displayMs": 1028.3999999910593,
+          "paintAtMs": 3980.7999999970198,
+          "sourceStartMs": 2952.4000000059605,
+          "bytes": 30000000,
+          "cacheHit": false,
+          "route": "array-buffer",
+          "spans": [
+            {
+              "id": "ap-09f1f490-638e-4b82-9b8b-a66ed5a0f4c2",
+              "context": "content",
+              "contextInstance": "5418c83e-9e51-479c-ae24-db5455b9ed59",
+              "name": "download.validated-source",
+              "startMs": 2952.4000000059605,
+              "durationMs": 336.3999999910593,
+              "bytes": 30000000
+            }
+          ]
+        },
+        {
+          "kind": "image",
+          "cache": "same-tab",
+          "run": 3,
+          "fetchMs": 0,
+          "displayMs": 552.6999999880791,
+          "paintAtMs": 7264.0999999940395,
+          "bytes": 30000000,
+          "cacheHit": true,
+          "route": "cache",
+          "spans": []
+        },
+        {
+          "kind": "image",
+          "cache": "reload",
+          "run": 4,
+          "fetchMs": 487.29999999701977,
+          "displayMs": 1023.0999999940395,
+          "paintAtMs": 4029.2999999970198,
+          "sourceStartMs": 3006.2000000029802,
+          "bytes": 30000000,
+          "cacheHit": false,
+          "route": "array-buffer",
+          "spans": [
+            {
+              "id": "ap-fc35de3d-a934-4fb0-bea3-46abee9dac0f",
+              "context": "content",
+              "contextInstance": "b0fa6d18-25fa-4898-986c-a263e0311898",
+              "name": "download.validated-source",
+              "startMs": 3006.2000000029802,
+              "durationMs": 487.29999999701977,
+              "bytes": 30000000
+            }
+          ]
+        },
+        {
+          "kind": "image",
+          "cache": "same-tab",
+          "run": 4,
+          "fetchMs": 0,
+          "displayMs": 717.2000000029802,
+          "paintAtMs": 7460.5,
+          "bytes": 30000000,
+          "cacheHit": true,
+          "route": "cache",
+          "spans": []
+        },
+        {
+          "kind": "image",
+          "cache": "reload",
+          "run": 5,
+          "fetchMs": 275.20000000298023,
+          "displayMs": 897.5999999940395,
+          "paintAtMs": 3680.3999999910593,
+          "sourceStartMs": 2782.7999999970198,
+          "bytes": 30000000,
+          "cacheHit": false,
+          "route": "array-buffer",
+          "spans": [
+            {
+              "id": "ap-e488eca3-2542-42ab-9cd3-175e6f194669",
+              "context": "content",
+              "contextInstance": "00da81f7-b6d7-4f49-8fdc-7f4b9eccd776",
+              "name": "download.validated-source",
+              "startMs": 2782.7999999970198,
+              "durationMs": 275.20000000298023,
+              "bytes": 30000000
+            }
+          ]
+        },
+        {
+          "kind": "image",
+          "cache": "same-tab",
+          "run": 5,
+          "fetchMs": 0,
+          "displayMs": 555.1000000089407,
+          "paintAtMs": 7101,
+          "bytes": 30000000,
+          "cacheHit": true,
+          "route": "cache",
+          "spans": []
+        }
+      ]
+    }
+  },
+  "gpuRepetition": [
+    {
+      "kind": "glb",
+      "samples": [
+        {
+          "phase": "retained",
+          "run": 1,
+          "active": {
+            "geometries": 1,
+            "textures": 2,
+            "programs": 2
+          },
+          "idle": {
+            "geometries": 0,
+            "textures": 0,
+            "programs": 0
+          },
+          "contextsAfterWait": 1
+        },
+        {
+          "phase": "retained",
+          "run": 2,
+          "active": {
+            "geometries": 1,
+            "textures": 2,
+            "programs": 2
+          },
+          "idle": {
+            "geometries": 0,
+            "textures": 0,
+            "programs": 0
+          },
+          "contextsAfterWait": 1
+        },
+        {
+          "phase": "retained",
+          "run": 3,
+          "active": {
+            "geometries": 1,
+            "textures": 2,
+            "programs": 2
+          },
+          "idle": {
+            "geometries": 0,
+            "textures": 0,
+            "programs": 0
+          },
+          "contextsAfterWait": 1
+        },
+        {
+          "phase": "retained",
+          "run": 4,
+          "active": {
+            "geometries": 1,
+            "textures": 2,
+            "programs": 2
+          },
+          "idle": {
+            "geometries": 0,
+            "textures": 0,
+            "programs": 0
+          },
+          "contextsAfterWait": 1
+        },
+        {
+          "phase": "retained",
+          "run": 5,
+          "active": {
+            "geometries": 1,
+            "textures": 2,
+            "programs": 2
+          },
+          "idle": {
+            "geometries": 0,
+            "textures": 0,
+            "programs": 0
+          },
+          "contextsAfterWait": 1
+        },
+        {
+          "phase": "expired",
+          "run": 1,
+          "active": {
+            "geometries": 1,
+            "textures": 2,
+            "programs": 2
+          },
+          "idle": {
+            "geometries": 0,
+            "textures": 0,
+            "programs": 0
+          },
+          "contextsAfterWait": 0
+        },
+        {
+          "phase": "expired",
+          "run": 2,
+          "active": {
+            "geometries": 1,
+            "textures": 2,
+            "programs": 2
+          },
+          "idle": {
+            "geometries": 0,
+            "textures": 0,
+            "programs": 0
+          },
+          "contextsAfterWait": 0
+        },
+        {
+          "phase": "expired",
+          "run": 3,
+          "active": {
+            "geometries": 1,
+            "textures": 2,
+            "programs": 2
+          },
+          "idle": {
+            "geometries": 0,
+            "textures": 0,
+            "programs": 0
+          },
+          "contextsAfterWait": 0
+        },
+        {
+          "phase": "expired",
+          "run": 4,
+          "active": {
+            "geometries": 1,
+            "textures": 2,
+            "programs": 2
+          },
+          "idle": {
+            "geometries": 0,
+            "textures": 0,
+            "programs": 0
+          },
+          "contextsAfterWait": 0
+        },
+        {
+          "phase": "expired",
+          "run": 5,
+          "active": {
+            "geometries": 1,
+            "textures": 2,
+            "programs": 2
+          },
+          "idle": {
+            "geometries": 0,
+            "textures": 0,
+            "programs": 0
+          },
+          "contextsAfterWait": 0
+        }
+      ]
+    },
+    {
+      "kind": "vrm",
+      "samples": [
+        {
+          "phase": "retained",
+          "run": 1,
+          "active": {
+            "geometries": 1,
+            "textures": 3,
+            "programs": 1
+          },
+          "idle": {
+            "geometries": 0,
+            "textures": 0,
+            "programs": 0
+          },
+          "contextsAfterWait": 1
+        },
+        {
+          "phase": "retained",
+          "run": 2,
+          "active": {
+            "geometries": 1,
+            "textures": 3,
+            "programs": 1
+          },
+          "idle": {
+            "geometries": 0,
+            "textures": 0,
+            "programs": 0
+          },
+          "contextsAfterWait": 1
+        },
+        {
+          "phase": "retained",
+          "run": 3,
+          "active": {
+            "geometries": 1,
+            "textures": 3,
+            "programs": 1
+          },
+          "idle": {
+            "geometries": 0,
+            "textures": 0,
+            "programs": 0
+          },
+          "contextsAfterWait": 1
+        },
+        {
+          "phase": "retained",
+          "run": 4,
+          "active": {
+            "geometries": 1,
+            "textures": 3,
+            "programs": 1
+          },
+          "idle": {
+            "geometries": 0,
+            "textures": 0,
+            "programs": 0
+          },
+          "contextsAfterWait": 1
+        },
+        {
+          "phase": "retained",
+          "run": 5,
+          "active": {
+            "geometries": 1,
+            "textures": 3,
+            "programs": 1
+          },
+          "idle": {
+            "geometries": 0,
+            "textures": 0,
+            "programs": 0
+          },
+          "contextsAfterWait": 1
+        },
+        {
+          "phase": "expired",
+          "run": 1,
+          "active": {
+            "geometries": 1,
+            "textures": 3,
+            "programs": 1
+          },
+          "idle": {
+            "geometries": 0,
+            "textures": 0,
+            "programs": 0
+          },
+          "contextsAfterWait": 0
+        },
+        {
+          "phase": "expired",
+          "run": 2,
+          "active": {
+            "geometries": 1,
+            "textures": 3,
+            "programs": 1
+          },
+          "idle": {
+            "geometries": 0,
+            "textures": 0,
+            "programs": 0
+          },
+          "contextsAfterWait": 0
+        },
+        {
+          "phase": "expired",
+          "run": 3,
+          "active": {
+            "geometries": 1,
+            "textures": 3,
+            "programs": 1
+          },
+          "idle": {
+            "geometries": 0,
+            "textures": 0,
+            "programs": 0
+          },
+          "contextsAfterWait": 0
+        },
+        {
+          "phase": "expired",
+          "run": 4,
+          "active": {
+            "geometries": 1,
+            "textures": 3,
+            "programs": 1
+          },
+          "idle": {
+            "geometries": 0,
+            "textures": 0,
+            "programs": 0
+          },
+          "contextsAfterWait": 0
+        },
+        {
+          "phase": "expired",
+          "run": 5,
+          "active": {
+            "geometries": 1,
+            "textures": 3,
+            "programs": 1
+          },
+          "idle": {
+            "geometries": 0,
+            "textures": 0,
+            "programs": 0
+          },
+          "contextsAfterWait": 0
+        }
+      ]
+    }
+  ]
+}

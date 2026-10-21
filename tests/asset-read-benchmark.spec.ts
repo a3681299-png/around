@@ -163,9 +163,14 @@ test('opt-in saved-source benchmark on real YouTube: reload and same-tab redispl
         let contentInstance: string | undefined;
         for (const cache of ['reload', 'same-tab'] as const) {
           let start: number | undefined;
+          let idleModelStats: Record<string, unknown> | undefined;
           if (cache === 'same-tab') {
             await set({ ...doc, decorations: doc.decorations.slice(0, 1) });
             await expect(page.locator('[data-image-id="image-c3-1"]')).toHaveCount(0);
+            if (kind === 'vrm')
+              idleModelStats = await page
+                .locator('#web-world-themes-decorations')
+                .evaluate((element: HTMLElement) => JSON.parse(element.dataset.wwModelStats!));
             start = await page.evaluate(() => {
               (globalThis as any).__c3Paints = [];
               return performance.now();
@@ -215,6 +220,14 @@ test('opt-in saved-source benchmark on real YouTube: reload and same-tab redispl
               : trialSpans.some((s) => s.name === 'download.transport.array-buffer')
                 ? 'array-buffer'
                 : 'chunks',
+            ...(kind === 'vrm'
+              ? {
+                  modelStats: await page
+                    .locator('#web-world-themes-decorations')
+                    .evaluate((element: HTMLElement) => JSON.parse(element.dataset.wwModelStats!)),
+                  ...(idleModelStats ? { idleModelStats } : {}),
+                }
+              : {}),
             spans: paint.trace ? trialSpans : source ? [source] : [],
           };
           trials.push(entry);
