@@ -47,7 +47,11 @@ async function seed() {
   assetInput.value = asset!.id;
   return asset!.id;
 }
-async function run(mode: 'transport' | 'direct' | 'stored', warmup: 'none' | 'textures' | 'compile' | 'both' = 'none') {
+async function run(
+  mode: 'transport' | 'direct' | 'stored',
+  warmup: 'none' | 'textures' | 'compile' | 'both' = 'none',
+  warmupPhase: 'before-player' | 'after-pose' = 'before-player',
+) {
   if (running) throw new Error('計測中です。');
   running = true;
   stop();
@@ -113,7 +117,7 @@ async function run(mode: 'transport' | 'direct' | 'stored', warmup: 'none' | 'te
       },
       shadow,
       blob ? async () => ({ metadata, blob: blob! }) : loadAsset,
-      { warmup, gpuBreakdown: true },
+      { warmup, warmupPhase, gpuBreakdown: true },
     );
     const surface = renderer.attach(shadow.appendChild(document.createElement('div')));
     activeSurface = surface;

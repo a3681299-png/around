@@ -93,6 +93,7 @@ function dispose(gltf: GLTF, shared?: SharedModelLease) {
 }
 export interface ModelRendererLabOptions {
   warmup?: AssetWarmup;
+  warmupPhase?: 'before-player' | 'after-pose';
   shared?: SharedModelPool;
   keepContext?: boolean;
   gpuBreakdown?: boolean;
@@ -130,6 +131,11 @@ export function createModelRenderer(
   const queries: WebGLQuery[] = [];
   let gpuApi: ReturnType<typeof measureAssetGpuApi> | undefined,
     firstRenderApi: Record<string, { calls: number; cpuMs: number }> | undefined;
+  const programInventory = () =>
+    (renderer?.info.programs ?? []).map((p) => ({ id: p.id, name: p.name, cacheKey: p.cacheKey }));
+  let preparationPrograms: ReturnType<typeof programInventory> | undefined,
+    beforeRenderPrograms: ReturnType<typeof programInventory> | undefined,
+    firstRenderPrograms: ReturnType<typeof programInventory> | undefined;
   const stats = () =>
     observe({
       contexts: renderer ? 1 : 0,
@@ -152,7 +158,18 @@ export function createModelRenderer(
       textures: renderer?.info.memory.textures ?? 0,
       programs: renderer?.info.programs?.length ?? 0,
       gpuMs,
-      ...(gpuApi ? { gpuApi: gpuApi.snapshot(), firstRenderApi } : {}),
+      ...(gpuApi
+        ? {
+            gpuApi: gpuApi.snapshot(),
+            checkShaderErrors: renderer?.debug.checkShaderErrors,
+            firstRenderApi,
+            programInventory: {
+              preparation: preparationPrograms,
+              beforeRender: beforeRenderPrograms,
+              firstRender: firstRenderPrograms,
+            },
+          }
+        : {}),
     });
   const reduced = view.matchMedia('(prefers-reduced-motion: reduce)');
   const ensure = (trace?: string) => {
@@ -368,6 +385,7 @@ export function createModelRenderer(
     generation: number;
     profiled?: boolean;
     preparing?: boolean;
+    posePrepared?: boolean;
   }
   const cancel = () => {
     if (frame !== undefined) view.cancelAnimationFrame(frame);
@@ -461,10 +479,37 @@ export function createModelRenderer(
             i.element.dataset.vrmPose = JSON.stringify(i.vrmPlayer.paint(i.evaluation, m, i.worldTime ?? 0));
           else i.player?.paint(i.evaluation, m);
         }
+        if (options?.warmupPhase === 'after-pose' && options.warmup && options.warmup !== 'none' && !i.posePrepared) {
+          i.preparing = true;
+          const generation = i.generation;
+          // The microtask starts after this paint's optional GPU query has ended.
+          // This experiment remains profiling-only; normal scheduling is unchanged.
+          void Promise.resolve()
+            .then(async () => {
+              if (!i.alive || closed || generation !== i.generation) return;
+              preparation = await prepareAssetGpu(r, i.scene, i.camera, options.warmup!);
+              if (!i.alive || closed || generation !== i.generation) return;
+              preparationPrograms = programInventory();
+              i.posePrepared = true;
+            })
+            .catch((error: unknown) => {
+              if (i.alive && generation === i.generation) {
+                i.failed = true;
+                report(error instanceof Error ? error.message : 'シェーダーを準備できませんでした。');
+              }
+            })
+            .finally(() => {
+              i.preparing = false;
+              schedule();
+            });
+          continue;
+        }
+        if (trace && gpuApi) beforeRenderPrograms = programInventory();
         const beforeApi = trace && gpuApi?.snapshot();
         if (ASSET_PROFILE && trace)
           profileSync(trace, 'first.webgl-render-inclusive', () => r.render(i.scene, i.camera));
         else r.render(i.scene, i.camera);
+        if (trace && gpuApi) firstRenderPrograms = programInventory();
         if (beforeApi && gpuApi)
           firstRenderApi = Object.fromEntries(
             Object.entries(gpuApi.snapshot()).map(([name, value]) => [
@@ -614,6 +659,7 @@ export function createModelRenderer(
       };
       instances.add(i);
       const unload = () => {
+        i.posePrepared = false;
         if (ASSET_PROFILE) delete element.dataset.profileReady;
         i.generation++;
         delete i.profiled;
@@ -675,12 +721,16 @@ export function createModelRenderer(
                 normal.position.copy(center).multiplyScalar(-1 / edge);
                 normal.add(root);
                 i.visual.add(normal);
-                if ((options?.warmup && options.warmup !== 'none') || options?.shared) {
+                if (
+                  options?.warmupPhase !== 'after-pose' &&
+                  ((options?.warmup && options.warmup !== 'none') || options?.shared)
+                ) {
                   i.preparing = true;
                   try {
                     const r = ensure(entry.trace);
                     for (const texture of options?.shared?.anchors() ?? []) r.initTexture(texture);
                     preparation = await prepareAssetGpu(r, i.scene, i.camera, options?.warmup ?? 'none');
+                    if (options?.gpuBreakdown) preparationPrograms = programInventory();
                   } finally {
                     i.preparing = false;
                   }

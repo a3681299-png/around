@@ -1,7 +1,7 @@
 import { ASSET_LAB_MESSAGE } from './asset-runtime-broker';
 import { createAssetLabScene } from './asset-runtime-scene';
 import type { AssetMetadata } from '../assets/validation';
-import { loadAsset, clearAssetSources } from '../assets/client';
+import { loadAssetChunks, clearAssetSources } from '../assets/client';
 import { newAssetProfile, linkAssetProfile, profileEnd } from './asset-profile';
 
 /** Experimental isolated-world bridge. Never installed by the ordinary build. */
@@ -142,7 +142,7 @@ export function installAssetRuntimeHost(doc: Document) {
       trace = newAssetProfile()!;
     linkAssetProfile(id, trace);
     if (mode === 'chunks') clearAssetSources();
-    const source = mode === 'chunks' ? await loadAsset(id) : await command('binary', { id });
+    const source = mode === 'chunks' ? await loadAssetChunks(id) : await command('binary', { id });
     const assetFetchMs = performance.now() - fetchStart;
     profileEnd(trace, 'lab.asset-fetch', fetchStart);
     if (

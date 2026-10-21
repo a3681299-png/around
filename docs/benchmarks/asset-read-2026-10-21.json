@@ -1,0 +1,2316 @@
+{
+  "date": "2026-10-21",
+  "beforeCommit": "deae995",
+  "transferCommit": "fe0408d",
+  "browser": "153.0.8010.12",
+  "viewport": [1920, 1080],
+  "vrmBytes": 57185776,
+  "vrmVersion": "0.x",
+  "pngBytes": 30000000,
+  "pngPixels": [3000, 2499],
+  "boundary": "Fetch ends after inspectAsset and verified immutable Blob. Display ends after rendered/copied image and two RAFs; no navigation or import time. Same-tab redisplay starts at re-add instruction.",
+  "trials": {
+    "before": [
+      {
+        "kind": "vrm",
+        "cache": "reload",
+        "run": 1,
+        "fetchMs": 5040.5,
+        "displayMs": 7635.8,
+        "bytes": 57185776,
+        "cacheHit": false,
+        "route": "chunks"
+      },
+      {
+        "kind": "vrm",
+        "cache": "same-tab",
+        "run": 1,
+        "fetchMs": 0,
+        "displayMs": 1334.3,
+        "bytes": 57185776,
+        "cacheHit": true,
+        "route": "cache"
+      },
+      {
+        "kind": "vrm",
+        "cache": "reload",
+        "run": 2,
+        "fetchMs": 4801.3,
+        "displayMs": 5944.4,
+        "bytes": 57185776,
+        "cacheHit": false,
+        "route": "chunks"
+      },
+      {
+        "kind": "vrm",
+        "cache": "same-tab",
+        "run": 2,
+        "fetchMs": 0,
+        "displayMs": 1026.4,
+        "bytes": 57185776,
+        "cacheHit": true,
+        "route": "cache"
+      },
+      {
+        "kind": "vrm",
+        "cache": "reload",
+        "run": 3,
+        "fetchMs": 4559.4,
+        "displayMs": 5671.8,
+        "bytes": 57185776,
+        "cacheHit": false,
+        "route": "chunks"
+      },
+      {
+        "kind": "vrm",
+        "cache": "same-tab",
+        "run": 3,
+        "fetchMs": 0,
+        "displayMs": 849.4,
+        "bytes": 57185776,
+        "cacheHit": true,
+        "route": "cache"
+      },
+      {
+        "kind": "vrm",
+        "cache": "reload",
+        "run": 4,
+        "fetchMs": 4522.2,
+        "displayMs": 5800.3,
+        "bytes": 57185776,
+        "cacheHit": false,
+        "route": "chunks"
+      },
+      {
+        "kind": "vrm",
+        "cache": "same-tab",
+        "run": 4,
+        "fetchMs": 0,
+        "displayMs": 1024.4,
+        "bytes": 57185776,
+        "cacheHit": true,
+        "route": "cache"
+      },
+      {
+        "kind": "vrm",
+        "cache": "reload",
+        "run": 5,
+        "fetchMs": 4767.5,
+        "displayMs": 7332.9,
+        "bytes": 57185776,
+        "cacheHit": false,
+        "route": "chunks"
+      },
+      {
+        "kind": "vrm",
+        "cache": "same-tab",
+        "run": 5,
+        "fetchMs": 0,
+        "displayMs": 971.6,
+        "bytes": 57185776,
+        "cacheHit": true,
+        "route": "cache"
+      },
+      {
+        "kind": "image",
+        "cache": "reload",
+        "run": 1,
+        "fetchMs": 2422.8,
+        "displayMs": 3516.5,
+        "bytes": 30000000,
+        "cacheHit": false,
+        "route": "chunks"
+      },
+      {
+        "kind": "image",
+        "cache": "same-tab",
+        "run": 1,
+        "fetchMs": 0,
+        "displayMs": 549.1,
+        "bytes": 30000000,
+        "cacheHit": true,
+        "route": "cache"
+      },
+      {
+        "kind": "image",
+        "cache": "reload",
+        "run": 2,
+        "fetchMs": 2223.6,
+        "displayMs": 3607.5,
+        "bytes": 30000000,
+        "cacheHit": false,
+        "route": "chunks"
+      },
+      {
+        "kind": "image",
+        "cache": "same-tab",
+        "run": 2,
+        "fetchMs": 0,
+        "displayMs": 541.9,
+        "bytes": 30000000,
+        "cacheHit": true,
+        "route": "cache"
+      },
+      {
+        "kind": "image",
+        "cache": "reload",
+        "run": 3,
+        "fetchMs": 2280.9,
+        "displayMs": 3595.4,
+        "bytes": 30000000,
+        "cacheHit": false,
+        "route": "chunks"
+      },
+      {
+        "kind": "image",
+        "cache": "same-tab",
+        "run": 3,
+        "fetchMs": 0,
+        "displayMs": 480.3,
+        "bytes": 30000000,
+        "cacheHit": true,
+        "route": "cache"
+      },
+      {
+        "kind": "image",
+        "cache": "reload",
+        "run": 4,
+        "fetchMs": 1375.5,
+        "displayMs": 2751.8,
+        "bytes": 30000000,
+        "cacheHit": false,
+        "route": "chunks"
+      },
+      {
+        "kind": "image",
+        "cache": "same-tab",
+        "run": 4,
+        "fetchMs": 0,
+        "displayMs": 506.4,
+        "bytes": 30000000,
+        "cacheHit": true,
+        "route": "cache"
+      },
+      {
+        "kind": "image",
+        "cache": "reload",
+        "run": 5,
+        "fetchMs": 2262,
+        "displayMs": 3185.7,
+        "bytes": 30000000,
+        "cacheHit": false,
+        "route": "chunks"
+      },
+      {
+        "kind": "image",
+        "cache": "same-tab",
+        "run": 5,
+        "fetchMs": 0,
+        "displayMs": 653.2,
+        "bytes": 30000000,
+        "cacheHit": true,
+        "route": "cache"
+      }
+    ],
+    "binary": [
+      {
+        "kind": "vrm",
+        "cache": "reload",
+        "run": 1,
+        "fetchMs": 806.3,
+        "displayMs": 3471.4,
+        "bytes": 57185776,
+        "cacheHit": false,
+        "route": "array-buffer"
+      },
+      {
+        "kind": "vrm",
+        "cache": "same-tab",
+        "run": 1,
+        "fetchMs": 0,
+        "displayMs": 3181.6,
+        "bytes": 57185776,
+        "cacheHit": true,
+        "route": "cache"
+      },
+      {
+        "kind": "vrm",
+        "cache": "reload",
+        "run": 2,
+        "fetchMs": 725.1,
+        "displayMs": 2291.9,
+        "bytes": 57185776,
+        "cacheHit": false,
+        "route": "array-buffer"
+      },
+      {
+        "kind": "vrm",
+        "cache": "same-tab",
+        "run": 2,
+        "fetchMs": 0,
+        "displayMs": 2329.7,
+        "bytes": 57185776,
+        "cacheHit": true,
+        "route": "cache"
+      },
+      {
+        "kind": "vrm",
+        "cache": "reload",
+        "run": 3,
+        "fetchMs": 814.5,
+        "displayMs": 3923.3,
+        "bytes": 57185776,
+        "cacheHit": false,
+        "route": "array-buffer"
+      },
+      {
+        "kind": "vrm",
+        "cache": "same-tab",
+        "run": 3,
+        "fetchMs": 0,
+        "displayMs": 1072,
+        "bytes": 57185776,
+        "cacheHit": true,
+        "route": "cache"
+      },
+      {
+        "kind": "vrm",
+        "cache": "reload",
+        "run": 4,
+        "fetchMs": 557.3,
+        "displayMs": 1573,
+        "bytes": 57185776,
+        "cacheHit": false,
+        "route": "array-buffer"
+      },
+      {
+        "kind": "vrm",
+        "cache": "same-tab",
+        "run": 4,
+        "fetchMs": 0,
+        "displayMs": 1598,
+        "bytes": 57185776,
+        "cacheHit": true,
+        "route": "cache"
+      },
+      {
+        "kind": "vrm",
+        "cache": "reload",
+        "run": 5,
+        "fetchMs": 613.9,
+        "displayMs": 1778.4,
+        "bytes": 57185776,
+        "cacheHit": false,
+        "route": "array-buffer"
+      },
+      {
+        "kind": "vrm",
+        "cache": "same-tab",
+        "run": 5,
+        "fetchMs": 0,
+        "displayMs": 1289,
+        "bytes": 57185776,
+        "cacheHit": true,
+        "route": "cache"
+      },
+      {
+        "kind": "image",
+        "cache": "reload",
+        "run": 1,
+        "fetchMs": 397,
+        "displayMs": 1007.8,
+        "bytes": 30000000,
+        "cacheHit": false,
+        "route": "array-buffer"
+      },
+      {
+        "kind": "image",
+        "cache": "same-tab",
+        "run": 1,
+        "fetchMs": 0,
+        "displayMs": 667.6,
+        "bytes": 30000000,
+        "cacheHit": true,
+        "route": "cache"
+      },
+      {
+        "kind": "image",
+        "cache": "reload",
+        "run": 2,
+        "fetchMs": 319.5,
+        "displayMs": 880.3,
+        "bytes": 30000000,
+        "cacheHit": false,
+        "route": "array-buffer"
+      },
+      {
+        "kind": "image",
+        "cache": "same-tab",
+        "run": 2,
+        "fetchMs": 0,
+        "displayMs": 623.4,
+        "bytes": 30000000,
+        "cacheHit": true,
+        "route": "cache"
+      },
+      {
+        "kind": "image",
+        "cache": "reload",
+        "run": 3,
+        "fetchMs": 245.1,
+        "displayMs": 837.2,
+        "bytes": 30000000,
+        "cacheHit": false,
+        "route": "array-buffer"
+      },
+      {
+        "kind": "image",
+        "cache": "same-tab",
+        "run": 3,
+        "fetchMs": 0,
+        "displayMs": 620.7,
+        "bytes": 30000000,
+        "cacheHit": true,
+        "route": "cache"
+      },
+      {
+        "kind": "image",
+        "cache": "reload",
+        "run": 4,
+        "fetchMs": 275.9,
+        "displayMs": 862.9,
+        "bytes": 30000000,
+        "cacheHit": false,
+        "route": "array-buffer"
+      },
+      {
+        "kind": "image",
+        "cache": "same-tab",
+        "run": 4,
+        "fetchMs": 0,
+        "displayMs": 758.1,
+        "bytes": 30000000,
+        "cacheHit": true,
+        "route": "cache"
+      },
+      {
+        "kind": "image",
+        "cache": "reload",
+        "run": 5,
+        "fetchMs": 318.5,
+        "displayMs": 1063.1,
+        "bytes": 30000000,
+        "cacheHit": false,
+        "route": "array-buffer"
+      },
+      {
+        "kind": "image",
+        "cache": "same-tab",
+        "run": 5,
+        "fetchMs": 0,
+        "displayMs": 662.9,
+        "bytes": 30000000,
+        "cacheHit": true,
+        "route": "cache"
+      }
+    ]
+  },
+  "summary": {
+    "before": {
+      "vrm-reload": {
+        "fetchMs": {
+          "medianMs": 4767.5,
+          "maxMs": 5040.5
+        },
+        "displayMs": {
+          "medianMs": 5944.4,
+          "maxMs": 7635.8
+        }
+      },
+      "vrm-same-tab": {
+        "fetchMs": {
+          "medianMs": 0,
+          "maxMs": 0
+        },
+        "displayMs": {
+          "medianMs": 1024.4,
+          "maxMs": 1334.3
+        }
+      },
+      "image-reload": {
+        "fetchMs": {
+          "medianMs": 2262,
+          "maxMs": 2422.8
+        },
+        "displayMs": {
+          "medianMs": 3516.5,
+          "maxMs": 3607.5
+        }
+      },
+      "image-same-tab": {
+        "fetchMs": {
+          "medianMs": 0,
+          "maxMs": 0
+        },
+        "displayMs": {
+          "medianMs": 541.9,
+          "maxMs": 653.2
+        }
+      }
+    },
+    "binary": {
+      "vrm-reload": {
+        "fetchMs": {
+          "medianMs": 725.1,
+          "maxMs": 814.5
+        },
+        "displayMs": {
+          "medianMs": 2291.9,
+          "maxMs": 3923.3
+        }
+      },
+      "vrm-same-tab": {
+        "fetchMs": {
+          "medianMs": 0,
+          "maxMs": 0
+        },
+        "displayMs": {
+          "medianMs": 1598,
+          "maxMs": 3181.6
+        }
+      },
+      "image-reload": {
+        "fetchMs": {
+          "medianMs": 318.5,
+          "maxMs": 397
+        },
+        "displayMs": {
+          "medianMs": 880.3,
+          "maxMs": 1063.1
+        }
+      },
+      "image-same-tab": {
+        "fetchMs": {
+          "medianMs": 0,
+          "maxMs": 0
+        },
+        "displayMs": {
+          "medianMs": 662.9,
+          "maxMs": 758.1
+        }
+      }
+    }
+  },
+  "shaderTrials": [
+    {
+      "round": 1,
+      "phase": "before-player",
+      "totalMs": 1120.5,
+      "preparation": {
+        "mode": "compile",
+        "parallelShaderCompile": true,
+        "textureInitCpuMs": 0,
+        "textureGpuElapsedMs": null,
+        "compileAsyncMs": 93.79999999701977
+      },
+      "firstRenderApi": {
+        "compileShader": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "linkProgram": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "getProgramParameter": {
+          "calls": 18,
+          "cpuMs": 0
+        },
+        "getShaderParameter": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "getProgramInfoLog": {
+          "calls": 6,
+          "cpuMs": 264.7999999821186
+        },
+        "getShaderInfoLog": {
+          "calls": 12,
+          "cpuMs": 1.300000011920929
+        },
+        "useProgram": {
+          "calls": 9,
+          "cpuMs": 0
+        },
+        "getActiveUniform": {
+          "calls": 186,
+          "cpuMs": 0.19999998807907104
+        },
+        "getUniformLocation": {
+          "calls": 186,
+          "cpuMs": 0
+        },
+        "getAttribLocation": {
+          "calls": 33,
+          "cpuMs": 0
+        },
+        "texStorage2D": {
+          "calls": 6,
+          "cpuMs": 0.10000000894069672
+        },
+        "texStorage3D": {
+          "calls": 2,
+          "cpuMs": 0
+        },
+        "texImage2D": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "texSubImage2D": {
+          "calls": 6,
+          "cpuMs": 12
+        },
+        "texImage3D": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "texSubImage3D": {
+          "calls": 2,
+          "cpuMs": 32.69999998807907
+        },
+        "generateMipmap": {
+          "calls": 5,
+          "cpuMs": 0
+        },
+        "bufferData": {
+          "calls": 35,
+          "cpuMs": 1.8999999910593033
+        },
+        "bufferSubData": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "drawElements": {
+          "calls": 10,
+          "cpuMs": 0
+        },
+        "drawArrays": {
+          "calls": 0,
+          "cpuMs": 0
+        }
+      },
+      "checkShaderErrors": true,
+      "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "programs": {
+        "preparation": [
+          {
+            "id": 0,
+            "cacheKeySha256": "1d730d0374cfc6b03202c8d920cfb3078bf5d05cb106b3b7105ad80d9aa60278"
+          },
+          {
+            "id": 1,
+            "cacheKeySha256": "825dd5caa17c3bdce53d2633a68cb0703e218d958ff49ef2cd767709fc910c93"
+          },
+          {
+            "id": 2,
+            "cacheKeySha256": "9eeca190aa0b0c67ac5848b0c3f47fb2f874fe4839b78f43dd128e1c95e865ee"
+          },
+          {
+            "id": 3,
+            "cacheKeySha256": "743f545a3f6da0b35515bc04f9395299a93c0f463076dcca149cd1e251e3bcbf"
+          },
+          {
+            "id": 4,
+            "cacheKeySha256": "fe35e90b9f851684e6cb0e9ceeae8db4df006d7b9778a682cc904e8ef07da018"
+          },
+          {
+            "id": 5,
+            "cacheKeySha256": "7f83b062314509283fe76e42d91a5a35be04f50c51e6aa03b812384d84350cc1"
+          }
+        ],
+        "beforeRender": [
+          {
+            "id": 0,
+            "cacheKeySha256": "1d730d0374cfc6b03202c8d920cfb3078bf5d05cb106b3b7105ad80d9aa60278"
+          },
+          {
+            "id": 1,
+            "cacheKeySha256": "825dd5caa17c3bdce53d2633a68cb0703e218d958ff49ef2cd767709fc910c93"
+          },
+          {
+            "id": 2,
+            "cacheKeySha256": "9eeca190aa0b0c67ac5848b0c3f47fb2f874fe4839b78f43dd128e1c95e865ee"
+          },
+          {
+            "id": 3,
+            "cacheKeySha256": "743f545a3f6da0b35515bc04f9395299a93c0f463076dcca149cd1e251e3bcbf"
+          },
+          {
+            "id": 4,
+            "cacheKeySha256": "fe35e90b9f851684e6cb0e9ceeae8db4df006d7b9778a682cc904e8ef07da018"
+          },
+          {
+            "id": 5,
+            "cacheKeySha256": "7f83b062314509283fe76e42d91a5a35be04f50c51e6aa03b812384d84350cc1"
+          }
+        ],
+        "firstRender": [
+          {
+            "id": 0,
+            "cacheKeySha256": "1d730d0374cfc6b03202c8d920cfb3078bf5d05cb106b3b7105ad80d9aa60278"
+          },
+          {
+            "id": 1,
+            "cacheKeySha256": "825dd5caa17c3bdce53d2633a68cb0703e218d958ff49ef2cd767709fc910c93"
+          },
+          {
+            "id": 2,
+            "cacheKeySha256": "9eeca190aa0b0c67ac5848b0c3f47fb2f874fe4839b78f43dd128e1c95e865ee"
+          },
+          {
+            "id": 3,
+            "cacheKeySha256": "743f545a3f6da0b35515bc04f9395299a93c0f463076dcca149cd1e251e3bcbf"
+          },
+          {
+            "id": 4,
+            "cacheKeySha256": "fe35e90b9f851684e6cb0e9ceeae8db4df006d7b9778a682cc904e8ef07da018"
+          },
+          {
+            "id": 5,
+            "cacheKeySha256": "7f83b062314509283fe76e42d91a5a35be04f50c51e6aa03b812384d84350cc1"
+          }
+        ]
+      },
+      "newPrograms": 0
+    },
+    {
+      "round": 1,
+      "phase": "after-pose",
+      "totalMs": 827.5,
+      "preparation": {
+        "mode": "compile",
+        "parallelShaderCompile": true,
+        "textureInitCpuMs": 0,
+        "textureGpuElapsedMs": null,
+        "compileAsyncMs": 18.400000005960464
+      },
+      "firstRenderApi": {
+        "compileShader": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "linkProgram": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "getProgramParameter": {
+          "calls": 18,
+          "cpuMs": 0
+        },
+        "getShaderParameter": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "getProgramInfoLog": {
+          "calls": 6,
+          "cpuMs": 28.700000002980232
+        },
+        "getShaderInfoLog": {
+          "calls": 12,
+          "cpuMs": 1.0999999940395355
+        },
+        "useProgram": {
+          "calls": 9,
+          "cpuMs": 0
+        },
+        "getActiveUniform": {
+          "calls": 186,
+          "cpuMs": 0.10000000894069672
+        },
+        "getUniformLocation": {
+          "calls": 186,
+          "cpuMs": 0.19999998807907104
+        },
+        "getAttribLocation": {
+          "calls": 33,
+          "cpuMs": 0
+        },
+        "texStorage2D": {
+          "calls": 6,
+          "cpuMs": 0
+        },
+        "texStorage3D": {
+          "calls": 2,
+          "cpuMs": 0
+        },
+        "texImage2D": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "texSubImage2D": {
+          "calls": 6,
+          "cpuMs": 11.5
+        },
+        "texImage3D": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "texSubImage3D": {
+          "calls": 2,
+          "cpuMs": 24.900000005960464
+        },
+        "generateMipmap": {
+          "calls": 5,
+          "cpuMs": 0
+        },
+        "bufferData": {
+          "calls": 35,
+          "cpuMs": 2.4999999701976776
+        },
+        "bufferSubData": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "drawElements": {
+          "calls": 10,
+          "cpuMs": 0
+        },
+        "drawArrays": {
+          "calls": 0,
+          "cpuMs": 0
+        }
+      },
+      "checkShaderErrors": true,
+      "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "programs": {
+        "preparation": [
+          {
+            "id": 6,
+            "cacheKeySha256": "d98aadef888940387c35bc4afa0f84ee38547d1a1b1b7a3348e702b77cd1be1a"
+          },
+          {
+            "id": 7,
+            "cacheKeySha256": "7b80f142b89107358be571d3b6c018fefd786be28640e1edcb83590496e21e96"
+          },
+          {
+            "id": 8,
+            "cacheKeySha256": "e3beadd96b792aa2e769a58eda8eda8b8495f3b75a2bee29addb39a6a95be8ba"
+          },
+          {
+            "id": 9,
+            "cacheKeySha256": "0a726aa94a496abf78c6c000fc42550eeeadbf527715ebf491303067b91147d2"
+          },
+          {
+            "id": 10,
+            "cacheKeySha256": "5f345d1b4881eb7f7b1a7c7bb354130717fe46d1b53f08f45364fe707a144bb9"
+          },
+          {
+            "id": 11,
+            "cacheKeySha256": "29414958599aea47ef502bda934638d706ee992b7374230599f54f0588f02e90"
+          }
+        ],
+        "beforeRender": [
+          {
+            "id": 6,
+            "cacheKeySha256": "d98aadef888940387c35bc4afa0f84ee38547d1a1b1b7a3348e702b77cd1be1a"
+          },
+          {
+            "id": 7,
+            "cacheKeySha256": "7b80f142b89107358be571d3b6c018fefd786be28640e1edcb83590496e21e96"
+          },
+          {
+            "id": 8,
+            "cacheKeySha256": "e3beadd96b792aa2e769a58eda8eda8b8495f3b75a2bee29addb39a6a95be8ba"
+          },
+          {
+            "id": 9,
+            "cacheKeySha256": "0a726aa94a496abf78c6c000fc42550eeeadbf527715ebf491303067b91147d2"
+          },
+          {
+            "id": 10,
+            "cacheKeySha256": "5f345d1b4881eb7f7b1a7c7bb354130717fe46d1b53f08f45364fe707a144bb9"
+          },
+          {
+            "id": 11,
+            "cacheKeySha256": "29414958599aea47ef502bda934638d706ee992b7374230599f54f0588f02e90"
+          }
+        ],
+        "firstRender": [
+          {
+            "id": 6,
+            "cacheKeySha256": "d98aadef888940387c35bc4afa0f84ee38547d1a1b1b7a3348e702b77cd1be1a"
+          },
+          {
+            "id": 7,
+            "cacheKeySha256": "7b80f142b89107358be571d3b6c018fefd786be28640e1edcb83590496e21e96"
+          },
+          {
+            "id": 8,
+            "cacheKeySha256": "e3beadd96b792aa2e769a58eda8eda8b8495f3b75a2bee29addb39a6a95be8ba"
+          },
+          {
+            "id": 9,
+            "cacheKeySha256": "0a726aa94a496abf78c6c000fc42550eeeadbf527715ebf491303067b91147d2"
+          },
+          {
+            "id": 10,
+            "cacheKeySha256": "5f345d1b4881eb7f7b1a7c7bb354130717fe46d1b53f08f45364fe707a144bb9"
+          },
+          {
+            "id": 11,
+            "cacheKeySha256": "29414958599aea47ef502bda934638d706ee992b7374230599f54f0588f02e90"
+          }
+        ]
+      },
+      "newPrograms": 0
+    },
+    {
+      "round": 2,
+      "phase": "after-pose",
+      "totalMs": 749.3000000119209,
+      "preparation": {
+        "mode": "compile",
+        "parallelShaderCompile": true,
+        "textureInitCpuMs": 0,
+        "textureGpuElapsedMs": null,
+        "compileAsyncMs": 15.799999997019768
+      },
+      "firstRenderApi": {
+        "compileShader": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "linkProgram": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "getProgramParameter": {
+          "calls": 18,
+          "cpuMs": 0
+        },
+        "getShaderParameter": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "getProgramInfoLog": {
+          "calls": 6,
+          "cpuMs": 30.399999991059303
+        },
+        "getShaderInfoLog": {
+          "calls": 12,
+          "cpuMs": 1.1000000089406967
+        },
+        "useProgram": {
+          "calls": 9,
+          "cpuMs": 0
+        },
+        "getActiveUniform": {
+          "calls": 186,
+          "cpuMs": 0.10000000894069672
+        },
+        "getUniformLocation": {
+          "calls": 186,
+          "cpuMs": 0
+        },
+        "getAttribLocation": {
+          "calls": 33,
+          "cpuMs": 0
+        },
+        "texStorage2D": {
+          "calls": 6,
+          "cpuMs": 0.09999999403953552
+        },
+        "texStorage3D": {
+          "calls": 2,
+          "cpuMs": 0
+        },
+        "texImage2D": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "texSubImage2D": {
+          "calls": 6,
+          "cpuMs": 11.200000002980232
+        },
+        "texImage3D": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "texSubImage3D": {
+          "calls": 2,
+          "cpuMs": 23.600000008940697
+        },
+        "generateMipmap": {
+          "calls": 5,
+          "cpuMs": 0
+        },
+        "bufferData": {
+          "calls": 35,
+          "cpuMs": 2.499999985098839
+        },
+        "bufferSubData": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "drawElements": {
+          "calls": 10,
+          "cpuMs": 0
+        },
+        "drawArrays": {
+          "calls": 0,
+          "cpuMs": 0
+        }
+      },
+      "checkShaderErrors": true,
+      "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "programs": {
+        "preparation": [
+          {
+            "id": 12,
+            "cacheKeySha256": "1bf4bbe0cdd0e4290b4e4d43894044514be42009286992bc37842ce3dcf98024"
+          },
+          {
+            "id": 13,
+            "cacheKeySha256": "1b0cb0bde94c0ba03a72a7e9904a1bb5a01925b8eaf4f313bf1c23cee233e839"
+          },
+          {
+            "id": 14,
+            "cacheKeySha256": "911cde32b019d23cffc2d08e8c482d420152afe7432f01ed951d4bbc55336f41"
+          },
+          {
+            "id": 15,
+            "cacheKeySha256": "6ac262052f3758c3f120954d27238cc129ef1d103ad1b71e8e296caaa5556829"
+          },
+          {
+            "id": 16,
+            "cacheKeySha256": "a9591037f9b94e7e59cad19be06b3c3c0ee6bb898821f16f7468210fee9ec42b"
+          },
+          {
+            "id": 17,
+            "cacheKeySha256": "310e0260d5f8de82b404c50c71213ed533c3bdd08e0093bfe789397a499b09c6"
+          }
+        ],
+        "beforeRender": [
+          {
+            "id": 12,
+            "cacheKeySha256": "1bf4bbe0cdd0e4290b4e4d43894044514be42009286992bc37842ce3dcf98024"
+          },
+          {
+            "id": 13,
+            "cacheKeySha256": "1b0cb0bde94c0ba03a72a7e9904a1bb5a01925b8eaf4f313bf1c23cee233e839"
+          },
+          {
+            "id": 14,
+            "cacheKeySha256": "911cde32b019d23cffc2d08e8c482d420152afe7432f01ed951d4bbc55336f41"
+          },
+          {
+            "id": 15,
+            "cacheKeySha256": "6ac262052f3758c3f120954d27238cc129ef1d103ad1b71e8e296caaa5556829"
+          },
+          {
+            "id": 16,
+            "cacheKeySha256": "a9591037f9b94e7e59cad19be06b3c3c0ee6bb898821f16f7468210fee9ec42b"
+          },
+          {
+            "id": 17,
+            "cacheKeySha256": "310e0260d5f8de82b404c50c71213ed533c3bdd08e0093bfe789397a499b09c6"
+          }
+        ],
+        "firstRender": [
+          {
+            "id": 12,
+            "cacheKeySha256": "1bf4bbe0cdd0e4290b4e4d43894044514be42009286992bc37842ce3dcf98024"
+          },
+          {
+            "id": 13,
+            "cacheKeySha256": "1b0cb0bde94c0ba03a72a7e9904a1bb5a01925b8eaf4f313bf1c23cee233e839"
+          },
+          {
+            "id": 14,
+            "cacheKeySha256": "911cde32b019d23cffc2d08e8c482d420152afe7432f01ed951d4bbc55336f41"
+          },
+          {
+            "id": 15,
+            "cacheKeySha256": "6ac262052f3758c3f120954d27238cc129ef1d103ad1b71e8e296caaa5556829"
+          },
+          {
+            "id": 16,
+            "cacheKeySha256": "a9591037f9b94e7e59cad19be06b3c3c0ee6bb898821f16f7468210fee9ec42b"
+          },
+          {
+            "id": 17,
+            "cacheKeySha256": "310e0260d5f8de82b404c50c71213ed533c3bdd08e0093bfe789397a499b09c6"
+          }
+        ]
+      },
+      "newPrograms": 0
+    },
+    {
+      "round": 2,
+      "phase": "before-player",
+      "totalMs": 659.5999999940395,
+      "preparation": {
+        "mode": "compile",
+        "parallelShaderCompile": true,
+        "textureInitCpuMs": 0,
+        "textureGpuElapsedMs": null,
+        "compileAsyncMs": 16.900000005960464
+      },
+      "firstRenderApi": {
+        "compileShader": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "linkProgram": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "getProgramParameter": {
+          "calls": 18,
+          "cpuMs": 0
+        },
+        "getShaderParameter": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "getProgramInfoLog": {
+          "calls": 6,
+          "cpuMs": 48.99999998509884
+        },
+        "getShaderInfoLog": {
+          "calls": 12,
+          "cpuMs": 1.4000000059604645
+        },
+        "useProgram": {
+          "calls": 9,
+          "cpuMs": 0
+        },
+        "getActiveUniform": {
+          "calls": 186,
+          "cpuMs": 0
+        },
+        "getUniformLocation": {
+          "calls": 186,
+          "cpuMs": 0.3999999761581421
+        },
+        "getAttribLocation": {
+          "calls": 33,
+          "cpuMs": 0
+        },
+        "texStorage2D": {
+          "calls": 6,
+          "cpuMs": 0
+        },
+        "texStorage3D": {
+          "calls": 2,
+          "cpuMs": 0
+        },
+        "texImage2D": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "texSubImage2D": {
+          "calls": 6,
+          "cpuMs": 14.000000029802322
+        },
+        "texImage3D": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "texSubImage3D": {
+          "calls": 2,
+          "cpuMs": 22.400000005960464
+        },
+        "generateMipmap": {
+          "calls": 5,
+          "cpuMs": 0.09999999403953552
+        },
+        "bufferData": {
+          "calls": 35,
+          "cpuMs": 2.000000014901161
+        },
+        "bufferSubData": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "drawElements": {
+          "calls": 10,
+          "cpuMs": 0
+        },
+        "drawArrays": {
+          "calls": 0,
+          "cpuMs": 0
+        }
+      },
+      "checkShaderErrors": true,
+      "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "programs": {
+        "preparation": [
+          {
+            "id": 18,
+            "cacheKeySha256": "f7f2af2a9eb0249c51313d50208cf5c28e950ddb443d89074846eb0e357c4747"
+          },
+          {
+            "id": 19,
+            "cacheKeySha256": "1140190966b9233447ee4eaa0455ed60616a08a5ae5be33720bfe8cde792a22d"
+          },
+          {
+            "id": 20,
+            "cacheKeySha256": "ae4d8d1dbd6ff0c29de0815498279db390a4b605cb558952904f9714fc16fbaa"
+          },
+          {
+            "id": 21,
+            "cacheKeySha256": "1cf368d0e66590df613faff471d605333d678a1072e942331adc87cb28895126"
+          },
+          {
+            "id": 22,
+            "cacheKeySha256": "349a0dd5a28d2b8f71a5aa2654660138c140648f02b98954d7bb7617169a1afd"
+          },
+          {
+            "id": 23,
+            "cacheKeySha256": "9101335e7154d2d9b4355c3c44518267a1c7fb0ebe21b293d4ebb7776054e9b6"
+          }
+        ],
+        "beforeRender": [
+          {
+            "id": 18,
+            "cacheKeySha256": "f7f2af2a9eb0249c51313d50208cf5c28e950ddb443d89074846eb0e357c4747"
+          },
+          {
+            "id": 19,
+            "cacheKeySha256": "1140190966b9233447ee4eaa0455ed60616a08a5ae5be33720bfe8cde792a22d"
+          },
+          {
+            "id": 20,
+            "cacheKeySha256": "ae4d8d1dbd6ff0c29de0815498279db390a4b605cb558952904f9714fc16fbaa"
+          },
+          {
+            "id": 21,
+            "cacheKeySha256": "1cf368d0e66590df613faff471d605333d678a1072e942331adc87cb28895126"
+          },
+          {
+            "id": 22,
+            "cacheKeySha256": "349a0dd5a28d2b8f71a5aa2654660138c140648f02b98954d7bb7617169a1afd"
+          },
+          {
+            "id": 23,
+            "cacheKeySha256": "9101335e7154d2d9b4355c3c44518267a1c7fb0ebe21b293d4ebb7776054e9b6"
+          }
+        ],
+        "firstRender": [
+          {
+            "id": 18,
+            "cacheKeySha256": "f7f2af2a9eb0249c51313d50208cf5c28e950ddb443d89074846eb0e357c4747"
+          },
+          {
+            "id": 19,
+            "cacheKeySha256": "1140190966b9233447ee4eaa0455ed60616a08a5ae5be33720bfe8cde792a22d"
+          },
+          {
+            "id": 20,
+            "cacheKeySha256": "ae4d8d1dbd6ff0c29de0815498279db390a4b605cb558952904f9714fc16fbaa"
+          },
+          {
+            "id": 21,
+            "cacheKeySha256": "1cf368d0e66590df613faff471d605333d678a1072e942331adc87cb28895126"
+          },
+          {
+            "id": 22,
+            "cacheKeySha256": "349a0dd5a28d2b8f71a5aa2654660138c140648f02b98954d7bb7617169a1afd"
+          },
+          {
+            "id": 23,
+            "cacheKeySha256": "9101335e7154d2d9b4355c3c44518267a1c7fb0ebe21b293d4ebb7776054e9b6"
+          }
+        ]
+      },
+      "newPrograms": 0
+    },
+    {
+      "round": 3,
+      "phase": "before-player",
+      "totalMs": 600.5999999940395,
+      "preparation": {
+        "mode": "compile",
+        "parallelShaderCompile": true,
+        "textureInitCpuMs": 0,
+        "textureGpuElapsedMs": null,
+        "compileAsyncMs": 15.700000002980232
+      },
+      "firstRenderApi": {
+        "compileShader": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "linkProgram": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "getProgramParameter": {
+          "calls": 18,
+          "cpuMs": 0.09999999403953552
+        },
+        "getShaderParameter": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "getProgramInfoLog": {
+          "calls": 6,
+          "cpuMs": 82.80000001192093
+        },
+        "getShaderInfoLog": {
+          "calls": 12,
+          "cpuMs": 1.2000000029802322
+        },
+        "useProgram": {
+          "calls": 9,
+          "cpuMs": 0
+        },
+        "getActiveUniform": {
+          "calls": 186,
+          "cpuMs": 0.19999998807907104
+        },
+        "getUniformLocation": {
+          "calls": 186,
+          "cpuMs": 0
+        },
+        "getAttribLocation": {
+          "calls": 33,
+          "cpuMs": 0
+        },
+        "texStorage2D": {
+          "calls": 6,
+          "cpuMs": 0
+        },
+        "texStorage3D": {
+          "calls": 2,
+          "cpuMs": 0
+        },
+        "texImage2D": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "texSubImage2D": {
+          "calls": 6,
+          "cpuMs": 11.600000008940697
+        },
+        "texImage3D": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "texSubImage3D": {
+          "calls": 2,
+          "cpuMs": 24.50000001490116
+        },
+        "generateMipmap": {
+          "calls": 5,
+          "cpuMs": 0.10000000894069672
+        },
+        "bufferData": {
+          "calls": 35,
+          "cpuMs": 1.6999999731779099
+        },
+        "bufferSubData": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "drawElements": {
+          "calls": 10,
+          "cpuMs": 0
+        },
+        "drawArrays": {
+          "calls": 0,
+          "cpuMs": 0
+        }
+      },
+      "checkShaderErrors": true,
+      "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "programs": {
+        "preparation": [
+          {
+            "id": 24,
+            "cacheKeySha256": "f6e73ea4b33ae40d64ad0bae3dfd85f6a14cb64876585c9d185a80bb9bbe9948"
+          },
+          {
+            "id": 25,
+            "cacheKeySha256": "29e9c55853de39e08f68089eaf42a7a545aa602e1f9c72e8b83df3b7c1ea0942"
+          },
+          {
+            "id": 26,
+            "cacheKeySha256": "171ffa16b6739d2b402aff8ddc249bf870f1ac3bb653c21218be3c8e181ce529"
+          },
+          {
+            "id": 27,
+            "cacheKeySha256": "5420fe422470a4d2b06f1d7bc20b3d93e1b831add29f6c4743bc671aba0958d9"
+          },
+          {
+            "id": 28,
+            "cacheKeySha256": "a9fd3ac31d17b432cf23f1b3144fd2386d86db7d12b6d50c522fc61ffe2defa0"
+          },
+          {
+            "id": 29,
+            "cacheKeySha256": "aabb879880ca511ba458b925fb242d8df862ba1a11e80591ad37e7985c6819e8"
+          }
+        ],
+        "beforeRender": [
+          {
+            "id": 24,
+            "cacheKeySha256": "f6e73ea4b33ae40d64ad0bae3dfd85f6a14cb64876585c9d185a80bb9bbe9948"
+          },
+          {
+            "id": 25,
+            "cacheKeySha256": "29e9c55853de39e08f68089eaf42a7a545aa602e1f9c72e8b83df3b7c1ea0942"
+          },
+          {
+            "id": 26,
+            "cacheKeySha256": "171ffa16b6739d2b402aff8ddc249bf870f1ac3bb653c21218be3c8e181ce529"
+          },
+          {
+            "id": 27,
+            "cacheKeySha256": "5420fe422470a4d2b06f1d7bc20b3d93e1b831add29f6c4743bc671aba0958d9"
+          },
+          {
+            "id": 28,
+            "cacheKeySha256": "a9fd3ac31d17b432cf23f1b3144fd2386d86db7d12b6d50c522fc61ffe2defa0"
+          },
+          {
+            "id": 29,
+            "cacheKeySha256": "aabb879880ca511ba458b925fb242d8df862ba1a11e80591ad37e7985c6819e8"
+          }
+        ],
+        "firstRender": [
+          {
+            "id": 24,
+            "cacheKeySha256": "f6e73ea4b33ae40d64ad0bae3dfd85f6a14cb64876585c9d185a80bb9bbe9948"
+          },
+          {
+            "id": 25,
+            "cacheKeySha256": "29e9c55853de39e08f68089eaf42a7a545aa602e1f9c72e8b83df3b7c1ea0942"
+          },
+          {
+            "id": 26,
+            "cacheKeySha256": "171ffa16b6739d2b402aff8ddc249bf870f1ac3bb653c21218be3c8e181ce529"
+          },
+          {
+            "id": 27,
+            "cacheKeySha256": "5420fe422470a4d2b06f1d7bc20b3d93e1b831add29f6c4743bc671aba0958d9"
+          },
+          {
+            "id": 28,
+            "cacheKeySha256": "a9fd3ac31d17b432cf23f1b3144fd2386d86db7d12b6d50c522fc61ffe2defa0"
+          },
+          {
+            "id": 29,
+            "cacheKeySha256": "aabb879880ca511ba458b925fb242d8df862ba1a11e80591ad37e7985c6819e8"
+          }
+        ]
+      },
+      "newPrograms": 0
+    },
+    {
+      "round": 3,
+      "phase": "after-pose",
+      "totalMs": 518.2000000029802,
+      "preparation": {
+        "mode": "compile",
+        "parallelShaderCompile": true,
+        "textureInitCpuMs": 0,
+        "textureGpuElapsedMs": null,
+        "compileAsyncMs": 15.899999991059303
+      },
+      "firstRenderApi": {
+        "compileShader": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "linkProgram": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "getProgramParameter": {
+          "calls": 18,
+          "cpuMs": 0.09999999403953552
+        },
+        "getShaderParameter": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "getProgramInfoLog": {
+          "calls": 6,
+          "cpuMs": 29.30000001192093
+        },
+        "getShaderInfoLog": {
+          "calls": 12,
+          "cpuMs": 0.8999999910593033
+        },
+        "useProgram": {
+          "calls": 9,
+          "cpuMs": 0
+        },
+        "getActiveUniform": {
+          "calls": 186,
+          "cpuMs": 0.10000000894069672
+        },
+        "getUniformLocation": {
+          "calls": 186,
+          "cpuMs": 0.09999999403953552
+        },
+        "getAttribLocation": {
+          "calls": 33,
+          "cpuMs": 0
+        },
+        "texStorage2D": {
+          "calls": 6,
+          "cpuMs": 0
+        },
+        "texStorage3D": {
+          "calls": 2,
+          "cpuMs": 0
+        },
+        "texImage2D": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "texSubImage2D": {
+          "calls": 6,
+          "cpuMs": 11.900000005960464
+        },
+        "texImage3D": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "texSubImage3D": {
+          "calls": 2,
+          "cpuMs": 22.799999982118607
+        },
+        "generateMipmap": {
+          "calls": 5,
+          "cpuMs": 0
+        },
+        "bufferData": {
+          "calls": 35,
+          "cpuMs": 1.6999999731779099
+        },
+        "bufferSubData": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "drawElements": {
+          "calls": 10,
+          "cpuMs": 0
+        },
+        "drawArrays": {
+          "calls": 0,
+          "cpuMs": 0
+        }
+      },
+      "checkShaderErrors": true,
+      "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "programs": {
+        "preparation": [
+          {
+            "id": 30,
+            "cacheKeySha256": "983e9383235fca61aa137e57a8a4cc99fed7ff4bf618cc064f3f8a7fef3f5290"
+          },
+          {
+            "id": 31,
+            "cacheKeySha256": "1d395d6008c0f579ebdfc919c43f076ac482928cab201ff1db49f49a2fe4c038"
+          },
+          {
+            "id": 32,
+            "cacheKeySha256": "c8fbb8145337edb3f24af795731f5c052a93913807106119e8e04056b60032d8"
+          },
+          {
+            "id": 33,
+            "cacheKeySha256": "7529b0e77b1c2ff268b035b3a27c0afdce6a1313346740c120ce570b7e8a6fef"
+          },
+          {
+            "id": 34,
+            "cacheKeySha256": "3e2f74a6c4d462413abc12e7dfb585cf07087209e286b4495b7d5f28e6312dc6"
+          },
+          {
+            "id": 35,
+            "cacheKeySha256": "a79bbf1c61502c79402220e3e1bdd708114eb855df0ccf8a5b3522af146f3397"
+          }
+        ],
+        "beforeRender": [
+          {
+            "id": 30,
+            "cacheKeySha256": "983e9383235fca61aa137e57a8a4cc99fed7ff4bf618cc064f3f8a7fef3f5290"
+          },
+          {
+            "id": 31,
+            "cacheKeySha256": "1d395d6008c0f579ebdfc919c43f076ac482928cab201ff1db49f49a2fe4c038"
+          },
+          {
+            "id": 32,
+            "cacheKeySha256": "c8fbb8145337edb3f24af795731f5c052a93913807106119e8e04056b60032d8"
+          },
+          {
+            "id": 33,
+            "cacheKeySha256": "7529b0e77b1c2ff268b035b3a27c0afdce6a1313346740c120ce570b7e8a6fef"
+          },
+          {
+            "id": 34,
+            "cacheKeySha256": "3e2f74a6c4d462413abc12e7dfb585cf07087209e286b4495b7d5f28e6312dc6"
+          },
+          {
+            "id": 35,
+            "cacheKeySha256": "a79bbf1c61502c79402220e3e1bdd708114eb855df0ccf8a5b3522af146f3397"
+          }
+        ],
+        "firstRender": [
+          {
+            "id": 30,
+            "cacheKeySha256": "983e9383235fca61aa137e57a8a4cc99fed7ff4bf618cc064f3f8a7fef3f5290"
+          },
+          {
+            "id": 31,
+            "cacheKeySha256": "1d395d6008c0f579ebdfc919c43f076ac482928cab201ff1db49f49a2fe4c038"
+          },
+          {
+            "id": 32,
+            "cacheKeySha256": "c8fbb8145337edb3f24af795731f5c052a93913807106119e8e04056b60032d8"
+          },
+          {
+            "id": 33,
+            "cacheKeySha256": "7529b0e77b1c2ff268b035b3a27c0afdce6a1313346740c120ce570b7e8a6fef"
+          },
+          {
+            "id": 34,
+            "cacheKeySha256": "3e2f74a6c4d462413abc12e7dfb585cf07087209e286b4495b7d5f28e6312dc6"
+          },
+          {
+            "id": 35,
+            "cacheKeySha256": "a79bbf1c61502c79402220e3e1bdd708114eb855df0ccf8a5b3522af146f3397"
+          }
+        ]
+      },
+      "newPrograms": 0
+    },
+    {
+      "round": 4,
+      "phase": "after-pose",
+      "totalMs": 534.0999999940395,
+      "preparation": {
+        "mode": "compile",
+        "parallelShaderCompile": true,
+        "textureInitCpuMs": 0,
+        "textureGpuElapsedMs": null,
+        "compileAsyncMs": 14.899999991059303
+      },
+      "firstRenderApi": {
+        "compileShader": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "linkProgram": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "getProgramParameter": {
+          "calls": 18,
+          "cpuMs": 0
+        },
+        "getShaderParameter": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "getProgramInfoLog": {
+          "calls": 6,
+          "cpuMs": 24.49999998509884
+        },
+        "getShaderInfoLog": {
+          "calls": 12,
+          "cpuMs": 1.100000023841858
+        },
+        "useProgram": {
+          "calls": 9,
+          "cpuMs": 0
+        },
+        "getActiveUniform": {
+          "calls": 186,
+          "cpuMs": 0.09999999403953552
+        },
+        "getUniformLocation": {
+          "calls": 186,
+          "cpuMs": 0.19999998807907104
+        },
+        "getAttribLocation": {
+          "calls": 33,
+          "cpuMs": 0
+        },
+        "texStorage2D": {
+          "calls": 6,
+          "cpuMs": 0
+        },
+        "texStorage3D": {
+          "calls": 2,
+          "cpuMs": 0
+        },
+        "texImage2D": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "texSubImage2D": {
+          "calls": 6,
+          "cpuMs": 10.399999991059303
+        },
+        "texImage3D": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "texSubImage3D": {
+          "calls": 2,
+          "cpuMs": 21.600000008940697
+        },
+        "generateMipmap": {
+          "calls": 5,
+          "cpuMs": 0
+        },
+        "bufferData": {
+          "calls": 35,
+          "cpuMs": 1.7999999970197678
+        },
+        "bufferSubData": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "drawElements": {
+          "calls": 10,
+          "cpuMs": 0.10000000894069672
+        },
+        "drawArrays": {
+          "calls": 0,
+          "cpuMs": 0
+        }
+      },
+      "checkShaderErrors": true,
+      "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "programs": {
+        "preparation": [
+          {
+            "id": 36,
+            "cacheKeySha256": "33e8f84b2eaf6fc5f94acf0b381475ca1f605addf65ad8036ea0ef9eeb00e4ad"
+          },
+          {
+            "id": 37,
+            "cacheKeySha256": "4e2bb3a1a6f17b481bfd5669a2f8e9ecddd8cdaf0816e391584c607fa0209b99"
+          },
+          {
+            "id": 38,
+            "cacheKeySha256": "8de60c9d6f918e679b9ee984b897bf6de2d9c5f7d81c7b3bdaf1656fad738568"
+          },
+          {
+            "id": 39,
+            "cacheKeySha256": "f7aff7c4a3525706a2e99fcc1e6426043b9f22dfefe77f92f0cd2cd3850bda37"
+          },
+          {
+            "id": 40,
+            "cacheKeySha256": "f0f202af5c127e9047efbf6e953c5352c6b436a4f7f0b5a126cc07eb9cabe5d2"
+          },
+          {
+            "id": 41,
+            "cacheKeySha256": "92d546c03a6ec04e58ef2d97c8fdfc5a6096b13b9b2868c6afb0a3d3d9687760"
+          }
+        ],
+        "beforeRender": [
+          {
+            "id": 36,
+            "cacheKeySha256": "33e8f84b2eaf6fc5f94acf0b381475ca1f605addf65ad8036ea0ef9eeb00e4ad"
+          },
+          {
+            "id": 37,
+            "cacheKeySha256": "4e2bb3a1a6f17b481bfd5669a2f8e9ecddd8cdaf0816e391584c607fa0209b99"
+          },
+          {
+            "id": 38,
+            "cacheKeySha256": "8de60c9d6f918e679b9ee984b897bf6de2d9c5f7d81c7b3bdaf1656fad738568"
+          },
+          {
+            "id": 39,
+            "cacheKeySha256": "f7aff7c4a3525706a2e99fcc1e6426043b9f22dfefe77f92f0cd2cd3850bda37"
+          },
+          {
+            "id": 40,
+            "cacheKeySha256": "f0f202af5c127e9047efbf6e953c5352c6b436a4f7f0b5a126cc07eb9cabe5d2"
+          },
+          {
+            "id": 41,
+            "cacheKeySha256": "92d546c03a6ec04e58ef2d97c8fdfc5a6096b13b9b2868c6afb0a3d3d9687760"
+          }
+        ],
+        "firstRender": [
+          {
+            "id": 36,
+            "cacheKeySha256": "33e8f84b2eaf6fc5f94acf0b381475ca1f605addf65ad8036ea0ef9eeb00e4ad"
+          },
+          {
+            "id": 37,
+            "cacheKeySha256": "4e2bb3a1a6f17b481bfd5669a2f8e9ecddd8cdaf0816e391584c607fa0209b99"
+          },
+          {
+            "id": 38,
+            "cacheKeySha256": "8de60c9d6f918e679b9ee984b897bf6de2d9c5f7d81c7b3bdaf1656fad738568"
+          },
+          {
+            "id": 39,
+            "cacheKeySha256": "f7aff7c4a3525706a2e99fcc1e6426043b9f22dfefe77f92f0cd2cd3850bda37"
+          },
+          {
+            "id": 40,
+            "cacheKeySha256": "f0f202af5c127e9047efbf6e953c5352c6b436a4f7f0b5a126cc07eb9cabe5d2"
+          },
+          {
+            "id": 41,
+            "cacheKeySha256": "92d546c03a6ec04e58ef2d97c8fdfc5a6096b13b9b2868c6afb0a3d3d9687760"
+          }
+        ]
+      },
+      "newPrograms": 0
+    },
+    {
+      "round": 4,
+      "phase": "before-player",
+      "totalMs": 517.7999999970198,
+      "preparation": {
+        "mode": "compile",
+        "parallelShaderCompile": true,
+        "textureInitCpuMs": 0,
+        "textureGpuElapsedMs": null,
+        "compileAsyncMs": 17.600000008940697
+      },
+      "firstRenderApi": {
+        "compileShader": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "linkProgram": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "getProgramParameter": {
+          "calls": 18,
+          "cpuMs": 0.10000000894069672
+        },
+        "getShaderParameter": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "getProgramInfoLog": {
+          "calls": 6,
+          "cpuMs": 27
+        },
+        "getShaderInfoLog": {
+          "calls": 12,
+          "cpuMs": 0.8999999612569809
+        },
+        "useProgram": {
+          "calls": 9,
+          "cpuMs": 0
+        },
+        "getActiveUniform": {
+          "calls": 186,
+          "cpuMs": 0
+        },
+        "getUniformLocation": {
+          "calls": 186,
+          "cpuMs": 0.29999999701976776
+        },
+        "getAttribLocation": {
+          "calls": 33,
+          "cpuMs": 0
+        },
+        "texStorage2D": {
+          "calls": 6,
+          "cpuMs": 0
+        },
+        "texStorage3D": {
+          "calls": 2,
+          "cpuMs": 0
+        },
+        "texImage2D": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "texSubImage2D": {
+          "calls": 6,
+          "cpuMs": 10.5
+        },
+        "texImage3D": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "texSubImage3D": {
+          "calls": 2,
+          "cpuMs": 23.200000002980232
+        },
+        "generateMipmap": {
+          "calls": 5,
+          "cpuMs": 0
+        },
+        "bufferData": {
+          "calls": 35,
+          "cpuMs": 1.8000000268220901
+        },
+        "bufferSubData": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "drawElements": {
+          "calls": 10,
+          "cpuMs": 0.10000000894069672
+        },
+        "drawArrays": {
+          "calls": 0,
+          "cpuMs": 0
+        }
+      },
+      "checkShaderErrors": true,
+      "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "programs": {
+        "preparation": [
+          {
+            "id": 42,
+            "cacheKeySha256": "20c3e12040c92aadff1004530101ba8202cc7c88648d3ebfee2ab190cfccf366"
+          },
+          {
+            "id": 43,
+            "cacheKeySha256": "744e52d1057ad2f61071f82d321ada4754a09900344ab0e58df85263ea2ab69a"
+          },
+          {
+            "id": 44,
+            "cacheKeySha256": "a258deab74c37d7c3de31663b58bca11f8030933802df8a51ffd1f343556ae4f"
+          },
+          {
+            "id": 45,
+            "cacheKeySha256": "affa3747dd85efd3f9716f8ddb330b38697cad8458cc1d5242fad3972f81a567"
+          },
+          {
+            "id": 46,
+            "cacheKeySha256": "14681b8620b99cfbd8fc80ecce7070612b68c0c867a0bf295a1b34db18645daa"
+          },
+          {
+            "id": 47,
+            "cacheKeySha256": "f31fe038d14d5f05a06be32f3628ea75b6c2ee52b58305109600e5c228513a4d"
+          }
+        ],
+        "beforeRender": [
+          {
+            "id": 42,
+            "cacheKeySha256": "20c3e12040c92aadff1004530101ba8202cc7c88648d3ebfee2ab190cfccf366"
+          },
+          {
+            "id": 43,
+            "cacheKeySha256": "744e52d1057ad2f61071f82d321ada4754a09900344ab0e58df85263ea2ab69a"
+          },
+          {
+            "id": 44,
+            "cacheKeySha256": "a258deab74c37d7c3de31663b58bca11f8030933802df8a51ffd1f343556ae4f"
+          },
+          {
+            "id": 45,
+            "cacheKeySha256": "affa3747dd85efd3f9716f8ddb330b38697cad8458cc1d5242fad3972f81a567"
+          },
+          {
+            "id": 46,
+            "cacheKeySha256": "14681b8620b99cfbd8fc80ecce7070612b68c0c867a0bf295a1b34db18645daa"
+          },
+          {
+            "id": 47,
+            "cacheKeySha256": "f31fe038d14d5f05a06be32f3628ea75b6c2ee52b58305109600e5c228513a4d"
+          }
+        ],
+        "firstRender": [
+          {
+            "id": 42,
+            "cacheKeySha256": "20c3e12040c92aadff1004530101ba8202cc7c88648d3ebfee2ab190cfccf366"
+          },
+          {
+            "id": 43,
+            "cacheKeySha256": "744e52d1057ad2f61071f82d321ada4754a09900344ab0e58df85263ea2ab69a"
+          },
+          {
+            "id": 44,
+            "cacheKeySha256": "a258deab74c37d7c3de31663b58bca11f8030933802df8a51ffd1f343556ae4f"
+          },
+          {
+            "id": 45,
+            "cacheKeySha256": "affa3747dd85efd3f9716f8ddb330b38697cad8458cc1d5242fad3972f81a567"
+          },
+          {
+            "id": 46,
+            "cacheKeySha256": "14681b8620b99cfbd8fc80ecce7070612b68c0c867a0bf295a1b34db18645daa"
+          },
+          {
+            "id": 47,
+            "cacheKeySha256": "f31fe038d14d5f05a06be32f3628ea75b6c2ee52b58305109600e5c228513a4d"
+          }
+        ]
+      },
+      "newPrograms": 0
+    },
+    {
+      "round": 5,
+      "phase": "before-player",
+      "totalMs": 545.3000000119209,
+      "preparation": {
+        "mode": "compile",
+        "parallelShaderCompile": true,
+        "textureInitCpuMs": 0,
+        "textureGpuElapsedMs": null,
+        "compileAsyncMs": 17.5
+      },
+      "firstRenderApi": {
+        "compileShader": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "linkProgram": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "getProgramParameter": {
+          "calls": 18,
+          "cpuMs": 0
+        },
+        "getShaderParameter": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "getProgramInfoLog": {
+          "calls": 6,
+          "cpuMs": 25.500000029802322
+        },
+        "getShaderInfoLog": {
+          "calls": 12,
+          "cpuMs": 0.8999999910593033
+        },
+        "useProgram": {
+          "calls": 9,
+          "cpuMs": 0
+        },
+        "getActiveUniform": {
+          "calls": 186,
+          "cpuMs": 0.09999999403953552
+        },
+        "getUniformLocation": {
+          "calls": 186,
+          "cpuMs": 0.20000001788139343
+        },
+        "getAttribLocation": {
+          "calls": 33,
+          "cpuMs": 0
+        },
+        "texStorage2D": {
+          "calls": 6,
+          "cpuMs": 0
+        },
+        "texStorage3D": {
+          "calls": 2,
+          "cpuMs": 0
+        },
+        "texImage2D": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "texSubImage2D": {
+          "calls": 6,
+          "cpuMs": 10.900000020861626
+        },
+        "texImage3D": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "texSubImage3D": {
+          "calls": 2,
+          "cpuMs": 21.799999997019768
+        },
+        "generateMipmap": {
+          "calls": 5,
+          "cpuMs": 0
+        },
+        "bufferData": {
+          "calls": 35,
+          "cpuMs": 1.600000038743019
+        },
+        "bufferSubData": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "drawElements": {
+          "calls": 10,
+          "cpuMs": 0
+        },
+        "drawArrays": {
+          "calls": 0,
+          "cpuMs": 0
+        }
+      },
+      "checkShaderErrors": true,
+      "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "programs": {
+        "preparation": [
+          {
+            "id": 48,
+            "cacheKeySha256": "e71dcfad742f432c1d16535b4ba210ae6f2b183470390d9f6a7b724651401cf8"
+          },
+          {
+            "id": 49,
+            "cacheKeySha256": "39dc4b6bb78352b4678382496a1d2ed2ac65a841b67cd008015da30f868c6781"
+          },
+          {
+            "id": 50,
+            "cacheKeySha256": "7c49b92f1d07ecb64739ba97fd93f1ddd3fd95485e6024dece7c00104ba1f650"
+          },
+          {
+            "id": 51,
+            "cacheKeySha256": "15fe513062ecac12709627a532a66f68640172f31465544e1f003187d131d5a8"
+          },
+          {
+            "id": 52,
+            "cacheKeySha256": "d472afc7ac75ead09290f583ca16615f374cfeab7cde8ee3ea1dc1cf20302581"
+          },
+          {
+            "id": 53,
+            "cacheKeySha256": "ffa2b25aea48dfb94e1fcf82eaed8b95facb5a806983f28ff597f4ecaf432a69"
+          }
+        ],
+        "beforeRender": [
+          {
+            "id": 48,
+            "cacheKeySha256": "e71dcfad742f432c1d16535b4ba210ae6f2b183470390d9f6a7b724651401cf8"
+          },
+          {
+            "id": 49,
+            "cacheKeySha256": "39dc4b6bb78352b4678382496a1d2ed2ac65a841b67cd008015da30f868c6781"
+          },
+          {
+            "id": 50,
+            "cacheKeySha256": "7c49b92f1d07ecb64739ba97fd93f1ddd3fd95485e6024dece7c00104ba1f650"
+          },
+          {
+            "id": 51,
+            "cacheKeySha256": "15fe513062ecac12709627a532a66f68640172f31465544e1f003187d131d5a8"
+          },
+          {
+            "id": 52,
+            "cacheKeySha256": "d472afc7ac75ead09290f583ca16615f374cfeab7cde8ee3ea1dc1cf20302581"
+          },
+          {
+            "id": 53,
+            "cacheKeySha256": "ffa2b25aea48dfb94e1fcf82eaed8b95facb5a806983f28ff597f4ecaf432a69"
+          }
+        ],
+        "firstRender": [
+          {
+            "id": 48,
+            "cacheKeySha256": "e71dcfad742f432c1d16535b4ba210ae6f2b183470390d9f6a7b724651401cf8"
+          },
+          {
+            "id": 49,
+            "cacheKeySha256": "39dc4b6bb78352b4678382496a1d2ed2ac65a841b67cd008015da30f868c6781"
+          },
+          {
+            "id": 50,
+            "cacheKeySha256": "7c49b92f1d07ecb64739ba97fd93f1ddd3fd95485e6024dece7c00104ba1f650"
+          },
+          {
+            "id": 51,
+            "cacheKeySha256": "15fe513062ecac12709627a532a66f68640172f31465544e1f003187d131d5a8"
+          },
+          {
+            "id": 52,
+            "cacheKeySha256": "d472afc7ac75ead09290f583ca16615f374cfeab7cde8ee3ea1dc1cf20302581"
+          },
+          {
+            "id": 53,
+            "cacheKeySha256": "ffa2b25aea48dfb94e1fcf82eaed8b95facb5a806983f28ff597f4ecaf432a69"
+          }
+        ]
+      },
+      "newPrograms": 0
+    },
+    {
+      "round": 5,
+      "phase": "after-pose",
+      "totalMs": 603,
+      "preparation": {
+        "mode": "compile",
+        "parallelShaderCompile": true,
+        "textureInitCpuMs": 0,
+        "textureGpuElapsedMs": null,
+        "compileAsyncMs": 17.400000005960464
+      },
+      "firstRenderApi": {
+        "compileShader": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "linkProgram": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "getProgramParameter": {
+          "calls": 18,
+          "cpuMs": 0
+        },
+        "getShaderParameter": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "getProgramInfoLog": {
+          "calls": 6,
+          "cpuMs": 71.30000001192093
+        },
+        "getShaderInfoLog": {
+          "calls": 12,
+          "cpuMs": 1.6000000089406967
+        },
+        "useProgram": {
+          "calls": 9,
+          "cpuMs": 0
+        },
+        "getActiveUniform": {
+          "calls": 186,
+          "cpuMs": 0.20000000298023224
+        },
+        "getUniformLocation": {
+          "calls": 186,
+          "cpuMs": 0.29999998211860657
+        },
+        "getAttribLocation": {
+          "calls": 33,
+          "cpuMs": 0.09999999403953552
+        },
+        "texStorage2D": {
+          "calls": 6,
+          "cpuMs": 0
+        },
+        "texStorage3D": {
+          "calls": 2,
+          "cpuMs": 0
+        },
+        "texImage2D": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "texSubImage2D": {
+          "calls": 6,
+          "cpuMs": 21.099999994039536
+        },
+        "texImage3D": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "texSubImage3D": {
+          "calls": 2,
+          "cpuMs": 33.29999999701977
+        },
+        "generateMipmap": {
+          "calls": 5,
+          "cpuMs": 0.19999998807907104
+        },
+        "bufferData": {
+          "calls": 35,
+          "cpuMs": 2.7999999970197678
+        },
+        "bufferSubData": {
+          "calls": 0,
+          "cpuMs": 0
+        },
+        "drawElements": {
+          "calls": 10,
+          "cpuMs": 0.10000000894069672
+        },
+        "drawArrays": {
+          "calls": 0,
+          "cpuMs": 0
+        }
+      },
+      "checkShaderErrors": true,
+      "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "programs": {
+        "preparation": [
+          {
+            "id": 54,
+            "cacheKeySha256": "63c780dc41f793a03034ae6622034c28af05af3e2ec2fdc40413bd2a9ab1c407"
+          },
+          {
+            "id": 55,
+            "cacheKeySha256": "7c1cc448687ab9049df070e9c5f60e5e248da768edece922ca705daf36661a8e"
+          },
+          {
+            "id": 56,
+            "cacheKeySha256": "3f60b87f0248c97b2e98fcda06ae2b2ede279b6892f16b494190b70039ee2cdf"
+          },
+          {
+            "id": 57,
+            "cacheKeySha256": "3e2e2d913e8b5a11793a9b28c92be9a44f3a201cd39b2f08199dc7f6af400373"
+          },
+          {
+            "id": 58,
+            "cacheKeySha256": "f38e8819e590ab8f8bc653043f5745fe58748240d4dda2b9be1daf87d4905eba"
+          },
+          {
+            "id": 59,
+            "cacheKeySha256": "2b2c5c166b9d52ed49e0856835b1e96f7d915237d94df5b96abae444938b34b2"
+          }
+        ],
+        "beforeRender": [
+          {
+            "id": 54,
+            "cacheKeySha256": "63c780dc41f793a03034ae6622034c28af05af3e2ec2fdc40413bd2a9ab1c407"
+          },
+          {
+            "id": 55,
+            "cacheKeySha256": "7c1cc448687ab9049df070e9c5f60e5e248da768edece922ca705daf36661a8e"
+          },
+          {
+            "id": 56,
+            "cacheKeySha256": "3f60b87f0248c97b2e98fcda06ae2b2ede279b6892f16b494190b70039ee2cdf"
+          },
+          {
+            "id": 57,
+            "cacheKeySha256": "3e2e2d913e8b5a11793a9b28c92be9a44f3a201cd39b2f08199dc7f6af400373"
+          },
+          {
+            "id": 58,
+            "cacheKeySha256": "f38e8819e590ab8f8bc653043f5745fe58748240d4dda2b9be1daf87d4905eba"
+          },
+          {
+            "id": 59,
+            "cacheKeySha256": "2b2c5c166b9d52ed49e0856835b1e96f7d915237d94df5b96abae444938b34b2"
+          }
+        ],
+        "firstRender": [
+          {
+            "id": 54,
+            "cacheKeySha256": "63c780dc41f793a03034ae6622034c28af05af3e2ec2fdc40413bd2a9ab1c407"
+          },
+          {
+            "id": 55,
+            "cacheKeySha256": "7c1cc448687ab9049df070e9c5f60e5e248da768edece922ca705daf36661a8e"
+          },
+          {
+            "id": 56,
+            "cacheKeySha256": "3f60b87f0248c97b2e98fcda06ae2b2ede279b6892f16b494190b70039ee2cdf"
+          },
+          {
+            "id": 57,
+            "cacheKeySha256": "3e2e2d913e8b5a11793a9b28c92be9a44f3a201cd39b2f08199dc7f6af400373"
+          },
+          {
+            "id": 58,
+            "cacheKeySha256": "f38e8819e590ab8f8bc653043f5745fe58748240d4dda2b9be1daf87d4905eba"
+          },
+          {
+            "id": 59,
+            "cacheKeySha256": "2b2c5c166b9d52ed49e0856835b1e96f7d915237d94df5b96abae444938b34b2"
+          }
+        ]
+      },
+      "newPrograms": 0
+    }
+  ]
+}

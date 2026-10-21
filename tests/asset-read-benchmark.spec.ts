@@ -160,6 +160,7 @@ test('opt-in saved-source benchmark on real YouTube: reload and same-tab redispl
         await page.bringToFront();
         const pollPaint = () => page.evaluate(() => (globalThis as any).__c3Paints.at(-1));
         await expect.poll(pollPaint, { timeout: 60_000 }).toBeTruthy();
+        let contentInstance: string | undefined;
         for (const cache of ['reload', 'same-tab'] as const) {
           let start: number | undefined;
           if (cache === 'same-tab') {
@@ -178,7 +179,10 @@ test('opt-in saved-source benchmark on real YouTube: reload and same-tab redispl
             chrome.runtime.sendMessage({ type: 'ww.asset-profile.v1', action: 'snapshot' }),
           );
           const spans = (snapshot.spans as AssetSpan[]).filter(
-            (s) => s.context === 'content' && (paint.trace ? s.id === paint.trace : true),
+            (s) =>
+              s.context === 'content' &&
+              (paint.trace ? s.id === paint.trace : true) &&
+              (!contentInstance || s.contextInstance === contentInstance),
           );
           const source = spans
             .filter(
@@ -191,6 +195,11 @@ test('opt-in saved-source benchmark on real YouTube: reload and same-tab redispl
             .at(-1);
           const fetchMs = source?.durationMs ?? 0;
           if (cache === 'reload') expect(source).toBeTruthy();
+          contentInstance ??= source!.contextInstance;
+          const trialSpans = spans.filter(
+            (s) =>
+              s.contextInstance === contentInstance && s.startMs >= (start ?? source!.startMs) && s.startMs < paint.at,
+          );
           const entry = {
             kind,
             cache,
@@ -201,7 +210,12 @@ test('opt-in saved-source benchmark on real YouTube: reload and same-tab redispl
             sourceStartMs: source?.startMs,
             bytes: asset.byteLength,
             cacheHit: !source,
-            spans: paint.trace ? spans : source ? [source] : [],
+            route: !source
+              ? 'cache'
+              : trialSpans.some((s) => s.name === 'download.transport.array-buffer')
+                ? 'array-buffer'
+                : 'chunks',
+            spans: paint.trace ? trialSpans : source ? [source] : [],
           };
           trials.push(entry);
           console.log('ASSET_READ_BENCHMARK ' + JSON.stringify({ ...entry, spans: undefined }));

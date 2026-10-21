@@ -162,10 +162,14 @@ async function fetchChunks(id: string, signal: AbortSignal): Promise<{ metadata:
   return { metadata: result.metadata, bytes };
 }
 
-async function fetchAsset(id: string, signal: AbortSignal): Promise<{ metadata: AssetMetadata; blob: Blob }> {
+async function fetchAsset(
+  id: string,
+  signal: AbortSignal,
+  binaryEnabled = true,
+): Promise<{ metadata: AssetMetadata; blob: Blob }> {
   signal.throwIfAborted();
   const sourceStart = ASSET_PROFILE ? performance.now() : 0;
-  const binary = await readAssetBuffer(id, signal);
+  const binary = binaryEnabled ? await readAssetBuffer(id, signal) : undefined;
   const result = binary
     ? { metadata: binary.metadata, bytes: new Uint8Array(binary.buffer) }
     : await fetchChunks(id, signal);
@@ -201,6 +205,8 @@ export async function loadAsset(id: string, signal?: AbortSignal): Promise<{ met
   return { metadata: structuredClone(asset.metadata), blob: asset.blob };
 }
 export const clearAssetSources = () => sources.clear();
+/** Explicit legacy comparator for profiling; it shares the production inspector. */
+export const loadAssetChunks = (id: string, signal = new AbortController().signal) => fetchAsset(id, signal, false);
 export const loadAssetMetadata = (id: string) => request<AssetMetadata>('get-metadata', { id });
 
 export const retainAssets = (session: string, ids: readonly string[]) => request<void>('lease', { session, ids });
