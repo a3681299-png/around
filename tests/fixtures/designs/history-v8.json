@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 8,
+  "id": "youtube-custom",
+  "siteId": "youtube",
+  "baseThemeId": null,
+  "rules": [],
+  "decorations": [
+    {
+      "kind": "image",
+      "id": "image-0",
+      "name": "world-0.png",
+      "assetId": "asset-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "placement": {
+        "anchor": {
+          "kind": "viewport"
+        },
+        "x": 0.1,
+        "y": 0.25,
+        "widthPx": 90,
+        "heightPx": 70,
+        "rotationDeg": 0
+      },
+      "visible": true,
+      "locked": false,
+      "opacity": 1,
+      "zIndex": 0,
+      "effects": [
+        {
+          "kind": "mask",
+          "shape": "circle",
+          "enabled": true,
+          "center": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "radiusPx": 160,
+          "featherPx": 40,
+          "intensity": 1,
+          "bindings": [
+            {
+              "source": "pointer.position",
+              "transform": {
+                "kind": "layer-local"
+              },
+              "target": "mask.center"
+            },
+            {
+              "source": "video.playing",
+              "transform": {
+                "kind": "boolean-gate",
+                "fadeMs": 350
+              },
+              "target": "mask.intensity"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "image",
+      "id": "image-1",
+      "name": "world-1.png",
+      "assetId": "asset-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "placement": {
+        "anchor": {
+          "kind": "viewport"
+        },
+        "x": 0.2,
+        "y": 0.25,
+        "widthPx": 91,
+        "heightPx": 70,
+        "rotationDeg": 5
+      },
+      "visible": true,
+      "locked": false,
+      "opacity": 1,
+      "zIndex": 1,
+      "effects": [
+        {
+          "kind": "mask",
+          "shape": "circle",
+          "enabled": true,
+          "center": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "radiusPx": 160,
+          "featherPx": 40,
+          "intensity": 1,
+          "bindings": [
+            {
+              "source": "pointer.position",
+              "transform": {
+                "kind": "layer-local"
+              },
+              "target": "mask.center"
+            },
+            {
+              "source": "video.playing",
+              "transform": {
+                "kind": "boolean-gate",
+                "fadeMs": 350
+              },
+              "target": "mask.intensity"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "kind": "group",
+      "id": "group-0",
+      "name": "World 0",
+      "visible": true,
+      "locked": false,
+      "opacity": 1,
+      "zIndex": 0,
+      "children": [
+        "image-0",
+        "image-1"
+      ],
+      "effects": [
+        {
+          "kind": "mask",
+          "shape": "circle",
+          "enabled": true,
+          "center": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "radiusPx": 160,
+          "featherPx": 40,
+          "intensity": 1,
+          "bindings": [
+            {
+              "source": "pointer.position",
+              "transform": {
+                "kind": "layer-local"
+              },
+              "target": "mask.center"
+            },
+            {
+              "source": "video.playing",
+              "transform": {
+                "kind": "boolean-gate",
+                "fadeMs": 350
+              },
+              "target": "mask.intensity"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "signalRules": [
+    {
+      "id": "scroll-image-0",
+      "enabled": true,
+      "source": {
+        "signal": "page.scroll.progress",
+        "axis": "y",
+        "space": "page",
+        "inputRange": [
+          0,
+          1
+        ]
+      },
+      "target": {
+        "layerId": "image-0",
+        "property": "opacity"
+      },
+      "keyframes": [
+        {
+          "id": "key-start",
+          "input": 0,
+          "value": 0,
+          "easing": "linear"
+        },
+        {
+          "id": "key-middle",
+          "input": 0.5,
+          "value": 1,
+          "easing": "linear"
+        },
+        {
+          "id": "key-end",
+          "input": 1,
+          "value": 0,
+          "easing": "linear"
+        }
+      ],
+      "evaluation": {
+        "mode": "follow",
+        "smoothing": {
+          "kind": "none"
+        }
+      },
+      "blend": {
+        "mode": "replace",
+        "priority": 0
+      }
+    }
+  ]
+}

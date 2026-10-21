@@ -1,0 +1,37 @@
+[
+  {
+    "version": 7,
+    "commit": "71418b2abcdeb25a42c1c000bf356e956052452a",
+    "file": "tests/media2-data.spec.ts",
+    "test": "v7 modes and raster speed preserve old v6 defaults; legacy recordings remain replayable",
+    "extraction": "first explicit parseDesign input accepted by the historical parser"
+  },
+  {
+    "version": 8,
+    "commit": "281b59c15b895b014d1238bcc81110e1379362fc",
+    "file": "tests/signal-rules.spec.ts",
+    "test": "validated rules roundtrip and reject unknown fields, targets, duplicates, modes, executable values and huge curves",
+    "extraction": "first explicit parseDesign input accepted by the historical parser"
+  },
+  {
+    "version": 9,
+    "commit": "37e34ad29f33a2584f14fa5939ce49ce229b834b",
+    "file": "tests/signal-motion.spec.ts",
+    "test": "X/Y/rotation are offsets, opacity remains replacement; base data and prepared scene remain untouched",
+    "extraction": "first explicit parseDesign input accepted by the historical parser"
+  },
+  {
+    "version": 10,
+    "commit": "99a86b460a84f1befdee479c1c8011086cd1845b",
+    "file": "tests/model-data.spec.ts",
+    "test": "bounded original GLB rig exposes arbitrary clips/bones; metadata and asset IDs roundtrip",
+    "extraction": "first explicit parseDesign input accepted by the historical parser"
+  },
+  {
+    "version": 11,
+    "commit": "856db47c0cc6c58a71a3e1874ac6fda874a1d65f",
+    "file": "tests/vrm-data.spec.ts",
+    "test": "VRM1 preserves humanoid, expression, spring and MToon capabilities with v11 roundtrip",
+    "extraction": "first explicit parseDesign input accepted by the historical parser"
+  }
+]

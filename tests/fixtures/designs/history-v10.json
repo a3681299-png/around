@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 10,
+  "id": "youtube-custom",
+  "siteId": "youtube",
+  "baseThemeId": "retro",
+  "rules": [],
+  "decorations": [
+    {
+      "kind": "model3d",
+      "id": "character",
+      "assetId": "asset-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "name": "Rig",
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "zIndex": 0,
+      "source": {
+        "format": "glb",
+        "clips": [
+          {
+            "name": "Rest / 待機",
+            "duration": 2
+          },
+          {
+            "name": "Stride",
+            "duration": 2
+          },
+          {
+            "name": "Sprint",
+            "duration": 2
+          }
+        ],
+        "bones": [
+          {
+            "node": 2,
+            "name": "Hips"
+          },
+          {
+            "node": 3,
+            "name": "Head"
+          }
+        ],
+        "vertices": 8,
+        "triangles": 12,
+        "textureBytes": 4
+      },
+      "model": {
+        "rotationX": 0,
+        "rotationY": 0,
+        "rotationZ": 0,
+        "clip": 0,
+        "playing": true,
+        "loop": true,
+        "speed": 1,
+        "crossFadeMs": 250,
+        "inPlace": true,
+        "locomotion": {
+          "enabled": false,
+          "idle": null,
+          "walk": null,
+          "run": null,
+          "walkSpeed": 10,
+          "runSpeed": 220,
+          "faceMovement": true,
+          "forwardDeg": 0
+        },
+        "look": {
+          "enabled": false,
+          "bone": null,
+          "yawLimit": 50,
+          "pitchLimit": 30,
+          "lagMs": 160
+        }
+      },
+      "placement": {
+        "anchor": {
+          "kind": "viewport"
+        },
+        "x": 0.5,
+        "y": 0.5,
+        "widthPx": 200,
+        "heightPx": 200,
+        "rotationDeg": 0
+      }
+    }
+  ]
+}

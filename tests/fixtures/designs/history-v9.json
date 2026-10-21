@@ -1,0 +1,223 @@
+{
+  "schemaVersion": 9,
+  "id": "youtube-custom",
+  "siteId": "youtube",
+  "baseThemeId": null,
+  "rules": [],
+  "decorations": [
+    {
+      "kind": "image",
+      "id": "image-0",
+      "name": "world-0.png",
+      "assetId": "asset-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "placement": {
+        "anchor": {
+          "kind": "viewport"
+        },
+        "x": 0.25,
+        "y": 0.5,
+        "widthPx": 90,
+        "heightPx": 70,
+        "rotationDeg": 20
+      },
+      "visible": true,
+      "locked": false,
+      "opacity": 1,
+      "zIndex": 0,
+      "effects": []
+    },
+    {
+      "kind": "image",
+      "id": "image-1",
+      "name": "world-1.png",
+      "assetId": "asset-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "placement": {
+        "anchor": {
+          "kind": "viewport"
+        },
+        "x": 0.35,
+        "y": 0.5,
+        "widthPx": 91,
+        "heightPx": 70,
+        "rotationDeg": 20
+      },
+      "visible": true,
+      "locked": false,
+      "opacity": 1,
+      "zIndex": 1,
+      "effects": []
+    }
+  ],
+  "signalRules": [
+    {
+      "id": "position-x-image-0",
+      "enabled": true,
+      "source": {
+        "signal": "pointer.x",
+        "axis": "x",
+        "space": "viewport",
+        "inputRange": [
+          0,
+          1
+        ]
+      },
+      "target": {
+        "layerId": "image-0",
+        "property": "position.x"
+      },
+      "keyframes": [
+        {
+          "id": "key-start",
+          "input": 0,
+          "value": 100,
+          "easing": "linear"
+        },
+        {
+          "id": "key-end",
+          "input": 1,
+          "value": 100,
+          "easing": "linear"
+        }
+      ],
+      "evaluation": {
+        "mode": "follow",
+        "smoothing": {
+          "kind": "none"
+        }
+      },
+      "blend": {
+        "mode": "add",
+        "priority": 0
+      }
+    },
+    {
+      "id": "position-y-image-0",
+      "enabled": true,
+      "source": {
+        "signal": "pointer.x",
+        "axis": "x",
+        "space": "viewport",
+        "inputRange": [
+          0,
+          1
+        ]
+      },
+      "target": {
+        "layerId": "image-0",
+        "property": "position.y"
+      },
+      "keyframes": [
+        {
+          "id": "key-start",
+          "input": 0,
+          "value": -50,
+          "easing": "linear"
+        },
+        {
+          "id": "key-end",
+          "input": 1,
+          "value": -50,
+          "easing": "linear"
+        }
+      ],
+      "evaluation": {
+        "mode": "follow",
+        "smoothing": {
+          "kind": "none"
+        }
+      },
+      "blend": {
+        "mode": "add",
+        "priority": 0
+      }
+    },
+    {
+      "id": "rotation-image-0",
+      "enabled": true,
+      "source": {
+        "signal": "pointer.x",
+        "axis": "x",
+        "space": "viewport",
+        "inputRange": [
+          0,
+          1
+        ]
+      },
+      "target": {
+        "layerId": "image-0",
+        "property": "rotation"
+      },
+      "keyframes": [
+        {
+          "id": "key-start",
+          "input": 0,
+          "value": 45,
+          "easing": "linear"
+        },
+        {
+          "id": "key-end",
+          "input": 1,
+          "value": 45,
+          "easing": "linear"
+        }
+      ],
+      "evaluation": {
+        "mode": "follow",
+        "smoothing": {
+          "kind": "none"
+        }
+      },
+      "blend": {
+        "mode": "add",
+        "priority": 0
+      }
+    },
+    {
+      "id": "opacity-image-0",
+      "enabled": true,
+      "source": {
+        "signal": "pointer.x",
+        "axis": "x",
+        "space": "viewport",
+        "inputRange": [
+          0,
+          1
+        ]
+      },
+      "target": {
+        "layerId": "image-0",
+        "property": "opacity"
+      },
+      "keyframes": [
+        {
+          "id": "key-start",
+          "input": 0,
+          "value": 0.7,
+          "easing": "linear"
+        },
+        {
+          "id": "key-middle",
+          "input": 0.5,
+          "value": 0.7,
+          "easing": "linear"
+        },
+        {
+          "id": "key-end",
+          "input": 1,
+          "value": 0.7,
+          "easing": "linear"
+        }
+      ],
+      "evaluation": {
+        "mode": "follow",
+        "smoothing": {
+          "kind": "none"
+        }
+      },
+      "blend": {
+        "mode": "replace",
+        "priority": 0
+      }
+    }
+  ]
+}
