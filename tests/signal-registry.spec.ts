@@ -175,7 +175,11 @@ test('registry keeps existing preset order, values, state and event evaluations'
     'anchor-angle',
     'mouse-speed',
   ]);
-  for (const preset of SIGNAL_PRESETS) expect(parseSignalSource(preset.source)).toEqual(preset.source);
+  for (const preset of SIGNAL_PRESETS) {
+    expect(parseSignalSource(preset.source)).toEqual(preset.source);
+    // A different key order leaves Timeline's optimistic edit over an Undo.
+    expect(JSON.stringify(preset.source)).toBe(JSON.stringify(parseSignalSource(preset.source)));
+  }
   const context = {
     signals: { playing: true, pointer: { x: 2, y: 4 } },
     events: [{ type: 'video.play' as const }, { type: 'video.pause' as const }],
