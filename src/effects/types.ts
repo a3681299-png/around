@@ -1,7 +1,9 @@
+import type { PointSignal, BooleanStateSignal } from '../signals/registry';
+
 /** Only registered sources, transforms and targets are accepted; no user code. */
 export type MaskBinding =
-  | { source: 'pointer.position'; transform: { kind: 'layer-local' }; target: 'mask.center' }
-  | { source: 'video.playing'; transform: { kind: 'boolean-gate'; fadeMs: number }; target: 'mask.intensity' };
+  | { source: PointSignal; transform: { kind: 'layer-local' }; target: 'mask.center' }
+  | { source: BooleanStateSignal; transform: { kind: 'boolean-gate'; fadeMs: number }; target: 'mask.intensity' };
 
 export interface CircleMask {
   kind: 'mask';

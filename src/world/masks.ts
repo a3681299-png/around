@@ -2,6 +2,7 @@ import { centre, type PlacementFrame, type Point } from './geometry';
 import type { LayerPlacement } from '../design/types';
 import type { SignalSnapshot } from '../signals/types';
 import type { CircleMask } from '../effects/types';
+import { SIGNAL_REGISTRY } from '../signals/registry';
 
 /** Inverse placement transform: never write runtime coordinates back to the draft. */
 export function layerLocal(point: Point, placement: LayerPlacement, frame: PlacementFrame): Point {
@@ -21,14 +22,16 @@ export function evaluateMask(
   frame: PlacementFrame,
   signals: SignalSnapshot,
 ) {
-  const follows = mask.bindings.some((binding) => binding.target === 'mask.center');
+  const follows = mask.bindings.find((binding) => binding.target === 'mask.center');
   const gate = mask.bindings.find((binding) => binding.target === 'mask.intensity');
+  const point = follows && SIGNAL_REGISTRY.evaluate(follows.source, { signals });
+  const playing = gate && SIGNAL_REGISTRY.evaluate(gate.source, { signals });
   return {
     center:
-      follows && signals.pointer
-        ? layerLocal(signals.pointer, placement, frame)
+      point && typeof point === 'object' && 'x' in point
+        ? layerLocal(point, placement, frame)
         : { x: mask.center.x * placement.widthPx, y: mask.center.y * placement.heightPx },
-    gate: gate ? Number(signals.playing) : 1,
+    gate: typeof playing === 'boolean' ? Number(playing) : 1,
     fadeMs: gate?.transform.fadeMs ?? 0,
   };
 }

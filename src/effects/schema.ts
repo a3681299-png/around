@@ -1,4 +1,5 @@
 import { EFFECT_LIMITS, type LayerEffect, type MaskBinding } from './types';
+import { SIGNAL_REGISTRY, type PointSignal, type BooleanStateSignal } from '../signals/registry';
 
 function record(value: unknown, keys: readonly string[]): Record<string, unknown> {
   if (
@@ -18,21 +19,24 @@ function number(value: unknown, min: number, max: number): number {
 function binding(value: unknown): MaskBinding {
   const input = record(value, ['source', 'transform', 'target']);
   const transform = record(input['transform'], ['kind', 'fadeMs']);
+  const source = SIGNAL_REGISTRY.definition(input['source']);
   if (
-    input['source'] === 'pointer.position' &&
+    source?.category === 'value' &&
+    source.valueType === 'point' &&
     input['target'] === 'mask.center' &&
     transform['kind'] === 'layer-local' &&
     !Object.hasOwn(transform, 'fadeMs')
   ) {
-    return { source: 'pointer.position', transform: { kind: 'layer-local' }, target: 'mask.center' };
+    return { source: input['source'] as PointSignal, transform: { kind: 'layer-local' }, target: 'mask.center' };
   }
   if (
-    input['source'] === 'video.playing' &&
+    source?.category === 'state' &&
+    source.valueType === 'boolean' &&
     input['target'] === 'mask.intensity' &&
     transform['kind'] === 'boolean-gate'
   ) {
     return {
-      source: 'video.playing',
+      source: input['source'] as BooleanStateSignal,
       transform: { kind: 'boolean-gate', fadeMs: number(transform['fadeMs'], 0, EFFECT_LIMITS.fadeMs) },
       target: 'mask.intensity',
     };

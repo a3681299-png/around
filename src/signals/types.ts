@@ -1,19 +1,10 @@
 import type { Point } from '../design/geometry';
+import type { HostSignalValue } from './registry';
+export { SIGNAL_REGISTRY } from './registry';
+import { SIGNAL_REGISTRY } from './registry';
 
 /** Values are sampled; states persist; events are occurrences, not latched booleans. */
-export const SIGNAL_CATALOG = Object.freeze({
-  'pointer.position': { category: 'value', valueType: 'point' },
-  'pointer.x': { category: 'value', valueType: 'number' },
-  'pointer.y': { category: 'value', valueType: 'number' },
-  'pointer.distance': { category: 'value', valueType: 'number' },
-  'pointer.angle': { category: 'value', valueType: 'number' },
-  'pointer.speed': { category: 'value', valueType: 'number' },
-  'page.scroll.progress': { category: 'value', valueType: 'number' },
-  'video.playing': { category: 'state', valueType: 'boolean' },
-  'video.play': { category: 'event' },
-  'video.pause': { category: 'event' },
-  'video.ended': { category: 'event' },
-} as const);
+export const SIGNAL_CATALOG = SIGNAL_REGISTRY.catalog;
 
 export interface ScrollSignal {
   x: number;
@@ -26,6 +17,8 @@ export interface SignalSnapshot {
   pointerTimeMs?: number;
   playing: boolean;
   scroll?: ScrollSignal;
+  /** Optional future host samples. Only registered hostSample entries may cross the recording boundary. */
+  samples?: Readonly<Record<string, HostSignalValue>>;
 }
 export interface PlaybackSignal {
   playing: boolean;

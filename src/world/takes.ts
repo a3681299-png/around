@@ -58,7 +58,7 @@ export function parseSignalTake(value: unknown): SignalTake {
   if (!Array.isArray(data['inputs']) || !data['inputs'].length || data['inputs'].length > TAKE_LIMITS.samples)
     throw new Error('テイクは1〜3600サンプルで指定してください。');
   const initialState = parseWorldState(data['initialState']),
-    inputs = data['inputs'].map(parseWorldInput);
+    inputs = data['inputs'].map((value) => parseWorldInput(value));
   let previous = initialState.timeMs ?? 0;
   for (const input of inputs) {
     if (input.timeMs < previous || input.timeMs - inputs[0]!.timeMs > TAKE_LIMITS.durationMs)

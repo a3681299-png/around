@@ -31,6 +31,7 @@ const unitSpecs = [
   'signal-motion',
   'signal-evaluation-benchmark',
   'signal-rules',
+  'signal-registry',
   'signal-takes',
   'spatial-points',
   'studio-client-data',

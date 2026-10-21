@@ -15,6 +15,7 @@ import type {
 } from '../world/types';
 import type { TimelineHost } from './timeline';
 import { rebaseWorldClock } from '../world/clock';
+import { SIGNAL_REGISTRY } from '../signals/registry';
 
 export interface WorldHostContext {
   scene: WorldScene;
@@ -73,8 +74,11 @@ export function createWorldSession(
           entry.layer.model.look.bone !== null,
       ),
     );
-  const pointerRuleActive = () =>
-    Boolean(context?.scene.signalRules?.some((rule) => rule.enabled && rule.source.signal.startsWith('pointer.')));
+  const ruleSubscriptions = () =>
+    SIGNAL_REGISTRY.subscriptions(
+      context?.scene.signalRules?.filter((rule) => rule.enabled).map((rule) => rule.source.signal) ?? [],
+    );
+  const pointerRuleActive = () => ruleSubscriptions().pointer;
   const ruleActive = () =>
     Boolean(context?.scene.signalRules?.some((rule) => rule.enabled)) || motionActive() || modelActive();
   const active = (target: WorldEffectTarget) => effectActive(target, evaluatedTargets, state.effects);
@@ -83,7 +87,7 @@ export function createWorldSession(
     playback,
     (source) => {
       if (
-        source === 'pointer.position' &&
+        SIGNAL_REGISTRY.requires(source, 'pointer') &&
         !devtools?.active &&
         !timeline?.observing &&
         !timeline?.recording &&
@@ -106,6 +110,7 @@ export function createWorldSession(
   const syncSources = (refresh = false) => {
     const authoring = timeline?.observing || timeline?.recording;
     const masks = neededSignals(evaluatedTargets, state.effects, doc.hidden);
+    const rules = ruleSubscriptions();
     const needed = timeline?.overriding
       ? { pointer: false, video: false, scroll: false }
       : {
@@ -113,17 +118,11 @@ export function createWorldSession(
             !doc.hidden &&
             (masks.pointer ||
               Boolean(devtools?.active || authoring) ||
-              pointerRuleActive() ||
+              rules.pointer ||
               motionActive() ||
               lookActive()),
-          video: !doc.hidden && (masks.video || Boolean(devtools?.active || authoring)),
-          scroll:
-            !doc.hidden &&
-            (Boolean(
-              context?.scene.signalRules?.some((rule) => rule.enabled && rule.source.signal === 'page.scroll.progress'),
-            ) ||
-              Boolean(devtools?.active) ||
-              Boolean(authoring)),
+          video: !doc.hidden && (masks.video || rules.video || Boolean(devtools?.active || authoring)),
+          scroll: !doc.hidden && (rules.scroll || Boolean(devtools?.active) || Boolean(authoring)),
         };
     sources.recordClicks(Boolean(timeline?.recording && !doc.hidden));
     if (

@@ -2,6 +2,7 @@ import type { LayerState } from '../design/types';
 import type { SignalSnapshot } from '../signals/types';
 import type { PlacementFrame, Point } from './geometry';
 import { evaluateMask, fadeValue, retargetFade, type Fade } from './masks';
+import { SIGNAL_REGISTRY } from '../signals/registry';
 
 export interface WorldEffectTarget {
   layer: LayerState;
@@ -44,8 +45,12 @@ export const effectActive = (target: WorldEffectTarget, targets: readonly WorldE
 export function neededSignals(targets: readonly WorldEffectTarget[], state: EffectState, hidden: boolean) {
   const active = hidden ? [] : targets.filter((target) => effectActive(target, targets, state));
   return {
-    pointer: active.some((target) => maskOf(target)!.bindings.some((binding) => binding.source === 'pointer.position')),
-    video: active.some((target) => maskOf(target)!.bindings.some((binding) => binding.source === 'video.playing')),
+    pointer: active.some((target) =>
+      maskOf(target)!.bindings.some((binding) => SIGNAL_REGISTRY.requires(binding.source, 'pointer')),
+    ),
+    video: active.some((target) =>
+      maskOf(target)!.bindings.some((binding) => SIGNAL_REGISTRY.requires(binding.source, 'video')),
+    ),
   };
 }
 export function wantsPointerFrame(
@@ -57,12 +62,11 @@ export function wantsPointerFrame(
   return targets.some((target) => {
     const mask = maskOf(target),
       fade = own(state.fades, target.layer.id);
+    const gate = mask?.bindings.find((binding) => binding.target === 'mask.intensity');
     return (
       effectActive(target, targets, state) &&
-      mask?.bindings.some((binding) => binding.source === 'pointer.position') &&
-      (!mask.bindings.some((binding) => binding.source === 'video.playing') ||
-        signals.playing ||
-        (fade && fadeValue(fade, timeMs) > 0))
+      mask?.bindings.some((binding) => SIGNAL_REGISTRY.requires(binding.source, 'pointer')) &&
+      (!gate || SIGNAL_REGISTRY.evaluate(gate.source, { signals }) !== false || (fade && fadeValue(fade, timeMs) > 0))
     );
   });
 }

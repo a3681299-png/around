@@ -1,4 +1,5 @@
 // Temporary rollback path from 1d23ec0; remove after live-site validation.
+import { SIGNAL_REGISTRY } from '../../signals/registry';
 import type { PlacementFrame } from '../../world/geometry';
 import type { LayerState } from '../../design/types';
 import { createSignalSources } from '../../host/signals';
@@ -30,14 +31,14 @@ export function createLegacyEffectController(doc: Document, playback?: PlaybackS
   const sources = createSignalSources(doc, playback, (source) => {
     // Keep the latest pointer sample, but do not redraw fully faded-out artwork.
     if (
-      source === 'pointer.position' &&
+      SIGNAL_REGISTRY.requires(source, 'pointer') &&
       !targets.some((target) => {
         const mask = maskOf(target),
           fade = fades.get(target.layer.id);
         return (
           active(target) &&
-          mask?.bindings.some((binding) => binding.source === 'pointer.position') &&
-          (!mask.bindings.some((binding) => binding.source === 'video.playing') ||
+          mask?.bindings.some((binding) => SIGNAL_REGISTRY.requires(binding.source, 'pointer')) &&
+          (!mask.bindings.some((binding) => SIGNAL_REGISTRY.requires(binding.source, 'video')) ||
             sources.snapshot.playing ||
             (fade && fadeValue(fade, view.performance.now()) > 0))
         );
@@ -75,9 +76,11 @@ export function createLegacyEffectController(doc: Document, playback?: PlaybackS
     const running = doc.hidden ? [] : targets.filter(active);
     const needed = {
       pointer: running.some((target) =>
-        maskOf(target)!.bindings.some((binding) => binding.source === 'pointer.position'),
+        maskOf(target)!.bindings.some((binding) => SIGNAL_REGISTRY.requires(binding.source, 'pointer')),
       ),
-      video: running.some((target) => maskOf(target)!.bindings.some((binding) => binding.source === 'video.playing')),
+      video: running.some((target) =>
+        maskOf(target)!.bindings.some((binding) => SIGNAL_REGISTRY.requires(binding.source, 'video')),
+      ),
     };
     if (refresh || needed.pointer !== subscribed.pointer || needed.video !== subscribed.video) {
       subscribed = needed;

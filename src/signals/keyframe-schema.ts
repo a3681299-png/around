@@ -6,6 +6,7 @@ import {
   type SignalSource,
   type SignalProperty,
 } from './keyframes';
+import { SIGNAL_REGISTRY, type SignalDefinitions, type SignalRegistry, type NumericSignalIds } from './registry';
 
 const id = (value: unknown): value is string => typeof value === 'string' && /^[a-z][a-z0-9-]{0,63}$/.test(value);
 function object(value: unknown, fields: readonly string[]) {
@@ -23,30 +24,24 @@ function unit(value: unknown): number {
     throw new Error('キーの位置と値は0〜100%で指定してください。');
   return value;
 }
-export function parseSignalSource(value: unknown): SignalSource {
+export function parseSignalSource(value: unknown): SignalSource;
+export function parseSignalSource<D extends SignalDefinitions>(
+  value: unknown,
+  registry: SignalRegistry & { definitions: D },
+): SignalSource<NumericSignalIds<D>>;
+export function parseSignalSource(value: unknown, registry: SignalRegistry = SIGNAL_REGISTRY): SignalSource<string> {
   const source = object(value, ['signal', 'axis', 'space', 'inputRange']);
   if (
-    !['page.scroll.progress', 'pointer.x', 'pointer.y', 'pointer.distance', 'pointer.angle', 'pointer.speed'].includes(
-      String(source['signal']),
-    ) ||
-    !['x', 'y'].includes(String(source['axis'])) ||
-    !['page', 'viewport', 'anchor', 'layer'].includes(String(source['space'])) ||
+    !registry.numericSource(source['signal'], source['space'], source['axis']) ||
     !Array.isArray(source['inputRange']) ||
     source['inputRange'].length !== 2
   )
     throw new Error('駆動元が不正です。');
-  if (
-    source['signal'] === 'page.scroll.progress'
-      ? source['space'] !== 'page' || source['axis'] !== 'y'
-      : source['space'] === 'page' ||
-        (['pointer.x', 'pointer.y', 'pointer.speed'].includes(String(source['signal'])) && source['space'] === 'layer')
-  )
-    throw new Error('駆動元の座標系が不正です。');
   const range = source['inputRange'];
   if (range.some((n) => typeof n !== 'number' || !Number.isFinite(n) || n < -1e6 || n > 1e6) || range[0] >= range[1])
     throw new Error('入力範囲の開始は終了より小さくしてください。');
   return {
-    signal: source['signal'] as SignalSource['signal'],
+    signal: source['signal'] as string,
     axis: source['axis'] as SignalSource['axis'],
     space: source['space'] as SignalSource['space'],
     inputRange: [range[0], range[1]],

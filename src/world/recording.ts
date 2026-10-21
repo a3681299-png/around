@@ -2,6 +2,7 @@ import { parseModelStates } from './models';
 import { isDesignId, parseDesign } from '../design/schema';
 import { evaluateWorld } from './evaluate';
 import type { Fade } from './masks';
+import { SIGNAL_REGISTRY, type SignalRegistry } from '../signals/registry';
 import {
   WORLD_RUNTIME_VERSION,
   type WorldEvent,
@@ -64,10 +65,10 @@ function events(value: unknown): WorldEvent[] {
     return { type: data['type'] as 'video.play' | 'video.pause' | 'video.ended' | 'host.lifecycle' };
   });
 }
-export function parseWorldInput(value: unknown): WorldInput {
+export function parseWorldInput(value: unknown, options?: { registry: SignalRegistry }): WorldInput {
   const data = record(value, ['timeMs', 'deltaMs', 'viewport', 'anchors', 'signals', 'events', 'environment', 'seed']);
   const viewport = record(data['viewport'], ['width', 'height']),
-    signals = record(data['signals'], ['pointer', 'pointerTimeMs', 'playing', 'scroll']);
+    signals = record(data['signals'], ['pointer', 'pointerTimeMs', 'playing', 'scroll', 'samples']);
   const environment = record(data['environment'], ['hidden', 'reducedMotion', 'holdTransforms']);
   const anchors = data['anchors'];
   if (
@@ -103,6 +104,9 @@ export function parseWorldInput(value: unknown): WorldInput {
     signals: {
       pointer: signals['pointer'] === undefined ? undefined : point(signals['pointer']),
       playing: boolean(signals['playing']),
+      ...(signals['samples'] === undefined
+        ? {}
+        : { samples: (options?.registry ?? SIGNAL_REGISTRY).parseSamples(signals['samples']) }),
       ...(signals['pointerTimeMs'] === undefined ? {} : { pointerTimeMs: number(signals['pointerTimeMs']) }),
       ...(scroll
         ? {
@@ -244,7 +248,7 @@ export function parseWorldRecording(value: unknown): WorldRecording {
     throw new Error('Too many World inputs.');
   const scene = parseWorldScene(data['scene'], data['formatVersion'] === 1),
     initialState = parseWorldState(data['initialState'], scene);
-  const inputs = data['inputs'].map(parseWorldInput);
+  const inputs = data['inputs'].map((value) => parseWorldInput(value));
   let time = initialState.timeMs ?? 0;
   for (const input of inputs) {
     if (input.timeMs < time || input.timeMs - inputs[0]!.timeMs > RECORDING_LIMITS.durationMs)

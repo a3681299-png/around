@@ -1,11 +1,12 @@
 import type { PlaybackSource, SignalSnapshot } from '../signals/types';
 import type { WorldEvent } from '../world/types';
+import type { SignalId } from '../signals/registry';
 
 /** A shared lazy subscription per tab. No polling, page API calls or pixel reads. */
 export function createSignalSources(
   doc: Document,
   playback: PlaybackSource | undefined,
-  changed: (source: 'pointer.position' | 'video.playing' | 'page.scroll.progress') => void,
+  changed: (source: SignalId) => void,
   occurred?: () => void,
 ) {
   const snapshot: SignalSnapshot = { pointer: undefined, playing: false };

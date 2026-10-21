@@ -7,12 +7,12 @@ export interface SignalKeyframe {
   easing: KeyframeEasing;
 }
 export type SignalProperty = 'opacity' | 'position.x' | 'position.y' | 'rotation';
-export type NumericSignal =
-  'page.scroll.progress' | 'pointer.x' | 'pointer.y' | 'pointer.distance' | 'pointer.angle' | 'pointer.speed';
-export interface SignalSource {
-  signal: NumericSignal;
-  axis: 'x' | 'y';
-  space: 'page' | 'viewport' | 'anchor' | 'layer';
+import type { NumericSignal, SignalAxis, SignalSpace } from './registry';
+export type { NumericSignal } from './registry';
+export interface SignalSource<Id extends string = NumericSignal> {
+  signal: Id;
+  axis: SignalAxis;
+  space: SignalSpace;
   inputRange: [number, number];
 }
 export interface SignalRule {

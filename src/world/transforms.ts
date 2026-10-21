@@ -4,6 +4,7 @@ import { emptyMotionState, followMotion, type MotionState } from './motion';
 import { pointerMemory, signalValue } from './signals';
 import { clampUnit, sampleKeyframes } from './keyframes';
 import type { WorldInput, WorldLayout } from './types';
+import { SIGNAL_REGISTRY } from '../signals/registry';
 
 /** Authored transforms -> numeric offsets -> motion -> parent composition. */
 export function evaluateTransforms(
@@ -108,10 +109,15 @@ export function evaluateTransforms(
       layers.some((entry) => entry.parentId === group.layer.id && entry.renderable);
   // A speed-driven rule needs one final evaluation after the last pointer sample.
   needsFrame ||= Boolean(
-    pointer &&
-    pointer.speed > 0 &&
-    input.timeMs - pointer.timeMs <= 100 &&
-    rules.some((rule) => rule.enabled && rule.source.signal === 'pointer.speed'),
+    rules.some(
+      (rule) =>
+        rule.enabled &&
+        SIGNAL_REGISTRY.needsFrame(rule.source.signal, {
+          signals: input.signals,
+          timeMs: input.timeMs,
+          ...(pointer ? { pointer } : {}),
+        }),
+    ),
   );
   return {
     layout: { ...prepared, groups, layers },
