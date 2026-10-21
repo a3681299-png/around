@@ -1,9 +1,17 @@
 import type { EditCommand } from './types';
-import { commandObject, parseImagePatch, parsePlacements, parseStyle, parseSignalRule } from './validation';
+import {
+  assertCommandData,
+  commandObject,
+  parseImagePatch,
+  parsePlacements,
+  parseStyle,
+  parseSignalRule,
+} from './validation';
 
 /** Reject unrecognized command keys, executable values and unbounded messages. */
 export function parseEditCommand(value: unknown): EditCommand {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('編集コマンドが不正です。');
+  assertCommandData(value);
   const object = { ...(value as Record<string, unknown>) };
   const fields: Record<string, readonly string[]> = {
     select: ['id', 'additive', 'preserve'],
@@ -51,7 +59,10 @@ export function parseEditCommand(value: unknown): EditCommand {
     (object.type === 'snap' && typeof object.value !== 'boolean')
   )
     throw new Error('編集コマンドの必須値がありません。');
-  if (object.type === 'tool' && !['select', 'browse', 'card'].includes(String(object.tool)))
+  if (
+    object.type === 'tool' &&
+    (typeof object.tool !== 'string' || !['select', 'browse', 'card'].includes(object.tool))
+  )
     throw new Error('未対応のツールです。');
   if (object.type === 'nudge') {
     const point = commandObject(object.delta, ['x', 'y']);
@@ -69,7 +80,8 @@ export function parseEditCommand(value: unknown): EditCommand {
   if (object.type === 'placements') object.changes = parsePlacements(object.changes);
   if (
     object.type === 'layout' &&
-    !['left', 'center-x', 'right', 'top', 'center-y', 'bottom', 'horizontal', 'vertical'].includes(String(object.mode))
+    (typeof object.mode !== 'string' ||
+      !['left', 'center-x', 'right', 'top', 'center-y', 'bottom', 'horizontal', 'vertical'].includes(object.mode))
   )
     throw new Error('整列方法が不正です。');
   if (object.type === 'change') object.patch = parseImagePatch(object.patch);

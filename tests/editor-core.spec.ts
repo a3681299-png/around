@@ -12,6 +12,7 @@ import { defaultScrollOpacityRule } from '../src/signals/keyframes';
 import { createStudioStateEncoder, createStudioStateDecoder } from '../src/studio/state-sync';
 import { packCheckpoint, unpackCheckpoint } from '../src/studio/checkpoint-codec';
 import { defaultModelSettings } from '../src/models/types';
+import { defaultFollowMotion } from '../src/signals/motion';
 
 function harness(validateAssets: () => Promise<void> = async () => undefined) {
   let value: DesignDocument | undefined,
@@ -139,6 +140,69 @@ test('command allowlists reject invalid patches before touching the draft or his
     expect(() => parseEditCommand({ type: 'signal-rule', rule: invalidRule })).toThrow();
   }
   editor.destroy();
+});
+
+test('command type checks reject callbacks, accessors, cycles and coerced enum arrays without executing them', () => {
+  let invoked = 0;
+  const rule = defaultScrollOpacityRule('image-a');
+  const values = [
+    { type: 'tool', tool: ['select'] },
+    { type: 'layout', mode: ['left'] },
+    { type: 'change', patch: { motion: { ...defaultFollowMotion(), mode: ['smooth'] } } },
+    { type: 'signal-rule', rule: { ...rule, source: { ...rule.source, signal: ['page.scroll.progress'] } } },
+    { type: 'signal-rule', rule: { ...rule, source: { ...rule.source, axis: ['y'] } } },
+    { type: 'signal-rule', rule: { ...rule, source: { ...rule.source, space: ['page'] } } },
+    { type: 'signal-rule', rule: { ...rule, target: { ...rule.target, property: ['opacity'] } } },
+    { type: 'signal-rule', rule: { ...rule, keyframes: [{ ...rule.keyframes[0], easing: ['linear'] }] } },
+    {
+      type: 'signal-rule',
+      rule: {
+        ...rule,
+        source: {
+          ...rule.source,
+          signal: {
+            toString() {
+              invoked++;
+              return 'page.scroll.progress';
+            },
+          },
+        },
+      },
+    },
+    {
+      type: 'change',
+      patch: {
+        name: {
+          toJSON() {
+            invoked++;
+            return 'Layer';
+          },
+        },
+      },
+    },
+    {
+      type: 'change',
+      patch: {
+        name: () => {
+          invoked++;
+          return 'Layer';
+        },
+      },
+    },
+    { type: 'change', patch: { name: Symbol('invalid') } },
+    {
+      type: 'change',
+      get patch() {
+        invoked++;
+        return { name: 'Layer' };
+      },
+    },
+  ];
+  for (const value of values) expect(() => parseEditCommand(value)).toThrow();
+  const cyclic: { type: string; patch?: unknown } = { type: 'change' };
+  cyclic.patch = cyclic;
+  expect(() => parseEditCommand(cyclic)).toThrow();
+  expect(invoked).toBe(0);
 });
 
 test('immutable revisions share unchanged layers and history cannot be rewritten by later edits', async () => {

@@ -6,6 +6,38 @@ import { parseSignalRules } from '../signals/keyframe-schema';
 import type { PlacementChange } from '../world/geometry';
 import type { SignalRule } from '../signals/keyframes';
 
+/** Type validation must precede JSON/string conversion: neither getters nor
+ * toJSON/toString callbacks are command data. This is not a key-name blacklist. */
+export function assertCommandData(value: unknown): void {
+  const ancestors = new Set<object>();
+  let nodes = 0;
+  function visit(value: unknown, depth: number) {
+    if (++nodes > 10_000 || depth > 32) throw new Error('編集コマンドが大きすぎます。');
+    if (value === null || value === undefined || typeof value === 'string' || typeof value === 'boolean') return;
+    if (typeof value === 'number' && Number.isFinite(value)) return;
+    if (!value || typeof value !== 'object' || ancestors.has(value))
+      throw new Error('編集コマンドはデータだけで指定してください。');
+    const prototype = Object.getPrototypeOf(value);
+    if (
+      prototype !== Object.prototype &&
+      prototype !== null &&
+      !(Array.isArray(value) && prototype === Array.prototype)
+    )
+      throw new Error('編集コマンドの形式が不正です。');
+    ancestors.add(value);
+    const keys = Reflect.ownKeys(value);
+    if (keys.length > 10_000) throw new Error('編集コマンドが大きすぎます。');
+    for (const key of keys) {
+      const descriptor = Object.getOwnPropertyDescriptor(value, key)!;
+      if (typeof key !== 'string' || !('value' in descriptor))
+        throw new Error('実行可能なプロパティは指定できません。');
+      visit(descriptor.value, depth + 1);
+    }
+    ancestors.delete(value);
+  }
+  visit(value, 0);
+}
+
 export function commandObject(value: unknown, fields: readonly string[]): Record<string, unknown> {
   if (
     !value ||
@@ -114,6 +146,13 @@ export function parseImagePatch(value: unknown): ImagePatch {
     'model',
   ]);
   const { placement, playback, model, ...properties } = input;
+  if (
+    Object.hasOwn(input, 'motion') &&
+    (!input['motion'] ||
+      typeof input['motion'] !== 'object' ||
+      typeof (input['motion'] as Record<string, unknown>)['mode'] !== 'string')
+  )
+    throw new Error('モーションの種類が不正です。');
   if (Object.hasOwn(input, 'placement')) commandObject(placement, Object.keys(base.placement));
   const parsed = parseDecoration({
     ...base,
@@ -161,5 +200,16 @@ export const parseStyle = parseSurfaceStyle;
 export function parseSignalRule(value: unknown): SignalRule {
   const rule = commandObject(value, ['id', 'enabled', 'source', 'target', 'keyframes', 'evaluation', 'blend']);
   const target = commandObject(rule['target'], ['layerId', 'property']);
+  const source = commandObject(rule['source'], ['signal', 'axis', 'space', 'inputRange']);
+  if (
+    ['signal', 'axis', 'space'].some((key) => typeof source[key] !== 'string') ||
+    typeof target['property'] !== 'string'
+  )
+    throw new Error('シグナルの種類は文字列で指定してください。');
+  if (Array.isArray(rule['keyframes']))
+    for (const key of rule['keyframes']) {
+      const frame = commandObject(key, ['id', 'input', 'value', 'easing']);
+      if (typeof frame['easing'] !== 'string') throw new Error('補間の種類は文字列で指定してください。');
+    }
   return parseSignalRules([rule], new Set(typeof target['layerId'] === 'string' ? [target['layerId']] : []))[0]!;
 }
