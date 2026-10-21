@@ -4,6 +4,10 @@ import type { Page, BrowserContext, Locator } from '@playwright/test';
 import { test, expect } from './fixtures';
 import type { DesignDocument } from '../src/design/types';
 import { observeImports, uploadLeases, type StudioImportProbe } from './helpers/studio-import';
+import { unpackCheckpoint } from '../src/studio/checkpoint-codec';
+import { createStudioStateDecoder } from '../src/studio/state-sync';
+import type { StudioMessage } from '../src/studio/protocol';
+import type { EditorSnapshot } from '../src/editor-core/types';
 
 const overlay = '#web-world-themes-decorations',
   images = `${overlay} [data-image-id]`,
@@ -224,17 +228,16 @@ test('multiple targets stay isolated and a second Studio cannot edit or overwrit
   await expect(second.getByRole('button', { name: '画像を追加', exact: true })).toBeDisabled();
   await expect(other.locator(images)).toHaveCount(0);
   await expect
-    .poll(() =>
-      popup.evaluate(
+    .poll(async () => {
+      const value: unknown = await popup.evaluate(
         async (target) =>
-          (
-            (await chrome.storage.session.get(`webWorldThemes.studio.session.${target}`))[
-              `webWorldThemes.studio.session.${target}`
-            ] as { draft?: { decorations: unknown[] } }
-          )?.draft?.decorations.length,
+          (await chrome.storage.session.get(`webWorldThemes.studio.session.${target}`))[
+            `webWorldThemes.studio.session.${target}`
+          ],
         firstTarget,
-      ),
-    )
+      );
+      return unpackCheckpoint(value)?.draft.decorations.length;
+    })
     .toBe(1);
   await studio.getByRole('button', { name: '接続を解除', exact: true }).click();
   await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-editing', '');
@@ -364,6 +367,10 @@ test('the authenticated Port rejects stale revisions and unrecognized commands w
   await expect(control.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
   await control.getByRole('button', { name: '接続を解除', exact: true }).click();
   await expect(youtube.locator('[data-ww-editing]')).toHaveCount(0);
+  const decoder = createStudioStateDecoder();
+  await control.exposeFunction('decodeStudioTestMessage', (message: StudioMessage) =>
+    message.type === 'state' || message.type === 'reply' ? decoder.accept(message)?.state : undefined,
+  );
   const result = await control.evaluate(
     async (base64) => {
       const tabs = await chrome.tabs.query({}),
@@ -379,16 +386,28 @@ test('the authenticated Port rejects stale revisions and unrecognized commands w
         }
       const port = chrome.tabs.connect(target!, { name: 'web-world-themes:studio-v1' });
       let serial = 0;
+      let current: EditorSnapshot | undefined;
+      let messages: Promise<void> = Promise.resolve();
+      const pending = new Map<number, (message: Record<string, any>) => void>();
+      const decode = (
+        globalThis as unknown as {
+          decodeStudioTestMessage(message: StudioMessage): Promise<EditorSnapshot | undefined>;
+        }
+      ).decodeStudioTestMessage;
+      port.onMessage.addListener((message: StudioMessage) => {
+        messages = messages.then(async () => {
+          const next = await decode(message);
+          if (next) current = next;
+          if (message.type === 'reply') {
+            pending.get(message.id)?.({ ...message, state: current });
+            pending.delete(message.id);
+          }
+        });
+      });
       const request = (body: Record<string, unknown>) =>
         new Promise<Record<string, any>>((resolve) => {
           const id = ++serial;
-          const listener = (message: Record<string, any>) => {
-            if (message.type === 'reply' && message.id === id) {
-              port.onMessage.removeListener(listener);
-              resolve(message);
-            }
-          };
-          port.onMessage.addListener(listener);
+          pending.set(id, resolve);
           port.postMessage({ id, ...body });
         });
       const attached = await request({ type: 'attach', owner: 'studio-protocol-test' }),

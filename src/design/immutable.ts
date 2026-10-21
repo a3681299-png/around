@@ -42,10 +42,21 @@ function share<T>(before: T, next: T): T {
     b = next as Record<string, unknown>;
   const keys = Object.keys(b),
     result: Record<string, unknown> = Array.isArray(next) ? ([] as unknown as Record<string, unknown>) : {};
+  const identity = (item: unknown): unknown =>
+    item && typeof item === 'object'
+      ? 'id' in item
+        ? item.id
+        : 'target' in item && typeof item.target === 'string'
+          ? item.target
+          : undefined
+      : undefined;
+  const byId = Array.isArray(before)
+    ? new Map(before.filter((item) => identity(item) !== undefined).map((item) => [identity(item), item]))
+    : undefined;
   let same = Object.keys(a).length === keys.length;
   let unchangedNext = true;
   for (const key of keys) {
-    result[key] = share(a[key], b[key]);
+    result[key] = share(byId?.get(identity(b[key])) ?? a[key], b[key]);
     if (!Object.hasOwn(a, key) || result[key] !== a[key]) same = false;
     if (result[key] !== b[key]) unchangedNext = false;
   }

@@ -1,3 +1,6 @@
+import { createStudioStateEncoder } from '../studio/state-sync';
+import { unpackCheckpoint } from '../studio/checkpoint-codec';
+import type { EditorSnapshot } from '../editor-core/types';
 import type { CreatorEditor } from '../editor/controller';
 import type { SiteAdapter } from '../sites/types';
 import {
@@ -57,9 +60,10 @@ export function connectStudioHost(doc: Document, site: SiteAdapter, editor: Crea
         }
       }
     };
-    const checkpoint = () => {
+    const encoder = createStudioStateEncoder();
+    const statePayload = (state: EditorSnapshot = editor.snapshot()) => {
       lastHistory = editor.historyVersion;
-      return editor.checkpoint();
+      return encoder.encode(state, editor.checkpoint());
     };
     const unsubscribe = editor.subscribe((state) => {
       if (!attached || !owner) return;
@@ -67,8 +71,7 @@ export function connectStudioHost(doc: Document, site: SiteAdapter, editor: Crea
         timer = undefined;
         post({
           type: 'state',
-          state: editor.snapshot(),
-          ...(lastHistory !== editor.historyVersion ? { checkpoint: checkpoint() } : {}),
+          ...statePayload(),
         });
       };
       // A command can render both its document and final status. Publish its
@@ -119,9 +122,11 @@ export function connectStudioHost(doc: Document, site: SiteAdapter, editor: Crea
               owner = request.owner;
               surface = new URL(port.sender!.url!).searchParams.get('surface') === 'sidepanel' ? 'sidepanel' : 'window';
               const previous = activePort;
+              const resume = request.resume === undefined ? undefined : unpackCheckpoint(request.resume);
+              if (request.resume !== undefined && !resume) throw new Error('復旧データの形式が不正です。');
               const state = await editor.attachStudio(
                 request.owner,
-                request.resume,
+                resume,
                 Boolean(previous && previous !== port && activeSurface !== surface),
               );
               activePort = port;
@@ -144,7 +149,7 @@ export function connectStudioHost(doc: Document, site: SiteAdapter, editor: Crea
                 return;
               }
               attached = true;
-              post({ type: 'reply', id: request.id, ok: true, state, checkpoint: checkpoint() });
+              post({ type: 'reply', id: request.id, ok: true, ...statePayload(state) });
               const update = editor.timelineSnapshot();
               if (update) post({ type: 'timeline', update });
             } else if (!owner) throw new Error('先に編集対象へ接続してください。');
@@ -165,8 +170,7 @@ export function connectStudioHost(doc: Document, site: SiteAdapter, editor: Crea
                 type: 'reply',
                 id: request.id,
                 ok: true,
-                state,
-                ...(lastHistory !== editor.historyVersion ? { checkpoint: checkpoint() } : {}),
+                ...statePayload(state),
               });
             } else if (request.type === 'import-assets') {
               if (
@@ -189,7 +193,7 @@ export function connectStudioHost(doc: Document, site: SiteAdapter, editor: Crea
                 items,
                 length: items.length,
               });
-              post({ type: 'reply', id: request.id, ok: true, state, checkpoint: checkpoint() });
+              post({ type: 'reply', id: request.id, ok: true, ...statePayload(state) });
             } else if (request.type === 'thumbnail') {
               if (
                 typeof request.layer !== 'string' ||
@@ -210,7 +214,9 @@ export function connectStudioHost(doc: Document, site: SiteAdapter, editor: Crea
               id: request.id,
               ok: false,
               error: error instanceof Error ? error.message : '通信に失敗しました。',
-              state: editor.snapshot(),
+              // A rejected attach may show disabled artwork, but must never
+              // disclose or seed recovery with another owner's Undo history.
+              ...(attached ? statePayload() : { state: editor.snapshot() }),
             });
           }
         });

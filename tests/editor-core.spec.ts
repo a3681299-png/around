@@ -9,6 +9,8 @@ import type { DesignDocument } from '../src/design/types';
 import type { EditorAsset, EditorCheckpoint, EditorPorts } from '../src/editor-core/types';
 import { parseEditCommand } from '../src/studio/protocol';
 import { defaultScrollOpacityRule } from '../src/signals/keyframes';
+import { createStudioStateEncoder, createStudioStateDecoder } from '../src/studio/state-sync';
+import { packCheckpoint, unpackCheckpoint } from '../src/studio/checkpoint-codec';
 
 function harness(validateAssets: () => Promise<void> = async () => undefined) {
   let value: DesignDocument | undefined,
@@ -172,6 +174,102 @@ test('immutable revisions share unchanged layers and history cannot be rewritten
   await editor.execute({ type: 'redo' });
   expect(editor.snapshot().document).toBe(after);
   expect(editor.snapshot().view.dirty).toBe(true);
+  const surviving = editor.snapshot().document.decorations[1];
+  await editor.execute({ type: 'delete', id });
+  expect(editor.snapshot().document.decorations[0]).toBe(surviving);
+  editor.destroy();
+});
+
+test('Studio deltas preserve gestures, Undo/Redo, save/discard and the bounded history through JSON transport', async () => {
+  const { editor } = await opened();
+  const encoder = createStudioStateEncoder(),
+    decoder = createStudioStateDecoder();
+  const id = editor.snapshot().document.decorations[0]!.id;
+  const wire = () => JSON.parse(JSON.stringify(encoder.encode(editor.snapshot(), editor.checkpoint())));
+  decoder.accept(wire());
+  const run = async (command: Parameters<typeof editor.execute>[0]) => {
+    await editor.execute(command);
+    const message = wire();
+    expect(message.checkpoint).toBeUndefined();
+    const received = decoder.accept(message);
+    if (received) {
+      expect(received.state).toEqual(editor.snapshot());
+      expect(received.checkpoint).toEqual(editor.checkpoint());
+    }
+    return { message, received };
+  };
+  await run({ type: 'begin' });
+  await run({ type: 'change', id, patch: { opacity: 0.5 } });
+  await run({ type: 'end', cancel: true });
+  await run({ type: 'begin' });
+  await run({ type: 'change', id, patch: { opacity: 0.6 } });
+  await run({ type: 'end' });
+  await run({ type: 'undo' });
+  await run({ type: 'redo' });
+  await run({ type: 'select-target', target: 'video-card' });
+  await run({ type: 'style', style: { backgroundColor: '#123456' } });
+  await run({ type: 'save' });
+  await run({ type: 'change', id, patch: { locked: true } });
+  await run({ type: 'discard' });
+  await run({ type: 'select-all' });
+  await run({ type: 'group' });
+  await run({ type: 'ungroup' });
+  let last;
+  for (let i = 0; i < 105; i++) {
+    last = await run({ type: 'change', id, patch: { opacity: 0.1 + i / 1000 } });
+    expect(Buffer.byteLength(JSON.stringify(last.message))).toBeLessThan(2500);
+  }
+  expect(last!.received!.checkpoint.history.past).toHaveLength(100);
+  const packed = packCheckpoint(last!.received!.checkpoint);
+  const restored = unpackCheckpoint(JSON.parse(JSON.stringify(packed)))!;
+  expect(restored).toEqual(editor.checkpoint());
+  expect(restored.history.past[0]!.decorations[1]).toBe(restored.history.past[1]!.decorations[1]);
+  const recovered = harness();
+  await Promise.resolve();
+  recovered.editor.setEnabled(true);
+  recovered.editor.open();
+  await recovered.editor.restore(restored);
+  const history = recovered.editor.checkpoint().history;
+  expect(history.past[0]!.decorations[1]).toBe(history.past[1]!.decorations[1]);
+  await recovered.editor.execute({ type: 'undo' });
+  expect(recovered.editor.snapshot().document).toEqual(editor.checkpoint().history.past.at(-1));
+  editor.destroy();
+  recovered.editor.destroy();
+});
+
+test('Studio detects missing or duplicate deltas atomically and reconnects from a new base', async () => {
+  const { editor } = await opened();
+  const encoder = createStudioStateEncoder(),
+    decoder = createStudioStateDecoder();
+  const first = JSON.parse(JSON.stringify(encoder.encode(editor.snapshot(), editor.checkpoint())));
+  decoder.accept(first);
+  await editor.execute({ type: 'snap', value: true });
+  const skipped = JSON.parse(JSON.stringify(encoder.encode(editor.snapshot(), editor.checkpoint())));
+  await editor.execute({ type: 'tool', tool: 'browse' });
+  const later = JSON.parse(JSON.stringify(encoder.encode(editor.snapshot(), editor.checkpoint())));
+  expect(() => decoder.accept(later)).toThrow(/順序/);
+  expect(decoder.accept(skipped)!.state.view.tool).toBe('select');
+  expect(() => decoder.accept(skipped)).toThrow(/順序/);
+  expect(decoder.accept(later)!.state.view.tool).toBe('browse');
+  const reconnected = createStudioStateEncoder();
+  expect(
+    decoder.accept(JSON.parse(JSON.stringify(reconnected.encode(editor.snapshot(), editor.checkpoint()))))!.state,
+  ).toEqual(editor.snapshot());
+  editor.destroy();
+});
+
+test('compact recovery reads legacy v1 unchanged and rejects cyclic or out-of-range graph references', async () => {
+  const { editor } = await opened();
+  const legacy = JSON.parse(JSON.stringify(editor.checkpoint()));
+  expect(unpackCheckpoint(legacy)).toBe(legacy);
+  expect(unpackCheckpoint(packCheckpoint(legacy))).toEqual(legacy);
+  expect(unpackCheckpoint({ version: 99 })).toBeUndefined();
+  expect(() => unpackCheckpoint({ version: 2, root: { ref: 1 }, nodes: [] })).toThrow();
+  expect(() => unpackCheckpoint({ version: 2, root: { ref: 0 }, nodes: [{ array: [{ ref: 0 }] }] })).toThrow();
+  const invalid = structuredClone(legacy);
+  invalid.history.past[0].decorations.push({ script: 'x' });
+  await expect(editor.restore(unpackCheckpoint(packCheckpoint(invalid))!)).rejects.toThrow();
+  expect(editor.checkpoint()).toEqual(legacy);
   editor.destroy();
 });
 

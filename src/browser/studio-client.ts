@@ -1,3 +1,5 @@
+import { createStudioStateDecoder } from '../studio/state-sync';
+import { packCheckpoint } from '../studio/checkpoint-codec';
 import {
   STUDIO_PORT,
   STUDIO_PROBE,
@@ -158,6 +160,7 @@ export function createStudioClient(
     try {
       const next = chrome.tabs.connect(target, { name: STUDIO_PORT, frameId: 0 });
       port = next;
+      const decoder = createStudioStateDecoder();
       next.onMessage.addListener((message: StudioMessage) => {
         if (generation !== epoch || port !== next || !message || typeof message !== 'object') return;
         if (message.type === 'handoff') {
@@ -170,12 +173,23 @@ export function createStudioClient(
           useTimeline(message.update);
           return;
         }
+        if (message.type !== 'state' && message.type !== 'reply') return;
+        let received;
+        try {
+          if (message.type === 'reply' && !message.ok && message.state && message.sequence === undefined)
+            useState(message.state);
+          else received = decoder.accept(message);
+        } catch {
+          next.disconnect();
+          return;
+        }
+        if (message.type === 'reply' && message.ok && message.checkpoint) connected = true;
+        if (received) useState(received.state, received.checkpoint);
         if (message.type === 'state') {
-          useState(message.state, message.checkpoint);
           emit(
-            message.state.active
+            state?.active
               ? '接続中'
-              : message.state.enabled
+              : state?.enabled
                 ? '編集を終了しました。接続ボタンで再開できます。'
                 : 'テーマがOFFまたは強さ0%です。',
           );
@@ -184,8 +198,6 @@ export function createStudioClient(
           if (!entry) return;
           pending.delete(message.id);
           clearTimeout(entry.timer);
-          if (message.ok && message.checkpoint) connected = true;
-          if (message.state) useState(message.state, message.checkpoint);
           if (message.ok) entry.resolve(message);
           else entry.reject(new Error(message.error ?? '操作を実行できませんでした。'));
         }
@@ -222,7 +234,7 @@ export function createStudioClient(
       await request({
         type: 'attach',
         owner,
-        ...(backup ? { resume: backup } : {}),
+        ...(backup ? { resume: packCheckpoint(backup) } : {}),
         ...(visibilityDocument ? { visible: !visibilityDocument.hidden } : {}),
       } as Omit<StudioRequest, 'id'>);
       if (generation !== epoch) return;

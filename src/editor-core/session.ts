@@ -744,7 +744,11 @@ export function createEditorSession<Source extends { readonly length: number }>(
       (value.selectedTarget !== undefined && !ports.targets.some((target) => target.id === value.selectedTarget))
     )
       throw new Error('復旧データが不正です。');
-    const restored = createHistory<DesignDocument>(readDesign, sameDesign);
+    let previousRestored = next;
+    const restored = createHistory<DesignDocument>((doc) => {
+      previousRestored = shareDesign(previousRestored, readDesign(doc));
+      return previousRestored;
+    }, sameDesign);
     restored.restore(value.history);
     if (restored.values().some((doc) => doc.siteId !== ports.siteId))
       throw new Error('復旧データの対象が一致しません。');

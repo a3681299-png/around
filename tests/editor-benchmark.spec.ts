@@ -3,12 +3,8 @@ import { performance } from 'node:perf_hooks';
 import { createEditorSession } from '../src/editor-core/session';
 import { emptyDesign, parseDesign } from '../src/design/schema';
 import { defaultScrollOpacityRule } from '../src/signals/keyframes';
-import type { EditorSnapshot, EditorCheckpoint } from '../src/editor-core/types';
-
-/** The same state envelope as studio-host; updated with the wire protocol, not an estimated document size. */
-function studioMessage(state: EditorSnapshot, checkpoint: EditorCheckpoint) {
-  return { type: 'state', state, checkpoint };
-}
+import { createStudioStateEncoder } from '../src/studio/state-sync';
+import { packCheckpoint } from '../src/studio/checkpoint-codec';
 
 test('editor benchmark: placements and Studio wire bytes (informational, no performance threshold)', async ({}, info) => {
   const results = [];
@@ -66,15 +62,17 @@ test('editor benchmark: placements and Studio wire bytes (informational, no perf
     editor.setEnabled(true);
     editor.open();
     const times = [];
+    const encoder = createStudioStateEncoder();
     for (let index = 0; index < 110; index++) {
       const placement = { ...doc.decorations[0]!.placement, x: 0.4 + index / 1000 };
+      if (index === 109) encoder.encode(editor.snapshot(), editor.checkpoint());
       const start = performance.now();
       await editor.execute({ type: 'placements', changes: [{ id: 'image-0', placement }] });
       if (index >= 10) times.push(performance.now() - start);
     }
     times.sort((a, b) => a - b);
     const start = performance.now();
-    const message = JSON.stringify(studioMessage(editor.snapshot(), editor.checkpoint()));
+    const message = JSON.stringify({ type: 'state', ...encoder.encode(editor.snapshot(), editor.checkpoint()) });
     const encodeMs = performance.now() - start;
     results.push({
       layers: 32,
@@ -87,6 +85,7 @@ test('editor benchmark: placements and Studio wire bytes (informational, no perf
       historyEntries: editor.checkpoint().history.past.length,
       studioBytes: Buffer.byteLength(message),
       encodeMs,
+      recoveryBytes: Buffer.byteLength(JSON.stringify(packCheckpoint(editor.checkpoint()))),
     });
     editor.destroy();
   }

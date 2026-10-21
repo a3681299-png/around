@@ -1,4 +1,6 @@
-import type { EditCommand, EditorCheckpoint, EditorSnapshot } from '../editor-core/types';
+import type { StudioStatePayload } from './state-sync';
+import type { PackedCheckpoint } from './checkpoint-codec';
+import type { EditCommand, EditorCheckpoint } from '../editor-core/types';
 import type { DesignTarget } from '../design/types';
 import type { TimelineCommand, TimelineUpdate } from '../timeline/types';
 
@@ -13,25 +15,21 @@ export interface StudioTarget {
   targets: readonly DesignTarget[];
 }
 export type StudioRequest =
-  | { id: number; type: 'attach'; owner: string; resume?: EditorCheckpoint; visible?: boolean }
+  | { id: number; type: 'attach'; owner: string; resume?: EditorCheckpoint | PackedCheckpoint; visible?: boolean }
   | { id: number; type: 'surface-visibility'; visible: boolean }
   | { id: number; type: 'command'; session: string; revision: number; command: EditCommand }
   | { id: number; type: 'import-assets'; session: string; revision: number; assets: string[] }
   | { id: number; type: 'thumbnail'; layer: string }
   | { id: number; type: 'timeline'; session: string; command: TimelineCommand }
   | { id: number; type: 'detach' };
-export interface StudioUpdate {
+export interface StudioUpdate extends StudioStatePayload {
   type: 'state';
-  state: EditorSnapshot;
-  checkpoint?: EditorCheckpoint;
 }
-export interface StudioReply {
+export interface StudioReply extends StudioStatePayload {
   type: 'reply';
   id: number;
   ok: boolean;
   error?: string;
-  state?: EditorSnapshot;
-  checkpoint?: EditorCheckpoint;
   thumbnail?: string;
 }
 export type StudioMessage =
