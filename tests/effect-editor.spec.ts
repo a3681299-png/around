@@ -5,6 +5,7 @@ import path from 'node:path';
 import { test, expect, launchExtension } from './fixtures';
 import type { DesignDocument } from '../src/design/types';
 import { defaultCircleMask } from '../src/effects/types';
+import { isolate } from './helpers/world-host';
 
 const key = 'webWorldThemes.design.youtube',
   overlay = '#web-world-themes-decorations';
@@ -218,6 +219,7 @@ test('effect edits survive undo, redo, discard, tab sync, reload and a persisten
 test('native video play/pause drives a reversible fade, shares GIF effects and suspends invisible playback', async ({
   popup,
   youtube,
+  extensionId,
 }) => {
   const panel = await open(popup, youtube);
   await watch(youtube);
@@ -237,35 +239,68 @@ test('native video play/pause drives a reversible fade, shares GIF effects and s
       preview.dispatchEvent(new Event('play'));
     }
   });
-  // Settle the adapter's asynchronous replacement scan before checking the source.
-  await youtube.waitForTimeout(75);
+  // Settle the adapter's queued replacement scan before controlling its clock.
+  await youtube.evaluate(
+    () => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))),
+  );
   await expect.poll(() => intensity(youtube)).toBe(0);
-  await nativeButton(youtube, 'Play');
-  await expect.poll(() => intensity(youtube)).toBe(1);
-  await expect(youtube.locator(media)).toHaveAttribute('data-playback', 'playing');
-  await nativeButton(youtube, 'Pause');
-  await youtube.waitForTimeout(140);
-  const mid = await intensity(youtube);
-  expect(mid).toBeGreaterThan(0);
-  expect(mid).toBeLessThan(1);
-  await nativeButton(youtube, 'Play');
-  const reversed = await intensity(youtube);
-  expect(reversed).toBeLessThan(1);
-  expect(Math.abs(reversed - mid)).toBeLessThan(0.2);
-  await expect.poll(() => intensity(youtube)).toBe(1);
-  await nativeButton(youtube, 'Pause');
-  await expect.poll(() => intensity(youtube)).toBe(0);
-  const stoppedFrame = await youtube.locator(media).getAttribute('data-frame');
-  await youtube.waitForTimeout(180);
-  expect(await youtube.locator(media).getAttribute('data-frame')).toBe(stoppedFrame);
-  await youtube.emulateMedia({ reducedMotion: 'reduce' });
-  await nativeButton(youtube, 'Play');
-  await expect.poll(() => intensity(youtube)).toBe(1);
-  await expect(youtube.locator(media)).toHaveAttribute('data-playback', 'reduced-motion');
-  await nativeButton(youtube, 'Pause');
-  await expect.poll(() => intensity(youtube)).toBe(0);
-  await panel.getByLabel('動画の一時停止で隠す').uncheck();
-  await expect.poll(() => intensity(youtube)).toBe(1);
+  const runtime = await isolate(youtube, extensionId);
+  // Control the real extension realm, not the page's separate JS world. Only
+  // this test-owned page is affected; the fixture closes it after the test.
+  const start = 1_047_360.4,
+    pause = start + 800,
+    reverse = pause + 140,
+    end = reverse + 800;
+  await runtime.evaluate(`(() => {
+    let now = ${start}, serial = 0;
+    const callbacks = new Map(), cancel = window.cancelAnimationFrame.bind(window);
+    Object.defineProperty(performance, 'now', { value: () => now });
+    window.requestAnimationFrame = callback => { const id = --serial; callbacks.set(id, callback); return id; };
+    window.cancelAnimationFrame = id => { if (!callbacks.delete(id)) cancel(id); };
+    globalThis.__effectTick = time => {
+      if (time < now) throw Error('Non-monotonic test clock');
+      now = time;
+      for (const [id, callback] of [...callbacks]) if (callbacks.delete(id)) callback(now);
+    };
+  })()`);
+  const tick = async (time: number) => {
+    await runtime.evaluate(`__effectTick(${time})`);
+  };
+  const sample = async (time: number) => {
+    await tick(time);
+    return intensity(youtube);
+  };
+  try {
+    await nativeButton(youtube, 'Play');
+    expect(await sample(start)).toBe(0);
+    expect(await sample(pause)).toBe(1);
+    await expect(youtube.locator(media)).toHaveAttribute('data-playback', 'playing');
+    await nativeButton(youtube, 'Pause');
+    await tick(pause);
+    const mid = await sample(reverse);
+    expect(mid).toBe(0.825);
+    await nativeButton(youtube, 'Play');
+    expect(await sample(reverse)).toBe(mid);
+    // This resumed fade straddles 2**20; end - reverse rounds below 800.
+    expect(await sample(end)).toBe(1);
+    await nativeButton(youtube, 'Pause');
+    await tick(end);
+    const hidden = end + 800;
+    expect(await sample(hidden)).toBe(0);
+    const stoppedFrame = await youtube.locator(media).getAttribute('data-frame');
+    await tick(hidden + 180);
+    expect(await youtube.locator(media).getAttribute('data-frame')).toBe(stoppedFrame);
+    await youtube.emulateMedia({ reducedMotion: 'reduce' });
+    await nativeButton(youtube, 'Play');
+    await expect.poll(() => sample(hidden + 180)).toBe(1);
+    await expect(youtube.locator(media)).toHaveAttribute('data-playback', 'reduced-motion');
+    await nativeButton(youtube, 'Pause');
+    await expect.poll(() => sample(hidden + 180)).toBe(0);
+    await panel.getByLabel('動画の一時停止で隠す').uncheck();
+    await expect.poll(() => sample(hidden + 180)).toBe(1);
+  } finally {
+    await runtime.session.detach();
+  }
 });
 
 test('semantic player anchor tracks resize, scroll and SPA without persisting runtime coordinates', async ({

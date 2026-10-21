@@ -40,8 +40,12 @@ export interface Fade {
   duration: number;
 }
 export function fadeValue(fade: Fade, time: number): number {
-  if (!fade.duration) return fade.to;
-  return fade.from + (fade.to - fade.from) * Math.max(0, Math.min(1, (time - fade.start) / fade.duration));
+  // Use the same end time as needsFrame: subtraction may round progress below 1.
+  if (!fade.duration || time >= fade.start + fade.duration) return fade.to;
+  const progress = (time - fade.start) / fade.duration;
+  if (progress <= 0) return fade.from;
+  if (progress >= 1) return fade.to;
+  return fade.from + (fade.to - fade.from) * progress;
 }
 export function retargetFade(previous: Fade | undefined, target: number, time: number, duration: number): Fade {
   if (previous?.to === target && previous.duration === duration) return previous;

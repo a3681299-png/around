@@ -6,6 +6,7 @@ import { evaluateMask, fadeValue, layerLocal, maskGradient, retargetFade } from 
 import { SIGNAL_CATALOG, type PlaybackSignal, type PlaybackSource } from '../src/signals/types';
 import { createSignalSources } from '../src/signals/sources';
 import { createHistory } from '../src/editor/history';
+import { evaluateEffects } from '../src/world/effects';
 
 const image = (): Decoration => ({
   kind: 'image',
@@ -153,6 +154,63 @@ test('pause/resume reverses fade continuously; repeated pointer samples never re
   expect(fadeValue(fade, 500)).toBe(0.75);
   expect(fadeValue(fade, 10_000)).toBe(1);
   expect(fadeValue(retargetFade(fade, 0, 500, 0), 500)).toBe(0);
+});
+
+test('fractional fade endpoints return the exact source and target values', () => {
+  // 1100.1 - 300.1 is 799.9999999999999, although start + duration is 1100.1.
+  for (const [from, to] of [
+    [0.125, 1],
+    [0.875, 0],
+    [0.7, 0.1],
+    [0.2, 0.9],
+  ] as const) {
+    const fade = { from, to, start: 300.1, duration: 800 };
+    for (const time of [0, 300.1]) expect(fadeValue(fade, time)).toBe(from);
+    for (const time of [1100.1, 1100.2, 2000]) expect(fadeValue(fade, time)).toBe(to);
+    expect(fadeValue({ ...fade, duration: 0 }, 300.1)).toBe(to);
+  }
+  expect(fadeValue({ from: 0.125, to: 1, start: 300.1, duration: 800 }, 700.1)).toBe(0.5625);
+});
+
+test('fractional fade completion matches the mask target and stops frames for fixed sampling schedules', () => {
+  const mask = {
+    ...defaultCircleMask(),
+    intensity: 0.65,
+    bindings: [
+      { source: 'video.playing', transform: { kind: 'boolean-gate', fadeMs: 800 }, target: 'mask.intensity' },
+    ] as const,
+  };
+  const target = {
+    layer: { ...image(), effects: [{ ...mask, bindings: [...mask.bindings] }] },
+    frame: { left: 0, top: 0, width: 800, height: 600 },
+    renderable: true,
+  };
+  for (const playing of [true, false]) {
+    for (const times of [
+      [300.1, 1100.1],
+      [300.1, 440.1, 700.1, 1100.1],
+    ]) {
+      let state = {
+        fades: {
+          [target.layer.id]: { from: playing ? 0.125 : 0.875, to: Number(playing), start: 300.1, duration: 800 },
+        },
+        visibility: { [target.layer.id]: true },
+      };
+      for (const timeMs of times) {
+        const result = evaluateEffects([target], state, {
+          timeMs,
+          signals: { pointer: undefined, playing },
+          environment: { hidden: false, reducedMotion: false },
+        });
+        state = result.state;
+        if (timeMs === 1100.1) {
+          expect(result.effects[0]!.mask!.intensity).toBe(playing ? mask.intensity : 0);
+          expect(result.effects[0]!.visible).toBe(playing);
+          expect(result.needsFrame).toBe(false);
+        }
+      }
+    }
+  }
 });
 
 test('mask composition clamps feather at the center and multiplies configured intensity without changing opacity', () => {
