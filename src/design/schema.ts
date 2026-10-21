@@ -7,6 +7,7 @@ import {
   type Decoration,
   type PlacementAnchor,
   type GroupLayer,
+  type LayerPlacement,
 } from './types';
 import { MODEL_LIMITS, parseModelInfo, parseModelSettings } from '../models/types';
 import { ASSET_LIMITS, ASSET_MESSAGES } from '../assets/limits';
@@ -101,7 +102,38 @@ function group(value: unknown, version: number): GroupLayer {
   };
 }
 
-function image(value: unknown, version: number): Decoration {
+export function parsePlacement(value: unknown): LayerPlacement {
+  const placement = record(value, ['anchor', 'x', 'y', 'widthPx', 'heightPx', 'rotationDeg']);
+  const inputAnchor = record(placement['anchor'], ['kind', 'target']);
+  let anchor: PlacementAnchor;
+  if (inputAnchor['kind'] === 'viewport' && !Object.hasOwn(inputAnchor, 'target')) anchor = { kind: 'viewport' };
+  else if (inputAnchor['kind'] === 'surface' && isDesignId(inputAnchor['target']))
+    anchor = { kind: 'surface', target: inputAnchor['target'] };
+  else throw new Error('素材の配置基準が不正です。');
+  return {
+    anchor,
+    x: number(placement['x'], 0, 1),
+    y: number(placement['y'], 0, 1),
+    widthPx: number(placement['widthPx'], IMAGE_LIMITS.minSize, IMAGE_LIMITS.maxSize),
+    heightPx: number(placement['heightPx'], IMAGE_LIMITS.minSize, IMAGE_LIMITS.maxSize),
+    rotationDeg: number(placement['rotationDeg'], -180, 180),
+  };
+}
+
+export function parseSurfaceStyle(value: unknown): SurfaceStyle {
+  const input = record(value, ['backgroundColor', 'border', 'borderRadiusPx']);
+  const style: SurfaceStyle = {};
+  if (Object.hasOwn(input, 'backgroundColor')) style.backgroundColor = color(input['backgroundColor']);
+  if (Object.hasOwn(input, 'border')) {
+    const border = record(input['border'], ['color', 'widthPx']);
+    style.border = { color: color(border['color']), widthPx: pixels(border['widthPx'], STYLE_LIMITS.borderWidth) };
+  }
+  if (Object.hasOwn(input, 'borderRadiusPx'))
+    style.borderRadiusPx = pixels(input['borderRadiusPx'], STYLE_LIMITS.borderRadius);
+  return style;
+}
+
+export function parseDecoration(value: unknown, version = 11): Decoration {
   const item = record(value, [
     'kind',
     'id',
@@ -131,27 +163,13 @@ function image(value: unknown, version: number): Decoration {
     (version >= 3 && typeof item['locked'] !== 'boolean')
   )
     throw new Error('素材レイヤーの形式が不正です。');
-  const placement = record(item['placement'], ['anchor', 'x', 'y', 'widthPx', 'heightPx', 'rotationDeg']);
-  const inputAnchor = record(placement['anchor'], ['kind', 'target']);
-  let anchor: PlacementAnchor;
-  if (inputAnchor['kind'] === 'viewport' && !Object.hasOwn(inputAnchor, 'target')) anchor = { kind: 'viewport' };
-  else if (inputAnchor['kind'] === 'surface' && isDesignId(inputAnchor['target']))
-    anchor = { kind: 'surface', target: inputAnchor['target'] };
-  else throw new Error('素材の配置基準が不正です。');
   const zIndex = number(item['zIndex'], -IMAGE_LIMITS.maxZ, IMAGE_LIMITS.maxZ);
   if (!Number.isInteger(zIndex)) throw new Error('重なり順は整数で指定してください。');
   const common = {
     id: item['id'],
     assetId: item['assetId'],
     name: item['name'],
-    placement: {
-      anchor,
-      x: number(placement['x'], 0, 1),
-      y: number(placement['y'], 0, 1),
-      widthPx: number(placement['widthPx'], IMAGE_LIMITS.minSize, IMAGE_LIMITS.maxSize),
-      heightPx: number(placement['heightPx'], IMAGE_LIMITS.minSize, IMAGE_LIMITS.maxSize),
-      rotationDeg: number(placement['rotationDeg'], -180, 180),
-    },
+    placement: parsePlacement(item['placement']),
     opacity: number(item['opacity'], 0, 1),
     zIndex,
     visible: item['visible'],
@@ -246,22 +264,14 @@ export function parseDesign(value: unknown): DesignDocument {
       throw new Error('未対応または重複した編集対象です。');
     }
     seen.add(rule['target']);
-    const input = record(rule['style'], ['backgroundColor', 'border', 'borderRadiusPx']);
-    const style: SurfaceStyle = {};
-    if (Object.hasOwn(input, 'backgroundColor')) style.backgroundColor = color(input['backgroundColor']);
-    if (Object.hasOwn(input, 'border')) {
-      const border = record(input['border'], ['color', 'widthPx']);
-      style.border = { color: color(border['color']), widthPx: pixels(border['widthPx'], STYLE_LIMITS.borderWidth) };
-    }
-    if (Object.hasOwn(input, 'borderRadiusPx'))
-      style.borderRadiusPx = pixels(input['borderRadiusPx'], STYLE_LIMITS.borderRadius);
+    const style = parseSurfaceStyle(rule['style']);
     return { kind: 'surface-style' as const, target: rule['target'], style };
   });
   let decorations: Decoration[] = [];
   if (version >= 2) {
     if (!Array.isArray(data['decorations']) || data['decorations'].length > IMAGE_LIMITS.count)
       throw new Error(ASSET_MESSAGES.layerCount);
-    decorations = data['decorations'].map((value) => image(value, version));
+    decorations = data['decorations'].map((value) => parseDecoration(value, version));
     if (decorations.filter((item) => item.kind === 'model3d').length > MODEL_LIMITS.count)
       throw new Error(ASSET_MESSAGES.modelCount);
     if (new Set(decorations.map((item) => item.id)).size !== decorations.length)

@@ -83,6 +83,61 @@ async function opened() {
   return h;
 }
 
+test('command allowlists reject invalid patches before touching the draft or history', async () => {
+  const { editor } = await opened();
+  const before = editor.checkpoint();
+  const invalid = [
+    { opacity: -0.1 },
+    { opacity: 1.01 },
+    { opacity: NaN },
+    { opacity: Infinity },
+    { zIndex: 0.5 },
+    { zIndex: 101 },
+    { visible: 'true' },
+    { name: '' },
+    { name: 'bad\nname' },
+    { assetId: assets[0]!.id },
+    { script: 'alert(1)' },
+    { placement: { x: -1 } },
+    { placement: { widthPx: 4097 } },
+    { placement: { rotationDeg: Infinity } },
+    { placement: { anchor: { kind: 'viewport', target: 'video' } } },
+    { placement: { x: '0.5' } },
+    { placement: { unknown: 1 } },
+    { playback: { speed: NaN } },
+    { playback: { playing: 1 } },
+    { playback: { script: 'x' } },
+    { model: { look: { yawLimit: 91 } } },
+    { model: { speed: 5 } },
+    { model: { vrm: { expressions: { happy: Infinity } } } },
+    { model: { unknown: false } },
+  ];
+  for (const patch of invalid) {
+    const command = { type: 'change', patch };
+    expect(() => parseEditCommand(command)).toThrow();
+    await expect(editor.execute(command as never)).rejects.toThrow();
+    expect(editor.checkpoint()).toEqual(before);
+  }
+  const placement = before.draft.decorations[0]!.placement;
+  for (const command of [
+    { type: 'placements', changes: [{ id: before.draft.decorations[0]!.id, placement: { ...placement, y: NaN } }] },
+    { type: 'placements', changes: [{ id: before.draft.decorations[0]!.id, placement: { ...placement, extra: 1 } }] },
+    { type: 'nudge', delta: { x: 1, y: 2, script: 'x' } },
+    { type: 'style', style: { borderRadiusPx: 49 } },
+    { type: 'style', style: { backgroundColor: 'url(x)' } },
+    { type: 'style', style: { border: { color: '#ffffff', widthPx: Infinity } } },
+    { type: 'style', style: { unknown: '#ffffff' } },
+  ])
+    expect(() => parseEditCommand(command)).toThrow();
+  const rule = defaultScrollOpacityRule(before.draft.decorations[0]!.id);
+  for (const value of [NaN, Infinity, -1, 2, '0.5']) {
+    const invalidRule = structuredClone(rule);
+    invalidRule.keyframes[0]!.value = value as number;
+    expect(() => parseEditCommand({ type: 'signal-rule', rule: invalidRule })).toThrow();
+  }
+  editor.destroy();
+});
+
 test('signal key edits share gesture history, locks, save/discard and session recovery', async () => {
   const { editor } = await opened(),
     id = editor.snapshot().document.decorations[0]!.id,

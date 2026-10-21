@@ -1,0 +1,165 @@
+import { isDesignId, parseDecoration, parsePlacement, parseSurfaceStyle } from '../design/schema';
+import { IMAGE_LIMITS, type ImagePatch } from '../design/types';
+import { ANIMATION_LIMITS } from '../assets/motion-types';
+import { MODEL_LIMITS } from '../models/types';
+import { parseSignalRules } from '../signals/keyframe-schema';
+import type { PlacementChange } from '../world/geometry';
+import type { SignalRule } from '../signals/keyframes';
+
+export function commandObject(value: unknown, fields: readonly string[]): Record<string, unknown> {
+  if (
+    !value ||
+    typeof value !== 'object' ||
+    Array.isArray(value) ||
+    (Object.getPrototypeOf(value) !== Object.prototype && Object.getPrototypeOf(value) !== null) ||
+    Object.keys(value).some((key) => !fields.includes(key))
+  )
+    throw new Error('編集コマンドの形式が不正です。');
+  return value as Record<string, unknown>;
+}
+function numeric(value: unknown, min: number, max: number) {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < min || value > max)
+    throw new Error('編集コマンドの値が範囲外です。');
+}
+function partial(value: unknown, rules: Record<string, (value: unknown) => void>) {
+  const input = commandObject(value, Object.keys(rules));
+  for (const [key, value] of Object.entries(input)) rules[key]!(value);
+  return input;
+}
+const boolean = (value: unknown) => {
+  if (typeof value !== 'boolean') throw new Error('真偽値を指定してください。');
+};
+const range = (min: number, max: number) => (value: unknown) => numeric(value, min, max);
+const index = (max: number) => (value: unknown) => {
+  if (value === null) return;
+  numeric(value, 0, max);
+  if (!Number.isInteger(value)) throw new Error('参照は整数で指定してください。');
+};
+function modelPatch(value: unknown) {
+  // Asset-specific clip/bone/expression membership and merged speed constraints
+  // are also checked by patchModel against the selected model's immutable source.
+  partial(value, {
+    rotationX: range(-180, 180),
+    rotationY: range(-180, 180),
+    rotationZ: range(-180, 180),
+    clip: index(MODEL_LIMITS.clips - 1),
+    playing: boolean,
+    loop: boolean,
+    speed: range(0.1, 4),
+    crossFadeMs: range(0, 5000),
+    inPlace: boolean,
+    locomotion: (v) => {
+      partial(v, {
+        enabled: boolean,
+        idle: index(MODEL_LIMITS.clips - 1),
+        walk: index(MODEL_LIMITS.clips - 1),
+        run: index(MODEL_LIMITS.clips - 1),
+        walkSpeed: range(0.1, 10000),
+        runSpeed: range(0.1, 10000),
+        faceMovement: boolean,
+        forwardDeg: range(-180, 180),
+      });
+    },
+    look: (v) => {
+      partial(v, {
+        enabled: boolean,
+        bone: index(MODEL_LIMITS.nodes - 1),
+        yawLimit: range(0, 90),
+        pitchLimit: range(0, 80),
+        lagMs: range(0, 5000),
+      });
+    },
+    vrm: (v) => {
+      partial(v, {
+        lookAt: boolean,
+        headFollow: boolean,
+        springBone: boolean,
+        expressions: (v) => {
+          if (!v || typeof v !== 'object' || Array.isArray(v)) throw new Error('表情の形式が不正です。');
+          const keys = Object.keys(v);
+          if (keys.length > 128 || keys.some((key) => !key.length || key.length > 120 || /[\u0000-\u001f]/.test(key)))
+            throw new Error('表情名が不正です。');
+          const entries = commandObject(v, keys);
+          Object.values(entries).forEach(range(0, 1));
+        },
+      });
+    },
+  });
+}
+
+const base = {
+  kind: 'image',
+  id: 'validation-layer',
+  assetId: `asset-${'0'.repeat(64)}`,
+  name: 'Layer',
+  placement: { anchor: { kind: 'viewport' }, x: 0, y: 0, widthPx: 1, heightPx: 1, rotationDeg: 0 },
+  opacity: 1,
+  zIndex: 0,
+  visible: true,
+  locked: false,
+};
+
+/** A patch has an allowlist at every level; scalar rules are shared with saved data. */
+export function parseImagePatch(value: unknown): ImagePatch {
+  const input = commandObject(value, [
+    'name',
+    'opacity',
+    'zIndex',
+    'visible',
+    'locked',
+    'effects',
+    'motion',
+    'placement',
+    'playback',
+    'model',
+  ]);
+  const { placement, playback, model, ...properties } = input;
+  if (Object.hasOwn(input, 'placement')) commandObject(placement, Object.keys(base.placement));
+  const parsed = parseDecoration({
+    ...base,
+    ...properties,
+    placement: { ...base.placement, ...(placement as object) },
+  });
+  const result = Object.fromEntries(
+    Object.keys(properties).map((key) => [key, (parsed as unknown as Record<string, unknown>)[key]]),
+  );
+  if (Object.hasOwn(input, 'placement'))
+    result['placement'] = Object.fromEntries(
+      Object.keys(placement as object).map((key) => [
+        key,
+        (parsed.placement as unknown as Record<string, unknown>)[key],
+      ]),
+    );
+  if (Object.hasOwn(input, 'playback')) {
+    const fields = partial(playback, {
+      playing: boolean,
+      loop: boolean,
+      speed: range(ANIMATION_LIMITS.speedMin, ANIMATION_LIMITS.speedMax),
+      mode: (v) => {
+        if (v !== 'auto' && v !== 'controlled') throw new Error('未対応の再生モードです。');
+      },
+    });
+    result['playback'] = { ...fields };
+  }
+  if (Object.hasOwn(input, 'model')) {
+    modelPatch(model);
+    result['model'] = model;
+  }
+  return JSON.parse(JSON.stringify(result)) as ImagePatch;
+}
+export function parsePlacements(value: unknown): PlacementChange[] {
+  if (!Array.isArray(value) || value.length > IMAGE_LIMITS.count) throw new Error('配置が不正です。');
+  const ids = new Set<string>();
+  return value.map((raw) => {
+    const entry = commandObject(raw, ['id', 'placement']);
+    if (!isDesignId(entry['id']) || ids.has(entry['id'])) throw new Error('配置のレイヤー指定が不正です。');
+    ids.add(entry['id']);
+    return { id: entry['id'], placement: parsePlacement(entry['placement']) };
+  });
+}
+export const parseStyle = parseSurfaceStyle;
+export function parseSignalRule(value: unknown): SignalRule {
+  const rule = commandObject(value, ['id', 'enabled', 'source', 'target', 'keyframes', 'evaluation', 'blend']);
+  const target = commandObject(rule['target'], ['layerId', 'property']);
+  return parseSignalRules([rule], new Set(typeof target['layerId'] === 'string' ? [target['layerId']] : []))[0]!;
+}

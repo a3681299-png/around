@@ -1,3 +1,4 @@
+import { parseEditCommand } from './commands';
 import { defaultModelSettings, patchModel } from '../models/types';
 import { ASSET_MESSAGES } from '../assets/limits';
 import { emptyDesign, parseDesign, sameDesign } from '../design/schema';
@@ -604,6 +605,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     return { ok: true };
   }
   async function execute(command: EditCommand): Promise<void> {
+    command = parseEditCommand(command);
     if (!active) throw new Error('編集セッションが開かれていません。');
     if ((saving || importing) && command.type !== 'close' && command.type !== 'tool')
       throw new Error('処理中です。完了を待ってください。');
