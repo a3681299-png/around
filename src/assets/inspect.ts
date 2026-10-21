@@ -4,18 +4,18 @@ import { inspectLottie } from './lottie';
 import { inspectApng } from './apng';
 import { inspectWebm } from './webm';
 import { ASSET_LIMITS, inspectImage, type AssetInfo } from './validation';
-import { rememberModelInspection } from './verified-source';
 import { ASSET_MESSAGES } from './limits';
 
-export function inspectAsset(data: Uint8Array, mime = ''): AssetInfo {
+export function inspectAssetResources(data: Uint8Array, mime = ''): { info: AssetInfo; gpuBytes?: number } {
   const model = data[0] === 0x67 && data[1] === 0x6c && data[2] === 0x54 && data[3] === 0x46;
   if (!data.length || data.length > (model ? ASSET_LIMITS.modelBytes : ASSET_LIMITS.fileBytes))
     throw new Error(ASSET_MESSAGES.fileSizes);
   let info: AssetInfo;
+  let gpuBytes: number | undefined;
   if (model) {
     const result = inspectGlb(data);
     info = result.info;
-    rememberModelInspection(info, result.gpuBytes);
+    gpuBytes = result.gpuBytes;
   } else if (data[0] === 0x47 && data[1] === 0x49 && data[2] === 0x46) info = inspectGif(data);
   else if (data[0] === 0x1a && data[1] === 0x45 && data[2] === 0xdf && data[3] === 0xa3) info = inspectWebm(data);
   else if (
@@ -34,5 +34,7 @@ export function inspectAsset(data: Uint8Array, mime = ''): AssetInfo {
     !(info.animation?.format === 'apng' && mime === 'image/apng')
   )
     throw new Error('素材の形式とMIMEが一致しません。');
-  return info;
+  return { info, ...(gpuBytes === undefined ? {} : { gpuBytes }) };
 }
+
+export const inspectAsset = (data: Uint8Array, mime = ''): AssetInfo => inspectAssetResources(data, mime).info;

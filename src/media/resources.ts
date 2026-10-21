@@ -45,6 +45,7 @@ export function createResourceCache(budget: MediaBudget) {
           }
         })
         .then(async ({ metadata, blob }) => {
+          if (!blob) throw new Error('2D素材が見つかりません。');
           let disposed = false,
             url: string | undefined,
             sampler: ReturnType<typeof createRasterSampler> | undefined;

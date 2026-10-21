@@ -5,7 +5,7 @@ import { ASSET_READ_TTL_MS, AssetReadError } from '../src/assets/read-protocol';
 import { installAssetReadAdapter } from '../src/assets/read-adapter';
 import { clearAssetSources, loadAsset } from '../src/assets/client';
 import { inspectAsset } from '../src/assets/inspect';
-import { verifiedModelBytes } from '../src/assets/verified-source';
+import { parseVerifiedModelSource, verifiedModelBytes } from '../src/assets/verified-source';
 import { vrmFixture } from './helpers/vrm-fixture';
 import { ASSET_LIMITS } from '../src/assets/limits';
 
@@ -167,17 +167,27 @@ test.afterEach(() => {
 });
 
 for (const kind of ['png', 'vrm'] as const)
-  test(`binary ${kind} sources cross the existing inspector and immutable Blob receipt`, async () => {
+  test(`binary ${kind} sources cross the shared inspector and retain the appropriate immutable source`, async () => {
     const bytes = kind === 'png' ? readFileSync('tests/fixtures/motion/petal.png') : vrmFixture(),
       info = inspectAsset(bytes),
       metadata = { ...info, id, name: 'fixture', byteLength: bytes.length };
     const uninstall = installAssetReadAdapter(async () => ({ metadata, buffer: Uint8Array.from(bytes).buffer }));
     try {
       const source = await loadAsset(id);
-      expect(new Uint8Array(await source.blob.arrayBuffer())).toEqual(Uint8Array.from(bytes));
       expect(source.metadata).toEqual(metadata);
-      if (kind === 'vrm') expect(verifiedModelBytes(source.blob)).toBeGreaterThan(0);
-      else expect(verifiedModelBytes(source.blob)).toBeUndefined();
+      if (kind === 'vrm') {
+        expect(source.blob).toBeUndefined();
+        expect(verifiedModelBytes(source.modelBuffer!)).toBeGreaterThan(0);
+        expect(
+          await parseVerifiedModelSource(source.modelBuffer!, {
+            parseAsync: async (buffer) => new Uint8Array(buffer).slice(),
+          }),
+        ).toEqual(Uint8Array.from(bytes));
+      } else {
+        expect(source.modelBuffer).toBeUndefined();
+        expect(new Uint8Array(await source.blob!.arrayBuffer())).toEqual(Uint8Array.from(bytes));
+        expect(verifiedModelBytes(source.blob!)).toBeUndefined();
+      }
     } finally {
       uninstall();
     }

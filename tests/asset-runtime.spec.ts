@@ -1,7 +1,13 @@
 import { test, expect } from '@playwright/test';
 import { createWorkQueue } from '../src/assets/work-queue';
 import { createSourceCache } from '../src/assets/source-cache';
-import { rememberVerifiedSource, verifiedModelBytes } from '../src/assets/verified-source';
+import {
+  prepareVerifiedSource,
+  parseVerifiedModelSource,
+  verifiedModelBytes,
+  type VerifiedModelSource,
+} from '../src/assets/verified-source';
+import { assetSourceBytes, type LoadedAsset } from '../src/assets/client';
 import { inspectAsset } from '../src/assets/inspect';
 import { vrmFixture } from './helpers/vrm-fixture';
 
@@ -246,15 +252,67 @@ test('failed source preparation is not cached and the next request retries', asy
   cache.clear();
 });
 
-test('only an inspected immutable Blob carries a reusable model receipt', () => {
-  const bytes = vrmFixture(),
-    info = inspectAsset(bytes),
-    original = new Blob([bytes as Uint8Array<ArrayBuffer>]);
-  const forged = new Blob([bytes as Uint8Array<ArrayBuffer>]);
-  expect(verifiedModelBytes(original)).toBeUndefined();
-  rememberVerifiedSource(original, info);
-  expect(verifiedModelBytes(original)).toBeGreaterThan(0);
-  expect(verifiedModelBytes(forged)).toBeUndefined();
-  rememberVerifiedSource(forged, { ...info });
-  expect(verifiedModelBytes(forged)).toBeUndefined();
+test('verified model references own inspected buffers and cannot mark caller-created buffers or forged receipts', async () => {
+  const original = Uint8Array.from(vrmFixture()),
+    expected = original.slice(),
+    buffer = original.buffer,
+    alias = new Uint8Array(buffer);
+  const { modelBuffer } = prepareVerifiedSource(original, 'model/vrml');
+  expect(modelBuffer).toBeTruthy();
+  expect(buffer.byteLength).toBe(0);
+  expect(alias.byteLength).toBe(0);
+  expect(Object.isFrozen(modelBuffer)).toBe(true);
+  expect(verifiedModelBytes(modelBuffer!)).toBeGreaterThan(0);
+  for (const forged of [
+    buffer,
+    expected.buffer,
+    new Blob([expected]),
+    { ...modelBuffer },
+    Object.freeze(expected.buffer),
+  ]) {
+    expect(verifiedModelBytes(forged)).toBeUndefined();
+    expect(() => parseVerifiedModelSource(forged as VerifiedModelSource, { parseAsync: async () => true })).toThrow();
+  }
+  const parsed = await parseVerifiedModelSource(modelBuffer!, {
+    parseAsync: async (owned) => Uint8Array.from(new Uint8Array(owned)),
+  });
+  expect(parsed).toEqual(expected);
+});
+
+test('verified subviews are isolated from mutable caller aliases and invalid sources never get receipts', async () => {
+  const original = Uint8Array.from(vrmFixture()),
+    padded = new Uint8Array(original.length + 8);
+  padded.set(original, 4);
+  const { modelBuffer } = prepareVerifiedSource(padded.subarray(4, -4));
+  padded.fill(0);
+  expect(modelBuffer!.byteLength).toBe(original.length);
+  expect(
+    await parseVerifiedModelSource(modelBuffer!, { parseAsync: async (buffer) => new Uint8Array(buffer).slice() }),
+  ).toEqual(original);
+  expect(() => prepareVerifiedSource(new Uint8Array([0x67, 0x6c, 0x54, 0x46]))).toThrow();
+});
+
+test('source cache charges model buffers and 2D Blobs once each and evicts by their combined byte lengths', async () => {
+  const original = Uint8Array.from(vrmFixture()),
+    info = inspectAsset(original),
+    modelBuffer = prepareVerifiedSource(original).modelBuffer!;
+  const values: Record<string, LoadedAsset> = {
+    model: { metadata: { ...info, id: 'model', name: 'model', byteLength: modelBuffer.byteLength }, modelBuffer },
+    image: { metadata: { ...info, id: 'image', name: 'image', byteLength: 8 }, blob: new Blob([new Uint8Array(8)]) },
+  };
+  const cache = createSourceCache({
+    load: async (id) => values[id]!,
+    size: assetSourceBytes,
+    now: () => 0,
+    maxBytes: modelBuffer.byteLength + 7,
+    idleMs: 30000,
+  });
+  try {
+    await cache.get('model');
+    expect(cache.stats().retainedBytes).toBe(modelBuffer.byteLength);
+    await cache.get('image');
+    expect(cache.stats()).toMatchObject({ entries: 1, retainedBytes: 8 });
+  } finally {
+    cache.clear();
+  }
 });

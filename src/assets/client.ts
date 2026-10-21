@@ -15,7 +15,7 @@ import {
   flushAssetProfile,
 } from '../diagnostics/asset-profile';
 import { createSourceCache } from './source-cache';
-import { rememberVerifiedSource } from './verified-source';
+import { prepareVerifiedSource, type VerifiedModelSource } from './verified-source';
 import { validateImportBatchSizes } from './import-validation';
 import { readAssetBuffer } from './read-adapter';
 
@@ -162,11 +162,12 @@ async function fetchChunks(id: string, signal: AbortSignal): Promise<{ metadata:
   return { metadata: result.metadata, bytes };
 }
 
-async function fetchAsset(
-  id: string,
-  signal: AbortSignal,
-  binaryEnabled = true,
-): Promise<{ metadata: AssetMetadata; blob: Blob }> {
+export type LoadedAsset = { metadata: AssetMetadata } & (
+  { blob: Blob; modelBuffer?: never } | { modelBuffer: VerifiedModelSource; blob?: never }
+);
+export const assetSourceBytes = (asset: LoadedAsset) => asset.modelBuffer?.byteLength ?? asset.blob!.size;
+
+async function fetchAsset(id: string, signal: AbortSignal, binaryEnabled = true): Promise<LoadedAsset> {
   signal.throwIfAborted();
   const sourceStart = ASSET_PROFILE ? performance.now() : 0;
   const binary = binaryEnabled ? await readAssetBuffer(id, signal) : undefined;
@@ -181,28 +182,36 @@ async function fetchAsset(
     count: 1,
   });
   signal.throwIfAborted();
-  const info = profileSync(trace, 'download.inspect', () => inspectAsset(bytes, result.metadata.mime));
-  const blob = profileSync(
-    trace,
-    'download.clone-blob',
-    () => new Blob([bytes as Uint8Array<ArrayBuffer>], { type: info.mime }),
-    { bytes: bytes.length },
+  const byteLength = bytes.length;
+  const prepared = profileSync(trace, 'download.inspect', () =>
+    prepareVerifiedSource(bytes as Uint8Array<ArrayBuffer>, result.metadata.mime),
   );
-  rememberVerifiedSource(blob, info);
-  profileEnd(trace, 'download.validated-source', sourceStart, { bytes: bytes.length });
+  const source = prepared.modelBuffer
+    ? { modelBuffer: prepared.modelBuffer }
+    : {
+        blob: profileSync(
+          trace,
+          'download.clone-blob',
+          () => new Blob([prepared.bytes!], { type: prepared.info.mime }),
+          {
+            bytes: byteLength,
+          },
+        ),
+      };
+  profileEnd(trace, 'download.validated-source', sourceStart, { bytes: byteLength });
   if (ASSET_PROFILE) void flushAssetProfile();
-  return { metadata: { ...result.metadata, ...info }, blob };
+  return { metadata: { ...result.metadata, ...prepared.info }, ...source };
 }
 const sources = createSourceCache({
   load: fetchAsset,
-  size: (asset) => asset.blob.size,
+  size: assetSourceBytes,
   now: () => performance.now(),
   maxBytes: 96 * 1024 * 1024,
   idleMs: 30000,
 });
-export async function loadAsset(id: string, signal?: AbortSignal): Promise<{ metadata: AssetMetadata; blob: Blob }> {
+export async function loadAsset(id: string, signal?: AbortSignal): Promise<LoadedAsset> {
   const asset = await sources.get(id, signal);
-  return { metadata: structuredClone(asset.metadata), blob: asset.blob };
+  return { ...asset, metadata: structuredClone(asset.metadata) };
 }
 export const clearAssetSources = () => sources.clear();
 /** Explicit legacy comparator for profiling; it shares the production inspector. */

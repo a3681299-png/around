@@ -22,7 +22,7 @@ import { createVrmPlayer, isVrm, disposeInstanceSkeletons } from './vrm-player';
 import type { ModelEvaluation } from '../../world/models';
 import type { WorldFrame } from '../../world/types';
 import { loadAsset } from '../../assets/client';
-import { verifiedModelBytes } from '../../assets/verified-source';
+import { parseVerifiedModelSource, verifiedModelBytes } from '../../assets/verified-source';
 import { ASSET_MESSAGES, MODEL_RESOURCE_LIMITS } from '../../assets/limits';
 import { inspectGlb } from '../../assets/glb';
 import type { Decoration, ModelDecoration } from '../../design/types';
@@ -241,18 +241,23 @@ export function createModelRenderer(
     cache.set(key, entry);
     const readStart = ASSET_PROFILE ? performance.now() : 0;
     entry.promise = readAsset(id, entry.controller.signal)
-      .then(async ({ blob, metadata }) => {
+      .then(async ({ blob, modelBuffer, metadata }) => {
         const trace = assetProfile(id);
         if (trace) entry.trace = trace;
         profileEnd(trace, 'renderer.source-load', readStart);
         if (!metadata.model) throw new Error('GLB素材が見つかりません。');
         if (entry.disposed || closed) throw new Error('読み込みを中止しました。');
-        const bytes = new Uint8Array(
-          await profileAsync(trace, 'renderer.blob-read', () => blob.arrayBuffer(), { bytes: blob.size }),
-        );
+        const bytes = blob
+          ? new Uint8Array(
+              await profileAsync(trace, 'renderer.blob-read', () => blob.arrayBuffer(), { bytes: blob.size }),
+            )
+          : undefined;
+        if (modelBuffer)
+          profileSync(trace, 'renderer.buffer-source', () => undefined, { bytes: modelBuffer.byteLength });
         if (entry.disposed || closed) throw new Error('読み込みを中止しました。');
         const gpuBytes =
-          verifiedModelBytes(blob) ?? profileSync(trace, 'renderer.inspect', () => inspectGlb(bytes).gpuBytes);
+          (modelBuffer && verifiedModelBytes(modelBuffer)) ??
+          profileSync(trace, 'renderer.inspect', () => inspectGlb(bytes!).gpuBytes);
         if (options?.shared) entry.shared = options.shared.reserve(id, gpuBytes, metadata.model.bones.length * 64);
         const ownBytes = entry.shared?.privateBytes ?? gpuBytes;
         if (budgetBytes + ownBytes + (options?.shared?.stats().sharedBytes ?? 0) > MODEL_RESOURCE_LIMITS.pageGpuBytes)
@@ -296,7 +301,9 @@ export function createModelRenderer(
         }));
         let gltf: GLTF;
         try {
-          gltf = await profileAsync(trace, 'parse.gltf-inclusive', () => loader.parseAsync(bytes.buffer, ''));
+          gltf = await profileAsync(trace, 'parse.gltf-inclusive', () =>
+            modelBuffer ? parseVerifiedModelSource(modelBuffer, loader) : loader.parseAsync(bytes!.buffer, ''),
+          );
         } catch (error) {
           failed = true;
           textures.forEach(releaseTexture);
