@@ -1,0 +1,757 @@
+{
+  "measuredOn": "2026-10-21",
+  "unit": "ms",
+  "sampleCountPerCase": 5,
+  "before": {
+    "phase": "before",
+    "source": "7062293a3f10fa665e22371dfe6bbc9d2deec35e",
+    "platform": "win32",
+    "extensionPath": ".work/studio-c2-before",
+    "conditions": "Fresh Chrome profile/process per trial; headless; real extension APIs; local YouTube document fixture; same original files; OS/driver cache not flushed. Same passive route observer installed before first Studio navigation; no extra Studio reload. One Node monotonic clock from setInputFiles start through ready layer, complete image/three renderer and enabled import UI. No throttling.",
+    "browser": "153.0.8010.12",
+    "renderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "trials": [
+      {
+        "label": "1MB PNG",
+        "bytes": 1000000,
+        "sha256": "9933e76542a9b9a30d64b2168a1d444d07da74a8104e729651cb8f68678c8a77",
+        "run": 1,
+        "ms": 140.8947999999998,
+        "route": "legacy-json",
+        "nativeTransfers": [],
+        "fileReads": 1,
+        "runtimeActions": ["import", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "1MB PNG",
+        "bytes": 1000000,
+        "sha256": "9933e76542a9b9a30d64b2168a1d444d07da74a8104e729651cb8f68678c8a77",
+        "run": 2,
+        "ms": 125.83530000000019,
+        "route": "legacy-json",
+        "nativeTransfers": [],
+        "fileReads": 1,
+        "runtimeActions": ["import", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "1MB PNG",
+        "bytes": 1000000,
+        "sha256": "9933e76542a9b9a30d64b2168a1d444d07da74a8104e729651cb8f68678c8a77",
+        "run": 3,
+        "ms": 139.8795,
+        "route": "legacy-json",
+        "nativeTransfers": [],
+        "fileReads": 1,
+        "runtimeActions": ["import", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "1MB PNG",
+        "bytes": 1000000,
+        "sha256": "9933e76542a9b9a30d64b2168a1d444d07da74a8104e729651cb8f68678c8a77",
+        "run": 4,
+        "ms": 100.49539999999979,
+        "route": "legacy-json",
+        "nativeTransfers": [],
+        "fileReads": 1,
+        "runtimeActions": ["import", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "1MB PNG",
+        "bytes": 1000000,
+        "sha256": "9933e76542a9b9a30d64b2168a1d444d07da74a8104e729651cb8f68678c8a77",
+        "run": 5,
+        "ms": 165.35429999999906,
+        "route": "legacy-json",
+        "nativeTransfers": [],
+        "fileReads": 1,
+        "runtimeActions": ["import", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "10MB PNG",
+        "bytes": 10000000,
+        "sha256": "20b8399269968a4da431ff22233bdd8cc1da8f56ce6341f7f07045e1eacb12f9",
+        "run": 1,
+        "ms": 499.6713,
+        "route": "legacy-json",
+        "nativeTransfers": [],
+        "fileReads": 1,
+        "runtimeActions": ["import", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "10MB PNG",
+        "bytes": 10000000,
+        "sha256": "20b8399269968a4da431ff22233bdd8cc1da8f56ce6341f7f07045e1eacb12f9",
+        "run": 2,
+        "ms": 498.044100000001,
+        "route": "legacy-json",
+        "nativeTransfers": [],
+        "fileReads": 1,
+        "runtimeActions": ["import", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "10MB PNG",
+        "bytes": 10000000,
+        "sha256": "20b8399269968a4da431ff22233bdd8cc1da8f56ce6341f7f07045e1eacb12f9",
+        "run": 3,
+        "ms": 548.0187000000005,
+        "route": "legacy-json",
+        "nativeTransfers": [],
+        "fileReads": 1,
+        "runtimeActions": ["import", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "10MB PNG",
+        "bytes": 10000000,
+        "sha256": "20b8399269968a4da431ff22233bdd8cc1da8f56ce6341f7f07045e1eacb12f9",
+        "run": 4,
+        "ms": 565.4351999999999,
+        "route": "legacy-json",
+        "nativeTransfers": [],
+        "fileReads": 1,
+        "runtimeActions": ["import", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "10MB PNG",
+        "bytes": 10000000,
+        "sha256": "20b8399269968a4da431ff22233bdd8cc1da8f56ce6341f7f07045e1eacb12f9",
+        "run": 5,
+        "ms": 565.5036999999975,
+        "route": "legacy-json",
+        "nativeTransfers": [],
+        "fileReads": 1,
+        "runtimeActions": ["import", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "30MB PNG",
+        "bytes": 30000000,
+        "sha256": "92cf6ab9465280d556576fec0119db69e0d2a32e0f28528cb9f96f9a27f79f95",
+        "run": 1,
+        "ms": 1329.6496999999981,
+        "route": "legacy-json",
+        "nativeTransfers": [],
+        "fileReads": 1,
+        "runtimeActions": ["import", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "30MB PNG",
+        "bytes": 30000000,
+        "sha256": "92cf6ab9465280d556576fec0119db69e0d2a32e0f28528cb9f96f9a27f79f95",
+        "run": 2,
+        "ms": 1304.9088999999985,
+        "route": "legacy-json",
+        "nativeTransfers": [],
+        "fileReads": 1,
+        "runtimeActions": ["import", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "30MB PNG",
+        "bytes": 30000000,
+        "sha256": "92cf6ab9465280d556576fec0119db69e0d2a32e0f28528cb9f96f9a27f79f95",
+        "run": 3,
+        "ms": 1303.0226999999977,
+        "route": "legacy-json",
+        "nativeTransfers": [],
+        "fileReads": 1,
+        "runtimeActions": ["import", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "30MB PNG",
+        "bytes": 30000000,
+        "sha256": "92cf6ab9465280d556576fec0119db69e0d2a32e0f28528cb9f96f9a27f79f95",
+        "run": 4,
+        "ms": 1298.4308999999994,
+        "route": "legacy-json",
+        "nativeTransfers": [],
+        "fileReads": 1,
+        "runtimeActions": ["import", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "30MB PNG",
+        "bytes": 30000000,
+        "sha256": "92cf6ab9465280d556576fec0119db69e0d2a32e0f28528cb9f96f9a27f79f95",
+        "run": 5,
+        "ms": 1403.046199999997,
+        "route": "legacy-json",
+        "nativeTransfers": [],
+        "fileReads": 1,
+        "runtimeActions": ["import", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "54.5366MiB VRM",
+        "bytes": 57185776,
+        "sha256": "d4291439be0461672f2940d2e0243a3591d499646bb0f944e1c250706d6cf4e9",
+        "run": 1,
+        "ms": 6071.227200000001,
+        "route": "legacy-chunks",
+        "nativeTransfers": [],
+        "fileReads": 1,
+        "runtimeActions": [
+          "upload-start",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-finish",
+          "release"
+        ],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "54.5366MiB VRM",
+        "bytes": 57185776,
+        "sha256": "d4291439be0461672f2940d2e0243a3591d499646bb0f944e1c250706d6cf4e9",
+        "run": 2,
+        "ms": 5765.690699999999,
+        "route": "legacy-chunks",
+        "nativeTransfers": [],
+        "fileReads": 1,
+        "runtimeActions": [
+          "upload-start",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-finish",
+          "release"
+        ],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "54.5366MiB VRM",
+        "bytes": 57185776,
+        "sha256": "d4291439be0461672f2940d2e0243a3591d499646bb0f944e1c250706d6cf4e9",
+        "run": 3,
+        "ms": 5985.214199999995,
+        "route": "legacy-chunks",
+        "nativeTransfers": [],
+        "fileReads": 1,
+        "runtimeActions": [
+          "upload-start",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-finish",
+          "release"
+        ],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "54.5366MiB VRM",
+        "bytes": 57185776,
+        "sha256": "d4291439be0461672f2940d2e0243a3591d499646bb0f944e1c250706d6cf4e9",
+        "run": 4,
+        "ms": 5860.837499999994,
+        "route": "legacy-chunks",
+        "nativeTransfers": [],
+        "fileReads": 1,
+        "runtimeActions": [
+          "upload-start",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-finish",
+          "release"
+        ],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "54.5366MiB VRM",
+        "bytes": 57185776,
+        "sha256": "d4291439be0461672f2940d2e0243a3591d499646bb0f944e1c250706d6cf4e9",
+        "run": 5,
+        "ms": 5702.781000000003,
+        "route": "legacy-chunks",
+        "nativeTransfers": [],
+        "fileReads": 1,
+        "runtimeActions": [
+          "upload-start",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-part",
+          "upload-finish",
+          "release"
+        ],
+        "hostMessages": ["import-assets"]
+      }
+    ],
+    "summary": [
+      {
+        "label": "1MB PNG",
+        "bytes": 1000000,
+        "sha256": "9933e76542a9b9a30d64b2168a1d444d07da74a8104e729651cb8f68678c8a77",
+        "medianMs": 139.8795,
+        "maxMs": 165.35429999999906
+      },
+      {
+        "label": "10MB PNG",
+        "bytes": 10000000,
+        "sha256": "20b8399269968a4da431ff22233bdd8cc1da8f56ce6341f7f07045e1eacb12f9",
+        "medianMs": 548.0187000000005,
+        "maxMs": 565.5036999999975
+      },
+      {
+        "label": "30MB PNG",
+        "bytes": 30000000,
+        "sha256": "92cf6ab9465280d556576fec0119db69e0d2a32e0f28528cb9f96f9a27f79f95",
+        "medianMs": 1304.9088999999985,
+        "maxMs": 1403.046199999997
+      },
+      {
+        "label": "54.5366MiB VRM",
+        "bytes": 57185776,
+        "sha256": "d4291439be0461672f2940d2e0243a3591d499646bb0f944e1c250706d6cf4e9",
+        "medianMs": 5860.837499999994,
+        "maxMs": 6071.227200000001
+      }
+    ]
+  },
+  "after": {
+    "phase": "after",
+    "source": "ff828a1eeb01405ff811a740b934147a8d629eb9",
+    "platform": "win32",
+    "extensionPath": ".work/studio-c2-after",
+    "conditions": "Fresh Chrome profile/process per trial; headless; real extension APIs; local YouTube document fixture; same original files; OS/driver cache not flushed. Same passive route observer installed before first Studio navigation; no extra Studio reload. One Node monotonic clock from setInputFiles start through ready layer, complete image/three renderer and enabled import UI. No throttling.",
+    "browser": "153.0.8010.12",
+    "renderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "trials": [
+      {
+        "label": "1MB PNG",
+        "bytes": 1000000,
+        "sha256": "9933e76542a9b9a30d64b2168a1d444d07da74a8104e729651cb8f68678c8a77",
+        "run": 1,
+        "ms": 113.11299999999983,
+        "route": "array-buffer",
+        "nativeTransfers": [
+          {
+            "bytes": 1000000,
+            "detached": true
+          }
+        ],
+        "fileReads": 1,
+        "runtimeActions": ["studio-transfer-authorize", "studio-transfer-confirm", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "1MB PNG",
+        "bytes": 1000000,
+        "sha256": "9933e76542a9b9a30d64b2168a1d444d07da74a8104e729651cb8f68678c8a77",
+        "run": 2,
+        "ms": 91.60850000000028,
+        "route": "array-buffer",
+        "nativeTransfers": [
+          {
+            "bytes": 1000000,
+            "detached": true
+          }
+        ],
+        "fileReads": 1,
+        "runtimeActions": ["studio-transfer-authorize", "studio-transfer-confirm", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "1MB PNG",
+        "bytes": 1000000,
+        "sha256": "9933e76542a9b9a30d64b2168a1d444d07da74a8104e729651cb8f68678c8a77",
+        "run": 3,
+        "ms": 154.30589999999938,
+        "route": "array-buffer",
+        "nativeTransfers": [
+          {
+            "bytes": 1000000,
+            "detached": true
+          }
+        ],
+        "fileReads": 1,
+        "runtimeActions": ["studio-transfer-authorize", "studio-transfer-confirm", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "1MB PNG",
+        "bytes": 1000000,
+        "sha256": "9933e76542a9b9a30d64b2168a1d444d07da74a8104e729651cb8f68678c8a77",
+        "run": 4,
+        "ms": 105.97209999999995,
+        "route": "array-buffer",
+        "nativeTransfers": [
+          {
+            "bytes": 1000000,
+            "detached": true
+          }
+        ],
+        "fileReads": 1,
+        "runtimeActions": ["studio-transfer-authorize", "studio-transfer-confirm", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "1MB PNG",
+        "bytes": 1000000,
+        "sha256": "9933e76542a9b9a30d64b2168a1d444d07da74a8104e729651cb8f68678c8a77",
+        "run": 5,
+        "ms": 141.59950000000026,
+        "route": "array-buffer",
+        "nativeTransfers": [
+          {
+            "bytes": 1000000,
+            "detached": true
+          }
+        ],
+        "fileReads": 1,
+        "runtimeActions": ["studio-transfer-authorize", "studio-transfer-confirm", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "10MB PNG",
+        "bytes": 10000000,
+        "sha256": "20b8399269968a4da431ff22233bdd8cc1da8f56ce6341f7f07045e1eacb12f9",
+        "run": 1,
+        "ms": 338.4610999999986,
+        "route": "array-buffer",
+        "nativeTransfers": [
+          {
+            "bytes": 10000000,
+            "detached": true
+          }
+        ],
+        "fileReads": 1,
+        "runtimeActions": ["studio-transfer-authorize", "studio-transfer-confirm", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "10MB PNG",
+        "bytes": 10000000,
+        "sha256": "20b8399269968a4da431ff22233bdd8cc1da8f56ce6341f7f07045e1eacb12f9",
+        "run": 2,
+        "ms": 331.4305999999997,
+        "route": "array-buffer",
+        "nativeTransfers": [
+          {
+            "bytes": 10000000,
+            "detached": true
+          }
+        ],
+        "fileReads": 1,
+        "runtimeActions": ["studio-transfer-authorize", "studio-transfer-confirm", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "10MB PNG",
+        "bytes": 10000000,
+        "sha256": "20b8399269968a4da431ff22233bdd8cc1da8f56ce6341f7f07045e1eacb12f9",
+        "run": 3,
+        "ms": 317.3172000000013,
+        "route": "array-buffer",
+        "nativeTransfers": [
+          {
+            "bytes": 10000000,
+            "detached": true
+          }
+        ],
+        "fileReads": 1,
+        "runtimeActions": ["studio-transfer-authorize", "studio-transfer-confirm", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "10MB PNG",
+        "bytes": 10000000,
+        "sha256": "20b8399269968a4da431ff22233bdd8cc1da8f56ce6341f7f07045e1eacb12f9",
+        "run": 4,
+        "ms": 340.1108000000022,
+        "route": "array-buffer",
+        "nativeTransfers": [
+          {
+            "bytes": 10000000,
+            "detached": true
+          }
+        ],
+        "fileReads": 1,
+        "runtimeActions": ["studio-transfer-authorize", "studio-transfer-confirm", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "10MB PNG",
+        "bytes": 10000000,
+        "sha256": "20b8399269968a4da431ff22233bdd8cc1da8f56ce6341f7f07045e1eacb12f9",
+        "run": 5,
+        "ms": 307.98969999999827,
+        "route": "array-buffer",
+        "nativeTransfers": [
+          {
+            "bytes": 10000000,
+            "detached": true
+          }
+        ],
+        "fileReads": 1,
+        "runtimeActions": ["studio-transfer-authorize", "studio-transfer-confirm", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "30MB PNG",
+        "bytes": 30000000,
+        "sha256": "92cf6ab9465280d556576fec0119db69e0d2a32e0f28528cb9f96f9a27f79f95",
+        "run": 1,
+        "ms": 846.9735999999975,
+        "route": "array-buffer",
+        "nativeTransfers": [
+          {
+            "bytes": 30000000,
+            "detached": true
+          }
+        ],
+        "fileReads": 1,
+        "runtimeActions": ["studio-transfer-authorize", "studio-transfer-confirm", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "30MB PNG",
+        "bytes": 30000000,
+        "sha256": "92cf6ab9465280d556576fec0119db69e0d2a32e0f28528cb9f96f9a27f79f95",
+        "run": 2,
+        "ms": 829.3235999999997,
+        "route": "array-buffer",
+        "nativeTransfers": [
+          {
+            "bytes": 30000000,
+            "detached": true
+          }
+        ],
+        "fileReads": 1,
+        "runtimeActions": ["studio-transfer-authorize", "studio-transfer-confirm", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "30MB PNG",
+        "bytes": 30000000,
+        "sha256": "92cf6ab9465280d556576fec0119db69e0d2a32e0f28528cb9f96f9a27f79f95",
+        "run": 3,
+        "ms": 837.6610000000001,
+        "route": "array-buffer",
+        "nativeTransfers": [
+          {
+            "bytes": 30000000,
+            "detached": true
+          }
+        ],
+        "fileReads": 1,
+        "runtimeActions": ["studio-transfer-authorize", "studio-transfer-confirm", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "30MB PNG",
+        "bytes": 30000000,
+        "sha256": "92cf6ab9465280d556576fec0119db69e0d2a32e0f28528cb9f96f9a27f79f95",
+        "run": 4,
+        "ms": 815.3738999999987,
+        "route": "array-buffer",
+        "nativeTransfers": [
+          {
+            "bytes": 30000000,
+            "detached": true
+          }
+        ],
+        "fileReads": 1,
+        "runtimeActions": ["studio-transfer-authorize", "studio-transfer-confirm", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "30MB PNG",
+        "bytes": 30000000,
+        "sha256": "92cf6ab9465280d556576fec0119db69e0d2a32e0f28528cb9f96f9a27f79f95",
+        "run": 5,
+        "ms": 799.8313000000016,
+        "route": "array-buffer",
+        "nativeTransfers": [
+          {
+            "bytes": 30000000,
+            "detached": true
+          }
+        ],
+        "fileReads": 1,
+        "runtimeActions": ["studio-transfer-authorize", "studio-transfer-confirm", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "54.5366MiB VRM",
+        "bytes": 57185776,
+        "sha256": "d4291439be0461672f2940d2e0243a3591d499646bb0f944e1c250706d6cf4e9",
+        "run": 1,
+        "ms": 3780.050000000003,
+        "route": "array-buffer",
+        "nativeTransfers": [
+          {
+            "bytes": 57185776,
+            "detached": true
+          }
+        ],
+        "fileReads": 1,
+        "runtimeActions": ["studio-transfer-authorize", "studio-transfer-confirm", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "54.5366MiB VRM",
+        "bytes": 57185776,
+        "sha256": "d4291439be0461672f2940d2e0243a3591d499646bb0f944e1c250706d6cf4e9",
+        "run": 2,
+        "ms": 3790.4419999999955,
+        "route": "array-buffer",
+        "nativeTransfers": [
+          {
+            "bytes": 57185776,
+            "detached": true
+          }
+        ],
+        "fileReads": 1,
+        "runtimeActions": ["studio-transfer-authorize", "studio-transfer-confirm", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "54.5366MiB VRM",
+        "bytes": 57185776,
+        "sha256": "d4291439be0461672f2940d2e0243a3591d499646bb0f944e1c250706d6cf4e9",
+        "run": 3,
+        "ms": 3704.591999999997,
+        "route": "array-buffer",
+        "nativeTransfers": [
+          {
+            "bytes": 57185776,
+            "detached": true
+          }
+        ],
+        "fileReads": 1,
+        "runtimeActions": ["studio-transfer-authorize", "studio-transfer-confirm", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "54.5366MiB VRM",
+        "bytes": 57185776,
+        "sha256": "d4291439be0461672f2940d2e0243a3591d499646bb0f944e1c250706d6cf4e9",
+        "run": 4,
+        "ms": 3639.749499999998,
+        "route": "array-buffer",
+        "nativeTransfers": [
+          {
+            "bytes": 57185776,
+            "detached": true
+          }
+        ],
+        "fileReads": 1,
+        "runtimeActions": ["studio-transfer-authorize", "studio-transfer-confirm", "release"],
+        "hostMessages": ["import-assets"]
+      },
+      {
+        "label": "54.5366MiB VRM",
+        "bytes": 57185776,
+        "sha256": "d4291439be0461672f2940d2e0243a3591d499646bb0f944e1c250706d6cf4e9",
+        "run": 5,
+        "ms": 3675.415399999998,
+        "route": "array-buffer",
+        "nativeTransfers": [
+          {
+            "bytes": 57185776,
+            "detached": true
+          }
+        ],
+        "fileReads": 1,
+        "runtimeActions": ["studio-transfer-authorize", "studio-transfer-confirm", "release"],
+        "hostMessages": ["import-assets"]
+      }
+    ],
+    "summary": [
+      {
+        "label": "1MB PNG",
+        "bytes": 1000000,
+        "sha256": "9933e76542a9b9a30d64b2168a1d444d07da74a8104e729651cb8f68678c8a77",
+        "medianMs": 113.11299999999983,
+        "maxMs": 154.30589999999938
+      },
+      {
+        "label": "10MB PNG",
+        "bytes": 10000000,
+        "sha256": "20b8399269968a4da431ff22233bdd8cc1da8f56ce6341f7f07045e1eacb12f9",
+        "medianMs": 331.4305999999997,
+        "maxMs": 340.1108000000022
+      },
+      {
+        "label": "30MB PNG",
+        "bytes": 30000000,
+        "sha256": "92cf6ab9465280d556576fec0119db69e0d2a32e0f28528cb9f96f9a27f79f95",
+        "medianMs": 829.3235999999997,
+        "maxMs": 846.9735999999975
+      },
+      {
+        "label": "54.5366MiB VRM",
+        "bytes": 57185776,
+        "sha256": "d4291439be0461672f2940d2e0243a3591d499646bb0f944e1c250706d6cf4e9",
+        "medianMs": 3704.591999999997,
+        "maxMs": 3790.4419999999955
+      }
+    ]
+  }
+}
