@@ -133,6 +133,7 @@ export async function importAssets(
 
 async function fetchAsset(id: string, signal: AbortSignal): Promise<{ metadata: AssetMetadata; blob: Blob }> {
   signal.throwIfAborted();
+  const sourceStart = ASSET_PROFILE ? performance.now() : 0;
   const result = await request<{ metadata: AssetMetadata; base64?: string; chunked?: boolean }>('get', { id });
   const trace = assetProfile(id),
     started = ASSET_PROFILE ? performance.now() : 0;
@@ -167,6 +168,8 @@ async function fetchAsset(id: string, signal: AbortSignal): Promise<{ metadata: 
     { bytes: bytes.length },
   );
   rememberVerifiedSource(blob, info);
+  profileEnd(trace, 'download.validated-source', sourceStart, { bytes: bytes.length });
+  if (ASSET_PROFILE) void flushAssetProfile();
   return { metadata: { ...result.metadata, ...info }, blob };
 }
 const sources = createSourceCache({
