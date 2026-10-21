@@ -330,6 +330,42 @@ test('core views explain duplicate/import/group/layout capabilities including pr
   models.editor.destroy();
 });
 
+test('an identical external save preserves the saved reference and cannot cancel an in-flight import', async () => {
+  let deferred = false,
+    release: () => void = () => {},
+    reached: () => void = () => {};
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const validating = new Promise<void>((resolve) => {
+    reached = resolve;
+  });
+  const h = harness(async () => {
+    if (deferred) {
+      reached();
+      await gate;
+    }
+  });
+  await Promise.resolve();
+  h.editor.setEnabled(true);
+  h.editor.open();
+  await h.editor.import([assets[0]!]);
+  await h.editor.execute({ type: 'save' });
+  const saved = h.editor.snapshot().saved!;
+  deferred = true;
+  const importing = h.editor.import([assets[1]!]);
+  await validating;
+  h.set(structuredClone(saved));
+  expect(h.editor.snapshot().saved).toBe(saved);
+  expect(h.editor.snapshot().document).toBe(saved);
+  release();
+  await importing;
+  expect(h.editor.snapshot().document.decorations).toHaveLength(2);
+  expect(h.editor.snapshot().view.error).toBe(false);
+  expect(h.editor.snapshot().view.dirty).toBe(true);
+  h.editor.destroy();
+});
+
 test('signal key edits share gesture history, locks, save/discard and session recovery', async () => {
   const { editor } = await opened(),
     id = editor.snapshot().document.decorations[0]!.id,
@@ -502,19 +538,24 @@ test('Host geometry notifications update views without invalidating document com
 });
 
 test('a delayed checkpoint validation cannot overwrite a new edit session', async () => {
-  const a = await opened(),
-    b = harness();
-  await Promise.resolve();
-  b.editor.setEnabled(true);
-  b.editor.open();
-  let release: () => void = () => {};
+  let release: () => void = () => {},
+    reached: () => void = () => {};
   const pending = new Promise<void>((resolve) => {
     release = resolve;
   });
-  b.ports.storage.validate = () => pending;
+  const validating = new Promise<void>((resolve) => {
+    reached = resolve;
+  });
+  const a = await opened(),
+    b = harness(async () => {
+      reached();
+      await pending;
+    });
+  await Promise.resolve();
+  b.editor.setEnabled(true);
+  b.editor.open();
   const restoring = b.editor.restore(a.editor.checkpoint());
-  await Promise.resolve();
-  await Promise.resolve();
+  await validating;
   await b.editor.execute({ type: 'close' });
   b.editor.open();
   release();

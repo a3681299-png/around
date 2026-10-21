@@ -520,6 +520,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     // Validate support before changing session state; unsupported data stays on disk.
     const previous = saved;
     incoming = incoming ? readDesign(incoming) : undefined;
+    if (incoming && previous) incoming = shareDesign(previous, incoming);
     ports.validate(incoming);
     saved = incoming && pendingSave && sameDesign(incoming, pendingSave) ? pendingSave : incoming;
     storageEpoch++;
