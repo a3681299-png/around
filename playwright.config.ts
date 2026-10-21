@@ -32,6 +32,7 @@ const unitSpecs = [
   'signal-evaluation-benchmark',
   'signal-rules',
   'signal-takes',
+  'spatial-points',
   'studio-client-data',
   'studio-transfer-data',
   'timeline-host',

@@ -1,6 +1,7 @@
 import type { SignalRule } from '../signals/keyframes';
 import type { WorldInput, WorldLayout } from './types';
 import { centre, type Point } from './geometry';
+import { legacySignalOrigin, resolvePoint, type SpatialPoint } from './points';
 
 export interface PointerMemory {
   point: Point;
@@ -31,6 +32,7 @@ export function signalValue(
   input: WorldInput,
   layout?: WorldLayout,
   pointer?: PointerMemory,
+  options?: { origin?: SpatialPoint },
 ): number | undefined {
   const source = rule.source,
     p = input.signals.pointer;
@@ -45,8 +47,10 @@ export function signalValue(
   if (!frame || frame.width <= 0 || frame.height <= 0) return undefined;
   if (source.signal === 'pointer.x') return (p.x - frame.left) / frame.width;
   if (source.signal === 'pointer.y') return (p.y - frame.top) / frame.height;
-  const target =
-    source.space === 'layer' ? context?.target : { x: frame.left + frame.width / 2, y: frame.top + frame.height / 2 };
+  const origin = options?.origin ?? legacySignalOrigin(source.space, rule.target.layerId);
+  const target = origin
+    ? resolvePoint(origin, { geometry: input, signals: input.signals, ...(layout ? { layout } : {}) })
+    : undefined;
   if (!target) return undefined;
   const x = target.x - p.x,
     y = target.y - p.y;
