@@ -47,7 +47,7 @@ export function parseSignalSource(value: unknown, registry: SignalRegistry = SIG
     inputRange: [range[0], range[1]],
   };
 }
-export function parseSignalRules(value: unknown, layerIds: ReadonlySet<string>, legacy = false): SignalRule[] {
+export function parseSignalRules(value: unknown, layerIds: ReadonlySet<string>): SignalRule[] {
   if (!Array.isArray(value) || value.length > SIGNAL_RULE_LIMITS.rules)
     throw new Error('シグナルルールは48本までです。');
   const ids = new Set<string>(),
@@ -60,17 +60,9 @@ export function parseSignalRules(value: unknown, layerIds: ReadonlySet<string>, 
     const source = parseSignalSource(rule['source']),
       target = object(rule['target'], ['layerId', 'property']);
     if (
-      legacy &&
-      (source.signal !== 'page.scroll.progress' ||
-        source.space !== 'page' ||
-        source.axis !== 'y' ||
-        source.inputRange.some((n) => n < 0 || n > 1))
-    )
-      throw new Error('v8以前の駆動元はスクロール進捗です。');
-    if (
       !id(target['layerId']) ||
       !layerIds.has(target['layerId']) ||
-      !['opacity', ...(!legacy ? ['position.x', 'position.y', 'rotation'] : [])].includes(String(target['property']))
+      !['opacity', 'position.x', 'position.y', 'rotation'].includes(String(target['property']))
     )
       throw new Error('ルールの対象が見つかりません。');
     const property = target['property'] as SignalProperty,

@@ -2,6 +2,8 @@ import { readFileSync } from 'node:fs';
 import { test, expect } from '@playwright/test';
 import { parseDesign } from '../src/design/schema';
 import { freezeTree, readDesign, editDesign, commitDesign } from '../src/design/immutable';
+import { DESIGN_MIGRATIONS, migrateDesign } from '../src/design/migrations';
+import type { DesignDocument } from '../src/design/types';
 
 const fixtures = 'tests/fixtures/designs/';
 const expected = JSON.parse(readFileSync(fixtures + 'chain-expected.json', 'utf8')) as {
@@ -59,5 +61,53 @@ test('each old version rejects fields and capabilities introduced in a later ver
         doc(version, { decorations: Array.from({ length: 9 }, (_, i) => ({ ...animation, id: `animation-${i}` })) }),
       ),
     ).toThrow();
+  }
+});
+
+test('every pure adjacent step advances one version without granting validation or mutating historical inputs', () => {
+  for (const [file, result] of Object.entries(expected.documents)) {
+    let data = freezeTree(JSON.parse(readFileSync(fixtures + file, 'utf8')));
+    const original = JSON.stringify(data);
+    const version = data.schemaVersion as number;
+    for (let from = version; from < 11; from++) {
+      const migration = DESIGN_MIGRATIONS[from - 1]!;
+      const before = JSON.stringify(data);
+      const migrated = migration(data);
+      expect(migrated['schemaVersion']).toBe(from + 1);
+      expect(JSON.stringify(data)).toBe(before);
+      expect(() => migration({ ...data, schemaVersion: from + 1 })).toThrow();
+      expect(() => migration({ ...data, unknown: undefined })).toThrow();
+      data = freezeTree(migrated);
+    }
+    expect(parseDesign(data)).toStrictEqual(result);
+    expect(JSON.stringify(JSON.parse(readFileSync(fixtures + file, 'utf8')))).toBe(original);
+  }
+  const unvalidated = migrateDesign({
+    schemaVersion: 2,
+    id: 'bad',
+    siteId: 'youtube',
+    baseThemeId: null,
+    rules: [],
+    decorations: [{ kind: 'image', opacity: Infinity }],
+  });
+  expect(unvalidated['schemaVersion']).toBe(11);
+  expect(() => parseDesign(unvalidated)).toThrow();
+  expect(() => readDesign(freezeTree(unvalidated))).toThrow();
+  expect(() => commitDesign(unvalidated as unknown as DesignDocument)).toThrow();
+});
+
+test('historical gates reject even undefined future fields and group motion before v9', () => {
+  const load = (name: string): any => JSON.parse(readFileSync(fixtures + name, 'utf8'));
+  for (const version of [2, 3, 4, 5, 6, 7, 8, 9]) {
+    const data = load(`v${version}.json`);
+    expect(() =>
+      parseDesign({ ...data, decorations: data.decorations.map((layer: object) => ({ ...layer, source: undefined })) }),
+    ).toThrow();
+  }
+  for (const version of [6, 7, 8]) {
+    const data = load('v6.json');
+    data.schemaVersion = version;
+    data.groups[0].motion = undefined;
+    expect(() => parseDesign(data)).toThrow();
   }
 });
