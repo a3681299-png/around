@@ -292,6 +292,18 @@ test('verified subviews are isolated from mutable caller aliases and invalid sou
   expect(() => prepareVerifiedSource(new Uint8Array([0x67, 0x6c, 0x54, 0x46]))).toThrow();
 });
 
+test('a Node Buffer subview cannot share mutable storage with the verified model reference', async () => {
+  const expected = Uint8Array.from(vrmFixture()),
+    caller = Buffer.alloc(expected.length + 8);
+  caller.set(expected, 4);
+  // Buffer.slice() shares storage, unlike Uint8Array.slice(). Ownership must not depend on the caller's method.
+  const { modelBuffer } = prepareVerifiedSource(caller.subarray(4, -4));
+  caller.fill(0);
+  expect(
+    await parseVerifiedModelSource(modelBuffer!, { parseAsync: async (buffer) => new Uint8Array(buffer).slice() }),
+  ).toEqual(expected);
+});
+
 test('source cache charges model buffers and 2D Blobs once each and evicts by their combined byte lengths', async () => {
   const original = Uint8Array.from(vrmFixture()),
     info = inspectAsset(original),

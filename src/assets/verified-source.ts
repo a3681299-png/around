@@ -14,7 +14,7 @@ export function prepareVerifiedSource(data: Uint8Array<ArrayBuffer>, mime = '') 
   const buffer =
     data.byteOffset === 0 && data.byteLength === data.buffer.byteLength
       ? structuredClone(data.buffer, { transfer: [data.buffer] })
-      : data.slice().buffer;
+      : new Uint8Array(data).buffer;
   const bytes = new Uint8Array(buffer),
     { info, gpuBytes } = inspectAssetResources(bytes, mime);
   if (gpuBytes === undefined) return { info, bytes };
