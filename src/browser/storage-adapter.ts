@@ -1,7 +1,7 @@
 import type { EditorStorage } from '../editor-core/types';
 import { checkDesignAssets, commitDesign, importAssets, releaseAssets, retainAssets } from '../assets/client';
 import { readDesign, watchDesign } from '../storage/designs';
-import type { AssetMetadata } from '../assets/validation';
+import { ASSET_LIMITS, type AssetMetadata } from '../assets/validation';
 
 export type BrowserImportSource =
   readonly File[] | { kind: 'stored-assets'; items: readonly AssetMetadata[]; length: number };
@@ -18,7 +18,7 @@ export function createBrowserEditorStorage(siteId: string): EditorStorage<Browse
     validate: checkDesignAssets,
     async import(files, session) {
       if ('kind' in files) {
-        if (files.length !== files.items.length || !files.length || files.length > 8)
+        if (files.length !== files.items.length || !files.length || files.length > ASSET_LIMITS.batchCount)
           throw new Error('素材参照が不正です。');
         // Pre-inspected Studio imports are leased before Core validates the full
         // document against authoritative IndexedDB metadata. Never transfer the
