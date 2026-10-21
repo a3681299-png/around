@@ -102,6 +102,8 @@ function group(value: unknown, version: number): GroupLayer {
   };
 }
 
+export const parseGroupLayer = (value: unknown): GroupLayer => group(value, 11);
+
 export function parsePlacement(value: unknown): LayerPlacement {
   const placement = record(value, ['anchor', 'x', 'y', 'widthPx', 'heightPx', 'rotationDeg']);
   const inputAnchor = record(placement['anchor'], ['kind', 'target']);

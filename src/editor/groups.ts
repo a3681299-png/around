@@ -1,4 +1,4 @@
-import { parseDesign } from '../design/schema';
+import { readDesign, editDesign, commitDesign } from '../design/immutable';
 import {
   childrenOf,
   effectivelyLocked,
@@ -65,7 +65,7 @@ export function groupingReason(doc: DesignDocument, ids: readonly string[]): str
 export function groupLayers(input: DesignDocument, ids: readonly string[], id: string): DesignDocument {
   const reason = groupingReason(input, ids);
   if (reason) throw new Error(reason);
-  const doc = parseDesign(input),
+  const doc = editDesign(readDesign(input)),
     roots = frontToBack(rootLayers(doc.decorations, doc.groups ?? [])).reverse();
   const children = roots.filter((layer) => ids.includes(layer.id));
   const group = {
@@ -83,7 +83,7 @@ export function groupLayers(input: DesignDocument, ids: readonly string[], id: s
   remaining.splice(insertion, 0, group);
   doc.groups = [...(doc.groups ?? []), group];
   rank(doc, remaining);
-  return parseDesign(doc);
+  return commitDesign(doc, input);
 }
 
 export function ungroupingReason(group: GroupLayer | undefined, rules: DesignDocument['signalRules'] = []): string {
@@ -98,7 +98,7 @@ export function ungroupingReason(group: GroupLayer | undefined, rules: DesignDoc
 }
 
 export function ungroupLayers(input: DesignDocument, id: string): DesignDocument {
-  const doc = parseDesign(input),
+  const doc = editDesign(readDesign(input)),
     group = doc.groups?.find((group) => group.id === id);
   const reason = ungroupingReason(group, doc.signalRules);
   if (reason || !group) throw new Error(reason);
@@ -111,11 +111,11 @@ export function ungroupLayers(input: DesignDocument, id: string): DesignDocument
   doc.groups = doc.groups!.filter((group) => group.id !== id);
   rank(doc, roots);
   pruneRules(doc);
-  return parseDesign(doc);
+  return commitDesign(doc, input);
 }
 
 export function reorderDocument(input: DesignDocument, id: string, targetId: string, after: boolean): DesignDocument {
-  const doc = parseDesign(input),
+  const doc = editDesign(readDesign(input)),
     groups = doc.groups ?? [];
   const parent = parentGroup(groups, id),
     targetParent = parentGroup(groups, targetId);
@@ -135,11 +135,11 @@ export function reorderDocument(input: DesignDocument, id: string, targetId: str
     doc.groups = doc.groups.map((layer) =>
       values.has(layer.id) ? { ...layer, zIndex: values.get(layer.id)! } : layer,
     );
-  return parseDesign(doc);
+  return commitDesign(doc, input);
 }
 
 export function deleteDocumentLayers(input: DesignDocument, ids: readonly string[]): DesignDocument {
-  const doc = parseDesign(input),
+  const doc = editDesign(readDesign(input)),
     groups = doc.groups ?? [];
   if (!groups.length) {
     doc.decorations = deleteLayers(doc.decorations, ids);
@@ -166,7 +166,7 @@ export function deleteDocumentLayers(input: DesignDocument, ids: readonly string
     .map((group) => ({ ...group, children: group.children.filter((id) => !removed.has(id)) }))
     .filter((group) => group.children.length > 0);
   pruneRules(doc);
-  return parseDesign(doc);
+  return commitDesign(doc, input);
 }
 
 export function duplicateDocumentLayers(
@@ -175,7 +175,7 @@ export function duplicateDocumentLayers(
   makeId: () => string,
   frameFor: (placement: LayerPlacement) => PlacementFrame | undefined,
 ) {
-  const doc = parseDesign(input),
+  const doc = editDesign(readDesign(input)),
     groups = doc.groups ?? [];
   if (!groups.length) {
     const result = duplicateLayers(doc.decorations, ids, makeId, (layer) => {
@@ -191,7 +191,7 @@ export function duplicateDocumentLayers(
       if (sources[index]) copyRules(doc, sources[index]!.id, id);
     });
     doc.decorations = result.layers;
-    return { doc: parseDesign(doc), ids: result.ids };
+    return { doc: commitDesign(doc, input), ids: result.ids };
   }
   const selected = normalizeSelection(ids, doc.decorations, groups),
     newIds: string[] = [];
@@ -233,7 +233,8 @@ export function duplicateDocumentLayers(
     } else {
       const parent = parentGroup(groups, id);
       if (parent) {
-        parent.children.push(copies[0]!.id);
+        const updated = { ...parent, children: [...parent.children, copies[0]!.id] };
+        doc.groups = doc.groups!.map((group) => (group === parent ? updated : group));
         rank(doc, [
           ...frontToBack(childrenOf(parent, doc.decorations))
             .reverse()
@@ -245,5 +246,5 @@ export function duplicateDocumentLayers(
     }
   }
   rank(doc, roots);
-  return { doc: parseDesign(doc), ids: newIds };
+  return { doc: commitDesign(doc, input), ids: newIds };
 }

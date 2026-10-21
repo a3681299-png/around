@@ -76,7 +76,7 @@ test('v1–v5 migrate without inventing groups; v6 references existing assets an
     expect(JSON.stringify(legacy)).toBe(before);
     expect(parsed.decorations.map((item) => item.assetId)).toEqual(input.decorations.map((item) => item.assetId));
   }
-  const grouped = groupLayers(input, ids, 'group-world');
+  const grouped = structuredClone(groupLayers(input, ids, 'group-world'));
   grouped.groups![0]!.effects = [defaultCircleMask()];
   expect(parseDesign(JSON.parse(JSON.stringify(grouped)))).toEqual(grouped);
   expect(grouped.decorations).toEqual(input.decorations);
@@ -86,7 +86,7 @@ test('v1–v5 migrate without inventing groups; v6 references existing assets an
 test('grouping a contiguous block and ungrouping preserve placement and composite painting order', () => {
   const before = document();
   before.decorations.push({ ...before.decorations[0]!, id: 'image-top', zIndex: 8 });
-  const grouped = groupLayers(before, ids, 'group-world');
+  const grouped = structuredClone(groupLayers(before, ids, 'group-world'));
   expect(order(grouped)).toEqual(order(before));
   expect(grouped.decorations.map((item) => item.placement)).toEqual(before.decorations.map((item) => item.placement));
   const ungrouped = ungroupLayers(grouped, 'group-world');
@@ -125,13 +125,13 @@ test('grouping rejects mixed anchors, protected media, nesting and interleaved p
   input.decorations[1]!.locked = false;
   input.decorations[1]!.placement.anchor = { kind: 'surface', target: 'video-player' };
   expect(groupingReason(input, ids)).toMatch(/画面基準/);
-  const grouped = groupLayers(document(), ['image-0', 'image-1'], 'group-world');
+  const grouped = structuredClone(groupLayers(document(), ['image-0', 'image-1'], 'group-world'));
   expect(groupingReason(grouped, ['group-world', 'image-2'])).toMatch(/ネスト/);
   expect(groupingReason(grouped, ['image-0', 'image-1'])).toMatch(/最上位/);
 });
 
 test('group motion includes hidden children, clamps one shared delta and refuses protected descendants', () => {
-  const grouped = groupLayers(document(), ids, 'group-world');
+  const grouped = structuredClone(groupLayers(document(), ids, 'group-world'));
   grouped.decorations[1]!.visible = false;
   const media = movableMedia(['group-world', 'image-0'], grouped.decorations, grouped.groups!);
   expect(media.map((layer) => layer.id)).toEqual(ids);
@@ -153,7 +153,7 @@ test('group motion includes hidden children, clamps one shared delta and refuses
 });
 
 test('derived group geometry follows child edits, rotation and anchor resize without a saved pivot', () => {
-  const grouped = groupLayers(document(), ids, 'group-world'),
+  const grouped = structuredClone(groupLayers(document(), ids, 'group-world')),
     before = JSON.stringify(grouped);
   expect(groupView(grouped.groups![0]!, grouped.decorations, () => frame).placement).toEqual({
     anchor: { kind: 'viewport' },
@@ -172,7 +172,7 @@ test('derived group geometry follows child edits, rotation and anchor resize wit
 });
 
 test('ungroup removes only group effects, keeps child effects/visibility, and refuses lossy opacity flattening', () => {
-  const grouped = groupLayers(document(), ids, 'group-world');
+  const grouped = structuredClone(groupLayers(document(), ids, 'group-world'));
   grouped.groups![0]!.effects = [defaultCircleMask()];
   grouped.decorations[0]!.effects = [{ ...defaultCircleMask(), intensity: 0.5 }];
   grouped.groups![0]!.visible = false;
@@ -189,7 +189,7 @@ test('ungroup removes only group effects, keeps child effects/visibility, and re
 });
 
 test('group and child ordering stay scoped; protected deletes and empty-container cleanup are atomic', () => {
-  const grouped = groupLayers(document(), ['image-0', 'image-1'], 'group-world');
+  const grouped = structuredClone(groupLayers(document(), ['image-0', 'image-1'], 'group-world'));
   const reordered = reorderDocument(grouped, 'group-world', 'image-2', false);
   expect(order(reordered)).toEqual(['image-2', 'image-0', 'image-1']);
   const childOrder = reorderDocument(grouped, 'image-0', 'image-1', false);
@@ -205,7 +205,7 @@ test('group and child ordering stay scoped; protected deletes and empty-containe
 });
 
 test('group copies share immutable asset IDs and history retains deleted group assets', () => {
-  const input = groupLayers(document(), ids, 'group-world');
+  const input = structuredClone(groupLayers(document(), ids, 'group-world'));
   input.groups![0]!.effects = [defaultCircleMask()];
   let sequence = 0;
   const copy = duplicateDocumentLayers(
@@ -220,7 +220,9 @@ test('group copies share immutable asset IDs and history retains deleted group a
     input.decorations.map((item) => item.assetId),
   );
   expect(new Set(copy.doc.groups!.flatMap((group) => group.children)).size).toBe(6);
-  copy.doc.groups![1]!.effects![0]!.radiusPx = 30;
+  expect(() => {
+    copy.doc.groups![1]!.effects![0]!.radiusPx = 30;
+  }).toThrow(TypeError);
   expect(input.groups![0]!.effects![0]!.radiusPx).toBe(160);
   const childCopy = duplicateDocumentLayers(
     input,

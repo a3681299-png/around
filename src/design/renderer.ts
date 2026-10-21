@@ -1,11 +1,12 @@
-import { isDesignId, parseDesign } from './schema';
+import { isDesignId } from './schema';
+import { readDesign } from './immutable';
 import type { DesignDocument, DesignTarget } from './types';
 
 export const DESIGN_STYLE_ID = 'web-world-themes-design-style';
 
 /** Selectors come only from bundled target definitions, never from saved JSON. */
 export function compileDesign(input: DesignDocument, targets: readonly DesignTarget[]): string {
-  const design = parseDesign(input);
+  const design = readDesign(input);
   return design.rules
     .map((rule) => {
       const target = targets.find((candidate) => candidate.id === rule.target);

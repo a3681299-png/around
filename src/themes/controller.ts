@@ -1,6 +1,6 @@
 import { createFeatureController } from '../features/controller';
 import { compileDesign, createDesignRenderer } from '../design/renderer';
-import { parseDesign } from '../design/schema';
+import { readDesign } from '../design/immutable';
 import type { DesignDocument } from '../design/types';
 import { createImageRenderer, type ImageEditing } from '../design/image-renderer';
 import type { SiteAdapter } from '../sites/types';
@@ -89,7 +89,7 @@ export function createThemeController(
   };
 
   const validateDesign = (input: DesignDocument | undefined) => {
-    const next = input ? parseDesign(input) : undefined;
+    const next = input ? readDesign(input) : undefined;
     if (next && (next.siteId !== site.id || (next.baseThemeId !== null && next.baseThemeId !== theme.id))) {
       throw new Error('このサイトまたは基底テーマには対応していません。');
     }

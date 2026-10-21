@@ -65,7 +65,7 @@ export function createCreatorEditor(
   let layout: StudioLayoutAdapter | undefined,
     panelMode: 'quick' | 'inpage' | 'sidepanel' = 'quick';
   const consumedKeys = new Set<string>();
-  let lastDesign = '',
+  let lastDesign: DesignDocument | undefined,
     geometryKey = '';
   const core = createEditorSession({
     siteId: site.id,
@@ -193,10 +193,9 @@ export function createCreatorEditor(
       badge?.remove();
       badge = undefined;
     }
-    const design = active && state.view.dirty ? state.document : state.saved,
-      key = JSON.stringify(design) ?? 'empty';
-    if (key !== lastDesign) {
-      lastDesign = key;
+    const design = active && state.view.dirty ? state.document : state.saved;
+    if (design !== lastDesign) {
+      lastDesign = design;
       apply(design);
     }
     if (panelMode === 'sidepanel') {

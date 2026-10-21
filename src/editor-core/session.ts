@@ -1,7 +1,8 @@
 import { parseEditCommand } from './commands';
 import { defaultModelSettings, patchModel } from '../models/types';
 import { ASSET_MESSAGES } from '../assets/limits';
-import { emptyDesign, parseDesign, sameDesign } from '../design/schema';
+import { emptyDesign, sameDesign } from '../design/schema';
+import { readDesign, editDesign, commitDesign, shareDesign, freezeTree } from '../design/immutable';
 import { IMAGE_LIMITS, type DesignDocument, type SurfaceStyle, type ImagePatch } from '../design/types';
 import { moveGroup, reanchorPlacement, type PlacementChange } from '../world/geometry';
 import {
@@ -34,15 +35,16 @@ export function createEditorSession<Source extends { readonly length: number }>(
   const releaseAssets = storage.release,
     retainAssets = storage.retain;
   const checkDesignAssets = storage.validate,
-    commitDesign = storage.save;
+    saveDesign = storage.save;
   let saved: DesignDocument | undefined,
-    draft = emptyDesign(ports.siteId, ports.baseThemeId),
+    draft = readDesign(emptyDesign(ports.siteId, ports.baseThemeId)),
     pendingSave: DesignDocument | undefined;
   let active = false,
     enabled = false,
     loaded = false,
     alive = true,
     loadError: string | undefined;
+  const empty = draft;
   let tool: EditorTool = 'select';
   let selectedTarget: string | undefined,
     selectedImageIds: string[] = [],
@@ -62,8 +64,11 @@ export function createEditorSession<Source extends { readonly length: number }>(
   let leaseQueue: Promise<void> = Promise.resolve();
   const deferredReleases = new Set<string>(),
     listeners = new Set<(state: EditorSnapshot) => void>();
-  const history = createHistory<DesignDocument>(parseDesign, sameDesign);
-  const initial = () => (saved ? parseDesign(saved) : emptyDesign(ports.siteId, ports.baseThemeId));
+  const history = createHistory<DesignDocument>(
+    (doc) => doc,
+    (a, b) => a === b,
+  );
+  const initial = () => saved ?? empty;
   const clearSelection = () => {
     selectedTarget = undefined;
   };
@@ -105,9 +110,9 @@ export function createEditorSession<Source extends { readonly length: number }>(
       revision,
       active,
       enabled,
-      view: JSON.parse(JSON.stringify(view())) as EditorView,
-      document: parseDesign(draft),
-      ...(saved ? { saved: parseDesign(saved) } : {}),
+      view: freezeTree(view()),
+      document: draft,
+      ...(saved ? { saved } : {}),
       ...(selectedTarget ? { selectedTarget } : {}),
     };
   }
@@ -142,10 +147,10 @@ export function createEditorSession<Source extends { readonly length: number }>(
     });
   };
   const updateDraft = (next: DesignDocument, record = true) => {
-    const parsed = parseDesign(next);
+    const parsed = shareDesign(initial(), commitDesign(next, draft));
     if (record) history.record(draft, parsed);
     draft = parsed;
-    dirty = !sameDesign(draft, initial());
+    dirty = draft !== initial();
     status = dirty ? 'このタブでプレビュー中です。保存すると各タブに反映します。' : '保存済みの見た目です。';
     error = false;
     render();
@@ -195,7 +200,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
       return;
     if (group) {
       if (patch.motion && !groupMovable(group, draft.decorations)) return;
-      const next = parseDesign(draft),
+      const next = editDesign(draft),
         { placement, playback: _playback, model: _model, ...properties } = patch;
       if (placement) {
         if (Object.keys(placement).some((key) => !['x', 'y'].includes(key)) || !groupMovable(group, draft.decorations))
@@ -239,7 +244,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
       }
       patch = { ...patch, placement: reanchorPlacement(current.placement, from, to, patch.placement.anchor) };
     }
-    const next = parseDesign(draft);
+    const next = editDesign(draft);
     const { playback, model, ...properties } = patch;
     next.decorations = next.decorations.map((image) =>
       image.id !== id
@@ -264,7 +269,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
   }
   function changePlacements(changes: readonly PlacementChange[]) {
     if (!active || saving || importing) return;
-    const next = parseDesign(draft);
+    const next = editDesign(draft);
     const placements = new Map(changes.map((change) => [change.id, change.placement]));
     next.decorations = next.decorations.map((image) =>
       !effectivelyLocked(image, next.groups ?? []) && placements.has(image.id)
@@ -293,7 +298,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     if (!layer || layer.locked || parentGroup(draft.groups ?? [], layer.id)?.locked) return;
     if (existing && existing.target.layerId !== id)
       throw new Error('既存ルールの対象を直接変更できません。接続を外してから作り直してください。');
-    const next = parseDesign(draft);
+    const next = editDesign(draft);
     next.signalRules = (next.signalRules ?? []).filter(
       (rule) => rule.id !== (typeof value === 'string' ? value : value.id),
     );
@@ -414,8 +419,8 @@ export function createEditorSession<Source extends { readonly length: number }>(
     try {
       const assets = await storage.import(files, importSession);
       if (epoch !== importEpoch || !active) return;
-      before = parseDesign(draft);
-      const next = parseDesign(draft);
+      before = draft;
+      const next = editDesign(draft);
       let importedSelection: string | undefined;
       const { width, height, origin } = ports.geometry.importFrame(point);
       assets.forEach((asset, index) => {
@@ -457,7 +462,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
       });
       await checkDesignAssets(next, importSession);
       if (epoch !== importEpoch || !active) return;
-      if (!sameDesign(before, draft)) {
+      if (before !== draft) {
         before = undefined;
         selectedImageIds = previousSelection;
         throw new Error('別のタブの保存値が変わったため、素材の追加を中止しました。もう一度読み込んでください。');
@@ -503,7 +508,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
   };
   const change = (style: SurfaceStyle) => {
     if (!selectedTarget || saving || importing) return;
-    const next = parseDesign(draft);
+    const next = editDesign(draft);
     next.rules = next.rules.filter((rule) => rule.target !== selectedTarget!);
     if (Object.keys(style).length > 0) next.rules.push({ kind: 'surface-style', target: selectedTarget, style });
     updateDraft(next);
@@ -512,8 +517,9 @@ export function createEditorSession<Source extends { readonly length: number }>(
   const accept = (incoming: DesignDocument | undefined) => {
     // Validate support before changing session state; unsupported data stays on disk.
     const previous = saved;
+    incoming = incoming ? readDesign(incoming) : undefined;
     ports.validate(incoming);
-    saved = incoming;
+    saved = incoming && pendingSave && sameDesign(incoming, pendingSave) ? pendingSave : incoming;
     storageEpoch++;
     loaded = true;
     loadError = undefined;
@@ -548,7 +554,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     finishGesture();
     if (!dirty || saving || importing || !assetSession) return;
     const saveSession = assetSession;
-    const snapshot = parseDesign(draft);
+    const snapshot = draft;
     pendingSave = snapshot;
     saving = true;
     status = '保存しています…';
@@ -558,7 +564,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
       // Renew the session's complete draft/history lease before crossing the save boundary.
       leased = '';
       await syncAssets();
-      await commitDesign(snapshot, saveSession);
+      await saveDesign(snapshot, saveSession);
       const epoch = storageEpoch;
       const latest = await storage.read();
       if (!alive) return;
@@ -712,8 +718,8 @@ export function createEditorSession<Source extends { readonly length: number }>(
     return {
       version: 1,
       siteId: ports.siteId,
-      draft: parseDesign(draft),
-      ...(saved ? { saved: parseDesign(saved) } : {}),
+      draft,
+      ...(saved ? { saved } : {}),
       selectedIds: [...selectedImageIds],
       tool,
       ...(selectedTarget ? { selectedTarget } : {}),
@@ -725,8 +731,8 @@ export function createEditorSession<Source extends { readonly length: number }>(
     if (!active || saving || importing || value.version !== 1 || value.siteId !== ports.siteId)
       throw new Error('この編集セッションに復元できません。');
     const restoringSession = sessionId;
-    const next = parseDesign(value.draft),
-      restoredSaved = value.saved === undefined ? undefined : parseDesign(value.saved);
+    const next = readDesign(value.draft),
+      restoredSaved = value.saved === undefined ? undefined : readDesign(value.saved);
     if (value.tool !== undefined && !['select', 'browse', 'card'].includes(value.tool))
       throw new Error('復旧ツールが不正です。');
     if (
@@ -738,7 +744,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
       (value.selectedTarget !== undefined && !ports.targets.some((target) => target.id === value.selectedTarget))
     )
       throw new Error('復旧データが不正です。');
-    const restored = createHistory<DesignDocument>(parseDesign, sameDesign);
+    const restored = createHistory<DesignDocument>(readDesign, sameDesign);
     restored.restore(value.history);
     if (restored.values().some((doc) => doc.siteId !== ports.siteId))
       throw new Error('復旧データの対象が一致しません。');
@@ -750,12 +756,12 @@ export function createEditorSession<Source extends { readonly length: number }>(
     if (!active || restoringSession !== sessionId) return;
     history.restore(restored.checkpoint());
     if (history.active) history.commit(next);
-    draft = next;
+    draft = shareDesign(initial(), next);
     selectedImageIds = normalizeSelection(value.selectedIds, draft.decorations, draft.groups ?? []);
     selectedTarget = value.selectedTarget;
     snapping = value.snapping;
     tool = value.tool ?? 'select';
-    dirty = !sameDesign(draft, initial());
+    dirty = draft !== initial();
     interactionEpoch++;
     error = !sameDesign(restoredSaved, saved);
     status = error

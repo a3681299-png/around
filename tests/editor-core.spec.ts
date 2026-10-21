@@ -138,6 +138,43 @@ test('command allowlists reject invalid patches before touching the draft or his
   editor.destroy();
 });
 
+test('immutable revisions share unchanged layers and history cannot be rewritten by later edits', async () => {
+  const { editor } = await opened();
+  await editor.execute({ type: 'save' });
+  const saved = editor.snapshot().document;
+  const id = saved.decorations[0]!.id;
+  await editor.execute({ type: 'signal-rule', rule: defaultScrollOpacityRule(id) });
+  const before = editor.snapshot().document;
+  const placement = { ...before.decorations[0]!.placement, x: 0.7 };
+  await editor.execute({ type: 'placements', changes: [{ id, placement }] });
+  placement.x = 0.9;
+  const after = editor.snapshot().document;
+  expect(after.decorations[0]!.placement.x).toBe(0.7);
+  expect(after.decorations[1]).toBe(before.decorations[1]);
+  expect(after.rules).toBe(before.rules);
+  expect(after.signalRules).toBe(before.signalRules);
+  expect(editor.checkpoint().history.past.at(-1)).toBe(before);
+  expect(Object.isFrozen(before)).toBe(true);
+  expect(Object.isFrozen(before.decorations[0]!.placement)).toBe(true);
+  expect(Object.isFrozen(before.signalRules![0]!.keyframes)).toBe(true);
+  expect(() => {
+    before.decorations[0]!.placement.x = 0.2;
+  }).toThrow(TypeError);
+  expect(() => {
+    before.signalRules![0]!.keyframes[0]!.value = 0.8;
+  }).toThrow(TypeError);
+  await editor.execute({ type: 'undo' });
+  expect(editor.snapshot().document).toBe(before);
+  await editor.execute({ type: 'undo' });
+  expect(editor.snapshot().document).toBe(saved);
+  expect(editor.snapshot().view.dirty).toBe(false);
+  await editor.execute({ type: 'redo' });
+  await editor.execute({ type: 'redo' });
+  expect(editor.snapshot().document).toBe(after);
+  expect(editor.snapshot().view.dirty).toBe(true);
+  editor.destroy();
+});
+
 test('signal key edits share gesture history, locks, save/discard and session recovery', async () => {
   const { editor } = await opened(),
     id = editor.snapshot().document.decorations[0]!.id,

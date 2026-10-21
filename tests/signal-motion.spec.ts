@@ -292,7 +292,9 @@ test('mouse ghost projections use raw normalized values and skip angle wrap; sig
 
 test('group ungrouping protects an active transform controller and retains base placement after disabling it', () => {
   const { scene } = setup(),
-    doc = groupLayers(parseDesign({ ...emptyDesign('youtube', null), ...scene }), ['image-0', 'image-1'], 'group-0');
+    doc = structuredClone(
+      groupLayers(parseDesign({ ...emptyDesign('youtube', null), ...scene }), ['image-0', 'image-1'], 'group-0'),
+    );
   doc.groups![0]!.motion = defaultFollowMotion();
   expect(() => ungroupLayers(doc, 'group-0')).toThrow(/OFF/);
   doc.groups![0]!.motion!.enabled = false;
