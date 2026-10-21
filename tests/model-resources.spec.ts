@@ -86,7 +86,7 @@ test('8 rigged models share one context/assets, respect surface budgets and susp
   await expect(youtube.locator(overlay)).toHaveCount(0);
 });
 
-test('real WebGL loss/restore, model deletion with 2D remaining, and Undo release/recreate shared GPU resources', async ({
+test('real WebGL loss recreates a context, deletion releases resources and Undo reuses the retained context', async ({
   popup,
   youtube,
 }) => {
@@ -108,27 +108,28 @@ test('real WebGL loss/restore, model deletion with 2D remaining, and Undo releas
   expect(
     await backend.evaluate((canvas: HTMLCanvasElement) => {
       const loss = canvas.getContext('webgl2')!.getExtension('WEBGL_lose_context');
-      if (loss) (canvas as HTMLCanvasElement & { testLoss?: WEBGL_lose_context }).testLoss = loss;
       loss?.loseContext();
       return Boolean(loss);
     }),
   ).toBe(true);
-  await expect(media).toHaveAttribute('data-playback', 'context-lost');
-  await youtube.waitForTimeout(50);
-  await backend.evaluate((canvas: HTMLCanvasElement) =>
-    (canvas as HTMLCanvasElement & { testLoss: WEBGL_lose_context }).testLoss.restoreContext(),
-  );
-  await expect(media).toHaveAttribute('data-playback', 'playing');
-  await panel.locator('.delete-image').click();
-  await expect(media).toHaveCount(0);
-  await expect(youtube.locator(`${overlay} img`)).toBeVisible();
-  await expect(backend).toHaveCount(0);
+  await expect.poll(() => handle.evaluate((canvas: HTMLCanvasElement) => canvas.isConnected)).toBe(false);
   await expect
     .poll(() => handle.evaluate((canvas: HTMLCanvasElement) => canvas.getContext('webgl2')!.isContextLost()))
     .toBe(true);
+  await expect(media).toHaveAttribute('data-playback', 'playing');
+  const recovered = (await backend.elementHandle())!;
+  await panel.locator('.delete-image').click();
+  await expect(media).toHaveCount(0);
+  await expect(youtube.locator(`${overlay} img`)).toBeVisible();
+  await expect(backend).toHaveCount(1);
+  await expect
+    .poll(() => youtube.locator(overlay).evaluate((e: HTMLElement) => JSON.parse(e.dataset.wwModelStats!)))
+    .toMatchObject({ contexts: 1, assets: 0, instances: 0, geometries: 0, textures: 0, programs: 0 });
+  expect(await recovered.evaluate((canvas) => canvas.isConnected)).toBe(true);
   await panel.locator('.undo').click();
   await expect(media).toHaveAttribute('data-renderer', 'three');
   await expect(backend).toHaveCount(1);
+  expect(await recovered.evaluate((canvas) => canvas.isConnected)).toBe(true);
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
   await expect(youtube.locator(overlay)).toHaveCount(0);
 });

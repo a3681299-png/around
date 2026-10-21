@@ -113,6 +113,7 @@ export function createModelRenderer(
     cache = new Map<string, Resource>(),
     instances = new Set<Instance>();
   let renderer: WebGLRenderer | undefined,
+    idleTimer: number | undefined,
     closed = false,
     lost = false,
     frame: number | undefined,
@@ -172,7 +173,12 @@ export function createModelRenderer(
         : {}),
     });
   const reduced = view.matchMedia('(prefers-reduced-motion: reduce)');
+  function cancelIdle() {
+    if (idleTimer !== undefined) view.clearTimeout(idleTimer);
+    idleTimer = undefined;
+  }
   const ensure = (trace?: string) => {
+    cancelIdle();
     if (renderer) return renderer;
     renderer = profileSync(
       trace,
@@ -189,21 +195,18 @@ export function createModelRenderer(
     renderer.setClearColor(new Color(0), 0);
     renderer.setPixelRatio(1);
     renderer.domElement.addEventListener('webglcontextlost', onLost);
-    renderer.domElement.addEventListener('webglcontextrestored', onRestored);
     return renderer;
   };
   function onLost(event: Event) {
     event.preventDefault();
-    lost = true;
-    queries.length = 0;
-    gpuMs = null;
     cancel();
+    dropRenderer();
+    lost = true;
     instances.forEach((i) => {
       i.element.dataset.playback = 'context-lost';
     });
     stats();
-  }
-  function onRestored() {
+    // The lost context is gone. Existing live instances may upload into a new one.
     lost = false;
     instances.forEach((i) => {
       i.dirty = true;
@@ -583,11 +586,11 @@ export function createModelRenderer(
     schedule();
   }
   const dropRenderer = () => {
+    cancelIdle();
     if (!renderer) return;
     const gl = renderer.getContext() as WebGL2RenderingContext;
     queries.splice(0).forEach((q) => gl.deleteQuery(q));
     renderer.domElement.removeEventListener('webglcontextlost', onLost);
-    renderer.domElement.removeEventListener('webglcontextrestored', onRestored);
     gpuApi?.restore();
     gpuApi = undefined;
     firstRenderApi = undefined;
@@ -598,9 +601,29 @@ export function createModelRenderer(
     lost = false;
     gpuMs = null;
   };
+  const retireRenderer = () => {
+    cancelIdle();
+    if (!renderer) return;
+    // Release render-list references immediately; only the empty context is retained.
+    renderer.renderLists.dispose();
+    if (closed || doc.hidden || lost) {
+      dropRenderer();
+    } else if (!options?.keepContext) {
+      idleTimer = view.setTimeout(() => {
+        idleTimer = undefined;
+        if (!instances.size) {
+          dropRenderer();
+          stats();
+        }
+      }, 30_000);
+    }
+  };
   const visibility = () => {
     cancel();
-    if (!doc.hidden) {
+    if (doc.hidden) {
+      dropRenderer();
+      stats();
+    } else {
       instances.forEach((i) => {
         i.dirty = true;
         i.failed = false;
@@ -635,6 +658,7 @@ export function createModelRenderer(
       schedule();
     },
     attach(parent: HTMLElement): ModelSurface {
+      cancelIdle();
       const element = doc.createElement('div');
       element.className = 'media model-media';
       element.dataset.format = 'glb';
@@ -765,7 +789,7 @@ export function createModelRenderer(
           element.remove();
           if (!instances.size) {
             cancel();
-            if (!options?.keepContext) dropRenderer();
+            retireRenderer();
           }
           stats();
         },
