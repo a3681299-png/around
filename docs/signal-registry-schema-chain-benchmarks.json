@@ -1,10 +1,10 @@
 {
   "measuredAt": "2026-10-21",
-  "note": "Original D: 7 B/A pairs plus 7 A/B pairs. Additional steady editor diagnostic: 5 B/A pairs, 2000 warmups, 100 samples. World: 5 B/A pairs, 100 warmups, 1000 samples. No thresholds or discarded samples.",
+  "note": "After preset serialization fix 4f4b62c. Original D: 7 B/A pairs plus 7 A/B pairs. Additional steady editor diagnostic: 5 B/A pairs, 2000 warmups, 100 samples. World: 5 B/A pairs, 100 warmups, 1000 samples. No thresholds or discarded samples.",
   "runs": {
-    "final-editor-before-first": {
+    "corrected-editor-before-first": {
       "before": "d1a552e",
-      "after": "56feb94c4fa2e8123b6269515b6d1e36da66272c",
+      "after": "4f4b62c1b1181e8efb31b1c3ae5075ce997c0ba3",
       "rounds": 7,
       "order": ["before", "after"],
       "warmup": 10,
@@ -25,11 +25,11 @@
               "keys": 0,
               "documentBytes": 9424,
               "samples": 100,
-              "placementsMedianMs": 0.05039999999999978,
-              "placementsMaxMs": 0.375,
+              "placementsMedianMs": 0.04840000000000089,
+              "placementsMaxMs": 0.4718000000000018,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.4415000000000049,
+              "encodeMs": 0.4311000000000007,
               "recoveryBytes": 100744
             },
             {
@@ -38,11 +38,11 @@
               "keys": 8,
               "documentBytes": 35724,
               "samples": 100,
-              "placementsMedianMs": 0.05930000000000035,
-              "placementsMaxMs": 0.4204000000000008,
+              "placementsMedianMs": 0.059000000000004604,
+              "placementsMaxMs": 0.43489999999999895,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.11899999999999977,
+              "encodeMs": 0.10900000000000176,
               "recoveryBytes": 144797
             },
             {
@@ -51,11 +51,11 @@
               "keys": 64,
               "documentBytes": 163500,
               "samples": 100,
-              "placementsMedianMs": 0.056100000000000705,
-              "placementsMaxMs": 0.4011999999999958,
+              "placementsMedianMs": 0.055899999999994066,
+              "placementsMaxMs": 0.414200000000001,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.10680000000000689,
+              "encodeMs": 0.10190000000000055,
               "recoveryBytes": 329918
             }
           ]
@@ -70,11 +70,11 @@
               "keys": 0,
               "documentBytes": 9424,
               "samples": 100,
-              "placementsMedianMs": 0.046100000000002694,
-              "placementsMaxMs": 0.34369999999999834,
+              "placementsMedianMs": 0.04740000000001032,
+              "placementsMaxMs": 0.35320000000000107,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.45170000000000243,
+              "encodeMs": 0.4649999999999892,
               "recoveryBytes": 100744
             },
             {
@@ -83,11 +83,11 @@
               "keys": 8,
               "documentBytes": 35724,
               "samples": 100,
-              "placementsMedianMs": 0.05820000000000647,
-              "placementsMaxMs": 0.5195000000000007,
+              "placementsMedianMs": 0.05850000000000932,
+              "placementsMaxMs": 1.2918999999999983,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.1221000000000032,
+              "encodeMs": 0.10950000000001125,
               "recoveryBytes": 144797
             },
             {
@@ -96,11 +96,11 @@
               "keys": 64,
               "documentBytes": 163500,
               "samples": 100,
-              "placementsMedianMs": 0.05639999999999645,
-              "placementsMaxMs": 0.5583999999999918,
+              "placementsMedianMs": 0.05890000000000839,
+              "placementsMaxMs": 0.6822999999999979,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.10670000000000357,
+              "encodeMs": 0.10039999999997917,
               "recoveryBytes": 329918
             }
           ]
@@ -115,11 +115,11 @@
               "keys": 0,
               "documentBytes": 9424,
               "samples": 100,
-              "placementsMedianMs": 0.04679999999999751,
-              "placementsMaxMs": 0.39250000000000185,
+              "placementsMedianMs": 0.05139999999999745,
+              "placementsMaxMs": 0.627399999999998,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.4404000000000039,
+              "encodeMs": 0.43849999999999767,
               "recoveryBytes": 100744
             },
             {
@@ -128,11 +128,281 @@
               "keys": 8,
               "documentBytes": 35724,
               "samples": 100,
-              "placementsMedianMs": 0.05830000000000268,
-              "placementsMaxMs": 0.5502000000000038,
+              "placementsMedianMs": 0.059499999999999886,
+              "placementsMaxMs": 0.44530000000000314,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.11659999999999826,
+              "encodeMs": 0.11189999999999856,
+              "recoveryBytes": 144797
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 64,
+              "documentBytes": 163500,
+              "samples": 100,
+              "placementsMedianMs": 0.05519999999999925,
+              "placementsMaxMs": 0.40730000000000643,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 1.0284000000000049,
+              "recoveryBytes": 329918
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "side": "after",
+          "results": [
+            {
+              "layers": 32,
+              "rules": 0,
+              "keys": 0,
+              "documentBytes": 9424,
+              "samples": 100,
+              "placementsMedianMs": 0.046700000000001296,
+              "placementsMaxMs": 0.33259999999999934,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.5131000000000014,
+              "recoveryBytes": 100744
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 8,
+              "documentBytes": 35724,
+              "samples": 100,
+              "placementsMedianMs": 0.05819999999999936,
+              "placementsMaxMs": 0.46479999999999677,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.10269999999999868,
+              "recoveryBytes": 144797
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 64,
+              "documentBytes": 163500,
+              "samples": 100,
+              "placementsMedianMs": 0.05580000000000496,
+              "placementsMaxMs": 0.5212000000000074,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.09560000000000457,
+              "recoveryBytes": 329918
+            }
+          ]
+        },
+        {
+          "round": 3,
+          "side": "before",
+          "results": [
+            {
+              "layers": 32,
+              "rules": 0,
+              "keys": 0,
+              "documentBytes": 9424,
+              "samples": 100,
+              "placementsMedianMs": 0.04800000000000182,
+              "placementsMaxMs": 0.4562000000000026,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.4245000000000019,
+              "recoveryBytes": 100744
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 8,
+              "documentBytes": 35724,
+              "samples": 100,
+              "placementsMedianMs": 0.062199999999997146,
+              "placementsMaxMs": 0.4314999999999998,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.11160000000000281,
+              "recoveryBytes": 144797
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 64,
+              "documentBytes": 163500,
+              "samples": 100,
+              "placementsMedianMs": 0.05649999999999977,
+              "placementsMaxMs": 0.4099000000000075,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.0981000000000023,
+              "recoveryBytes": 329918
+            }
+          ]
+        },
+        {
+          "round": 3,
+          "side": "after",
+          "results": [
+            {
+              "layers": 32,
+              "rules": 0,
+              "keys": 0,
+              "documentBytes": 9424,
+              "samples": 100,
+              "placementsMedianMs": 0.05150000000000432,
+              "placementsMaxMs": 0.34559999999999746,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.44950000000000045,
+              "recoveryBytes": 100744
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 8,
+              "documentBytes": 35724,
+              "samples": 100,
+              "placementsMedianMs": 0.0595999999999961,
+              "placementsMaxMs": 0.4917999999999978,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.11749999999999972,
+              "recoveryBytes": 144797
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 64,
+              "documentBytes": 163500,
+              "samples": 100,
+              "placementsMedianMs": 0.05680000000000973,
+              "placementsMaxMs": 0.6140000000000043,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.0945999999999998,
+              "recoveryBytes": 329918
+            }
+          ]
+        },
+        {
+          "round": 4,
+          "side": "before",
+          "results": [
+            {
+              "layers": 32,
+              "rules": 0,
+              "keys": 0,
+              "documentBytes": 9424,
+              "samples": 100,
+              "placementsMedianMs": 0.04770000000000252,
+              "placementsMaxMs": 0.4079000000000015,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.4333999999999989,
+              "recoveryBytes": 100744
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 8,
+              "documentBytes": 35724,
+              "samples": 100,
+              "placementsMedianMs": 0.05910000000000082,
+              "placementsMaxMs": 0.45130000000000337,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.10650000000000404,
+              "recoveryBytes": 144797
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 64,
+              "documentBytes": 163500,
+              "samples": 100,
+              "placementsMedianMs": 0.055499999999995,
+              "placementsMaxMs": 0.3363999999999976,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.09619999999999607,
+              "recoveryBytes": 329918
+            }
+          ]
+        },
+        {
+          "round": 4,
+          "side": "after",
+          "results": [
+            {
+              "layers": 32,
+              "rules": 0,
+              "keys": 0,
+              "documentBytes": 9424,
+              "samples": 100,
+              "placementsMedianMs": 0.04639999999999844,
+              "placementsMaxMs": 0.32789999999999964,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.4568999999999974,
+              "recoveryBytes": 100744
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 8,
+              "documentBytes": 35724,
+              "samples": 100,
+              "placementsMedianMs": 0.05799999999999983,
+              "placementsMaxMs": 0.4900999999999982,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.10989999999999611,
+              "recoveryBytes": 144797
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 64,
+              "documentBytes": 163500,
+              "samples": 100,
+              "placementsMedianMs": 0.05870000000000175,
+              "placementsMaxMs": 0.52409999999999,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.09730000000000416,
+              "recoveryBytes": 329918
+            }
+          ]
+        },
+        {
+          "round": 5,
+          "side": "before",
+          "results": [
+            {
+              "layers": 32,
+              "rules": 0,
+              "keys": 0,
+              "documentBytes": 9424,
+              "samples": 100,
+              "placementsMedianMs": 0.047800000000002285,
+              "placementsMaxMs": 0.3561000000000014,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.4350999999999985,
+              "recoveryBytes": 100744
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 8,
+              "documentBytes": 35724,
+              "samples": 100,
+              "placementsMedianMs": 0.058099999999996044,
+              "placementsMaxMs": 0.5296000000000021,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.10190000000000055,
               "recoveryBytes": 144797
             },
             {
@@ -142,322 +412,7 @@
               "documentBytes": 163500,
               "samples": 100,
               "placementsMedianMs": 0.05469999999999686,
-              "placementsMaxMs": 0.36230000000000473,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.0992999999999995,
-              "recoveryBytes": 329918
-            }
-          ]
-        },
-        {
-          "round": 2,
-          "side": "after",
-          "results": [
-            {
-              "layers": 32,
-              "rules": 0,
-              "keys": 0,
-              "documentBytes": 9424,
-              "samples": 100,
-              "placementsMedianMs": 0.047100000000000364,
-              "placementsMaxMs": 0.3733000000000004,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.44300000000000495,
-              "recoveryBytes": 100744
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 8,
-              "documentBytes": 35724,
-              "samples": 100,
-              "placementsMedianMs": 0.058699999999994645,
-              "placementsMaxMs": 0.44600000000000506,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.11059999999999803,
-              "recoveryBytes": 144797
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 64,
-              "documentBytes": 163500,
-              "samples": 100,
-              "placementsMedianMs": 0.05919999999998993,
-              "placementsMaxMs": 0.541400000000003,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.10249999999999204,
-              "recoveryBytes": 329918
-            }
-          ]
-        },
-        {
-          "round": 3,
-          "side": "before",
-          "results": [
-            {
-              "layers": 32,
-              "rules": 0,
-              "keys": 0,
-              "documentBytes": 9424,
-              "samples": 100,
-              "placementsMedianMs": 0.047399999999999665,
-              "placementsMaxMs": 0.33750000000000213,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.4430999999999976,
-              "recoveryBytes": 100744
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 8,
-              "documentBytes": 35724,
-              "samples": 100,
-              "placementsMedianMs": 0.0583999999999989,
-              "placementsMaxMs": 0.4473999999999947,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.10640000000000072,
-              "recoveryBytes": 144797
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 64,
-              "documentBytes": 163500,
-              "samples": 100,
-              "placementsMedianMs": 0.05460000000000065,
-              "placementsMaxMs": 0.3855000000000004,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.1034000000000006,
-              "recoveryBytes": 329918
-            }
-          ]
-        },
-        {
-          "round": 3,
-          "side": "after",
-          "results": [
-            {
-              "layers": 32,
-              "rules": 0,
-              "keys": 0,
-              "documentBytes": 9424,
-              "samples": 100,
-              "placementsMedianMs": 0.04740000000000322,
-              "placementsMaxMs": 0.37180000000000035,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.4268999999999963,
-              "recoveryBytes": 100744
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 8,
-              "documentBytes": 35724,
-              "samples": 100,
-              "placementsMedianMs": 0.0583999999999989,
-              "placementsMaxMs": 0.41669999999999874,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.10710000000000264,
-              "recoveryBytes": 144797
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 64,
-              "documentBytes": 163500,
-              "samples": 100,
-              "placementsMedianMs": 0.059899999999998954,
-              "placementsMaxMs": 0.5578999999999894,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.09340000000000259,
-              "recoveryBytes": 329918
-            }
-          ]
-        },
-        {
-          "round": 4,
-          "side": "before",
-          "results": [
-            {
-              "layers": 32,
-              "rules": 0,
-              "keys": 0,
-              "documentBytes": 9424,
-              "samples": 100,
-              "placementsMedianMs": 0.04809999999999803,
-              "placementsMaxMs": 0.36540000000000106,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.44549999999999557,
-              "recoveryBytes": 100744
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 8,
-              "documentBytes": 35724,
-              "samples": 100,
-              "placementsMedianMs": 0.05810000000000315,
-              "placementsMaxMs": 0.43380000000000507,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.10849999999999937,
-              "recoveryBytes": 144797
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 64,
-              "documentBytes": 163500,
-              "samples": 100,
-              "placementsMedianMs": 0.054999999999999716,
-              "placementsMaxMs": 0.4686000000000021,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.10329999999999728,
-              "recoveryBytes": 329918
-            }
-          ]
-        },
-        {
-          "round": 4,
-          "side": "after",
-          "results": [
-            {
-              "layers": 32,
-              "rules": 0,
-              "keys": 0,
-              "documentBytes": 9424,
-              "samples": 100,
-              "placementsMedianMs": 0.04720000000000368,
-              "placementsMaxMs": 0.3243000000000009,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.4508999999999972,
-              "recoveryBytes": 100744
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 8,
-              "documentBytes": 35724,
-              "samples": 100,
-              "placementsMedianMs": 0.059499999999999886,
-              "placementsMaxMs": 0.5138999999999996,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.11599999999999966,
-              "recoveryBytes": 144797
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 64,
-              "documentBytes": 163500,
-              "samples": 100,
-              "placementsMedianMs": 0.059499999999999886,
-              "placementsMaxMs": 0.5068000000000055,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.10030000000000427,
-              "recoveryBytes": 329918
-            }
-          ]
-        },
-        {
-          "round": 5,
-          "side": "before",
-          "results": [
-            {
-              "layers": 32,
-              "rules": 0,
-              "keys": 0,
-              "documentBytes": 9424,
-              "samples": 100,
-              "placementsMedianMs": 0.047100000000000364,
-              "placementsMaxMs": 0.33810000000000073,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.43290000000000006,
-              "recoveryBytes": 100744
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 8,
-              "documentBytes": 35724,
-              "samples": 100,
-              "placementsMedianMs": 0.05829999999999558,
-              "placementsMaxMs": 0.4549999999999983,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.10929999999999751,
-              "recoveryBytes": 144797
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 64,
-              "documentBytes": 163500,
-              "samples": 100,
-              "placementsMedianMs": 0.05480000000000018,
-              "placementsMaxMs": 0.39050000000000296,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.0992999999999995,
-              "recoveryBytes": 329918
-            }
-          ]
-        },
-        {
-          "round": 5,
-          "side": "after",
-          "results": [
-            {
-              "layers": 32,
-              "rules": 0,
-              "keys": 0,
-              "documentBytes": 9424,
-              "samples": 100,
-              "placementsMedianMs": 0.04630000000000223,
-              "placementsMaxMs": 0.39410000000000167,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.4808000000000021,
-              "recoveryBytes": 100744
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 8,
-              "documentBytes": 35724,
-              "samples": 100,
-              "placementsMedianMs": 0.0583999999999989,
-              "placementsMaxMs": 0.4147999999999996,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.11240000000000094,
-              "recoveryBytes": 144797
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 64,
-              "documentBytes": 163500,
-              "samples": 100,
-              "placementsMedianMs": 0.05930000000000746,
-              "placementsMaxMs": 0.5974999999999966,
+              "placementsMaxMs": 0.3620000000000019,
               "historyEntries": 100,
               "studioBytes": 499,
               "encodeMs": 0.09799999999999898,
@@ -466,8 +421,8 @@
           ]
         },
         {
-          "round": 6,
-          "side": "before",
+          "round": 5,
+          "side": "after",
           "results": [
             {
               "layers": 32,
@@ -475,11 +430,11 @@
               "keys": 0,
               "documentBytes": 9424,
               "samples": 100,
-              "placementsMedianMs": 0.046700000000001296,
-              "placementsMaxMs": 0.39199999999999946,
+              "placementsMedianMs": 0.04560000000000031,
+              "placementsMaxMs": 0.35540000000000305,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.4361999999999995,
+              "encodeMs": 0.4941999999999993,
               "recoveryBytes": 100744
             },
             {
@@ -489,10 +444,10 @@
               "documentBytes": 35724,
               "samples": 100,
               "placementsMedianMs": 0.05850000000000222,
-              "placementsMaxMs": 0.572100000000006,
+              "placementsMaxMs": 0.41210000000000235,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.11459999999999582,
+              "encodeMs": 0.11139999999999617,
               "recoveryBytes": 144797
             },
             {
@@ -501,11 +456,56 @@
               "keys": 64,
               "documentBytes": 163500,
               "samples": 100,
-              "placementsMedianMs": 0.0549000000000035,
-              "placementsMaxMs": 0.39170000000000016,
+              "placementsMedianMs": 0.06040000000000134,
+              "placementsMaxMs": 0.5383000000000067,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.09689999999999799,
+              "encodeMs": 0.09959999999999525,
+              "recoveryBytes": 329918
+            }
+          ]
+        },
+        {
+          "round": 6,
+          "side": "before",
+          "results": [
+            {
+              "layers": 32,
+              "rules": 0,
+              "keys": 0,
+              "documentBytes": 9424,
+              "samples": 100,
+              "placementsMedianMs": 0.050499999999999545,
+              "placementsMaxMs": 0.4087999999999994,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.435299999999998,
+              "recoveryBytes": 100744
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 8,
+              "documentBytes": 35724,
+              "samples": 100,
+              "placementsMedianMs": 0.06090000000000373,
+              "placementsMaxMs": 0.5122999999999962,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.12099999999999511,
+              "recoveryBytes": 144797
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 64,
+              "documentBytes": 163500,
+              "samples": 100,
+              "placementsMedianMs": 0.057200000000001694,
+              "placementsMaxMs": 0.49970000000000425,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.10989999999999611,
               "recoveryBytes": 329918
             }
           ]
@@ -520,11 +520,11 @@
               "keys": 0,
               "documentBytes": 9424,
               "samples": 100,
-              "placementsMedianMs": 0.049900000000000944,
-              "placementsMaxMs": 0.3830999999999989,
+              "placementsMedianMs": 0.046200000000006014,
+              "placementsMaxMs": 0.4095000000000013,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.42610000000000525,
+              "encodeMs": 0.46589999999999776,
               "recoveryBytes": 100744
             },
             {
@@ -533,11 +533,11 @@
               "keys": 8,
               "documentBytes": 35724,
               "samples": 100,
-              "placementsMedianMs": 0.05919999999999703,
-              "placementsMaxMs": 0.45250000000000057,
+              "placementsMedianMs": 0.05770000000000408,
+              "placementsMaxMs": 0.4392999999999958,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.1110000000000042,
+              "encodeMs": 0.1150999999999982,
               "recoveryBytes": 144797
             },
             {
@@ -546,11 +546,11 @@
               "keys": 64,
               "documentBytes": 163500,
               "samples": 100,
-              "placementsMedianMs": 0.05939999999999657,
-              "placementsMaxMs": 0.6089000000000055,
+              "placementsMedianMs": 0.06009999999999138,
+              "placementsMaxMs": 0.47639999999999816,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.09949999999999193,
+              "encodeMs": 0.09600000000000364,
               "recoveryBytes": 329918
             }
           ]
@@ -565,11 +565,11 @@
               "keys": 0,
               "documentBytes": 9424,
               "samples": 100,
-              "placementsMedianMs": 0.04720000000000013,
-              "placementsMaxMs": 0.3655000000000008,
+              "placementsMedianMs": 0.04650000000000176,
+              "placementsMaxMs": 0.3656000000000006,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.42269999999999897,
+              "encodeMs": 0.435299999999998,
               "recoveryBytes": 100744
             },
             {
@@ -578,11 +578,11 @@
               "keys": 8,
               "documentBytes": 35724,
               "samples": 100,
-              "placementsMedianMs": 0.059000000000004604,
-              "placementsMaxMs": 0.5521999999999991,
+              "placementsMedianMs": 0.060000000000002274,
+              "placementsMaxMs": 0.4253,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.11230000000000473,
+              "encodeMs": 0.1203000000000003,
               "recoveryBytes": 144797
             },
             {
@@ -591,11 +591,11 @@
               "keys": 64,
               "documentBytes": 163500,
               "samples": 100,
-              "placementsMedianMs": 0.05449999999999733,
-              "placementsMaxMs": 0.47350000000000136,
+              "placementsMedianMs": 0.05679999999999552,
+              "placementsMaxMs": 0.46280000000000143,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.10179999999999723,
+              "encodeMs": 0.10310000000000485,
               "recoveryBytes": 329918
             }
           ]
@@ -610,11 +610,11 @@
               "keys": 0,
               "documentBytes": 9424,
               "samples": 100,
-              "placementsMedianMs": 0.04679999999999751,
-              "placementsMaxMs": 0.35889999999999844,
+              "placementsMedianMs": 0.047800000000002285,
+              "placementsMaxMs": 0.40500000000000114,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.432300000000005,
+              "encodeMs": 0.4158000000000044,
               "recoveryBytes": 100744
             },
             {
@@ -623,11 +623,11 @@
               "keys": 8,
               "documentBytes": 35724,
               "samples": 100,
-              "placementsMedianMs": 0.058900000000001285,
-              "placementsMaxMs": 0.48930000000000007,
+              "placementsMedianMs": 0.05859999999999843,
+              "placementsMaxMs": 0.47749999999999915,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.11829999999999785,
+              "encodeMs": 0.10699999999999932,
               "recoveryBytes": 144797
             },
             {
@@ -636,20 +636,20 @@
               "keys": 64,
               "documentBytes": 163500,
               "samples": 100,
-              "placementsMedianMs": 0.05639999999999645,
-              "placementsMaxMs": 0.5534999999999997,
+              "placementsMedianMs": 0.056200000000004025,
+              "placementsMaxMs": 0.5035000000000025,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.09960000000000946,
+              "encodeMs": 0.09780000000000655,
               "recoveryBytes": 329918
             }
           ]
         }
       ]
     },
-    "final-editor-after-first": {
+    "corrected-editor-after-first": {
       "before": "d1a552e",
-      "after": "56feb94c4fa2e8123b6269515b6d1e36da66272c",
+      "after": "4f4b62c1b1181e8efb31b1c3ae5075ce997c0ba3",
       "rounds": 7,
       "order": ["after", "before"],
       "warmup": 10,
@@ -670,11 +670,11 @@
               "keys": 0,
               "documentBytes": 9424,
               "samples": 100,
-              "placementsMedianMs": 0.046599999999983766,
-              "placementsMaxMs": 0.38530000000000086,
+              "placementsMedianMs": 0.04540000000000077,
+              "placementsMaxMs": 0.3649999999999807,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.4294000000000153,
+              "encodeMs": 0.4379000000000133,
               "recoveryBytes": 100744
             },
             {
@@ -683,11 +683,11 @@
               "keys": 8,
               "documentBytes": 35724,
               "samples": 100,
-              "placementsMedianMs": 0.05920000000000414,
-              "placementsMaxMs": 0.41089999999999804,
+              "placementsMedianMs": 0.057800000000014506,
+              "placementsMaxMs": 0.447400000000016,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.11249999999998295,
+              "encodeMs": 0.11239999999997963,
               "recoveryBytes": 144797
             },
             {
@@ -696,11 +696,11 @@
               "keys": 64,
               "documentBytes": 163500,
               "samples": 100,
-              "placementsMedianMs": 0.05669999999997799,
-              "placementsMaxMs": 0.5493000000000166,
+              "placementsMedianMs": 0.05629999999999313,
+              "placementsMaxMs": 0.6413000000000011,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.1092999999999904,
+              "encodeMs": 0.09720000000001505,
               "recoveryBytes": 329918
             }
           ]
@@ -715,11 +715,11 @@
               "keys": 0,
               "documentBytes": 9424,
               "samples": 100,
-              "placementsMedianMs": 0.04779999999999518,
-              "placementsMaxMs": 0.3521000000000001,
+              "placementsMedianMs": 0.04689999999999728,
+              "placementsMaxMs": 0.40460000000000207,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.4358000000000004,
+              "encodeMs": 0.42469999999999786,
               "recoveryBytes": 100744
             },
             {
@@ -728,11 +728,11 @@
               "keys": 8,
               "documentBytes": 35724,
               "samples": 100,
-              "placementsMedianMs": 0.058699999999994645,
-              "placementsMaxMs": 0.531800000000004,
+              "placementsMedianMs": 0.05789999999999651,
+              "placementsMaxMs": 0.4256999999999991,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.10310000000000485,
+              "encodeMs": 0.1051000000000002,
               "recoveryBytes": 144797
             },
             {
@@ -741,11 +741,11 @@
               "keys": 64,
               "documentBytes": 163500,
               "samples": 100,
-              "placementsMedianMs": 0.055399999999998784,
-              "placementsMaxMs": 0.4076000000000022,
+              "placementsMedianMs": 0.05420000000000158,
+              "placementsMaxMs": 0.38649999999999807,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.10200000000000387,
+              "encodeMs": 0.09389999999999787,
               "recoveryBytes": 329918
             }
           ]
@@ -760,11 +760,11 @@
               "keys": 0,
               "documentBytes": 9424,
               "samples": 100,
-              "placementsMedianMs": 0.045000000000001705,
-              "placementsMaxMs": 0.36839999999999407,
+              "placementsMedianMs": 0.04569999999999652,
+              "placementsMaxMs": 0.3458000000000112,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.4140000000000015,
+              "encodeMs": 0.41689999999999827,
               "recoveryBytes": 100744
             },
             {
@@ -773,11 +773,11 @@
               "keys": 8,
               "documentBytes": 35724,
               "samples": 100,
-              "placementsMedianMs": 0.05810000000000315,
-              "placementsMaxMs": 0.43019999999999925,
+              "placementsMedianMs": 0.06029999999999802,
+              "placementsMaxMs": 0.44880000000000564,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.11290000000000333,
+              "encodeMs": 0.12220000000000653,
               "recoveryBytes": 144797
             },
             {
@@ -786,11 +786,11 @@
               "keys": 64,
               "documentBytes": 163500,
               "samples": 100,
-              "placementsMedianMs": 0.05559999999999832,
-              "placementsMaxMs": 0.5026999999999902,
+              "placementsMedianMs": 0.056400000000010664,
+              "placementsMaxMs": 0.5268000000000086,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.09799999999999898,
+              "encodeMs": 0.09749999999999659,
               "recoveryBytes": 329918
             }
           ]
@@ -805,11 +805,11 @@
               "keys": 0,
               "documentBytes": 9424,
               "samples": 100,
-              "placementsMedianMs": 0.0478999999999985,
-              "placementsMaxMs": 0.3265999999999991,
+              "placementsMedianMs": 0.05000000000000071,
+              "placementsMaxMs": 0.3572000000000024,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.4298000000000002,
+              "encodeMs": 0.44140000000000157,
               "recoveryBytes": 100744
             },
             {
@@ -818,11 +818,11 @@
               "keys": 8,
               "documentBytes": 35724,
               "samples": 100,
-              "placementsMedianMs": 0.05940000000000367,
-              "placementsMaxMs": 0.4376000000000033,
+              "placementsMedianMs": 0.06030000000000513,
+              "placementsMaxMs": 0.5442000000000036,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.10679999999999978,
+              "encodeMs": 0.11090000000000089,
               "recoveryBytes": 144797
             },
             {
@@ -831,107 +831,17 @@
               "keys": 64,
               "documentBytes": 163500,
               "samples": 100,
-              "placementsMedianMs": 0.055399999999998784,
-              "placementsMaxMs": 0.4661000000000044,
+              "placementsMedianMs": 0.05630000000000024,
+              "placementsMaxMs": 0.5465000000000018,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.102800000000002,
+              "encodeMs": 0.10140000000001237,
               "recoveryBytes": 329918
             }
           ]
         },
         {
           "round": 3,
-          "side": "after",
-          "results": [
-            {
-              "layers": 32,
-              "rules": 0,
-              "keys": 0,
-              "documentBytes": 9424,
-              "samples": 100,
-              "placementsMedianMs": 0.04809999999999803,
-              "placementsMaxMs": 0.8498999999999981,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.4435000000000002,
-              "recoveryBytes": 100744
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 8,
-              "documentBytes": 35724,
-              "samples": 100,
-              "placementsMedianMs": 0.057800000000000296,
-              "placementsMaxMs": 0.3155000000000001,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.1191999999999993,
-              "recoveryBytes": 144797
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 64,
-              "documentBytes": 163500,
-              "samples": 100,
-              "placementsMedianMs": 0.05570000000000164,
-              "placementsMaxMs": 0.44879999999999143,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.09900000000000375,
-              "recoveryBytes": 329918
-            }
-          ]
-        },
-        {
-          "round": 3,
-          "side": "before",
-          "results": [
-            {
-              "layers": 32,
-              "rules": 0,
-              "keys": 0,
-              "documentBytes": 9424,
-              "samples": 100,
-              "placementsMedianMs": 0.04809999999999803,
-              "placementsMaxMs": 0.3816999999999986,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.46589999999999776,
-              "recoveryBytes": 100744
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 8,
-              "documentBytes": 35724,
-              "samples": 100,
-              "placementsMedianMs": 0.06109999999999616,
-              "placementsMaxMs": 0.42079999999999984,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.11670000000000158,
-              "recoveryBytes": 144797
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 64,
-              "documentBytes": 163500,
-              "samples": 100,
-              "placementsMedianMs": 0.05799999999999983,
-              "placementsMaxMs": 0.5600999999999985,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.10370000000000346,
-              "recoveryBytes": 329918
-            }
-          ]
-        },
-        {
-          "round": 4,
           "side": "after",
           "results": [
             {
@@ -941,10 +851,10 @@
               "documentBytes": 9424,
               "samples": 100,
               "placementsMedianMs": 0.04690000000000083,
-              "placementsMaxMs": 0.3393000000000015,
+              "placementsMaxMs": 0.3575000000000017,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.42950000000000443,
+              "encodeMs": 0.5249999999999986,
               "recoveryBytes": 100744
             },
             {
@@ -953,11 +863,11 @@
               "keys": 8,
               "documentBytes": 35724,
               "samples": 100,
-              "placementsMedianMs": 0.05850000000000222,
-              "placementsMaxMs": 0.4059999999999988,
+              "placementsMedianMs": 0.05910000000000082,
+              "placementsMaxMs": 0.44720000000000226,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.11550000000000438,
+              "encodeMs": 0.12310000000000088,
               "recoveryBytes": 144797
             },
             {
@@ -966,11 +876,101 @@
               "keys": 64,
               "documentBytes": 163500,
               "samples": 100,
-              "placementsMedianMs": 0.05930000000000746,
-              "placementsMaxMs": 0.5589000000000084,
+              "placementsMedianMs": 0.059600000000003206,
+              "placementsMaxMs": 0.570999999999998,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.10200000000000387,
+              "encodeMs": 0.1045999999999907,
+              "recoveryBytes": 329918
+            }
+          ]
+        },
+        {
+          "round": 3,
+          "side": "before",
+          "results": [
+            {
+              "layers": 32,
+              "rules": 0,
+              "keys": 0,
+              "documentBytes": 9424,
+              "samples": 100,
+              "placementsMedianMs": 0.04690000000000083,
+              "placementsMaxMs": 0.4079000000000015,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.43270000000000053,
+              "recoveryBytes": 100744
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 8,
+              "documentBytes": 35724,
+              "samples": 100,
+              "placementsMedianMs": 0.058900000000001285,
+              "placementsMaxMs": 0.43200000000000216,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.10580000000000211,
+              "recoveryBytes": 144797
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 64,
+              "documentBytes": 163500,
+              "samples": 100,
+              "placementsMedianMs": 0.05469999999999686,
+              "placementsMaxMs": 0.35089999999999577,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.09599999999999653,
+              "recoveryBytes": 329918
+            }
+          ]
+        },
+        {
+          "round": 4,
+          "side": "after",
+          "results": [
+            {
+              "layers": 32,
+              "rules": 0,
+              "keys": 0,
+              "documentBytes": 9424,
+              "samples": 100,
+              "placementsMedianMs": 0.046599999999997976,
+              "placementsMaxMs": 0.3269999999999982,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.4439000000000064,
+              "recoveryBytes": 100744
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 8,
+              "documentBytes": 35724,
+              "samples": 100,
+              "placementsMedianMs": 0.057900000000003615,
+              "placementsMaxMs": 0.43789999999999907,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.1103999999999985,
+              "recoveryBytes": 144797
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 64,
+              "documentBytes": 163500,
+              "samples": 100,
+              "placementsMedianMs": 0.05519999999999925,
+              "placementsMaxMs": 0.4936000000000007,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.09680000000000177,
               "recoveryBytes": 329918
             }
           ]
@@ -985,11 +985,11 @@
               "keys": 0,
               "documentBytes": 9424,
               "samples": 100,
-              "placementsMedianMs": 0.04899999999999949,
-              "placementsMaxMs": 0.5402999999999984,
+              "placementsMedianMs": 0.04749999999999943,
+              "placementsMaxMs": 0.4471000000000025,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.4361999999999995,
+              "encodeMs": 0.44379999999999953,
               "recoveryBytes": 100744
             },
             {
@@ -998,11 +998,11 @@
               "keys": 8,
               "documentBytes": 35724,
               "samples": 100,
-              "placementsMedianMs": 0.058799999999997965,
-              "placementsMaxMs": 0.4446000000000012,
+              "placementsMedianMs": 0.05939999999999657,
+              "placementsMaxMs": 0.4906000000000006,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.11029999999999518,
+              "encodeMs": 0.11630000000000251,
               "recoveryBytes": 144797
             },
             {
@@ -1011,11 +1011,11 @@
               "keys": 64,
               "documentBytes": 163500,
               "samples": 100,
-              "placementsMedianMs": 0.055399999999998784,
-              "placementsMaxMs": 0.396099999999997,
+              "placementsMedianMs": 0.05619999999999692,
+              "placementsMaxMs": 1.0430999999999955,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.1016999999999939,
+              "encodeMs": 0.10790000000000077,
               "recoveryBytes": 329918
             }
           ]
@@ -1030,11 +1030,11 @@
               "keys": 0,
               "documentBytes": 9424,
               "samples": 100,
-              "placementsMedianMs": 0.04760000000000275,
-              "placementsMaxMs": 0.4358999999999895,
+              "placementsMedianMs": 0.04549999999999699,
+              "placementsMaxMs": 0.34960000000000235,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.4433999999999969,
+              "encodeMs": 0.42480000000000473,
               "recoveryBytes": 100744
             },
             {
@@ -1043,11 +1043,11 @@
               "keys": 8,
               "documentBytes": 35724,
               "samples": 100,
-              "placementsMedianMs": 0.059499999999999886,
-              "placementsMaxMs": 0.4562999999999988,
+              "placementsMedianMs": 0.059899999999998954,
+              "placementsMaxMs": 0.4474000000000018,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.11200000000000898,
+              "encodeMs": 0.10960000000000036,
               "recoveryBytes": 144797
             },
             {
@@ -1056,11 +1056,11 @@
               "keys": 64,
               "documentBytes": 163500,
               "samples": 100,
-              "placementsMedianMs": 0.057900000000003615,
-              "placementsMaxMs": 0.5688999999999993,
+              "placementsMedianMs": 0.061399999999991905,
+              "placementsMaxMs": 0.5631000000000057,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.09900000000000375,
+              "encodeMs": 0.09619999999999607,
               "recoveryBytes": 329918
             }
           ]
@@ -1075,8 +1075,8 @@
               "keys": 0,
               "documentBytes": 9424,
               "samples": 100,
-              "placementsMedianMs": 0.04649999999999821,
-              "placementsMaxMs": 0.3509999999999991,
+              "placementsMedianMs": 0.04989999999999739,
+              "placementsMaxMs": 0.43270000000000053,
               "historyEntries": 100,
               "studioBytes": 499,
               "encodeMs": 0.44010000000000105,
@@ -1088,191 +1088,11 @@
               "keys": 8,
               "documentBytes": 35724,
               "samples": 100,
-              "placementsMedianMs": 0.05860000000000554,
-              "placementsMaxMs": 0.41150000000000375,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.11260000000000048,
-              "recoveryBytes": 144797
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 64,
-              "documentBytes": 163500,
-              "samples": 100,
-              "placementsMedianMs": 0.054899999999996396,
-              "placementsMaxMs": 0.4362999999999957,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.11249999999999716,
-              "recoveryBytes": 329918
-            }
-          ]
-        },
-        {
-          "round": 6,
-          "side": "after",
-          "results": [
-            {
-              "layers": 32,
-              "rules": 0,
-              "keys": 0,
-              "documentBytes": 9424,
-              "samples": 100,
-              "placementsMedianMs": 0.04619999999999891,
-              "placementsMaxMs": 0.33319999999999794,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.4160000000000039,
-              "recoveryBytes": 100744
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 8,
-              "documentBytes": 35724,
-              "samples": 100,
-              "placementsMedianMs": 0.05830000000000268,
-              "placementsMaxMs": 0.42620000000000147,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.10770000000000124,
-              "recoveryBytes": 144797
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 64,
-              "documentBytes": 163500,
-              "samples": 100,
-              "placementsMedianMs": 0.0566999999999922,
-              "placementsMaxMs": 0.5264000000000095,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.09860000000000468,
-              "recoveryBytes": 329918
-            }
-          ]
-        },
-        {
-          "round": 6,
-          "side": "before",
-          "results": [
-            {
-              "layers": 32,
-              "rules": 0,
-              "keys": 0,
-              "documentBytes": 9424,
-              "samples": 100,
-              "placementsMedianMs": 0.04619999999999891,
-              "placementsMaxMs": 0.35940000000000083,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.42719999999999914,
-              "recoveryBytes": 100744
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 8,
-              "documentBytes": 35724,
-              "samples": 100,
-              "placementsMedianMs": 0.05930000000000035,
-              "placementsMaxMs": 0.5745000000000005,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.14710000000000178,
-              "recoveryBytes": 144797
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 64,
-              "documentBytes": 163500,
-              "samples": 100,
-              "placementsMedianMs": 0.05459999999999354,
-              "placementsMaxMs": 0.32970000000000255,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.0981000000000023,
-              "recoveryBytes": 329918
-            }
-          ]
-        },
-        {
-          "round": 7,
-          "side": "after",
-          "results": [
-            {
-              "layers": 32,
-              "rules": 0,
-              "keys": 0,
-              "documentBytes": 9424,
-              "samples": 100,
-              "placementsMedianMs": 0.04609999999999559,
-              "placementsMaxMs": 0.3714000000000013,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.4281000000000006,
-              "recoveryBytes": 100744
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 8,
-              "documentBytes": 35724,
-              "samples": 100,
-              "placementsMedianMs": 0.05799999999999983,
-              "placementsMaxMs": 0.40109999999999957,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.10549999999999926,
-              "recoveryBytes": 144797
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 64,
-              "documentBytes": 163500,
-              "samples": 100,
-              "placementsMedianMs": 0.056100000000000705,
-              "placementsMaxMs": 0.5656000000000034,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.10069999999998913,
-              "recoveryBytes": 329918
-            }
-          ]
-        },
-        {
-          "round": 7,
-          "side": "before",
-          "results": [
-            {
-              "layers": 32,
-              "rules": 0,
-              "keys": 0,
-              "documentBytes": 9424,
-              "samples": 100,
-              "placementsMedianMs": 0.047100000000000364,
-              "placementsMaxMs": 0.40160000000000196,
-              "historyEntries": 100,
-              "studioBytes": 499,
-              "encodeMs": 0.4250000000000007,
-              "recoveryBytes": 100744
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 8,
-              "documentBytes": 35724,
-              "samples": 100,
               "placementsMedianMs": 0.058799999999997965,
-              "placementsMaxMs": 0.48440000000000083,
+              "placementsMaxMs": 0.4812999999999974,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.10790000000000077,
+              "encodeMs": 0.11610000000000298,
               "recoveryBytes": 144797
             },
             {
@@ -1281,11 +1101,191 @@
               "keys": 64,
               "documentBytes": 163500,
               "samples": 100,
-              "placementsMedianMs": 0.054899999999996396,
-              "placementsMaxMs": 0.44469999999999743,
+              "placementsMedianMs": 0.055399999999998784,
+              "placementsMaxMs": 0.403100000000002,
               "historyEntries": 100,
               "studioBytes": 499,
-              "encodeMs": 0.10289999999999822,
+              "encodeMs": 0.10679999999999268,
+              "recoveryBytes": 329918
+            }
+          ]
+        },
+        {
+          "round": 6,
+          "side": "after",
+          "results": [
+            {
+              "layers": 32,
+              "rules": 0,
+              "keys": 0,
+              "documentBytes": 9424,
+              "samples": 100,
+              "placementsMedianMs": 0.04700000000000415,
+              "placementsMaxMs": 0.3290000000000006,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.5043000000000006,
+              "recoveryBytes": 100744
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 8,
+              "documentBytes": 35724,
+              "samples": 100,
+              "placementsMedianMs": 0.057800000000000296,
+              "placementsMaxMs": 0.41899999999999693,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.12140000000000128,
+              "recoveryBytes": 144797
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 64,
+              "documentBytes": 163500,
+              "samples": 100,
+              "placementsMedianMs": 0.06359999999999388,
+              "placementsMaxMs": 0.5794999999999959,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.09789999999999566,
+              "recoveryBytes": 329918
+            }
+          ]
+        },
+        {
+          "round": 6,
+          "side": "before",
+          "results": [
+            {
+              "layers": 32,
+              "rules": 0,
+              "keys": 0,
+              "documentBytes": 9424,
+              "samples": 100,
+              "placementsMedianMs": 0.0519999999999996,
+              "placementsMaxMs": 0.4784000000000006,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.4451999999999998,
+              "recoveryBytes": 100744
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 8,
+              "documentBytes": 35724,
+              "samples": 100,
+              "placementsMedianMs": 0.059899999999998954,
+              "placementsMaxMs": 0.41740000000000066,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.11540000000000106,
+              "recoveryBytes": 144797
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 64,
+              "documentBytes": 163500,
+              "samples": 100,
+              "placementsMedianMs": 0.05579999999999785,
+              "placementsMaxMs": 0.329500000000003,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.10009999999999764,
+              "recoveryBytes": 329918
+            }
+          ]
+        },
+        {
+          "round": 7,
+          "side": "after",
+          "results": [
+            {
+              "layers": 32,
+              "rules": 0,
+              "keys": 0,
+              "documentBytes": 9424,
+              "samples": 100,
+              "placementsMedianMs": 0.05169999999999675,
+              "placementsMaxMs": 0.393100000000004,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.47469999999999857,
+              "recoveryBytes": 100744
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 8,
+              "documentBytes": 35724,
+              "samples": 100,
+              "placementsMedianMs": 0.06099999999999994,
+              "placementsMaxMs": 0.40989999999999327,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.11730000000000018,
+              "recoveryBytes": 144797
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 64,
+              "documentBytes": 163500,
+              "samples": 100,
+              "placementsMedianMs": 0.06040000000000134,
+              "placementsMaxMs": 0.5078000000000031,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.10020000000000095,
+              "recoveryBytes": 329918
+            }
+          ]
+        },
+        {
+          "round": 7,
+          "side": "before",
+          "results": [
+            {
+              "layers": 32,
+              "rules": 0,
+              "keys": 0,
+              "documentBytes": 9424,
+              "samples": 100,
+              "placementsMedianMs": 0.04840000000000089,
+              "placementsMaxMs": 0.4060999999999986,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.4241000000000028,
+              "recoveryBytes": 100744
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 8,
+              "documentBytes": 35724,
+              "samples": 100,
+              "placementsMedianMs": 0.0589999999999975,
+              "placementsMaxMs": 0.44939999999999714,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.11090000000000089,
+              "recoveryBytes": 144797
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 64,
+              "documentBytes": 163500,
+              "samples": 100,
+              "placementsMedianMs": 0.0549000000000035,
+              "placementsMaxMs": 0.38809999999999434,
+              "historyEntries": 100,
+              "studioBytes": 499,
+              "encodeMs": 0.09629999999999939,
               "recoveryBytes": 329918
             }
           ]
@@ -1294,7 +1294,7 @@
     },
     "steady-alternating": {
       "before": "d1a552e",
-      "after": "56feb94c4fa2e8123b6269515b6d1e36da66272c",
+      "after": "4f4b62c1b1181e8efb31b1c3ae5075ce997c0ba3",
       "rounds": 5,
       "order": ["before", "after"],
       "warmup": 2000,
@@ -1315,11 +1315,11 @@
               "keys": 0,
               "documentBytes": 9424,
               "samples": 100,
-              "placementsMedianMs": 0.038100000000014234,
-              "placementsMaxMs": 0.247099999999989,
+              "placementsMedianMs": 0.03789999999997917,
+              "placementsMaxMs": 0.1963000000000079,
               "historyEntries": 100,
               "studioBytes": 528,
-              "encodeMs": 0.4590999999999781,
+              "encodeMs": 0.4498000000000104,
               "recoveryBytes": 100644
             },
             {
@@ -1328,11 +1328,11 @@
               "keys": 8,
               "documentBytes": 35724,
               "samples": 100,
-              "placementsMedianMs": 0.05020000000001801,
-              "placementsMaxMs": 0.24179999999995516,
+              "placementsMedianMs": 0.05040000000002465,
+              "placementsMaxMs": 0.22040000000004056,
               "historyEntries": 100,
               "studioBytes": 528,
-              "encodeMs": 0.11029999999999518,
+              "encodeMs": 0.11610000000001719,
               "recoveryBytes": 144697
             },
             {
@@ -1341,11 +1341,11 @@
               "keys": 64,
               "documentBytes": 163500,
               "samples": 100,
-              "placementsMedianMs": 0.05050000000005639,
-              "placementsMaxMs": 0.3653999999999087,
+              "placementsMedianMs": 0.04980000000000473,
+              "placementsMaxMs": 0.29529999999999745,
               "historyEntries": 100,
               "studioBytes": 528,
-              "encodeMs": 0.10490000000004329,
+              "encodeMs": 0.10140000000001237,
               "recoveryBytes": 329818
             }
           ]
@@ -1360,326 +1360,11 @@
               "keys": 0,
               "documentBytes": 9424,
               "samples": 100,
-              "placementsMedianMs": 0.03809999999998581,
-              "placementsMaxMs": 0.2790999999999997,
+              "placementsMedianMs": 0.03799999999998249,
+              "placementsMaxMs": 0.25319999999999254,
               "historyEntries": 100,
               "studioBytes": 528,
-              "encodeMs": 0.5432999999999879,
-              "recoveryBytes": 100644
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 8,
-              "documentBytes": 35724,
-              "samples": 100,
-              "placementsMedianMs": 0.05129999999996926,
-              "placementsMaxMs": 0.30810000000002447,
-              "historyEntries": 100,
-              "studioBytes": 528,
-              "encodeMs": 0.11739999999997508,
-              "recoveryBytes": 144697
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 64,
-              "documentBytes": 163500,
-              "samples": 100,
-              "placementsMedianMs": 0.049600000000054933,
-              "placementsMaxMs": 4.800800000000038,
-              "historyEntries": 100,
-              "studioBytes": 528,
-              "encodeMs": 0.10920000000004393,
-              "recoveryBytes": 329818
-            }
-          ]
-        },
-        {
-          "round": 2,
-          "side": "before",
-          "results": [
-            {
-              "layers": 32,
-              "rules": 0,
-              "keys": 0,
-              "documentBytes": 9424,
-              "samples": 100,
-              "placementsMedianMs": 0.037900000000007594,
-              "placementsMaxMs": 0.2179999999999893,
-              "historyEntries": 100,
-              "studioBytes": 528,
-              "encodeMs": 0.45179999999999154,
-              "recoveryBytes": 100644
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 8,
-              "documentBytes": 35724,
-              "samples": 100,
-              "placementsMedianMs": 0.050299999999992906,
-              "placementsMaxMs": 0.6324999999999932,
-              "historyEntries": 100,
-              "studioBytes": 528,
-              "encodeMs": 0.12970000000001392,
-              "recoveryBytes": 144697
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 64,
-              "documentBytes": 163500,
-              "samples": 100,
-              "placementsMedianMs": 0.05009999999998627,
-              "placementsMaxMs": 0.3194000000000301,
-              "historyEntries": 100,
-              "studioBytes": 528,
-              "encodeMs": 0.10360000000002856,
-              "recoveryBytes": 329818
-            }
-          ]
-        },
-        {
-          "round": 2,
-          "side": "after",
-          "results": [
-            {
-              "layers": 32,
-              "rules": 0,
-              "keys": 0,
-              "documentBytes": 9424,
-              "samples": 100,
-              "placementsMedianMs": 0.037599999999997635,
-              "placementsMaxMs": 0.23640000000000327,
-              "historyEntries": 100,
-              "studioBytes": 528,
-              "encodeMs": 0.49389999999999645,
-              "recoveryBytes": 100644
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 8,
-              "documentBytes": 35724,
-              "samples": 100,
-              "placementsMedianMs": 0.04989999999997963,
-              "placementsMaxMs": 0.23570000000000846,
-              "historyEntries": 100,
-              "studioBytes": 528,
-              "encodeMs": 0.1313000000000102,
-              "recoveryBytes": 144697
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 64,
-              "documentBytes": 163500,
-              "samples": 100,
-              "placementsMedianMs": 0.04950000000002319,
-              "placementsMaxMs": 0.32330000000001746,
-              "historyEntries": 100,
-              "studioBytes": 528,
-              "encodeMs": 0.3587999999999738,
-              "recoveryBytes": 329818
-            }
-          ]
-        },
-        {
-          "round": 3,
-          "side": "before",
-          "results": [
-            {
-              "layers": 32,
-              "rules": 0,
-              "keys": 0,
-              "documentBytes": 9424,
-              "samples": 100,
-              "placementsMedianMs": 0.03760000000002606,
-              "placementsMaxMs": 0.21989999999999554,
-              "historyEntries": 100,
-              "studioBytes": 528,
-              "encodeMs": 0.43250000000000455,
-              "recoveryBytes": 100644
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 8,
-              "documentBytes": 35724,
-              "samples": 100,
-              "placementsMedianMs": 0.05000000000001137,
-              "placementsMaxMs": 3.694500000000005,
-              "historyEntries": 100,
-              "studioBytes": 528,
-              "encodeMs": 0.11880000000002156,
-              "recoveryBytes": 144697
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 64,
-              "documentBytes": 163500,
-              "samples": 100,
-              "placementsMedianMs": 0.04980000000000473,
-              "placementsMaxMs": 0.911200000000008,
-              "historyEntries": 100,
-              "studioBytes": 528,
-              "encodeMs": 0.10719999999997754,
-              "recoveryBytes": 329818
-            }
-          ]
-        },
-        {
-          "round": 3,
-          "side": "after",
-          "results": [
-            {
-              "layers": 32,
-              "rules": 0,
-              "keys": 0,
-              "documentBytes": 9424,
-              "samples": 100,
-              "placementsMedianMs": 0.03750000000002274,
-              "placementsMaxMs": 0.2342000000000155,
-              "historyEntries": 100,
-              "studioBytes": 528,
-              "encodeMs": 0.44760000000002265,
-              "recoveryBytes": 100644
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 8,
-              "documentBytes": 35724,
-              "samples": 100,
-              "placementsMedianMs": 0.05000000000001137,
-              "placementsMaxMs": 2.6136999999999944,
-              "historyEntries": 100,
-              "studioBytes": 528,
-              "encodeMs": 0.1150000000000091,
-              "recoveryBytes": 144697
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 64,
-              "documentBytes": 163500,
-              "samples": 100,
-              "placementsMedianMs": 0.04980000000000473,
-              "placementsMaxMs": 3.9162999999999784,
-              "historyEntries": 100,
-              "studioBytes": 528,
-              "encodeMs": 0.10629999999997608,
-              "recoveryBytes": 329818
-            }
-          ]
-        },
-        {
-          "round": 4,
-          "side": "before",
-          "results": [
-            {
-              "layers": 32,
-              "rules": 0,
-              "keys": 0,
-              "documentBytes": 9424,
-              "samples": 100,
-              "placementsMedianMs": 0.03829999999999245,
-              "placementsMaxMs": 0.26480000000000814,
-              "historyEntries": 100,
-              "studioBytes": 528,
-              "encodeMs": 0.4480000000000075,
-              "recoveryBytes": 100644
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 8,
-              "documentBytes": 35724,
-              "samples": 100,
-              "placementsMedianMs": 0.050800000000037926,
-              "placementsMaxMs": 2.9547000000000025,
-              "historyEntries": 100,
-              "studioBytes": 528,
-              "encodeMs": 0.11129999999997153,
-              "recoveryBytes": 144697
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 64,
-              "documentBytes": 163500,
-              "samples": 100,
-              "placementsMedianMs": 0.050700000000006185,
-              "placementsMaxMs": 0.3523000000000138,
-              "historyEntries": 100,
-              "studioBytes": 528,
-              "encodeMs": 0.10329999999999018,
-              "recoveryBytes": 329818
-            }
-          ]
-        },
-        {
-          "round": 4,
-          "side": "after",
-          "results": [
-            {
-              "layers": 32,
-              "rules": 0,
-              "keys": 0,
-              "documentBytes": 9424,
-              "samples": 100,
-              "placementsMedianMs": 0.03839999999999577,
-              "placementsMaxMs": 0.22640000000001237,
-              "historyEntries": 100,
-              "studioBytes": 528,
-              "encodeMs": 0.44010000000000105,
-              "recoveryBytes": 100644
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 8,
-              "documentBytes": 35724,
-              "samples": 100,
-              "placementsMedianMs": 0.04970000000002983,
-              "placementsMaxMs": 3.0640000000000214,
-              "historyEntries": 100,
-              "studioBytes": 528,
-              "encodeMs": 0.13229999999998654,
-              "recoveryBytes": 144697
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 64,
-              "documentBytes": 163500,
-              "samples": 100,
-              "placementsMedianMs": 0.04970000000002983,
-              "placementsMaxMs": 4.239399999999989,
-              "historyEntries": 100,
-              "studioBytes": 528,
-              "encodeMs": 0.11950000000001637,
-              "recoveryBytes": 329818
-            }
-          ]
-        },
-        {
-          "round": 5,
-          "side": "before",
-          "results": [
-            {
-              "layers": 32,
-              "rules": 0,
-              "keys": 0,
-              "documentBytes": 9424,
-              "samples": 100,
-              "placementsMedianMs": 0.03789999999997917,
-              "placementsMaxMs": 0.23980000000000246,
-              "historyEntries": 100,
-              "studioBytes": 528,
-              "encodeMs": 0.4387999999999863,
+              "encodeMs": 0.44239999999999213,
               "recoveryBytes": 100644
             },
             {
@@ -1689,10 +1374,10 @@
               "documentBytes": 35724,
               "samples": 100,
               "placementsMedianMs": 0.05060000000003129,
-              "placementsMaxMs": 0.2732000000000312,
+              "placementsMaxMs": 4.018300000000011,
               "historyEntries": 100,
               "studioBytes": 528,
-              "encodeMs": 0.14670000000000982,
+              "encodeMs": 0.12949999999995043,
               "recoveryBytes": 144697
             },
             {
@@ -1701,11 +1386,326 @@
               "keys": 64,
               "documentBytes": 163500,
               "samples": 100,
-              "placementsMedianMs": 0.05059999999997444,
-              "placementsMaxMs": 0.4212999999999738,
+              "placementsMedianMs": 0.05000000000001137,
+              "placementsMaxMs": 0.4793000000000234,
               "historyEntries": 100,
               "studioBytes": 528,
-              "encodeMs": 0.11110000000002174,
+              "encodeMs": 0.10480000000001155,
+              "recoveryBytes": 329818
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "side": "before",
+          "results": [
+            {
+              "layers": 32,
+              "rules": 0,
+              "keys": 0,
+              "documentBytes": 9424,
+              "samples": 100,
+              "placementsMedianMs": 0.03899999999998727,
+              "placementsMaxMs": 0.37110000000001264,
+              "historyEntries": 100,
+              "studioBytes": 528,
+              "encodeMs": 0.4492999999999938,
+              "recoveryBytes": 100644
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 8,
+              "documentBytes": 35724,
+              "samples": 100,
+              "placementsMedianMs": 0.050499999999999545,
+              "placementsMaxMs": 0.25649999999996,
+              "historyEntries": 100,
+              "studioBytes": 528,
+              "encodeMs": 0.11369999999999436,
+              "recoveryBytes": 144697
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 64,
+              "documentBytes": 163500,
+              "samples": 100,
+              "placementsMedianMs": 0.05129999999996926,
+              "placementsMaxMs": 0.4241999999999848,
+              "historyEntries": 100,
+              "studioBytes": 528,
+              "encodeMs": 0.10199999999997544,
+              "recoveryBytes": 329818
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "side": "after",
+          "results": [
+            {
+              "layers": 32,
+              "rules": 0,
+              "keys": 0,
+              "documentBytes": 9424,
+              "samples": 100,
+              "placementsMedianMs": 0.038000000000010914,
+              "placementsMaxMs": 1.8935999999999922,
+              "historyEntries": 100,
+              "studioBytes": 528,
+              "encodeMs": 0.4467999999999961,
+              "recoveryBytes": 100644
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 8,
+              "documentBytes": 35724,
+              "samples": 100,
+              "placementsMedianMs": 0.04980000000000473,
+              "placementsMaxMs": 0.2685999999999922,
+              "historyEntries": 100,
+              "studioBytes": 528,
+              "encodeMs": 0.12000000000000455,
+              "recoveryBytes": 144697
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 64,
+              "documentBytes": 163500,
+              "samples": 100,
+              "placementsMedianMs": 0.049200000000041655,
+              "placementsMaxMs": 4.799599999999998,
+              "historyEntries": 100,
+              "studioBytes": 528,
+              "encodeMs": 0.11539999999996553,
+              "recoveryBytes": 329818
+            }
+          ]
+        },
+        {
+          "round": 3,
+          "side": "before",
+          "results": [
+            {
+              "layers": 32,
+              "rules": 0,
+              "keys": 0,
+              "documentBytes": 9424,
+              "samples": 100,
+              "placementsMedianMs": 0.037499999999994316,
+              "placementsMaxMs": 0.24190000000000111,
+              "historyEntries": 100,
+              "studioBytes": 528,
+              "encodeMs": 0.4408999999999992,
+              "recoveryBytes": 100644
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 8,
+              "documentBytes": 35724,
+              "samples": 100,
+              "placementsMedianMs": 0.050900000000012824,
+              "placementsMaxMs": 0.2277000000000271,
+              "historyEntries": 100,
+              "studioBytes": 528,
+              "encodeMs": 0.1523000000000252,
+              "recoveryBytes": 144697
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 64,
+              "documentBytes": 163500,
+              "samples": 100,
+              "placementsMedianMs": 0.050399999999967804,
+              "placementsMaxMs": 0.3340999999999781,
+              "historyEntries": 100,
+              "studioBytes": 528,
+              "encodeMs": 0.10389999999995325,
+              "recoveryBytes": 329818
+            }
+          ]
+        },
+        {
+          "round": 3,
+          "side": "after",
+          "results": [
+            {
+              "layers": 32,
+              "rules": 0,
+              "keys": 0,
+              "documentBytes": 9424,
+              "samples": 100,
+              "placementsMedianMs": 0.03819999999998913,
+              "placementsMaxMs": 0.27070000000000505,
+              "historyEntries": 100,
+              "studioBytes": 528,
+              "encodeMs": 0.4847000000000037,
+              "recoveryBytes": 100644
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 8,
+              "documentBytes": 35724,
+              "samples": 100,
+              "placementsMedianMs": 0.05360000000001719,
+              "placementsMaxMs": 2.7122999999999706,
+              "historyEntries": 100,
+              "studioBytes": 528,
+              "encodeMs": 0.1419999999999959,
+              "recoveryBytes": 144697
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 64,
+              "documentBytes": 163500,
+              "samples": 100,
+              "placementsMedianMs": 0.04949999999996635,
+              "placementsMaxMs": 0.27499999999997726,
+              "historyEntries": 100,
+              "studioBytes": 528,
+              "encodeMs": 0.10339999999996508,
+              "recoveryBytes": 329818
+            }
+          ]
+        },
+        {
+          "round": 4,
+          "side": "before",
+          "results": [
+            {
+              "layers": 32,
+              "rules": 0,
+              "keys": 0,
+              "documentBytes": 9424,
+              "samples": 100,
+              "placementsMedianMs": 0.03799999999998249,
+              "placementsMaxMs": 0.22719999999998208,
+              "historyEntries": 100,
+              "studioBytes": 528,
+              "encodeMs": 0.4399999999999977,
+              "recoveryBytes": 100644
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 8,
+              "documentBytes": 35724,
+              "samples": 100,
+              "placementsMedianMs": 0.05009999999998627,
+              "placementsMaxMs": 3.5546999999999684,
+              "historyEntries": 100,
+              "studioBytes": 528,
+              "encodeMs": 0.11009999999998854,
+              "recoveryBytes": 144697
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 64,
+              "documentBytes": 163500,
+              "samples": 100,
+              "placementsMedianMs": 0.05009999999998627,
+              "placementsMaxMs": 0.3432999999999993,
+              "historyEntries": 100,
+              "studioBytes": 528,
+              "encodeMs": 0.11050000000000182,
+              "recoveryBytes": 329818
+            }
+          ]
+        },
+        {
+          "round": 4,
+          "side": "after",
+          "results": [
+            {
+              "layers": 32,
+              "rules": 0,
+              "keys": 0,
+              "documentBytes": 9424,
+              "samples": 100,
+              "placementsMedianMs": 0.037700000000000955,
+              "placementsMaxMs": 0.2376999999999896,
+              "historyEntries": 100,
+              "studioBytes": 528,
+              "encodeMs": 0.42969999999999686,
+              "recoveryBytes": 100644
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 8,
+              "documentBytes": 35724,
+              "samples": 100,
+              "placementsMedianMs": 0.05310000000002901,
+              "placementsMaxMs": 0.3523000000000138,
+              "historyEntries": 100,
+              "studioBytes": 528,
+              "encodeMs": 0.14030000000002474,
+              "recoveryBytes": 144697
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 64,
+              "documentBytes": 163500,
+              "samples": 100,
+              "placementsMedianMs": 0.052099999999995816,
+              "placementsMaxMs": 5.04830000000004,
+              "historyEntries": 100,
+              "studioBytes": 528,
+              "encodeMs": 0.11820000000000164,
+              "recoveryBytes": 329818
+            }
+          ]
+        },
+        {
+          "round": 5,
+          "side": "before",
+          "results": [
+            {
+              "layers": 32,
+              "rules": 0,
+              "keys": 0,
+              "documentBytes": 9424,
+              "samples": 100,
+              "placementsMedianMs": 0.039700000000010505,
+              "placementsMaxMs": 0.2886000000000024,
+              "historyEntries": 100,
+              "studioBytes": 528,
+              "encodeMs": 0.8435999999999808,
+              "recoveryBytes": 100644
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 8,
+              "documentBytes": 35724,
+              "samples": 100,
+              "placementsMedianMs": 0.05220000000002756,
+              "placementsMaxMs": 3.7595999999999776,
+              "historyEntries": 100,
+              "studioBytes": 528,
+              "encodeMs": 0.12650000000002137,
+              "recoveryBytes": 144697
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 64,
+              "documentBytes": 163500,
+              "samples": 100,
+              "placementsMedianMs": 0.055499999999995,
+              "placementsMaxMs": 1.1539000000000215,
+              "historyEntries": 100,
+              "studioBytes": 528,
+              "encodeMs": 0.11740000000003192,
               "recoveryBytes": 329818
             }
           ]
@@ -1720,11 +1720,11 @@
               "keys": 0,
               "documentBytes": 9424,
               "samples": 100,
-              "placementsMedianMs": 0.03880000000000905,
-              "placementsMaxMs": 0.2913000000000068,
+              "placementsMedianMs": 0.041100000000000136,
+              "placementsMaxMs": 0.3772999999999911,
               "historyEntries": 100,
               "studioBytes": 528,
-              "encodeMs": 0.47040000000001214,
+              "encodeMs": 0.47350000000000136,
               "recoveryBytes": 100644
             },
             {
@@ -1733,11 +1733,11 @@
               "keys": 8,
               "documentBytes": 35724,
               "samples": 100,
-              "placementsMedianMs": 0.050800000000037926,
-              "placementsMaxMs": 0.24539999999996098,
+              "placementsMedianMs": 0.05169999999998254,
+              "placementsMaxMs": 2.764099999999985,
               "historyEntries": 100,
               "studioBytes": 528,
-              "encodeMs": 0.11759999999998172,
+              "encodeMs": 0.1258999999999446,
               "recoveryBytes": 144697
             },
             {
@@ -1746,11 +1746,11 @@
               "keys": 64,
               "documentBytes": 163500,
               "samples": 100,
-              "placementsMedianMs": 0.050499999999999545,
-              "placementsMaxMs": 0.33700000000004593,
+              "placementsMedianMs": 0.050700000000006185,
+              "placementsMaxMs": 0.38900000000001,
               "historyEntries": 100,
               "studioBytes": 528,
-              "encodeMs": 0.1097000000000321,
+              "encodeMs": 0.11379999999996926,
               "recoveryBytes": 329818
             }
           ]
@@ -1759,7 +1759,7 @@
     },
     "world-alternating": {
       "before": "d1a552e",
-      "after": "56feb94c4fa2e8123b6269515b6d1e36da66272c",
+      "after": "4f4b62c1b1181e8efb31b1c3ae5075ce997c0ba3",
       "rounds": 5,
       "order": ["before", "after"],
       "warmup": 100,
@@ -1779,8 +1779,8 @@
               "rules": 2,
               "keys": 8,
               "samples": 1000,
-              "medianMs": 0.0022999999999981924,
-              "maxMs": 0.22469999999999857
+              "medianMs": 0.002500000000001279,
+              "maxMs": 0.41029999999999944
             },
             {
               "layers": 2,
@@ -1788,23 +1788,23 @@
               "keys": 64,
               "samples": 1000,
               "medianMs": 0.0020999999999986585,
-              "maxMs": 0.186399999999999
+              "maxMs": 0.18029999999999902
             },
             {
               "layers": 32,
               "rules": 32,
               "keys": 8,
               "samples": 1000,
-              "medianMs": 0.026899999999997704,
-              "maxMs": 0.5033999999999992
+              "medianMs": 0.023900000000004695,
+              "maxMs": 0.47350000000000136
             },
             {
               "layers": 32,
               "rules": 32,
               "keys": 64,
               "samples": 1000,
-              "medianMs": 0.022899999999992815,
-              "maxMs": 0.7616000000000014
+              "medianMs": 0.023499999999998522,
+              "maxMs": 0.1828000000000003
             }
           ]
         },
@@ -1817,32 +1817,32 @@
               "rules": 2,
               "keys": 8,
               "samples": 1000,
-              "medianMs": 0.004199999999997317,
-              "maxMs": 0.15879999999999939
+              "medianMs": 0.00409999999999755,
+              "maxMs": 0.16969999999999885
             },
             {
               "layers": 2,
               "rules": 2,
               "keys": 64,
               "samples": 1000,
-              "medianMs": 0.002500000000001279,
-              "maxMs": 0.15199999999999747
+              "medianMs": 0.0024999999999977263,
+              "maxMs": 0.17310000000000159
             },
             {
               "layers": 32,
               "rules": 32,
               "keys": 8,
               "samples": 1000,
-              "medianMs": 0.03410000000000224,
-              "maxMs": 0.42019999999999413
+              "medianMs": 0.034199999999998454,
+              "maxMs": 1.014799999999994
             },
             {
               "layers": 32,
               "rules": 32,
               "keys": 64,
               "samples": 1000,
-              "medianMs": 0.03289999999999793,
-              "maxMs": 0.20319999999999538
+              "medianMs": 0.03360000000000696,
+              "maxMs": 0.31170000000000186
             }
           ]
         },
@@ -1855,32 +1855,32 @@
               "rules": 2,
               "keys": 8,
               "samples": 1000,
-              "medianMs": 0.002100000000002211,
-              "maxMs": 0.3282000000000025
+              "medianMs": 0.0020999999999986585,
+              "maxMs": 0.28149999999999764
             },
             {
               "layers": 2,
               "rules": 2,
               "keys": 64,
               "samples": 1000,
-              "medianMs": 0.0020999999999986585,
-              "maxMs": 0.19059999999999633
+              "medianMs": 0.0020000000000024443,
+              "maxMs": 0.13940000000000197
             },
             {
               "layers": 32,
               "rules": 32,
               "keys": 8,
               "samples": 1000,
-              "medianMs": 0.02449999999999619,
-              "maxMs": 0.347999999999999
+              "medianMs": 0.025500000000000966,
+              "maxMs": 0.22990000000000066
             },
             {
               "layers": 32,
               "rules": 32,
               "keys": 64,
               "samples": 1000,
-              "medianMs": 0.023000000000010346,
-              "maxMs": 0.1728999999999985
+              "medianMs": 0.022500000000007958,
+              "maxMs": 0.6037000000000035
             }
           ]
         },
@@ -1894,7 +1894,7 @@
               "keys": 8,
               "samples": 1000,
               "medianMs": 0.004100000000001103,
-              "maxMs": 0.21940000000000026
+              "maxMs": 0.2149000000000001
             },
             {
               "layers": 2,
@@ -1902,23 +1902,23 @@
               "keys": 64,
               "samples": 1000,
               "medianMs": 0.0024999999999977263,
-              "maxMs": 0.1745999999999981
+              "maxMs": 0.3808000000000007
             },
             {
               "layers": 32,
               "rules": 32,
               "keys": 8,
               "samples": 1000,
-              "medianMs": 0.033799999999999386,
-              "maxMs": 0.7286000000000001
+              "medianMs": 0.03440000000000509,
+              "maxMs": 0.2839999999999918
             },
             {
               "layers": 32,
               "rules": 32,
               "keys": 64,
               "samples": 1000,
-              "medianMs": 0.03249999999999886,
-              "maxMs": 0.18030000000000257
+              "medianMs": 0.031999999999982265,
+              "maxMs": 0.7305999999999955
             }
           ]
         },
@@ -1932,7 +1932,7 @@
               "keys": 8,
               "samples": 1000,
               "medianMs": 0.0021999999999984254,
-              "maxMs": 0.28020000000000067
+              "maxMs": 0.2259999999999991
             },
             {
               "layers": 2,
@@ -1940,23 +1940,23 @@
               "keys": 64,
               "samples": 1000,
               "medianMs": 0.0020000000000024443,
-              "maxMs": 0.18319999999999936
+              "maxMs": 0.19760000000000133
             },
             {
               "layers": 32,
               "rules": 32,
               "keys": 8,
               "samples": 1000,
-              "medianMs": 0.026299999999999102,
-              "maxMs": 0.3813999999999993
+              "medianMs": 0.02389999999999759,
+              "maxMs": 0.45770000000000266
             },
             {
               "layers": 32,
               "rules": 32,
               "keys": 64,
               "samples": 1000,
-              "medianMs": 0.022500000000007958,
-              "maxMs": 0.15320000000001244
+              "medianMs": 0.022700000000000387,
+              "maxMs": 0.10710000000000264
             }
           ]
         },
@@ -1969,160 +1969,8 @@
               "rules": 2,
               "keys": 8,
               "samples": 1000,
-              "medianMs": 0.003900000000001569,
-              "maxMs": 0.2851999999999997
-            },
-            {
-              "layers": 2,
-              "rules": 2,
-              "keys": 64,
-              "samples": 1000,
-              "medianMs": 0.0024999999999977263,
-              "maxMs": 0.230799999999995
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 8,
-              "samples": 1000,
-              "medianMs": 0.034199999999998454,
-              "maxMs": 0.504800000000003
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 64,
-              "samples": 1000,
-              "medianMs": 0.03289999999999793,
-              "maxMs": 0.4642000000000053
-            }
-          ]
-        },
-        {
-          "round": 4,
-          "side": "before",
-          "results": [
-            {
-              "layers": 2,
-              "rules": 2,
-              "keys": 8,
-              "samples": 1000,
-              "medianMs": 0.0020999999999986585,
-              "maxMs": 0.31339999999999435
-            },
-            {
-              "layers": 2,
-              "rules": 2,
-              "keys": 64,
-              "samples": 1000,
-              "medianMs": 0.0020999999999986585,
-              "maxMs": 0.1576999999999984
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 8,
-              "samples": 1000,
-              "medianMs": 0.02729999999999677,
-              "maxMs": 0.6101999999999919
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 64,
-              "samples": 1000,
-              "medianMs": 0.023399999999995202,
-              "maxMs": 0.1792999999999978
-            }
-          ]
-        },
-        {
-          "round": 4,
-          "side": "after",
-          "results": [
-            {
-              "layers": 2,
-              "rules": 2,
-              "keys": 8,
-              "samples": 1000,
-              "medianMs": 0.004199999999997317,
-              "maxMs": 0.1786999999999992
-            },
-            {
-              "layers": 2,
-              "rules": 2,
-              "keys": 64,
-              "samples": 1000,
-              "medianMs": 0.0024999999999977263,
-              "maxMs": 0.16469999999999985
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 8,
-              "samples": 1000,
-              "medianMs": 0.03340000000000032,
-              "maxMs": 0.7558999999999969
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 64,
-              "samples": 1000,
-              "medianMs": 0.031999999999996476,
-              "maxMs": 0.23160000000000025
-            }
-          ]
-        },
-        {
-          "round": 5,
-          "side": "before",
-          "results": [
-            {
-              "layers": 2,
-              "rules": 2,
-              "keys": 8,
-              "samples": 1000,
-              "medianMs": 0.002100000000002211,
-              "maxMs": 0.27120000000000033
-            },
-            {
-              "layers": 2,
-              "rules": 2,
-              "keys": 64,
-              "samples": 1000,
-              "medianMs": 0.0020000000000024443,
-              "maxMs": 0.20730000000000004
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 8,
-              "samples": 1000,
-              "medianMs": 0.02370000000000516,
-              "maxMs": 0.1746000000000052
-            },
-            {
-              "layers": 32,
-              "rules": 32,
-              "keys": 64,
-              "samples": 1000,
-              "medianMs": 0.022199999999998,
-              "maxMs": 0.17019999999999413
-            }
-          ]
-        },
-        {
-          "round": 5,
-          "side": "after",
-          "results": [
-            {
-              "layers": 2,
-              "rules": 2,
-              "keys": 8,
-              "samples": 1000,
-              "medianMs": 0.004300000000000637,
-              "maxMs": 0.22919999999999874
+              "medianMs": 0.004100000000001103,
+              "maxMs": 0.30779999999999674
             },
             {
               "layers": 2,
@@ -2130,23 +1978,175 @@
               "keys": 64,
               "samples": 1000,
               "medianMs": 0.0025000000000048317,
-              "maxMs": 0.24390000000000356
+              "maxMs": 0.12939999999999685
             },
             {
               "layers": 32,
               "rules": 32,
               "keys": 8,
               "samples": 1000,
-              "medianMs": 0.03340000000000032,
-              "maxMs": 1.0331999999999937
+              "medianMs": 0.03300000000000125,
+              "maxMs": 0.3960999999999899
             },
             {
               "layers": 32,
               "rules": 32,
               "keys": 64,
               "samples": 1000,
-              "medianMs": 0.03180000000000405,
-              "maxMs": 0.7160999999999973
+              "medianMs": 0.031899999999993156,
+              "maxMs": 0.4586999999999932
+            }
+          ]
+        },
+        {
+          "round": 4,
+          "side": "before",
+          "results": [
+            {
+              "layers": 2,
+              "rules": 2,
+              "keys": 8,
+              "samples": 1000,
+              "medianMs": 0.0021999999999984254,
+              "maxMs": 0.26920000000000144
+            },
+            {
+              "layers": 2,
+              "rules": 2,
+              "keys": 64,
+              "samples": 1000,
+              "medianMs": 0.0020000000000024443,
+              "maxMs": 0.17849999999999966
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 8,
+              "samples": 1000,
+              "medianMs": 0.02379999999999427,
+              "maxMs": 0.209699999999998
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 64,
+              "samples": 1000,
+              "medianMs": 0.02200000000000557,
+              "maxMs": 0.16089999999999804
+            }
+          ]
+        },
+        {
+          "round": 4,
+          "side": "after",
+          "results": [
+            {
+              "layers": 2,
+              "rules": 2,
+              "keys": 8,
+              "samples": 1000,
+              "medianMs": 0.00409999999999755,
+              "maxMs": 0.21259999999999835
+            },
+            {
+              "layers": 2,
+              "rules": 2,
+              "keys": 64,
+              "samples": 1000,
+              "medianMs": 0.0024999999999977263,
+              "maxMs": 0.11799999999999855
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 8,
+              "samples": 1000,
+              "medianMs": 0.033799999999999386,
+              "maxMs": 1.1365999999999872
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 64,
+              "samples": 1000,
+              "medianMs": 0.03249999999999886,
+              "maxMs": 0.27360000000000184
+            }
+          ]
+        },
+        {
+          "round": 5,
+          "side": "before",
+          "results": [
+            {
+              "layers": 2,
+              "rules": 2,
+              "keys": 8,
+              "samples": 1000,
+              "medianMs": 0.0021999999999984254,
+              "maxMs": 0.2624999999999993
+            },
+            {
+              "layers": 2,
+              "rules": 2,
+              "keys": 64,
+              "samples": 1000,
+              "medianMs": 0.0020000000000024443,
+              "maxMs": 0.18249999999999744
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 8,
+              "samples": 1000,
+              "medianMs": 0.026000000000003354,
+              "maxMs": 0.6610999999999905
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 64,
+              "samples": 1000,
+              "medianMs": 0.02230000000000132,
+              "maxMs": 0.1595000000000084
+            }
+          ]
+        },
+        {
+          "round": 5,
+          "side": "after",
+          "results": [
+            {
+              "layers": 2,
+              "rules": 2,
+              "keys": 8,
+              "samples": 1000,
+              "medianMs": 0.004000000000001336,
+              "maxMs": 0.1816000000000031
+            },
+            {
+              "layers": 2,
+              "rules": 2,
+              "keys": 64,
+              "samples": 1000,
+              "medianMs": 0.0024999999999977263,
+              "maxMs": 0.13189999999999813
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 8,
+              "samples": 1000,
+              "medianMs": 0.03349999999999653,
+              "maxMs": 0.5099000000000018
+            },
+            {
+              "layers": 32,
+              "rules": 32,
+              "keys": 64,
+              "samples": 1000,
+              "medianMs": 0.032299999999992224,
+              "maxMs": 0.19550000000000978
             }
           ]
         }
