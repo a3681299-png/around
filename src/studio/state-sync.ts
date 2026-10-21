@@ -6,7 +6,19 @@ import { freezeTree } from '../design/immutable';
 
 /** Sparse tree changes: array indices are keys too; no unchanged subtree is serialized. */
 export type TreeChange =
-  { unset: true } | { set: unknown } | { keys: Record<string, TreeChange>; remove: string[]; length?: number };
+  | { unset: true }
+  | { set: unknown }
+  | { keyed: { field: 'id' | 'target'; items: Record<string, TreeChange>; order?: string[] } }
+  | { keys: Record<string, TreeChange>; remove: string[]; length?: number };
+function arrayKey(before: unknown[], next: unknown[]): 'id' | 'target' | undefined {
+  for (const key of ['id', 'target'] as const) {
+    const valid = (items: unknown[]) =>
+      items.every(
+        (item) => item && typeof item === 'object' && typeof (item as Record<string, unknown>)[key] === 'string',
+      ) && new Set(items.map((item) => (item as Record<string, unknown>)[key])).size === items.length;
+    if (valid(before) && valid(next)) return key;
+  }
+}
 export function treeChange(before: unknown, next: unknown): TreeChange | undefined {
   if (before === next) return;
   if (next === undefined) return { unset: true };
@@ -18,9 +30,24 @@ export function treeChange(before: unknown, next: unknown): TreeChange | undefin
     Array.isArray(before) !== Array.isArray(next)
   )
     return { set: next };
+  if (Array.isArray(before) && Array.isArray(next)) {
+    const field = arrayKey(before, next);
+    if (field) {
+      const a = new Map(before.map((item) => [item[field] as string, item as unknown]));
+      const order = next.map((item) => item[field] as string),
+        items: Record<string, TreeChange> = Object.create(null) as Record<string, TreeChange>;
+      for (const item of next) {
+        const change = treeChange(a.get(item[field]), item);
+        if (change) items[item[field]] = change;
+      }
+      const reordered = before.length !== next.length || order.some((id, i) => before[i]?.[field] !== id);
+      if (!reordered && !Object.keys(items).length) return;
+      return { keyed: { field, items, ...(reordered ? { order } : {}) } };
+    }
+  }
   const a = before as Record<string, unknown>,
     b = next as Record<string, unknown>;
-  const keys: Record<string, TreeChange> = {},
+  const keys: Record<string, TreeChange> = Object.create(null) as Record<string, TreeChange>,
     remove = Object.keys(a).filter((key) => !Object.hasOwn(b, key));
   for (const key of Object.keys(b)) {
     const change = treeChange(a[key], b[key]);
@@ -35,6 +62,18 @@ export function applyTreeChange<T>(before: T, change: TreeChange | undefined): T
   if (!change) return before;
   if ('unset' in change) return undefined as T;
   if ('set' in change) return change.set as T;
+  if ('keyed' in change) {
+    if (!Array.isArray(before)) throw new Error('配列差分の基準が不正です。');
+    const { field, items, order } = change.keyed;
+    const values = new Map(before.map((item: Record<string, unknown>) => [item[field], item]));
+    const ids = order ?? before.map((item: Record<string, unknown>) => item[field] as string);
+    if (new Set(ids).size !== ids.length) throw new Error('配列差分のIDが重複しています。');
+    return ids.map((id) => {
+      const value = applyTreeChange(values.get(id), Object.hasOwn(items, id) ? items[id] : undefined);
+      if (!value || value[field] !== id) throw new Error('配列差分のIDが不正です。');
+      return value;
+    }) as T;
+  }
   if (!before || typeof before !== 'object') throw new Error('差分の基準が不正です。');
   const next = (Array.isArray(before) ? [...before] : { ...before }) as Record<string, unknown>;
   for (const key of change.remove) delete next[key];
@@ -136,6 +175,7 @@ export interface StudioStateDelta {
   sequence: number;
   state?: TreeChange;
   history?: HistoryChange;
+  savedFromDocument?: true;
 }
 export interface StudioStatePayload {
   state?: EditorSnapshot;
@@ -156,13 +196,20 @@ export function createStudioStateEncoder() {
         checkpoint = nextCheckpoint;
         return { state: next, checkpoint: packCheckpoint(nextCheckpoint), sequence: ++sequence };
       }
-      const state = treeChange(previous, next),
+      const savedFromDocument = next.saved !== previous.saved && next.saved === next.document;
+      const state = treeChange(previous, savedFromDocument ? { ...next, saved: previous.saved } : next),
         history = changeHistory(checkpoint.history, nextCheckpoint.history, previous.document);
       previous = next;
       checkpoint = nextCheckpoint;
-      if (!state && !history) return {};
+      if (!state && !history && !savedFromDocument) return {};
       return {
-        delta: { base: sequence, sequence: ++sequence, ...(state ? { state } : {}), ...(history ? { history } : {}) },
+        delta: {
+          base: sequence,
+          sequence: ++sequence,
+          ...(state ? { state } : {}),
+          ...(history ? { history } : {}),
+          ...(savedFromDocument ? { savedFromDocument: true } : {}),
+        },
       };
     },
   };
@@ -181,6 +228,7 @@ export function createStudioStateDecoder() {
         if (!state || !checkpoint || delta.base !== sequence || delta.sequence !== sequence + 1)
           throw new Error('Studio差分の順序が一致しません。再接続してください。');
         next = applyTreeChange(state, delta.state);
+        if (delta.savedFromDocument) next = { ...next, saved: next.document };
         history = applyHistory(checkpoint.history, delta.history, state.document);
         nextSequence = delta.sequence;
       }

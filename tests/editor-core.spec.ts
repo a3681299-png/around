@@ -209,12 +209,18 @@ test('Studio deltas preserve gestures, Undo/Redo, save/discard and the bounded h
   await run({ type: 'redo' });
   await run({ type: 'select-target', target: 'video-card' });
   await run({ type: 'style', style: { backgroundColor: '#123456' } });
-  await run({ type: 'save' });
+  const savedMessage = await run({ type: 'save' });
+  expect(JSON.stringify(savedMessage.message)).not.toContain('schemaVersion');
+  expect(savedMessage.received!.state.saved).toBe(savedMessage.received!.state.document);
   await run({ type: 'change', id, patch: { locked: true } });
   await run({ type: 'discard' });
   await run({ type: 'select-all' });
   await run({ type: 'group' });
   await run({ type: 'ungroup' });
+  await run({ type: 'duplicate', id });
+  await run({ type: 'undo' });
+  await run({ type: 'delete', id });
+  await run({ type: 'undo' });
   let last;
   for (let i = 0; i < 105; i++) {
     last = await run({ type: 'change', id, patch: { opacity: 0.1 + i / 1000 } });
@@ -236,6 +242,48 @@ test('Studio deltas preserve gestures, Undo/Redo, save/discard and the bounded h
   expect(recovered.editor.snapshot().document).toEqual(editor.checkpoint().history.past.at(-1));
   editor.destroy();
   recovered.editor.destroy();
+});
+
+test('editing one of 32 long rules sends changed keys and ordering IDs without resending unchanged keyframes', async () => {
+  const a = await opened(),
+    doc = structuredClone(a.editor.snapshot().document);
+  const layer = doc.decorations[0]!;
+  doc.decorations = Array.from({ length: 32 }, (_, i) => ({ ...layer, id: `image-${i}` }));
+  doc.signalRules = doc.decorations.map((layer, index) => ({
+    ...defaultScrollOpacityRule(layer.id),
+    id: index === 31 ? 'constructor' : `scroll-${layer.id}`,
+    keyframes: Array.from({ length: 64 }, (_, i) => ({
+      id: `key-${i}`,
+      input: i / 63,
+      value: (index + i) / 100,
+      easing: 'linear',
+    })),
+  }));
+  const h = harness();
+  h.set(doc);
+  h.editor.setEnabled(true);
+  h.editor.open();
+  const encoder = createStudioStateEncoder(),
+    decoder = createStudioStateDecoder();
+  const wire = () => JSON.parse(JSON.stringify(encoder.encode(h.editor.snapshot(), h.editor.checkpoint())));
+  decoder.accept(wire());
+  const rule = structuredClone(doc.signalRules[0]!);
+  rule.keyframes[0]!.value = 0.8;
+  await h.editor.execute({ type: 'signal-rule', rule });
+  const message = wire(),
+    text = JSON.stringify(message);
+  expect(text).not.toContain('key-63');
+  expect(text).not.toContain('schemaVersion');
+  expect(Buffer.byteLength(text)).toBeLessThan(5000);
+  expect(decoder.accept(message)!.checkpoint).toEqual(h.editor.checkpoint());
+  await h.editor.execute({ type: 'save' });
+  const save = wire();
+  expect(JSON.stringify(save)).not.toContain('keyframes');
+  const saved = decoder.accept(save)!;
+  expect(saved.state.saved).toBe(saved.state.document);
+  expect(saved.checkpoint).toEqual(h.editor.checkpoint());
+  a.editor.destroy();
+  h.editor.destroy();
 });
 
 test('Studio detects missing or duplicate deltas atomically and reconnects from a new base', async () => {
