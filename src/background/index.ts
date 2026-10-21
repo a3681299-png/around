@@ -11,7 +11,13 @@ import { installTakeStorage } from '../browser/take-repository';
 import { createAssetTransfers } from '../assets/transfers';
 import { createWorkQueue } from '../assets/work-queue';
 import { createSourceCache } from '../assets/source-cache';
-import { canReuseImportInspection } from '../assets/import-validation';
+import { canReuseImportInspection, validateImportBatchSizes } from '../assets/import-validation';
+import { createStudioTransferService, type StudioTransferEvent } from './studio-transfer';
+import {
+  STUDIO_TRANSFER_AUTHORIZE,
+  STUDIO_TRANSFER_CONFIRM,
+  STUDIO_TRANSFER_STATUS,
+} from '../assets/studio-transfer-protocol';
 import { ASSET_MESSAGES } from '../assets/limits';
 import { installAssetRuntimeBroker } from '../diagnostics/asset-runtime-broker';
 import {
@@ -155,14 +161,19 @@ async function leaseAssets(lease: AssetLease, ids: readonly string[]): Promise<v
 async function importBatch(
   input: unknown,
   lease: AssetLease,
-  decoded?: Uint8Array,
+  decoded?: Uint8Array | readonly Uint8Array[],
   trace?: string,
 ): Promise<AssetMetadata[]> {
   if (!Array.isArray(input) || !input.length || input.length > ASSET_LIMITS.batchCount)
     throw new Error(ASSET_MESSAGES.batchCount);
+  const decodedFiles = decoded instanceof Uint8Array ? undefined : decoded;
+  if (decodedFiles) {
+    if (decodedFiles.length !== input.length) throw new Error('素材転送の個数が不正です。');
+    validateImportBatchSizes(decodedFiles.map((bytes) => bytes.length));
+  }
   const assets: StoredAsset[] = [];
   let size = 0;
-  for (const raw of input) {
+  for (const [index, raw] of input.entries()) {
     if (!raw || typeof raw !== 'object') throw new Error('素材の形式が不正です。');
     const file = raw as AssetWireFile;
     if (
@@ -173,7 +184,11 @@ async function importBatch(
       typeof file.mime !== 'string'
     )
       throw new Error('素材の形式が不正です。');
-    const bytes = decoded ?? base64ToBytes(file.base64);
+    const bytes = decodedFiles
+      ? decodedFiles[index]!
+      : decoded instanceof Uint8Array
+        ? decoded
+        : base64ToBytes(file.base64);
     size += bytes.length;
     if (size > (decoded ? ASSET_LIMITS.modelBytes : ASSET_LIMITS.fileBytes))
       throw new Error(ASSET_MESSAGES.transferSize(Boolean(decoded)));
@@ -239,11 +254,35 @@ async function importBatch(
   return assets.map(({ blob: _blob, leases: _leases, ...metadata }) => metadata);
 }
 
+const workerClients = (
+  globalThis as unknown as {
+    clients: { get(id: string): Promise<{ id: string; url: string; frameType: string } | undefined> };
+  }
+).clients;
+const studioTransfer = createStudioTransferService({
+  studioURL: chrome.runtime.getURL('studio/index.html'),
+  extensionId: chrome.runtime.id,
+  async sidePanelDocument(url) {
+    const contexts = (
+      await chrome.runtime.getContexts({ contextTypes: [chrome.runtime.ContextType.SIDE_PANEL] })
+    ).filter((context) => context.documentUrl === url && context.frameId === 0);
+    return contexts.length === 1 ? contexts[0]!.documentId : undefined;
+  },
+  client: (id) => workerClients.get(id),
+  owner,
+  enqueue,
+  importBatch,
+});
+self.addEventListener('message', (event) => studioTransfer.receive(event as unknown as StudioTransferEvent));
+
 async function handle(
   message: Record<string, unknown>,
   sender: chrome.runtime.MessageSender,
   trace?: string,
 ): Promise<unknown> {
+  if (message['action'] === STUDIO_TRANSFER_AUTHORIZE) return studioTransfer.authorize(message, sender);
+  if (message['action'] === STUDIO_TRANSFER_CONFIRM) return studioTransfer.confirm(message, sender);
+  if (message['action'] === STUDIO_TRANSFER_STATUS) return studioTransfer.status(message, sender);
   if (message['action'] === 'get' || message['action'] === 'get-part' || message['action'] === 'get-metadata') {
     if (!isAssetId(message['id'])) throw new Error('素材IDが不正です。');
     const asset = await profileAsync(trace, 'store.idb-read-or-cached', () => sourceRows.get(message['id'] as string));
@@ -312,6 +351,7 @@ async function handle(
       throw new Error('素材IDが不正です。');
     await profileAsync(trace, 'store.lease-rewrite', () => leaseAssets(lease, ids));
   } else if (message['action'] === 'release') {
+    studioTransfer.revoke(lease.session);
     await profileAsync(trace, 'store.release-rewrite', () => leaseAssets(lease, []));
   } else if (message['action'] === 'save' || message['action'] === 'validate') {
     const design = parseDesign(message['design']);
@@ -420,7 +460,11 @@ chrome.runtime.onMessage.addListener((input: unknown, sender, respond) => {
     }
   }
   const arrived = ASSET_PROFILE ? performance.now() : 0;
-  const scheduler = ['get', 'get-part', 'get-metadata'].includes(String(message['action'])) ? reads : mutations;
+  const scheduler = ['get', 'get-part', 'get-metadata', STUDIO_TRANSFER_CONFIRM, STUDIO_TRANSFER_STATUS].includes(
+    String(message['action']),
+  )
+    ? reads
+    : mutations;
   void scheduler
     .run(() => {
       profileEnd(trace, 'queue.' + message['action'], arrived);

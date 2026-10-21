@@ -130,8 +130,19 @@ test('side panel and standalone hand off unsaved Undo and asset leases, while ta
     await local.getByRole('button', { name: 'Chromeサイドパネルを開く', exact: true }).click();
     const panel = await sidePanelDriver(context, page, id);
     await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
+    await panel.evaluate(`(() => {
+      globalThis.__studioNativeTransfers = [];
+      const post = ServiceWorker.prototype.postMessage;
+      ServiceWorker.prototype.postMessage = function(message, ...args) {
+        const result = Reflect.apply(post, this, [message, ...args]);
+        if (message?.type === 'web-world-themes:studio-assets-v1')
+          __studioNativeTransfers.push(message.files.every(file => file.buffer.byteLength === 0));
+        return result;
+      };
+    })()`);
     await panel.files([path.resolve('tests/fixtures/motion/petal.png')]);
     await expect.poll(() => panel.text('.selected-count')).toBe('1個選択中');
+    expect(await panel.evaluate('__studioNativeTransfers')).toEqual([true]);
     await panel.fill('[data-image-prop="rotationDeg"]', '20');
     await expect.poll(() => panel.text('.dirty')).toBe('未保存の変更');
     await expect.poll(() => panel.evaluate('document.querySelector(".recovery-status").textContent')).toBe('');

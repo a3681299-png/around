@@ -16,6 +16,7 @@ import {
 } from '../diagnostics/asset-profile';
 import { createSourceCache } from './source-cache';
 import { rememberVerifiedSource } from './verified-source';
+import { validateImportBatchSizes } from './import-validation';
 
 async function request<T>(action: string, values: Record<string, unknown>): Promise<T> {
   const trace = ASSET_PROFILE
@@ -46,6 +47,20 @@ async function request<T>(action: string, values: Record<string, unknown>): Prom
   return response.value as T;
 }
 
+/** Both Studio transports retain the existing client-side media probes. */
+export async function readImportFile(file: File, signal?: AbortSignal, trace?: string) {
+  signal?.throwIfAborted();
+  if (file.size > ASSET_LIMITS.modelBytes) throw new Error(ASSET_MESSAGES.fileSizes);
+  const bytes = new Uint8Array(
+    await profileAsync(trace, 'import.file-read', () => file.arrayBuffer(), { bytes: file.size }),
+  );
+  const info = profileSync(trace, 'import.inspect', () => inspectAsset(bytes, file.type));
+  await profileAsync(trace, 'import.validate-textures', () => validateAnimatedFrames(bytes, info, signal, trace));
+  signal?.throwIfAborted();
+  const name = file.name.replace(/[\u0000-\u001f]/g, '').slice(0, 120) || 'image';
+  return { bytes, name };
+}
+
 export async function importAssets(
   files: readonly File[],
   session: string,
@@ -53,10 +68,7 @@ export async function importAssets(
   ownerTabId?: number,
 ): Promise<AssetMetadata[]> {
   const owner = ownerTabId === undefined ? {} : { ownerTabId };
-  if (!files.length || files.length > ASSET_LIMITS.batchCount) throw new Error(ASSET_MESSAGES.batchCount);
-  const large = files.some((file) => file.size > ASSET_LIMITS.fileBytes),
-    total = files.reduce((size, file) => size + file.size, 0);
-  if (total > (large ? ASSET_LIMITS.batchBytes : ASSET_LIMITS.fileBytes)) throw new Error(ASSET_MESSAGES.batchSize);
+  validateImportBatchSizes(files.map((file) => file.size));
   const wire: AssetWireFile[] = [];
   const imported: AssetMetadata[] = new Array(files.length),
     wireIndices: number[] = [];
@@ -65,15 +77,7 @@ export async function importAssets(
     const trace = newAssetProfile(),
       before = ASSET_PROFILE ? performance.now() : 0;
     const profiled = trace ? { __profile: trace } : {};
-    signal?.throwIfAborted();
-    if (file.size > ASSET_LIMITS.modelBytes) throw new Error(ASSET_MESSAGES.fileSizes);
-    const bytes = new Uint8Array(
-      await profileAsync(trace, 'import.file-read', () => file.arrayBuffer(), { bytes: file.size }),
-    );
-    const info = profileSync(trace, 'import.inspect', () => inspectAsset(bytes, file.type));
-    await profileAsync(trace, 'import.validate-textures', () => validateAnimatedFrames(bytes, info, signal, trace));
-    signal?.throwIfAborted();
-    const name = file.name.replace(/[\u0000-\u001f]/g, '').slice(0, 120) || 'image';
+    const { bytes, name } = await readImportFile(file, signal, trace);
     if (file.size > ASSET_LIMITS.fileBytes) {
       const upload = await request<string>('upload-start', {
         session,

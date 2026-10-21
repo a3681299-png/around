@@ -8,7 +8,8 @@ import {
 import type { EditCommand, EditorCheckpoint, EditorSnapshot } from '../editor-core/types';
 import { ASSET_LIMITS } from '../assets/validation';
 import { ASSET_MESSAGES } from '../assets/limits';
-import { importAssets, releaseAssets } from '../assets/client';
+import { releaseAssets } from '../assets/client';
+import { importStudioAssets } from '../assets/studio-upload';
 
 import type { StudioConnectionState, StudioConnection } from '../studio/connection';
 import { requestStudioSurface } from './side-panel';
@@ -385,7 +386,7 @@ export function createStudioClient(
           const ownerTab = surface === 'sidepanel' ? target : (await chrome.tabs.getCurrent())?.id;
           controller.signal.throwIfAborted();
           if (ownerTab === undefined) throw new Error('Studioの保持先が見つかりません。');
-          const assets = await importAssets(files, lease, controller.signal, ownerTab);
+          const assets = await importStudioAssets(files, lease, controller.signal, ownerTab);
           if (generation !== epoch || !connected) throw new Error('素材の読み込み中に接続が変わりました。');
           const current = state!;
           await request({

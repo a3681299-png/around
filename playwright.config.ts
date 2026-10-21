@@ -28,6 +28,7 @@ const unitSpecs = [
   'signal-motion',
   'signal-rules',
   'signal-takes',
+  'studio-transfer-data',
   'timeline-host',
   'vrm-data',
   'world-boundaries',

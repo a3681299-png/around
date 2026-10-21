@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import type { Page, BrowserContext, Locator } from '@playwright/test';
 import { test, expect } from './fixtures';
 import type { DesignDocument } from '../src/design/types';
+import { observeImports, uploadLeases, type StudioImportProbe } from './helpers/studio-import';
 
 const overlay = '#web-world-themes-decorations',
   images = `${overlay} [data-image-id]`,
@@ -35,76 +36,6 @@ async function stored(popup: Page) {
   return popup.evaluate(async (key) => (await chrome.storage.local.get(key))[key] as DesignDocument, key);
 }
 
-interface StudioImportProbe {
-  portImports: { type: string; keys: string[]; assets?: string[] }[];
-  uploads: { action: string; session: string }[];
-  stored: boolean;
-  resume?: () => void;
-}
-async function observeImports(studio: Page, holdStored = false) {
-  await studio.addInitScript((hold) => {
-    const probe: StudioImportProbe = { portImports: [], uploads: [], stored: false };
-    (globalThis as any).__studioImportProbe = probe;
-    const connect = chrome.tabs.connect;
-    chrome.tabs.connect = function (...args) {
-      const port = Reflect.apply(connect, chrome.tabs, args) as chrome.runtime.Port,
-        post = port.postMessage;
-      port.postMessage = (message: Record<string, any>) => {
-        if (message.type === 'import' || message.type === 'import-assets')
-          probe.portImports.push({ type: message.type, keys: Object.keys(message), assets: message.assets });
-        post.call(port, message);
-      };
-      return port;
-    };
-    const send = chrome.runtime.sendMessage;
-    chrome.runtime.sendMessage = function (...args: unknown[]) {
-      const message = args[0] as Record<string, any>,
-        result = Reflect.apply(send, chrome.runtime, args);
-      if (message?.type === 'web-world-themes:assets' && message.session?.startsWith('studio-upload-')) {
-        probe.uploads.push({ action: message.action, session: message.session });
-        if (hold && message.action === 'import')
-          return Promise.resolve(result).then(async (response) => {
-            if (response?.ok) {
-              probe.stored = true;
-              await new Promise<void>((resolve) => {
-                probe.resume = resolve;
-              });
-            }
-            return response;
-          });
-      }
-      return result;
-    } as typeof chrome.runtime.sendMessage;
-  }, holdStored);
-  await studio.reload();
-  await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
-}
-async function uploadLeases(popup: Page) {
-  return popup.evaluate(
-    () =>
-      new Promise<string[]>((resolve, reject) => {
-        const open = indexedDB.open('web-world-themes-assets', 1);
-        open.onerror = () => reject(open.error);
-        open.onsuccess = () => {
-          const db = open.result,
-            request = db.transaction('assets').objectStore('assets').getAll();
-          request.onerror = () => {
-            db.close();
-            reject(request.error);
-          };
-          request.onsuccess = () => {
-            db.close();
-            resolve(
-              request.result.flatMap((row: { leases: { session: string }[] }) =>
-                row.leases.filter((lease) => lease.session.startsWith('studio-upload-')).map((lease) => lease.session),
-              ),
-            );
-          };
-        };
-      }),
-  );
-}
-
 test('Studio uploads small files directly, sends only asset IDs and preserves saved history', async ({
   context,
   popup,
@@ -118,7 +49,10 @@ test('Studio uploads small files directly, sends only asset IDs and preserves sa
   expect(probe.portImports).toHaveLength(1);
   expect(probe.portImports[0]).toMatchObject({ type: 'import-assets', assets: [expect.stringMatching(/^asset-/)] });
   expect(probe.portImports[0]!.keys.sort()).toEqual(['assets', 'id', 'revision', 'session', 'type']);
-  expect(probe.uploads.map((entry) => entry.action)).toEqual(['import', 'release']);
+  expect(probe.uploads.map((entry) => entry.action)).toContain('studio-transfer-authorize');
+  expect(probe.uploads.map((entry) => entry.action)).toContain('studio-transfer-confirm');
+  expect(probe.uploads.map((entry) => entry.action)).not.toContain('import');
+  expect(probe.nativeTransfers).toEqual([{ bytes: expect.any(Number), detached: true }]);
   await panel.locator('.undo').click();
   await expect(youtube.locator(images)).toHaveCount(0);
   await panel.locator('.redo').click();
