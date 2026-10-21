@@ -13,6 +13,7 @@ import { createStudioStateEncoder, createStudioStateDecoder } from '../src/studi
 import { packCheckpoint, unpackCheckpoint } from '../src/studio/checkpoint-codec';
 import { defaultModelSettings } from '../src/models/types';
 import { defaultFollowMotion } from '../src/signals/motion';
+import { commitDesign, editDesign, freezeTree, readDesign, shareDesign } from '../src/design/immutable';
 
 function harness(validateAssets: () => Promise<void> = async () => undefined) {
   let value: DesignDocument | undefined,
@@ -243,6 +244,74 @@ test('immutable revisions share unchanged layers and history cannot be rewritten
   await editor.execute({ type: 'delete', id });
   expect(editor.snapshot().document.decorations[0]).toBe(surviving);
   editor.destroy();
+});
+
+test('freezing display data never marks invalid layers, styles, groups or signals as validated', async () => {
+  const { editor } = await opened();
+  const input = structuredClone(editor.snapshot().document);
+  input.rules = [{ kind: 'surface-style', target: 'video-card', style: { borderRadiusPx: 8 } }];
+  input.groups = [
+    {
+      kind: 'group',
+      id: 'group-test',
+      name: 'Group',
+      opacity: 1,
+      visible: true,
+      locked: false,
+      zIndex: 0,
+      children: input.decorations.slice(0, 2).map((layer) => layer.id),
+    },
+  ];
+  input.signalRules = [defaultScrollOpacityRule(input.decorations[0]!.id)];
+  const previous = readDesign(input);
+  const invalid: Array<(doc: DesignDocument) => void> = [
+    (doc) => {
+      doc.decorations[0]!.opacity = 1.01;
+    },
+    (doc) => {
+      doc.decorations[0]!.placement.x = Infinity;
+    },
+    (doc) => {
+      doc.groups![0]!.opacity = -0.1;
+    },
+    (doc) => {
+      doc.rules[0]!.style.borderRadiusPx = 49;
+    },
+    (doc) => {
+      doc.signalRules![0]!.keyframes[0]!.value = NaN;
+    },
+  ];
+  try {
+    for (const corrupt of invalid) {
+      const value = structuredClone(input);
+      corrupt(value);
+      freezeTree(value);
+      expect(Object.isFrozen(value.decorations[0]!)).toBe(true);
+      expect(() => commitDesign(value, previous)).toThrow();
+      expect(() => shareDesign(previous, value)).toThrow();
+      expect(() => shareDesign(value, previous)).toThrow();
+    }
+    expect(previous).toEqual(input);
+    // A valid frozen view also crosses the schema, rather than being adopted by reference.
+    const display = freezeTree(structuredClone(input)),
+      adopted = commitDesign(display),
+      committed = commitDesign(display, previous);
+    expect(adopted).toEqual(input);
+    expect(adopted.decorations[0]).not.toBe(display.decorations[0]);
+    expect(committed).toBe(previous);
+    const wrongRole = editDesign(previous);
+    wrongRole.decorations[0] = previous.groups![0] as never;
+    expect(() => commitDesign(wrongRole, previous)).toThrow();
+    const edited = editDesign(committed);
+    edited.decorations[0] = { ...committed.decorations[0]!, opacity: 0.5 };
+    const next = commitDesign(edited, committed);
+    expect(next.decorations[1]).toBe(previous.decorations[1]);
+    expect(next.rules).toBe(previous.rules);
+    expect(next.groups).toBe(previous.groups);
+    expect(next.signalRules).toBe(previous.signalRules);
+  } finally {
+    editor.destroy();
+  }
 });
 
 test('Studio deltas preserve gestures, Undo/Redo, save/discard and the bounded history through JSON transport', async () => {

@@ -9,8 +9,15 @@ import { sameAnchor } from './hierarchy';
 
 const documents = new WeakSet<object>(),
   frozen = new WeakSet<object>();
+// Validation belongs to a schema role, independently of recursive immutability.
+const validated = {
+  rules: new WeakSet<DesignDocument['rules'][number]>(),
+  decorations: new WeakSet<DesignDocument['decorations'][number]>(),
+  groups: new WeakSet<NonNullable<DesignDocument['groups']>[number]>(),
+  signalRules: new WeakSet<NonNullable<DesignDocument['signalRules']>[number]>(),
+};
 
-/** Only trees already owned by the editor may bypass recursive freezing. */
+/** Freeze any tree, including display data, without granting schema trust. */
 export function freezeTree<T>(value: T): T {
   if (value && typeof value === 'object' && !frozen.has(value)) {
     Object.values(value).forEach(freezeTree);
@@ -20,12 +27,22 @@ export function freezeTree<T>(value: T): T {
   return value;
 }
 
+/** Private: only schema results or structural sharing of validated revisions reach here. */
+function adoptValidatedDesign(value: DesignDocument): DesignDocument {
+  if (documents.has(value)) return value;
+  freezeTree(value);
+  value.rules.forEach((rule) => validated.rules.add(rule));
+  value.decorations.forEach((layer) => validated.decorations.add(layer));
+  value.groups?.forEach((group) => validated.groups.add(group));
+  value.signalRules?.forEach((rule) => validated.signalRules.add(rule));
+  documents.add(value);
+  return value;
+}
+
 /** External data always crosses the full versioned schema before it becomes trusted. */
 export function readDesign(value: unknown): DesignDocument {
   if (value && typeof value === 'object' && documents.has(value)) return value as DesignDocument;
-  const parsed = freezeTree(parseDesign(value));
-  documents.add(parsed);
-  return parsed;
+  return adoptValidatedDesign(parseDesign(value));
 }
 
 function share<T>(before: T, next: T): T {
@@ -88,18 +105,20 @@ export function commitDesign(input: DesignDocument, previous?: DesignDocument): 
   if (input.rules.length > 16 || new Set(input.rules.map((rule) => rule.target)).size !== input.rules.length)
     throw new Error('デザインのルールが不正です。');
   const rules = input.rules.map((rule) => {
-    if (frozen.has(rule)) return rule;
+    if (validated.rules.has(rule)) return rule;
     if (rule.kind !== 'surface-style' || !isDesignId(rule.target)) throw new Error('編集対象が不正です。');
     return { kind: 'surface-style' as const, target: rule.target, style: parseSurfaceStyle(rule.style) };
   });
   if (input.decorations.length > IMAGE_LIMITS.count) throw new Error(ASSET_MESSAGES.layerCount);
-  const decorations = input.decorations.map((layer) => (frozen.has(layer) ? layer : parseDecoration(layer)));
+  const decorations = input.decorations.map((layer) =>
+    validated.decorations.has(layer) ? layer : parseDecoration(layer),
+  );
   if (decorations.filter((layer) => layer.kind === 'model3d').length > MODEL_LIMITS.count)
     throw new Error(ASSET_MESSAGES.modelCount);
   if (decorations.filter((layer) => layer.kind === 'animation').length > ANIMATION_LIMITS.count)
     throw new Error(ASSET_MESSAGES.layerCount);
   if ((input.groups?.length ?? 0) > GROUP_LIMITS.count) throw new Error('グループは16個までです。');
-  const groups = (input.groups ?? []).map((layer) => (frozen.has(layer) ? layer : parseGroupLayer(layer)));
+  const groups = (input.groups ?? []).map((layer) => (validated.groups.has(layer) ? layer : parseGroupLayer(layer)));
   const ids = new Set([...decorations, ...groups].map((layer) => layer.id));
   if (ids.size !== decorations.length + groups.length) throw new Error('レイヤーのIDが重複しています。');
   const assigned = new Set<string>();
@@ -114,7 +133,7 @@ export function commitDesign(input: DesignDocument, previous?: DesignDocument): 
   const ruleIds = new Set<string>(),
     targets = new Set<string>();
   const signalRules = (input.signalRules ?? []).map((value) => {
-    const rule = frozen.has(value) ? value : parseSignalRules([value], ids)[0]!;
+    const rule = validated.signalRules.has(value) ? value : parseSignalRules([value], ids)[0]!;
     const target = `${rule.target.layerId}:${rule.target.property}`;
     if (!ids.has(rule.target.layerId) || ruleIds.has(rule.id) || (rule.enabled && targets.has(target)))
       throw new Error('シグナルルールの対象が不正または重複しています。');
@@ -131,15 +150,10 @@ export function commitDesign(input: DesignDocument, previous?: DesignDocument): 
   };
   if (!groups.length) delete next.groups;
   if (!signalRules.length) delete next.signalRules;
-  const shared = previous ? share(previous, next) : next;
-  freezeTree(shared);
-  documents.add(shared);
-  return shared;
+  return adoptValidatedDesign(previous ? share(previous, next) : next);
 }
 
 /** Canonicalize an already validated revision against the saved reference too. */
 export function shareDesign(before: DesignDocument, next: DesignDocument): DesignDocument {
-  const shared = freezeTree(share(before, next));
-  documents.add(shared);
-  return shared;
+  return adoptValidatedDesign(share(readDesign(before), readDesign(next)));
 }
