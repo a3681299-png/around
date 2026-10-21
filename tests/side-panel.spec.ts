@@ -6,6 +6,7 @@ import { launchExtension } from './fixtures';
 import { sidePanelDriver, nativeWindow } from './helpers/side-panel';
 import { createTakeSampler, type SignalTake } from '../src/world/takes';
 import type { DesignDocument } from '../src/design/types';
+import { unpackCheckpoint } from '../src/studio/checkpoint-codec';
 
 async function setup() {
   const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-panel-test-')), true, { headed: true });
@@ -43,18 +44,29 @@ test('native Chrome panel uses the same draft, group masks, selection, history, 
     await expect(page.locator('#web-world-themes-studio-layout')).toHaveCount(0);
     await expect.poll(() => panel.evaluate('innerWidth')).toBeGreaterThan(250);
     await expect
-      .poll(() =>
-        panel.evaluate(
-          'chrome.storage.session.get(null).then(xs=>Object.values(xs).some(v=>v?.draft?.decorations?.length===3))',
-        ),
-      )
+      .poll(async () => {
+        const values = await popup.evaluate(async () =>
+          Object.entries(await chrome.storage.session.get(null))
+            .filter(([key]) => key.startsWith('webWorldThemes.studio.session.'))
+            .map(([, value]) => value as unknown),
+        );
+        return values.some((value) => unpackCheckpoint(value)?.draft.decorations.length === 3);
+      })
       .toBe(true);
     // Isolated fixture only: reproduce a delayed empty recovery write. The live
     // page's lease must continue protecting bytes, even without a recovery pin.
+    const recoveryTarget = await panel.evaluate<number>('Number(new URL(location.href).searchParams.get("target"))');
+    const recoveryValue: unknown = await popup.evaluate(
+      async (target) =>
+        (await chrome.storage.session.get('webWorldThemes.studio.session.' + target))[
+          'webWorldThemes.studio.session.' + target
+        ],
+      recoveryTarget,
+    );
+    const assetId = unpackCheckpoint(recoveryValue)!.draft.decorations[0]!.assetId;
     const retained = await panel.evaluate<boolean>(`(async()=>{
       const target=Number(new URL(location.href).searchParams.get('target'));
-      const checkpoint=(await chrome.storage.session.get('webWorldThemes.studio.session.'+target))['webWorldThemes.studio.session.'+target];
-      const id=checkpoint.draft.decorations[0].assetId;
+      const id=${JSON.stringify(assetId)};
       await chrome.runtime.sendMessage({type:'web-world-themes:assets',action:'lease',session:'session-studio-'+target+'-'+target,ownerTabId:target,ids:[]});
       return (await chrome.runtime.sendMessage({type:'web-world-themes:assets',action:'get',id})).ok;
     })()`);
@@ -386,17 +398,16 @@ test('panel tools replace floating tools; responsive inspectors and empty contro
     await panel.send('Emulation.clearDeviceMetricsOverride');
     const target = await panel.evaluate<number>('Number(new URL(location.href).searchParams.get("target"))');
     await expect
-      .poll(() =>
-        popup.evaluate(
+      .poll(async () => {
+        const value: unknown = await popup.evaluate(
           async (tabId) =>
-            (
-              (await chrome.storage.session.get('webWorldThemes.studio.session.' + tabId))[
-                'webWorldThemes.studio.session.' + tabId
-              ] as { draft: { decorations: { opacity: number }[] } } | undefined
-            )?.draft.decorations[0]?.opacity,
+            (await chrome.storage.session.get('webWorldThemes.studio.session.' + tabId))[
+              'webWorldThemes.studio.session.' + tabId
+            ],
           target,
-        ),
-      )
+        );
+        return unpackCheckpoint(value)?.draft.decorations[0]?.opacity;
+      })
       .toBe(0.7);
     await popup.evaluate(async (tabId) => {
       await chrome.sidePanel.setOptions({ tabId, enabled: false });
