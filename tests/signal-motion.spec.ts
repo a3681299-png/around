@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { emptyDesign, parseDesign } from '../src/design/schema';
 import { defaultSignalRule, defaultScrollOpacityRule, type SignalSource } from '../src/signals/keyframes';
-import { defaultFollowMotion } from '../src/signals/motion';
+import { defaultFollowMotion, parseMotion } from '../src/signals/motion';
 import { evaluateWorld, initialWorldState } from '../src/world/evaluate';
 import { centre } from '../src/world/geometry';
 import { signalValue, pointerMemory } from '../src/world/signals';
@@ -40,6 +40,45 @@ function setup() {
   });
   return { scene, input };
 }
+
+test('saved v9-v11 motions reject coerced modes on both layers and groups', () => {
+  const { scene } = worldScenario(2);
+  const motion = defaultFollowMotion();
+  for (const version of [9, 10, 11]) {
+    const doc = { ...emptyDesign('youtube', null), ...scene, schemaVersion: version };
+    for (const mode of ['direct', 'smooth', 'pursuit']) {
+      expect(
+        parseDesign({
+          ...doc,
+          decorations: scene.decorations.map((layer) => ({ ...layer, motion: { ...motion, mode } })),
+        }).decorations[0]!.motion?.mode,
+      ).toBe(mode);
+    }
+    for (const mode of [
+      ['smooth'],
+      ['direct'],
+      ['pursuit'],
+      new String('smooth'),
+      { toString: () => 'smooth' },
+      null,
+      1,
+    ]) {
+      const invalid = { ...motion, mode };
+      expect(() => parseMotion(invalid)).toThrow();
+      expect(() =>
+        parseDesign({ ...doc, decorations: scene.decorations.map((layer) => ({ ...layer, motion: invalid })) }),
+      ).toThrow();
+      expect(() =>
+        parseDesign({ ...doc, groups: scene.groups!.map((group) => ({ ...group, motion: invalid })) }),
+      ).toThrow();
+    }
+    const json = JSON.stringify({
+      ...doc,
+      decorations: scene.decorations.map((layer) => ({ ...layer, motion: { ...motion, mode: ['smooth'] } })),
+    });
+    expect(() => parseDesign(JSON.parse(json))).toThrow();
+  }
+});
 
 test('numeric signals share viewport/anchor/base-layer coordinates; missing anchors and zero ranges are safe', () => {
   const { scene, input } = setup(),

@@ -43,7 +43,8 @@ export function parseMotion(value: unknown): FollowMotion {
         ].includes(key),
     ) ||
     data['kind'] !== 'pointer-follow' ||
-    !['direct', 'smooth', 'pursuit'].includes(String(data['mode'])) ||
+    typeof data['mode'] !== 'string' ||
+    !['direct', 'smooth', 'pursuit'].includes(data['mode']) ||
     typeof data['enabled'] !== 'boolean' ||
     typeof data['orientToMovement'] !== 'boolean'
   )
