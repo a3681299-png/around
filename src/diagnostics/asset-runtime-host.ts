@@ -1,7 +1,7 @@
 import { ASSET_LAB_MESSAGE } from './asset-runtime-broker';
 import { createAssetLabScene } from './asset-runtime-scene';
 import type { AssetMetadata } from '../assets/validation';
-import { loadAssetChunks, clearAssetSources } from '../assets/client';
+import { loadAssetChunks, clearAssetSources, type LoadedAsset } from '../assets/client';
 import { newAssetProfile, linkAssetProfile, profileEnd } from './asset-profile';
 
 /** Experimental isolated-world bridge. Never installed by the ordinary build. */
@@ -150,13 +150,14 @@ export function installAssetRuntimeHost(doc: Document) {
       (!(source.buffer instanceof ArrayBuffer) || source.buffer.byteLength !== source.metadata.byteLength)
     )
       throw new Error('Invalid binary source');
-    const blob: Blob = mode === 'chunks' ? source.blob : new Blob([source.buffer], { type: source.metadata.mime }),
-      metadata = source.metadata as AssetMetadata;
+    const metadata = source.metadata as AssetMetadata;
+    const loaded: LoadedAsset =
+      mode === 'chunks' ? source : { metadata, blob: new Blob([source.buffer], { type: metadata.mime }) };
     container = doc.createElement('div');
     container.id = 'ww-asset-runtime-binary';
     container.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:2147483643';
     (doc.fullscreenElement ?? doc.body).append(container);
-    scene = createAssetLabScene(container, async () => ({ blob, metadata }));
+    scene = createAssetLabScene(container, async () => loaded);
     scene.configure(settings);
     const result = await scene.show(metadata, count, trace),
       endToEndMs = performance.now() - started;
