@@ -103,9 +103,11 @@ export function parseGroupLayer(value: unknown): GroupLayer {
   };
 }
 
+const PLACEMENT_FIELDS = ['anchor', 'x', 'y', 'widthPx', 'heightPx', 'rotationDeg'];
+const ANCHOR_FIELDS = ['kind', 'target'];
 export function parsePlacement(value: unknown): LayerPlacement {
-  const placement = record(value, ['anchor', 'x', 'y', 'widthPx', 'heightPx', 'rotationDeg']);
-  const inputAnchor = record(placement['anchor'], ['kind', 'target']);
+  const placement = record(value, PLACEMENT_FIELDS);
+  const inputAnchor = record(placement['anchor'], ANCHOR_FIELDS);
   let anchor: PlacementAnchor;
   if (inputAnchor['kind'] === 'viewport' && !Object.hasOwn(inputAnchor, 'target')) anchor = { kind: 'viewport' };
   else if (inputAnchor['kind'] === 'surface' && isDesignId(inputAnchor['target']))
@@ -134,26 +136,28 @@ export function parseSurfaceStyle(value: unknown): SurfaceStyle {
   return style;
 }
 
+const DECORATION_FIELDS = [
+  'kind',
+  'id',
+  'assetId',
+  'name',
+  'placement',
+  'opacity',
+  'zIndex',
+  'visible',
+  'locked',
+  'format',
+  'playback',
+  'effects',
+  'motion',
+  'model',
+  'source',
+] as const;
+const DECORATION_KINDS = ['image', 'animation', 'model3d'] as const;
 export function parseDecoration(value: unknown): Decoration {
-  const item = record(value, [
-    'kind',
-    'id',
-    'assetId',
-    'name',
-    'placement',
-    'opacity',
-    'zIndex',
-    'visible',
-    'locked',
-    'format',
-    'playback',
-    'effects',
-    'motion',
-    'model',
-    'source',
-  ]);
+  const item = record(value, DECORATION_FIELDS);
   if (
-    !['image', 'animation', 'model3d'].includes(item['kind'] as string) ||
+    !DECORATION_KINDS.includes(item['kind'] as Decoration['kind']) ||
     !isDesignId(item['id']) ||
     !isAssetId(item['assetId']) ||
     typeof item['name'] !== 'string' ||
