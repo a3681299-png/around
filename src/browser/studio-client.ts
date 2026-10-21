@@ -161,48 +161,7 @@ export function createStudioClient(
       const next = chrome.tabs.connect(target, { name: STUDIO_PORT, frameId: 0 });
       port = next;
       const decoder = createStudioStateDecoder();
-      next.onMessage.addListener((message: StudioMessage) => {
-        if (generation !== epoch || port !== next || !message || typeof message !== 'object') return;
-        if (message.type === 'handoff') {
-          stopped = true;
-          disconnect();
-          emit('別のStudioへ編集を引き継ぎました。未保存の変更と履歴は対象タブで保持しています。');
-          return;
-        }
-        if (message.type === 'timeline') {
-          useTimeline(message.update);
-          return;
-        }
-        if (message.type !== 'state' && message.type !== 'reply') return;
-        let received;
-        try {
-          if (message.type === 'reply' && !message.ok && message.state && message.sequence === undefined)
-            useState(message.state);
-          else received = decoder.accept(message);
-        } catch {
-          next.disconnect();
-          return;
-        }
-        if (message.type === 'reply' && message.ok && message.checkpoint) connected = true;
-        if (received) useState(received.state, received.checkpoint);
-        if (message.type === 'state') {
-          emit(
-            state?.active
-              ? '接続中'
-              : state?.enabled
-                ? '編集を終了しました。接続ボタンで再開できます。'
-                : 'テーマがOFFまたは強さ0%です。',
-          );
-        } else if (message.type === 'reply') {
-          const entry = pending.get(message.id);
-          if (!entry) return;
-          pending.delete(message.id);
-          clearTimeout(entry.timer);
-          if (message.ok) entry.resolve(message);
-          else entry.reject(new Error(message.error ?? '操作を実行できませんでした。'));
-        }
-      });
-      next.onDisconnect.addListener(() => {
+      const onDisconnected = () => {
         if (generation !== epoch || port !== next) return;
         // Queued commands and file reads belong to the disconnected document.
         epoch++;
@@ -230,7 +189,51 @@ export function createStudioClient(
             },
             Math.min(5000, 300 * 2 ** Math.min(4, retries++)),
           );
+      };
+      next.onMessage.addListener((message: StudioMessage) => {
+        if (generation !== epoch || port !== next || !message || typeof message !== 'object') return;
+        if (message.type === 'handoff') {
+          stopped = true;
+          disconnect();
+          emit('別のStudioへ編集を引き継ぎました。未保存の変更と履歴は対象タブで保持しています。');
+          return;
+        }
+        if (message.type === 'timeline') {
+          useTimeline(message.update);
+          return;
+        }
+        if (message.type !== 'state' && message.type !== 'reply') return;
+        let received;
+        try {
+          if (message.type === 'reply' && !message.ok && message.state && message.sequence === undefined)
+            useState(message.state);
+          else received = decoder.accept(message);
+        } catch {
+          next.disconnect();
+          // Chrome does not emit onDisconnect on the end calling disconnect().
+          onDisconnected();
+          return;
+        }
+        if (message.type === 'reply' && message.ok && message.checkpoint) connected = true;
+        if (received) useState(received.state, received.checkpoint);
+        if (message.type === 'state') {
+          emit(
+            state?.active
+              ? '接続中'
+              : state?.enabled
+                ? '編集を終了しました。接続ボタンで再開できます。'
+                : 'テーマがOFFまたは強さ0%です。',
+          );
+        } else if (message.type === 'reply') {
+          const entry = pending.get(message.id);
+          if (!entry) return;
+          pending.delete(message.id);
+          clearTimeout(entry.timer);
+          if (message.ok) entry.resolve(message);
+          else entry.reject(new Error(message.error ?? '操作を実行できませんでした。'));
+        }
       });
+      next.onDisconnect.addListener(onDisconnected);
       await request({
         type: 'attach',
         owner,
