@@ -5,6 +5,7 @@ import { defineConfig } from '@playwright/test';
 const unitSpecs = [
   'asset-import-validation',
   'asset-profile',
+  'asset-read-data',
   'asset-runtime',
   'asset-shared-pool',
   'comment-timestamps',

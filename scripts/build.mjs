@@ -34,6 +34,7 @@ await mkdir(join(outDir, 'popup'), { recursive: true });
 await mkdir(join(outDir, 'content'), { recursive: true });
 await mkdir(join(outDir, 'background'), { recursive: true });
 await mkdir(join(outDir, 'studio'), { recursive: true });
+await mkdir(join(outDir, 'assets'), { recursive: true });
 if (profiling) await mkdir(join(outDir, 'diagnostics'), { recursive: true });
 
 async function copyStaticFiles() {
@@ -65,6 +66,7 @@ async function copyStaticFiles() {
     copyFile(join(root, 'src/popup/popup.css'), join(outDir, 'popup/popup.css')),
     copyFile(join(root, 'src/studio/index.html'), join(outDir, 'studio/index.html')),
     copyFile(join(root, 'src/studio/studio.css'), join(outDir, 'studio/studio.css')),
+    copyFile(join(root, 'src/assets/read-frame.html'), join(outDir, 'assets/read-frame.html')),
   ]);
   if (profiling)
     await Promise.all(
@@ -89,6 +91,12 @@ const shared = {
 };
 
 const builds = await Promise.all([
+  context({
+    ...shared,
+    entryPoints: ['src/assets/read-frame.ts'],
+    outfile: join(outDir, 'assets/read-frame.js'),
+    format: 'iife',
+  }),
   ...(profiling
     ? ['asset-benchmark', 'asset-runtime-lab'].map((name) =>
         context({
@@ -136,6 +144,9 @@ if (watching) {
     watch(join(root, 'assets/fonts'), refresh),
     watch(join(root, 'src/studio'), (_event, file) => {
       if (file === 'index.html' || file === 'studio.css') refresh();
+    }),
+    watch(join(root, 'src/assets'), (_event, file) => {
+      if (file === 'read-frame.html') refresh();
     }),
     watch(join(root, 'src/popup'), (_event, file) => {
       if (file === 'index.html' || file === 'popup.css') refresh();

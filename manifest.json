@@ -28,6 +28,10 @@
     {
       "resources": ["assets/fonts/PixelMplus12-Regular.woff2"],
       "matches": ["https://www.youtube.com/*"]
+    },
+    {
+      "resources": ["assets/read-frame.html"],
+      "matches": ["https://www.youtube.com/*"]
     }
   ]
 }

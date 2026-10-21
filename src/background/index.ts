@@ -20,6 +20,8 @@ import {
 } from '../assets/studio-transfer-protocol';
 import { ASSET_MESSAGES } from '../assets/limits';
 import { installAssetRuntimeBroker } from '../diagnostics/asset-runtime-broker';
+import { createAssetReadService } from './asset-read';
+import { ASSET_READ_CONFIRM, ASSET_READ_FRAME, ASSET_READ_MESSAGE, AssetReadError } from '../assets/read-protocol';
 import {
   ASSET_PROFILE,
   PROFILE_MESSAGE,
@@ -43,6 +45,57 @@ const profileSessions = new Map<string, string>();
 const mutations = createWorkQueue(1, Infinity),
   reads = createWorkQueue(2);
 const enqueue = <T>(action: () => Promise<T>) => mutations.run(action);
+const assetRead = createAssetReadService({
+  extensionId: chrome.runtime.id,
+  frameURL: chrome.runtime.getURL(ASSET_READ_FRAME),
+  async approved(id, host) {
+    const row = await getAsset(id);
+    if (!row) return false;
+    if (row.leases.some((lease) => lease.tabId === host.tab && lease.documentId === host.document)) return true;
+    const key = 'webWorldThemes.design.youtube',
+      values = await chrome.storage.local.get(key);
+    if (!values[key]) return false;
+    try {
+      return parseDesign(values[key]).decorations.some((layer) => layer.assetId === id);
+    } catch {
+      return false;
+    }
+  },
+  async confirm(host, proof) {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      return await Promise.race([
+        chrome.tabs
+          .sendMessage(host.tab, { type: ASSET_READ_CONFIRM, ...proof }, { documentId: host.document, frameId: 0 })
+          .then(
+            (reply) => reply?.allowed === true,
+            () => false,
+          ),
+        new Promise<boolean>((resolve) => {
+          timer = setTimeout(() => resolve(false), 1500);
+        }),
+      ]);
+    } finally {
+      clearTimeout(timer);
+    }
+  },
+});
+chrome.runtime.onMessage.addListener((input: unknown, sender, respond) => {
+  if (!input || typeof input !== 'object' || !('type' in input) || input.type !== ASSET_READ_MESSAGE) return false;
+  void reads
+    .run(() => assetRead.handle(input as Record<string, unknown>, sender))
+    .then(
+      (value) => respond({ ok: true, value }),
+      (error: unknown) =>
+        respond({
+          ok: false,
+          code: error instanceof AssetReadError ? error.code : 'unavailable',
+          error: error instanceof Error ? error.message : '素材取得を利用できません。',
+        }),
+    );
+  return true;
+});
+chrome.tabs.onRemoved.addListener((tab) => assetRead.revokeTab(tab));
 const verified = new Map<string, AssetInfo>(); // Worker-lifetime receipts, populated only after full validation.
 const sourceRows = createSourceCache({
   load: async (id: string) => {

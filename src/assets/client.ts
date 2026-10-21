@@ -17,6 +17,7 @@ import {
 import { createSourceCache } from './source-cache';
 import { rememberVerifiedSource } from './verified-source';
 import { validateImportBatchSizes } from './import-validation';
+import { readAssetBuffer } from './read-adapter';
 
 async function request<T>(action: string, values: Record<string, unknown>): Promise<T> {
   const trace = ASSET_PROFILE
@@ -131,9 +132,8 @@ export async function importAssets(
   return imported;
 }
 
-async function fetchAsset(id: string, signal: AbortSignal): Promise<{ metadata: AssetMetadata; blob: Blob }> {
+async function fetchChunks(id: string, signal: AbortSignal): Promise<{ metadata: AssetMetadata; bytes: Uint8Array }> {
   signal.throwIfAborted();
-  const sourceStart = ASSET_PROFILE ? performance.now() : 0;
   const result = await request<{ metadata: AssetMetadata; base64?: string; chunked?: boolean }>('get', { id });
   const trace = assetProfile(id),
     started = ASSET_PROFILE ? performance.now() : 0;
@@ -159,6 +159,23 @@ async function fetchAsset(id: string, signal: AbortSignal): Promise<{ metadata: 
     }
   } else bytes = base64ToBytes(result.base64);
   profileEnd(trace, 'download.parts-total', started, { bytes: bytes.length });
+  return { metadata: result.metadata, bytes };
+}
+
+async function fetchAsset(id: string, signal: AbortSignal): Promise<{ metadata: AssetMetadata; blob: Blob }> {
+  signal.throwIfAborted();
+  const sourceStart = ASSET_PROFILE ? performance.now() : 0;
+  const binary = await readAssetBuffer(id, signal);
+  const result = binary
+    ? { metadata: binary.metadata, bytes: new Uint8Array(binary.buffer) }
+    : await fetchChunks(id, signal);
+  const trace = assetProfile(id) ?? newAssetProfile(),
+    { bytes } = result;
+  linkAssetProfile(id, trace);
+  profileEnd(trace, binary ? 'download.transport.array-buffer' : 'download.transport.chunks', sourceStart, {
+    bytes: bytes.length,
+    count: 1,
+  });
   signal.throwIfAborted();
   const info = profileSync(trace, 'download.inspect', () => inspectAsset(bytes, result.metadata.mime));
   const blob = profileSync(

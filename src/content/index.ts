@@ -9,6 +9,7 @@ import type { UserSettings } from '../storage/settings';
 import { connectStudioHost } from '../browser/studio-host';
 import { ASSET_PROFILE } from '../diagnostics/asset-profile';
 import { installAssetRuntimeHost } from '../diagnostics/asset-runtime-host';
+import { createAssetReadHost } from '../browser/asset-read-host';
 
 if (ASSET_PROFILE) installAssetRuntimeHost(document);
 
@@ -20,6 +21,7 @@ const lifetime = globalThis as typeof globalThis & {
 const site = getSiteAdapter(document, window);
 if (site) {
   lifetime.__webWorldThemesCleanup?.();
+  const assetReader = createAssetReadHost(document);
   let creator: CreatorEditor | undefined;
   const controller = createThemeController(document, site, themes[DEFAULT_THEME], () => creator?.refreshSelection());
   creator = createCreatorEditor(
@@ -82,5 +84,6 @@ if (site) {
     disconnectStudio();
     creator?.destroy();
     controller.destroy();
+    assetReader.destroy();
   };
 }
