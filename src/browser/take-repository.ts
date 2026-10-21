@@ -2,6 +2,7 @@ import { TAKE_MESSAGE } from './take-storage';
 import { parseSignalTake, takeDuration, TAKE_LIMITS, type SignalTake } from '../world/takes';
 import type { TakeSummary } from '../timeline/types';
 import { isDesignId } from '../design/schema';
+import { TAKE_MESSAGES } from '../assets/limits';
 
 const DATABASE = 'web-world-themes-signal-takes';
 interface Row {
@@ -64,7 +65,7 @@ async function handle(data: Record<string, unknown>) {
               retained.length >= TAKE_LIMITS.storedCount ||
               retained.reduce((sum, row) => sum + row.chars, 0) + chars > TAKE_LIMITS.storedChars
             )
-              throw new Error('保存テイクは8個・合計16MBまでです。不要なテイクを削除してください。');
+              throw new Error(TAKE_MESSAGES.storage);
             store.put({ id: incoming.id, take: incoming, chars, updatedAt: Date.now() } satisfies Row);
           }
         } catch (reason) {

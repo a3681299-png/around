@@ -22,6 +22,22 @@ export const MODEL_RESOURCE_LIMITS = Object.freeze({
   vrmGpuBytes: 192 * 1024 * 1024,
   pageGpuBytes: 256 * 1024 * 1024,
 });
+// These quotas intentionally count JSON string.length, not encoded bytes.
+export const TAKE_LIMITS = Object.freeze({
+  samples: 3600,
+  chars: 4 * 1024 * 1024,
+  durationMs: 180_000,
+  intervalMs: 50,
+  storedCount: 8,
+  storedChars: 16 * 1024 * 1024,
+  ghosts: 4096,
+});
+const characters = (count: number) => `${count.toLocaleString('ja-JP')}文字（UTF-16コード単位）`;
+export const TAKE_MESSAGES = Object.freeze({
+  size: `テイクのJSONは${characters(TAKE_LIMITS.chars)}までです。`,
+  storage: `保存テイクは${TAKE_LIMITS.storedCount}個・JSON合計${characters(TAKE_LIMITS.storedChars)}までです。不要なテイクを削除してください。`,
+  samples: `テイクは1〜${TAKE_LIMITS.samples}サンプルで指定してください。`,
+});
 const mib = (bytes: number) => `${bytes / (1024 * 1024)}MiB`;
 const fileSizes = `通常素材は${mib(ASSET_LIMITS.fileBytes)}、GLB・VRMは${mib(ASSET_LIMITS.modelBytes)}までです。`;
 const batchSizes = `通常${mib(ASSET_LIMITS.fileBytes)}、大容量3Dを含む場合は${mib(ASSET_LIMITS.batchBytes)}までです。`;

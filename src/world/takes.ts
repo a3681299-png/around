@@ -5,16 +5,9 @@ import { evaluateLayout } from './layout';
 import { WORLD_RUNTIME_VERSION, type WorldInput, type WorldScene, type WorldState } from './types';
 import { clampUnit, scrollProgress } from './keyframes';
 import type { SignalRule } from '../signals/keyframes';
+import { TAKE_LIMITS, TAKE_MESSAGES } from '../assets/limits';
+export { TAKE_LIMITS } from '../assets/limits';
 
-export const TAKE_LIMITS = Object.freeze({
-  samples: 3600,
-  chars: 4 * 1024 * 1024,
-  durationMs: 180_000,
-  intervalMs: 50,
-  storedCount: 8,
-  storedChars: 16 * 1024 * 1024,
-  ghosts: 4096,
-});
 /** Inputs only: rules and asset references belong to the artwork, never the take. */
 export interface SignalTake {
   format: 'ww-signal-take';
@@ -28,7 +21,7 @@ export interface SignalTake {
 }
 export function parseSignalTake(value: unknown): SignalTake {
   if (typeof value === 'string') {
-    if (value.length > TAKE_LIMITS.chars) throw new Error('テイクは4MBまでです。');
+    if (value.length > TAKE_LIMITS.chars) throw new Error(TAKE_MESSAGES.size);
     value = JSON.parse(value);
   }
   if (
@@ -56,7 +49,7 @@ export function parseSignalTake(value: unknown): SignalTake {
   )
     throw new Error('未対応または不正なテイクです。');
   if (!Array.isArray(data['inputs']) || !data['inputs'].length || data['inputs'].length > TAKE_LIMITS.samples)
-    throw new Error('テイクは1〜3600サンプルで指定してください。');
+    throw new Error(TAKE_MESSAGES.samples);
   const initialState = parseWorldState(data['initialState']),
     inputs = data['inputs'].map((value) => parseWorldInput(value));
   let previous = initialState.timeMs ?? 0;
@@ -75,7 +68,7 @@ export function parseSignalTake(value: unknown): SignalTake {
     initialState,
     inputs,
   };
-  if (JSON.stringify(take).length > TAKE_LIMITS.chars) throw new Error('テイクは4MBまでです。');
+  if (JSON.stringify(take).length > TAKE_LIMITS.chars) throw new Error(TAKE_MESSAGES.size);
   return take;
 }
 export const takeDuration = (take: SignalTake) => Math.max(0, take.inputs.at(-1)!.timeMs - take.inputs[0]!.timeMs);

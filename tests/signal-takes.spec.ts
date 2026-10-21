@@ -14,6 +14,7 @@ import { defaultScrollOpacityRule } from '../src/signals/keyframes';
 import { worldScenario } from './helpers/world-scenario';
 import { parseTimelineCommand } from '../src/timeline/types';
 import { ruleInput, scrollProgress } from '../src/world/keyframes';
+import { TAKE_MESSAGES } from '../src/assets/limits';
 
 export function sampleTake(): { take: SignalTake; scene: WorldScene } {
   const { scene, inputs } = worldScenario(6);
@@ -69,6 +70,19 @@ test('take JSON contains raw context, preserves events and never contains artwor
     { type: 'observe', value: 'true' },
   ])
     expect(() => parseTimelineCommand(value)).toThrow();
+});
+
+test('take size limits count UTF-16 JSON characters, including non-ASCII text and the exact boundary', () => {
+  const { take } = sampleTake();
+  const named = { ...take, name: '日本語😀' };
+  const json = JSON.stringify(named);
+  const atLimit = json + ' '.repeat(TAKE_LIMITS.chars - json.length);
+  expect(atLimit.length).toBe(TAKE_LIMITS.chars);
+  expect(Buffer.byteLength(atLimit, 'utf8')).toBeGreaterThan(TAKE_LIMITS.chars);
+  expect(parseSignalTake(atLimit)).toEqual(named);
+  expect(() => parseSignalTake(atLimit + ' ')).toThrow(TAKE_MESSAGES.size);
+  expect(TAKE_MESSAGES.size).toContain('UTF-16コード単位');
+  expect(TAKE_MESSAGES.storage).toContain('UTF-16コード単位');
 });
 test('random seeks and reverse order restore the same complete Runtime frame as forward evaluation', () => {
   const { scene, take } = sampleTake(),
