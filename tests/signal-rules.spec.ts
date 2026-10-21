@@ -2,7 +2,9 @@ import { test, expect } from '@playwright/test';
 import { emptyDesign, parseDesign } from '../src/design/schema';
 import { defaultScrollOpacityRule } from '../src/signals/keyframes';
 import { sampleKeyframes, scrollProgress } from '../src/world/keyframes';
-import { evaluateWorld, initialWorldState } from '../src/world/evaluate';
+import { evaluateWorld, evaluatePreparedWorld, initialWorldState } from '../src/world/evaluate';
+import { evaluateLayout } from '../src/world/layout';
+import { evaluateTransforms } from '../src/world/transforms';
 import { createWorldRecorder, replayWorld, parseWorldRecording } from '../src/world/recording';
 import { deleteDocumentLayers, duplicateDocumentLayers, ungroupLayers } from '../src/editor/groups';
 import { worldScenario } from './helpers/world-scenario';
@@ -131,4 +133,43 @@ test('same recorded raw inputs reproduce group/mask/opacity frames, including ba
     scene: { decorations: scene.decorations, groups: scene.groups },
   };
   expect(parseWorldRecording(old).runtimeVersion).toBe('1.3.0');
+});
+
+test('scroll opacity uses the same generic transform state and complete layout for every frame', () => {
+  const { scene, inputs } = worldScenario(4);
+  for (const layer of scene.decorations) {
+    layer.visible = true;
+    layer.placement.x = 0.314159265;
+    layer.placement.rotationDeg = 31;
+  }
+  const rules = [defaultScrollOpacityRule('image-0'), defaultScrollOpacityRule('group-0')];
+  let previous = initialWorldState();
+  for (const [index, value] of inputs.entries()) {
+    const input = {
+      ...value,
+      signals: { ...value.signals, scroll: { x: 0, y: (index * 37) % 2100, maxX: 0, maxY: 2000 } },
+    };
+    const prepared = evaluateLayout(scene, input);
+    const before = JSON.stringify(prepared);
+    const expected = evaluateTransforms(
+      prepared,
+      rules,
+      previous.timeMs === null ? { ...input, deltaMs: 0 } : input,
+      previous.motion,
+    );
+    const actual = evaluatePreparedWorld(prepared, previous, input, rules);
+    expect(actual.frame.layout).toEqual(expected.layout);
+    expect(actual.state.motion).toEqual(expected.state);
+    expect(JSON.stringify(prepared)).toBe(before);
+    previous = actual.state;
+  }
+  const prepared = evaluateLayout(scene, inputs[0]!);
+  expect(
+    evaluatePreparedWorld(
+      prepared,
+      initialWorldState(),
+      inputs[0]!,
+      rules.map((rule) => ({ ...rule, enabled: false })),
+    ).frame.layout,
+  ).toBe(prepared);
 });

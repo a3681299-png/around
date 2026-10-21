@@ -14,7 +14,12 @@ const output = '.work/e-benchmark';
 await mkdir(output, { recursive: true });
 for (const side of ['before', 'after']) {
   const result = await build({
-    stdin: { contents: await readFile(entry, 'utf8'), resolveDir: resolve('tests'), sourcefile: entry },
+    stdin: {
+      contents: await readFile(entry, 'utf8'),
+      resolveDir: resolve('tests'),
+      sourcefile: posix.basename(entry),
+      loader: 'ts',
+    },
     absWorkingDir: process.cwd(),
     bundle: true,
     write: false,

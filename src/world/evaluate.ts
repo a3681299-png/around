@@ -9,7 +9,6 @@ import {
   type WorldLayout,
   type WorldFrame,
 } from './types';
-import { evaluateRuleLayout } from './keyframes';
 import type { SignalRule } from '../signals/keyframes';
 import { evaluateTransforms } from './transforms';
 
@@ -53,15 +52,12 @@ export function evaluatePreparedWorld(
     throw new Error('World Runtime requires monotonic finite time.');
   const effects = input.events.some((event) => event.type === 'host.lifecycle') ? emptyEffectState() : previous.effects;
   const dynamic =
-    rules.some(
-      (rule) =>
-        (rule.enabled && rule.source.signal !== 'page.scroll.progress') ||
-        (rule.enabled && rule.target.property !== 'opacity'),
-    ) || [...prepared.groups, ...prepared.layers].some((entry) => entry.layer.motion?.enabled);
+    rules.some((rule) => rule.enabled) ||
+    [...prepared.groups, ...prepared.layers].some((entry) => entry.layer.motion?.enabled);
   const transformed = dynamic
     ? evaluateTransforms(prepared, rules, previous.timeMs === null ? { ...input, deltaMs: 0 } : input, previous.motion)
     : undefined;
-  const layout = transformed?.layout ?? (rules.length ? evaluateRuleLayout(prepared, rules, input) : prepared);
+  const layout = transformed?.layout ?? prepared;
   const evaluated = evaluateEffects(layoutEffectTargets(layout), effects, input);
   const models = layout.layers.some((e) => e.layer.kind === 'model3d')
     ? evaluateModels(
