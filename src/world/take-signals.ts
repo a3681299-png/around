@@ -1,3 +1,4 @@
+import { SIGNAL_REGISTRY } from '../signals/registry';
 import type { SignalRule } from '../signals/keyframes';
 import type { SignalTake, GhostKeyframe } from './takes';
 import type { WorldScene, WorldLayout } from './types';
@@ -31,6 +32,8 @@ export function takeSignalSeries(take: SignalTake, rule: SignalRule, scene?: Wor
 }
 /** Display projections only; exact runtime playback uses the full input history. */
 export function projectNumericGhosts(series: readonly SignalSample[], rule: SignalRule, limit = 4096): GhostKeyframe[] {
+  const definition = SIGNAL_REGISTRY.definition(rule.source.signal);
+  const period = definition?.valueType === 'number' ? definition.period : undefined;
   const ghosts: GhostKeyframe[] = [],
     seen = new Set<string>();
   const add = (keyId: string, input: number, timeMs: number) => {
@@ -50,7 +53,7 @@ export function projectNumericGhosts(series: readonly SignalSample[], rule: Sign
         a.raw === undefined ||
         b.raw === undefined ||
         a.raw === b.raw ||
-        (rule.source.signal === 'pointer.angle' && Math.abs(b.raw - a.raw) > 180)
+        (period !== undefined && Math.abs(b.raw - a.raw) > period / 2)
       )
         continue;
       const amount = (rawKey - a.raw) / (b.raw - a.raw);

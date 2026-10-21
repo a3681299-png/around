@@ -39,6 +39,7 @@ interface SignalMetadata {
   axes: readonly SignalAxis[];
   subscriptions: readonly SignalSubscription[];
   hostSample?: boolean;
+  historyDependent?: boolean;
   needsFrame?(context: SignalEvaluationContext): boolean;
 }
 export type SignalDefinition = SignalMetadata &
@@ -48,6 +49,9 @@ export type SignalDefinition = SignalMetadata &
         valueType: 'number';
         evaluate(context: SignalEvaluationContext): number | undefined;
         presets?: readonly PresetDefinition[];
+        preview?(value: number, context: SignalEvaluationContext): SignalPreview;
+        period?: number;
+        projection?: 'scroll-ratio';
       }
     | { category: 'value'; valueType: 'point'; evaluate(context: SignalEvaluationContext): Point | undefined }
     | { category: 'state'; valueType: 'boolean'; evaluate(context: SignalEvaluationContext): boolean | undefined }
@@ -62,6 +66,10 @@ export type SignalIds<
   [K in keyof D & string]: D[K] extends { category: Category; valueType: Value } ? K : never;
 }[keyof D & string];
 export type NumericSignalIds<D extends SignalDefinitions> = SignalIds<D, 'value', 'number'>;
+export interface SignalPreview {
+  signals: SignalSnapshot;
+  pointer?: PointerMemory;
+}
 
 export function createSignalRegistry<const D extends SignalDefinitions>(definitions: D) {
   const definition = (id: unknown): SignalDefinition | undefined =>
@@ -116,6 +124,21 @@ export function createSignalRegistry<const D extends SignalDefinitions>(definiti
       if (entry?.category !== 'value' || entry.valueType !== 'number') return undefined;
       const value = entry.evaluate({ ...context, source });
       return value !== undefined && Number.isFinite(value) ? value : undefined;
+    },
+    numericPreview(
+      source: NumericSource,
+      value: number,
+      context: Omit<SignalEvaluationContext, 'source'>,
+    ): SignalPreview {
+      const entry = definition(source.signal);
+      if (entry?.valueType !== 'number') return { signals: { ...context.signals } };
+      if (entry.preview) return entry.preview(value, { ...context, source });
+      return {
+        signals: {
+          ...context.signals,
+          ...(entry.hostSample ? { samples: { ...context.signals.samples, [source.signal]: value } } : {}),
+        },
+      };
     },
     requires(id: string, subscription: SignalSubscription) {
       return definition(id)?.subscriptions.includes(subscription) ?? false;
@@ -206,6 +229,25 @@ const recentSpeed = (context: SignalEvaluationContext) =>
 const occurrence = (id: WorldEvent['type']) => (context: SignalEvaluationContext) =>
   (context.events ?? []).filter((event) => event.type === id);
 
+function pointerPreview(
+  context: SignalEvaluationContext,
+  change: (point: Point, frame: NonNullable<ReturnType<typeof frameFor>>, target: Point) => void,
+): SignalPreview {
+  const frame = frameFor(context);
+  if (!frame) return { signals: { ...context.signals, pointer: undefined } };
+  const entry = entryFor(context);
+  const target =
+    context.source?.space === 'layer' && entry?.frame
+      ? {
+          x: entry.frame.left + entry.layer.placement.x * entry.frame.width,
+          y: entry.frame.top + entry.layer.placement.y * entry.frame.height,
+        }
+      : { x: frame.left + frame.width / 2, y: frame.top + frame.height / 2 };
+  const point = { ...(context.signals.pointer ?? target) };
+  change(point, frame, target);
+  return { signals: { ...context.signals, pointer: point, pointerTimeMs: 100 } };
+}
+
 export const SIGNAL_REGISTRY = createSignalRegistry({
   'pointer.position': {
     category: 'value',
@@ -222,6 +264,10 @@ export const SIGNAL_REGISTRY = createSignalRegistry({
     axes: ['x', 'y'],
     subscriptions: ['pointer'],
     evaluate: (context) => component(context, 'x'),
+    preview: (value, context) =>
+      pointerPreview(context, (point, frame) => {
+        point.x = frame.left + value * frame.width;
+      }),
     presets: [
       {
         id: 'mouse-x',
@@ -250,6 +296,10 @@ export const SIGNAL_REGISTRY = createSignalRegistry({
     axes: ['x', 'y'],
     subscriptions: ['pointer'],
     evaluate: (context) => component(context, 'y'),
+    preview: (value, context) =>
+      pointerPreview(context, (point, frame) => {
+        point.y = frame.top + value * frame.height;
+      }),
     presets: [
       {
         id: 'mouse-y',
@@ -281,6 +331,11 @@ export const SIGNAL_REGISTRY = createSignalRegistry({
       const value = vector(context);
       return value ? Math.hypot(value.x, value.y) / value.diagonal : undefined;
     },
+    preview: (value, context) =>
+      pointerPreview(context, (point, frame, target) => {
+        point.x = target.x - Math.max(0, value) * Math.hypot(frame.width, frame.height);
+        point.y = target.y;
+      }),
     presets: [
       {
         id: 'layer-distance',
@@ -312,6 +367,13 @@ export const SIGNAL_REGISTRY = createSignalRegistry({
       const value = vector(context);
       return value ? (Math.atan2(value.y, value.x) * 180) / Math.PI : undefined;
     },
+    period: 360,
+    preview: (value, context) =>
+      pointerPreview(context, (point, _frame, target) => {
+        const angle = (value * Math.PI) / 180;
+        point.x = target.x - Math.cos(angle) * 100;
+        point.y = target.y - Math.sin(angle) * 100;
+      }),
     presets: [
       {
         id: 'layer-angle',
@@ -346,6 +408,17 @@ export const SIGNAL_REGISTRY = createSignalRegistry({
           ? context.pointer.speed
           : 0,
     needsFrame: recentSpeed,
+    historyDependent: true,
+    preview: (value, context) => {
+      const result = pointerPreview(context, () => {});
+      const point = result.signals.pointer;
+      return {
+        ...result,
+        ...(point
+          ? { pointer: { point: { x: point.x - Math.max(0, value) * 0.05, y: point.y }, timeMs: 50, speed: 0 } }
+          : {}),
+      };
+    },
     presets: [
       {
         id: 'mouse-speed',
@@ -365,6 +438,11 @@ export const SIGNAL_REGISTRY = createSignalRegistry({
     axes: ['y'],
     subscriptions: ['scroll'],
     evaluate: (context) => scrollProgress(context.signals),
+    projection: 'scroll-ratio',
+    preview: (value, context) => {
+      const maxY = Math.max(1, context.signals.scroll?.maxY ?? 1);
+      return { signals: { ...context.signals, scroll: { x: 0, y: value * maxY, maxX: 0, maxY } } };
+    },
     presets: [
       { id: 'scroll', label: 'ページのスクロール', unit: '%', order: 0, space: 'page', axis: 'y', inputRange: [0, 1] },
     ],
@@ -411,6 +489,7 @@ export type SignalRegistry = Pick<
   | 'definition'
   | 'numericSource'
   | 'numericValue'
+  | 'numericPreview'
   | 'subscriptions'
   | 'requires'
   | 'needsFrame'

@@ -1,3 +1,4 @@
+import { SIGNAL_REGISTRY } from '../signals/registry';
 import { takeSignalSeries, projectNumericGhosts } from './take-signals';
 import { parseWorldInput, parseWorldState } from './recording';
 import { evaluateWorld, evaluatePreparedWorld } from './evaluate';
@@ -131,7 +132,8 @@ export interface GhostKeyframe {
 /** Derived crossings only. Changing a take never creates independent artwork keys. */
 export function projectGhosts(take: SignalTake, rule: SignalRule, scene?: WorldScene): GhostKeyframe[] {
   if (!rule.enabled) return [];
-  if (rule.source.signal !== 'page.scroll.progress')
+  const definition = SIGNAL_REGISTRY.definition(rule.source.signal);
+  if (definition?.valueType !== 'number' || definition.projection !== 'scroll-ratio')
     return projectNumericGhosts(takeSignalSeries(take, rule, scene), rule, TAKE_LIMITS.ghosts);
   const ghosts: GhostKeyframe[] = [],
     seen = new Set<string>(),

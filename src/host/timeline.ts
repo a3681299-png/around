@@ -1,3 +1,4 @@
+import { SIGNAL_REGISTRY } from '../signals/registry';
 import { createWorldRecorder } from '../world/recording';
 import { createTakeSampler, parseSignalTake, takeDuration, TAKE_LIMITS, type SignalTake } from '../world/takes';
 import type { SignalRule } from '../signals/keyframes';
@@ -409,7 +410,10 @@ export function createTimelineHost(doc: Document, siteId: string, storage: TakeS
           [...scene.decorations, ...(scene.groups ?? [])].some(
             (layer) =>
               layer.motion?.enabled || (layer.kind === 'model3d' && (layer.model.playing || layer.model.look.enabled)),
-          ) || scene.signalRules?.some((rule) => rule.enabled && rule.source.signal === 'pointer.speed');
+          ) ||
+          scene.signalRules?.some(
+            (rule) => rule.enabled && SIGNAL_REGISTRY.definition(rule.source.signal)?.historyDependent,
+          );
         recordInput(scene, input, boundary || Boolean(historyDependent));
         persistentSignature = signature;
       }

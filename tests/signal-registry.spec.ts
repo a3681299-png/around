@@ -19,11 +19,13 @@ test('one numeric registry entry supplies its type, source validation, catalog, 
       axes: ['x'],
       subscriptions: ['scroll'],
       hostSample: true,
+      historyDependent: true,
       evaluate: ({ signals }) => {
         const value = signals.samples?.['test.level'];
         return typeof value === 'number' ? value * 2 : undefined;
       },
       needsFrame: ({ signals }) => signals.samples?.['test.level'] === 0.25,
+      preview: (value, context) => ({ signals: { ...context.signals, samples: { 'test.level': value / 2 } } }),
       presets: [
         {
           id: 'test-level',
@@ -50,6 +52,9 @@ test('one numeric registry entry supplies its type, source validation, catalog, 
   expect(registry.presets.at(-1)?.source).toEqual(source);
   expect(registry.subscriptions([id])).toEqual({ pointer: false, scroll: true, video: false });
   expect(registry.needsFrame(id, { signals: input.signals })).toBe(true);
+  expect(registry.definition(id)?.historyDependent).toBe(true);
+  const preview = registry.numericPreview(source, 0.8, { signals: input.signals });
+  expect(registry.numericValue(source, { signals: preview.signals })).toBe(0.8);
   expect(
     signalValue(rule, { ...input, signals: { playing: false, pointer: undefined } }, undefined, undefined, {
       registry,
