@@ -89,6 +89,14 @@ npm run test:e2e
 
 VRMの通常テストは小さな自作データで描画を確認します。33MiBのVRMは、実GPU環境で`WW_REAL_GPU_VRM=1`を指定した場合にだけ実行します。SwiftShaderなどのソフトウェア描画では実行できません。整形・lintの使い方は[tooling.md](docs/tooling.md)を参照してください。
 
+## エディターをすぐ開く
+
+設定画面の先頭にある「エディターを開く」から制作画面を開けます。「制作モード」をONにすると、拡張アイコンから直接エディターを開きます（初期値はOFF）。表示テーマのON/OFF・強さは、エディター内の「表示設定」から開けます。設定ウィンドウのタイトルバーをドラッグすると位置を覚えます。
+
+Alt+Shift+Eで、制作モードに関係なくエディターを開けます。このキーは提案値です。競合した場合や変更したい場合は chrome://extensions/shortcuts で「エディターを直接開く」を設定してください。追加権限や常時表示の起動ボタンは使いません。
+
+保存先を移す場合は[バックアップ](docs/extension-backup.md)と[マージ後の移行手順](docs/extension-consolidation.md)を先に確認してください。読み込み先案内の統合用下書きは[readme-after-merge.md](docs/readme-after-merge.md)に置いてあります。
+
 ## ファイル構成
 
 ```text

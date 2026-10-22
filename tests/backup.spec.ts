@@ -95,6 +95,7 @@ test('one file restores saved artwork, originals, takes and settings into a diff
     async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
   );
   const before = await youtube.screenshot({
+    path: info.outputPath('source-artwork.png'),
     animations: 'disabled',
     mask: [youtube.locator('#web-world-themes-clock, #web-world-themes-daily-detail')],
   });
@@ -145,6 +146,7 @@ test('one file restores saved artwork, originals, takes and settings into a diff
       )
       .toBe(true);
     const after = await canvas.screenshot({
+      path: info.outputPath('restored-artwork.png'),
       animations: 'disabled',
       mask: [canvas.locator('#web-world-themes-clock, #web-world-themes-daily-detail')],
     });
