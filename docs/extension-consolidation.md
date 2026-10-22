@@ -4,7 +4,7 @@
 
 ## 調査した現状
 
-基準ディレクトリは C:\Users\sm787\GitHub-Projects\web-world-themes。
+基準ディレクトリは `C:\Users\sm787\GitHub-Projects\web-world-themes`。
 
 | worktree             | ブランチ / 調査開始時のHEAD          | 用途                                |
 | -------------------- | ------------------------------------ | ----------------------------------- |
@@ -13,7 +13,7 @@
 | .work/heisei-preview | detached / 0ff3806                   | 旧平成UIの確認用。distが残る        |
 | .work/shell-preview  | detached / 89eea92                   | 旧シェルUIの確認用。distが残る      |
 
-通常版は基準ディレクトリの dist。実験worktree直下の dist は調査時には存在しない。一方、Chrome DefaultのSecure Preferencesには C:\Users\sm787\GitHub-Projects\web-world-themes\.work\creator-editor\dist を読み込んだ登録があり、IDは aiknffgfafmhbjfcemhkbemonddapmao だった。これは設定ファイルの登録であり、その時点のChromeウィンドウで実際に有効かは確認していない。通常版IDは今回読めた設定・READMEからは確認できなかった。
+通常版は基準ディレクトリの dist。実験worktree直下の dist は調査時には存在しない。一方、Chrome DefaultのSecure Preferencesには `C:\Users\sm787\GitHub-Projects\web-world-themes\.work\creator-editor\dist` を読み込んだ登録があり、IDは aiknffgfafmhbjfcemhkbemonddapmao だった。これは設定ファイルの登録であり、その時点のChromeウィンドウで実際に有効かは確認していない。通常版IDは今回読めた設定・READMEからは確認できなかった。
 
 直近Fの検証済み出力は .work/creator-editor/.work/f-verified。Gの最終出力は同worktreeの .work/g-verified。**新しいパスへ読み込むと、元の登録の保存先を引き継げるとは限らない。** Chrome上のIDと読み込み元を先に確認する。
 
@@ -53,7 +53,7 @@ chrome.storage.sync、独自localStorage、外部サーバー保存は使って�
 
 ## 統合先の案
 
-**通常版の既存パス C:\Users\sm787\GitHub-Projects\web-world-themes\dist を統合先として維持する。** マージ後はここだけを常用向けに更新する。フォルダーを移さず、通常版のIDと設定を保てる可能性を優先する。実際のIDは再読み込み前後に確認する。
+**通常版の既存パス `C:\Users\sm787\GitHub-Projects\web-world-themes\dist` を統合先として維持する。** マージ後はここだけを常用向けに更新する。フォルダーを移さず、通常版のIDと設定を保てる可能性を優先する。実際のIDは再読み込み前後に確認する。
 
 実験worktreeと既存出力は、復元と数日間の利用確認が終わるまで残す。開発継続時も同worktreeを残し、検証は .work/test-dist 等の固定出力と隔離プロファイルで行う。常用Chromeへ毎回違う計測ビルドを追加しない。統合確認後は実験版を先に無効化し、問題がなければ削除する。worktree整理は最後にする。
 
@@ -79,7 +79,7 @@ chrome.storage.sync、独自localStorage、外部サーバー保存は使って�
 マージ後のPowerShell実行例:
 
 ```powershell
-Set-Location C:\Users\sm787\GitHub-Projects\web-world-themes
+Set-Location `C:\Users\sm787\GitHub-Projects\web-world-themes`
 $env:WW_BUILD_OUT = 'dist'
 npm run build
 # 実験版も登録元の絶対パスを確認してから、そのworktreeで出力先を指定する。

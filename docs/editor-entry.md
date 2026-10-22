@@ -52,4 +52,6 @@ tests/editor-entry.spec.ts は次を実際のChrome APIとネイティブウィ�
 
 テスト専用コピーだけに_execute_actionのAlt+Shift+Yを登録する。これはChrome自身が通常のアイコンと同じPopup/onClicked経路を実行するコマンドであり、製品manifestには追加しない。RendererへのCDPキーイベントではChromeのアクセラレーターを検証できないため、Windowsでは生成したテスト用profileと拡張パスを所有するプロセス・前面ウィンドウを確認してキーを送る。CIでは独立Xvfb内の一意なタイトルのウィンドウへxdotoolで送る。失敗をskipしたりforceクリックへ置き換えたりしない。
 
-tests/features.spec.ts で制作モードの初期値・共有・イベント解除、tests/settings-position.spec.ts で矩形配置を単体検証する。追加部分のe2eはローカルで計7ケース（バックアップ3件・起動4件）成功。全unitは303件成功。全e2eとGitHub Actionsの最終結果は完了報告と該当コミットのActionsを参照する。
+tests/features.spec.ts で制作モードの初期値・共有・イベント解除、tests/settings-position.spec.ts で矩形配置を単体検証する。追加部分のe2eはローカルで計7ケース（バックアップ3件・起動4件）成功。全unitは306件成功。全e2eとGitHub Actionsの最終結果は完了報告と該当コミットのActionsを参照する。
+
+全件実行で、既存の素材確認ヘルパーが未作成DBを空のまま作り、ストア欠落で停止する競合をtraceから確認した。ヘルパーを読み取り専用にし、DB未作成・ストア欠落・作成競合を固定入力のunit 3件で確認する。元の不正MIME拒否テストは変更せず、20回連続成功（51.4秒）。拒否・上限の期待値、skip、タイムアウトは変えていない。
