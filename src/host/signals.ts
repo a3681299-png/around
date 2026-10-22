@@ -6,7 +6,7 @@ import type { SignalId } from '../signals/registry';
 export function createSignalSources(
   doc: Document,
   playback: PlaybackSource | undefined,
-  changed: (source: SignalId) => void,
+  changed: (source: SignalId, frameTime?: number) => void,
   occurred?: () => void,
 ) {
   const snapshot: SignalSnapshot = { pointer: undefined, playing: false };
@@ -48,7 +48,7 @@ export function createSignalSources(
     events.push({ type: 'pointer.click', point: { x: event.clientX, y: event.clientY } });
     occurred?.();
   };
-  const sampleScroll = (notify = true) => {
+  const sampleScroll = (notify = true, frameTime?: number) => {
     const root = doc.scrollingElement ?? doc.documentElement;
     const next = {
       x: root.scrollLeft,
@@ -62,16 +62,16 @@ export function createSignalSources(
       notify &&
       (!before || Object.keys(next).some((key) => next[key as keyof typeof next] !== before[key as keyof typeof next]))
     )
-      changed('page.scroll.progress');
+      changed('page.scroll.progress', frameTime);
   };
   const markScroll = () => {
     scrollDirty = true;
     if (scrollFrame === undefined)
-      scrollFrame = doc.defaultView!.requestAnimationFrame(() => {
+      scrollFrame = doc.defaultView!.requestAnimationFrame((time) => {
         scrollFrame = undefined;
         if (scroll && scrollDirty) {
           scrollDirty = false;
-          sampleScroll();
+          sampleScroll(true, time);
         }
       });
   };

@@ -1,5 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { createSignalSources } from '../src/host/signals';
+import { createWorldSession } from '../src/host/world-session';
+import { worldScenario } from './helpers/world-scenario';
+import { defaultScrollOpacityRule } from '../src/signals/keyframes';
 
 const originalResizeObserver = globalThis.ResizeObserver;
 test.afterEach(() => {
@@ -37,6 +40,8 @@ function harness() {
     viewListeners = new Map<string, EventListener>(),
     frames = new Map<number, FrameRequestCallback>();
   const view = {
+    performance: { now: () => 0 },
+    matchMedia: () => ({ matches: false, addEventListener() {}, removeEventListener() {} }),
     addEventListener(type: string, listener: EventListener) {
       viewListeners.set(type, listener);
     },
@@ -52,6 +57,7 @@ function harness() {
     },
   };
   const doc = {
+    hidden: false,
     scrollingElement: root,
     documentElement: root,
     body: {},
@@ -73,6 +79,7 @@ function harness() {
   const changes: string[] = [],
     sources = createSignalSources(doc as unknown as Document, undefined, (source) => changes.push(source));
   return {
+    doc: doc as unknown as Document,
     sources,
     values,
     changes,
@@ -94,6 +101,32 @@ function harness() {
     },
   };
 }
+
+test('a scroll sample paints World output in the same RAF without scheduling a second frame', () => {
+  const h = harness(),
+    { scene, inputs } = worldScenario(1),
+    opacity: number[] = [];
+  const session = createWorldSession(h.doc, undefined, (frame) => {
+    opacity.push(frame.layout.layers[0]!.layer.opacity);
+  });
+  session.update([], {
+    scene: { ...scene, signalRules: [defaultScrollOpacityRule(scene.decorations[0]!.id)] },
+    geometry: inputs[0]!,
+  });
+  try {
+    const before = opacity.length;
+    h.values.scrollTop = 700; // maxY=1400, progress=0.5 -> opacity=1 exactly.
+    h.scroll();
+    expect(opacity.length).toBe(before);
+    h.frame();
+    expect(opacity.length).toBe(before + 1);
+    expect(opacity.at(-1)).toBe(1);
+    expect(h.frames.size).toBe(0);
+  } finally {
+    session.destroy();
+    h.sources.destroy();
+  }
+});
 
 test('scroll and resize events defer geometry reads and coalesce into the next RAF', () => {
   const h = harness();

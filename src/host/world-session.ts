@@ -85,7 +85,7 @@ export function createWorldSession(
   const sources = createSignalSources(
     doc,
     playback,
-    (source) => {
+    (source, frameTime) => {
       if (
         SIGNAL_REGISTRY.requires(source, 'pointer') &&
         !devtools?.active &&
@@ -97,7 +97,11 @@ export function createWorldSession(
         !wantsPointerFrame(evaluatedTargets, state.effects, sources.snapshot, view.performance.now())
       )
         return;
-      schedule();
+      if (frameTime !== undefined && !doc.hidden) {
+        // Scroll sampling already runs in RAF. Paint before this frame is presented.
+        cancel();
+        paint(frameTime);
+      } else schedule();
     },
     () => {
       if (devtools?.active || timeline?.recording) schedule();
