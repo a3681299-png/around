@@ -5,7 +5,7 @@ import { BACKUP_LIMITS, BACKUP_MESSAGES, settingsStorageValues } from './schema'
 import { sameBackupData } from './data';
 import { validateTakeMerge } from '../browser/take-repository';
 import type { SignalTake } from '../world/takes';
-import type { StoredAsset } from '../assets/repository';
+import { BACKUP_LIBRARY_LEASE, type StoredAsset } from '../assets/repository';
 import type { ValidatedBackup } from './archive';
 
 /** Additive restore. An existing artwork/take is never silently replaced. */
@@ -59,7 +59,7 @@ export function planRestore(
       ...row,
       // Saved artwork protects referenced originals. Spare originals have no live tab
       // after migration, so retain them as a backup library within the normal quotas.
-      leases: references.has(row.id) ? [] : [{ session: 'backup-library', tabId: -1, documentId: 'backup-library' }],
+      leases: references.has(row.id) ? [] : [BACKUP_LIBRARY_LEASE],
     }));
   return { values, added };
 }

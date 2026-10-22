@@ -6,6 +6,29 @@ export interface AssetLease {
   tabId: number;
   documentId: string;
 }
+export const BACKUP_LIBRARY_LEASE: Readonly<AssetLease> = Object.freeze({
+  session: 'backup-library',
+  tabId: -1,
+  documentId: 'backup-library',
+});
+export function keepAssetLease(
+  lease: AssetLease,
+  tabs: ReadonlySet<number | undefined>,
+  current?: AssetLease,
+): boolean {
+  return (
+    (lease.tabId === -1 || tabs.has(lease.tabId)) &&
+    !(
+      current &&
+      !current.documentId.startsWith('studio:') &&
+      lease.tabId === current.tabId &&
+      lease.documentId !== current.documentId &&
+      !lease.documentId.startsWith('studio:') &&
+      // A restored library is durable, not the previous document of an un-tabbed UI.
+      lease.documentId !== BACKUP_LIBRARY_LEASE.documentId
+    )
+  );
+}
 export interface StoredAsset extends AssetMetadata {
   blob: Blob;
   leases: AssetLease[];

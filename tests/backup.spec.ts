@@ -6,7 +6,9 @@ import { initialWorldState } from '../src/world/evaluate';
 import { WORLD_RUNTIME_VERSION } from '../src/world/types';
 import { worldScenario } from './helpers/world-scenario';
 import { modelFixture } from './helpers/model-fixture';
-import { BACKUP_HEADER_BYTES } from '../src/backup/archive';
+import { BACKUP_HEADER_BYTES, encodeBackup, sha256 } from '../src/backup/archive';
+import { DEFAULT_SETTINGS, mergeSettings } from '../src/storage/settings';
+import { sidePanelDriver } from './helpers/side-panel';
 
 async function openBackup(popup: Page) {
   const page = await popup.context().newPage();
@@ -225,4 +227,87 @@ test('backup transport refuses a different extension page', async ({ popup }) =>
     return result;
   });
   expect(response).toMatchObject({ ok: false, error: expect.stringContaining('専用ページ') });
+});
+
+test('restored spare originals survive unrelated cleanup from the native panel without a tab', async ({}, info) => {
+  test.setTimeout(60_000);
+  const profile = await mkdtemp(path.join(path.resolve('.work'), 'g-backup-profile-'));
+  const context = await launchExtension(profile, true, { headed: true });
+  try {
+    const worker = context.serviceWorkers()[0] ?? (await context.waitForEvent('serviceworker'));
+    const id = new URL(worker.url()).host;
+    const popup = await context.newPage();
+    await popup.goto('chrome-extension://' + id + '/popup/index.html');
+    const page = await context.newPage();
+    await page.goto('https://www.youtube.com/watch?v=fixture');
+    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+    await page.getByRole('button', { name: 'Web World Themes の設定', exact: true }).click();
+    await page
+      .getByRole('dialog', { name: 'Web World Themes の設定' })
+      .getByRole('button', { name: 'エディターを開く', exact: true })
+      .click();
+    const panel = await sidePanelDriver(context, page, id);
+    await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
+    const bytes = new Uint8Array(
+      modelFixture((json) => {
+        json.images = [];
+        json.textures = [];
+        json.materials[0].pbrMetallicRoughness = { baseColorFactor: [1, 1, 1, 1] };
+      }),
+    );
+    const assetId = 'asset-' + (await sha256(bytes));
+    const file = await encodeBackup(
+      {
+        format: 'web-world-themes-backup',
+        version: 1,
+        createdAt: '2026-10-22T00:00:00Z',
+        settings: mergeSettings(DEFAULT_SETTINGS, {}),
+        preferences: {},
+        designs: [],
+        takes: [],
+        assets: [{ id: assetId, name: 'spare.glb', mime: 'model/gltf-binary', byteLength: bytes.length }],
+      },
+      [new Blob([bytes])],
+    );
+    const backup = await openBackup(popup);
+    await backup.locator('#backup-settings').uncheck();
+    await backup.locator('#backup-file').setInputFiles({
+      name: 'spare.wwbackup',
+      mimeType: 'application/octet-stream',
+      buffer: Buffer.from(await file.arrayBuffer()),
+    });
+    await backup.locator('#backup-inspect').click();
+    await expect(backup.locator('#backup-restore')).toBeEnabled();
+    await backup.locator('#backup-restore').click();
+    await expect(backup.locator('.backup-status')).toContainText('読み込みが完了');
+    const released = await panel.evaluate<{ ok: boolean }>(
+      'chrome.runtime.sendMessage({type:"web-world-themes:assets",action:"release",session:"g-unrelated-panel"})',
+    );
+    expect(released.ok).toBe(true);
+    const stored = await backup.evaluate(
+      async (id) =>
+        new Promise<boolean>((resolve, reject) => {
+          const open = indexedDB.open('web-world-themes-assets', 1);
+          open.onerror = () => reject(open.error);
+          open.onsuccess = () => {
+            const db = open.result,
+              get = db.transaction('assets').objectStore('assets').get(id);
+            get.onsuccess = () => {
+              resolve(Boolean(get.result));
+              db.close();
+            };
+            get.onerror = () => {
+              reject(get.error);
+              db.close();
+            };
+          };
+        }),
+      assetId,
+    );
+    expect(stored).toBe(true);
+    await panel.detach();
+    await info.attach('spare-original-retained', { body: assetId, contentType: 'text/plain' });
+  } finally {
+    await context.close();
+  }
 });

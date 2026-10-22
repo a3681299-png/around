@@ -10,6 +10,28 @@ import {
 import { assetSourceBytes, type LoadedAsset } from '../src/assets/client';
 import { inspectAsset } from '../src/assets/inspect';
 import { vrmFixture } from './helpers/vrm-fixture';
+import { BACKUP_LIBRARY_LEASE, keepAssetLease, type AssetLease } from '../src/assets/repository';
+
+test('restored spare originals survive cleanup from an unrelated extension page without a tab', () => {
+  const current: AssetLease = { session: 'other-upload', tabId: -1, documentId: 'extension-page-document' };
+  expect(keepAssetLease(BACKUP_LIBRARY_LEASE, new Set(), current)).toBe(true);
+  expect(keepAssetLease(BACKUP_LIBRARY_LEASE, new Set())).toBe(true);
+});
+test('normal lease cleanup still expires closed tabs and superseded documents while retaining Studio recovery', () => {
+  const lease = (tabId: number, documentId: string): AssetLease => ({ session: 'test-session', tabId, documentId });
+  for (const [row, current, expected] of [
+    [lease(1, 'old'), undefined, true],
+    [lease(2, 'old'), undefined, false],
+    [lease(-1, 'old'), undefined, true],
+    [lease(1, 'same'), lease(1, 'same'), true],
+    [lease(1, 'old'), lease(1, 'new'), false],
+    [lease(1, 'old'), lease(2, 'new'), true],
+    [lease(1, 'studio:1'), lease(1, 'new'), true],
+    [lease(1, 'old'), lease(1, 'studio:sidepanel:1'), true],
+    [lease(-1, 'old'), lease(-1, 'new'), false],
+  ] as const)
+    expect(keepAssetLease(row, new Set([1]), current)).toBe(expected);
+});
 
 const deferred = <T>() => {
   let resolve!: (value: T) => void;

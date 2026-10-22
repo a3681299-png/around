@@ -1,7 +1,7 @@
 import { installSidePanelHost } from '../browser/side-panel';
 import { installEditorEntry } from '../browser/editor-entry';
 import { ASSET_MESSAGE, type AssetWireFile } from '../assets/protocol';
-import { changeAssets, getAsset, type AssetLease, type StoredAsset } from '../assets/repository';
+import { changeAssets, getAsset, keepAssetLease, type AssetLease, type StoredAsset } from '../assets/repository';
 import { ASSET_LIMITS, base64ToBytes, bytesToBase64, type AssetMetadata, type AssetInfo } from '../assets/validation';
 import { validateAssetBytes } from '../assets/validate-bytes';
 import { validateDesignAssets } from '../assets/design-assets';
@@ -167,17 +167,7 @@ async function prune(current?: AssetLease): Promise<void> {
       remove: string[] = [];
     for (const row of rows) {
       // Recovery shares a tab with the live page, but cannot supersede its document.
-      const leases = row.leases.filter(
-        (lease) =>
-          (lease.tabId === -1 || tabs.has(lease.tabId)) &&
-          !(
-            current &&
-            !current.documentId.startsWith('studio:') &&
-            lease.tabId === current.tabId &&
-            lease.documentId !== current.documentId &&
-            !lease.documentId.startsWith('studio:')
-          ),
-      );
+      const leases = row.leases.filter((lease) => keepAssetLease(lease, tabs, current));
       if (leases.length || references.has(row.id)) {
         if (leases.length !== row.leases.length) put.push({ ...row, leases });
       } else {
