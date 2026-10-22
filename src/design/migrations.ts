@@ -1,4 +1,5 @@
 import { ASSET_LIMITS, ASSET_MESSAGES } from '../assets/limits';
+import { IMAGE_LIMITS } from './types';
 
 // Intermediate objects are untrusted. Only schema.ts's final v11 validation may
 // produce a DesignDocument; migration never grants immutable.ts's validated mark.
@@ -45,7 +46,9 @@ function stage(value: unknown, version: number, shape: Shape): Data {
   const data = record(value, shape.root);
   if (data['schemaVersion'] !== version) throw new Error('移行元のバージョンが不正です。');
   if (shape.layer) {
-    for (const value of list(data['decorations'])) {
+    const decorations = list(data['decorations']);
+    if (decorations.length > IMAGE_LIMITS.count) throw new Error(ASSET_MESSAGES.layerCount);
+    for (const value of decorations) {
       const layer = record(value, shape.layer);
       if (!shape.kinds?.includes(layer['kind'] as string)) throw new Error('素材レイヤーの形式が不正です。');
     }

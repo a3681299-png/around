@@ -3,13 +3,38 @@ import { test, expect } from '@playwright/test';
 import { parseDesign } from '../src/design/schema';
 import { freezeTree, readDesign, editDesign, commitDesign } from '../src/design/immutable';
 import { DESIGN_MIGRATIONS, migrateDesign } from '../src/design/migrations';
-import type { DesignDocument } from '../src/design/types';
+import { IMAGE_LIMITS, type DesignDocument } from '../src/design/types';
+import { ASSET_MESSAGES } from '../src/assets/limits';
 
 const fixtures = 'tests/fixtures/designs/';
 const expected = JSON.parse(readFileSync(fixtures + 'chain-expected.json', 'utf8')) as {
   baseline: string;
   documents: Record<string, unknown>;
 };
+
+test('every historical layer stage rejects excess decorations before inspecting the first layer', () => {
+  for (let version = 2; version < 11; version++) {
+    let reads = 0;
+    const decorations = new Array<unknown>(IMAGE_LIMITS.count + 1);
+    Object.defineProperty(decorations, 0, {
+      get() {
+        reads++;
+        throw new Error('layer inspection must follow the count limit');
+      },
+    });
+    const document = {
+      schemaVersion: version,
+      id: 'legacy',
+      siteId: 'youtube',
+      baseThemeId: null,
+      rules: [],
+      decorations,
+    };
+    expect(() => DESIGN_MIGRATIONS[version - 1]!(document)).toThrow(ASSET_MESSAGES.layerCount);
+    expect(() => parseDesign(document)).toThrow(ASSET_MESSAGES.layerCount);
+    expect(reads).toBe(0);
+  }
+});
 for (const [file, result] of Object.entries(expected.documents)) {
   test(`${file}: parseDesign stays exactly equal to the pre-chain result and preserves frozen inputs`, () => {
     const input = freezeTree(JSON.parse(readFileSync(fixtures + file, 'utf8')));
