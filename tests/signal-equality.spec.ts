@@ -2,6 +2,44 @@ import { test, expect } from '@playwright/test';
 import { defaultScrollOpacityRule, type SignalRule } from '../src/signals/keyframes';
 import { sameSignalRule } from '../src/signals/equality';
 
+// Required mapped keys make even a new optional field a typecheck failure until
+// this test supplies it. Array descriptors cover each element's fields.
+type EqualityFields<T> = T extends readonly (infer Item)[]
+  ? EqualityFields<Item>
+  : T extends object
+    ? { [Key in keyof T]-?: EqualityFields<NonNullable<T[Key]>> }
+    : true;
+const fields = {
+  id: true,
+  enabled: true,
+  source: { signal: true, axis: true, space: true, inputRange: true },
+  target: { layerId: true, property: true },
+  keyframes: { id: true, input: true, value: true, easing: true },
+  evaluation: { mode: true, smoothing: { kind: true } },
+  blend: { mode: true, priority: true },
+} satisfies EqualityFields<SignalRule>;
+
+test('the equality field descriptor covers the type and changing every populated leaf breaks equality', () => {
+  const rule = defaultScrollOpacityRule('image-a');
+  const visit = (descriptor: any, value: any, path: (string | number)[]) => {
+    if (Array.isArray(value)) {
+      value.forEach((item, index) => visit(descriptor, item, [...path, index]));
+    } else if (descriptor === true) {
+      expect(['number', 'boolean', 'string']).toContain(typeof value);
+      const changed = structuredClone(rule);
+      let parent: any = changed;
+      for (const key of path.slice(0, -1)) parent = parent[key];
+      parent[path.at(-1)!] =
+        typeof value === 'number' ? value + 0.125 : typeof value === 'boolean' ? !value : value + '-changed';
+      expect(sameSignalRule(rule, changed), path.join('.')).toBe(false);
+    } else {
+      expect(Object.keys(value).sort()).toEqual(Object.keys(descriptor).sort());
+      for (const key of Object.keys(descriptor)) visit(descriptor[key], value[key], [...path, key]);
+    }
+  };
+  visit(fields, rule, []);
+});
+
 test('SignalRule equality ignores key order at every object level without mutating either rule', () => {
   const rule = defaultScrollOpacityRule('image-a');
   const reorder = (value: unknown): any =>
