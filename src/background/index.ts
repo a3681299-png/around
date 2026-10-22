@@ -2,8 +2,7 @@ import { installSidePanelHost } from '../browser/side-panel';
 import { ASSET_MESSAGE, type AssetWireFile } from '../assets/protocol';
 import { changeAssets, getAsset, type AssetLease, type StoredAsset } from '../assets/repository';
 import { ASSET_LIMITS, base64ToBytes, bytesToBase64, type AssetMetadata, type AssetInfo } from '../assets/validation';
-import { inspectAsset } from '../assets/inspect';
-import { validateModelTextures } from '../assets/decode';
+import { validateAssetBytes } from '../assets/validate-bytes';
 import { validateDesignAssets } from '../assets/design-assets';
 import { isAssetId, isDesignId, parseDesign } from '../design/schema';
 import { saveDesign } from '../storage/designs';
@@ -21,6 +20,7 @@ import {
 import { ASSET_MESSAGES } from '../assets/limits';
 import { installAssetRuntimeBroker } from '../diagnostics/asset-runtime-broker';
 import { createAssetReadService } from './asset-read';
+import { createBackupService, backupPageURL } from './backup';
 import { ASSET_READ_CONFIRM, ASSET_READ_FRAME, ASSET_READ_MESSAGE, AssetReadError } from '../assets/read-protocol';
 import {
   ASSET_PROFILE,
@@ -255,28 +255,12 @@ async function importBatch(
     const cached = verified.get(id);
     // A different MIME declaration still passes the original boundary check.
     const reusable = canReuseImportInspection(cached, file.mime);
-    const info = reusable
-      ? profileSync(trace, 'store.verified-hit', () => structuredClone(cached))
-      : profileSync(trace, 'store.inspect', () => inspectAsset(bytes, file.mime));
-    if (!reusable && info.model)
-      await profileAsync(trace, 'store.validate-textures', () => validateModelTextures(bytes, undefined, trace));
-    const blob = profileSync(
-      trace,
-      'store.clone-blob',
-      () => new Blob([bytes as Uint8Array<ArrayBuffer>], { type: info.mime }),
-      { bytes: bytes.length },
-    );
-    // ServiceWorker has no ImageDecoder. Both boundaries inspect containers;
-    // images validate frame 0. Video is probed by the content importer.
-    if (!reusable && !info.model && info.animation?.format !== 'lottie' && info.animation?.format !== 'webm') {
-      const bitmap = await createImageBitmap(blob);
-      try {
-        if (bitmap.width !== info.width || bitmap.height !== info.height)
-          throw new Error('画像を正しく読み込めませんでした。');
-      } finally {
-        bitmap.close();
-      }
-    }
+    const { info, blob } = reusable
+      ? profileSync(trace, 'store.verified-hit', () => ({
+          info: structuredClone(cached),
+          blob: new Blob([bytes as Uint8Array<ArrayBuffer>], { type: cached.mime }),
+        }))
+      : await validateAssetBytes(bytes as Uint8Array<ArrayBuffer>, file.mime, trace);
     if (verified.size >= ASSET_LIMITS.count) verified.delete(verified.keys().next().value!);
     verified.set(id, structuredClone(info));
     assets.push({ ...info, id, name: file.name, byteLength: bytes.length, blob, leases: [lease] });
@@ -327,6 +311,8 @@ const studioTransfer = createStudioTransferService({
   importBatch,
 });
 self.addEventListener('message', (event) => studioTransfer.receive(event as unknown as StudioTransferEvent));
+const backups = createBackupService({ pageURL: backupPageURL(), client: (id) => workerClients.get(id), enqueue });
+self.addEventListener('message', (event) => backups.receive(event as unknown as StudioTransferEvent));
 
 async function handle(
   message: Record<string, unknown>,
@@ -535,5 +521,5 @@ chrome.tabs.onRemoved.addListener(() => {
 });
 
 installSidePanelHost();
-installTakeStorage();
+installTakeStorage(enqueue);
 if (ASSET_PROFILE) installAssetRuntimeBroker();

@@ -1,0 +1,39 @@
+body {
+  margin: 0;
+  padding: 24px;
+  font: 14px/1.6 var(--ww-font);
+  background: var(--ww-panel);
+  color: var(--ww-ink);
+}
+main {
+  max-width: 820px;
+  margin: auto;
+}
+section {
+  margin: 20px 0;
+  padding: 16px;
+}
+h1 {
+  font-size: 23px;
+}
+h2 {
+  font-size: 18px;
+}
+input[type='file'] {
+  display: block;
+  max-width: 100%;
+  margin-top: 8px;
+}
+.identity {
+  overflow-wrap: anywhere;
+}
+[hidden] {
+  display: none !important;
+}
+.backup-status[data-error='true'] {
+  font-weight: bold;
+}
+#backup-download {
+  display: block;
+  margin-top: 12px;
+}

@@ -3,6 +3,7 @@ import { defineConfig } from '@playwright/test';
 // These specs use in-memory ports, data fixtures and document stubs only.
 // fullyParallel gives each test a worker-isolated module/global environment.
 const unitSpecs = [
+  'backup-data',
   'asset-import-validation',
   'asset-profile',
   'asset-read-data',

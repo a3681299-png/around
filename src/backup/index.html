@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Web World Themes — バックアップ</title>
+    <link rel="stylesheet" href="backup.css" />
+    <script src="index.js" defer></script>
+  </head>
+  <body>
+    <main class="ww-editor">
+      <h1>作品と設定のバックアップ</h1>
+      <p class="identity"></p>
+      <p
+        >先に作品とテイクを保存してください。編集中のタブやStudioを閉じてから操作します。未保存の編集と接続復旧用の履歴は含みません。</p
+      >
+      <section class="ww-group">
+        <h2>ファイルへ書き出す</h2>
+        <p
+          >保存済み作品・原本素材・保存テイク・表示設定・制作画面の配置設定を、1つの .wwbackup ファイルにまとめます。</p
+        >
+        <button type="button" id="backup-export">バックアップを書き出す</button>
+        <a id="backup-download" hidden>バックアップを保存</a>
+      </section>
+      <section class="ww-group">
+        <h2>別の拡張IDへ読み込む</h2>
+        <label for="backup-file">バックアップファイル</label>
+        <input id="backup-file" type="file" accept=".wwbackup,application/octet-stream" />
+        <p
+          ><label
+            ><input id="backup-settings" type="checkbox" checked />
+            バックアップの表示設定・制作画面の配置設定を適用する（現在の設定を置き換えます）</label
+          ></p
+        >
+        <p
+          >作品・テイクは、同じIDで内容が異なる場合には読み込み全体を拒否します。同じID・同じ内容の素材や作品は増えません。</p
+        >
+        <button type="button" id="backup-inspect">内容と衝突を確認する</button>
+        <p class="backup-summary"></p>
+        <button type="button" id="backup-restore" disabled>確認したバックアップを読み込む</button>
+      </section>
+      <p class="backup-status" role="status" aria-live="polite">ファイルはこの端末内で処理します。</p>
+      <p
+        >上限:
+        原本合計256MiB・128素材。バックアップ全体336MiB。保存テイクは8個。ファイルの内容は暗号化されません。共有前に素材の利用条件を確認してください。</p
+      >
+      <a href="../popup/index.html">表示設定へ</a>
+    </main>
+  </body>
+</html>

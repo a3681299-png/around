@@ -4,14 +4,15 @@ import { mkdir, mkdtemp, readFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { renderDiagnostics } from './helpers/render-diagnostics';
 
-const extensionPath = path.resolve(process.env.WW_TEST_EXTENSION_PATH ?? 'dist');
+const defaultExtensionPath = path.resolve(process.env.WW_TEST_EXTENSION_PATH ?? 'dist');
 const fixturePath = path.resolve('tests/fixtures/youtube.html');
 
 export async function launchExtension(
   profile: string,
   useFixture = true,
-  options: { headed?: boolean; width?: number; height?: number } = {},
+  options: { headed?: boolean; width?: number; height?: number; extensionPath?: string } = {},
 ): Promise<BrowserContext> {
+  const extensionPath = path.resolve(options.extensionPath ?? defaultExtensionPath);
   const context = await chromium.launchPersistentContext(profile, {
     ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
       ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH }

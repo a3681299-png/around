@@ -35,6 +35,7 @@ await mkdir(join(outDir, 'content'), { recursive: true });
 await mkdir(join(outDir, 'background'), { recursive: true });
 await mkdir(join(outDir, 'studio'), { recursive: true });
 await mkdir(join(outDir, 'assets'), { recursive: true });
+await mkdir(join(outDir, 'backup'), { recursive: true });
 if (profiling) await mkdir(join(outDir, 'diagnostics'), { recursive: true });
 
 async function copyStaticFiles() {
@@ -67,6 +68,8 @@ async function copyStaticFiles() {
     copyFile(join(root, 'src/studio/index.html'), join(outDir, 'studio/index.html')),
     copyFile(join(root, 'src/studio/studio.css'), join(outDir, 'studio/studio.css')),
     copyFile(join(root, 'src/assets/read-frame.html'), join(outDir, 'assets/read-frame.html')),
+    copyFile(join(root, 'src/backup/index.html'), join(outDir, 'backup/index.html')),
+    copyFile(join(root, 'src/backup/backup.css'), join(outDir, 'backup/backup.css')),
   ]);
   if (profiling)
     await Promise.all(
@@ -91,6 +94,13 @@ const shared = {
 };
 
 const builds = await Promise.all([
+  context({
+    ...shared,
+    entryPoints: ['src/backup/page.ts'],
+    outfile: join(outDir, 'backup/index.js'),
+    format: 'iife',
+    loader: { '.css': 'text' },
+  }),
   context({
     ...shared,
     entryPoints: ['src/assets/read-frame.ts'],
@@ -150,6 +160,9 @@ if (watching) {
     }),
     watch(join(root, 'src/popup'), (_event, file) => {
       if (file === 'index.html' || file === 'popup.css') refresh();
+    }),
+    watch(join(root, 'src/backup'), (_event, file) => {
+      if (file === 'index.html' || file === 'backup.css') refresh();
     }),
     watch(root, (_event, file) => {
       if (file === 'manifest.json') refresh();

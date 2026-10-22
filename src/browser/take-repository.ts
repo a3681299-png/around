@@ -4,8 +4,9 @@ import type { TakeSummary } from '../timeline/types';
 import { isDesignId } from '../design/schema';
 import { TAKE_MESSAGES } from '../assets/limits';
 import { oneOf } from '../validation';
+import { sameBackupData } from '../backup/data';
 
-const DATABASE = 'web-world-themes-signal-takes';
+export const TAKE_DATABASE = 'web-world-themes-signal-takes';
 interface Row {
   id: string;
   chars: number;
@@ -14,7 +15,7 @@ interface Row {
 }
 async function open() {
   return new Promise<IDBDatabase>((resolve, reject) => {
-    const request = indexedDB.open(DATABASE, 1);
+    const request = indexedDB.open(TAKE_DATABASE, 1);
     request.onupgradeneeded = () => request.result.createObjectStore('takes', { keyPath: 'id' });
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
@@ -81,7 +82,75 @@ async function handle(data: Record<string, unknown>) {
     db.close();
   }
 }
-export function installTakeStorage() {
+/** Backup uses the same database and parser as the ordinary take repository. */
+export async function readStoredTakes(): Promise<SignalTake[]> {
+  const db = await open();
+  try {
+    return await new Promise((resolve, reject) => {
+      const request = db.transaction('takes').objectStore('takes').getAll();
+      request.onsuccess = () => {
+        try {
+          resolve((request.result as Row[]).map((row) => parseSignalTake(row.take)));
+        } catch (error) {
+          reject(error);
+        }
+      };
+      request.onerror = () => reject(request.error);
+    });
+  } finally {
+    db.close();
+  }
+}
+
+export function validateTakeMerge(current: readonly SignalTake[], incoming: readonly SignalTake[]): SignalTake[] {
+  const result = new Map(current.map((take) => [take.id, take]));
+  for (const take of incoming) {
+    const existing = result.get(take.id);
+    if (existing && !sameBackupData(existing, take)) throw new Error(`テイクIDが衝突しています: ${take.id}`);
+    result.set(take.id, take);
+  }
+  const takes = [...result.values()];
+  if (
+    takes.length > TAKE_LIMITS.storedCount ||
+    takes.reduce((sum, take) => sum + JSON.stringify(take).length, 0) > TAKE_LIMITS.storedChars
+  )
+    throw new Error(TAKE_MESSAGES.storage);
+  return takes;
+}
+
+export async function restoreTakes(incoming: readonly SignalTake[]): Promise<void> {
+  const parsed = incoming.map((take) => parseSignalTake(take)),
+    db = await open();
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction('takes', 'readwrite'),
+        store = tx.objectStore('takes'),
+        request = store.getAll();
+      let failure: unknown;
+      request.onsuccess = () => {
+        try {
+          const rows = request.result as Row[];
+          validateTakeMerge(
+            rows.map((row) => parseSignalTake(row.take)),
+            parsed,
+          );
+          for (const take of parsed)
+            if (!rows.some((row) => row.id === take.id))
+              store.add({ id: take.id, take, chars: JSON.stringify(take).length, updatedAt: Date.now() } satisfies Row);
+        } catch (error) {
+          failure = error;
+          tx.abort();
+        }
+      };
+      tx.oncomplete = () => resolve();
+      tx.onabort = tx.onerror = () => reject(failure ?? tx.error ?? new Error('テイクを復元できませんでした。'));
+    });
+  } finally {
+    db.close();
+  }
+}
+
+export function installTakeStorage(serialize?: <T>(operation: () => Promise<T>) => Promise<T>) {
   let queue: Promise<unknown> = Promise.resolve();
   chrome.runtime.onMessage.addListener((value: unknown, sender, respond) => {
     if (
@@ -97,7 +166,9 @@ export function installTakeStorage() {
       !(sender.origin === 'https://www.youtube.com' && sender.frameId === 0)
     )
       return false;
-    const result = queue.then(() => handle(value as Record<string, unknown>));
+    const result = serialize
+      ? serialize(() => handle(value as Record<string, unknown>))
+      : queue.then(() => handle(value as Record<string, unknown>));
     queue = result.catch(() => undefined);
     void result.then(
       (value) => respond({ ok: true, value }),
