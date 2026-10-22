@@ -58,6 +58,8 @@ jobs:
       # Native toolbar action / shortcut tests must go through Chrome's accelerators.
       - run: sudo apt-get install -y xdotool
       - run: npm run build
+      # Fail early if the native toolbar/command window cannot receive input.
+      - run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" npm run test:e2e -- tests/editor-entry.spec.ts --grep "OFF opens|ON action" --output=.work/native-entry-results
       # Native Chrome Side Panel tests need a real window and display server.
       - run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" npm run test:e2e
       - name: Optional public YouTube inspection
@@ -70,6 +72,7 @@ jobs:
           name: theme-e2e-results
           path: |
             .work/test-results/e2e/
+            .work/native-entry-results/
             .work/live-results/
           include-hidden-files: true
           retention-days: 7

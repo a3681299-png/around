@@ -24,13 +24,34 @@ public static class EntryTestKeys {
   [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr window);
   [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
   [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr window, int command);
+  [DllImport("user32.dll")] public static extern bool BringWindowToTop(IntPtr window);
+  [DllImport("user32.dll")] public static extern IntPtr SetFocus(IntPtr window);
+  [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr window, out uint process);
+  [DllImport("kernel32.dll")] public static extern uint GetCurrentThreadId();
+  [DllImport("user32.dll")] public static extern bool AttachThreadInput(uint from, uint to, bool attach);
   [DllImport("user32.dll")] public static extern void keybd_event(byte key, byte scan, uint flags, UIntPtr extra);
 }
 '@
 $window = (Get-Process -Id $owned[0].ProcessId).MainWindowHandle
 if ($window -eq [IntPtr]::Zero) { throw 'Owned browser has no window.' }
-[EntryTestKeys]::ShowWindow($window, 9) | Out-Null
-[EntryTestKeys]::SetForegroundWindow($window) | Out-Null
+[uint32]$ownedWindowPid = 0
+$targetThread = [EntryTestKeys]::GetWindowThreadProcessId($window, [ref]$ownedWindowPid)
+if ($ownedWindowPid -ne $owned[0].ProcessId) { throw 'Window no longer belongs to the owned browser.' }
+[uint32]$foregroundWindowPid = 0
+$foregroundThread = [EntryTestKeys]::GetWindowThreadProcessId([EntryTestKeys]::GetForegroundWindow(), [ref]$foregroundWindowPid)
+$helperThread = [EntryTestKeys]::GetCurrentThreadId()
+# Windows restricts cross-process foreground activation. Temporarily share the
+# input queue to focus this verified test window, then detach before sending keys.
+$attachedThreads = @($targetThread, $foregroundThread) | Where-Object { $_ -ne 0 -and $_ -ne $helperThread } | Select-Object -Unique
+try {
+  foreach ($thread in $attachedThreads) { [EntryTestKeys]::AttachThreadInput($helperThread, $thread, $true) | Out-Null }
+  [EntryTestKeys]::ShowWindow($window, 9) | Out-Null
+  [EntryTestKeys]::BringWindowToTop($window) | Out-Null
+  [EntryTestKeys]::SetForegroundWindow($window) | Out-Null
+  [EntryTestKeys]::SetFocus($window) | Out-Null
+} finally {
+  foreach ($thread in $attachedThreads) { [EntryTestKeys]::AttachThreadInput($helperThread, $thread, $false) | Out-Null }
+}
 for ($i = 0; $i -lt 50 -and [EntryTestKeys]::GetForegroundWindow() -ne $window; $i++) { Start-Sleep -Milliseconds 10 }
 if ([EntryTestKeys]::GetForegroundWindow() -ne $window) { throw 'Refusing keys outside the owned test window.' }
 $code = [byte][char]$Key
