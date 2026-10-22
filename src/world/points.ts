@@ -2,6 +2,7 @@ import type { PlacementAnchor } from '../design/types';
 import type { SignalSnapshot } from '../signals/types';
 import { centre, type Point } from './geometry';
 import { frameFor, type WorldGeometry, type WorldLayout } from './types';
+import { layoutEntry } from './layout-index';
 
 export interface PointContext {
   geometry: WorldGeometry;
@@ -34,8 +35,7 @@ export function createPointRegistry<const D extends PointDefinitions>(definition
   });
 }
 
-const layerEntry = (context: PointContext, layerId: string) =>
-  context.layout && [...context.layout.groups, ...context.layout.layers].find((entry) => entry.layer.id === layerId);
+const layerEntry = (context: PointContext, layerId: string) => context.layout && layoutEntry(context.layout, layerId);
 const usable = (frame: { width: number; height: number } | undefined) =>
   Boolean(frame && frame.width > 0 && frame.height > 0);
 const currentLayerFrame = (context: PointContext, layerId: string) => {

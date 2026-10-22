@@ -3,6 +3,7 @@ import type { PointerMemory } from '../world/signals';
 import type { WorldEvent, WorldGeometry, WorldLayout } from '../world/types';
 import type { Point } from '../world/geometry';
 import { legacySignalOrigin, resolvePoint, type SpatialPoint } from '../world/points';
+import { layoutEntry } from '../world/layout-index';
 
 export type SignalSpace = 'page' | 'viewport' | 'anchor' | 'layer';
 export type SignalAxis = 'x' | 'y';
@@ -197,9 +198,7 @@ export const scrollProgress = (signals: SignalSnapshot): number => {
   const value = scroll && scroll.maxY > 0 ? scroll.y / scroll.maxY : 0;
   return Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : 0;
 };
-const entryFor = (context: SignalEvaluationContext) =>
-  context.layout &&
-  [...context.layout.groups, ...context.layout.layers].find((entry) => entry.layer.id === context.layerId);
+const entryFor = (context: SignalEvaluationContext) => context.layout && layoutEntry(context.layout, context.layerId);
 const frameFor = (context: SignalEvaluationContext) =>
   context.source?.space === 'viewport' && context.geometry
     ? { left: 0, top: 0, ...context.geometry.viewport }
