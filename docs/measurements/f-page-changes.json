@@ -1,0 +1,132 @@
+{
+  "before": "28d594a",
+  "node": "v24.16.0",
+  "chrome": "153.0.8010.12",
+  "cpu": "13th Gen Intel(R) Core(TM) i7-13650HX",
+  "viewport": "1920x1080",
+  "rounds": 5,
+  "steps": 60,
+  "metric": "CDP Performance.ScriptDuration; includes page scripts and async DOM-following callbacks; excludes idle/paint",
+  "samples": [
+    {
+      "round": 1,
+      "side": "before",
+      "scriptMs": 66.432,
+      "counts": {
+        "themeWrites": 4392,
+        "variables": 122,
+        "compiles": 122,
+        "featureRefreshes": 122,
+        "surfaces": 122
+      }
+    },
+    {
+      "round": 1,
+      "side": "after",
+      "scriptMs": 6.37,
+      "counts": {
+        "themeWrites": 0,
+        "variables": 0,
+        "compiles": 0,
+        "featureRefreshes": 0,
+        "surfaces": 60
+      }
+    },
+    {
+      "round": 2,
+      "side": "after",
+      "scriptMs": 6.507,
+      "counts": {
+        "themeWrites": 0,
+        "variables": 0,
+        "compiles": 0,
+        "featureRefreshes": 0,
+        "surfaces": 60
+      }
+    },
+    {
+      "round": 2,
+      "side": "before",
+      "scriptMs": 88.628,
+      "counts": {
+        "themeWrites": 4392,
+        "variables": 122,
+        "compiles": 122,
+        "featureRefreshes": 122,
+        "surfaces": 122
+      }
+    },
+    {
+      "round": 3,
+      "side": "before",
+      "scriptMs": 87.791,
+      "counts": {
+        "themeWrites": 4392,
+        "variables": 122,
+        "compiles": 122,
+        "featureRefreshes": 122,
+        "surfaces": 122
+      }
+    },
+    {
+      "round": 3,
+      "side": "after",
+      "scriptMs": 6.644,
+      "counts": {
+        "themeWrites": 0,
+        "variables": 0,
+        "compiles": 0,
+        "featureRefreshes": 0,
+        "surfaces": 60
+      }
+    },
+    {
+      "round": 4,
+      "side": "after",
+      "scriptMs": 7.439,
+      "counts": {
+        "themeWrites": 0,
+        "variables": 0,
+        "compiles": 0,
+        "featureRefreshes": 0,
+        "surfaces": 60
+      }
+    },
+    {
+      "round": 4,
+      "side": "before",
+      "scriptMs": 78.763,
+      "counts": {
+        "themeWrites": 4356,
+        "variables": 121,
+        "compiles": 121,
+        "featureRefreshes": 121,
+        "surfaces": 121
+      }
+    },
+    {
+      "round": 5,
+      "side": "before",
+      "scriptMs": 92.71,
+      "counts": {
+        "themeWrites": 4392,
+        "variables": 122,
+        "compiles": 122,
+        "featureRefreshes": 122,
+        "surfaces": 122
+      }
+    },
+    {
+      "round": 5,
+      "side": "after",
+      "scriptMs": 7.136,
+      "counts": {
+        "themeWrites": 0,
+        "variables": 0,
+        "compiles": 0,
+        "featureRefreshes": 0,
+        "surfaces": 60
+      }
+    }
+  ]
+}
