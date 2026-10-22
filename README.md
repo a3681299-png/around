@@ -14,7 +14,9 @@ npm ci --registry=https://registry.npmjs.org
 npm run build
 ```
 
-Chromeで`chrome://extensions`を開き、右上の「デベロッパーモード」をONにします。「パッケージ化されていない拡張機能を読み込む」を押し、このプロジェクトの`dist`フォルダーを選んでください。ソースのルートフォルダーではなく、ビルド後の`dist`を読み込みます。
+Chromeで`chrome://extensions`を開き、右上の「デベロッパーモード」をONにします。「パッケージ化されていない拡張機能を読み込む」を押し、通常版の既存パス `C:\Users\sm787\GitHub-Projects\web-world-themes\dist` を選んでください。既に登録済みなら同じカードを再読み込みします。ソースのルートフォルダーではなく、ビルド後の`dist`を読み込みます。
+
+実験版など別の読み込み先から移す場合は、作品とテイクを保存し、「作品と設定のバックアップ」から1ファイルへ書き出してください。読み込み先を変えると拡張IDが変わる場合があり、保存データは自動では引き継がれません。[移行手順と戻し方](docs/extension-consolidation.md)に従い、復元を確認するまで旧拡張とフォルダーを残します。
 
 拡張機能をツールバーに固定し、YouTubeを開くか再読み込みします。Popupで`Theme ON / OFF`をONにすると、retroテーマが適用されます。初期値はOFF、`Effect Strength`は60%です。スライダーは0〜100%で、0%では元の見た目に戻ります。雰囲気をはっきり確認したい場合は100%へ動かしてください。
 
@@ -58,13 +60,13 @@ BBSの番号は現在読み込まれたコメントと返信の表示順で、�
 
 ## 開発
 
-クリエイター向け編集の実験は `codex/creator-editor-spike` と専用worktreeで進めます。Popupの「Studioを開く（このタブ）」で、実際のYouTubeを中央にした制作画面を開けます。「デザインを編集（実験）」のクイック編集も維持しています。動画カードの装飾を編集したり、PNG・WebP素材を読み込んで移動・サイズ変更・回転したりできます。レイヤー一覧、ロック、複製、複数選択と一括移動、Undo／Redo、任意のスナップ、整列・等間隔配置にも対応します。GIF・アニメーションWebP・Lottie JSONは、編集画面で再生を確認し、停止・ループ・Lottieの速度を設定できます。
+設定画面先頭の「エディターを開く」から制作画面を開けます。制作モードONなら拡張アイコンから直接開きます。従来の「Studioを開く（このタブ）」と「デザインを編集（実験）」のクイック編集も利用できます。動画カードの装飾を編集したり、PNG・WebP素材を読み込んで移動・サイズ変更・回転したりできます。レイヤー一覧、ロック、複製、複数選択と一括移動、Undo／Redo、任意のスナップ、整列・等間隔配置にも対応します。GIF・アニメーションWebP・Lottie JSONは、編集画面で再生を確認し、停止・ループ・Lottieの速度を設定できます。
 
 Signal Timeline v2では「モーション → マウスを追いかける」で、遅延・最高速度・加減速・停止距離・移動方向への回転を設定できます。Timelineの「対象」「入力」からマウス位置・距離・角度・速度を位置／回転／不透明度へ接続します。基本配置は保持し、位置と回転にはオフセットを加えます。操作テイクの録画・再生・シーク、別保存にも対応します。操作・構造は [signal-timeline-v2.md](docs/signal-timeline-v2.md)、検証結果と制約は [signal-timeline-v2-verification.md](docs/signal-timeline-v2-verification.md) を参照してください。
 
 円形マスクで画像の一部を照らし、マウスに追従させたり動画の一時停止でフェードアウトさせたりできます。設定は既存の保存・履歴と共通です。構造と操作は [effects-and-signals.md](docs/effects-and-signals.md) を参照してください。
 
-複数素材をグループ化し、階層表示と全体移動・不透明度・共通マスクを設定できます。使い方と制約は [group-layers.md](docs/group-layers.md) にまとめています。素材は拡張専用IndexedDB、デザインはバージョン付きJSONで保存します。使い方は [creator-editor.md](docs/creator-editor.md)、アニメーションの制限は [animations.md](docs/animations.md) を参照してください。実験用worktreeの `dist` は、別のChromeプロファイルへ読み込みます。
+複数素材をグループ化し、階層表示と全体移動・不透明度・共通マスクを設定できます。使い方と制約は [group-layers.md](docs/group-layers.md) にまとめています。素材は拡張専用IndexedDB、デザインはバージョン付きJSONで保存します。使い方は [creator-editor.md](docs/creator-editor.md)、アニメーションの制限は [animations.md](docs/animations.md) を参照してください。開発と自動テストは専用worktree・`.work/test-dist`・隔離Chromeプロファイルを使い、常用の読み込み先と分けます。
 
 ```powershell
 npm run dev
@@ -95,12 +97,12 @@ VRMの通常テストは小さな自作データで描画を確認します。33
 
 Alt+Shift+Eで、制作モードに関係なくエディターを開けます。このキーは提案値です。競合した場合や変更したい場合は chrome://extensions/shortcuts で「エディターを直接開く」を設定してください。追加権限や常時表示の起動ボタンは使いません。
 
-保存先を移す場合は[バックアップ](docs/extension-backup.md)と[マージ後の移行手順](docs/extension-consolidation.md)を先に確認してください。読み込み先案内の統合用下書きは[readme-after-merge.md](docs/readme-after-merge.md)に置いてあります。
+保存先を移す場合は[バックアップ](docs/extension-backup.md)と[読み込み先の移行手順](docs/extension-consolidation.md)を先に確認してください。
 
 ## ファイル構成
 
 ```text
-manifest.json                 Manifest V3 / YouTube対象範囲 / storage権限
+manifest.json                 Manifest V3 / YouTube対象範囲 / storage・sidePanel権限
 scripts/
   build.mjs                   esbuild / dist生成 / 変更監視
   test.mjs                    検証用ブラウザーの保存先と起動
@@ -143,7 +145,7 @@ dist/                         Chromeへ読み込む生成物（Git管理対象�
 
 ## 設計
 
-Popupまたはプレイヤー設定パネル → `chrome.storage.local` → `storage.onChanged` → content → ThemeController → SiteAdapter / theme、という流れです。content scriptをYouTubeへ静的に登録します。実験エディターのService Workerは、拡張専用IndexedDBへの画像保存と、素材参照を検証したデザイン保存を担当します。権限は`storage`だけで、適用先は`https://www.youtube.com/*`に限定しています。埋め込みプレイヤーとライブチャット専用ページは除外します。YouTube Music、モバイル版、Twitch、Xは対象外です。
+Popupまたはプレイヤー設定パネル → `chrome.storage.local` → `storage.onChanged` → content → ThemeController → SiteAdapter / theme、という流れです。content scriptをYouTubeへ静的に登録します。エディターのService Workerは、拡張専用IndexedDBへの素材保存と、素材参照を検証したデザイン保存を担当します。権限は`storage`と`sidePanel`で、適用先は`https://www.youtube.com/*`に限定しています。埋め込みプレイヤーとライブチャット専用ページは除外します。YouTube Music、モバイル版、Twitch、Xは対象外です。
 
 ON/OFFと強さは別々のキーに保存します。複数のPopupから異なる設定を変更しても、もう一方の値を上書きしません。初期読込中に届いた変更は読込結果へ合流させ、古い設定への巻き戻りを防ぎます。スライダー操作のたびに保存を始め、Popupを閉じると失われる遅延タイマーは使いません。
 
@@ -187,11 +189,11 @@ YouTubeの`yt-navigate-finish`と`yt-page-data-updated`で再確認し、追加D
 
 ブラウザー起動・実サイト・スクリーンショットの実施状況と制限は`docs/verification.md`を参照してください。過去バージョンのPASSは今回の変更の実測結果を意味しません。デザインの意図は`docs/heisei-design.md`にまとめています。
 
-実験用クリエイターエディターのアニメーション素材コアは[設計](docs/animation-core.md)と[形式・制限・検証記録](docs/animation-core-verification.md)を参照してください。読み込む拡張はこのworktreeの`dist/`です。
+クリエイターエディターのアニメーション素材コアは[設計](docs/animation-core.md)と[形式・制限・検証記録](docs/animation-core-verification.md)を参照してください。常用の読み込み先は冒頭の通常版`dist`に揃えます。
 
 クリエイターUIの[再設計](docs/editor-ux.md)と[操作・検証結果](docs/editor-ux-verification.md)をまとめています。一覧のチェックから、キーを使わず複数選択してグループ化できます。
 
-独立StudioはPopupの「Studioを開く（別ウィンドウ）」から起動します。編集対象のYouTubeを選び、Studioで設定しながら実サイトで直接選択・移動できます。サイト内の「デザインを編集」も同じCoreとUIを使います。[構造とDesktop Hostへの境界](docs/studio-foundation.md)、[操作と検証結果](docs/studio-verification.md)を参照してください。実験版は `.work/creator-editor/dist` をChromeへ読み込みます。通常版の `dist` は更新しません。
+独立StudioはPopupの「Studioを開く（別ウィンドウ）」から起動します。編集対象のYouTubeを選び、Studioで設定しながら実サイトで直接選択・移動できます。サイト内の「デザインを編集」も同じCoreとUIを使います。[構造とDesktop Hostへの境界](docs/studio-foundation.md)、[操作と検証結果](docs/studio-verification.md)を参照してください。
 
 Chromeの仕様は[Content scripts](https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts)と[Storage API](https://developer.chrome.com/docs/extensions/reference/api/storage)、拡張機能の検証方法は[Playwright公式ドキュメント](https://playwright.dev/docs/chrome-extensions)を参照しています。
 
@@ -199,6 +201,6 @@ Chromeの仕様は[Content scripts](https://developer.chrome.com/docs/extensions
 
 一覧のチェック → グループ化 → プロパティの光とマスク／振る舞い → 保存、の順に制作できます。独立Studio・「従来のインページStudio（切り戻し）」・クイック編集も同じCoreを使います。切替は未保存作品とUndo履歴を維持します。旧インページ方式はブラウザー幅とCSSの予約幅が一致しない制約があるため、通常は公式パネルを使ってください。
 
-[公式パネルの設計・操作](docs/side-panel-studio.md)、[比較画像・検証結果](docs/side-panel-studio-verification.md)を参照してください。拡張を更新後、専用worktreeの `.work/creator-editor/dist` を再読み込みします。今回の追加権限は許可された `sidePanel` のみです。通常版のdistとmainは更新しません。
+[公式パネルの設計・操作](docs/side-panel-studio.md)、[比較画像・検証結果](docs/side-panel-studio-verification.md)を参照してください。拡張を更新後、通常版の既存カードとYouTubeを再読み込みします。サイドパネルは既存の`sidePanel`権限を使います。
 
 Signal Timeline v1は、レイヤーを選んで下端の **Signal Timeline → スクロールに接続** から使えます。0%・50%・100%のキーで不透明度を編集し、実スクロールへ追従させられます。明示録画した操作をテイクとして別保存し、再生・逆再生・シーク、波形とルールの投影を確認できます。キーを触った後のPREVIEWからはライブアイコンでLIVEへ戻ります。[設計・操作・制限](docs/signal-timeline-v1.md)、[実サイト・自動テスト・性能の記録](docs/signal-timeline-verification.md)を参照してください。作品はv8へ移行し、旧v1〜v7の読み込みを維持します。
