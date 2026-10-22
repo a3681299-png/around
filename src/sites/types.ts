@@ -54,6 +54,9 @@ export interface SiteFeatureCapability {
   mount(): SiteFeatureInstance;
 }
 
+/** The adapter classifies page work; themes do not inspect site-specific DOM. */
+export type SitePageChange = 'content' | 'structure' | 'navigation' | 'mode' | 'fullscreen';
+
 export interface SiteAdapter {
   readonly id: string;
   readonly stylesheet: string;
@@ -63,7 +66,7 @@ export interface SiteAdapter {
   readonly signals?: { readonly videoPlayback?: PlaybackSource };
   /** Optional site-owned implementations; unsupported features are safely skipped. */
   readonly features?: Readonly<Record<string, SiteFeatureCapability>>;
-  connect(onPageChange: () => void): () => void;
+  connect(onPageChange: (change?: SitePageChange) => void): () => void;
   mountSettings(entry: SettingsEntry): () => void;
   protectStudioToolbar?(toolbar: HTMLElement): () => void;
   mountStudio?(changed: (state: StudioHostLayout) => void): StudioLayoutAdapter;

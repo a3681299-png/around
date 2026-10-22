@@ -30,9 +30,17 @@ export function compileDesign(input: DesignDocument, targets: readonly DesignTar
 
 export function createDesignRenderer(doc: Document, targets: readonly DesignTarget[]) {
   let style: HTMLStyleElement | undefined;
+  let designId: string | undefined;
+  const refresh = () => {
+    if (!style || !designId) return;
+    if (doc.documentElement.getAttribute('data-ww-design') !== designId)
+      doc.documentElement.setAttribute('data-ww-design', designId);
+    if (!style.isConnected) (doc.head ?? doc.documentElement).append(style);
+  };
   const destroy = () => {
     style?.remove();
     style = undefined;
+    designId = undefined;
     doc.documentElement.removeAttribute('data-ww-design');
   };
   return {
@@ -45,9 +53,10 @@ export function createDesignRenderer(doc: Document, targets: readonly DesignTarg
       style ??= doc.createElement('style');
       style.id = DESIGN_STYLE_ID;
       if (style.textContent !== css) style.textContent = css;
-      doc.documentElement.setAttribute('data-ww-design', design.id);
-      if (!style.isConnected) (doc.head ?? doc.documentElement).append(style);
+      designId = design.id;
+      refresh();
     },
+    refresh,
     destroy,
   };
 }

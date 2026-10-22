@@ -3,7 +3,7 @@ import { compileDesign, createDesignRenderer } from '../design/renderer';
 import { readDesign } from '../design/immutable';
 import type { DesignDocument } from '../design/types';
 import { createImageRenderer, type ImageEditing } from '../design/image-renderer';
-import type { SiteAdapter } from '../sites/types';
+import type { SiteAdapter, SitePageChange } from '../sites/types';
 import type { UserSettings } from '../storage/settings';
 import type { ThemeDefinition } from './types';
 import { createTimelineHost, type TimelineHost } from '../host/timeline';
@@ -56,6 +56,19 @@ export function createThemeController(
     disconnect?.();
     disconnect = undefined;
     removeBase();
+  };
+
+  const followPage = (change?: SitePageChange) => {
+    if (!current?.enabled || current.strength === 0) return;
+    if (design?.baseThemeId !== null) {
+      // Reattach the cached sheet after head replacement; settings have not changed.
+      if (style && !style.isConnected) (doc.head ?? root).append(style);
+      if (change !== 'content') features.refresh();
+    }
+    designRenderer.refresh();
+    images.refresh();
+    // Text can alter geometry too; active editors compare their anchor snapshot.
+    onSurfacesChanged?.();
   };
 
   const render = () => {
@@ -115,7 +128,7 @@ export function createThemeController(
         deactivate();
         return;
       }
-      disconnect ??= site.connect(render);
+      disconnect ??= site.connect(followPage);
       render();
     },
     updateDesign(input) {

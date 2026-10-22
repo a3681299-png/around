@@ -4,7 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { relative } from 'node:path';
 
 /** Test-only counters; neither the shipping bundle nor artwork can enable these. */
-export async function pageChangeBundle(ref?: string) {
+export async function pageChangeBundle(ref?: string, legacyPage = false) {
   const result = await build({
     entryPoints: ['tests/helpers/page-change-runtime.ts'],
     bundle: true,
@@ -33,6 +33,11 @@ export async function pageChangeBundle(ref?: string) {
                 'compiles',
               );
             if (file === 'src/features/controller.ts') inject('    refresh() {', 'featureRefreshes');
+            if (legacyPage && file === 'src/themes/controller.ts') {
+              const needle = 'site.connect(followPage)';
+              if (!contents.includes(needle)) throw new Error('Legacy full-render route must be updated');
+              contents = contents.replace(needle, 'site.connect(render)');
+            }
             return { contents, loader: path.endsWith('.css') ? 'text' : 'ts' };
           });
         },

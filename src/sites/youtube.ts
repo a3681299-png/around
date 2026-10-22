@@ -1,6 +1,6 @@
 import stylesheet from './youtube.css';
 import chromeStylesheet from './youtube-chrome.css';
-import type { SiteAdapter, Surface } from './types';
+import type { SiteAdapter, SitePageChange, Surface } from './types';
 import { mountYouTubeSettings } from './youtube-player';
 import { mountYouTubeChrome } from './youtube-chrome';
 import { mountYouTubeDetails, mountYouTubeFocus } from './youtube-details';
@@ -186,6 +186,9 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
       let frame: number | undefined;
       let needsFullScan = false;
       let needsPrune = false;
+      let change: SitePageChange = 'content';
+      const owned = (node: Node) =>
+        Boolean((node instanceof Element ? node : node.parentElement)?.closest('[id^="web-world-themes-"]'));
 
       const setMode = () => {
         root.setAttribute('data-ww-mode', root.hasAttribute('dark') ? 'dark' : 'light');
@@ -248,7 +251,9 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
         needsFullScan = false;
         needsPrune = false;
         setMode();
-        onPageChange();
+        const notification = change;
+        change = 'content';
+        onPageChange(notification);
       };
 
       const schedule = () => {
@@ -257,6 +262,12 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
 
       const refresh = () => {
         needsFullScan = true;
+        change = 'navigation';
+        schedule();
+      };
+      const fullscreen = () => {
+        needsFullScan = true;
+        change = 'fullscreen';
         schedule();
       };
 
@@ -267,6 +278,13 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
       // Only added subtrees / changed IDs are scanned on ordinary DOM updates.
       const observer = new MutationObserver((records) => {
         for (const record of records) {
+          if (!owned(record.target)) {
+            const structural =
+              record.type === 'attributes' ||
+              [...record.addedNodes, ...record.removedNodes].some((node) => node instanceof Element && !owned(node));
+            if (record.attributeName === 'fullscreen') change = 'fullscreen';
+            else if (structural && change === 'content') change = 'structure';
+          }
           // A delayed/recycled link can change eligibility without replacing the card.
           const owner = record.target instanceof Element ? record.target : record.target.parentElement;
           const card = owner && videoCardContainer(owner);
@@ -307,11 +325,11 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
 
       const modeObserver = new MutationObserver(() => {
         setMode();
-        onPageChange();
+        onPageChange('mode');
       });
       modeObserver.observe(root, { attributes: true, attributeFilter: ['dark'] });
       navigationEvents.forEach((event) => doc.addEventListener(event, refresh));
-      doc.addEventListener('fullscreenchange', refresh);
+      doc.addEventListener('fullscreenchange', fullscreen);
       view.addEventListener('popstate', refresh);
       view.addEventListener('pageshow', refresh);
 
@@ -319,7 +337,7 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
         observer.disconnect();
         modeObserver.disconnect();
         navigationEvents.forEach((event) => doc.removeEventListener(event, refresh));
-        doc.removeEventListener('fullscreenchange', refresh);
+        doc.removeEventListener('fullscreenchange', fullscreen);
         view.removeEventListener('popstate', refresh);
         view.removeEventListener('pageshow', refresh);
         if (frame !== undefined) view.cancelAnimationFrame(frame);
