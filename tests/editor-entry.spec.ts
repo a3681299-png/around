@@ -92,7 +92,7 @@ test('ON action and the registered editor shortcut bypass settings; shortcut wor
           async () => (await chrome.runtime.getContexts({})).filter((entry) => entry.contextType === 'POPUP').length,
         ),
       ).toBe(0);
-      await panel.click('.close', false);
+      await panel.clickAndLeave('.close');
       await panel.detach();
     }
     await page.bringToFront();

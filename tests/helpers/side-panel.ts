@@ -77,14 +77,40 @@ export async function sidePanelDriver(
     text(selector: string) {
       return evaluate<string>(query(selector) + '?.textContent');
     },
-    async click(selector: string, waitAfter = true) {
+    async click(selector: string) {
       await settle();
       // Panel WebContents is not a Playwright Page. Exercise the shared button's
       // DOM action with CDP user activation; real YouTube controls use mouse clicks.
       await evaluate(
         `(()=>{const n=${query(selector)};if(!n||n.disabled)throw Error('Unavailable: '+${JSON.stringify(selector)});n.click();})()`,
       );
-      if (waitAfter) await settle();
+      await settle();
+    },
+    async clickAndLeave(selector: string) {
+      await settle();
+      await evaluate(
+        '(()=>{const n=' +
+          query(selector) +
+          ';if(!n||n.disabled)throw Error("Unavailable: "+' +
+          JSON.stringify(selector) +
+          ');})()',
+      );
+      // A handoff destroys this WebContents and can discard its Runtime reply.
+      // Await protocol delivery, then closure; callers still assert the new owner
+      // and its draft/history. Ordinary evaluate/click errors remain authoritative.
+      await cdp.send('Target.sendMessageToTarget', {
+        sessionId,
+        message: JSON.stringify({
+          id: ++serial,
+          method: 'Runtime.evaluate',
+          params: { expression: query(selector) + '.click()', userGesture: true },
+        }),
+      });
+      await expect
+        .poll(async () =>
+          (await cdp.send('Target.getTargets')).targetInfos.some((target) => target.targetId === targetId),
+        )
+        .toBe(false);
     },
     async fill(selector: string, value: string) {
       await settle();

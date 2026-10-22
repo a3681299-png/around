@@ -37,6 +37,7 @@ const unitSpecs = [
   'signal-takes',
   'spatial-points',
   'settings-position',
+  'side-panel-protocol',
   'studio-client-data',
   'studio-import-probe',
   'studio-transfer-data',

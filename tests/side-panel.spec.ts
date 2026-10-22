@@ -125,7 +125,7 @@ test('native Chrome panel uses the same draft, group masks, selection, history, 
     await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
     await expect(page.locator('#web-world-themes-decorations [data-image-id]')).toHaveCount(3);
     await panel.click('.studio-menu-item > summary');
-    await panel.click('[data-source="close"]', false);
+    await panel.clickAndLeave('[data-source="close"]');
     await expect(page.locator('[data-ww-editing]')).toHaveCount(0);
     await expect(local).toHaveCount(0);
     await expect.poll(() => page.evaluate(() => innerWidth)).toBeGreaterThan(1750);
@@ -175,7 +175,7 @@ test('side panel and standalone hand off unsaved Undo and asset leases, while ta
     await expect.poll(() => panel.text('.dirty')).toBe('未保存の変更');
     await expect(page.locator('#web-world-themes-decorations [data-image-id]')).toHaveCount(1);
     const opened = context.waitForEvent('page');
-    await panel.click('[aria-label="独立Studioへ切替"]', false);
+    await panel.clickAndLeave('[aria-label="独立Studioへ切替"]');
     const standalone = await opened;
     await standalone.setViewportSize({ width: 1440, height: 900 });
     await expect(standalone.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
@@ -191,7 +191,7 @@ test('side panel and standalone hand off unsaved Undo and asset leases, while ta
     await expect.poll(() => next.text('.dirty')).toBe('未保存の変更');
     await expect(standalone.locator('.connection-status')).toContainText('引き継ぎ');
     await expect(standalone.locator('.connection-status')).toHaveAttribute('data-connected', 'false');
-    await next.click('[aria-label="従来のインページStudioへ切替"]', false);
+    await next.clickAndLeave('[aria-label="従来のインページStudioへ切替"]');
     await expect(local).toHaveAttribute('data-inpage', '');
     await expect(local.locator('.dirty')).toHaveText('未保存の変更');
     await local.locator('.undo').click();
