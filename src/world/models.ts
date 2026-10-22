@@ -2,6 +2,7 @@ import type { ModelDecoration } from '../design/types';
 import type { WorldInput, WorldLayout } from './types';
 import type { MotionState } from './motion';
 import { object, numeric } from '../models/types';
+import { oneOf } from '../validation';
 
 export interface ModelState {
   clip: number | null;
@@ -48,7 +49,7 @@ export function parseModelStates(value: unknown, ids?: ReadonlySet<string>): Rec
       };
       if (typeof v['suspended'] !== 'boolean') throw new Error('Invalid model suspension state.');
       const phase = v['phase'];
-      if (!['manual', 'idle', 'walk', 'run'].includes(String(phase))) throw new Error('Invalid locomotion state.');
+      if (!oneOf(phase, ['manual', 'idle', 'walk', 'run'])) throw new Error('Invalid locomotion state.');
       return [
         id,
         {

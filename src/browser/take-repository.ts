@@ -3,6 +3,7 @@ import { parseSignalTake, takeDuration, TAKE_LIMITS, type SignalTake } from '../
 import type { TakeSummary } from '../timeline/types';
 import { isDesignId } from '../design/schema';
 import { TAKE_MESSAGES } from '../assets/limits';
+import { oneOf } from '../validation';
 
 const DATABASE = 'web-world-themes-signal-takes';
 interface Row {
@@ -23,18 +24,17 @@ async function open() {
 async function handle(data: Record<string, unknown>) {
   if (
     !isDesignId(data['siteId']) ||
-    !['list', 'get', 'put', 'delete'].includes(String(data['action'])) ||
+    !oneOf(data['action'], ['list', 'get', 'put', 'delete']) ||
     Object.keys(data).some((key) => !['type', 'action', 'siteId', 'id', 'take'].includes(key))
   )
     throw new Error('テイク操作が不正です。');
-  if (['get', 'delete'].includes(String(data['action'])) && !isDesignId(data['id']))
-    throw new Error('テイクのIDが不正です。');
+  if (oneOf(data['action'], ['get', 'delete']) && !isDesignId(data['id'])) throw new Error('テイクのIDが不正です。');
   const incoming = data['action'] === 'put' ? parseSignalTake(data['take']) : undefined;
   if (incoming && incoming.siteId !== data['siteId']) throw new Error('保存先サイトが一致しません。');
   const db = await open();
   try {
     return await new Promise<unknown>((resolve, reject) => {
-      const tx = db.transaction('takes', ['put', 'delete'].includes(String(data['action'])) ? 'readwrite' : 'readonly'),
+      const tx = db.transaction('takes', oneOf(data['action'], ['put', 'delete']) ? 'readwrite' : 'readonly'),
         store = tx.objectStore('takes'),
         request = store.getAll();
       let result: unknown, failure: unknown;

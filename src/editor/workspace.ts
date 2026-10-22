@@ -1,4 +1,5 @@
 import { ungroupingReason } from './groups';
+import { oneOf } from '../validation';
 import type { PanelState, PanelOptions } from './panel';
 import { transientPreferences } from '../studio/preferences';
 
@@ -381,7 +382,7 @@ export function createWorkspace(
               .find((item) => item.className === entry[0])
               ?.toggleAttribute('open', entry[1]);
           }
-        show(['layers', 'properties', 'help'].includes(String(value.area)) ? (value.area as Area) : 'layers');
+        show(oneOf(value.area, ['layers', 'properties', 'help']) ? value.area : 'layers');
       },
       () => {
         preferencesReady = true;

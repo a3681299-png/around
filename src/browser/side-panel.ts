@@ -1,3 +1,4 @@
+import { oneOf } from '../validation';
 import {
   CLOSE_SIDE_PANEL,
   OPEN_SIDE_PANEL,
@@ -11,8 +12,7 @@ import {
 export function installSidePanelHost() {
   chrome.runtime.onMessage.addListener((raw: unknown, sender, respond) => {
     if (sender.id !== chrome.runtime.id || !raw || typeof raw !== 'object' || !('type' in raw)) return false;
-    if (![PREPARE_SIDE_PANEL, OPEN_SIDE_PANEL, CLOSE_SIDE_PANEL, OPEN_STUDIO_WINDOW].includes(String(raw.type)))
-      return false;
+    if (!oneOf(raw.type, [PREPARE_SIDE_PANEL, OPEN_SIDE_PANEL, CLOSE_SIDE_PANEL, OPEN_STUDIO_WINDOW])) return false;
     const fromPage = sender.origin === 'https://www.youtube.com' && sender.frameId === 0;
     const extensionPage = sender.url?.split('?')[0];
     const trustedUI =

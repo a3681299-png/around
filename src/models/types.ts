@@ -1,3 +1,5 @@
+import { oneOf } from '../validation';
+
 /** Data only. Node/clip indices refer to the immutable GLB asset. */
 export interface ModelInfo {
   format: 'glb' | 'vrm';
@@ -113,7 +115,7 @@ const label = (v: unknown) => {
 export function parseModelInfo(value: unknown): ModelInfo {
   const v = object(value, ['format', 'vrm', 'clips', 'bones', 'vertices', 'triangles', 'textureBytes']);
   if (
-    !['glb', 'vrm'].includes(String(v['format'])) ||
+    !oneOf(v['format'], ['glb', 'vrm']) ||
     !Array.isArray(v['clips']) ||
     v['clips'].length > MODEL_LIMITS.clips ||
     !Array.isArray(v['bones']) ||
@@ -135,7 +137,7 @@ export function parseModelInfo(value: unknown): ModelInfo {
   if (v['format'] === 'vrm') {
     const r = object(v['vrm'], ['version', 'humanoid', 'expressions', 'lookAt', 'springBone', 'mtoon']);
     if (
-      !['1.0', '0.x'].includes(String(r['version'])) ||
+      !oneOf(r['version'], ['1.0', '0.x']) ||
       !Array.isArray(r['humanoid']) ||
       r['humanoid'].length > 64 ||
       !Array.isArray(r['expressions']) ||

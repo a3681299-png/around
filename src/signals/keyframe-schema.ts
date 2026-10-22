@@ -1,3 +1,4 @@
+import { oneOf } from '../validation';
 import {
   SIGNAL_RULE_LIMITS,
   propertyRange,
@@ -62,7 +63,7 @@ export function parseSignalRules(value: unknown, layerIds: ReadonlySet<string>):
     if (
       !id(target['layerId']) ||
       !layerIds.has(target['layerId']) ||
-      !['opacity', 'position.x', 'position.y', 'rotation'].includes(String(target['property']))
+      !oneOf(target['property'], ['opacity', 'position.x', 'position.y', 'rotation'])
     )
       throw new Error('ルールの対象が見つかりません。');
     const property = target['property'] as SignalProperty,
@@ -95,7 +96,7 @@ export function parseSignalRules(value: unknown, layerIds: ReadonlySet<string>):
           !id(key['id']) ||
           keys.has(key['id']) ||
           positions.has(input) ||
-          !['linear', 'ease-in', 'ease-out', 'ease-in-out'].includes(String(key['easing']))
+          !oneOf(key['easing'], ['linear', 'ease-in', 'ease-out', 'ease-in-out'])
         )
           throw new Error('キーの識別子・位置・補間が不正です。同じ位置には1個だけ置けます。');
         keys.add(key['id']);

@@ -1,4 +1,5 @@
 import { getSiteAdapter } from '../sites';
+import { oneOf } from '../validation';
 import { watchSettings } from '../storage/settings';
 import { DEFAULT_THEME, themes } from '../themes';
 import { createThemeController } from '../themes/controller';
@@ -54,7 +55,7 @@ if (site) {
       !message ||
       typeof message !== 'object' ||
       !('type' in message) ||
-      ![OPEN_CREATOR_EDITOR, OPEN_INPAGE_STUDIO, OPEN_SIDE_PANEL_TOOLS].includes(String(message.type))
+      !oneOf(message.type, [OPEN_CREATOR_EDITOR, OPEN_INPAGE_STUDIO, OPEN_SIDE_PANEL_TOOLS])
     )
       return false;
     respond(

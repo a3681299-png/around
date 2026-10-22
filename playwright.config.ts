@@ -38,6 +38,7 @@ const unitSpecs = [
   'studio-transfer-data',
   'timeline-host',
   'vrm-data',
+  'validation',
   'world-boundaries',
   'world-compatibility',
   'world-media-time',
