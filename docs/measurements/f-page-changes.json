@@ -11,7 +11,7 @@
     {
       "round": 1,
       "side": "before",
-      "scriptMs": 66.432,
+      "scriptMs": 75.32300000000001,
       "counts": {
         "themeWrites": 4392,
         "variables": 122,
@@ -23,7 +23,7 @@
     {
       "round": 1,
       "side": "after",
-      "scriptMs": 6.37,
+      "scriptMs": 6.953,
       "counts": {
         "themeWrites": 0,
         "variables": 0,
@@ -35,7 +35,7 @@
     {
       "round": 2,
       "side": "after",
-      "scriptMs": 6.507,
+      "scriptMs": 6.77,
       "counts": {
         "themeWrites": 0,
         "variables": 0,
@@ -47,19 +47,19 @@
     {
       "round": 2,
       "side": "before",
-      "scriptMs": 88.628,
+      "scriptMs": 93.803,
       "counts": {
-        "themeWrites": 4392,
-        "variables": 122,
-        "compiles": 122,
-        "featureRefreshes": 122,
-        "surfaces": 122
+        "themeWrites": 4428,
+        "variables": 123,
+        "compiles": 123,
+        "featureRefreshes": 123,
+        "surfaces": 123
       }
     },
     {
       "round": 3,
       "side": "before",
-      "scriptMs": 87.791,
+      "scriptMs": 95.761,
       "counts": {
         "themeWrites": 4392,
         "variables": 122,
@@ -71,7 +71,7 @@
     {
       "round": 3,
       "side": "after",
-      "scriptMs": 6.644,
+      "scriptMs": 7.6579999999999995,
       "counts": {
         "themeWrites": 0,
         "variables": 0,
@@ -83,7 +83,7 @@
     {
       "round": 4,
       "side": "after",
-      "scriptMs": 7.439,
+      "scriptMs": 7.091,
       "counts": {
         "themeWrites": 0,
         "variables": 0,
@@ -95,7 +95,7 @@
     {
       "round": 4,
       "side": "before",
-      "scriptMs": 78.763,
+      "scriptMs": 82.923,
       "counts": {
         "themeWrites": 4356,
         "variables": 121,
@@ -107,19 +107,19 @@
     {
       "round": 5,
       "side": "before",
-      "scriptMs": 92.71,
+      "scriptMs": 91.017,
       "counts": {
-        "themeWrites": 4392,
-        "variables": 122,
-        "compiles": 122,
-        "featureRefreshes": 122,
-        "surfaces": 122
+        "themeWrites": 4356,
+        "variables": 121,
+        "compiles": 121,
+        "featureRefreshes": 121,
+        "surfaces": 121
       }
     },
     {
       "round": 5,
       "side": "after",
-      "scriptMs": 7.136,
+      "scriptMs": 7.4079999999999995,
       "counts": {
         "themeWrites": 0,
         "variables": 0,
