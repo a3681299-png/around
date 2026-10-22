@@ -505,13 +505,23 @@ test('timeline keeps layer controls reachable in narrow and wide native panels',
       )
       .toBe(false);
     await panel.click('.timeline-connect');
-    for (const width of [360, 940]) {
+    for (const { width, wide } of [
+      { width: 360, wide: false },
+      { width: 940, wide: true },
+    ]) {
       await panel.send('Emulation.setDeviceMetricsOverride', {
         width,
         height: 760,
         deviceScaleFactor: 1,
         mobile: false,
       });
+      // CDP acknowledges the viewport before Chrome dispatches window.resize.
+      // Wait for the responsive layout before measuring the real pointer target.
+      await expect
+        .poll(() =>
+          panel.evaluate('document.querySelector("#web-world-themes-creator").hasAttribute("data-inspectors-wide")'),
+        )
+        .toBe(wide);
       const ui = 'document.querySelector("#web-world-themes-creator").shadowRoot';
       const rowHeight = await panel.evaluate<number>(
         `Math.ceil(${ui}.querySelector('.layer').getBoundingClientRect().height)`,

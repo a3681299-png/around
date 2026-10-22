@@ -59,7 +59,7 @@ jobs:
       - run: sudo apt-get install -y xdotool
       - run: npm run build
       # Fail early if the native toolbar/command window cannot receive input.
-      - run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" npm run test:e2e -- tests/editor-entry.spec.ts tests/side-panel.spec.ts --grep "OFF opens|ON action|hand off unsaved" --output=.work/native-entry-results
+      - run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" npm run test:e2e -- tests/editor-entry.spec.ts tests/side-panel.spec.ts --grep "OFF opens|ON action|hand off unsaved|timeline keeps layer controls" --output=.work/native-entry-results
       # Native Chrome Side Panel tests need a real window and display server.
       - run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" npm run test:e2e
       - name: Optional public YouTube inspection
