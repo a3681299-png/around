@@ -43,6 +43,7 @@ const unitSpecs = [
   'world-boundaries',
   'world-compatibility',
   'world-media-time',
+  'world-lookup-benchmark',
   'world-recording',
   'world-runtime',
   'world-timeline-host',

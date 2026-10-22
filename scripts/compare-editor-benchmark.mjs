@@ -8,15 +8,20 @@ import { cpus, platform, arch } from 'node:os';
 // Both sides run the unchanged D benchmark in separate Node processes, alternating B/A.
 const before = process.argv[2] ?? 'd1a552e';
 const rounds = Number(process.argv[3] ?? 5);
-const world = process.argv[4] === 'world';
+const lookups = process.argv[4] === 'world-lookups';
+const world = process.argv[4] === 'world' || lookups;
 const order = process.argv[5] === 'after' ? ['after', 'before'] : ['before', 'after'];
 const steady = process.argv[6] === 'steady';
 if (world && steady) throw new Error('Steady mode is for the editor diagnostic only');
-const entry = world ? 'tests/signal-evaluation-benchmark.spec.ts' : 'tests/editor-benchmark.spec.ts';
+const entry = lookups
+  ? 'tests/world-lookup-benchmark.spec.ts'
+  : world
+    ? 'tests/signal-evaluation-benchmark.spec.ts'
+    : 'tests/editor-benchmark.spec.ts';
 const prefix = world ? 'WORLD_SIGNAL_BENCHMARK ' : 'EDITOR_BENCHMARK ';
 if (!Number.isInteger(rounds) || rounds < 1 || rounds > 20) throw new Error('Invalid round count');
 const output = '.work/e-benchmark';
-const label = `${world ? 'world-' : ''}${steady ? 'steady-' : ''}`;
+const label = `${lookups ? 'world-lookups-' : world ? 'world-' : ''}${steady ? 'steady-' : ''}`;
 let harness = await readFile(entry, 'utf8');
 if (steady) {
   // An additional diagnostic, never a replacement for the unchanged D run.
