@@ -38,6 +38,7 @@ const unitSpecs = [
   'spatial-points',
   'settings-position',
   'studio-client-data',
+  'studio-import-probe',
   'studio-transfer-data',
   'timeline-host',
   'vrm-data',

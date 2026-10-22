@@ -94,25 +94,40 @@ export async function observeImports(studio: Page, holdStored = false) {
   await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
 }
 export async function assetRows(page: Page) {
-  return page.evaluate(
-    () =>
-      new Promise<{ id: string; byteLength: number; leases: { session: string }[] }[]>((resolve, reject) => {
-        const open = indexedDB.open('web-world-themes-assets', 1);
-        open.onerror = () => reject(open.error);
-        open.onsuccess = () => {
-          const db = open.result,
-            request = db.transaction('assets').objectStore('assets').getAll();
-          request.onerror = () => {
-            db.close();
-            reject(request.error);
-          };
-          request.onsuccess = () => {
-            db.close();
-            resolve(request.result.map((row) => ({ id: row.id, byteLength: row.byteLength, leases: row.leases })));
-          };
-        };
-      }),
-  );
+  return page.evaluate(readAssetRows, undefined);
+}
+/** Injectable factory keeps the absent/invalid-schema probe tests independent of worker startup. */
+export async function readAssetRows(factory: Pick<IDBFactory, 'databases' | 'open'> = indexedDB) {
+  // Invalid imports can be rejected before the production repository is opened.
+  // Observing that state must not create an empty version-1 database without its store.
+  if (!(await factory.databases()).some((db) => db.name === 'web-world-themes-assets')) return [];
+  return new Promise<{ id: string; byteLength: number; leases: { session: string }[] }[]>((resolve, reject) => {
+    const open = factory.open('web-world-themes-assets', 1);
+    open.onerror = () => reject(open.error);
+    open.onupgradeneeded = () => {
+      open.transaction?.abort();
+      reject(new Error('The asset database changed while inspecting it; the probe will not create it.'));
+    };
+    open.onsuccess = () => {
+      const db = open.result;
+      let request: IDBRequest<any[]>;
+      try {
+        request = db.transaction('assets').objectStore('assets').getAll();
+      } catch (error) {
+        db.close();
+        reject(error);
+        return;
+      }
+      request.onerror = () => {
+        db.close();
+        reject(request.error);
+      };
+      request.onsuccess = () => {
+        db.close();
+        resolve(request.result.map((row) => ({ id: row.id, byteLength: row.byteLength, leases: row.leases })));
+      };
+    };
+  });
 }
 export async function uploadLeases(page: Page) {
   return (await assetRows(page)).flatMap((row) =>
