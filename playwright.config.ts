@@ -30,6 +30,7 @@ const unitSpecs = [
   'palette',
   'signal-motion',
   'signal-evaluation-benchmark',
+  'signal-equality',
   'signal-rules',
   'signal-registry',
   'signal-takes',

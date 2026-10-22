@@ -177,7 +177,7 @@ test('registry keeps existing preset order, values, state and event evaluations'
   ]);
   for (const preset of SIGNAL_PRESETS) {
     expect(parseSignalSource(preset.source)).toEqual(preset.source);
-    // A different key order leaves Timeline's optimistic edit over an Undo.
+    // Keep the established serialized source order for existing artwork.
     expect(JSON.stringify(preset.source)).toBe(JSON.stringify(parseSignalSource(preset.source)));
   }
   const context = {

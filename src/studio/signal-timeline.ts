@@ -12,6 +12,7 @@ import { sampleKeyframes, clampUnit } from '../world/keyframes';
 import { buttonIcon } from '../editor/icons';
 import type { TimelinePort } from '../timeline/types';
 import { SIGNAL_PRESETS, signalPreset } from '../signals/presets';
+import { sameSignalRule } from '../signals/equality';
 import { createTimelineTransport } from './timeline-transport';
 
 /** One authoring UI for every Studio surface; commands, never host APIs. */
@@ -665,7 +666,7 @@ export function createSignalTimeline(
       }
       state = next;
       layerId = next.image?.id;
-      if (optimistic && JSON.stringify(optimistic) === JSON.stringify(model())) optimistic = undefined;
+      if (optimistic && sameSignalRule(optimistic, model())) optimistic = undefined;
       if (model()) driverSelect.value = signalPreset(model()!.source).id;
       draw();
     },

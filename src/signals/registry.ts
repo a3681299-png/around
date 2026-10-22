@@ -85,8 +85,8 @@ export function createSignalRegistry<const D extends SignalDefinitions>(definiti
             source: {
               signal: signal as NumericSignalIds<D>,
               axis: preset.axis,
-              // Preserve the canonical source order: Timeline compares its
-              // optimistic rule with the acknowledged rule through JSON.
+              // Preserve the established source serialization order for saved data.
+              // Timeline compares rule values independently of object key order.
               space: preset.space,
               inputRange: [...preset.inputRange] as [number, number],
             },
