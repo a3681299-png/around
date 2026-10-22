@@ -281,7 +281,11 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
           if (!owned(record.target)) {
             const structural =
               record.type === 'attributes' ||
-              [...record.addedNodes, ...record.removedNodes].some((node) => node instanceof Element && !owned(node));
+              (record.type === 'childList' &&
+                ([...record.addedNodes].some((node) => node instanceof Element && !owned(node)) ||
+                  // Detached top-level feature UI must be restored too. Changes
+                  // inside an owned region (clock/title text) still stay content-only.
+                  [...record.removedNodes].some((node) => node instanceof Element)));
             if (record.attributeName === 'fullscreen') change = 'fullscreen';
             else if (structural && change === 'content') change = 'structure';
           }

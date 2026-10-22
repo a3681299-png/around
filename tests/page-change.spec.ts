@@ -74,6 +74,28 @@ test('page following reattaches the cached sheets and discovers new native surfa
   await expect(page.locator('#new-native-card')).toHaveCSS('background-color', 'rgb(201, 212, 232)');
 });
 
+test('removed owned feature UI is restored once without resuming full rendering on text changes', async ({ page }) => {
+  await mount(page);
+  await page.evaluate(() => {
+    (globalThis as any).__chromeBefore = document.getElementById('web-world-themes-window-chrome');
+    (globalThis as any).__pageTest.reset();
+    (globalThis as any).__chromeBefore.remove();
+  });
+  await expect(page.locator('#web-world-themes-window-chrome')).toHaveCount(1);
+  expect(
+    await page.evaluate(
+      () => (globalThis as any).__chromeBefore === document.getElementById('web-world-themes-window-chrome'),
+    ),
+  ).toBe(true);
+  await settle(page);
+  const counts = await page.evaluate(async () => {
+    const runtime = (globalThis as any).__pageTest;
+    runtime.reset();
+    return runtime.mutate(6);
+  });
+  expect(counts).toMatchObject({ themeWrites: 0, variables: 0, compiles: 0, featureRefreshes: 0 });
+});
+
 test('settings, artwork, navigation, native modes and fullscreen match the former full-render route', async ({
   context,
 }, info) => {
