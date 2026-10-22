@@ -8,6 +8,7 @@ import { studioActions } from './ui-actions';
 import { buttonIcon } from '../editor/icons';
 
 interface StudioPorts {
+  openSettings?(target?: number): void;
   hostName: string;
   sidePanel?: boolean;
   connect(
@@ -31,6 +32,13 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
     message = get('.connection-status'),
     recoveryStatus = get('.recovery-status');
   const connectionBar = get('.connection-bar');
+  const settingsButton = doc.createElement('button');
+  settingsButton.type = 'button';
+  settingsButton.className = 'studio-display-settings';
+  settingsButton.textContent = '表示設定';
+  settingsButton.hidden = !ports.openSettings;
+  settingsButton.addEventListener('click', () => ports.openSettings?.(connection.target));
+  connectionBar.append(settingsButton);
   connectionBar.querySelector('strong')!.remove();
   for (const [selector, name] of [
     ['refresh-targets', 'refresh'],
@@ -106,6 +114,7 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
         targets.find((target) => target.id === value.target)?.anchors ?? [],
         {
           preferences: ports.preferences,
+          ...(ports.openSettings ? { onSettings: () => ports.openSettings!(connection.target) } : {}),
           timeline: connection.timeline,
           hostLabel: ports.hostName,
           fullPage: true,
@@ -119,6 +128,7 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
         },
       );
       mount.append(panel.host);
+      settingsButton.hidden = true;
       connectionBar.slot = 'connection';
       message.slot = 'connection-status';
       panel.host.append(connectionBar, message);

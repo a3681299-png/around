@@ -240,6 +240,8 @@ export function createStudioWorkbench(
   buttonIcon(dock, 'dock', '左右を入れ替える');
   buttonIcon(close, 'close', '編集を終了');
   menuEnd.append(dock, make('使い方', 'help', openHelp), close);
+  const displaySettings = get<HTMLButtonElement>('.display-settings');
+  if (options.onSettings) menuEnd.prepend(displaySettings);
   menu.append(menuEnd);
   const commands: [string, string, string][] = [
     ['undo', 'undo', 'Ctrl+Z'],

@@ -41,10 +41,9 @@ export function installSidePanelHost() {
         const result = await chrome.tabs.sendMessage<{ type: string }, OpenEditorResponse>(tabId, {
           type: OPEN_SIDE_PANEL_TOOLS,
         });
-        if (!result?.ok) {
-          await chrome.sidePanel.setOptions({ tabId, enabled: false });
-          throw new Error(result?.error ?? 'YouTubeのテーマをONにしてください。');
-        }
+        // Studio itself explains an OFF theme and offers display settings. Keep
+        // that entry usable instead of closing the only route back to settings.
+        if (!result?.ok) return;
       });
     } else {
       operation = chrome.windows

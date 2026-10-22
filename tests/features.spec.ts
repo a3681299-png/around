@@ -383,6 +383,7 @@ function fakeForm() {
     return element;
   };
   const enabled = control();
+  const creatorMode = control();
   const strength = control();
   const chrome = control();
   const themeState = control();
@@ -405,6 +406,7 @@ function fakeForm() {
   ) as Record<keyof typeof PALETTE_PRESETS, ReturnType<typeof control>>;
   chrome.dataset.featureId = 'window-chrome';
   const elements = new Map([
+    ['#creator-mode', creatorMode],
     ['#theme-enabled', enabled],
     ['#effect-strength', strength],
     ['#theme-state', themeState],
@@ -429,8 +431,25 @@ function fakeForm() {
           ? Object.values(presets)
           : [],
   } as unknown as ParentNode;
-  return { root, enabled, strength, chrome, status, palettes, presets, noise };
+  return { root, enabled, creatorMode, strength, chrome, status, palettes, presets, noise };
 }
+
+test('creator mode defaults OFF, is shared between forms, and unbinds its change listener', async () => {
+  const storage = fakeStorage();
+  const a = fakeForm(),
+    b = fakeForm(),
+    stopA = bindSettingsForm(a.root),
+    stopB = bindSettingsForm(b.root);
+  await expect.poll(() => a.creatorMode.disabled).toBe(false);
+  expect(a.creatorMode.checked).toBe(false);
+  a.creatorMode.checked = true;
+  a.creatorMode.dispatch('change');
+  await expect.poll(() => b.creatorMode.checked).toBe(true);
+  expect(storage.writes).toContainEqual({ [SETTINGS_KEYS.creatorMode]: true });
+  stopA();
+  stopB();
+  expect(a.creatorMode.listenerCount()).toBe(0);
+});
 
 test('shared editor reconciles independent changes when older saves finish last', async () => {
   const storage = fakeStorage();

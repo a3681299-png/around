@@ -11,6 +11,8 @@ import { connectStudioHost } from '../browser/studio-host';
 import { ASSET_PROFILE } from '../diagnostics/asset-profile';
 import { installAssetRuntimeHost } from '../diagnostics/asset-runtime-host';
 import { createAssetReadHost } from '../browser/asset-read-host';
+import { requestStudioSurface } from '../browser/side-panel';
+import { OPEN_SIDE_PANEL } from '../editor/messages';
 
 if (ASSET_PROFILE) installAssetRuntimeHost(document);
 
@@ -33,10 +35,17 @@ if (site) {
     controller.setImageEditing,
     controller.validateDesign,
     controller.timeline,
+    () => settingsPanel.open(),
   );
   const disconnectStudio = connectStudioHost(document, site, creator);
   void chrome.runtime.sendMessage({ type: PREPARE_SIDE_PANEL }).catch(() => undefined);
-  const settingsPanel = createSettingsPanel(document);
+  const settingsPanel = createSettingsPanel(document, () => {
+    void requestStudioSurface(OPEN_SIDE_PANEL).catch((error: unknown) => {
+      settingsPanel.open();
+      settingsPanel.panel.shadowRoot!.querySelector('#save-status')!.textContent =
+        error instanceof Error ? error.message : 'エディターを開けませんでした。';
+    });
+  });
   // The settings entry stays available independently of the theme's ON/OFF state.
   const unmountSettings = site.mountSettings(settingsPanel);
   const reportError = (error: unknown) => {

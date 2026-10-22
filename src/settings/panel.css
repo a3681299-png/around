@@ -1,14 +1,14 @@
 :host {
   /* Important host rules outrank the page's player-wide div resets. */
   all: initial !important;
-  position: absolute !important;
-  right: 12px !important;
-  bottom: 64px !important;
-  z-index: 70 !important;
+  position: fixed !important;
+  left: var(--ww-settings-x, 12px) !important;
+  top: var(--ww-settings-y, 12px) !important;
+  z-index: 2147483645 !important;
   display: block !important;
   width: 340px !important;
-  max-width: calc(100% - 24px) !important;
-  max-height: calc(100% - 80px) !important;
+  max-width: calc(100vw - 24px) !important;
+  max-height: var(--ww-settings-height, calc(100vh - 24px)) !important;
   overflow: auto !important;
   overscroll-behavior: contain !important;
   color-scheme: light !important;
@@ -22,4 +22,8 @@
 }
 :host([hidden]) {
   display: none !important;
+}
+.ww-titlebar {
+  cursor: move;
+  touch-action: none;
 }

@@ -1,4 +1,13 @@
 /* The popup and player editor share a small silver control panel. */
+.creator-entry {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.creator-entry > button {
+  min-height: 36px;
+  font-weight: bold;
+}
 .ww-editor {
   box-sizing: border-box;
   padding: 4px;

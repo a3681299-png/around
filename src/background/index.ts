@@ -1,4 +1,5 @@
 import { installSidePanelHost } from '../browser/side-panel';
+import { installEditorEntry } from '../browser/editor-entry';
 import { ASSET_MESSAGE, type AssetWireFile } from '../assets/protocol';
 import { changeAssets, getAsset, type AssetLease, type StoredAsset } from '../assets/repository';
 import { ASSET_LIMITS, base64ToBytes, bytesToBase64, type AssetMetadata, type AssetInfo } from '../assets/validation';
@@ -521,5 +522,6 @@ chrome.tabs.onRemoved.addListener(() => {
 });
 
 installSidePanelHost();
+installEditorEntry();
 installTakeStorage(enqueue);
 if (ASSET_PROFILE) installAssetRuntimeBroker();

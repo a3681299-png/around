@@ -9,15 +9,17 @@ export function mountYouTubeSettings(doc: Document, view: Window, entry: Setting
   let controls: Element | null = null;
   let player: Element | null = null;
   let frame: number | undefined;
+  entry.setAvoidRect?.(() => player?.getBoundingClientRect());
   entry.button.classList.add('ytp-button');
 
   const refresh = () => {
     frame = undefined;
+    const container = doc.fullscreenElement ?? doc.body ?? doc.documentElement;
     if (
       player?.isConnected &&
       controls?.isConnected &&
       controls.firstElementChild === entry.button &&
-      entry.panel.parentElement === player
+      entry.panel.parentElement === container
     )
       return;
 
@@ -34,8 +36,11 @@ export function mountYouTubeSettings(doc: Document, view: Window, entry: Setting
     controls = nextControls;
     player = nextPlayer;
     if (controls.firstElementChild !== entry.button) controls.prepend(entry.button);
-    // Keep the panel inside the player so it also appears in fullscreen.
-    if (entry.panel.parentElement !== player) player.append(entry.panel);
+    // Normal settings live outside the video. Fullscreen must use its top-layer subtree.
+    if (entry.panel.parentElement !== container) {
+      container.append(entry.panel);
+      entry.reposition?.();
+    }
   };
 
   const schedule = () => {
@@ -58,6 +63,7 @@ export function mountYouTubeSettings(doc: Document, view: Window, entry: Setting
   refreshEvents.forEach((event) => doc.addEventListener(event, schedule));
   view.addEventListener('popstate', onNavigation);
   view.addEventListener('pageshow', schedule);
+  doc.addEventListener('fullscreenchange', schedule);
 
   return () => {
     observer.disconnect();
@@ -65,6 +71,7 @@ export function mountYouTubeSettings(doc: Document, view: Window, entry: Setting
     refreshEvents.forEach((event) => doc.removeEventListener(event, schedule));
     view.removeEventListener('popstate', onNavigation);
     view.removeEventListener('pageshow', schedule);
+    doc.removeEventListener('fullscreenchange', schedule);
     if (frame !== undefined) view.cancelAnimationFrame(frame);
     entry.close();
     entry.button.remove();

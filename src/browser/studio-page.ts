@@ -16,6 +16,14 @@ async function start() {
     connect: (notify, checkpoint) => createStudioClient(notify, checkpoint, sidePanel ? document : undefined),
     recovery: createStudioRecovery(tab.id),
     preferences: browserStudioPreferences,
+    openSettings: (target) => {
+      void chrome.windows.create({
+        url: chrome.runtime.getURL('popup/index.html') + (target === undefined ? '' : '?target=' + target),
+        type: 'popup',
+        width: 420,
+        height: 900,
+      });
+    },
   });
   document.body.toggleAttribute('data-sidepanel', sidePanel);
   await app.start(target);

@@ -35,19 +35,23 @@ export function mountCreatorLauncher(container: HTMLElement): () => void {
   sidepanel.disabled = true;
   inpage.textContent = '従来のインページStudio（切り戻し）';
   section.append(sidepanel, inpage, studio, button, status);
-  container.insertBefore(section, container.querySelector('.ww-editor-body'));
+  container.querySelector('.ww-editor-body')!.append(section);
+  const direct = container.querySelector<HTMLButtonElement>('#creator-editor-direct')!;
+  const requested = new URL(doc.URL).searchParams.get('target');
+  const requestedTarget =
+    requested && /^\d+$/.test(requested) && Number.isSafeInteger(Number(requested)) ? Number(requested) : undefined;
   let alive = true,
     targetTab: number | undefined;
   void chrome.tabs
     .query({ active: true, currentWindow: true })
     .then(async ([tab]) => {
-      targetTab = tab?.id;
+      targetTab = requestedTarget ?? tab?.id;
       if (targetTab !== undefined) {
         const result = (await chrome.runtime.sendMessage({
           type: PREPARE_SIDE_PANEL,
           tabId: targetTab,
         })) as OpenEditorResponse;
-        if (alive) sidepanel.disabled = !result?.ok;
+        if (alive) direct.disabled = sidepanel.disabled = !result?.ok;
       }
     })
     .catch(() => {
@@ -64,13 +68,15 @@ export function mountCreatorLauncher(container: HTMLElement): () => void {
     );
   };
   sidepanel.addEventListener('click', onSidePanel);
+  direct.addEventListener('click', onSidePanel);
   const open = async (message = OPEN_CREATOR_EDITOR) => {
     button.disabled = true;
     status.textContent = '編集モードを開いています…';
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      if (tab?.id === undefined) throw new Error('タブが見つかりません。');
-      const response = await chrome.tabs.sendMessage<{ type: string }, OpenEditorResponse>(tab.id, { type: message });
+      const id = requestedTarget ?? tab?.id;
+      if (id === undefined) throw new Error('タブが見つかりません。');
+      const response = await chrome.tabs.sendMessage<{ type: string }, OpenEditorResponse>(id, { type: message });
       if (!alive) return;
       status.textContent = response?.ok
         ? 'YouTubeでカードを選ぶか、画像を追加してください。'
@@ -88,7 +94,9 @@ export function mountCreatorLauncher(container: HTMLElement): () => void {
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
       await chrome.windows.create({
-        url: chrome.runtime.getURL('studio/index.html') + (tab?.id === undefined ? '' : '?target=' + tab.id),
+        url:
+          chrome.runtime.getURL('studio/index.html') +
+          ((requestedTarget ?? tab?.id) === undefined ? '' : '?target=' + (requestedTarget ?? tab?.id)),
         type: 'popup',
         width: 1440,
         height: 900,
@@ -115,6 +123,7 @@ export function mountCreatorLauncher(container: HTMLElement): () => void {
   return () => {
     alive = false;
     sidepanel.removeEventListener('click', onSidePanel);
+    direct.removeEventListener('click', onSidePanel);
     button.removeEventListener('click', onClick);
     inpage.removeEventListener('click', onInpage);
     studio.removeEventListener('click', onStudio);

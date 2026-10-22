@@ -12,6 +12,12 @@
     "default_title": "Web World Themes",
     "default_popup": "popup/index.html"
   },
+  "commands": {
+    "open-editor": {
+      "suggested_key": { "default": "Alt+Shift+E" },
+      "description": "エディターを直接開く"
+    }
+  },
   "content_scripts": [
     {
       "matches": ["https://www.youtube.com/*"],

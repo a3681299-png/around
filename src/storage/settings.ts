@@ -8,6 +8,7 @@ import {
 } from '../themes/retro/palette';
 
 export interface UserSettings {
+  creatorMode: boolean;
   enabled: boolean;
   strength: number;
   features: FeaturePreferences;
@@ -19,6 +20,7 @@ export interface UserSettings {
 export type SettingsPatch = Partial<Omit<UserSettings, 'palette'>> & { palette?: Partial<PaletteSettings> };
 
 export const DEFAULT_SETTINGS: Readonly<UserSettings> = Object.freeze({
+  creatorMode: false,
   enabled: false,
   strength: 60,
   palette: DEFAULT_PALETTE,
@@ -28,6 +30,7 @@ export const DEFAULT_SETTINGS: Readonly<UserSettings> = Object.freeze({
 
 // Keep the original global keys: existing installations require no destructive migration.
 export const SETTINGS_KEYS = {
+  creatorMode: 'webWorldThemes.creatorMode',
   enabled: 'webWorldThemes.enabled',
   strength: 'webWorldThemes.strength',
   noiseStrength: 'webWorldThemes.noiseStrength',
@@ -75,6 +78,7 @@ export async function readSettings(): Promise<UserSettings> {
     ...Object.values(PALETTE_SETTINGS_KEYS),
   ]);
   return {
+    creatorMode: stored[SETTINGS_KEYS.creatorMode] === true,
     enabled: normalizeEnabled(stored[SETTINGS_KEYS.enabled]),
     strength: normalizeStrength(stored[SETTINGS_KEYS.strength]),
     noiseStrength: normalizeNoiseStrength(stored[SETTINGS_KEYS.noiseStrength]),
@@ -95,6 +99,7 @@ export async function readSettings(): Promise<UserSettings> {
 /** Separate keys prevent concurrent editors from overwriting unrelated preferences. */
 export async function updateSettings(patch: SettingsPatch): Promise<void> {
   const values: Record<string, boolean | number> = {};
+  if ('creatorMode' in patch) values[SETTINGS_KEYS.creatorMode] = patch.creatorMode === true;
   if ('enabled' in patch) values[SETTINGS_KEYS.enabled] = normalizeEnabled(patch.enabled);
   if ('strength' in patch) values[SETTINGS_KEYS.strength] = normalizeStrength(patch.strength);
   if ('noiseStrength' in patch) values[SETTINGS_KEYS.noiseStrength] = normalizeNoiseStrength(patch.noiseStrength);
@@ -124,6 +129,8 @@ export function watchSettings(
   const onChanged = (changes: Record<string, chrome.storage.StorageChange>, area: string): void => {
     if (area !== 'local' || !active) return;
     const patch: SettingsPatch = {};
+    const creatorMode = changes[SETTINGS_KEYS.creatorMode];
+    if (creatorMode) patch.creatorMode = creatorMode.newValue === true;
     const enabled = changes[SETTINGS_KEYS.enabled];
     const strength = changes[SETTINGS_KEYS.strength];
     if (enabled) patch.enabled = normalizeEnabled(enabled.newValue);

@@ -42,6 +42,8 @@ export interface SettingsEntry {
   readonly button: HTMLButtonElement;
   readonly panel: HTMLElement;
   close(restoreFocus?: boolean): void;
+  setAvoidRect?(get: () => { left: number; top: number; width: number; height: number } | undefined): void;
+  reposition?(): void;
 }
 
 /** A mounted capability owns everything it adds, including listeners and observers. */

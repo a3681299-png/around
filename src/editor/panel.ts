@@ -20,6 +20,7 @@ export type { EditorView as PanelState } from '../editor-core/types';
 import type { EditorView as PanelState } from '../editor-core/types';
 import type { StudioPreferences } from '../studio/preferences';
 export interface PanelOptions {
+  onSettings?(): void;
   preferences?: StudioPreferences;
   fullPage?: boolean;
   persistWorkspace?: boolean;
@@ -154,6 +155,14 @@ export function createCreatorPanel(
     <div class="actions"><button class="primary save" type="button">保存</button><button class="discard" type="button">変更を破棄</button></div>
     <p class="status" role="status" aria-live="polite"></p></footer>`;
   shadow.append(sheet, main);
+  const displaySettings = doc.createElement('button');
+  displaySettings.type = 'button';
+  displaySettings.className = 'display-settings';
+  displaySettings.textContent = '表示設定';
+  displaySettings.title = 'テーマのON/OFFと強さを開く';
+  displaySettings.hidden = !options.onSettings;
+  displaySettings.addEventListener('click', () => options.onSettings?.());
+  main.querySelector('header')!.append(displaySettings);
   const get = <T extends HTMLElement>(selector: string) => main.querySelector<T>(selector)!;
   const tools = doc.createElement('div');
   tools.className = 'interaction-tools';

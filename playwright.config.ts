@@ -36,6 +36,7 @@ const unitSpecs = [
   'signal-registry',
   'signal-takes',
   'spatial-points',
+  'settings-position',
   'studio-client-data',
   'studio-transfer-data',
   'timeline-host',

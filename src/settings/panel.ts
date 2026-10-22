@@ -4,13 +4,15 @@ import { bindSettingsForm } from './form';
 import panelStyles from './panel.css';
 import { DEFAULT_THEME, themes } from '../themes';
 import { SETTINGS_MARKUP } from './markup';
+import { initialSettingsPosition, SETTINGS_POSITION_KEY, type SettingsRect } from './position';
 
 export interface SettingsPanel extends SettingsEntry {
+  open(): void;
   destroy(): void;
 }
 
 /** Site-independent editor; Shadow DOM isolates its UI from the host site's CSS. */
-export function createSettingsPanel(doc: Document): SettingsPanel {
+export function createSettingsPanel(doc: Document, openEditor?: () => void): SettingsPanel {
   const unmountFont = mountPixelFont(doc);
   const button = doc.createElement('button');
   button.type = 'button';
@@ -41,6 +43,94 @@ export function createSettingsPanel(doc: Document): SettingsPanel {
   main.innerHTML = SETTINGS_MARKUP;
   shadow.append(main);
   const closeButton = main.querySelector<HTMLButtonElement>('.close')!;
+  const direct = main.querySelector<HTMLButtonElement>('#creator-editor-direct')!;
+  direct.disabled = !openEditor;
+  const onEditor = () => {
+    close();
+    openEditor?.();
+  };
+  direct.addEventListener('click', onEditor);
+  const titlebar = main.querySelector<HTMLElement>('.ww-titlebar')!,
+    view = doc.defaultView!;
+  let avoidRect: (() => SettingsRect | undefined) | undefined;
+  let saved: { x: number; y: number } | undefined,
+    positionTouched = false,
+    alive = true;
+  let gesture: { x: number; y: number; left: number; top: number } | undefined;
+  const place = (x: number, y: number, maxHeight: number) => {
+    panel.style.setProperty('--ww-settings-x', x + 'px');
+    panel.style.setProperty('--ww-settings-y', y + 'px');
+    panel.style.setProperty('--ww-settings-height', Math.max(80, maxHeight) + 'px');
+  };
+  const clampSaved = () => {
+    if (!saved) return;
+    const x = Math.max(0, Math.min(saved.x, view.innerWidth - panel.getBoundingClientRect().width)),
+      y = Math.max(0, Math.min(saved.y, view.innerHeight - 100));
+    place(x, y, view.innerHeight - y - 12);
+  };
+  const reposition = () => {
+    if (panel.hidden) return;
+    if (saved) {
+      clampSaved();
+      return;
+    }
+    const width = panel.getBoundingClientRect().width;
+    const obstacle = doc.fullscreenElement ? undefined : avoidRect?.();
+    let position = initialSettingsPosition(view.innerWidth, view.innerHeight, width, obstacle);
+    if (!position.hasRoom && obstacle) {
+      // A narrow page may have no side gutter. Reveal free page space below the video.
+      view.scrollBy(0, Math.max(1, Math.ceil(obstacle.top + obstacle.height - (view.innerHeight - 204)) + 1));
+      position = initialSettingsPosition(view.innerWidth, view.innerHeight, width, avoidRect?.());
+    }
+    place(position.x, position.y, position.maxHeight);
+  };
+  void chrome.storage.local
+    .get(SETTINGS_POSITION_KEY)
+    .then((values) => {
+      const value = values[SETTINGS_POSITION_KEY] as { x?: unknown; y?: unknown } | undefined;
+      if (
+        !alive ||
+        positionTouched ||
+        !value ||
+        typeof value.x !== 'number' ||
+        typeof value.y !== 'number' ||
+        !Number.isFinite(value.x) ||
+        !Number.isFinite(value.y)
+      )
+        return;
+      saved = { x: value.x, y: value.y };
+      reposition();
+    })
+    .catch(() => undefined);
+  const startDrag = (event: PointerEvent) => {
+    if (event.button !== 0 || (event.target as Element).closest('button')) return;
+    positionTouched = true;
+    const rect = panel.getBoundingClientRect();
+    gesture = { x: event.clientX, y: event.clientY, left: rect.left, top: rect.top };
+    titlebar.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  };
+  const moveDrag = (event: PointerEvent) => {
+    if (!gesture) return;
+    saved = { x: gesture.left + event.clientX - gesture.x, y: gesture.top + event.clientY - gesture.y };
+    clampSaved();
+    const rect = panel.getBoundingClientRect();
+    saved = { x: rect.left, y: rect.top };
+  };
+  const finishDrag = () => {
+    if (!gesture) return;
+    gesture = undefined;
+    if (saved)
+      void chrome.storage.local.set({ [SETTINGS_POSITION_KEY]: saved }).catch(() => {
+        main.querySelector('#save-status')!.textContent = '設定ウィンドウの位置を保存できませんでした。';
+      });
+  };
+  titlebar.addEventListener('pointerdown', startDrag);
+  titlebar.addEventListener('pointermove', moveDrag);
+  titlebar.addEventListener('pointerup', finishDrag);
+  titlebar.addEventListener('pointercancel', finishDrag);
+  titlebar.addEventListener('lostpointercapture', finishDrag);
+  view.addEventListener('resize', reposition);
   let unbind: (() => void) | undefined;
 
   const close = (restoreFocus = false) => {
@@ -56,16 +146,18 @@ export function createSettingsPanel(doc: Document): SettingsPanel {
     const path = event.composedPath();
     if (!path.includes(panel) && !path.includes(button)) close();
   };
-  const onClick = () => {
-    if (!panel.hidden) {
-      close(true);
-      return;
-    }
+  const open = () => {
+    if (!panel.hidden) return;
     panel.hidden = false;
     button.setAttribute('aria-expanded', 'true');
     unbind = bindSettingsForm(shadow);
     doc.addEventListener('pointerdown', onOutsidePointer, true);
-    closeButton.focus();
+    reposition();
+    closeButton.focus({ preventScroll: true });
+  };
+  const onClick = () => {
+    if (!panel.hidden) close(true);
+    else open();
   };
   const onKeyDown = (event: KeyboardEvent) => {
     // The player must not seek or toggle playback while the user edits a slider.
@@ -93,7 +185,13 @@ export function createSettingsPanel(doc: Document): SettingsPanel {
     button,
     panel,
     close,
+    open,
+    reposition,
+    setAvoidRect(get) {
+      avoidRect = get;
+    },
     destroy() {
+      alive = false;
       close();
       unmountFont();
       button.removeEventListener('click', onClick);
@@ -101,6 +199,13 @@ export function createSettingsPanel(doc: Document): SettingsPanel {
       button.removeEventListener('keydown', onButtonKey);
       button.removeEventListener('keyup', onButtonKey);
       closeButton.removeEventListener('click', onClose);
+      direct.removeEventListener('click', onEditor);
+      titlebar.removeEventListener('pointerdown', startDrag);
+      titlebar.removeEventListener('pointermove', moveDrag);
+      titlebar.removeEventListener('pointerup', finishDrag);
+      titlebar.removeEventListener('pointercancel', finishDrag);
+      titlebar.removeEventListener('lostpointercapture', finishDrag);
+      view.removeEventListener('resize', reposition);
       panel.removeEventListener('keydown', onKeyDown);
       panel.removeEventListener('keyup', stopPropagation);
       panel.removeEventListener('click', stopPropagation);

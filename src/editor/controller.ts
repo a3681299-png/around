@@ -52,6 +52,7 @@ export function createCreatorEditor(
   editImages: (editing: ImageEditing | undefined) => void,
   validate: (design: DesignDocument | undefined) => void,
   timeline?: TimelineHost,
+  openSettings?: () => void,
 ): CreatorEditor {
   let panel: ReturnType<typeof createCreatorPanel> | undefined,
     selectionStyle: HTMLStyleElement | undefined,
@@ -261,6 +262,7 @@ export function createCreatorEditor(
         site.decorationAnchors,
         {
           preferences: browserStudioPreferences,
+          ...(openSettings ? { onSettings: openSettings } : {}),
           timeline: timeline?.port('inline'),
           hostLabel: site.id === 'youtube' ? 'YouTube' : site.id,
           inPage: mode === 'inpage',

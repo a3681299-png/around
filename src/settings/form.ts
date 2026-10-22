@@ -11,6 +11,8 @@ import { PALETTE_CHANNELS, PALETTE_PRESETS, type PaletteChannel } from '../theme
 
 /** Both the extension popup and the in-page panel share this storage binding. */
 export function bindSettingsForm(root: ParentNode): () => void {
+  const backup = root.querySelector<HTMLAnchorElement>('.backup-open');
+  if (backup) backup.href = chrome.runtime.getURL('backup/index.html');
   function required<T extends HTMLElement>(selector: string): T {
     const element = root.querySelector<T>(selector);
     if (!element) throw new Error(`Missing settings element: ${selector}`);
@@ -18,6 +20,7 @@ export function bindSettingsForm(root: ParentNode): () => void {
   }
 
   const enabled = required<HTMLInputElement>('#theme-enabled');
+  const creatorMode = required<HTMLInputElement>('#creator-mode');
   const strength = required<HTMLInputElement>('#effect-strength');
   const themeState = required<HTMLOutputElement>('#theme-state');
   const strengthValue = required<HTMLOutputElement>('#strength-value');
@@ -31,6 +34,7 @@ export function bindSettingsForm(root: ParentNode): () => void {
   const presetButtons = root.querySelectorAll<HTMLButtonElement>('[data-palette-preset]');
   const featureControls = root.querySelectorAll<HTMLInputElement>('input[data-feature-id]');
   const controls = [
+    creatorMode,
     enabled,
     strength,
     noise,
@@ -55,6 +59,7 @@ export function bindSettingsForm(root: ParentNode): () => void {
     status.dataset.error = String(error);
   };
   const render = () => {
+    creatorMode.checked = settings.creatorMode;
     enabled.checked = settings.enabled;
     strength.value = String(settings.strength);
     themeState.value = settings.enabled ? 'ON' : 'OFF';
@@ -135,6 +140,7 @@ export function bindSettingsForm(root: ParentNode): () => void {
     );
   };
   const onToggle = () => commit({ enabled: enabled.checked });
+  const onCreatorMode = () => commit({ creatorMode: creatorMode.checked });
   const onStrength = () => commit({ strength: Number(strength.value) });
   const onNoise = () => commit({ noiseStrength: Number(noise.value) });
   const onPalette = (event: Event) => {
@@ -158,6 +164,7 @@ export function bindSettingsForm(root: ParentNode): () => void {
     if (target) root.querySelector<HTMLInputElement>(`#${target}`)?.focus();
   };
   enabled.addEventListener('change', onToggle);
+  creatorMode.addEventListener('change', onCreatorMode);
   strength.addEventListener('input', onStrength);
   noise.addEventListener('input', onNoise);
   paletteControls.forEach(({ input }) => input.addEventListener('input', onPalette));
@@ -169,6 +176,7 @@ export function bindSettingsForm(root: ParentNode): () => void {
     active = false;
     unwatch();
     enabled.removeEventListener('change', onToggle);
+    creatorMode.removeEventListener('change', onCreatorMode);
     strength.removeEventListener('input', onStrength);
     noise.removeEventListener('input', onNoise);
     paletteControls.forEach(({ input }) => input.removeEventListener('input', onPalette));
