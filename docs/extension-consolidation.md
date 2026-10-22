@@ -79,7 +79,7 @@ chrome.storage.sync、独自localStorage、外部サーバー保存は使って�
 マージ後のPowerShell実行例:
 
 ```powershell
-Set-Location `C:\Users\sm787\GitHub-Projects\web-world-themes`
+Set-Location -LiteralPath 'C:\Users\sm787\GitHub-Projects\web-world-themes'
 $env:WW_BUILD_OUT = 'dist'
 npm run build
 # 実験版も登録元の絶対パスを確認してから、そのworktreeで出力先を指定する。
