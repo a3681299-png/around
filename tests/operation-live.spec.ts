@@ -1,0 +1,127 @@
+import { test, expect, type Page } from '@playwright/test';
+import { mkdir, mkdtemp } from 'node:fs/promises';
+import path from 'node:path';
+import { launchExtension } from './fixtures';
+import { exposeEditorControls } from './helpers/editor-workspace';
+
+async function nativeInputs(page: Page) {
+  const player = page.locator('#movie_player'),
+    video = page.locator('video.html5-main-video');
+  await expect(player).toBeVisible();
+  await expect
+    .poll(() => video.evaluate((v: HTMLVideoElement) => Number.isFinite(v.duration) && v.duration > 30), {
+      timeout: 25_000,
+    })
+    .toBe(true);
+  await player.hover();
+  const bar = page.locator('.ytp-progress-bar-container');
+  await expect(bar).toBeVisible();
+  await (await bar.elementHandle())!.waitForElementState('stable');
+  const seek = (await bar.boundingBox())!;
+  await page.mouse.move(seek.x + seek.width * 0.2, seek.y + seek.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(seek.x + seek.width * 0.35, seek.y + seek.height / 2, { steps: 8 });
+  await page.mouse.up();
+  console.log(
+    'LIVE_SEEK_STATE ' +
+      JSON.stringify(
+        await video.evaluate((v: HTMLVideoElement) => ({
+          currentTime: v.currentTime,
+          duration: v.duration,
+          readyState: v.readyState,
+          error: v.error?.code,
+          seekable: Array.from({ length: v.seekable.length }, (_, i) => [v.seekable.start(i), v.seekable.end(i)]),
+        })),
+      ),
+  );
+  await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.currentTime / v.duration)).toBeGreaterThan(0.3);
+  await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.currentTime / v.duration)).toBeLessThan(0.42);
+  await page.locator('.ytp-mute-button').hover();
+  const slider = page.locator('.ytp-volume-slider');
+  await expect(slider).toBeVisible();
+  // YouTube expands the volume panel on hover. Its visible, intermediate box
+  // is not yet a usable coordinate for a raw native drag.
+  await (await slider.elementHandle())!.waitForElementState('stable');
+  const volume = (await slider.boundingBox())!;
+  await page.mouse.move(volume.x + volume.width * 0.3, volume.y + volume.height / 2);
+  await page.mouse.down();
+  const quieter = await video.evaluate((v: HTMLVideoElement) => v.volume);
+  await page.mouse.move(volume.x + volume.width * 0.65, volume.y + volume.height / 2, { steps: 6 });
+  await page.mouse.up();
+  await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.volume)).toBeGreaterThan(quieter);
+  await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.volume)).toBeLessThan(1);
+  await player.focus();
+  const paused = await video.evaluate((v: HTMLVideoElement) => v.paused);
+  await page.keyboard.press('k');
+  await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.paused)).toBe(!paused);
+  await page.locator('.ytp-fullscreen-button').click();
+  await expect.poll(() => page.evaluate(() => Boolean(document.fullscreenElement))).toBe(true);
+  await page.locator('.ytp-fullscreen-button').click();
+  await expect.poll(() => page.evaluate(() => Boolean(document.fullscreenElement))).toBe(false);
+  const search = page.locator('yt-searchbox input, ytd-searchbox input').filter({ visible: true }).first();
+  await search.fill('G1 input check');
+  await expect(search).toHaveValue('G1 input check');
+  await search.fill('');
+  const comment = page.locator('ytd-comments [contenteditable="true"]').filter({ visible: true }).first();
+  let commentResult = 'sign-in-gated; real text entry unavailable in this fresh signed-out profile';
+  if (await comment.count()) {
+    await comment.fill('G1 input check');
+    await expect(comment).toHaveText('G1 input check');
+    await comment.fill('');
+    commentResult = 'text entered and cleared; never posted';
+  }
+  return {
+    seekFraction: await video.evaluate((v: HTMLVideoElement) => v.currentTime / v.duration),
+    volume: await video.evaluate((v: HTMLVideoElement) => v.volume),
+    comment: commentResult,
+  };
+}
+
+test('optional real YouTube operation checks with and without authored paint', async ({}, info) => {
+  test.skip(
+    process.env.WW_LIVE_OPERATIONS !== '1',
+    'Explicit public-network operation verification; fixtures cover signed-in input behavior without posting.',
+  );
+  test.setTimeout(180_000);
+  await mkdir('.work', { recursive: true });
+  const context = await launchExtension(await mkdtemp(path.resolve('.work/g1-live-')), false);
+  try {
+    const worker = context.serviceWorkers()[0] ?? (await context.waitForEvent('serviceworker')),
+      id = new URL(worker.url()).host;
+    const popup = await context.newPage();
+    await popup.goto(`chrome-extension://${id}/popup/index.html`);
+    const page = await context.newPage();
+    const url = process.env.WW_LIVE_VIDEO_URL ?? 'https://www.youtube.com/watch?v=LC1a-DwUhls';
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30_000 });
+    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+    await page.bringToFront();
+    const before = await nativeInputs(page);
+    await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
+    const editor = page.locator('#web-world-themes-creator');
+    await exposeEditorControls(editor);
+    await editor.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
+    await editor.getByLabel('配置の基準').selectOption('video-player');
+    await editor.getByLabel('画像のY位置', { exact: true }).fill('80');
+    await editor.getByLabel('画像のY位置', { exact: true }).press('Tab');
+    await editor.locator('.save').click();
+    await expect(editor.locator('.dirty')).toHaveText('保存済み');
+    await editor.getByRole('button', { name: '編集を終了', exact: true }).click();
+    // A fresh public document makes the two phases independent of buffering and
+    // the video clock. The saved, fully validated artwork is actually restored.
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await expect(page.locator('[data-image-id]')).toHaveCount(1);
+    await expect(page.locator('[data-image-id]')).toBeVisible();
+    const after = await nativeInputs(page);
+    expect(Math.abs(after.volume - before.volume)).toBeLessThan(0.02);
+    expect(after.comment).toBe(before.comment);
+    await page.screenshot({ path: info.outputPath('youtube-operations-protected.png') });
+    await info.attach('real-operation-results.json', {
+      body: JSON.stringify({ url, before, after }, null, 2),
+      contentType: 'application/json',
+    });
+    console.log('LIVE_OPERATION_RESULTS ' + JSON.stringify({ before, after }));
+  } finally {
+    await context.close();
+  }
+});

@@ -1,4 +1,4 @@
-import type { Locator, Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 
 /** Regression suites exercise both existing control areas in the optional split view.
  * editor-ux.spec.ts separately verifies the default tabbed, mouse-only experience. */
@@ -32,4 +32,27 @@ export async function withCanvas<T>(page: Page, operation: () => Promise<T>): Pr
 
 export async function clickCanvas(node: Locator, options?: Parameters<Locator['click']>[0]) {
   await withCanvas(node.page(), () => node.click(options));
+}
+
+/** A numeric bounding box is also available while Host verification has hidden
+ * the layer. Wait for its real hit target before starting a raw drag. */
+export async function beginCanvasGesture(node: Locator, point?: { x: number; y: number }) {
+  const box = (await node.boundingBox())!;
+  const at = point ?? { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  await node.page().mouse.move(at.x, at.y);
+  await expect
+    .poll(() =>
+      node.evaluate((element, p) => {
+        let hit = element.ownerDocument.elementFromPoint(p.x, p.y);
+        while (hit?.shadowRoot) {
+          const next = hit.shadowRoot.elementFromPoint(p.x, p.y);
+          if (!next || next === hit) break;
+          hit = next;
+        }
+        const group = element.closest('.composition[data-selected]');
+        return Boolean(hit && (hit === element || element.contains(hit) || group?.contains(hit)));
+      }, at),
+    )
+    .toBe(true);
+  await node.page().mouse.down();
 }

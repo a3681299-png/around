@@ -5,7 +5,13 @@ import { DEFAULT_THEME, themes } from '../themes';
 import { createThemeController } from '../themes/controller';
 import { createSettingsPanel } from '../settings/panel';
 import { createCreatorEditor, type CreatorEditor } from '../editor/controller';
-import { OPEN_CREATOR_EDITOR, OPEN_INPAGE_STUDIO, OPEN_SIDE_PANEL_TOOLS, PREPARE_SIDE_PANEL } from '../editor/messages';
+import {
+  OPEN_CREATOR_EDITOR,
+  OPEN_INPAGE_STUDIO,
+  OPEN_SIDE_PANEL_TOOLS,
+  PREPARE_SIDE_PANEL,
+  PROBE_EDITOR_TARGET,
+} from '../editor/messages';
 import type { UserSettings } from '../storage/settings';
 import { connectStudioHost } from '../browser/studio-host';
 import { ASSET_PROFILE } from '../diagnostics/asset-profile';
@@ -13,6 +19,7 @@ import { installAssetRuntimeHost } from '../diagnostics/asset-runtime-host';
 import { createAssetReadHost } from '../browser/asset-read-host';
 import { requestStudioSurface } from '../browser/side-panel';
 import { OPEN_SIDE_PANEL } from '../editor/messages';
+import { watchEmergencyOff } from '../storage/safety';
 
 if (ASSET_PROFILE) installAssetRuntimeHost(document);
 
@@ -27,6 +34,7 @@ if (site) {
   const assetReader = createAssetReadHost(document);
   let creator: CreatorEditor | undefined;
   const controller = createThemeController(document, site, themes[DEFAULT_THEME], () => creator?.refreshSelection());
+  controller.suspend(true);
   creator = createCreatorEditor(
     document,
     site,
@@ -37,7 +45,8 @@ if (site) {
     controller.timeline,
     () => settingsPanel.open(),
   );
-  const disconnectStudio = connectStudioHost(document, site, creator);
+  const disconnectStudio = connectStudioHost(document, site, creator, controller.safety);
+  const unwatchEmergency = watchEmergencyOff((value) => controller.suspend(value));
   void chrome.runtime.sendMessage({ type: PREPARE_SIDE_PANEL }).catch(() => undefined);
   const settingsPanel = createSettingsPanel(document, () => {
     void requestStudioSurface(OPEN_SIDE_PANEL).catch((error: unknown) => {
@@ -64,9 +73,13 @@ if (site) {
       !message ||
       typeof message !== 'object' ||
       !('type' in message) ||
-      !oneOf(message.type, [OPEN_CREATOR_EDITOR, OPEN_INPAGE_STUDIO, OPEN_SIDE_PANEL_TOOLS])
+      !oneOf(message.type, [OPEN_CREATOR_EDITOR, OPEN_INPAGE_STUDIO, OPEN_SIDE_PANEL_TOOLS, PROBE_EDITOR_TARGET])
     )
       return false;
+    if (message.type === PROBE_EDITOR_TARGET) {
+      respond({ siteId: site.id });
+      return false;
+    }
     respond(
       message.type === OPEN_SIDE_PANEL_TOOLS
         ? creator?.openSidePanel()
@@ -83,10 +96,12 @@ if (site) {
     unwatch();
     unwatch = watchSettings(update, reportError);
     creator?.reload();
+    void chrome.runtime.sendMessage({ type: PREPARE_SIDE_PANEL }).catch(() => undefined);
   };
   window.addEventListener('pageshow', onPageShow);
   lifetime.__webWorldThemesCleanup = () => {
     unwatch();
+    unwatchEmergency();
     chrome.runtime.onMessage.removeListener(onMessage);
     window.removeEventListener('pageshow', onPageShow);
     unmountSettings();

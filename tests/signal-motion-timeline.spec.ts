@@ -47,11 +47,11 @@ test('mouse-driven X/rotation lanes edit offsets, custom ranges and curves with 
   expect(design.signalRules).toHaveLength(2);
   expect(design.decorations[0]!.placement.rotationDeg).toBe(0);
   await panel.locator('.take-live').click();
-  await youtube.mouse.move(500, 250);
+  await youtube.mouse.move(650, 380);
   const image = youtube.locator('#web-world-themes-decorations .image');
   await expect
     .poll(() => image.evaluate((node: HTMLElement) => Number.parseFloat(node.style.left)))
-    .toBeCloseTo(design.decorations[0]!.placement.x * 1100 - 200 + (500 * 500) / 1100, 3);
+    .toBeCloseTo(design.decorations[0]!.placement.x * 1100 - 200 + (650 * 500) / 1100, 3);
   await mkdir('.work/verification', { recursive: true });
   await panel.screenshot({ path: '.work/verification/signal-v2-key-editor.png' });
   await youtube.reload();

@@ -7,7 +7,8 @@ import type { Page, Locator } from '@playwright/test';
 import type { DesignDocument } from '../src/design/types';
 
 const overlay = '#web-world-themes-decorations',
-  layers = `${overlay} [data-image-id]`;
+  presentation = ':is(#web-world-themes-decorations, #web-world-themes-video-decorations)',
+  layers = `${presentation} [data-image-id]`;
 const file = (name: string) => path.resolve(`tests/fixtures/motion/${name}`);
 async function open(popup: Page, page: Page) {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
@@ -313,7 +314,7 @@ test('APNG/WebM/image share player-anchored groups, mask signals, history, reduc
   await expect(youtube.locator(`${layers} video`)).toHaveCount(0);
   await youtube.locator('#movie_player [aria-label="Play"]').evaluate((n: HTMLButtonElement) => n.click());
   await ready(youtube, 3);
-  const content = youtube.locator(`${overlay} .group-content`);
+  const content = youtube.locator(`${presentation} .group-content`);
   await expect(content).toHaveAttribute('data-mask-intensity', '1');
   const initialMask = await content.evaluate((n: HTMLElement) => n.style.maskImage);
   await youtube.mouse.move(190, 270);

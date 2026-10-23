@@ -35,7 +35,9 @@ test('shared motion UI pursues, stops, rotates, keeps handles aligned and preser
       y: Number.parseFloat(node.style.top),
     }));
   const start = await point();
-  await youtube.mouse.move(500, 220);
+  // G1 flattens motion near native chip controls. Pursuit is tested in the
+  // artwork area; approach/hysteresis has its own operation-safety assertions.
+  await youtube.mouse.move(650, 380);
   await expect
     .poll(async () => Math.hypot((await point()).x - start.x, (await point()).y - start.y))
     .toBeGreaterThan(10);
@@ -43,7 +45,7 @@ test('shared motion UI pursues, stops, rotates, keeps handles aligned and preser
     .poll(
       async () => {
         const p = await point();
-        return Math.abs(Math.hypot(500 - p.x, 220 - p.y) - 40);
+        return Math.abs(Math.hypot(650 - p.x, 380 - p.y) - 40);
       },
       { timeout: 8000 },
     )
@@ -87,11 +89,27 @@ test('shared motion UI pursues, stops, rotates, keeps handles aligned and preser
   await panel.getByLabel('追従方式').selectOption('direct');
   await panel.getByLabel('マウスとの停止距離').fill('0');
   await panel.getByLabel('マウスとの停止距離').press('Tab');
-  await youtube.mouse.move(500, 300);
-  await expect.poll(async () => (await point()).x).toBeCloseTo(500, 3);
+  // Use a gap outside the conservative swept chip-control columns for a real
+  // canvas drag; protected columns deliberately pass input to native controls.
+  await youtube.mouse.move(710, 350);
+  await expect.poll(async () => (await point()).x).toBeCloseTo(710, 3);
   const scale = youtube.viewportSize()!.width;
+  // Style sampling can precede presentation. Wait for the actual hit target,
+  // including the compositor clip and any temporary geometry suspension.
+  await expect
+    .poll(() =>
+      image.evaluate((node) => {
+        const root = node.getRootNode() as ShadowRoot;
+        return (
+          document.elementFromPoint(710, 350) === root.host &&
+          node.contains(root.elementFromPoint(710, 350)) &&
+          getComputedStyle(node).visibility === 'visible'
+        );
+      }),
+    )
+    .toBe(true);
   await youtube.mouse.down();
-  await youtube.mouse.move(560, 300, { steps: 8 });
+  await youtube.mouse.move(770, 350, { steps: 8 });
   await youtube.mouse.up();
   await panel.locator('.save').click();
   await expect(panel.locator('.dirty')).toHaveText('保存済み');

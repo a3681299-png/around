@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import type { Locator, Page } from '@playwright/test';
 import { test, expect } from './fixtures';
 import type { DesignDocument } from '../src/design/types';
+import { beginCanvasGesture } from './helpers/editor-workspace';
 
 const key = 'webWorldThemes.design.youtube',
   overlay = '#web-world-themes-decorations';
@@ -61,6 +62,14 @@ test('mouse-only first creation: import, check selection, group, mask, behavior,
   await expect(panel.getByRole('button', { name: '選択をグループ化', exact: true })).toBeDisabled();
   await expect(panel.locator('.grouping-help')).toContainText('2枚以上');
   await add(panel, youtube);
+  // The owned canvas gesture must start outside native guide/chip columns.
+  for (let i = 0; i < 3; i++) {
+    await panel.getByRole('button', { name: `素材${i + 1}.png`, exact: true }).click();
+    await panel.getByRole('button', { name: 'プロパティを編集', exact: true }).click();
+    await panel.getByLabel('画像のX位置', { exact: true }).fill(String(60 + i * 10));
+    await panel.getByLabel('画像のX位置', { exact: true }).press('Tab');
+    await panel.getByRole('tab', { name: 'レイヤー', exact: true }).click();
+  }
   await selectThree(panel);
   await expect(panel.locator('.thumbnail img')).toHaveCount(3);
   await expect(panel.getByRole('button', { name: '画像を追加', exact: true })).toBeInViewport();
@@ -70,8 +79,7 @@ test('mouse-only first creation: import, check selection, group, mask, behavior,
   await expect(panel.locator('[data-parent-id]')).toHaveCount(3);
   const first = youtube.locator(layers).first(),
     before = (await first.boundingBox())!;
-  await youtube.mouse.move(before.x + before.width / 2, before.y + before.height / 2);
-  await youtube.mouse.down();
+  await beginCanvasGesture(first);
   await youtube.mouse.move(before.x + before.width / 2 - 40, before.y + before.height / 2 + 15, { steps: 8 });
   await youtube.mouse.up();
   expect((await first.boundingBox())!.x).toBeCloseTo(before.x - 40, 2);

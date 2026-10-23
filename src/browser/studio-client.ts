@@ -12,6 +12,7 @@ import { ASSET_LIMITS } from '../assets/validation';
 import { ASSET_MESSAGES } from '../assets/limits';
 import { releaseAssets } from '../assets/client';
 import { importStudioAssets } from '../assets/studio-upload';
+import type { SafetyStatus } from '../host/operation-guard';
 
 import type { StudioConnectionState, StudioConnection } from '../studio/connection';
 import { requestStudioSurface } from './side-panel';
@@ -29,6 +30,8 @@ export function createStudioClient(
   visibilityDocument?: Document,
 ): StudioConnection {
   const owner = `studio-${crypto.randomUUID()}`;
+  const safetyListeners = new Set<(status: SafetyStatus) => void>();
+  let safetyStatus: SafetyStatus | undefined;
   let port: chrome.runtime.Port | undefined,
     tabId: number | undefined,
     state: EditorSnapshot | undefined,
@@ -198,6 +201,11 @@ export function createStudioClient(
           emit('別のStudioへ編集を引き継ぎました。未保存の変更と履歴は対象タブで保持しています。');
           return;
         }
+        if (message.type === 'safety') {
+          safetyStatus = message.status;
+          safetyListeners.forEach((listener) => listener(message.status));
+          return;
+        }
         if (message.type === 'timeline') {
           useTimeline(message.update);
           return;
@@ -324,6 +332,18 @@ export function createStudioClient(
   };
   return {
     timeline,
+    safety: {
+      subscribe(listener) {
+        safetyListeners.add(listener);
+        if (safetyStatus) listener(safetyStatus);
+        return () => {
+          safetyListeners.delete(listener);
+        };
+      },
+      async overlay(value) {
+        await request({ type: 'safety', overlay: value } as Omit<StudioRequest, 'id'>);
+      },
+    },
     async targets(): Promise<StudioTarget[]> {
       const tabs = await chrome.tabs.query({});
       const results = await Promise.all(

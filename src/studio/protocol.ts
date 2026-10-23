@@ -20,8 +20,10 @@ export type StudioRequest =
   | { id: number; type: 'command'; session: string; revision: number; command: EditCommand }
   | { id: number; type: 'import-assets'; session: string; revision: number; assets: string[] }
   | { id: number; type: 'thumbnail'; layer: string }
+  | { id: number; type: 'safety'; overlay: boolean }
   | { id: number; type: 'timeline'; session: string; command: TimelineCommand }
   | { id: number; type: 'detach' };
+// Safety has a separate Host channel; no artwork command can relax protection.
 export interface StudioUpdate extends StudioStatePayload {
   type: 'state';
 }
@@ -33,6 +35,10 @@ export interface StudioReply extends StudioStatePayload {
   thumbnail?: string;
 }
 export type StudioMessage =
-  StudioUpdate | StudioReply | { type: 'handoff' } | { type: 'timeline'; update: TimelineUpdate };
+  | StudioUpdate
+  | StudioReply
+  | { type: 'handoff' }
+  | { type: 'timeline'; update: TimelineUpdate }
+  | { type: 'safety'; status: import('../host/operation-guard').SafetyStatus };
 
 export { parseEditCommand } from '../editor-core/commands';

@@ -8,9 +8,11 @@ import { unpackCheckpoint } from '../src/studio/checkpoint-codec';
 import { createStudioStateDecoder } from '../src/studio/state-sync';
 import type { StudioMessage } from '../src/studio/protocol';
 import type { EditorSnapshot } from '../src/editor-core/types';
+import { beginCanvasGesture } from './helpers/editor-workspace';
 
 const overlay = '#web-world-themes-decorations',
-  images = `${overlay} [data-image-id]`,
+  presentation = ':is(#web-world-themes-decorations, #web-world-themes-video-decorations)',
+  images = `${presentation} [data-image-id]`,
   key = 'webWorldThemes.design.youtube';
 async function launch(context: BrowserContext, popup: Page, youtube: Page) {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
@@ -111,6 +113,10 @@ test('standalone Studio edits a real extension target using shared grouping, eff
   await expect(panel.locator('.layers-pane')).toBeVisible();
   await expect(panel.locator('.inspector-pane')).toBeVisible();
   await importImages(panel, youtube);
+  for (const row of await panel.locator('[data-layer-id]').all()) {
+    await row.locator('[data-action="select"]').click();
+    await panel.getByLabel('画像のX位置', { exact: true }).fill('65');
+  }
   await panel
     .locator('.layer')
     .last()
@@ -128,8 +134,7 @@ test('standalone Studio edits a real extension target using shared grouping, eff
   const first = youtube.locator(images).first(),
     before = (await first.boundingBox())!;
   await youtube.bringToFront();
-  await youtube.mouse.move(before.x + before.width / 2, before.y + before.height / 2);
-  await youtube.mouse.down();
+  await beginCanvasGesture(first);
   await youtube.mouse.move(before.x + before.width / 2 - 30, before.y + before.height / 2 + 15, { steps: 8 });
   await youtube.mouse.up();
   await expect.poll(async () => (await first.boundingBox())!.x).toBeCloseTo(before.x - 30, 2);
@@ -334,7 +339,7 @@ test('animation playback, groups, player anchors, SPA, scrolling and strength ze
   await youtube.locator('#navigate').evaluate((button: HTMLButtonElement) => button.click());
   await expect(youtube.locator('[data-ww-surface~="player-window"]')).toBeVisible();
   await panel.getByLabel('配置の基準', { exact: true }).selectOption('video-player');
-  await expect.poll(async () => (await youtube.locator(`${overlay} video`).boundingBox())!.x).toBeGreaterThan(0);
+  await expect.poll(async () => (await youtube.locator(`${presentation} video`).boundingBox())!.x).toBeGreaterThan(0);
   await youtube.evaluate(() => window.scrollTo(0, 200));
   await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
   await panel.getByLabel('配置の基準', { exact: true }).selectOption('viewport');

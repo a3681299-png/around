@@ -15,9 +15,15 @@ import { ASSET_MESSAGES } from '../assets/limits';
 import { parseTimelineCommand } from '../timeline/types';
 import { loadAssetMetadata } from '../assets/client';
 import { isAssetId } from '../design/schema';
+import type { OperationGuardHost } from '../host/operation-guard';
 
 /** Authenticated extension Port; no window messages or page-script command bridge. */
-export function connectStudioHost(doc: Document, site: SiteAdapter, editor: CreatorEditor) {
+export function connectStudioHost(
+  doc: Document,
+  site: SiteAdapter,
+  editor: CreatorEditor,
+  safety?: OperationGuardHost,
+) {
   const ports = new Map<chrome.runtime.Port, () => void>();
   let activePort: chrome.runtime.Port | undefined, activeSurface: string | undefined;
   const trusted = (sender: chrome.runtime.MessageSender | undefined) =>
@@ -91,12 +97,17 @@ export function connectStudioHost(doc: Document, site: SiteAdapter, editor: Crea
     const unsubscribeTimeline = editor.subscribeTimeline((update) => {
       if (attached && owner) post({ type: 'timeline', update });
     });
+    const unsubscribeSafety = safety?.subscribe((status) => {
+      if (attached && owner) post({ type: 'safety', status });
+    });
     function cleanup() {
       if (closed) return;
       closed = true;
       clearTimeout(timer);
       unsubscribe();
       unsubscribeTimeline();
+      unsubscribeSafety?.();
+      if (activePort === port) safety?.overlay(false);
       if (owner) editor.detachStudio(owner);
       ports.delete(port);
       if (activePort === port) {
@@ -152,11 +163,17 @@ export function connectStudioHost(doc: Document, site: SiteAdapter, editor: Crea
               post({ type: 'reply', id: request.id, ok: true, ...statePayload(state) });
               const update = editor.timelineSnapshot();
               if (update) post({ type: 'timeline', update });
+              if (safety) post({ type: 'safety', status: safety.snapshot() });
             } else if (!owner) throw new Error('先に編集対象へ接続してください。');
             else if (request.type === 'surface-visibility') {
               if (!attached || activePort !== port || surface !== 'sidepanel' || typeof request.visible !== 'boolean')
                 throw new Error('Studioの表示状態が不正です。');
               editor.setSidePanelVisible(owner, request.visible);
+              post({ type: 'reply', id: request.id, ok: true });
+            } else if (request.type === 'safety') {
+              if (!attached || activePort !== port || typeof request.overlay !== 'boolean')
+                throw new Error('操作チェックの要求が不正です。');
+              safety?.overlay(request.overlay);
               post({ type: 'reply', id: request.id, ok: true });
             } else if (request.type === 'timeline') {
               if (!attached || activePort !== port || typeof request.session !== 'string')

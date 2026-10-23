@@ -6,7 +6,7 @@ import type { Page } from '@playwright/test';
 
 const run = promisify(execFile);
 /** Renderer CDP key events do not invoke Chrome's toolbar/command accelerators. */
-export async function nativeShortcut(page: Page, profile: string, extension: string, key: 'E' | 'Y') {
+export async function nativeShortcut(page: Page, profile: string, extension: string, key: 'E' | 'Y' | 'Q') {
   await page.bringToFront();
   if (process.platform === 'win32') {
     await run(

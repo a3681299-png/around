@@ -26,6 +26,8 @@ import type { DesignTarget, Decoration, GroupLayer } from '../../design/types';
 import type { SignalRule } from '../../signals/keyframes';
 import type { TimelineHost } from '../../host/timeline';
 import type { WorldLayout } from '../../world/types';
+import type { OperationGuardHost } from '../../host/operation-guard';
+import { safePaintRegions } from '../../world/operations';
 
 export interface ImageEditing {
   selectedIds: readonly string[];
@@ -40,7 +42,7 @@ export interface ImageEditing {
 }
 
 const CSS = `
-:host { all:initial !important; position:fixed !important; inset:0 !important; width:100vw !important; height:100vh !important; margin:0 !important; padding:0 !important; border:0 !important; background:transparent !important; overflow:hidden !important; pointer-events:none !important; z-index:2147482000 !important; }
+:host { all:initial !important; position:fixed !important; inset:0 !important; width:100vw !important; height:100vh !important; margin:0 !important; padding:0 !important; border:0 !important; background:transparent !important; overflow:hidden !important; pointer-events:none !important; z-index:var(--ww-decoration-z,2147482000) !important; clip-path:var(--ww-decoration-clip,none) !important; }
 * { box-sizing:border-box; }
 .image, .selection-frame { position:absolute; transform-origin:center; pointer-events:none; touch-action:none; }
 .composition { position:absolute; pointer-events:none; }
@@ -74,6 +76,7 @@ export function createImageRenderer(
   anchors: readonly DesignTarget[],
   playback?: PlaybackSource,
   timeline?: TimelineHost,
+  safety?: OperationGuardHost,
 ) {
   const view = doc.defaultView!;
   let host: HTMLElement | undefined;
@@ -100,6 +103,7 @@ export function createImageRenderer(
     }
   >();
   const compositions = new Map<string, { node: HTMLDivElement; content: HTMLDivElement; controls: HTMLDivElement }>();
+  let videoSlot: { host: HTMLElement; content: HTMLElement; shadow: ShadowRoot } | undefined;
   let lastLayout: WorldLayout | undefined;
   let gesture:
     | {
@@ -148,6 +152,133 @@ export function createImageRenderer(
         top: `${point.y}px`,
         transform: `translate(-50%, -50%) rotate(${p.rotationDeg}deg)`,
       });
+    }
+    if (safety) {
+      // The screen overlay excludes complete scroll paths. This clip cannot
+      // expose a moving native control during asynchronous compositor scroll.
+      const regions = safePaintRegions(safety.source.capture(), Boolean(editing));
+      const path = regions.map((r) => `M${r.left} ${r.top}h${r.width}v${r.height}h${-r.width}Z`).join('');
+      host!.style.setProperty('--ww-decoration-clip', path ? `path('${path}')` : 'inset(100%)');
+      const slot = safety.source.videoSlot();
+      const roots = new Map([...layout.groups, ...layout.layers].map((entry) => [entry.layer.id, entry]));
+      const localRoots = new Set(
+        slot
+          ? layout.roots.filter((id) => {
+              const anchor = roots.get(id)!.layer.placement.anchor;
+              return anchor.kind === 'surface' && anchor.target === 'video-player';
+            })
+          : [],
+      );
+      if (localRoots.size && !videoSlot) {
+        const localHost = doc.createElement('div');
+        localHost.id = 'web-world-themes-video-decorations';
+        const localShadow = localHost.attachShadow({ mode: 'open' }),
+          style = doc.createElement('style'),
+          content = doc.createElement('div');
+        style.textContent =
+          CSS +
+          ':host{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;z-index:1!important}.image{pointer-events:none!important}.image[data-editable]{pointer-events:auto!important}';
+        content.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:0';
+        localShadow.append(style, content);
+        wireGestures(localShadow);
+        videoSlot = { host: localHost, content, shadow: localShadow };
+      }
+      if (slot && videoSlot) {
+        if (videoSlot.host.parentElement !== slot.parent) slot.parent.append(videoSlot.host);
+        videoSlot.host.style.setProperty('--ww-decoration-clip', `inset(${slot.top}px 0 ${slot.bottom}px 0)`);
+      }
+      // One presentation container preserves scoped z-index/tie ordering and
+      // keeps a group's masks/opacity on the original, un-cloned subtree.
+      let localIndex = 0,
+        globalIndex = 0;
+      for (const id of layout.roots) {
+        const node = nodes.get(id)?.node ?? compositions.get(id)!.node;
+        const local = localRoots.has(id),
+          container = local ? videoSlot!.content : imageLayer!,
+          index = local ? localIndex++ : globalIndex++;
+        if (container.children[index] !== node) container.insertBefore(node, container.children[index] ?? null);
+        if (local && slot) {
+          node.style.left = parseFloat(node.style.left) - slot.rect.left + 'px';
+          node.style.top = parseFloat(node.style.top) - slot.rect.top + 'px';
+        }
+      }
+      // Editor handles own only their visible authored bounds, inside the same
+      // native clip. Drag/volume bands never become editor-owned.
+      for (const entry of [...nodes.values(), ...compositions.values()]) {
+        const id = entry.controls.dataset.frameId!,
+          parentId = layout.layers.find((l) => l.layer.id === id)?.parentId;
+        const local = localRoots.has(parentId ?? id),
+          root = local ? videoSlot!.shadow : shadow!;
+        if (entry.controls.parentNode !== root) root.append(entry.controls);
+        if (local && slot) {
+          entry.controls.style.left = parseFloat(entry.controls.style.left) - slot.rect.left + 'px';
+          entry.controls.style.top = parseFloat(entry.controls.style.top) - slot.rect.top + 'px';
+        }
+      }
+      if (!localRoots.size) {
+        videoSlot?.host.remove();
+        videoSlot = undefined;
+      }
+      const localIds = new Set<string>();
+      for (const layer of layout.layers) {
+        const entry = nodes.get(layer.layer.id);
+        if (!entry) continue;
+        if (localRoots.has(layer.parentId ?? layer.layer.id)) {
+          localIds.add(layer.layer.id);
+        }
+      }
+      const blocked = safety.commit(
+        layout.layers
+          .filter((l) => l.layer.visible && (!l.frame || l.visible))
+          .map((layer) => ({
+            id: layer.layer.id,
+            bounds: layer.bounds ?? { left: 0, top: 0, right: 0, bottom: 0 },
+            opacity: layer.effectiveOpacity,
+            pointerEvents: Boolean(editing && !editing.locked && !layer.locked),
+            editorOwned: Boolean(editing && !editing.locked && !layer.locked) && localIds.has(layer.layer.id),
+            outset: 0,
+            composition:
+              !layer.frame || !safety.source.overlaySlot()
+                ? ('unsupported' as const)
+                : localIds.has(layer.layer.id)
+                  ? ('native-underlay' as const)
+                  : ('overlay' as const),
+            dynamic: Boolean(
+              layer.layer.motion?.enabled ||
+              (layer.parentId && parents.get(layer.parentId)?.layer.motion?.enabled) ||
+              signalRules.some(
+                (r) => r.enabled && (r.target.layerId === layer.layer.id || r.target.layerId === layer.parentId),
+              ) ||
+              (layer.layer.kind === 'model3d' && (layer.layer.model.playing || layer.layer.model.look.enabled)),
+            ),
+            animated:
+              layer.layer.kind === 'animation' ||
+              Boolean(layer.layer.effects?.some((e) => e.enabled && e.bindings.length)),
+            ...(localIds.has(layer.layer.id) && slot
+              ? {
+                  clip: {
+                    left: slot.rect.left,
+                    top: slot.rect.top + slot.top,
+                    width: slot.rect.width,
+                    height: slot.rect.height - slot.top - slot.bottom,
+                  },
+                }
+              : {}),
+          })),
+      );
+      host!.dataset.wwSafety = JSON.stringify({ stopped: safety.snapshot().stopped, issues: safety.snapshot().issues });
+      for (const layer of layout.layers) {
+        const entry = nodes.get(layer.layer.id);
+        if (!entry) continue;
+        // The native-owned clip is the final paint boundary, including any
+        // future blur/shadow spill. No page-sized stale rectangular hole mask.
+        const stopped = blocked.has(layer.layer.id);
+        entry.node.style.visibility = stopped ? 'hidden' : '';
+        entry.node.toggleAttribute('data-safety-limited', stopped);
+        entry.node.style.pointerEvents = stopped ? 'none' : '';
+        if (stopped) entry.controls.hidden = true;
+        if (stopped) entry.media.update(layer.layer, false);
+      }
     }
     const selected =
       editing && editing.selectedIds.length > 1
@@ -200,7 +331,10 @@ export function createImageRenderer(
 
   const draw = () => {
     if (!host) return;
-    const parent = doc.fullscreenElement ?? doc.body ?? doc.documentElement;
+    safety?.sample(view.performance.now());
+    const overlaySlot = safety?.source.overlaySlot();
+    const parent = overlaySlot?.parent ?? doc.fullscreenElement ?? doc.body ?? doc.documentElement;
+    if (overlaySlot) host.style.setProperty('--ww-decoration-z', String(overlaySlot.zIndex));
     if (host.parentElement !== parent) parent.append(host);
     const nextObserved = new Set<Element>();
     const effectTargets: EffectTarget[] = [];
@@ -306,7 +440,13 @@ export function createImageRenderer(
       );
     }
     applyLayout(layout);
-    effects?.update(effectTargets, { scene, geometry, layout, ...(gesture ? { holdTransforms: true } : {}) });
+    effects?.update(effectTargets, {
+      scene,
+      geometry,
+      layout,
+      ...(safety ? { safety } : {}),
+      ...(gesture ? { holdTransforms: true } : {}),
+    });
     if (observed.size !== nextObserved.size || [...nextObserved].some((element) => !observed.has(element))) {
       observer?.disconnect();
       nextObserved.forEach((element) => observer?.observe(element));
@@ -470,6 +610,19 @@ export function createImageRenderer(
     refresh();
   };
 
+  const wireGestures = (root: ShadowRoot) => {
+    root.addEventListener('pointerdown', onPointerDown as EventListener);
+    root.addEventListener('pointermove', onPointerMove as EventListener);
+    root.addEventListener('pointerup', onPointerUp as EventListener);
+    root.addEventListener('pointercancel', onPointerUp as EventListener);
+    root.addEventListener('lostpointercapture', () => finish(true));
+    root.addEventListener('click', (event) => {
+      if (editing) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    });
+  };
   const mount = () => {
     host = doc.createElement('div');
     host.id = 'web-world-themes-decorations';
@@ -486,11 +639,22 @@ export function createImageRenderer(
     );
     models = createModelRenderer(
       doc,
-      (message) => editing?.error(message),
+      (message) => {
+        editing?.error(message);
+        if (message.includes('コンテキスト')) safety?.pause(message);
+      },
       (stats) => {
         if (host) host.dataset.wwModelStats = JSON.stringify(stats);
       },
       shadow,
+      undefined,
+      undefined,
+      () =>
+        safety?.pause(
+          'WebGLコンテキストが失われたため3Dの描画を停止しました。',
+          true,
+          images.filter((i) => i.kind === 'model3d').map((i) => i.id),
+        ),
     );
     effects = createEffectController(doc, playback, timeline, applyLayout, (frame) => models?.evaluate(frame));
     imageLayer = doc.createElement('div');
@@ -507,17 +671,7 @@ export function createImageRenderer(
       shadow!.append(node);
       return node;
     });
-    shadow.addEventListener('pointerdown', onPointerDown as EventListener);
-    shadow.addEventListener('pointermove', onPointerMove as EventListener);
-    shadow.addEventListener('pointerup', onPointerUp as EventListener);
-    shadow.addEventListener('pointercancel', onPointerUp as EventListener);
-    shadow.addEventListener('lostpointercapture', () => finish(true));
-    shadow.addEventListener('click', (event) => {
-      if (editing) {
-        event.preventDefault();
-        event.stopPropagation();
-      }
-    });
+    wireGestures(shadow);
     observer = new ResizeObserver(refresh);
     view.addEventListener('resize', onViewChange);
     view.addEventListener('blur', onBlur);
@@ -549,6 +703,8 @@ export function createImageRenderer(
     doc.removeEventListener('scroll', onViewChange, true);
     doc.removeEventListener('fullscreenchange', onViewChange);
     host?.remove();
+    videoSlot?.host.remove();
+    videoSlot = undefined;
     host = undefined;
     shadow = undefined;
     groupFrame = undefined;
@@ -653,7 +809,9 @@ export function createImageRenderer(
       groups.forEach((group) => place(compositions.get(group.id)!.content, group.children));
       place(
         imageLayer!,
-        rootLayers(images, groups).map((layer) => layer.id),
+        rootLayers(images, groups)
+          .map((layer) => layer.id)
+          .filter((id) => (nodes.get(id)?.node ?? compositions.get(id)!.node).parentNode !== videoSlot?.content),
       );
       draw();
     },
@@ -666,6 +824,17 @@ export function createImageRenderer(
       draw();
     },
     refresh,
+    holdSafety(layerIds?: readonly string[]) {
+      nodes.forEach((entry, id) => {
+        if (layerIds && !layerIds.includes(id)) return;
+        entry.node.style.visibility = 'hidden';
+        entry.controls.hidden = true;
+      });
+      compositions.forEach((entry) => {
+        entry.controls.hidden = true;
+      });
+      if (groupFrame) groupFrame.hidden = true;
+    },
     destroy,
   };
 }

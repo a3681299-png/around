@@ -1,4 +1,4 @@
-import { exposeEditorControls, withCanvas } from './helpers/editor-workspace';
+import { exposeEditorControls, withCanvas, beginCanvasGesture } from './helpers/editor-workspace';
 import type { Page, Locator, CDPSession } from '@playwright/test';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -9,7 +9,7 @@ import { emptyDesign } from '../src/design/schema';
 
 const key = 'webWorldThemes.design.youtube',
   overlay = '#web-world-themes-decorations';
-const layers = `${overlay} [data-image-id]`;
+const layers = ':is(#web-world-themes-decorations, #web-world-themes-video-decorations) [data-image-id]';
 const fixture = (extension: string) => path.resolve(`tests/fixtures/motion/petal.${extension}`);
 async function open(popup: Page, page: Page) {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
@@ -45,8 +45,7 @@ async function drag(page: Page, node: Locator, dx: number, dy: number) {
     const b = (await node.boundingBox())!,
       x = b.x + b.width / 2,
       y = b.y + b.height / 2;
-    await page.mouse.move(x, y);
-    await page.mouse.down();
+    await beginCanvasGesture(node, { x, y });
     await page.mouse.move(x + dx, y + dy, { steps: 8 });
     await page.mouse.up();
   });
@@ -70,6 +69,7 @@ for (const [extension, format] of [
     youtube.on('pageerror', (error) => errors.push(error.message));
     await panel.getByLabel('アニメーション素材を追加').setInputFiles(fixture(extension));
     await ready(youtube, 1);
+    await panel.getByLabel('画像のX位置', { exact: true }).fill('65');
     if (format !== 'lottie') await panel.getByLabel('再生方式', { exact: true }).selectOption('controlled');
     const layer = youtube.locator(layers),
       media = layer.locator('.media');

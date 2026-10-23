@@ -8,9 +8,12 @@ import {
   type SettingsPatch,
 } from '../storage/settings';
 import { PALETTE_CHANNELS, PALETTE_PRESETS, type PaletteChannel } from '../themes/retro/palette';
+import { mountSafetyControls } from './safety-controls';
 
 /** Both the extension popup and the in-page panel share this storage binding. */
 export function bindSettingsForm(root: ParentNode): () => void {
+  const safetyRoot = root.querySelector<HTMLElement>('.ww-editor-body');
+  const unmountSafety = safetyRoot ? mountSafetyControls(safetyRoot) : undefined;
   const backup = root.querySelector<HTMLAnchorElement>('.backup-open');
   if (backup) backup.href = chrome.runtime.getURL('backup/index.html');
   function required<T extends HTMLElement>(selector: string): T {
@@ -173,6 +176,7 @@ export function bindSettingsForm(root: ParentNode): () => void {
   focusButtons.forEach((button) => button.addEventListener('click', onFocusControl));
 
   return () => {
+    unmountSafety?.();
     active = false;
     unwatch();
     enabled.removeEventListener('change', onToggle);

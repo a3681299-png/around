@@ -1,9 +1,10 @@
 import path from 'node:path';
 import type { Page } from '@playwright/test';
 import { test, expect } from './fixtures';
+import { beginCanvasGesture } from './helpers/editor-workspace';
 
 const overlay = '#web-world-themes-decorations',
-  images = `${overlay} [data-image-id]`;
+  images = ':is(#web-world-themes-decorations, #web-world-themes-video-decorations) [data-image-id]';
 async function open(popup: Page, page: Page) {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
@@ -33,14 +34,17 @@ test('one live workspace imports, directly moves, groups, masks and saves withou
     .setInputFiles(Array(3).fill(path.resolve('tests/fixtures/motion/petal.png')));
   await expect(youtube.locator(images)).toHaveCount(3);
   await expect(panel.getByRole('button', { name: '画像を追加', exact: true })).toBeEnabled();
+  for (const row of await panel.locator('[data-layer-id]').all()) {
+    await row.locator('[data-action="select"]').click();
+    await panel.getByLabel('画像のX位置', { exact: true }).fill('65');
+  }
   await panel.getByRole('button', { name: 'すべて選択', exact: true }).click();
   await expect(panel.locator('.selected-count')).toHaveText('3個選択中');
   await panel.getByRole('button', { name: '選択をグループ化', exact: true }).click();
   await expect(panel.locator('[data-kind="group"]')).toHaveCount(1);
   const first = youtube.locator(images).first(),
     before = (await first.boundingBox())!;
-  await youtube.mouse.move(before.x + before.width / 2, before.y + before.height / 2);
-  await youtube.mouse.down();
+  await beginCanvasGesture(first);
   await youtube.mouse.move(before.x + before.width / 2 - 35, before.y + before.height / 2 + 20, { steps: 8 });
   await youtube.mouse.up();
   await expect.poll(async () => (await first.boundingBox())!.x).toBeCloseTo(before.x - 35, 2);
@@ -250,20 +254,19 @@ test('standalone opens the same live Core; selection, scrubbing, history and rel
   const remote = studio.getByRole('dialog', { name: 'デザインエディター' });
   await inline.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await expect(remote.locator('.selected-count')).toHaveText('1個選択中');
-  await remote.getByLabel('画像のX位置', { exact: true }).fill('45');
-  await expect(inline.getByLabel('画像のX位置', { exact: true })).toHaveValue('45');
+  await remote.getByLabel('画像のX位置', { exact: true }).fill('65');
+  await expect(inline.getByLabel('画像のX位置', { exact: true })).toHaveValue('65');
   await youtube.bringToFront();
   const first = youtube.locator(images).first(),
     box = (await first.boundingBox())!;
-  await youtube.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-  await youtube.mouse.down();
+  await beginCanvasGesture(first);
   await youtube.mouse.move(box.x + box.width / 2 + 40, box.y + box.height / 2, { steps: 6 });
   await youtube.mouse.up();
   await expect
     .poll(async () => Number(await remote.getByLabel('画像のX位置', { exact: true }).inputValue()))
-    .toBeGreaterThan(45);
+    .toBeGreaterThan(65);
   await remote.getByRole('button', { name: '元に戻す', exact: true }).click();
-  await expect(inline.getByLabel('画像のX位置', { exact: true })).toHaveValue('45');
+  await expect(inline.getByLabel('画像のX位置', { exact: true })).toHaveValue('65');
   // Recovery checkpoint contains the active draft and shared Undo stack, never a second editor.
   await expect
     .poll(() =>
@@ -280,7 +283,7 @@ test('standalone opens the same live Core; selection, scrubbing, history and rel
   await expect(youtube.locator(images)).toHaveCount(1);
   await studio.getByRole('button', { name: 'YouTubeでStudioを開く', exact: true }).click();
   await expect(inline).toBeVisible();
-  await expect(inline.getByLabel('画像のX位置', { exact: true })).toHaveValue('45');
+  await expect(inline.getByLabel('画像のX位置', { exact: true })).toHaveValue('65');
   await inline.getByRole('button', { name: '保存', exact: true }).click();
   await expect(remote.locator('.dirty')).toHaveText('保存済み');
 });

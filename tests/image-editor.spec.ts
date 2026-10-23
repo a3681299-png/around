@@ -1,4 +1,4 @@
-import { exposeEditorControls, withCanvas } from './helpers/editor-workspace';
+import { exposeEditorControls, withCanvas, beginCanvasGesture } from './helpers/editor-workspace';
 import type { Page, Locator, BrowserContext } from '@playwright/test';
 import { test, expect, launchExtension } from './fixtures';
 import type { DesignDocument } from '../src/design/types';
@@ -61,8 +61,7 @@ async function stored(popup: Page): Promise<DesignDocument> {
 async function drag(youtube: Page, element: Locator, dx: number, dy: number) {
   await withCanvas(youtube, async () => {
     const box = (await element.boundingBox())!;
-    await youtube.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-    await youtube.mouse.down();
+    await beginCanvasGesture(element);
     await youtube.mouse.move(box.x + box.width / 2 + dx, box.y + box.height / 2 + dy, { steps: 8 });
     await youtube.mouse.up();
   });
@@ -113,6 +112,8 @@ test('import a transparent image, drag and resize it, save, reload and restart w
 }) => {
   const dialog = await open(popup, youtube);
   const image = await importImage(dialog, youtube);
+  // Exercise gestures outside the protected guide/chip scroll columns.
+  await dialog.getByLabel('画像のX位置', { exact: true }).fill('65');
   const alpha = await image.locator('img').evaluate((node: HTMLImageElement) => {
     const canvas = document.createElement('canvas');
     canvas.width = node.naturalWidth;
@@ -215,6 +216,7 @@ test('rotation handle, Delete, discard and close preserve saved layers and colle
 }) => {
   const dialog = await open(popup, youtube);
   let image = await importImage(dialog, youtube);
+  await dialog.getByLabel('画像のX位置', { exact: true }).fill('65');
   await save(dialog);
   const handle = (await controls(youtube, image)).getByRole('button', { name: '画像を回転' });
   const box = (await image.boundingBox())!,
@@ -295,11 +297,14 @@ test('viewport placement follows resizing without scroll drift; player anchors f
   const beforeAnchor = (await image.boundingBox())!;
   await dialog.getByLabel('配置の基準').selectOption('video-player');
   await save(dialog);
-  expect((await image.boundingBox())!.x).toBeCloseTo(beforeAnchor.x, 0);
+  // Player-local rendering moves the presentation into a native scroll/clip
+  // owner; the artwork ID and viewport position are still the same.
+  const anchored = youtube.locator('[data-image-id]').last();
+  expect((await anchored.boundingBox())!.x).toBeCloseTo(beforeAnchor.x, 0);
   await dialog.getByRole('button', { name: '編集を終了' }).click();
   await youtube.locator('ytd-guide-entry-renderer a[href="/"]').first().click();
   await expect(youtube).toHaveURL('https://www.youtube.com/');
-  await expect(image).toBeHidden();
+  await expect(anchored).toBeHidden();
 });
 
 test('invalid files and missing assets fail without saving corrupt JSON or disturbing existing content', async ({

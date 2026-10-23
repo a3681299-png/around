@@ -10,6 +10,10 @@ export interface StudioConnectionState {
 }
 /** A Studio uses commands and snapshots, never a Chrome tab or site DOM. */
 export interface StudioConnection {
+  readonly safety?: {
+    subscribe(listener: (status: import('../host/operation-guard').SafetyStatus) => void): () => void;
+    overlay(value: boolean): Promise<void>;
+  };
   readonly timeline?: TimelinePort;
   targets(): Promise<StudioTarget[]>;
   select(target: number, resume?: EditorCheckpoint): Promise<void>;
