@@ -165,7 +165,11 @@ export function createImageRenderer(
         slot
           ? layout.roots.filter((id) => {
               const anchor = roots.get(id)!.layer.placement.anchor;
-              return anchor.kind === 'surface' && anchor.target === 'video-player';
+              // Fullscreen has one native plane. Keep every authored root in
+              // the same stacking context, irrespective of its logical anchor.
+              return (
+                slot.parent === doc.fullscreenElement || (anchor.kind === 'surface' && anchor.target === 'video-player')
+              );
             })
           : [],
       );
@@ -238,7 +242,7 @@ export function createImageRenderer(
             editorOwned: Boolean(editing && !editing.locked && !layer.locked) && localIds.has(layer.layer.id),
             outset: 0,
             composition:
-              !layer.frame || !safety.source.overlaySlot()
+              !layer.frame || !safety.source.overlaySlot() || (!localIds.has(layer.layer.id) && !regions.length)
                 ? ('unsupported' as const)
                 : localIds.has(layer.layer.id)
                   ? ('native-underlay' as const)

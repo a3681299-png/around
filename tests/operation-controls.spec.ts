@@ -1,6 +1,7 @@
 import { test, expect } from './fixtures';
 import path from 'node:path';
 import { exposeEditorControls } from './helpers/editor-workspace';
+import type { DesignDocument } from '../src/design/types';
 
 test('native drag, text, keyboard and fullscreen controls remain usable with opaque artwork', async ({
   popup,
@@ -121,6 +122,74 @@ test('native drag, text, keyboard and fullscreen controls remain usable with opa
   await expect.poll(async () => (await youtube.locator('#g1-seek').screenshot()).equals(protectedBefore)).toBe(true);
   expect(await run()).toEqual(baseline);
   await youtube.screenshot({ path: info.outputPath('opaque-paint-native-controls.png') });
+});
+
+test('fullscreen keeps authored painting order across viewport and player anchors', async ({ popup, youtube }) => {
+  await youtube.goto('https://www.youtube.com/watch?v=fixture');
+  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
+  const editor = youtube.locator('#web-world-themes-creator');
+  const files = await youtube.evaluate(() =>
+    ['red', 'blue'].map((color) => {
+      const c = document.createElement('canvas');
+      c.width = c.height = 16;
+      const ctx = c.getContext('2d')!;
+      ctx.fillStyle = color;
+      ctx.fillRect(0, 0, 16, 16);
+      return { color, base64: c.toDataURL().split(',')[1]! };
+    }),
+  );
+  await editor.getByLabel('画像素材を追加').setInputFiles(
+    files.map((f) => ({
+      name: f.color + '.png',
+      mimeType: 'image/png',
+      buffer: Buffer.from(f.base64, 'base64'),
+    })),
+  );
+  await editor.locator('.save').click();
+  await expect(editor.locator('.dirty')).toHaveText('保存済み');
+  await editor.getByRole('button', { name: '編集を終了', exact: true }).click();
+  const design = await popup.evaluate(
+    async () =>
+      (await chrome.storage.local.get('webWorldThemes.design.youtube'))[
+        'webWorldThemes.design.youtube'
+      ] as DesignDocument,
+  );
+  design.decorations.forEach((layer, i) => {
+    layer.placement = {
+      anchor: i ? { kind: 'surface', target: 'video-player' } : { kind: 'viewport' },
+      x: 0.5,
+      y: 0.5,
+      widthPx: 80,
+      heightPx: 80,
+      rotationDeg: 0,
+    };
+    layer.zIndex = i;
+  });
+  const store = () =>
+    popup.evaluate(async (design) => chrome.storage.local.set({ 'webWorldThemes.design.youtube': design }), design);
+  await store();
+  await youtube.getByRole('button', { name: 'Fullscreen', exact: true }).click();
+  await expect.poll(() => youtube.evaluate(() => Boolean(document.fullscreenElement))).toBe(true);
+  const pixel = async () => {
+    const { width, height } = youtube.viewportSize()!;
+    const png = await youtube.screenshot({ clip: { x: width / 2 - 1, y: height / 2 - 1, width: 2, height: 2 } });
+    return youtube.evaluate(async (base64) => {
+      const bitmap = await createImageBitmap(new Blob([Uint8Array.from(atob(base64), (c) => c.charCodeAt(0))]));
+      const c = document.createElement('canvas');
+      c.width = c.height = 2;
+      const ctx = c.getContext('2d')!;
+      ctx.drawImage(bitmap, 0, 0);
+      bitmap.close();
+      return [...ctx.getImageData(0, 0, 1, 1).data];
+    }, png.toString('base64'));
+  };
+  await expect.poll(pixel).toEqual([0, 0, 255, 255]);
+  design.decorations.forEach((layer, i) => {
+    layer.zIndex = 1 - i;
+  });
+  await store();
+  await expect.poll(pixel).toEqual([255, 0, 0, 255]);
 });
 
 test('Studio exposes protection overlays, per-layer restrictions and emergency OFF', async ({

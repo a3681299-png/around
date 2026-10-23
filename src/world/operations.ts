@@ -119,7 +119,9 @@ export function guardPaint(snapshot: OperationSnapshot, paints: readonly PaintFo
           ? { ...surface.protectedEnvelope, top: 0, height: snapshot.viewport.height }
           : surface.protectedEnvelope;
       if (!intersects(bounds, envelope)) continue;
-      if (surface.compositionCapability === 'native-above') {
+      // The stacking proof is relative to the screen overlay. A player-local
+      // subtree must still check every native control in that player's plane.
+      if (surface.compositionCapability === 'native-above' && paint.composition === 'overlay') {
         issues.push({
           layerId: paint.id,
           surfaceId: surface.id,

@@ -101,6 +101,14 @@ test('player-local clips permit video paint and report clipped parts without lea
   ]);
   expect(result).toMatchObject([{ action: 'clip', severity: 'enforced' }]);
   expect(guardPaint(snapshot(), [paint({ composition: 'native-underlay' })])).toHaveLength(1);
+  expect(
+    guardPaint(snapshot([surface({ compositionCapability: 'native-above' })]), [
+      paint({
+        composition: 'native-underlay',
+        clip: { left: 0, top: 0, width: 1100, height: 760 },
+      }),
+    ]),
+  ).toMatchObject([{ action: 'stop' }]);
 });
 test('proximity uses original coordinates, the pointer path and hysteresis, including keyboard/drag focus', () => {
   const s = snapshot();

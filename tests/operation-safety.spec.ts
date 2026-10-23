@@ -62,12 +62,17 @@ test('YouTube operation snapshots contain numeric geometry and detect replacemen
     const latest = source.capture();
     const forged = source.validate({ ...latest });
     const frozen = Object.isFrozen(latest.surfaces[0].policy);
+    const player = document.querySelector<HTMLElement>('#movie_player')!;
+    player.style.position = 'fixed';
+    const fixedSlot = source.videoSlot();
+    player.style.removeProperty('position');
     source.destroy();
-    return { first, latest, valid, forged, frozen };
+    return { first, latest, valid, forged, frozen, hasFixedSlot: Boolean(fixedSlot) };
   });
   expect(result.valid).toBe(false);
   expect(result.forged).toBe(false);
   expect(result.frozen).toBe(true);
+  expect(result.hasFixedSlot).toBe(false);
   expect(result.latest.generation.geometry).toBeGreaterThan(result.first.generation.geometry);
   expect(result.first.surfaces.some((s: any) => s.id === 'player.controls.bottom' && s.kind === 'drag')).toBe(true);
   expect(result.first.surfaces.some((s: any) => s.id.startsWith('comment.') && s.kind === 'text-input')).toBe(true);

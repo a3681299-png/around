@@ -27,6 +27,7 @@ export function youtubeOperations(doc: Document) {
           envelope: shape,
           occlusion: 'allow',
           scrolls: scrollsWithPage(root),
+          nativeAbove: Boolean(overlay && nativeAbove(root, overlay.parent, overlay.zIndex)),
         });
         // Controls stay reserved while auto-hidden, including focus/preview spill.
         rows.push({
@@ -108,6 +109,9 @@ export function youtubeOperations(doc: Document) {
       if (!overlaySlot()) return undefined;
       const parent = player();
       if (!parent) return undefined;
+      // A non-fullscreen fixed player uses the single screen composition. A
+      // separate local context could otherwise reorder overlapping anchors.
+      if (doc.fullscreenElement !== parent && !scrollsWithPage(parent)) return undefined;
       const menu = [
         ...parent.querySelectorAll<HTMLElement>('.ytp-error, .ytp-ad-player-overlay, .ytp-popup, .ytp-settings-menu'),
       ].some(
