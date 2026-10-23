@@ -6,7 +6,7 @@ import { exposeEditorControls } from './helpers/editor-workspace';
 async function probeCode() {
   const result = await build({
     stdin: {
-      contents: `export {youtubeOperations} from './src/sites/youtube-operations'; export {createOperationGuardHost} from './src/host/operation-guard'; export {safePaintRegions} from './src/world/operations'; export {evaluatePreparedWorld,initialWorldState} from './src/world/evaluate'; export {evaluateLayout} from './src/world/layout'; export {worldScenario} from './tests/helpers/world-scenario';`,
+      contents: `export {youtubeOperations} from './src/sites/youtube-operations'; export {createCompositionReader,nativeAbove,scrollsWithPage} from './src/host/operation-composition'; export {createOperationGuardHost} from './src/host/operation-guard'; export {safePaintRegions} from './src/world/operations'; export {evaluatePreparedWorld,initialWorldState} from './src/world/evaluate'; export {evaluateLayout} from './src/world/layout'; export {worldScenario} from './tests/helpers/world-scenario';`,
       resolveDir: process.cwd(),
     },
     bundle: true,
@@ -44,6 +44,98 @@ test('default artwork retains its decoder while the compositor clips protected r
     console.log('Safety state:', await youtube.locator('#web-world-themes-decorations').getAttribute('data-ww-safety'));
     throw error;
   }
+});
+
+test('shared ancestry preserves stacking proofs and a new read sees changed native styles', async ({ youtube }) => {
+  await youtube.addScriptTag({ content: await probeCode() });
+  const result = await youtube.evaluate(() => {
+    const api = (window as any).G1Probe;
+    const root = document.querySelector<HTMLElement>('ytd-app')!;
+    const container = document.createElement('div');
+    container.style.cssText = 'position:fixed;z-index:20';
+    container.innerHTML = '<div><div>' + '<button>native</button>'.repeat(300) + '</div></div>';
+    root.append(container);
+    const controls = [...container.querySelectorAll('button')];
+    const original = window.getComputedStyle.bind(window);
+    let calls = 0;
+    window.getComputedStyle = (...args) => {
+      calls++;
+      return original(...args);
+    };
+    const reader = api.createCompositionReader(document);
+    const actual = controls.map((el) => [reader.scrolls(el), reader.above(el, root, 1)]);
+    const sharedCalls = calls;
+    window.getComputedStyle = original;
+    const expected = controls.map((el) => [api.scrollsWithPage(el), api.nativeAbove(el, root, 1)]);
+    container.style.zIndex = '0';
+    const next = api.createCompositionReader(document);
+    const updated = next.above(controls[0], root, 1);
+    container.style.position = 'absolute';
+    const followsPage = api.createCompositionReader(document).scrolls(controls[0]);
+    // An inner high z-index must not escape its outer stacking context.
+    const nested = container.firstElementChild as HTMLElement;
+    nested.style.cssText = 'position:relative;z-index:999';
+    const nestedAbove = api.createCompositionReader(document).above(controls[0], root, 1);
+    container.style.zIndex = '2';
+    nested.style.zIndex = '-999';
+    const outerAbove = api.createCompositionReader(document).above(controls[0], root, 1);
+    container.remove();
+    return {
+      same: JSON.stringify(actual) === JSON.stringify(expected),
+      sharedCalls,
+      updated,
+      followsPage,
+      nestedAbove,
+      outerAbove,
+      first: actual[0],
+    };
+  });
+  expect(result.same).toBe(true);
+  expect(result.sharedCalls).toBeLessThan(320);
+  expect(result.first).toEqual([false, true]);
+  expect(result.updated).toBe(false);
+  expect(result.followsPage).toBe(true);
+  expect(result.nestedAbove).toBe(false);
+  expect(result.outerAbove).toBe(true);
+});
+
+test('native mutations hide artwork immediately and defer geometry until the next sample', async ({ youtube }) => {
+  await youtube.addScriptTag({ content: await probeCode() });
+  const result = await youtube.evaluate(async () => {
+    const api = (window as any).G1Probe;
+    const source = api.youtubeOperations(document),
+      capture = source.capture.bind(source);
+    let reads = 0,
+      holds = 0;
+    source.capture = () => {
+      reads++;
+      return capture();
+    };
+    const host = api.createOperationGuardHost(document, source, (stop: boolean) => {
+      if (stop) holds++;
+    });
+    reads = 0;
+    const button = document.createElement('button');
+    button.style.cssText = 'position:absolute;left:200px;top:300px;width:44px;height:44px';
+    document.querySelector('ytd-app')!.append(button);
+    await Promise.resolve();
+    const before = { reads, holds };
+    host.sample(performance.now());
+    const after = {
+      reads,
+      stopped: host.snapshot().stopped,
+      found: host
+        .snapshot()
+        .surfaces.surfaces.some((s: any) => s.shape.left === 200 && s.shape.top === 300 && s.shape.width === 44),
+    };
+    host.destroy();
+    button.remove();
+    return { before, after };
+  });
+  expect(result.before).toEqual({ reads: 0, holds: 1 });
+  expect(result.after.reads).toBe(1);
+  expect(result.after.found).toBe(true);
+  expect(result.after.stopped).toBeTruthy();
 });
 
 test('YouTube operation snapshots contain numeric geometry and detect replacement before input', async ({

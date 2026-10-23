@@ -210,20 +210,13 @@ export function createOperationGuardHost(
     'visibilitychange',
   ] as const;
   events.forEach((type) => doc.addEventListener(type, activity, { capture: true, passive: true }));
-  const changed = () => {
-    surfaces = source.capture();
-    invalidate();
-  };
+  let boundaryDirty = false;
+  const changed = () => invalidate();
   const unsubscribeSource = source.subscribe(() => {
-    const next = source.capture(),
-      nextBoundary = boundaryKey(next);
-    surfaces = next;
-    if (nextBoundary !== boundary) {
-      boundary = nextBoundary;
-      // Observer callbacks precede paint: hide immediately if an exclusion
-      // boundary may have moved, then wait for stable native geometry.
-      pause('操作面の保護範囲が変わったため、安定するまで描画を停止しています。');
-    } else invalidate();
+    boundaryDirty = true;
+    // Hide before paint without forcing native layout in every observer
+    // microtask. Input validation still performs a fresh synchronous read.
+    invalidate(true);
   });
   doc.addEventListener('scroll', changed, { capture: true, passive: true });
   view.addEventListener('resize', changed);
@@ -261,6 +254,14 @@ export function createOperationGuardHost(
     source,
     sample(time) {
       surfaces = source.capture();
+      if (boundaryDirty) {
+        boundaryDirty = false;
+        const nextBoundary = boundaryKey(surfaces);
+        if (nextBoundary !== boundary) {
+          boundary = nextBoundary;
+          pause('操作面の保護範囲が変わったため、安定するまで描画を停止しています。');
+        }
+      }
       const generation = surfaces.generation.geometry;
       if (generation !== lastGeneration) {
         lastGeneration = generation;

@@ -13,6 +13,9 @@ export interface OperationCandidate {
   scrolls?: boolean;
   unsupported?: boolean;
   nativeAbove?: boolean;
+  /** Optional readings from the adapter's same synchronous discovery pass. */
+  rect?: PlacementFrame;
+  visible?: boolean;
 }
 export interface OperationSource {
   active(value: boolean): void;
@@ -123,7 +126,7 @@ export function createOperationSource(
       return identities.get(element);
     });
     const surfaces = rows.map((row): OperationSurface => {
-      const rect = row.element.getBoundingClientRect();
+      const rect = row.rect ?? row.element.getBoundingClientRect();
       const shape = { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
       // Fullscreen hides the rest of the document even while its layout rects remain.
       const presented = !doc.fullscreenElement || doc.fullscreenElement.contains(row.element);
@@ -146,7 +149,7 @@ export function createOperationSource(
             row.element.isConnected &&
             rect.width > 0 &&
             rect.height > 0 &&
-            doc.defaultView!.getComputedStyle(row.element).visibility !== 'hidden',
+            (row.visible ?? doc.defaultView!.getComputedStyle(row.element).visibility !== 'hidden'),
           disabled: row.element.matches(':disabled,[aria-disabled="true"]'),
           focused: presented && doc.hasFocus() && row.element.contains(doc.activeElement),
           editing: presented && doc.hasFocus() && row.kind === 'text-input' && row.element.contains(doc.activeElement),

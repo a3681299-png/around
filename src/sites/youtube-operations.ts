@@ -1,5 +1,5 @@
 import { createOperationSource, type OperationCandidate } from '../host/operation-source';
-import { fixedContainingBlock, nativeAbove, scrollsWithPage } from '../host/operation-composition';
+import { createCompositionReader, fixedContainingBlock, scrollsWithPage } from '../host/operation-composition';
 
 export function youtubeOperations(doc: Document) {
   const player = () => doc.querySelector<HTMLElement>('.html5-video-player, #movie_player');
@@ -14,6 +14,7 @@ export function youtubeOperations(doc: Document) {
   return createOperationSource(
     doc,
     () => {
+      const composition = createCompositionReader(doc);
       const rows: OperationCandidate[] = [];
       const root = player(),
         overlay = overlaySlot();
@@ -26,22 +27,22 @@ export function youtubeOperations(doc: Document) {
           kind: 'gesture',
           envelope: shape,
           occlusion: 'allow',
-          scrolls: scrollsWithPage(root),
-          nativeAbove: Boolean(overlay && nativeAbove(root, overlay.parent, overlay.zIndex)),
+          scrolls: composition.scrolls(root),
+          nativeAbove: Boolean(overlay && composition.above(root, overlay.parent, overlay.zIndex)),
         });
         // Controls stay reserved while auto-hidden, including focus/preview spill.
         rows.push({
           id: 'player.controls.bottom',
           element: root,
           kind: 'drag',
-          scrolls: scrollsWithPage(root),
+          scrolls: composition.scrolls(root),
           envelope: { ...shape, top: r.top + Math.max(0, r.height - 112), height: Math.min(112, r.height) },
         });
         rows.push({
           id: 'player.controls.top',
           element: root,
           kind: 'click',
-          scrolls: scrollsWithPage(root),
+          scrolls: composition.scrolls(root),
           envelope: { ...shape, height: Math.min(64, r.height) },
         });
       }
@@ -72,6 +73,9 @@ export function youtubeOperations(doc: Document) {
         for (const element of doc.querySelectorAll<HTMLElement>(selector)) {
           if (seen.has(element) || element.closest('[id^="web-world-themes"]')) continue;
           seen.add(element);
+          const r = element.getBoundingClientRect();
+          const rect = { left: r.left, top: r.top, width: r.width, height: r.height };
+          const visible = r.width > 0 && r.height > 0 && composition.style(element).visibility !== 'hidden';
           rows.push({
             id: `${id}.${index++}`,
             kind: element.matches('input[type="range"],[role="slider"]') ? 'drag' : kind,
@@ -86,8 +90,10 @@ export function youtubeOperations(doc: Document) {
                   },
                 }
               : {}),
-            scrolls: scrollsWithPage(element),
-            nativeAbove: Boolean(overlay && nativeAbove(element, overlay.parent, overlay.zIndex)),
+            rect,
+            visible,
+            scrolls: visible ? composition.scrolls(element) : true,
+            nativeAbove: Boolean(visible && overlay && composition.above(element, overlay.parent, overlay.zIndex)),
             unsupported: kind === 'native-menu' && element.matches('select') && element === doc.activeElement,
           });
         }

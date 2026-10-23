@@ -159,8 +159,15 @@ export function createImageRenderer(
       const regions = safePaintRegions(safety.source.capture(), Boolean(editing));
       const path = regions.map((r) => `M${r.left} ${r.top}h${r.width}v${r.height}h${-r.width}Z`).join('');
       host!.style.setProperty('--ww-decoration-clip', path ? `path('${path}')` : 'inset(100%)');
-      const slot = safety.source.videoSlot();
       const roots = new Map([...layout.groups, ...layout.layers].map((entry) => [entry.layer.id, entry]));
+      const needsVideoSlot =
+        Boolean(doc.fullscreenElement) ||
+        layout.roots.some((id) => {
+          const anchor = roots.get(id)!.layer.placement.anchor;
+          return anchor.kind === 'surface' && anchor.target === 'video-player';
+        });
+      const slot = needsVideoSlot ? safety.source.videoSlot() : undefined;
+      const overlaySupported = Boolean(safety.source.overlaySlot());
       const localRoots = new Set(
         slot
           ? layout.roots.filter((id) => {
@@ -242,7 +249,7 @@ export function createImageRenderer(
             editorOwned: Boolean(editing && !editing.locked && !layer.locked) && localIds.has(layer.layer.id),
             outset: 0,
             composition:
-              !layer.frame || !safety.source.overlaySlot() || (!localIds.has(layer.layer.id) && !regions.length)
+              !layer.frame || !overlaySupported || (!localIds.has(layer.layer.id) && !regions.length)
                 ? ('unsupported' as const)
                 : localIds.has(layer.layer.id)
                   ? ('native-underlay' as const)
