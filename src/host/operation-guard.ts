@@ -286,7 +286,7 @@ export function createOperationGuardHost(
           timer = undefined;
           if (active) invalidate();
         }, 360);
-      if (proximity.safe && proximity.clearSince !== null && timer === undefined)
+      if (proximity.safe && proximity.clearSince !== null && timer === undefined && paints.some((p) => p.dynamic))
         timer = view.setTimeout(() => {
           timer = undefined;
           if (active) invalidate();

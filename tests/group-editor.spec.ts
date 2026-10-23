@@ -602,6 +602,13 @@ test('16 groups / 32 media share effect sources and become idle or fully detache
   await runtime.session.send('Runtime.evaluate', {
     contextId: runtime.id,
     expression: `
+    // A minute rollover updates the independent window-chrome clock. Freeze
+    // wall time only; timers, performance.now and real frame scheduling stay live.
+    const NativeDate = Date, fixedNow = NativeDate.now();
+    window.Date = class extends NativeDate {
+      constructor(...args) { super(...(args.length ? args : [fixedNow])); }
+      static now() { return fixedNow; }
+    };
     const registrations = new Map(); globalThis.__groupRafs = 0;
     const add = EventTarget.prototype.addEventListener, remove = EventTarget.prototype.removeEventListener;
     const tracked = (target, type) => target === document && type === 'pointermove' || target instanceof HTMLVideoElement && ['play','playing','pause','ended','emptied'].includes(type);
@@ -662,6 +669,11 @@ test('16 groups / 32 media share effect sources and become idle or fully detache
   await expect(youtube.locator(`${compositions} .group-content[data-mask-intensity="1"]`)).toHaveCount(14);
   await play(youtube, 'Pause');
   await expect(youtube.locator(`${compositions} .group-content[data-mask-intensity="0"]`)).toHaveCount(16);
+  // G1 may still be restoring paint after a native geometry change. Measure
+  // the stationary scene after that explicit Host transition has completed.
+  await expect
+    .poll(() => youtube.locator(overlay).evaluate((node: HTMLElement) => JSON.parse(node.dataset.wwSafety!).stopped))
+    .toBe('');
   await youtube.waitForTimeout(100);
   await runtime.session.send('Performance.enable');
   const metrics = await runtime.session.send('Performance.getMetrics'),

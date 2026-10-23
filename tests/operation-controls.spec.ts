@@ -62,8 +62,30 @@ test('native drag, text, keyboard and fullscreen controls remain usable with opa
     await expect.poll(() => youtube.locator('#movie_player').boundingBox()).toEqual(playerBox);
     return values;
   };
+  // Compare against an actual decoded frame, rather than racing the fixture's
+  // SVG poster -> canvas-stream frame transition beneath the transparent range.
+  await youtube.getByRole('button', { name: 'Play', exact: true }).click();
+  await youtube
+    .locator('#movie_player video')
+    .evaluate((v: HTMLVideoElement) => new Promise<void>((resolve) => v.requestVideoFrameCallback(() => resolve())));
+  await youtube.getByRole('button', { name: 'Pause', exact: true }).click();
+  await expect(youtube.locator('#movie_player video')).toHaveJSProperty('paused', true);
   const baseline = await run();
   const protectedBefore = await youtube.locator('#g1-seek').screenshot();
+  await info.attach('native-seek-before', { body: protectedBefore, contentType: 'image/png' });
+  const preserved = async (name: string) => {
+    let picture = protectedBefore;
+    try {
+      await expect
+        .poll(async () => {
+          picture = await youtube.locator('#g1-seek').screenshot();
+          return picture.equals(protectedBefore);
+        })
+        .toBe(true);
+    } finally {
+      await info.attach(name, { body: picture, contentType: 'image/png' });
+    }
+  };
   await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
   const editor = youtube.locator('#web-world-themes-creator');
   await exposeEditorControls(editor);
@@ -101,7 +123,7 @@ test('native drag, text, keyboard and fullscreen controls remain usable with opa
   expect(await youtube.locator('#web-world-themes-decorations').evaluate((host) => getComputedStyle(host).zIndex)).toBe(
     '1',
   );
-  await expect.poll(async () => (await youtube.locator('#g1-seek').screenshot()).equals(protectedBefore)).toBe(true);
+  await preserved('native-seek-screen');
   expect(await run()).toEqual(baseline);
   // Repeat against the other production composition path: moving the original
   // opaque media into the player must never expose its reserved controls.
@@ -119,7 +141,7 @@ test('native drag, text, keyboard and fullscreen controls remain usable with opa
   const playerPaint = youtube.locator('#web-world-themes-video-decorations');
   await expect(playerPaint.locator('[data-image-id]')).toBeVisible();
   await expect(playerPaint).toHaveCSS('clip-path', 'inset(64px 0px 112px)');
-  await expect.poll(async () => (await youtube.locator('#g1-seek').screenshot()).equals(protectedBefore)).toBe(true);
+  await preserved('native-seek-player');
   expect(await run()).toEqual(baseline);
   await youtube.screenshot({ path: info.outputPath('opaque-paint-native-controls.png') });
 });
