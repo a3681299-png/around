@@ -51,7 +51,7 @@ test('YouTube operation snapshots contain numeric geometry and detect replacemen
 }) => {
   await youtube.goto('https://www.youtube.com/watch?v=fixture');
   await youtube.addScriptTag({ content: await probeCode() });
-  const result = await youtube.evaluate(() => {
+  const result = await youtube.evaluate(async () => {
     const api = (window as any).G1Probe,
       source = api.youtubeOperations(document),
       first = source.capture();
@@ -66,13 +66,21 @@ test('YouTube operation snapshots contain numeric geometry and detect replacemen
     player.style.position = 'fixed';
     const fixedSlot = source.videoSlot();
     player.style.removeProperty('position');
+    await player.requestFullscreen();
+    source.validate(latest, new KeyboardEvent('keydown')); // Force a fresh numeric snapshot.
+    const fullscreen = source.capture();
+    const outsideVisible = fullscreen.surfaces.some((s: any) => s.id.startsWith('comment.') && s.availability.visible);
+    const fullscreenHit = source.validate(fullscreen, new PointerEvent('pointerdown', { clientX: 550, clientY: 380 }));
+    await document.exitFullscreen();
     source.destroy();
-    return { first, latest, valid, forged, frozen, hasFixedSlot: Boolean(fixedSlot) };
+    return { first, latest, valid, forged, frozen, hasFixedSlot: Boolean(fixedSlot), outsideVisible, fullscreenHit };
   });
   expect(result.valid).toBe(false);
   expect(result.forged).toBe(false);
   expect(result.frozen).toBe(true);
   expect(result.hasFixedSlot).toBe(false);
+  expect(result.outsideVisible).toBe(false);
+  expect(result.fullscreenHit).toBe(true);
   expect(result.latest.generation.geometry).toBeGreaterThan(result.first.generation.geometry);
   expect(result.first.surfaces.some((s: any) => s.id === 'player.controls.bottom' && s.kind === 'drag')).toBe(true);
   expect(result.first.surfaces.some((s: any) => s.id.startsWith('comment.') && s.kind === 'text-input')).toBe(true);

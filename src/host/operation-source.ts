@@ -125,6 +125,8 @@ export function createOperationSource(
     const surfaces = rows.map((row): OperationSurface => {
       const rect = row.element.getBoundingClientRect();
       const shape = { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
+      // Fullscreen hides the rest of the document even while its layout rects remain.
+      const presented = !doc.fullscreenElement || doc.fullscreenElement.contains(row.element);
       return {
         id: row.id,
         owner: 'native',
@@ -140,15 +142,16 @@ export function createOperationSource(
         availability: {
           present: row.element.isConnected,
           visible:
+            presented &&
             row.element.isConnected &&
             rect.width > 0 &&
             rect.height > 0 &&
             doc.defaultView!.getComputedStyle(row.element).visibility !== 'hidden',
           disabled: row.element.matches(':disabled,[aria-disabled="true"]'),
-          focused: doc.hasFocus() && row.element.contains(doc.activeElement),
-          editing: doc.hasFocus() && row.kind === 'text-input' && row.element.contains(doc.activeElement),
-          dragging: Boolean(dragging && row.element.contains(dragging)),
-          captured: Boolean(captured && row.element.contains(captured)),
+          focused: presented && doc.hasFocus() && row.element.contains(doc.activeElement),
+          editing: presented && doc.hasFocus() && row.kind === 'text-input' && row.element.contains(doc.activeElement),
+          dragging: presented && Boolean(dragging && row.element.contains(dragging)),
+          captured: presented && Boolean(captured && row.element.contains(captured)),
         },
         policy: { transform: 'fixed-plane', occlusion: row.occlusion ?? 'forbid', input: 'native-only' },
         compositionCapability: row.unsupported
@@ -252,6 +255,7 @@ export function createOperationSource(
       const hit = doc.elementFromPoint(event.clientX, event.clientY);
       return rows
         .filter((row) => {
+          if (doc.fullscreenElement && !doc.fullscreenElement.contains(row.element)) return false;
           const r = row.element.getBoundingClientRect();
           return (
             event.clientX >= r.left && event.clientX <= r.right && event.clientY >= r.top && event.clientY <= r.bottom
