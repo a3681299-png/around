@@ -12,6 +12,8 @@ export function installEditorEntry() {
       height: 900,
     });
   const open = (tab?: chrome.tabs.Tab) => {
+    // No Studio window for an unrelated tab; there is no supported edit target.
+    if (!tab?.url || !/^https:\/\/www\.youtube\.com\/(?!embed\/|live_chat)/.test(tab.url)) return;
     const id = tab?.id;
     const operation =
       id === undefined
