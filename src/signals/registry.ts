@@ -432,6 +432,22 @@ export const SIGNAL_REGISTRY = createSignalRegistry({
       },
     ],
   },
+  'user.idle.duration': {
+    category: 'value',
+    valueType: 'number',
+    spaces: ['page'],
+    axes: ['y'],
+    subscriptions: [],
+    hostSample: true,
+    evaluate: (context) => {
+      const value = context.signals.samples?.['user.idle.duration'];
+      return typeof value === 'number' ? value : undefined;
+    },
+    needsFrame: () => true,
+    presets: [
+      { id: 'idle', label: '操作していない時間', unit: '秒', order: 10, space: 'page', axis: 'y', inputRange: [0, 30] },
+    ],
+  },
   'page.scroll.progress': {
     category: 'value',
     valueType: 'number',

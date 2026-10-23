@@ -21,7 +21,7 @@ export interface WorldInput extends WorldGeometry {
   deltaMs: number;
   signals: SignalSnapshot;
   events: readonly WorldEvent[];
-  environment: { hidden: boolean; reducedMotion: boolean; holdTransforms?: boolean };
+  environment: { hidden: boolean; reducedMotion: boolean; holdTransforms?: boolean; safeInteraction?: boolean };
   /** Reserved input, not a request to access a global random generator. */
   seed?: number;
 }

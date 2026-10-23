@@ -18,6 +18,7 @@ export interface ModelState {
   phase: 'manual' | 'idle' | 'walk' | 'run';
 }
 export interface ModelEvaluation extends ModelState {
+  resetDynamics?: boolean;
   id: string;
   blend: number;
   speedPx: number;
@@ -94,7 +95,8 @@ export function evaluateModels(
       entry.renderable &&
       (!visible || visible.has(layer.id)) &&
       !input.environment.hidden &&
-      !input.environment.reducedMotion;
+      !input.environment.reducedMotion &&
+      !input.environment.safeInteraction;
     const dt = running && before && !before.suspended ? input.deltaMs : 0,
       delta = model.playing ? dt * model.speed : 0;
     const body = motion?.bodies[layer.id] ?? (entry.parentId ? motion?.bodies[entry.parentId] : undefined);
@@ -115,21 +117,22 @@ export function evaluateModels(
           : phase === 'run'
             ? (l.run ?? l.walk ?? model.clip)
             : (l.walk ?? model.clip);
-    let next: ModelState = before
-      ? { ...before }
-      : {
-          clip,
-          timeMs: 0,
-          previousClip: null,
-          previousTimeMs: 0,
-          fadeElapsedMs: model.crossFadeMs,
-          fadeDurationMs: model.crossFadeMs,
-          yawDeg: 0,
-          lookYaw: 0,
-          lookPitch: 0,
-          suspended: !running,
-          phase: 'manual',
-        };
+    let next: ModelState =
+      before && !input.environment.reducedMotion && !input.environment.safeInteraction
+        ? { ...before }
+        : {
+            clip,
+            timeMs: 0,
+            previousClip: null,
+            previousTimeMs: 0,
+            fadeElapsedMs: model.crossFadeMs,
+            fadeDurationMs: model.crossFadeMs,
+            yawDeg: 0,
+            lookYaw: 0,
+            lookPitch: 0,
+            suspended: !running,
+            phase: 'manual',
+          };
     if (clip !== next.clip)
       next = {
         ...next,
@@ -192,7 +195,13 @@ export function evaluateModels(
     next.phase = phase;
     next.suspended = !running;
     state[layer.id] = next;
-    evaluations.push({ ...next, id: layer.id, blend, speedPx });
+    evaluations.push({
+      ...next,
+      id: layer.id,
+      blend,
+      speedPx,
+      ...(input.environment.reducedMotion || input.environment.safeInteraction ? { resetDynamics: true } : {}),
+    });
     const duration = clip === null ? 0 : (layer.source.clips[clip]?.duration ?? 0) * 1000;
     needsFrame ||=
       running &&

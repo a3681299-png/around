@@ -28,6 +28,7 @@ const unitSpecs = [
   'model-motion',
   'model-rig',
   'motion-data',
+  'operation-data',
   'palette',
   'signal-motion',
   'signal-evaluation-benchmark',

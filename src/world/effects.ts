@@ -75,7 +75,11 @@ export function wantsPointerFrame(
 export function evaluateEffects(
   targets: readonly WorldEffectTarget[],
   previous: EffectState,
-  input: { timeMs: number; signals: SignalSnapshot; environment: { hidden: boolean; reducedMotion: boolean } },
+  input: {
+    timeMs: number;
+    signals: SignalSnapshot;
+    environment: { hidden: boolean; reducedMotion: boolean; safeInteraction?: boolean };
+  },
 ) {
   const state = emptyEffectState(),
     ids = new Set(targets.map((target) => target.layer.id));
@@ -99,7 +103,12 @@ export function evaluateEffects(
         },
       };
     else {
-      const value = evaluateMask(mask, layer.placement, frame, input.signals);
+      const value = evaluateMask(
+        mask,
+        layer.placement,
+        frame,
+        input.environment.reducedMotion ? { ...input.signals, pointer: undefined } : input.signals,
+      );
       const fade = retargetFade(
         own(previous.fades, layer.id),
         value.gate,

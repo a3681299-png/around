@@ -69,7 +69,7 @@ export function parseWorldInput(value: unknown, options?: { registry: SignalRegi
   const data = record(value, ['timeMs', 'deltaMs', 'viewport', 'anchors', 'signals', 'events', 'environment', 'seed']);
   const viewport = record(data['viewport'], ['width', 'height']),
     signals = record(data['signals'], ['pointer', 'pointerTimeMs', 'playing', 'scroll', 'samples']);
-  const environment = record(data['environment'], ['hidden', 'reducedMotion', 'holdTransforms']);
+  const environment = record(data['environment'], ['hidden', 'reducedMotion', 'holdTransforms', 'safeInteraction']);
   const anchors = data['anchors'];
   if (
     !anchors ||
@@ -123,6 +123,9 @@ export function parseWorldInput(value: unknown, options?: { registry: SignalRegi
     environment: {
       hidden: boolean(environment['hidden']),
       reducedMotion: boolean(environment['reducedMotion']),
+      ...(environment['safeInteraction'] === undefined
+        ? {}
+        : { safeInteraction: boolean(environment['safeInteraction']) }),
       ...(environment['holdTransforms'] === undefined
         ? {}
         : { holdTransforms: boolean(environment['holdTransforms']) }),

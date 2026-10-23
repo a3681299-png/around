@@ -7,6 +7,63 @@ import { ASSET_LIMITS } from '../src/assets/validation';
 import { vrmFixture } from './helpers/vrm-fixture';
 import { modelFixture } from './helpers/model-fixture';
 import { evaluateWorld, initialWorldState } from '../src/world/evaluate';
+import { Group } from 'three';
+import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
+import type { VRM } from '@pixiv/three-vrm';
+import { createVrmPlayer } from '../src/renderers/three/vrm-player';
+import type { ModelEvaluation } from '../src/world/models';
+
+test('Host motion restrictions reset VRM spring state and stop its clock', () => {
+  const root = new Group(),
+    head = new Group();
+  root.add(head);
+  let resets = 0;
+  const deltas: number[] = [];
+  const vrm = {
+    scene: root,
+    humanoid: {
+      autoUpdateHumanBones: false,
+      getRawBoneNode: (name: string) => (name === 'head' ? head : undefined),
+      update() {},
+    },
+    springBoneManager: {
+      reset() {
+        resets++;
+      },
+      update(delta: number) {
+        deltas.push(delta);
+      },
+    },
+  } as unknown as VRM;
+  const gltf = { scene: root, animations: [], parser: { associations: new Map() } } as unknown as GLTF;
+  const model = defaultModelSettings(inspectAsset(vrmFixture()).model!);
+  model.playing = true;
+  const frame: ModelEvaluation = {
+    id: 'avatar',
+    clip: null,
+    timeMs: 0,
+    previousClip: null,
+    previousTimeMs: 0,
+    fadeElapsedMs: 0,
+    fadeDurationMs: 0,
+    yawDeg: 0,
+    lookYaw: 0,
+    lookPitch: 0,
+    suspended: false,
+    phase: 'manual',
+    blend: 1,
+    speedPx: 0,
+  };
+  const player = createVrmPlayer(gltf, vrm, false);
+  player.paint(frame, model, 0);
+  player.paint(frame, model, 16);
+  expect(resets).toBe(1);
+  expect(deltas.at(-1)).toBe(0.016);
+  player.paint({ ...frame, suspended: true, resetDynamics: true }, model, 32);
+  expect(resets).toBe(2);
+  expect(deltas.at(-1)).toBe(0);
+  player.destroy();
+});
 
 for (const mime of ['model/vrml', '', 'application/octet-stream']) {
   test(`VRM accepts the OS MIME ${JSON.stringify(mime)} after structure validation`, () => {

@@ -30,7 +30,12 @@ export function createVrmPlayer(gltf: GLTF, vrm: VRM, inPlace: boolean) {
       const options = model.vrm!,
         active = !frame.suspended && model.playing;
       const elapsed = previousTime === undefined ? 0 : timeMs - previousTime;
-      const reset = previousTime === undefined || elapsed < 0 || elapsed > 250 || springOn !== options.springBone;
+      const reset =
+        previousTime === undefined ||
+        elapsed < 0 ||
+        elapsed > 250 ||
+        springOn !== options.springBone ||
+        frame.resetDynamics === true;
       previousTime = timeMs;
       springOn = options.springBone;
       const dt = active && !reset ? Math.min(100, Math.max(0, elapsed)) / 1000 : 0;
