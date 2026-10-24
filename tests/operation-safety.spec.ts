@@ -296,6 +296,195 @@ test('manual emergency OFF releases drawing and preserves an unsaved editor and 
   await expect(editor.locator('.dirty')).toHaveText('未保存の変更');
 });
 
+test('candidate discovery assigns each element to its first matching selector in document order', async ({
+  youtube,
+}) => {
+  await youtube.addScriptTag({ content: await probeCode() });
+  const result = await youtube.evaluate(() => {
+    const api = (window as any).G1Probe;
+    const app = document.querySelector('ytd-app')!;
+    // Elements that match several selectors, hidden ones that still consume an index,
+    // and a descendant selector whose ancestor sits outside the inserted subtree.
+    const host = document.createElement('div');
+    host.innerHTML = `
+      <ytd-masthead><a href="/x" role="button" style="display:block;width:31px;height:11px">both</a></ytd-masthead>
+      <div role="menu" style="width:32px;height:12px"><button style="width:33px;height:13px">in menu</button></div>
+      <div role="dialog" style="width:34px;height:14px"><input type="range" style="width:35px;height:15px"></div>
+      <button hidden style="width:36px;height:16px">hidden</button>
+      <button style="visibility:hidden;width:37px;height:17px">invisible</button>
+      <ytd-comments><div contenteditable="true" style="width:38px;height:18px">c</div></ytd-comments>
+      <div contenteditable="true" style="width:39px;height:19px">plain</div>
+      <div role="slider" style="width:40px;height:20px"></div>
+      <select style="width:41px;height:21px"><option>a</option></select>`;
+    app.append(host);
+    // Independent copy of the original one-query-per-selector algorithm.
+    const selectors: [string, string, string][] = [
+      ['player.seek', 'drag', '.ytp-progress-bar-container, .ytp-progress-bar'],
+      ['player.volume', 'drag', '.ytp-volume-panel, .ytp-volume-slider'],
+      ['search', 'text-input', 'ytd-searchbox, yt-searchbox'],
+      ['comment', 'text-input', 'ytd-comment-simplebox-renderer, ytd-comments [contenteditable="true"]'],
+      [
+        'navigation',
+        'click',
+        'ytd-guide-entry-renderer a[href], ytd-mini-guide-entry-renderer a[href], ytd-masthead a[href]',
+      ],
+      [
+        'menu',
+        'native-menu',
+        '.ytp-popup, .ytp-settings-menu, ytd-menu-popup-renderer, tp-yt-paper-dialog, [role="menu"], [role="dialog"], [role="listbox"], select',
+      ],
+      [
+        'control',
+        'click',
+        'button, a[role="button"], [role="button"], input, textarea, [contenteditable="true"], [role="slider"]',
+      ],
+    ];
+    const seen = new Set<Element>();
+    const expected: string[] = [];
+    for (const [id, kind, selector] of selectors) {
+      let index = 0;
+      for (const element of document.querySelectorAll<HTMLElement>(selector)) {
+        if (seen.has(element) || element.closest('[id^="web-world-themes"]')) continue;
+        seen.add(element);
+        const r = element.getBoundingClientRect();
+        const finalKind = element.matches('input[type="range"],[role="slider"]') ? 'drag' : kind;
+        expected.push(`${id}.${index++}|${finalKind}|${r.left},${r.top},${r.width},${r.height}`);
+      }
+    }
+    const source = api.youtubeOperations(document);
+    const actual = source
+      .capture()
+      .surfaces.filter(
+        (s: any) => !s.id.startsWith('player.controls') && s.id !== 'player.video' && s.id !== 'native.focus',
+      )
+      .map((s: any) => `${s.id}|${s.kind}|${s.shape.left},${s.shape.top},${s.shape.width},${s.shape.height}`);
+    source.destroy();
+    host.remove();
+    return { expected, actual };
+  });
+  expect(result.expected.length).toBeGreaterThan(9);
+  expect(result.actual).toEqual(result.expected);
+});
+
+test('incremental discovery matches a fresh full scan after inserts, removals, moves and matching attribute changes', async ({
+  youtube,
+}) => {
+  await youtube.addScriptTag({ content: await probeCode() });
+  const result = await youtube.evaluate(async () => {
+    const api = (window as any).G1Probe;
+    const app = document.querySelector('ytd-app')!;
+    const describe = (source: any) =>
+      source
+        .capture()
+        .surfaces.map(
+          (s: any) =>
+            `${s.id}|${s.kind}|${s.shape.left},${s.shape.top},${s.shape.width},${s.shape.height}|${s.availability.visible}`,
+        );
+    const live = api.youtubeOperations(document);
+    live.capture();
+    const host = document.createElement('div');
+    app.append(host);
+    const box = (width: number) => `style="display:block;width:${width}px;height:10px"`;
+    const steps: Record<string, { live: string[]; fresh: string[]; width: number }> = {};
+    const step = async (name: string, width: number, change: () => void) => {
+      change();
+      await new Promise((resolve) => setTimeout(resolve, 0)); // MutationObserver delivery
+      const fresh = api.youtubeOperations(document);
+      steps[name] = { live: describe(live), fresh: describe(fresh), width };
+      fresh.destroy();
+    };
+    await step('insert subtree', 61, () => {
+      host.innerHTML = `<ytd-masthead><a href="/x" ${box(61)}>nav</a></ytd-masthead>
+        <div role="menu" ${box(62)}><button ${box(63)}>in menu</button></div><ytd-comments id="c"></ytd-comments>`;
+    });
+    await step('remove candidate', 0, () => host.querySelector('button')!.remove());
+    await step('role added', 64, () => {
+      const plain = document.createElement('div');
+      plain.id = 'plain';
+      plain.setAttribute('style', `display:block;width:64px;height:10px`);
+      host.prepend(plain);
+      plain.setAttribute('role', 'button');
+    });
+    await step('role removed', 0, () => host.querySelector('#plain')!.removeAttribute('role'));
+    await step('class added', 65, () => {
+      const popup = document.createElement('div');
+      popup.id = 'popup';
+      popup.setAttribute('style', `display:block;width:65px;height:10px`);
+      host.append(popup);
+      popup.className = 'ytp-popup';
+    });
+    await step('class removed', 0, () => host.querySelector('#popup')!.removeAttribute('class'));
+    await step('href added', 66, () => {
+      const link = document.createElement('a');
+      link.id = 'link';
+      link.setAttribute('style', `display:block;width:66px;height:10px`);
+      host.querySelector('ytd-masthead')!.append(link);
+      link.setAttribute('href', '/y');
+    });
+    await step('contenteditable under existing ancestor', 67, () => {
+      const field = document.createElement('div');
+      field.setAttribute('style', `display:block;width:67px;height:10px`);
+      field.setAttribute('contenteditable', 'true');
+      host.querySelector('#c')!.append(field);
+    });
+    await step('move reorders ids', 0, () => host.prepend(host.querySelector('#link')!.parentElement!));
+    live.destroy();
+    host.remove();
+    return steps;
+  });
+  for (const [name, step] of Object.entries(result)) {
+    expect(step.live, name).toEqual(step.fresh);
+    if (step.width)
+      expect(
+        step.live.some((row) => row.includes(`,${step.width},`)),
+        name,
+      ).toBe(true);
+  }
+});
+
+test('small native changes skip the whole-document query while input checks and the periodic sweep still scan it', async ({
+  youtube,
+}) => {
+  await youtube.addScriptTag({ content: await probeCode() });
+  const result = await youtube.evaluate(async () => {
+    const api = (window as any).G1Probe;
+    const original = document.querySelectorAll;
+    let documentQueries = 0;
+    document.querySelectorAll = function (this: Document, ...args: [string]) {
+      documentQueries++;
+      return original.apply(this, args);
+    } as typeof original;
+    const live = api.youtubeOperations(document);
+    const found = (width: number) =>
+      live.capture().surfaces.some((s: any) => s.shape.width === width && s.availability.visible);
+    const first = (live.capture(), documentQueries);
+    documentQueries = 0;
+    const button = document.createElement('button');
+    button.setAttribute('style', 'position:absolute;left:200px;top:300px;width:44px;height:44px');
+    document.querySelector('ytd-app')!.append(button);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const incrementalFound = found(44);
+    const incrementalQueries = documentQueries;
+    documentQueries = 0;
+    live.validate(live.capture(), new KeyboardEvent('keydown'));
+    const inputQueries = documentQueries;
+    documentQueries = 0;
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+    window.dispatchEvent(new Event('resize'));
+    live.capture();
+    const sweepQueries = documentQueries;
+    document.querySelectorAll = original;
+    button.remove();
+    live.destroy();
+    return { first, incrementalFound, incrementalQueries, inputQueries, sweepQueries };
+  });
+  expect(result.first).toBeGreaterThan(0);
+  expect(result.incrementalFound).toBe(true);
+  expect(result.incrementalQueries).toBe(0);
+  expect(result.inputQueries).toBeGreaterThan(0);
+  expect(result.sweepQueries).toBeGreaterThan(0);
+});
+
 test('opaque click-through paint is compositor-clipped away from native controls', async ({ youtube }) => {
   await youtube.addScriptTag({ content: await probeCode() });
   // Exercise exactly the production numerical partition, independent of assets.

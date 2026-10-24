@@ -386,6 +386,19 @@ try {
         v.muted = true;
         await v.play();
       });
+      // A pre-roll ad is not the measured content: wait for it to end before the window opens.
+      await page.waitForFunction(
+        () => !document.querySelector('#movie_player')?.classList.contains('ad-showing'),
+        {},
+        {
+          timeout: 60000,
+        },
+      );
+      await page.evaluate(async () => {
+        const v = document.querySelector('video.html5-main-video');
+        v.muted = true;
+        if (v.paused) await v.play();
+      });
       await page.waitForTimeout(5000);
       await page.evaluate(() => {
         const v = document.querySelector('video.html5-main-video');
@@ -487,10 +500,25 @@ try {
           categories: 'devtools.timeline,disabled-by-default-devtools.timeline.frame',
           transferMode: 'ReportEvents',
         });
+        // Diagnostic only: a V8 CPU profile of the same window. It adds overhead, so
+        // never use it for the pass/fail p95 numbers.
+        const profiling = process.env.G11_CPUPROFILE === '1';
+        if (profiling) {
+          await session.send('Profiler.enable');
+          await session.send('Profiler.setSamplingInterval', { interval: 100 });
+          await session.send('Profiler.start');
+        }
         await evaluate('__g11Probe.begin(true)');
         if (startup) await evaluate(`globalThis.__g11DisableGuard=${!guarded};\n${content}`);
         await page.waitForTimeout(6000);
         const data = await evaluate('__g11Probe.end()');
+        if (profiling) {
+          const { profile } = await session.send('Profiler.stop');
+          await writeFile(
+            path.join(work, `pair-${pair}-${guarded ? 'guarded' : 'unguarded'}-cpuprofile.json`),
+            JSON.stringify(profile),
+          );
+        }
         const traceDone = new Promise((resolve) => session.once('Tracing.tracingComplete', resolve));
         await session.send('Tracing.end');
         await traceDone;

@@ -1,6 +1,13 @@
 import type { OperationSnapshot, OperationSurface } from '../world/operations';
 import type { PlacementFrame } from '../world/geometry';
 
+/** Attributes a site selector may test; a change can add or drop a candidate by itself. */
+const MATCHING_ATTRIBUTES = new Set(['class', 'role', 'href', 'contenteditable']);
+/** A mutation burst this large is cheaper to answer with a whole-document scan. */
+const MAX_INCREMENTAL_ROOTS = 64;
+/** Bounds how long a change the observer could not describe can go unnoticed. */
+const FULL_SCAN_INTERVAL_MS = 1000;
+
 let nextDocumentId = 0;
 const documentIds = new WeakMap<Document, number>();
 
@@ -17,6 +24,15 @@ export interface OperationCandidate {
   rect?: PlacementFrame;
   visible?: boolean;
 }
+/** What changed since the adapter's previous discovery. */
+export interface DiscoveryScan {
+  /** Enumerate the whole document: first read, input check, overflow or periodic sweep. */
+  full: boolean;
+  /** Subtree roots inserted into the document. */
+  added: readonly Element[];
+  /** Elements whose class/role/href/contenteditable changed, so their own match may differ. */
+  touched: readonly Element[];
+}
 export interface OperationSource {
   active(value: boolean): void;
   subscribe(listener: () => void): () => void;
@@ -29,7 +45,7 @@ export interface OperationSource {
 /** DOM identities stay here; the site adapter alone supplies discovery/selectors. */
 export function createOperationSource(
   doc: Document,
-  discover: () => readonly OperationCandidate[],
+  discover: (scan: DiscoveryScan) => readonly OperationCandidate[],
   videoSlot: OperationSource['videoSlot'],
   overlaySlot: OperationSource['overlaySlot'] = () => ({ parent: doc.body ?? doc.documentElement, zIndex: 2147482000 }),
 ): OperationSource {
@@ -46,6 +62,30 @@ export function createOperationSource(
   let dirty = true,
     cached: OperationSnapshot | undefined;
   const listeners = new Set<() => void>();
+  let fullScan = true,
+    lastFullScan = -Infinity;
+  const added = new Set<Element>(),
+    touched = new Set<Element>();
+  const collect = (records: readonly MutationRecord[]) => {
+    for (const r of records) {
+      if (fullScan) return;
+      if (!(r.target instanceof Element)) {
+        fullScan = true;
+        return;
+      }
+      if (r.target.closest('[id^="web-world-themes"]')) continue;
+      if (r.type === 'attributes') {
+        if (MATCHING_ATTRIBUTES.has(r.attributeName ?? '')) touched.add(r.target);
+      } else
+        for (const node of r.addedNodes)
+          if (node instanceof Element && !node.id.startsWith('web-world-themes')) added.add(node);
+      if (added.size + touched.size > MAX_INCREMENTAL_ROOTS) {
+        fullScan = true;
+        added.clear();
+        touched.clear();
+      }
+    }
+  };
   const mark = () => {
     if (!dirty) {
       dirty = true;
@@ -53,6 +93,7 @@ export function createOperationSource(
     }
   };
   const observer = new MutationObserver((records) => {
+    collect(records);
     if (
       records.some(
         (r) =>
@@ -82,6 +123,7 @@ export function createOperationSource(
       'role',
       'tabindex',
       'contenteditable',
+      'href',
     ],
   });
   const resize = new ResizeObserver(mark);
@@ -113,7 +155,17 @@ export function createOperationSource(
   function capture(): OperationSnapshot {
     if (!dirty && cached && rows.every((r) => r.element.isConnected)) return cached;
     dirty = false;
-    rows = discover();
+    const now = doc.defaultView!.performance.now();
+    const scan: DiscoveryScan = {
+      full: fullScan || now - lastFullScan >= FULL_SCAN_INTERVAL_MS,
+      added: [...added],
+      touched: [...touched],
+    };
+    if (scan.full) lastFullScan = now;
+    fullScan = false;
+    added.clear();
+    touched.clear();
+    rows = discover(scan);
     const wanted = new Set(rows.map((r) => r.element));
     if (wanted.size !== observed.size || [...wanted].some((e) => !observed.has(e))) {
       resize.disconnect();
@@ -227,6 +279,7 @@ export function createOperationSource(
             'role',
             'tabindex',
             'contenteditable',
+            'href',
           ],
         });
         resize.observe(doc.documentElement);
@@ -241,6 +294,7 @@ export function createOperationSource(
         doc.fonts?.addEventListener('loadingdone', mark);
       }
       dirty = true;
+      fullScan = true;
     },
     subscribe(listener) {
       listeners.add(listener);
@@ -251,7 +305,11 @@ export function createOperationSource(
     capture,
     validate(snapshot, event) {
       if (!issued.has(snapshot) || snapshot.generation.documentId !== documentId) return false;
-      if (event) dirty = true;
+      if (event) {
+        // Input-time reads never trust the incremental view.
+        dirty = true;
+        fullScan = true;
+      }
       const next = capture();
       if (next.generation.geometry !== snapshot.generation.geometry || !next.supported) return false;
       if (!(event instanceof MouseEvent)) return true;

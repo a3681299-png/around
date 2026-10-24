@@ -1,7 +1,66 @@
-import { createOperationSource, type OperationCandidate } from '../host/operation-source';
+import { createOperationSource, type DiscoveryScan, type OperationCandidate } from '../host/operation-source';
 import { createCompositionReader, fixedContainingBlock, scrollsWithPage } from '../host/operation-composition';
 
+const selectors: [string, OperationCandidate['kind'], string][] = [
+  ['player.seek', 'drag', '.ytp-progress-bar-container, .ytp-progress-bar'],
+  ['player.volume', 'drag', '.ytp-volume-panel, .ytp-volume-slider'],
+  ['search', 'text-input', 'ytd-searchbox, yt-searchbox'],
+  ['comment', 'text-input', 'ytd-comment-simplebox-renderer, ytd-comments [contenteditable="true"]'],
+  [
+    'navigation',
+    'click',
+    'ytd-guide-entry-renderer a[href], ytd-mini-guide-entry-renderer a[href], ytd-masthead a[href]',
+  ],
+  [
+    'menu',
+    'native-menu',
+    '.ytp-popup, .ytp-settings-menu, ytd-menu-popup-renderer, tp-yt-paper-dialog, [role="menu"], [role="dialog"], [role="listbox"], select',
+  ],
+  [
+    'control',
+    'click',
+    'button, a[role="button"], [role="button"], input, textarea, [contenteditable="true"], [role="slider"]',
+  ],
+];
+// One document traversal finds every candidate; each element then belongs to the first
+// selector (in this order) that matches it, exactly as when each selector had its own query.
+const candidateSelector = selectors.map(([, , selector]) => selector).join(', ');
+
+/**
+ * The elements any selector can match, kept in document order between reads. A whole-document
+ * query only runs for a full scan; otherwise the inserted subtrees and attribute-changed
+ * elements the source reported are the only places the candidate set can have changed.
+ */
+function createCandidateIndex(doc: Document) {
+  let ordered: HTMLElement[] | undefined;
+  const byDocumentOrder = (a: Element, b: Element) =>
+    a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
+  return (scan: DiscoveryScan): readonly HTMLElement[] => {
+    if (scan.full || !ordered) return (ordered = [...doc.querySelectorAll<HTMLElement>(candidateSelector)]);
+    const members = new Set(ordered.filter((element) => element.isConnected));
+    let reorder = false;
+    const include = (element: HTMLElement) => {
+      if (members.has(element)) reorder = true;
+      else (members.add(element), (reorder = true));
+    };
+    for (const root of scan.added) {
+      if (!root.isConnected) continue;
+      if (root.matches(candidateSelector)) include(root as HTMLElement);
+      for (const element of root.querySelectorAll<HTMLElement>(candidateSelector)) include(element);
+    }
+    for (const element of scan.touched as readonly HTMLElement[]) {
+      if (!element.isConnected) continue;
+      if (!element.matches(candidateSelector)) members.delete(element);
+      else if (!members.has(element)) include(element);
+    }
+    ordered = [...members];
+    if (reorder) ordered.sort(byDocumentOrder);
+    return ordered;
+  };
+}
+
 export function youtubeOperations(doc: Document) {
+  const candidates = createCandidateIndex(doc);
   const player = () => doc.querySelector<HTMLElement>('.html5-video-player, #movie_player');
   const overlaySlot = () => {
     const parent =
@@ -13,7 +72,7 @@ export function youtubeOperations(doc: Document) {
   };
   return createOperationSource(
     doc,
-    () => {
+    (scan) => {
       const composition = createCompositionReader(doc);
       const rows: OperationCandidate[] = [];
       const root = player(),
@@ -46,38 +105,20 @@ export function youtubeOperations(doc: Document) {
           envelope: { ...shape, height: Math.min(64, r.height) },
         });
       }
-      const selectors: [string, OperationCandidate['kind'], string][] = [
-        ['player.seek', 'drag', '.ytp-progress-bar-container, .ytp-progress-bar'],
-        ['player.volume', 'drag', '.ytp-volume-panel, .ytp-volume-slider'],
-        ['search', 'text-input', 'ytd-searchbox, yt-searchbox'],
-        ['comment', 'text-input', 'ytd-comment-simplebox-renderer, ytd-comments [contenteditable="true"]'],
-        [
-          'navigation',
-          'click',
-          'ytd-guide-entry-renderer a[href], ytd-mini-guide-entry-renderer a[href], ytd-masthead a[href]',
-        ],
-        [
-          'menu',
-          'native-menu',
-          '.ytp-popup, .ytp-settings-menu, ytd-menu-popup-renderer, tp-yt-paper-dialog, [role="menu"], [role="dialog"], [role="listbox"], select',
-        ],
-        [
-          'control',
-          'click',
-          'button, a[role="button"], [role="button"], input, textarea, [contenteditable="true"], [role="slider"]',
-        ],
-      ];
       const seen = new Set<Element>();
-      for (const [id, kind, selector] of selectors) {
-        let index = 0;
-        for (const element of doc.querySelectorAll<HTMLElement>(selector)) {
-          if (seen.has(element) || element.closest('[id^="web-world-themes"]')) continue;
-          seen.add(element);
+      const buckets = selectors.map(() => [] as HTMLElement[]);
+      for (const element of candidates(scan)) {
+        if (element.closest('[id^="web-world-themes"]')) continue;
+        seen.add(element);
+        buckets[selectors.findIndex(([, , selector]) => element.matches(selector))]!.push(element);
+      }
+      selectors.forEach(([id, kind], bucket) => {
+        buckets[bucket]!.forEach((element, index) => {
           const r = element.getBoundingClientRect();
           const rect = { left: r.left, top: r.top, width: r.width, height: r.height };
           const visible = r.width > 0 && r.height > 0 && composition.style(element).visibility !== 'hidden';
           rows.push({
-            id: `${id}.${index++}`,
+            id: `${id}.${index}`,
             kind: element.matches('input[type="range"],[role="slider"]') ? 'drag' : kind,
             element,
             ...(kind === 'native-menu'
@@ -96,8 +137,8 @@ export function youtubeOperations(doc: Document) {
             nativeAbove: Boolean(visible && overlay && composition.above(element, overlay.parent, overlay.zIndex)),
             unsupported: kind === 'native-menu' && element.matches('select') && element === doc.activeElement,
           });
-        }
-      }
+        });
+      });
       const active = doc.activeElement;
       if (
         active instanceof HTMLElement &&
