@@ -672,10 +672,12 @@ test('16 groups / 32 media share effect sources and become idle or fully detache
   await expect(youtube.locator(`${compositions} .group-content[data-mask-intensity="0"]`)).toHaveCount(16);
   // G1 may still be restoring paint after a native geometry change. Measure
   // the stationary scene after that explicit Host transition has completed.
-  await expect
-    .poll(() => youtube.locator(overlay).evaluate((node: HTMLElement) => JSON.parse(node.dataset.wwSafety!).stopped))
-    .toBe('');
-  await youtube.waitForTimeout(100);
+  const stopped = () =>
+    youtube.locator(overlay).evaluate((node: HTMLElement) => JSON.parse(node.dataset.wwSafety!).stopped);
+  await expect.poll(stopped).toBe('');
+  // A change just before that read may still be held for one coalescing window (200 ms).
+  await youtube.waitForTimeout(300);
+  await expect.poll(stopped).toBe('');
   await runtime.session.send('Performance.enable');
   const metrics = await runtime.session.send('Performance.getMetrics'),
     first = await stats();
