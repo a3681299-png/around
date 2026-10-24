@@ -205,9 +205,11 @@ test('redraws over unchanged protection geometry leave the clip and safety recor
     const observer = new MutationObserver((records) => records.forEach((r) => writes.push(r.attributeName!)));
     observer.observe(host, { attributes: true, attributeFilter: ['style', 'data-ww-safety'] });
     // Each resize marks the source and forces a redraw; the geometry itself is unchanged.
+    // They are spaced past the coalescing window, so each one is read on its own.
     for (let i = 0; i < 5; i++) {
       window.dispatchEvent(new Event('resize'));
       await frame();
+      await new Promise((resolve) => setTimeout(resolve, 250));
     }
     observer.disconnect();
     return { clip, writes };
@@ -697,6 +699,157 @@ test('a stylesheet-only change to an overlay ancestor is seen by the next frame 
   });
   // The snapshot is not reissued, so only a per-frame slot read can notice the change.
   expect(result).toEqual({ before: true, nextFrame: false, restored: true, sameSnapshot: true });
+});
+
+test('a burst of native changes is read at most once per window while drawing stays held', async ({ youtube }) => {
+  await youtube.addScriptTag({ content: await probeCode() });
+  const result = await youtube.evaluate(async () => {
+    const api = (window as any).G1Probe;
+    const frame = () => new Promise<number>((resolve) => requestAnimationFrame(resolve));
+    const source = api.youtubeOperations(document);
+    const host = api.createOperationGuardHost(document, source, () => undefined);
+    const app = document.querySelector('ytd-app')!;
+    for (let i = 0; i < 3; i++) host.sample(await frame());
+    const reads = new Set<object>([source.capture()]);
+    const held: boolean[] = [];
+    const start = performance.now();
+    // About 0.6 s of continuous native changes, one per frame.
+    while (performance.now() - start < 600) {
+      const node = document.createElement('div');
+      node.textContent = 'x';
+      app.append(node);
+      await Promise.resolve();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      host.sample(await frame());
+      reads.add(source.capture());
+      held.push(Boolean(host.snapshot().stopped));
+    }
+    const burstReads = reads.size - 1;
+    const burstFrames = held.length;
+    const heldFrames = held.filter(Boolean).length;
+    // Input never waits for the window: it reads the page synchronously.
+    const beforeInput = source.capture();
+    app.append(document.createElement('div'));
+    source.validate(beforeInput, new KeyboardEvent('keydown'));
+    const inputRead = source.capture() !== beforeInput;
+    // Once changes stop, the next window reads and drawing resumes without the stability wait.
+    await new Promise((resolve) => setTimeout(resolve, 260));
+    host.sample(await frame());
+    host.sample(await frame());
+    const resumed = !host.snapshot().stopped;
+    host.destroy();
+    return { burstReads, burstFrames, heldFrames, inputRead, resumed };
+  });
+  expect(result.burstFrames).toBeGreaterThan(20);
+  // 0.6 s at one read per 200 ms window, plus the leading read.
+  expect(result.burstReads).toBeLessThanOrEqual(5);
+  expect(result.heldFrames).toBeGreaterThan(result.burstFrames / 2);
+  expect(result.inputRead).toBe(true);
+  expect(result.resumed).toBe(true);
+});
+
+test('input during a burst of real geometry changes pauses but never counts as a repeated failure', async ({
+  youtube,
+}) => {
+  await youtube.addScriptTag({ content: await probeCode() });
+  const result = await youtube.evaluate(async () => {
+    const api = (window as any).G1Probe;
+    const frame = () => new Promise<number>((resolve) => requestAnimationFrame(resolve));
+    const source = api.youtubeOperations(document);
+    const host = api.createOperationGuardHost(document, source, () => undefined);
+    const app = document.querySelector('ytd-app')!;
+    for (let i = 0; i < 3; i++) host.sample(await frame());
+    // Three inputs, each after a new native control appeared inside a held window.
+    for (let round = 0; round < 3; round++) {
+      app.append(document.createElement('div'));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      host.sample(await frame());
+      const button = document.createElement('button');
+      button.setAttribute('style', `position:absolute;left:${100 + round * 60}px;top:200px;width:40px;height:40px`);
+      app.append(button);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      host.sample(await frame());
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'a' }));
+      document.dispatchEvent(new KeyboardEvent('keyup', { key: 'a' }));
+    }
+    const paused = Boolean(host.snapshot().stopped);
+    // The first read after the burst observes the last change; stability is counted from it.
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    host.sample(await frame());
+    await new Promise((resolve) => setTimeout(resolve, 450));
+    for (let i = 0; i < 3; i++) host.sample(await frame());
+    const recovered = !host.snapshot().stopped;
+    host.destroy();
+    return { paused, recovered };
+  });
+  // A geometry change at input time is legitimate: the guard recovers once things settle.
+  expect(result).toEqual({ paused: true, recovered: true });
+});
+
+test('focus inside the extension own player-local host never counts as focus on a native surface', async ({
+  youtube,
+}) => {
+  await youtube.goto('https://www.youtube.com/watch?v=fixture');
+  await youtube.addScriptTag({ content: await probeCode() });
+  const result = await youtube.evaluate(() => {
+    const api = (window as any).G1Probe;
+    const player = document.querySelector<HTMLElement>('#movie_player')!;
+    // The player-local paint host lives inside the player; the editor focuses layers in it.
+    const own = document.createElement('div');
+    own.id = 'web-world-themes-video-decorations';
+    own.tabIndex = -1;
+    player.append(own);
+    const native = document.createElement('button');
+    native.textContent = 'native';
+    player.append(native);
+    const source = api.youtubeOperations(document);
+    const focused = () =>
+      source
+        .capture()
+        .surfaces.filter((s: any) => s.availability.focused)
+        .map((s: any) => s.id);
+    own.focus();
+    const whileOwn = { active: document.activeElement === own, focused: focused() };
+    native.focus();
+    const whileNative = focused();
+    source.destroy();
+    own.remove();
+    native.remove();
+    return { whileOwn, whileNative };
+  });
+  expect(result.whileOwn.active).toBe(true);
+  expect(result.whileOwn.focused).toEqual([]);
+  // A real native control in the player still marks the player surfaces as focused.
+  expect(result.whileNative).toEqual(expect.arrayContaining(['player.video']));
+});
+
+test('focus that silently leaves with a removed element is not kept by the cached snapshot', async ({ youtube }) => {
+  await youtube.goto('https://www.youtube.com/watch?v=fixture');
+  await youtube.addScriptTag({ content: await probeCode() });
+  const result = await youtube.evaluate(async () => {
+    const api = (window as any).G1Probe;
+    const player = document.querySelector<HTMLElement>('#movie_player')!;
+    const control = document.createElement('button');
+    control.textContent = 'transient';
+    player.append(control);
+    const source = api.youtubeOperations(document);
+    control.focus();
+    const focusedBefore = source.capture().surfaces.some((s: any) => s.availability.focused);
+    // Removing the focused element moves focus to body without any focusout event; a
+    // mutation inside the extension's own host is the kind of change the observer skips.
+    const own = document.createElement('div');
+    own.id = 'web-world-themes-test-focus';
+    own.tabIndex = -1;
+    player.append(own);
+    own.focus();
+    own.remove();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const focusedAfter = source.capture().surfaces.some((s: any) => s.availability.focused);
+    control.remove();
+    source.destroy();
+    return { focusedBefore, focusedAfter, active: document.activeElement?.tagName };
+  });
+  expect(result).toEqual({ focusedBefore: true, focusedAfter: false, active: 'BODY' });
 });
 
 test('a native removal is seen by the next synchronous read and the guard is told after the task', async ({

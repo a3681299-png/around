@@ -94,7 +94,9 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
     await expect(local).not.toBeVisible();
     report.checks.gifRuleEditedAndSaved = true;
     stage('live scroll');
-    const media = page.locator('#web-world-themes-decorations .media');
+    const media = page.locator(
+      ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) .media',
+    );
     const verifyScroll = async (progress: number) => {
       await page.evaluate((value) => {
         const root = document.scrollingElement!;
@@ -195,7 +197,11 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
     report.checks.savedRuleAndTakeReload = true;
     await panel.click('.take-live');
     await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
-    await expect(page.locator('#web-world-themes-decorations')).toHaveCount(0);
+    await expect(
+      page.locator(
+        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',
+      ),
+    ).toHaveCount(0);
     await expect(local).toHaveCount(0);
     report.checks.offCleanup = true;
     report.completed = true;

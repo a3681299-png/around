@@ -5,13 +5,16 @@ import { execFile } from 'node:child_process';
 import { workPath, extensionPath, browserPath, createProfile, revision } from './environment.mjs';
 
 const mode = process.argv[2];
-if (!['startup', 'steady', 'minute', 'areas', 'smoke'].includes(mode))
-  throw new Error('Usage: node scripts/g11/run.mjs startup|steady|minute|areas|smoke');
+if (!['startup', 'spa', 'steady', 'minute', 'areas', 'smoke'].includes(mode))
+  throw new Error('Usage: node scripts/g11/run.mjs startup|spa|steady|minute|areas|smoke');
+// spa: settle on the video, start recording, then follow a related-video link in the same document.
+const spa = mode === 'spa';
 process.env.G11_STARTUP = mode === 'startup' ? '1' : '0';
 process.env.G11_FRAMES_ONLY = mode === 'minute' ? '0' : '1';
 process.env.G11_PERF_ONLY = mode === 'areas' ? '0' : '1';
 process.env.G11_SMOKE = mode === 'smoke' ? '1' : '0';
 if (mode === 'steady') process.env.G11_SETTLE_MS ??= '15000';
+if (spa) process.env.G11_SETTLE_MS ??= '8000';
 if (['minute', 'areas', 'smoke'].includes(mode)) process.env.G11_PAIR_COUNT = '0';
 const work = workPath(process.env.G11_WORK ?? `.work/g11-results/${mode}-${Date.now()}`);
 await mkdir(work, { recursive: true });
@@ -470,7 +473,9 @@ try {
       const row = { pair, order: order.map((v) => (v ? 'guarded' : 'unguarded')), blocks: [] };
       for (const guarded of order) {
         if (process.env.G11_FRAMES_ONLY === '1') {
-          await page.reload({ waitUntil: 'domcontentloaded' });
+          // A navigation block leaves the page on another video; start each block from the same one.
+          if (spa) await page.goto(videoUrl, { waitUntil: 'domcontentloaded' });
+          else await page.reload({ waitUntil: 'domcontentloaded' });
           await page.waitForFunction(
             () => {
               const v = document.querySelector('video.html5-main-video');
@@ -517,6 +522,19 @@ try {
         }
         await evaluate('__g11Probe.begin(true)');
         if (startup) await evaluate(`globalThis.__g11DisableGuard=${!guarded};\n${content}`);
+        let navigation;
+        if (spa) {
+          navigation = await page.evaluate(() => {
+            globalThis.__g11SameDocument = true;
+            const from = location.href;
+            const link = [...document.querySelectorAll('#secondary a[href*="/watch?v="]')].find(
+              (a) => a.getBoundingClientRect().height > 0 && !a.href.includes(new URL(from).searchParams.get('v')),
+            );
+            link?.click();
+            return { from, to: link?.href ?? null };
+          });
+          if (!navigation.to) throw new Error('No related video link for the SPA block.');
+        }
         await page.waitForTimeout(6000);
         const data = await evaluate('__g11Probe.end()');
         if (profiling) {
@@ -535,22 +553,31 @@ try {
           JSON.stringify({ traceEvents: trace }),
         );
         const after = await videoState();
+        if (spa) {
+          const arrived = await page.evaluate(() => ({
+            url: location.href,
+            same: globalThis.__g11SameDocument === true,
+          }));
+          if (!arrived.same || arrived.url === navigation.from || !arrived.url.includes('/watch?v='))
+            throw new Error('Invalid SPA block: ' + JSON.stringify({ navigation, arrived }));
+          navigation.arrived = arrived.url;
+        }
         const validation = await page.evaluate(() => ({
           sameElement: __g11FrameVideo.element === document.querySelector('video.html5-main-video'),
           events: __g11FrameVideo.events,
         }));
+        // A navigation block replaces the video on purpose; only its starting state must be valid.
+        const startValid = before && !before.paused && before.readyState >= 2 && !before.ad;
         if (
-          !before ||
-          !after ||
-          before.paused ||
-          after.paused ||
-          before.readyState < 2 ||
-          after.readyState < 2 ||
-          after.currentTime - before.currentTime < 5 ||
-          before.ad ||
-          after.ad ||
-          !validation.sameElement ||
-          validation.events.length
+          !startValid ||
+          (!spa &&
+            (!after ||
+              after.paused ||
+              after.readyState < 2 ||
+              after.currentTime - before.currentTime < 5 ||
+              after.ad ||
+              !validation.sameElement ||
+              validation.events.length))
         )
           throw new Error('Invalid playback state in comparison block.');
         const summary = summarize(data);
@@ -559,7 +586,7 @@ try {
         );
         if (state.guard !== guarded || summary.extensionFrameCpuMs.count < 1)
           throw new Error('Invalid comparison block: ' + JSON.stringify({ state, summary }));
-        row.blocks.push({ guarded, before, after, validation, summary });
+        row.blocks.push({ guarded, before, after, validation, summary, ...(navigation ? { navigation } : {}) });
         await writeFile(
           path.join(work, `pair-${pair}-${guarded ? 'guarded' : 'unguarded'}-raw.json`),
           JSON.stringify(data),

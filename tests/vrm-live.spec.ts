@@ -48,8 +48,12 @@ test('real YouTube: private local VRM import, MToon, pointer gaze, Studio transf
     stage('import private avatar');
     const started = Date.now();
     await panel.files([path.resolve(process.env.WW_VRM_FILE!)], '.model-file');
-    const media = page.locator('#web-world-themes-decorations .model-media'),
-      image = page.locator('#web-world-themes-decorations [data-image-id]');
+    const media = page.locator(
+        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) .model-media',
+      ),
+      image = page.locator(
+        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]',
+      );
     await expect(media).toHaveAttribute('data-renderer', 'three', { timeout: 100000 });
     report.checks.importAndFirstPaintMs = Date.now() - started;
     await expect(media).toHaveAttribute('data-format', 'vrm');
@@ -200,7 +204,11 @@ test('real YouTube: private local VRM import, MToon, pointer gaze, Studio transf
     expect(await page.evaluate(() => (globalThis as { vrmDocumentToken?: number }).vrmDocumentToken)).toBe(31);
     report.checks.spaDocumentPreserved = true;
     await popup.locator('#effect-strength').fill('0');
-    await expect(page.locator('#web-world-themes-decorations')).toHaveCount(0);
+    await expect(
+      page.locator(
+        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',
+      ),
+    ).toHaveCount(0);
     report.checks.zeroCleanup = true;
     report.completed = true;
   } finally {

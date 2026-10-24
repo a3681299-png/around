@@ -8,7 +8,7 @@ import type { UserSettings } from '../storage/settings';
 import type { ThemeDefinition } from './types';
 import { createTimelineHost, type TimelineHost } from '../host/timeline';
 import { createTakeStorage } from '../browser/take-storage';
-import { createOperationGuardHost, type OperationGuardHost } from '../host/operation-guard';
+import { createOperationGuardHost, guardWanted, type OperationGuardHost } from '../host/operation-guard';
 
 const STYLE_ID = 'web-world-themes-style';
 
@@ -39,7 +39,20 @@ export function createThemeController(
       })
     : undefined;
   const images = createImageRenderer(doc, site.decorationAnchors ?? [], site.signals?.videoPlayback, timeline, safety);
-  let suspended = false;
+  let suspended = false,
+    editing = false;
+  // Observation starts only once settings and artwork call for it.
+  safety?.setActive(false);
+  const inspect = () =>
+    safety?.setActive(
+      guardWanted({
+        suspended,
+        enabled: Boolean(current?.enabled),
+        strength: current?.strength ?? 0,
+        layers: design?.decorations.length ?? 0,
+        editing,
+      }),
+    );
   const variables = new Set<string>();
   let disconnect: (() => void) | undefined;
   let style: HTMLStyleElement | undefined;
@@ -84,7 +97,7 @@ export function createThemeController(
 
   const render = () => {
     if (suspended || !current?.enabled || current.strength === 0) return;
-    safety?.setActive(true);
+    inspect();
     if (design?.baseThemeId === null) {
       // Independent designs use native site styling plus their own rules only.
       features.destroy();
@@ -157,8 +170,10 @@ export function createThemeController(
       design = validateDesign(input);
       render();
     },
-    setImageEditing(editing) {
-      images.edit(editing);
+    setImageEditing(next) {
+      editing = Boolean(next);
+      if (!suspended && current?.enabled && current.strength > 0) inspect();
+      images.edit(next);
     },
     validateDesign(input) {
       validateDesign(input);

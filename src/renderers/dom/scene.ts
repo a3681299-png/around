@@ -217,12 +217,13 @@ export function createImageRenderer(
       // Fullscreen has one native plane: every root stays local, atmosphere included.
       const fullscreenPlane = Boolean(slot && slot.parent === doc.fullscreenElement);
       const atmosphereRoot = (id: string) => renderModeOf(roots.get(id)!.layer) === 'atmosphere';
-      // Only a player-anchored root without a player-local plane can use the page plane.
+      // Any root anchored to page content scrolls with the page; the player alone has its own
+      // local plane first. Viewport-anchored roots are screen-fixed by definition.
+      const pageAnchored = (id: string) => roots.get(id)!.layer.placement.anchor.kind === 'surface';
       const pageSlot =
         overlaySlot &&
-        !slot &&
         !doc.fullscreenElement &&
-        layout.roots.some((id) => videoAnchored(id) && !atmosphereRoot(id))
+        layout.roots.some((id) => pageAnchored(id) && !atmosphereRoot(id) && !(slot && videoAnchored(id)))
           ? safety.source.pageSlot()
           : undefined;
       const rootBounds = (id: string) =>
@@ -254,7 +255,7 @@ export function createImageRenderer(
       let floor = ATMOSPHERE;
       for (const id of layout.roots) {
         if (localRoots.has(id)) continue;
-        let plane = atmosphereRoot(id) && overlaySlot ? ATMOSPHERE : videoAnchored(id) && pageSlot ? PAGE : SCREEN;
+        let plane = atmosphereRoot(id) && overlaySlot ? ATMOSPHERE : pageAnchored(id) && pageSlot ? PAGE : SCREEN;
         if (plane < floor) plane = SCREEN;
         floor = plane;
         planes.set(id, plane);
@@ -455,7 +456,8 @@ export function createImageRenderer(
         if (!entry) continue;
         // The native-owned clip is the final paint boundary, including any
         // future blur/shadow spill. No page-sized stale rectangular hole mask.
-        const stopped = blocked.has(layer.layer.id);
+        const stopped = blocked.has(layer.layer.id),
+          wasStopped = entry.node.hasAttribute('data-safety-limited');
         if (entry.node.style.visibility !== (stopped ? 'hidden' : ''))
           entry.node.style.visibility = stopped ? 'hidden' : '';
         if (entry.node.hasAttribute('data-safety-limited') !== stopped)
@@ -463,7 +465,10 @@ export function createImageRenderer(
         if (entry.node.style.pointerEvents !== (stopped ? 'none' : ''))
           entry.node.style.pointerEvents = stopped ? 'none' : '';
         if (stopped) entry.controls.hidden = true;
-        if (stopped) entry.media.update(layer.layer, false);
+        // Media is paused once when a stop begins and restarted once when it ends, even if no
+        // effect frame follows; held frames in between do no media work.
+        if (stopped && !wasStopped) entry.media.update(layer.layer, false);
+        else if (!stopped && wasStopped) entry.media.update(layer.layer, layer.visible);
       }
     }
     const selected =
@@ -613,6 +618,8 @@ export function createImageRenderer(
         renderable,
         ...(parent ? { parentId: parent.id } : {}),
         visibility(value) {
+          // A layer stopped by protection stays paused; the protection pass resumes it.
+          if (value && entry.node.hasAttribute('data-safety-limited')) return;
           if (previousVisibility !== value) {
             previousVisibility = value;
             entry.media.update(item, value);

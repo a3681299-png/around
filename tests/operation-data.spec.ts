@@ -20,6 +20,7 @@ import { worldScenario } from './helpers/world-scenario';
 import { defaultScrollOpacityRule } from '../src/signals/keyframes';
 import { defaultFollowMotion } from '../src/signals/motion';
 import { referenceGuardPaint } from './helpers/reference-guard-paint';
+import { guardWanted } from '../src/host/operation-guard';
 
 export function surface(patch: Partial<OperationSurface> = {}): OperationSurface {
   return {
@@ -300,4 +301,36 @@ test('atmosphere crosses protected surfaces but never takes input or skips verif
   expect(guardPaint(snapshot(), [{ ...atmosphere, opacity: NaN }])).toHaveLength(1);
   expect(ATMOSPHERE_ALPHA_CAP).toBeGreaterThan(0);
   expect(ATMOSPHERE_ALPHA_CAP).toBeLessThanOrEqual(0.4);
+});
+
+test('native-surface inspection runs only while artwork or the editor can paint', () => {
+  const on = { suspended: false, enabled: true, strength: 60, layers: 1, editing: false };
+  expect(guardWanted(on)).toBe(true);
+  expect(guardWanted({ ...on, layers: 0 })).toBe(false); // No artwork: nothing can cover a control.
+  expect(guardWanted({ ...on, layers: 0, editing: true })).toBe(true); // The editor may add one at any time.
+  expect(guardWanted({ ...on, enabled: false })).toBe(false); // Theme OFF.
+  expect(guardWanted({ ...on, strength: 0 })).toBe(false); // Strength zero.
+  expect(guardWanted({ ...on, suspended: true, editing: true })).toBe(false); // Emergency OFF / fullscreen suspend.
+});
+
+test('approach uses the protected band of a surface, never the whole player behind it', () => {
+  const player = { left: 16, top: 145, width: 1050, height: 590 };
+  const band = { ...player, top: player.top + player.height - 112, height: 112 };
+  const surfaces = [
+    surface({
+      id: 'player.video',
+      kind: 'gesture',
+      shape: player,
+      protectedEnvelope: player,
+      policy: { transform: 'fixed-plane', occlusion: 'allow', input: 'native-only' },
+    }),
+    surface({ id: 'player.controls.bottom', shape: player, protectedEnvelope: band }),
+  ];
+  const step = (point: { x: number; y: number }) =>
+    stepProximity({ safe: false, clearSince: null }, snapshot(surfaces), { timeMs: 0, point, interacting: false }).safe;
+  // Over the middle of the video: neither the gesture area nor the far control band is near.
+  expect(step({ x: 80, y: 400 })).toBe(false);
+  // Inside, and within the margin of, the real control band.
+  expect(step({ x: 80, y: 700 })).toBe(true);
+  expect(step({ x: 80, y: band.top - 30 })).toBe(true);
 });

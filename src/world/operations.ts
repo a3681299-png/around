@@ -327,6 +327,17 @@ function segmentHits(a: Point, b: Point, rect: PlacementFrame, margin: number) {
   }
   return true;
 }
+/** Where a pointer approaches a control: its shape, narrowed to its protected envelope. A
+ * band reserved on a large element (the player's control bars) is not the whole element. */
+function approachRect(surface: OperationSurface): PlacementFrame | undefined {
+  const a = surface.shape,
+    b = surface.protectedEnvelope;
+  const left = Math.max(a.left, b.left),
+    top = Math.max(a.top, b.top),
+    right = Math.min(a.left + a.width, b.left + b.width),
+    bottom = Math.min(a.top + a.height, b.top + b.height);
+  return right > left && bottom > top ? { left, top, width: right - left, height: bottom - top } : undefined;
+}
 export function stepProximity(
   previous: ProximityState,
   snapshot: OperationSnapshot,
@@ -341,8 +352,10 @@ export function stepProximity(
         surface.availability.dragging ||
         surface.availability.captured ||
         (surface.availability.visible &&
+          surface.policy.occlusion !== 'allow' &&
           input.point &&
-          segmentHits(input.previousPoint ?? input.point, input.point, surface.shape, margin)),
+          approachRect(surface) !== undefined &&
+          segmentHits(input.previousPoint ?? input.point, input.point, approachRect(surface)!, margin)),
     );
   if (near) return { safe: true, clearSince: null };
   const clearSince = previous.clearSince ?? input.timeMs;

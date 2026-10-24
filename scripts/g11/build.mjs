@@ -125,8 +125,8 @@ await build({
           );
           text = replaceOnce(
             text,
-            '  let suspended = false;',
-            '  globalThis.__g11Probe.refresh = () => images.refresh();\n  let suspended = false;',
+            '  let suspended = false,',
+            '  globalThis.__g11Probe.refresh = () => images.refresh();\n  let suspended = false,',
             'full renderer redraw',
           );
           return { contents: text, loader: 'ts' };

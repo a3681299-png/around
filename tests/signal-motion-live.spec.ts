@@ -69,7 +69,9 @@ test('real YouTube: official Studio configures GIF pursuit, records/replays/load
       stopRadius: 36,
       orientToMovement: true,
     });
-    const image = page.locator('#web-world-themes-decorations .image');
+    const image = page.locator(
+      ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) .image',
+    );
     const point = () =>
       image.evaluate((node: HTMLElement) => ({
         x: Number.parseFloat(node.style.left),
@@ -175,7 +177,11 @@ test('real YouTube: official Studio configures GIF pursuit, records/replays/load
     }
     report.checks.windowWidthsAndSettingsClicks = [1366, 1920, 1000];
     await popup.locator('#effect-strength').fill('0');
-    await expect(page.locator('#web-world-themes-decorations')).toHaveCount(0);
+    await expect(
+      page.locator(
+        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',
+      ),
+    ).toHaveCount(0);
     await expect(local).toHaveCount(0);
     report.checks.zeroCleanup = true;
     report.completed = true;

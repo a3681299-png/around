@@ -99,6 +99,9 @@ test('recording-only listeners stop after artwork changes and idle/OFF leaves no
   await youtube.evaluate(
     () => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))),
   );
+  // A held protection read after the scene change runs once at the end of its window; a
+  // loop would keep counting after it.
+  await youtube.waitForTimeout(300);
   const before = (await stats()).rafs;
   await youtube.waitForTimeout(150);
   expect((await stats()).rafs).toBe(before);

@@ -48,8 +48,12 @@ test('real YouTube: official Studio places a rig, switches run/idle, replays mod
     const panel = await sidePanelDriver(context, page, id);
     await writeFile('.work/verification/live-rig.glb', modelFixture());
     await panel.files([path.resolve('.work/verification/live-rig.glb')], '.model-file');
-    const media = page.locator('#web-world-themes-decorations .model-media'),
-      image = page.locator('#web-world-themes-decorations .image');
+    const media = page.locator(
+        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) .model-media',
+      ),
+      image = page.locator(
+        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) .image',
+      );
     await expect(media).toHaveAttribute('data-renderer', 'three', { timeout: 25000 });
     stage('settings');
     await panel.fill('[data-image-prop="anchor"]', 'video-player');
@@ -187,7 +191,11 @@ test('real YouTube: official Studio places a rig, switches run/idle, replays mod
       .locator('#web-world-themes-decorations')
       .evaluate((e: HTMLElement) => JSON.parse(e.dataset.wwModelStats!));
     await popup.locator('#effect-strength').fill('0');
-    await expect(page.locator('#web-world-themes-decorations')).toHaveCount(0);
+    await expect(
+      page.locator(
+        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',
+      ),
+    ).toHaveCount(0);
     report.checks.zeroCleanup = true;
     report.completed = true;
   } finally {

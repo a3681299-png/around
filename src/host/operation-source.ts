@@ -8,6 +8,8 @@ const MATCHING_ATTRIBUTES = new Set(['class', 'role', 'href', 'contenteditable']
 const MAX_INCREMENTAL_ROOTS = 64;
 /** Bounds how long a change the observer could not describe can go unnoticed. */
 const FULL_SCAN_INTERVAL_MS = 1000;
+/** Changes inside this window after a read wait for its end; callers hold drawing meanwhile. */
+export const COALESCE_MS = 200;
 
 let nextDocumentId = 0;
 const documentIds = new WeakMap<Document, number>();
@@ -39,8 +41,11 @@ export interface DiscoveryScan {
 export interface OperationSource {
   active(value: boolean): void;
   subscribe(listener: () => void): () => void;
-  capture(): OperationSnapshot;
+  /** coalesce: the caller holds drawing while a burst of changes is pending (see COALESCE_MS). */
+  capture(options?: { coalesce?: boolean }): OperationSnapshot;
   validate(snapshot: OperationSnapshot, event?: Event): boolean;
+  /** Milliseconds until a pending change may be read; 0 when the last capture is current. */
+  deferredFor(): number;
   videoSlot(): { parent: HTMLElement; rect: PlacementFrame; top: number; bottom: number } | undefined;
   overlaySlot(): { parent: HTMLElement; zIndex: number } | undefined;
   /** The overlay parent when a child placed at the document origin scrolls with the page. */
@@ -67,8 +72,13 @@ export function createOperationSource(
   let dirty = true,
     cached: OperationSnapshot | undefined;
   const listeners = new Set<() => void>();
+  let readActive: Element | null = null,
+    readFocus = false;
   let fullScan = true,
-    lastFullScan = -Infinity;
+    lastFullScan = -Infinity,
+    forced = false,
+    capturedAt = -Infinity,
+    deferredUntil = 0;
   const added = new Set<Element>(),
     touched = new Set<Element>();
   const collect = (records: readonly MutationRecord[]) => {
@@ -91,6 +101,12 @@ export function createOperationSource(
       }
     }
   };
+  // Focus and pointer state never move a surface; only geometry changes are coalesced.
+  let geometryDirty = false;
+  const changed = () => {
+    geometryDirty = true;
+    mark();
+  };
   const mark = () => {
     if (!dirty) {
       dirty = true;
@@ -103,6 +119,7 @@ export function createOperationSource(
   const handle = (records: readonly MutationRecord[], deliver: boolean) => {
     collect(records);
     if (!relevant(records)) return;
+    geometryDirty = true;
     if (deliver) mark();
     else if (!dirty) {
       dirty = true;
@@ -148,24 +165,31 @@ export function createOperationSource(
       'href',
     ],
   });
-  const resize = new ResizeObserver(mark);
+  const resize = new ResizeObserver(changed);
   resize.observe(doc.documentElement);
-  doc.addEventListener('scroll', mark, { capture: true, passive: true });
+  doc.addEventListener('scroll', changed, { capture: true, passive: true });
   doc.addEventListener('focusin', mark, true);
   doc.addEventListener('focusout', mark, true);
-  doc.defaultView!.addEventListener('resize', mark);
-  doc.fonts?.addEventListener('loadingdone', mark);
+  doc.defaultView!.addEventListener('resize', changed);
+  doc.fonts?.addEventListener('loadingdone', changed);
   let serial = 0;
+  // The extension's own UI (editor handles, panels) is never a native surface; its gestures
+  // must not mark the page as changed, or a drag would hold and hide its own handles.
+  const owned = (event: Event) =>
+    event.composedPath().some((node) => node instanceof Element && node.id.startsWith('web-world-themes'));
   const down = (event: Event) => {
+    if (owned(event)) return;
     dragging = event.composedPath().find((node): node is Element => node instanceof Element);
     mark();
   };
-  const up = () => {
+  const up = (event?: Event) => {
+    if (event && owned(event) && !dragging && !captured) return;
     dragging = undefined;
     captured = undefined;
     mark();
   };
   const capturePointer = (event: Event) => {
+    if (owned(event)) return;
     captured = event.target instanceof Element ? event.target : undefined;
     mark();
   };
@@ -174,13 +198,33 @@ export function createOperationSource(
   doc.defaultView!.addEventListener('blur', up);
   doc.defaultView!.addEventListener('focus', mark);
   types.forEach((type, i) => doc.addEventListener(type, handlers[i]!, { capture: true, passive: true }));
-  function capture(): OperationSnapshot {
+  function capture(options?: { coalesce?: boolean }): OperationSnapshot {
     // Undelivered records are the only way a read element can have left the document.
     const pending = observer.takeRecords();
     if (pending.length) handle(pending, false);
+    // Focus can leave with a removed element without any focus event; compare it directly.
+    if (doc.activeElement !== readActive || doc.hasFocus() !== readFocus) dirty = true;
     if (!dirty && cached && doc.documentElement === root) return cached;
-    dirty = false;
     const now = doc.defaultView!.performance.now();
+    // A burst of native changes is read once per window, not once per frame. The stale
+    // snapshot is only for callers that hold drawing; input checks force a fresh read.
+    // Other reads inside the same held window share that caller's snapshot.
+    if (
+      (options?.coalesce || deferredUntil > now) &&
+      geometryDirty &&
+      cached &&
+      !forced &&
+      doc.documentElement === root &&
+      now - capturedAt < COALESCE_MS
+    ) {
+      deferredUntil = capturedAt + COALESCE_MS;
+      return cached;
+    }
+    forced = false;
+    geometryDirty = false;
+    deferredUntil = 0;
+    capturedAt = now;
+    dirty = false;
     const scan: DiscoveryScan = {
       full: fullScan || now - lastFullScan >= FULL_SCAN_INTERVAL_MS,
       added: [...added],
@@ -202,6 +246,10 @@ export function createOperationSource(
       if (!identities.has(element)) identities.set(element, ++serial);
       return identities.get(element);
     });
+    readActive = doc.activeElement;
+    readFocus = doc.hasFocus();
+    // Focus on the extension's own hosts (some live inside the player) is not native focus.
+    const active = doc.activeElement?.closest('[id^="web-world-themes"]') ? null : doc.activeElement;
     const surfaces = rows.map((row): OperationSurface => {
       const rect = row.rect ?? row.element.getBoundingClientRect();
       const shape = { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
@@ -228,8 +276,8 @@ export function createOperationSource(
             rect.height > 0 &&
             (row.visible ?? doc.defaultView!.getComputedStyle(row.element).visibility !== 'hidden'),
           disabled: row.element.matches(':disabled,[aria-disabled="true"]'),
-          focused: presented && doc.hasFocus() && row.element.contains(doc.activeElement),
-          editing: presented && doc.hasFocus() && row.kind === 'text-input' && row.element.contains(doc.activeElement),
+          focused: presented && doc.hasFocus() && row.element.contains(active),
+          editing: presented && doc.hasFocus() && row.kind === 'text-input' && row.element.contains(active),
           dragging: presented && Boolean(dragging && row.element.contains(dragging)),
           captured: presented && Boolean(captured && row.element.contains(captured)),
         },
@@ -295,13 +343,13 @@ export function createOperationSource(
       observer.disconnect();
       resize.disconnect();
       types.forEach((type, i) => doc.removeEventListener(type, handlers[i]!, true));
-      doc.removeEventListener('scroll', mark, true);
+      doc.removeEventListener('scroll', changed, true);
       doc.removeEventListener('focusin', mark, true);
       doc.removeEventListener('focusout', mark, true);
-      doc.defaultView!.removeEventListener('resize', mark);
+      doc.defaultView!.removeEventListener('resize', changed);
       doc.defaultView!.removeEventListener('blur', up);
       doc.defaultView!.removeEventListener('focus', mark);
-      doc.fonts?.removeEventListener('loadingdone', mark);
+      doc.fonts?.removeEventListener('loadingdone', changed);
       if (value) {
         observer.observe(doc.documentElement, {
           childList: true,
@@ -323,16 +371,17 @@ export function createOperationSource(
         resize.observe(doc.documentElement);
         observed.forEach((e) => resize.observe(e));
         types.forEach((type, i) => doc.addEventListener(type, handlers[i]!, { capture: true, passive: true }));
-        doc.addEventListener('scroll', mark, { capture: true, passive: true });
+        doc.addEventListener('scroll', changed, { capture: true, passive: true });
         doc.addEventListener('focusin', mark, true);
         doc.addEventListener('focusout', mark, true);
-        doc.defaultView!.addEventListener('resize', mark);
+        doc.defaultView!.addEventListener('resize', changed);
         doc.defaultView!.addEventListener('blur', up);
         doc.defaultView!.addEventListener('focus', mark);
-        doc.fonts?.addEventListener('loadingdone', mark);
+        doc.fonts?.addEventListener('loadingdone', changed);
       }
       dirty = true;
       fullScan = true;
+      forced = true;
     },
     subscribe(listener) {
       listeners.add(listener);
@@ -341,12 +390,16 @@ export function createOperationSource(
       };
     },
     capture,
+    deferredFor() {
+      return dirty && deferredUntil ? Math.max(0, deferredUntil - doc.defaultView!.performance.now()) : 0;
+    },
     validate(snapshot, event) {
       if (!issued.has(snapshot) || snapshot.generation.documentId !== documentId) return false;
       if (event) {
-        // Input-time reads never trust the incremental view.
+        // Input-time reads never trust the incremental view or wait for a window.
         dirty = true;
         fullScan = true;
+        forced = true;
       }
       const next = capture();
       if (next.generation.geometry !== snapshot.generation.geometry || !next.supported) return false;
@@ -381,13 +434,13 @@ export function createOperationSource(
       observer.disconnect();
       resize.disconnect();
       listeners.clear();
-      doc.removeEventListener('scroll', mark, true);
+      doc.removeEventListener('scroll', changed, true);
       doc.removeEventListener('focusin', mark, true);
       doc.removeEventListener('focusout', mark, true);
-      doc.defaultView!.removeEventListener('resize', mark);
+      doc.defaultView!.removeEventListener('resize', changed);
       doc.defaultView!.removeEventListener('blur', up);
       doc.defaultView!.removeEventListener('focus', mark);
-      doc.fonts?.removeEventListener('loadingdone', mark);
+      doc.fonts?.removeEventListener('loadingdone', changed);
       types.forEach((type, i) => doc.removeEventListener(type, handlers[i]!, true));
       rows = [];
       up();

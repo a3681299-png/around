@@ -27,6 +27,16 @@ export interface OperationGuardHost {
   pause(reason: string, repeatedFailure?: boolean, layerIds?: readonly string[]): void;
   destroy(): void;
 }
+/** Inspection observes the whole page; it runs only while authored paint can exist. */
+export function guardWanted(state: {
+  suspended: boolean;
+  enabled: boolean;
+  strength: number;
+  layers: number;
+  editing: boolean;
+}): boolean {
+  return !state.suspended && state.enabled && state.strength > 0 && (state.layers > 0 || state.editing);
+}
 export function createOperationGuardHost(
   doc: Document,
   source: OperationSource,
@@ -72,7 +82,9 @@ export function createOperationGuardHost(
   const listeners = new Set<(value: SafetyStatus) => void>();
   let overlayHost: HTMLElement | undefined,
     lastStatus = '',
-    timer: number | undefined;
+    timer: number | undefined,
+    holdTimer: number | undefined;
+  const HOLD = '操作面が変化している間は、まとめて確認するまで描画を停止しています。';
   const snapshot = (): SafetyStatus => ({ issues, surfaces, approaching: proximity.safe, stopped, overlay });
   // Same objects and flags as the last publish cannot change the signature below.
   let published: readonly unknown[] = [];
@@ -179,9 +191,11 @@ export function createOperationGuardHost(
       interacting = false;
     }
     if (!owned && (event.type === 'keydown' || event.type === 'pointerdown' || event.type === 'focusin')) {
+      // validate() reads the page synchronously; the snapshot it leaves behind is the current
+      // one, so a geometry change is never mistaken for a repeated failure.
+      const valid = source.validate(surfaces, event);
       const geometryChanged = source.capture().generation.geometry !== surfaces.generation.geometry;
-      if (!source.validate(surfaces, event))
-        pause('入力直前に操作面の世代またはクリック先が変わりました。', !geometryChanged);
+      if (!valid) pause('入力直前に操作面の世代またはクリック先が変わりました。', !geometryChanged);
     }
     // Pointer paths are tested immediately, including movement across a control.
     const next = stepProximity(proximity, source.capture(), {
@@ -239,6 +253,8 @@ export function createOperationGuardHost(
       source.active(value);
       reduced.removeEventListener('change', changed);
       if (timer !== undefined) view.clearTimeout(timer);
+      if (holdTimer !== undefined) view.clearTimeout(holdTimer);
+      holdTimer = undefined;
       timer = undefined;
       if (value) {
         events.forEach((type) => doc.addEventListener(type, activity, { capture: true, passive: true }));
@@ -259,13 +275,32 @@ export function createOperationGuardHost(
     },
     source,
     sample(time) {
-      surfaces = source.capture();
-      if (boundaryDirty) {
-        boundaryDirty = false;
-        const nextBoundary = boundaryKey(surfaces);
-        if (nextBoundary !== boundary) {
-          boundary = nextBoundary;
-          pause('操作面の保護範囲が変わったため、安定するまで描画を停止しています。');
+      surfaces = source.capture({ coalesce: true });
+      const wait = source.deferredFor();
+      if (wait > 0) {
+        // Native changes are still arriving and this snapshot is not current: hold all
+        // drawing, keep the boundary comparison pending and come back when the window ends.
+        if (!stopped) {
+          stopped = HOLD;
+          stoppedIds = undefined;
+        }
+        if (holdTimer === undefined)
+          holdTimer = view.setTimeout(() => {
+            holdTimer = undefined;
+            if (active) invalidate();
+          }, Math.ceil(wait));
+      } else {
+        if (stopped === HOLD) {
+          stopped = '';
+          issues = [];
+        }
+        if (boundaryDirty) {
+          boundaryDirty = false;
+          const nextBoundary = boundaryKey(surfaces);
+          if (nextBoundary !== boundary) {
+            boundary = nextBoundary;
+            pause('操作面の保護範囲が変わったため、安定するまで描画を停止しています。');
+          }
         }
       }
       const generation = surfaces.generation.geometry;
@@ -276,7 +311,7 @@ export function createOperationGuardHost(
       const nativeEditing = surfaces.surfaces.some(
         (s) => s.availability.editing || s.availability.dragging || s.availability.captured,
       );
-      if (stopped && failures < 3 && !interacting && !nativeEditing && time - stableAt >= 350) {
+      if (stopped && stopped !== HOLD && failures < 3 && !interacting && !nativeEditing && time - stableAt >= 350) {
         stopped = '';
         issues = [];
       }
@@ -393,6 +428,8 @@ export function createOperationGuardHost(
       unsubscribeSource();
       active = false;
       if (timer !== undefined) view.clearTimeout(timer);
+      if (holdTimer !== undefined) view.clearTimeout(holdTimer);
+      holdTimer = undefined;
       events.forEach((type) => doc.removeEventListener(type, activity, true));
       doc.removeEventListener('scroll', changed, true);
       view.removeEventListener('resize', changed);

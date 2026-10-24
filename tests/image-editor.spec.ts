@@ -222,8 +222,8 @@ test('rotation handle, Delete, discard and close preserve saved layers and colle
   const box = (await image.boundingBox())!,
     grip = (await handle.boundingBox())!;
   await withCanvas(youtube, async () => {
-    await youtube.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2);
-    await youtube.mouse.down();
+    // Collapsing the panel changes the page layout; wait until the handle is the hit target again.
+    await beginCanvasGesture(handle, { x: grip.x + grip.width / 2, y: grip.y + grip.height / 2 });
     await youtube.mouse.move(box.x + box.width + 40, box.y + box.height / 2, { steps: 8 });
     await youtube.mouse.up();
   });

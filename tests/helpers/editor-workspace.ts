@@ -16,12 +16,34 @@ export async function exposeEditorControls(panel: Locator) {
   });
 }
 
+/** Collapsing the panel changes the page layout; protection briefly holds drawing while it
+ * re-reads the native surfaces. Screenshots and gestures wait until drawing has resumed. */
+export async function protectionSettled(page: Page) {
+  const host = page.locator('#web-world-themes-decorations');
+  if (!(await host.count())) return;
+  // The record updates on the next draw, while a new change hides layers at once; require both,
+  // twice in a row, so a pending change cannot pass between the two reads.
+  const settled = () =>
+    page.evaluate(() => {
+      const record = document.querySelector('#web-world-themes-decorations')?.getAttribute('data-ww-safety');
+      const stopped = record ? (JSON.parse(record).stopped ?? '') : '';
+      const hidden = [...document.querySelectorAll('[id^="web-world-themes-"][id$="decorations"]')].some((host) =>
+        [...(host.shadowRoot?.querySelectorAll<HTMLElement>('[data-image-id]') ?? [])].some(
+          (node) => node.style.visibility === 'hidden' && !node.hasAttribute('data-safety-limited'),
+        ),
+      );
+      return !stopped && !hidden;
+    });
+  await expect.poll(async () => (await settled()) && (await settled())).toBe(true);
+}
+
 /** Preview gestures use the real collapse control so optional split panels cannot cover the artwork. */
 export async function withCanvas<T>(page: Page, operation: () => Promise<T>): Promise<T> {
   const panel = page.getByRole('dialog', { name: 'デザインエディター' });
   const minimize = panel.getByRole('button', { name: 'パネルを折りたたむ', exact: true });
   const restore = await minimize.isVisible();
   if (restore) await minimize.click();
+  await protectionSettled(page);
   try {
     return await operation();
   } finally {
