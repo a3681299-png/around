@@ -1,6 +1,11 @@
 import { test, expect } from '@playwright/test';
 import {
   guardPaint,
+  protectionClip,
+  safePaintRegions,
+  pagePaintRegions,
+  intersects,
+  ATMOSPHERE_ALPHA_CAP,
   initialProximity,
   stepProximity,
   type OperationSnapshot,
@@ -14,6 +19,7 @@ import { evaluateWorld, initialWorldState } from '../src/world/evaluate';
 import { worldScenario } from './helpers/world-scenario';
 import { defaultScrollOpacityRule } from '../src/signals/keyframes';
 import { defaultFollowMotion } from '../src/signals/motion';
+import { referenceGuardPaint } from './helpers/reference-guard-paint';
 
 export function surface(patch: Partial<OperationSurface> = {}): OperationSurface {
   return {
@@ -170,4 +176,128 @@ test('reduced motion and native approach return transforms to authored values wi
     expect(result.frame.needsFrame).toBe(false);
   }
   expect(JSON.stringify(scene)).toBe(before);
+});
+
+test('guardPaint reuses per-snapshot envelopes without changing a single issue', () => {
+  let seed = 7;
+  const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const pick = <T>(values: readonly T[]) => values[Math.floor(random() * values.length)]!;
+  for (let round = 0; round < 60; round++) {
+    const surfaces = Array.from({ length: 1 + Math.floor(random() * 40) }, (_, i) => {
+      const left = random() * 1000,
+        top = random() * 700,
+        width = 10 + random() * 200,
+        height = 10 + random() * 80;
+      return surface({
+        id: `s${i}`,
+        shape: { left, top, width, height },
+        protectedEnvelope: { left: left - 4, top: top - 4, width: width + 8, height: height + 8 },
+        availability: { ...surface().availability, visible: random() > 0.2 },
+        policy: { transform: 'fixed-plane', occlusion: pick(['forbid', 'allow'] as const), input: 'native-only' },
+        compositionCapability: pick(['exclusion', 'native-underlay', 'native-above'] as const),
+        scrolls: random() > 0.5,
+      });
+    });
+    const current = { ...snapshot(surfaces), supported: random() > 0.05 };
+    const paints = Array.from({ length: 1 + Math.floor(random() * 32) }, (_, i) => {
+      const left = random() * 1000,
+        top = random() * 700;
+      return paint({
+        id: `p${i}`,
+        bounds: { left, top, right: left + random() * 300, bottom: top + random() * 300 },
+        opacity: pick([0, 0.5, 1]),
+        pointerEvents: random() > 0.7,
+        editorOwned: random() > 0.8,
+        outset: pick([0, 4, 30]),
+        composition: pick(['overlay', 'native-underlay', 'unsupported'] as const),
+        ...(random() > 0.3 ? { clip: { left: 100, top: 100, width: 600, height: 400 } } : {}),
+      });
+    });
+    const expected = referenceGuardPaint(current, paints);
+    expect(guardPaint(current, paints), `round ${round}`).toEqual(expected);
+    // A repeated frame with the same immutable snapshot takes the reuse path.
+    expect(guardPaint(current, paints), `round ${round} repeated`).toEqual(expected);
+  }
+});
+
+test('protection clip is computed once per immutable snapshot and editing state', () => {
+  const first = Object.freeze(snapshot([surface(), surface({ id: 'b', scrolls: true })]));
+  const clip = protectionClip(first, false);
+  expect(protectionClip(first, false)).toBe(clip);
+  expect(clip.regions).toEqual(safePaintRegions(first, false));
+  expect(clip.path).toBe(
+    clip.regions.map((r) => `M${r.left} ${r.top}h${r.width}v${r.height}h${-r.width}Z`).join('') || '',
+  );
+  expect(protectionClip(first, true)).not.toBe(clip);
+  const next = Object.freeze(snapshot([surface({ shape: { left: 0, top: 0, width: 10, height: 10 } })]));
+  expect(protectionClip(next, false)).not.toBe(clip);
+  expect(protectionClip(Object.freeze({ ...first, supported: false }), false).path).toBe('');
+});
+
+test('the page plane cuts page-scrolling surfaces at their current envelope only', () => {
+  const page = snapshot([surface({ scrolls: true })]);
+  // Same column as the seek bar, far below it: the screen plane must avoid the whole
+  // column, the page plane moves with the bar and only avoids its current envelope.
+  const below = { left: 120, top: 500, right: 160, bottom: 540 };
+  expect(guardPaint(page, [paint({ bounds: below })])).toHaveLength(1);
+  expect(guardPaint(page, [paint({ bounds: below, composition: 'page' })])).toEqual([]);
+  expect(guardPaint(page, [paint({ composition: 'page' })])).toMatchObject([{ action: 'clip', surfaceId: 'seek' }]);
+});
+
+test('the page plane sweeps screen-fixed surfaces and whole inner scroll boxes', () => {
+  const fixed = snapshot([surface({ scrolls: false })]);
+  const far = { left: 120, top: 2000, right: 160, bottom: 2040 };
+  expect(guardPaint(fixed, [paint({ bounds: far })])).toEqual([]);
+  expect(guardPaint(fixed, [paint({ bounds: far, composition: 'page' })])).toHaveLength(1);
+  const nested = snapshot([surface({ scrolls: true, scrollBox: { left: 50, top: 100, width: 400, height: 300 } })]);
+  const insideBox = { left: 380, top: 350, right: 420, bottom: 390 };
+  expect(guardPaint(nested, [paint({ bounds: insideBox, composition: 'page' })])).toHaveLength(1);
+  expect(guardPaint(nested, [paint({ bounds: { ...insideBox, top: 450, bottom: 480 }, composition: 'page' })])).toEqual(
+    [],
+  );
+  // A proven native-above control stays in front of either plane.
+  const above = snapshot([surface({ scrolls: false, compositionCapability: 'native-above' })]);
+  expect(guardPaint(above, [paint({ bounds: far, composition: 'page' })])).toEqual([]);
+});
+
+test('page regions never meet a page envelope and cover the rest of the requested area', () => {
+  const surfaces = [
+    surface({ id: 'a', scrolls: true }),
+    surface({ id: 'b', scrolls: false, protectedEnvelope: { left: 700, top: 10, width: 60, height: 40 } }),
+    surface({
+      id: 'c',
+      scrolls: true,
+      protectedEnvelope: { left: 300, top: 400, width: 20, height: 20 },
+      scrollBox: { left: 280, top: 380, width: 200, height: 150 },
+    }),
+    surface({ id: 'hidden', availability: { ...surface().availability, visible: false } }),
+  ];
+  const area = { left: 0, top: -500, width: 1100, height: 2000 };
+  const regions = pagePaintRegions(snapshot(surfaces), false, area);
+  const cuts = [
+    surfaces[0]!.protectedEnvelope,
+    { left: 700, top: -1e7, width: 60, height: 2e7 },
+    surfaces[2]!.scrollBox!,
+  ];
+  for (const r of regions)
+    for (const cut of cuts)
+      expect(intersects({ left: r.left, top: r.top, right: r.left + r.width, bottom: r.top + r.height }, cut)).toBe(
+        false,
+      );
+  const area2 = (r: { width: number; height: number }) => r.width * r.height;
+  const removed = area2(surfaces[0]!.protectedEnvelope) + 60 * 2000 + area2(surfaces[2]!.scrollBox!);
+  expect(regions.reduce((sum, r) => sum + area2(r), 0)).toBeCloseTo(area2(area) - removed, 6);
+  expect(pagePaintRegions({ ...snapshot(surfaces), supported: false }, false, area)).toEqual([]);
+});
+
+test('atmosphere crosses protected surfaces but never takes input or skips verification', () => {
+  const atmosphere = paint({ composition: 'atmosphere', bounds: { left: 0, top: 0, right: 1100, bottom: 760 } });
+  expect(guardPaint(snapshot(), [atmosphere])).toEqual([]);
+  expect(guardPaint(snapshot(), [{ ...atmosphere, pointerEvents: true }])).toMatchObject([
+    { action: 'stop', surfaceId: 'atmosphere' },
+  ]);
+  expect(guardPaint({ ...snapshot(), supported: false }, [atmosphere])).toHaveLength(1);
+  expect(guardPaint(snapshot(), [{ ...atmosphere, opacity: NaN }])).toHaveLength(1);
+  expect(ATMOSPHERE_ALPHA_CAP).toBeGreaterThan(0);
+  expect(ATMOSPHERE_ALPHA_CAP).toBeLessThanOrEqual(0.4);
 });

@@ -56,6 +56,20 @@ export function createCompositionReader(doc: Document) {
   const styles = new WeakMap<HTMLElement, CSSStyleDeclaration>();
   const fixed = new WeakMap<HTMLElement, boolean>();
   const ranks = new WeakMap<HTMLElement, { found: boolean; rank: number }>();
+  const scrollers = new WeakMap<HTMLElement, HTMLElement | null>();
+  const stickies = new WeakMap<HTMLElement, HTMLElement | null>();
+  const stickyAncestor = (element: HTMLElement): HTMLElement | null => {
+    const cached = stickies.get(element);
+    if (cached !== undefined) return cached;
+    const value =
+      style(element).position === 'sticky'
+        ? element
+        : element.parentElement
+          ? stickyAncestor(element.parentElement)
+          : null;
+    stickies.set(element, value);
+    return value;
+  };
   let rankRoot: HTMLElement | undefined;
   const style = (element: HTMLElement) => {
     let value = styles.get(element);
@@ -108,8 +122,36 @@ export function createCompositionReader(doc: Document) {
     ranks.set(element, value);
     return value;
   };
+  // An element that clips overflowing content can move its descendants without the page
+  // moving. Hidden overflow counts too: script may still scroll it.
+  const nearestScroller = (element: HTMLElement): HTMLElement | null => {
+    const parent = element.parentElement;
+    if (!parent || parent === doc.body || parent === doc.documentElement) return null;
+    const cached = scrollers.get(parent);
+    if (cached !== undefined) return cached;
+    const s = style(parent);
+    const value =
+      [s.overflowX, s.overflowY].some((v) => v === 'auto' || v === 'scroll' || v === 'hidden') &&
+      (parent.scrollWidth > parent.clientWidth || parent.scrollHeight > parent.clientHeight)
+        ? parent
+        : nearestScroller(parent);
+    scrollers.set(parent, value);
+    return value;
+  };
   return {
     style,
+    scrollBox(element: HTMLElement) {
+      // A stuck element moves against the page along its whole column.
+      const sticky = stickyAncestor(element);
+      if (sticky) {
+        const r = sticky.getBoundingClientRect();
+        return { left: r.left - 4, top: -1e7, width: r.width + 8, height: 2e7 };
+      }
+      const scroller = nearestScroller(element);
+      if (!scroller) return undefined;
+      const r = scroller.getBoundingClientRect();
+      return { left: r.left, top: r.top, width: r.width, height: r.height };
+    },
     scrolls(element: HTMLElement) {
       return !doc.fullscreenElement?.contains(element) && !fixedAncestor(element);
     },

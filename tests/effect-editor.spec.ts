@@ -9,7 +9,8 @@ import { isolate } from './helpers/world-host';
 
 const key = 'webWorldThemes.design.youtube',
   overlay = '#web-world-themes-decorations';
-const layers = ':is(#web-world-themes-decorations, #web-world-themes-video-decorations) [data-image-id]',
+const layers =
+    ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]',
   media = `${layers} .media`;
 async function open(popup: Page, youtube: Page) {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
@@ -168,7 +169,7 @@ test('effect edits survive undo, redo, discard, tab sync, reload and a persisten
   await save(panel);
   const saved = await stored(popup);
   expect(saved).toMatchObject({
-    schemaVersion: 11,
+    schemaVersion: 12,
     decorations: [{ effects: [{ kind: 'mask', radiusPx: 130, featherPx: 25, intensity: 0.65 }] }],
   });
   for (let i = 0; i < 8; i++) await youtube.mouse.move(200 + i * 20, 300);

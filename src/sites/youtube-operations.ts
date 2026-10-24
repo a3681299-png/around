@@ -134,6 +134,7 @@ export function youtubeOperations(doc: Document) {
             rect,
             visible,
             scrolls: visible ? composition.scrolls(element) : true,
+            ...((box) => (box ? { scrollBox: box } : {}))(visible ? composition.scrollBox(element) : undefined),
             nativeAbove: Boolean(visible && overlay && composition.above(element, overlay.parent, overlay.zIndex)),
             unsupported: kind === 'native-menu' && element.matches('select') && element === doc.activeElement,
           });

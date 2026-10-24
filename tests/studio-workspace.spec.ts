@@ -4,7 +4,8 @@ import { test, expect } from './fixtures';
 import { beginCanvasGesture } from './helpers/editor-workspace';
 
 const overlay = '#web-world-themes-decorations',
-  images = ':is(#web-world-themes-decorations, #web-world-themes-video-decorations) [data-image-id]';
+  images =
+    ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]';
 async function open(popup: Page, page: Page) {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();

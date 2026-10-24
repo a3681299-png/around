@@ -8,7 +8,8 @@ import { defaultCircleMask } from '../src/effects/types';
 
 const key = 'webWorldThemes.design.youtube',
   overlay = '#web-world-themes-decorations';
-const presentation = ':is(#web-world-themes-decorations, #web-world-themes-video-decorations)',
+const presentation =
+    ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',
   images = `${presentation} [data-image-id]`,
   compositions = `${presentation} [data-group-id]`;
 const colors = ['#f04a50', '#3caf78', '#4276ed'],
@@ -229,7 +230,7 @@ test('three images group, move as one, share a mouse/video mask, save, restart a
   await save(panel);
   const saved = await stored(popup);
   expect(saved).toMatchObject({
-    schemaVersion: 11,
+    schemaVersion: 12,
     groups: [{ name: '海の世界', effects: [{ radiusPx: 120, featherPx: 25 }] }],
   });
   expect(saved.decorations).toHaveLength(3);

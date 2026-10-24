@@ -55,6 +55,7 @@ export function createOperationGuardHost(
           s.protectedEnvelope.left,
           s.protectedEnvelope.width,
           ...(s.scrolls ? [] : [s.protectedEnvelope.top, s.protectedEnvelope.height]),
+          s.scrollBox ? [s.scrollBox.left, s.scrollBox.top, s.scrollBox.width, s.scrollBox.height] : null,
         ]),
     ]);
   let boundary = boundaryKey(surfaces);
@@ -73,7 +74,12 @@ export function createOperationGuardHost(
     lastStatus = '',
     timer: number | undefined;
   const snapshot = (): SafetyStatus => ({ issues, surfaces, approaching: proximity.safe, stopped, overlay });
+  // Same objects and flags as the last publish cannot change the signature below.
+  let published: readonly unknown[] = [];
   const publish = () => {
+    const inputs = [issues, stopped, overlay, proximity.safe, overlay ? surfaces : null, overlayHost];
+    if (inputs.length === published.length && inputs.every((value, i) => value === published[i])) return;
+    published = inputs;
     const signature = JSON.stringify([issues, stopped, overlay, proximity.safe, overlay ? surfaces : null]);
     if (signature === lastStatus) return;
     lastStatus = signature;
@@ -379,6 +385,7 @@ export function createOperationGuardHost(
         overlayHost.attachShadow({ mode: 'open' });
       }
       lastStatus = '';
+      published = [];
       publish();
     },
     pause,

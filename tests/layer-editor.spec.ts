@@ -5,7 +5,8 @@ import type { DesignDocument } from '../src/design/types';
 
 const key = 'webWorldThemes.design.youtube';
 const overlay = '#web-world-themes-decorations';
-const images = ':is(#web-world-themes-decorations, #web-world-themes-video-decorations) [data-image-id]';
+const images =
+  ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]';
 const rows = '[data-layer-id]';
 
 async function open(popup: Page, page: Page) {

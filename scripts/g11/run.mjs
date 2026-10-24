@@ -137,10 +137,12 @@ async function area(name) {
   await selectContext();
   const value = await evaluate('__g11Probe.controller.safety.sample(performance.now()); __g11Probe.snapshot()');
   if (!value) throw new Error('No guarded snapshot for ' + name);
-  const { snapshot, regions, status, videoSlot } = value;
+  const { snapshot, regions, pageRegions, pageSlot, status, videoSlot } = value;
   const total = snapshot.viewport.width * snapshot.viewport.height;
   const safe = regions.reduce((a, r) => a + r.width * r.height, 0);
+  const pageSafe = pageRegions.reduce((a, r) => a + r.width * r.height, 0);
   if (safe < 0 || safe > total + 1e-6) throw new Error('Invalid disjoint region area');
+  if (pageSafe < 0 || pageSafe > total + 1e-6) throw new Error('Invalid disjoint page region area');
   const state = await page.evaluate(() => ({
     url: location.href,
     scrollY,
@@ -160,6 +162,10 @@ async function area(name) {
     totalPixels: total,
     drawablePercent: (100 * safe) / total,
     regionCount: regions.length,
+    pageSlot,
+    pageSafePixels: pageSafe,
+    pageDrawablePercent: (100 * pageSafe) / total,
+    pageRegions,
     surfaceCount: snapshot.surfaces.length,
     visibleSurfaceCount: snapshot.surfaces.filter((s) => s.availability.visible).length,
     snapshot,
@@ -173,6 +179,7 @@ async function area(name) {
       JSON.stringify({
         name,
         percent: row.drawablePercent,
+        pagePercent: row.pageDrawablePercent,
         surfaces: row.surfaceCount,
         stopped: status,
         cards: state.cards,

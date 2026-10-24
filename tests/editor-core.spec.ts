@@ -689,12 +689,12 @@ test('legacy v7 saved checkpoints migrate before conflict comparison and failed 
   b.editor.setEnabled(true);
   b.editor.open();
   await b.editor.restore(legacy);
-  expect(b.editor.snapshot().document.schemaVersion).toBe(11);
+  expect(b.editor.snapshot().document.schemaVersion).toBe(12);
   expect(b.editor.snapshot().view.dirty).toBe(false);
   expect(b.editor.snapshot().view.error).toBe(false);
   expect(JSON.stringify(legacy)).toBe(before);
   const invalid = structuredClone(legacy);
-  Object.assign(invalid.saved!, { schemaVersion: 12 });
+  Object.assign(invalid.saved!, { schemaVersion: 13 });
   const current = b.editor.snapshot().document;
   await expect(b.editor.restore(invalid)).rejects.toThrow();
   expect(b.editor.snapshot().document).toEqual(current);

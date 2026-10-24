@@ -1,5 +1,6 @@
 import type { OperationSnapshot, OperationSurface } from '../world/operations';
 import type { PlacementFrame } from '../world/geometry';
+import { scrollsWithPage } from './operation-composition';
 
 /** Attributes a site selector may test; a change can add or drop a candidate by itself. */
 const MATCHING_ATTRIBUTES = new Set(['class', 'role', 'href', 'contenteditable']);
@@ -23,6 +24,8 @@ export interface OperationCandidate {
   /** Optional readings from the adapter's same synchronous discovery pass. */
   rect?: PlacementFrame;
   visible?: boolean;
+  /** Clip box of an inner scroll container, when the candidate is inside one. */
+  scrollBox?: PlacementFrame;
 }
 /** What changed since the adapter's previous discovery. */
 export interface DiscoveryScan {
@@ -40,6 +43,8 @@ export interface OperationSource {
   validate(snapshot: OperationSnapshot, event?: Event): boolean;
   videoSlot(): { parent: HTMLElement; rect: PlacementFrame; top: number; bottom: number } | undefined;
   overlaySlot(): { parent: HTMLElement; zIndex: number } | undefined;
+  /** The overlay parent when a child placed at the document origin scrolls with the page. */
+  pageSlot(): { parent: HTMLElement; zIndex: number } | undefined;
   destroy(): void;
 }
 /** DOM identities stay here; the site adapter alone supplies discovery/selectors. */
@@ -92,23 +97,40 @@ export function createOperationSource(
       listeners.forEach((listener) => listener());
     }
   };
-  const observer = new MutationObserver((records) => {
+  // Records taken synchronously by capture() notify listeners at the same microtask
+  // checkpoint the observer callback would have used, never inside the caller's frame.
+  let notifyPending = false;
+  const handle = (records: readonly MutationRecord[], deliver: boolean) => {
     collect(records);
-    if (
-      records.some(
-        (r) =>
-          r.target instanceof Element &&
-          !r.target.closest('[id^="web-world-themes"]') &&
-          ((r.type === 'attributes' &&
-            (['role', 'tabindex', 'contenteditable'].includes(r.attributeName ?? '') ||
-              rows.some((row) => r.target === row.element || (r.target as Element).contains(row.element)))) ||
-            [...r.addedNodes, ...r.removedNodes].some(
-              (n) => n instanceof Element && !n.id.startsWith('web-world-themes'),
-            )),
-      )
-    )
-      mark();
-  });
+    if (!relevant(records)) return;
+    if (deliver) mark();
+    else if (!dirty) {
+      dirty = true;
+      if (!notifyPending) {
+        notifyPending = true;
+        queueMicrotask(() => {
+          notifyPending = false;
+          listeners.forEach((listener) => listener());
+        });
+      }
+    }
+  };
+  const relevant = (records: readonly MutationRecord[]) =>
+    records.some(
+      (r) =>
+        r.target instanceof Element &&
+        !r.target.closest('[id^="web-world-themes"]') &&
+        ((r.type === 'attributes' &&
+          // While composition is unverified, any observed attribute may restore it.
+          (cached?.supported === false ||
+            ['role', 'tabindex', 'contenteditable'].includes(r.attributeName ?? '') ||
+            rows.some((row) => r.target === row.element || (r.target as Element).contains(row.element)))) ||
+          [...r.addedNodes, ...r.removedNodes].some(
+            (n) => n instanceof Element && !n.id.startsWith('web-world-themes'),
+          )),
+    );
+  const observer = new MutationObserver((records) => handle(records, true));
+  const root = doc.documentElement;
   observer.observe(doc.documentElement, {
     childList: true,
     subtree: true,
@@ -153,7 +175,10 @@ export function createOperationSource(
   doc.defaultView!.addEventListener('focus', mark);
   types.forEach((type, i) => doc.addEventListener(type, handlers[i]!, { capture: true, passive: true }));
   function capture(): OperationSnapshot {
-    if (!dirty && cached && rows.every((r) => r.element.isConnected)) return cached;
+    // Undelivered records are the only way a read element can have left the document.
+    const pending = observer.takeRecords();
+    if (pending.length) handle(pending, false);
+    if (!dirty && cached && doc.documentElement === root) return cached;
     dirty = false;
     const now = doc.defaultView!.performance.now();
     const scan: DiscoveryScan = {
@@ -217,13 +242,15 @@ export function createOperationSource(
               ? 'native-underlay'
               : 'exclusion',
         scrolls: row.scrolls !== false,
+        ...(row.scrollBox ? { scrollBox: Object.freeze({ ...row.scrollBox }) } : {}),
       };
     });
     const signature = JSON.stringify([
       identity,
-      surfaces.map(({ shape, protectedEnvelope, policy, compositionCapability, availability }) => [
+      surfaces.map(({ shape, protectedEnvelope, scrollBox, policy, compositionCapability, availability }) => [
         shape,
         protectedEnvelope,
+        scrollBox ?? null,
         policy,
         compositionCapability,
         availability.visible,
@@ -252,6 +279,17 @@ export function createOperationSource(
     issued.add(cached);
     return cached;
   }
+  // The slot reads computed styles of the overlay's ancestors, which a stylesheet can change
+  // without any MutationRecord. Calls within one task (one draw) share a read; the next task
+  // reads again, so no paint is decided on an earlier task's value.
+  let slot: { value: ReturnType<typeof overlaySlot> } | undefined;
+  const verifiedOverlaySlot = () => {
+    if (!slot) {
+      slot = { value: overlaySlot() };
+      queueMicrotask(() => (slot = undefined));
+    }
+    return slot.value;
+  };
   return {
     active(value) {
       observer.disconnect();
@@ -330,7 +368,15 @@ export function createOperationSource(
         );
     },
     videoSlot,
-    overlaySlot,
+    overlaySlot: verifiedOverlaySlot,
+    pageSlot() {
+      const overlay = verifiedOverlaySlot();
+      if (!overlay || doc.fullscreenElement) return undefined;
+      // Horizontal page scroll is not part of any envelope; refuse rather than guess.
+      const scroller = doc.scrollingElement ?? doc.documentElement;
+      if (scroller.scrollWidth > scroller.clientWidth) return undefined;
+      return scrollsWithPage(overlay.parent) ? overlay : undefined;
+    },
     destroy() {
       observer.disconnect();
       resize.disconnect();

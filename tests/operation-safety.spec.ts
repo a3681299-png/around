@@ -1,4 +1,5 @@
 import { build } from 'esbuild';
+import type { Page } from '@playwright/test';
 import { test, expect } from './fixtures';
 import path from 'node:path';
 import { exposeEditorControls } from './helpers/editor-workspace';
@@ -6,7 +7,7 @@ import { exposeEditorControls } from './helpers/editor-workspace';
 async function probeCode() {
   const result = await build({
     stdin: {
-      contents: `export {youtubeOperations} from './src/sites/youtube-operations'; export {createCompositionReader,nativeAbove,scrollsWithPage} from './src/host/operation-composition'; export {createOperationGuardHost} from './src/host/operation-guard'; export {safePaintRegions} from './src/world/operations'; export {evaluatePreparedWorld,initialWorldState} from './src/world/evaluate'; export {evaluateLayout} from './src/world/layout'; export {worldScenario} from './tests/helpers/world-scenario';`,
+      contents: `export {youtubeOperations} from './src/sites/youtube-operations'; export {createCompositionReader,nativeAbove,scrollsWithPage,fixedContainingBlock} from './src/host/operation-composition'; export {createOperationSource} from './src/host/operation-source'; export {createOperationGuardHost} from './src/host/operation-guard'; export {safePaintRegions} from './src/world/operations'; export {evaluatePreparedWorld,initialWorldState} from './src/world/evaluate'; export {evaluateLayout} from './src/world/layout'; export {worldScenario} from './tests/helpers/world-scenario';`,
       resolveDir: process.cwd(),
     },
     bundle: true,
@@ -44,6 +45,175 @@ test('default artwork retains its decoder while the compositor clips protected r
     console.log('Safety state:', await youtube.locator('#web-world-themes-decorations').getAttribute('data-ww-safety'));
     throw error;
   }
+});
+
+async function opaqueArtwork(popup: Page, youtube: Page) {
+  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await youtube.bringToFront();
+  await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
+  const editor = youtube.locator('#web-world-themes-creator');
+  await exposeEditorControls(editor);
+  const data = await youtube.evaluate(() => {
+    const c = document.createElement('canvas');
+    c.width = 64;
+    c.height = 48;
+    c.getContext('2d')!.fillRect(0, 0, 64, 48);
+    return c.toDataURL();
+  });
+  await editor.getByLabel('画像素材を追加').setInputFiles({
+    name: 'opaque.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from(data.split(',')[1]!, 'base64'),
+  });
+  await expect(youtube.locator('[data-image-id]').first()).toBeAttached();
+  return editor;
+}
+// Editor changes briefly pause drawing until the native geometry is stable again.
+const settled = (youtube: Page) =>
+  expect
+    .poll(
+      async () =>
+        JSON.parse((await youtube.locator('#web-world-themes-decorations').getAttribute('data-ww-safety')) ?? '{}')
+          .stopped,
+    )
+    .toBe('');
+const planeOf = (youtube: Page) =>
+  youtube.evaluate(() => {
+    const node = [
+      '#web-world-themes-decorations',
+      '#web-world-themes-page-decorations',
+      '#web-world-themes-atmosphere-decorations',
+      '#web-world-themes-video-decorations',
+    ].find((id) => document.querySelector(id)?.shadowRoot?.querySelector('[data-image-id]'));
+    return node ?? null;
+  });
+
+test('atmosphere artwork crosses protected controls under one capped plane and never takes input', async ({
+  popup,
+  youtube,
+}) => {
+  const editor = await opaqueArtwork(popup, youtube);
+  await editor.getByLabel('画像の幅').fill('1800');
+  await editor.getByLabel('画像の高さ').fill('1000');
+  await editor.getByLabel('描画モード').selectOption('atmosphere');
+  await expect.poll(() => planeOf(youtube)).toBe('#web-world-themes-atmosphere-decorations');
+  await settled(youtube);
+  const result = await youtube.evaluate(() => {
+    const plane = document.querySelector<HTMLElement>('#web-world-themes-atmosphere-decorations')!,
+      screen = document.querySelector<HTMLElement>('#web-world-themes-decorations')!;
+    const node = plane.shadowRoot!.querySelector<HTMLElement>('[data-image-id]')!;
+    const safety = JSON.parse(screen.dataset.wwSafety ?? '{}');
+    return {
+      opacity: Number(getComputedStyle(plane).opacity),
+      clip: getComputedStyle(plane).clipPath,
+      filter: getComputedStyle(node).filter,
+      nodePointer: getComputedStyle(node).pointerEvents,
+      visibility: node.style.visibility,
+      belowScreen: Boolean(plane.compareDocumentPosition(screen) & Node.DOCUMENT_POSITION_FOLLOWING),
+      issues: safety.issues ?? [],
+    };
+  });
+  expect(result.opacity).toBeCloseTo(0.33, 5);
+  expect(result.clip).toBe('none');
+  expect(result.filter).toBe('none');
+  expect(result.nodePointer).toBe('none');
+  expect(result.visibility).toBe('');
+  expect(result.belowScreen).toBe(true);
+  expect(result.issues.filter((i: any) => i.severity === 'enforced' && i.action !== 'flatten')).toEqual([]);
+  // The native control under the translucent plane is still the real hit target.
+  const button = youtube.getByRole('button', { name: 'All', exact: true });
+  expect(
+    await button.evaluate((element) => {
+      const r = element.getBoundingClientRect();
+      return document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) === element;
+    }),
+  ).toBe(true);
+  await button.click();
+});
+
+test('player artwork follows the page when the player-local plane is unavailable and avoids only current rectangles', async ({
+  popup,
+  youtube,
+}) => {
+  await youtube.goto('https://www.youtube.com/watch?v=fixture');
+  const editor = await opaqueArtwork(popup, youtube);
+  await editor.getByLabel('配置の基準').selectOption('video-player');
+  await editor.getByLabel('画像の幅').fill('600');
+  await editor.getByLabel('画像の高さ').fill('300');
+  // A player this short has no verified local band, which used to leave only the screen plane.
+  await youtube.locator('#movie_player').evaluate((player: HTMLElement) => {
+    player.style.height = '150px';
+  });
+  await expect.poll(() => planeOf(youtube)).toBe('#web-world-themes-page-decorations');
+  await settled(youtube);
+  const result = await youtube.evaluate(async () => {
+    const frame = () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    const plane = document.querySelector<HTMLElement>('#web-world-themes-page-decorations')!,
+      screen = document.querySelector<HTMLElement>('#web-world-themes-decorations')!;
+    const node = plane.shadowRoot!.querySelector<HTMLElement>('[data-image-id]')!;
+    await frame();
+    const before = node.getBoundingClientRect().top;
+    const origin = plane.getBoundingClientRect();
+    window.scrollBy(0, 120);
+    await frame();
+    await frame();
+    return {
+      moved: before - node.getBoundingClientRect().top,
+      origin: { left: origin.left + scrollX, top: origin.top + scrollY - 120 },
+      clip: plane.style.getPropertyValue('--ww-decoration-clip'),
+      order: Boolean(plane.compareDocumentPosition(screen) & Node.DOCUMENT_POSITION_FOLLOWING),
+      sameParent: plane.parentElement === screen.parentElement,
+    };
+  });
+  expect(result.moved).toBeCloseTo(120, 0);
+  expect(Math.abs(result.origin.left)).toBeLessThan(1);
+  expect(Math.abs(result.origin.top)).toBeLessThan(1);
+  expect(result.clip).toContain('path(');
+  expect(result.order).toBe(true);
+  expect(result.sameParent).toBe(true);
+});
+
+test('redraws over unchanged protection geometry leave the clip and safety record untouched', async ({
+  popup,
+  youtube,
+}) => {
+  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await youtube.bringToFront();
+  await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
+  const editor = youtube.locator('#web-world-themes-creator');
+  await exposeEditorControls(editor);
+  const data = await youtube.evaluate(() => {
+    const c = document.createElement('canvas');
+    c.width = 64;
+    c.height = 48;
+    c.getContext('2d')!.fillRect(0, 0, 64, 48);
+    return c.toDataURL();
+  });
+  await editor.getByLabel('画像素材を追加').setInputFiles({
+    name: 'opaque.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from(data.split(',')[1]!, 'base64'),
+  });
+  await expect(youtube.locator('#web-world-themes-decorations img')).toBeVisible();
+  const result = await youtube.evaluate(async () => {
+    const host = document.querySelector('#web-world-themes-decorations')!;
+    const frame = () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    for (let i = 0; i < 30 && host.getAttribute('data-ww-safety')?.includes('"stopped":"操作'); i++) await frame();
+    await frame();
+    const clip = (host as HTMLElement).style.getPropertyValue('--ww-decoration-clip');
+    const writes: string[] = [];
+    const observer = new MutationObserver((records) => records.forEach((r) => writes.push(r.attributeName!)));
+    observer.observe(host, { attributes: true, attributeFilter: ['style', 'data-ww-safety'] });
+    // Each resize marks the source and forces a redraw; the geometry itself is unchanged.
+    for (let i = 0; i < 5; i++) {
+      window.dispatchEvent(new Event('resize'));
+      await frame();
+    }
+    observer.disconnect();
+    return { clip, writes };
+  });
+  expect(result.clip).toContain('path(');
+  expect(result.writes).toEqual([]);
 });
 
 test('shared ancestry preserves stacking proofs and a new read sees changed native styles', async ({ youtube }) => {
@@ -440,6 +610,123 @@ test('incremental discovery matches a fresh full scan after inserts, removals, m
         name,
       ).toBe(true);
   }
+});
+
+test('the composition slot is shared within one task and read again by every later task', async ({ youtube }) => {
+  await youtube.addScriptTag({ content: await probeCode() });
+  const result = await youtube.evaluate(async () => {
+    const api = (window as any).G1Probe;
+    const original = window.getComputedStyle;
+    let reads = 0;
+    window.getComputedStyle = function (...args: Parameters<typeof original>) {
+      reads++;
+      return original.apply(window, args);
+    } as typeof original;
+    const count = (f: () => unknown) => {
+      reads = 0;
+      const value = f();
+      return { reads, value };
+    };
+    const source = api.youtubeOperations(document);
+    source.capture();
+    const first = count(() => Boolean(source.overlaySlot()));
+    const repeated = count(() => Boolean(source.overlaySlot()));
+    const app = document.querySelector<HTMLElement>('ytd-app')!;
+    app.style.transform = 'translateX(0)';
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const changed = count(() => Boolean(source.overlaySlot()));
+    app.style.removeProperty('transform');
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const restored = count(() => Boolean(source.overlaySlot()));
+    await Promise.resolve();
+    const nextMicrotask = count(() => Boolean(source.overlaySlot()));
+    window.getComputedStyle = original;
+    source.destroy();
+    return { first, repeated, changed, restored, nextMicrotask };
+  });
+  expect(result.first).toMatchObject({ value: true });
+  expect(result.first.reads).toBeGreaterThan(0);
+  expect(result.repeated).toEqual({ reads: 0, value: true });
+  expect(result.changed.value).toBe(false); // A transformed ancestor removes the verified slot.
+  expect(result.restored.value).toBe(true);
+  expect(result.nextMicrotask.reads).toBeGreaterThan(0);
+});
+
+test('a stylesheet-only change to an overlay ancestor is seen by the next frame without any DOM mutation', async ({
+  youtube,
+}) => {
+  await youtube.addScriptTag({ content: await probeCode() });
+  const result = await youtube.evaluate(async () => {
+    const api = (window as any).G1Probe;
+    const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
+    // A quiet document isolates the slot read from unrelated snapshot reissues.
+    const iframe = document.createElement('iframe');
+    iframe.id = 'web-world-themes-test-quiet';
+    document.body.append(iframe);
+    const doc = iframe.contentDocument!;
+    doc.body.innerHTML = '<div id="app"></div>';
+    const app = doc.getElementById('app')!;
+    const source = api.createOperationSource(
+      doc,
+      () => [],
+      () => undefined,
+      () => {
+        for (let node: HTMLElement | null = app; node; node = node.parentElement)
+          if (api.fixedContainingBlock(doc.defaultView!.getComputedStyle(node))) return undefined;
+        return { parent: app, zIndex: 1 };
+      },
+    );
+    // Let the initial ResizeObserver delivery reissue its snapshot first.
+    source.capture();
+    for (let i = 0; i < 3; i++) await frame();
+    const before = Boolean(source.overlaySlot());
+    const snapshot = source.capture();
+    // Constructed sheets change computed style without a MutationRecord.
+    const sheet = new (doc.defaultView as any).CSSStyleSheet();
+    sheet.replaceSync('#app{transform:translateX(0)}');
+    doc.adoptedStyleSheets = [sheet];
+    await frame();
+    const nextFrame = Boolean(source.overlaySlot());
+    const sameSnapshot = source.capture() === snapshot;
+    doc.adoptedStyleSheets = [];
+    await frame();
+    const restored = Boolean(source.overlaySlot());
+    source.destroy();
+    iframe.remove();
+    return { before, nextFrame, restored, sameSnapshot };
+  });
+  // The snapshot is not reissued, so only a per-frame slot read can notice the change.
+  expect(result).toEqual({ before: true, nextFrame: false, restored: true, sameSnapshot: true });
+});
+
+test('a native removal is seen by the next synchronous read and the guard is told after the task', async ({
+  youtube,
+}) => {
+  await youtube.addScriptTag({ content: await probeCode() });
+  const result = await youtube.evaluate(async () => {
+    const api = (window as any).G1Probe;
+    const button = document.createElement('button');
+    button.setAttribute('style', 'position:absolute;left:300px;top:300px;width:47px;height:47px');
+    document.querySelector('ytd-app')!.append(button);
+    const source = api.youtubeOperations(document);
+    let notified = 0;
+    source.subscribe(() => notified++);
+    const has = (snapshot: any) => snapshot.surfaces.some((s: any) => s.shape.width === 47);
+    const before = has(source.capture());
+    button.remove();
+    const sameTask = has(source.capture());
+    const notifiedInTask = notified;
+    await Promise.resolve();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const later = { present: has(source.capture()), notified };
+    source.destroy();
+    return { before, sameTask, notifiedInTask, later };
+  });
+  expect(result.before).toBe(true);
+  expect(result.sameTask).toBe(false);
+  expect(result.notifiedInTask).toBe(0);
+  expect(result.later.present).toBe(false);
+  expect(result.later.notified).toBeGreaterThan(0);
 });
 
 test('small native changes skip the whole-document query while input checks and the periodic sweep still scan it', async ({

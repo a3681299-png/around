@@ -13,7 +13,7 @@ const expected = JSON.parse(readFileSync(fixtures + 'chain-expected.json', 'utf8
 };
 
 test('every historical layer stage rejects excess decorations before inspecting the first layer', () => {
-  for (let version = 2; version < 11; version++) {
+  for (let version = 2; version < 12; version++) {
     let reads = 0;
     const decorations = new Array<unknown>(IMAGE_LIMITS.count + 1);
     Object.defineProperty(decorations, 0, {
@@ -71,6 +71,7 @@ test('each old version rejects fields and capabilities introduced in a later ver
     doc(8, { decorations: [{ ...image, motion: { kind: 'pointer-follow' } }] }),
     { ...load('history-v10.json'), schemaVersion: 9 },
     { ...load('history-v11.json'), schemaVersion: 10 },
+    doc(11, { decorations: [{ ...image, renderMode: 'atmosphere' }] }),
   ];
   for (const value of forbidden) expect(() => parseDesign(value)).toThrow();
   for (const version of [4, 5, 6]) {
@@ -94,7 +95,7 @@ test('every pure adjacent step advances one version without granting validation 
     let data = freezeTree(JSON.parse(readFileSync(fixtures + file, 'utf8')));
     const original = JSON.stringify(data);
     const version = data.schemaVersion as number;
-    for (let from = version; from < 11; from++) {
+    for (let from = version; from < 12; from++) {
       const migration = DESIGN_MIGRATIONS[from - 1]!;
       const before = JSON.stringify(data);
       const migrated = migration(data);
@@ -115,7 +116,7 @@ test('every pure adjacent step advances one version without granting validation 
     rules: [],
     decorations: [{ kind: 'image', opacity: Infinity }],
   });
-  expect(unvalidated['schemaVersion']).toBe(11);
+  expect(unvalidated['schemaVersion']).toBe(12);
   expect(() => parseDesign(unvalidated)).toThrow();
   expect(() => readDesign(freezeTree(unvalidated))).toThrow();
   expect(() => commitDesign(unvalidated as unknown as DesignDocument)).toThrow();
@@ -135,4 +136,51 @@ test('historical gates reject even undefined future fields and group motion befo
     data.groups[0].motion = undefined;
     expect(() => parseDesign(data)).toThrow();
   }
+});
+
+test('v12 renderMode keeps normal by omission, stores atmosphere, and keeps a group undivided', () => {
+  const image = JSON.parse(readFileSync(fixtures + 'v3.json', 'utf8')).decorations[0];
+  const doc = (decorations: object[], groups?: object[]) => ({
+    schemaVersion: 12,
+    id: 'modes',
+    siteId: 'youtube',
+    baseThemeId: null,
+    rules: [],
+    decorations,
+    ...(groups ? { groups } : {}),
+  });
+  const a = { ...image, id: 'image-a' },
+    b = { ...image, id: 'image-b' };
+  // Every v11 document migrates with normal rendering and no new field.
+  const migrated = parseDesign({ ...doc([a]), schemaVersion: 11 });
+  expect(migrated.schemaVersion).toBe(12);
+  expect(Object.hasOwn(migrated.decorations[0]!, 'renderMode')).toBe(false);
+  expect(Object.hasOwn(parseDesign(doc([{ ...a, renderMode: 'normal' }])).decorations[0]!, 'renderMode')).toBe(false);
+  const atmosphere = parseDesign(doc([{ ...a, renderMode: 'atmosphere' }]));
+  expect(atmosphere.decorations[0]!.renderMode).toBe('atmosphere');
+  expect(parseDesign(JSON.parse(JSON.stringify(atmosphere)))).toStrictEqual(atmosphere);
+  for (const renderMode of ['overlay', 1, null, 'Atmosphere'])
+    expect(() => parseDesign(doc([{ ...a, renderMode }]))).toThrow('描画モード');
+  const group = {
+    kind: 'group',
+    id: 'group-a',
+    name: 'Group',
+    opacity: 1,
+    zIndex: 0,
+    visible: true,
+    locked: false,
+    children: ['image-a', 'image-b'],
+  };
+  const both = [
+    { ...a, renderMode: 'atmosphere' },
+    { ...b, renderMode: 'atmosphere' },
+  ];
+  expect(parseDesign(doc(both, [{ ...group, renderMode: 'atmosphere' }])).groups![0]!.renderMode).toBe('atmosphere');
+  expect(() => parseDesign(doc(both, [group]))).toThrow('同じ描画モード');
+  expect(() => parseDesign(doc([both[0]!, b], [{ ...group, renderMode: 'atmosphere' }]))).toThrow('同じ描画モード');
+  const committed = readDesign(freezeTree(parseDesign(doc(both, [{ ...group, renderMode: 'atmosphere' }]))));
+  const edited = editDesign(committed);
+  edited.decorations[1] = { ...edited.decorations[1]!, renderMode: undefined } as never;
+  delete (edited.decorations[1] as { renderMode?: string }).renderMode;
+  expect(() => commitDesign(edited, committed)).toThrow('同じ描画モード');
 });

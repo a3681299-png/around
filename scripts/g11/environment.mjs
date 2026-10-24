@@ -7,7 +7,11 @@ import { chromium } from '@playwright/test';
 export const root = fileURLToPath(new URL('../../', import.meta.url));
 process.chdir(root);
 export const workRoot = path.join(root, '.work');
-export const extensionPath = path.join(workRoot, 'g11-measurement-dist');
+// A whole earlier build can be measured (for example a version with an older saved format);
+// it must stay inside this checkout's .work directory like every other output.
+export const extensionPath = process.env.G11_EXTENSION_PATH
+  ? workPath(process.env.G11_EXTENSION_PATH)
+  : path.join(workRoot, 'g11-measurement-dist');
 export const browserPath =
   process.env.G11_BROWSER_PATH || process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || chromium.executablePath();
 export const revision = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();

@@ -225,10 +225,22 @@ export function createEditorSession<Source extends { readonly length: number }>(
         );
       }
       next.groups = next.groups!.map((group) => (group.id === id ? { ...group, ...properties } : group));
+      // A group renders as one subtree, so its members always follow its mode.
+      const mode = properties.renderMode;
+      if (mode)
+        next.decorations = next.decorations.map((image) =>
+          group.children.includes(image.id) ? { ...image, renderMode: mode } : image,
+        );
       updateDraft(next);
       return;
     }
     if (current.kind === 'group') return;
+    if (parent && patch.renderMode) {
+      status = 'グループ内の描画モードはグループで変更してください。';
+      error = true;
+      render();
+      return;
+    }
     if (patch.placement?.anchor) {
       if (parent && !sameAnchor(current.placement.anchor, patch.placement.anchor)) {
         status = 'グループ内では配置基準を変更できません。解除してから変更してください。';

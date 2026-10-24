@@ -104,13 +104,14 @@ await build({
             `  __probe.controller = controller;
   __probe.snapshot = () => {
     const snapshot = controller.safety?.source.capture();
-    return snapshot ? { snapshot, regions: __g11SafePaintRegions(snapshot, false), videoSlot: Boolean(controller.safety.source.videoSlot()), status: controller.safety.snapshot().stopped } : null;
+    const pageSlot = snapshot && controller.safety.source.pageSlot();
+    return snapshot ? { snapshot, regions: __g11SafePaintRegions(snapshot, false), pageRegions: pageSlot ? __g11PagePaintRegions(snapshot, false, { left: 0, top: 0, ...snapshot.viewport }) : [], pageSlot: Boolean(pageSlot), videoSlot: Boolean(controller.safety.source.videoSlot()), status: controller.safety.snapshot().stopped } : null;
   };
   const disconnectStudio =`,
             'controller access',
           );
           return {
-            contents: `import { safePaintRegions as __g11SafePaintRegions } from '../world/operations';\n${prefix}\n${text}`,
+            contents: `import { safePaintRegions as __g11SafePaintRegions, pagePaintRegions as __g11PagePaintRegions } from '../world/operations';\n${prefix}\n${text}`,
             loader: 'ts',
           };
         });

@@ -1,7 +1,7 @@
 import { ASSET_LIMITS, ASSET_MESSAGES } from '../assets/limits';
 import { IMAGE_LIMITS } from './types';
 
-// Intermediate objects are untrusted. Only schema.ts's final v11 validation may
+// Intermediate objects are untrusted. Only schema.ts's final v12 validation may
 // produce a DesignDocument; migration never grants immutable.ts's validated mark.
 type Data = Record<string, unknown>;
 interface Shape {
@@ -137,6 +137,11 @@ export function migrateV10ToV11(value: unknown): Data {
   return next(data, 11);
 }
 
+export function migrateV11ToV12(value: unknown): Data {
+  // renderMode is new in v12; every earlier layer keeps normal rendering by omission.
+  return next(stage(value, 11, { root: root8, layer: layer10, kinds: models, group: group9 }), 12);
+}
+
 export const DESIGN_MIGRATIONS = Object.freeze([
   migrateV1ToV2,
   migrateV2ToV3,
@@ -148,14 +153,15 @@ export const DESIGN_MIGRATIONS = Object.freeze([
   migrateV8ToV9,
   migrateV9ToV10,
   migrateV10ToV11,
+  migrateV11ToV12,
 ]);
 
-/** Pure chain; a returned v11 object is still unvalidated external input. */
+/** Pure chain; a returned v12 object is still unvalidated external input. */
 export function migrateDesign(value: unknown): Data {
   let data = record(value);
   const version = data['schemaVersion'];
-  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 11)
+  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 12)
     throw new Error('このデザインのバージョンには対応していません。');
-  for (let from = version; from < 11; from++) data = DESIGN_MIGRATIONS[from - 1]!(data);
+  for (let from = version; from < 12; from++) data = DESIGN_MIGRATIONS[from - 1]!(data);
   return data;
 }

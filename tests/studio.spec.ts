@@ -11,7 +11,8 @@ import type { EditorSnapshot } from '../src/editor-core/types';
 import { beginCanvasGesture } from './helpers/editor-workspace';
 
 const overlay = '#web-world-themes-decorations',
-  presentation = ':is(#web-world-themes-decorations, #web-world-themes-video-decorations)',
+  presentation =
+    ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',
   images = `${presentation} [data-image-id]`,
   key = 'webWorldThemes.design.youtube';
 async function launch(context: BrowserContext, popup: Page, youtube: Page) {
@@ -152,7 +153,7 @@ test('standalone Studio edits a real extension target using shared grouping, eff
   await panel.getByLabel('動画の一時停止で隠す', { exact: true }).check();
   await save(panel);
   const saved = await stored(popup);
-  expect(saved.schemaVersion).toBe(11);
+  expect(saved.schemaVersion).toBe(12);
   expect(saved.groups?.[0]?.effects?.[0]).toMatchObject({ radiusPx: 180 });
   await studio.screenshot({ path: info.outputPath('studio-workspace.png') });
   // Quick editing shares the selected group and same Undo stack.

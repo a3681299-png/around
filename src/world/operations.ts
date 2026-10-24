@@ -21,6 +21,10 @@ export interface OperationSurface {
   compositionCapability: 'exclusion' | 'native-underlay' | 'native-above' | 'unsupported';
   /** Full possible vertical scroll path for a screen-fixed overlay. */
   scrolls: boolean;
+  /** Clip box of an inner scroll container between this surface and the page. The surface
+   * can move anywhere inside it without the page moving, so a page-following plane
+   * excludes the whole box instead of the current rectangle. */
+  scrollBox?: PlacementFrame;
 }
 export interface OperationSnapshot {
   generation: { documentId: number; geometry: number };
@@ -48,12 +52,53 @@ export interface PaintFootprint {
   pointerEvents: boolean;
   /** Includes filter/blur/shadow spread. Unknown spread is unsupported. */
   outset: number;
-  composition: 'overlay' | 'native-underlay' | 'unsupported';
+  /** overlay: screen-fixed plane. page: plane that scrolls with the document. atmosphere:
+   * translucent plane under ATMOSPHERE_ALPHA_CAP. native-underlay: player-local plane. */
+  composition: 'overlay' | 'page' | 'atmosphere' | 'native-underlay' | 'unsupported';
+}
+/** Engine-held, never stored in artwork. Worst-case uniform tint at this alpha keeps
+ * YouTube primary text at >= 4.5:1 and secondary text at >= 3:1 in light and dark themes. */
+export const ATMOSPHERE_ALPHA_CAP = 0.33;
+const UNBOUNDED = 1e7;
+/** Where a surface can be, as seen from a plane, during asynchronous scroll. */
+function pageEnvelope(surface: OperationSurface): PlacementFrame {
+  if (!surface.scrolls)
+    return {
+      left: surface.protectedEnvelope.left,
+      width: surface.protectedEnvelope.width,
+      top: -UNBOUNDED,
+      height: 2 * UNBOUNDED,
+    };
+  return surface.scrollBox ?? surface.protectedEnvelope;
 }
 export const intersects = (a: Bounds, b: PlacementFrame) =>
   a.right > b.left && a.left < b.left + b.width && a.bottom > b.top && a.top < b.top + b.height;
+/** Visible surfaces with both possible envelopes. Snapshots are immutable, so one read
+ * serves every paint and every frame until the source issues a new snapshot. */
+const visibleEnvelopes = new WeakMap<
+  OperationSnapshot,
+  readonly { surface: OperationSurface; envelope: PlacementFrame; swept: PlacementFrame; page: PlacementFrame }[]
+>();
+function envelopesOf(snapshot: OperationSnapshot) {
+  let rows = visibleEnvelopes.get(snapshot);
+  if (!rows) {
+    rows = snapshot.surfaces
+      .filter((surface) => surface.availability.visible)
+      .map((surface) => ({
+        surface,
+        envelope: surface.protectedEnvelope,
+        swept: surface.scrolls
+          ? { ...surface.protectedEnvelope, top: 0, height: snapshot.viewport.height }
+          : surface.protectedEnvelope,
+        page: pageEnvelope(surface),
+      }));
+    visibleEnvelopes.set(snapshot, rows);
+  }
+  return rows;
+}
 export function guardPaint(snapshot: OperationSnapshot, paints: readonly PaintFootprint[]): SafetyIssue[] {
   const issues: SafetyIssue[] = [];
+  const visible = envelopesOf(snapshot);
   for (const paint of paints) {
     if (paint.opacity <= 0 && !paint.pointerEvents) continue;
     if (
@@ -71,6 +116,20 @@ export function guardPaint(snapshot: OperationSnapshot, paints: readonly PaintFo
         reason: '操作面・配置基準・合成方法のいずれかを確認できません。',
         remedy: '対応する配置基準へ移すか、ページが安定するまで待ってください。',
       });
+      continue;
+    }
+    if (paint.composition === 'atmosphere') {
+      // The plane caps the composite alpha of all its layers, has no filters and takes no
+      // input; it may cross protected surfaces, so only input capture is a violation.
+      if (paint.pointerEvents)
+        issues.push({
+          layerId: paint.id,
+          surfaceId: 'atmosphere',
+          severity: 'enforced',
+          action: 'stop',
+          reason: '雰囲気レイヤーは入力を受け取れません。',
+          remedy: '操作を受け取る必要がある素材は通常の描画モードにしてください。',
+        });
       continue;
     }
     const bounds = {
@@ -112,16 +171,18 @@ export function guardPaint(snapshot: OperationSnapshot, paints: readonly PaintFo
       bounds.bottom = Math.min(bounds.bottom, clip.top + clip.height);
       if (bounds.left >= bounds.right || bounds.top >= bounds.bottom) continue;
     }
-    for (const surface of snapshot.surfaces) {
-      if (!surface.availability.visible) continue;
+    const planeCovers = paint.composition === 'overlay' || paint.composition === 'page';
+    for (const { surface, envelope: fixed, swept, page } of visible) {
       const envelope =
-        surface.scrolls && paint.composition !== 'native-underlay' && surface.compositionCapability !== 'native-above'
-          ? { ...surface.protectedEnvelope, top: 0, height: snapshot.viewport.height }
-          : surface.protectedEnvelope;
+        !planeCovers || surface.compositionCapability === 'native-above'
+          ? fixed
+          : paint.composition === 'page'
+            ? page
+            : swept;
       if (!intersects(bounds, envelope)) continue;
       // The stacking proof is relative to the screen overlay. A player-local
       // subtree must still check every native control in that player's plane.
-      if (surface.compositionCapability === 'native-above' && paint.composition === 'overlay') {
+      if (surface.compositionCapability === 'native-above' && planeCovers) {
         issues.push({
           layerId: paint.id,
           surfaceId: surface.id,
@@ -139,7 +200,7 @@ export function guardPaint(snapshot: OperationSnapshot, paints: readonly PaintFo
           layerId: paint.id,
           surfaceId: surface.id,
           severity: 'enforced',
-          action: paint.composition === 'overlay' ? 'clip' : 'stop',
+          action: planeCovers ? 'clip' : 'stop',
           reason: paint.pointerEvents
             ? '制作ハンドルが本物の操作を奪う位置です。'
             : '操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。',
@@ -184,6 +245,63 @@ export function safePaintRegions(snapshot: OperationSnapshot, editing: boolean):
     if (regions.length > 1024) return [];
   }
   return regions;
+}
+/** Disjoint safe rectangles for the plane that scrolls with the document, in viewport
+ * coordinates at the moment of the snapshot. Surfaces that scroll with the page are cut at
+ * their current envelope, inner scroll containers at their whole box, and screen-fixed
+ * surfaces along their entire vertical path. Only `area` (the plane's paint bounds) is
+ * partitioned, which keeps the clip small; too many pieces return none (no paint). */
+export function pagePaintRegions(
+  snapshot: OperationSnapshot,
+  editing: boolean,
+  area: PlacementFrame,
+): PlacementFrame[] {
+  if (!snapshot.supported || !(area.width > 0 && area.height > 0)) return [];
+  let regions: PlacementFrame[] = [area];
+  for (const surface of snapshot.surfaces) {
+    if (
+      !surface.availability.visible ||
+      surface.compositionCapability === 'native-above' ||
+      (!editing && surface.policy.occlusion === 'allow')
+    )
+      continue;
+    regions = cutRegions(regions, pageEnvelope(surface));
+    if (regions.length > 1024) return [];
+  }
+  return regions;
+}
+function cutRegions(regions: PlacementFrame[], cut: PlacementFrame): PlacementFrame[] {
+  return regions.flatMap((r) => {
+    const a = Math.max(r.left, cut.left),
+      b = Math.min(r.left + r.width, cut.left + cut.width),
+      c = Math.max(r.top, cut.top),
+      d = Math.min(r.top + r.height, cut.top + cut.height);
+    if (a >= b || c >= d) return [r];
+    return [
+      { left: r.left, top: r.top, width: r.width, height: c - r.top },
+      { left: r.left, top: d, width: r.width, height: r.top + r.height - d },
+      { left: r.left, top: c, width: a - r.left, height: d - c },
+      { left: b, top: c, width: r.left + r.width - b, height: d - c },
+    ].filter((part) => part.width > 0 && part.height > 0);
+  });
+}
+/** The compositor clip for one immutable snapshot, reused until the snapshot changes. */
+const clips = new WeakMap<
+  OperationSnapshot,
+  Partial<Record<'edit' | 'view', { regions: PlacementFrame[]; path: string }>>
+>();
+export function protectionClip(snapshot: OperationSnapshot, editing: boolean) {
+  let entry = clips.get(snapshot);
+  if (!entry) clips.set(snapshot, (entry = {}));
+  const key = editing ? 'edit' : 'view';
+  if (!entry[key]) {
+    const regions = safePaintRegions(snapshot, editing);
+    entry[key] = {
+      regions,
+      path: regions.map((r) => `M${r.left} ${r.top}h${r.width}v${r.height}h${-r.width}Z`).join(''),
+    };
+  }
+  return entry[key];
 }
 export interface ProximityState {
   safe: boolean;

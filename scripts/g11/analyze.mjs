@@ -68,6 +68,33 @@ for (const row of data.areas) {
       );
     }
   checks.push({ name: 'independent union and disjointness: ' + row.name, passed: true });
+  if (row.pageRegions) {
+    // The page plane cuts page-scrolling surfaces at their envelope, inner scroll boxes whole
+    // and screen-fixed surfaces along their column; recomputed here independently.
+    const pageRects = row.snapshot.surfaces
+      .filter(
+        (s) => s.availability.visible && s.compositionCapability !== 'native-above' && s.policy.occlusion !== 'allow',
+      )
+      .map((s) => {
+        const r = !s.scrolls
+          ? { ...s.protectedEnvelope, top: -1e7, height: 2e7 }
+          : (s.scrollBox ?? s.protectedEnvelope);
+        return {
+          left: Math.max(0, r.left),
+          right: Math.min(width, r.left + r.width),
+          top: Math.max(0, r.top),
+          bottom: Math.min(height, r.top + r.height),
+        };
+      })
+      .filter((r) => r.left < r.right && r.top < r.bottom);
+    const pageExpected = row.snapshot.supported && row.pageSlot ? width * height - unionArea(pageRects) : 0;
+    // A partition that exceeds the clip budget is reported as zero (no paint), never larger.
+    assert(
+      Math.abs(row.pageSafePixels - pageExpected) < 1e-4 || (row.pageSafePixels === 0 && row.pageRegions.length === 0),
+      row.name + ' page area mismatch',
+    );
+    checks.push({ name: 'independent page-plane union: ' + row.name, passed: true });
+  }
 }
 const playback = data.playback;
 if (playback) {
@@ -80,8 +107,8 @@ if (playback) {
   checks.push({ name: '60 second real playback validity', passed: true });
 }
 const pooled = {
-  guarded: { cpu: [], intervals: [], fullFrame: [], render: [], recaptures: [] },
-  unguarded: { cpu: [], intervals: [], fullFrame: [], render: [], recaptures: [] },
+  guarded: { cpu: [], quiet: [], recapturing: [], intervals: [], fullFrame: [], render: [], recaptures: [] },
+  unguarded: { cpu: [], quiet: [], recapturing: [], intervals: [], fullFrame: [], render: [], recaptures: [] },
 };
 for (const pair of data.pairs)
   for (const block of pair.blocks) {
@@ -94,6 +121,22 @@ for (const pair of data.pairs)
     }
     assert(grouped.size >= 1);
     pooled[mode].cpu.push(...grouped.values());
+    // A recapture belongs to the latest RAF that started at or before it. Captures outside
+    // RAF callbacks can only move a frame into the recapture group, never out of it.
+    const starts = [...grouped.keys()].sort((a, b) => a - b),
+      recapturing = new Set();
+    for (const { time } of raw.captures) {
+      let low = 0,
+        high = starts.length - 1,
+        found;
+      while (low <= high) {
+        const mid = (low + high) >> 1;
+        if (starts[mid] <= time) ((found = starts[mid]), (low = mid + 1));
+        else high = mid - 1;
+      }
+      if (found !== undefined) recapturing.add(found);
+    }
+    for (const [time, ms] of grouped) pooled[mode][recapturing.has(time) ? 'recapturing' : 'quiet'].push(ms);
     pooled[mode].intervals.push(...raw.intervals);
     pooled[mode].recaptures.push(...raw.captures.map((r) => r.ms));
     checks.push({ name: `valid frame records: ${pair.pair} ${mode}`, passed: true });
@@ -161,6 +204,8 @@ const modes = Object.fromEntries(
       fullFrameMs: stats(p.fullFrame),
       renderPhaseMs: stats(p.render),
       extensionRafCpuMs: stats(p.cpu),
+      extensionCpuQuietFrameMs: stats(p.quiet),
+      extensionCpuRecaptureFrameMs: stats(p.recapturing),
       rafIntervalMs: stats(p.intervals),
       recaptureMs: stats(p.recaptures),
     },
@@ -170,9 +215,22 @@ const summary = {
   revision: data.revision,
   measuredAt: data.measuredAt,
   areas: data.areas.map(
-    ({ name, drawablePercent, surfaceCount, viewport, cards, commentThreads, safePixels, totalPixels }) => ({
+    ({
       name,
       drawablePercent,
+      pageDrawablePercent,
+      pageSlot,
+      surfaceCount,
+      viewport,
+      cards,
+      commentThreads,
+      safePixels,
+      totalPixels,
+    }) => ({
+      name,
+      drawablePercent,
+      pageDrawablePercent,
+      pageSlot,
       surfaceCount,
       viewport,
       cards,
@@ -192,6 +250,16 @@ const summary = {
       }
     : null,
   p95: modes,
+  // Pass/fail: extension CPU per frame on frames without a recapture. Full-frame p95 is
+  // recorded for reference only; it swings with machine load even without the guard.
+  verdict: (() => {
+    const g = modes.guarded.extensionCpuQuietFrameMs,
+      u = modes.unguarded.extensionCpuQuietFrameMs;
+    if (!g.count || !u.count) return null;
+    const medianDelta = g.median - u.median,
+      p95Delta = g.p95 - u.p95;
+    return { medianDelta, p95Delta, limits: { median: 0.5, p95: 1 }, pass: medianDelta <= 0.5 && p95Delta <= 1 };
+  })(),
   pairs: data.pairs,
   checks,
   traceIndex: traces,

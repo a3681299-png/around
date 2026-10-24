@@ -9,7 +9,8 @@ import { emptyDesign } from '../src/design/schema';
 
 const key = 'webWorldThemes.design.youtube',
   overlay = '#web-world-themes-decorations';
-const layers = ':is(#web-world-themes-decorations, #web-world-themes-video-decorations) [data-image-id]';
+const layers =
+  ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]';
 const fixture = (extension: string) => path.resolve(`tests/fixtures/motion/petal.${extension}`);
 async function open(popup: Page, page: Page) {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
@@ -110,7 +111,7 @@ for (const [extension, format] of [
     await save(panel);
     const saved = await stored(popup);
     expect(saved).toMatchObject({
-      schemaVersion: 11,
+      schemaVersion: 12,
       decorations: [
         {
           kind: 'animation',

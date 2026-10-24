@@ -7,7 +7,8 @@ import type { Page, Locator } from '@playwright/test';
 import type { DesignDocument } from '../src/design/types';
 
 const overlay = '#web-world-themes-decorations',
-  presentation = ':is(#web-world-themes-decorations, #web-world-themes-video-decorations)',
+  presentation =
+    ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',
   layers = `${presentation} [data-image-id]`;
 const file = (name: string) => path.resolve(`tests/fixtures/motion/${name}`);
 async function open(popup: Page, page: Page) {
@@ -200,7 +201,7 @@ test('1080p alpha WebM plays, transforms, pauses/rates/loops, saves and survives
   await save(panel);
   const saved = await stored(popup);
   expect(saved).toMatchObject({
-    schemaVersion: 11,
+    schemaVersion: 12,
     decorations: [
       { format: 'webm', placement: { rotationDeg: 25, widthPx: 320 }, playback: { speed: 1.5, loop: true } },
     ],
