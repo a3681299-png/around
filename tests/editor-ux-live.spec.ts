@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
 import { beginCanvasGesture, visiblePart } from './helpers/editor-workspace';
-import { errorSummary } from './helpers/youtube-live';
+import { errorSummary, waitForAdvertToEnd } from './helpers/youtube-live';
 
 test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and cleanup', async () => {
   test.skip(process.env.WW_LIVE_EDITOR_UX !== '1', 'Explicit real YouTube UI validation.');
@@ -104,6 +104,7 @@ test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and 
     await check('ordinary mode click-through and OFF removal', async () => {
       await panel.getByRole('button', { name: '編集を終了', exact: true }).click();
       expect(await page.locator(overlay).evaluate((element) => getComputedStyle(element).pointerEvents)).toBe('none');
+      await waitForAdvertToEnd(page);
       const video = page.locator('#movie_player video').first(),
         paused = await video.evaluate((node: HTMLVideoElement) => node.paused);
       await page.locator('#movie_player .ytp-play-button').click();

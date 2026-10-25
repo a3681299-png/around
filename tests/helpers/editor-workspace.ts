@@ -85,7 +85,19 @@ export async function beginCanvasGesture(node: Locator, point?: { x: number; y: 
           ok,
           point: p,
           hit: hit && `${hit.tagName}#${hit.id}.${String(hit.className).slice(0, 60)}`,
-          plane: root instanceof ShadowRoot ? root.host.id : '',
+          plane: (() => {
+            let at: Node = element;
+            while (at.getRootNode() instanceof ShadowRoot) {
+              const host = (at.getRootNode() as ShadowRoot).host;
+              if (host.id.startsWith('web-world-themes')) return host.id;
+              at = host;
+            }
+            return '';
+          })(),
+          planeClips: [...document.querySelectorAll<HTMLElement>('[id^="web-world-themes-"][id$="decorations"]')].map(
+            (h) => `${h.id}=${h.style.getPropertyValue('--ww-decoration-clip').slice(0, 60)}`,
+          ),
+          horizontalScroll: document.documentElement.scrollWidth > document.documentElement.clientWidth,
           visibility: (element as HTMLElement).style.visibility,
           clip:
             root instanceof ShadowRoot

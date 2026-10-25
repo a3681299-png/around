@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
 import { beginCanvasGesture, visiblePart } from './helpers/editor-workspace';
-import { errorSummary } from './helpers/youtube-live';
+import { errorSummary, waitForAdvertToEnd } from './helpers/youtube-live';
 
 test('optional real signed-out YouTube: independent Studio creation, bidirectional editing, recovery and cleanup', async () => {
   test.skip(process.env.WW_LIVE_STUDIO !== '1', 'Explicit real-site validation; fixture tests run separately.');
@@ -116,6 +116,7 @@ test('optional real signed-out YouTube: independent Studio creation, bidirection
       await studio.getByRole('button', { name: '接続を解除', exact: true }).click();
       await expect(youtube.locator('[data-ww-editing]')).toHaveCount(0);
       expect(await youtube.locator(overlay).evaluate((node) => getComputedStyle(node).pointerEvents)).toBe('none');
+      await waitForAdvertToEnd(youtube);
       const video = youtube.locator('#movie_player video').first(),
         paused = await video.evaluate((node: HTMLVideoElement) => node.paused);
       await youtube.locator('#movie_player .ytp-play-button').click();
