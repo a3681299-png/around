@@ -43,6 +43,9 @@ export interface SafetyIssue {
 export interface PaintFootprint {
   /** Issued only by the renderer during explicit editor ownership, never artwork. */
   editorOwned?: boolean;
+  /** Renderer-issued, explicit editing only: the verified video centre (the player minus its
+   * control bands) where an editor-owned screen-plane paint may take input over the video. */
+  editorRegion?: PlacementFrame;
   dynamic?: boolean;
   animated?: boolean;
   clip?: PlacementFrame;
@@ -172,9 +175,16 @@ export function guardPaint(snapshot: OperationSnapshot, paints: readonly PaintFo
       if (bounds.left >= bounds.right || bounds.top >= bounds.bottom) continue;
     }
     const planeCovers = paint.composition === 'overlay' || paint.composition === 'page';
+    // An editor-owned screen-plane paint wholly inside the verified video centre: there the
+    // clip cuts current rectangles, and input is claimed only after a fresh read (editorClaims).
+    const centre =
+      paint.editorOwned &&
+      paint.composition === 'overlay' &&
+      paint.editorRegion !== undefined &&
+      contains(paint.editorRegion, bounds);
     for (const { surface, envelope: fixed, swept, page } of visible) {
       const envelope =
-        !planeCovers || surface.compositionCapability === 'native-above'
+        !planeCovers || centre || surface.compositionCapability === 'native-above'
           ? fixed
           : paint.composition === 'page'
             ? page
@@ -194,7 +204,9 @@ export function guardPaint(snapshot: OperationSnapshot, paints: readonly PaintFo
         break;
       }
       const ownsVideoInput =
-        paint.editorOwned && paint.composition === 'native-underlay' && surface.policy.occlusion === 'allow';
+        paint.editorOwned &&
+        (paint.composition === 'native-underlay' || centre) &&
+        surface.policy.occlusion === 'allow';
       if ((paint.pointerEvents && !ownsVideoInput) || surface.policy.occlusion === 'forbid') {
         issues.push({
           layerId: paint.id,
@@ -213,11 +225,55 @@ export function guardPaint(snapshot: OperationSnapshot, paints: readonly PaintFo
   return issues;
 }
 
+const contains = (frame: PlacementFrame, b: Bounds) =>
+  b.left >= frame.left &&
+  b.top >= frame.top &&
+  b.right <= frame.left + frame.width &&
+  b.bottom <= frame.top + frame.height;
 /** Disjoint safe rectangles, including the entire swept scroll envelope.
  * The compositor clips the final output (filters included), not sampled pixels.
+ * editorRegion (explicit editing only): the verified video centre is reopened, cut only by the
+ * current rectangles of protected surfaces. A screen-plane handle there can lag behind an
+ * asynchronous scroll, so every gesture on it is claimed after a fresh read (editorClaims).
  */
-export function safePaintRegions(snapshot: OperationSnapshot, editing: boolean): PlacementFrame[] {
+export function safePaintRegions(
+  snapshot: OperationSnapshot,
+  editing: boolean,
+  editorRegion?: PlacementFrame,
+): PlacementFrame[] {
   if (!snapshot.supported) return [];
+  const regions = sweptRegions(snapshot, editing);
+  if (!editing || !editorRegion || !regions.length) return regions;
+  let centre = [editorRegion];
+  for (const surface of snapshot.surfaces) {
+    if (
+      !surface.availability.visible ||
+      surface.compositionCapability === 'native-above' ||
+      surface.policy.occlusion === 'allow'
+    )
+      continue;
+    centre = cutRegions(centre, surface.protectedEnvelope);
+    if (centre.length > 1024) return regions;
+  }
+  const merged = [...cutRegions(regions, editorRegion), ...centre];
+  return merged.length > 1024 ? regions : merged;
+}
+/** True when a fresh snapshot shows no protected surface under an editor gesture's point. */
+export function editorClaims(snapshot: OperationSnapshot, point: Point): boolean {
+  return (
+    snapshot.supported &&
+    !snapshot.surfaces.some(
+      (surface) =>
+        surface.availability.visible &&
+        surface.policy.occlusion !== 'allow' &&
+        point.x >= surface.protectedEnvelope.left &&
+        point.x <= surface.protectedEnvelope.left + surface.protectedEnvelope.width &&
+        point.y >= surface.protectedEnvelope.top &&
+        point.y <= surface.protectedEnvelope.top + surface.protectedEnvelope.height,
+    )
+  );
+}
+function sweptRegions(snapshot: OperationSnapshot, editing: boolean): PlacementFrame[] {
   let regions: PlacementFrame[] = [{ left: 0, top: 0, ...snapshot.viewport }];
   for (const surface of snapshot.surfaces) {
     if (
@@ -286,22 +342,22 @@ function cutRegions(regions: PlacementFrame[], cut: PlacementFrame): PlacementFr
   });
 }
 /** The compositor clip for one immutable snapshot, reused until the snapshot changes. */
-const clips = new WeakMap<
-  OperationSnapshot,
-  Partial<Record<'edit' | 'view', { regions: PlacementFrame[]; path: string }>>
->();
-export function protectionClip(snapshot: OperationSnapshot, editing: boolean) {
+const clips = new WeakMap<OperationSnapshot, Map<string, { regions: PlacementFrame[]; path: string }>>();
+export function protectionClip(snapshot: OperationSnapshot, editing: boolean, editorRegion?: PlacementFrame) {
   let entry = clips.get(snapshot);
-  if (!entry) clips.set(snapshot, (entry = {}));
-  const key = editing ? 'edit' : 'view';
-  if (!entry[key]) {
-    const regions = safePaintRegions(snapshot, editing);
-    entry[key] = {
-      regions,
-      path: regions.map((r) => `M${r.left} ${r.top}h${r.width}v${r.height}h${-r.width}Z`).join(''),
-    };
+  if (!entry) clips.set(snapshot, (entry = new Map()));
+  const key = !editing
+    ? 'view'
+    : editorRegion
+      ? `edit ${editorRegion.left} ${editorRegion.top} ${editorRegion.width} ${editorRegion.height}`
+      : 'edit';
+  let clip = entry.get(key);
+  if (!clip) {
+    const regions = safePaintRegions(snapshot, editing, editorRegion);
+    clip = { regions, path: regions.map((r) => `M${r.left} ${r.top}h${r.width}v${r.height}h${-r.width}Z`).join('') };
+    entry.set(key, clip);
   }
-  return entry[key];
+  return clip;
 }
 export interface ProximityState {
   safe: boolean;

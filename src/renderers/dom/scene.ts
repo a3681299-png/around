@@ -192,22 +192,36 @@ export function createImageRenderer(
       });
     }
     if (safety && protect) {
-      // The screen overlay excludes complete scroll paths. This clip cannot
-      // expose a moving native control during asynchronous compositor scroll.
-      const { regions, path } = protectionClip(safety.source.capture(), Boolean(editing));
-      const clip = path ? `path('${path}')` : 'inset(100%)';
-      if (clip !== writtenClip || host!.style.getPropertyValue('--ww-decoration-clip') !== clip) {
-        host!.style.setProperty('--ww-decoration-clip', clip);
-        writtenClip = clip;
-      }
       const roots = new Map([...layout.groups, ...layout.layers].map((entry) => [entry.layer.id, entry]));
+      const authoring = Boolean(editing && !editing.locked);
       const needsVideoSlot =
         Boolean(doc.fullscreenElement) ||
+        authoring ||
         layout.roots.some((id) => {
           const anchor = roots.get(id)!.layer.placement.anchor;
           return anchor.kind === 'surface' && anchor.target === 'video-player';
         });
       const slot = needsVideoSlot ? safety.source.videoSlot() : undefined;
+      // Explicit editing only: the verified video centre (no menu, error or central control),
+      // where screen-plane handles may take input over the video. The bands stay native.
+      const editorRegion =
+        authoring && slot && !doc.fullscreenElement
+          ? {
+              left: slot.rect.left,
+              top: slot.rect.top + slot.top,
+              width: slot.rect.width,
+              height: slot.rect.height - slot.top - slot.bottom,
+            }
+          : undefined;
+      // The screen overlay excludes complete scroll paths. This clip cannot
+      // expose a moving native control during asynchronous compositor scroll; the editing
+      // centre is the exception, and every gesture there is claimed after a fresh read.
+      const { regions, path } = protectionClip(safety.source.capture(), Boolean(editing), editorRegion);
+      const clip = path ? `path('${path}')` : 'inset(100%)';
+      if (clip !== writtenClip || host!.style.getPropertyValue('--ww-decoration-clip') !== clip) {
+        host!.style.setProperty('--ww-decoration-clip', clip);
+        writtenClip = clip;
+      }
       // Read once at the start of this draw, before this renderer's own writes.
       const overlaySupported = Boolean(overlaySlot);
       const videoAnchored = (id: string) => {
@@ -412,7 +426,10 @@ export function createImageRenderer(
               opacity: layer.effectiveOpacity,
               // The atmosphere plane takes no input; its handles stay on the clipped screen plane.
               pointerEvents: !atmosphere && Boolean(editing && !editing.locked && !layer.locked),
-              editorOwned: Boolean(editing && !editing.locked && !layer.locked) && local,
+              editorOwned:
+                Boolean(editing && !editing.locked && !layer.locked) &&
+                (local || (!page && !atmosphere && editorRegion !== undefined)),
+              ...(editorRegion && !local && !page && !atmosphere ? { editorRegion } : {}),
               outset: 0,
               composition: !verified
                 ? ('unsupported' as const)
@@ -674,6 +691,10 @@ export function createImageRenderer(
       item = group ?? images.find((image) => image.id === id);
     const node = id ? (compositions.get(id)?.node ?? nodes.get(id)?.node) : undefined;
     if (!node || !item || (group ? !groupMovable(group, images) : effectivelyLocked(item, groups))) return;
+    // A handle can lag behind native geometry (an asynchronous scroll moves the page under the
+    // screen plane). A fresh read must find no protected control under the point; otherwise the
+    // guard hides the artwork and the next press reaches the native control.
+    if (safety && !safety.claim({ x: event.clientX, y: event.clientY })) return;
     event.preventDefault();
     event.stopPropagation();
     const mode = target?.getAttribute('data-handle') ?? 'move';

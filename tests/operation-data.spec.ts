@@ -8,6 +8,7 @@ import {
   ATMOSPHERE_ALPHA_CAP,
   initialProximity,
   stepProximity,
+  editorClaims,
   type OperationSnapshot,
   type OperationSurface,
   type PaintFootprint,
@@ -89,6 +90,112 @@ test('input capture is forbidden even where noninteractive video paint is allowe
   expect(guardPaint(snapshot(), [owned])).toHaveLength(1); // Seek remains protected.
   expect(guardPaint(video, [{ ...owned, composition: 'overlay' }])).toHaveLength(1);
   expect(() => parseEditCommand({ type: 'change', id: 'image-a', patch: { editorOwned: true } })).toThrow();
+});
+/** A player that scrolls with the page: its coverable video, the two control bands and seek. */
+function playerSnapshot() {
+  const player = { left: 16, top: 100, width: 640, height: 360 };
+  const allow = { transform: 'fixed-plane', occlusion: 'allow', input: 'native-only' } as const;
+  return snapshot([
+    surface({
+      id: 'player.video',
+      kind: 'gesture',
+      shape: player,
+      protectedEnvelope: player,
+      policy: allow,
+      scrolls: true,
+    }),
+    surface({
+      id: 'player.controls.top',
+      kind: 'click',
+      shape: player,
+      protectedEnvelope: { ...player, height: 64 },
+      scrolls: true,
+    }),
+    surface({
+      id: 'player.controls.bottom',
+      shape: player,
+      protectedEnvelope: { ...player, top: 100 + 360 - 112, height: 112 },
+      scrolls: true,
+    }),
+  ]);
+}
+const videoCentre = { left: 16, top: 164, width: 640, height: 184 };
+test('explicit editing lets screen-plane handles own only the verified video centre, never its bands', () => {
+  const owned = paint({
+    pointerEvents: true,
+    editorOwned: true,
+    editorRegion: videoCentre,
+    bounds: { left: 200, top: 200, right: 300, bottom: 280 },
+  });
+  // Inside the centre: the bands are checked at their current rectangles, the video is owned.
+  expect(guardPaint(playerSnapshot(), [owned])).toEqual([]);
+  // Without the renderer-issued centre, the swept bands and the video still forbid input.
+  const { editorRegion: _unused, ...unowned } = owned;
+  void _unused;
+  expect(guardPaint(playerSnapshot(), [unowned])).toHaveLength(1);
+  expect(guardPaint(playerSnapshot(), [{ ...owned, editorOwned: false }])).toHaveLength(1);
+  // Reaching into a band, or outside the centre, falls back to the full protection.
+  expect(guardPaint(playerSnapshot(), [{ ...owned, bounds: { ...owned.bounds, bottom: 360 } }])).toHaveLength(1);
+  expect(guardPaint(playerSnapshot(), [{ ...owned, bounds: { ...owned.bounds, top: 140 } }])).toHaveLength(1);
+  // A real control that appears in the centre stays protected.
+  const central = snapshot([
+    ...playerSnapshot().surfaces,
+    surface({
+      id: 'control.9',
+      kind: 'click',
+      shape: { left: 220, top: 220, width: 40, height: 40 },
+      protectedEnvelope: { left: 216, top: 216, width: 48, height: 48 },
+      scrolls: true,
+    }),
+  ]);
+  expect(guardPaint(central, [owned])).toMatchObject([{ surfaceId: 'control.9' }]);
+  // The page and atmosphere planes never take this ownership.
+  expect(guardPaint(playerSnapshot(), [{ ...owned, composition: 'page' }])).toHaveLength(1);
+});
+test('the editing clip opens the video centre to the screen plane but keeps bands, seek and central controls cut', () => {
+  const inside = (regions: { left: number; top: number; width: number; height: number }[], x: number, y: number) =>
+    regions.some((r) => x >= r.left && x < r.left + r.width && y >= r.top && y < r.top + r.height);
+  const snap = playerSnapshot();
+  // Without the centre the swept bands remove the player's whole column.
+  expect(inside(safePaintRegions(snap, true), 300, 250)).toBe(false);
+  const regions = safePaintRegions(snap, true, videoCentre);
+  expect(inside(regions, 300, 250)).toBe(true);
+  expect(inside(regions, 300, 130)).toBe(false); // top band
+  expect(inside(regions, 300, 400)).toBe(false); // bottom band
+  expect(inside(regions, 300, 600)).toBe(false); // the rest of the swept column
+  expect(inside(regions, 900, 600)).toBe(true); // elsewhere unchanged
+  // The centre is only for explicit editing.
+  expect(inside(safePaintRegions(snap, false, videoCentre), 300, 250)).toBe(false);
+  const central = snapshot([
+    ...snap.surfaces,
+    surface({
+      id: 'control.9',
+      kind: 'click',
+      shape: { left: 220, top: 220, width: 40, height: 40 },
+      protectedEnvelope: { left: 216, top: 216, width: 48, height: 48 },
+      scrolls: true,
+    }),
+  ]);
+  const cut = safePaintRegions(central, true, videoCentre);
+  expect(inside(cut, 240, 240)).toBe(false);
+  expect(inside(cut, 400, 250)).toBe(true);
+  // Regions stay disjoint.
+  for (const [i, a] of cut.entries())
+    for (const b of cut.slice(i + 1))
+      expect(
+        a.left < b.left + b.width && b.left < a.left + a.width && a.top < b.top + b.height && b.top < a.top + a.height,
+      ).toBe(false);
+  expect(protectionClip(snap, true, videoCentre).path).not.toBe(protectionClip(snap, true).path);
+});
+test('an editor gesture is claimed only where a fresh read finds no protected control under the point', () => {
+  const snap = playerSnapshot();
+  expect(editorClaims(snap, { x: 300, y: 250 })).toBe(true);
+  expect(editorClaims(snap, { x: 300, y: 400 })).toBe(false); // bottom band
+  expect(editorClaims(snap, { x: 300, y: 120 })).toBe(false); // top band
+  expect(editorClaims({ ...snap, supported: false }, { x: 300, y: 250 })).toBe(false);
+  const hidden = snapshot([surface({ availability: { ...surface().availability, visible: false } })]);
+  expect(editorClaims(hidden, { x: 150, y: 210 })).toBe(true);
+  expect(editorClaims(snapshot(), { x: 150, y: 210 })).toBe(false);
 });
 test('screen overlays reserve the entire compositor scroll path instead of cutting stale holes', () => {
   expect(

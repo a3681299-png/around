@@ -181,6 +181,99 @@ test('editing owns the center of a real-style player whose media sits on its own
   });
 });
 
+/** Viewport artwork centred on the player's video, with the editor panel collapsed. */
+async function viewportArtworkOverVideo(popup: Page, youtube: Page) {
+  await youtube.goto('https://www.youtube.com/watch?v=fixture');
+  const editor = await opaqueArtwork(popup, youtube);
+  await editor.getByLabel('画像の幅').fill('120');
+  await editor.getByLabel('画像の高さ').fill('80');
+  const at = await youtube.locator('#movie_player').evaluate((player) => {
+    const r = player.getBoundingClientRect();
+    // The middle of the coverable centre, between the 64px and 112px control bands.
+    const y = r.top + 64 + (r.height - 176) / 2;
+    return { x: ((r.left + r.width / 2) / innerWidth) * 100, y: (y / innerHeight) * 100 };
+  });
+  await editor.getByLabel('画像のX位置').fill(at.x.toFixed(2));
+  await editor.getByLabel('画像のY位置').fill(at.y.toFixed(2));
+  await expect.poll(() => planeOf(youtube)).toBe('#web-world-themes-decorations');
+  await settled(youtube);
+  const node = youtube.locator('#web-world-themes-decorations [data-image-id]');
+  const hit = (point: { x: number; y: number }) =>
+    node.evaluate((element, p) => {
+      let target = element.ownerDocument.elementFromPoint(p.x, p.y);
+      while (target?.shadowRoot) {
+        const next = target.shadowRoot.elementFromPoint(p.x, p.y);
+        if (!next || next === target) break;
+        target = next;
+      }
+      return { own: Boolean(target && (target === element || element.contains(target))), tag: target?.tagName };
+    }, point);
+  return { node, hit };
+}
+
+test('editing lets viewport artwork own the verified video centre, never the bands', async ({ popup, youtube }) => {
+  const { node, hit } = await viewportArtworkOverVideo(popup, youtube);
+  await withCanvas(youtube, async () => {
+    await settled(youtube);
+    const box = (await node.boundingBox())!;
+    const player = (await youtube.locator('#movie_player').boundingBox())!;
+    const center = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+    expect(await hit(center)).toMatchObject({ own: true });
+    // Both control bands stay native while editing.
+    expect(await hit({ x: center.x, y: player.y + player.height - 40 })).toMatchObject({ own: false });
+    expect(await hit({ x: center.x, y: player.y + 20 })).toMatchObject({ own: false });
+    await youtube.mouse.move(center.x, center.y);
+    await youtube.mouse.down();
+    await youtube.mouse.move(center.x - 30, center.y + 10, { steps: 6 });
+    await youtube.mouse.up();
+    await expect.poll(async () => (await node.boundingBox())!.x).toBeCloseTo(box.x - 30, 0);
+  });
+});
+
+test('a stale screen-plane handle over a moved control band never takes the input meant for it', async ({
+  popup,
+  youtube,
+}) => {
+  const { node, hit } = await viewportArtworkOverVideo(popup, youtube);
+  await withCanvas(youtube, async () => {
+    await settled(youtube);
+    const box = (await node.boundingBox())!;
+    const center = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+    expect(await hit(center)).toMatchObject({ own: true });
+    // Move the player like an asynchronous scroll would, with no DOM mutation, resize or scroll
+    // event: its bottom control band now lies under the handle while the clip is still stale.
+    const native = await youtube.locator('#movie_player').evaluate((player, y) => {
+      const r = player.getBoundingClientRect();
+      const shift = r.bottom - 56 - y;
+      player.animate([{ transform: `translateY(${-shift}px)` }, { transform: `translateY(${-shift}px)` }], {
+        duration: 600000,
+        fill: 'forwards',
+      });
+      const w = window as unknown as { nativeClicks: number };
+      w.nativeClicks = 0;
+      player.addEventListener('click', (event) => {
+        if (!event.composedPath().some((n) => n instanceof Element && n.id.startsWith('web-world-themes')))
+          w.nativeClicks++;
+      });
+      return { shift };
+    }, center.y);
+    expect(native.shift).toBeGreaterThan(50);
+    await youtube.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+    // The scenario is real: the stale handle is still the hit target over the band.
+    expect(await hit(center)).toMatchObject({ own: true });
+    await youtube.mouse.move(center.x, center.y);
+    await youtube.mouse.down();
+    await youtube.mouse.move(center.x - 30, center.y - 10, { steps: 6 });
+    await youtube.mouse.up();
+    // No gesture started: the artwork did not move.
+    expect((await node.boundingBox())!.x).toBeCloseTo(box.x, 0);
+    // The handle no longer covers the band; the next press reaches the native player.
+    await expect.poll(async () => (await hit(center)).own).toBe(false);
+    await youtube.mouse.click(center.x, center.y);
+    expect(await youtube.evaluate(() => (window as unknown as { nativeClicks: number }).nativeClicks)).toBe(1);
+  });
+});
+
 test('player artwork follows the page when the player-local plane is unavailable and avoids only current rectangles', async ({
   popup,
   youtube,

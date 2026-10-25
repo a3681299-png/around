@@ -1,4 +1,5 @@
 import {
+  editorClaims,
   guardPaint,
   initialProximity,
   stepProximity,
@@ -25,6 +26,9 @@ export interface OperationGuardHost {
   subscribe(listener: (value: SafetyStatus) => void): () => void;
   overlay(value: boolean): void;
   pause(reason: string, repeatedFailure?: boolean, layerIds?: readonly string[]): void;
+  /** Input-time check for an editor gesture: false (and drawing paused) when a fresh read finds
+   * a protected surface under the point. */
+  claim(point: Point): boolean;
   destroy(): void;
 }
 /** Inspection observes the whole page; it runs only while authored paint can exist. */
@@ -337,6 +341,11 @@ export function createOperationGuardHost(
         approaching: proximity.safe,
         idleSeconds: doc.hidden ? 0 : Math.max(0, Math.min(1e9, (time - lastActivity) / 1000)),
       };
+    },
+    claim(point) {
+      if (editorClaims(source.capture({ fresh: true }), point)) return true;
+      pause('入力直前の照合で、編集ハンドルの下に本物の操作面がありました。');
+      return false;
     },
     commit(next) {
       paints = next;

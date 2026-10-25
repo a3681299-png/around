@@ -1,4 +1,5 @@
 import { modelPoseError } from './helpers/model-assertions';
+import { declinePromotion } from './helpers/youtube-live';
 import { test, expect } from '@playwright/test';
 import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -84,13 +85,29 @@ test('real YouTube: official Studio places a rig, switches run/idle, replays mod
       model: { locomotion: { idle: 0, walk: 1, run: 2 }, look: { enabled: true, bone: 3 } },
     });
     const pose = () => media.evaluate((m: HTMLElement) => JSON.parse(m.dataset.modelFrame!) as ModelEvaluation),
-      point = () => image.evaluate((e: HTMLElement) => ({ x: parseFloat(e.style.left), y: parseFloat(e.style.top) }));
+      // Screen coordinates: style.left/top are exact CSS values relative to the paint container
+      // holding the layer (the player for the player-local plane), so add that container's origin.
+      point = () =>
+        image.evaluate((e: HTMLElement) => {
+          const origin = e.parentElement!.getBoundingClientRect();
+          return { x: parseFloat(e.style.left) + origin.left, y: parseFloat(e.style.top) + origin.top };
+        });
     stage('pursuit');
     const width = await page.evaluate(() => innerWidth),
       target = { x: width * 0.75, y: 400 };
+    // Start from a known rest half a window away: earlier panel clicks already moved the
+    // pointer, and a rig that walked there could reach a nearby target without running.
+    const rest = { x: width * 0.25, y: 400 };
+    // A promotion dialog stops painting; declining it moves the pointer, so aim again.
+    const phaseAt = async (aim: { x: number; y: number }) => {
+      if (await declinePromotion(page)) await page.mouse.move(aim.x, aim.y);
+      return (await pose()).phase;
+    };
+    await page.mouse.move(rest.x, rest.y);
+    await expect.poll(() => phaseAt(rest), { timeout: 15000 }).toBe('idle');
     await page.mouse.move(target.x, target.y);
-    await expect.poll(async () => (await pose()).phase).toBe('run');
-    await expect.poll(async () => (await pose()).phase, { timeout: 10000 }).toBe('idle');
+    await expect.poll(() => phaseAt(target)).toBe('run');
+    await expect.poll(() => phaseAt(target), { timeout: 10000 }).toBe('idle');
     expect(Math.abs(Math.hypot((await point()).x - target.x, (await point()).y - target.y) - 40)).toBeLessThan(0.2);
     report.checks.runStopIdle = true;
     stage('take');
@@ -140,8 +157,25 @@ test('real YouTube: official Studio places a rig, switches run/idle, replays mod
         { timeout: 30000 },
       )
       .toBe('true');
-    await expect(media).toHaveAttribute('data-renderer', 'three');
+    // Same load allowance as the first placement; a promotion dialog would stop painting.
+    await expect
+      .poll(
+        async () => {
+          await declinePromotion(page);
+          return media.getAttribute('data-renderer');
+        },
+        { timeout: 25000 },
+      )
+      .toBe('three');
     report.checks.savedReloadAndReconnect = true;
+    // A take can only be chosen once the reconnected page has listed it again.
+    await expect
+      .poll(() =>
+        panel.evaluate(
+          `(() => { const s = ${ui}.querySelector('.take-library-select'); return !s.disabled && [...s.options].some((o) => o.value === ${JSON.stringify(take.id)}); })()`,
+        ),
+      )
+      .toBe(true);
     await panel.fill('.take-library-select', take.id);
     await expect.poll(() => panel.text('.take-source')).toBe('PREVIEW');
     await panel.fill('.take-position', String(at / 1000));
@@ -199,6 +233,40 @@ test('real YouTube: official Studio places a rig, switches run/idle, replays mod
     report.checks.zeroCleanup = true;
     report.completed = true;
   } finally {
+    if (!report.completed) {
+      const yt = context.pages().find((p) => p.url().startsWith('https://www.youtube.com'));
+      report.checks.diag = await yt
+        ?.evaluate(() => ({
+          safety: (document.querySelector('#web-world-themes-decorations') as HTMLElement | null)?.dataset.wwSafety,
+          dialogs: [...document.querySelectorAll('tp-yt-paper-dialog, [role="dialog"]')]
+            .filter((e) => e.getBoundingClientRect().height > 0)
+            .map((e) => (e as HTMLElement).innerText.slice(0, 80)),
+          media: [...document.querySelectorAll('*')]
+            .flatMap((e) => (e.shadowRoot ? [...e.shadowRoot.querySelectorAll('.model-media')] : []))
+            .map((m) => JSON.stringify((m as HTMLElement).dataset).slice(0, 300)),
+          hidden: document.hidden,
+          safetyRecord: (document.querySelector('#web-world-themes-decorations') as HTMLElement | null)?.dataset
+            .wwSafety,
+          menus: [
+            ...document.querySelectorAll(
+              '.ytp-popup, .ytp-settings-menu, ytd-menu-popup-renderer, tp-yt-paper-dialog, [role="menu"], [role="dialog"], [role="listbox"], select',
+            ),
+          ]
+            .filter(
+              (e) =>
+                e.getBoundingClientRect().height > 0 &&
+                getComputedStyle(e).visibility !== 'hidden' &&
+                !e.closest('[id^="web-world-themes"]'),
+            )
+            .map(
+              (e) =>
+                e.tagName + '.' + String(e.className).slice(0, 40) + ' ' + JSON.stringify(e.getBoundingClientRect()),
+            ),
+          focus: document.hasFocus(),
+        }))
+        .catch((e) => String(e));
+      await yt?.screenshot({ path: '.work/verification/3d-live-failure.png', timeout: 3000 }).catch(() => undefined);
+    }
     await writeFile('.work/verification/3d-live.json', JSON.stringify(report, null, 2));
     await context.close();
   }

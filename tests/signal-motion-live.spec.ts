@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
 import { nativeWindow, sidePanelDriver } from './helpers/side-panel';
+import { declinePromotion } from './helpers/youtube-live';
 import { createTakeSampler, type SignalTake } from '../src/world/takes';
 import type { DesignDocument } from '../src/design/types';
 
@@ -72,12 +73,17 @@ test('real YouTube: official Studio configures GIF pursuit, records/replays/load
     const image = page.locator(
       ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) .image',
     );
+    // Screen coordinates: style.left/top are exact CSS values relative to the paint container
+    // holding the layer (the player for the player-local plane), so add that container's origin.
     const point = () =>
-      image.evaluate((node: HTMLElement) => ({
-        x: Number.parseFloat(node.style.left),
-        y: Number.parseFloat(node.style.top),
-        transform: node.style.transform,
-      }));
+      image.evaluate((node: HTMLElement) => {
+        const origin = node.parentElement!.getBoundingClientRect();
+        return {
+          x: Number.parseFloat(node.style.left) + origin.left,
+          y: Number.parseFloat(node.style.top) + origin.top,
+          transform: node.style.transform,
+        };
+      });
     const width = await page.evaluate(() => innerWidth),
       target = { x: Math.round(width * 0.65), y: 300 },
       initial = await point();
@@ -147,6 +153,14 @@ test('real YouTube: official Studio configures GIF pursuit, records/replays/load
     await expect
       .poll(() => panel.evaluate('document.querySelector(".connection-status").dataset.connected'))
       .toBe('true');
+    // A take can only be chosen once the reconnected page has listed it again.
+    await expect
+      .poll(() =>
+        panel.evaluate(
+          `(() => { const s = ${ui}.querySelector('.take-library-select'); return !s.disabled && [...s.options].some((o) => o.value === ${JSON.stringify(take.id)}); })()`,
+        ),
+      )
+      .toBe(true);
     await panel.fill('.take-library-select', take.id);
     await expect.poll(() => panel.text('.take-source')).toBe('PREVIEW');
     await panel.fill('.take-position', String(at / 1000));
@@ -158,13 +172,21 @@ test('real YouTube: official Studio configures GIF pursuit, records/replays/load
     for (const size of [1366, 1920, 1000]) {
       await nativeWindow(panel.cdp, size);
       await page.waitForTimeout(100);
-      const canvasWidth = await page.evaluate(() => innerWidth);
-      await page.mouse.move(canvasWidth * 0.5, 350);
+      // Aim at the middle of the coverable video centre: a fixed y can land within the 40px
+      // approach margin of the bottom control band at small widths, where the G1 approach
+      // rule correctly holds the layer.
+      const aim = await page.locator('#movie_player').evaluate((player) => {
+        const r = player.getBoundingClientRect();
+        return { x: r.left + r.width / 2, y: r.top + 64 + (r.height - 64 - 112) / 2 };
+      });
+      await page.mouse.move(aim.x, aim.y);
       await expect
         .poll(
           async () => {
+            // Declining clicks the dialog, which moves the pointer; aim again afterwards.
+            if (await declinePromotion(page)) await page.mouse.move(aim.x, aim.y);
             const p = await point();
-            return Math.abs(Math.hypot(p.x - canvasWidth * 0.5, p.y - 350) - 36);
+            return Math.abs(Math.hypot(p.x - aim.x, p.y - aim.y) - 36);
           },
           { timeout: 9000 },
         )

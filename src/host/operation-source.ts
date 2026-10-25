@@ -41,8 +41,9 @@ export interface DiscoveryScan {
 export interface OperationSource {
   active(value: boolean): void;
   subscribe(listener: () => void): () => void;
-  /** coalesce: the caller holds drawing while a burst of changes is pending (see COALESCE_MS). */
-  capture(options?: { coalesce?: boolean }): OperationSnapshot;
+  /** coalesce: the caller holds drawing while a burst of changes is pending (see COALESCE_MS).
+   * fresh: an input-time read of the whole document that never trusts a cached snapshot. */
+  capture(options?: { coalesce?: boolean; fresh?: boolean }): OperationSnapshot;
   validate(snapshot: OperationSnapshot, event?: Event): boolean;
   /** Milliseconds until a pending change may be read; 0 when the last capture is current. */
   deferredFor(): number;
@@ -205,7 +206,12 @@ export function createOperationSource(
   doc.defaultView!.addEventListener('blur', up);
   doc.defaultView!.addEventListener('focus', mark);
   types.forEach((type, i) => doc.addEventListener(type, handlers[i]!, { capture: true, passive: true }));
-  function capture(options?: { coalesce?: boolean }): OperationSnapshot {
+  function capture(options?: { coalesce?: boolean; fresh?: boolean }): OperationSnapshot {
+    if (options?.fresh) {
+      dirty = true;
+      fullScan = true;
+      forced = true;
+    }
     // Undelivered records are the only way a read element can have left the document.
     const pending = observer.takeRecords();
     if (pending.length) handle(pending, false);
@@ -418,13 +424,8 @@ export function createOperationSource(
     },
     validate(snapshot, event) {
       if (!issued.has(snapshot) || snapshot.generation.documentId !== documentId) return false;
-      if (event) {
-        // Input-time reads never trust the incremental view or wait for a window.
-        dirty = true;
-        fullScan = true;
-        forced = true;
-      }
-      const next = capture();
+      // Input-time reads never trust the incremental view or wait for a window.
+      const next = capture({ fresh: Boolean(event) });
       if (next.generation.geometry !== snapshot.generation.geometry || !next.supported) return false;
       if (!(event instanceof MouseEvent)) return true;
       const hit = doc.elementFromPoint(event.clientX, event.clientY);
