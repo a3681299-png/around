@@ -16,16 +16,25 @@ export async function declinePromotion(page: Page) {
   return true;
 }
 
+/** Wider than the approach rule's margins (40px to start, 72px to clear). */
+export const APPROACH_CLEARANCE = 80;
 /**
  * The point in `area` farthest from every visible native control and the player's control
  * bands. Within 40-72px of those the G1 approach rule correctly returns motion and gaze to rest,
  * and YouTube's layout (guide links, card menus, play buttons) differs between runs, so live
- * pointer checks aim at the clearest point instead of a fixed coordinate.
+ * pointer checks aim at the clearest point instead of a fixed coordinate. Fails, naming the
+ * clearance found, when no point in `area` is at least `minimum` away.
  */
-export function clearestPoint(page: Page, area: { left: number; top: number; right: number; bottom: number }) {
-  return page.evaluate((area) => {
+export async function clearestPoint(
+  page: Page,
+  area: { left: number; top: number; right: number; bottom: number },
+  minimum = APPROACH_CLEARANCE,
+) {
+  const best = await page.evaluate((area) => {
     const boxes = [
-      ...document.querySelectorAll('button, a[href], [role="button"], [role="slider"], input, textarea, select'),
+      ...document.querySelectorAll(
+        'button, a[href], [role="button"], [role="slider"], [role="menu"], [role="dialog"], [role="listbox"], input, textarea, select, [contenteditable="true"], ytd-searchbox, yt-searchbox',
+      ),
     ]
       .filter((e) => !e.closest('[id^="web-world-themes"]') && getComputedStyle(e).visibility !== 'hidden')
       .map((e) => e.getBoundingClientRect())
@@ -42,14 +51,20 @@ export function clearestPoint(page: Page, area: { left: number; top: number; rig
         ),
       );
     const clearance = (x: number, y: number) =>
-      Math.min(Infinity, ...boxes.map((b) => Math.max(b.left - x, x - b.right, b.top - y, y - b.bottom)));
-    let best = { x: (area.left + area.right) / 2, y: (area.top + area.bottom) / 2 };
-    for (let i = 0; i <= 12; i++)
-      for (let j = 0; j <= 12; j++) {
-        const x = area.left + ((area.right - area.left) * i) / 12,
-          y = area.top + ((area.bottom - area.top) * j) / 12;
-        if (clearance(x, y) > clearance(best.x, best.y)) best = { x, y };
+      Math.min(1e6, ...boxes.map((b) => Math.max(b.left - x, x - b.right, b.top - y, y - b.bottom)));
+    let best = { x: (area.left + area.right) / 2, y: (area.top + area.bottom) / 2, clearance: -Infinity };
+    for (let i = 0; i <= 16; i++)
+      for (let j = 0; j <= 16; j++) {
+        const x = area.left + ((area.right - area.left) * i) / 16,
+          y = area.top + ((area.bottom - area.top) * j) / 16,
+          c = clearance(x, y);
+        if (c > best.clearance) best = { x, y, clearance: c };
       }
     return best;
   }, area);
+  if (best.clearance < minimum)
+    throw new Error(
+      `No point ${minimum}px clear of native controls in ${JSON.stringify(area)}: ${JSON.stringify(best)}`,
+    );
+  return { x: best.x, y: best.y };
 }

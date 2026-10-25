@@ -59,6 +59,8 @@ const unitSpecs = [
 export default defineConfig({
   testDir: './tests',
   outputDir: './.work/test-results',
+  // Removes `%TEMP%\ww-*` profiles left by tests that ended without closing their browser.
+  globalSetup: './tests/temporary-profiles.ts',
   fullyParallel: false,
   workers: 4,
   maxFailures: 0,

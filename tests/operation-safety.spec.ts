@@ -552,6 +552,42 @@ test('Host pauses before mismatched input, recovers only when stable, and exclud
   expect(result.scopedStops).toEqual(['model']);
 });
 
+test('the player unmute button is protected as a button, not as a menu covering the window', async ({ youtube }) => {
+  await youtube.goto('https://www.youtube.com/watch?v=fixture');
+  await youtube.addScriptTag({ content: await probeCode() });
+  const result = await youtube.evaluate(() => {
+    const api = (window as any).G1Probe;
+    // YouTube shows this after a muted autoplay; it carries the ytp-popup class of its menus.
+    const unmute = document.createElement('button');
+    unmute.className = 'ytp-unmute ytp-popup ytp-button';
+    unmute.textContent = 'Tap to unmute';
+    unmute.style.cssText = 'position:absolute;left:12px;top:70px;width:140px;height:40px;z-index:60';
+    document.querySelector('#movie_player')!.append(unmute);
+    const source = api.youtubeOperations(document);
+    const snapshot = source.capture();
+    const r = unmute.getBoundingClientRect();
+    const row = snapshot.surfaces.find(
+      (s: any) => s.shape.left === r.left && s.shape.top === r.top && s.shape.width === r.width,
+    );
+    const regions = api.safePaintRegions(snapshot, false);
+    const inside = (x: number, y: number) =>
+      regions.some((q: any) => x >= q.left && x < q.left + q.width && y >= q.top && y < q.top + q.height);
+    source.destroy();
+    return {
+      kind: row?.kind,
+      envelope: row && [row.protectedEnvelope.width, row.protectedEnvelope.height],
+      viewport: [innerWidth, innerHeight],
+      onButton: inside(r.left + 10, r.top + 10),
+      elsewhere: inside(innerWidth - 20, innerHeight - 20),
+    };
+  });
+  expect(result.kind).toBe('click');
+  expect(result.envelope).toEqual([148, 48]);
+  expect(result.onButton).toBe(false);
+  // The rest of the page can still be painted.
+  expect(result.elsewhere).toBe(true);
+});
+
 test('leaving a native control restores motion after hysteresis without another pointer event', async ({ youtube }) => {
   await youtube.addScriptTag({ content: await probeCode() });
   await youtube.evaluate(() => {

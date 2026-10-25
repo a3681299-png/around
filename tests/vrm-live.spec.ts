@@ -66,9 +66,22 @@ test('real YouTube: private local VRM import, MToon, pointer gaze, Studio transf
     await panel.fill('[data-model="rotationY"]', '15');
     await panel.fill('[data-image-prop="anchor"]', 'video-player');
     const { width, height } = await page.evaluate(() => ({ width: innerWidth, height: innerHeight }));
-    // Left and right of the rig, at the points clearest of native controls (see clearestPoint).
-    const leftPoint = await clearestPoint(page, { left: 8, top: 150, right: 160, bottom: height - 40 }),
-      rightPoint = await clearestPoint(page, { left: width - 160, top: 150, right: width - 8, bottom: height - 40 });
+    // Well to the left and right of the rig, at the points clearest of native controls, beyond
+    // the approach margins (see clearestPoint).
+    const rig = (await image.first().boundingBox())!,
+      centreX = rig.x + rig.width / 2;
+    const leftPoint = await clearestPoint(page, {
+        left: 8,
+        top: 120,
+        right: Math.max(40, centreX - 200),
+        bottom: height - 20,
+      }),
+      rightPoint = await clearestPoint(page, {
+        left: Math.min(width - 40, centreX + 200),
+        top: 120,
+        right: width - 8,
+        bottom: height - 20,
+      });
     const yawAt = async (aim: { x: number; y: number }) => {
       if (await declinePromotion(page)) await page.mouse.move(aim.x, aim.y);
       return (await frame()).lookYaw as number;

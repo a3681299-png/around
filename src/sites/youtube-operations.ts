@@ -11,10 +11,11 @@ const selectors: [string, OperationCandidate['kind'], string][] = [
     'click',
     'ytd-guide-entry-renderer a[href], ytd-mini-guide-entry-renderer a[href], ytd-masthead a[href]',
   ],
+  // The player's unmute button also carries ytp-popup; it is a button, not a menu over the window.
   [
     'menu',
     'native-menu',
-    '.ytp-popup, .ytp-settings-menu, ytd-menu-popup-renderer, tp-yt-paper-dialog, [role="menu"], [role="dialog"], [role="listbox"], select',
+    '.ytp-popup:not(button), .ytp-settings-menu, ytd-menu-popup-renderer, tp-yt-paper-dialog, [role="menu"], [role="dialog"], [role="listbox"], select',
   ],
   [
     'control',
@@ -161,7 +162,9 @@ export function youtubeOperations(doc: Document) {
       // separate local context could otherwise reorder overlapping anchors.
       if (doc.fullscreenElement !== parent && !scrollsWithPage(parent)) return undefined;
       const menu = [
-        ...parent.querySelectorAll<HTMLElement>('.ytp-error, .ytp-ad-player-overlay, .ytp-popup, .ytp-settings-menu'),
+        ...parent.querySelectorAll<HTMLElement>(
+          '.ytp-error, .ytp-ad-player-overlay, .ytp-popup:not(button), .ytp-settings-menu',
+        ),
       ].some(
         (e) => e.getBoundingClientRect().height > 0 && doc.defaultView!.getComputedStyle(e).visibility !== 'hidden',
       );

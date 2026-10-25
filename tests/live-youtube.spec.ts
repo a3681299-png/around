@@ -302,7 +302,23 @@ for (const colorScheme of ['light', 'dark'] as const) {
           .evaluate((element) => getComputedStyle(element).color),
       );
       await page.evaluate(() => window.scrollTo(0, 454));
-      await expect(page.locator('ytd-comments-header-renderer:visible').first()).toBeVisible({ timeout: 30_000 });
+      await expect(page.locator('ytd-comments-header-renderer:visible').first())
+        .toBeVisible({ timeout: 30_000 })
+        .catch(async (error: Error) => {
+          // Comments load lazily when their section enters the viewport; keep the layout that kept it out.
+          const layout = await page.evaluate(() => {
+            const r = document.querySelector('ytd-comments')?.getBoundingClientRect();
+            return {
+              scrollY,
+              innerHeight,
+              comments: r && [r.top, r.height].map(Math.round),
+              flexy: [...(document.querySelector('ytd-watch-flexy')?.attributes ?? [])]
+                .map((a) => a.name)
+                .filter((n) => !['role', 'video-id', 'style', 'class'].includes(n)),
+            };
+          });
+          throw new Error(`${error.message}${String.fromCharCode(10)}Comments layout: ${JSON.stringify(layout)}`);
+        });
       await page
         .locator('ytd-comments [data-ww-bbs-number]')
         .first()

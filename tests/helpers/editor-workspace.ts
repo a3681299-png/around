@@ -62,9 +62,10 @@ export async function beginCanvasGesture(node: Locator, point?: { x: number; y: 
   const box = (await node.boundingBox())!;
   const at = point ?? { x: box.x + box.width / 2, y: box.y + box.height / 2 };
   await node.page().mouse.move(at.x, at.y);
+  let last: unknown;
   await expect
-    .poll(() =>
-      node.evaluate((element, p) => {
+    .poll(async () => {
+      const state = await node.evaluate((element, p) => {
         let hit = element.ownerDocument.elementFromPoint(p.x, p.y);
         while (hit?.shadowRoot) {
           const next = hit.shadowRoot.elementFromPoint(p.x, p.y);
@@ -72,9 +73,46 @@ export async function beginCanvasGesture(node: Locator, point?: { x: number; y: 
           hit = next;
         }
         const group = element.closest('.composition[data-selected]');
-        return Boolean(hit && (hit === element || element.contains(hit) || group?.contains(hit)));
-      }, at),
-    )
-    .toBe(true);
+        const ok = Boolean(hit && (hit === element || element.contains(hit) || group?.contains(hit)));
+        if (ok) return { ok };
+        // What took the point instead, for live-site failures that do not reproduce alone.
+        const root = element.getRootNode();
+        const visible = (e: Element) => {
+          const b = e.getBoundingClientRect();
+          return b.width > 0 && b.height > 0 && getComputedStyle(e).visibility !== 'hidden';
+        };
+        return {
+          ok,
+          point: p,
+          hit: hit && `${hit.tagName}#${hit.id}.${String(hit.className).slice(0, 60)}`,
+          plane: root instanceof ShadowRoot ? root.host.id : '',
+          visibility: (element as HTMLElement).style.visibility,
+          clip:
+            root instanceof ShadowRoot
+              ? (root.host as HTMLElement).style.getPropertyValue('--ww-decoration-clip').slice(0, 160)
+              : '',
+          safety: document
+            .querySelector('#web-world-themes-decorations')
+            ?.getAttribute('data-ww-safety')
+            ?.slice(0, 600),
+          playerControls: [...document.querySelectorAll('#movie_player button, #movie_player [role="button"]')]
+            .filter(visible)
+            .map((e) => `${String(e.className).slice(0, 40)}@${Math.round(e.getBoundingClientRect().top)}`),
+          dialogs: [...document.querySelectorAll('tp-yt-paper-dialog, [role="dialog"]')].filter(visible).length,
+          player: (() => {
+            const r = document.querySelector('#movie_player')?.getBoundingClientRect();
+            return r && [r.left, r.top, r.width, r.height].map(Math.round);
+          })(),
+        };
+      }, at);
+      last = state;
+      return state.ok;
+    })
+    .toBe(true)
+    .catch((error: Error) => {
+      throw new Error(
+        `${error.message}${String.fromCharCode(10)}Artwork is not the hit target: ${JSON.stringify(last)}`,
+      );
+    });
   await node.page().mouse.down();
 }
