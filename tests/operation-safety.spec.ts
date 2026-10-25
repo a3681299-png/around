@@ -2,7 +2,7 @@ import { build } from 'esbuild';
 import type { Page } from '@playwright/test';
 import { test, expect } from './fixtures';
 import path from 'node:path';
-import { exposeEditorControls } from './helpers/editor-workspace';
+import { exposeEditorControls, withCanvas } from './helpers/editor-workspace';
 
 async function probeCode() {
   const result = await build({
@@ -129,6 +129,56 @@ test('atmosphere artwork crosses protected controls under one capped plane and n
     }),
   ).toBe(true);
   await button.click();
+});
+
+test('editing owns the center of a real-style player whose media sits on its own z-index, but never its bands', async ({
+  popup,
+  youtube,
+}) => {
+  await youtube.goto('https://www.youtube.com/watch?v=fixture');
+  // YouTube puts the media in a positioned container with z-index 10.
+  await youtube.evaluate(() => {
+    const video = document.querySelector('#movie_player video')!;
+    const container = document.createElement('div');
+    container.className = 'html5-video-container';
+    container.style.cssText = 'position:absolute;inset:0;z-index:10';
+    video.replaceWith(container);
+    container.append(video);
+  });
+  const editor = await opaqueArtwork(popup, youtube);
+  await editor.getByLabel('配置の基準').selectOption('video-player');
+  await editor.getByLabel('画像の幅').fill('120');
+  await editor.getByLabel('画像の高さ').fill('80');
+  // In the middle of the video, well inside the bands.
+  await editor.getByLabel('画像のX位置').fill('50');
+  await editor.getByLabel('画像のY位置').fill('50');
+  await expect.poll(() => planeOf(youtube)).toBe('#web-world-themes-video-decorations');
+  await settled(youtube);
+  const node = youtube.locator('#web-world-themes-video-decorations [data-image-id]');
+  const hit = (point: { x: number; y: number }) =>
+    node.evaluate((element, p) => {
+      let target = element.ownerDocument.elementFromPoint(p.x, p.y);
+      while (target?.shadowRoot) {
+        const next = target.shadowRoot.elementFromPoint(p.x, p.y);
+        if (!next || next === target) break;
+        target = next;
+      }
+      return { own: Boolean(target && (target === element || element.contains(target))), tag: target?.tagName };
+    }, point);
+  // The editor panel can cover the player in this viewport; collapse it like other canvas checks.
+  await withCanvas(youtube, async () => {
+    const box = (await node.boundingBox())!;
+    const player = (await youtube.locator('#movie_player').boundingBox())!;
+    const center = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+    expect(await hit(center)).toMatchObject({ own: true });
+    // The bottom control band stays native while editing.
+    expect(await hit({ x: player.x + 60, y: player.y + player.height - 40 })).toMatchObject({ own: false });
+    await youtube.mouse.move(center.x, center.y);
+    await youtube.mouse.down();
+    await youtube.mouse.move(center.x - 30, center.y + 10, { steps: 6 });
+    await youtube.mouse.up();
+    await expect.poll(async () => (await node.boundingBox())!.x).toBeCloseTo(box.x - 30, 0);
+  });
 });
 
 test('player artwork follows the page when the player-local plane is unavailable and avoids only current rectangles', async ({
@@ -823,6 +873,33 @@ test('focus inside the extension own player-local host never counts as focus on 
   expect(result.whileNative).toEqual(expect.arrayContaining(['player.video']));
 });
 
+test('focus on the player container is not focus on its control bands; a control inside a band is', async ({
+  youtube,
+}) => {
+  await youtube.goto('https://www.youtube.com/watch?v=fixture');
+  await youtube.addScriptTag({ content: await probeCode() });
+  const result = await youtube.evaluate(() => {
+    const api = (window as any).G1Probe;
+    const player = document.querySelector<HTMLElement>('#movie_player')!;
+    player.tabIndex = -1;
+    const source = api.youtubeOperations(document);
+    const focused = () =>
+      source
+        .capture()
+        .surfaces.filter((s: any) => s.availability.focused && s.id.startsWith('player.controls'))
+        .map((s: any) => s.id);
+    // YouTube focuses the player itself for keyboard shortcuts.
+    player.focus();
+    const container = { active: document.activeElement === player, focused: focused() };
+    player.querySelector<HTMLElement>('.ytp-chrome-bottom button')!.focus();
+    const bottom = focused();
+    source.destroy();
+    return { container, bottom };
+  });
+  expect(result.container).toEqual({ active: true, focused: [] });
+  expect(result.bottom).toEqual(['player.controls.bottom']);
+});
+
 test('focus that silently leaves with a removed element is not kept by the cached snapshot', async ({ youtube }) => {
   await youtube.goto('https://www.youtube.com/watch?v=fixture');
   await youtube.addScriptTag({ content: await probeCode() });
@@ -850,6 +927,66 @@ test('focus that silently leaves with a removed element is not kept by the cache
     return { focusedBefore, focusedAfter, active: document.activeElement?.tagName };
   });
   expect(result).toEqual({ focusedBefore: true, focusedAfter: false, active: 'BODY' });
+});
+
+test('focus moving inside the extension own UI does not notify the guard', async ({ youtube }) => {
+  const code = await probeCode();
+  const result = await youtube.evaluate(async (code) => {
+    // A quiet document isolates focus notifications from unrelated page mutations. The probe
+    // is loaded inside it so element checks run in the document's own realm, as in production.
+    const iframe = document.createElement('iframe');
+    iframe.id = 'web-world-themes-test-focus-frame';
+    document.body.append(iframe);
+    const win = iframe.contentWindow as any;
+    const doc = iframe.contentDocument!;
+    const script = doc.createElement('script');
+    script.textContent = code;
+    doc.head.append(script);
+    const api = win.G1Probe;
+    doc.body.insertAdjacentHTML('beforeend', '<button id="native">native</button>');
+    // Two of the extension's own hosts, like the editor panel and the player-local layers.
+    const own = doc.createElement('div');
+    own.id = 'web-world-themes-test-own';
+    own.attachShadow({ mode: 'open' }).innerHTML = '<div tabindex="-1">layer</div>';
+    const panel = doc.createElement('div');
+    panel.id = 'web-world-themes-test-panel';
+    panel.attachShadow({ mode: 'open' }).innerHTML = '<div tabindex="-1">panel</div>';
+    doc.body.append(own, panel);
+    const source = api.createOperationSource(
+      doc,
+      () => [],
+      () => undefined,
+    );
+    let notified = 0;
+    source.subscribe(() => notified++);
+    const settle = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      source.capture();
+      notified = 0;
+    };
+    const layer = own.shadowRoot!.querySelector<HTMLElement>('[tabindex]')!,
+      handle = panel.shadowRoot!.querySelector<HTMLElement>('[tabindex]')!;
+    win.focus();
+    // The first focus also focuses the frame's window, which is a native change of its own.
+    handle.focus();
+    await settle();
+    // A pointerdown on a layer moves focus from the panel to the layer, then away to nothing.
+    layer.focus();
+    handle.focus();
+    handle.blur();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const ownNotified = notified;
+    await settle();
+    doc.getElementById('native')!.focus();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const nativeNotified = notified;
+    source.destroy();
+    iframe.remove();
+    return { ownNotified, nativeNotified };
+  }, code);
+  // Notification makes the guard hide every layer and handle at once, which ends a drag.
+  expect(result.ownNotified).toBe(0);
+  expect(result.nativeNotified).toBeGreaterThan(0);
 });
 
 test('a native removal is seen by the next synchronous read and the guard is told after the task', async ({

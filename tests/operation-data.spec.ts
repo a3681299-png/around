@@ -334,3 +334,24 @@ test('approach uses the protected band of a surface, never the whole player behi
   expect(step({ x: 80, y: 700 })).toBe(true);
   expect(step({ x: 80, y: band.top - 30 })).toBe(true);
 });
+
+test('keyboard focus on the coverable video area alone is not an approach', () => {
+  const player = { left: 16, top: 145, width: 1050, height: 590 };
+  const video = surface({
+    id: 'player.video',
+    kind: 'gesture',
+    shape: player,
+    protectedEnvelope: player,
+    policy: { transform: 'fixed-plane', occlusion: 'allow', input: 'native-only' },
+    availability: { ...surface().availability, focused: true },
+  });
+  const step = (surfaces: OperationSurface[]) =>
+    stepProximity({ safe: false, clearSince: null }, snapshot(surfaces), {
+      timeMs: 0,
+      point: { x: 990, y: 300 },
+      interacting: false,
+    }).safe;
+  expect(step([video])).toBe(false);
+  // A focused control that must not be covered still counts, wherever the pointer is.
+  expect(step([video, surface({ id: 'seek', availability: { ...surface().availability, focused: true } })])).toBe(true);
+});

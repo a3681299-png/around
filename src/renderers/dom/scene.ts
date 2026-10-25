@@ -324,7 +324,7 @@ export function createImageRenderer(
           content = doc.createElement('div');
         style.textContent =
           CSS +
-          ':host{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;z-index:1!important}.image{pointer-events:none!important}.image[data-editable]{pointer-events:auto!important}';
+          ':host{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;z-index:var(--ww-local-z,1)!important}.image{pointer-events:none!important}.image[data-editable]{pointer-events:auto!important}';
         content.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:0';
         localShadow.append(style, content);
         wireGestures(localShadow);
@@ -333,6 +333,7 @@ export function createImageRenderer(
       if (slot && videoSlot) {
         if (videoSlot.host.parentElement !== slot.parent) slot.parent.append(videoSlot.host);
         videoSlot.host.style.setProperty('--ww-decoration-clip', `inset(${slot.top}px 0 ${slot.bottom}px 0)`);
+        videoSlot.host.style.setProperty('--ww-local-z', String(slot.zIndex));
       }
       // One presentation container preserves scoped z-index/tie ordering and
       // keeps a group's masks/opacity on the original, un-cloned subtree.

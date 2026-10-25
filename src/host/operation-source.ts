@@ -46,7 +46,8 @@ export interface OperationSource {
   validate(snapshot: OperationSnapshot, event?: Event): boolean;
   /** Milliseconds until a pending change may be read; 0 when the last capture is current. */
   deferredFor(): number;
-  videoSlot(): { parent: HTMLElement; rect: PlacementFrame; top: number; bottom: number } | undefined;
+  /** zIndex: the local plane's order inside the player, just above its media and below its UI. */
+  videoSlot(): { parent: HTMLElement; rect: PlacementFrame; top: number; bottom: number; zIndex: number } | undefined;
   overlaySlot(): { parent: HTMLElement; zIndex: number } | undefined;
   /** The overlay parent when a child placed at the document origin scrolls with the page. */
   pageSlot(): { parent: HTMLElement; zIndex: number } | undefined;
@@ -167,16 +168,22 @@ export function createOperationSource(
   });
   const resize = new ResizeObserver(changed);
   resize.observe(doc.documentElement);
-  doc.addEventListener('scroll', changed, { capture: true, passive: true });
-  doc.addEventListener('focusin', mark, true);
-  doc.addEventListener('focusout', mark, true);
-  doc.defaultView!.addEventListener('resize', changed);
-  doc.fonts?.addEventListener('loadingdone', changed);
-  let serial = 0;
   // The extension's own UI (editor handles, panels) is never a native surface; its gestures
   // must not mark the page as changed, or a drag would hold and hide its own handles.
   const owned = (event: Event) =>
     event.composedPath().some((node) => node instanceof Element && node.id.startsWith('web-world-themes'));
+  // Focus moving between the extension's own nodes (a layer, its handle) is not native state.
+  const focusChanged = (event: Event) => {
+    const related = (event as FocusEvent).relatedTarget;
+    if (owned(event) && (!(related instanceof Element) || related.closest('[id^="web-world-themes"]'))) return;
+    mark();
+  };
+  doc.addEventListener('scroll', changed, { capture: true, passive: true });
+  doc.addEventListener('focusin', focusChanged, true);
+  doc.addEventListener('focusout', focusChanged, true);
+  doc.defaultView!.addEventListener('resize', changed);
+  doc.fonts?.addEventListener('loadingdone', changed);
+  let serial = 0;
   const down = (event: Event) => {
     if (owned(event)) return;
     dragging = event.composedPath().find((node): node is Element => node instanceof Element);
@@ -250,6 +257,22 @@ export function createOperationSource(
     readFocus = doc.hasFocus();
     // Focus on the extension's own hosts (some live inside the player) is not native focus.
     const active = doc.activeElement?.closest('[id^="web-world-themes"]') ? null : doc.activeElement;
+    const activeRect = active?.getBoundingClientRect();
+    // A band reserved on a larger element (the player's control bars) is focused only through a
+    // focused descendant inside that band, not by focus on the container itself.
+    const focusedIn = (row: OperationCandidate, rect: PlacementFrame) => {
+      if (!active || !row.element.contains(active)) return false;
+      const band = row.envelope;
+      if (!band || band.width * band.height >= rect.width * rect.height - 1) return true;
+      return (
+        active !== row.element &&
+        Boolean(activeRect) &&
+        activeRect!.right > band.left &&
+        activeRect!.left < band.left + band.width &&
+        activeRect!.bottom > band.top &&
+        activeRect!.top < band.top + band.height
+      );
+    };
     const surfaces = rows.map((row): OperationSurface => {
       const rect = row.rect ?? row.element.getBoundingClientRect();
       const shape = { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
@@ -276,8 +299,8 @@ export function createOperationSource(
             rect.height > 0 &&
             (row.visible ?? doc.defaultView!.getComputedStyle(row.element).visibility !== 'hidden'),
           disabled: row.element.matches(':disabled,[aria-disabled="true"]'),
-          focused: presented && doc.hasFocus() && row.element.contains(active),
-          editing: presented && doc.hasFocus() && row.kind === 'text-input' && row.element.contains(active),
+          focused: presented && doc.hasFocus() && focusedIn(row, shape),
+          editing: presented && doc.hasFocus() && row.kind === 'text-input' && focusedIn(row, shape),
           dragging: presented && Boolean(dragging && row.element.contains(dragging)),
           captured: presented && Boolean(captured && row.element.contains(captured)),
         },
@@ -344,8 +367,8 @@ export function createOperationSource(
       resize.disconnect();
       types.forEach((type, i) => doc.removeEventListener(type, handlers[i]!, true));
       doc.removeEventListener('scroll', changed, true);
-      doc.removeEventListener('focusin', mark, true);
-      doc.removeEventListener('focusout', mark, true);
+      doc.removeEventListener('focusin', focusChanged, true);
+      doc.removeEventListener('focusout', focusChanged, true);
       doc.defaultView!.removeEventListener('resize', changed);
       doc.defaultView!.removeEventListener('blur', up);
       doc.defaultView!.removeEventListener('focus', mark);
@@ -372,8 +395,8 @@ export function createOperationSource(
         observed.forEach((e) => resize.observe(e));
         types.forEach((type, i) => doc.addEventListener(type, handlers[i]!, { capture: true, passive: true }));
         doc.addEventListener('scroll', changed, { capture: true, passive: true });
-        doc.addEventListener('focusin', mark, true);
-        doc.addEventListener('focusout', mark, true);
+        doc.addEventListener('focusin', focusChanged, true);
+        doc.addEventListener('focusout', focusChanged, true);
         doc.defaultView!.addEventListener('resize', changed);
         doc.defaultView!.addEventListener('blur', up);
         doc.defaultView!.addEventListener('focus', mark);
@@ -435,8 +458,8 @@ export function createOperationSource(
       resize.disconnect();
       listeners.clear();
       doc.removeEventListener('scroll', changed, true);
-      doc.removeEventListener('focusin', mark, true);
-      doc.removeEventListener('focusout', mark, true);
+      doc.removeEventListener('focusin', focusChanged, true);
+      doc.removeEventListener('focusout', focusChanged, true);
       doc.defaultView!.removeEventListener('resize', changed);
       doc.defaultView!.removeEventListener('blur', up);
       doc.defaultView!.removeEventListener('focus', mark);

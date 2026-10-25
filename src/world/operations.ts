@@ -348,7 +348,8 @@ export function stepProximity(
     input.interacting ||
     snapshot.surfaces.some(
       (surface) =>
-        surface.availability.focused ||
+        // Focus on an area that may be covered (the video itself) is not an approach to a control.
+        (surface.availability.focused && surface.policy.occlusion !== 'allow') ||
         surface.availability.dragging ||
         surface.availability.captured ||
         (surface.availability.visible &&

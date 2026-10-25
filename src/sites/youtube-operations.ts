@@ -182,7 +182,18 @@ export function youtubeOperations(doc: Document) {
         );
       });
       if (centralControl) return undefined;
-      return { parent, rect: { left: r.left, top: r.top, width: r.width, height: r.height }, top: 64, bottom: 112 };
+      // The media sits in its own positioned container (z-index 10 on YouTube). The local plane
+      // goes directly above it, so artwork is over the video yet under every native overlay
+      // and control layer; the bands above are clipped and central controls disable it.
+      const media = parent.querySelector<HTMLElement>('.html5-video-container');
+      const mediaZ = media ? Number.parseInt(doc.defaultView!.getComputedStyle(media).zIndex, 10) : NaN;
+      return {
+        parent,
+        rect: { left: r.left, top: r.top, width: r.width, height: r.height },
+        top: 64,
+        bottom: 112,
+        zIndex: Number.isFinite(mediaZ) ? mediaZ + 1 : 1,
+      };
     },
     overlaySlot,
   );
