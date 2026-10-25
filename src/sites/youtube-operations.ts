@@ -71,6 +71,24 @@ export function youtubeOperations(doc: Document) {
       if (fixedContainingBlock(doc.defaultView!.getComputedStyle(node))) return undefined;
     return { parent, zIndex: 1 };
   };
+  /** The player when its centre is the native video gesture: no menu, error or advert over it,
+   * tall enough for both control bands, and scrolling with the page (or fullscreen). */
+  const verifiedPlayer = () => {
+    if (!overlaySlot()) return undefined;
+    const parent = player();
+    if (!parent) return undefined;
+    // A non-fullscreen fixed player uses the single screen composition. A
+    // separate local context could otherwise reorder overlapping anchors.
+    if (doc.fullscreenElement !== parent && !scrollsWithPage(parent)) return undefined;
+    const menu = [
+      ...parent.querySelectorAll<HTMLElement>(
+        '.ytp-error, .ytp-ad-player-overlay, .ytp-popup:not(button), .ytp-settings-menu',
+      ),
+    ].some((e) => e.getBoundingClientRect().height > 0 && doc.defaultView!.getComputedStyle(e).visibility !== 'hidden');
+    const r = parent.getBoundingClientRect();
+    if (menu || r.height <= 176 || r.width <= 0) return undefined;
+    return { parent, r };
+  };
   return createOperationSource(
     doc,
     (scan) => {
@@ -155,21 +173,9 @@ export function youtubeOperations(doc: Document) {
         : [{ id: 'composition.unavailable', kind: 'gesture', element: doc.documentElement, unsupported: true }];
     },
     () => {
-      if (!overlaySlot()) return undefined;
-      const parent = player();
-      if (!parent) return undefined;
-      // A non-fullscreen fixed player uses the single screen composition. A
-      // separate local context could otherwise reorder overlapping anchors.
-      if (doc.fullscreenElement !== parent && !scrollsWithPage(parent)) return undefined;
-      const menu = [
-        ...parent.querySelectorAll<HTMLElement>(
-          '.ytp-error, .ytp-ad-player-overlay, .ytp-popup:not(button), .ytp-settings-menu',
-        ),
-      ].some(
-        (e) => e.getBoundingClientRect().height > 0 && doc.defaultView!.getComputedStyle(e).visibility !== 'hidden',
-      );
-      const r = parent.getBoundingClientRect();
-      if (menu || r.height <= 176 || r.width <= 0) return undefined;
+      const verified = verifiedPlayer();
+      if (!verified) return undefined;
+      const { parent, r } = verified;
       // The center is native gesture space; explicit editor ownership may only
       // replace that gesture, never another native button/input placed here.
       const centralControl = [
@@ -199,5 +205,12 @@ export function youtubeOperations(doc: Document) {
       };
     },
     overlaySlot,
+    () => {
+      if (doc.fullscreenElement) return undefined;
+      const verified = verifiedPlayer();
+      if (!verified) return undefined;
+      const { r } = verified;
+      return { left: r.left, top: r.top + 64, width: r.width, height: r.height - 176 };
+    },
   );
 }

@@ -50,6 +50,10 @@ export interface OperationSource {
   /** zIndex: the local plane's order inside the player, just above its media and below its UI. */
   videoSlot(): { parent: HTMLElement; rect: PlacementFrame; top: number; bottom: number; zIndex: number } | undefined;
   overlaySlot(): { parent: HTMLElement; zIndex: number } | undefined;
+  /** Explicit editing only: the player's video centre (minus its control bands) while no menu,
+   * error or advert covers it. Unlike videoSlot it stays available when native controls appear in
+   * the centre; those are cut from the clip and refused at input time instead. */
+  editorCentre(): PlacementFrame | undefined;
   /** The overlay parent when a child placed at the document origin scrolls with the page. */
   pageSlot(): { parent: HTMLElement; zIndex: number } | undefined;
   destroy(): void;
@@ -60,6 +64,7 @@ export function createOperationSource(
   discover: (scan: DiscoveryScan) => readonly OperationCandidate[],
   videoSlot: OperationSource['videoSlot'],
   overlaySlot: OperationSource['overlaySlot'] = () => ({ parent: doc.body ?? doc.documentElement, zIndex: 2147482000 }),
+  editorCentre: OperationSource['editorCentre'] = () => undefined,
 ): OperationSource {
   if (!documentIds.has(doc)) documentIds.set(doc, ++nextDocumentId);
   const documentId = documentIds.get(doc)!;
@@ -445,6 +450,7 @@ export function createOperationSource(
         );
     },
     videoSlot,
+    editorCentre,
     overlaySlot: verifiedOverlaySlot,
     pageSlot() {
       const overlay = verifiedOverlaySlot();

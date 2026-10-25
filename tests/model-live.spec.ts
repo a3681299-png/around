@@ -106,7 +106,20 @@ test('real YouTube: official Studio places a rig, switches run/idle, replays mod
     await page.mouse.move(rest.x, rest.y);
     await expect.poll(() => phaseAt(rest), { timeout: 15000 }).toBe('idle');
     await page.mouse.move(target.x, target.y);
-    await expect.poll(() => phaseAt(target)).toBe('run');
+    await expect
+      .poll(() => phaseAt(target))
+      .toBe('run')
+      .catch(async (error: Error) => {
+        // Keep the protection state and rig position for live failures that do not reproduce alone.
+        const state = {
+          rest,
+          target,
+          rig: await point(),
+          pose: await pose(),
+          safety: await page.locator('#web-world-themes-decorations').getAttribute('data-ww-safety'),
+        };
+        throw new Error(`${error.message}${String.fromCharCode(10)}Pursuit state: ${JSON.stringify(state)}`);
+      });
     await expect.poll(() => phaseAt(target), { timeout: 10000 }).toBe('idle');
     expect(Math.abs(Math.hypot((await point()).x - target.x, (await point()).y - target.y) - 40)).toBeLessThan(0.2);
     report.checks.runStopIdle = true;

@@ -68,3 +68,15 @@ export async function clearestPoint(
     );
   return { x: best.x, y: best.y };
 }
+
+/** An error's message for a live check record: the received values and diagnostics included. */
+export function errorSummary(error: unknown) {
+  return String(error)
+    .replace(new RegExp(String.fromCharCode(27) + '\[[0-9;]*m', 'g'), '')
+    .split(String.fromCharCode(10))
+    .map((line) => line.trim())
+    .filter((line) => line && !line.startsWith('at ') && !line.startsWith('Call log'))
+    .slice(0, 12)
+    .join(' · ')
+    .slice(0, 2000);
+}

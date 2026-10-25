@@ -149,8 +149,34 @@ test('explicit editing lets screen-plane handles own only the verified video cen
     }),
   ]);
   expect(guardPaint(central, [owned])).toMatchObject([{ surfaceId: 'control.9' }]);
-  // The page and atmosphere planes never take this ownership.
-  expect(guardPaint(playerSnapshot(), [{ ...owned, composition: 'page' }])).toHaveLength(1);
+  // A player-anchored root that falls back to the page plane takes the same ownership; the
+  // atmosphere plane never takes input.
+  expect(guardPaint(playerSnapshot(), [{ ...owned, composition: 'page' }])).toEqual([]);
+  expect(guardPaint(playerSnapshot(), [{ ...owned, composition: 'atmosphere' }])).toHaveLength(1);
+});
+test('the page plane reopens the editing video centre too, cutting central controls at their rectangles', () => {
+  const inside = (regions: { left: number; top: number; width: number; height: number }[], x: number, y: number) =>
+    regions.some((r) => x >= r.left && x < r.left + r.width && y >= r.top && y < r.top + r.height);
+  const area = { left: 0, top: 0, width: 1100, height: 760 };
+  const central = snapshot([
+    ...playerSnapshot().surfaces,
+    surface({
+      id: 'control.9',
+      kind: 'click',
+      shape: { left: 220, top: 220, width: 40, height: 40 },
+      protectedEnvelope: { left: 216, top: 216, width: 48, height: 48 },
+      scrolls: true,
+    }),
+  ]);
+  // Without the centre, editing cuts the whole (allow) player.
+  expect(inside(pagePaintRegions(central, true, area), 400, 250)).toBe(false);
+  const regions = pagePaintRegions(central, true, area, videoCentre);
+  expect(inside(regions, 400, 250)).toBe(true);
+  expect(inside(regions, 240, 240)).toBe(false); // the central control
+  expect(inside(regions, 300, 400)).toBe(false); // bottom band
+  expect(inside(regions, 300, 130)).toBe(false); // top band
+  // Outside editing the centre changes nothing (the page plane may paint over the video, without input).
+  expect(pagePaintRegions(central, false, area, videoCentre)).toEqual(pagePaintRegions(central, false, area));
 });
 test('the editing clip opens the video centre to the screen plane but keeps bands, seek and central controls cut', () => {
   const inside = (regions: { left: number; top: number; width: number; height: number }[], x: number, y: number) =>

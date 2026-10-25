@@ -274,6 +274,107 @@ test('a stale screen-plane handle over a moved control band never takes the inpu
   });
 });
 
+/** A visible native button in the middle of the player, like YouTube's large play button on a
+ * video that has not started. Its clicks are counted. */
+async function centralPlayButton(youtube: Page) {
+  await youtube.locator('#movie_player').evaluate((player) => {
+    const button = document.createElement('button');
+    button.className = 'ytp-large-play-button ytp-button';
+    button.setAttribute('aria-label', 'Play');
+    button.style.cssText =
+      'position:absolute;left:50%;top:50%;width:68px;height:48px;transform:translate(-50%,-50%);z-index:20';
+    const w = window as unknown as { centralClicks: number };
+    w.centralClicks = 0;
+    button.addEventListener('click', () => w.centralClicks++);
+    player.append(button);
+  });
+  // Read when needed: collapsing the editor panel resizes the player.
+  return async () =>
+    youtube.locator('.ytp-large-play-button').evaluate((button) => {
+      const r = button.getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    });
+}
+/** Places the selected artwork (percent of its frame) so its centre is `dx` left of the player centre. */
+async function besideCentre(youtube: Page, editor: import('@playwright/test').Locator, frame: 'viewport' | 'player') {
+  const at = await youtube.locator('#movie_player').evaluate((player, frame) => {
+    const r = player.getBoundingClientRect();
+    const x = r.left + r.width / 2 - 150,
+      y = r.top + r.height / 2;
+    return frame === 'viewport'
+      ? { x: (x / innerWidth) * 100, y: (y / innerHeight) * 100 }
+      : { x: ((x - r.left) / r.width) * 100, y: ((y - r.top) / r.height) * 100 };
+  }, frame);
+  await editor.getByLabel('画像のX位置').fill(at.x.toFixed(2));
+  await editor.getByLabel('画像のY位置').fill(at.y.toFixed(2));
+}
+const hitOwn = (node: import('@playwright/test').Locator, point: { x: number; y: number }) =>
+  node.evaluate((element, p) => {
+    let target = element.ownerDocument.elementFromPoint(p.x, p.y);
+    while (target?.shadowRoot) {
+      const next = target.shadowRoot.elementFromPoint(p.x, p.y);
+      if (!next || next === target) break;
+      target = next;
+    }
+    return Boolean(target && (target === element || element.contains(target)));
+  }, point);
+
+test('editing keeps the video centre while a central native button is visible, and the button stays native', async ({
+  popup,
+  youtube,
+}) => {
+  await youtube.goto('https://www.youtube.com/watch?v=fixture');
+  const button = await centralPlayButton(youtube);
+  const editor = await opaqueArtwork(popup, youtube);
+  await editor.getByLabel('画像の幅').fill('120');
+  await editor.getByLabel('画像の高さ').fill('80');
+  await besideCentre(youtube, editor, 'viewport');
+  await expect.poll(() => planeOf(youtube)).toBe('#web-world-themes-decorations');
+  const node = youtube.locator('#web-world-themes-decorations [data-image-id]');
+  await withCanvas(youtube, async () => {
+    await settled(youtube);
+    const box = (await node.boundingBox())!;
+    const center = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+    expect(await hitOwn(node, center)).toBe(true);
+    await youtube.mouse.move(center.x, center.y);
+    await youtube.mouse.down();
+    await youtube.mouse.move(center.x - 30, center.y + 10, { steps: 6 });
+    await youtube.mouse.up();
+    await expect.poll(async () => (await node.boundingBox())!.x).toBeCloseTo(box.x - 30, 0);
+    // The real button keeps its clicks while editing.
+    const at = await button();
+    await youtube.mouse.click(at.x, at.y);
+    expect(await youtube.evaluate(() => (window as unknown as { centralClicks: number }).centralClicks)).toBe(1);
+  });
+});
+
+test('player artwork moved to the page plane by a central button can still be edited over the video centre', async ({
+  popup,
+  youtube,
+}) => {
+  await youtube.goto('https://www.youtube.com/watch?v=fixture');
+  await centralPlayButton(youtube);
+  const editor = await opaqueArtwork(popup, youtube);
+  await editor.getByLabel('配置の基準').selectOption('video-player');
+  await editor.getByLabel('画像の幅').fill('120');
+  await editor.getByLabel('画像の高さ').fill('80');
+  await besideCentre(youtube, editor, 'player');
+  // A central native control keeps the player-local plane unavailable.
+  await expect.poll(() => planeOf(youtube)).toBe('#web-world-themes-page-decorations');
+  const node = youtube.locator('#web-world-themes-page-decorations [data-image-id]');
+  await withCanvas(youtube, async () => {
+    await settled(youtube);
+    const box = (await node.boundingBox())!;
+    const center = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+    expect(await hitOwn(node, center)).toBe(true);
+    await youtube.mouse.move(center.x, center.y);
+    await youtube.mouse.down();
+    await youtube.mouse.move(center.x - 30, center.y + 10, { steps: 6 });
+    await youtube.mouse.up();
+    await expect.poll(async () => (await node.boundingBox())!.x).toBeCloseTo(box.x - 30, 0);
+  });
+});
+
 test('player artwork follows the page when the player-local plane is unavailable and avoids only current rectangles', async ({
   popup,
   youtube,

@@ -193,26 +193,17 @@ export function createImageRenderer(
     }
     if (safety && protect) {
       const roots = new Map([...layout.groups, ...layout.layers].map((entry) => [entry.layer.id, entry]));
-      const authoring = Boolean(editing && !editing.locked);
       const needsVideoSlot =
         Boolean(doc.fullscreenElement) ||
-        authoring ||
         layout.roots.some((id) => {
           const anchor = roots.get(id)!.layer.placement.anchor;
           return anchor.kind === 'surface' && anchor.target === 'video-player';
         });
       const slot = needsVideoSlot ? safety.source.videoSlot() : undefined;
-      // Explicit editing only: the verified video centre (no menu, error or central control),
-      // where screen-plane handles may take input over the video. The bands stay native.
-      const editorRegion =
-        authoring && slot && !doc.fullscreenElement
-          ? {
-              left: slot.rect.left,
-              top: slot.rect.top + slot.top,
-              width: slot.rect.width,
-              height: slot.rect.height - slot.top - slot.bottom,
-            }
-          : undefined;
+      // Explicit editing only: the verified video centre (no menu, error or advert over it), where
+      // screen- and page-plane handles may take input over the video. The bands and any native
+      // control in the centre stay native: they are cut from the clip and refused at input time.
+      const editorRegion = editing && !editing.locked ? safety.source.editorCentre() : undefined;
       // The screen overlay excludes complete scroll paths. This clip cannot
       // expose a moving native control during asynchronous compositor scroll; the editing
       // centre is the exception, and every gesture there is claimed after a fresh read.
@@ -322,7 +313,7 @@ export function createImageRenderer(
               height: Math.max(...bounds.map((b) => b.bottom)) - Math.min(...bounds.map((b) => b.top)) + 2,
             }
           : { left: 0, top: 0, width: 0, height: 0 };
-        pageRegions = pagePaintRegions(safety.source.capture(), Boolean(editing), area);
+        pageRegions = pagePaintRegions(safety.source.capture(), Boolean(editing), area, editorRegion);
         const pagePath = pageRegions
           .map((r) => `M${r.left + scroll.x} ${r.top + scroll.y}h${r.width}v${r.height}h${-r.width}Z`)
           .join('');
@@ -428,8 +419,8 @@ export function createImageRenderer(
               pointerEvents: !atmosphere && Boolean(editing && !editing.locked && !layer.locked),
               editorOwned:
                 Boolean(editing && !editing.locked && !layer.locked) &&
-                (local || (!page && !atmosphere && editorRegion !== undefined)),
-              ...(editorRegion && !local && !page && !atmosphere ? { editorRegion } : {}),
+                (local || (!atmosphere && editorRegion !== undefined)),
+              ...(editorRegion && !local && !atmosphere ? { editorRegion } : {}),
               outset: 0,
               composition: !verified
                 ? ('unsupported' as const)
@@ -1042,11 +1033,16 @@ export function createImageRenderer(
           if (container.children[index] !== node) container.insertBefore(node, container.children[index] ?? null);
         });
       groups.forEach((group) => place(compositions.get(group.id)!.content, group.children));
+      // Roots drawn on another plane stay there: moving a node out and back (as draw() would)
+      // drops its pointer capture and cancels an editor gesture in progress.
+      const planeContents = new Set([videoSlot?.content, pagePlane?.content, atmospherePlane?.content]);
       place(
         imageLayer!,
         rootLayers(images, groups)
           .map((layer) => layer.id)
-          .filter((id) => (nodes.get(id)?.node ?? compositions.get(id)!.node).parentNode !== videoSlot?.content),
+          .filter(
+            (id) => !planeContents.has((nodes.get(id)?.node ?? compositions.get(id)!.node).parentElement ?? undefined),
+          ),
       );
       draw();
     },

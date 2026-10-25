@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
 import { beginCanvasGesture } from './helpers/editor-workspace';
+import { errorSummary } from './helpers/youtube-live';
 
 test('optional real signed-out YouTube: independent Studio creation, bidirectional editing, recovery and cleanup', async () => {
   test.skip(process.env.WW_LIVE_STUDIO !== '1', 'Explicit real-site validation; fixture tests run separately.');
@@ -22,7 +23,7 @@ test('optional real signed-out YouTube: independent Studio creation, bidirection
       checks.push({
         name,
         status: 'unconfirmed',
-        detail: String(error).split('\n').slice(0, 3).join(' ') + (diagnostics ? await diagnostics() : ''),
+        detail: errorSummary(error) + (diagnostics ? await diagnostics() : ''),
       });
     }
   };
@@ -135,7 +136,7 @@ test('optional real signed-out YouTube: independent Studio creation, bidirection
     checks.push({
       name: 'real site startup',
       status: 'unconfirmed',
-      detail: String(error).split('\n').slice(0, 3).join(' '),
+      detail: errorSummary(error),
     });
   } finally {
     await writeFile(

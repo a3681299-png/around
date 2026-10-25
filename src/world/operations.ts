@@ -175,20 +175,19 @@ export function guardPaint(snapshot: OperationSnapshot, paints: readonly PaintFo
       if (bounds.left >= bounds.right || bounds.top >= bounds.bottom) continue;
     }
     const planeCovers = paint.composition === 'overlay' || paint.composition === 'page';
-    // An editor-owned screen-plane paint wholly inside the verified video centre: there the
-    // clip cuts current rectangles, and input is claimed only after a fresh read (editorClaims).
+    // An editor-owned screen- or page-plane paint wholly inside the verified video centre: there
+    // the clip cuts current rectangles, and input is claimed only after a fresh read (editorClaims).
     const centre =
-      paint.editorOwned &&
-      paint.composition === 'overlay' &&
-      paint.editorRegion !== undefined &&
-      contains(paint.editorRegion, bounds);
+      paint.editorOwned && planeCovers && paint.editorRegion !== undefined && contains(paint.editorRegion, bounds);
     for (const { surface, envelope: fixed, swept, page } of visible) {
       const envelope =
-        !planeCovers || centre || surface.compositionCapability === 'native-above'
+        !planeCovers || surface.compositionCapability === 'native-above'
           ? fixed
           : paint.composition === 'page'
             ? page
-            : swept;
+            : centre
+              ? fixed
+              : swept;
       if (!intersects(bounds, envelope)) continue;
       // The stacking proof is relative to the screen overlay. A player-local
       // subtree must still check every native control in that player's plane.
@@ -311,8 +310,34 @@ export function pagePaintRegions(
   snapshot: OperationSnapshot,
   editing: boolean,
   area: PlacementFrame,
+  editorRegion?: PlacementFrame,
 ): PlacementFrame[] {
   if (!snapshot.supported || !(area.width > 0 && area.height > 0)) return [];
+  const regions = pageRegions(snapshot, editing, area);
+  if (!editing || !editorRegion) return regions;
+  // The editing video centre, as for the screen plane (see safePaintRegions); this plane moves
+  // with the page, so every protected surface is cut at its page envelope.
+  let centre = [editorRegion].flatMap((r) => {
+    const left = Math.max(r.left, area.left),
+      top = Math.max(r.top, area.top),
+      right = Math.min(r.left + r.width, area.left + area.width),
+      bottom = Math.min(r.top + r.height, area.top + area.height);
+    return right > left && bottom > top ? [{ left, top, width: right - left, height: bottom - top }] : [];
+  });
+  for (const surface of snapshot.surfaces) {
+    if (
+      !surface.availability.visible ||
+      surface.compositionCapability === 'native-above' ||
+      surface.policy.occlusion === 'allow'
+    )
+      continue;
+    centre = cutRegions(centre, pageEnvelope(surface));
+    if (centre.length > 1024) return regions;
+  }
+  const merged = [...cutRegions(regions, editorRegion), ...centre];
+  return merged.length > 1024 ? regions : merged;
+}
+function pageRegions(snapshot: OperationSnapshot, editing: boolean, area: PlacementFrame): PlacementFrame[] {
   let regions: PlacementFrame[] = [area];
   for (const surface of snapshot.surfaces) {
     if (

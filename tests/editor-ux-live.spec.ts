@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
 import { beginCanvasGesture } from './helpers/editor-workspace';
+import { errorSummary } from './helpers/youtube-live';
 
 test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and cleanup', async () => {
   test.skip(process.env.WW_LIVE_EDITOR_UX !== '1', 'Explicit real YouTube UI validation.');
@@ -18,7 +19,7 @@ test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and 
       await action();
       results.push({ name, status: 'passed' });
     } catch (error) {
-      results.push({ name, status: 'unconfirmed', detail: String(error).split('\n').slice(0, 2).join(' ') });
+      results.push({ name, status: 'unconfirmed', detail: errorSummary(error) });
     }
   };
   try {
@@ -114,7 +115,7 @@ test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and 
     results.push({
       name: 'real site startup',
       status: 'unconfirmed',
-      detail: String(error).split('\n').slice(0, 2).join(' '),
+      detail: errorSummary(error),
     });
   } finally {
     await writeFile(
