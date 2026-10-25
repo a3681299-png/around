@@ -5,6 +5,7 @@ import path from 'node:path';
 import { launchExtension } from './fixtures';
 import { nativeWindow, sidePanelDriver } from './helpers/side-panel';
 import type { DesignDocument } from '../src/design/types';
+import { clearestPoint, declinePromotion } from './helpers/youtube-live';
 
 test('real YouTube: private local VRM import, MToon, pointer gaze, Studio transforms, save/reload and OFF', async () => {
   test.skip(
@@ -64,12 +65,19 @@ test('real YouTube: private local VRM import, MToon, pointer gaze, Studio transf
     await panel.fill('[data-image-prop="heightPx"]', '520');
     await panel.fill('[data-model="rotationY"]', '15');
     await panel.fill('[data-image-prop="anchor"]', 'video-player');
-    const width = await page.evaluate(() => innerWidth);
-    await page.mouse.move(80, 400);
-    await expect.poll(async () => (await frame()).lookYaw).toBeLessThan(-5);
+    const { width, height } = await page.evaluate(() => ({ width: innerWidth, height: innerHeight }));
+    // Left and right of the rig, at the points clearest of native controls (see clearestPoint).
+    const leftPoint = await clearestPoint(page, { left: 8, top: 150, right: 160, bottom: height - 40 }),
+      rightPoint = await clearestPoint(page, { left: width - 160, top: 150, right: width - 8, bottom: height - 40 });
+    const yawAt = async (aim: { x: number; y: number }) => {
+      if (await declinePromotion(page)) await page.mouse.move(aim.x, aim.y);
+      return (await frame()).lookYaw as number;
+    };
+    await page.mouse.move(leftPoint.x, leftPoint.y);
+    await expect.poll(() => yawAt(leftPoint)).toBeLessThan(-5);
     const left = await pose();
-    await page.mouse.move(width - 80, 300);
-    await expect.poll(async () => (await frame()).lookYaw).toBeGreaterThan(5);
+    await page.mouse.move(rightPoint.x, rightPoint.y);
+    await expect.poll(() => yawAt(rightPoint)).toBeGreaterThan(5);
     const right = await pose();
     expect(right.head).not.toEqual(left.head);
     expect(right.eyes).not.toEqual(left.eyes);

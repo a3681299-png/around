@@ -172,13 +172,34 @@ test('real YouTube: official Studio configures GIF pursuit, records/replays/load
     for (const size of [1366, 1920, 1000]) {
       await nativeWindow(panel.cdp, size);
       await page.waitForTimeout(100);
-      // Aim at the middle of the coverable video centre: a fixed y can land within the 40px
-      // approach margin of the bottom control band at small widths, where the G1 approach
-      // rule correctly holds the layer.
-      const aim = await page.locator('#movie_player').evaluate((player) => {
+      // Aim inside the coverable video centre, as far as possible from the control bands and
+      // any visible native control (e.g. the large play button of a paused video). Near those
+      // the G1 approach rule correctly holds the layer, so a fixed point is not a fair target.
+      // The aim is also well beyond the stop radius from where the layer rests now; a layer
+      // already inside the radius correctly stays where it is.
+      const from = await point();
+      const aim = await page.locator('#movie_player').evaluate((player, from) => {
         const r = player.getBoundingClientRect();
-        return { x: r.left + r.width / 2, y: r.top + 64 + (r.height - 64 - 112) / 2 };
-      });
+        const controls = [...document.querySelectorAll('button, a[href], [role="button"], [role="slider"], input')]
+          .filter((e) => !e.closest('[id^="web-world-themes"]') && getComputedStyle(e).visibility !== 'hidden')
+          .map((e) => e.getBoundingClientRect())
+          .filter((b) => b.width > 0 && b.height > 0);
+        const gap = (x: number, y: number) =>
+          Math.min(
+            y - (r.top + 64),
+            r.bottom - 112 - y,
+            ...controls.map((b) => Math.max(b.left - x, x - b.right, b.top - y, y - b.bottom)),
+          );
+        let best = { x: r.left + r.width / 2, y: r.top + 64 + (r.height - 176) / 2 };
+        for (let i = 1; i < 10; i++)
+          for (let j = 1; j < 10; j++) {
+            const x = r.left + (r.width * i) / 10,
+              y = r.top + 64 + ((r.height - 176) * j) / 10;
+            if (Math.hypot(x - from.x, y - from.y) < 120) continue;
+            if (gap(x, y) > gap(best.x, best.y) || Math.hypot(best.x - from.x, best.y - from.y) < 120) best = { x, y };
+          }
+        return best;
+      }, from);
       await page.mouse.move(aim.x, aim.y);
       await expect
         .poll(
