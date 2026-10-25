@@ -116,3 +116,37 @@ export async function beginCanvasGesture(node: Locator, point?: { x: number; y: 
     });
   await node.page().mouse.down();
 }
+
+/** A point on the artwork that is its real hit target, the centre when possible. On the live
+ * site a native control (e.g. a paused video's large play button) can sit over part of it; that
+ * part correctly stays native, so a person grabs the rest. Falls back to the centre. */
+export async function visiblePart(node: Locator) {
+  let found: { x: number; y: number } | undefined;
+  await expect
+    .poll(async () => {
+      const box = await node.boundingBox();
+      if (!box) return false;
+      const points = [{ x: box.x + box.width / 2, y: box.y + box.height / 2 }];
+      for (let i = 1; i < 6; i++)
+        for (let j = 1; j < 6; j++) points.push({ x: box.x + (box.width * i) / 6, y: box.y + (box.height * j) / 6 });
+      found = await node.evaluate((element, points) => {
+        const own = (p: { x: number; y: number }) => {
+          let hit = element.ownerDocument.elementFromPoint(p.x, p.y);
+          while (hit?.shadowRoot) {
+            const next = hit.shadowRoot.elementFromPoint(p.x, p.y);
+            if (!next || next === hit) break;
+            hit = next;
+          }
+          const group = element.closest('.composition[data-selected]');
+          return Boolean(hit && (hit === element || element.contains(hit) || group?.contains(hit)));
+        };
+        return points.find(own);
+      }, points);
+      return Boolean(found);
+    })
+    .toBe(true)
+    .catch(() => undefined);
+  if (found) return found;
+  const box = (await node.boundingBox())!;
+  return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+}

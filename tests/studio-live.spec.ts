@@ -3,7 +3,7 @@ import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
-import { beginCanvasGesture } from './helpers/editor-workspace';
+import { beginCanvasGesture, visiblePart } from './helpers/editor-workspace';
 import { errorSummary } from './helpers/youtube-live';
 
 test('optional real signed-out YouTube: independent Studio creation, bidirectional editing, recovery and cleanup', async () => {
@@ -75,8 +75,9 @@ test('optional real signed-out YouTube: independent Studio creation, bidirection
       const first = youtube.locator(images).first(),
         before = (await first.boundingBox())!;
       // Start only once the artwork is the real hit target (protection may hold it briefly).
-      await beginCanvasGesture(first);
-      await youtube.mouse.move(before.x + before.width / 2 - 30, before.y + before.height / 2 + 20, { steps: 8 });
+      const start = await visiblePart(first);
+      await beginCanvasGesture(first, start);
+      await youtube.mouse.move(start.x - 30, start.y + 20, { steps: 8 });
       await youtube.mouse.up();
       await expect.poll(async () => (await first.boundingBox())!.x).toBeCloseTo(before.x - 30, 1);
       await expect(panel.getByLabel('グループのX位置', { exact: true })).not.toHaveValue('0');

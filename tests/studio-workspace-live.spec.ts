@@ -3,7 +3,7 @@ import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
-import { beginCanvasGesture } from './helpers/editor-workspace';
+import { beginCanvasGesture, visiblePart } from './helpers/editor-workspace';
 
 test('layout feasibility on real signed-out YouTube, preserving native media and DOM parents', async () => {
   test.skip(process.env.WW_LAYOUT_PILOT !== '1', 'Explicit live layout pilot.');
@@ -164,8 +164,9 @@ test('production in-page Studio authors on the real signed-out YouTube, without 
     const first = page.locator(presentation + ' [data-image-id]').first(),
       before = (await first.boundingBox())!;
     // Grouping briefly holds drawing; start only once the artwork is the real hit target.
-    await beginCanvasGesture(first);
-    await page.mouse.move(before.x + before.width / 2 - 30, before.y + before.height / 2 + 15, { steps: 8 });
+    const start = await visiblePart(first);
+    await beginCanvasGesture(first, start);
+    await page.mouse.move(start.x - 30, start.y + 15, { steps: 8 });
     await page.mouse.up();
     await expect.poll(async () => (await first.boundingBox())!.x).toBeCloseTo(before.x - 30, 1);
     report.checks.directGroupMovement = true;

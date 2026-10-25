@@ -3,11 +3,13 @@ import { mkdir, mkdtemp } from 'node:fs/promises';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
 import { exposeEditorControls } from './helpers/editor-workspace';
+import { waitForAdvertToEnd } from './helpers/youtube-live';
 
 async function nativeInputs(page: Page) {
   const player = page.locator('#movie_player'),
     video = page.locator('video.html5-main-video');
   await expect(player).toBeVisible();
+  await waitForAdvertToEnd(page);
   await expect
     .poll(() => video.evaluate((v: HTMLVideoElement) => Number.isFinite(v.duration) && v.duration > 30), {
       timeout: 25_000,
@@ -111,7 +113,25 @@ test('optional real YouTube operation checks with and without authored paint', a
     // the video clock. The saved, fully validated artwork is actually restored.
     await page.reload({ waitUntil: 'domcontentloaded' });
     await expect(page.locator('[data-image-id]')).toHaveCount(1);
-    await expect(page.locator('[data-image-id]')).toBeVisible();
+    await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30_000 });
+    await waitForAdvertToEnd(page);
+    await expect(page.locator('[data-image-id]'))
+      .toBeVisible()
+      .catch(async (error: Error) => {
+        // Keep why protection hides the restored artwork on the live page.
+        const state = await page.evaluate(() => ({
+          safety: document.querySelector('#web-world-themes-decorations')?.getAttribute('data-ww-safety'),
+          planes: [...document.querySelectorAll('[id^="web-world-themes-"][id$="decorations"]')].map((h) => h.id),
+          video: (() => {
+            const v = document.querySelector<HTMLVideoElement>('video.html5-main-video');
+            return v && { paused: v.paused, readyState: v.readyState, currentTime: v.currentTime };
+          })(),
+          centralButtons: [...document.querySelectorAll('#movie_player button')]
+            .filter((b) => b.getBoundingClientRect().height > 0)
+            .map((b) => String(b.className).slice(0, 40)),
+        }));
+        throw new Error(`${error.message}${String.fromCharCode(10)}Restored artwork state: ${JSON.stringify(state)}`);
+      });
     const after = await nativeInputs(page);
     expect(Math.abs(after.volume - before.volume)).toBeLessThan(0.02);
     expect(after.comment).toBe(before.comment);

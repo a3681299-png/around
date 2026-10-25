@@ -3,7 +3,7 @@ import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
-import { beginCanvasGesture } from './helpers/editor-workspace';
+import { beginCanvasGesture, visiblePart } from './helpers/editor-workspace';
 import { errorSummary } from './helpers/youtube-live';
 
 test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and cleanup', async () => {
@@ -61,8 +61,9 @@ test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and 
       const image = page.locator(`${presentation} [data-image-id]`).first(),
         before = (await image.boundingBox())!;
       // Grouping briefly holds drawing; start only once the artwork is the real hit target.
-      await beginCanvasGesture(image);
-      await page.mouse.move(before.x + before.width / 2 - 30, before.y + before.height / 2 + 20, { steps: 8 });
+      const start = await visiblePart(image);
+      await beginCanvasGesture(image, start);
+      await page.mouse.move(start.x - 30, start.y + 20, { steps: 8 });
       await page.mouse.up();
       expect((await image.boundingBox())!.x).toBeCloseTo(before.x - 30, 1);
     });

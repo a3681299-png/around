@@ -80,3 +80,19 @@ export function errorSummary(error: unknown) {
     .join(' · ')
     .slice(0, 2000);
 }
+
+/**
+ * YouTube can play an advert before the video. While it runs the player has a second media
+ * element and changing native UI, and protection holds artwork by design, so checks of the
+ * video itself wait for it to end, skipping it when YouTube offers that as a person would.
+ */
+export async function waitForAdvertToEnd(page: Page, timeout = 120_000) {
+  const player = page.locator('#movie_player');
+  const end = Date.now() + timeout;
+  while ((await player.getAttribute('class').catch(() => ''))?.split(' ').includes('ad-showing')) {
+    if (Date.now() > end) throw new Error('A YouTube advert did not end within ' + timeout + 'ms.');
+    const skip = page.locator('.ytp-skip-ad-button:visible, .ytp-ad-skip-button-modern:visible').first();
+    if (await skip.count()) await skip.click({ timeout: 2000 }).catch(() => undefined);
+    await page.waitForTimeout(500);
+  }
+}
