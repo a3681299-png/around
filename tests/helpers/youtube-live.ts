@@ -1,5 +1,23 @@
 import type { Page } from '@playwright/test';
 
+/** Split-scroll watch pages put comments in a native panel rather than below the video.
+ * Open its real rail button when closed, leaving the caller's visibility/content checks intact. */
+export async function openNativeComments(page: Page) {
+  const watch = page.locator('ytd-watch-flexy');
+  if (
+    !(await watch.evaluate(
+      (element) => element.hasAttribute('split-scroll') && element.hasAttribute('using-fixed-panel'),
+    ))
+  )
+    return;
+  const button = watch
+    .locator('button[aria-label="Comments"]:visible, button[role="tab"][aria-label^="Comments,"]:visible')
+    .first();
+  if (!(await button.isVisible())) return;
+  if ((await button.getAttribute('aria-pressed')) !== 'true' && (await button.getAttribute('aria-selected')) !== 'true')
+    await button.click();
+}
+
 /**
  * YouTube can open a promotion dialog (e.g. YouTube Music) at any moment. Painting stops while a
  * native dialog is open, by design, so decline it as a person would. Returns whether a dialog was

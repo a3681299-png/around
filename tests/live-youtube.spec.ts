@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
+import { openNativeComments } from './helpers/youtube-live';
 
 for (const colorScheme of ['light', 'dark'] as const) {
   test(`optional public YouTube ${colorScheme} watch inspection with unmodified network documents`, async ({}, testInfo) => {
@@ -302,6 +303,7 @@ for (const colorScheme of ['light', 'dark'] as const) {
           .evaluate((element) => getComputedStyle(element).color),
       );
       await page.evaluate(() => window.scrollTo(0, 454));
+      await openNativeComments(page);
       await expect(page.locator('ytd-comments-header-renderer:visible').first())
         .toBeVisible({ timeout: 30_000 })
         .catch(async (error: Error) => {

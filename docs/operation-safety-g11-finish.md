@@ -306,3 +306,13 @@ Content ScriptはStudioの接続口を登録してから、`watchSettings`で最
 Core内で、最初の設定を受け取ったかを実行時だけ保持する。未取得の間は「設定を読み込み中」として拒否し、既存の再試行を使う。最初にfalseを受け取った場合も、ONからOFFにした場合も、従来どおり編集を拒否する。保存形式・Chrome権限・操作面の保護は変更していない。
 
 lint・型検査・隔離ビルドと、Editor CoreおよびStudio Clientの25件は成功。拡張なしのChromiumによるYouTubeの接続確認も3回ともHTTP 200・プレイヤー表示まで成功した。この後の実サイト比較・CIの結果を追記する。
+
+### コメント欄をパネルで開くYouTubeの表示方式
+
+修正後の最初の比較で、ダーク表示のコメント見出しが出ない件も再現した。`split-scroll`・`using-fixed-panel`のあるページは、右側にプレイリストを表示し、Commentsボタンは未選択だった。ページを下へスクロールしても、閉じたコメントパネルの`ytd-comments`は高さ0のままになる。
+
+失敗した試験用プロファイルをそのまま使い、同じ高さ0の状態から本物のCommentsボタンをクリックすると、同じコメント見出しの表示判定を通ることを確認した。[開く前](screenshots/operation-g11-live/comments-panel-before.png)と[開いた後](screenshots/operation-g11-live/comments-panel-after.png)。作品やサイトの状態をJavaScriptで書き換えてはいない。
+
+実サイト試験は、この表示方式でパネルが未選択の場合だけネイティブボタンを押す。通常レイアウトは従来のスクロールのまま。見出し・本文・装飾・表示の判定と30秒の制限は維持し、比較用mainにも同じ操作を当てた。修正後のダーク表示と追従・再接続の2件は成功した。
+
+最初の追従試験は機能の判定を全て通り、`completed: true`の記録を残した後、contextを閉じてトレースを保存する際に`file data stream has unexpected number of bytes`で失敗した。追加の確認では機能・結果保存とも成功した。元の失敗も原記録に残す。以後は試験中に試験ソースを変更せず、条件を固定して残る比較を行う。
