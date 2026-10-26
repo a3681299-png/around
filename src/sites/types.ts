@@ -79,7 +79,9 @@ export interface SiteAdapter {
   readonly operationSurfaces?: () => import('../host/operation-source').OperationSource;
   /** Optional site-owned implementations; unsupported features are safely skipped. */
   readonly features?: Readonly<Record<string, SiteFeatureCapability>>;
-  connect(onPageChange: (change?: SitePageChange) => void): () => void;
+  /** `marked` lists elements whose semantic surfaces changed in this batch, so consumers
+   * never need a whole-document query to find new parts. */
+  connect(onPageChange: (change?: SitePageChange, marked?: readonly Element[]) => void): () => void;
   mountSettings(entry: SettingsEntry): () => void;
   protectStudioToolbar?(toolbar: HTMLElement): () => void;
   mountStudio?(changed: (state: StudioHostLayout) => void): StudioLayoutAdapter;

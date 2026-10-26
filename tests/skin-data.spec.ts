@@ -403,3 +403,64 @@ test('the page renderer loads skin art once, writes CSS only after it is ready, 
   renderer.dispose();
   expect(attributes.has('data-ww-design')).toBe(false);
 });
+
+test('compact sizing observes only parts the site just marked; page changes never query the whole document', async () => {
+  let queries = 0;
+  const observed: unknown[] = [];
+  const part = (matches: boolean) =>
+    ({
+      isConnected: true,
+      matches: () => matches,
+      hasAttribute: () => false,
+      getAttribute: () => null,
+      setAttribute() {},
+      removeAttribute() {},
+    }) as unknown as Element;
+  const style = { id: '', textContent: '', isConnected: true, remove() {} } as unknown as HTMLStyleElement;
+  const page = {
+    documentElement: { getAttribute: () => null, setAttribute() {}, removeAttribute() {}, append() {} },
+    head: { append() {} },
+    createElement: () => style,
+    querySelectorAll: () => {
+      queries++;
+      return [];
+    },
+    defaultView: {
+      ResizeObserver: class {
+        observe(element: unknown) {
+          observed.push(element);
+        }
+        unobserve() {}
+        disconnect() {}
+      },
+    },
+  } as unknown as Document;
+  const renderer = createDesignRenderer(page, [target], {
+    load: async () => 'blob:https://www.youtube.com/0b8f1d3e-0000-4000-8000-00000000000a',
+    revoke() {},
+  });
+  renderer.update(
+    parseDesign(
+      doc([
+        {
+          kind: 'surface-style',
+          target: 'subscribe-button',
+          style: {},
+          skin: { states: { normal: frame() }, compact: { kind: 'color', color: '#112233' } },
+        },
+      ]),
+    ),
+  );
+  await Promise.resolve();
+  await Promise.resolve();
+  // Finding the parts once when the design arrives is expected.
+  const initial = queries;
+  expect(initial).toBeGreaterThan(0);
+  const button = part(true),
+    other = part(false);
+  for (let i = 0; i < 50; i++) renderer.refresh('structure', i === 10 ? [button, other] : []);
+  renderer.refresh('content', []);
+  expect(queries).toBe(initial);
+  expect(observed).toEqual([button]);
+  renderer.dispose();
+});

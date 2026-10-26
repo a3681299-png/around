@@ -86,14 +86,14 @@ export function createThemeController(
     removeBase();
   };
 
-  const followPage = (change?: SitePageChange) => {
+  const followPage = (change?: SitePageChange, marked?: readonly Element[]) => {
     if (suspended || !current?.enabled || current.strength === 0) return;
     if (design?.baseThemeId !== null) {
       // Reattach the cached sheet after head replacement; settings have not changed.
       if (style && !style.isConnected) (doc.head ?? root).append(style);
       if (change !== 'content') features.refresh();
     }
-    designRenderer.refresh(change);
+    designRenderer.refresh(change, marked);
     images.refresh();
     // Text can alter geometry too; active editors compare their anchor snapshot.
     onSurfacesChanged?.();

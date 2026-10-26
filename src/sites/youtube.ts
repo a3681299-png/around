@@ -189,6 +189,7 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
       const root = doc.documentElement;
       const marked = new Set<Element>();
       const pending = new Set<Element>();
+      let fresh: Element[] = [];
       let frame: number | undefined;
       let needsFullScan = false;
       let needsPrune = false;
@@ -222,6 +223,7 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
           const value = [...surfaces].join(' ');
           if (element.getAttribute(SURFACE_ATTRIBUTE) !== value) {
             element.setAttribute(SURFACE_ATTRIBUTE, value);
+            fresh.push(element);
           }
           marked.add(element);
         } else if (marked.delete(element)) {
@@ -257,9 +259,11 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
         needsFullScan = false;
         needsPrune = false;
         setMode();
-        const notification = change;
+        const notification = change,
+          changed = fresh;
         change = 'content';
-        onPageChange(notification);
+        fresh = [];
+        onPageChange(notification, changed);
       };
 
       const schedule = () => {

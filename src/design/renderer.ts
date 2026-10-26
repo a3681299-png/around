@@ -212,7 +212,9 @@ export function createDesignRenderer(
     observed.forEach((element) => element.removeAttribute(SKIN_COMPACT_ATTRIBUTE));
     observed.clear();
   };
-  const observeCompact = (prune: boolean) => {
+  /** `candidates`: elements the site just marked. Without them (initial render, other sites),
+   * one whole-document query finds the parts. */
+  const observeCompact = (prune: boolean, candidates?: readonly Element[]) => {
     if (!needs.length) return stopCompact();
     const View = doc.defaultView?.ResizeObserver;
     if (!View) return;
@@ -238,19 +240,26 @@ export function createDesignRenderer(
       .map(surfaceSelector)
       .join(',');
     if (!selector) return;
-    for (const element of doc.querySelectorAll(selector))
+    const elements = candidates
+      ? candidates.filter((element) => element.isConnected && element.matches(selector))
+      : doc.querySelectorAll(selector);
+    for (const element of elements)
       if (!observed.has(element)) {
         observed.add(element);
         resize.observe(element, { box: 'border-box' });
       }
   };
-  const refresh = (change?: string) => {
+  const refresh = (change?: string, marked?: readonly Element[]) => {
     if (!style || !designId) return;
     if (doc.documentElement.getAttribute('data-ww-design') !== designId)
       doc.documentElement.setAttribute('data-ww-design', designId);
     if (!style.isConnected) (doc.head ?? doc.documentElement).append(style);
-    // Text-only updates cannot add parts; new parts arrive with structure or navigation.
-    if (needs.length && change !== 'content') observeCompact(change === 'navigation');
+    if (!needs.length) return;
+    // With the site's list of newly marked parts, only those are checked; otherwise text-only
+    // updates cannot add parts, and structure or navigation falls back to one query.
+    if (marked) {
+      if (marked.length || change === 'navigation') observeCompact(change === 'navigation', marked);
+    } else if (change !== 'content') observeCompact(change === 'navigation');
   };
   const destroy = () => {
     style?.remove();

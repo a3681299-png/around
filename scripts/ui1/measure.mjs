@@ -261,7 +261,8 @@ async function skinned(browser) {
       style: {},
       skin: {
         states: { normal: frame, hover: { ...frame, center: 'repeat' }, pressed: frame },
-        ...(index % 3 === 0 ? { compact: { kind: 'color', color: '#3d3654' } } : {}),
+        // UI1_COMPACT=0 isolates the compact-size observer from the CSS itself.
+        ...(index % 3 === 0 && process.env.UI1_COMPACT !== '0' ? { compact: { kind: 'color', color: '#3d3654' } } : {}),
       },
     })),
     decorations: [],
