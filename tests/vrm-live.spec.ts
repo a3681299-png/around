@@ -6,6 +6,7 @@ import { launchExtension } from './fixtures';
 import { nativeWindow, sidePanelDriver } from './helpers/side-panel';
 import type { DesignDocument } from '../src/design/types';
 import { clearestPoint, declinePromotion } from './helpers/youtube-live';
+import { enterNativeTheater } from './helpers/youtube-theater';
 
 test('real YouTube: private local VRM import, MToon, pointer gaze, Studio transforms, save/reload and OFF', async () => {
   test.skip(
@@ -198,11 +199,9 @@ test('real YouTube: private local VRM import, MToon, pointer gaze, Studio transf
     report.checks.widthsAndNativeSettingsClicks = [1366, 1920, 1000];
     await nativeWindow(panel.cdp, 1920);
     const player = page.locator('#movie_player');
-    await player.hover();
-    await player.locator('.ytp-size-button').click();
-    await expect(page.locator('ytd-watch-flexy')).toHaveAttribute('theater', '');
+    const leaveTheater = await enterNativeTheater(page);
     await expect(media).toBeVisible();
-    await player.locator('.ytp-size-button').click();
+    await leaveTheater();
     report.checks.theater = true;
     await player.hover();
     await player.locator('.ytp-fullscreen-button').click();
