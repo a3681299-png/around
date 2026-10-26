@@ -1,5 +1,5 @@
 import { createFeatureController } from '../features/controller';
-import { compileDesign, createDesignRenderer } from '../design/renderer';
+import { compileDesign, createDesignRenderer, type SkinAssetPort, type SkinAssetStatus } from '../design/renderer';
 import { readDesign } from '../design/immutable';
 import type { DesignDocument } from '../design/types';
 import { createImageRenderer, type ImageEditing } from '../design/image-renderer';
@@ -19,6 +19,8 @@ export interface ThemeController {
   update(settings: UserSettings): void;
   updateDesign(design: DesignDocument | undefined): void;
   setImageEditing(editing: ImageEditing | undefined): void;
+  /** Load state of a UI skin's art in the page renderer. */
+  skinAssetStatus(assetId: string): SkinAssetStatus | undefined;
   validateDesign(design: DesignDocument | undefined): void;
   destroy(): void;
 }
@@ -28,9 +30,10 @@ export function createThemeController(
   site: SiteAdapter,
   theme: ThemeDefinition,
   onSurfacesChanged?: () => void,
+  skinAssets?: SkinAssetPort,
 ): ThemeController {
   const features = createFeatureController({ document: doc, site });
-  const designRenderer = createDesignRenderer(doc, site.designTargets ?? []);
+  const designRenderer = createDesignRenderer(doc, site.designTargets ?? [], skinAssets, () => onSurfacesChanged?.());
   const timeline = createTimelineHost(doc, site.id, createTakeStorage(site.id));
   const safety = site.operationSurfaces
     ? createOperationGuardHost(doc, site.operationSurfaces(), (stop) => {
@@ -89,7 +92,7 @@ export function createThemeController(
       if (style && !style.isConnected) (doc.head ?? root).append(style);
       if (change !== 'content') features.refresh();
     }
-    designRenderer.refresh();
+    designRenderer.refresh(change);
     images.refresh();
     // Text can alter geometry too; active editors compare their anchor snapshot.
     onSurfacesChanged?.();
@@ -170,6 +173,7 @@ export function createThemeController(
       design = validateDesign(input);
       render();
     },
+    skinAssetStatus: designRenderer.assetStatus,
     setImageEditing(next) {
       editing = Boolean(next);
       if (!suspended && current?.enabled && current.strength > 0) inspect();
@@ -182,6 +186,7 @@ export function createThemeController(
       current = undefined;
       deactivate();
       safety?.destroy();
+      designRenderer.dispose();
     },
   };
 }

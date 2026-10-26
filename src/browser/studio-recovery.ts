@@ -1,6 +1,7 @@
 import { packCheckpoint, unpackCheckpoint } from '../studio/checkpoint-codec';
 import type { StudioRecovery } from '../studio/connection';
 import { retainStudioAssets, releaseAssets } from '../assets/client';
+import { designAssetIds } from '../design/references';
 
 const prefix = 'webWorldThemes.studio.session.';
 const maxBytes = 6 * 1024 * 1024;
@@ -38,7 +39,7 @@ export function createStudioRecovery(studioTab: number): StudioRecovery {
             ...artwork!.history.future,
             ...(artwork!.history.transaction ? [artwork!.history.transaction] : []),
           ];
-          const ids = [...new Set(documents.flatMap((doc) => doc.decorations.map((layer) => layer.assetId)))];
+          const ids = [...new Set(documents.flatMap(designAssetIds))];
           // Pin first: a reloaded target can release its old document lease at any time.
           await retainStudioAssets(session, ids, studioTab);
           await chrome.storage.session.set({ [key]: copy });

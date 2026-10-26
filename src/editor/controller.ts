@@ -16,6 +16,15 @@ import { studioActions } from '../studio/ui-actions';
 import type { StudioLayoutAdapter } from '../studio/layout-types';
 import type { TimelineHost } from '../host/timeline';
 import type { TimelineCommand, TimelineUpdate } from '../timeline/types';
+import type { SkinAssetStatus } from '../design/renderer';
+import { createSkinPicker } from './skin-picker';
+import type { SkinSlot } from '../editor-core/skins';
+
+/** The page renderer's view of skin art, for previews and "not applied" reasons. */
+export interface SkinAssetHost {
+  status(assetId: string): SkinAssetStatus | undefined;
+  url(assetId: string): Promise<string | undefined>;
+}
 
 export interface CreatorEditor {
   open(): OpenEditorResponse;
@@ -53,6 +62,7 @@ export function createCreatorEditor(
   validate: (design: DesignDocument | undefined) => void,
   timeline?: TimelineHost,
   openSettings?: () => void,
+  skinAssets?: SkinAssetHost,
 ): CreatorEditor {
   let panel: ReturnType<typeof createCreatorPanel> | undefined,
     selectionStyle: HTMLStyleElement | undefined,
@@ -66,6 +76,9 @@ export function createCreatorEditor(
   let layout: StudioLayoutAdapter | undefined,
     panelMode: 'quick' | 'inpage' | 'sidepanel' = 'quick';
   const consumedKeys = new Set<string>();
+  const picker = createSkinPicker(doc, site.designTargets ?? [], site.skinControls);
+  const skinTargets = (site.designTargets ?? []).filter((target) => target.skin);
+  let skinInfoTimer: ReturnType<typeof setTimeout> | undefined;
   let lastDesign: DesignDocument | undefined,
     geometryKey = '';
   const core = createEditorSession({
@@ -123,7 +136,7 @@ export function createCreatorEditor(
     if (active) {
       selectionStyle = doc.createElement('style');
       selectionStyle.id = 'web-world-themes-selection-style';
-      selectionStyle.textContent = SELECTION_CSS;
+      selectionStyle.textContent = SELECTION_CSS + '\n' + picker.css();
       (doc.head ?? doc.documentElement).append(selectionStyle);
       doc.documentElement.setAttribute('data-ww-editing', '');
       PICK_EVENTS.forEach((name) => doc.addEventListener(name, onPick, true));
@@ -146,8 +159,28 @@ export function createCreatorEditor(
       doc.documentElement.removeAttribute('data-ww-editing');
       doc.documentElement.removeAttribute('data-ww-editor-tool');
       doc.documentElement.removeAttribute('data-ww-editor-card-picking');
+      picker.setActive(false);
+      picker.setSelection(undefined, false);
+      picker.setPreview(undefined, undefined);
+      if (skinInfoTimer !== undefined) clearTimeout(skinInfoTimer);
+      skinInfoTimer = undefined;
     }
   }
+  const skinTool = () => editing() && state.view.tool === 'skin';
+  /** Page presence and art state per part. Throttled: it reads layout, so never per frame. */
+  const scheduleSkinInfo = () => {
+    if (!panel || !skinTool() || skinInfoTimer !== undefined) return;
+    skinInfoTimer = setTimeout(() => {
+      skinInfoTimer = undefined;
+      if (!panel || !skinTool()) return;
+      const assets = new Map(
+        state.document.rules.flatMap((rule) =>
+          rule.skin ? [[rule.target, skinAssets?.status(rule.skin.states.normal.assetId)] as const] : [],
+        ),
+      );
+      panel.setSkinPage(picker.pageInfo((id) => assets.get(id)));
+    }, 250);
+  };
   function refresh(next = core.snapshot()) {
     state = next;
     if (!state.active) {
@@ -167,6 +200,12 @@ export function createCreatorEditor(
     if (!state.selectedTarget) removeSelection();
     const active = editing();
     bind(active);
+    const skinning = active && state.view.tool === 'skin' && !fullscreen();
+    picker.setActive(skinning);
+    const preview = skinning ? state.view.skinPreview : undefined;
+    picker.setSelection(skinning ? state.view.target : undefined, !preview?.state && !preview?.compact);
+    picker.setPreview(skinning ? state.view.target : undefined, preview);
+    if (skinning) scheduleSkinInfo();
     if (active) {
       doc.documentElement.setAttribute('data-ww-editor-tool', state.view.tool ?? 'select');
       doc.documentElement.toggleAttribute(
@@ -205,7 +244,11 @@ export function createCreatorEditor(
     }
     panel?.render(state.view);
     editImages(
-      active && !fullscreen() && state.view.tool !== 'browse' && state.view.tool !== 'card'
+      active &&
+        !fullscreen() &&
+        state.view.tool !== 'browse' &&
+        state.view.tool !== 'card' &&
+        state.view.tool !== 'skin'
         ? {
             selectedIds: state.view.selectedIds,
             locked: state.view.saving,
@@ -267,6 +310,15 @@ export function createCreatorEditor(
           hostLabel: site.id === 'youtube' ? 'YouTube' : site.id,
           inPage: mode === 'inpage',
           toolbarOnly: mode === 'sidepanel',
+          ...(mode !== 'sidepanel' && skinTargets.length && skinAssets
+            ? {
+                skin: {
+                  targets: skinTargets,
+                  assetUrl: skinAssets.url,
+                  import: (files: readonly File[], slot: SkinSlot) => void importSkin(files, slot),
+                },
+              }
+            : {}),
           persistWorkspace: mode === 'inpage',
           onSurface: (surface) => {
             if (surface === 'inpage') open('inpage');
@@ -286,31 +338,46 @@ export function createCreatorEditor(
     panel.focus();
     return { ok: true };
   }
-  function pickTarget(event: Event) {
+  const ownUi = (event: Event) =>
+    event.composedPath().some((node) => node instanceof Element && node.hasAttribute('data-ww-signal-control'));
+  function pickTarget(event: Event): { element: Element; target?: (typeof skinTargets)[number] } | undefined {
     if (
       !editing() ||
       fullscreen() ||
       state.view.tool === 'browse' ||
-      (panelMode !== 'quick' && state.view.tool !== 'card') ||
-      event.composedPath().some((node) => node instanceof Element && node.hasAttribute('data-ww-signal-control'))
+      (panelMode !== 'quick' && state.view.tool !== 'card' && state.view.tool !== 'skin') ||
+      ownUi(event)
     )
       return;
     const node = event.target instanceof Element ? event.target : undefined;
+    if (state.view.tool === 'skin') return picker.hit(node);
     for (const target of site.designTargets ?? []) {
       const element = node?.closest(`[data-ww-surface~="${target.surface}"]`);
       if (element) return { element, target };
     }
   }
+  const selectElement = (element: Element, id: string) => {
+    removeSelection();
+    dispatch({ type: 'select-target', target: id });
+    selectedElement = element;
+    selectedElement.setAttribute('data-ww-editor-selected', '');
+  };
   function onPick(event: Event) {
     const target = pickTarget(event);
-    if (!target || ('button' in event && event.button === 2)) return;
+    // While choosing parts, the page never navigates or toggles from a stray click.
+    const blocking = Boolean(target) || (skinTool() && !fullscreen() && !ownUi(event));
+    if (!blocking || ('button' in event && event.button === 2)) return;
     event.preventDefault();
     event.stopImmediatePropagation();
-    if (state.view.saving || !['click', 'auxclick'].includes(event.type)) return;
-    removeSelection();
-    dispatch({ type: 'select-target', target: target.target.id });
-    selectedElement = target.element;
-    selectedElement.setAttribute('data-ww-editor-selected', '');
+    if (state.view.saving || !['click', 'auxclick'].includes(event.type) || !target) return;
+    if (!target.target) {
+      core.fail('この部品は着せ替えに対応していません。紫の枠が出る部品を選んでください。');
+      return;
+    }
+    selectElement(target.element, target.target.id);
+  }
+  async function importSkin(files: readonly File[], slot: SkinSlot) {
+    await core.importSkin(files, slot);
   }
   function onKeyDown(event: KeyboardEvent) {
     if (
@@ -337,12 +404,9 @@ export function createCreatorEditor(
       return;
     const command = shortcutCommand(event, state.view, true);
     if (command) dispatch(command);
-    else if ((event.key === 'Enter' || event.key === ' ') && pickTarget(event)) {
+    else if ((event.key === 'Enter' || event.key === ' ') && pickTarget(event)?.target) {
       const target = pickTarget(event)!;
-      removeSelection();
-      dispatch({ type: 'select-target', target: target.target.id });
-      selectedElement = target.element;
-      selectedElement.setAttribute('data-ww-editor-selected', '');
+      selectElement(target.element, target.target!.id);
     } else return;
     consumedKeys.add(event.code || event.key);
     event.preventDefault();
@@ -365,8 +429,28 @@ export function createCreatorEditor(
     if (!editing() || !event.dataTransfer?.files.length) return;
     event.preventDefault();
     event.stopImmediatePropagation();
+    const files = [...event.dataTransfer.files];
+    // Skin drop zones in the panel name their slot; a drop on a page part dresses that part.
+    const zone = event
+      .composedPath()
+      .find((node): node is HTMLElement => node instanceof HTMLElement && Boolean(node.dataset.skinSlot));
+    if (zone) {
+      void importSkin(files, zone.dataset.skinSlot as SkinSlot);
+      return;
+    }
+    if (skinTool() && !(panel && event.composedPath().includes(panel.host))) {
+      const target = picker.hit(event.target instanceof Element ? event.target : undefined);
+      if (!target?.target) {
+        core.fail('絵は紫の枠が出る部品の上、またはパネルの枠にドロップしてください。');
+        return;
+      }
+      // select-target applies synchronously, so the import sees the new part.
+      selectElement(target.element, target.target.id);
+      void importSkin(files, 'normal');
+      return;
+    }
     void core.import(
-      [...event.dataTransfer.files],
+      files,
       panel && event.composedPath().includes(panel.host) ? undefined : { x: event.clientX, y: event.clientY },
     );
   }
@@ -386,6 +470,12 @@ export function createCreatorEditor(
     },
     setEnabled: core.setEnabled,
     refreshSelection() {
+      scheduleSkinInfo();
+      // A skin edit follows the part's kind, not one element: YouTube re-renders buttons often.
+      if (skinTool() && selectedElement && !selectedElement.isConnected) {
+        removeSelection();
+        return;
+      }
       if (
         selectedElement &&
         (!selectedElement.isConnected ||
@@ -468,6 +558,7 @@ export function createCreatorEditor(
     thumbnail: (id) => captureLayerThumbnail(doc, id),
     destroy() {
       destroyed = true;
+      picker.destroy();
       core.destroy();
       unsubscribe();
       bind(false);

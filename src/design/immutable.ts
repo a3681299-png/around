@@ -1,10 +1,11 @@
 import {
   checkGroupRenderMode,
+  checkStyleRules,
   isDesignId,
   parseDecoration,
   parseDesign,
   parseGroupLayer,
-  parseSurfaceStyle,
+  parseStyleRule,
 } from './schema';
 import { GROUP_LIMITS, IMAGE_LIMITS, type Decoration, type DesignDocument } from './types';
 import { MODEL_LIMITS } from '../models/types';
@@ -103,19 +104,15 @@ export function commitDesign(input: DesignDocument, previous?: DesignDocument): 
   if (documents.has(input)) return input;
   if (previous) previous = readDesign(previous);
   if (
-    input.schemaVersion !== 12 ||
+    input.schemaVersion !== 13 ||
     !isDesignId(input.id) ||
     !isDesignId(input.siteId) ||
     (input.baseThemeId !== null && !isDesignId(input.baseThemeId))
   )
     throw new Error('デザインの識別子が不正です。');
-  if (input.rules.length > 16 || new Set(input.rules.map((rule) => rule.target)).size !== input.rules.length)
-    throw new Error('デザインのルールが不正です。');
-  const rules = input.rules.map((rule) => {
-    if (validated.rules.has(rule)) return rule;
-    if (rule.kind !== 'surface-style' || !isDesignId(rule.target)) throw new Error('編集対象が不正です。');
-    return { kind: 'surface-style' as const, target: rule.target, style: parseSurfaceStyle(rule.style) };
-  });
+  if (input.rules.length > 16) throw new Error('デザインのルールが不正です。');
+  const rules = input.rules.map((rule) => (validated.rules.has(rule) ? rule : parseStyleRule(rule)));
+  checkStyleRules(rules);
   if (input.decorations.length > IMAGE_LIMITS.count) throw new Error(ASSET_MESSAGES.layerCount);
   const decorations = input.decorations.map((layer) =>
     validated.decorations.has(layer) ? layer : parseDecoration(layer),

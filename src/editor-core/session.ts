@@ -26,7 +26,18 @@ import {
   reorderDocument,
   ungroupLayers,
 } from '../editor/groups';
-import type { EditCommand, EditorCheckpoint, EditorPorts, EditorSnapshot, EditorView, EditorTool } from './types';
+import {
+  EDITOR_TOOLS,
+  type EditCommand,
+  type EditorCheckpoint,
+  type EditorPorts,
+  type EditorSnapshot,
+  type EditorView,
+  type EditorTool,
+  type SkinPreview,
+} from './types';
+import { designAssetIds } from '../design/references';
+import { defaultSkinFrame, putSkin, skinAssetProblem, withSkinFrame, type SkinSlot } from './skins';
 import type { SignalRule } from '../signals/keyframes';
 
 /** Portable, authoritative edit session. All environment access comes through ports. */
@@ -49,6 +60,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
   const empty = draft;
   let tool: EditorTool = 'select';
   let selectedTarget: string | undefined,
+    skinPreview: SkinPreview = {},
     selectedImageIds: string[] = [],
     snapping = false;
   let dirty = false,
@@ -73,6 +85,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
   const initial = () => saved ?? empty;
   const clearSelection = () => {
     selectedTarget = undefined;
+    skinPreview = {};
   };
   function view(): EditorView {
     const groups = draft.groups ?? [];
@@ -83,10 +96,14 @@ export function createEditorSession<Source extends { readonly length: number }>(
       : selectedImageIds.length === 1
         ? draft.decorations.find((layer) => layer.id === selectedImageIds[0])
         : undefined;
+    const rule = draft.rules.find((rule) => rule.target === selectedTarget);
     return {
       ...editorCapabilities(draft, selectedImageIds, saving || importing),
       selected: Boolean(selectedTarget),
-      style: draft.rules.find((rule) => rule.target === selectedTarget)?.style ?? {},
+      style: rule?.style ?? {},
+      ...(selectedTarget ? { target: selectedTarget } : {}),
+      ...(rule?.skin ? { skin: rule.skin } : {}),
+      skinPreview: { ...skinPreview },
       dirty,
       saving: saving || importing,
       status,
@@ -127,9 +144,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
   const syncAssets = (): Promise<void> => {
     const session = assetSession;
     if (!session) return Promise.resolve();
-    const ids = [
-      ...new Set([draft, ...history.values()].flatMap((value) => value.decorations.map((image) => image.assetId))),
-    ];
+    const ids = [...new Set([draft, ...history.values()].flatMap(designAssetIds))];
     const key = ids.sort().join(',');
     leaseQueue = leaseQueue
       .catch(() => undefined)
@@ -524,9 +539,92 @@ export function createEditorSession<Source extends { readonly length: number }>(
   const change = (style: SurfaceStyle) => {
     if (!selectedTarget || saving || importing) return;
     const next = editDesign(draft);
+    // A part's UI skin survives colour edits; only an empty rule is removed.
+    const skin = next.rules.find((rule) => rule.target === selectedTarget)?.skin;
     next.rules = next.rules.filter((rule) => rule.target !== selectedTarget!);
-    if (Object.keys(style).length > 0) next.rules.push({ kind: 'surface-style', target: selectedTarget, style });
+    if (Object.keys(style).length > 0 || skin)
+      next.rules.push({ kind: 'surface-style', target: selectedTarget, style, ...(skin ? { skin } : {}) });
     updateDraft(next);
+  };
+  const skinTarget = () => {
+    const target = ports.targets.find((item) => item.id === selectedTarget);
+    if (!target) throw new Error('着せ替える部品を選んでください。');
+    if (!target.skin) throw new Error(`${target.label}は着せ替えに対応していません。`);
+    return target;
+  };
+  const refuse = (message: string) => {
+    status = message;
+    error = true;
+    render();
+  };
+  /** Uses the shared asset import, then stores the asset in one skin slot instead of a layer. */
+  const addSkinImage = async (files: Source, slot: SkinSlot) => {
+    if (!active || !assetSession || saving || importing || !files.length) return;
+    let target;
+    try {
+      target = skinTarget();
+    } catch (reason) {
+      return refuse(reason instanceof Error ? reason.message : '着せ替える部品を選んでください。');
+    }
+    if (files.length !== 1) return refuse('着せ替えの絵は1枚ずつ入れてください。');
+    const existing = draft.rules.find((rule) => rule.target === target.id)?.skin;
+    if (slot !== 'normal' && !existing) return refuse('先に通常状態の絵を入れてください。');
+    finishGesture();
+    const epoch = importEpoch,
+      importSession = ports.makeId('session');
+    let before: DesignDocument | undefined;
+    importing = true;
+    status = '着せ替えの絵を読み込んでいます…';
+    error = false;
+    render();
+    try {
+      const [asset] = await storage.import(files, importSession);
+      if (epoch !== importEpoch || !active) return;
+      if (!asset) throw new Error('画像を読み込めませんでした。');
+      const problem = skinAssetProblem(asset);
+      if (problem) throw new Error(problem);
+      before = draft;
+      // Keep the guides an author already placed when only the art of a slot changes.
+      const previous =
+        slot === 'compact'
+          ? existing?.compact?.kind === 'frame'
+            ? existing.compact.frame
+            : undefined
+          : existing?.states[slot];
+      const frame =
+        previous &&
+        previous.slices.left + previous.slices.right <= asset.width &&
+        previous.slices.top + previous.slices.bottom <= asset.height
+          ? { ...previous, assetId: asset.id }
+          : defaultSkinFrame(asset);
+      const next = putSkin(draft, target.id, withSkinFrame(existing, slot, frame));
+      await checkDesignAssets(next, importSession);
+      if (epoch !== importEpoch || !active) return;
+      if (before !== draft) {
+        before = undefined;
+        throw new Error('別のタブの保存値が変わったため、素材の追加を中止しました。もう一度読み込んでください。');
+      }
+      updateDraft(next, false);
+      leased = '';
+      await syncAssets();
+      if (epoch !== importEpoch || !active) return;
+      history.record(before, draft);
+      status = `${target.label}に絵を入れました。ガイドをドラッグして切り位置を調整できます。`;
+      settleAssets();
+    } catch (reason) {
+      if (epoch !== importEpoch || !active) return;
+      if (before && before !== draft) updateDraft(before, false);
+      status = reason instanceof Error ? reason.message : '画像を読み込めませんでした。';
+      error = true;
+      leased = '';
+      settleAssets();
+    } finally {
+      void releaseAssets(importSession).catch(() => undefined);
+      if (epoch === importEpoch) {
+        importing = false;
+        render();
+      }
+    }
   };
 
   const accept = (incoming: DesignDocument | undefined) => {
@@ -634,9 +732,11 @@ export function createEditorSession<Source extends { readonly length: number }>(
       throw new Error('処理中です。完了を待ってください。');
     switch (command.type) {
       case 'tool':
-        if (!['select', 'browse', 'card'].includes(command.tool)) throw new Error('未対応のツールです。');
+        if (!EDITOR_TOOLS.includes(command.tool)) throw new Error('未対応のツールです。');
         finishGesture(true);
         tool = command.tool;
+        // A forced preview belongs to the skin editor; other tools show the live page.
+        if (tool !== 'skin') skinPreview = {};
         render();
         break;
       case 'select':
@@ -647,6 +747,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
           throw new Error('編集できない対象です。');
         finishGesture(true);
         selectedImageIds = [];
+        if (selectedTarget !== command.target) skinPreview = {};
         selectedTarget = command.target;
         render();
         break;
@@ -675,6 +776,19 @@ export function createEditorSession<Source extends { readonly length: number }>(
         break;
       case 'style':
         change(command.style);
+        break;
+      case 'skin':
+        if (saving || importing) break;
+        updateDraft(putSkin(draft, skinTarget().id, command.skin));
+        settleAssets();
+        break;
+      case 'skin-preview':
+        if (!selectedTarget) break;
+        skinPreview = {
+          ...(command.state ? { state: command.state } : {}),
+          ...(command.compact ? { compact: true } : {}),
+        };
+        render();
         break;
       case 'placements':
         changePlacements(command.changes);
@@ -750,8 +864,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     const restoringSession = sessionId;
     const next = readDesign(value.draft),
       restoredSaved = value.saved === undefined ? undefined : readDesign(value.saved);
-    if (value.tool !== undefined && !['select', 'browse', 'card'].includes(value.tool))
-      throw new Error('復旧ツールが不正です。');
+    if (value.tool !== undefined && !EDITOR_TOOLS.includes(value.tool)) throw new Error('復旧ツールが不正です。');
     if (
       next.siteId !== ports.siteId ||
       !Array.isArray(value.selectedIds) ||
@@ -769,9 +882,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     restored.restore(value.history);
     if (restored.values().some((doc) => doc.siteId !== ports.siteId))
       throw new Error('復旧データの対象が一致しません。');
-    const ids = [
-      ...new Set([next, ...restored.values()].flatMap((doc) => doc.decorations.map((layer) => layer.assetId))),
-    ];
+    const ids = [...new Set([next, ...restored.values()].flatMap(designAssetIds))];
     await retainAssets(assetSession!, ids);
     await checkDesignAssets(next, assetSession!);
     if (!active || restoringSession !== sessionId) return;
@@ -799,6 +910,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     checkpoint,
     restore,
     import: addImages,
+    importSkin: addSkinImage,
     subscribe(listener: (state: EditorSnapshot) => void) {
       listeners.add(listener);
       return () => listeners.delete(listener);

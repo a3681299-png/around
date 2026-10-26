@@ -9,6 +9,7 @@ import { isYouTubeVideoCard, videoCardContainer } from './youtube-cards';
 import { youtubePlaybackSource } from './youtube-signals';
 import { youtubeOperations } from './youtube-operations';
 import { mountYouTubeStudio, protectYouTubeStudioToolbar } from './youtube-studio';
+import { YOUTUBE_DESIGN_TARGETS, YOUTUBE_SKIN_CONTROLS, YOUTUBE_SKIN_MARKS } from './youtube-targets';
 
 const SURFACE_ATTRIBUTE = 'data-ww-surface';
 
@@ -138,6 +139,8 @@ const targets: ReadonlyArray<{ selector: string; surfaces: readonly Surface[] }>
     surfaces: ['rounded'],
   },
   { selector: 'ytd-thumbnail #thumbnail, yt-thumbnail-view-model', surfaces: ['rounded'] },
+  // Parts an author can dress (see youtube-targets.ts).
+  ...YOUTUBE_SKIN_MARKS,
 ];
 
 const allSelectors = targets.map((target) => target.selector).join(', ');
@@ -168,7 +171,8 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
   return {
     id: 'youtube',
     stylesheet: `${stylesheet}\n${chromeStylesheet}`,
-    designTargets: [{ id: 'video-card', surface: 'video-card', label: '動画カード' }],
+    designTargets: YOUTUBE_DESIGN_TARGETS,
+    skinControls: YOUTUBE_SKIN_CONTROLS,
     decorationAnchors: [{ id: 'video-player', surface: 'player-window', label: '動画プレイヤー' }],
     signals: { videoPlayback: youtubePlaybackSource(doc) },
     operationSurfaces: () => youtubeOperations(doc),

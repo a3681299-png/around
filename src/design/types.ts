@@ -5,14 +5,40 @@ export interface SurfaceStyle {
   borderRadiusPx?: number;
 }
 
+/** States are names only; each site adapter owns the CSS condition for every state. */
+export const SKIN_STATES = ['normal', 'hover', 'focus', 'selected', 'pressed', 'disabled'] as const;
+export type SkinState = (typeof SKIN_STATES)[number];
+/** Inner widths in source-image pixels, as in border-image-slice. */
+export interface SkinSlices {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}
+export interface SkinFrame {
+  assetId: string;
+  slices: SkinSlices;
+  center: 'stretch' | 'repeat';
+  /** Drawn edge width = slice × scalePct / 100 CSS px. Never changes the element's box. */
+  scalePct: number;
+}
+/** Used while the element is smaller than the normal frame's drawn edges. */
+export type SkinCompact = { kind: 'color'; color: string } | { kind: 'frame'; frame: SkinFrame };
+export interface SurfaceSkin {
+  states: { normal: SkinFrame } & { [state in Exclude<SkinState, 'normal'>]?: SkinFrame };
+  compact?: SkinCompact;
+}
+
 export interface SurfaceStyleRule {
   kind: 'surface-style';
   target: string;
   style: SurfaceStyle;
+  /** v13. Validated numbers and asset IDs only; the engine builds the CSS. */
+  skin?: SurfaceSkin;
 }
 
 export interface DesignDocument {
-  schemaVersion: 12;
+  schemaVersion: 13;
   id: string;
   siteId: string;
   /** null uses native site styling; a built-in theme is an optional starting point. */
@@ -103,12 +129,25 @@ export type ImagePatch = Partial<
   model?: import('../models/types').ModelPatch;
 };
 
+/** Bundled site knowledge. A condition is a selector with one `&` for the target element. */
+export interface SkinTargetSpec {
+  readonly states: { readonly [state in Exclude<SkinState, 'normal'>]?: string };
+  /** Part-specific names for a state, e.g. selected = 登録済み. */
+  readonly labels?: { readonly [state in SkinState]?: string };
+  /** Where the part normally appears, shown when no element is found. */
+  readonly where?: string;
+  /** Typical size, used by the editor's size preview. */
+  readonly sample?: { readonly width: number; readonly height: number };
+}
+
 export interface DesignTarget {
   readonly id: string;
   readonly surface: string;
   readonly label: string;
+  readonly skin?: SkinTargetSpec;
 }
 
 export const STYLE_LIMITS = Object.freeze({ borderWidth: 12, borderRadius: 48 });
 export const IMAGE_LIMITS = Object.freeze({ count: 32, minSize: 1, maxSize: 4096, maxZ: 100 });
+export const SKIN_LIMITS = Object.freeze({ slice: 512, scaleMin: 10, scaleMax: 400, assets: 32, edge: 1024 });
 export const GROUP_LIMITS = Object.freeze({ count: 16 });

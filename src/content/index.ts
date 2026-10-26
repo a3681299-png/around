@@ -20,6 +20,7 @@ import { createAssetReadHost } from '../browser/asset-read-host';
 import { requestStudioSurface } from '../browser/side-panel';
 import { OPEN_SIDE_PANEL } from '../editor/messages';
 import { watchEmergencyOff } from '../storage/safety';
+import { skinAssetPort } from '../browser/skin-assets';
 
 if (ASSET_PROFILE) installAssetRuntimeHost(document);
 
@@ -33,7 +34,15 @@ if (site) {
   lifetime.__webWorldThemesCleanup?.();
   const assetReader = createAssetReadHost(document);
   let creator: CreatorEditor | undefined;
-  const controller = createThemeController(document, site, themes[DEFAULT_THEME], () => creator?.refreshSelection());
+  const controller = createThemeController(
+    document,
+    site,
+    themes[DEFAULT_THEME],
+    () => creator?.refreshSelection(),
+    skinAssetPort,
+  );
+  // Panel previews share the renderer's loader; each preview URL lives until the page unloads.
+  const previewUrls = new Map<string, Promise<string | undefined>>();
   controller.suspend(true);
   creator = createCreatorEditor(
     document,
@@ -44,6 +53,20 @@ if (site) {
     controller.validateDesign,
     controller.timeline,
     () => settingsPanel.open(),
+    {
+      status: controller.skinAssetStatus,
+      url(assetId) {
+        let url = previewUrls.get(assetId);
+        if (!url) {
+          url = skinAssetPort.load(assetId).catch(() => {
+            previewUrls.delete(assetId);
+            return undefined;
+          });
+          previewUrls.set(assetId, url);
+        }
+        return url;
+      },
+    },
   );
   const disconnectStudio = connectStudioHost(document, site, creator, controller.safety);
   const unwatchEmergency = watchEmergencyOff((value) => controller.suspend(value));
@@ -109,6 +132,8 @@ if (site) {
     disconnectStudio();
     creator?.destroy();
     controller.destroy();
+    for (const url of previewUrls.values()) void url.then((value) => value && skinAssetPort.revoke(value));
+    previewUrls.clear();
     assetReader.destroy();
   };
 }

@@ -4,12 +4,12 @@ import { parseDesign } from '../src/design/schema';
 import { evaluateWorld, initialWorldState } from '../src/world/evaluate';
 
 for (let version = 1; version <= 9; version++)
-  test(`historical v${version} test data migrates purely to v12 and evaluates without changing assets`, async () => {
+  test(`historical v${version} test data migrates purely to v13 and evaluates without changing assets`, async () => {
     const input = JSON.parse(await readFile(`tests/fixtures/designs/v${version}.json`, 'utf8'));
     const before = JSON.stringify(input),
       parsed = parseDesign(input);
     expect(input.schemaVersion).toBe(version);
-    expect(parsed.schemaVersion).toBe(12);
+    expect(parsed.schemaVersion).toBe(13);
     expect(JSON.stringify(input)).toBe(before);
     expect(parsed.rules).toEqual(
       input.rules.map((rule: { style: { backgroundColor?: string } }) =>
@@ -41,9 +41,9 @@ for (let version = 1; version <= 9; version++)
     );
   });
 
-test('unknown future DesignDocument remains unchanged and v13 remains unsupported', async () => {
+test('unknown future DesignDocument remains unchanged and v14 remains unsupported', async () => {
   const input = JSON.parse(await readFile('tests/fixtures/designs/v6.json', 'utf8'));
-  input.schemaVersion = 13;
+  input.schemaVersion = 14;
   const before = JSON.stringify(input);
   expect(() => parseDesign(input)).toThrow(/バージョン/);
   expect(JSON.stringify(input)).toBe(before);

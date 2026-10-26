@@ -1,4 +1,6 @@
-import type { EditCommand } from './types';
+import { EDITOR_TOOLS, type EditCommand, type EditorTool } from './types';
+import { parseSurfaceSkin } from '../design/schema';
+import { SKIN_STATES } from '../design/types';
 import {
   assertCommandData,
   commandObject,
@@ -29,6 +31,8 @@ export function parseEditCommand(value: unknown): EditCommand {
     end: ['cancel'],
     change: ['id', 'patch'],
     style: ['style'],
+    skin: ['skin'],
+    'skin-preview': ['state', 'compact'],
     delete: ['id'],
     duplicate: ['id'],
     placements: ['changes'],
@@ -50,7 +54,7 @@ export function parseEditCommand(value: unknown): EditCommand {
   for (const key of ['id', 'targetId', 'target'])
     if (object[key] !== undefined && (typeof object[key] !== 'string' || (object[key] as string).length > 120))
       throw new Error('レイヤー指定が不正です。');
-  for (const key of ['additive', 'preserve', 'cancel', 'after', 'value'])
+  for (const key of ['additive', 'preserve', 'cancel', 'after', 'value', 'compact'])
     if (object[key] !== undefined && typeof object[key] !== 'boolean') throw new Error('編集コマンドの値が不正です。');
   if (
     (object.type === 'select' && typeof object.id !== 'string') ||
@@ -59,10 +63,7 @@ export function parseEditCommand(value: unknown): EditCommand {
     (object.type === 'snap' && typeof object.value !== 'boolean')
   )
     throw new Error('編集コマンドの必須値がありません。');
-  if (
-    object.type === 'tool' &&
-    (typeof object.tool !== 'string' || !['select', 'browse', 'card'].includes(object.tool))
-  )
+  if (object.type === 'tool' && (typeof object.tool !== 'string' || !EDITOR_TOOLS.includes(object.tool as EditorTool)))
     throw new Error('未対応のツールです。');
   if (object.type === 'nudge') {
     const point = commandObject(object.delta, ['x', 'y']);
@@ -86,6 +87,16 @@ export function parseEditCommand(value: unknown): EditCommand {
     throw new Error('整列方法が不正です。');
   if (object.type === 'change') object.patch = parseImagePatch(object.patch);
   if (object.type === 'style') object.style = parseStyle(object.style);
+  if (object.type === 'skin') {
+    if (!Object.hasOwn(object, 'skin')) throw new Error('編集コマンドの必須値がありません。');
+    if (object.skin !== null) object.skin = parseSurfaceSkin(object.skin);
+  }
+  if (
+    object.type === 'skin-preview' &&
+    object.state !== undefined &&
+    !SKIN_STATES.includes(object.state as (typeof SKIN_STATES)[number])
+  )
+    throw new Error('未対応の状態です。');
   if (object.type === 'signal-rule') object.rule = parseSignalRule(object.rule);
   if (object.type === 'remove-signal-rule' && typeof object.id !== 'string')
     throw new Error('接続の識別子が不正です。');

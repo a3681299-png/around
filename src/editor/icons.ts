@@ -22,6 +22,7 @@ export function icon(name: string): string {
     select: '<path d="m5 3 14 10-7 1-3 7Z"/>',
     browse:
       '<path d="M8 12V5a2 2 0 0 1 4 0v7-8a2 2 0 0 1 4 0v8-6a2 2 0 0 1 4 0v8c0 5-2 7-7 7-4 0-5-2-8-6l-2-3c-1-2 2-4 4-1l1 1Z"/>',
+    skin: '<path d="M9 3 3 6.5l2 4 2.5-1.2V21h9V9.3l2.5 1.2 2-4L15 3a3 3 0 0 1-6 0Z"/>',
     card: '<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 14h18m-14 3h5m-1-10 5 3-5 3Z"/>',
     mask: '<circle cx="12" cy="12" r="7"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1 1m12 12 1 1M5 19l1-1M18 6l1-1"/>',
     help: '<circle cx="12" cy="12" r="10"/><path d="M9 8a3 3 0 1 1 5 2c-2 1-2 2-2 3m0 4h0"/>',

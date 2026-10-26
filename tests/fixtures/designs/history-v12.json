@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 12,
+  "id": "modes",
+  "siteId": "youtube",
+  "baseThemeId": null,
+  "rules": [],
+  "decorations": [
+    {
+      "kind": "image",
+      "id": "image-a",
+      "assetId": "asset-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "name": "flower.png",
+      "placement": {
+        "anchor": {
+          "kind": "viewport"
+        },
+        "x": 0.5,
+        "y": 0.5,
+        "widthPx": 100,
+        "heightPx": 80,
+        "rotationDeg": 0
+      },
+      "opacity": 0.8,
+      "zIndex": 1,
+      "visible": true,
+      "locked": true,
+      "renderMode": "atmosphere"
+    },
+    {
+      "kind": "image",
+      "id": "image-b",
+      "assetId": "asset-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "name": "flower.png",
+      "placement": {
+        "anchor": {
+          "kind": "viewport"
+        },
+        "x": 0.5,
+        "y": 0.5,
+        "widthPx": 100,
+        "heightPx": 80,
+        "rotationDeg": 0
+      },
+      "opacity": 0.8,
+      "zIndex": 1,
+      "visible": true,
+      "locked": true,
+      "renderMode": "atmosphere"
+    }
+  ],
+  "groups": [
+    {
+      "kind": "group",
+      "id": "group-a",
+      "name": "Group",
+      "opacity": 1,
+      "zIndex": 0,
+      "visible": true,
+      "locked": false,
+      "children": [
+        "image-a",
+        "image-b"
+      ],
+      "renderMode": "atmosphere"
+    }
+  ]
+}

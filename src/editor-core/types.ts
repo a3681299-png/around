@@ -7,13 +7,21 @@ import type {
   ImagePatch,
   LayerPlacement,
   SurfaceStyle,
+  SurfaceSkin,
+  SkinState,
 } from '../design/types';
 import type { PlacementChange, PlacementFrame, PlacementSample, Point } from '../world/geometry';
 import type { Alignment, Distribution } from '../design/layout';
 import type { HistoryCheckpoint } from '../editor/history';
 import type { AnimationFormat } from '../assets/motion-types';
 import type { SignalRule } from '../signals/keyframes';
-export type EditorTool = 'select' | 'browse' | 'card';
+export type EditorTool = 'select' | 'browse' | 'card' | 'skin';
+export const EDITOR_TOOLS: readonly EditorTool[] = ['select', 'browse', 'card', 'skin'];
+/** View-only previews of the selected part on the real page; never saved or recorded. */
+export interface SkinPreview {
+  state?: SkinState;
+  compact?: boolean;
+}
 
 export interface EditorCapability {
   allowed: boolean;
@@ -35,6 +43,10 @@ export interface EditorCapabilities {
 export interface EditorView extends EditorCapabilities {
   selected: boolean;
   style: SurfaceStyle;
+  /** The selected native part (design target) and its UI skin, if any. */
+  target?: string;
+  skin?: SurfaceSkin;
+  skinPreview?: SkinPreview;
   dirty: boolean;
   saving: boolean;
   status: string;
@@ -71,6 +83,8 @@ export type EditCommand =
   | { type: 'end'; cancel?: boolean }
   | { type: 'change'; id?: string; patch: ImagePatch }
   | { type: 'style'; style: SurfaceStyle }
+  | { type: 'skin'; skin: SurfaceSkin | null }
+  | { type: 'skin-preview'; state?: SkinState; compact?: boolean }
   | { type: 'delete' | 'duplicate'; id?: string }
   | { type: 'placements'; changes: readonly PlacementChange[] }
   | { type: 'reorder'; id: string; targetId: string; after: boolean }

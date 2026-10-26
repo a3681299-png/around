@@ -4,7 +4,8 @@ import { ASSET_MESSAGE, type AssetWireFile } from '../assets/protocol';
 import { changeAssets, getAsset, keepAssetLease, type AssetLease, type StoredAsset } from '../assets/repository';
 import { ASSET_LIMITS, base64ToBytes, bytesToBase64, type AssetMetadata, type AssetInfo } from '../assets/validation';
 import { validateAssetBytes } from '../assets/validate-bytes';
-import { validateDesignAssets } from '../assets/design-assets';
+import { validateDocumentAssets } from '../assets/design-assets';
+import { designAssetIds } from '../design/references';
 import { isAssetId, isDesignId, parseDesign } from '../design/schema';
 import { saveDesign } from '../storage/designs';
 import { installTakeStorage } from '../browser/take-repository';
@@ -57,7 +58,7 @@ const assetRead = createAssetReadService({
       values = await chrome.storage.local.get(key);
     if (!values[key]) return false;
     try {
-      return parseDesign(values[key]).decorations.some((layer) => layer.assetId === id);
+      return designAssetIds(parseDesign(values[key])).includes(id);
     } catch {
       return false;
     }
@@ -156,7 +157,7 @@ async function prune(current?: AssetLease): Promise<void> {
   for (const [key, value] of Object.entries(values)) {
     if (!key.startsWith('webWorldThemes.design.')) continue;
     try {
-      parseDesign(value).decorations.forEach((item) => references.add(item.assetId));
+      designAssetIds(parseDesign(value)).forEach((id) => references.add(id));
     } catch {
       return;
     } // A future document version may reference assets we cannot see.
@@ -386,11 +387,11 @@ async function handle(
   } else if (message['action'] === 'save' || message['action'] === 'validate') {
     const design = parseDesign(message['design']);
     const assets = new Map<string, AssetMetadata>();
-    for (const id of new Set(design.decorations.map((layer) => layer.assetId))) {
+    for (const id of designAssetIds(design)) {
       const asset = await getAsset(id);
       if (asset) assets.set(id, asset);
     }
-    validateDesignAssets(design.decorations, assets);
+    validateDocumentAssets(design, assets);
     if (message['action'] === 'validate') return undefined;
     await saveDesign(design);
   } else throw new Error('未対応の素材操作です。');

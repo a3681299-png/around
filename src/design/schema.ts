@@ -1,7 +1,12 @@
 import {
   GROUP_LIMITS,
   IMAGE_LIMITS,
+  SKIN_LIMITS,
+  SKIN_STATES,
   STYLE_LIMITS,
+  type SkinFrame,
+  type SurfaceSkin,
+  type SurfaceStyleRule,
   type DesignDocument,
   type SurfaceStyle,
   type Decoration,
@@ -153,6 +158,86 @@ export function parseSurfaceStyle(value: unknown): SurfaceStyle {
   return style;
 }
 
+function sliceWidth(value: unknown): number {
+  if (typeof value !== 'number' || !Number.isInteger(value) || value < 0 || value > SKIN_LIMITS.slice)
+    throw new Error(`着せ替えの切り位置は0〜${SKIN_LIMITS.slice}pxの整数で指定してください。`);
+  return value;
+}
+
+export function parseSkinFrame(value: unknown): SkinFrame {
+  const input = record(value, ['assetId', 'slices', 'center', 'scalePct']);
+  if (!isAssetId(input['assetId'])) throw new Error('着せ替えの素材が不正です。');
+  const slices = record(input['slices'], ['top', 'right', 'bottom', 'left']);
+  const center = input['center'];
+  if (center !== 'stretch' && center !== 'repeat') throw new Error('着せ替えの中央の扱いが不正です。');
+  const scale = input['scalePct'];
+  if (
+    typeof scale !== 'number' ||
+    !Number.isInteger(scale) ||
+    scale < SKIN_LIMITS.scaleMin ||
+    scale > SKIN_LIMITS.scaleMax
+  )
+    throw new Error(`着せ替えの表示倍率は${SKIN_LIMITS.scaleMin}〜${SKIN_LIMITS.scaleMax}%の整数で指定してください。`);
+  return {
+    assetId: input['assetId'],
+    slices: {
+      top: sliceWidth(slices['top']),
+      right: sliceWidth(slices['right']),
+      bottom: sliceWidth(slices['bottom']),
+      left: sliceWidth(slices['left']),
+    },
+    center,
+    scalePct: scale,
+  };
+}
+
+/** Only state names and frames are stored; CSS conditions belong to the site adapter. */
+export function parseSurfaceSkin(value: unknown): SurfaceSkin {
+  const input = record(value, ['states', 'compact']);
+  const states = record(input['states'], SKIN_STATES);
+  if (!Object.hasOwn(states, 'normal')) throw new Error('着せ替えには通常状態の絵が必要です。');
+  const parsed = {} as Record<string, SkinFrame>;
+  // Canonical order keeps equal artwork byte-identical.
+  for (const state of SKIN_STATES) if (Object.hasOwn(states, state)) parsed[state] = parseSkinFrame(states[state]);
+  const skin: SurfaceSkin = { states: parsed as SurfaceSkin['states'] };
+  if (Object.hasOwn(input, 'compact')) {
+    const compact = record(input['compact'], ['kind', 'color', 'frame']);
+    if (compact['kind'] === 'color' && !Object.hasOwn(compact, 'frame'))
+      skin.compact = { kind: 'color', color: color(compact['color']) };
+    else if (compact['kind'] === 'frame' && !Object.hasOwn(compact, 'color'))
+      skin.compact = { kind: 'frame', frame: parseSkinFrame(compact['frame']) };
+    else throw new Error('小さいときの着せ替えが不正です。');
+  }
+  return skin;
+}
+
+export function skinAssetIds(skin: SurfaceSkin): string[] {
+  const frames = Object.values(skin.states) as SkinFrame[];
+  if (skin.compact?.kind === 'frame') frames.push(skin.compact.frame);
+  return frames.map((frame) => frame.assetId);
+}
+
+/** One rule, shared by the full parser and incremental commits. */
+export function parseStyleRule(value: unknown): SurfaceStyleRule {
+  const rule = record(value, ['kind', 'target', 'style', 'skin']);
+  if (rule['kind'] !== 'surface-style' || !isDesignId(rule['target'])) throw new Error('未対応の編集対象です。');
+  const style = parseSurfaceStyle(rule['style']);
+  return {
+    kind: 'surface-style',
+    target: rule['target'],
+    style,
+    ...(Object.hasOwn(rule, 'skin') ? { skin: parseSurfaceSkin(rule['skin']) } : {}),
+  };
+}
+
+/** Rule-set invariants: count, unique targets and the skin asset budget. */
+export function checkStyleRules(rules: readonly SurfaceStyleRule[]): void {
+  if (rules.length > 16 || new Set(rules.map((rule) => rule.target)).size !== rules.length)
+    throw new Error('未対応または重複した編集対象です。');
+  const assets = new Set(rules.flatMap((rule) => (rule.skin ? skinAssetIds(rule.skin) : [])));
+  if (assets.size > SKIN_LIMITS.assets) throw new Error(`着せ替えに使える素材は${SKIN_LIMITS.assets}個までです。`);
+}
+
 const DECORATION_FIELDS = [
   'kind',
   'id',
@@ -253,16 +338,8 @@ export function parseDesign(value: unknown): DesignDocument {
   if (!Array.isArray(data['rules']) || data['rules'].length > 16) {
     throw new Error('デザインのルールが不正です。');
   }
-  const seen = new Set<string>();
-  const rules = data['rules'].map((value) => {
-    const rule = record(value, ['kind', 'target', 'style']);
-    if (rule['kind'] !== 'surface-style' || !isDesignId(rule['target']) || seen.has(rule['target'])) {
-      throw new Error('未対応または重複した編集対象です。');
-    }
-    seen.add(rule['target']);
-    const style = parseSurfaceStyle(rule['style']);
-    return { kind: 'surface-style' as const, target: rule['target'], style };
-  });
+  const rules = data['rules'].map(parseStyleRule);
+  checkStyleRules(rules);
   if (!Array.isArray(data['decorations']) || data['decorations'].length > IMAGE_LIMITS.count)
     throw new Error(ASSET_MESSAGES.layerCount);
   const decorations = data['decorations'].map(parseDecoration);
@@ -294,7 +371,7 @@ export function parseDesign(value: unknown): DesignDocument {
     ? parseSignalRules(data['signalRules'], new Set([...decorations, ...groups].map((layer) => layer.id)))
     : [];
   return {
-    schemaVersion: 12,
+    schemaVersion: 13,
     id: data['id'],
     siteId: data['siteId'],
     baseThemeId: data['baseThemeId'],
@@ -306,7 +383,7 @@ export function parseDesign(value: unknown): DesignDocument {
 }
 
 export function emptyDesign(siteId: string, baseThemeId: string | null): DesignDocument {
-  return parseDesign({ schemaVersion: 12, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
+  return parseDesign({ schemaVersion: 13, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
 }
 
 export function sameDesign(a: DesignDocument | undefined, b: DesignDocument | undefined): boolean {

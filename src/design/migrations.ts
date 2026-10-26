@@ -1,7 +1,7 @@
 import { ASSET_LIMITS, ASSET_MESSAGES } from '../assets/limits';
 import { IMAGE_LIMITS } from './types';
 
-// Intermediate objects are untrusted. Only schema.ts's final v12 validation may
+// Intermediate objects are untrusted. Only schema.ts's final v13 validation may
 // produce a DesignDocument; migration never grants immutable.ts's validated mark.
 type Data = Record<string, unknown>;
 interface Shape {
@@ -9,6 +9,7 @@ interface Shape {
   layer?: readonly string[];
   kinds?: readonly string[];
   group?: readonly string[];
+  rule?: readonly string[];
 }
 const root1 = ['schemaVersion', 'id', 'siteId', 'baseThemeId', 'rules'];
 const root2 = [...root1, 'decorations'];
@@ -22,6 +23,9 @@ const layer9 = [...layer5, 'motion'];
 const layer10 = [...layer9, 'model', 'source'];
 const group6 = ['kind', 'id', 'name', 'opacity', 'zIndex', 'visible', 'locked', 'effects', 'children'];
 const group9 = [...group6, 'motion'];
+const layer12 = [...layer10, 'renderMode'];
+const group12 = [...group9, 'renderMode'];
+const rule1 = ['kind', 'target', 'style'];
 const images = ['image'];
 const media = [...images, 'animation'];
 const models = [...media, 'model3d'];
@@ -54,6 +58,7 @@ function stage(value: unknown, version: number, shape: Shape): Data {
     }
   }
   if (Object.hasOwn(data, 'groups')) for (const group of list(data['groups'])) record(group, shape.group);
+  if (shape.rule) for (const rule of list(data['rules'])) record(rule, shape.rule);
   return data;
 }
 const next = (data: Data, version: number): Data => ({ ...data, schemaVersion: version });
@@ -142,6 +147,12 @@ export function migrateV11ToV12(value: unknown): Data {
   return next(stage(value, 11, { root: root8, layer: layer10, kinds: models, group: group9 }), 12);
 }
 
+export function migrateV12ToV13(value: unknown): Data {
+  // Rules pass unchanged through every earlier step, so this gate covers v1–v12:
+  // skin is new in v13 and every earlier rule keeps its native look by omission.
+  return next(stage(value, 12, { root: root8, layer: layer12, kinds: models, group: group12, rule: rule1 }), 13);
+}
+
 export const DESIGN_MIGRATIONS = Object.freeze([
   migrateV1ToV2,
   migrateV2ToV3,
@@ -154,14 +165,15 @@ export const DESIGN_MIGRATIONS = Object.freeze([
   migrateV9ToV10,
   migrateV10ToV11,
   migrateV11ToV12,
+  migrateV12ToV13,
 ]);
 
-/** Pure chain; a returned v12 object is still unvalidated external input. */
+/** Pure chain; a returned v13 object is still unvalidated external input. */
 export function migrateDesign(value: unknown): Data {
   let data = record(value);
   const version = data['schemaVersion'];
-  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 12)
+  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 13)
     throw new Error('このデザインのバージョンには対応していません。');
-  for (let from = version; from < 12; from++) data = DESIGN_MIGRATIONS[from - 1]!(data);
+  for (let from = version; from < 13; from++) data = DESIGN_MIGRATIONS[from - 1]!(data);
   return data;
 }

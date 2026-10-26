@@ -4,6 +4,7 @@ import {
   STYLE_LIMITS,
   renderModeOf,
   type SurfaceStyle,
+  type SurfaceSkin,
   type ImagePatch,
   type DesignTarget,
 } from '../design/types';
@@ -19,7 +20,8 @@ import { createWorkspace } from './workspace';
 import { createStudioWorkbench } from '../studio/workbench';
 import { buttonIcon } from './icons';
 import { mountNumberScrub } from './number-scrub';
-import type { EditorTool } from '../editor-core/types';
+import { createSkinPanel, SKIN_PANEL_STYLES, type SkinPageInfo, type SkinPanelOptions } from './skin-panel';
+import type { EditorTool, SkinPreview } from '../editor-core/types';
 import type { StudioHostLayout, StudioInsets } from '../studio/layout-types';
 import type { SignalRule } from '../signals/keyframes';
 import type { TimelinePort } from '../timeline/types';
@@ -39,10 +41,15 @@ export interface PanelOptions {
   hostLabel?: string;
   onLayout?(insets: StudioInsets): void;
   timeline?: TimelinePort | undefined;
+  /** UI skin editing; omitted where the panel has no native page parts to dress. */
+  skin?: SkinPanelOptions;
 }
 
 export interface PanelActions {
   change(style: SurfaceStyle): void;
+  selectTarget(id: string): void;
+  skin(skin: SurfaceSkin | null): void;
+  skinPreview(value: SkinPreview): void;
   save(): void;
   discard(): void;
   reset(): void;
@@ -86,7 +93,7 @@ export function createCreatorPanel(
   host.setAttribute('aria-label', 'デザインエディター');
   const shadow = host.attachShadow({ mode: 'open' });
   const sheet = doc.createElement('style');
-  sheet.textContent = styles;
+  sheet.textContent = options.skin ? styles + SKIN_PANEL_STYLES : styles;
   const main = doc.createElement('main');
   main.innerHTML = `
     <header><div><span class="eyebrow">WORLD CREATOR</span><h2>デザインを編集</h2></div><button class="dock" type="button" title="YouTubeの見たい場所に合わせて左右を切り替え">パネルを左へ</button><button class="minimize" type="button" aria-label="パネルを折りたたむ" title="プレビューを広く見る">−</button><button class="close" type="button" aria-label="編集を終了" title="未保存の変更を破棄して終了">×</button></header>
@@ -180,6 +187,7 @@ export function createCreatorPanel(
     ['select', '選択・変形', 'V'],
     ['browse', 'サイト操作', 'H'],
     ['card', '動画カードを編集', 'C'],
+    ...(options.skin ? ([['skin', 'UIを着せ替え', 'U']] as const) : []),
   ] as const) {
     const button = doc.createElement('button');
     button.type = 'button';
@@ -189,6 +197,19 @@ export function createCreatorPanel(
     tools.append(button);
   }
   get('.toolbar').append(tools);
+  const skinPanel = options.skin
+    ? createSkinPanel(
+        doc,
+        {
+          selectTarget: actions.selectTarget,
+          skin: actions.skin,
+          preview: actions.skinPreview,
+          begin: actions.beginEdit,
+          end: actions.endEdit,
+        },
+        options.skin,
+      )
+    : undefined;
   const backgroundToggle = get<HTMLInputElement>('[data-override="backgroundColor"]');
   const borderToggle = get<HTMLInputElement>('[data-override="border"]');
   const radiusToggle = get<HTMLInputElement>('[data-override="borderRadiusPx"]');
@@ -280,6 +301,9 @@ export function createCreatorPanel(
     options.fullPage || options.inPage || options.sidePanel || options.toolbarOnly
       ? createStudioWorkbench(doc, host, main, tree, actions, options)
       : createWorkspace(doc, host, main, tree, actions.clearSelection, actions.selectAll, options);
+  // Workspaces rebuild the body, so the skin editor joins the final layout: the Studio's
+  // inspector column, or the quick panel's body.
+  if (skinPanel) (main.querySelector('.studio-inspectors') ?? get('.editor-body')).prepend(skinPanel.element);
   const layerName = get<HTMLInputElement>('.layer-name');
   layerName.addEventListener('change', () => {
     const name = layerName.value.trim();
@@ -371,6 +395,8 @@ export function createCreatorPanel(
     },
     render(state: PanelState) {
       current = state;
+      main.toggleAttribute('data-skin-tool', Boolean(skinPanel) && state.tool === 'skin');
+      skinPanel?.render(state);
       imageProperties.hidden =
         (!state.image && !(options.fullPage || options.inPage || options.sidePanel || options.toolbarOnly)) ||
         state.selected;
@@ -534,7 +560,7 @@ export function createCreatorPanel(
           : state.selectedIds.length > 1
             ? `${state.selectedIds.length}レイヤーを選択中`
             : state.selected
-              ? '動画カードを選択中'
+              ? `${options.skin?.targets.find((target) => target.id === state.target)?.label ?? '動画カード'}を選択中`
               : 'カードまたは画像を選択してください',
       );
       setText(status, state.status);
@@ -545,7 +571,11 @@ export function createCreatorPanel(
         pendingContext = undefined;
       }
     },
+    setSkinPage(info: readonly SkinPageInfo[]) {
+      skinPanel?.setPage(info);
+    },
     destroy() {
+      skinPanel?.destroy();
       stopScrub();
       workspace.destroy();
       tree.destroy();

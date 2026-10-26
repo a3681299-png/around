@@ -18,3 +18,10 @@ v1: カードの色・枠・角丸。v2: ロックのない画像。v3: ロッ�
 `chain-expected.json`は移行チェーンへの変更前、`d1a552e`のパーサーで読み込んだ全14件の結果。
 移行後の結果との完全一致をテストする固定の比較対象であり、テスト実行時には再生成しない。
 v1〜v11すべてで履歴由来の入力を確保できたが、利用者が実際に保存した過去のJSONによる確認は引き続き未実施。
+
+UI1（v13）では `history-v12.json` を追加した。v12で `renderMode` を導入した `tests/design-migrations.spec.ts` の
+「v12 renderMode keeps normal by omission…」が、最初に `parseDesign` へ渡して受理された入力（雰囲気レイヤー2枚とグループ）である。
+その期待値は変更前の `29b8d5b` のパーサーで取得し、`chain-expected.json` へ加えた。
+
+`css-expected.json` は、変更前の `29b8d5b` の `compileDesign` で全fixtureを組み立てたCSS。
+v13の着せ替えを追加したレンダラーでも、既存作品の見た目（CSS）がバイト単位で変わらないことを確かめる固定の比較対象。

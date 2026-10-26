@@ -35,7 +35,15 @@ export type Surface =
   | 'playlist-row'
   | 'duration'
   | 'wordmark'
-  | 'icon';
+  | 'icon'
+  | 'subscribe-button'
+  | 'like-button'
+  | 'dislike-button'
+  | 'action-button'
+  | 'search-box'
+  | 'filter-chip'
+  | 'description-panel'
+  | 'comment-input';
 
 /** A site places this entry; its settings UI never needs site-specific selectors. */
 export interface SettingsEntry {
@@ -64,6 +72,8 @@ export interface SiteAdapter {
   readonly stylesheet: string;
   readonly designTargets?: readonly DesignTarget[];
   readonly decorationAnchors?: readonly DesignTarget[];
+  /** Site-specific native controls the skin picker labels as 未対応 when no part covers them. */
+  readonly skinControls?: string;
   /** Native media discovery belongs to the site; consumers only receive signals. */
   readonly signals?: { readonly videoPlayback?: PlaybackSource };
   readonly operationSurfaces?: () => import('../host/operation-source').OperationSource;

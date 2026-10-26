@@ -1,5 +1,6 @@
 import { isDesignId, parseDesign } from '../design/schema';
 import { designKey } from '../storage/designs';
+import { designAssetIds } from '../design/references';
 import { ASSET_LIMITS, ASSET_MESSAGES } from '../assets/limits';
 import { BACKUP_LIMITS, BACKUP_MESSAGES, settingsStorageValues } from './schema';
 import { sameBackupData } from './data';
@@ -52,7 +53,7 @@ export function planRestore(
     0,
   );
   if (size > BACKUP_LIMITS.localBytes) throw new Error(BACKUP_MESSAGES.localSize);
-  const references = new Set(manifest.designs.flatMap((design) => design.decorations.map((layer) => layer.assetId)));
+  const references = new Set(manifest.designs.flatMap(designAssetIds));
   const added = backup.assets
     .filter((row) => !existingAssets.some((existing) => existing.id === row.id))
     .map((row) => ({

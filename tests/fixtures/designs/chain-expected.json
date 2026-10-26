@@ -2,7 +2,7 @@
   "baseline": "d1a552e3641ac9141844afeff911fe7bfc46109f",
   "documents": {
     "history-v10.json": {
-      "schemaVersion": 12,
+      "schemaVersion": 13,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": "retro",
@@ -89,7 +89,7 @@
       ]
     },
     "history-v11.json": {
-      "schemaVersion": 12,
+      "schemaVersion": 13,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": "retro",
@@ -321,8 +321,75 @@
         }
       ]
     },
+    "history-v12.json": {
+      "schemaVersion": 13,
+      "id": "modes",
+      "siteId": "youtube",
+      "baseThemeId": null,
+      "rules": [],
+      "decorations": [
+        {
+          "id": "image-a",
+          "assetId": "asset-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "name": "flower.png",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.5,
+            "y": 0.5,
+            "widthPx": 100,
+            "heightPx": 80,
+            "rotationDeg": 0
+          },
+          "opacity": 0.8,
+          "zIndex": 1,
+          "visible": true,
+          "locked": true,
+          "renderMode": "atmosphere",
+          "kind": "image"
+        },
+        {
+          "id": "image-b",
+          "assetId": "asset-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "name": "flower.png",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.5,
+            "y": 0.5,
+            "widthPx": 100,
+            "heightPx": 80,
+            "rotationDeg": 0
+          },
+          "opacity": 0.8,
+          "zIndex": 1,
+          "visible": true,
+          "locked": true,
+          "renderMode": "atmosphere",
+          "kind": "image"
+        }
+      ],
+      "groups": [
+        {
+          "kind": "group",
+          "id": "group-a",
+          "name": "Group",
+          "opacity": 1,
+          "zIndex": 0,
+          "visible": true,
+          "locked": false,
+          "children": [
+            "image-a",
+            "image-b"
+          ],
+          "renderMode": "atmosphere"
+        }
+      ]
+    },
     "history-v7.json": {
-      "schemaVersion": 12,
+      "schemaVersion": 13,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": null,
@@ -389,7 +456,7 @@
       ]
     },
     "history-v8.json": {
-      "schemaVersion": 12,
+      "schemaVersion": 13,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": null,
@@ -595,7 +662,7 @@
       ]
     },
     "history-v9.json": {
-      "schemaVersion": 12,
+      "schemaVersion": 13,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": null,
@@ -818,7 +885,7 @@
       ]
     },
     "v1.json": {
-      "schemaVersion": 12,
+      "schemaVersion": 13,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": "retro",
@@ -839,7 +906,7 @@
       "decorations": []
     },
     "v2.json": {
-      "schemaVersion": 12,
+      "schemaVersion": 13,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": null,
@@ -868,7 +935,7 @@
       ]
     },
     "v3.json": {
-      "schemaVersion": 12,
+      "schemaVersion": 13,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": null,
@@ -897,7 +964,7 @@
       ]
     },
     "v4.json": {
-      "schemaVersion": 12,
+      "schemaVersion": 13,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": "retro",
@@ -932,7 +999,7 @@
       ]
     },
     "v5.json": {
-      "schemaVersion": 12,
+      "schemaVersion": 13,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": null,
@@ -993,7 +1060,7 @@
       ]
     },
     "v6.json": {
-      "schemaVersion": 12,
+      "schemaVersion": 13,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": "retro",
@@ -1078,7 +1145,7 @@
       ]
     },
     "v7.json": {
-      "schemaVersion": 12,
+      "schemaVersion": 13,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": "retro",
@@ -1170,7 +1237,7 @@
       ]
     },
     "v8.json": {
-      "schemaVersion": 12,
+      "schemaVersion": 13,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": "retro",
@@ -1311,7 +1378,7 @@
       ]
     },
     "v9.json": {
-      "schemaVersion": 12,
+      "schemaVersion": 13,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": "retro",

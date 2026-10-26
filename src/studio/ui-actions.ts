@@ -9,6 +9,9 @@ export function studioActions(
 ): PanelActions {
   return {
     change: (style) => dispatch({ type: 'style', style }),
+    selectTarget: (target) => dispatch({ type: 'select-target', target }),
+    skin: (skin) => dispatch({ type: 'skin', skin }),
+    skinPreview: (value) => dispatch({ type: 'skin-preview', ...value }),
     save: () => dispatch({ type: 'save' }),
     discard: () => dispatch({ type: 'discard' }),
     reset: () => dispatch({ type: 'style', style: {} }),
