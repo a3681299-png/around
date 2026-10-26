@@ -2,7 +2,7 @@
 
 最終更新：2026-10-26。**引継ぎ後の実装・実サイト検証は完了した。** 最終確認13件成功、CIは単体336件・E2E246件成功。結果・比較表・性能の限界は [完了報告](operation-safety-g11-completion.md) にまとめた。検証したソースは `b705f16`。
 
-mainへの統合は、自動承認レビューが元のmain変更禁止の制約に対する明示的な許可を確認できず拒否したため、未実施。mainは `6721ce4`、通常版distも変更していない。確認用ビルドは `.work/creator-editor/.work/g11-check-dist`。**以下は初回引継ぎ時点の記録**であり、残作業の現状は完了報告を参照する。
+ユーザーの「mainへ反映して完了する」という明示的な承認後、`4402323`でmainへ統合し、通常版distも更新した。content bundleは検証済みビルドと一致する。**以下は初回引継ぎ時点の記録**であり、現状と性能の限界は完了報告を参照する。
 
 経緯と結果の詳細は [operation-safety-g11-finish.md](operation-safety-g11-finish.md) の「4回目」、保護の仕様は [operation-safety.md](operation-safety.md)（「G1.1での拡張」を含む）にある。
 
