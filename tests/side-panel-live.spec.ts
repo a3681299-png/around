@@ -65,7 +65,11 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
     await expect
       .poll(
         async () => ({
-          images: await page.locator('#web-world-themes-decorations [data-image-id]').count(),
+          images: await page
+            .locator(
+              ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]',
+            )
+            .count(),
           status: await panel.text('.status'),
           connection: await panel.evaluate('document.querySelector(".connection-status").textContent'),
         }),
@@ -101,7 +105,9 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
       ))
     )
       await panel.click('[data-effect="pointer"]');
-    const mask = page.locator('#web-world-themes-decorations .group-content');
+    const mask = page.locator(
+      ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) .group-content',
+    );
     await expect(mask).toHaveCSS('mask-image', /radial-gradient/);
     await page.mouse.move(300, 280);
     const beforeMask = await mask.evaluate((node: HTMLElement) => node.style.maskImage);
@@ -234,7 +240,11 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
     await expect(local).not.toBeVisible();
     await expect(local).not.toHaveAttribute('data-fullscreen', '');
     report.checks.fullscreen = true;
-    const first = page.locator('#web-world-themes-decorations [data-image-id]').first(),
+    const first = page
+        .locator(
+          ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]',
+        )
+        .first(),
       prior = (await first.boundingBox())!,
       playerPrior = (await player.boundingBox())!;
     await page.mouse.move(400, 350);
@@ -248,7 +258,11 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
     await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
     await page.reload();
     await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
-    await expect(page.locator('#web-world-themes-decorations [data-image-id]')).toHaveCount(3);
+    await expect(
+      page.locator(
+        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]',
+      ),
+    ).toHaveCount(3);
     report.checks.savedReload = true;
     const search = page.locator('ytd-masthead input[name="search_query"], ytd-masthead input#search').first();
     await search.fill('Web World Themes');
@@ -260,7 +274,11 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
     report.checks.spa = true;
     await popup.locator('#effect-strength').fill('0');
     await expect(local).toHaveCount(0);
-    await expect(page.locator('#web-world-themes-decorations')).toHaveCount(0);
+    await expect(
+      page.locator(
+        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',
+      ),
+    ).toHaveCount(0);
     await expect(page.locator('#web-world-themes-studio-layout')).toHaveCount(0);
     await expect(page.locator('html')).not.toHaveAttribute('data-ww-editing', '');
     report.checks.strengthZeroCleanup = true;

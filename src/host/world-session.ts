@@ -16,12 +16,14 @@ import type {
 import type { TimelineHost } from './timeline';
 import { rebaseWorldClock } from '../world/clock';
 import { SIGNAL_REGISTRY } from '../signals/registry';
+import type { OperationGuardHost } from './operation-guard';
 
 export interface WorldHostContext {
   scene: WorldScene;
   geometry: WorldGeometry;
   layout?: WorldLayout;
   holdTransforms?: boolean;
+  safety?: OperationGuardHost;
 }
 /** Browser inputs/scheduling only. The renderer receives data through apply(). */
 export function createWorldSession(
@@ -168,7 +170,16 @@ export function createWorldSession(
         ...(context.holdTransforms ? { holdTransforms: true } : {}),
       },
     };
-    const result = overridden ?? evaluatePreparedWorld(prepared, state, input, context.scene.signalRules);
+    if (context.safety) {
+      const safety = context.safety.sample(timeMs);
+      input.signals.samples = { ...input.signals.samples, 'user.idle.duration': safety.idleSeconds };
+      input.environment.safeInteraction = safety.approaching;
+    }
+    // User/Host restrictions also override a recorded or previewed frame.
+    const result =
+      input.environment.reducedMotion || input.environment.safeInteraction
+        ? evaluatePreparedWorld(prepared, state, input, context.scene.signalRules)
+        : (overridden ?? evaluatePreparedWorld(prepared, state, input, context.scene.signalRules));
     if (!overridden) {
       if (
         !context.scene.signalRules?.length &&

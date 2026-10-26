@@ -40,7 +40,8 @@ jobs:
           retention-days: 7
   e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    # Chromium/system dependencies can take 7m before the serial browser suite starts.
+    timeout-minutes: 35
     env:
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.work/browsers
       WW_BUILD_OUT: .work/test-dist

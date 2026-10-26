@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
 import { nativeWindow, sidePanelDriver } from './helpers/side-panel';
+import { declinePromotion } from './helpers/youtube-live';
 import { createTakeSampler, type SignalTake } from '../src/world/takes';
 import type { DesignDocument } from '../src/design/types';
 
@@ -69,13 +70,20 @@ test('real YouTube: official Studio configures GIF pursuit, records/replays/load
       stopRadius: 36,
       orientToMovement: true,
     });
-    const image = page.locator('#web-world-themes-decorations .image');
+    const image = page.locator(
+      ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) .image',
+    );
+    // Screen coordinates: style.left/top are exact CSS values relative to the paint container
+    // holding the layer (the player for the player-local plane), so add that container's origin.
     const point = () =>
-      image.evaluate((node: HTMLElement) => ({
-        x: Number.parseFloat(node.style.left),
-        y: Number.parseFloat(node.style.top),
-        transform: node.style.transform,
-      }));
+      image.evaluate((node: HTMLElement) => {
+        const origin = node.parentElement!.getBoundingClientRect();
+        return {
+          x: Number.parseFloat(node.style.left) + origin.left,
+          y: Number.parseFloat(node.style.top) + origin.top,
+          transform: node.style.transform,
+        };
+      });
     const width = await page.evaluate(() => innerWidth),
       target = { x: Math.round(width * 0.65), y: 300 },
       initial = await point();
@@ -144,7 +152,34 @@ test('real YouTube: official Studio configures GIF pursuit, records/replays/load
     await page.reload();
     await expect
       .poll(() => panel.evaluate('document.querySelector(".connection-status").dataset.connected'))
-      .toBe('true');
+      .toBe('true')
+      .catch(async (error: Error) => {
+        // Observe after a failure without turning a late connection into a passing assertion.
+        const start = Date.now();
+        const samples: { ms: number; connected: string; message: string }[] = [];
+        try {
+          while (Date.now() - start < 20_000) {
+            const status = await panel.evaluate<{ connected: string; message: string }>(
+              `(() => { const n = document.querySelector('.connection-status'); return { connected: n.dataset.connected, message: n.textContent }; })()`,
+            );
+            samples.push({ ms: Date.now() - start, ...status });
+            if (status.connected === 'true') break;
+            await page.waitForTimeout(500);
+          }
+        } catch (diagnosticError) {
+          report.checks.reconnectDiagnosticError = String(diagnosticError);
+        }
+        report.checks.reconnectAfterFailure = samples;
+        throw error;
+      });
+    // A take can only be chosen once the reconnected page has listed it again.
+    await expect
+      .poll(() =>
+        panel.evaluate(
+          `(() => { const s = ${ui}.querySelector('.take-library-select'); return !s.disabled && [...s.options].some((o) => o.value === ${JSON.stringify(take.id)}); })()`,
+        ),
+      )
+      .toBe(true);
     await panel.fill('.take-library-select', take.id);
     await expect.poll(() => panel.text('.take-source')).toBe('PREVIEW');
     await panel.fill('.take-position', String(at / 1000));
@@ -156,13 +191,42 @@ test('real YouTube: official Studio configures GIF pursuit, records/replays/load
     for (const size of [1366, 1920, 1000]) {
       await nativeWindow(panel.cdp, size);
       await page.waitForTimeout(100);
-      const canvasWidth = await page.evaluate(() => innerWidth);
-      await page.mouse.move(canvasWidth * 0.5, 350);
+      // Aim inside the coverable video centre, as far as possible from the control bands and
+      // any visible native control (e.g. the large play button of a paused video). Near those
+      // the G1 approach rule correctly holds the layer, so a fixed point is not a fair target.
+      // The aim is also well beyond the stop radius from where the layer rests now; a layer
+      // already inside the radius correctly stays where it is.
+      const from = await point();
+      const aim = await page.locator('#movie_player').evaluate((player, from) => {
+        const r = player.getBoundingClientRect();
+        const controls = [...document.querySelectorAll('button, a[href], [role="button"], [role="slider"], input')]
+          .filter((e) => !e.closest('[id^="web-world-themes"]') && getComputedStyle(e).visibility !== 'hidden')
+          .map((e) => e.getBoundingClientRect())
+          .filter((b) => b.width > 0 && b.height > 0);
+        const gap = (x: number, y: number) =>
+          Math.min(
+            y - (r.top + 64),
+            r.bottom - 112 - y,
+            ...controls.map((b) => Math.max(b.left - x, x - b.right, b.top - y, y - b.bottom)),
+          );
+        let best = { x: r.left + r.width / 2, y: r.top + 64 + (r.height - 176) / 2 };
+        for (let i = 1; i < 10; i++)
+          for (let j = 1; j < 10; j++) {
+            const x = r.left + (r.width * i) / 10,
+              y = r.top + 64 + ((r.height - 176) * j) / 10;
+            if (Math.hypot(x - from.x, y - from.y) < 120) continue;
+            if (gap(x, y) > gap(best.x, best.y) || Math.hypot(best.x - from.x, best.y - from.y) < 120) best = { x, y };
+          }
+        return best;
+      }, from);
+      await page.mouse.move(aim.x, aim.y);
       await expect
         .poll(
           async () => {
+            // Declining clicks the dialog, which moves the pointer; aim again afterwards.
+            if (await declinePromotion(page)) await page.mouse.move(aim.x, aim.y);
             const p = await point();
-            return Math.abs(Math.hypot(p.x - canvasWidth * 0.5, p.y - 350) - 36);
+            return Math.abs(Math.hypot(p.x - aim.x, p.y - aim.y) - 36);
           },
           { timeout: 9000 },
         )
@@ -175,7 +239,11 @@ test('real YouTube: official Studio configures GIF pursuit, records/replays/load
     }
     report.checks.windowWidthsAndSettingsClicks = [1366, 1920, 1000];
     await popup.locator('#effect-strength').fill('0');
-    await expect(page.locator('#web-world-themes-decorations')).toHaveCount(0);
+    await expect(
+      page.locator(
+        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',
+      ),
+    ).toHaveCount(0);
     await expect(local).toHaveCount(0);
     report.checks.zeroCleanup = true;
     report.completed = true;

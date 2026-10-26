@@ -13,6 +13,10 @@
     "default_popup": "popup/index.html"
   },
   "commands": {
+    "emergency-off": {
+      "suggested_key": { "default": "Alt+Shift+Q" },
+      "description": "作品の描画を緊急停止（再開は表示設定から）"
+    },
     "open-editor": {
       "suggested_key": { "default": "Alt+Shift+E" },
       "description": "エディターを直接開く"

@@ -3,6 +3,7 @@ import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
+import { beginCanvasGesture, visiblePart } from './helpers/editor-workspace';
 
 test('layout feasibility on real signed-out YouTube, preserving native media and DOM parents', async () => {
   test.skip(process.env.WW_LAYOUT_PILOT !== '1', 'Explicit live layout pilot.');
@@ -27,6 +28,10 @@ test('layout feasibility on real signed-out YouTube, preserving native media and
     await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 20_000 });
     await page.bringToFront();
+    // The bootstrap player can exist before the native watch columns and title.
+    // Measure the reserved layout only after YouTube has built that layout.
+    await expect(page.locator('ytd-watch-flexy #movie_player')).toBeVisible({ timeout: 30_000 });
+    await expect(page.locator('ytd-watch-metadata h1').first()).toBeVisible({ timeout: 30_000 });
     const opened = context.waitForEvent('page');
     await popup.locator('#creator-studio-open').evaluate((button: HTMLButtonElement) => button.click());
     const oldStudio = await opened;
@@ -142,14 +147,15 @@ test('production in-page Studio authors on the real signed-out YouTube, without 
     const appBefore = (await page.locator('ytd-app').boundingBox())!,
       parentBefore = await nativePlayer!.evaluate((node) => node.parentElement?.id);
     await popup.locator('#creator-studio-inpage').evaluate((button: HTMLButtonElement) => button.click());
-    const panel = page.locator('#web-world-themes-creator'),
-      overlay = '#web-world-themes-decorations';
+    const panel = page.locator('#web-world-themes-creator');
+    const presentation =
+      ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)';
     await expect(panel).toHaveAttribute('data-inpage', '');
     await expect(page.locator('html')).toHaveAttribute('data-ww-studio-layout', 'reserved');
     await panel
       .getByLabel('画像素材を追加')
       .setInputFiles(Array(3).fill(path.resolve('tests/fixtures/motion/petal.png')));
-    await expect(page.locator(overlay + ' [data-image-id]')).toHaveCount(3);
+    await expect(page.locator(presentation + ' [data-image-id]')).toHaveCount(3);
     await expect(panel.getByRole('button', { name: '画像を追加', exact: true })).toBeEnabled();
     for (const row of await panel.locator('.layer').all()) {
       await row.locator('[data-action="select"]').click();
@@ -159,18 +165,19 @@ test('production in-page Studio authors on the real signed-out YouTube, without 
     await expect(panel.locator('.selected-count')).toHaveText('3個選択中');
     await panel.getByRole('button', { name: '選択をグループ化', exact: true }).click();
     await expect(panel.locator('[data-kind="group"]')).toHaveCount(1);
-    const first = page.locator(overlay + ' [data-image-id]').first(),
+    const first = page.locator(presentation + ' [data-image-id]').first(),
       before = (await first.boundingBox())!;
-    await page.mouse.move(before.x + before.width / 2, before.y + before.height / 2);
-    await page.mouse.down();
-    await page.mouse.move(before.x + before.width / 2 - 30, before.y + before.height / 2 + 15, { steps: 8 });
+    // Grouping briefly holds drawing; start only once the artwork is the real hit target.
+    const start = await visiblePart(first);
+    await beginCanvasGesture(first, start);
+    await page.mouse.move(start.x - 30, start.y + 15, { steps: 8 });
     await page.mouse.up();
     await expect.poll(async () => (await first.boundingBox())!.x).toBeCloseTo(before.x - 30, 1);
     report.checks.directGroupMovement = true;
     await panel.getByRole('button', { name: '光とマスクを設定', exact: true }).click();
     await panel.getByLabel('円形マスクを使う', { exact: true }).check();
     await panel.getByLabel('光の半径', { exact: true }).fill('220');
-    const mask = page.locator(overlay + ' .group-content');
+    const mask = page.locator(presentation + ' .group-content');
     await expect(mask).toHaveCSS('mask-image', /radial-gradient/);
     await page.mouse.move(before.x + before.width / 2, before.y + before.height / 2);
     const maskBefore = await mask.evaluate((node: HTMLElement) => node.style.maskImage);
@@ -293,14 +300,14 @@ test('production in-page Studio authors on the real signed-out YouTube, without 
     await expect.poll(async () => (await page.locator('ytd-app').boundingBox())!.width).toBeCloseTo(appBefore.width, 0);
     report.checks.exitRestore = true;
     await page.reload({ waitUntil: 'domcontentloaded' });
-    await expect(page.locator(overlay + ' [data-image-id]')).toHaveCount(3);
+    await expect(page.locator(presentation + ' [data-image-id]')).toHaveCount(3);
     await popup.locator('#creator-studio-inpage').evaluate((button: HTMLButtonElement) => button.click());
     await expect(panel.locator('[data-kind="group"]')).toHaveCount(1);
     await expect(panel.locator('.dirty')).toHaveText('保存済み');
     report.checks.savedReload = true;
     await popup.locator('#effect-strength').fill('0');
     await expect(panel).toHaveCount(0);
-    await expect(page.locator(overlay)).toHaveCount(0);
+    await expect(page.locator(presentation)).toHaveCount(0);
     await expect(page.locator('#web-world-themes-studio-layout')).toHaveCount(0);
     await expect(page.locator('html')).not.toHaveAttribute('data-ww-inpage-studio', '');
     report.checks.strengthZeroCleanup = true;

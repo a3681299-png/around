@@ -1,7 +1,7 @@
 param(
   [Parameter(Mandatory = $true)][string]$OwnedProfile,
   [Parameter(Mandatory = $true)][string]$ExtensionPath,
-  [Parameter(Mandatory = $true)][ValidateSet('E', 'Y')][string]$Key
+  [Parameter(Mandatory = $true)][ValidateSet('E', 'Y', 'Q')][string]$Key
 )
 $ErrorActionPreference = 'Stop'
 $work = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../.work'))

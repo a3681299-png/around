@@ -13,6 +13,7 @@ import { moveGroup, type PlacementFrame } from '../design/geometry';
 import {
   GROUP_LIMITS,
   IMAGE_LIMITS,
+  renderModeOf,
   type DesignDocument,
   type GroupLayer,
   type LayerNode,
@@ -55,6 +56,8 @@ export function groupingReason(doc: DesignDocument, ids: readonly string[]): str
   if (selected.some((image) => image.locked)) return '選択したレイヤーをロック解除してください。';
   if (selected.some((image) => !sameAnchor(image.placement.anchor, selected[0]!.placement.anchor)))
     return '画面基準とプレイヤー基準は分けてグループ化してください。';
+  if (selected.some((image) => renderModeOf(image) !== renderModeOf(selected[0]!)))
+    return '通常と雰囲気の描画モードは分けてグループ化してください。';
   const roots = frontToBack(rootLayers(doc.decorations, groups)),
     positions = roots.flatMap((layer, index) => (ids.includes(layer.id) ? [index] : []));
   if (Math.max(...positions) - Math.min(...positions) + 1 !== ids.length)
@@ -77,6 +80,7 @@ export function groupLayers(input: DesignDocument, ids: readonly string[], id: s
     zIndex: 0,
     visible: true,
     locked: false,
+    ...(renderModeOf(children[0]!) === 'atmosphere' ? { renderMode: 'atmosphere' as const } : {}),
   };
   const insertion = roots.findIndex((layer) => ids.includes(layer.id)),
     remaining = roots.filter((layer) => !ids.includes(layer.id));

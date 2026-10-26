@@ -1,10 +1,9 @@
 import { BACKUP_MESSAGE, BACKUP_PAGE, type BackupReply, type BackupSummary } from '../backup/protocol';
-import { BACKUP_PREFERENCE_KEYS, type BackupManifest } from '../backup/schema';
+import { BACKUP_PREFERENCE_KEYS, backupDesigns, type BackupManifest } from '../backup/schema';
 import { backupObject, sameBackupData } from '../backup/data';
 import { encodeBackup, decodeBackup, sha256 } from '../backup/archive';
 import { planRestore } from '../backup/restore';
 import { readSettings } from '../storage/settings';
-import { parseDesign } from '../design/schema';
 import { changeAssets } from '../assets/repository';
 import { readStoredTakes, restoreTakes } from '../browser/take-repository';
 import { oneOf } from '../validation';
@@ -46,13 +45,7 @@ export function createBackupService(ports: BackupPorts) {
         preferences: Object.fromEntries(
           BACKUP_PREFERENCE_KEYS.filter((key) => Object.hasOwn(local, key)).map((key) => [key, local[key]]),
         ),
-        designs: Object.entries(local)
-          .filter(([key]) => key.startsWith('webWorldThemes.design.'))
-          .map(([key, raw]) => {
-            const design = parseDesign(raw);
-            if (key !== 'webWorldThemes.design.' + design.siteId) throw new Error('作品の保存先が不正です。');
-            return design;
-          }),
+        designs: backupDesigns(local),
         takes: await readStoredTakes(),
         assets: rows.map(({ id, name, mime, byteLength }) => ({ id, name, mime, byteLength })),
       };

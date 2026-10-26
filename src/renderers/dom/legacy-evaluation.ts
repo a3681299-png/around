@@ -141,7 +141,12 @@ export function legacyWorld(
       });
       continue;
     }
-    const value = evaluateMask(mask, layer.placement, frame, input.signals);
+    const value = evaluateMask(
+      mask,
+      layer.placement,
+      frame,
+      input.environment.reducedMotion ? { ...input.signals, pointer: undefined } : input.signals,
+    );
     const old = Object.hasOwn(previous.effects.fades, layer.id) ? previous.effects.fades[layer.id] : undefined;
     const fade = retargetFade(
       old,

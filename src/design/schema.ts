@@ -8,6 +8,8 @@ import {
   type PlacementAnchor,
   type GroupLayer,
   type LayerPlacement,
+  type RenderMode,
+  renderModeOf,
 } from './types';
 import { MODEL_LIMITS, parseModelInfo, parseModelSettings } from '../models/types';
 import { ASSET_MESSAGES } from '../assets/limits';
@@ -58,6 +60,19 @@ function number(value: unknown, min: number, max: number): number {
   return value;
 }
 
+/** Normal is stored by omission, so equal artwork has one canonical form. */
+function renderMode(input: Record<string, unknown>): { renderMode?: RenderMode } {
+  if (!Object.hasOwn(input, 'renderMode')) return {};
+  const value = input['renderMode'];
+  if (value !== 'normal' && value !== 'atmosphere') throw new Error('描画モードが不正です。');
+  return value === 'atmosphere' ? { renderMode: value } : {};
+}
+/** A group is rendered as one undivided subtree, so its members share its mode. */
+export function checkGroupRenderMode(group: GroupLayer, children: readonly { renderMode?: RenderMode }[]): void {
+  if (children.some((child) => renderModeOf(child) !== renderModeOf(group)))
+    throw new Error('グループと中のレイヤーは同じ描画モードにしてください。');
+}
+
 export function parseGroupLayer(value: unknown): GroupLayer {
   const input = record(value, [
     'kind',
@@ -70,6 +85,7 @@ export function parseGroupLayer(value: unknown): GroupLayer {
     'effects',
     'children',
     'motion',
+    'renderMode',
   ]);
   if (
     input['kind'] !== 'group' ||
@@ -98,6 +114,7 @@ export function parseGroupLayer(value: unknown): GroupLayer {
     visible: input['visible'],
     locked: input['locked'],
     children: [...input['children']],
+    ...renderMode(input),
     ...(Object.hasOwn(input, 'motion') ? { motion: parseMotion(input['motion']) } : {}),
     ...(Object.hasOwn(input, 'effects') ? { effects: parseEffects(input['effects']) } : {}),
   };
@@ -152,6 +169,7 @@ const DECORATION_FIELDS = [
   'motion',
   'model',
   'source',
+  'renderMode',
 ] as const;
 const DECORATION_KINDS = ['image', 'animation', 'model3d'] as const;
 export function parseDecoration(value: unknown): Decoration {
@@ -179,6 +197,7 @@ export function parseDecoration(value: unknown): Decoration {
     zIndex,
     visible: item['visible'],
     locked: item['locked'] as boolean,
+    ...renderMode(item),
     ...(Object.hasOwn(item, 'motion') ? { motion: parseMotion(item['motion']) } : {}),
     ...(Object.hasOwn(item, 'effects') ? { effects: parseEffects(item['effects']) } : {}),
   };
@@ -267,6 +286,7 @@ export function parseDesign(value: unknown): DesignDocument {
         throw new Error('グループの参照が不正です。多重所属・ネストには対応していません。');
       if (children.some((child) => !sameAnchor(child!.placement.anchor, children[0]!.placement.anchor)))
         throw new Error('同じ配置基準のレイヤーだけをグループ化できます。');
+      checkGroupRenderMode(group, children as Decoration[]);
       group.children.forEach((id) => assigned.add(id));
     }
   }
@@ -274,7 +294,7 @@ export function parseDesign(value: unknown): DesignDocument {
     ? parseSignalRules(data['signalRules'], new Set([...decorations, ...groups].map((layer) => layer.id)))
     : [];
   return {
-    schemaVersion: 11,
+    schemaVersion: 12,
     id: data['id'],
     siteId: data['siteId'],
     baseThemeId: data['baseThemeId'],
@@ -286,7 +306,7 @@ export function parseDesign(value: unknown): DesignDocument {
 }
 
 export function emptyDesign(siteId: string, baseThemeId: string | null): DesignDocument {
-  return parseDesign({ schemaVersion: 11, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
+  return parseDesign({ schemaVersion: 12, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
 }
 
 export function sameDesign(a: DesignDocument | undefined, b: DesignDocument | undefined): boolean {

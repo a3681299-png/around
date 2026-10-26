@@ -27,7 +27,7 @@ export function evaluateTransforms(
     pointer = pointerMemory(previous?.pointer, input);
   if (pointer) state.pointer = pointer;
   for (const rule of rules) {
-    if (!rule.enabled) continue;
+    if (!rule.enabled || input.environment.reducedMotion || input.environment.safeInteraction) continue;
     const entry = byId.get(rule.target.layerId),
       raw = signalValue(rule, input, prepared, pointer);
     if (!entry || raw === undefined) continue;
@@ -58,7 +58,7 @@ export function evaluateTransforms(
       base,
       visible && !input.environment.hidden && !input.environment.holdTransforms ? input.signals.pointer : undefined,
       input.deltaMs,
-      input.environment.reducedMotion,
+      input.environment.reducedMotion || Boolean(input.environment.safeInteraction),
     );
     state.bodies[entry.layer.id] = followed.body;
     needsFrame ||= followed.needsFrame;
@@ -112,6 +112,8 @@ export function evaluateTransforms(
     rules.some(
       (rule) =>
         rule.enabled &&
+        !input.environment.reducedMotion &&
+        !input.environment.safeInteraction &&
         SIGNAL_REGISTRY.needsFrame(rule.source.signal, {
           signals: input.signals,
           timeMs: input.timeMs,

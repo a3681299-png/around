@@ -1,4 +1,4 @@
-import { exposeEditorControls, withCanvas } from './helpers/editor-workspace';
+import { exposeEditorControls, withCanvas, beginCanvasGesture } from './helpers/editor-workspace';
 import type { Page, Locator, CDPSession } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -9,7 +9,8 @@ import { isolate } from './helpers/world-host';
 
 const key = 'webWorldThemes.design.youtube',
   overlay = '#web-world-themes-decorations';
-const layers = `${overlay} [data-image-id]`,
+const layers =
+    ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]',
   media = `${layers} .media`;
 async function open(popup: Page, youtube: Page) {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
@@ -86,7 +87,7 @@ test('circle mask actually reveals pixels, feathers edges, follows the pointer a
   youtube,
 }, info) => {
   const panel = await open(popup, youtube),
-    clip = { x: 185, y: 154, width: 400, height: 300 };
+    clip = { x: 647, y: 154, width: 400, height: 300 };
   const baseline = await withCanvas(youtube, () => youtube.screenshot({ clip }));
   const png = await youtube.evaluate(() => {
     const canvas = document.createElement('canvas');
@@ -102,7 +103,7 @@ test('circle mask actually reveals pixels, feathers edges, follows the pointer a
     .setInputFiles({ name: 'alternate-world.png', mimeType: 'image/png', buffer: Buffer.from(png, 'base64') });
   await expect(youtube.locator(media)).toHaveAttribute('data-playback', 'still');
   for (const [label, value] of [
-    ['画像のX位置', 35],
+    ['画像のX位置', 77],
     ['画像のY位置', 40],
     ['画像の幅', 400],
     ['画像の高さ', 300],
@@ -111,7 +112,7 @@ test('circle mask actually reveals pixels, feathers edges, follows the pointer a
   await panel.getByLabel('円形マスクを使う').check();
   await setNumber(panel, '光の半径', 80);
   await setNumber(panel, '境界のぼかし', 20);
-  await youtube.mouse.move(385, 304);
+  await youtube.mouse.move(847, 304);
   await expect.poll(() => maskCenter(youtube)).toEqual({ x: 200, y: 150 });
   await panel.getByLabel('光の半径').hover();
   await expect.poll(() => maskCenter(youtube)).toEqual({ x: 200, y: 150 });
@@ -129,15 +130,14 @@ test('circle mask actually reveals pixels, feathers edges, follows the pointer a
   expect(actual[2]).not.toEqual(actual[0]);
   await info.attach('circle-reveal', { body: masked, contentType: 'image/png' });
   await setNumber(panel, '画像の角度', 90);
-  await withCanvas(youtube, () => youtube.mouse.move(445, 304));
+  await withCanvas(youtube, () => youtube.mouse.move(907, 304));
   await expect.poll(() => maskCenter(youtube)).toEqual({ x: 200, y: 90 });
-  const handle = youtube.locator(`${overlay} [data-handle="se"]`);
+  const handle = youtube.locator(`${overlay} [data-handle="ne"]`);
   await expect(handle).toBeVisible();
   const box = (await handle.boundingBox())!;
   await withCanvas(youtube, async () => {
-    await youtube.mouse.move(box.x + 7, box.y + 7);
-    await youtube.mouse.down();
-    await youtube.mouse.move(box.x - 33, box.y + 47, { steps: 5 });
+    await beginCanvasGesture(handle, { x: box.x + 7, y: box.y + 7 });
+    await youtube.mouse.move(box.x + 47, box.y + 47, { steps: 5 });
     await youtube.mouse.up();
   });
   expect(Number(await panel.getByLabel('画像の幅', { exact: true }).inputValue())).toBeGreaterThan(400);
@@ -169,7 +169,7 @@ test('effect edits survive undo, redo, discard, tab sync, reload and a persisten
   await save(panel);
   const saved = await stored(popup);
   expect(saved).toMatchObject({
-    schemaVersion: 11,
+    schemaVersion: 12,
     decorations: [{ effects: [{ kind: 'mask', radiusPx: 130, featherPx: 25, intensity: 0.65 }] }],
   });
   for (let i = 0; i < 8; i++) await youtube.mouse.move(200 + i * 20, 300);
@@ -485,6 +485,7 @@ test('32 masks share sources, stay idle, detach on background/OFF/zero and remai
     await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
     await youtube.bringToFront();
     await expect(youtube.locator(media)).toHaveCount(32);
-    await expect.poll(stats).toMatchObject({ pointer: 1, video: 5 });
+    // After reactivation instrumentation also sees G1's single Host guard.
+    await expect.poll(stats).toMatchObject({ pointer: 2, video: 5 });
   }
 });

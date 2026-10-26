@@ -3,6 +3,8 @@ import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
+import { beginCanvasGesture, visiblePart } from './helpers/editor-workspace';
+import { errorSummary, waitForAdvertToEnd } from './helpers/youtube-live';
 
 test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and cleanup', async () => {
   test.skip(process.env.WW_LIVE_EDITOR_UX !== '1', 'Explicit real YouTube UI validation.');
@@ -17,7 +19,7 @@ test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and 
       await action();
       results.push({ name, status: 'passed' });
     } catch (error) {
-      results.push({ name, status: 'unconfirmed', detail: String(error).split('\n').slice(0, 2).join(' ') });
+      results.push({ name, status: 'unconfirmed', detail: errorSummary(error) });
     }
   };
   try {
@@ -41,11 +43,13 @@ test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and 
     const panel = page.getByRole('dialog', { name: 'デザインエディター' });
     await expect(panel).toBeVisible();
     const overlay = '#web-world-themes-decorations';
+    const presentation =
+      ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)';
     await check('mouse-only import, selection, grouping and drag', async () => {
       await panel
         .getByLabel('画像素材を追加')
         .setInputFiles(Array(3).fill(path.resolve('tests/fixtures/motion/petal.png')));
-      await expect(page.locator(`${overlay} [data-image-id]`)).toHaveCount(3);
+      await expect(page.locator(`${presentation} [data-image-id]`)).toHaveCount(3);
       await expect(panel.getByRole('button', { name: '画像を追加', exact: true })).toBeEnabled();
       await panel.getByRole('button', { name: '選択解除', exact: true }).click();
       for (const checkbox of await panel.locator('[data-multiselect]').all()) await checkbox.check();
@@ -54,11 +58,12 @@ test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and 
       await page.screenshot({ path: '.work/verification/editor-ux-live-layers.png' });
       await panel.getByRole('button', { name: '選択をグループ化', exact: true }).click();
       await expect(panel.locator('[data-kind="group"]')).toHaveCount(1);
-      const image = page.locator(`${overlay} [data-image-id]`).first(),
+      const image = page.locator(`${presentation} [data-image-id]`).first(),
         before = (await image.boundingBox())!;
-      await page.mouse.move(before.x + before.width / 2, before.y + before.height / 2);
-      await page.mouse.down();
-      await page.mouse.move(before.x + before.width / 2 - 30, before.y + before.height / 2 + 20, { steps: 8 });
+      // Grouping briefly holds drawing; start only once the artwork is the real hit target.
+      const start = await visiblePart(image);
+      await beginCanvasGesture(image, start);
+      await page.mouse.move(start.x - 30, start.y + 20, { steps: 8 });
       await page.mouse.up();
       expect((await image.boundingBox())!.x).toBeCloseTo(before.x - 30, 1);
     });
@@ -67,10 +72,10 @@ test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and 
       await panel.getByLabel('円形マスクを使う', { exact: true }).check();
       await panel.getByLabel('光の半径', { exact: true }).fill('180');
       await page.mouse.move(430, 350);
-      await expect(page.locator(`${overlay} .group-content`)).not.toHaveCSS('mask-image', 'none');
+      await expect(page.locator(`${presentation} .group-content`)).not.toHaveCSS('mask-image', 'none');
       await expect
         .poll(() =>
-          page.locator(`${overlay} .group-content`).evaluate((element: HTMLElement) => {
+          page.locator(`${presentation} .group-content`).evaluate((element: HTMLElement) => {
             const match = element.style.maskImage.match(/at ([\d.e+-]+)px ([\d.e+-]+)px/)!,
               rect = element.getBoundingClientRect();
             return Math.abs(rect.x + Number(match[1]) - 430) + Math.abs(rect.y + Number(match[2]) - 350);
@@ -85,11 +90,11 @@ test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and 
         .locator('#movie_player video')
         .first()
         .evaluate((video: HTMLVideoElement) => video.pause());
-      await expect(page.locator(`${overlay} .group-content`)).toHaveAttribute('data-mask-intensity', '0');
+      await expect(page.locator(`${presentation} .group-content`)).toHaveAttribute('data-mask-intensity', '0');
       await panel.getByRole('button', { name: '保存', exact: true }).click();
       await expect(panel.locator('.dirty')).toHaveText('保存済み');
       await page.reload({ waitUntil: 'domcontentloaded' });
-      await expect(page.locator(`${overlay} [data-image-id]`)).toHaveCount(3, { timeout: 20_000 });
+      await expect(page.locator(`${presentation} [data-image-id]`)).toHaveCount(3, { timeout: 20_000 });
       await popup.locator('#creator-editor-open').evaluate((node: HTMLButtonElement) => node.click());
       await expect(panel).toBeVisible();
       await panel.locator('[data-kind="group"] [data-action="select"]').click();
@@ -99,19 +104,20 @@ test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and 
     await check('ordinary mode click-through and OFF removal', async () => {
       await panel.getByRole('button', { name: '編集を終了', exact: true }).click();
       expect(await page.locator(overlay).evaluate((element) => getComputedStyle(element).pointerEvents)).toBe('none');
+      await waitForAdvertToEnd(page);
       const video = page.locator('#movie_player video').first(),
         paused = await video.evaluate((node: HTMLVideoElement) => node.paused);
       await page.locator('#movie_player .ytp-play-button').click();
       await expect.poll(() => video.evaluate((node: HTMLVideoElement) => node.paused)).not.toBe(paused);
       await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
-      await expect(page.locator(overlay)).toHaveCount(0);
+      await expect(page.locator(presentation)).toHaveCount(0);
       await expect(panel).toHaveCount(0);
     });
   } catch (error) {
     results.push({
       name: 'real site startup',
       status: 'unconfirmed',
-      detail: String(error).split('\n').slice(0, 2).join(' '),
+      detail: errorSummary(error),
     });
   } finally {
     await writeFile(

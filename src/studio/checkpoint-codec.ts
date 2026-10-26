@@ -8,7 +8,7 @@ export interface PackedCheckpoint {
   nodes: Node[];
 }
 
-/** Preserve the shared graph on disk; DesignDocument itself still has exactly the v11 shape. */
+/** Preserve the shared graph on disk; DesignDocument itself still has exactly the v12 shape. */
 export function packCheckpoint(checkpoint: EditorCheckpoint): PackedCheckpoint {
   const nodes: Node[] = [],
     refs = new WeakMap<object, number>(),

@@ -1,5 +1,13 @@
 import styles from './panel.css';
-import { IMAGE_LIMITS, STYLE_LIMITS, type SurfaceStyle, type ImagePatch, type DesignTarget } from '../design/types';
+import {
+  IMAGE_LIMITS,
+  STYLE_LIMITS,
+  renderModeOf,
+  type SurfaceStyle,
+  type ImagePatch,
+  type DesignTarget,
+} from '../design/types';
+import { ATMOSPHERE_ALPHA_CAP } from '../world/operations';
 import { ANIMATION_LIMITS } from '../assets/motion-types';
 import { ASSET_MESSAGES } from '../assets/limits';
 import type { Alignment, Distribution } from '../design/layout';
@@ -138,6 +146,7 @@ export function createCreatorPanel(
       </div>
       <div class="property rotation-property"><label>角度 <input type="number" aria-label="画像の角度" data-image-prop="rotationDeg" min="-180" max="180" step="0.1" required>°</label></div>
       <div class="property"><label>不透明度 <output class="opacity-value"></output></label><input type="range" aria-label="画像の不透明度" data-image-prop="opacity" min="0" max="100" step="1"></div>
+      <div class="property render-mode-property"><label>描画モード <select aria-label="描画モード" data-image-prop="renderMode"><option value="normal">通常</option><option value="atmosphere">雰囲気</option></select></label><p class="hint render-mode-help" hidden>雰囲気レイヤーは操作面の上にも重なります。すべての雰囲気レイヤーを合わせた濃さは${Math.round(ATMOSPHERE_ALPHA_CAP * 100)}%以下に固定され、ぼかし・影・クリックは使えません。通常のレイヤーより下に描きます。</p></div>
       <fieldset class="playback" aria-label="アニメーションの再生" hidden>
         <div class="property playback-mode"><label>再生方式 <select data-playback="mode" aria-label="再生方式"><option value="auto">軽量再生（自動）</option><option value="controlled">時刻制御</option></select></label></div>
         <div class="property"><label><input type="checkbox" data-playback="playing">アニメーションを再生</label><label><input type="checkbox" data-playback="loop">ループ再生</label></div>
@@ -297,6 +306,8 @@ export function createCreatorPanel(
         },
       });
     else if (property === 'opacity') changeImage({ opacity: Number(input.value) / 100 });
+    else if (property === 'renderMode')
+      changeImage({ renderMode: input.value === 'atmosphere' ? 'atmosphere' : 'normal' });
     else
       changeImage({
         placement: { [property]: Number(input.value) / (property === 'x' || property === 'y' ? 100 : 1) },
@@ -481,6 +492,8 @@ export function createCreatorPanel(
           );
         }
         get<HTMLInputElement>('[data-image-prop="opacity"]').value = String(Math.round(image.opacity * 100));
+        get<HTMLSelectElement>('[data-image-prop="renderMode"]').value = renderModeOf(image);
+        get<HTMLElement>('.render-mode-help').hidden = renderModeOf(image) !== 'atmosphere';
         setText(get<HTMLOutputElement>('.opacity-value'), `${Math.round(image.opacity * 100)}%`);
       } else if (options.fullPage || options.inPage) {
         imageProperties

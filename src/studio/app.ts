@@ -8,6 +8,7 @@ import { studioActions } from './ui-actions';
 import { buttonIcon } from '../editor/icons';
 
 interface StudioPorts {
+  mountSafety?(root: HTMLElement, connection: StudioConnection): () => void;
   openSettings?(target?: number): void;
   hostName: string;
   sidePanel?: boolean;
@@ -78,6 +79,7 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
     clearTimeout(recoveryTimer);
     recoveryTimer = setTimeout(persist, 180);
   });
+  const unmountSafety = ports.mountSafety?.(root, connection);
   const dispatch = (command: EditCommand) => {
     if (!connection.isConnected || !connection.state?.active) return;
     pendingCommands++;
@@ -277,6 +279,7 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
       }
     },
     destroy() {
+      unmountSafety?.();
       persist();
       alive = false;
       connection.destroy();

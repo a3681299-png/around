@@ -34,6 +34,36 @@ async function setup() {
   await page.bringToFront();
   return { context, page, popup, id, profile, extension };
 }
+
+test('the emergency accelerator is assigned, latches drawing OFF, and unrelated tabs cannot open Studio', async () => {
+  test.setTimeout(60_000);
+  const { context, page, popup, profile, extension } = await setup();
+  try {
+    expect(
+      await popup.evaluate(
+        async () => (await chrome.commands.getAll()).find((c) => c.name === 'emergency-off')?.shortcut,
+      ),
+    ).toBe('Alt+Shift+Q');
+    await nativeShortcut(page, profile, extension, 'Q');
+    await expect(popup.getByRole('button', { name: '描画を再開' })).toBeVisible();
+    await expect(page.locator('html')).not.toHaveAttribute('data-ww-theme', 'retro');
+    // A previously approved YouTube tab must lose its approval on navigation.
+    const unrelated = page;
+    await unrelated.goto('https://example.com/');
+    const windows = await popup.evaluate(() => chrome.windows.getAll());
+    await nativeShortcut(unrelated, profile, extension, 'E');
+    // Observe the actual accelerator delivery interval for a negative UI action.
+    await unrelated.waitForTimeout(500);
+    expect((await popup.evaluate(() => chrome.windows.getAll())).map((w) => w.id)).toEqual(windows.map((w) => w.id));
+    expect(
+      await popup.evaluate(async () =>
+        (await chrome.runtime.getContexts({})).some((c) => c.contextType === 'SIDE_PANEL'),
+      ),
+    ).toBe(false);
+  } finally {
+    await context.close();
+  }
+});
 test('OFF opens the real action settings; its top button opens the editor and settings returns without losing edits', async ({}, info) => {
   test.setTimeout(60_000);
   const { context, page, popup, id, profile, extension } = await setup();

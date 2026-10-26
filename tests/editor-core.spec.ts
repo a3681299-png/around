@@ -79,6 +79,24 @@ const assets = Array.from({ length: 3 }, (_, i) => ({
   width: 200,
   height: 160,
 }));
+
+test('unknown initial settings are pending, while the first explicit OFF remains a terminal refusal', async () => {
+  const { editor } = harness();
+  try {
+    await Promise.resolve();
+    expect(editor.open()).toMatchObject({ ok: false, error: /設定を読み込み中/ });
+    editor.setEnabled(false);
+    expect(editor.open()).toMatchObject({ ok: false, error: /テーマをON/ });
+    expect(editor.snapshot()).toMatchObject({ enabled: false, active: false });
+    editor.setEnabled(true);
+    expect(editor.open().ok).toBe(true);
+    editor.setEnabled(false);
+    expect(editor.snapshot()).toMatchObject({ enabled: false, active: false });
+    expect(editor.open()).toMatchObject({ ok: false, error: /テーマをON/ });
+  } finally {
+    editor.destroy();
+  }
+});
 async function opened() {
   const h = harness();
   await Promise.resolve();
@@ -689,12 +707,12 @@ test('legacy v7 saved checkpoints migrate before conflict comparison and failed 
   b.editor.setEnabled(true);
   b.editor.open();
   await b.editor.restore(legacy);
-  expect(b.editor.snapshot().document.schemaVersion).toBe(11);
+  expect(b.editor.snapshot().document.schemaVersion).toBe(12);
   expect(b.editor.snapshot().view.dirty).toBe(false);
   expect(b.editor.snapshot().view.error).toBe(false);
   expect(JSON.stringify(legacy)).toBe(before);
   const invalid = structuredClone(legacy);
-  Object.assign(invalid.saved!, { schemaVersion: 12 });
+  Object.assign(invalid.saved!, { schemaVersion: 13 });
   const current = b.editor.snapshot().document;
   await expect(b.editor.restore(invalid)).rejects.toThrow();
   expect(b.editor.snapshot().document).toEqual(current);

@@ -111,7 +111,12 @@ export function createLegacyEffectController(doc: Document, playback?: PlaybackS
         publish(target, false);
         continue;
       }
-      const value = evaluateMask(mask, layer.placement, frame, sources.snapshot);
+      const value = evaluateMask(
+        mask,
+        layer.placement,
+        frame,
+        reduced.matches ? { ...sources.snapshot, pointer: undefined } : sources.snapshot,
+      );
       const fade = retargetFade(
         fades.get(layer.id),
         value.gate,

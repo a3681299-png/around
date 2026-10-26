@@ -1,11 +1,12 @@
-import { exposeEditorControls, withCanvas, clickCanvas } from './helpers/editor-workspace';
+import { exposeEditorControls, withCanvas, clickCanvas, beginCanvasGesture } from './helpers/editor-workspace';
 import type { Page, Locator } from '@playwright/test';
 import { test, expect } from './fixtures';
 import type { DesignDocument } from '../src/design/types';
 
 const key = 'webWorldThemes.design.youtube';
 const overlay = '#web-world-themes-decorations';
-const images = `${overlay} [data-image-id]`;
+const images =
+  ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]';
 const rows = '[data-layer-id]';
 
 async function open(popup: Page, page: Page) {
@@ -61,7 +62,8 @@ async function seed(popup: Page, page: Page, count = 3) {
       ...original.placement,
       widthPx: 60,
       heightPx: 40,
-      x: 0.12 + (i % 8) * 0.075,
+      // Do not start a canvas gesture inside a protected native operation path.
+      x: 0.52 + (i % 8) * 0.05,
       y: 0.4 + Math.floor(i / 8) * 0.12,
     },
   }));
@@ -81,8 +83,7 @@ async function point(node: Locator) {
 async function drag(page: Page, node: Locator, dx: number, dy: number) {
   await withCanvas(page, async () => {
     const p = await point(node);
-    await page.mouse.move(p.x, p.y);
-    await page.mouse.down();
+    await beginCanvasGesture(node, p);
     await page.mouse.move(p.x + dx, p.y + dy, { steps: 15 });
     await page.mouse.up();
   });
@@ -206,7 +207,7 @@ test('32 layers combine hidden and locked selection without moving or deleting p
   const design = await stored(popup);
   expect(design.decorations[0]?.locked).toBe(true);
   expect(design.decorations[1]?.visible).toBe(false);
-  expect(design.decorations[1]?.placement.x).toBe(0.195);
+  expect(design.decorations[1]?.placement.x).toBe(0.5700000000000001);
   await expect(dialog.getByRole('button', { name: '元に戻す', exact: true })).toBeInViewport();
   await expect(dialog.getByRole('button', { name: '保存', exact: true })).toBeInViewport();
   await youtube.screenshot({ path: '.work/verification/layer-editor-32.png' });
@@ -224,12 +225,13 @@ test('optional snapping shows guides at screen/player/other layer bounds and Alt
   await clickCanvas(first);
   await dialog.getByRole('checkbox', { name: 'スナップを有効にする' }).check();
   const initial = await point(first);
-  await youtube.mouse.move(initial.x, initial.y);
-  await youtube.mouse.down();
-  await youtube.mouse.move(546, 432, { steps: 15 });
-  expect((await point(first)).x).toBeCloseTo(550, 3);
-  await expect(youtube.locator(`${overlay} [data-snap-guide="x"]:visible`)).toHaveCount(1);
-  await youtube.mouse.up();
+  await withCanvas(youtube, async () => {
+    await beginCanvasGesture(first, initial);
+    await youtube.mouse.move(546, 432, { steps: 15 });
+    expect((await point(first)).x).toBeCloseTo(550, 3);
+    await expect(youtube.locator(`${overlay} [data-snap-guide="x"]:visible`)).toHaveCount(1);
+    await youtube.mouse.up();
+  });
   await expect(youtube.locator(`${overlay} .guide:visible`)).toHaveCount(0);
   await youtube.keyboard.press('Control+z');
   expect((await point(first)).x).toBeCloseTo(initial.x, 3);
@@ -245,6 +247,9 @@ test('optional snapping shows guides at screen/player/other layer bounds and Alt
   await dialog.getByRole('checkbox', { name: 'スナップを有効にする' }).uncheck();
   await drag(youtube, first, 546 - initial.x, 432 - initial.y);
   expect((await point(first)).x).toBeCloseTo(546, 3);
+  // Start outside the player; pointer capture then exercises snapping *to*
+  // its geometry without stealing a native player's initial pointerdown.
+  await dialog.getByLabel('画像のX位置', { exact: true }).fill('90');
   await youtube.locator('#navigate').evaluate((node: HTMLButtonElement) => node.click());
   await expect(youtube).toHaveURL(/\/watch\?/);
   await expect(youtube.locator('[data-ww-surface~="player-window"]')).toBeVisible();
@@ -269,7 +274,7 @@ test('alignment and equal gaps filter locked/hidden layers and each undo as one 
   await row(dialog, 3).getByRole('button', { name: 'ロック', exact: true }).click();
   await row(dialog, 4).getByRole('button', { name: '非表示にする' }).click();
   await clickCanvas(image(youtube, 1));
-  await dialog.getByLabel('画像のX位置').fill('25');
+  await dialog.getByLabel('画像のX位置').fill('55');
   await dialog.getByLabel('画像のY位置').fill('60');
   for (const id of [0, 2, 3, 4])
     await row(dialog, id)
@@ -337,10 +342,11 @@ test('resize and rotation each undo as one gesture; save baseline and discard st
   const resized = (await stored(popup)).decorations[0]!.placement;
   const origin = await point(image(youtube, 0)),
     grip = await point(frame.getByRole('button', { name: '画像を回転' }));
-  await youtube.mouse.move(grip.x, grip.y);
-  await youtube.mouse.down();
-  await youtube.mouse.move(origin.x + 80, origin.y, { steps: 12 });
-  await youtube.mouse.up();
+  await withCanvas(youtube, async () => {
+    await beginCanvasGesture(frame.getByRole('button', { name: '画像を回転' }), grip);
+    await youtube.mouse.move(origin.x + 80, origin.y, { steps: 12 });
+    await youtube.mouse.up();
+  });
   expect(Number(await dialog.getByLabel('画像の角度', { exact: true }).inputValue())).toBeGreaterThan(60);
   await youtube.keyboard.press('Control+z');
   expect(Number(await dialog.getByLabel('画像の角度', { exact: true }).inputValue())).toBe(0);
@@ -365,7 +371,7 @@ test('Undo of imports and saved deletions retains immutable asset bytes until th
   expect(await assetExists(popup, assetId)).toBe(true);
   await dialog.getByRole('button', { name: 'やり直す', exact: true }).click();
   await expect(youtube.locator(images).locator('img')).toBeVisible();
-  await clickCanvas(youtube.locator(images));
+  await dialog.locator('[data-layer-id] [data-action="select"]').click();
   await youtube.keyboard.press('Delete');
   await save(dialog);
   expect(await assetExists(popup, assetId)).toBe(true);
@@ -424,7 +430,7 @@ test('Undo restores equal-z painting order even when a deleted node is recreated
   await dialog.getByRole('button', { name: '編集を終了' }).click();
   design.decorations.forEach((layer) => {
     layer.zIndex = 0;
-    layer.placement.x = 0.4;
+    layer.placement.x = 0.6;
   });
   await popup.evaluate(async ({ designKey, doc }) => chrome.storage.local.set({ [designKey]: doc }), {
     designKey: key,

@@ -5,6 +5,8 @@ import path from 'node:path';
 import { launchExtension } from './fixtures';
 import { nativeWindow, sidePanelDriver } from './helpers/side-panel';
 import type { DesignDocument } from '../src/design/types';
+import { clearestPoint, declinePromotion } from './helpers/youtube-live';
+import { enterNativeTheater } from './helpers/youtube-theater';
 
 test('real YouTube: private local VRM import, MToon, pointer gaze, Studio transforms, save/reload and OFF', async () => {
   test.skip(
@@ -48,8 +50,12 @@ test('real YouTube: private local VRM import, MToon, pointer gaze, Studio transf
     stage('import private avatar');
     const started = Date.now();
     await panel.files([path.resolve(process.env.WW_VRM_FILE!)], '.model-file');
-    const media = page.locator('#web-world-themes-decorations .model-media'),
-      image = page.locator('#web-world-themes-decorations [data-image-id]');
+    const media = page.locator(
+        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) .model-media',
+      ),
+      image = page.locator(
+        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]',
+      );
     await expect(media).toHaveAttribute('data-renderer', 'three', { timeout: 100000 });
     report.checks.importAndFirstPaintMs = Date.now() - started;
     await expect(media).toHaveAttribute('data-format', 'vrm');
@@ -60,12 +66,32 @@ test('real YouTube: private local VRM import, MToon, pointer gaze, Studio transf
     await panel.fill('[data-image-prop="heightPx"]', '520');
     await panel.fill('[data-model="rotationY"]', '15');
     await panel.fill('[data-image-prop="anchor"]', 'video-player');
-    const width = await page.evaluate(() => innerWidth);
-    await page.mouse.move(80, 400);
-    await expect.poll(async () => (await frame()).lookYaw).toBeLessThan(-5);
+    const { width, height } = await page.evaluate(() => ({ width: innerWidth, height: innerHeight }));
+    // Well to the left and right of the rig, at the points clearest of native controls, beyond
+    // the approach margins (see clearestPoint).
+    const rig = (await image.first().boundingBox())!,
+      centreX = rig.x + rig.width / 2;
+    const leftPoint = await clearestPoint(page, {
+        left: 8,
+        top: 120,
+        right: Math.max(40, centreX - 200),
+        bottom: height - 20,
+      }),
+      rightPoint = await clearestPoint(page, {
+        left: Math.min(width - 40, centreX + 200),
+        top: 120,
+        right: width - 8,
+        bottom: height - 20,
+      });
+    const yawAt = async (aim: { x: number; y: number }) => {
+      if (await declinePromotion(page)) await page.mouse.move(aim.x, aim.y);
+      return (await frame()).lookYaw as number;
+    };
+    await page.mouse.move(leftPoint.x, leftPoint.y);
+    await expect.poll(() => yawAt(leftPoint)).toBeLessThan(-5);
     const left = await pose();
-    await page.mouse.move(width - 80, 300);
-    await expect.poll(async () => (await frame()).lookYaw).toBeGreaterThan(5);
+    await page.mouse.move(rightPoint.x, rightPoint.y);
+    await expect.poll(() => yawAt(rightPoint)).toBeGreaterThan(5);
     const right = await pose();
     expect(right.head).not.toEqual(left.head);
     expect(right.eyes).not.toEqual(left.eyes);
@@ -173,11 +199,9 @@ test('real YouTube: private local VRM import, MToon, pointer gaze, Studio transf
     report.checks.widthsAndNativeSettingsClicks = [1366, 1920, 1000];
     await nativeWindow(panel.cdp, 1920);
     const player = page.locator('#movie_player');
-    await player.hover();
-    await player.locator('.ytp-size-button').click();
-    await expect(page.locator('ytd-watch-flexy')).toHaveAttribute('theater', '');
+    const leaveTheater = await enterNativeTheater(page);
     await expect(media).toBeVisible();
-    await player.locator('.ytp-size-button').click();
+    await leaveTheater();
     report.checks.theater = true;
     await player.hover();
     await player.locator('.ytp-fullscreen-button').click();
@@ -200,7 +224,11 @@ test('real YouTube: private local VRM import, MToon, pointer gaze, Studio transf
     expect(await page.evaluate(() => (globalThis as { vrmDocumentToken?: number }).vrmDocumentToken)).toBe(31);
     report.checks.spaDocumentPreserved = true;
     await popup.locator('#effect-strength').fill('0');
-    await expect(page.locator('#web-world-themes-decorations')).toHaveCount(0);
+    await expect(
+      page.locator(
+        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',
+      ),
+    ).toHaveCount(0);
     report.checks.zeroCleanup = true;
     report.completed = true;
   } finally {

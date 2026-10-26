@@ -174,6 +174,7 @@ test('registry keeps existing preset order, values, state and event evaluations'
     'layer-angle',
     'anchor-angle',
     'mouse-speed',
+    'idle',
   ]);
   for (const preset of SIGNAL_PRESETS) {
     expect(parseSignalSource(preset.source)).toEqual(preset.source);

@@ -28,6 +28,7 @@ const unitSpecs = [
   'model-motion',
   'model-rig',
   'motion-data',
+  'operation-data',
   'palette',
   'signal-motion',
   'signal-evaluation-benchmark',
@@ -58,6 +59,8 @@ const unitSpecs = [
 export default defineConfig({
   testDir: './tests',
   outputDir: './.work/test-results',
+  // Removes `%TEMP%\ww-*` profiles left by tests that ended without closing their browser.
+  globalSetup: './tests/temporary-profiles.ts',
   fullyParallel: false,
   workers: 4,
   maxFailures: 0,

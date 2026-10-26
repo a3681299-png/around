@@ -1,4 +1,4 @@
-import { exposeEditorControls, withCanvas } from './helpers/editor-workspace';
+import { exposeEditorControls, withCanvas, clickCanvas, beginCanvasGesture } from './helpers/editor-workspace';
 import type { CDPSession, Locator, Page } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -8,8 +8,10 @@ import { defaultCircleMask } from '../src/effects/types';
 
 const key = 'webWorldThemes.design.youtube',
   overlay = '#web-world-themes-decorations';
-const images = `${overlay} [data-image-id]`,
-  compositions = `${overlay} [data-group-id]`;
+const presentation =
+    ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',
+  images = `${presentation} [data-image-id]`,
+  compositions = `${presentation} [data-group-id]`;
 const colors = ['#f04a50', '#3caf78', '#4276ed'],
   names = ['red.png', 'green.png', 'blue.png'];
 async function open(popup: Page, page: Page) {
@@ -69,7 +71,9 @@ async function addThree(panel: Locator, page: Page, overlap = false) {
   for (const [i, name] of names.entries()) {
     await row(panel, name).locator('[data-action="select"]').click();
     for (const [label, value] of [
-      ['画像のX位置', overlap ? 35 : 35 + i * 15],
+      // Mask/gesture fidelity belongs in free canvas space. G1 separately
+      // verifies that native control columns actually remove opaque pixels.
+      ['画像のX位置', overlap ? 80 : 52 + i * 15],
       ['画像のY位置', 40],
       ['画像の幅', 220],
       ['画像の高さ', 160],
@@ -160,7 +164,6 @@ test('three images group, move as one, share a mouse/video mask, save, restart a
 }, info) => {
   test.setTimeout(90_000);
   const panel = await open(popup, youtube);
-  await watch(youtube);
   await addThree(panel, youtube);
   const original = await boxes(youtube);
   await youtube
@@ -178,10 +181,11 @@ test('three images group, move as one, share a mouse/video mask, save, restart a
   await expect(panel.getByRole('group', { name: 'グループのプロパティ', exact: true })).toBeVisible();
   await expect(youtube.locator(`${overlay} [data-group] .handle`)).toHaveCount(0);
   const box = (await youtube.locator(images).first().boundingBox())!;
-  await youtube.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-  await youtube.mouse.down();
-  await youtube.mouse.move(box.x + box.width / 2 + 45, box.y + box.height / 2 + 28, { steps: 6 });
-  await youtube.mouse.up();
+  await withCanvas(youtube, async () => {
+    await beginCanvasGesture(youtube.locator(images).first());
+    await youtube.mouse.move(box.x + box.width / 2 + 45, box.y + box.height / 2 + 28, { steps: 6 });
+    await youtube.mouse.up();
+  });
   const moved = await boxes(youtube);
   moved.forEach((item, i) => {
     expect(item.x - original[i]!.x).toBeCloseTo(45, 3);
@@ -210,6 +214,7 @@ test('three images group, move as one, share a mouse/video mask, save, restart a
       )
       .toBeLessThan(0.04);
   }
+  await watch(youtube);
   await panel.getByLabel('動画の一時停止で隠す').check();
   await number(panel, 'マスクのフェード時間', 500);
   await expect(content).toHaveAttribute('data-mask-intensity', '0');
@@ -225,7 +230,7 @@ test('three images group, move as one, share a mouse/video mask, save, restart a
   await save(panel);
   const saved = await stored(popup);
   expect(saved).toMatchObject({
-    schemaVersion: 11,
+    schemaVersion: 12,
     groups: [{ name: '海の世界', effects: [{ radiusPx: 120, featherPx: 25 }] }],
   });
   expect(saved.decorations).toHaveLength(3);
@@ -279,11 +284,11 @@ test('group opacity and mask are applied once to overlapping pixels, with child 
   await expect(panel.getByRole('button', { name: 'グループを解除', exact: true })).toBeDisabled();
   await youtube.mouse.move(20, 20);
   const masked = await withCanvas(youtube, () => youtube.screenshot());
-  const background = await pixel(youtube, baseline, 385, 304),
-    actual = await pixel(youtube, masked, 385, 304),
+  const background = await pixel(youtube, baseline, 880, 304),
+    actual = await pixel(youtube, masked, 880, 304),
     top = [66, 118, 237];
   for (let i = 0; i < 3; i++) expect(actual[i]).toBeCloseTo(Math.round(top[i]! * 0.25 + background[i]! * 0.75), -1);
-  expect(await pixel(youtube, masked, 485, 304)).toEqual(await pixel(youtube, baseline, 485, 304));
+  expect(await pixel(youtube, masked, 980, 304)).toEqual(await pixel(youtube, baseline, 980, 304));
   expect(
     await youtube
       .locator(`${images} .media`)
@@ -314,7 +319,7 @@ test('hierarchy folding, independent edits, protected descendants, hidden motion
   await expect(panel.locator('[data-parent-id]')).toHaveCount(3);
   await panel.getByLabel('円形マスクを使う').check();
   await number(panel, '光の半径', 120);
-  await youtube.locator(`${images}[aria-label="red.png"]`).click({ modifiers: ['Control'] });
+  await clickCanvas(youtube.locator(`${images}[aria-label="red.png"]`), { modifiers: ['Control'] });
   await expect(row(panel, 'red.png')).toHaveAttribute('data-selected', '');
   await expect(panel.getByRole('group', { name: '画像のプロパティ', exact: true })).toBeVisible();
   await number(panel, '画像の角度', 20);
@@ -598,6 +603,13 @@ test('16 groups / 32 media share effect sources and become idle or fully detache
   await runtime.session.send('Runtime.evaluate', {
     contextId: runtime.id,
     expression: `
+    // A minute rollover updates the independent window-chrome clock. Freeze
+    // wall time only; timers, performance.now and real frame scheduling stay live.
+    const NativeDate = Date, fixedNow = NativeDate.now();
+    window.Date = class extends NativeDate {
+      constructor(...args) { super(...(args.length ? args : [fixedNow])); }
+      static now() { return fixedNow; }
+    };
     const registrations = new Map(); globalThis.__groupRafs = 0;
     const add = EventTarget.prototype.addEventListener, remove = EventTarget.prototype.removeEventListener;
     const tracked = (target, type) => target === document && type === 'pointermove' || target instanceof HTMLVideoElement && ['play','playing','pause','ended','emptied'].includes(type);
@@ -658,7 +670,14 @@ test('16 groups / 32 media share effect sources and become idle or fully detache
   await expect(youtube.locator(`${compositions} .group-content[data-mask-intensity="1"]`)).toHaveCount(14);
   await play(youtube, 'Pause');
   await expect(youtube.locator(`${compositions} .group-content[data-mask-intensity="0"]`)).toHaveCount(16);
-  await youtube.waitForTimeout(100);
+  // G1 may still be restoring paint after a native geometry change. Measure
+  // the stationary scene after that explicit Host transition has completed.
+  const stopped = () =>
+    youtube.locator(overlay).evaluate((node: HTMLElement) => JSON.parse(node.dataset.wwSafety!).stopped);
+  await expect.poll(stopped).toBe('');
+  // A change just before that read may still be held for one coalescing window (200 ms).
+  await youtube.waitForTimeout(300);
+  await expect.poll(stopped).toBe('');
   await runtime.session.send('Performance.enable');
   const metrics = await runtime.session.send('Performance.getMetrics'),
     first = await stats();

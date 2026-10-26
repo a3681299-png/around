@@ -6,7 +6,8 @@ import { promisify } from 'node:util';
 import { test, expect } from './fixtures';
 
 const overlay = '#web-world-themes-decorations',
-  layers = `${overlay} [data-image-id]`;
+  layers =
+    ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]';
 const cases = [
   { name: '10 GIF / native', file: 'medium.gif', count: 10, controlled: false, scroll: false },
   { name: '10 GIF / controlled', file: 'medium.gif', count: 10, controlled: true, scroll: false },

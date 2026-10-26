@@ -3,6 +3,8 @@ import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
+import { beginCanvasGesture, visiblePart } from './helpers/editor-workspace';
+import { errorSummary, waitForAdvertToEnd } from './helpers/youtube-live';
 
 test('optional real signed-out YouTube: independent Studio creation, bidirectional editing, recovery and cleanup', async () => {
   test.skip(process.env.WW_LIVE_STUDIO !== '1', 'Explicit real-site validation; fixture tests run separately.');
@@ -21,7 +23,7 @@ test('optional real signed-out YouTube: independent Studio creation, bidirection
       checks.push({
         name,
         status: 'unconfirmed',
-        detail: String(error).split('\n').slice(0, 3).join(' ') + (diagnostics ? await diagnostics() : ''),
+        detail: errorSummary(error) + (diagnostics ? await diagnostics() : ''),
       });
     }
   };
@@ -54,7 +56,9 @@ test('optional real signed-out YouTube: independent Studio creation, bidirection
       (await studio.locator('.recovery-status').textContent());
     const panel = studio.getByRole('dialog', { name: 'デザインエディター' }),
       overlay = '#web-world-themes-decorations',
-      images = `${overlay} [data-image-id]`;
+      presentation =
+        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',
+      images = `${presentation} [data-image-id]`;
     await check('standalone launch, image import and mouse-only grouping', async () => {
       await panel
         .getByLabel('画像素材を追加')
@@ -70,9 +74,10 @@ test('optional real signed-out YouTube: independent Studio creation, bidirection
       await youtube.bringToFront();
       const first = youtube.locator(images).first(),
         before = (await first.boundingBox())!;
-      await youtube.mouse.move(before.x + before.width / 2, before.y + before.height / 2);
-      await youtube.mouse.down();
-      await youtube.mouse.move(before.x + before.width / 2 - 30, before.y + before.height / 2 + 20, { steps: 8 });
+      // Start only once the artwork is the real hit target (protection may hold it briefly).
+      const start = await visiblePart(first);
+      await beginCanvasGesture(first, start);
+      await youtube.mouse.move(start.x - 30, start.y + 20, { steps: 8 });
       await youtube.mouse.up();
       await expect.poll(async () => (await first.boundingBox())!.x).toBeCloseTo(before.x - 30, 1);
       await expect(panel.getByLabel('グループのX位置', { exact: true })).not.toHaveValue('0');
@@ -86,13 +91,13 @@ test('optional real signed-out YouTube: independent Studio creation, bidirection
       await panel.getByLabel('円形マスクを使う', { exact: true }).check();
       await panel.getByLabel('光の半径', { exact: true }).fill('180');
       await youtube.mouse.move(430, 350);
-      await expect(youtube.locator(`${overlay} .group-content`)).toHaveCSS('mask-image', /radial-gradient/);
+      await expect(youtube.locator(`${presentation} .group-content`)).toHaveCSS('mask-image', /radial-gradient/);
       await panel.getByLabel('動画の一時停止で隠す', { exact: true }).check();
       await youtube
         .locator('#movie_player video')
         .first()
         .evaluate((video: HTMLVideoElement) => video.pause());
-      await expect(youtube.locator(`${overlay} .group-content`)).toHaveAttribute('data-mask-intensity', '0');
+      await expect(youtube.locator(`${presentation} .group-content`)).toHaveAttribute('data-mask-intensity', '0');
       await studio.screenshot({ path: '.work/verification/studio-live-workspace.png' });
       await youtube.screenshot({ path: '.work/verification/studio-live-youtube.png' });
     });
@@ -111,6 +116,7 @@ test('optional real signed-out YouTube: independent Studio creation, bidirection
       await studio.getByRole('button', { name: '接続を解除', exact: true }).click();
       await expect(youtube.locator('[data-ww-editing]')).toHaveCount(0);
       expect(await youtube.locator(overlay).evaluate((node) => getComputedStyle(node).pointerEvents)).toBe('none');
+      await waitForAdvertToEnd(youtube);
       const video = youtube.locator('#movie_player video').first(),
         paused = await video.evaluate((node: HTMLVideoElement) => node.paused);
       await youtube.locator('#movie_player .ytp-play-button').click();
@@ -123,7 +129,7 @@ test('optional real signed-out YouTube: independent Studio creation, bidirection
     });
     await check('theme OFF completely removes editing and decorations', async () => {
       await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
-      await expect(youtube.locator(overlay)).toHaveCount(0);
+      await expect(youtube.locator(presentation)).toHaveCount(0);
       await expect(youtube.locator('[data-ww-editing]')).toHaveCount(0);
       await expect(youtube.locator('#web-world-themes-studio-link')).toHaveCount(0);
       await expect(panel.getByRole('button', { name: '保存', exact: true })).toBeDisabled();
@@ -132,7 +138,7 @@ test('optional real signed-out YouTube: independent Studio creation, bidirection
     checks.push({
       name: 'real site startup',
       status: 'unconfirmed',
-      detail: String(error).split('\n').slice(0, 3).join(' '),
+      detail: errorSummary(error),
     });
   } finally {
     await writeFile(

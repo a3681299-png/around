@@ -66,6 +66,7 @@ export interface SiteAdapter {
   readonly decorationAnchors?: readonly DesignTarget[];
   /** Native media discovery belongs to the site; consumers only receive signals. */
   readonly signals?: { readonly videoPlayback?: PlaybackSource };
+  readonly operationSurfaces?: () => import('../host/operation-source').OperationSource;
   /** Optional site-owned implementations; unsupported features are safely skipped. */
   readonly features?: Readonly<Record<string, SiteFeatureCapability>>;
   connect(onPageChange: (change?: SitePageChange) => void): () => void;

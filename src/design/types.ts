@@ -12,7 +12,7 @@ export interface SurfaceStyleRule {
 }
 
 export interface DesignDocument {
-  schemaVersion: 11;
+  schemaVersion: 12;
   id: string;
   siteId: string;
   /** null uses native site styling; a built-in theme is an optional starting point. */
@@ -23,6 +23,9 @@ export interface DesignDocument {
   groups?: GroupLayer[];
   signalRules?: import('../signals/keyframes').SignalRule[];
 }
+
+export type RenderMode = 'normal' | 'atmosphere';
+export const renderModeOf = (layer: { renderMode?: RenderMode }): RenderMode => layer.renderMode ?? 'normal';
 
 export type PlacementAnchor = { kind: 'viewport' } | { kind: 'surface'; target: string };
 
@@ -46,6 +49,9 @@ export interface LayerAppearance {
   locked: boolean;
   /** Render-time effects never change placement or the underlying asset. */
   effects?: import('../effects/types').LayerEffect[];
+  /** Omitted means normal. Atmosphere paints over protected areas under an engine-held
+   * alpha cap, without filters, shadows or input; the cap is never stored in artwork. */
+  renderMode?: RenderMode;
   motion?: import('../signals/motion').FollowMotion;
 }
 
@@ -90,7 +96,7 @@ export interface ModelDecoration extends LayerState {
 export type Decoration = ImageDecoration | AnimationDecoration | ModelDecoration;
 
 export type ImagePatch = Partial<
-  Pick<LayerState, 'name' | 'opacity' | 'zIndex' | 'visible' | 'locked' | 'effects' | 'motion'>
+  Pick<LayerState, 'name' | 'opacity' | 'zIndex' | 'visible' | 'locked' | 'effects' | 'motion' | 'renderMode'>
 > & {
   placement?: Partial<LayerPlacement>;
   playback?: Partial<PlaybackSettings>;

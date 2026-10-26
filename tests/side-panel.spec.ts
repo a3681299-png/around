@@ -7,6 +7,7 @@ import { sidePanelDriver, nativeWindow } from './helpers/side-panel';
 import { createTakeSampler, type SignalTake } from '../src/world/takes';
 import type { DesignDocument } from '../src/design/types';
 import { unpackCheckpoint } from '../src/studio/checkpoint-codec';
+import { beginCanvasGesture } from './helpers/editor-workspace';
 
 async function setup() {
   const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-panel-test-')), true, { headed: true });
@@ -73,6 +74,13 @@ test('native Chrome panel uses the same draft, group masks, selection, history, 
     expect(retained).toBe(true);
     await expect.poll(() => page.evaluate(() => innerWidth)).toBeLessThan(1200);
     const width = await page.evaluate(() => innerWidth);
+    for (const rowId of await panel.evaluate<string[]>(
+      'Array.from(document.querySelector("#web-world-themes-creator").shadowRoot.querySelectorAll(".layer"),n=>n.dataset.layerId)',
+    )) {
+      await panel.click(`[data-layer-id="${rowId}"] [data-action="select"]`);
+      await panel.fill('[data-image-prop="x"]', '70');
+    }
+    await panel.click('.select-all');
     await panel.click('.group-layers');
     await expect
       .poll(() =>
@@ -92,8 +100,7 @@ test('native Chrome panel uses the same draft, group masks, selection, history, 
     );
     const first = page.locator('#web-world-themes-decorations [data-image-id]').first();
     const before = (await first.boundingBox())!;
-    await page.mouse.move(before.x + before.width / 2, before.y + before.height / 2);
-    await page.mouse.down();
+    await beginCanvasGesture(first);
     await page.mouse.move(before.x + before.width / 2 + 30, before.y + before.height / 2 + 10, { steps: 6 });
     await page.mouse.up();
     await expect.poll(async () => (await first.boundingBox())!.x).toBeCloseTo(before.x + 30, 0);
@@ -120,7 +127,7 @@ test('native Chrome panel uses the same draft, group masks, selection, history, 
     const stored = await popup.evaluate(
       async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
     );
-    expect((stored as { schemaVersion: number }).schemaVersion).toBe(11);
+    expect((stored as { schemaVersion: number }).schemaVersion).toBe(12);
     await page.reload();
     await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
     await expect(page.locator('#web-world-themes-decorations [data-image-id]')).toHaveCount(3);
@@ -618,6 +625,25 @@ test('official panel records raw signals, plays/seeks without live input, and re
         ] as DesignDocument,
     );
     expect(design).not.toHaveProperty('takes');
+    // End the real native text edit before checking an unrestricted playback
+    // preview. G1 intentionally keeps the authored base while it is focused.
+    await page.locator('ytd-masthead input').first().fill('');
+    await page
+      .locator('ytd-masthead input')
+      .first()
+      .evaluate((input: HTMLInputElement) => input.blur());
+    await page.mouse.move((await page.evaluate(() => innerWidth)) - 90, 450);
+    await expect
+      .poll(() =>
+        page
+          .locator('#web-world-themes-decorations')
+          .evaluate((host: HTMLElement) =>
+            JSON.parse(host.dataset.wwSafety!).issues.some(
+              (i: { surfaceId: string }) => i.surfaceId === 'native.approach',
+            ),
+          ),
+      )
+      .toBe(false);
     await expect.poll(() => panel.evaluate(`${ui}.querySelectorAll('.take-ghost').length`)).toBeGreaterThan(3);
     expect(await panel.evaluate(`${ui}.querySelectorAll('.take-projection').length`)).toBe(1);
     await panel.evaluate(

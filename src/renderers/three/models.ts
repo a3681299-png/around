@@ -107,6 +107,7 @@ export function createModelRenderer(
   parent: ShadowRoot,
   readAsset: typeof loadAsset = loadAsset,
   labOptions?: ModelRendererLabOptions,
+  onContextLost?: () => void,
 ) {
   const options = ASSET_PROFILE ? labOptions : undefined;
   const view = doc.defaultView!,
@@ -199,6 +200,7 @@ export function createModelRenderer(
   };
   function onLost(event: Event) {
     event.preventDefault();
+    onContextLost?.();
     cancel();
     dropRenderer();
     lost = true;

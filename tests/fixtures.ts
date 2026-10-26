@@ -25,6 +25,18 @@ export async function launchExtension(
       ...(options.headed
         ? [`--window-size=${options.width ?? 1366},${options.height ?? 1000}`, '--force-device-scale-factor=1']
         : []),
+      // Opt-in: keep headed windows off the visible desktop. Chrome must still treat the page as
+      // visible (not occluded), or it stops rendering and media like a minimized window. An
+      // off-screen window also loses audible autoplay, so YouTube would start muted and show its
+      // central unmute button; keep the on-screen playback state instead.
+      ...(options.headed && process.env.WW_TEST_WINDOW_OFFSCREEN === '1'
+        ? [
+            '--window-position=-4000,0',
+            '--disable-backgrounding-occluded-windows',
+            '--disable-features=CalculateNativeWinOcclusion',
+            '--autoplay-policy=no-user-gesture-required',
+          ]
+        : []),
     ],
   });
   // Bound Windows Chromium shutdown; only the test's headless profile and

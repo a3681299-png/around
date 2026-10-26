@@ -2,6 +2,7 @@ import { mountStudio } from '../studio/app';
 import { createStudioClient } from './studio-client';
 import { createStudioRecovery } from './studio-recovery';
 import { browserStudioPreferences } from './preferences';
+import { mountSafetyControls } from '../settings/safety-controls';
 
 async function start() {
   const params = new URL(location.href).searchParams,
@@ -12,6 +13,7 @@ async function start() {
   if (tab?.id === undefined) throw new Error('Studioのタブを取得できません。');
   const app = mountStudio(document, document.querySelector<HTMLElement>('#studio')!, {
     hostName: 'YouTube',
+    mountSafety: mountSafetyControls,
     sidePanel,
     connect: (notify, checkpoint) => createStudioClient(notify, checkpoint, sidePanel ? document : undefined),
     recovery: createStudioRecovery(tab.id),

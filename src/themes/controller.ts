@@ -8,10 +8,13 @@ import type { UserSettings } from '../storage/settings';
 import type { ThemeDefinition } from './types';
 import { createTimelineHost, type TimelineHost } from '../host/timeline';
 import { createTakeStorage } from '../browser/take-storage';
+import { createOperationGuardHost, guardWanted, type OperationGuardHost } from '../host/operation-guard';
 
 const STYLE_ID = 'web-world-themes-style';
 
 export interface ThemeController {
+  safety: OperationGuardHost | undefined;
+  suspend(value: boolean): void;
   timeline: TimelineHost;
   update(settings: UserSettings): void;
   updateDesign(design: DesignDocument | undefined): void;
@@ -29,7 +32,27 @@ export function createThemeController(
   const features = createFeatureController({ document: doc, site });
   const designRenderer = createDesignRenderer(doc, site.designTargets ?? []);
   const timeline = createTimelineHost(doc, site.id, createTakeStorage(site.id));
-  const images = createImageRenderer(doc, site.decorationAnchors ?? [], site.signals?.videoPlayback, timeline);
+  const safety = site.operationSurfaces
+    ? createOperationGuardHost(doc, site.operationSurfaces(), (stop) => {
+        if (stop) images.holdSafety(stop === true ? undefined : stop);
+        images.refresh();
+      })
+    : undefined;
+  const images = createImageRenderer(doc, site.decorationAnchors ?? [], site.signals?.videoPlayback, timeline, safety);
+  let suspended = false,
+    editing = false;
+  // Observation starts only once settings and artwork call for it.
+  safety?.setActive(false);
+  const inspect = () =>
+    safety?.setActive(
+      guardWanted({
+        suspended,
+        enabled: Boolean(current?.enabled),
+        strength: current?.strength ?? 0,
+        layers: design?.decorations.length ?? 0,
+        editing,
+      }),
+    );
   const variables = new Set<string>();
   let disconnect: (() => void) | undefined;
   let style: HTMLStyleElement | undefined;
@@ -50,6 +73,7 @@ export function createThemeController(
     clearVariables();
   };
   const deactivate = () => {
+    safety?.setActive(false);
     images.destroy();
     designRenderer.destroy();
     features.destroy();
@@ -59,7 +83,7 @@ export function createThemeController(
   };
 
   const followPage = (change?: SitePageChange) => {
-    if (!current?.enabled || current.strength === 0) return;
+    if (suspended || !current?.enabled || current.strength === 0) return;
     if (design?.baseThemeId !== null) {
       // Reattach the cached sheet after head replacement; settings have not changed.
       if (style && !style.isConnected) (doc.head ?? root).append(style);
@@ -72,7 +96,8 @@ export function createThemeController(
   };
 
   const render = () => {
-    if (!current?.enabled || current.strength === 0) return;
+    if (suspended || !current?.enabled || current.strength === 0) return;
+    inspect();
     if (design?.baseThemeId === null) {
       // Independent designs use native site styling plus their own rules only.
       features.destroy();
@@ -121,10 +146,20 @@ export function createThemeController(
     return next;
   };
   return {
+    safety,
+    suspend(value) {
+      if (value === suspended) return;
+      suspended = value;
+      if (value) deactivate();
+      else if (current?.enabled && current.strength > 0) {
+        disconnect ??= site.connect(followPage);
+        render();
+      }
+    },
     timeline,
     update(settings) {
       current = settings;
-      if (!settings.enabled || settings.strength === 0) {
+      if (suspended || !settings.enabled || settings.strength === 0) {
         deactivate();
         return;
       }
@@ -135,8 +170,10 @@ export function createThemeController(
       design = validateDesign(input);
       render();
     },
-    setImageEditing(editing) {
-      images.edit(editing);
+    setImageEditing(next) {
+      editing = Boolean(next);
+      if (!suspended && current?.enabled && current.strength > 0) inspect();
+      images.edit(next);
     },
     validateDesign(input) {
       validateDesign(input);
@@ -144,6 +181,7 @@ export function createThemeController(
     destroy() {
       current = undefined;
       deactivate();
+      safety?.destroy();
     },
   };
 }

@@ -144,8 +144,12 @@ export function parseImagePatch(value: unknown): ImagePatch {
     'placement',
     'playback',
     'model',
+    'renderMode',
   ]);
-  const { placement, playback, model, ...properties } = input;
+  const { placement, playback, model, renderMode, ...properties } = input;
+  // Normal is a real request in a patch even though saved data stores it by omission.
+  if (Object.hasOwn(input, 'renderMode') && renderMode !== 'normal' && renderMode !== 'atmosphere')
+    throw new Error('描画モードが不正です。');
   if (
     Object.hasOwn(input, 'motion') &&
     (!input['motion'] ||
@@ -184,6 +188,7 @@ export function parseImagePatch(value: unknown): ImagePatch {
     modelPatch(model);
     result['model'] = model;
   }
+  if (Object.hasOwn(input, 'renderMode')) result['renderMode'] = renderMode;
   return JSON.parse(JSON.stringify(result)) as ImagePatch;
 }
 export function parsePlacements(value: unknown): PlacementChange[] {

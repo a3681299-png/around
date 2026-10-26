@@ -42,6 +42,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     pendingSave: DesignDocument | undefined;
   let active = false,
     enabled = false,
+    settingsReceived = false,
     loaded = false,
     alive = true,
     loadError: string | undefined;
@@ -225,10 +226,22 @@ export function createEditorSession<Source extends { readonly length: number }>(
         );
       }
       next.groups = next.groups!.map((group) => (group.id === id ? { ...group, ...properties } : group));
+      // A group renders as one subtree, so its members always follow its mode.
+      const mode = properties.renderMode;
+      if (mode)
+        next.decorations = next.decorations.map((image) =>
+          group.children.includes(image.id) ? { ...image, renderMode: mode } : image,
+        );
       updateDraft(next);
       return;
     }
     if (current.kind === 'group') return;
+    if (parent && patch.renderMode) {
+      status = 'グループ内の描画モードはグループで変更してください。';
+      error = true;
+      render();
+      return;
+    }
     if (patch.placement?.anchor) {
       if (parent && !sameAnchor(current.placement.anchor, patch.placement.anchor)) {
         status = 'グループ内では配置基準を変更できません。解除してから変更してください。';
@@ -591,6 +604,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
   };
 
   function open(): { ok: boolean; error?: string } {
+    if (!settingsReceived) return { ok: false, error: '表示設定を読み込み中です。少し待ってから開いてください。' };
     if (!enabled) return { ok: false, error: 'テーマをONにし、強さを1%以上にしてから編集してください。' };
     if (!loaded) return { ok: false, error: 'デザインを読み込み中です。少し待ってから開いてください。' };
     if (loadError) return { ok: false, error: loadError };
@@ -790,6 +804,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
       return () => listeners.delete(listener);
     },
     setEnabled(value: boolean) {
+      settingsReceived = true;
       if (enabled === value) return;
       enabled = value;
       if (!enabled && active) close();

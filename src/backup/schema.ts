@@ -3,7 +3,13 @@ import type { DesignDocument } from '../design/types';
 import { parseSignalTake, type SignalTake } from '../world/takes';
 import { ASSET_LIMITS, TAKE_LIMITS } from '../assets/limits';
 import { FEATURE_REGISTRY } from '../features';
-import { SETTINGS_KEYS, FEATURE_SETTINGS_KEYS, PALETTE_SETTINGS_KEYS, type UserSettings } from '../storage/settings';
+import {
+  DEFAULT_SETTINGS,
+  SETTINGS_KEYS,
+  FEATURE_SETTINGS_KEYS,
+  PALETTE_SETTINGS_KEYS,
+  type UserSettings,
+} from '../storage/settings';
 import { backupObject, backupNumber } from './data';
 import { oneOf } from '../validation';
 
@@ -51,21 +57,54 @@ const flag = (value: unknown): value is boolean => typeof value === 'boolean';
 const sizedArray = (value: unknown, max: number): value is unknown[] => Array.isArray(value) && value.length <= max;
 
 export function parseBackupSettings(raw: unknown): UserSettings {
-  const value = backupObject(raw, [...Object.keys(SETTINGS_KEYS), 'features', 'palette']);
+  const supplied = backupObject(raw, [...Object.keys(SETTINGS_KEYS), 'features', 'palette']);
+  const value = { ...DEFAULT_SETTINGS, ...supplied };
   for (const key of Object.keys(SETTINGS_KEYS)) {
     if (key === 'enabled' || key === 'creatorMode') {
-      if (!flag(value[key])) throw failure();
-    } else if (!backupNumber(value[key], 0, 100) || !Number.isInteger(value[key])) throw failure();
+      if (!flag(value[key as keyof UserSettings])) throw failure();
+    } else if (
+      !backupNumber(value[key as keyof UserSettings], 0, 100) ||
+      !Number.isInteger(value[key as keyof UserSettings])
+    )
+      throw failure();
   }
   const features = backupObject(
-    value['features'],
+    Object.hasOwn(supplied, 'features') ? supplied['features'] : {},
     FEATURE_REGISTRY.map((entry) => entry.id),
   );
-  if (FEATURE_REGISTRY.some((entry) => !flag(features[entry.id]))) throw failure();
-  const palette = backupObject(value['palette'], Object.keys(PALETTE_SETTINGS_KEYS));
+  if (Object.values(features).some((entry) => !flag(entry))) throw failure();
+  const palette = backupObject(
+    Object.hasOwn(supplied, 'palette') ? supplied['palette'] : {},
+    Object.keys(PALETTE_SETTINGS_KEYS),
+  );
   for (const key of Object.keys(PALETTE_SETTINGS_KEYS))
-    if (!backupNumber(palette[key], 0, key === 'hue' ? 360 : 100) || !Number.isInteger(palette[key])) throw failure();
-  return { ...value, features: { ...features }, palette: { ...palette } } as unknown as UserSettings;
+    if (
+      Object.hasOwn(palette, key) &&
+      (!backupNumber(palette[key], 0, key === 'hue' ? 360 : 100) || !Number.isInteger(palette[key]))
+    )
+      throw failure();
+  return {
+    ...value,
+    features: { ...DEFAULT_SETTINGS.features, ...features },
+    palette: { ...DEFAULT_SETTINGS.palette, ...palette },
+  } as UserSettings;
+}
+
+export function backupDesigns(local: Record<string, unknown>): DesignDocument[] {
+  return Object.entries(local)
+    .filter(([key]) => key.startsWith('webWorldThemes.design.'))
+    .map(([key, raw]) => {
+      const site = key.slice('webWorldThemes.design.'.length);
+      try {
+        const design = parseDesign(raw);
+        if (site !== design.siteId) throw new Error('作品の保存先が不正です。');
+        return design;
+      } catch (error) {
+        throw new Error(
+          `サイトID「${site}」の作品を書き出せません: ${error instanceof Error ? error.message : '作品が不正です。'}`,
+        );
+      }
+    });
 }
 
 /** Restore only declared preferences. Arbitrary storage keys never cross the boundary. */

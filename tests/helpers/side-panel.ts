@@ -70,6 +70,10 @@ export async function sidePanelDriver(
     expect
       .poll(() => evaluate('document.querySelector("#web-world-themes-creator")?.getAttribute("aria-busy")'))
       .not.toBe('true');
+  // Like Playwright's own click, wait (in the panel, within the same Runtime call) for the control
+  // to exist and be enabled; state such as the Timeline binding arrives asynchronously.
+  const whenEnabled = (selector: string, then: string) =>
+    `(async()=>{const end=performance.now()+5000;let n;while(!(n=${query(selector)})||n.disabled){if(performance.now()>end)throw Error('Unavailable: '+${JSON.stringify(selector)});await new Promise(r=>setTimeout(r,50));}${then}})()`;
   return {
     evaluate,
     send,
@@ -81,20 +85,12 @@ export async function sidePanelDriver(
       await settle();
       // Panel WebContents is not a Playwright Page. Exercise the shared button's
       // DOM action with CDP user activation; real YouTube controls use mouse clicks.
-      await evaluate(
-        `(()=>{const n=${query(selector)};if(!n||n.disabled)throw Error('Unavailable: '+${JSON.stringify(selector)});n.click();})()`,
-      );
+      await evaluate(whenEnabled(selector, 'n.click();'));
       await settle();
     },
     async clickAndLeave(selector: string) {
       await settle();
-      await evaluate(
-        '(()=>{const n=' +
-          query(selector) +
-          ';if(!n||n.disabled)throw Error("Unavailable: "+' +
-          JSON.stringify(selector) +
-          ');})()',
-      );
+      await evaluate(whenEnabled(selector, ''));
       // A handoff destroys this WebContents and can discard its Runtime reply.
       // Await protocol delivery, then closure; callers still assert the new owner
       // and its draft/history. Ordinary evaluate/click errors remain authoritative.

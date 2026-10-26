@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures';
-import { exposeEditorControls, withCanvas } from './helpers/editor-workspace';
+import { exposeEditorControls, withCanvas, beginCanvasGesture } from './helpers/editor-workspace';
 import { modelFixture } from './helpers/model-fixture';
 import type { DesignDocument } from '../src/design/types';
 import type { ModelEvaluation } from '../src/world/models';
@@ -40,11 +40,11 @@ test('GLB renders alpha, shares resources, edits/drags/duplicates/undoes, saves 
   expect(center[2]).toBeLessThan(10); // Embedded green texture, not just the purple material factor.
   await panel.getByLabel('3D回転Y', { exact: true }).fill('35');
   await panel.getByLabel('3D回転Y', { exact: true }).press('Tab');
+  await panel.getByLabel('画像のX位置', { exact: true }).fill('65');
   const image = youtube.locator(`${overlay} [data-image-id]`);
   const before = await image.boundingBox();
   await withCanvas(youtube, async () => {
-    await youtube.mouse.move(before!.x + before!.width / 2, before!.y + before!.height / 2);
-    await youtube.mouse.down();
+    await beginCanvasGesture(image);
     await youtube.mouse.move(before!.x + before!.width / 2 - 80, before!.y + before!.height / 2 + 50, { steps: 6 });
     await youtube.mouse.up();
   });
@@ -66,7 +66,7 @@ test('GLB renders alpha, shares resources, edits/drags/duplicates/undoes, saves 
         'webWorldThemes.design.youtube'
       ] as DesignDocument,
   );
-  expect(saved.schemaVersion).toBe(11);
+  expect(saved.schemaVersion).toBe(12);
   expect(saved.decorations[0]).toMatchObject({ kind: 'model3d', model: { rotationY: 35 } });
   expect(saved.decorations[0]!.assetId).toBe(saved.decorations[1]!.assetId);
   await youtube.reload();

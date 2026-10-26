@@ -1,7 +1,13 @@
 import { test, expect } from '@playwright/test';
 import { emptyDesign } from '../src/design/schema';
 import { DEFAULT_SETTINGS, mergeSettings } from '../src/storage/settings';
-import { BACKUP_LIMITS, parseBackupManifest, type BackupManifest } from '../src/backup/schema';
+import {
+  BACKUP_LIMITS,
+  backupDesigns,
+  parseBackupSettings,
+  parseBackupManifest,
+  type BackupManifest,
+} from '../src/backup/schema';
 import { BACKUP_HEADER_BYTES, encodeBackup, decodeBackup, sha256, type ValidatedBackup } from '../src/backup/archive';
 import { planRestore } from '../src/backup/restore';
 import { createBackupService } from '../src/background/backup';
@@ -21,6 +27,30 @@ function manifest(): BackupManifest {
     assets: [],
   };
 }
+
+test('older backups fill missing settings with defaults while rejecting unknown or invalid supplied values', () => {
+  expect(parseBackupSettings({})).toEqual(DEFAULT_SETTINGS);
+  expect(parseBackupSettings({ enabled: true, features: {}, palette: { hue: 25 } })).toEqual({
+    ...DEFAULT_SETTINGS,
+    enabled: true,
+    palette: { ...DEFAULT_SETTINGS.palette, hue: 25 },
+  });
+  for (const settings of [
+    { enabled: undefined },
+    { palette: { unknown: 1 } },
+    { features: { unknown: true } },
+    { unknown: false },
+    { strength: '60' },
+  ])
+    expect(() => parseBackupSettings(settings)).toThrow();
+});
+
+test('export identifies the site of a corrupt saved design', () => {
+  expect(() => backupDesigns({ 'webWorldThemes.design.youtube': { broken: true } })).toThrow('サイトID「youtube」');
+  expect(() => backupDesigns({ 'webWorldThemes.design.other': emptyDesign('youtube', 'retro') })).toThrow(
+    'サイトID「other」',
+  );
+});
 function untexturedModel() {
   return new Uint8Array(
     modelFixture((json) => {

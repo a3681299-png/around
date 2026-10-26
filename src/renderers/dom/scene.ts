@@ -22,10 +22,13 @@ import {
 import { editableSceneSamples, placementFrame, snapTargets } from '../../design/frames';
 import { effectivelyLocked, groupMovable, parentGroup, rootLayers } from '../../world/hierarchy';
 import { snapMove, type Guide } from '../../design/layout';
-import type { DesignTarget, Decoration, GroupLayer } from '../../design/types';
+import { renderModeOf, type DesignTarget, type Decoration, type GroupLayer } from '../../design/types';
 import type { SignalRule } from '../../signals/keyframes';
 import type { TimelineHost } from '../../host/timeline';
 import type { WorldLayout } from '../../world/types';
+import type { OperationGuardHost } from '../../host/operation-guard';
+import type { OperationSource } from '../../host/operation-source';
+import { ATMOSPHERE_ALPHA_CAP, pagePaintRegions, protectionClip } from '../../world/operations';
 
 export interface ImageEditing {
   selectedIds: readonly string[];
@@ -40,7 +43,7 @@ export interface ImageEditing {
 }
 
 const CSS = `
-:host { all:initial !important; position:fixed !important; inset:0 !important; width:100vw !important; height:100vh !important; margin:0 !important; padding:0 !important; border:0 !important; background:transparent !important; overflow:hidden !important; pointer-events:none !important; z-index:2147482000 !important; }
+:host { all:initial !important; position:fixed !important; inset:0 !important; width:100vw !important; height:100vh !important; margin:0 !important; padding:0 !important; border:0 !important; background:transparent !important; overflow:hidden !important; pointer-events:none !important; z-index:var(--ww-decoration-z,2147482000) !important; clip-path:var(--ww-decoration-clip,none) !important; }
 * { box-sizing:border-box; }
 .image, .selection-frame { position:absolute; transform-origin:center; pointer-events:none; touch-action:none; }
 .composition { position:absolute; pointer-events:none; }
@@ -68,12 +71,26 @@ const CSS = `
 [data-handle="rotate"] { left:calc(50% - 7px); top:-32px; border-radius:50%; cursor:grab; }
 `;
 
+// Plane hosts reuse the screen CSS; later !important rules in the same sheet win.
+const PAGE_CSS =
+  CSS +
+  ':host{position:absolute!important;inset:auto!important;left:var(--ww-page-left,0)!important;top:var(--ww-page-top,0)!important;width:1px!important;height:1px!important;overflow:visible!important}';
+// One opacity on the whole plane bounds the composite of any number of atmosphere layers.
+const ATMOSPHERE_CSS =
+  CSS +
+  `:host{opacity:${ATMOSPHERE_ALPHA_CAP}!important;clip-path:none!important;filter:none!important}*{filter:none!important;backdrop-filter:none!important;box-shadow:none!important;text-shadow:none!important}.image,.image[data-editable],.composition{pointer-events:none!important}`;
+type Plane = { host: HTMLElement; content: HTMLElement; shadow: ShadowRoot };
+const ATMOSPHERE = 0,
+  PAGE = 1,
+  SCREEN = 2;
+
 /** Shared layer layout/gestures; media decoding and playback live in media/. */
 export function createImageRenderer(
   doc: Document,
   anchors: readonly DesignTarget[],
   playback?: PlaybackSource,
   timeline?: TimelineHost,
+  safety?: OperationGuardHost,
 ) {
   const view = doc.defaultView!;
   let host: HTMLElement | undefined;
@@ -100,6 +117,22 @@ export function createImageRenderer(
     }
   >();
   const compositions = new Map<string, { node: HTMLDivElement; content: HTMLDivElement; controls: HTMLDivElement }>();
+  let videoSlot: { host: HTMLElement; content: HTMLElement; shadow: ShadowRoot } | undefined;
+  let pagePlane: Plane | undefined, atmospherePlane: Plane | undefined;
+  const createPlane = (id: string, css: string, gestures: boolean): Plane => {
+    const planeHost = doc.createElement('div');
+    planeHost.id = id;
+    const planeShadow = planeHost.attachShadow({ mode: 'open' }),
+      style = doc.createElement('style'),
+      content = doc.createElement('div');
+    style.textContent = css;
+    content.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:0';
+    planeShadow.append(style, content);
+    if (gestures) wireGestures(planeShadow);
+    return { host: planeHost, content, shadow: planeShadow };
+  };
+  // Document-origin offset of the page plane, corrected from its measured position.
+  let pageOffset = { left: 0, top: 0 };
   let lastLayout: WorldLayout | undefined;
   let gesture:
     | {
@@ -112,7 +145,16 @@ export function createImageRenderer(
       }
     | undefined;
 
-  const applyLayout = (layout: WorldLayout) => {
+  // The last values written to the host; identical frames skip the attribute writes.
+  let writtenClip = '',
+    writtenSafety = '';
+  // Set when the effect session applies its final layout (and protection) inside a draw.
+  let effectLayoutApplied = false;
+  const applyLayout = (
+    layout: WorldLayout,
+    overlaySlot: ReturnType<OperationSource['overlaySlot']>,
+    protect = true,
+  ) => {
     lastLayout = layout;
     const parents = new Map(layout.groups.map((group) => [group.layer.id, group]));
     for (const group of layout.groups) {
@@ -148,6 +190,295 @@ export function createImageRenderer(
         top: `${point.y}px`,
         transform: `translate(-50%, -50%) rotate(${p.rotationDeg}deg)`,
       });
+    }
+    if (safety && protect) {
+      const roots = new Map([...layout.groups, ...layout.layers].map((entry) => [entry.layer.id, entry]));
+      const needsVideoSlot =
+        Boolean(doc.fullscreenElement) ||
+        layout.roots.some((id) => {
+          const anchor = roots.get(id)!.layer.placement.anchor;
+          return anchor.kind === 'surface' && anchor.target === 'video-player';
+        });
+      const slot = needsVideoSlot ? safety.source.videoSlot() : undefined;
+      // Explicit editing only: the verified video centre (no menu, error or advert over it), where
+      // screen- and page-plane handles may take input over the video. The bands and any native
+      // control in the centre stay native: they are cut from the clip and refused at input time.
+      const editorRegion = editing && !editing.locked ? safety.source.editorCentre() : undefined;
+      // The screen overlay excludes complete scroll paths. This clip cannot
+      // expose a moving native control during asynchronous compositor scroll; the editing
+      // centre is the exception, and every gesture there is claimed after a fresh read.
+      const { regions, path } = protectionClip(safety.source.capture(), Boolean(editing), editorRegion);
+      const clip = path ? `path('${path}')` : 'inset(100%)';
+      if (clip !== writtenClip || host!.style.getPropertyValue('--ww-decoration-clip') !== clip) {
+        host!.style.setProperty('--ww-decoration-clip', clip);
+        writtenClip = clip;
+      }
+      // Read once at the start of this draw, before this renderer's own writes.
+      const overlaySupported = Boolean(overlaySlot);
+      const videoAnchored = (id: string) => {
+        const anchor = roots.get(id)!.layer.placement.anchor;
+        return anchor.kind === 'surface' && anchor.target === 'video-player';
+      };
+      // Fullscreen has one native plane: every root stays local, atmosphere included.
+      const fullscreenPlane = Boolean(slot && slot.parent === doc.fullscreenElement);
+      const atmosphereRoot = (id: string) => renderModeOf(roots.get(id)!.layer) === 'atmosphere';
+      // Any root anchored to page content scrolls with the page; the player alone has its own
+      // local plane first. Viewport-anchored roots are screen-fixed by definition.
+      const pageAnchored = (id: string) => roots.get(id)!.layer.placement.anchor.kind === 'surface';
+      const pageSlot =
+        overlaySlot &&
+        !doc.fullscreenElement &&
+        layout.roots.some((id) => pageAnchored(id) && !atmosphereRoot(id) && !(slot && videoAnchored(id)))
+          ? safety.source.pageSlot()
+          : undefined;
+      const rootBounds = (id: string) =>
+        layout.layers
+          .filter((l) => (l.parentId ?? l.layer.id) === id && l.bounds)
+          .map((l) => l.bounds!)
+          .reduce<{ left: number; top: number; right: number; bottom: number } | undefined>(
+            (u, b) =>
+              u
+                ? {
+                    left: Math.min(u.left, b.left),
+                    top: Math.min(u.top, b.top),
+                    right: Math.max(u.right, b.right),
+                    bottom: Math.max(u.bottom, b.bottom),
+                  }
+                : { ...b },
+            undefined,
+          );
+      const localRoots = new Set(
+        slot
+          ? // The player-local plane keeps its native-underlay order; only when it is unavailable
+            // does a player-anchored root follow the page instead of the screen plane.
+            layout.roots.filter((id) => fullscreenPlane || (videoAnchored(id) && !atmosphereRoot(id)))
+          : [],
+      );
+      // Planes stack atmosphere < page < screen. A root never moves below an earlier root:
+      // one that would is drawn on the screen plane as normal, clipped artwork.
+      const planes = new Map<string, number>();
+      let floor = ATMOSPHERE;
+      for (const id of layout.roots) {
+        if (localRoots.has(id)) continue;
+        let plane = atmosphereRoot(id) && overlaySlot ? ATMOSPHERE : pageAnchored(id) && pageSlot ? PAGE : SCREEN;
+        if (plane < floor) plane = SCREEN;
+        floor = plane;
+        planes.set(id, plane);
+      }
+      const inPlane = (id: string, plane: number) => planes.get(id) === plane;
+      const used = new Set(planes.values());
+      if (used.has(ATMOSPHERE))
+        atmospherePlane ??= createPlane('web-world-themes-atmosphere-decorations', ATMOSPHERE_CSS, false);
+      if (used.has(PAGE)) pagePlane ??= createPlane('web-world-themes-page-decorations', PAGE_CSS, true);
+      const parent = host!.parentElement;
+      // DOM order in the shared overlay parent is the paint order: atmosphere, page, screen.
+      for (const [plane, value] of [
+        [pagePlane, PAGE],
+        [atmospherePlane, ATMOSPHERE],
+      ] as const) {
+        if (!plane) continue;
+        if (!used.has(value) || !parent) {
+          plane.host.remove();
+          continue;
+        }
+        const before = value === PAGE ? host! : (used.has(PAGE) && pagePlane?.host) || host!;
+        if (plane.host.parentElement !== parent || plane.host.nextSibling !== before)
+          parent.insertBefore(plane.host, before);
+        if (overlaySlot) plane.host.style.setProperty('--ww-decoration-z', String(overlaySlot.zIndex));
+      }
+      if (!used.has(PAGE)) pagePlane = undefined;
+      if (!used.has(ATMOSPHERE)) atmospherePlane = undefined;
+      // Reading scroll offsets forces layout after this draw's writes; only the page plane needs them.
+      const scroll = pagePlane ? { x: view.scrollX, y: view.scrollY } : { x: 0, y: 0 };
+      let pageRegions: ReturnType<typeof pagePaintRegions> = [];
+      if (pagePlane) {
+        // Place the plane's origin at the document origin, whatever its containing block.
+        const r = pagePlane.host.getBoundingClientRect(),
+          dx = -scroll.x - r.left,
+          dy = -scroll.y - r.top;
+        if (Math.abs(dx) > 0.01 || Math.abs(dy) > 0.01) {
+          pageOffset = { left: pageOffset.left + dx, top: pageOffset.top + dy };
+          pagePlane.host.style.setProperty('--ww-page-left', `${pageOffset.left}px`);
+          pagePlane.host.style.setProperty('--ww-page-top', `${pageOffset.top}px`);
+        }
+        const bounds = layout.roots
+          .filter((id) => inPlane(id, PAGE))
+          .map(rootBounds)
+          .filter((b) => b !== undefined);
+        const area = bounds.length
+          ? {
+              left: Math.min(...bounds.map((b) => b.left)) - 1,
+              top: Math.min(...bounds.map((b) => b.top)) - 1,
+              width: Math.max(...bounds.map((b) => b.right)) - Math.min(...bounds.map((b) => b.left)) + 2,
+              height: Math.max(...bounds.map((b) => b.bottom)) - Math.min(...bounds.map((b) => b.top)) + 2,
+            }
+          : { left: 0, top: 0, width: 0, height: 0 };
+        pageRegions = pagePaintRegions(safety.source.capture(), Boolean(editing), area, editorRegion);
+        const pagePath = pageRegions
+          .map((r) => `M${r.left + scroll.x} ${r.top + scroll.y}h${r.width}v${r.height}h${-r.width}Z`)
+          .join('');
+        const pageClip = pagePath ? `path('${pagePath}')` : 'inset(100%)';
+        if (pagePlane.host.style.getPropertyValue('--ww-decoration-clip') !== pageClip)
+          pagePlane.host.style.setProperty('--ww-decoration-clip', pageClip);
+      }
+      if (localRoots.size && !videoSlot) {
+        const localHost = doc.createElement('div');
+        localHost.id = 'web-world-themes-video-decorations';
+        const localShadow = localHost.attachShadow({ mode: 'open' }),
+          style = doc.createElement('style'),
+          content = doc.createElement('div');
+        style.textContent =
+          CSS +
+          ':host{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;z-index:var(--ww-local-z,1)!important}.image{pointer-events:none!important}.image[data-editable]{pointer-events:auto!important}';
+        content.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:0';
+        localShadow.append(style, content);
+        wireGestures(localShadow);
+        videoSlot = { host: localHost, content, shadow: localShadow };
+      }
+      if (slot && videoSlot) {
+        if (videoSlot.host.parentElement !== slot.parent) slot.parent.append(videoSlot.host);
+        videoSlot.host.style.setProperty('--ww-decoration-clip', `inset(${slot.top}px 0 ${slot.bottom}px 0)`);
+        videoSlot.host.style.setProperty('--ww-local-z', String(slot.zIndex));
+      }
+      // One presentation container preserves scoped z-index/tie ordering and
+      // keeps a group's masks/opacity on the original, un-cloned subtree.
+      let localIndex = 0,
+        globalIndex = 0;
+      let pageIndex = 0,
+        atmosphereIndex = 0;
+      for (const id of layout.roots) {
+        const node = nodes.get(id)?.node ?? compositions.get(id)!.node;
+        const local = localRoots.has(id),
+          page = inPlane(id, PAGE),
+          atmosphere = inPlane(id, ATMOSPHERE),
+          container = local
+            ? videoSlot!.content
+            : page
+              ? pagePlane!.content
+              : atmosphere
+                ? atmospherePlane!.content
+                : imageLayer!,
+          index = local ? localIndex++ : page ? pageIndex++ : atmosphere ? atmosphereIndex++ : globalIndex++;
+        if (container.children[index] !== node) container.insertBefore(node, container.children[index] ?? null);
+        if (local && slot) {
+          node.style.left = parseFloat(node.style.left) - slot.rect.left + 'px';
+          node.style.top = parseFloat(node.style.top) - slot.rect.top + 'px';
+        }
+        if (page) {
+          node.style.left = parseFloat(node.style.left) + scroll.x + 'px';
+          node.style.top = parseFloat(node.style.top) + scroll.y + 'px';
+        }
+      }
+      // Editor handles own only their visible authored bounds, inside the same
+      // native clip. Drag/volume bands never become editor-owned.
+      for (const entry of [...nodes.values(), ...compositions.values()]) {
+        const id = entry.controls.dataset.frameId!,
+          parentId = layout.layers.find((l) => l.layer.id === id)?.parentId;
+        const local = localRoots.has(parentId ?? id),
+          page = inPlane(parentId ?? id, PAGE),
+          root = local ? videoSlot!.shadow : page ? pagePlane!.shadow : shadow!;
+        if (entry.controls.parentNode !== root) root.append(entry.controls);
+        if (local && slot) {
+          entry.controls.style.left = parseFloat(entry.controls.style.left) - slot.rect.left + 'px';
+          entry.controls.style.top = parseFloat(entry.controls.style.top) - slot.rect.top + 'px';
+        }
+        if (page) {
+          entry.controls.style.left = parseFloat(entry.controls.style.left) + scroll.x + 'px';
+          entry.controls.style.top = parseFloat(entry.controls.style.top) + scroll.y + 'px';
+        }
+      }
+      if (!localRoots.size) {
+        videoSlot?.host.remove();
+        videoSlot = undefined;
+      }
+      const localIds = new Set<string>();
+      for (const layer of layout.layers) {
+        const entry = nodes.get(layer.layer.id);
+        if (!entry) continue;
+        if (localRoots.has(layer.parentId ?? layer.layer.id)) {
+          localIds.add(layer.layer.id);
+        }
+      }
+      const blocked = safety.commit(
+        layout.layers
+          .filter((l) => l.layer.visible && (!l.frame || l.visible))
+          .map((layer) => {
+            const root = layer.parentId ?? layer.layer.id,
+              local = localIds.has(layer.layer.id),
+              atmosphere = inPlane(root, ATMOSPHERE),
+              page = inPlane(root, PAGE);
+            const verified =
+              Boolean(layer.frame) &&
+              overlaySupported &&
+              (local || atmosphere || (page ? pageRegions.length > 0 : regions.length > 0));
+            return {
+              id: layer.layer.id,
+              bounds: layer.bounds ?? { left: 0, top: 0, right: 0, bottom: 0 },
+              opacity: layer.effectiveOpacity,
+              // The atmosphere plane takes no input; its handles stay on the clipped screen plane.
+              pointerEvents: !atmosphere && Boolean(editing && !editing.locked && !layer.locked),
+              editorOwned:
+                Boolean(editing && !editing.locked && !layer.locked) &&
+                (local || (!atmosphere && editorRegion !== undefined)),
+              ...(editorRegion && !local && !atmosphere ? { editorRegion } : {}),
+              outset: 0,
+              composition: !verified
+                ? ('unsupported' as const)
+                : local
+                  ? ('native-underlay' as const)
+                  : atmosphere
+                    ? ('atmosphere' as const)
+                    : page
+                      ? ('page' as const)
+                      : ('overlay' as const),
+              dynamic: Boolean(
+                layer.layer.motion?.enabled ||
+                (layer.parentId && parents.get(layer.parentId)?.layer.motion?.enabled) ||
+                signalRules.some(
+                  (r) => r.enabled && (r.target.layerId === layer.layer.id || r.target.layerId === layer.parentId),
+                ) ||
+                (layer.layer.kind === 'model3d' && (layer.layer.model.playing || layer.layer.model.look.enabled)),
+              ),
+              animated:
+                layer.layer.kind === 'animation' ||
+                Boolean(layer.layer.effects?.some((e) => e.enabled && e.bindings.length)),
+              ...(localIds.has(layer.layer.id) && slot
+                ? {
+                    clip: {
+                      left: slot.rect.left,
+                      top: slot.rect.top + slot.top,
+                      width: slot.rect.width,
+                      height: slot.rect.height - slot.top - slot.bottom,
+                    },
+                  }
+                : {}),
+            };
+          }),
+      );
+      const record = JSON.stringify({ stopped: safety.snapshot().stopped, issues: safety.snapshot().issues });
+      if (record !== writtenSafety || host!.dataset.wwSafety !== record) {
+        host!.dataset.wwSafety = record;
+        writtenSafety = record;
+      }
+      for (const layer of layout.layers) {
+        const entry = nodes.get(layer.layer.id);
+        if (!entry) continue;
+        // The native-owned clip is the final paint boundary, including any
+        // future blur/shadow spill. No page-sized stale rectangular hole mask.
+        const stopped = blocked.has(layer.layer.id),
+          wasStopped = entry.node.hasAttribute('data-safety-limited');
+        if (entry.node.style.visibility !== (stopped ? 'hidden' : ''))
+          entry.node.style.visibility = stopped ? 'hidden' : '';
+        if (entry.node.hasAttribute('data-safety-limited') !== stopped)
+          entry.node.toggleAttribute('data-safety-limited', stopped);
+        if (entry.node.style.pointerEvents !== (stopped ? 'none' : ''))
+          entry.node.style.pointerEvents = stopped ? 'none' : '';
+        if (stopped) entry.controls.hidden = true;
+        // Media is paused once when a stop begins and restarted once when it ends, even if no
+        // effect frame follows; held frames in between do no media work.
+        if (stopped && !wasStopped) entry.media.update(layer.layer, false);
+        else if (!stopped && wasStopped) entry.media.update(layer.layer, layer.visible);
+      }
     }
     const selected =
       editing && editing.selectedIds.length > 1
@@ -200,7 +531,10 @@ export function createImageRenderer(
 
   const draw = () => {
     if (!host) return;
-    const parent = doc.fullscreenElement ?? doc.body ?? doc.documentElement;
+    safety?.sample(view.performance.now());
+    const overlaySlot = safety?.source.overlaySlot();
+    const parent = overlaySlot?.parent ?? doc.fullscreenElement ?? doc.body ?? doc.documentElement;
+    if (overlaySlot) host.style.setProperty('--ww-decoration-z', String(overlaySlot.zIndex));
     if (host.parentElement !== parent) parent.append(host);
     const nextObserved = new Set<Element>();
     const effectTargets: EffectTarget[] = [];
@@ -293,6 +627,8 @@ export function createImageRenderer(
         renderable,
         ...(parent ? { parentId: parent.id } : {}),
         visibility(value) {
+          // A layer stopped by protection stays paused; the protection pass resumes it.
+          if (value && entry.node.hasAttribute('data-safety-limited')) return;
           if (previousVisibility !== value) {
             previousVisibility = value;
             entry.media.update(item, value);
@@ -305,8 +641,21 @@ export function createImageRenderer(
         Boolean(editing && !editing.locked && !locked && editing.selectedIds.length === 1),
       );
     }
-    applyLayout(layout);
-    effects?.update(effectTargets, { scene, geometry, layout, ...(gesture ? { holdTransforms: true } : {}) });
+    // Protection is decided once per draw, on the last layout applied before paint: the effect
+    // session's when it applies synchronously, otherwise this draw's own (always, even on error).
+    applyLayout(layout, overlaySlot, false);
+    effectLayoutApplied = false;
+    try {
+      effects?.update(effectTargets, {
+        scene,
+        geometry,
+        layout,
+        ...(safety ? { safety } : {}),
+        ...(gesture ? { holdTransforms: true } : {}),
+      });
+    } finally {
+      if (!effectLayoutApplied) applyLayout(layout, overlaySlot);
+    }
     if (observed.size !== nextObserved.size || [...nextObserved].some((element) => !observed.has(element))) {
       observer?.disconnect();
       nextObserved.forEach((element) => observer?.observe(element));
@@ -333,6 +682,10 @@ export function createImageRenderer(
       item = group ?? images.find((image) => image.id === id);
     const node = id ? (compositions.get(id)?.node ?? nodes.get(id)?.node) : undefined;
     if (!node || !item || (group ? !groupMovable(group, images) : effectivelyLocked(item, groups))) return;
+    // A handle can lag behind native geometry (an asynchronous scroll moves the page under the
+    // screen plane). A fresh read must find no protected control under the point; otherwise the
+    // guard hides the artwork and the next press reaches the native control.
+    if (safety && !safety.claim({ x: event.clientX, y: event.clientY })) return;
     event.preventDefault();
     event.stopPropagation();
     const mode = target?.getAttribute('data-handle') ?? 'move';
@@ -470,6 +823,19 @@ export function createImageRenderer(
     refresh();
   };
 
+  const wireGestures = (root: ShadowRoot) => {
+    root.addEventListener('pointerdown', onPointerDown as EventListener);
+    root.addEventListener('pointermove', onPointerMove as EventListener);
+    root.addEventListener('pointerup', onPointerUp as EventListener);
+    root.addEventListener('pointercancel', onPointerUp as EventListener);
+    root.addEventListener('lostpointercapture', () => finish(true));
+    root.addEventListener('click', (event) => {
+      if (editing) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    });
+  };
   const mount = () => {
     host = doc.createElement('div');
     host.id = 'web-world-themes-decorations';
@@ -486,13 +852,34 @@ export function createImageRenderer(
     );
     models = createModelRenderer(
       doc,
-      (message) => editing?.error(message),
+      (message) => {
+        editing?.error(message);
+        if (message.includes('コンテキスト')) safety?.pause(message);
+      },
       (stats) => {
         if (host) host.dataset.wwModelStats = JSON.stringify(stats);
       },
       shadow,
+      undefined,
+      undefined,
+      () =>
+        safety?.pause(
+          'WebGLコンテキストが失われたため3Dの描画を停止しました。',
+          true,
+          images.filter((i) => i.kind === 'model3d').map((i) => i.id),
+        ),
     );
-    effects = createEffectController(doc, playback, timeline, applyLayout, (frame) => models?.evaluate(frame));
+    effects = createEffectController(
+      doc,
+      playback,
+      timeline,
+      // Effect frames run outside draw(), so they read the composition slot themselves.
+      (layout) => {
+        effectLayoutApplied = true;
+        applyLayout(layout, safety?.source.overlaySlot());
+      },
+      (frame) => models?.evaluate(frame),
+    );
     imageLayer = doc.createElement('div');
     imageLayer.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:0';
     shadow.append(imageLayer);
@@ -507,17 +894,7 @@ export function createImageRenderer(
       shadow!.append(node);
       return node;
     });
-    shadow.addEventListener('pointerdown', onPointerDown as EventListener);
-    shadow.addEventListener('pointermove', onPointerMove as EventListener);
-    shadow.addEventListener('pointerup', onPointerUp as EventListener);
-    shadow.addEventListener('pointercancel', onPointerUp as EventListener);
-    shadow.addEventListener('lostpointercapture', () => finish(true));
-    shadow.addEventListener('click', (event) => {
-      if (editing) {
-        event.preventDefault();
-        event.stopPropagation();
-      }
-    });
+    wireGestures(shadow);
     observer = new ResizeObserver(refresh);
     view.addEventListener('resize', onViewChange);
     view.addEventListener('blur', onBlur);
@@ -549,6 +926,11 @@ export function createImageRenderer(
     doc.removeEventListener('scroll', onViewChange, true);
     doc.removeEventListener('fullscreenchange', onViewChange);
     host?.remove();
+    videoSlot?.host.remove();
+    videoSlot = undefined;
+    pagePlane?.host.remove();
+    atmospherePlane?.host.remove();
+    pagePlane = atmospherePlane = undefined;
     host = undefined;
     shadow = undefined;
     groupFrame = undefined;
@@ -651,9 +1033,16 @@ export function createImageRenderer(
           if (container.children[index] !== node) container.insertBefore(node, container.children[index] ?? null);
         });
       groups.forEach((group) => place(compositions.get(group.id)!.content, group.children));
+      // Roots drawn on another plane stay there: moving a node out and back (as draw() would)
+      // drops its pointer capture and cancels an editor gesture in progress.
+      const planeContents = new Set([videoSlot?.content, pagePlane?.content, atmospherePlane?.content]);
       place(
         imageLayer!,
-        rootLayers(images, groups).map((layer) => layer.id),
+        rootLayers(images, groups)
+          .map((layer) => layer.id)
+          .filter(
+            (id) => !planeContents.has((nodes.get(id)?.node ?? compositions.get(id)!.node).parentElement ?? undefined),
+          ),
       );
       draw();
     },
@@ -666,6 +1055,17 @@ export function createImageRenderer(
       draw();
     },
     refresh,
+    holdSafety(layerIds?: readonly string[]) {
+      nodes.forEach((entry, id) => {
+        if (layerIds && !layerIds.includes(id)) return;
+        entry.node.style.visibility = 'hidden';
+        entry.controls.hidden = true;
+      });
+      compositions.forEach((entry) => {
+        entry.controls.hidden = true;
+      });
+      if (groupFrame) groupFrame.hidden = true;
+    },
     destroy,
   };
 }

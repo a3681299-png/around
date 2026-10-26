@@ -1,5 +1,12 @@
-import { isDesignId, parseDecoration, parseDesign, parseGroupLayer, parseSurfaceStyle } from './schema';
-import { GROUP_LIMITS, IMAGE_LIMITS, type DesignDocument } from './types';
+import {
+  checkGroupRenderMode,
+  isDesignId,
+  parseDecoration,
+  parseDesign,
+  parseGroupLayer,
+  parseSurfaceStyle,
+} from './schema';
+import { GROUP_LIMITS, IMAGE_LIMITS, type Decoration, type DesignDocument } from './types';
 import { MODEL_LIMITS } from '../models/types';
 import { ANIMATION_LIMITS } from '../assets/motion-types';
 import { ASSET_MESSAGES } from '../assets/limits';
@@ -96,7 +103,7 @@ export function commitDesign(input: DesignDocument, previous?: DesignDocument): 
   if (documents.has(input)) return input;
   if (previous) previous = readDesign(previous);
   if (
-    input.schemaVersion !== 11 ||
+    input.schemaVersion !== 12 ||
     !isDesignId(input.id) ||
     !isDesignId(input.siteId) ||
     (input.baseThemeId !== null && !isDesignId(input.baseThemeId))
@@ -127,6 +134,7 @@ export function commitDesign(input: DesignDocument, previous?: DesignDocument): 
     if (children.some((child) => !child || assigned.has(child.id))) throw new Error('グループの参照が不正です。');
     if (children.some((child) => !sameAnchor(child!.placement.anchor, children[0]!.placement.anchor)))
       throw new Error('同じ配置基準のレイヤーだけをグループ化できます。');
+    checkGroupRenderMode(group, children as Decoration[]);
     group.children.forEach((id) => assigned.add(id));
   }
   if ((input.signalRules?.length ?? 0) > SIGNAL_RULE_LIMITS.rules) throw new Error('シグナルルールが多すぎます。');
