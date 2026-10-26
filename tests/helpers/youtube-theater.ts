@@ -8,6 +8,15 @@ export async function enterNativeTheater(page: Page) {
   const button = player.locator('.ytp-size-button');
   const watch = page.locator('ytd-watch-flexy');
   await player.hover();
+  if (/^(Default view|デフォルト表示)$/.test((await button.getAttribute('data-title-no-tooltip')) ?? '')) {
+    // Window resizing may leave YouTube in its wide view before this check starts.
+    const wide = await player.boundingBox();
+    expect(wide).not.toBeNull();
+    await button.click();
+    await expect(button).toHaveAttribute('data-title-no-tooltip', /^(Theater mode|シアター モード)$/);
+    await expect.poll(async () => (await player.boundingBox())?.width ?? Infinity).toBeLessThan(wide!.width - 1);
+    await player.hover(); // Wait for the native resize animation to stop before taking the baseline.
+  }
   await expect(button).toHaveAttribute('data-title-no-tooltip', /^(Theater mode|シアター モード)$/);
   const before = await player.boundingBox();
   expect(before).not.toBeNull();
