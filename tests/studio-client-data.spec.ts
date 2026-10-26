@@ -41,6 +41,80 @@ function fakePort() {
   };
 }
 
+test('Studio retries an attach made before the first settings result and connects when settings arrive', async () => {
+  let serial = 0;
+  const editor = createEditorSession({
+    siteId: 'youtube',
+    baseThemeId: 'retro',
+    targets: [],
+    makeId: () => `session-${++serial}`,
+    validate() {},
+    geometry: {
+      frameFor: () => ({ left: 0, top: 0, width: 1920, height: 1080 }),
+      samples: () => [],
+      importFrame: () => ({ width: 1920, height: 1080, origin: { x: 960, y: 540 } }),
+    },
+    storage: {
+      read: async () => undefined,
+      watch(accept) {
+        accept(undefined);
+        return () => {};
+      },
+      retain: async () => {},
+      release: async () => {},
+      validate: async () => {},
+      save: async () => {},
+      import: async () => [],
+      cancelImport() {},
+    },
+  });
+  const ports: ReturnType<typeof fakePort>[] = [];
+  globalThis.chrome = {
+    tabs: {
+      connect() {
+        const next = fakePort();
+        ports.push(next);
+        return next.port;
+      },
+      onRemoved: { addListener() {}, removeListener() {} },
+    },
+  } as unknown as typeof chrome;
+  const updates: StudioConnectionState[] = [];
+  const client = createStudioClient(
+    (value) => updates.push(value),
+    () => {},
+  );
+  try {
+    // The host port is installed before watchSettings delivers its initial async read.
+    const initial = client.select(12);
+    const first = ports[0]!;
+    const opening = editor.open();
+    expect(opening.ok).toBe(false);
+    first.send({ type: 'reply', id: first.requests[0]!.id, ok: false, error: opening.error! });
+    await initial;
+    expect(client.isConnected).toBe(false);
+    editor.setEnabled(true);
+    await expect.poll(() => ports.length).toBe(2);
+    expect(editor.open().ok).toBe(true);
+    const next = ports[1]!;
+    next.send({
+      type: 'reply',
+      id: next.requests[0]!.id,
+      ok: true,
+      ...createStudioStateEncoder().encode(editor.snapshot(), editor.checkpoint()),
+    });
+    await expect.poll(() => client.isConnected).toBe(true);
+    expect(client.state).toMatchObject({ enabled: true, active: true });
+    expect(updates.at(-1)).toMatchObject({ connected: true, message: '接続中' });
+    editor.setEnabled(false);
+    expect(editor.open()).toMatchObject({ ok: false, error: /テーマをON/ });
+    expect(editor.snapshot().active).toBe(false);
+  } finally {
+    client.destroy();
+    editor.destroy();
+  }
+});
+
 for (const fault of ['missing', 'duplicate'] as const)
   test(`Studio rejects pending requests on a ${fault} delta and reconnects with a complete current base`, async () => {
     let serial = 0;

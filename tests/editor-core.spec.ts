@@ -79,6 +79,24 @@ const assets = Array.from({ length: 3 }, (_, i) => ({
   width: 200,
   height: 160,
 }));
+
+test('unknown initial settings are pending, while the first explicit OFF remains a terminal refusal', async () => {
+  const { editor } = harness();
+  try {
+    await Promise.resolve();
+    expect(editor.open()).toMatchObject({ ok: false, error: /設定を読み込み中/ });
+    editor.setEnabled(false);
+    expect(editor.open()).toMatchObject({ ok: false, error: /テーマをON/ });
+    expect(editor.snapshot()).toMatchObject({ enabled: false, active: false });
+    editor.setEnabled(true);
+    expect(editor.open().ok).toBe(true);
+    editor.setEnabled(false);
+    expect(editor.snapshot()).toMatchObject({ enabled: false, active: false });
+    expect(editor.open()).toMatchObject({ ok: false, error: /テーマをON/ });
+  } finally {
+    editor.destroy();
+  }
+});
 async function opened() {
   const h = harness();
   await Promise.resolve();
