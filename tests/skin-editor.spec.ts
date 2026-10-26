@@ -176,6 +176,11 @@ test('skin tool: hover names parts, click dresses every card, guides and state p
   await expect.poll(async () => (await skinStyle(card)).repeat).toBe('round');
 
   // A file dropped on the slice editor replaces the open tab's art; it never becomes an image layer.
+  // The forced preview shows the hover art without depending on the pointer staying on the card.
+  const force = dialog.getByRole('checkbox', { name: 'ページ上でこの状態を表示' });
+  await force.check();
+  await youtube.mouse.move(2, 400);
+  await expect.poll(async () => (await skinStyle(card)).repeat).toBe('round');
   const hoverSource = (await skinStyle(card)).source;
   const bytes = [...(await framePng(youtube, ['#000000', '#ffffff', '#ff00ff']))];
   const transfer = await youtube.evaluateHandle((bytes) => {
@@ -187,6 +192,7 @@ test('skin tool: hover names parts, click dresses every card, guides and state p
   await expect.poll(async () => (await skinStyle(card)).source).not.toBe(hoverSource);
   expect((await skinStyle(card)).repeat).toBe('round');
   await expect(youtube.locator('[data-image-id]')).toHaveCount(0);
+  await force.uncheck();
 
   // Size preview renders the frame at three sizes inside the panel.
   await expect(dialog.locator('.size-box')).toHaveCount(3);
