@@ -152,7 +152,26 @@ test('real YouTube: official Studio configures GIF pursuit, records/replays/load
     await page.reload();
     await expect
       .poll(() => panel.evaluate('document.querySelector(".connection-status").dataset.connected'))
-      .toBe('true');
+      .toBe('true')
+      .catch(async (error: Error) => {
+        // Observe after a failure without turning a late connection into a passing assertion.
+        const start = Date.now();
+        const samples: { ms: number; connected: string; message: string }[] = [];
+        try {
+          while (Date.now() - start < 20_000) {
+            const status = await panel.evaluate<{ connected: string; message: string }>(
+              `(() => { const n = document.querySelector('.connection-status'); return { connected: n.dataset.connected, message: n.textContent }; })()`,
+            );
+            samples.push({ ms: Date.now() - start, ...status });
+            if (status.connected === 'true') break;
+            await page.waitForTimeout(500);
+          }
+        } catch (diagnosticError) {
+          report.checks.reconnectDiagnosticError = String(diagnosticError);
+        }
+        report.checks.reconnectAfterFailure = samples;
+        throw error;
+      });
     // A take can only be chosen once the reconnected page has listed it again.
     await expect
       .poll(() =>
