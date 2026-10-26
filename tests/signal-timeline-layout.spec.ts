@@ -15,9 +15,12 @@ for (const viewport of [
   }, info) => {
     await youtube.setViewportSize(viewport);
     await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+    // The popup changes optimistically; authoring is enabled after the page receives the save.
+    await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
     await youtube.bringToFront();
     await popup.locator('#creator-studio-inpage').evaluate((button: HTMLButtonElement) => button.click());
     const panel = youtube.locator('#web-world-themes-creator');
+    await expect(panel).toHaveAttribute('data-inpage', '');
     if (viewport.width < 640)
       await panel.getByRole('button', { name: 'プロパティとレイヤーを開閉', exact: true }).click();
     await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));

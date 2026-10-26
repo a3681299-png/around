@@ -3,7 +3,7 @@ import { mkdir, mkdtemp } from 'node:fs/promises';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
 import { exposeEditorControls } from './helpers/editor-workspace';
-import { waitForAdvertToEnd } from './helpers/youtube-live';
+import { declinePromotion, waitForAdvertToEnd } from './helpers/youtube-live';
 
 async function nativeInputs(page: Page) {
   const player = page.locator('#movie_player'),
@@ -114,24 +114,39 @@ test('optional real YouTube operation checks with and without authored paint', a
     await page.reload({ waitUntil: 'domcontentloaded' });
     await expect(page.locator('[data-image-id]')).toHaveCount(1);
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30_000 });
+    await expect(page.locator('ytd-watch-metadata h1').first()).toBeVisible({ timeout: 30_000 });
     await waitForAdvertToEnd(page);
-    await expect(page.locator('[data-image-id]'))
-      .toBeVisible()
-      .catch(async (error: Error) => {
-        // Keep why protection hides the restored artwork on the live page.
-        const state = await page.evaluate(() => ({
-          safety: document.querySelector('#web-world-themes-decorations')?.getAttribute('data-ww-safety'),
-          planes: [...document.querySelectorAll('[id^="web-world-themes-"][id$="decorations"]')].map((h) => h.id),
-          video: (() => {
-            const v = document.querySelector<HTMLVideoElement>('video.html5-main-video');
-            return v && { paused: v.paused, readyState: v.readyState, currentTime: v.currentTime };
-          })(),
-          centralButtons: [...document.querySelectorAll('#movie_player button')]
-            .filter((b) => b.getBoundingClientRect().height > 0)
-            .map((b) => String(b.className).slice(0, 40)),
-        }));
-        throw new Error(`${error.message}${String.fromCharCode(10)}Restored artwork state: ${JSON.stringify(state)}`);
-      });
+    let checkingArtwork = true;
+    const dismissals = (async () => {
+      while (checkingArtwork && !page.isClosed()) {
+        // A promotion can appear during the original visibility assertion. Closing it is an
+        // independent human action; keep Playwright's original auto-wait and verdict intact.
+        await declinePromotion(page);
+        if (checkingArtwork) await page.waitForTimeout(100);
+      }
+    })().catch(() => undefined); // A closed page must retain the visibility assertion's error.
+    try {
+      await expect(page.locator('[data-image-id]'))
+        .toBeVisible()
+        .catch(async (error: Error) => {
+          // Keep why protection hides the restored artwork on the live page.
+          const state = await page.evaluate(() => ({
+            safety: document.querySelector('#web-world-themes-decorations')?.getAttribute('data-ww-safety'),
+            planes: [...document.querySelectorAll('[id^="web-world-themes-"][id$="decorations"]')].map((h) => h.id),
+            video: (() => {
+              const v = document.querySelector<HTMLVideoElement>('video.html5-main-video');
+              return v && { paused: v.paused, readyState: v.readyState, currentTime: v.currentTime };
+            })(),
+            centralButtons: [...document.querySelectorAll('#movie_player button')]
+              .filter((b) => b.getBoundingClientRect().height > 0)
+              .map((b) => String(b.className).slice(0, 40)),
+          }));
+          throw new Error(`${error.message}${String.fromCharCode(10)}Restored artwork state: ${JSON.stringify(state)}`);
+        });
+    } finally {
+      checkingArtwork = false;
+      await dismissals;
+    }
     const after = await nativeInputs(page);
     expect(Math.abs(after.volume - before.volume)).toBeLessThan(0.02);
     expect(after.comment).toBe(before.comment);

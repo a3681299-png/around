@@ -28,6 +28,10 @@ test('layout feasibility on real signed-out YouTube, preserving native media and
     await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 20_000 });
     await page.bringToFront();
+    // The bootstrap player can exist before the native watch columns and title.
+    // Measure the reserved layout only after YouTube has built that layout.
+    await expect(page.locator('ytd-watch-flexy #movie_player')).toBeVisible({ timeout: 30_000 });
+    await expect(page.locator('ytd-watch-metadata h1').first()).toBeVisible({ timeout: 30_000 });
     const opened = context.waitForEvent('page');
     await popup.locator('#creator-studio-open').evaluate((button: HTMLButtonElement) => button.click());
     const oldStudio = await opened;

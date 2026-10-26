@@ -96,6 +96,28 @@ await build({
     {
       name: 'g11-measurements-only',
       setup(builder) {
+        if (process.env.G11_DIAG_PAGE === '1')
+          builder.onLoad({ filter: /src[\\/]renderers[\\/]dom[\\/]scene\.ts$/ }, async ({ path: file }) => {
+            const text = replaceOnce(
+              await readFile(file, 'utf8'),
+              '        pageRegions = pagePaintRegions(safety.source.capture(), Boolean(editing), area, editorRegion);',
+              `        const diagnosticSnapshot = safety.source.capture();
+        pageRegions = pagePaintRegions(diagnosticSnapshot, Boolean(editing), area, editorRegion);
+        if (!pageRegions.length) {
+          const probe = globalThis.__g11Probe;
+          const key = JSON.stringify([diagnosticSnapshot.generation, area, editorRegion]);
+          const misses = probe.pageMisses ??= [];
+          if (misses.at(-1)?.key !== key) {
+            misses.push({ key, time: performance.now(), snapshot: diagnosticSnapshot, area, editorRegion,
+              bounds, editing: Boolean(editing), scroll, pageOffset,
+              roots: layout.roots.filter((id) => inPlane(id, PAGE)) });
+            if (misses.length > 12) misses.shift();
+          }
+        }`,
+              'empty page paint diagnostic',
+            );
+            return { contents: text, loader: 'ts' };
+          });
         builder.onLoad({ filter: /src[\\/]content[\\/]index\.ts$/ }, async ({ path: file }) => {
           let text = await readFile(file, 'utf8');
           text = replaceOnce(

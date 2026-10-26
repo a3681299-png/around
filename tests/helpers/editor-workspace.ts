@@ -1,4 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
+import { attachOperationDiagnostics } from './operation-diagnostics';
 
 /** Regression suites exercise both existing control areas in the optional split view.
  * editor-ux.spec.ts separately verifies the default tabbed, mouse-only experience. */
@@ -121,7 +122,8 @@ export async function beginCanvasGesture(node: Locator, point?: { x: number; y: 
       return state.ok;
     })
     .toBe(true)
-    .catch((error: Error) => {
+    .catch(async (error: Error) => {
+      await attachOperationDiagnostics(node.page()).catch(() => undefined);
       throw new Error(
         `${error.message}${String.fromCharCode(10)}Artwork is not the hit target: ${JSON.stringify(last)}`,
       );

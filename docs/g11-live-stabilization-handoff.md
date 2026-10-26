@@ -4,6 +4,8 @@
 
 経緯と結果の詳細は [operation-safety-g11-finish.md](operation-safety-g11-finish.md) の「4回目」、保護の仕様は [operation-safety.md](operation-safety.md)（「G1.1での拡張」を含む）にある。
 
+2026年10月26日の再開後の確認と試験の開始条件の修正は、同じ記録の「5回目」に追記している。下記の状況は初回引継ぎ時点のもの。
+
 ## 依頼（ユーザーの指示、この順番と基準）
 
 1. 最優先：ドラッグ開始で作品がクリック対象にならない件（editor-ux・studio・studio-workspace）。押下時の照合を最初に疑い、原因を特定して製品側を直し、テストで示す。→ **対応済み**（原因は照合ではなかった。下の「直したこと」）。ただし studio-workspace（Studio作成）にまだ別の失敗が残る。
