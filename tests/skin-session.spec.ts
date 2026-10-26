@@ -7,6 +7,7 @@ import { defaultSkinFrame } from '../src/editor-core/skins';
 import type { DesignDocument, SurfaceSkin } from '../src/design/types';
 import type { EditorAsset, EditorPorts } from '../src/editor-core/types';
 import { YOUTUBE_DESIGN_TARGETS } from '../src/sites/youtube-targets';
+import { skinReason, skinStateName, skinStates } from '../src/editor/skin-status';
 
 function harness() {
   let value: DesignDocument | undefined,
@@ -234,4 +235,36 @@ test('unsupported parts and non-image assets are refused with a reason and leave
   } finally {
     editor.destroy();
   }
+});
+
+test('part status words: missing parts say where they live, loading and errors are reasons, not silence', () => {
+  const card = YOUTUBE_DESIGN_TARGETS.find((item) => item.id === 'video-card')!;
+  const subscribe = YOUTUBE_DESIGN_TARGETS.find((item) => item.id === 'subscribe-button')!;
+  const skin = { states: { normal: defaultSkinFrame(image(1)) } };
+  expect(skinReason(subscribe, skin, { id: subscribe.id, count: 0 })).toStrictEqual({
+    status: 'missing',
+    text: 'このページに見つかりません（動画ページ・チャンネルページにあります）',
+  });
+  expect(skinReason(card, undefined, { id: card.id, count: 6, width: 300, height: 280 }).text).toBe(
+    '未設定・ページ上に6個',
+  );
+  expect(
+    skinReason(card, skin, { id: card.id, count: 6, width: 300, height: 280, asset: { state: 'loading' } }).status,
+  ).toBe('loading');
+  expect(
+    skinReason(card, skin, {
+      id: card.id,
+      count: 6,
+      width: 300,
+      height: 280,
+      asset: { state: 'error', message: '素材が見つかりません。' },
+    }).text,
+  ).toBe('絵を読み込めません：素材が見つかりません。');
+  expect(skinReason(card, skin, { id: card.id, count: 2, width: 0, height: 0 }).status).toBe('missing');
+  expect(skinReason(card, skin, { id: card.id, count: 6, width: 300, height: 280 }).text).toBe('6個に反映中');
+  // Tabs follow the adapter's conditions and its part-specific names.
+  expect(skinStates(subscribe)).toEqual(['normal', 'hover', 'focus', 'selected', 'pressed', 'disabled']);
+  expect(skinStates(card)).toEqual(['normal', 'hover', 'focus', 'pressed']);
+  expect(skinStateName(subscribe, 'selected')).toBe('登録済み');
+  expect(skinStateName(card, 'hover')).toBe('ホバー');
 });

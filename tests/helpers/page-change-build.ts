@@ -27,9 +27,12 @@ export async function pageChangeBundle(ref?: string, legacyPage = false) {
               if (contents.split(needle).length !== 2) throw new Error(`Measurement hook changed: ${file}`);
               contents = contents.replace(needle, needle + meter(field));
             };
+            // v13 added the optional asset URL resolver; older refs keep the two-argument form.
             if (file === 'src/design/renderer.ts')
               inject(
-                'export function compileDesign(input: DesignDocument, targets: readonly DesignTarget[]): string {',
+                contents.includes('targets: readonly DesignTarget[], url?: AssetUrl): string {')
+                  ? 'export function compileDesign(input: DesignDocument, targets: readonly DesignTarget[], url?: AssetUrl): string {'
+                  : 'export function compileDesign(input: DesignDocument, targets: readonly DesignTarget[]): string {',
                 'compiles',
               );
             if (file === 'src/features/controller.ts') inject('    refresh() {', 'featureRefreshes');

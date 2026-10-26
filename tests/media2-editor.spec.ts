@@ -201,7 +201,7 @@ test('1080p alpha WebM plays, transforms, pauses/rates/loops, saves and survives
   await save(panel);
   const saved = await stored(popup);
   expect(saved).toMatchObject({
-    schemaVersion: 12,
+    schemaVersion: 13,
     decorations: [
       { format: 'webm', placement: { rotationDeg: 25, widthPx: 320 }, playback: { speed: 1.5, loop: true } },
     ],

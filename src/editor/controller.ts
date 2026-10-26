@@ -434,11 +434,13 @@ export function createCreatorEditor(
     const zone = event
       .composedPath()
       .find((node): node is HTMLElement => node instanceof HTMLElement && Boolean(node.dataset.skinSlot));
-    if (zone) {
-      void importSkin(files, zone.dataset.skinSlot as SkinSlot);
+    const inPanel = Boolean(panel && event.composedPath().includes(panel.host));
+    // While dressing parts, a drop is never a new image layer.
+    if (zone || (skinTool() && inPanel)) {
+      void importSkin(files, (zone?.dataset.skinSlot as SkinSlot | undefined) ?? 'normal');
       return;
     }
-    if (skinTool() && !(panel && event.composedPath().includes(panel.host))) {
+    if (skinTool()) {
       const target = picker.hit(event.target instanceof Element ? event.target : undefined);
       if (!target?.target) {
         core.fail('絵は紫の枠が出る部品の上、またはパネルの枠にドロップしてください。');
@@ -449,10 +451,7 @@ export function createCreatorEditor(
       void importSkin(files, 'normal');
       return;
     }
-    void core.import(
-      files,
-      panel && event.composedPath().includes(panel.host) ? undefined : { x: event.clientX, y: event.clientY },
-    );
+    void core.import(files, inPanel ? undefined : { x: event.clientX, y: event.clientY });
   }
   const authorize = (owner: string, session: string, revision: number) => {
     if (owner !== remoteOwner || session !== state.sessionId || revision !== state.revision || !state.active)
@@ -472,11 +471,8 @@ export function createCreatorEditor(
     refreshSelection() {
       scheduleSkinInfo();
       // A skin edit follows the part's kind, not one element: YouTube re-renders buttons often.
-      if (skinTool() && selectedElement && !selectedElement.isConnected) {
-        removeSelection();
-        return;
-      }
-      if (
+      if (skinTool() && selectedElement && !selectedElement.isConnected) removeSelection();
+      else if (
         selectedElement &&
         (!selectedElement.isConnected ||
           !site.designTargets?.some(

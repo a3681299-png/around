@@ -175,6 +175,19 @@ test('skin tool: hover names parts, click dresses every card, guides and state p
   await card.hover();
   await expect.poll(async () => (await skinStyle(card)).repeat).toBe('round');
 
+  // A file dropped on the slice editor replaces the open tab's art; it never becomes an image layer.
+  const hoverSource = (await skinStyle(card)).source;
+  const bytes = [...(await framePng(youtube, ['#000000', '#ffffff', '#ff00ff']))];
+  const transfer = await youtube.evaluateHandle((bytes) => {
+    const data = new DataTransfer();
+    data.items.add(new File([new Uint8Array(bytes)], 'dropped.png', { type: 'image/png' }));
+    return data;
+  }, bytes);
+  await dialog.locator('.slice-stage').dispatchEvent('drop', { dataTransfer: transfer });
+  await expect.poll(async () => (await skinStyle(card)).source).not.toBe(hoverSource);
+  expect((await skinStyle(card)).repeat).toBe('round');
+  await expect(youtube.locator('[data-image-id]')).toHaveCount(0);
+
   // Size preview renders the frame at three sizes inside the panel.
   await expect(dialog.locator('.size-box')).toHaveCount(3);
   await expect(dialog.locator('.size-box').first()).toHaveCSS('border-image-source', /^url\("blob:/);

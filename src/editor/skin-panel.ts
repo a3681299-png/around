@@ -1,27 +1,12 @@
 import styles from './skin-panel.css';
-import {
-  SKIN_LIMITS,
-  SKIN_STATES,
-  type DesignTarget,
-  type SkinFrame,
-  type SkinState,
-  type SurfaceSkin,
-} from '../design/types';
-import type { SkinAssetStatus } from '../design/renderer';
+import { SKIN_LIMITS, type DesignTarget, type SkinFrame, type SkinState, type SurfaceSkin } from '../design/types';
+import { SKIN_STATE_HELP as STATE_HELP, skinReason, skinStateName, skinStates, type SkinPageInfo } from './skin-status';
 import type { EditorView, SkinPreview } from '../editor-core/types';
 import type { SkinSlot } from '../editor-core/skins';
 
 export const SKIN_PANEL_STYLES = styles;
+export type { SkinPageInfo } from './skin-status';
 
-/** What the Host found on the page for one part; never part of the document. */
-export interface SkinPageInfo {
-  id: string;
-  count: number;
-  width?: number;
-  height?: number;
-  /** Load state of the part's normal art in the page renderer. */
-  asset?: SkinAssetStatus;
-}
 export interface SkinPanelOptions {
   targets: readonly DesignTarget[];
   assetUrl(assetId: string): Promise<string | undefined>;
@@ -36,34 +21,12 @@ export interface SkinPanelActions {
   end(cancel?: boolean): void;
 }
 
-const STATE_NAMES: Record<SkinState, string> = {
-  normal: '通常',
-  hover: 'ホバー',
-  focus: 'フォーカス',
-  selected: '選択中',
-  pressed: '押下',
-  disabled: '無効',
-};
-const STATE_HELP: Record<SkinState, string> = {
-  normal: 'いつもの見た目です。ほかの状態に絵がないときもこの絵を使います。',
-  hover: 'マウスを乗せている間の見た目です。',
-  focus: 'キーボードで選んだときの見た目です。',
-  selected: 'オンになっている間の見た目です。',
-  pressed: '押している間の見た目です。',
-  disabled: '押せないときの見た目です。',
-};
 type Tab = SkinState | 'compact';
 type Side = 'top' | 'right' | 'bottom' | 'left';
 const SIDES: readonly Side[] = ['top', 'right', 'bottom', 'left'];
 const SIDE_NAMES: Record<Side, string> = { top: '上', right: '右', bottom: '下', left: '左' };
 const STAGE = { width: 296, height: 168, zoom: 4 };
 
-export function skinStates(target: DesignTarget | undefined): SkinState[] {
-  return SKIN_STATES.filter((state) => state === 'normal' || target?.skin?.states[state] !== undefined);
-}
-export function skinStateName(target: DesignTarget | undefined, state: SkinState): string {
-  return target?.skin?.labels?.[state] ?? STATE_NAMES[state];
-}
 function frameOf(skin: SurfaceSkin | undefined, tab: Tab): SkinFrame | undefined {
   if (!skin) return;
   if (tab === 'compact') return skin.compact?.kind === 'frame' ? skin.compact.frame : undefined;
@@ -74,24 +37,6 @@ function withFrame(skin: SurfaceSkin, tab: Tab, frame: SkinFrame): SurfaceSkin {
     ? { ...skin, compact: { kind: 'frame', frame } }
     : { ...skin, states: { ...skin.states, [tab]: frame } };
 }
-/** Part status for the list and the "not applied" reason, in the spirit of the guard's 制限中 display. */
-export function skinReason(
-  target: DesignTarget,
-  skin: SurfaceSkin | undefined,
-  info: SkinPageInfo | undefined,
-): { status: 'applied' | 'empty' | 'missing' | 'loading' | 'error'; text: string } {
-  if (info && info.count === 0)
-    return {
-      status: 'missing',
-      text: `このページに見つかりません${target.skin?.where ? `（${target.skin.where}にあります）` : ''}`,
-    };
-  if (!skin) return { status: 'empty', text: info ? `未設定・ページ上に${info.count}個` : '未設定' };
-  if (info?.asset?.state === 'error') return { status: 'error', text: `絵を読み込めません：${info.asset.message}` };
-  if (info?.asset?.state === 'loading') return { status: 'loading', text: '絵を読み込み中…' };
-  if (info && info.width === 0) return { status: 'missing', text: 'ページ上で非表示です' };
-  return { status: 'applied', text: info ? `${info.count}個に反映中` : '設定済み' };
-}
-
 /** Skin editor UI. It holds no document state: every change is an editor command. */
 export function createSkinPanel(doc: Document, actions: SkinPanelActions, options: SkinPanelOptions) {
   const targets = options.targets.filter((target) => target.skin);
@@ -606,6 +551,8 @@ export function createSkinPanel(doc: Document, actions: SkinPanelActions, option
     forceCompact.checked = Boolean(state.skinPreview?.compact);
     forceCompact.disabled = state.saving || !skin?.compact;
     drop.dataset.skinSlot = tab;
+    // Dropping anywhere on the editor replaces the art of the open tab.
+    editor.dataset.skinSlot = tab;
     drop.hidden = Boolean(frame) || !options.import || (tab !== 'normal' && !skin);
     setText(
       drop.querySelector<HTMLElement>('.drop-title')!,

@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { test, expect } from '@playwright/test';
 import { parseDesign, parseSurfaceSkin } from '../src/design/schema';
 import { commitDesign, editDesign, freezeTree, readDesign } from '../src/design/immutable';
-import { compileDesign, skinCompactNeeds } from '../src/design/renderer';
+import { compileDesign, createDesignRenderer, skinCompactNeeds } from '../src/design/renderer';
 import { designAssetIds } from '../src/design/references';
 import { SKIN_LIMITS, type DesignDocument, type DesignTarget, type SurfaceSkin } from '../src/design/types';
 import { validateDocumentAssets } from '../src/assets/design-assets';
@@ -323,4 +323,70 @@ test('bundled YouTube targets have fixed semantic ids and adapter-owned state co
   const css = compileDesign(all, YOUTUBE_DESIGN_TARGETS, urls);
   expect(css.split('\n').length).toBeGreaterThan(YOUTUBE_DESIGN_TARGETS.length);
   expect(freezeTree(all)).toBe(all);
+});
+
+test('the page renderer loads skin art once, writes CSS only after it is ready, and revokes replaced URLs', async () => {
+  const attributes = new Map<string, string>();
+  const style = { id: '', textContent: '', isConnected: false, remove() {} } as unknown as HTMLStyleElement;
+  const page = {
+    documentElement: {
+      getAttribute: (name: string) => attributes.get(name) ?? null,
+      setAttribute: (name: string, value: string) => attributes.set(name, value),
+      removeAttribute: (name: string) => attributes.delete(name),
+      append() {},
+    },
+    head: {
+      append() {
+        (style as { isConnected: boolean }).isConnected = true;
+      },
+    },
+    createElement: () => style,
+    defaultView: undefined,
+  } as unknown as Document;
+  const loads: string[] = [],
+    revoked: string[] = [];
+  const pending = new Map<string, (url: string) => void>();
+  const failures = new Map<string, (error: Error) => void>();
+  let statusCalls = 0;
+  const renderer = createDesignRenderer(
+    page,
+    [target],
+    {
+      load: (id) =>
+        new Promise<string>((resolve, reject) => {
+          loads.push(id);
+          pending.set(id, resolve);
+          failures.set(id, reject);
+        }),
+      revoke: (url) => revoked.push(url),
+    },
+    () => statusCalls++,
+  );
+  const design = (assetId: string) =>
+    parseDesign(
+      doc([
+        { kind: 'surface-style', target: 'subscribe-button', style: {}, skin: { states: { normal: frame(assetId) } } },
+      ]),
+    );
+  renderer.update(design(A));
+  renderer.update(design(A));
+  expect(loads).toEqual([A]);
+  expect(renderer.assetStatus(A)).toStrictEqual({ state: 'loading' });
+  expect(style.textContent).toBe('');
+  pending.get(A)!('blob:https://www.youtube.com/0b8f1d3e-0000-4000-8000-00000000000a');
+  await Promise.resolve();
+  await Promise.resolve();
+  expect(renderer.assetStatus(A)).toStrictEqual({ state: 'ready' });
+  expect(style.textContent).toContain('0b8f1d3e-0000-4000-8000-00000000000a');
+  expect(attributes.get('data-ww-design')).toBe('skins');
+  // Replacing the art releases the old object URL; a failed load is a reason, not CSS.
+  renderer.update(design(B));
+  expect(revoked).toEqual(['blob:https://www.youtube.com/0b8f1d3e-0000-4000-8000-00000000000a']);
+  failures.get(B)!(new Error('素材が見つかりません。'));
+  await Promise.resolve();
+  await Promise.resolve();
+  expect(renderer.assetStatus(B)).toStrictEqual({ state: 'error', message: '素材が見つかりません。' });
+  expect(statusCalls).toBeGreaterThan(0);
+  renderer.dispose();
+  expect(attributes.has('data-ww-design')).toBe(false);
 });

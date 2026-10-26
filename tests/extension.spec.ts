@@ -90,7 +90,7 @@ test('SPA replacement, lazy DOM insertion, changing IDs, and removed stylesheet 
   await expect(youtube.getByRole('heading', { name: 'Watch' })).toBeVisible();
   await expect(youtube.locator('ytd-watch-metadata #description')).toHaveAttribute(
     'data-ww-surface',
-    'panel frame rounded text',
+    'panel frame rounded text description-panel',
   );
   await expect(youtube.locator('ytd-thumbnail #thumbnail')).toHaveCSS('border-radius', '0px');
 
@@ -104,7 +104,10 @@ test('SPA replacement, lazy DOM insertion, changing IDs, and removed stylesheet 
   await youtube.locator('#changed-container').evaluate((element) => {
     element.id = 'container';
   });
-  await expect(youtube.locator('ytd-searchbox #container')).toHaveAttribute('data-ww-surface', 'input frame rounded');
+  await expect(youtube.locator('ytd-searchbox #container')).toHaveAttribute(
+    'data-ww-surface',
+    'input frame rounded search-box',
+  );
 
   await youtube.locator(themeStyle).evaluate((element) => element.remove());
   await expect(youtube.locator(themeStyle)).toHaveCount(1);
