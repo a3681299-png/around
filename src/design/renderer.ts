@@ -61,6 +61,9 @@ function frameDeclarations(frame: SkinFrame, url: string, background: string): s
   );
 }
 
+/** Every state selector keeps the part's attribute as its key, so the browser files the rules
+ * under that attribute instead of checking them against every element on each recalculation.
+ * The adapter's condition runs on the same element as `*` inside :where(). */
 function conditions(target: DesignTarget): Record<SkinState, string> {
   if (!target.skin) throw new Error(`${target.label}は着せ替えに対応していません。`);
   const element = surfaceSelector(target);
@@ -71,12 +74,17 @@ function conditions(target: DesignTarget): Record<SkinState, string> {
     if (condition === undefined) continue;
     if (condition.split('&').length !== 2 || /[{};\\]/.test(condition))
       throw new Error('着せ替えの状態条件が不正です。');
-    result[state] = condition.replace('&', element);
+    result[state] = `${element}:where(${condition.replace('&', '*')})`;
   }
   return result;
 }
 
-function compileSkin(rule: SurfaceStyleRule, target: DesignTarget, url: AssetUrl | undefined): string {
+function compileSkin(
+  rule: SurfaceStyleRule,
+  target: DesignTarget,
+  url: AssetUrl | undefined,
+  previews: boolean,
+): string {
   const skin = rule.skin!;
   const states = conditions(target);
   const resolve = (frame: SkinFrame) => {
@@ -97,35 +105,37 @@ function compileSkin(rule: SurfaceStyleRule, target: DesignTarget, url: AssetUrl
   for (const state of SKIN_STATES) {
     const declarations = paint(skin.states[state]);
     if (declarations && states[state] !== undefined)
-      lines.push(
-        `${ROOT}:not([${SKIN_FORCE_ATTRIBUTE}^="${rule.target}:"])${BOOST} :where(${states[state]}){${declarations}}`,
-      );
+      lines.push(`${ROOT}:not([${SKIN_FORCE_ATTRIBUTE}^="${rule.target}:"])${BOOST} ${states[state]}{${declarations}}`);
   }
   // Forced previews show a state without hovering or pressing; a missing state shows normal.
-  for (const state of SKIN_STATES) {
-    const declarations = paint(skin.states[state] ?? skin.states.normal);
-    if (declarations)
-      lines.push(
-        `${ROOT}[${SKIN_FORCE_ATTRIBUTE}="${rule.target}:${state}"]${BOOST} :where(${element}){${declarations}}`,
-      );
-  }
+  // They exist only while the skin editor is open, so viewers never pay for their matching.
+  if (previews)
+    for (const state of SKIN_STATES) {
+      const declarations = paint(skin.states[state] ?? skin.states.normal);
+      if (declarations)
+        lines.push(`${ROOT}[${SKIN_FORCE_ATTRIBUTE}="${rule.target}:${state}"]${BOOST} ${element}{${declarations}}`);
+    }
   if (skin.compact) {
     const declarations =
       skin.compact.kind === 'color'
         ? `border-image-source:none !important;background-color:${skin.compact.color} !important;background-image:none !important;`
         : paint(skin.compact.frame);
     if (declarations) {
-      lines.push(`${ROOT}${BOOST} :where(${element})[${SKIN_COMPACT_ATTRIBUTE}~="${rule.target}"]{${declarations}}`);
-      lines.push(
-        `${ROOT}[${SKIN_FORCE_COMPACT_ATTRIBUTE}="${rule.target}"]${BOOST} :where(${element}){${declarations}}`,
-      );
+      lines.push(`${ROOT}${BOOST} ${element}[${SKIN_COMPACT_ATTRIBUTE}~="${rule.target}"]{${declarations}}`);
+      if (previews)
+        lines.push(`${ROOT}[${SKIN_FORCE_COMPACT_ATTRIBUTE}="${rule.target}"]${BOOST} ${element}{${declarations}}`);
     }
   }
   return lines.join('\n');
 }
 
 /** Selectors come only from bundled target definitions, never from saved JSON. */
-export function compileDesign(input: DesignDocument, targets: readonly DesignTarget[], url?: AssetUrl): string {
+export function compileDesign(
+  input: DesignDocument,
+  targets: readonly DesignTarget[],
+  url?: AssetUrl,
+  options: { previews?: boolean } = {},
+): string {
   const design = readDesign(input);
   return design.rules
     .map((rule) => {
@@ -133,7 +143,7 @@ export function compileDesign(input: DesignDocument, targets: readonly DesignTar
       if (!target || !isDesignId(target.surface)) throw new Error('このページでは編集対象を利用できません。');
       const style = compileStyle(rule, target);
       if (!rule.skin) return style;
-      const skin = compileSkin(rule, target, url);
+      const skin = compileSkin(rule, target, url, Boolean(options.previews));
       return [style, skin].filter(Boolean).join('\n');
     })
     .join('\n');
@@ -176,7 +186,8 @@ export function createDesignRenderer(
   let style: HTMLStyleElement | undefined;
   let designId: string | undefined;
   let design: DesignDocument | undefined;
-  let alive = true;
+  let alive = true,
+    previews = false;
   const urls = new Map<string, string>(),
     status = new Map<string, SkinAssetStatus>();
   // Compact detection uses one ResizeObserver; it runs only when a size changes, never per frame.
@@ -289,7 +300,7 @@ export function createDesignRenderer(
     }
   };
   function render() {
-    const css = design ? compileDesign(design, targets, (id) => urls.get(id)) : '';
+    const css = design ? compileDesign(design, targets, (id) => urls.get(id), { previews }) : '';
     if (!design || !css) {
       destroy();
       onStatus?.();
@@ -316,6 +327,12 @@ export function createDesignRenderer(
       render();
     },
     refresh,
+    /** The skin editor's forced-state rules are compiled only while it is open. */
+    setPreviews(value: boolean) {
+      if (value === previews) return;
+      previews = value;
+      if (design) render();
+    },
     /** Per-asset loading state, for the editor's "not applied" reasons. */
     assetStatus: (id: string): SkinAssetStatus | undefined => status.get(id),
     destroy() {

@@ -176,7 +176,14 @@ async function phases(browser) {
   });
   const cards = await page.locator('ytd-video-renderer').count();
   if (cards < 8) throw new Error(`Too few result cards for a list page: ${cards}`);
-  result.startup = { ...perFrame(startup.value), full: startup.full, cards };
+  // Visible cards only: hidden cards of a previous page are 0×0 and correctly use the compact look.
+  const dressed = await page.evaluate(
+    () =>
+      [...document.querySelectorAll('[data-ww-surface~="video-card"]')].filter(
+        (node) => node.getBoundingClientRect().width > 0 && getComputedStyle(node).borderImageSource.startsWith('url('),
+      ).length,
+  );
+  result.startup = { ...perFrame(startup.value), full: startup.full, cards, dressed };
   await page.waitForTimeout(SETTLE_MS);
   await page.mouse.move(960, 600);
   const steady = await traced(async () => {
@@ -220,8 +227,12 @@ async function skinned(browser) {
   await page.goto(url, { waitUntil: 'domcontentloaded' });
   await page.locator('ytd-video-renderer').first().waitFor({ timeout: 30000 });
   await page.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((button) => button.click());
+  // The popup acts on the active tab; settings may still be loading right after navigation.
   const editor = page.getByRole('dialog', { name: 'デザインエディター' });
+  for (let attempt = 0; attempt < 10 && !(await editor.isVisible()); attempt++) {
+    await popup.locator('#creator-editor-open').evaluate((button) => button.click());
+    await page.waitForTimeout(1000);
+  }
   await editor.getByRole('button', { name: 'UIを着せ替え' }).click();
   await editor.locator('.skin-part[data-target="video-card"]').click();
   const chooser = page.waitForEvent('filechooser');
@@ -231,6 +242,9 @@ async function skinned(browser) {
   await editor.getByRole('button', { name: '保存', exact: true }).click();
   await editor.locator('.status').filter({ hasText: '保存しました。' }).waitFor();
   await editor.getByRole('button', { name: /編集を終了/ }).click();
+  // Closing releases the edit lease and prunes unreferenced assets; let that finish while the
+  // saved design still references the image, before any design without it is stored.
+  await page.waitForTimeout(3000);
   const saved = await popup.evaluate(
     async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
   );
@@ -284,12 +298,7 @@ try {
         await browser.page.goto('about:blank');
         const measured = await phases(browser);
         if (mode === 'skin') {
-          const dressed = await browser.page.evaluate(
-            () =>
-              [...document.querySelectorAll('[data-ww-surface~="video-card"]')].filter((node) =>
-                getComputedStyle(node).borderImageSource.startsWith('url('),
-              ).length,
-          );
+          const dressed = measured.startup.dressed;
           if ((condition === 'skinned') !== dressed > 0)
             throw new Error(`Skin state does not match the condition: ${condition} ${dressed}`);
           measured.dressedCards = dressed;
@@ -348,6 +357,7 @@ try {
 } catch (error) {
   result.failure = error.stack;
   await save();
+  await shared?.page.screenshot({ path: path.join(work, 'failure.png') }).catch(() => {});
   console.error(error.stack);
   process.exitCode = 1;
 } finally {

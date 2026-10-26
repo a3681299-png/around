@@ -55,6 +55,7 @@ if (site) {
     () => settingsPanel.open(),
     {
       status: controller.skinAssetStatus,
+      previews: controller.setSkinPreviews,
       url(assetId) {
         let url = previewUrls.get(assetId);
         if (!url) {

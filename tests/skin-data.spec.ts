@@ -177,7 +177,20 @@ test('skin CSS uses only border-image and background painting, ordered states, a
       },
     ]),
   );
-  const css = compileDesign(design, [target], urls);
+  // Viewers get no preview rules; the editor compiles them while the skin tool is open.
+  expect(compileDesign(design, [target], urls)).not.toContain('data-ww-skin-force=');
+  const css = compileDesign(design, [target], urls, { previews: true });
+  // Every rule keys on the part attribute (outside :where) so the browser can bucket it.
+  const key = '[data-ww-surface~="subscribe-button"]';
+  for (const line of css.split(String.fromCharCode(10))) {
+    const selector = line.slice(0, line.indexOf('{'));
+    const last = selector.slice(selector.lastIndexOf(' ' + key) + 1);
+    expect(selector.lastIndexOf(' ' + key), selector).toBeGreaterThan(0);
+    expect(
+      last === key || last.startsWith(key + ':where(') || last === key + '[data-ww-skin-compact~="subscribe-button"]',
+      last,
+    ).toBe(true);
+  }
   expect(css).toContain('border-image-source:url("blob:https://www.youtube.com/0b8f1d3e-0000-4000-8000-000000000001")');
   expect(css).toContain('border-image-slice:12 16 12 16 fill');
   expect(css).toContain('border-image-width:12px 16px 12px 16px');
@@ -205,8 +218,8 @@ test('skin CSS uses only border-image and background painting, ordered states, a
     /padding|margin|(?<!image-)width:|height|position|transform|inset:|border-style|border-width|outline|pointer-events|display|z-index/,
   );
   // Natural states follow the adapter's conditions in a fixed priority order; forced previews win.
-  const order = ['&:hover', '&:active'].map((condition) =>
-    css.indexOf(condition.replace('&', '[data-ww-surface~="subscribe-button"]')),
+  const order = [':where(*:hover)', ':where(*:active)'].map((condition) =>
+    css.indexOf('[data-ww-surface~="subscribe-button"]' + condition),
   );
   expect(order.every((index) => index > 0)).toBe(true);
   expect(order[0]!).toBeLessThan(order[1]!);

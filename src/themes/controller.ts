@@ -21,6 +21,7 @@ export interface ThemeController {
   setImageEditing(editing: ImageEditing | undefined): void;
   /** Load state of a UI skin's art in the page renderer. */
   skinAssetStatus(assetId: string): SkinAssetStatus | undefined;
+  setSkinPreviews(enabled: boolean): void;
   validateDesign(design: DesignDocument | undefined): void;
   destroy(): void;
 }
@@ -174,6 +175,7 @@ export function createThemeController(
       render();
     },
     skinAssetStatus: designRenderer.assetStatus,
+    setSkinPreviews: designRenderer.setPreviews,
     setImageEditing(next) {
       editing = Boolean(next);
       if (!suspended && current?.enabled && current.strength > 0) inspect();

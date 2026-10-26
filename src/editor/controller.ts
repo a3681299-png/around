@@ -24,6 +24,8 @@ import type { SkinSlot } from '../editor-core/skins';
 export interface SkinAssetHost {
   status(assetId: string): SkinAssetStatus | undefined;
   url(assetId: string): Promise<string | undefined>;
+  /** Forced-state preview rules exist only while the skin tool is open. */
+  previews(enabled: boolean): void;
 }
 
 export interface CreatorEditor {
@@ -202,6 +204,7 @@ export function createCreatorEditor(
     bind(active);
     const skinning = active && state.view.tool === 'skin' && !fullscreen();
     picker.setActive(skinning);
+    skinAssets?.previews(skinning);
     const preview = skinning ? state.view.skinPreview : undefined;
     picker.setSelection(skinning ? state.view.target : undefined, !preview?.state && !preview?.compact);
     picker.setPreview(skinning ? state.view.target : undefined, preview);
