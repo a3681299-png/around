@@ -102,10 +102,15 @@ Eの0.0225→0.0323msと比べ、現在は同程度の0.0319msであり、旧専
 
 ```powershell
 $env:PLAYWRIGHT_BROWSERS_PATH=(Resolve-Path '../../.work/browsers').Path
-node scripts/benchmark-page-changes.mjs 28d594a 5
+node scripts/benchmark-page-changes.mjs 5
 node scripts/compare-editor-benchmark.mjs 28d594a 5 world
 node scripts/compare-editor-benchmark.mjs b7aa71a 5 world-lookups
 ```
+
+2026-10-27のUI1検証で、page-changeの道具のソース文字列置換を廃止した。
+現在の最初の引数は組数で、同じコードの明示的な全体反映ルートと差分反映ルートを比べる。
+上の過去の測定値を取った旧コマンドは `node scripts/benchmark-page-changes.mjs 28d594a 5`。
+当時の実装そのものを比べ直す場合は、その履歴のツリーと当時のスクリプトを使う。
 
 作品の保存形式、新しいシグナルや点、解析結果の再利用、専用のスクロール高速経路は追加していない。
 実サイト・実GPU・私用VRMを使う既存オプトイン試験は今回の計測対象外。

@@ -1,5 +1,6 @@
 import { isDesignId } from './schema';
 import { readDesign } from './immutable';
+import { countPageChange } from '../diagnostics/page-change-probe';
 import {
   SKIN_STATES,
   type DesignDocument,
@@ -137,6 +138,7 @@ export function compileDesign(
   options: { previews?: boolean } = {},
 ): string {
   const design = readDesign(input);
+  WW_TEST_PAGE_CHANGE: countPageChange('compiles');
   return design.rules
     .map((rule) => {
       const target = targets.find((candidate) => candidate.id === rule.target);

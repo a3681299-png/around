@@ -1,5 +1,6 @@
 import type { SiteFeatureInstance } from '../sites/types';
 import { FEATURE_REGISTRY, featureEnabled } from './index';
+import { countPageChange } from '../diagnostics/page-change-probe';
 import type { FeatureContext, FeatureDefinition, FeaturePreferences } from './types';
 
 /** Idempotent mounts with per-feature teardown, driven by the active theme lifetime. */
@@ -30,6 +31,7 @@ export function createFeatureController(
       }
     },
     refresh() {
+      WW_TEST_PAGE_CHANGE: countPageChange('featureRefreshes');
       for (const instance of mounted.values()) instance.refresh?.();
     },
     destroy() {

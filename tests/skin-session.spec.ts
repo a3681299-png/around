@@ -185,6 +185,8 @@ test('previews are view state only, follow the target, and never enter history o
     await editor.execute({ type: 'select-target', target: 'like-button' });
     await editor.importSkin([image(1)], 'normal');
     const before = editor.snapshot();
+    const checkpoint = editor.checkpoint();
+    const historyVersion = editor.historyVersion;
     await editor.execute({ type: 'skin-preview', state: 'pressed' });
     let state = editor.snapshot();
     expect(state.view.skinPreview).toStrictEqual({ state: 'pressed' });
@@ -192,6 +194,8 @@ test('previews are view state only, follow the target, and never enter history o
     expect(state.view.canUndo).toBe(before.view.canUndo);
     await editor.execute({ type: 'skin-preview', compact: true });
     expect(editor.snapshot().view.skinPreview).toStrictEqual({ compact: true });
+    expect(editor.checkpoint()).toStrictEqual(checkpoint);
+    expect(editor.historyVersion).toBe(historyVersion);
     await editor.execute({ type: 'select-target', target: 'search-box' });
     expect(editor.snapshot().view.skinPreview).toStrictEqual({});
     await editor.execute({ type: 'skin-preview', state: 'hover' });

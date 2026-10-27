@@ -9,6 +9,7 @@ import type { ThemeDefinition } from './types';
 import { createTimelineHost, type TimelineHost } from '../host/timeline';
 import { createTakeStorage } from '../browser/take-storage';
 import { createOperationGuardHost, guardWanted, type OperationGuardHost } from '../host/operation-guard';
+import { legacyPageChange } from '../diagnostics/page-change-probe';
 
 const STYLE_ID = 'web-world-themes-style';
 
@@ -87,6 +88,7 @@ export function createThemeController(
   };
 
   const followPage = (change?: SitePageChange, marked?: readonly Element[]) => {
+    WW_TEST_PAGE_CHANGE: if (legacyPageChange()) return render();
     if (suspended || !current?.enabled || current.strength === 0) return;
     if (design?.baseThemeId !== null) {
       // Reattach the cached sheet after head replacement; settings have not changed.

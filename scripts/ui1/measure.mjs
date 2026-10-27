@@ -7,6 +7,7 @@ import { chromium } from '@playwright/test';
 import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import os from 'node:os';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 process.chdir(root);
@@ -79,7 +80,9 @@ function perFrame({ calls, frames }) {
     if (found >= 0 && start < frames[frames.length - 1]) sums[found] += ms;
   }
   const span = frames.length > 1 ? frames.at(-1) - frames[0] : 0;
-  return { frames: sums, totalMs: total, spanMs: span };
+  const accountedMs = sums.reduce((a, b) => a + b, 0);
+  if (Math.abs(accountedMs - total) > 0.001) throw new Error(`Dropped extension CPU: ${total - accountedMs}ms`);
+  return { frames: sums, totalMs: total, spanMs: span, accountedMs };
 }
 function traceFrames(events) {
   const counts = new Map();
@@ -119,11 +122,14 @@ async function launch(build) {
   const page = await context.newPage();
   const session = await context.newCDPSession(page);
   const contexts = new Set();
-  session.on('Runtime.executionContextCreated', ({ context: c }) => contexts.add(c.id));
+  session.on('Runtime.executionContextCreated', ({ context: c }) => {
+    if (c.auxData?.type === 'isolated') contexts.add(c.id);
+  });
   session.on('Runtime.executionContextDestroyed', ({ executionContextId: id }) => contexts.delete(id));
   session.on('Runtime.executionContextsCleared', () => contexts.clear());
   await session.send('Runtime.enable');
   const errors = [];
+  const version = context.browser()?.version();
   page.on('pageerror', (error) => errors.push(error.message));
   const store = (values) => popup.evaluate((values) => chrome.storage.local.set(values), values);
   await store({
@@ -147,7 +153,7 @@ async function launch(build) {
     }
     throw new Error('No measurement content script.');
   }
-  async function traced(run) {
+  async function traced(phase, run) {
     const events = [];
     const collect = ({ value }) => events.push(...value);
     session.on('Tracing.dataCollected', collect);
@@ -155,21 +161,34 @@ async function launch(build) {
       categories: 'devtools.timeline,disabled-by-default-devtools.timeline.frame',
       transferMode: 'ReportEvents',
     });
+    const profiling = process.env.UI1_CPUPROFILE === '1';
+    if (profiling) {
+      await session.send('Profiler.enable');
+      await session.send('Profiler.setSamplingInterval', { interval: 100 });
+      await session.send('Profiler.start');
+    }
     const value = await run();
+    if (profiling) {
+      const { profile } = await session.send('Profiler.stop');
+      await writeFile(
+        path.join(work, `${path.basename(build)}-${phase}-${Date.now()}-cpuprofile.json`),
+        JSON.stringify(profile),
+      );
+    }
     const done = new Promise((resolve) => session.once('Tracing.tracingComplete', resolve));
     await session.send('Tracing.end');
     await done;
     session.off('Tracing.dataCollected', collect);
     return { value, full: traceFrames(events) };
   }
-  return { context, popup, page, probe, traced, store, errors };
+  return { context, popup, page, probe, traced, store, errors, version };
 }
 
 /** startup (navigation + first 6s), steady (scrolling the feed after settling), SPA (open a video). */
 async function phases(browser) {
   const { page, probe, traced } = browser;
   const result = {};
-  const startup = await traced(async () => {
+  const startup = await traced('startup', async () => {
     await page.goto(url, { waitUntil: 'commit', timeout: 45000 });
     await page.waitForTimeout(PHASE_MS);
     return probe('__ui1Probe.end()');
@@ -183,10 +202,10 @@ async function phases(browser) {
         (node) => node.getBoundingClientRect().width > 0 && getComputedStyle(node).borderImageSource.startsWith('url('),
       ).length,
   );
-  result.startup = { ...perFrame(startup.value), full: startup.full, cards, dressed };
+  result.startup = { ...perFrame(startup.value), kinds: startup.value.kinds, full: startup.full, cards, dressed };
   await page.waitForTimeout(SETTLE_MS);
   await page.mouse.move(960, 600);
-  const steady = await traced(async () => {
+  const steady = await traced('steady', async () => {
     await probe('(__ui1Probe.begin(), true)');
     for (let i = 0; i < PHASE_MS / 500; i++) {
       await page.mouse.wheel(0, 420);
@@ -196,12 +215,13 @@ async function phases(browser) {
   });
   result.steady = {
     ...perFrame(steady.value),
+    kinds: steady.value.kinds,
     full: steady.full,
     cards: await page.locator('ytd-video-renderer').count(),
   };
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(1500);
-  const spa = await traced(async () => {
+  const spa = await traced('spa', async () => {
     await probe('(__ui1Probe.begin(), true)');
     const from = await page.evaluate(() => {
       globalThis.__ui1Same = true;
@@ -217,7 +237,7 @@ async function phases(browser) {
     if (!arrived.same || !arrived.url.includes('/watch?v=')) throw new Error('Invalid SPA block.');
     return probe('__ui1Probe.end()');
   });
-  result.spa = { ...perFrame(spa.value), full: spa.full };
+  result.spa = { ...perFrame(spa.value), kinds: spa.value.kinds, full: spa.full };
   return result;
 }
 
@@ -269,7 +289,21 @@ async function skinned(browser) {
   };
 }
 
-const result = { mode, url, measuredAt: new Date().toISOString(), builds: {}, pairs: [] };
+const result = {
+  mode,
+  url,
+  measuredAt: new Date().toISOString(),
+  environment: {
+    os: `${os.platform()} ${os.release()}`,
+    cpu: os.cpus()[0]?.model,
+    node: process.version,
+    viewport: { width: 1920, height: 1080, deviceScaleFactor: 1 },
+    phaseMs: PHASE_MS,
+    settleMs: SETTLE_MS,
+  },
+  builds: {},
+  pairs: [],
+};
 for (const [name, dir] of Object.entries(builds))
   result.builds[name] = JSON.parse(await readFile(path.join(dir, 'ui1-build.json'), 'utf8').catch(() => 'null'));
 const save = () => writeFile(path.join(work, 'result.json'), JSON.stringify(result));
@@ -291,6 +325,7 @@ try {
           ? ['skinned', 'plain']
           : ['plain', 'skinned'];
     const row = { pair, order, blocks: {} };
+    result.pairs.push(row);
     for (const condition of order) {
       const browser = mode === 'build' ? await launch(builds[condition]) : shared;
       try {
@@ -305,7 +340,15 @@ try {
           measured.dressedCards = dressed;
         }
         measured.errors = [...browser.errors];
+        measured.chrome = browser.version;
+        measured.native = await browser.page.evaluate(() => ({
+          advert: Boolean(document.querySelector('.ad-showing')),
+          dialogs: [...document.querySelectorAll('[role="dialog"]')]
+            .filter((e) => e.getBoundingClientRect().height > 0)
+            .map((e) => e.textContent?.slice(0, 200)),
+        }));
         row.blocks[condition] = measured;
+        await save();
         const brief = Object.fromEntries(
           ['startup', 'steady', 'spa'].map((phase) => [
             phase,
@@ -320,7 +363,6 @@ try {
         if (mode === 'build') await browser.context.close();
       }
     }
-    result.pairs.push(row);
     await save();
   }
   const conditions = mode === 'build' ? ['before', 'after'] : ['plain', 'skinned'];

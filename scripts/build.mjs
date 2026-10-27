@@ -11,6 +11,9 @@ const outputName = profiling ? '.work/asset-profile-dist' : (process.env.WW_BUIL
 if (!/^(dist|\.work\/[a-zA-Z0-9_-]+)$/.test(outputName))
   throw new Error('WW_BUILD_OUT must be dist or a direct .work child.');
 const outDir = join(root, outputName);
+const pageChangeProbe = process.env.WW_PAGE_CHANGE_PROBE === '1';
+if (pageChangeProbe && !outputName.startsWith('.work/'))
+  throw new Error('Development page-change probes must stay inside .work.');
 const watching = process.argv.includes('--watch');
 const worldMode = process.env.WW_WORLD_MODE ?? 'runtime';
 if (!['legacy', 'compare', 'runtime'].includes(worldMode))
@@ -86,7 +89,9 @@ const shared = {
   charset: 'utf8',
   legalComments: 'none',
   logLevel: 'info',
+  dropLabels: pageChangeProbe ? [] : ['WW_TEST_PAGE_CHANGE'],
   define: {
+    __WW_PAGE_CHANGE_LEGACY__: String(pageChangeProbe && process.env.WW_PAGE_CHANGE_LEGACY === '1'),
     __WW_WORLD_MODE__: JSON.stringify(worldMode),
     __WW_WORLD_DEVTOOLS__: String(process.env.WW_WORLD_DEVTOOLS === '1'),
     __WW_ASSET_PROFILE__: String(profiling),

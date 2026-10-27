@@ -4,11 +4,11 @@ import { cpus } from 'node:os';
 import { pageChangeBundle } from '../tests/helpers/page-change-build.ts';
 
 // Run in one browser, alternating old/current pages. No extension, private asset or network is needed.
-const before = process.argv[2] ?? '28d594a',
-  rounds = Number(process.argv[3] ?? 5),
+const before = 'development full-render route',
+  rounds = Number(process.argv[2] ?? 5),
   steps = 60;
 if (!Number.isInteger(rounds) || rounds < 1 || rounds > 20) throw new Error('Invalid round count');
-const bundles = { before: await pageChangeBundle(before), after: await pageChangeBundle() },
+const bundles = { before: await pageChangeBundle(true), after: await pageChangeBundle() },
   html = await readFile('tests/fixtures/youtube.html', 'utf8');
 const browser = await chromium.launch({ channel: 'chromium' });
 const context = await browser.newContext({ viewport: { width: 1920, height: 1080 } });

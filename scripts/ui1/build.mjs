@@ -5,6 +5,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
+import { cpuProbeBanner, cpuProbeFooter } from './cpu-probe.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const [sourceArg, outArg] = process.argv.slice(2);
@@ -26,58 +27,9 @@ execFileSync(process.execPath, ['scripts/build.mjs'], {
 });
 
 // Isolated-world wrappers: only the extension's own callbacks pass through them.
-const banner = `
-const __ui1 = (globalThis.__ui1Probe ??= { calls: [], frames: [], recording: true, top: performance.now() });
-if (!__ui1.installed) {
-  __ui1.installed = true;
-  const raf = window.requestAnimationFrame.bind(window);
-  __ui1.raf = raf;
-  const wrap = (fn) =>
-    function (...args) {
-      const start = performance.now();
-      try {
-        return fn.apply(this, args);
-      } finally {
-        if (__ui1.recording) __ui1.calls.push(start, performance.now() - start);
-      }
-    };
-  window.requestAnimationFrame = (callback) => raf(wrap(callback));
-  const timeout = window.setTimeout.bind(window);
-  window.setTimeout = (callback, ms, ...rest) => timeout(typeof callback === 'function' ? wrap(callback) : callback, ms, ...rest);
-  for (const name of ['MutationObserver', 'ResizeObserver', 'IntersectionObserver']) {
-    const Base = window[name];
-    if (Base) window[name] = class extends Base { constructor(callback, options) { super(wrap(callback), options); } };
-  }
-  const add = EventTarget.prototype.addEventListener,
-    remove = EventTarget.prototype.removeEventListener,
-    wrapped = new WeakMap();
-  EventTarget.prototype.addEventListener = function (type, listener, options) {
-    if (typeof listener !== 'function') return add.call(this, type, listener, options);
-    let value = wrapped.get(listener);
-    if (!value) wrapped.set(listener, (value = wrap(listener)));
-    return add.call(this, type, value, options);
-  };
-  EventTarget.prototype.removeEventListener = function (type, listener, options) {
-    return remove.call(this, type, (typeof listener === 'function' && wrapped.get(listener)) || listener, options);
-  };
-  // Frame boundaries from an unwrapped loop; extension work is grouped into these frames.
-  const pump = (time) => {
-    if (__ui1.recording) __ui1.frames.push(performance.now());
-    raf(pump);
-  };
-  raf(pump);
-  __ui1.begin = () => {
-    __ui1.calls = [];
-    __ui1.frames = [];
-    __ui1.recording = true;
-  };
-  __ui1.end = () => {
-    __ui1.recording = false;
-    return { calls: __ui1.calls, frames: __ui1.frames };
-  };
-}
-`;
-const footer = `if (__ui1.recording) __ui1.calls.push(__ui1.top, performance.now() - __ui1.top);`;
+const busyMs = Number(process.env.UI1_PROBE_BUSY_MS ?? 0);
+const banner = cpuProbeBanner(busyMs);
+const footer = cpuProbeFooter;
 await build({
   absWorkingDir: source,
   entryPoints: ['src/content/index.ts'],
@@ -88,6 +40,7 @@ await build({
   charset: 'utf8',
   legalComments: 'none',
   loader: { '.css': 'text' },
+  dropLabels: ['WW_TEST_PAGE_CHANGE'],
   define: { __WW_WORLD_MODE__: '"runtime"', __WW_WORLD_DEVTOOLS__: 'false', __WW_ASSET_PROFILE__: 'false' },
   banner: { js: banner },
   footer: { js: footer },
@@ -102,6 +55,6 @@ const dirty = execFileSync('git', ['status', '--porcelain', '--', 'src', 'manife
 });
 await writeFile(
   path.join(out, 'ui1-build.json'),
-  JSON.stringify({ source, revision, dirtySource: dirty.length > 0 }, null, 2),
+  JSON.stringify({ source, revision, dirtySource: dirty.length > 0, probe: 'isolated-world-v2', busyMs }, null, 2),
 );
 console.log(JSON.stringify({ out, revision, dirtySource: dirty.length > 0 }));

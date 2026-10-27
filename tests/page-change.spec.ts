@@ -11,7 +11,7 @@ async function mount(page: Page, legacy = false) {
       : route.abort(),
   );
   await page.goto('https://www.youtube.com/');
-  await page.addScriptTag({ content: await pageChangeBundle(undefined, legacy) });
+  await page.addScriptTag({ content: await pageChangeBundle(legacy) });
   await page.evaluate(() => {
     (globalThis as any).__pageTest = (globalThis as any).PageChangeTest.mount();
   });

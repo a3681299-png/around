@@ -5,6 +5,7 @@ import { compileDesign, createDesignRenderer } from '../src/design/renderer';
 import { validateDocumentAssets } from '../src/assets/design-assets';
 import { YOUTUBE_DESIGN_TARGETS } from '../src/sites/youtube-targets';
 import type { AssetMetadata } from '../src/assets/validation';
+import { hasFrameColour } from './helpers/skin-pixels';
 
 const asset = (index = 1) => `asset-${index.toString(16).padStart(64, '0')}`;
 const frame = (index = 1) => ({
@@ -34,6 +35,22 @@ const meta = (width = 96, height = 96): AssetMetadata => ({
   byteLength: 100,
   width,
   height,
+});
+
+test('the paint oracle accepts native white compositing and rejects missing or differently coloured edges', () => {
+  const source = [0, 112, 192];
+  for (const alpha of [0, 0.05, 0.15, 0.3, 0.5]) {
+    const painted = source.map((value) => Math.round(value + (255 - value) * alpha));
+    expect(hasFrameColour(painted, source)).toBe(true);
+  }
+  for (const wrong of [
+    [255, 255, 255],
+    [15, 15, 15],
+    [128, 64, 192],
+    [0, 97, 103],
+    [224, 48, 48],
+  ])
+    expect(hasFrameColour(wrong, source)).toBe(false);
 });
 
 test('all twelve historical schema versions reject the new skin field before migrating', () => {
