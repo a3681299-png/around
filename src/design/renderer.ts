@@ -328,8 +328,9 @@ export function createDesignRenderer(
     if (doc.documentElement.getAttribute('data-ww-design') !== designId)
       doc.documentElement.setAttribute('data-ww-design', designId);
     if (!style.isConnected) (doc.head ?? doc.documentElement).append(style);
-    // A mode switch shows other native colours; parts that were absent may have just appeared.
-    if (change === 'mode') schedulePlan(true);
+    // A new page may reuse a kind with different native ink/backdrops. Its presence in the
+    // previous page's plan does not make those samples valid after navigation.
+    if (change === 'mode' || change === 'navigation') schedulePlan(true);
     else if (
       pending.size &&
       marked?.some((element) =>
