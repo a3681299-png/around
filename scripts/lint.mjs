@@ -2,6 +2,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { transform } from 'esbuild';
+import { skillProblems } from './install-skills.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const errors = [];
@@ -31,5 +32,6 @@ async function check(directory) {
   }
 }
 await check(join(root, 'src'));
+errors.push(...(await skillProblems()));
 if (errors.length) throw new Error(errors.join('\n'));
-console.log('Source whitespace, CSS syntax, theme selector boundaries and color tokens checked.');
+console.log('Source whitespace, CSS syntax, theme selector boundaries, color tokens and skill metadata checked.');
