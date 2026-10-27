@@ -192,8 +192,13 @@ test('skin tool: hover names parts, click dresses every card, guides and state p
     return data;
   }, bytes);
   await dialog.locator('.slice-stage').dispatchEvent('drop', { dataTransfer: transfer });
-  await expect.poll(async () => (await skinStyle(card)).source).not.toBe(hoverSource);
-  expect((await skinStyle(card)).repeat).toBe('round');
+  // The new hover art arrives after its asset loads; meanwhile the normal art stands in.
+  await expect
+    .poll(async () => {
+      const style = await skinStyle(card);
+      return style.source !== hoverSource && style.source.startsWith('url(') && style.repeat === 'round';
+    })
+    .toBe(true);
   await expect(youtube.locator('[data-image-id]')).toHaveCount(0);
   await force.uncheck();
 

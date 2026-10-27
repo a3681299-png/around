@@ -3,7 +3,7 @@ import { createEditorSession } from '../src/editor-core/session';
 import { parseEditCommand } from '../src/editor-core/commands';
 import { shortcutCommand } from '../src/editor-core/shortcuts';
 import { parseDesign } from '../src/design/schema';
-import { defaultSkinFrame } from '../src/editor-core/skins';
+import { defaultSkinFrame, fitSkinScale } from '../src/editor-core/skins';
 import type { DesignDocument, SurfaceSkin } from '../src/design/types';
 import type { EditorAsset, EditorPorts } from '../src/editor-core/types';
 import { YOUTUBE_DESIGN_TARGETS } from '../src/sites/youtube-targets';
@@ -85,6 +85,23 @@ test('default slices take a third of each side, capped for small native parts', 
   });
 });
 
+test('the first frame is scaled so its edges take at most half of the part, keeping the centre', () => {
+  // The 96×96 verification frame: thirds of 32px, 64px top+bottom.
+  const frame = defaultSkinFrame(image(1, { width: 96, height: 96 }));
+  // A 36px button: 64 × 25% = 16px ≤ 18px; 30% would be 19.2px.
+  expect(fitSkinScale(frame, { width: 130, height: 36 }).scalePct).toBe(25);
+  // A 300px card keeps the art at full size.
+  expect(fitSkinScale(frame, { width: 360, height: 300 }).scalePct).toBe(100);
+  // Never below the schema's minimum, even for a tiny part.
+  expect(fitSkinScale(frame, { width: 8, height: 8 }).scalePct).toBe(10);
+  // Without a known size, nothing changes.
+  expect(fitSkinScale(frame, undefined)).toBe(frame);
+  // Zero-width slices on one axis do not constrain it.
+  expect(
+    fitSkinScale(defaultSkinFrame(image(2, { width: 1024, height: 2 })), { width: 520, height: 40 }).scalePct,
+  ).toBe(100);
+});
+
 test('the skin tool, its shortcut and its commands are validated at the entrance', () => {
   expect(parseEditCommand({ type: 'tool', tool: 'skin' })).toEqual({ type: 'tool', tool: 'skin' });
   const key = (k: string) =>
@@ -119,9 +136,12 @@ test('importing into a state creates the skin as one undo step and keeps its ass
     await editor.execute({ type: 'select-target', target: 'subscribe-button' });
     await editor.importSkin([image(1)], 'normal');
     let state = editor.snapshot();
+    // The first frame is fitted to the part's typical 130×36px (55%: 32px × 0.55 ≤ 18px).
+    const sample = YOUTUBE_DESIGN_TARGETS.find((item) => item.id === 'subscribe-button')!.skin!.sample;
     expect(skinOf(state.document, 'subscribe-button')).toStrictEqual({
-      states: { normal: defaultSkinFrame(image(1)) },
+      states: { normal: fitSkinScale(defaultSkinFrame(image(1)), sample) },
     });
+    expect(skinOf(state.document, 'subscribe-button')!.states.normal.scalePct).toBe(55);
     expect(state.view.skin).toStrictEqual(skinOf(state.document, 'subscribe-button'));
     expect(state.view.target).toBe('subscribe-button');
     expect(state.document.decorations).toHaveLength(0);
@@ -134,7 +154,7 @@ test('importing into a state creates the skin as one undo step and keeps its ass
     expect(Object.keys(skinOf(state.document, 'subscribe-button')!.states)).toEqual(['normal', 'pressed']);
     expect(skinOf(state.document, 'subscribe-button')!.compact).toStrictEqual({
       kind: 'frame',
-      frame: defaultSkinFrame(image(3)),
+      frame: fitSkinScale(defaultSkinFrame(image(3)), sample),
     });
     await editor.execute({ type: 'undo' });
     await editor.execute({ type: 'undo' });

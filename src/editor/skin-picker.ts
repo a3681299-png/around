@@ -10,6 +10,26 @@ const PICKING = 'data-ww-skin-picking',
 const CONTROL =
   'button, a[href], input, textarea, select, [role="button"], [role="tab"], [role="link"], [role="checkbox"], [role="switch"], [contenteditable="true"], img';
 
+/** Space between the part's edges and its nearest visible text: a frame wider than this covers text. */
+function textInset(element: Element) {
+  const box = element.getBoundingClientRect();
+  const inset = { top: Infinity, right: Infinity, bottom: Infinity, left: Infinity };
+  const walker = element.ownerDocument.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    if (!node.textContent?.trim()) continue;
+    const range = element.ownerDocument.createRange();
+    range.selectNodeContents(node);
+    for (const rect of range.getClientRects()) {
+      if (!rect.width || !rect.height) continue;
+      inset.top = Math.min(inset.top, rect.top - box.top);
+      inset.right = Math.min(inset.right, box.right - rect.right);
+      inset.bottom = Math.min(inset.bottom, box.bottom - rect.bottom);
+      inset.left = Math.min(inset.left, rect.left - box.left);
+    }
+  }
+  return Number.isFinite(inset.top) ? inset : undefined;
+}
+
 export interface SkinHit {
   element: Element;
   /** Undefined: a native control with no skin support (shown as 未対応). */
@@ -151,25 +171,39 @@ export function createSkinPicker(doc: Document, targets: readonly DesignTarget[]
         root.setAttribute(SKIN_FORCE_COMPACT_ATTRIBUTE, compact);
     },
     /** One query per part, only while the skin tool is open. */
-    pageInfo(asset: (targetId: string) => SkinAssetStatus | undefined): SkinPageInfo[] {
+    pageInfo(
+      asset: (targetId: string) => SkinAssetStatus | undefined,
+      ink: (targetId: string) => SkinPageInfo['ink'] | undefined,
+    ): SkinPageInfo[] {
       return parts.map((target) => {
         const elements = doc.querySelectorAll(selector(target));
         let width = 0,
-          height = 0;
+          height = 0,
+          minWidth = Infinity,
+          minHeight = Infinity,
+          first: Element | undefined;
         for (const element of elements) {
           const rect = element.getBoundingClientRect();
-          if (rect.width && rect.height) {
+          if (!rect.width || !rect.height) continue;
+          if (!first) {
+            first = element;
             width = rect.width;
             height = rect.height;
-            break;
           }
+          minWidth = Math.min(minWidth, rect.width);
+          minHeight = Math.min(minHeight, rect.height);
         }
-        const status = asset(target.id);
+        const status = asset(target.id),
+          legibility = ink(target.id),
+          inset = first && textInset(first);
         return {
           id: target.id,
           count: elements.length,
           ...(elements.length ? { width, height } : {}),
+          ...(first ? { minWidth, minHeight } : {}),
+          ...(inset ? { textInset: inset } : {}),
           ...(status ? { asset: status } : {}),
+          ...(legibility ? { ink: legibility } : {}),
         };
       });
     },

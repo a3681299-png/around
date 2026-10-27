@@ -1,5 +1,6 @@
 import { createFeatureController } from '../features/controller';
 import { compileDesign, createDesignRenderer, type SkinAssetPort, type SkinAssetStatus } from '../design/renderer';
+import type { InkDecision } from '../design/contrast';
 import { readDesign } from '../design/immutable';
 import type { DesignDocument } from '../design/types';
 import { createImageRenderer, type ImageEditing } from '../design/image-renderer';
@@ -22,6 +23,7 @@ export interface ThemeController {
   setImageEditing(editing: ImageEditing | undefined): void;
   /** Load state of a UI skin's art in the page renderer. */
   skinAssetStatus(assetId: string): SkinAssetStatus | undefined;
+  skinInkStatus(target: string): Readonly<Record<string, InkDecision>> | undefined;
   setSkinPreviews(enabled: boolean): void;
   validateDesign(design: DesignDocument | undefined): void;
   destroy(): void;
@@ -188,6 +190,7 @@ export function createThemeController(
       render();
     },
     skinAssetStatus: designRenderer.assetStatus,
+    skinInkStatus: designRenderer.inkStatus,
     setSkinPreviews(enabled) {
       designRenderer.setPreviews(enabled);
       // The skin tool lists and highlights every part, used or not.

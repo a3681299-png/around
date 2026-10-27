@@ -17,6 +17,7 @@ import type { StudioLayoutAdapter } from '../studio/layout-types';
 import type { TimelineHost } from '../host/timeline';
 import type { TimelineCommand, TimelineUpdate } from '../timeline/types';
 import type { SkinAssetStatus } from '../design/renderer';
+import type { InkDecision } from '../design/contrast';
 import { createSkinPicker } from './skin-picker';
 import type { SkinSlot } from '../editor-core/skins';
 
@@ -26,6 +27,8 @@ export interface SkinAssetHost {
   url(assetId: string): Promise<string | undefined>;
   /** Forced-state preview rules exist only while the skin tool is open. */
   previews(enabled: boolean): void;
+  /** The renderer's legibility decision per state of one part, in the current mode. */
+  ink(target: string): Readonly<Record<string, InkDecision>> | undefined;
 }
 
 export interface CreatorEditor {
@@ -180,7 +183,12 @@ export function createCreatorEditor(
           rule.skin ? [[rule.target, skinAssets?.status(rule.skin.states.normal.assetId)] as const] : [],
         ),
       );
-      panel.setSkinPage(picker.pageInfo((id) => assets.get(id)));
+      panel.setSkinPage(
+        picker.pageInfo(
+          (id) => assets.get(id),
+          (id) => skinAssets?.ink(id),
+        ),
+      );
     }, 250);
   };
   function refresh(next = core.snapshot()) {

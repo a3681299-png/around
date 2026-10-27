@@ -29,6 +29,11 @@ const targets: readonly YouTubeTarget[] = [
       states: { hover: '&:hover', focus: '&:focus-within', pressed: '&:active' },
       where: 'トップページ・検索結果・関連動画',
       sample: { width: 360, height: 300 },
+      // Thumbnails cover the card's own edges. Cards stand at least 8px apart (watch sidebar,
+      // measured 2026-10-27), so 4px per card keeps neighbouring frames and cards clear.
+      outset: 4,
+      // Titles and metadata set their own colours; text on thumbnails (badges) stays as it is.
+      ink: '& :not(ytd-thumbnail, ytd-thumbnail *, yt-thumbnail-view-model, yt-thumbnail-view-model *)',
     },
   },
   {
@@ -94,6 +99,8 @@ const targets: readonly YouTubeTarget[] = [
       states: { hover: '&:hover', focus: '&:focus-within' },
       where: 'ページ上部（すべてのページ）',
       sample: { width: 480, height: 40 },
+      // The typed text and the placeholder live in the input, which has its own colour.
+      ink: '& input, & input::placeholder',
     },
   },
   {
@@ -124,6 +131,8 @@ const targets: readonly YouTubeTarget[] = [
       labels: { selected: '展開中' },
       where: '動画ページ',
       sample: { width: 560, height: 104 },
+      // Spans, links and hashtags each set a colour.
+      ink: '& *',
     },
   },
   {
@@ -135,6 +144,11 @@ const targets: readonly YouTubeTarget[] = [
       states: { hover: '&:hover', focus: '&:focus-within' },
       where: '動画ページのコメント欄（スクロールして読み込み後）',
       sample: { width: 520, height: 40 },
+      // The placeholder text starts at the left edge (0px padding). Measured clear space:
+      // 12px to the avatar, 24px above, 32px below and right (2026-10-27).
+      outset: 8,
+      // The placeholder string sets its own grey.
+      ink: '& *',
     },
   },
 ];

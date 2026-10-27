@@ -177,11 +177,10 @@ test('every forbidden geometry or interaction property is rejected at every skin
   }
 });
 
-test('all nine parts emit only seven paint properties, and every non-object URL is rejected', () => {
+test('all nine parts emit only the five border-image properties, and every non-object URL is rejected', () => {
   const design = parseDesign(documentWith(YOUTUBE_DESIGN_TARGETS.map((target) => rule(target.id))));
+  // UI1.1: the native background stays; `color` appears only with an engine legibility plan.
   const allowed = [
-    'background-color',
-    'background-image',
     'border-image-source',
     'border-image-slice',
     'border-image-width',

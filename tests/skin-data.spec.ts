@@ -8,6 +8,7 @@ import { SKIN_LIMITS, type DesignDocument, type DesignTarget, type SurfaceSkin }
 import { validateDocumentAssets } from '../src/assets/design-assets';
 import { YOUTUBE_DESIGN_TARGETS } from '../src/sites/youtube-targets';
 import type { AssetMetadata } from '../src/assets/validation';
+import { INK } from '../src/design/contrast';
 
 const fixtures = 'tests/fixtures/designs/';
 const A = `asset-${'a'.repeat(64)}`,
@@ -197,7 +198,12 @@ test('skin CSS uses only border-image and background painting, ordered states, a
   expect(css).toContain('border-image-repeat:stretch');
   expect(css).toContain('border-image-repeat:round');
   expect(css).toContain('border-image-outset:0');
-  expect(css).toContain('background-color:transparent');
+  // UI1.1: the native background stays under the art. The only background a skin writes is the
+  // colour the author chose for small parts; the only colour is the engine's legibility plan.
+  for (const line of css.split(String.fromCharCode(10)))
+    if (!line.includes('[data-ww-skin-compact~=') && !line.includes('data-ww-skin-force-compact'))
+      expect(line, line).not.toMatch(/background|[{;]color:/);
+  expect(css).not.toContain('transparent');
   // Geometry and hit-testing properties are never written.
   const properties = new Set([...css.matchAll(/[{;]([a-z-]+):/g)].map((match) => match[1]!));
   expect(properties.size).toBeGreaterThan(0);
@@ -210,7 +216,6 @@ test('skin CSS uses only border-image and background painting, ordered states, a
         'border-image-repeat',
         'border-image-outset',
         'background-color',
-        'background-image',
       ],
       property,
     ).toContain(property);
@@ -254,12 +259,97 @@ test('scale changes only the drawn edge width and compact needs come from the no
   );
   const css = compileDesign(design, [target], urls);
   expect(css).toContain('border-image-width:6px 8px 6px 8px');
-  // The explicit background colour replaces the transparent default under the art.
-  expect(css).toContain('background-color:#010203');
+  // The author's explicit colour comes from the existing style rule; the skin adds none.
+  expect(css).toContain('background:#010203 !important');
+  expect(css.split(String.fromCharCode(10)).filter((line) => line.includes('border-image-source'))).not.toEqual(
+    expect.arrayContaining([expect.stringContaining('background')]),
+  );
   expect(skinCompactNeeds(design)).toStrictEqual([{ target: 'subscribe-button', minWidth: 16, minHeight: 12 }]);
   expect(
     skinCompactNeeds(parseDesign(doc([{ kind: 'surface-style', target: 'video-card', style: {}, skin: skin() }]))),
   ).toStrictEqual([]);
+});
+
+test('a forced state whose new art is still loading shows the normal art instead of nothing', () => {
+  const design = parseDesign(
+    doc([
+      {
+        kind: 'surface-style',
+        target: 'subscribe-button',
+        style: {},
+        skin: { states: { normal: frame(A), hover: frame(C) } },
+      },
+    ]),
+  );
+  // C has no URL yet: the natural hover rule is omitted (normal applies), and the forced hover
+  // preview — which switches natural rules off — falls back to the normal art.
+  const css = compileDesign(design, [target], urls, { previews: true });
+  const forced = css.split(String.fromCharCode(10)).find((line) => line.includes('="subscribe-button:hover"]'));
+  expect(forced).toContain('0b8f1d3e-0000-4000-8000-000000000001');
+  expect(css).not.toContain(':where(*:hover){');
+});
+
+test('parts with an adapter outset draw outward by at most the measured gap, the rest inside', () => {
+  const outward: DesignTarget = { ...target, skin: { ...target.skin!, outset: 4 } };
+  const design = (scalePct: number) =>
+    parseDesign(
+      doc([
+        {
+          kind: 'surface-style',
+          target: 'subscribe-button',
+          style: {},
+          skin: { states: { normal: frame(A, { scalePct }) } },
+        },
+      ]),
+    );
+  // Widths 12/16px are capped at 4px outside; the remaining 8/12px stay inside.
+  expect(compileDesign(design(100), [outward], urls)).toContain('border-image-outset:4px 4px 4px 4px');
+  // Thin frames (3/4px) lie wholly outside.
+  expect(compileDesign(design(25), [outward], urls)).toContain('border-image-outset:3px 4px 3px 4px');
+  // Without an adapter outset the frame stays inside.
+  expect(compileDesign(design(100), [target], urls)).toContain('border-image-outset:0 !important');
+  // The bundled card and comment entry draw outward; the other seven parts do not.
+  expect(
+    YOUTUBE_DESIGN_TARGETS.filter((item) => item.skin?.outset)
+      .map((item) => [item.id, item.skin!.outset])
+      .sort(),
+  ).toEqual([
+    ['comment-input', 8],
+    ['video-card', 4],
+  ]);
+});
+
+test('legibility colours are white or black only, per mode, part and state, and reach the adapter descendants', () => {
+  const inked: DesignTarget = { ...target, skin: { ...target.skin!, ink: '& span, & input::placeholder' } };
+  const design = parseDesign(doc([{ kind: 'surface-style', target: 'subscribe-button', style: {}, skin: skin() }]));
+  const css = compileDesign(design, [inked], urls, {
+    inks: { light: { 'subscribe-button': { normal: INK.black, hover: INK.white } } },
+  });
+  const ink = css.split(String.fromCharCode(10)).filter((line) => line.includes('color:'));
+  expect(ink).toHaveLength(2);
+  expect(ink[0]).toContain('html[data-ww-design][data-ww-site][data-ww-mode="light"]');
+  expect(ink[0]).toContain('[data-ww-surface~="subscribe-button"] span,');
+  expect(ink[0]).toContain('[data-ww-surface~="subscribe-button"] input::placeholder{color:#000000 !important;}');
+  // Hover follows normal in source order, as the art does.
+  expect(ink[1]).toContain(':where(*:hover)');
+  expect(ink[1]).toContain('color:#ffffff');
+  expect(css).not.toContain('data-ww-mode="dark"');
+  // Only the two engine colours; nothing from artwork reaches `color`.
+  expect(() =>
+    compileDesign(design, [inked], urls, { inks: { light: { 'subscribe-button': { normal: '#123456' as never } } } }),
+  ).toThrow();
+  expect(() =>
+    compileDesign(design, [{ ...target, skin: { ...target.skin!, ink: 'span{color:red}' } }], urls, {
+      inks: { light: { 'subscribe-button': { normal: INK.black } } },
+    }),
+  ).toThrow();
+  // Forced previews and the compact look carry the colour of their state.
+  const previews = compileDesign(design, [inked], urls, {
+    previews: true,
+    inks: { dark: { 'subscribe-button': { normal: INK.white, compact: INK.black } } },
+  });
+  expect(previews).toContain('[data-ww-mode="dark"][data-ww-skin-force="subscribe-button:pressed"]');
+  expect(previews).toMatch(/\[data-ww-skin-compact~="subscribe-button"\] span,[^{]*\{color:#000000/);
 });
 
 test('asset references include skins, and saved skins must reference small static images that fit the slices', () => {
@@ -462,5 +552,72 @@ test('compact sizing observes only parts the site just marked; page changes neve
   renderer.refresh('content', []);
   expect(queries).toBe(initial);
   expect(observed).toEqual([button]);
+  renderer.dispose();
+});
+
+test('the renderer plans legibility once from the art and the native colours, and reports it', async () => {
+  const centre = (rgba: number[]) => {
+    const data = new Uint8ClampedArray(48 * 48 * 4);
+    for (let i = 0; i < 48 * 48; i++) data.set(rgba, i * 4);
+    return { width: 96, height: 96, sampleWidth: 48, sampleHeight: 48, data };
+  };
+  let art = centre([245, 245, 245, 255]),
+    reads = 0;
+  const button = {
+    parentElement: null,
+    getBoundingClientRect: () => ({ width: 130, height: 36 }),
+    matches: () => true,
+  } as unknown as Element;
+  const style = { id: '', textContent: '', isConnected: true, remove() {} } as unknown as HTMLStyleElement;
+  const page = {
+    documentElement: {
+      getAttribute: (name: string) => (name === 'data-ww-mode' ? 'light' : null),
+      setAttribute() {},
+      removeAttribute() {},
+    },
+    head: { append() {} },
+    createElement: () => style,
+    querySelectorAll: () => [button],
+    defaultView: {
+      getComputedStyle: () => {
+        reads++;
+        // The subscribe button: white text on #0f0f0f.
+        return { color: 'rgb(241, 241, 241)', backgroundColor: 'rgb(15, 15, 15)' };
+      },
+    },
+  } as unknown as Document;
+  const renderer = createDesignRenderer(page, [target], {
+    load: async () => 'blob:https://www.youtube.com/0b8f1d3e-0000-4000-8000-00000000000a',
+    revoke() {},
+    pixels: async () => art,
+  });
+  const design = parseDesign(
+    doc([{ kind: 'surface-style', target: 'subscribe-button', style: {}, skin: { states: { normal: frame() } } }]),
+  );
+  renderer.update(design);
+  await expect.poll(() => style.textContent).toContain('color:#000000');
+  expect(style.textContent).toContain('[data-ww-mode="light"]');
+  expect(renderer.inkStatus('subscribe-button')!.normal).toMatchObject({ ink: INK.black, warn: false });
+  // A page change does not replan: nothing is read again.
+  const settled = reads;
+  renderer.refresh('structure', []);
+  await new Promise((resolve) => setTimeout(resolve, 10));
+  expect(reads).toBe(settled);
+  // Transparent art shows the native black button: native white text stays, no colour rule.
+  art = centre([0, 0, 0, 0]);
+  renderer.update(
+    parseDesign(
+      doc([
+        {
+          kind: 'surface-style',
+          target: 'subscribe-button',
+          style: {},
+          skin: { states: { normal: frame(B) } },
+        },
+      ]),
+    ),
+  );
+  await expect.poll(() => style.textContent).not.toContain('color:');
+  expect(renderer.inkStatus('subscribe-button')!.normal!.ink).toBeUndefined();
   renderer.dispose();
 });

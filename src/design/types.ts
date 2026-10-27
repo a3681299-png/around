@@ -138,6 +138,12 @@ export interface SkinTargetSpec {
   readonly where?: string;
   /** Typical size, used by the editor's size preview. */
   readonly sample?: { readonly width: number; readonly height: number };
+  /** Most CSS px the frame may be drawn outside the part: the measured clear gap around it.
+   * Used where children cover the edges or text starts at the edge. Omitted: drawn inside. */
+  readonly outset?: number;
+  /** Descendants that keep their own text colour, as a selector of `&` (the part). The engine's
+   * legibility colour reaches them as well as the part itself. */
+  readonly ink?: string;
 }
 
 export interface DesignTarget {

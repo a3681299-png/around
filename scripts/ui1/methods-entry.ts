@@ -110,4 +110,38 @@ scope.__ui1Methods = {
   clear() {
     document.getElementById('ui1-method-style')?.remove();
   },
+  /** Does `color` on the part reach every visible text node and icon? Lists the elements
+   * whose own rules keep a different colour. */
+  ink() {
+    const element = document.querySelector('[data-ui1-method]')!;
+    const style = document.createElement('style');
+    style.id = 'ui1-ink-style';
+    style.textContent = '[data-ui1-method]{color:rgb(1, 2, 3) !important;}';
+    document.head.append(style);
+    const ignored: string[] = [];
+    let texts = 0;
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      const parent = node.parentElement!;
+      if (!node.textContent?.trim() || !parent.getClientRects().length) continue;
+      texts++;
+      const color = getComputedStyle(parent).color;
+      if (color !== 'rgb(1, 2, 3)')
+        ignored.push(`text ${parent.tagName.toLowerCase()}.${[...parent.classList][0] ?? ''} ${color}`);
+    }
+    let icons = 0;
+    for (const svg of element.querySelectorAll('svg')) {
+      if (!svg.getClientRects().length) continue;
+      icons++;
+      for (const shape of svg.querySelectorAll('path,circle,rect')) {
+        const fill = getComputedStyle(shape).fill;
+        if (fill !== 'none' && fill !== 'rgb(1, 2, 3)') {
+          ignored.push(`icon ${shape.tagName.toLowerCase()} fill ${fill}`);
+          break;
+        }
+      }
+    }
+    style.remove();
+    return { texts, icons, ignored: ignored.slice(0, 6) };
+  },
 };

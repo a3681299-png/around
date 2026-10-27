@@ -1,6 +1,15 @@
 import styles from './skin-panel.css';
 import { SKIN_LIMITS, type DesignTarget, type SkinFrame, type SkinState, type SurfaceSkin } from '../design/types';
-import { SKIN_STATE_HELP as STATE_HELP, skinReason, skinStateName, skinStates, type SkinPageInfo } from './skin-status';
+import {
+  SKIN_STATE_HELP as STATE_HELP,
+  inkMessage,
+  skinReason,
+  skinReport,
+  skinStateName,
+  skinStates,
+  type PaintedArea,
+  type SkinPageInfo,
+} from './skin-status';
 import type { EditorView, SkinPreview } from '../editor-core/types';
 import type { SkinSlot } from '../editor-core/skins';
 
@@ -52,6 +61,7 @@ export function createSkinPanel(doc: Document, actions: SkinPanelActions, option
       <div class="skin-heading"><strong class="skin-name"></strong><span class="skin-reach"></span><span class="skin-reason" role="status" hidden></span></div>
       <div class="skin-tabs" role="tablist" aria-label="部品の状態"></div>
       <p class="hint skin-state-help"></p>
+      <p class="skin-ink" role="status" hidden></p>
       <label class="skin-toggle"><input type="checkbox" class="skin-force">ページ上でこの状態を表示</label>
       <div class="skin-drop main-drop" role="button" tabindex="0"><strong class="drop-title"></strong><small>PNG・WebP（${SKIN_LIMITS.edge}px以内）をドロップ、またはクリックして選ぶ</small></div>
       <div class="skin-inherit" hidden><p>この状態は「通常」の絵を使っています。</p><button type="button" class="skin-copy">通常の絵をもとに編集する</button></div>
@@ -64,6 +74,7 @@ export function createSkinPanel(doc: Document, actions: SkinPanelActions, option
           <label>枠の太さ<input type="number" class="skin-scale" aria-label="枠の太さ（%）" min="${SKIN_LIMITS.scaleMin}" max="${SKIN_LIMITS.scaleMax}" step="5" required></label>
         </div>
         <div class="skin-row"><button type="button" class="skin-replace">絵を差し替える</button><button type="button" class="skin-remove"></button></div>
+        <div class="skin-report" aria-label="取り込んだ絵の確認"><ul class="report-facts"></ul><ul class="report-warnings" role="status"></ul></div>
       </div>
       <details class="skin-sizes" open><summary>大きさの確認</summary><div class="size-previews"></div><p class="hint size-actual"></p></details>
       <details class="skin-compact"><summary>小さすぎるとき</summary>
@@ -103,6 +114,36 @@ export function createSkinPanel(doc: Document, actions: SkinPanelActions, option
     fileSlot: SkinSlot = 'normal',
     lastTarget: string | undefined;
   const urls = new Map<string, string | null>();
+  // Painted area per asset, measured once from the decoded preview image.
+  const paintedAreas = new Map<string, { size: { width: number; height: number }; area?: PaintedArea }>();
+  const measurePainted = (assetId: string) => {
+    if (paintedAreas.has(assetId) || !image.naturalWidth) return;
+    const width = image.naturalWidth,
+      height = image.naturalHeight;
+    const canvas = doc.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext('2d', { willReadFrequently: true });
+    if (!context) return;
+    context.drawImage(image, 0, 0);
+    const { data } = context.getImageData(0, 0, width, height);
+    let left = width,
+      top = height,
+      right = -1,
+      bottom = -1;
+    for (let y = 0; y < height; y++)
+      for (let x = 0; x < width; x++)
+        if (data[(y * width + x) * 4 + 3]! > 8) {
+          left = Math.min(left, x);
+          right = Math.max(right, x + 1);
+          top = Math.min(top, y);
+          bottom = Math.max(bottom, y + 1);
+        }
+    paintedAreas.set(assetId, {
+      size: { width, height },
+      ...(right >= 0 ? { area: { left, top, right, bottom } } : {}),
+    });
+  };
   const target = () => targets.find((item) => item.id === view?.target);
   // Typing in a number field must not be overwritten by the echo of its own command.
   const focused = (element: HTMLElement) => (root.getRootNode() as Document | ShadowRoot).activeElement === element;
@@ -310,9 +351,33 @@ export function createSkinPanel(doc: Document, actions: SkinPanelActions, option
   }
   image.addEventListener('load', () => {
     const frame = dragging?.frame ?? frameOf(view?.skin, tab);
-    if (frame) layoutGuides(frame);
-    if (view) renderSizes(view);
+    if (frame) {
+      layoutGuides(frame);
+      measurePainted(frame.assetId);
+    }
+    if (view) render(view);
   });
+  const renderReport = (part: DesignTarget, frame: SkinFrame | undefined) => {
+    const facts = get<HTMLUListElement>('.report-facts'),
+      warnings = get<HTMLUListElement>('.report-warnings');
+    const measured = frame && paintedAreas.get(frame.assetId);
+    const report = frame
+      ? skinReport(part, frame, measured?.size, measured?.area, page.get(part.id))
+      : { facts: [], warnings: [] };
+    const key = JSON.stringify(report);
+    if (facts.dataset.key === key) return;
+    facts.dataset.key = key;
+    const items = (list: HTMLUListElement, lines: string[]) =>
+      list.replaceChildren(
+        ...lines.map((line) => {
+          const item = doc.createElement('li');
+          item.textContent = line;
+          return item;
+        }),
+      );
+    items(facts, report.facts);
+    items(warnings, report.warnings);
+  };
 
   // Size preview: the same border-image the engine writes, set through CSSOM properties only.
   const paint = (element: HTMLElement, frame: SkinFrame | undefined, background: string) => {
@@ -589,6 +654,13 @@ export function createSkinPanel(doc: Document, actions: SkinPanelActions, option
     compactColor.disabled = state.saving || !skin;
     compactDrop.hidden = compactKind !== 'frame' || Boolean(skin?.compact?.kind === 'frame') || !options.import;
     get<HTMLButtonElement>('.compact-edit').hidden = compactKind !== 'frame' || tab === 'compact';
+    renderReport(part, frame);
+    // The engine's legibility decision for the open tab (a state without its own art shows normal's).
+    const ink = inkMessage(info?.ink?.[tab] ?? (tab !== 'compact' && !frame ? info?.ink?.normal : undefined));
+    const inkLine = get<HTMLElement>('.skin-ink');
+    inkLine.hidden = !ink || !skin;
+    inkLine.dataset.warn = String(Boolean(ink?.warn));
+    setText(inkLine, ink?.text ?? '');
     renderSizes(state);
   }
 

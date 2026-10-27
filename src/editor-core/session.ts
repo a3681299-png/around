@@ -37,7 +37,7 @@ import {
   type SkinPreview,
 } from './types';
 import { designAssetIds } from '../design/references';
-import { defaultSkinFrame, putSkin, skinAssetProblem, withSkinFrame, type SkinSlot } from './skins';
+import { defaultSkinFrame, fitSkinScale, putSkin, skinAssetProblem, withSkinFrame, type SkinSlot } from './skins';
 import type { SignalRule } from '../signals/keyframes';
 
 /** Portable, authoritative edit session. All environment access comes through ports. */
@@ -596,7 +596,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
         previous.slices.left + previous.slices.right <= asset.width &&
         previous.slices.top + previous.slices.bottom <= asset.height
           ? { ...previous, assetId: asset.id }
-          : defaultSkinFrame(asset);
+          : fitSkinScale(defaultSkinFrame(asset), target.skin?.sample);
       const next = putSkin(draft, target.id, withSkinFrame(existing, slot, frame));
       await checkDesignAssets(next, importSession);
       if (epoch !== importEpoch || !active) return;

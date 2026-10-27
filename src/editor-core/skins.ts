@@ -27,6 +27,22 @@ export function defaultSkinFrame(asset: Pick<EditorAsset, 'id' | 'width' | 'heig
   };
 }
 
+/** Scales a first frame so its drawn edges take at most half of the part's typical size, leaving
+ * a centre. Steps of 5% like the editor; never below the schema minimum. */
+export function fitSkinScale(
+  frame: SkinFrame,
+  part: { readonly width: number; readonly height: number } | undefined,
+): SkinFrame {
+  if (!part) return frame;
+  const { top, right, bottom, left } = frame.slices;
+  const limits = [
+    top + bottom ? part.height / 2 / (top + bottom) : 1,
+    left + right ? part.width / 2 / (left + right) : 1,
+  ];
+  const scalePct = Math.max(SKIN_LIMITS.scaleMin, Math.min(100, Math.floor((Math.min(...limits) * 100) / 5) * 5));
+  return scalePct === frame.scalePct ? frame : { ...frame, scalePct };
+}
+
 /** Static raster images only, small enough to paint on many parts at once. */
 export function skinAssetProblem(asset: EditorAsset): string | undefined {
   if (asset.model || asset.animation) return '着せ替えにはPNG・WebPの静止画像を使ってください。';

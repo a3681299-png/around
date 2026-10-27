@@ -56,6 +56,7 @@ if (site) {
     {
       status: controller.skinAssetStatus,
       previews: controller.setSkinPreviews,
+      ink: controller.skinInkStatus,
       url(assetId) {
         let url = previewUrls.get(assetId);
         if (!url) {

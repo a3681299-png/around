@@ -34,6 +34,7 @@ const unitSpecs = [
   'signal-evaluation-benchmark',
   'signal-equality',
   'signal-rules',
+  'skin-contrast',
   'skin-data',
   'skin-session',
   'skin-verification-data',

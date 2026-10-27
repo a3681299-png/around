@@ -394,3 +394,31 @@ main[data-skin-tool] .studio-inspectors > .skin {
   background: #272831;
   color: #cfcde0;
 }
+.skin-ink {
+  margin: 4px 0;
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: #23302a;
+  color: #b6e6c4;
+}
+.skin-ink[data-warn='true'] {
+  background: #3a3220;
+  color: #f3d991;
+}
+.skin-ink[hidden] {
+  display: none;
+}
+.skin-report ul {
+  margin: 6px 0 0;
+  padding-left: 16px;
+}
+.report-facts li {
+  color: #b9b8c6;
+}
+.report-warnings:empty {
+  display: none;
+}
+.report-warnings li {
+  margin: 3px 0;
+  color: #f3d991;
+}
