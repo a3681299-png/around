@@ -70,9 +70,26 @@ export interface InkDecision {
  * of the backdrop; otherwise white or black, whichever reads better. Warns when neither reaches
  * 4.5:1. A part's children often set their own colours, so all of them are judged. */
 export function decideInk(backdrop: { dark: number; light: number }, native: Rgb | readonly Rgb[]): InkDecision {
-  const worst = (ink: number) => Math.min(contrastRatio(ink, backdrop.dark), contrastRatio(ink, backdrop.light));
   const natives = (typeof native[0] === 'number' ? [native] : native) as readonly Rgb[];
-  const own = Math.min(...natives.map((colour) => worst(luminance(colour)))),
+  return decideInkAcross([{ backdrop, natives }]);
+}
+
+/** One colour for every part of a kind (CSS is per kind): each visible part is judged against its
+ * own backdrop, and the least readable case decides. */
+export function decideInkAcross(
+  cases: readonly { backdrop: { dark: number; light: number }; natives: readonly Rgb[] }[],
+): InkDecision {
+  const worst = (ink: number) =>
+    Math.min(
+      ...cases.map(({ backdrop }) => Math.min(contrastRatio(ink, backdrop.dark), contrastRatio(ink, backdrop.light))),
+    );
+  const own = Math.min(
+      ...cases.flatMap(({ backdrop, natives }) =>
+        natives.map((colour) =>
+          Math.min(contrastRatio(luminance(colour), backdrop.dark), contrastRatio(luminance(colour), backdrop.light)),
+        ),
+      ),
+    ),
     white = worst(1),
     black = worst(0);
   const best = Math.max(white, black);

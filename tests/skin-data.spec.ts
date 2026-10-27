@@ -348,7 +348,12 @@ test('legibility colours are white or black only, per mode, part and state, and 
     previews: true,
     inks: { dark: { 'subscribe-button': { normal: INK.white, compact: INK.black } } },
   });
-  expect(previews).toContain('[data-ww-mode="dark"][data-ww-skin-force="subscribe-button:pressed"]');
+  expect(previews).toContain(
+    '[data-ww-mode="dark"]:not([data-ww-ink-off])[data-ww-skin-force="subscribe-button:pressed"]',
+  );
+  // Every colour rule steps aside while the engine reads native colours.
+  for (const line of previews.split(String.fromCharCode(10)).filter((item) => item.includes('color:')))
+    expect(line).toContain(':not([data-ww-ink-off])');
   expect(previews).toMatch(/\[data-ww-skin-compact~="subscribe-button"\] span,[^{]*\{color:#000000/);
 });
 

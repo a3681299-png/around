@@ -3,6 +3,7 @@ import {
   backdropLuminance,
   contrastRatio,
   decideInk,
+  decideInkAcross,
   INK,
   luminance,
   parseRgb,
@@ -108,6 +109,20 @@ test('a part whose text uses several colours is judged by the least readable one
   expect(decideInk(light, [[0, 0, 0], BLACK]).ink).toBeUndefined();
   // A single colour still works as before.
   expect(decideInk(light, WHITE).ink).toBe(INK.black);
+});
+
+test('parts of one kind with different backdrops and colours share one colour that works for all', () => {
+  // Chips: the selected one is white on black, the others dark on grey. Light art over both.
+  const art96 = art(solid([245, 245, 245, 200].slice(0, 3) as unknown as Rgb, 200));
+  const selected = { backdrop: backdropLuminance(art96, frame, [15, 15, 15]), natives: [WHITE] as Rgb[] };
+  const plain = { backdrop: backdropLuminance(art96, frame, [242, 242, 242]), natives: [BLACK] as Rgb[] };
+  // Judged on the plain chip alone, nothing would change; across both, black is chosen.
+  expect(decideInkAcross([plain]).ink).toBeUndefined();
+  const both = decideInkAcross([plain, selected]);
+  expect(both.ink).toBe(INK.black);
+  expect(both.contrast).toBeGreaterThanOrEqual(3);
+  // A single case is the same as decideInk.
+  expect(decideInkAcross([selected])).toStrictEqual(decideInk(selected.backdrop, WHITE));
 });
 
 test('an empty centre slice falls back to the whole image', () => {

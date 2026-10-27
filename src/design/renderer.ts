@@ -3,7 +3,7 @@ import { readDesign } from './immutable';
 import { countPageChange } from '../diagnostics/page-change-probe';
 import {
   backdropLuminance,
-  decideInk,
+  decideInkAcross,
   hexRgb,
   INK,
   luminance,
@@ -28,6 +28,8 @@ export const SKIN_FORCE_ATTRIBUTE = 'data-ww-skin-force';
 export const SKIN_FORCE_COMPACT_ATTRIBUTE = 'data-ww-skin-force-compact';
 /** Element attribute the renderer maintains for parts smaller than their frame's edges. */
 export const SKIN_COMPACT_ATTRIBUTE = 'data-ww-skin-compact';
+/** Root attribute held only while the engine reads native text colours for its legibility plan. */
+export const INK_OFF_ATTRIBUTE = 'data-ww-ink-off';
 
 export type AssetUrl = (assetId: string) => string | undefined;
 // Only object URLs the engine created itself are written into CSS.
@@ -179,7 +181,7 @@ function compileInk(
   for (const mode of ['light', 'dark'] as const) {
     const slots = inks?.[mode]?.[id];
     if (!slots) continue;
-    const root = `${ROOT}[data-ww-mode="${mode}"]`;
+    const root = `${ROOT}[data-ww-mode="${mode}"]:not([${INK_OFF_ATTRIBUTE}])`;
     for (const state of SKIN_STATES)
       if (slots[state] && states[state] !== undefined)
         lines.push(rule(`${root}:not([${SKIN_FORCE_ATTRIBUTE}^="${id}:"])${BOOST}`, states[state], slots[state]));
@@ -395,15 +397,17 @@ export function createDesignRenderer(
     planKey = '',
     planTimer: ReturnType<typeof setTimeout> | undefined;
   const decisions = new Map<string, Record<string, InkDecision>>(),
-    natives = new Map<string, readonly Rgb[]>(),
     art = new Map<string, Promise<ArtPixels | undefined>>(),
     pending = new Set<string>();
   const mode = () => (doc.documentElement.getAttribute('data-ww-mode') === 'dark' ? 'dark' : 'light');
-  const firstVisible = (target: DesignTarget) => {
+  /** Up to eight visible parts of the kind: one colour must suit each of them on its own backdrop. */
+  const visibleParts = (target: DesignTarget) => {
+    const found: Element[] = [];
     for (const element of doc.querySelectorAll(surfaceSelector(target))) {
       const rect = element.getBoundingClientRect();
-      if (rect.width > 0 && rect.height > 0) return element;
+      if (rect.width > 0 && rect.height > 0 && found.push(element) >= 8) break;
     }
+    return found;
   };
   /** What shows through transparent art: the part's own background over its ancestors'. */
   const backdropOf = (element: Element): Rgb => {
@@ -481,40 +485,57 @@ export function createDesignRenderer(
     const next: Record<string, Record<string, Ink>> = {};
     const status = new Map<string, Record<string, InkDecision>>();
     pending.clear();
+    // Native colours and backdrops of every sampled part, read with the engine's colours switched
+    // off for a moment (one attribute on the root; only while planning, never per frame).
+    const samples = new Map<string, { backdrop: Rgb; natives: Rgb[] }[]>();
+    const root = doc.documentElement;
+    root.setAttribute(INK_OFF_ATTRIBUTE, '');
+    try {
+      for (const rule of current.rules) {
+        const target = targets.find((item) => item.id === rule.target);
+        if (!rule.skin || !target?.skin) continue;
+        const parts = visibleParts(target);
+        if (!parts.length) pending.add(rule.target);
+        else
+          samples.set(
+            rule.target,
+            parts
+              .map((element) => ({ backdrop: backdropOf(element), natives: textColours(element, target) }))
+              .filter((sample) => sample.natives.length),
+          );
+      }
+    } finally {
+      root.removeAttribute(INK_OFF_ATTRIBUTE);
+    }
     for (const rule of current.rules) {
-      const target = targets.find((item) => item.id === rule.target);
-      if (!rule.skin || !target?.skin) continue;
-      const element = firstVisible(target);
-      if (!element) {
-        pending.add(rule.target);
-        continue;
-      }
-      let native = natives.get(`${now}|${rule.target}`);
-      if (!native) {
-        native = textColours(element, target);
-        if (!native.length) continue;
-        natives.set(`${now}|${rule.target}`, native);
-      }
-      const backdrop = backdropOf(element);
+      const cases = samples.get(rule.target);
+      if (!rule.skin || !cases?.length) continue;
       const slots: Record<string, Ink> = {},
         results: Record<string, InkDecision> = {};
-      const judge = async (slot: string, frame: SkinFrame, base: Rgb | readonly Rgb[]) => {
+      const judge = async (slot: string, frame: SkinFrame, shown?: Rgb) => {
         const pixels = await pixelsOf(frame.assetId);
         if (!pixels) return;
-        const decision = decideInk(backdropLuminance(pixels, frame, backdrop), base);
+        const decision = decideInkAcross(
+          cases.map(({ backdrop, natives }) => ({
+            backdrop: backdropLuminance(pixels, frame, backdrop),
+            natives: shown ? [shown] : natives,
+          })),
+        );
         results[slot] = decision;
         if (decision.ink) slots[slot] = decision.ink;
       };
-      await judge('normal', rule.skin.states.normal, native);
+      await judge('normal', rule.skin.states.normal);
       // Other states start from what the normal rule already shows.
-      const shown = slots.normal ? inkRgb(slots.normal) : native;
+      const shown = slots.normal ? inkRgb(slots.normal) : undefined;
       for (const state of SKIN_STATES)
         if (state !== 'normal' && rule.skin.states[state]) await judge(state, rule.skin.states[state]!, shown);
       if (rule.skin.compact?.kind === 'frame') await judge('compact', rule.skin.compact.frame, shown);
       else if (rule.skin.compact?.kind === 'color') {
         // An opaque author colour: one level for both ends.
         const level = luminance(hexRgb(rule.skin.compact.color));
-        const decision = decideInk({ dark: level, light: level }, shown);
+        const decision = decideInkAcross(
+          cases.map(({ natives }) => ({ backdrop: { dark: level, light: level }, natives: shown ? [shown] : natives })),
+        );
         results.compact = decision;
         if (decision.ink) slots.compact = decision.ink;
       }
