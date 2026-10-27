@@ -231,6 +231,7 @@ export function createDesignRenderer(
     if (prune)
       for (const element of observed)
         if (!element.isConnected) {
+          element.removeAttribute(SKIN_COMPACT_ATTRIBUTE);
           resize.unobserve(element);
           observed.delete(element);
         }

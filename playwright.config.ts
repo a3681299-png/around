@@ -36,6 +36,7 @@ const unitSpecs = [
   'signal-rules',
   'skin-data',
   'skin-session',
+  'skin-verification-data',
   'signal-registry',
   'signal-takes',
   'spatial-points',
