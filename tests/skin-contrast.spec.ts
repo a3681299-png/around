@@ -99,6 +99,17 @@ test('mid tones: switch below 3:1, warn only when neither white nor black reache
   expect(kept.warn).toBe(false);
 });
 
+test('a part whose text uses several colours is judged by the least readable one', () => {
+  // A dark-mode card on light art: the card element is black, but its title is white.
+  const light = backdropLuminance(art(solid([245, 245, 245])), frame, BLACK);
+  const decision = decideInk(light, [[0, 0, 0], WHITE, [170, 170, 170]]);
+  expect(decision.ink).toBe(INK.black);
+  // All dark: nothing to change.
+  expect(decideInk(light, [[0, 0, 0], BLACK]).ink).toBeUndefined();
+  // A single colour still works as before.
+  expect(decideInk(light, WHITE).ink).toBe(INK.black);
+});
+
 test('an empty centre slice falls back to the whole image', () => {
   const tight = { ...frame, slices: { top: 48, right: 48, bottom: 48, left: 48 } };
   const result = backdropLuminance(art(solid([0, 0, 0])), tight, WHITE);

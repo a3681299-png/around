@@ -578,6 +578,8 @@ test('the renderer plans legibility once from the art and the native colours, an
     head: { append() {} },
     createElement: () => style,
     querySelectorAll: () => [button],
+    // The button's text inherits its colour: no descendant colours to add.
+    createTreeWalker: () => ({ nextNode: () => null }),
     defaultView: {
       getComputedStyle: () => {
         reads++;

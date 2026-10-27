@@ -66,11 +66,13 @@ export interface InkDecision {
   warn: boolean;
 }
 
-/** Keeps the native ink while it reaches 3:1 against both ends of the backdrop; otherwise
- * white or black, whichever reads better. Warns when neither reaches 4.5:1. */
-export function decideInk(backdrop: { dark: number; light: number }, native: Rgb): InkDecision {
+/** Keeps the native ink while every native text colour of the part reaches 3:1 against both ends
+ * of the backdrop; otherwise white or black, whichever reads better. Warns when neither reaches
+ * 4.5:1. A part's children often set their own colours, so all of them are judged. */
+export function decideInk(backdrop: { dark: number; light: number }, native: Rgb | readonly Rgb[]): InkDecision {
   const worst = (ink: number) => Math.min(contrastRatio(ink, backdrop.dark), contrastRatio(ink, backdrop.light));
-  const own = worst(luminance(native)),
+  const natives = (typeof native[0] === 'number' ? [native] : native) as readonly Rgb[];
+  const own = Math.min(...natives.map((colour) => worst(luminance(colour)))),
     white = worst(1),
     black = worst(0);
   const best = Math.max(white, black);

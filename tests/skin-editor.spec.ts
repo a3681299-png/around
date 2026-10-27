@@ -255,5 +255,17 @@ test('the in-page Studio shows the skin editor in its inspector column and picks
   await expect(region.getByRole('tab', { name: '選択中のカテゴリ' })).toBeVisible();
   await importInto(youtube, region.locator('.main-drop'), 'chip.png', await framePng(youtube));
   await expect.poll(() => chip.evaluate((node) => getComputedStyle(node).borderImageSource)).toMatch(/^url\("blob:/);
+  // The import report: image size, painted area, drawn frame and the smallest chip on the page.
+  // The first frame is fitted to a chip (72×32): 16px slices at 50% draw 8+8px.
+  const facts = region.locator('.report-facts');
+  await expect(facts).toContainText('画像 48×48px');
+  await expect(facts).toContainText('絵がある範囲 横0〜48px・縦0〜48px');
+  await expect(facts).toContainText('描く枠 上下 8＋8＝16px');
+  await expect(facts).toContainText('ページ上で一番小さい部品');
+  await expect(region.locator('.report-warnings li')).toHaveCount(0);
+  // Thicker edges than the chip is tall: the centre would vanish, and the author is told so.
+  await region.locator('.skin-scale').fill('150');
+  await region.locator('.skin-scale').press('Enter');
+  await expect(region.locator('.report-warnings')).toContainText('中央が消えます');
   await shot(youtube, 'skin-inpage-studio');
 });

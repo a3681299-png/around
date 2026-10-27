@@ -22,7 +22,8 @@ for (const part of skinParts)
     test.setTimeout(300_000);
     await mkdir('.work', { recursive: true });
     const context = await launchExtension(await mkdtemp(path.resolve('.work/ui1-live-')), false);
-    const shots = path.resolve('docs/screenshots/ui1/verification');
+    // A later run can keep earlier evidence by choosing another folder (UI1.1: before/after).
+    const shots = path.resolve(process.env.WW_LIVE_SKIN_SHOTS ?? 'docs/screenshots/ui1/verification');
     const evidence: Record<string, unknown> = {};
     let livePage: import('@playwright/test').Page | undefined;
     try {
@@ -82,12 +83,23 @@ for (const part of skinParts)
         await target.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest' }));
         const clear = await clearestPoint(page, { left: 0, top: 0, right: 1920, bottom: 1080 }, 0);
         await page.mouse.move(clear.x, clear.y);
-        const screenshot = await target.screenshot({
+        const native = await target.boundingBox();
+        if (!native) throw new Error(`No native box: ${part}`);
+        // UI1.1: parts whose edges are covered (cards) or whose text starts at the edge (comment
+        // entry) draw the frame outward. Sample the box the frame is drawn in, as the browser
+        // reports it; inside-drawn parts report 0 and keep the native box.
+        const outset = parseFloat(await target.evaluate((node) => getComputedStyle(node).borderImageOutset)) || 0;
+        const box = {
+          x: native.x - outset,
+          y: native.y - outset,
+          width: native.width + outset * 2,
+          height: native.height + outset * 2,
+        };
+        const screenshot = await page.screenshot({
+          clip: box,
           path: path.join(shots, `${part}-frame-light.png`),
           animations: 'disabled',
         });
-        const box = await target.boundingBox();
-        if (!box) throw new Error(`No native box: ${part}`);
         const w = Math.floor(box.width),
           h = Math.floor(box.height);
         // Every region is sampled away from antialiased boundaries and text: TL,T,TR,L,C,R,BL,B,BR.

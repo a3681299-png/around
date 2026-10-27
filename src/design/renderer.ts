@@ -395,7 +395,7 @@ export function createDesignRenderer(
     planKey = '',
     planTimer: ReturnType<typeof setTimeout> | undefined;
   const decisions = new Map<string, Record<string, InkDecision>>(),
-    natives = new Map<string, Rgb>(),
+    natives = new Map<string, readonly Rgb[]>(),
     art = new Map<string, Promise<ArtPixels | undefined>>(),
     pending = new Set<string>();
   const mode = () => (doc.documentElement.getAttribute('data-ww-mode') === 'dark' ? 'dark' : 'light');
@@ -417,6 +417,52 @@ export function createDesignRenderer(
         rgb = paint.rgb.map((value, index) => value * paint.alpha + rgb[index]! * (1 - paint.alpha)) as unknown as Rgb;
     }
     return rgb;
+  };
+  // Pseudo-element entries of the list (e.g. ::placeholder) cannot match an element; test the
+  // top-level entries one by one (commas inside :not(...) stay with their entry).
+  const reaches = (node: Element, list: string) => {
+    const entries: string[] = [];
+    let depth = 0,
+      start = 0;
+    for (let index = 0; index < list.length; index++) {
+      const char = list[index];
+      if (char === '(') depth++;
+      else if (char === ')') depth--;
+      else if (char === ',' && depth === 0) {
+        entries.push(list.slice(start, index));
+        start = index + 1;
+      }
+    }
+    entries.push(list.slice(start));
+    return entries.some((selector) => {
+      try {
+        return node.matches(selector);
+      } catch {
+        return false;
+      }
+    });
+  };
+  /** The native colours of the text the engine's colour would reach: the part itself and the
+   * adapter's text descendants. Children often set their own colour (titles, links). */
+  const textColours = (element: Element, target: DesignTarget): Rgb[] => {
+    const view = doc.defaultView!,
+      template = target.skin?.ink;
+    const reach = template ? template.replaceAll('&', surfaceSelector(target)) : undefined;
+    const colours = new Map<string, Rgb>();
+    const add = (node: Element) => {
+      const colour = parseRgb(view.getComputedStyle(node).color);
+      if (colour) colours.set(colour.rgb.join(), colour.rgb);
+    };
+    add(element);
+    const walker = doc.createTreeWalker(element, 4 /* NodeFilter.SHOW_TEXT */);
+    let seen = 0;
+    for (let node = walker.nextNode(); node && seen < 24; node = walker.nextNode()) {
+      const parent = node.parentElement;
+      if (!parent || !node.textContent?.trim() || !parent.getClientRects().length) continue;
+      seen++;
+      if (parent === element || (reach && reaches(parent, reach))) add(parent);
+    }
+    return [...colours.values()];
   };
   const pixelsOf = (assetId: string) => {
     let entry = art.get(assetId);
@@ -445,14 +491,14 @@ export function createDesignRenderer(
       }
       let native = natives.get(`${now}|${rule.target}`);
       if (!native) {
-        native = parseRgb(doc.defaultView.getComputedStyle(element).color)?.rgb;
-        if (!native) continue;
+        native = textColours(element, target);
+        if (!native.length) continue;
         natives.set(`${now}|${rule.target}`, native);
       }
       const backdrop = backdropOf(element);
       const slots: Record<string, Ink> = {},
         results: Record<string, InkDecision> = {};
-      const judge = async (slot: string, frame: SkinFrame, base: Rgb) => {
+      const judge = async (slot: string, frame: SkinFrame, base: Rgb | readonly Rgb[]) => {
         const pixels = await pixelsOf(frame.assetId);
         if (!pixels) return;
         const decision = decideInk(backdropLuminance(pixels, frame, backdrop), base);
