@@ -1,0 +1,8 @@
+<!-- @dsCard group="Navigation" height=80 subtitle="side panel sections, G-pen mark on the selected tab" -->
+<div class="ww" style="background:var(--ground);padding:20px;min-height:100%;display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start"><div role="tablist" class="ww-tabs" style="width:420px" id="tabs"><button class="ww-tab" role="tab" aria-selected="true">レイヤー</button><button class="ww-tab" role="tab" aria-selected="false">属性</button><button class="ww-tab" role="tab" aria-selected="false">着せ替え</button><button class="ww-tab" role="tab" aria-selected="false">タイムライン</button></div></div>
+<script>
+document.getElementById('tabs').addEventListener('click', function (e) {
+  var tab = e.target.closest('.ww-tab'); if (!tab) return;
+  this.querySelectorAll('.ww-tab').forEach(function (t) { t.setAttribute('aria-selected', String(t === tab)); });
+});
+</script>

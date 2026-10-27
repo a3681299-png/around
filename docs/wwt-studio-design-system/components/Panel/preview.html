@@ -1,0 +1,21 @@
+<!-- @dsCard group="Layout" height=360 subtitle="docked 340 and floating; click 開き直す to see it constructed" -->
+<div class="ww" style="background:var(--ground);padding:20px;min-height:100%;display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start">
+<div style="display:flex;flex-direction:column;gap:12px;align-items:flex-start">
+<section class="ww-panel ww-construct" style="width:340px" id="docked">
+<header class="ww-panel__header"><span class="ww-panel__eyebrow">PROPERTIES</span><span class="ww-panel__title">雨粒</span><span class="ww-chip ww-chip--saved">保存済み</span></header>
+<div class="ww-panel__body">
+<div class="ww-section"><div class="ww-section__head">配置</div>
+<div class="ww-pair"><div class="ww-scrub"><span class="ww-scrub__axis">X</span><input class="ww-scrub__value" value="212"><span class="ww-scrub__unit">px</span></div><div class="ww-scrub"><span class="ww-scrub__axis">Y</span><input class="ww-scrub__value" value="84"><span class="ww-scrub__unit">px</span></div></div></div>
+<div class="ww-section"><div class="ww-section__head">表示</div><label class="ww-toggle"><input type="checkbox" checked>雰囲気レイヤー</label></div>
+</div></section>
+<button class="ww-btn ww-btn--ghost" id="reopen">開き直す</button>
+</div>
+<section class="ww-panel ww-panel--float" style="width:340px">
+<header class="ww-panel__header"><span class="ww-panel__title">クイック編集</span><span class="ww-chip ww-chip--saved">保存済み</span><button class="ww-icon-btn ww-icon-btn--dense" aria-label="閉じる"><svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></header>
+<div class="ww-panel__body"><div class="ww-section"><p class="small" style="margin:0;color:var(--ink-muted)">外側の角丸 8 − 余白 4 = 内側の角丸 4</p></div></div></section></div>
+<script>
+document.getElementById('reopen').addEventListener('click', function () {
+  var p = document.getElementById('docked');
+  p.classList.remove('ww-construct'); void p.offsetWidth; p.classList.add('ww-construct');
+});
+</script>

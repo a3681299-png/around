@@ -1,0 +1,24 @@
+<!-- @dsCard group="Foundations" height=260 subtitle="ruler and G-pen; click もう一度引く to redraw" -->
+<div class="ww" style="background:var(--ground);padding:20px;min-height:100%;display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start">
+<figure style="margin:0;display:flex;flex-direction:column;gap:8px">
+<svg width="340" height="136" viewBox="0 0 340 136" id="lines" aria-label="定規の線とGペンの線" role="img">
+<line class="ww-rule ww-draw" pathLength="1" x1="0" y1="20" x2="340" y2="20"></line>
+<line class="ww-rule ww-draw" pathLength="1" x1="0" y1="116" x2="340" y2="116" style="--ww-delay:166ms"></line>
+</svg>
+<figcaption class="small" style="color:var(--ink-muted)">上下：定規の 1px。中：Gペン 3.4 / 2.4 / 1.4px、入りと抜きは 0.2px。</figcaption>
+</figure>
+<button class="ww-btn ww-btn--ghost" id="again">もう一度引く</button>
+</div>
+<script>
+(function () {
+  var W = window.WWTStudio, svg = document.getElementById('lines');
+  function draw() {
+    svg.querySelectorAll('mask, .ww-pen').forEach(function (n) { n.remove(); });
+    W.drawPen(svg, W.line(8, 48, 332, 48, 24), { width: 3.4, color: 'var(--ink)', delay: 2 });
+    W.drawPen(svg, W.line(8, 68, 332, 68, 24), { width: 2.4, color: 'var(--cobalt)', delay: 5 });
+    W.drawPen(svg, W.line(8, 88, 332, 88, 24), { width: 1.4, color: 'var(--pen-bone)', delay: 8 });
+  }
+  draw();
+  document.getElementById('again').addEventListener('click', draw);
+})();
+</script>
