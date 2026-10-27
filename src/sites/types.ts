@@ -82,6 +82,9 @@ export interface SiteAdapter {
   /** `marked` lists elements whose semantic surfaces changed in this batch, so consumers
    * never need a whole-document query to find new parts. */
   connect(onPageChange: (change?: SitePageChange, marked?: readonly Element[]) => void): () => void;
+  /** Design-target parts the page needs marked: those the artwork uses, or all of them while
+   * the editor picks parts. Unused parts cost nothing during scans. */
+  setDesignParts?(ids: ReadonlySet<string>): void;
   mountSettings(entry: SettingsEntry): () => void;
   protectStudioToolbar?(toolbar: HTMLElement): () => void;
   mountStudio?(changed: (state: StudioHostLayout) => void): StudioLayoutAdapter;

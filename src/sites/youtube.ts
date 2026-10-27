@@ -139,11 +139,10 @@ const targets: ReadonlyArray<{ selector: string; surfaces: readonly Surface[] }>
     surfaces: ['rounded'],
   },
   { selector: 'ytd-thumbnail #thumbnail, yt-thumbnail-view-model', surfaces: ['rounded'] },
-  // Parts an author can dress (see youtube-targets.ts).
-  ...YOUTUBE_SKIN_MARKS,
 ];
 
-const allSelectors = targets.map((target) => target.selector).join(', ');
+// Parts an author can dress (see youtube-targets.ts) join the scan only while in use.
+const baseSelectors = targets.map((target) => target.selector).join(', ');
 const navigationEvents = ['yt-navigate-finish', 'yt-page-data-updated'] as const;
 const durationSelector =
   'ytd-thumbnail-overlay-time-status-renderer, yt-thumbnail-badge-view-model .badge-shape-wiz, yt-thumbnail-overlay-badge-view-model .badge-shape-wiz, yt-thumbnail-badge-view-model badge-shape, yt-thumbnail-overlay-badge-view-model badge-shape';
@@ -168,6 +167,10 @@ export function supportsYouTube(url: URL): boolean {
 }
 
 export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
+  let partMarks: typeof YOUTUBE_SKIN_MARKS = [],
+    activeTargets = targets,
+    allSelectors = baseSelectors,
+    rescan: (() => void) | undefined;
   return {
     id: 'youtube',
     stylesheet: `${stylesheet}\n${chromeStylesheet}`,
@@ -184,6 +187,15 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
       'daily-details': { mount: () => mountYouTubeDetails(doc) },
       'focus-titlebars': { mount: () => mountYouTubeFocus(doc) },
       'bbs-comments': { mount: () => mountYouTubeComments(doc) },
+    },
+    setDesignParts(ids) {
+      const next = YOUTUBE_SKIN_MARKS.filter((mark) => ids.has(mark.part));
+      if (next.length === partMarks.length && next.every((mark, index) => mark === partMarks[index])) return;
+      partMarks = next;
+      activeTargets = [...targets, ...next];
+      allSelectors = activeTargets.map((target) => target.selector).join(', ');
+      // Re-evaluate every element once so parts gain or lose their marks.
+      rescan?.();
     },
     connect(onPageChange) {
       const root = doc.documentElement;
@@ -207,7 +219,7 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
 
       const mark = (element: Element) => {
         const surfaces = new Set<Surface>();
-        for (const target of targets) {
+        for (const target of activeTargets) {
           if (element.matches(target.selector)) {
             target.surfaces.forEach((surface) => {
               if (
@@ -280,6 +292,11 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
         change = 'fullscreen';
         schedule();
       };
+      rescan = () => {
+        needsFullScan = true;
+        if (change === 'content') change = 'structure';
+        schedule();
+      };
 
       root.setAttribute('data-ww-site', 'youtube');
       setMode();
@@ -348,6 +365,7 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
       view.addEventListener('pageshow', refresh);
 
       return () => {
+        rescan = undefined;
         observer.disconnect();
         modeObserver.disconnect();
         navigationEvents.forEach((event) => doc.removeEventListener(event, refresh));

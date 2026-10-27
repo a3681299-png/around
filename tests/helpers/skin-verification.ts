@@ -7,12 +7,14 @@ import { parseDesign } from '../../src/design/schema';
 export const skinParts = YOUTUBE_DESIGN_TARGETS.map((target) => target.id);
 export const partLocator = (page: Page, part: string) =>
   page.locator(`[data-ww-surface~="${part}"]`).filter({ visible: true });
+/** The native look with every part referenced: parts are marked only for artwork that names
+ * them (UI1.1), and empty style rules compile to no CSS, so this is still the baseline. */
 export const plainSkinDesign = {
   schemaVersion: 13,
   id: 'ui1-independent-verification',
   siteId: 'youtube',
   baseThemeId: null,
-  rules: [],
+  rules: skinParts.map((target) => ({ kind: 'surface-style', target, style: {} })),
   decorations: [],
 };
 export async function storeDesign(popup: Page, design: object) {

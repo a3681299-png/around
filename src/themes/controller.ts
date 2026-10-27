@@ -127,10 +127,21 @@ export function createThemeController(
       features.update(current.features);
       features.refresh();
     }
+    syncParts();
     designRenderer.update(design);
     images.update(design?.decorations ?? [], design?.groups ?? [], design?.signalRules ?? []);
     onSurfacesChanged?.();
   };
+  /** Viewers who never dress a part do not pay for matching its selectors on every scan. */
+  let picking = false;
+  const syncParts = () =>
+    site.setDesignParts?.(
+      new Set(
+        picking
+          ? (site.designTargets ?? []).map((target) => target.id)
+          : (design?.rules.map((rule) => rule.target) ?? []),
+      ),
+    );
 
   const validateDesign = (input: DesignDocument | undefined) => {
     const next = input ? readDesign(input) : undefined;
@@ -177,7 +188,13 @@ export function createThemeController(
       render();
     },
     skinAssetStatus: designRenderer.assetStatus,
-    setSkinPreviews: designRenderer.setPreviews,
+    setSkinPreviews(enabled) {
+      designRenderer.setPreviews(enabled);
+      // The skin tool lists and highlights every part, used or not.
+      if (picking === enabled) return;
+      picking = enabled;
+      if (!suspended && current?.enabled && current.strength > 0) syncParts();
+    },
     setImageEditing(next) {
       editing = Boolean(next);
       if (!suspended && current?.enabled && current.strength > 0) inspect();

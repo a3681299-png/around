@@ -146,6 +146,7 @@ export const YOUTUBE_DESIGN_TARGETS: readonly DesignTarget[] = Object.freeze(
 export const YOUTUBE_SKIN_CONTROLS =
   'yt-icon, ytd-thumbnail, yt-thumbnail-view-model, yt-button-shape, yt-chip-cloud-chip-renderer';
 /** Marking entries for the adapter's surface scan. */
-export const YOUTUBE_SKIN_MARKS: ReadonlyArray<{ selector: string; surfaces: readonly Surface[] }> = targets.flatMap(
-  (target) => (target.selector ? [{ selector: target.selector, surfaces: [target.surface] }] : []),
-);
+export const YOUTUBE_SKIN_MARKS: ReadonlyArray<{ part: string; selector: string; surfaces: readonly Surface[] }> =
+  targets.flatMap((target) =>
+    target.selector ? [{ part: target.id, selector: target.selector, surfaces: [target.surface] }] : [],
+  );

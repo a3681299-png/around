@@ -77,6 +77,11 @@ test('skin tool: hover names parts, click dresses every card, guides and state p
   const dialog = await openEditor(popup, youtube);
   const card = youtube.locator(cards).first();
   const before = await skinStyle(card);
+  // Parts no artwork names are not matched during scans; the skin tool marks them all.
+  await expect(youtube.locator('[data-ww-surface~="search-box"]')).toHaveCount(0);
+  await dialog.getByRole('button', { name: 'UIを着せ替え' }).click();
+  await expect(dialog.getByRole('region', { name: 'UIの着せ替え' })).toBeVisible();
+  await expect(youtube.locator('[data-ww-surface~="search-box"]')).not.toHaveCount(0);
   const layout = await youtube.evaluate(
     (selector) =>
       [...document.querySelectorAll(selector)].map((node) => {
@@ -85,8 +90,6 @@ test('skin tool: hover names parts, click dresses every card, guides and state p
       }),
     '[data-ww-surface]',
   );
-  await dialog.getByRole('button', { name: 'UIを着せ替え' }).click();
-  await expect(dialog.getByRole('region', { name: 'UIの着せ替え' })).toBeVisible();
   // The part list reports page presence: cards exist here, the subscribe button does not.
   await expect(dialog.locator('.skin-part[data-target="video-card"] .state')).toHaveText(/^[0-9]+個$/);
   await expect(dialog.locator('.skin-part[data-target="subscribe-button"] .state')).toHaveText('見つかりません');
@@ -218,6 +221,9 @@ test('skin tool: hover names parts, click dresses every card, guides and state p
   await dialog.getByRole('button', { name: '選択・変形' }).click();
   await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-skin-picking', /.*/);
   await expect(hover).toBeHidden();
+  // Leaving the skin tool keeps only the parts the artwork names (here the video card).
+  await expect(youtube.locator('[data-ww-surface~="search-box"]')).toHaveCount(0);
+  await expect(youtube.locator(cards).first()).toHaveCSS('border-image-source', /^url\("blob:/);
   expect(errors).toEqual([]);
 });
 
