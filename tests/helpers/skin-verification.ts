@@ -7,6 +7,44 @@ import { parseDesign } from '../../src/design/schema';
 export const skinParts = YOUTUBE_DESIGN_TARGETS.map((target) => target.id);
 export const partLocator = (page: Page, part: string) =>
   page.locator(`[data-ww-surface~="${part}"]`).filter({ visible: true });
+/** Public signed-out native shapes, shared by the fixture operation and lifecycle checks. */
+export async function nativeFixtureParts(page: Page) {
+  await page.goto('https://www.youtube.com/watch?v=fixture');
+  await page.evaluate(() => {
+    const metadata = document.querySelector('ytd-watch-metadata')!;
+    const actions = metadata.querySelector('.watch-actions')!;
+    const subscribe = actions.querySelector('yt-button-shape')!;
+    const wrapper = document.createElement('ytd-subscribe-button-renderer');
+    subscribe.before(wrapper);
+    wrapper.append(subscribe);
+    const like = actions.querySelector('button[aria-label="Like video"]')!;
+    const buttons = document.createElement('div');
+    buttons.id = 'top-level-buttons-computed';
+    const segmented = document.createElement('segmented-like-dislike-button-view-model');
+    const likeModel = document.createElement('like-button-view-model');
+    likeModel.append(like);
+    const dislikeModel = document.createElement('dislike-button-view-model');
+    dislikeModel.innerHTML = '<button aria-label="Dislike" aria-pressed="false">Dislike</button>';
+    segmented.append(likeModel, dislikeModel);
+    const share = document.createElement('yt-button-shape');
+    share.innerHTML = '<button>Share</button>';
+    buttons.append(segmented, share);
+    actions.append(buttons);
+    const chip = document.createElement('yt-chip-cloud-chip-renderer');
+    chip.innerHTML = '<button><div class="ytChipShapeChip">All</div></button>';
+    metadata.prepend(chip);
+    const input = document.querySelector('#contenteditable-root')!;
+    const placeholder = document.createElement('div');
+    placeholder.id = 'placeholder-area';
+    input.before(placeholder);
+    placeholder.append(input);
+    const expand = document.createElement('button');
+    expand.textContent = 'Show more';
+    metadata.querySelector('#description')!.append(expand);
+    document.dispatchEvent(new Event('yt-page-data-updated'));
+  });
+  for (const part of skinParts) await expect(partLocator(page, part).first(), part).toBeVisible();
+}
 /** The native look with every part referenced: parts are marked only for artwork that names
  * them (UI1.1), and empty style rules compile to no CSS, so this is still the baseline. */
 export const plainSkinDesign = {

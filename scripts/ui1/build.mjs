@@ -5,7 +5,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
-import { cpuProbeBanner, cpuProbeFooter } from './cpu-probe.mjs';
+import { disableInkPlugin, probeBuildOptions } from './probe-build.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const [sourceArg, outArg] = process.argv.slice(2);
@@ -28,8 +28,9 @@ execFileSync(process.execPath, ['scripts/build.mjs'], {
 
 // Isolated-world wrappers: only the extension's own callbacks pass through them.
 const busyMs = Number(process.env.UI1_PROBE_BUSY_MS ?? 0);
-const banner = cpuProbeBanner(busyMs);
-const footer = cpuProbeFooter;
+const busyAfterAwait = process.env.UI1_PROBE_AFTER_AWAIT === '1';
+const disableInk = process.env.UI1_DISABLE_INK === '1';
+const instrumentation = await probeBuildOptions(busyMs, busyAfterAwait);
 await build({
   absWorkingDir: source,
   entryPoints: ['src/content/index.ts'],
@@ -42,8 +43,8 @@ await build({
   loader: { '.css': 'text' },
   dropLabels: ['WW_TEST_PAGE_CHANGE'],
   define: { __WW_WORLD_MODE__: '"runtime"', __WW_WORLD_DEVTOOLS__: 'false', __WW_ASSET_PROFILE__: 'false' },
-  banner: { js: banner },
-  footer: { js: footer },
+  ...instrumentation,
+  plugins: disableInk ? [disableInkPlugin(source)] : [],
 });
 const manifest = JSON.parse(await readFile(path.join(source, 'manifest.json'), 'utf8'));
 const built = JSON.parse(await readFile(path.join(out, 'manifest.json'), 'utf8'));
@@ -55,6 +56,19 @@ const dirty = execFileSync('git', ['status', '--porcelain', '--', 'src', 'manife
 });
 await writeFile(
   path.join(out, 'ui1-build.json'),
-  JSON.stringify({ source, revision, dirtySource: dirty.length > 0, probe: 'isolated-world-v2', busyMs }, null, 2),
+  JSON.stringify(
+    {
+      source,
+      revision,
+      dirtySource: dirty.length > 0,
+      probe: 'isolated-world-v3',
+      asyncContinuations: 'lowered-promises',
+      busyMs,
+      busyAfterAwait,
+      disableInk,
+    },
+    null,
+    2,
+  ),
 );
 console.log(JSON.stringify({ out, revision, dirtySource: dirty.length > 0 }));

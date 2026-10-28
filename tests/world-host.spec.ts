@@ -99,9 +99,11 @@ test('recording-only listeners stop after artwork changes and idle/OFF leaves no
   await youtube.evaluate(
     () => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))),
   );
-  // A held protection read after the scene change runs once at the end of its window; a
-  // loop would keep counting after it.
-  await youtube.waitForTimeout(300);
+  // A scene change may trigger G1's one-shot 360ms recovery frame. A fixed 300ms delay
+  // sometimes starts counting before that frame; wait for the native protection state instead.
+  await expect
+    .poll(() => youtube.locator(overlay).evaluate((node: HTMLElement) => JSON.parse(node.dataset.wwSafety!).stopped))
+    .toBe('');
   const before = (await stats()).rafs;
   await youtube.waitForTimeout(150);
   expect((await stats()).rafs).toBe(before);

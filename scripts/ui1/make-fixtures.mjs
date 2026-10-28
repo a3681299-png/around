@@ -25,6 +25,8 @@ await mkdir(directory, { recursive: true });
 for (const [name, center] of [
   ['frame-light', [245, 245, 245]],
   ['frame-dark', [17, 17, 17]],
+  ['frame-checker', [0, 0, 0]],
+  ['frame-outset', [245, 245, 245]],
 ]) {
   const width = 96,
     height = 96,
@@ -42,10 +44,15 @@ for (const [name, center] of [
   ];
   for (let y = 0; y < height; y++)
     for (let x = 0; x < width; x++) {
-      const column = x < 24 ? 0 : x < 72 ? 1 : 2;
-      const row = y < 24 ? 0 : y < 72 ? 1 : 2;
+      const cut = name === 'frame-outset' ? 16 : 24;
+      const column = x < cut ? 0 : x < width - cut ? 1 : 2;
+      const row = y < cut ? 0 : y < height - cut ? 1 : 2;
       const offset = y * (1 + width * 4) + 1 + x * 4;
-      rows.set([...colours[row * 3 + column], 255], offset);
+      const colour =
+        name === 'frame-checker' && column === 1 && row === 1
+          ? Array(3).fill((Math.floor(x / 2) + Math.floor(y / 2)) % 2 ? 255 : 0)
+          : colours[row * 3 + column];
+      rows.set([...colour, 255], offset);
     }
   const header = Buffer.alloc(13);
   header.writeUInt32BE(width, 0);

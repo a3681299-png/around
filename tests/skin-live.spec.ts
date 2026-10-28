@@ -24,6 +24,7 @@ for (const part of skinParts)
     const context = await launchExtension(await mkdtemp(path.resolve('.work/ui1-live-')), false);
     // A later run can keep earlier evidence by choosing another folder (UI1.1: before/after).
     const shots = path.resolve(process.env.WW_LIVE_SKIN_SHOTS ?? 'docs/screenshots/ui1/verification');
+    const evidenceRoot = path.resolve(process.env.WW_LIVE_SKIN_DATA ?? '.work/ui1-verification');
     const evidence: Record<string, unknown> = {};
     let livePage: import('@playwright/test').Page | undefined;
     try {
@@ -138,6 +139,38 @@ for (const part of skinParts)
             .soft(hasFrameColour(sampled[index]!, source[index]!), `${part} frame region ${index}: ${sampled[index]}`)
             .toBe(true);
         console.log('SKIN_PART ' + JSON.stringify({ part, before, after, focusBefore, focusAfter, sampled }));
+        if (part === 'description-panel') {
+          // Expansion is public even when signed out. Compare the expanded native DOM with
+          // and without a selected-state frame, rather than treating it as login-only.
+          await storeDesign(popup, plainSkinDesign);
+          const collapsedHeight = (await target.boundingBox())!.height;
+          await target
+            .getByRole('button', { name: /more|もっと見る|さらに表示/i })
+            .first()
+            .click();
+          await expect.poll(async () => (await target.boundingBox())!.height).toBeGreaterThan(collapsedHeight);
+          await (await target.elementHandle())!.waitForElementState('stable');
+          const expandedBefore = await partSnapshot(target);
+          const expandedDesign = allPartsDesign(assetId);
+          const rule = expandedDesign.rules.find((item) => item.target === part)!;
+          await storeDesign(popup, {
+            ...expandedDesign,
+            rules: [
+              {
+                ...rule,
+                skin: { states: { ...rule.skin.states, selected: { ...rule.skin.states.normal, scalePct: 50 } } },
+              },
+            ],
+          });
+          await expect(target).toHaveCSS('border-image-width', '12px');
+          const expandedAfter = await partSnapshot(target);
+          evidence.expanded = { before: expandedBefore, after: expandedAfter };
+          expect.soft(expandedAfter.box, 'expanded description geometry').toEqual(expandedBefore.box);
+          expect.soft(expandedAfter.hits, 'expanded description hits').toEqual(expandedBefore.hits);
+          expect.soft(expandedAfter.text, 'expanded description text').toEqual(expandedBefore.text);
+          expect.soft(expandedAfter.focusables, 'expanded description focusables').toEqual(expandedBefore.focusables);
+          await page.screenshot({ path: path.join(shots, 'description-expanded-page.png') });
+        }
       });
       await page.screenshot({ path: path.join(shots, 'real-youtube-nine-slice.png') });
     } finally {
@@ -153,8 +186,8 @@ for (const part of skinParts)
         }));
         await livePage.screenshot({ path: path.join(shots, `${part}-page.png`) });
       }
-      await mkdir('.work/ui1-verification/parts', { recursive: true });
-      await writeFile(path.resolve(`.work/ui1-verification/parts/${part}.json`), JSON.stringify(evidence, null, 2));
+      await mkdir(path.join(evidenceRoot, 'parts'), { recursive: true });
+      await writeFile(path.join(evidenceRoot, `parts/${part}.json`), JSON.stringify(evidence, null, 2));
       await info.attach('ui1-live-parts.json', {
         body: JSON.stringify(evidence, null, 2),
         contentType: 'application/json',

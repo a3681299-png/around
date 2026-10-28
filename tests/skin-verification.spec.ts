@@ -1,5 +1,4 @@
 import { test, expect, launchExtension } from './fixtures';
-import type { Page } from '@playwright/test';
 import { cp, mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { nativeShortcut } from './helpers/native-shortcut';
@@ -13,46 +12,8 @@ import {
   allPartsDesign,
   partSnapshot,
   focusSequence,
+  nativeFixtureParts as nativeParts,
 } from './helpers/skin-verification';
-
-/** Public native shapes observed in the signed-out capture, added to the local watch fixture. */
-async function nativeParts(page: Page) {
-  await page.goto('https://www.youtube.com/watch?v=fixture');
-  await page.evaluate(() => {
-    const metadata = document.querySelector('ytd-watch-metadata')!;
-    const actions = metadata.querySelector('.watch-actions')!;
-    const subscribe = actions.querySelector('yt-button-shape')!;
-    const wrapper = document.createElement('ytd-subscribe-button-renderer');
-    subscribe.before(wrapper);
-    wrapper.append(subscribe);
-    const like = actions.querySelector('button[aria-label="Like video"]')!;
-    const buttons = document.createElement('div');
-    buttons.id = 'top-level-buttons-computed';
-    const segmented = document.createElement('segmented-like-dislike-button-view-model');
-    const likeModel = document.createElement('like-button-view-model');
-    likeModel.append(like);
-    const dislikeModel = document.createElement('dislike-button-view-model');
-    dislikeModel.innerHTML = '<button aria-label="Dislike" aria-pressed="false">Dislike</button>';
-    segmented.append(likeModel, dislikeModel);
-    const share = document.createElement('yt-button-shape');
-    share.innerHTML = '<button>Share</button>';
-    buttons.append(segmented, share);
-    actions.append(buttons);
-    const chip = document.createElement('yt-chip-cloud-chip-renderer');
-    chip.innerHTML = '<button><div class="ytChipShapeChip">All</div></button>';
-    metadata.prepend(chip);
-    const input = document.querySelector('#contenteditable-root')!;
-    const placeholder = document.createElement('div');
-    placeholder.id = 'placeholder-area';
-    input.before(placeholder);
-    placeholder.append(input);
-    const expand = document.createElement('button');
-    expand.textContent = 'Show more';
-    metadata.querySelector('#description')!.append(expand);
-    document.dispatchEvent(new Event('yt-page-data-updated'));
-  });
-  for (const part of skinParts) await expect(partLocator(page, part).first(), part).toBeVisible();
-}
 
 test('nine skins preserve the G1 operation contract, both player bands and every safe paint region', async ({
   youtube,

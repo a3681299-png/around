@@ -43,6 +43,9 @@ for (const mode of ['light', 'dark'] as const)
     if (mode === 'dark')
       await context.addCookies([{ name: 'PREF', value: 'f6=400', domain: '.youtube.com', path: '/' }]);
     const evidence: Record<string, unknown>[] = [];
+    const shots = path.resolve(process.env.WW_LIVE_SKIN_SHOTS ?? 'docs/screenshots/ui1/after');
+    const evidenceRoot = path.resolve(process.env.WW_LIVE_SKIN_DATA ?? '.work/ui1-verification');
+    await mkdir(shots, { recursive: true });
     try {
       const worker = context.serviceWorkers()[0] ?? (await context.waitForEvent('serviceworker'));
       const popup = await context.newPage();
@@ -106,7 +109,7 @@ for (const mode of ['light', 'dark'] as const)
             // `unobscured` is recorded only: on buttons the hit point is YouTube's own touch-feedback
             // layer, a native sibling of the text. Hit-testing equality is skin-live.spec.ts's check.
             await target.screenshot({
-              path: path.resolve(`docs/screenshots/ui1/after/ink-${mode}-${art}-${part}.png`),
+              path: path.join(shots, `ink-${mode}-${art}-${part}.png`),
               animations: 'disabled',
             });
           }
@@ -114,8 +117,8 @@ for (const mode of ['light', 'dark'] as const)
       }
       console.log('INK ' + JSON.stringify(evidence));
     } finally {
-      await mkdir('.work/ui1-verification', { recursive: true });
-      await writeFile(path.resolve(`.work/ui1-verification/ink-${mode}.json`), JSON.stringify(evidence, null, 2));
+      await mkdir(evidenceRoot, { recursive: true });
+      await writeFile(path.join(evidenceRoot, `ink-${mode}.json`), JSON.stringify(evidence, null, 2));
       await info.attach(`ink-${mode}.json`, {
         body: JSON.stringify(evidence, null, 2),
         contentType: 'application/json',

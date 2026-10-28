@@ -8,6 +8,9 @@ import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import os from 'node:os';
+import { auditHost } from './host-audit.mjs';
+import { installFrameClock, sampleFrameClock } from './frame-clock.mjs';
+import { resumeMeasurement } from './resume.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 process.chdir(root);
@@ -120,6 +123,7 @@ async function launch(build) {
   const popup = await context.newPage();
   await popup.goto(`chrome-extension://${new URL(worker.url()).host}/popup/index.html`);
   const page = await context.newPage();
+  await installFrameClock(page);
   const session = await context.newCDPSession(page);
   const contexts = new Set();
   session.on('Runtime.executionContextCreated', ({ context: c }) => {
@@ -202,7 +206,16 @@ async function phases(browser) {
         (node) => node.getBoundingClientRect().width > 0 && getComputedStyle(node).borderImageSource.startsWith('url('),
       ).length,
   );
-  result.startup = { ...perFrame(startup.value), kinds: startup.value.kinds, full: startup.full, cards, dressed };
+  const origin = await probe('performance.timeOrigin');
+  const startupSample = await sampleFrameClock(page, startup.value, origin, true);
+  result.startup = {
+    ...perFrame(startupSample),
+    clock: startupSample.clock,
+    kinds: startup.value.kinds,
+    full: startup.full,
+    cards,
+    dressed,
+  };
   await page.waitForTimeout(SETTLE_MS);
   await page.mouse.move(960, 600);
   const steady = await traced('steady', async () => {
@@ -213,8 +226,10 @@ async function phases(browser) {
     }
     return probe('__ui1Probe.end()');
   });
+  const steadySample = await sampleFrameClock(page, steady.value, origin);
   result.steady = {
-    ...perFrame(steady.value),
+    ...perFrame(steadySample),
+    clock: steadySample.clock,
     kinds: steady.value.kinds,
     full: steady.full,
     cards: await page.locator('ytd-video-renderer').count(),
@@ -237,7 +252,8 @@ async function phases(browser) {
     if (!arrived.same || !arrived.url.includes('/watch?v=')) throw new Error('Invalid SPA block.');
     return probe('__ui1Probe.end()');
   });
-  result.spa = { ...perFrame(spa.value), kinds: spa.value.kinds, full: spa.full };
+  const spaSample = await sampleFrameClock(page, spa.value, origin);
+  result.spa = { ...perFrame(spaSample), clock: spaSample.clock, kinds: spa.value.kinds, full: spa.full };
   return result;
 }
 
@@ -289,7 +305,7 @@ async function skinned(browser) {
   };
 }
 
-const result = {
+let result = {
   mode,
   url,
   measuredAt: new Date().toISOString(),
@@ -300,12 +316,30 @@ const result = {
     viewport: { width: 1920, height: 1080, deviceScaleFactor: 1 },
     phaseMs: PHASE_MS,
     settleMs: SETTLE_MS,
+    hostAudit: process.env.UI1_HOST_AUDIT === '1',
+    allowBackground: process.env.UI1_ALLOW_BACKGROUND === '1',
+    diagnosticOnly: process.env.UI1_CPUPROFILE === '1' || process.env.UI1_DIAGNOSTIC === '1',
+    compact: process.env.UI1_COMPACT !== '0',
   },
   builds: {},
   pairs: [],
 };
 for (const [name, dir] of Object.entries(builds))
   result.builds[name] = JSON.parse(await readFile(path.join(dir, 'ui1-build.json'), 'utf8').catch(() => 'null'));
+for (const name of mode === 'build' ? ['before', 'after'] : ['after']) {
+  const metadata = result.builds[name];
+  if (metadata?.probe !== 'isolated-world-v3' || metadata.asyncContinuations !== 'lowered-promises')
+    throw new Error(`Rebuild ${name}: native async continuations are not captured by the old probe.`);
+  if (metadata.busyMs !== 0) throw new Error('A calibration workload cannot be used for the performance gate.');
+  if ((metadata.disableInk || !result.environment.compact) && !result.environment.diagnosticOnly)
+    throw new Error('Disabled features require UI1_DIAGNOSTIC=1; they cannot determine the performance gate.');
+}
+if (process.env.UI1_RESUME === '1')
+  result = resumeMeasurement(
+    JSON.parse(await readFile(path.join(work, 'result.json'), 'utf8')),
+    result,
+    mode === 'build' ? ['before', 'after'] : ['plain', 'skinned'],
+  );
 const save = () => writeFile(path.join(work, 'result.json'), JSON.stringify(result));
 let shared;
 try {
@@ -315,7 +349,7 @@ try {
     skinDesign = await skinned(shared);
     result.skinDesign = skinDesign;
   }
-  for (let pair = 0; pair < pairs; pair++) {
+  for (let pair = result.pairs.length; pair < pairs; pair++) {
     const order =
       mode === 'build'
         ? pair % 2
@@ -332,6 +366,32 @@ try {
         if (mode === 'skin')
           await browser.store({ 'webWorldThemes.design.youtube': condition === 'skinned' ? skinDesign : plain });
         await browser.page.goto('about:blank');
+        let host = await auditHost();
+        while (host && !host.CodeQuiet) {
+          (row.waitingForCodeSession ??= []).push({ condition, ...host });
+          await save();
+          console.log(
+            'WAIT_CODE ' +
+              JSON.stringify({ pair, condition, background: host.BackgroundPercent, code: host.OtherCodeSessions }),
+          );
+          host = await auditHost();
+        }
+        if (host) {
+          (row.host ??= {})[condition] = host;
+          await save();
+          console.log(
+            'HOST ' +
+              JSON.stringify({
+                pair,
+                condition,
+                quiet: host.Quiet,
+                backgroundPercent: host.BackgroundPercent,
+                otherCode: host.OtherCodeSessions,
+              }),
+          );
+          if (!host.Quiet && process.env.UI1_ALLOW_BACKGROUND !== '1')
+            throw new Error('Host is busy; the unmeasured block is retained for diagnosis.');
+        }
         const measured = await phases(browser);
         if (mode === 'skin') {
           const dressed = measured.startup.dressed;
