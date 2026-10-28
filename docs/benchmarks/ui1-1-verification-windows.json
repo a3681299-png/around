@@ -1,5 +1,5 @@
 {
-  "verifiedAt": "2026-10-28T02:51:55.269Z",
+  "verifiedAt": "2026-10-28T03:16:03.028Z",
   "scope": {
     "before": "29b8d5ba923c4a0a06db96678a4c27346893dd95",
     "after": "2c93579f2b96d4b2f35a41b9f825e4a43803dc30",
@@ -36594,10 +36594,35 @@
       ]
     },
     "ci": {
-      "revision": "42aacdab5ef8a36ebb2a4fb33beb36c21cd6c519",
-      "run": 40463412430,
+      "revision": "77a5595e623ac2c8687def752f9a7245a693a5f6",
+      "run": 40623604571,
+      "url": "https://github.com/a3681299-png/web-world-themes/actions/runs/40623604571",
       "conclusion": "success",
-      "note": "Historical UI1.1 CI only. The latest verification CI has not been recorded yet."
+      "attempt": 1,
+      "startedAt": "2026-10-28T02:54:04Z",
+      "completedAt": "2026-10-28T03:13:49Z",
+      "jobs": [
+        {
+          "id": 122603186631,
+          "name": "unit",
+          "conclusion": "success",
+          "startedAt": "2026-10-28T02:54:08Z",
+          "completedAt": "2026-10-28T02:55:03Z",
+          "passed": 391,
+          "failed": 0
+        },
+        {
+          "id": 122603186935,
+          "name": "e2e",
+          "conclusion": "success",
+          "startedAt": "2026-10-28T02:54:08Z",
+          "completedAt": "2026-10-28T03:13:49Z",
+          "nativeEntry": { "passed": 4, "failed": 0 },
+          "suite": { "passed": 259, "failed": 0, "skipped": 44 }
+        }
+      ],
+      "logs": { "unit": ".work/ui11-verification/ci-unit.log", "e2e": ".work/ui11-verification/ci-e2e.log" },
+      "note": "CI tested code and tests at 77a5595. The follow-up evidence-only commit changes the two report files, with local formatting checked. The performance gate for the frozen 2c93579 target remains failed."
     }
   },
   "dist": { "Checked": 48, "ActualFiles": 48, "Mismatches": 0, "ExtraFiles": 0 }
