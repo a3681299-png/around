@@ -145,6 +145,13 @@ export function createThemeController(
       ),
     );
 
+  const connect = () => {
+    if (disconnect) return;
+    // The first scan already looks for the parts the artwork uses; no second scan follows.
+    syncParts();
+    disconnect = site.connect(followPage);
+  };
+
   const validateDesign = (input: DesignDocument | undefined) => {
     const next = input ? readDesign(input) : undefined;
     if (next && (next.siteId !== site.id || (next.baseThemeId !== null && next.baseThemeId !== theme.id))) {
@@ -171,7 +178,7 @@ export function createThemeController(
       suspended = value;
       if (value) deactivate();
       else if (current?.enabled && current.strength > 0) {
-        disconnect ??= site.connect(followPage);
+        connect();
         render();
       }
     },
@@ -182,7 +189,7 @@ export function createThemeController(
         deactivate();
         return;
       }
-      disconnect ??= site.connect(followPage);
+      connect();
       render();
     },
     updateDesign(input) {
