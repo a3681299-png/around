@@ -125,6 +125,55 @@ test('parts of one kind with different backdrops and colours share one colour th
   expect(decideInkAcross([selected])).toStrictEqual(decideInk(selected.backdrop, WHITE));
 });
 
+test('the table-based backdrop luminance equals the straightforward formulation on random art', () => {
+  // The formulation UI1.1 shipped: every pixel blended and converted with pow(), then sorted.
+  const reference = (art: ArtPixels, frame: SkinFrame, backdrop: Rgb) => {
+    const sx = art.sampleWidth / art.width,
+      sy = art.sampleHeight / art.height;
+    let x0 = Math.floor(frame.slices.left * sx),
+      x1 = Math.ceil(art.sampleWidth - frame.slices.right * sx),
+      y0 = Math.floor(frame.slices.top * sy),
+      y1 = Math.ceil(art.sampleHeight - frame.slices.bottom * sy);
+    if (x1 - x0 < 1 || y1 - y0 < 1) [x0, x1, y0, y1] = [0, art.sampleWidth, 0, art.sampleHeight];
+    const values: number[] = [];
+    for (let y = y0; y < y1; y++)
+      for (let x = x0; x < x1; x++) {
+        const i = (y * art.sampleWidth + x) * 4,
+          alpha = art.data[i + 3]! / 255;
+        values.push(
+          luminance([
+            art.data[i]! * alpha + backdrop[0] * (1 - alpha),
+            art.data[i + 1]! * alpha + backdrop[1] * (1 - alpha),
+            art.data[i + 2]! * alpha + backdrop[2] * (1 - alpha),
+          ]),
+        );
+      }
+    values.sort((a, b) => a - b);
+    const at = (q: number) => values[Math.min(values.length - 1, Math.floor(q * values.length))]!;
+    return { dark: at(0.05), light: at(0.95), mean: values.reduce((a, b) => a + b, 0) / values.length };
+  };
+  let seed = 12345;
+  const random = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+  for (let round = 0; round < 40; round++) {
+    const size = 8 + Math.floor(random() * 90);
+    const data = new Uint8ClampedArray(size * size * 4);
+    for (let i = 0; i < size * size; i++) {
+      const kind = random();
+      // A mix of opaque, fully transparent and translucent pixels.
+      const alpha = kind < 0.4 ? 255 : kind < 0.7 ? 0 : Math.floor(random() * 256);
+      data.set([random() * 256, random() * 256, random() * 256, alpha], i * 4);
+    }
+    const pixels: ArtPixels = { width: size * 2, height: size * 2, sampleWidth: size, sampleHeight: size, data };
+    const slices = { top: Math.floor(random() * size), right: Math.floor(random() * size), bottom: 3, left: 2 };
+    const backdrop: Rgb = [Math.floor(random() * 256), Math.floor(random() * 256), Math.floor(random() * 256)];
+    const a = backdropLuminance(pixels, { ...frame, slices }, backdrop),
+      b = reference(pixels, { ...frame, slices }, backdrop);
+    expect(a.dark).toBeCloseTo(b.dark, 12);
+    expect(a.light).toBeCloseTo(b.light, 12);
+    expect(a.mean).toBeCloseTo(b.mean, 12);
+  }
+});
+
 test('an empty centre slice falls back to the whole image', () => {
   const tight = { ...frame, slices: { top: 48, right: 48, bottom: 48, left: 48 } };
   const result = backdropLuminance(art(solid([0, 0, 0])), tight, WHITE);

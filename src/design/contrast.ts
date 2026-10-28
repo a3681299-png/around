@@ -7,12 +7,14 @@ export type Rgb = readonly [number, number, number];
 /** Below this the native text colour is replaced; below the second a warning is shown. */
 export const CONTRAST = Object.freeze({ minimum: 3, readable: 4.5 });
 
+const linear = (value: number) => {
+  const c = value / 255;
+  return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+};
+/** sRGB → linear light for the 256 integer levels; art pixels are integers. */
+const LEVELS = Float64Array.from({ length: 256 }, (_, level) => linear(level));
 export function luminance([r, g, b]: Rgb): number {
-  const channel = (value: number) => {
-    const c = value / 255;
-    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
-  };
-  return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+  return 0.2126 * linear(r) + 0.7152 * linear(g) + 0.0722 * linear(b);
 }
 export const contrastRatio = (a: number, b: number) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
 
@@ -27,9 +29,13 @@ export interface ArtPixels {
   data: Uint8ClampedArray;
 }
 
+// One reusable buffer for the sorted luminances: no allocation per call.
+let scratch = new Float64Array(96 * 96);
+
 /** Luminance of the art's centre slice (what is stretched under the text), each pixel composited
  * over the native backdrop: darkest 5%, brightest 5% and mean, so a single dark stroke on a light
- * centre still counts. An empty centre falls back to the whole image. */
+ * centre still counts. An empty centre falls back to the whole image. Opaque pixels and fully
+ * transparent ones (the backdrop alone) take table lookups; only translucent ones are blended. */
 export function backdropLuminance(art: ArtPixels, frame: SkinFrame, backdrop: Rgb) {
   const sx = art.sampleWidth / art.width,
     sy = art.sampleHeight / art.height;
@@ -38,22 +44,35 @@ export function backdropLuminance(art: ArtPixels, frame: SkinFrame, backdrop: Rg
     y0 = Math.floor(frame.slices.top * sy),
     y1 = Math.ceil(art.sampleHeight - frame.slices.bottom * sy);
   if (x1 - x0 < 1 || y1 - y0 < 1) [x0, x1, y0, y1] = [0, art.sampleWidth, 0, art.sampleHeight];
-  const values: number[] = [];
+  const count = (x1 - x0) * (y1 - y0);
+  if (scratch.length < count) scratch = new Float64Array(count);
+  const values = scratch.subarray(0, count),
+    data = art.data,
+    behind = luminance(backdrop);
+  let at = 0,
+    sum = 0;
   for (let y = y0; y < y1; y++)
     for (let x = x0; x < x1; x++) {
       const i = (y * art.sampleWidth + x) * 4,
-        alpha = art.data[i + 3]! / 255;
-      values.push(
-        luminance([
-          art.data[i]! * alpha + backdrop[0] * (1 - alpha),
-          art.data[i + 1]! * alpha + backdrop[1] * (1 - alpha),
-          art.data[i + 2]! * alpha + backdrop[2] * (1 - alpha),
-        ]),
-      );
+        a = data[i + 3]!;
+      let value: number;
+      if (a === 255)
+        value = 0.2126 * LEVELS[data[i]!]! + 0.7152 * LEVELS[data[i + 1]!]! + 0.0722 * LEVELS[data[i + 2]!]!;
+      else if (a === 0) value = behind;
+      else {
+        const alpha = a / 255;
+        value = luminance([
+          data[i]! * alpha + backdrop[0] * (1 - alpha),
+          data[i + 1]! * alpha + backdrop[1] * (1 - alpha),
+          data[i + 2]! * alpha + backdrop[2] * (1 - alpha),
+        ]);
+      }
+      values[at++] = value;
+      sum += value;
     }
-  values.sort((a, b) => a - b);
-  const at = (q: number) => values[Math.min(values.length - 1, Math.floor(q * values.length))]!;
-  return { dark: at(0.05), light: at(0.95), mean: values.reduce((a, b) => a + b, 0) / values.length };
+  values.sort();
+  const pick = (q: number) => values[Math.min(count - 1, Math.floor(q * count))]!;
+  return { dark: pick(0.05), light: pick(0.95), mean: sum / count };
 }
 
 export interface InkDecision {
