@@ -16,9 +16,9 @@ The tool UI of Web World Themes: Studio, the side panel, the floating in-page ed
 
 ## Lines
 
-| Line | Token | Where | How |
-| --- | --- | --- | --- |
-| Ruler | `rule` (1px), `line`, `line-control`, `ink-faint` | Panel borders, row separators, input edges, the timesheet grid, construction guides in drawings | A uniform border or `ww-rule` stroke. Never tapered, never drawn in. |
+| Line  | Token                                                 | Where                                                                                                                                                          | How                                                                                  |
+| ----- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Ruler | `rule` (1px), `line`, `line-control`, `ink-faint`     | Panel borders, row separators, input edges, the timesheet grid, construction guides in drawings                                                                | A uniform border or `ww-rule` stroke. Never tapered, never drawn in.                 |
 | G-pen | `pen` (2.4px), `pen-large` (3.4px), `pen-tip` (0.2px) | The active tool (`ww-rail`), the selected tab (`ww-tab`), the frame around a part on the page (`ww-mark`), the main lines and spiral of a construction drawing | A filled outline (`WWTStudio.penOutline`) or the `--ww-pen-*` masks in `bundle.css`. |
 
 - A G-pen line is drawn **in** when it appears: it grows from its start along its own path, in 4 frames for marks and up to 12 for a long spiral (`ww-draw` on the mask centreline; `WWTStudio.drawPen` does both). It never animates while it stays on screen.
@@ -47,15 +47,15 @@ One frame is `--ww-frame` (83ms). Every transition is a whole number of frames p
 
 ## States and their meaning
 
-| State | Token | Shape | Words |
-| --- | --- | --- | --- |
-| Saved | `ok-green` | filled circle | 保存済み |
-| Unsaved | `ink-muted` | dashed circle | 未保存 |
-| Limited by the engine (G1) | `vermilion`, `vermilion-wash` | diamond; 45° hatch on the page | 制限中 + what it protected and how to fix it |
-| Advice, not enforced | `lamp-amber` | triangle | 読みにくいかもしれません 等 |
-| Atmosphere layer | `lamp-amber` | ruled edge | 雰囲気 33% |
-| Not available | `ink-faint` | small dot; dashed edge on the page | 未対応 |
-| Timesheet key | `pen-bone`, selected `cobalt` | square | — |
+| State                      | Token                         | Shape                              | Words                                        |
+| -------------------------- | ----------------------------- | ---------------------------------- | -------------------------------------------- |
+| Saved                      | `ok-green`                    | filled circle                      | 保存済み                                     |
+| Unsaved                    | `ink-muted`                   | dashed circle                      | 未保存                                       |
+| Limited by the engine (G1) | `vermilion`, `vermilion-wash` | diamond; 45° hatch on the page     | 制限中 + what it protected and how to fix it |
+| Advice, not enforced       | `lamp-amber`                  | triangle                           | 読みにくいかもしれません 等                  |
+| Atmosphere layer           | `lamp-amber`                  | ruled edge                         | 雰囲気 33%                                   |
+| Not available              | `ink-faint`                   | small dot; dashed edge on the page | 未対応                                       |
+| Timesheet key              | `pen-bone`, selected `cobalt` | square                             | —                                            |
 
 Protected areas on the page are drawn with `ww-protect`: the 45° vermilion hatch with a mono label naming the part (`player.controls.bottom`). Red always means "the engine is protecting a real control here".
 
