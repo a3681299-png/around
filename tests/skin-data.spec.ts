@@ -628,3 +628,59 @@ test('the renderer plans legibility once from the art and the native colours, an
   expect(renderer.inkStatus('subscribe-button')!.normal!.ink).toBeUndefined();
   renderer.dispose();
 });
+
+test('a stored result paints readable text before any native colour is read; a miss is judged at once and stored', async () => {
+  const art = { width: 96, height: 96, sampleWidth: 48, sampleHeight: 48, data: new Uint8ClampedArray(48 * 48 * 4) };
+  art.data.fill(245);
+  let reads = 0;
+  const button = {
+    parentElement: null,
+    getBoundingClientRect: () => ({ width: 130, height: 36 }),
+    matches: () => true,
+  } as unknown as Element;
+  const style = { id: '', textContent: '', isConnected: true, remove() {} } as unknown as HTMLStyleElement;
+  const page = {
+    documentElement: {
+      getAttribute: (name: string) => (name === 'data-ww-mode' ? 'light' : null),
+      setAttribute() {},
+      removeAttribute() {},
+    },
+    head: { append() {} },
+    createElement: () => style,
+    querySelectorAll: () => [button],
+    createTreeWalker: () => ({ nextNode: () => null }),
+    defaultView: {
+      getComputedStyle: () => {
+        reads++;
+        return { color: 'rgb(241, 241, 241)', backgroundColor: 'rgb(15, 15, 15)' };
+      },
+    },
+  } as unknown as Document;
+  const design = parseDesign(
+    doc([{ kind: 'surface-style', target: 'subscribe-button', style: {}, skin: { states: { normal: frame() } } }]),
+  );
+  const writes: unknown[] = [];
+  const port = (stored: unknown) => ({
+    load: async () => 'blob:https://www.youtube.com/0b8f1d3e-0000-4000-8000-00000000000a',
+    revoke() {},
+    pixels: async () => art,
+    readInks: async () => stored,
+    writeInks: (cache: unknown) => void writes.push(cache),
+  });
+  // Miss (and junk in storage): judged at once, then stored.
+  const miss = createDesignRenderer(page, [target], port({ junk: 1 }));
+  miss.update(design);
+  await expect.poll(() => style.textContent).toContain('color:#000000');
+  await expect.poll(() => writes.length).toBe(1);
+  miss.dispose();
+  // Hit: the stored colour is used while no native colour has been read yet.
+  const key = Object.keys(writes[0] as object)[0]!;
+  reads = 0;
+  style.textContent = '';
+  const hit = createDesignRenderer(page, [target], port(writes[0]));
+  hit.update(design);
+  await expect.poll(() => style.textContent).toContain('color:#000000');
+  expect(reads).toBe(0);
+  expect(key).toMatch(/^[0-9a-f]{8}$/);
+  hit.dispose();
+});

@@ -5,6 +5,8 @@ import type { ArtPixels } from '../design/contrast';
 
 // Enough to tell light, dark and mixed centres apart; the original can be up to 1024px.
 const SAMPLE_EDGE = 96;
+/** Where the last white/black results live; a cache, not artwork, and not part of backups. */
+const INK_CACHE_KEY = 'webWorldThemes.skinInk.v1';
 
 async function staticImage(assetId: string) {
   const { metadata, blob } = await loadAsset(assetId);
@@ -26,6 +28,12 @@ export const skinAssetPort: SkinAssetPort = {
     return URL.createObjectURL((await staticImage(assetId)).blob);
   },
   revoke: (url) => URL.revokeObjectURL(url),
+  async readInks() {
+    return (await chrome.storage.local.get(INK_CACHE_KEY))[INK_CACHE_KEY];
+  },
+  writeInks(cache) {
+    void chrome.storage.local.set({ [INK_CACHE_KEY]: cache }).catch(() => undefined);
+  },
   /** A small copy of the image for the legibility check; decoded once per asset. */
   async pixels(assetId): Promise<ArtPixels> {
     const { blob, metadata } = await staticImage(assetId);

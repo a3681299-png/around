@@ -35,6 +35,7 @@ const unitSpecs = [
   'signal-equality',
   'signal-rules',
   'skin-contrast',
+  'ink-cache',
   'surface-index',
   'skin-cpu-probe',
   'skin-frame-clock',

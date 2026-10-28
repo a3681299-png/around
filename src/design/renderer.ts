@@ -1,5 +1,6 @@
 import { isDesignId } from './schema';
 import { readDesign } from './immutable';
+import { inkDesignKey, parseInkCache, withInkEntry, type InkCache } from './ink-cache';
 import { countPageChange } from '../diagnostics/page-change-probe';
 import {
   backdropLuminance,
@@ -248,6 +249,9 @@ export interface SkinAssetPort {
   revoke(url: string): void;
   /** Downscaled pixels of the same image, for the legibility check. */
   pixels?(assetId: string): Promise<ArtPixels>;
+  /** The last legibility results the browser kept (white/black only; never in the artwork). */
+  readInks?(): Promise<unknown>;
+  writeInks?(cache: InkCache): void;
 }
 
 export function createDesignRenderer(
@@ -330,14 +334,24 @@ export function createDesignRenderer(
     if (!style.isConnected) (doc.head ?? doc.documentElement).append(style);
     // A new page may reuse a kind with different native ink/backdrops. Its presence in the
     // previous page's plan does not make those samples valid after navigation.
-    if (change === 'mode' || change === 'navigation') schedulePlan(true);
-    else if (
+    if (change === 'mode') schedulePlan(true);
+    else if (change === 'navigation') {
+      // Same address (a re-announced navigation) leaves the sampled parts as they were.
+      const href = doc.defaultView?.location?.href;
+      if (href !== planHref) {
+        planHref = href;
+        urgentNext = true;
+        schedulePlan(true);
+      }
+    } else if (
       pending.size &&
       marked?.some((element) =>
         targets.some((target) => pending.has(target.id) && element.matches(surfaceSelector(target))),
       )
-    )
+    ) {
+      urgentNext = true;
       schedulePlan(true);
+    }
     if (!needs.length) return;
     // With the site's list of newly marked parts, only those are checked; otherwise text-only
     // updates cannot add parts, and structure or navigation falls back to one query.
@@ -396,6 +410,8 @@ export function createDesignRenderer(
   // frame. Natives are read once per part and mode, before any engine colour for that mode exists.
   let inks: InkPlan = {},
     planKey = '',
+    planHref = doc.defaultView?.location?.href,
+    urgentNext = false,
     planTimer: ReturnType<typeof setTimeout> | undefined;
   const decisions = new Map<string, Record<string, InkDecision>>(),
     art = new Map<string, Promise<ArtPixels | undefined>>(),
@@ -411,15 +427,24 @@ export function createDesignRenderer(
     return found;
   };
   /** What shows through transparent art: the part's own background over its ancestors'. */
-  const backdropOf = (element: Element): Rgb => {
+  const backdropOf = (element: Element, memo: Map<Element, Rgb>): Rgb => {
     const view = doc.defaultView!,
       chain: Element[] = [];
-    for (let node: Element | null = element; node; node = node.parentElement) chain.push(node);
     let rgb: Rgb = mode() === 'dark' ? [15, 15, 15] : [255, 255, 255];
+    // Ancestors are shared between parts: each element's blended backdrop is computed once per run.
+    for (let node: Element | null = element; node; node = node.parentElement) {
+      const known = memo.get(node);
+      if (known) {
+        rgb = known;
+        break;
+      }
+      chain.push(node);
+    }
     for (const node of chain.reverse()) {
       const paint = parseRgb(view.getComputedStyle(node).backgroundColor);
       if (paint && paint.alpha > 0)
         rgb = paint.rgb.map((value, index) => value * paint.alpha + rgb[index]! * (1 - paint.alpha)) as unknown as Rgb;
+      memo.set(node, rgb);
     }
     return rgb;
   };
@@ -499,6 +524,8 @@ export function createDesignRenderer(
     // Native colours and backdrops of every sampled part, read with the engine's colours switched
     // off for a moment (one attribute on the root; only while planning, never per frame).
     const samples = new Map<string, { backdrop: Rgb; natives: Rgb[] }[]>();
+    const memo = new Map<Element, Rgb>(),
+      lights = new Map<string, ReturnType<typeof backdropLuminance>>();
     const root = doc.documentElement;
     root.setAttribute(INK_OFF_ATTRIBUTE, '');
     try {
@@ -511,7 +538,7 @@ export function createDesignRenderer(
           samples.set(
             rule.target,
             parts
-              .map((element) => ({ backdrop: backdropOf(element), natives: textColours(element, target) }))
+              .map((element) => ({ backdrop: backdropOf(element, memo), natives: textColours(element, target) }))
               .filter((sample) => sample.natives.length),
           );
       }
@@ -523,12 +550,19 @@ export function createDesignRenderer(
       if (!rule.skin || !cases?.length) continue;
       const slots: Record<string, Ink> = {},
         results: Record<string, InkDecision> = {};
+      // Parts of one kind often share a backdrop: judge each (art, slices, backdrop) once.
+      const lightOf = (pixels: ArtPixels, frame: SkinFrame, backdrop: Rgb) => {
+        const id = `${frame.assetId}|${Object.values(frame.slices).join()}|${backdrop.join()}`;
+        let light = lights.get(id);
+        if (!light) lights.set(id, (light = backdropLuminance(pixels, frame, backdrop)));
+        return light;
+      };
       const judge = async (slot: string, frame: SkinFrame, shown?: Rgb) => {
         const pixels = await pixelsOf(frame.assetId);
         if (!pixels) return;
         const decision = decideInkAcross(
           cases.map(({ backdrop, natives }) => ({
-            backdrop: backdropLuminance(pixels, frame, backdrop),
+            backdrop: lightOf(pixels, frame, backdrop),
             natives: shown ? [shown] : natives,
           })),
         );
@@ -559,9 +593,39 @@ export function createDesignRenderer(
     status.forEach((value, key) => decisions.set(key, value));
     const changed = JSON.stringify(inks[now] ?? {}) !== JSON.stringify(next);
     inks = { ...inks, [now]: next };
+    remember(current, inks);
     if (changed) render();
     else onStatus?.();
   }
+  // The last result per design, kept across page loads: the next load paints readable text from it
+  // at once and the live check below only confirms (or corrects) it when the page is idle.
+  let stored: InkCache | undefined,
+    storedRead: Promise<void> | undefined,
+    hydrated = '';
+  const ready = () =>
+    (storedRead ??= (assets?.readInks?.() ?? Promise.resolve(undefined)).then(
+      (value) => void (stored = parseInkCache(value)),
+      () => void (stored = {}),
+    ));
+  function remember(current: DesignDocument, plan: InkPlan) {
+    const key = inkDesignKey(current);
+    if (JSON.stringify(stored?.[key] ?? {}) === JSON.stringify(plan)) return;
+    stored = withInkEntry(stored ?? {}, key, plan);
+    assets?.writeInks?.(stored);
+  }
+  const queue = (urgent: boolean) => {
+    if (urgent) {
+      if (planIdle !== undefined) (doc.defaultView as Window).cancelIdleCallback?.(planIdle);
+      planIdle = undefined;
+      planTimer ??= setTimeout(() => void plan(), 0);
+    } else if (planTimer === undefined && planIdle === undefined) {
+      const view = doc.defaultView as Window | null;
+      if (view?.requestIdleCallback)
+        planIdle = view.requestIdleCallback(() => ((planIdle = undefined), void plan()), { timeout: 4000 });
+      else planTimer = setTimeout(() => void plan(), 1000);
+    }
+  };
+  let planIdle: number | undefined;
   const schedulePlan = (force = false) => {
     if (!assets?.pixels || !design) return;
     const key = JSON.stringify([
@@ -571,7 +635,20 @@ export function createDesignRenderer(
     ]);
     if (!force && key === planKey) return;
     planKey = key;
-    planTimer ??= setTimeout(() => void plan(), 0);
+    const requested = design,
+      now = mode();
+    void ready().then(() => {
+      if (!alive || requested !== design || now !== mode()) return;
+      const known = stored?.[inkDesignKey(requested)];
+      if (known?.[now] && hydrated !== `${inkDesignKey(requested)}|${now}`) {
+        hydrated = `${inkDesignKey(requested)}|${now}`;
+        inks = { ...inks, [now]: known[now] };
+        render();
+      }
+      // A stored result for this mode makes the live check a confirmation, not an urgent need.
+      queue(!known?.[now] || urgentNext);
+      urgentNext = false;
+    });
   };
   function render() {
     const css = design ? compileDesign(design, targets, (id) => urls.get(id), { previews, inks }) : '';
@@ -621,6 +698,8 @@ export function createDesignRenderer(
       alive = false;
       if (planTimer !== undefined) clearTimeout(planTimer);
       planTimer = undefined;
+      if (planIdle !== undefined) doc.defaultView?.cancelIdleCallback?.(planIdle);
+      planIdle = undefined;
       destroy();
       design = undefined;
       release(new Set());
