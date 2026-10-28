@@ -99,8 +99,9 @@ const targets: readonly YouTubeTarget[] = [
       states: { hover: '&:hover', focus: '&:focus-within' },
       where: 'ページ上部（すべてのページ）',
       sample: { width: 480, height: 40 },
-      // The typed text and the placeholder live in the input, which has its own colour.
-      ink: '& input, & input::placeholder',
+      // The input and the clear icon's wrapper set native colours of their own. Override
+      // currentColor at the SVG boundary too; never write the SVG's fill property.
+      ink: '& input, & input::placeholder, & svg',
     },
   },
   {

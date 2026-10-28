@@ -447,8 +447,8 @@ export function createDesignRenderer(
       }
     });
   };
-  /** The native colours of the text the engine's colour would reach: the part itself and the
-   * adapter's text descendants. Children often set their own colour (titles, links). */
+  /** Native colours reached by the adapter's ink selectors. Form values and currentColor
+   * SVGs have no text nodes, so a text walker alone cannot sample their inherited colours. */
   const textColours = (element: Element, target: DesignTarget): Rgb[] => {
     const view = doc.defaultView!,
       template = target.skin?.ink;
@@ -466,6 +466,16 @@ export function createDesignRenderer(
       if (!parent || !node.textContent?.trim() || !parent.getClientRects().length) continue;
       seen++;
       if (parent === element || (reach && reaches(parent, reach))) add(parent);
+    }
+    if (reach) {
+      let controls = 0;
+      for (const node of element.querySelectorAll('input,textarea,svg')) {
+        if (controls >= 24) break;
+        if (node.getClientRects().length && reaches(node, reach)) {
+          add(node);
+          controls++;
+        }
+      }
     }
     return [...colours.values()];
   };
