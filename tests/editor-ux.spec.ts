@@ -89,7 +89,7 @@ test('mouse-only first creation: import, check selection, group, mask, behavior,
   await panel.getByRole('checkbox', { name: 'マウスに追従', exact: true }).check();
   await panel.getByRole('checkbox', { name: '動画の一時停止で隠す', exact: true }).check();
   await expect(panel.getByLabel('画像の幅', { exact: true })).toBeHidden();
-  await expect(panel.locator('.dirty')).toHaveText('未保存の変更');
+  await expect(panel.locator('.dirty')).toHaveText('未保存');
   await save(panel);
   const saved = await stored(popup);
   expect(saved.schemaVersion).toBe(13);
@@ -223,7 +223,11 @@ test('animation thumbnails are static and independent of playback; error feedbac
     .getByLabel('アニメーション素材を追加')
     .setInputFiles({ name: 'bad.gif', mimeType: 'image/gif', buffer: Buffer.from('broken') });
   await expect(panel.locator('.status')).toHaveAttribute('role', 'alert');
-  await expect(panel.locator('.dirty')).toContainText('失敗');
+  // The header chip carries the save state only; an operation error is told, visibly, in the footer.
+  await expect(panel.locator('.status')).toHaveAttribute('data-error', 'true');
+  await expect(panel.locator('.status')).toBeVisible();
+  await expect(panel.locator('.status')).not.toBeEmpty();
+  await expect(panel.locator('.dirty')).not.toContainText('保存済み');
   await panel.getByRole('tab', { name: '使い方', exact: true }).click();
   await expect(panel.locator('.status')).toHaveAttribute('data-error', 'true');
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
@@ -287,6 +291,43 @@ test('32 layers keep one list scroll, shared thumbnails, lock protection, Undo/d
   await expect(again.locator('.quick-guide')).toBeVisible();
 });
 
+test('on a low window (1366×657) the guide folds to its title and the first layer row shows without scrolling', async ({
+  popup,
+  youtube,
+}) => {
+  await youtube.setViewportSize({ width: 1366, height: 657 });
+  const panel = await open(popup, youtube);
+  await add(panel, youtube);
+  await save(panel);
+  await panel.getByRole('button', { name: '編集を終了', exact: true }).click();
+  await expect(panel).toHaveCount(0);
+  const again = await open(popup, youtube);
+  await expect(again.locator('.layer')).toHaveCount(3);
+  const guide = again.locator('.quick-guide');
+  await expect(guide).toBeVisible();
+  await expect(guide).toHaveAttribute('data-folded', '');
+  const toggle = again.getByRole('button', { name: 'はじめての制作', exact: true });
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  await expect(guide.locator('ol')).toBeHidden();
+  // Straight after opening, nothing scrolled: the first row is whole on screen and is the row itself.
+  expect(await again.locator('.layers-pane').evaluate((pane) => pane.scrollTop)).toBe(0);
+  const first = again.locator('.layer').first();
+  await expect(first).toBeInViewport({ ratio: 1 });
+  expect(
+    await again.evaluate((host) => {
+      const row = host.shadowRoot!.querySelector('.layer')!,
+        box = row.querySelector('.layer-select')!.getBoundingClientRect();
+      return row.contains(host.shadowRoot!.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2));
+    }),
+  ).toBe(true);
+  // Pressing the title opens the steps, and again folds them.
+  await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  await expect(guide.locator('ol')).toBeVisible();
+  await toggle.click();
+  await expect(guide.locator('ol')).toBeHidden();
+});
+
 test('a low window (1366×657) with the guide shown still lets the bottom of three layer rows be picked', async ({
   popup,
   youtube,
@@ -344,6 +385,9 @@ test('a low window (1366×657) with the guide shown still lets the bottom of thr
   // Taller, the list still scrolls but the pane has nothing to scroll: the list's leftover wheel
   // must not reach the page.
   await youtube.setViewportSize({ width: 1366, height: 800 });
+  // Unfolded, the guide takes the room that leaves the list scrolling inside a pane that does not.
+  if (await panel.locator('.quick-guide[data-folded]').count())
+    await panel.getByRole('button', { name: 'はじめての制作', exact: true }).click();
   await expect(panel.locator('.layers')).toBeInViewport({ ratio: 1 });
   await expect
     .poll(() => panel.locator('.layers-pane').evaluate((pane) => pane.scrollHeight - pane.clientHeight))

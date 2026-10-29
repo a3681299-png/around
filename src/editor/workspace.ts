@@ -2,6 +2,8 @@ import { ungroupingReason } from './groups';
 import { oneOf } from '../validation';
 import type { PanelState, PanelOptions } from './panel';
 import { transientPreferences } from '../studio/preferences';
+import { glyphButton } from './icons';
+import { drawPen, drawRule, goldenSpiral, line, arc, svg } from './pen';
 
 type Area = 'layers' | 'properties' | 'help';
 interface TreeView {
@@ -19,6 +21,8 @@ export function createWorkspace(
   options: PanelOptions = {},
 ) {
   const preferences = options.preferences ?? transientPreferences;
+  // The floating editor wears the WWT Studio design system; Studio's workbench keeps its own.
+  const floating = Boolean(options.floating);
   const fullPage = Boolean(options.fullPage),
     workspaceKey = 'webWorldThemes.studio.workspace.v1';
   let touched = false,
@@ -99,9 +103,70 @@ export function createWorkspace(
     },
     () => undefined,
   );
+  // On a low window the guide folds to its one-line title, so the layer list shows without scrolling.
+  const lowWindow = floating ? doc.defaultView?.matchMedia('(max-height: 800px)') : undefined;
+  const foldGuide = (folded: boolean) => {
+    const toggle = guide.querySelector<HTMLButtonElement>('.guide-toggle');
+    toggle?.setAttribute('aria-expanded', String(!folded));
+    guide.toggleAttribute('data-folded', folded);
+  };
+  if (floating) {
+    guide.innerHTML = `<button class="dismiss-guide" type="button">×</button><button class="guide-toggle" type="button" aria-controls="ww-guide-steps">はじめての制作</button><ol id="ww-guide-steps"><li>画像やアニメーションを追加</li><li>一覧のチェックで2個以上選択</li><li>グループ化 → 光とマスク → 保存</li></ol>`;
+    glyphButton(guide.querySelector<HTMLButtonElement>('.dismiss-guide')!, 'close', '操作ガイドを閉じる');
+    foldGuide(Boolean(lowWindow?.matches));
+    guide
+      .querySelector('.guide-toggle')!
+      .addEventListener('click', () => foldGuide(!guide.hasAttribute('data-folded')));
+  }
+  const refold = (event: MediaQueryListEvent) => foldGuide(event.matches);
+  lowWindow?.addEventListener('change', refold);
   const empty = doc.createElement('div');
   empty.className = 'empty-layers';
-  empty.innerHTML = `<strong>最初の素材を置いてみましょう</strong><p>画像やアニメーションを追加すると、YouTubeの上でドラッグして動かせます。</p><button type="button">素材を選ぶ</button><p class="hint">このパネルへファイルをドロップしても追加できます。</p>`;
+  if (floating) {
+    // ww-empty: the golden rectangle and its spiral are constructed, then the words appear.
+    empty.classList.add('ww-empty');
+    const drawing = svg(doc, '0 0 236 152', 'ww-empty__drawing'),
+      g = doc.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.setAttribute('transform', 'translate(8 8)');
+    drawing.append(g);
+    // Guides (ruler), then the main lines (G-pen, ink; the compass arc in pen-bone), then the accent.
+    [
+      'M-6 136H226',
+      'M0 0h136v136H0Z',
+      'M68 136 136 0',
+      'M136-4v144',
+      'M132 84h92',
+      'M168 80v60',
+      'M132 104h40',
+    ].forEach((d, i) => drawRule(g, d, i));
+    drawPen(g, arc(68, 136, 152, Math.atan2(-136, 68), 0), { width: 1.8, color: 'var(--pen-bone)', delay: 7 });
+    drawPen(g, line(-4, 0, 224, 0), { width: 3.4, color: 'var(--ink)', delay: 8 });
+    drawPen(g, line(220, -4, 220, 140), { width: 3.4, color: 'var(--ink)', delay: 9 });
+    drawPen(g, line(224, 136, -4, 136), { width: 3.4, color: 'var(--ink)', delay: 10 });
+    drawPen(g, line(0, 140, 0, -4), { width: 3.4, color: 'var(--ink)', delay: 11 });
+    // The spiral takes 8 frames; the words follow it (frames 20–22).
+    drawPen(g, goldenSpiral(0, 0, [136, 84, 52, 32, 20, 12]), {
+      width: 3.4,
+      color: 'var(--cobalt)',
+      delay: 12,
+      frames: 8,
+    });
+    const title = doc.createElement('strong'),
+      text = doc.createElement('p'),
+      actions = doc.createElement('div'),
+      add = doc.createElement('button');
+    title.className = 'ww-empty__title ww-appear';
+    title.textContent = 'まだレイヤーがありません';
+    text.className = 'ww-empty__text ww-appear';
+    text.textContent = '画像やアニメーションを置くと、YouTubeの上で動かせます。';
+    actions.className = 'ww-empty__actions ww-appear';
+    add.type = 'button';
+    add.textContent = '画像を追加';
+    actions.append(add);
+    [title, text, actions].forEach((node, i) => node.style.setProperty('--ww-delay', `${Math.round((20 + i) * 83)}ms`));
+    empty.append(drawing, title, text, actions);
+  } else
+    empty.innerHTML = `<strong>最初の素材を置いてみましょう</strong><p>画像やアニメーションを追加すると、YouTubeの上でドラッグして動かせます。</p><button type="button">素材を選ぶ</button><p class="hint">このパネルへファイルをドロップしても追加できます。</p>`;
   const layerSection = get<HTMLDetailsElement>('.layers-section');
   layersPane.append(assets, guide, layerSection, empty);
   empty.querySelector('button')!.addEventListener('click', () => get<HTMLButtonElement>('.add-image').click());
@@ -311,15 +376,23 @@ export function createWorkspace(
   });
   get('.show-guide').addEventListener('click', () => {
     guide.hidden = false;
+    if (floating) foldGuide(false);
     void preferences.write(guideKey, false).catch(() => undefined);
     show('layers');
   });
   const minimize = get<HTMLButtonElement>('.minimize');
+  const showMinimized = (value: boolean) => {
+    const label = value ? 'パネルを展開する' : 'パネルを折りたたむ';
+    if (floating) glyphButton(minimize, value ? 'expand' : 'collapse', label, '', 'プレビューを広く見る');
+    else {
+      minimize.textContent = value ? '+' : '−';
+      minimize.setAttribute('aria-label', label);
+    }
+  };
   minimize.addEventListener('click', () => {
     const value = !host.hasAttribute('data-minimized');
     host.toggleAttribute('data-minimized', value);
-    minimize.textContent = value ? '+' : '−';
-    minimize.setAttribute('aria-label', value ? 'パネルを展開する' : 'パネルを折りたたむ');
+    showMinimized(value);
     show(area);
     remember();
   });
@@ -332,7 +405,8 @@ export function createWorkspace(
   resize.setAttribute('aria-orientation', 'vertical');
   resize.setAttribute('aria-valuemin', '320');
   resize.setAttribute('aria-valuemax', '520');
-  let width = fullPage ? 300 : 360,
+  // The floating editor is 340 wide (`panel-properties`); the keyboard and drag still step by 20.
+  let width = fullPage ? 300 : floating ? 340 : 360,
     gesture: { x: number; width: number; id: number } | undefined;
   const setWidth = (value: number) => {
     width = Math.max(320, Math.min(520, value));
@@ -384,8 +458,7 @@ export function createWorkspace(
         splitButton.setAttribute('aria-pressed', String(split));
         splitButton.textContent = split ? '切り替え表示' : '並べる';
         if (typeof value.minimized === 'boolean') host.toggleAttribute('data-minimized', value.minimized);
-        minimize.textContent = value.minimized ? '+' : '−';
-        minimize.setAttribute('aria-label', value.minimized ? 'パネルを展開する' : 'パネルを折りたたむ');
+        showMinimized(Boolean(value.minimized));
         if (Array.isArray(value.folds))
           for (const entry of value.folds) {
             if (!Array.isArray(entry) || typeof entry[0] !== 'string' || typeof entry[1] !== 'boolean') continue;
@@ -483,6 +556,7 @@ export function createWorkspace(
       clearTimeout(preferenceTimer);
       closeMenu();
       compact.removeEventListener('change', adapt);
+      lowWindow?.removeEventListener('change', refold);
       doc.removeEventListener('keydown', menuKeys, true);
       doc.removeEventListener('pointerdown', outside, true);
     },

@@ -8,7 +8,7 @@
   right: 20px !important;
   display: block !important;
   box-sizing: border-box !important;
-  width: var(--panel-width, 360px) !important;
+  width: var(--panel-width, 340px) !important;
   max-width: calc(100vw - 40px) !important;
   height: calc(100dvh - 96px) !important;
   max-height: 920px !important;
@@ -34,7 +34,7 @@
   right: auto !important;
 }
 :host([data-split]) {
-  width: calc(var(--panel-width, 360px) + 340px) !important;
+  width: calc(var(--panel-width, 340px) + 340px) !important;
 }
 * {
   box-sizing: border-box;
@@ -46,66 +46,29 @@ main {
   height: 100%;
   min-height: 0;
 }
-/* Floating header (32 + 20): the eyebrow and title with 折りたたむ and 終了 on the first line; the
-   panel's own settings (左右・表示設定) as dense ghost buttons under it, and the save chip at its
-   right end. Every line the header saves goes to the layer list. */
+/* Header (one line, 32): the title, then the panel's own controls as ruled icon buttons —
+   左右, 表示設定, 折りたたむ, 終了. */
 header {
-  display: grid;
-  grid-template-columns: auto auto minmax(0, 1fr) auto auto;
-  grid-template-rows: 32px 20px;
-  grid-template-areas:
-    'title title title minimize close'
-    'dock settings . . .';
+  display: flex;
   flex: none;
   align-items: center;
-  gap: 0 var(--space-4);
-  padding: 0 0 0 var(--space-8);
+  gap: var(--space-4);
+  padding: 0 0 var(--space-4) var(--space-8);
 }
 header > div {
-  grid-area: title;
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-8);
+  flex: 1;
   min-width: 0;
 }
-header .minimize {
-  grid-area: minimize;
-}
-header .close {
-  grid-area: close;
-}
-header .dock {
-  grid-area: dock;
-  margin-left: calc(var(--space-8) * -1);
-}
-header .display-settings {
-  grid-area: settings;
-}
-header .dock,
-header .display-settings {
-  min-height: 20px;
-  padding: 0 var(--space-8);
-  border-color: transparent;
-  color: var(--ink-muted);
-  font-size: 12px;
-}
-header .dock:hover:not(:disabled),
-header .display-settings:hover:not(:disabled) {
-  color: var(--ink);
-}
-h2,
-header button {
+h2 {
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
-.eyebrow {
-  flex: none;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  line-height: 20px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
+header .icon-button {
+  border-color: var(--line-control);
+}
+header .icon-button:disabled {
+  border-color: var(--line);
 }
 h2 {
   margin: 0;
@@ -185,64 +148,67 @@ summary:focus-visible,
 .primary:disabled {
   background: transparent;
 }
-/* ww-icon-btn: no edge, 32 square, a 16px ruled icon. */
-.icon-button,
-.close,
-.minimize {
+/* ww-icon-btn: 32 square, a 16px ruled icon (icons.ts `glyph`). */
+.icon-button {
+  position: relative;
   min-width: 32px;
   padding: 0;
   border-color: transparent;
   color: var(--ink-muted);
 }
-.icon-button:hover:not(:disabled),
-.close:hover:not(:disabled),
-.minimize:hover:not(:disabled) {
+.icon-button:hover:not(:disabled) {
   color: var(--ink);
 }
-.icon-button:disabled,
-.close:disabled,
-.minimize:disabled {
+.icon-button:disabled {
   border-color: transparent;
-}
-.icon-button[aria-pressed='true'],
-.icon-button[aria-pressed='true']:hover:not(:disabled) {
-  color: var(--cobalt);
-  background: var(--cobalt-wash);
 }
 .icon-button svg {
   width: 16px;
   height: 16px;
   flex: none;
 }
-.close,
-.minimize {
-  font-size: 20px;
+/* ww-rail: the chosen tool is cobalt with a G-pen circle round it (an open ring, thin where it starts
+   and ends), drawn round in 4 frames. The ring is a filled outline from pen.ts, never a stroke. */
+.icon-button[aria-pressed='true'],
+.icon-button[aria-pressed='true']:hover:not(:disabled) {
+  color: var(--cobalt);
 }
+.icon-button .tool-ring {
+  position: absolute;
+  left: -6px;
+  top: -6px;
+  width: 44px;
+  height: 44px;
+  overflow: visible;
+  pointer-events: none;
+}
+/* The tools, a ruled separator, undo and redo, then the save chip at the end. */
 .toolbar {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-4);
   align-items: center;
-  padding: 0 0 var(--space-4);
+  padding: var(--space-4) var(--space-8) var(--space-8);
   flex: none;
-}
-.toolbar > button {
-  min-height: 20px;
-  padding: 0 var(--space-8);
-  font-size: 12px;
 }
 .interaction-tools {
   display: flex;
-  gap: var(--space-4);
-  order: -1;
-  margin-right: var(--space-4);
+  gap: var(--space-8);
 }
-/* ww-chip: the word carries the state, the shape repeats it. It sits in the header's second
-   line (top 32), the one place the save state is shown. */
+.toolbar-separator {
+  width: 1px;
+  height: 20px;
+  background: var(--line);
+}
+/* ww-chip: the word carries the state, the shape repeats it. The one place the save state is shown. */
+.save-state {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4) var(--space-8);
+  margin-left: auto;
+}
 .dirty {
-  position: absolute;
-  top: 32px;
-  right: 0;
   display: inline-flex;
   align-items: center;
   gap: var(--space-8);
@@ -261,23 +227,45 @@ summary:focus-visible,
 .dirty::before {
   content: '';
   flex: none;
+  box-sizing: border-box;
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: var(--ok-green);
 }
-.dirty[data-dirty='true']::before {
+/* 未保存, 処理中 and 保存できませんでした share the dashed circle: the change is not stored yet. */
+.dirty:not([data-state='saved'])::before {
   border: 1px dashed var(--ink-muted);
   background: transparent;
 }
-.dirty[data-error='true'] {
-  color: var(--lamp-amber);
+/* A failed save: the chip, one reason and the way out, on a line of their own. No red, no triangle:
+   red means the engine protecting a control, the triangle advice. */
+.save-state[data-failed] {
+  flex-basis: 100%;
+  padding: var(--space-8);
+  border: 1px solid var(--line-control);
+  border-radius: 4px;
+  background: var(--surface);
 }
-.dirty[data-error='true']::before {
-  border: 0;
-  border-radius: 0;
-  background: var(--lamp-amber);
-  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+.dirty[data-state='failed'] {
+  padding: 0;
+  color: var(--ink);
+  font-weight: 700;
+}
+.save-failure {
+  display: flex;
+  flex: 1 1 100%;
+  align-items: center;
+  gap: var(--space-8);
+}
+.save-reason {
+  flex: 1;
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 12px;
+}
+.retry-save {
+  flex: none;
 }
 /* ww-tabs: the selected tab gets a G-pen stroke, drawn in 4 frames. */
 .workspace-nav {
@@ -485,15 +473,36 @@ ol {
   color: var(--ink);
   font-weight: 700;
 }
-.dismiss-guide {
+.dismiss-guide.icon-button {
   position: absolute;
   right: var(--space-4);
-  top: var(--space-4);
+  top: 0;
   min-width: 20px;
   min-height: 20px;
-  padding: 0;
-  border-color: transparent;
+}
+/* The guide's title is its fold: on a low window it shows alone (はじめての制作 ▸), and opens on press. */
+.guide-toggle {
+  min-height: 20px;
+  padding: 0 var(--space-20) 0 0;
+  border: 0;
+  font-weight: 700;
+  font-size: 12px;
+}
+.guide-toggle:hover:not(:disabled),
+.guide-toggle:active:not(:disabled) {
+  background: transparent;
+}
+.guide-toggle::after {
+  /* The arrow is drawing only: empty alt text keeps the button's name 「はじめての制作」. */
+  content: '▾' / '';
+  margin-left: var(--space-4);
   color: var(--ink-muted);
+}
+.quick-guide[data-folded] .guide-toggle::after {
+  content: '▸' / '';
+}
+.quick-guide[data-folded] ol {
+  display: none;
 }
 .layers-section {
   display: flex;
@@ -708,21 +717,83 @@ input[type='checkbox']:disabled {
   grid-row: 1;
   width: 100%;
 }
-.empty-layers {
-  padding: var(--space-32) var(--space-20);
+/* ww-empty: a construction drawn on graph paper (guides → main lines → accent), then the words and
+   the action appear. Graph paper (20px, 5% ink) is the only texture, and only here. */
+.ww-empty {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+  margin: 0 var(--space-12) var(--space-12);
+  padding: var(--space-20) var(--space-12);
   text-align: center;
-  margin: auto 0;
+  border-radius: 4px;
+  background-image:
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--ink) 5%, transparent) 0 1px, transparent 1px 20px),
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--ink) 5%, transparent) 0 1px, transparent 1px 20px);
 }
-.empty-layers strong {
+.ww-empty__drawing {
+  width: 236px;
+  max-width: 100%;
+  height: auto;
+  overflow: visible;
+}
+/* On a low window the construction is drawn at 136 wide, so the words and the list keep their room. */
+@media (max-height: 800px) {
+  .ww-empty__drawing {
+    width: 136px;
+  }
+}
+.ww-empty__title {
   display: block;
   font-size: 20px;
   line-height: 32px;
 }
-.empty-layers p {
+.ww-empty__text {
+  max-width: 300px;
+  margin: 0;
   color: var(--ink-muted);
 }
-.empty-layers button {
-  margin: var(--space-8) 0;
+.ww-empty__actions {
+  display: flex;
+  gap: var(--space-12);
+}
+/* The two lines in drawings: the ruler (uniform, ink-faint) and the G-pen (a filled outline). */
+.ww-rule {
+  fill: none;
+  stroke: var(--ink-faint);
+  stroke-width: 1;
+}
+.ww-pen {
+  fill: currentColor;
+  stroke: none;
+}
+/* Drawn in on 12fps steps from the start of its path; under reduced motion it is simply there. */
+.ww-draw {
+  stroke-dasharray: 1;
+  animation: ww-draw calc(var(--ww-frame) * var(--ww-frames, 4)) steps(var(--ww-frames, 4), end) var(--ww-delay, 0ms)
+    both;
+}
+.ww-appear {
+  animation: ww-appear calc(var(--ww-frame) * 3) steps(3, end) var(--ww-delay, 0ms) both;
+}
+/* ww-construct: when the panel opens its ruled edge is drawn in 4 frames, then the content appears
+   in 3. The edge is its own layer over the frame and never takes a click; nothing is clipped. */
+main.ww-construct::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  z-index: 20;
+  border: 1px solid var(--line-control);
+  border-radius: 8px;
+  pointer-events: none;
+  animation:
+    ww-construct-edge calc(var(--ww-frame) * 4) steps(4, end) both,
+    ww-fade calc(var(--ww-frame) * 3) steps(3, end) calc(var(--ww-frame) * 7) both;
+}
+main.ww-construct > * {
+  animation: ww-appear calc(var(--ww-frame) * 3) steps(3, end) calc(var(--ww-frame) * 4) both;
 }
 details {
   margin: 0;
@@ -892,8 +963,29 @@ footer {
   margin: var(--space-4) 0 0;
   min-height: 40px;
 }
+/* Other errors are told here in ink after a dashed circle (not stored / not done), never in red. */
 .status[data-error='true'] {
-  color: var(--lamp-amber);
+  color: var(--ink);
+}
+.status[data-error='true']::before {
+  content: '';
+  display: inline-block;
+  box-sizing: border-box;
+  width: 8px;
+  height: 8px;
+  margin-right: var(--space-8);
+  border: 1px dashed var(--ink-muted);
+  border-radius: 50%;
+}
+/* Save messages are for assistive technology only here: the header chip is where the save state shows. */
+.status[data-save] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  min-height: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 .context-menu {
   position: absolute;
@@ -959,7 +1051,7 @@ footer {
     left: 12px !important;
   }
   :host([data-split]) {
-    width: var(--panel-width, 360px) !important;
+    width: var(--panel-width, 340px) !important;
   }
   .split {
     display: none;
@@ -976,9 +1068,6 @@ footer {
   :host {
     top: 12px !important;
     height: calc(100dvh - 24px) !important;
-  }
-  .quick-guide {
-    display: none;
   }
   .selection {
     margin: 0 0 var(--space-4);

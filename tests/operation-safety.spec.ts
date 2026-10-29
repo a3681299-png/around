@@ -38,7 +38,7 @@ test('default artwork retains its decoder while the compositor clips protected r
     mimeType: 'image/png',
     buffer: Buffer.from(data.split(',')[1]!, 'base64'),
   });
-  await expect(editor.locator('.dirty')).toHaveText('未保存の変更');
+  await expect(editor.locator('.dirty')).toHaveText('未保存');
   try {
     await expect(youtube.locator('#web-world-themes-decorations img')).toBeVisible();
   } catch (error) {
@@ -734,18 +734,18 @@ test('manual emergency OFF releases drawing and preserves an unsaved editor and 
   await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
   const editor = youtube.locator('#web-world-themes-creator');
   await editor.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
-  await expect(editor.locator('.dirty')).toHaveText('未保存の変更');
+  await expect(editor.locator('.dirty')).toHaveText('未保存');
   await popup.getByRole('button', { name: '緊急OFF', exact: true }).click();
   await expect(youtube.locator('#web-world-themes-decorations')).toHaveCount(0);
   await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-theme', 'retro');
-  await expect(editor.locator('.dirty')).toHaveText('未保存の変更');
+  await expect(editor.locator('.dirty')).toHaveText('未保存');
   await expect(editor.getByRole('button', { name: '元に戻す', exact: true })).toBeEnabled();
   await popup.getByRole('switch', { name: '制作モード' }).check();
   await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-theme', 'retro');
   await popup.getByRole('button', { name: '描画を再開', exact: true }).click();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
   await expect(youtube.locator('#web-world-themes-decorations')).toHaveCount(1);
-  await expect(editor.locator('.dirty')).toHaveText('未保存の変更');
+  await expect(editor.locator('.dirty')).toHaveText('未保存');
 });
 
 test('candidate discovery assigns each element to its first matching selector in document order', async ({

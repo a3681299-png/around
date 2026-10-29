@@ -552,7 +552,7 @@ test('grouping, scoped drag ordering, ungrouping and effect edits undo/redo, dis
   await expect(second.locator(compositions)).toHaveCount(1);
   await youtube.bringToFront();
   await groupRow.locator('[data-reorder]').dragTo(row(panel, 'blue.png'), { targetPosition: { x: 10, y: 2 } });
-  await expect(panel.locator('.dirty')).toHaveText('未保存の変更');
+  await expect(panel.locator('.dirty')).toHaveText('未保存');
   await panel.getByRole('button', { name: '元に戻す', exact: true }).click();
   await expect(panel.locator('.dirty')).toHaveText('保存済み');
   await panel.getByRole('button', { name: 'やり直す', exact: true }).click();

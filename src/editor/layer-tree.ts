@@ -14,10 +14,13 @@ interface TreeActions {
   reorder(id: string, targetId: string, after: boolean): void;
   context(id: string, x: number, y: number): void;
   thumbnail(id: string): Promise<string | undefined>;
+  /** The icon set to draw with; the floating editor passes the design system's glyphs. */
+  icon?: (name: string) => string;
 }
 
 /** Hierarchy and authoring UI only. Document operations stay in the controller. */
 export function createLayerTree(doc: Document, container: HTMLElement, actions: TreeActions) {
+  const draw = actions.icon ?? icon;
   let current: TreeState | undefined,
     key = '',
     lastSelection = '',
@@ -260,7 +263,7 @@ export function createLayerTree(doc: Document, container: HTMLElement, actions: 
           const button = doc.createElement('button');
           button.type = 'button';
           button.dataset.action = action;
-          if (svg) button.innerHTML = icon(content);
+          if (svg) button.innerHTML = draw(content);
           else button.textContent = content;
           button.setAttribute('aria-label', label);
           button.title = label;
@@ -282,7 +285,7 @@ export function createLayerTree(doc: Document, container: HTMLElement, actions: 
         select.className = 'layer-select';
         const preview = doc.createElement('span');
         preview.className = 'thumbnail';
-        preview.innerHTML = icon(layer.kind);
+        preview.innerHTML = draw(layer.kind);
         if (layer.kind !== 'group') preview.dataset.thumbnail = layer.assetId;
         const text = doc.createElement('span');
         text.className = 'layer-text';

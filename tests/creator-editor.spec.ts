@@ -301,13 +301,23 @@ test('real storage quota failure preserves the preview and retry saves it', asyn
   });
   await dialog.getByRole('button', { name: '保存', exact: true }).click();
   await expect(dialog.locator('.status')).toContainText('保存できませんでした');
-  await expect(dialog.locator('.dirty')).toHaveText('保存失敗');
+  // The one save indicator: the header chip with the dashed circle, one reason and the way out.
+  await expect(dialog.locator('.dirty')).toHaveText('保存できませんでした');
+  await expect(dialog.locator('.dirty')).toHaveAttribute('data-state', 'failed');
+  await expect(dialog.locator('.save-failure')).toBeVisible();
+  await expect(dialog.locator('.save-reason')).toHaveText('ブラウザの保存領域に書き込めませんでした。');
+  // The footer keeps the message for assistive technology only; it is not drawn a second time.
+  expect(await dialog.locator('.status').evaluate((node) => node.getBoundingClientRect().width)).toBeLessThanOrEqual(1);
   await expect(youtube.locator(cards).first()).toHaveCSS('background-color', 'rgb(221, 255, 238)');
   await expect(dialog.getByRole('button', { name: '保存', exact: true })).toBeEnabled();
   await popup.evaluate(async () => {
     await chrome.storage.local.remove('creatorQuota');
   });
-  await save(dialog);
+  await dialog.getByRole('button', { name: 'もう一度保存', exact: true }).click();
+  await expect(dialog.locator('.status')).toHaveText('保存しました。');
+  await expect(dialog.locator('.dirty')).toHaveText('保存済み');
+  await expect(dialog.locator('.save-failure')).toBeHidden();
+  await expect(youtube.locator(cards).first()).toHaveCSS('background-color', 'rgb(221, 255, 238)');
 });
 
 test('independent documents apply without retro styles, palette or features and OFF restores native styling', async ({

@@ -42,6 +42,7 @@ const unitSpecs = [
   'skin-data',
   'skin-session',
   'skin-verification-data',
+  'studio-pen',
   'skin-build-flags',
   'signal-registry',
   'signal-takes',

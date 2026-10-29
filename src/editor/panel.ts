@@ -21,7 +21,8 @@ import { createEffectsPanel } from './effects-panel';
 import { createLayerTree } from './layer-tree';
 import { createWorkspace } from './workspace';
 import { createStudioWorkbench } from '../studio/workbench';
-import { buttonIcon } from './icons';
+import { buttonIcon, glyph, glyphButton } from './icons';
+import { arc, drawPen, svg } from './pen';
 import { mountNumberScrub } from './number-scrub';
 import { createSkinPanel, SKIN_PANEL_STYLES, type SkinPageInfo, type SkinPanelOptions } from './skin-panel';
 import type { EditorTool, SkinPreview } from '../editor-core/types';
@@ -46,6 +47,8 @@ export interface PanelOptions {
   timeline?: TimelinePort | undefined;
   /** UI skin editing; omitted where the panel has no native page parts to dress. */
   skin?: SkinPanelOptions;
+  /** Set by the panel itself: the floating editor, which wears the WWT Studio design system. */
+  floating?: boolean;
 }
 
 export interface PanelActions {
@@ -97,6 +100,7 @@ export function createCreatorPanel(
   const shadow = host.attachShadow({ mode: 'open' });
   const sheet = doc.createElement('style');
   const workbench = Boolean(options.fullPage || options.inPage || options.sidePanel || options.toolbarOnly);
+  const floating = !workbench;
   // Only the floating editor wears the WWT Studio system so far; Studio keeps its base styles.
   sheet.textContent = workbench
     ? studioBaseStyles + (options.skin ? studioSkinStyles : '')
@@ -199,11 +203,59 @@ export function createCreatorPanel(
     const button = doc.createElement('button');
     button.type = 'button';
     button.dataset.tool = tool;
-    buttonIcon(button, tool, label, key);
+    if (floating) glyphButton(button, tool, label, key);
+    else buttonIcon(button, tool, label, key);
     button.addEventListener('click', () => actions.tool(tool));
     tools.append(button);
   }
   get('.toolbar').append(tools);
+  // The floating editor's header: the title alone, then its own controls as ruled icon buttons. The
+  // toolbar is the tools, a ruled separator, undo and redo, then the one save chip.
+  const saveState = doc.createElement('div'),
+    saveFailure = doc.createElement('div'),
+    retry = doc.createElement('button');
+  if (floating) {
+    get('.eyebrow').remove();
+    glyphButton(get('.dock'), 'dock', 'パネルを左へ', '', 'YouTubeの見たい場所に合わせて左右を切り替え');
+    glyphButton(displaySettings, 'settings', '表示設定', '', 'テーマのON/OFFと強さを開く');
+    glyphButton(get('.minimize'), 'collapse', 'パネルを折りたたむ', '', 'プレビューを広く見る');
+    glyphButton(get('.close'), 'close', '編集を終了', '', '未保存の変更を破棄して終了');
+    get('header').append(get('.dock'), displaySettings, get('.minimize'), get('.close'));
+    glyphButton(get('.undo'), 'undo', '元に戻す', 'Ctrl＋Z');
+    glyphButton(get('.redo'), 'redo', 'やり直す', 'Ctrl＋Shift＋Z / Ctrl＋Y');
+    const separator = doc.createElement('span');
+    separator.className = 'toolbar-separator';
+    separator.setAttribute('role', 'separator');
+    separator.setAttribute('aria-orientation', 'vertical');
+    // A failed save keeps its words in the chip, then one reason and the way out.
+    saveState.className = 'save-state';
+    saveFailure.className = 'save-failure';
+    saveFailure.hidden = true;
+    const reason = doc.createElement('p');
+    reason.className = 'save-reason';
+    reason.textContent = 'ブラウザの保存領域に書き込めませんでした。';
+    retry.type = 'button';
+    retry.className = 'retry-save';
+    retry.textContent = 'もう一度保存';
+    retry.addEventListener('click', actions.save);
+    saveFailure.append(reason, retry);
+    saveState.append(get('.dirty'), saveFailure);
+    get('.toolbar').replaceChildren(tools, separator, get('.undo'), get('.redo'), saveState);
+    // Opening: the panel's ruled edges are drawn in 4 frames, then the content appears in 3.
+    main.classList.add('ww-construct');
+  }
+  // ww-rail: the chosen tool gets a G-pen circle, drawn round in 4 frames when it is chosen.
+  let ringTool: string | undefined;
+  const ringOn = (button: HTMLButtonElement | null) => {
+    if (!floating || ringTool === button?.dataset.tool) return;
+    tools.querySelector('.tool-ring')?.remove();
+    ringTool = button?.dataset.tool;
+    if (!button) return;
+    const ring = svg(doc, '0 0 44 44', 'tool-ring');
+    // An open ring from just right of the top, round, ending just left of it: thin at both ends.
+    drawPen(ring, arc(22, 22, 17, -Math.PI / 2 + 0.35, Math.PI * 1.5 - 0.35), { width: 2.4, frames: 4 });
+    button.append(ring);
+  };
   const skinPanel = options.skin
     ? createSkinPanel(
         doc,
@@ -214,7 +266,7 @@ export function createCreatorPanel(
           begin: actions.beginEdit,
           end: actions.endEdit,
         },
-        options.skin,
+        { ...options.skin, floating },
       )
     : undefined;
   const backgroundToggle = get<HTMLInputElement>('[data-override="backgroundColor"]');
@@ -242,9 +294,16 @@ export function createCreatorPanel(
   const addImage = get<HTMLButtonElement>('.add-image');
   const addAnimation = get<HTMLButtonElement>('.add-animation');
   const animationInput = get<HTMLInputElement>('.animation-file');
-  buttonIcon(addImage, 'image', '画像を追加');
-  buttonIcon(addAnimation, 'animation', 'アニメーションを追加');
-  buttonIcon(addModel, 'model3d', '3Dモデルを追加');
+  const iconButton = floating ? glyphButton : buttonIcon;
+  iconButton(addImage, 'image', '画像を追加');
+  iconButton(addAnimation, 'animation', 'アニメーションを追加');
+  iconButton(addModel, 'model3d', '3Dモデルを追加');
+  if (floating) {
+    // Standing instructions move to a tooltip; the list's heading carries it.
+    const tip = get('.selection-tip');
+    get('.layers-section > summary').title = tip.textContent!;
+    tip.remove();
+  }
   const layers = get<HTMLDivElement>('.layers');
   const anchorSelect = get<HTMLSelectElement>('[data-image-prop="anchor"]');
   for (const anchor of anchors) {
@@ -297,6 +356,7 @@ export function createCreatorPanel(
     change: actions.layerChange,
     reorder: actions.reorder,
     thumbnail: actions.thumbnail,
+    ...(floating ? { icon: glyph } : {}),
     context: (id, x, y) => {
       if (!current?.selectedIds.includes(id)) actions.imageSelect(id);
       // A remote selection must be acknowledged before the menu uses its actions.
@@ -307,7 +367,7 @@ export function createCreatorPanel(
   workspace =
     options.fullPage || options.inPage || options.sidePanel || options.toolbarOnly
       ? createStudioWorkbench(doc, host, main, tree, actions, options)
-      : createWorkspace(doc, host, main, tree, actions.clearSelection, actions.selectAll, options);
+      : createWorkspace(doc, host, main, tree, actions.clearSelection, actions.selectAll, { ...options, floating });
   // Workspaces rebuild the body, so the skin editor joins the final layout: the Studio's
   // inspector column, or the quick panel's body.
   if (skinPanel) (main.querySelector('.studio-inspectors') ?? get('.editor-body')).prepend(skinPanel.element);
@@ -380,7 +440,9 @@ export function createCreatorPanel(
   dock.addEventListener('click', () => {
     const left = host.dataset.wwDock !== 'left';
     host.dataset.wwDock = left ? 'left' : 'right';
-    dock.textContent = options.fullPage ? '左右を入れ替える' : left ? 'パネルを右へ' : 'パネルを左へ';
+    const label = options.fullPage ? '左右を入れ替える' : left ? 'パネルを右へ' : 'パネルを左へ';
+    if (floating) dock.setAttribute('aria-label', label);
+    else dock.textContent = label;
     workspace.layoutChanged();
   });
   get<HTMLButtonElement>('.reset').addEventListener('click', actions.reset);
@@ -419,6 +481,7 @@ export function createCreatorPanel(
       tools.querySelectorAll<HTMLButtonElement>('[data-tool]').forEach((button) => {
         button.setAttribute('aria-pressed', String(button.dataset.tool === (state.tool ?? 'select')));
       });
+      ringOn(tools.querySelector<HTMLButtonElement>('[data-tool][aria-pressed="true"]'));
       const isGroup = state.image?.kind === 'group';
       imageProperties.setAttribute('aria-label', isGroup ? 'グループのプロパティ' : '画像のプロパティ');
       get<HTMLElement>('.group-help').hidden = !isGroup;
@@ -474,19 +537,42 @@ export function createCreatorPanel(
           : state.canAlign;
         button.disabled = state.saving || !availability.allowed;
       });
+      const saveFailed = state.error && state.status.startsWith('保存でき');
       setText(
         get<HTMLElement>('.dirty'),
-        state.error
-          ? state.status.startsWith('保存でき')
-            ? '保存失敗'
-            : '操作失敗・要確認'
-          : state.saving
-            ? '処理中…'
-            : state.dirty
-              ? '未保存の変更'
-              : '保存済み',
+        floating
+          ? // The chip carries the save state only, in the README's words; other errors are told in
+            // the footer.
+            saveFailed
+            ? '保存できませんでした'
+            : state.saving
+              ? '処理中…'
+              : state.dirty
+                ? '未保存'
+                : '保存済み'
+          : state.error
+            ? saveFailed
+              ? '保存失敗'
+              : '操作失敗・要確認'
+            : state.saving
+              ? '処理中…'
+              : state.dirty
+                ? '未保存の変更'
+                : '保存済み',
       );
       get<HTMLElement>('.dirty').dataset.dirty = String(state.dirty);
+      if (floating) {
+        get<HTMLElement>('.dirty').dataset.state = saveFailed
+          ? 'failed'
+          : state.saving
+            ? 'saving'
+            : state.dirty
+              ? 'dirty'
+              : 'saved';
+        saveFailure.hidden = !saveFailed;
+        saveState.toggleAttribute('data-failed', Boolean(saveFailed));
+        retry.disabled = state.saving;
+      }
       setText(
         get<HTMLElement>('.layer-count'),
         `${state.images.length} / ${IMAGE_LIMITS.count}${state.groups.length ? `・グループ${state.groups.length}` : ''}`,
@@ -572,6 +658,9 @@ export function createCreatorPanel(
       );
       setText(status, state.status);
       status.dataset.error = String(state.error);
+      // The save state shows in the header chip alone. Save messages still reach assistive technology
+      // through this live region, but are not drawn a second time in the footer.
+      if (floating) status.toggleAttribute('data-save', state.status === '保存しました。' || Boolean(saveFailed));
       workspace.render(state);
       if (pendingContext && state.selectedIds.includes(pendingContext.id)) {
         workspace.context(pendingContext.x, pendingContext.y);

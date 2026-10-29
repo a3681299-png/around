@@ -12,6 +12,7 @@ import {
 } from './skin-status';
 import type { EditorView, SkinPreview } from '../editor-core/types';
 import type { SkinSlot } from '../editor-core/skins';
+import { drawPen, drawRule, line, svg } from './pen';
 
 export const SKIN_PANEL_STYLES = styles;
 export type { SkinPageInfo } from './skin-status';
@@ -21,6 +22,8 @@ export interface SkinPanelOptions {
   assetUrl(assetId: string): Promise<string | undefined>;
   /** In-page panels import into a skin slot; remote panels omit it. */
   import?(files: readonly File[], slot: SkinSlot): void;
+  /** The floating editor: the WWT Studio design system's empty state and copy. */
+  floating?: boolean;
 }
 export interface SkinPanelActions {
   selectTarget(id: string): void;
@@ -90,6 +93,43 @@ export function createSkinPanel(doc: Document, actions: SkinPanelActions, option
     </div>
     <p class="skin-note" hidden>このパネルでは絵の取り込みと切り位置の編集ができません。YouTubeのページ内のパネルで編集してください。</p>`;
   const get = <T extends HTMLElement>(selector: string) => root.querySelector<T>(selector)!;
+  // The floating editor: the standing instructions become the heading's tooltip, and until a part
+  // is chosen a nine-slice frame with a part inside it is constructed (ww-empty).
+  const empty = doc.createElement('div');
+  if (options.floating) {
+    const intro = get('.skin-intro');
+    get('h3').title = intro.textContent!;
+    intro.remove();
+    empty.className = 'skin-empty ww-empty';
+    const drawing = svg(doc, '0 0 236 116', 'ww-empty__drawing'),
+      g = doc.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.setAttribute('transform', 'translate(12 8)');
+    drawing.append(g);
+    // Guides: the four slice lines run past the frame (ruler).
+    ['M32-4v108', 'M180-4v108', 'M-8 32h228', 'M-8 68h228'].forEach((d, i) => drawRule(g, d, i));
+    // Main lines: the frame (G-pen, ink), then the part inside it (pen-bone).
+    drawPen(g, line(-4, 0, 216, 0), { width: 3.4, color: 'var(--ink)', delay: 4 });
+    drawPen(g, line(212, -4, 212, 104), { width: 3.4, color: 'var(--ink)', delay: 5 });
+    drawPen(g, line(216, 100, -4, 100), { width: 3.4, color: 'var(--ink)', delay: 6 });
+    drawPen(g, line(0, 104, 0, -4), { width: 3.4, color: 'var(--ink)', delay: 7 });
+    drawPen(g, line(52, 50, 160, 50), { width: 2.4, color: 'var(--pen-bone)', delay: 8 });
+    // The accent: the four corners that are never stretched (G-pen, cobalt).
+    [
+      [line(4, 32, 4, 4, 4), line(4, 4, 32, 4, 4)],
+      [line(180, 4, 208, 4, 4), line(208, 4, 208, 32, 4)],
+      [line(208, 68, 208, 96, 4), line(208, 96, 180, 96, 4)],
+      [line(32, 96, 4, 96, 4), line(4, 96, 4, 68, 4)],
+    ].forEach(([a, b], i) => drawPen(g, [...a!, ...b!.slice(1)], { width: 2.4, color: 'var(--cobalt)', delay: 9 + i }));
+    const title = doc.createElement('strong'),
+      text = doc.createElement('p');
+    title.className = 'ww-empty__title ww-appear';
+    title.textContent = '部品を選んでください';
+    text.className = 'ww-empty__text ww-appear';
+    text.textContent = 'ページの部品をクリックするか、下の一覧から選びます。';
+    [title, text].forEach((node, i) => node.style.setProperty('--ww-delay', `${Math.round((13 + i) * 83)}ms`));
+    empty.append(drawing, title, text);
+    get('h3').after(empty);
+  }
   const parts = get<HTMLDivElement>('.skin-parts'),
     editor = get<HTMLDivElement>('.skin-editor'),
     tabs = get<HTMLDivElement>('.skin-tabs'),
@@ -581,10 +621,14 @@ export function createSkinPanel(doc: Document, actions: SkinPanelActions, option
             ? '見つかりません'
             : page.has(item.id)
               ? `${page.get(item.id)!.count}個`
-              : '確認中…',
+              : // A count that is not known yet shows nothing.
+                options.floating
+                ? ''
+                : '確認中…',
       );
     }
     editor.hidden = !part;
+    empty.hidden = Boolean(part);
     setText(get<HTMLElement>('.skin-parts-summary'), part ? `部品を選ぶ（選択中：${part.label}）` : '部品を選ぶ');
     get<HTMLElement>('.skin-note').hidden = Boolean(options.import);
     if (!part) return;

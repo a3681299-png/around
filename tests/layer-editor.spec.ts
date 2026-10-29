@@ -352,7 +352,7 @@ test('resize and rotation each undo as one gesture; save baseline and discard st
   expect(Number(await dialog.getByLabel('画像の角度', { exact: true }).inputValue())).toBe(0);
   await expect(dialog.locator('.dirty')).toHaveText('保存済み');
   await youtube.keyboard.press('Control+z');
-  await expect(dialog.locator('.dirty')).toHaveText('未保存の変更');
+  await expect(dialog.locator('.dirty')).toHaveText('未保存');
   await dialog.getByRole('button', { name: '変更を破棄', exact: true }).click();
   expect(Number(await dialog.getByLabel('画像の幅', { exact: true }).inputValue())).toBe(resized.widthPx);
   await expect(dialog.getByRole('button', { name: '元に戻す', exact: true })).toBeDisabled();

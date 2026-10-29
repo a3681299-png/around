@@ -82,3 +82,24 @@
     opacity: 1;
   }
 }
+@keyframes ww-fade {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes ww-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes ww-construct-edge {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}

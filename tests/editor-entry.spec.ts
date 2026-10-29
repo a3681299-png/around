@@ -203,7 +203,7 @@ test('the page editor opens display settings and hands its unsaved draft back to
     await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
     const editor = page.locator('#web-world-themes-creator');
     await editor.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
-    await expect(editor.locator('.dirty')).toHaveText('未保存の変更');
+    await expect(editor.locator('.dirty')).toHaveText('未保存');
     await editor.locator('.display-settings').click();
     const settings = page.getByRole('dialog', { name: 'Web World Themes の設定' });
     await expect(settings).toBeVisible();

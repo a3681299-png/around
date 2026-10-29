@@ -47,21 +47,25 @@ One frame is `--ww-frame` (83ms). Every transition is a whole number of frames p
 
 ## States and their meaning
 
-| State                      | Token                         | Shape                              | Words                                        |
-| -------------------------- | ----------------------------- | ---------------------------------- | -------------------------------------------- |
-| Saved                      | `ok-green`                    | filled circle                      | 保存済み                                     |
-| Unsaved                    | `ink-muted`                   | dashed circle                      | 未保存                                       |
-| Limited by the engine (G1) | `vermilion`, `vermilion-wash` | diamond; 45° hatch on the page     | 制限中 + what it protected and how to fix it |
-| Advice, not enforced       | `lamp-amber`                  | triangle                           | 読みにくいかもしれません 等                  |
-| Atmosphere layer           | `lamp-amber`                  | ruled edge                         | 雰囲気 33%                                   |
-| Not available              | `ink-faint`                   | small dot; dashed edge on the page | 未対応                                       |
-| Timesheet key              | `pen-bone`, selected `cobalt` | square                             | —                                            |
+| State                      | Token                         | Shape                              | Words                                            |
+| -------------------------- | ----------------------------- | ---------------------------------- | ------------------------------------------------ |
+| Saved                      | `ok-green`                    | filled circle                      | 保存済み                                         |
+| Unsaved                    | `ink-muted`                   | dashed circle                      | 未保存                                           |
+| Save failed                | `ink`, edge `line-control`    | dashed circle                      | 保存できませんでした + one reason + もう一度保存 |
+| Limited by the engine (G1) | `vermilion`, `vermilion-wash` | diamond; 45° hatch on the page     | 制限中 + what it protected and how to fix it     |
+| Advice, not enforced       | `lamp-amber`                  | triangle                           | 読みにくいかもしれません 等                      |
+| Atmosphere layer           | `lamp-amber`                  | ruled edge                         | 雰囲気 33%                                       |
+| Not available              | `ink-faint`                   | small dot; dashed edge on the page | 未対応                                           |
+| Timesheet key              | `pen-bone`, selected `cobalt` | square                             | —                                                |
 
 Protected areas on the page are drawn with `ww-protect`: the 45° vermilion hatch with a mono label naming the part (`player.controls.bottom`). Red always means "the engine is protecting a real control here".
+
+A failed save is still "not stored", so it keeps the dashed circle of 未保存. It never uses red (red is the engine's protection) or the triangle (the triangle is advice that can be ignored; a failed save cannot). It lives where the save state always lives, the header chip, which opens into a ruled box: 保存できませんでした in `strong`, one sentence saying why in `ink-muted` (ブラウザの保存領域に書き込めませんでした。), and a `ww-btn` 「もう一度保存」. The preview stays as it was. Nothing else on the screen repeats it; a status line may keep the message for assistive technology only.
 
 ## Type
 
 - Interface text is `BIZ UDPGothic` (`ui` family). Numbers, frame counts, protection labels and English eyebrows are `IBM Plex Mono` (`mono` family), with tabular figures.
+- In the extension no font is bundled or fetched, and no permission is added for one. The faces are matched by family name against what is installed (`'BIZ UDPGothic', 'Hiragino Sans', 'Yu Gothic UI', 'Meiryo UI', 'Noto Sans JP', system-ui` and `'IBM Plex Mono', ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Consolas`), not through `@font-face { src: local() }`: Chrome ignores `@font-face` inside a shadow root, and one declared on the page would put a name onto someone else's page. Matching by family name uses the installed font just as `local()` would.
 - Uppercase is for short English eyebrows only (`LAYERS`, `PROPERTIES`). Japanese labels are never set in the mono face.
 
 ## Surfaces
@@ -70,7 +74,7 @@ Each surface uses the same components; only the arrangement changes.
 
 - **Studio (separate window, 1440px reference).** Top bar `bar` (52) on `surface-sunk`. `ww-rail` on the left (52), layers `panel-layers` (212), the live page on `ground` with `space-32` around it, properties `panel-properties` (340), `ww-sheet` along the bottom (`sheet`, 136) aligned under the layers panel.
 - **Side panel (320–480px).** Header `bar` (52) with the status chip, `ww-tabs` (レイヤー / 属性 / 着せ替え / タイムライン), one column.
-- **In-page editor (floating, 340px).** The side panel's content inside `ww-panel--float`, docked `space-20` in from the left or right edge of the page. It moves out of the way of the player and remembers where it was put.
+- **In-page editor (floating, 340px).** The side panel's content inside `ww-panel--float`, docked `space-20` in from the left or right edge of the page. It moves out of the way of the player and remembers where it was put. It is the one surface that keeps a shadow (`shadow-float`, on the panel and on its context menu), because it floats over someone else's page and its edge must not run into their artwork; every docked surface stays flat. The header is one line: the title, then 左右・表示設定・折りたたむ・終了 as ruled icon buttons. Under it the tool row: the tools (with the G-pen circle on the chosen one), a ruled separator, undo and redo, and the save chip at the end. On a low window (800px tall or less) the first-run guide folds to its title (はじめての制作 ▸) so the layer list shows without scrolling.
 - **Popup and display settings.** One `ww-panel` with the primary action 「エディターを開く」 first, then the display controls. The popup is not a place for editing.
 - **The retro "settings.exe" window belongs to the retro theme, not to the tool.** The editor and Studio always wear this system.
 
