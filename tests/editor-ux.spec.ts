@@ -383,11 +383,13 @@ test('a low window (1366×657) with the guide shown still lets the bottom of thr
   await expect(menu).toBeHidden();
   await expect(bottom).toHaveAttribute('data-selected', '');
   // Taller, the list still scrolls but the pane has nothing to scroll: the list's leftover wheel
-  // must not reach the page.
-  await youtube.setViewportSize({ width: 1366, height: 800 });
-  // Unfolded, the guide takes the room that leaves the list scrolling inside a pane that does not.
-  if (await panel.locator('.quick-guide[data-folded]').count())
-    await panel.getByRole('button', { name: 'はじめての制作', exact: true }).click();
+  // must not reach the page. Nine rows overflow the list with room to spare on every platform's
+  // fonts, while the pane above keeps everything in view.
+  await youtube.setViewportSize({ width: 1366, height: 900 });
+  await panel
+    .getByLabel('画像素材を追加')
+    .setInputFiles(Array(6).fill(path.resolve('tests/fixtures/motion/petal.png')));
+  await expect(panel.locator('.layer')).toHaveCount(9);
   await expect(panel.locator('.layers')).toBeInViewport({ ratio: 1 });
   await expect
     .poll(() => panel.locator('.layers-pane').evaluate((pane) => pane.scrollHeight - pane.clientHeight))
@@ -398,7 +400,15 @@ test('a low window (1366×657) with the guide shown still lets the bottom of thr
   expect(await youtube.evaluate(() => document.documentElement.scrollHeight - innerHeight - scrollY)).toBeGreaterThan(
     0,
   );
+  // A wheel stays with the box it started on, so first bring the list to its end; the next wheel then
+  // starts with nothing left in the list, and only chaining could carry it on.
   await panel.locator('.layers').hover();
+  await youtube.mouse.wheel(0, 600);
+  await expect
+    .poll(() => panel.locator('.layers').evaluate((list) => list.scrollHeight - list.clientHeight - list.scrollTop))
+    .toBeLessThan(1);
+  await youtube.waitForTimeout(500);
+  expect(await youtube.evaluate(() => scrollY)).toBe(tallY);
   await youtube.mouse.wheel(0, 600);
   await youtube.waitForTimeout(300);
   expect(await youtube.evaluate(() => scrollY)).toBe(tallY);
