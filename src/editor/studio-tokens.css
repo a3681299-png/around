@@ -1,0 +1,84 @@
+/* WWT Studio design system (docs/wwt-studio-design-system/tokens.css and the parts of
+   components/bundle.css the editor uses), scoped to the editor's shadow root. Everything is
+   declared on :host, so no colour, name or keyframe reaches the page. Payne's grey (dark) is the
+   default; Gesso (light) follows the system colour scheme. */
+:host {
+  --ground: #171a20;
+  --surface: #1e222a;
+  --surface-raised: #272c36;
+  --surface-sunk: #13161b;
+  --line: #303644;
+  --line-control: #737c8c;
+  --ink: #ece7df;
+  --ink-muted: #a9adb5;
+  --ink-faint: #757c88;
+  --cobalt: #7ea4f4;
+  --on-cobalt: #0b1430;
+  --cobalt-wash: rgba(126, 164, 244, 0.16);
+  --vermilion: #f27a58;
+  --vermilion-wash: rgba(242, 122, 88, 0.14);
+  --lamp-amber: #e2b35d;
+  --ok-green: #79cf9c;
+  --pen-bone: #d8cdbb;
+  --shadow-float: 0 8px 20px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-20: 20px;
+  --space-32: 32px;
+  --space-52: 52px;
+  --space-84: 84px;
+  --space-136: 136px;
+  --radius-control: 4px;
+  --radius-float: 8px;
+  --radius-pill: 16px;
+  --control: 32px;
+  --control-dense: 20px;
+  --rule: 1px;
+  /* No font is bundled or fetched. Chrome ignores @font-face inside a shadow root, and one on the
+     page would leak a name, so the installed face is matched by its family name: BIZ UDPGothic,
+     then the platform's Japanese UI fonts. IBM Plex Mono is used only when installed. */
+  --font-ui: 'BIZ UDPGothic', 'Hiragino Sans', 'Yu Gothic UI', 'Meiryo UI', 'Noto Sans JP', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Consolas, monospace;
+  --ww-frame: 83ms;
+  --ww-pen-h: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 4' preserveAspectRatio='none'%3E%3Cpath d='M0 2C24 .4 52 .1 100 2C52 3.9 24 3.6 0 2Z'/%3E%3C/svg%3E");
+}
+@media (prefers-color-scheme: light) {
+  :host {
+    --ground: #e4e3df;
+    --surface: #f3f2ef;
+    --surface-raised: #fbfaf8;
+    --surface-sunk: #dad9d4;
+    --line: #cfcdc7;
+    --line-control: #7d7f86;
+    --ink: #1d2028;
+    --ink-muted: #53575f;
+    --ink-faint: #80838a;
+    --cobalt: #2b51b8;
+    --on-cobalt: #ffffff;
+    --cobalt-wash: rgba(43, 81, 184, 0.1);
+    --vermilion: #bf3f1d;
+    --vermilion-wash: rgba(191, 63, 29, 0.08);
+    --lamp-amber: #875600;
+    --ok-green: #2a7448;
+    --pen-bone: #8f7f66;
+    --shadow-float: 0 8px 20px rgba(20, 30, 40, 0.16), 0 0 0 1px rgba(20, 30, 40, 0.1);
+  }
+}
+/* Motion runs on 12fps steps (コマ打ち). */
+@keyframes ww-stroke {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes ww-appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

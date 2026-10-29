@@ -169,7 +169,8 @@ test('workspace width, docking, collapse, tabs and menu keys keep selection and 
   await youtube.keyboard.press('ArrowRight');
   expect((await panel.boundingBox())!.width).toBe(before!.width + 20);
   await panel.getByRole('button', { name: 'パネルを左へ', exact: true }).click();
-  expect((await panel.boundingBox())!.x).toBe(14);
+  // Docked space-20 in from the page edge (WWT Studio design system).
+  expect((await panel.boundingBox())!.x).toBe(20);
   await panel.getByRole('button', { name: 'パネルを折りたたむ' }).click();
   expect((await panel.boundingBox())!.height).toBeLessThan(100);
   await panel.getByRole('button', { name: 'パネルを展開する' }).click();

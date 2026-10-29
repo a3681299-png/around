@@ -1,184 +1,184 @@
-/* Quick panel: the skin editor replaces the layer and property panes. */
-:host(:not([data-workbench])) main[data-skin-tool] .editor-body > :not(.skin),
+/* The floating editor: the skin editor replaces the layer and property panes. Studio's workbench
+   keeps its own copy (studio/editor-skin-base.css). */
+main[data-skin-tool] .editor-body > :not(.skin),
 main[data-skin-tool] > .workspace-nav,
 main[data-skin-tool] > .selection-bar {
   display: none !important;
 }
-:host(:not([data-workbench])) main[data-skin-tool] .editor-body > .skin {
+main[data-skin-tool] .editor-body {
+  border-radius: 4px 4px 0 0;
+}
+main[data-skin-tool] .editor-body > .skin {
   overflow: auto;
-  padding: 0 12px 12px;
-}
-/* Studio: it takes the whole inspector column; the canvas and library stay. */
-main[data-skin-tool] .studio-inspectors {
-  grid-template-rows: minmax(0, 1fr);
-}
-main[data-skin-tool] .studio-inspectors > :not(.skin) {
-  display: none !important;
-}
-main[data-skin-tool] .studio-inspectors > .skin {
-  overflow: auto;
-  padding: 10px 12px;
+  padding: 0 var(--space-12) var(--space-12);
 }
 .skin[hidden] {
   display: none;
 }
 .skin h3 {
-  margin: 4px 0 2px;
+  margin: var(--space-4) 0;
   display: flex;
   align-items: center;
-  gap: 6px;
-}
-.skin-intro {
-  color: #b9b8c6;
+  gap: var(--space-8);
 }
 .skin .skin-parts-section {
-  margin-top: 6px;
+  margin-top: var(--space-8);
   border-top: 0;
   padding-top: 0;
 }
+/* ww-part: ruled cards; the chosen one is a cobalt edge on cobalt wash. */
 .skin-parts {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4px;
-  margin: 8px 0 12px;
+  gap: var(--space-4);
+  margin: var(--space-8) 0 var(--space-12);
 }
 .skin-part {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 1px;
+  justify-content: center;
+  gap: 0;
   min-width: 0;
-  padding: 5px 7px;
+  min-height: 52px;
+  padding: var(--space-4) var(--space-8);
   text-align: left;
-  background: #272831;
+  border-color: var(--line);
 }
 .skin-part[aria-pressed='true'] {
-  border-color: #baa0f8;
-  background: #352e4a;
-  box-shadow: inset 0 0 0 1px #baa0f8;
+  border-color: var(--cobalt);
+  background: var(--cobalt-wash);
 }
 .skin-part .name {
   max-width: 100%;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font-weight: 600;
+  font-weight: 700;
 }
+/* The state is a word plus its shape: filled circle applied, triangle advice, small dot none. */
 .skin-part .state {
-  font-size: 10px;
-  color: #a9a8b8;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: 12px;
+  color: var(--ink-muted);
 }
 .skin-part .state::before {
   content: '';
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  margin-right: 4px;
+  flex: none;
+  width: 4px;
+  height: 4px;
+  margin: 0 2px;
   border-radius: 50%;
-  background: #6b6a78;
-  vertical-align: 1px;
+  background: var(--ink-faint);
 }
 .skin-part[data-status='applied'] .state::before {
-  background: #7ddc9a;
+  width: 8px;
+  height: 8px;
+  margin: 0;
+  background: var(--ok-green);
 }
 .skin-part[data-status='missing'] .state::before,
-.skin-part[data-status='loading'] .state::before {
-  background: #e8c36a;
-}
+.skin-part[data-status='loading'] .state::before,
 .skin-part[data-status='error'] .state::before {
-  background: #ff8a8a;
+  width: 8px;
+  height: 8px;
+  margin: 0;
+  border-radius: 0;
+  background: var(--lamp-amber);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
 }
 .skin-editor {
-  border-top: 1px solid #3a3b46;
-  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  padding-top: var(--space-12);
 }
 .skin-heading {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-4);
 }
 .skin-name {
-  font-size: 13px;
+  font-size: 20px;
+  line-height: 32px;
 }
 .skin-reach {
-  color: #cdbcff;
+  color: var(--ink-muted);
+  font-size: 12px;
 }
 .skin-reason {
-  padding: 5px 8px;
-  border-radius: 6px;
-  background: #3a3220;
-  color: #f3d991;
+  padding: var(--space-8) var(--space-12);
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px var(--lamp-amber);
+  color: var(--lamp-amber);
 }
 .skin-reason[hidden] {
   display: none;
 }
 .skin-reason[data-kind='error'] {
-  background: #3d2426;
-  color: #ffb3b3;
+  color: var(--ink);
 }
+/* The skin's states are tabs (ww-tabs), wrapped when there are many. */
 .skin-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: 3px;
-  margin: 10px 0 4px;
+  margin: var(--space-12) 0 var(--space-4);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-sunk);
 }
 .skin-tab {
-  position: relative;
-  padding: 4px 8px;
-  font-size: 11px;
+  flex: 1 0 auto;
+  font-size: 12px;
 }
-.skin-tab[aria-selected='true'] {
-  color: #16101f;
-  background: #baa0f8;
-  border-color: #baa0f8;
-  font-weight: 650;
-}
-.skin-tab[data-own]::after {
+/* A small filled circle: this state has its own picture. */
+.skin-tab[data-own]::before {
   content: '';
   position: absolute;
-  top: 2px;
-  right: 2px;
-  width: 5px;
-  height: 5px;
+  top: var(--space-4);
+  right: var(--space-4);
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
-  background: #7ddc9a;
-}
-.skin-tab[aria-selected='true'][data-own]::after {
-  background: #2c6b40;
+  background: var(--ok-green);
 }
 .skin-state-help {
-  margin: 2px 0 6px;
-  color: #b9b8c6;
+  margin: var(--space-4) 0 var(--space-8);
 }
 .skin-toggle {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin: 6px 0;
+  gap: var(--space-8);
+  margin: var(--space-8) 0;
 }
 .skin-drop {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  min-height: 72px;
-  margin: 6px 0;
-  padding: 10px;
-  border: 1.5px dashed #6d6a85;
-  border-radius: 10px;
-  color: #cfcde0;
-  background: #24242d;
+  gap: var(--space-4);
+  min-height: 84px;
+  margin: var(--space-8) 0;
+  padding: var(--space-12);
+  border: 1px dashed var(--line-control);
+  border-radius: 4px;
+  color: var(--ink);
+  background: var(--surface-sunk);
   text-align: center;
   cursor: pointer;
+  transition: background-color calc(var(--ww-frame) * 2) steps(2, end);
 }
 .skin-drop:hover,
 .skin-drop[data-over] {
-  border-color: #baa0f8;
-  background: #2d2840;
+  border-color: var(--cobalt);
+  background: var(--cobalt-wash);
+}
+.skin-drop:focus-visible {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 1px;
 }
 .skin-drop small {
-  color: #9f9db0;
+  color: var(--ink-muted);
+  font-size: 12px;
 }
 .skin-drop[hidden],
 .skin-inherit[hidden],
@@ -186,19 +186,20 @@ main[data-skin-tool] .studio-inspectors > .skin {
   display: none;
 }
 .skin-inherit {
-  padding: 8px;
-  border-radius: 8px;
-  background: #272831;
+  padding: var(--space-8);
+  border: 1px solid var(--line);
+  border-radius: 4px;
 }
 .skin-inherit p {
-  margin: 0 0 6px;
+  margin: 0 0 var(--space-8);
 }
+/* The image sits on a flat sunk ground; the guides are ruled cobalt lines. */
 .slice-stage {
   position: relative;
-  margin: 8px auto 6px;
+  margin: var(--space-8) auto;
   touch-action: none;
-  background: repeating-conic-gradient(#2e2f38 0 25%, #26272f 0 50%) 0 0 / 12px 12px;
-  outline: 1px solid #44455280;
+  background: var(--surface-sunk);
+  outline: 1px solid var(--line);
 }
 .slice-stage img {
   display: block;
@@ -213,7 +214,7 @@ main[data-skin-tool] .studio-inspectors > .skin {
 .slice-shade {
   position: absolute;
   pointer-events: none;
-  background: #0c0c1266;
+  background: rgba(0, 0, 0, 0.4);
 }
 .slice-guide {
   position: absolute;
@@ -221,59 +222,60 @@ main[data-skin-tool] .studio-inspectors > .skin {
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 0;
   padding: 0;
   border: 0;
   border-radius: 0;
   background: transparent;
 }
+.slice-guide:hover:not(:disabled),
+.slice-guide:active:not(:disabled) {
+  background: transparent;
+}
 .slice-guide::before {
   content: '';
   position: absolute;
-  background: #baa0f8;
-  box-shadow: 0 0 0 1px #0008;
+  background: var(--cobalt);
 }
 .slice-guide[data-axis='x'] {
-  top: -10px;
-  bottom: -10px;
-  width: 15px;
-  margin-left: -7px;
+  top: -12px;
+  bottom: -12px;
+  width: 20px;
+  margin-left: -10px;
   cursor: col-resize;
 }
 .slice-guide[data-axis='x']::before {
-  top: 10px;
-  bottom: 10px;
-  left: 7px;
-  width: 1.5px;
+  top: 12px;
+  bottom: 12px;
+  left: 10px;
+  width: 1px;
 }
 .slice-guide[data-axis='y'] {
-  left: -10px;
-  right: -10px;
-  height: 15px;
-  margin-top: -7px;
+  left: -12px;
+  right: -12px;
+  height: 20px;
+  margin-top: -10px;
   cursor: row-resize;
 }
 .slice-guide[data-axis='y']::before {
-  left: 10px;
-  right: 10px;
-  top: 7px;
-  height: 1.5px;
+  left: 12px;
+  right: 12px;
+  top: 10px;
+  height: 1px;
 }
 .slice-guide:hover::before,
 .slice-guide:focus-visible::before,
 .slice-guide[data-dragging]::before {
-  background: #fff;
-  box-shadow: 0 0 0 2px #baa0f8;
+  outline: 1px solid var(--cobalt);
 }
 .slice-guide:focus-visible {
   outline: none;
 }
 .slice-guide .knob {
   position: absolute;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #baa0f8;
-  box-shadow: 0 0 0 1.5px #16101f;
+  width: 8px;
+  height: 8px;
+  background: var(--cobalt);
 }
 .slice-guide[data-axis='x'] .knob {
   top: 0;
@@ -283,17 +285,18 @@ main[data-skin-tool] .studio-inspectors > .skin {
 }
 .slice-guide .value {
   position: absolute;
-  padding: 0 4px;
+  padding: 0 var(--space-4);
   border-radius: 4px;
-  font-size: 10px;
-  line-height: 15px;
-  color: #16101f;
-  background: #baa0f8;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--on-cobalt);
+  background: var(--cobalt);
   white-space: nowrap;
   pointer-events: none;
 }
 .slice-guide[data-axis='x'] .value {
-  bottom: -6px;
+  bottom: -8px;
 }
 .slice-guide[data-axis='y'] .value {
   right: -8px;
@@ -301,61 +304,56 @@ main[data-skin-tool] .studio-inspectors > .skin {
 .slice-numbers {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 4px;
+  gap: var(--space-4);
 }
 .slice-numbers label,
 .skin-row label {
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  font-size: 10px;
-  color: #b9b8c6;
+  align-items: stretch;
+  gap: var(--space-4);
+  font-size: 12px;
+  color: var(--ink-muted);
 }
 .skin input[type='number'],
 .skin select {
-  min-width: 0;
   width: 100%;
-  padding: 3px 5px;
-  color: #ecebf3;
-  background: #17171d;
-  border: 1px solid #4c4d5b;
-  border-radius: 5px;
+  max-width: none;
 }
 .skin-row {
   display: flex;
-  gap: 6px;
-  margin: 6px 0;
+  gap: var(--space-8);
+  margin: var(--space-8) 0;
 }
 .skin-row > * {
   flex: 1;
 }
 .skin details {
-  margin-top: 8px;
-  border-top: 1px solid #3a3b46;
-  padding-top: 6px;
-}
-.skin summary {
-  cursor: pointer;
-  font-weight: 600;
+  margin-top: var(--space-8);
+  border-top: 1px solid var(--line);
+  border-bottom: 0;
+  padding-top: var(--space-8);
 }
 .size-previews {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin: 8px 0;
+  gap: var(--space-8);
+  margin: var(--space-8) 0;
 }
 .size-preview {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-4);
 }
 .size-preview small {
-  color: #9f9db0;
+  color: var(--ink-muted);
+  font-size: 12px;
 }
+/* The previews show YouTube's own grounds, so these two colours stay YouTube's. */
 .size-frame {
   overflow: hidden;
-  padding: 4px;
-  border-radius: 6px;
+  padding: var(--space-4);
+  border-radius: 4px;
   background: #f4f4f4;
 }
 .size-frame[data-dark] {
@@ -378,47 +376,47 @@ main[data-skin-tool] .studio-inspectors > .skin {
 .skin-compact label {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin: 4px 0;
+  gap: var(--space-8);
+  margin: var(--space-4) 0;
 }
-.skin-compact input[type='color'] {
-  width: 32px;
-  height: 22px;
-  padding: 0;
-  border: 1px solid #4c4d5b;
-  background: none;
+.skin input[type='radio'] {
+  margin: 0;
+  accent-color: var(--cobalt);
 }
 .skin-note {
-  padding: 8px;
-  border-radius: 8px;
-  background: #272831;
-  color: #cfcde0;
+  padding: var(--space-8) var(--space-12);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--ink-muted);
 }
+/* Advice, not enforced: amber text with a triangle on the surface. */
 .skin-ink {
-  margin: 4px 0;
-  padding: 5px 8px;
-  border-radius: 6px;
-  background: #23302a;
-  color: #b6e6c4;
+  display: flex;
+  gap: var(--space-8);
+  margin: var(--space-4) 0;
+  padding: var(--space-4) var(--space-8);
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--ink-muted);
 }
 .skin-ink[data-warn='true'] {
-  background: #3a3220;
-  color: #f3d991;
+  box-shadow: inset 0 0 0 1px var(--lamp-amber);
+  color: var(--lamp-amber);
 }
 .skin-ink[hidden] {
   display: none;
 }
 .skin-report ul {
-  margin: 6px 0 0;
-  padding-left: 16px;
+  margin: var(--space-8) 0 0;
+  padding-left: var(--space-20);
 }
 .report-facts li {
-  color: #b9b8c6;
+  color: var(--ink-muted);
 }
 .report-warnings:empty {
   display: none;
 }
 .report-warnings li {
-  margin: 3px 0;
-  color: #f3d991;
+  margin: var(--space-4) 0;
+  color: var(--lamp-amber);
 }

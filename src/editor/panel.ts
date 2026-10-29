@@ -1,4 +1,7 @@
+import tokens from './studio-tokens.css';
 import styles from './panel.css';
+import studioBaseStyles from '../studio/editor-base.css';
+import studioSkinStyles from '../studio/editor-skin-base.css';
 import {
   IMAGE_LIMITS,
   STYLE_LIMITS,
@@ -93,7 +96,11 @@ export function createCreatorPanel(
   host.setAttribute('aria-label', 'デザインエディター');
   const shadow = host.attachShadow({ mode: 'open' });
   const sheet = doc.createElement('style');
-  sheet.textContent = options.skin ? styles + SKIN_PANEL_STYLES : styles;
+  const workbench = Boolean(options.fullPage || options.inPage || options.sidePanel || options.toolbarOnly);
+  // Only the floating editor wears the WWT Studio system so far; Studio keeps its base styles.
+  sheet.textContent = workbench
+    ? studioBaseStyles + (options.skin ? studioSkinStyles : '')
+    : tokens + styles + (options.skin ? SKIN_PANEL_STYLES : '');
   const main = doc.createElement('main');
   main.innerHTML = `
     <header><div><span class="eyebrow">WORLD CREATOR</span><h2>デザインを編集</h2></div><button class="dock" type="button" title="YouTubeの見たい場所に合わせて左右を切り替え">パネルを左へ</button><button class="minimize" type="button" aria-label="パネルを折りたたむ" title="プレビューを広く見る">−</button><button class="close" type="button" aria-label="編集を終了" title="未保存の変更を破棄して終了">×</button></header>

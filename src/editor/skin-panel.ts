@@ -67,7 +67,7 @@ export function createSkinPanel(doc: Document, actions: SkinPanelActions, option
       <div class="skin-inherit" hidden><p>この状態は「通常」の絵を使っています。</p><button type="button" class="skin-copy">通常の絵をもとに編集する</button></div>
       <div class="slice" hidden>
         <div class="slice-stage"><img class="slice-image" alt="" draggable="false"></div>
-        <p class="hint">紫の線をドラッグして、伸ばさない角と縁の幅を決めます。矢印キーでも動かせます。</p>
+        <p class="hint">青い線をドラッグして、伸ばさない角と縁の幅を決めます。矢印キーでも動かせます。</p>
         <div class="slice-numbers"></div>
         <div class="skin-row">
           <label>中央と縁<select class="skin-center" aria-label="中央と縁の扱い"><option value="stretch">伸ばす</option><option value="repeat">繰り返す</option></select></label>
