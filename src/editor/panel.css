@@ -870,12 +870,14 @@ footer {
 .actions .save {
   flex: 1;
 }
+/* Two lines are kept for the message, so a longer one never grows the footer and moves the rows
+   under the pointer (a double-click on a row would land somewhere else). */
 .status {
   font-size: 12px;
   line-height: 20px;
   color: var(--ink-muted);
   margin: var(--space-4) 0 0;
-  min-height: 20px;
+  min-height: 40px;
 }
 .status[data-error='true'] {
   color: var(--lamp-amber);
