@@ -15,7 +15,9 @@ description: WWTのe2eテストと本物のYouTubeでのテストを書く・直
 | e2e（模擬ページ） | 拡張を読み込んだ Chromium ＋ `tests/fixtures/youtube.html`    | `npm run build` → `npm run test:e2e -- tests/<名前>.spec.ts`     |
 | 実サイト          | 本物の YouTube。環境変数で明示したときだけ動く                | `WW_LIVE_<名前>=1 npm run test:e2e -- tests/<名前>-live.spec.ts` |
 
-- CI は unit と e2e を毎回動かす。実サイトは CI では動かさない（ネットワークと YouTube の変化で結果が揺れるため）
+- CI は unit と e2e を毎回動かす。e2e は `--shard=N/4` で4台に分けて並べる。実サイトは CI では動かさない（ネットワークと YouTube の変化で結果が揺れるため）
+- 手元でどこまで回すかは AGENTS.md の「テストの段階分け」に従う。作業の途中は触った部分の spec だけでよい。spec を1つの機能ごとに分けておくと、選びやすい
+- 1件ごとに拡張入りの Chromium を起動し直すので、1件あたり数秒かかる。同じ準備で確かめられることは1つのテストにまとめ、似たテストを増やしすぎない
 - 新しい実サイトのテストは `test.skip(process.env.WW_LIVE_<名前> !== '1', '理由')` で始め、既存の `*-live.spec.ts` と同じ形にする
 - e2e は `workers: 1` で順に動く。ネイティブの Chrome ウィンドウ（サイドパネル・ショートカット）を使うテストは、Linux では `xvfb-run` が要る
 - 拡張は `tests/fixtures.ts` の `launchExtension()` で読み込む。読み込む dist は `WW_TEST_EXTENSION_PATH`（既定は `dist`）。e2e の前に `npm run build` を忘れない

@@ -7,6 +7,8 @@ description: WWTの性能を本物のYouTubeで計測・調査するときの手
 
 合否の基準と原則は AGENTS.md の「計測」「性能の調査」にある。このスキルは、その進め方の手順。
 
+測るのは、ページの上で動く処理（content script・`src/sites/`・`src/world/`・`src/host/`・描画）を変えた段階だけ。エディターやサイドパネルの見た目だけの段階では測らない。
+
 ## 合否の基準（再掲）
 
 - 指標：**拡張の CPU 時間（1フレームあたり）**。拡張のコールバック（rAF・タイマー・Mutation/Resize/IntersectionObserver・イベント・読込時の実行）を、フレームごとに合計した値

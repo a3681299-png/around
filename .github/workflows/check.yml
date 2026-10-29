@@ -40,8 +40,14 @@ jobs:
           retention-days: 7
   e2e:
     runs-on: ubuntu-latest
+    # The serial suite takes ~23m on one runner. Each shard is its own machine, so
+    # `workers: 1` (native windows and benchmarks must not share a host) still holds.
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
     # Chromium/system dependencies can take 7m before the serial browser suite starts.
-    timeout-minutes: 35
+    timeout-minutes: 25
     env:
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.work/browsers
       WW_BUILD_OUT: .work/test-dist
@@ -60,17 +66,18 @@ jobs:
       - run: sudo apt-get install -y xdotool
       - run: npm run build
       # Fail early if the native toolbar/command window cannot receive input.
-      - run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" npm run test:e2e -- tests/editor-entry.spec.ts tests/side-panel.spec.ts --grep "OFF opens|ON action|hand off unsaved|timeline keeps layer controls" --output=.work/native-entry-results
+      - if: matrix.shard == 1
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" npm run test:e2e -- tests/editor-entry.spec.ts tests/side-panel.spec.ts --grep "OFF opens|ON action|hand off unsaved|timeline keeps layer controls" --output=.work/native-entry-results
       # Native Chrome Side Panel tests need a real window and display server.
-      - run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" npm run test:e2e
+      - run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" npm run test:e2e -- --shard=${{ matrix.shard }}/4
       - name: Optional public YouTube inspection
-        if: github.ref_name == 'fix/youtube-silver-native-surfaces'
+        if: matrix.shard == 1 && github.ref_name == 'fix/youtube-silver-native-surfaces'
         continue-on-error: true
         run: WW_LIVE_YOUTUBE=1 npm run test:e2e -- tests/live-youtube.spec.ts --output=.work/live-results
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: theme-e2e-results
+          name: theme-e2e-results-${{ matrix.shard }}
           path: |
             .work/test-results/e2e/
             .work/native-entry-results/
