@@ -194,7 +194,18 @@ export function createWorkspace(
     if (!event.composedPath().includes(menu)) closeMenu();
   };
   doc.addEventListener('pointerdown', outside, true);
-  body.addEventListener('scroll', () => closeMenu(), true);
+  // A scroll event arrives a frame after the scroll. One that moved before the menu opened (the
+  // wheel just before a right-click, a row brought into view) must not close the new menu.
+  let scrollAtOpen = new WeakMap<EventTarget, string>();
+  const scrollKey = (node: Element) => `${node.scrollTop},${node.scrollLeft}`;
+  body.addEventListener(
+    'scroll',
+    (event) => {
+      const target = event.target as Element;
+      if (scrollAtOpen.get(target) !== scrollKey(target)) closeMenu();
+    },
+    true,
+  );
   // Menus/help own Escape before the editor's capture-phase selection shortcut.
   const menuKeys = (event: KeyboardEvent) => {
     if (menu.hidden || !event.composedPath().includes(host)) return;
@@ -409,6 +420,9 @@ export function createWorkspace(
         target.hidden = source.hidden;
       });
       menu.hidden = false;
+      scrollAtOpen = new WeakMap();
+      for (const node of [body, ...body.querySelectorAll('.layers-pane, .layers, .inspector-pane, .help-pane')])
+        scrollAtOpen.set(node, scrollKey(node));
       const rect = host.getBoundingClientRect(),
         menuRect = menu.getBoundingClientRect();
       menu.style.left = `${Math.max(4, Math.min(rect.width - menuRect.width - 4, x - rect.left))}px`;

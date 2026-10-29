@@ -329,6 +329,18 @@ test('a low window (1366×657) with the guide shown still lets the bottom of thr
   expect(await youtube.evaluate(() => scrollY)).toBe(pageY);
   await expect(panel.getByRole('button', { name: '元に戻す', exact: true })).toBeInViewport();
   await expect(panel.getByRole('button', { name: '保存', exact: true })).toBeInViewport();
+  // The row menu stays open over its row, and a scroll after it opened still closes it.
+  await bottom.getByRole('button', { name: 'レイヤーの操作' }).click();
+  const menu = panel.getByRole('menu', { name: 'レイヤーの操作' });
+  await expect(menu).toBeVisible();
+  await youtube.waitForTimeout(100);
+  await expect(menu).toBeVisible();
+  // The wheel over the list's top-left corner, away from the menu that opened at the row's end.
+  const listBox = (await panel.locator('.layers').boundingBox())!;
+  await youtube.mouse.move(listBox.x + 20, listBox.y + 8);
+  await youtube.mouse.wheel(0, -200);
+  await expect(menu).toBeHidden();
+  await expect(bottom).toHaveAttribute('data-selected', '');
   // Taller, the list still scrolls but the pane has nothing to scroll: the list's leftover wheel
   // must not reach the page.
   await youtube.setViewportSize({ width: 1366, height: 800 });
