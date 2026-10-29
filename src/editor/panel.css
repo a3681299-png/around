@@ -398,13 +398,18 @@ summary:focus-visible,
   overflow: clip;
   background: var(--surface);
 }
+/* The layer list keeps at least two rows. On a low window the material buttons and the guide above
+   it move up with the browser's own scroll chaining (list end → this pane); the page never scrolls. */
 .layers-pane {
   display: flex;
   flex: 1;
   min-width: 0;
   min-height: 0;
   flex-direction: column;
-  overflow: clip;
+  overflow: hidden auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  container-type: scroll-state;
 }
 .inspector-pane,
 .help-pane {
@@ -494,7 +499,6 @@ ol {
   display: flex;
   flex-direction: column;
   flex: 1;
-  min-height: 0;
   margin: 0;
   border: 0;
   padding: 0 var(--space-8) var(--space-8);
@@ -508,7 +512,6 @@ ol {
   display: flex;
   flex-direction: column;
   flex: 1;
-  min-height: 0;
   overflow: clip;
 }
 .layer-count {
@@ -523,13 +526,23 @@ ol {
   margin: 0 var(--space-4) var(--space-4);
   flex: none;
 }
+/* A zero basis keeps the list from asking for its whole content: it fills what is left and scrolls
+   on its own, and only below two rows does the pane above take over. */
 .layers {
-  flex: 1;
-  min-height: 0;
+  flex: 1 1 0px;
+  min-height: 84px;
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
   padding: var(--space-4) 0;
+}
+/* The list hands its leftover wheel to the pane only while the pane can scroll. A pane without
+   overflow is not in the browser's scroll chain, so its `contain` would not stop the page. Browsers
+   without scroll-state queries keep the list contained: the pane then scrolls from the guide. */
+@container scroll-state(scrollable: y) {
+  .layers {
+    overscroll-behavior: auto;
+  }
 }
 /* ww-row: ruled rows; the selection is a cobalt wash inside a 1px cobalt edge. */
 .layer {

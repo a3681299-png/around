@@ -287,6 +287,67 @@ test('32 layers keep one list scroll, shared thumbnails, lock protection, Undo/d
   await expect(again.locator('.quick-guide')).toBeVisible();
 });
 
+test('a low window (1366×657) with the guide shown still lets the bottom of three layer rows be picked', async ({
+  popup,
+  youtube,
+}) => {
+  await youtube.setViewportSize({ width: 1366, height: 657 });
+  const panel = await open(popup, youtube);
+  await add(panel, youtube);
+  await expect(panel.locator('.quick-guide')).toBeVisible();
+  const bottom = panel.locator('.layer').last();
+  await expect(bottom).toHaveAttribute('title', '素材1.png');
+  // Reach the bottom row the way a person does, with the browser's own scroll chaining: the wheel
+  // over the guide brings the list up, then the wheel over the list. The page itself stays put.
+  const pageY = await youtube.evaluate(() => scrollY);
+  await panel.locator('.quick-guide').hover();
+  await youtube.mouse.wheel(0, 600);
+  await expect(panel.locator('.layers')).toBeInViewport({ ratio: 1 });
+  await panel.locator('.layers').hover();
+  await youtube.mouse.wheel(0, 600);
+  const probe = () =>
+    panel.evaluate((host) => {
+      const root = host.shadowRoot!,
+        list = root.querySelector('.layers')!.getBoundingClientRect(),
+        row = [...root.querySelectorAll('.layer')].at(-1)!,
+        target = row.querySelector('.layer-select')!.getBoundingClientRect(),
+        x = target.left + target.width / 2,
+        y = target.top + target.height / 2;
+      return {
+        list: list.height,
+        row: row.getBoundingClientRect().height,
+        x,
+        y,
+        hit: row.contains(root.elementFromPoint(x, y)),
+      };
+    });
+  await expect.poll(async () => (await probe()).hit).toBe(true);
+  const { list, row, x, y } = await probe();
+  expect(list).toBeGreaterThanOrEqual(row);
+  await youtube.mouse.click(x, y);
+  await expect(bottom).toHaveAttribute('data-selected', '');
+  expect(await youtube.evaluate(() => scrollY)).toBe(pageY);
+  await expect(panel.getByRole('button', { name: '元に戻す', exact: true })).toBeInViewport();
+  await expect(panel.getByRole('button', { name: '保存', exact: true })).toBeInViewport();
+  // Taller, the list still scrolls but the pane has nothing to scroll: the list's leftover wheel
+  // must not reach the page.
+  await youtube.setViewportSize({ width: 1366, height: 800 });
+  await expect(panel.locator('.layers')).toBeInViewport({ ratio: 1 });
+  await expect
+    .poll(() => panel.locator('.layers-pane').evaluate((pane) => pane.scrollHeight - pane.clientHeight))
+    .toBe(0);
+  expect(await panel.locator('.layers').evaluate((list) => list.scrollHeight - list.clientHeight)).toBeGreaterThan(0);
+  // The page can still scroll down from here, so a leak would show.
+  const tallY = await youtube.evaluate(() => scrollY);
+  expect(await youtube.evaluate(() => document.documentElement.scrollHeight - innerHeight - scrollY)).toBeGreaterThan(
+    0,
+  );
+  await panel.locator('.layers').hover();
+  await youtube.mouse.wheel(0, 600);
+  await youtube.waitForTimeout(300);
+  expect(await youtube.evaluate(() => scrollY)).toBe(tallY);
+});
+
 test('dropping onto the workspace places material in the visible preview, including split mode', async ({
   popup,
   youtube,
