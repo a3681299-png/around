@@ -135,7 +135,7 @@ backup・creator-editor・effect-editor・group-editor・image-editor・layer-ed
 | e2e（全件） | 327 件（275 実行、52 件は `WW_LIVE_*` 未指定などでスキップ。うち 1 件は止めたテスト）。274 件成功・1 件失敗（下の「不安定さ」）、19.5 分 |
 | e2e（途中） | 前の全件で落ちた 15 個の spec を回し直して成功。`motion-editor` を 5 回繰り返して 50 件成功                                              |
 | 実サイト    | `WW_LIVE_EDITOR_SURFACES=1` の `editor-surfaces-live.spec.ts`：変更前・変更後で 1 回ずつ、明・暗の 2 件ずつ成功                          |
-| CI          | （記入）                                                                                                                                 |
+| CI          | `2bd794c`（run 41193362747）：unit と e2e の 4 分割、すべて成功                                                                          |
 
 ### 不安定さ
 
