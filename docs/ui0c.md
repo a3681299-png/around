@@ -101,7 +101,7 @@
 | e2e（全件、引き渡し前） | 315 件（268 実行、47 件は `WW_LIVE_*` 未指定でスキップ）。268 件成功、失敗 0、16.1 分。そのあとグループとロックの枠の CSS だけを変え、`page-marks`・`layer-editor`・`group-editor` を回し直して 23 件成功                                                                                                                                                         |
 | e2e（途中）             | `page-marks`・`skin-editor`・`creator-editor`・`studio`・`operation-controls`・`operation-safety`・`signal-motion-editor`（58 件成功）、`layer-editor`（12 件成功）                                                                                                                                                                                               |
 | 実サイト                | `WW_LIVE_PAGE_MARKS=1` の `page-marks-live.spec.ts`（白・ダークの 2 件）を、変更前のビルドと変更後のビルドで最終 1 回ずつ。全項目 ok。途中で、明るい動画の再生エラー（Big Buck Bunny が「Something went wrong」）、動画の読み込み前のスクリーンショット（空の範囲）、YouTube のホバーのプレビューの video が点を取る、の 3 つで撮り直した。どれもテストの側の原因 |
-| CI                      | TBD                                                                                                                                                                                                                                                                                                                                                               |
+| CI                      | `1caafdc`（run 41176751669）：unit と e2e の 4 分割、すべて成功                                                                                                                                                                                                                                                                                                   |
 
 ## 変えたテスト
 
