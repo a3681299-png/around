@@ -3,6 +3,7 @@ import { createStudioClient } from './studio-client';
 import { createStudioRecovery } from './studio-recovery';
 import { browserStudioPreferences } from './preferences';
 import { mountSafetyControls } from '../settings/safety-controls';
+import { skinAssetPort } from './skin-assets';
 
 async function start() {
   const params = new URL(location.href).searchParams,
@@ -11,6 +12,8 @@ async function start() {
   const target = value && /^\d+$/.test(value) ? Number(value) : undefined;
   const tab = sidePanel ? { id: target } : await chrome.tabs.getCurrent();
   if (tab?.id === undefined) throw new Error('Studioのタブを取得できません。');
+  // Each preview URL lives until the Studio page closes.
+  const skinPreviews = new Map<string, Promise<string | undefined>>();
   const app = mountStudio(document, document.querySelector<HTMLElement>('#studio')!, {
     hostName: 'YouTube',
     mountSafety: mountSafetyControls,
@@ -18,6 +21,18 @@ async function start() {
     connect: (notify, checkpoint) => createStudioClient(notify, checkpoint, sidePanel ? document : undefined),
     recovery: createStudioRecovery(tab.id),
     preferences: browserStudioPreferences,
+    // The extension page reads skin art from its own asset store, like the page renderer does.
+    skinAssetUrl(assetId) {
+      let url = skinPreviews.get(assetId);
+      if (!url) {
+        url = skinAssetPort.load(assetId).catch(() => {
+          skinPreviews.delete(assetId);
+          return undefined;
+        });
+        skinPreviews.set(assetId, url);
+      }
+      return url;
+    },
     openSettings: (target) => {
       void chrome.windows.create({
         url: chrome.runtime.getURL('popup/index.html') + (target === undefined ? '' : '?target=' + target),

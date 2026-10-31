@@ -695,3 +695,37 @@ test('official panel records raw signals, plays/seeks without live input, and re
     await context.close();
   }
 });
+
+test('the official panel dresses UI parts: page part list, picking on the page and art through its own lease', async () => {
+  test.setTimeout(120_000);
+  const { context, page, id, local } = await setup();
+  try {
+    await local.getByRole('button', { name: 'Chromeサイドパネルを開く', exact: true }).click();
+    const panel = await sidePanelDriver(context, page, id);
+    await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
+    await panel.click('[data-tool="skin"]');
+    await expect(page.locator('html')).toHaveAttribute('data-ww-skin-picking', '');
+    // The page measures its parts and the panel lists them.
+    await expect.poll(() => panel.text('.skin-part[data-target="video-card"] .state')).toMatch(/^[0-9]+個$/);
+    const card = page.locator('[data-ww-surface~="video-card"]').first();
+    await card.hover();
+    await expect(page.locator('#web-world-themes-skin-hover')).toContainText('動画カード');
+    await card.locator('a').first().click();
+    await expect(page.locator('html')).toHaveAttribute('data-ww-skin-selected', 'video-card');
+    await expect.poll(() => panel.text('.skin-name')).toBe('動画カード');
+    // The side panel's upload is leased to its tab only after the background finds the real panel.
+    await panel.files([path.resolve('tests/fixtures/skins/frame-light.png')], '.skin-file');
+    await expect.poll(() => card.evaluate((node) => getComputedStyle(node).borderImageSource)).toMatch(/^url\("blob:/);
+    await expect
+      .poll(() =>
+        panel.evaluate<number>(
+          'document.querySelector("#web-world-themes-creator").shadowRoot.querySelector(".slice-image").naturalWidth',
+        ),
+      )
+      .toBe(96);
+    await panel.click('.undo');
+    await expect.poll(() => card.evaluate((node) => getComputedStyle(node).borderImageSource)).toBe('none');
+  } finally {
+    await context.close();
+  }
+});

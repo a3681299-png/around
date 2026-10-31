@@ -3,6 +3,8 @@ import type { PackedCheckpoint } from './checkpoint-codec';
 import type { EditCommand, EditorCheckpoint } from '../editor-core/types';
 import type { DesignTarget } from '../design/types';
 import type { TimelineCommand, TimelineUpdate } from '../timeline/types';
+import type { SkinSlot } from '../editor-core/skins';
+import type { SkinPageInfo } from '../editor/skin-status';
 
 export const STUDIO_PORT = 'web-world-themes:studio-v1';
 export const STUDIO_PROBE = 'web-world-themes:studio-probe';
@@ -19,6 +21,8 @@ export type StudioRequest =
   | { id: number; type: 'surface-visibility'; visible: boolean }
   | { id: number; type: 'command'; session: string; revision: number; command: EditCommand }
   | { id: number; type: 'import-assets'; session: string; revision: number; assets: string[] }
+  // UI skin art into one slot of the selected part (Core accepts exactly one picture).
+  | { id: number; type: 'import-skin'; session: string; revision: number; assets: string[]; slot: SkinSlot }
   | { id: number; type: 'thumbnail'; layer: string }
   | { id: number; type: 'safety'; overlay: boolean }
   | { id: number; type: 'timeline'; session: string; command: TimelineCommand }
@@ -39,6 +43,7 @@ export type StudioMessage =
   | StudioReply
   | { type: 'handoff' }
   | { type: 'timeline'; update: TimelineUpdate }
+  | { type: 'skin-page'; info: readonly SkinPageInfo[] }
   | { type: 'safety'; status: import('../host/operation-guard').SafetyStatus };
 
 export { parseEditCommand } from '../editor-core/commands';

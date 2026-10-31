@@ -15,6 +15,7 @@ import { ASSET_MESSAGES } from '../assets/limits';
 import { parseTimelineCommand } from '../timeline/types';
 import { loadAssetMetadata } from '../assets/client';
 import { isAssetId } from '../design/schema';
+import { SKIN_STATES, type SkinState } from '../design/types';
 import type { OperationGuardHost } from '../host/operation-guard';
 
 /** Authenticated extension Port; no window messages or page-script command bridge. */
@@ -100,6 +101,9 @@ export function connectStudioHost(
     const unsubscribeSafety = safety?.subscribe((status) => {
       if (attached && owner) post({ type: 'safety', status });
     });
+    const unsubscribeSkinPage = editor.subscribeSkinPage((info) => {
+      if (attached && owner && activePort === port) post({ type: 'skin-page', info });
+    });
     function cleanup() {
       if (closed) return;
       closed = true;
@@ -107,6 +111,7 @@ export function connectStudioHost(
       unsubscribe();
       unsubscribeTimeline();
       unsubscribeSafety?.();
+      unsubscribeSkinPage();
       if (activePort === port) safety?.overlay(false);
       if (owner) editor.detachStudio(owner);
       ports.delete(port);
@@ -210,6 +215,25 @@ export function connectStudioHost(
                 items,
                 length: items.length,
               });
+              post({ type: 'reply', id: request.id, ok: true, ...statePayload(state) });
+            } else if (request.type === 'import-skin') {
+              if (
+                !Array.isArray(request.assets) ||
+                !request.assets.length ||
+                request.assets.length > ASSET_LIMITS.batchCount ||
+                !request.assets.every(isAssetId)
+              )
+                throw new Error('素材IDが不正です。');
+              if (request.slot !== 'compact' && !SKIN_STATES.includes(request.slot as SkinState))
+                throw new Error('着せ替えの差し込み口が不正です。');
+              const items = await Promise.all(request.assets.map((id) => loadAssetMetadata(id)));
+              const state = await editor.importSkin(
+                owner,
+                request.session,
+                request.revision,
+                { kind: 'stored-assets', items, length: items.length },
+                request.slot,
+              );
               post({ type: 'reply', id: request.id, ok: true, ...statePayload(state) });
             } else if (request.type === 'thumbnail') {
               if (

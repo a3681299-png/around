@@ -442,11 +442,35 @@ test('the authenticated Port rejects stale revisions and unrecognized commands w
         revision: changed.state.revision,
         files: [{ name: 'legacy.png', mime: 'image/png', base64 }],
       });
+      // UI skin art arrives only as stored asset IDs for a known slot; nothing else is accepted.
+      const skinSlot = await request({
+        type: 'import-skin',
+        session: changed.state.sessionId,
+        revision: changed.state.revision,
+        assets: ['asset-' + '0'.repeat(64)],
+        slot: 'background',
+      });
+      const skinIds = await request({
+        type: 'import-skin',
+        session: changed.state.sessionId,
+        revision: changed.state.revision,
+        assets: ['javascript:alert(1)'],
+        slot: 'normal',
+      });
+      const skinInline = await request({
+        type: 'import-skin',
+        session: changed.state.sessionId,
+        revision: changed.state.revision,
+        files: [{ name: 'skin.png', mime: 'image/png', base64 }],
+        slot: 'normal',
+      });
       const output = {
         attached: attached.ok,
         snap: changed.state.view.snapping,
         stale: stale.ok,
         unsafe: unsafe.ok,
+        skin: [skinSlot.ok, skinIds.ok, skinInline.ok],
+        skinErrors: [skinSlot.error, skinIds.error, skinInline.error],
         legacyImport: legacyImport.ok,
         legacyError: legacyImport.error,
         document: legacyImport.state.document,
@@ -459,6 +483,8 @@ test('the authenticated Port rejects stale revisions and unrecognized commands w
   );
   expect(result).toMatchObject({ attached: true, snap: true, stale: false, unsafe: false, legacyImport: false });
   expect(result.legacyError).toBe('未対応のStudio操作です。');
+  expect(result.skin).toEqual([false, false, false]);
+  expect(result.skinErrors).toEqual(['着せ替えの差し込み口が不正です。', '素材IDが不正です。', '素材IDが不正です。']);
   expect(result.document).toEqual(result.before);
 });
 

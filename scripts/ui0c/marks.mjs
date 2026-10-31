@@ -184,8 +184,41 @@ async function scenarios(browser) {
   return { hover, scroll };
 }
 
+/** UI0-d: the Studio window as a tab, connected to the YouTube tab. */
+async function openStudio({ context, popup, page }) {
+  await page.bringToFront();
+  const tab = await popup.evaluate(async () => (await chrome.tabs.query({ active: true, currentWindow: true }))[0]?.id);
+  const studio = await context.newPage();
+  await studio.setViewportSize({ width: 1440, height: 900 });
+  await studio.goto(`chrome-extension://${new URL(popup.url()).host}/studio/index.html?target=${tab}`);
+  await studio.locator('.connection-status[data-connected="true"]').waitFor();
+  await page.bringToFront();
+  return studio.getByRole('dialog', { name: 'デザインエディター' });
+}
+/** UI0-d: the skin tool's page-side work, opened from the floating editor or from the Studio page. */
+async function skinSurface(browser, surface) {
+  const { page } = browser;
+  await page.goto(url, { waitUntil: 'domcontentloaded' });
+  await page.locator('[data-ww-surface~="video-card"]').nth(3).waitFor();
+  await page.waitForTimeout(8000);
+  const editor = surface === 'window' ? await openStudio(browser) : await openEditor(browser);
+  await editor.getByRole('button', { name: 'UIを着せ替え' }).click();
+  await page.waitForTimeout(1500);
+  const hover = await measure(browser, async () => {
+    for (let i = 0; i < 12; i++) {
+      const y = 200 + (i % 4) * 200;
+      await page.mouse.move(80, y, { steps: 2 });
+      await page.mouse.move(900, y + 60, { steps: 20 });
+      await page.waitForTimeout(100);
+    }
+  });
+  return { hover };
+}
+const surfaceMode = process.env.UI0C_MODE === 'surface';
+
 const result = {
   url,
+  mode: surfaceMode ? 'surface (after build: floating vs window)' : 'build (before vs after)',
   measuredAt: new Date().toISOString(),
   environment: { os: `${os.platform()} ${os.release()}`, cpu: os.cpus()[0]?.model, node: process.version },
   builds: {},
@@ -194,14 +227,20 @@ const result = {
 for (const [name, dir] of Object.entries(builds))
   result.builds[name] = JSON.parse(await readFile(path.join(dir, 'ui1-build.json'), 'utf8'));
 for (let pair = 0; pair < pairs; pair++) {
-  const order = pair % 2 ? ['after', 'before'] : ['before', 'after'];
+  const order = surfaceMode
+    ? pair % 2
+      ? ['window', 'floating']
+      : ['floating', 'window']
+    : pair % 2
+      ? ['after', 'before']
+      : ['before', 'after'];
   const row = { pair, order, blocks: {} };
   result.pairs.push(row);
   for (const condition of order) {
-    const browser = await launch(builds[condition]);
+    const browser = await launch(surfaceMode ? builds.after : builds[condition]);
     result.browser = browser.version;
     try {
-      row.blocks[condition] = await scenarios(browser);
+      row.blocks[condition] = surfaceMode ? await skinSurface(browser, condition) : await scenarios(browser);
     } catch (error) {
       row.blocks[condition] = { error: String(error).slice(0, 600) };
     } finally {

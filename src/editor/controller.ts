@@ -22,6 +22,7 @@ import { createSkinPicker } from './skin-picker';
 import { createPageMarks } from './page-marks';
 import tokens from './studio-tokens.css';
 import type { SkinSlot } from '../editor-core/skins';
+import type { SkinPageInfo } from './skin-status';
 
 /** The page renderer's view of skin art, for previews and "not applied" reasons. */
 export interface SkinAssetHost {
@@ -55,6 +56,16 @@ export interface CreatorEditor {
   timelineCommand(owner: string, session: string, command: TimelineCommand): Promise<void>;
   command(owner: string, session: string, revision: number, command: EditCommand): Promise<EditorSnapshot>;
   import(owner: string, session: string, revision: number, files: BrowserImportSource): Promise<EditorSnapshot>;
+  /** UI skin art for one slot of the selected part, from a connected Studio page. */
+  importSkin(
+    owner: string,
+    session: string,
+    revision: number,
+    files: BrowserImportSource,
+    slot: SkinSlot,
+  ): Promise<EditorSnapshot>;
+  /** The skin tool's part list (page presence, art and ink state), throttled, while the tool is open. */
+  subscribeSkinPage(listener: (info: readonly SkinPageInfo[]) => void): () => void;
   thumbnail(id: string): Promise<string | undefined>;
 }
 const PICK_EVENTS = ['pointerdown', 'pointerup', 'mousedown', 'mouseup', 'click', 'auxclick', 'dblclick'] as const;
@@ -90,6 +101,7 @@ export function createCreatorEditor(
   let layout: StudioLayoutAdapter | undefined,
     panelMode: 'quick' | 'inpage' | 'sidepanel' = 'quick';
   const consumedKeys = new Set<string>();
+  const skinPageListeners = new Set<(info: readonly SkinPageInfo[]) => void>();
   const marks = createPageMarks(doc);
   const picker = createSkinPicker(doc, site.designTargets ?? [], marks, site.skinControls);
   const selectionMark = marks.mark('web-world-themes-selection-mark');
@@ -231,23 +243,28 @@ export function createCreatorEditor(
     }
   }
   const skinTool = () => editing() && state.view.tool === 'skin';
+  /** Only the floating editor on the page picks cards with any tool; from the Studio page (side panel
+   * or window) the page's own clicks stay YouTube's unless the card tool is chosen. */
+  const quickPanel = () => Boolean(panel) && panelMode === 'quick';
   /** Page presence and art state per part. Throttled: it reads layout, so never per frame. */
+  /** Whether anyone shows the part list: a panel on the page or a connected Studio page. */
+  const skinReaders = () => Boolean(panel) || skinPageListeners.size > 0;
   const scheduleSkinInfo = () => {
-    if (!panel || !skinTool() || skinInfoTimer !== undefined) return;
+    if (!skinReaders() || !skinTool() || skinInfoTimer !== undefined) return;
     skinInfoTimer = setTimeout(() => {
       skinInfoTimer = undefined;
-      if (!panel || !skinTool()) return;
+      if (!skinReaders() || !skinTool()) return;
       const assets = new Map(
         state.document.rules.flatMap((rule) =>
           rule.skin ? [[rule.target, skinAssets?.status(rule.skin.states.normal.assetId)] as const] : [],
         ),
       );
-      panel.setSkinPage(
-        picker.pageInfo(
-          (id) => assets.get(id),
-          (id) => skinAssets?.ink(id),
-        ),
+      const info = picker.pageInfo(
+        (id) => assets.get(id),
+        (id) => skinAssets?.ink(id),
       );
+      panel?.setSkinPage(info);
+      skinPageListeners.forEach((listener) => listener(info));
     }, 250);
   };
   function refresh(next = core.snapshot()) {
@@ -284,7 +301,7 @@ export function createCreatorEditor(
       doc.documentElement.setAttribute('data-ww-editor-tool', state.view.tool ?? 'select');
       doc.documentElement.toggleAttribute(
         'data-ww-editor-card-picking',
-        state.view.tool !== 'browse' && (panelMode === 'quick' || state.view.tool === 'card'),
+        state.view.tool !== 'browse' && (quickPanel() || state.view.tool === 'card'),
       );
     }
     if (remoteOwner && state.active && !panel && !badge) {
@@ -423,7 +440,7 @@ export function createCreatorEditor(
       !editing() ||
       fullscreen() ||
       state.view.tool === 'browse' ||
-      (panelMode !== 'quick' && state.view.tool !== 'card' && state.view.tool !== 'skin') ||
+      (!quickPanel() && state.view.tool !== 'card' && state.view.tool !== 'skin') ||
       ownUi(event)
     )
       return;
@@ -637,6 +654,16 @@ export function createCreatorEditor(
       authorize(owner, session, revision);
       await core.import(files);
       return core.snapshot();
+    },
+    async importSkin(owner, session, revision, files, slot) {
+      authorize(owner, session, revision);
+      await core.importSkin(files, slot);
+      return core.snapshot();
+    },
+    subscribeSkinPage(listener) {
+      skinPageListeners.add(listener);
+      scheduleSkinInfo();
+      return () => skinPageListeners.delete(listener);
     },
     thumbnail: (id) => captureLayerThumbnail(doc, id),
     destroy() {

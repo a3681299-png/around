@@ -13,6 +13,8 @@ import { ASSET_MESSAGES } from '../assets/limits';
 import { releaseAssets } from '../assets/client';
 import { importStudioAssets } from '../assets/studio-upload';
 import type { SafetyStatus } from '../host/operation-guard';
+import type { SkinPageInfo } from '../editor/skin-status';
+import type { SkinSlot } from '../editor-core/skins';
 
 import type { StudioConnectionState, StudioConnection } from '../studio/connection';
 import { requestStudioSurface } from './side-panel';
@@ -31,6 +33,7 @@ export function createStudioClient(
 ): StudioConnection {
   const owner = `studio-${crypto.randomUUID()}`;
   const safetyListeners = new Set<(status: SafetyStatus) => void>();
+  const skinPageListeners = new Set<(info: readonly SkinPageInfo[]) => void>();
   let safetyStatus: SafetyStatus | undefined;
   let port: chrome.runtime.Port | undefined,
     tabId: number | undefined,
@@ -210,6 +213,10 @@ export function createStudioClient(
           useTimeline(message.update);
           return;
         }
+        if (message.type === 'skin-page') {
+          if (Array.isArray(message.info)) skinPageListeners.forEach((listener) => listener(message.info));
+          return;
+        }
         if (message.type !== 'state' && message.type !== 'reply') return;
         let received;
         try {
@@ -332,6 +339,14 @@ export function createStudioClient(
   };
   return {
     timeline,
+    skinPage: {
+      subscribe(listener) {
+        skinPageListeners.add(listener);
+        return () => {
+          skinPageListeners.delete(listener);
+        };
+      },
+    },
     safety: {
       subscribe(listener) {
         safetyListeners.add(listener);
@@ -402,7 +417,7 @@ export function createStudioClient(
         >);
       });
     },
-    import(files: readonly File[]) {
+    import(files: readonly File[], slot?: SkinSlot) {
       return enqueue(async () => {
         const generation = epoch;
         const large = files.some((f) => f.size > ASSET_LIMITS.fileBytes);
@@ -424,11 +439,13 @@ export function createStudioClient(
           const assets = await importStudioAssets(files, lease, controller.signal, ownerTab);
           if (generation !== epoch || !connected) throw new Error('素材の読み込み中に接続が変わりました。');
           const current = state!;
+          // A skin slot takes one picture; Core refuses more with its own message in the panel.
           await request({
-            type: 'import-assets',
+            type: slot === undefined ? 'import-assets' : 'import-skin',
             session: current.sessionId,
             revision: current.revision,
             assets: assets.map((a) => a.id),
+            ...(slot === undefined ? {} : { slot }),
           } as Omit<StudioRequest, 'id'>);
         } finally {
           if (pendingImport?.controller === controller) pendingImport = undefined;

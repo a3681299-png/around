@@ -1,0 +1,59 @@
+{
+  "stage": "UI0-d round 1",
+  "kind": "short check, 2 alternated pairs, one build: skin tool opened from the floating editor vs from the Studio window tab",
+  "url": "https://www.youtube.com/results?search_query=lofi+hip+hop",
+  "measuredAt": "2026-10-31T07:43:31.410Z",
+  "browser": "143.0.7499.4",
+  "environment": {
+    "os": "win32 10.0.26300",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13650HX",
+    "node": "v24.16.0"
+  },
+  "build": "38775f8770fbcbef635c13c77e39650d859759ce + UI0-d round 1 working tree",
+  "pairs": [
+    {
+      "pair": 0,
+      "order": ["floating", "window"],
+      "blocks": {
+        "floating": {
+          "frames": 440,
+          "medianMs": 0,
+          "p95Ms": 0.7,
+          "maxMs": 2.4,
+          "longestCallbackMs": 2.4,
+          "longTasksOver50ms": 0
+        },
+        "window": {
+          "frames": 440,
+          "medianMs": 0,
+          "p95Ms": 0.7,
+          "maxMs": 1.7,
+          "longestCallbackMs": 1.6,
+          "longTasksOver50ms": 0
+        }
+      }
+    },
+    {
+      "pair": 1,
+      "order": ["window", "floating"],
+      "blocks": {
+        "window": {
+          "frames": 440,
+          "medianMs": 0,
+          "p95Ms": 0.6,
+          "maxMs": 1.7,
+          "longestCallbackMs": 1.6,
+          "longTasksOver50ms": 0
+        },
+        "floating": {
+          "frames": 452,
+          "medianMs": 0,
+          "p95Ms": 0.6,
+          "maxMs": 3,
+          "longestCallbackMs": 3,
+          "longTasksOver50ms": 0
+        }
+      }
+    }
+  ]
+}

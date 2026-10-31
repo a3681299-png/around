@@ -6,6 +6,7 @@ import type { StudioPreferences } from './preferences';
 import type { StudioTarget } from './protocol';
 import { studioActions } from './ui-actions';
 import { buttonIcon } from '../editor/icons';
+import type { SkinSlot } from '../editor-core/skins';
 
 interface StudioPorts {
   mountSafety?(root: HTMLElement, connection: StudioConnection): () => void;
@@ -18,6 +19,8 @@ interface StudioPorts {
   ): StudioConnection;
   recovery: StudioRecovery;
   preferences: StudioPreferences;
+  /** Preview URLs for UI skin art, read from the extension's own asset store. */
+  skinAssetUrl?(assetId: string): Promise<string | undefined>;
 }
 
 /** Shared full-size UI. The composition root supplies transport, storage and preferences. */
@@ -90,6 +93,11 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
       if (!pendingCommands && latest) render(latest);
     });
   };
+  const importSkin = (files: readonly File[], slot: SkinSlot) => {
+    if (connection.isConnected) void connection.import(files, slot);
+  };
+  // The page measures its parts only while the skin tool is open.
+  const unsubscribeSkinPage = connection.skinPage?.subscribe((info) => panel?.setSkinPage(info));
   function render(value: StudioConnectionState) {
     if (!alive) return;
     latest = value;
@@ -104,6 +112,9 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
       panel?.destroy();
       mount.replaceChildren();
       paneTarget = value.target;
+      const skinTargets = (targets.find((target) => target.id === value.target)?.targets ?? []).filter(
+        (target) => target.skin,
+      );
       panel = createCreatorPanel(
         doc,
         studioActions(
@@ -122,6 +133,15 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
           fullPage: true,
           sidePanel: Boolean(ports.sidePanel),
           persistWorkspace: true,
+          ...(skinTargets.length && ports.skinAssetUrl
+            ? {
+                skin: {
+                  targets: skinTargets,
+                  assetUrl: ports.skinAssetUrl,
+                  import: (files: readonly File[], slot: SkinSlot) => importSkin(files, slot),
+                },
+              }
+            : {}),
           onSurface: (surface) => {
             void connection.openWorkspace(surface).catch((error: unknown) => {
               message.textContent = error instanceof Error ? error.message : '切替できませんでした。';
@@ -258,7 +278,14 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
     if (connection.isConnected && event.dataTransfer?.files.length) {
       event.preventDefault();
       event.stopImmediatePropagation();
-      void connection.import([...event.dataTransfer.files]);
+      const files = [...event.dataTransfer.files];
+      // Skin drop zones name their slot; while dressing parts, a drop is never a new image layer.
+      const zone = event
+        .composedPath()
+        .find((node): node is HTMLElement => node instanceof HTMLElement && Boolean(node.dataset.skinSlot));
+      if (zone || connection.state?.view.tool === 'skin')
+        importSkin(files, (zone?.dataset.skinSlot as SkinSlot | undefined) ?? 'normal');
+      else void connection.import(files);
     }
   };
   // Bubble phase lets menus and focused input controls own their shortcuts first.
@@ -280,6 +307,7 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
     },
     destroy() {
       unmountSafety?.();
+      unsubscribeSkinPage?.();
       persist();
       alive = false;
       connection.destroy();
