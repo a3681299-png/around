@@ -2,12 +2,13 @@ import path from 'node:path';
 import { test, expect } from './fixtures';
 import { closeEditorPages, openEditor } from './helpers/editor';
 import type { DesignDocument } from '../src/design/types';
+import { unpackCheckpoint } from '../src/studio/checkpoint-codec';
 
 test('shared motion UI pursues, stops, rotates, keeps handles aligned and preserves authored placement through Undo/save/reload/OFF', async ({
   popup,
   youtube,
 }) => {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   let { panel } = await openEditor(popup, youtube);
   await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await panel.locator('.save').click();
@@ -80,6 +81,21 @@ test('shared motion UI pursues, stops, rotates, keeps handles aligned and preser
   await panel.locator('.layer [data-action="lock"]').click();
   await expect(panel.getByLabel('レイヤーのマウス追跡')).toBeDisabled();
   await panel.locator('.undo').click();
+  // Undo unlocks the layer. The editor page closes once its recovery copy has caught up: the page
+  // writes it a moment later, and closing first would leave the locked draft to be restored
+  // (docs/ui0d-3.md, deferred).
+  await expect(panel.getByLabel('レイヤーのマウス追跡')).toBeEnabled();
+  await expect(panel.locator('.dirty')).toHaveText('保存済み');
+  const target = new URL(panel.page().url()).searchParams.get('target');
+  await expect
+    .poll(async () => {
+      const value: unknown = await popup.evaluate(
+        async (key) => (await chrome.storage.session.get(key))[key],
+        'webWorldThemes.studio.session.' + target,
+      );
+      return unpackCheckpoint(value)?.draft.decorations[0]?.locked;
+    })
+    .toBe(false);
   // The editor closes with the reload, as before; then it is opened again on the saved work.
   await closeEditorPages(youtube);
   await youtube.reload();
@@ -115,9 +131,9 @@ test('shared motion UI pursues, stops, rotates, keeps handles aligned and preser
   await panel.locator('.save').click();
   await expect(panel.locator('.dirty')).toHaveText('保存済み');
   expect((await stored()).decorations[0]!.placement.x).toBeCloseTo(before.x + 60 / scale, 3);
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
   await expect(youtube.locator('#web-world-themes-decorations')).toHaveCount(0);
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   await expect(image).toBeVisible();
   await youtube.emulateMedia({ reducedMotion: 'reduce' });
   await youtube.waitForTimeout(50);

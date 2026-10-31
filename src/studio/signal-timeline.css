@@ -96,9 +96,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-:host([data-inpage]) .timeline-connection {
-  display: none;
-}
 @media (max-width: 680px) {
   .timeline-connection {
     display: none;
@@ -217,18 +214,4 @@
   .timeline-key-properties input[type='number'] {
     width: 52px;
   }
-}
-:host([data-inpage]) .signal-timeline {
-  position: absolute;
-  bottom: 24px;
-  right: 0;
-  width: var(--inspector-width, 320px);
-  z-index: 6;
-}
-:host([data-inpage]) .studio-inspectors {
-  margin-bottom: var(--timeline-inset, 28px);
-}
-:host([data-inpage][data-dock-flip]) .signal-timeline {
-  right: auto;
-  left: 0;
 }

@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { writeFile } from 'node:fs/promises';
 import { test, expect } from './fixtures';
-import { openRetiredEditor } from './helpers/editor';
+import { openEditor } from './helpers/editor';
 import { renderDiagnostics } from './helpers/render-diagnostics';
 
 for (const viewport of [
@@ -15,19 +15,21 @@ for (const viewport of [
     youtube,
   }, info) => {
     await youtube.setViewportSize(viewport);
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
     // The popup changes optimistically; authoring is enabled after the page receives the save.
     await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
-    // UI0-d: checks the in-page Studio's arrangement at these widths; stays on it until round 3
-    // decides (docs/ui0d-2.md).
-    const panel = await openRetiredEditor(popup, youtube, 'inpage');
-    await expect(panel).toHaveAttribute('data-inpage', '');
-    if (viewport.width < 640)
+    // UI0-d round 3: the in-page Studio's workbench is the editor window's own, at the same sizes.
+    const { panel, studio } = await openEditor(popup, youtube, viewport);
+    // A narrow window gets the one-column arrangement: the レイヤー tab shows the list, as the
+    // wide arrangement's 開閉 button did.
+    const layersTab = panel.getByRole('tab', { name: 'レイヤー', exact: true });
+    if (await layersTab.isVisible()) await layersTab.click();
+    else if (viewport.width < 640)
       await panel.getByRole('button', { name: 'プロパティとレイヤーを開閉', exact: true }).click();
     await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
     await panel.locator('.timeline-toggle').click();
     await panel.locator('.timeline-connect').click();
-    await youtube.screenshot({ path: info.outputPath('timeline-layer-controls.png') });
+    await studio.screenshot({ path: info.outputPath('timeline-layer-controls.png') });
     const diagnostics = info.outputPath('layout-and-fonts.json');
     await writeFile(diagnostics, JSON.stringify(await renderDiagnostics(context), null, 2));
     await info.attach('layout-and-fonts', { path: diagnostics, contentType: 'application/json' });

@@ -7,8 +7,8 @@ test('popup changes reach existing YouTube tabs and OFF restores native styles',
   popup,
   youtube,
 }) => {
-  const toggle = popup.getByRole('switch', { name: 'Theme ON / OFF' });
-  const slider = popup.getByRole('slider', { name: 'Effect Strength' });
+  const toggle = popup.getByRole('switch', { name: 'テーマを使う' });
+  const slider = popup.getByRole('slider', { name: 'エフェクトの強さ' });
   await expect(toggle).toBeEnabled();
   await expect(toggle).not.toBeChecked();
   await expect(slider).toHaveValue('60');
@@ -50,8 +50,8 @@ test('settings survive popup closure, page reload, and a browser restart', async
   extensionId,
   profile,
 }) => {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  const slider = popup.getByRole('slider', { name: 'Effect Strength' });
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  const slider = popup.getByRole('slider', { name: 'エフェクトの強さ' });
   await slider.press('Home');
   for (let step = 0; step < 37; step++) await slider.press('ArrowRight');
   await expect(popup.locator('#save-status')).toHaveText('保存しました。');
@@ -65,8 +65,8 @@ test('settings survive popup closure, page reload, and a browser restart', async
   try {
     const nextPopup = await restarted.newPage();
     await nextPopup.goto(`chrome-extension://${extensionId}/popup/index.html`);
-    await expect(nextPopup.getByRole('switch', { name: 'Theme ON / OFF' })).toBeChecked();
-    await expect(nextPopup.getByRole('slider', { name: 'Effect Strength' })).toHaveValue('37');
+    await expect(nextPopup.getByRole('switch', { name: 'テーマを使う' })).toBeChecked();
+    await expect(nextPopup.getByRole('slider', { name: 'エフェクトの強さ' })).toHaveValue('37');
     const nextPage = await restarted.newPage();
     await nextPage.goto('https://www.youtube.com/watch?v=fixture');
     await expect(nextPage.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
@@ -82,8 +82,8 @@ test('SPA replacement, lazy DOM insertion, changing IDs, and removed stylesheet 
 }) => {
   const errors: string[] = [];
   youtube.on('pageerror', (error) => errors.push(error.message));
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
   await expect(youtube.locator('ytd-thumbnail #thumbnail')).toHaveCSS('border-radius', '0px');
   await youtube.getByRole('button', { name: 'SPA navigation' }).click();
   await expect(youtube).toHaveURL(/\/watch\?v=fixture$/);
@@ -116,8 +116,8 @@ test('zero restores native appearance and native dark mode never changes the sil
   popup,
   youtube,
 }) => {
-  const toggle = popup.getByRole('switch', { name: 'Theme ON / OFF' });
-  const slider = popup.getByRole('slider', { name: 'Effect Strength' });
+  const toggle = popup.getByRole('switch', { name: 'テーマを使う' });
+  const slider = popup.getByRole('slider', { name: 'エフェクトの強さ' });
   await toggle.check();
   await slider.press('Home');
   await expect(toggle).toBeChecked();
@@ -147,11 +147,11 @@ test('invalid settings are normalized and other hosts / excluded YouTube pages s
   popup,
   youtube,
 }) => {
-  await expect(popup.getByRole('switch', { name: 'Theme ON / OFF' })).toBeEnabled();
+  await expect(popup.getByRole('switch', { name: 'テーマを使う' })).toBeEnabled();
   await popup.evaluate(async () => {
     await chrome.storage.local.set({ 'webWorldThemes.enabled': true, 'webWorldThemes.strength': 999 });
   });
-  await expect(popup.getByRole('slider', { name: 'Effect Strength' })).toHaveValue('100');
+  await expect(popup.getByRole('slider', { name: 'エフェクトの強さ' })).toHaveValue('100');
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
   for (const url of [
     'https://example.com/',
@@ -167,13 +167,13 @@ test('invalid settings are normalized and other hosts / excluded YouTube pages s
   await popup.evaluate(async () => {
     await chrome.storage.local.set({ 'webWorldThemes.enabled': 'yes', 'webWorldThemes.strength': 'invalid' });
   });
-  await expect(popup.getByRole('switch', { name: 'Theme ON / OFF' })).not.toBeChecked();
-  await expect(popup.getByRole('slider', { name: 'Effect Strength' })).toHaveValue('60');
+  await expect(popup.getByRole('switch', { name: 'テーマを使う' })).not.toBeChecked();
+  await expect(popup.getByRole('slider', { name: 'エフェクトの強さ' })).toHaveValue('60');
   await expect(youtube.locator(themeStyle)).toHaveCount(0);
 });
 
 test('a storage write failure shows an error and restores the saved popup state', async ({ popup, youtube }) => {
-  const toggle = popup.getByRole('switch', { name: 'Theme ON / OFF' });
+  const toggle = popup.getByRole('switch', { name: 'テーマを使う' });
   await expect(toggle).toBeEnabled();
   // Fault injection only; all other tests use the actual extension storage APIs.
   await popup.evaluate(() => {
@@ -199,8 +199,8 @@ test('the first right-hand player icon opens shared settings even when the theme
   await expect(icon).toHaveCount(1);
   await expect(youtube.locator(themeStyle)).toHaveCount(0);
   await icon.click();
-  const toggle = panel.getByRole('switch', { name: 'Theme ON / OFF' });
-  const slider = panel.getByRole('slider', { name: 'Effect Strength' });
+  const toggle = panel.getByRole('switch', { name: 'テーマを使う' });
+  const slider = panel.getByRole('slider', { name: 'エフェクトの強さ' });
   await expect(panel).not.toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
   await expect(panel).toHaveCSS('border-top-width', '1px');
   await expect(toggle).toBeEnabled();
@@ -225,8 +225,8 @@ test('the first right-hand player icon opens shared settings even when the theme
   await slider.press('Home');
   for (let step = 0; step < 23; step++) await slider.press('ArrowRight');
   await expect(panel.locator('#save-status')).toHaveText('保存しました。');
-  await expect(popup.getByRole('switch', { name: 'Theme ON / OFF' })).toBeChecked();
-  await expect(popup.getByRole('slider', { name: 'Effect Strength' })).toHaveValue('23');
+  await expect(popup.getByRole('switch', { name: 'テーマを使う' })).toBeChecked();
+  await expect(popup.getByRole('slider', { name: 'エフェクトの強さ' })).toHaveValue('23');
   await expect(second.locator('html')).toHaveAttribute('style', /--ww-strength: 0.23;/);
   await expect(youtube.locator('html')).not.toHaveAttribute('data-player-key-count', /.+/);
 
@@ -236,7 +236,7 @@ test('the first right-hand player icon opens shared settings even when the theme
   await icon.press('Enter');
   await expect(slider).toHaveValue('23');
   await expect(youtube.locator('html')).not.toHaveAttribute('data-player-key-count', /.+/);
-  await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+  await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
   await expect(slider).toHaveValue('100');
   await toggle.uncheck();
   await expect(youtube.locator(themeStyle)).toHaveCount(0);
@@ -258,7 +258,7 @@ test('player replacement and control-bar rebuild keep one icon at the left edge;
   const panel = youtube.getByRole('dialog', { name: 'Web World Themes の設定' });
   await expect(icon).toHaveCount(1);
   await icon.click();
-  await expect(panel.getByRole('slider', { name: 'Effect Strength' })).toBeEnabled();
+  await expect(panel.getByRole('slider', { name: 'エフェクトの強さ' })).toBeEnabled();
   await youtube.getByRole('button', { name: 'SPA navigation' }).click();
   await expect(panel).not.toBeVisible();
   await expect(icon).toHaveCount(1);
@@ -275,11 +275,11 @@ test('player replacement and control-bar rebuild keep one icon at the left edge;
   await expect.poll(() => youtube.evaluate(() => document.fullscreenElement?.id)).toBe('movie_player');
   await icon.click();
   await expect(panel).toBeVisible();
-  await panel.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await panel.getByRole('slider', { name: 'Effect Strength' }).press('End');
-  await expect(popup.getByRole('slider', { name: 'Effect Strength' })).toHaveValue('100');
+  await panel.getByRole('switch', { name: 'テーマを使う' }).check();
+  await panel.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
+  await expect(popup.getByRole('slider', { name: 'エフェクトの強さ' })).toHaveValue('100');
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
-  await panel.getByRole('slider', { name: 'Effect Strength' }).press('Escape');
+  await panel.getByRole('slider', { name: 'エフェクトの強さ' }).press('Escape');
   await expect(panel).not.toBeVisible();
   await expect.poll(() => youtube.evaluate(() => document.fullscreenElement?.id)).toBe('movie_player');
   await youtube.evaluate(() => document.exitFullscreen());
@@ -291,7 +291,7 @@ test('window chrome recovers once after DOM replacement and OFF restores the nat
   popup,
   youtube,
 }) => {
-  const toggle = popup.getByRole('switch', { name: 'Theme ON / OFF' });
+  const toggle = popup.getByRole('switch', { name: 'テーマを使う' });
   const nativeHeader = await youtube.locator('ytd-masthead').boundingBox();
   const nativePage = await youtube.locator('ytd-page-manager').boundingBox();
   await toggle.check();
@@ -324,8 +324,8 @@ test('repeated theme ON, OFF, and zero strength leave no stale surfaces or layou
   popup,
   youtube,
 }) => {
-  const toggle = popup.getByRole('switch', { name: 'Theme ON / OFF' });
-  const slider = popup.getByRole('slider', { name: 'Effect Strength' });
+  const toggle = popup.getByRole('switch', { name: 'テーマを使う' });
+  const slider = popup.getByRole('slider', { name: 'エフェクトの強さ' });
   const root = youtube.locator('html');
   const nativeHeader = await youtube.locator('ytd-masthead').boundingBox();
   const nativePage = await youtube.locator('ytd-page-manager').boundingBox();
@@ -376,8 +376,8 @@ test('feature preference independently mounts and cleans up window chrome in bot
   popup,
   youtube,
 }) => {
-  const toggle = popup.getByRole('switch', { name: 'Theme ON / OFF' });
-  const feature = popup.getByRole('switch', { name: 'Window chrome', exact: true });
+  const toggle = popup.getByRole('switch', { name: 'テーマを使う' });
+  const feature = popup.getByRole('switch', { name: '窓の飾り', exact: true });
   const chrome = youtube.locator('#web-world-themes-window-chrome');
   await expect(feature).toBeChecked();
   await feature.uncheck();
@@ -398,7 +398,7 @@ test('feature preference independently mounts and cleans up window chrome in bot
   await youtube.getByRole('button', { name: 'SPA navigation' }).click();
   await youtube.getByRole('button', { name: 'Web World Themes の設定', exact: true }).click();
   const panel = youtube.getByRole('dialog', { name: 'Web World Themes の設定' });
-  const panelFeature = panel.getByRole('switch', { name: 'Window chrome', exact: true });
+  const panelFeature = panel.getByRole('switch', { name: '窓の飾り', exact: true });
   await expect(panelFeature).not.toBeChecked();
   await panelFeature.check();
   await expect(feature).toBeChecked();
@@ -408,8 +408,8 @@ test('feature preference independently mounts and cleans up window chrome in bot
   await expect(feature).toBeChecked();
   await expect(panelFeature).toBeChecked();
   await popup.reload();
-  await expect(popup.getByRole('switch', { name: 'Window chrome', exact: true })).toBeChecked();
-  await expect(popup.getByRole('switch', { name: 'Theme ON / OFF' })).not.toBeChecked();
+  await expect(popup.getByRole('switch', { name: '窓の飾り', exact: true })).toBeChecked();
+  await expect(popup.getByRole('switch', { name: 'テーマを使う' })).not.toBeChecked();
 });
 
 test('native search, history navigation, comment typing, and local video playback survive theming', async ({
@@ -418,8 +418,8 @@ test('native search, history navigation, comment typing, and local video playbac
 }) => {
   const errors: string[] = [];
   youtube.on('pageerror', (error) => errors.push(error.message));
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
   const search = youtube.getByRole('textbox', { name: 'Search', exact: true });
   await search.fill('海辺 ambient 2003');
   await search.press('Enter');
@@ -437,7 +437,7 @@ test('native search, history navigation, comment typing, and local video playbac
   await expect.poll(() => video.evaluate((element) => (element as HTMLVideoElement).paused)).toBe(false);
   await expect.poll(() => video.evaluate((element) => (element as HTMLVideoElement).currentTime)).toBeGreaterThan(0);
   const initialTime = await video.evaluate((element) => (element as HTMLVideoElement).currentTime);
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
   await expect(youtube.locator(themeStyle)).toHaveCount(0);
   await expect(comment).toHaveText('Nice colors! こんにちは');
   await expect
@@ -495,24 +495,24 @@ test('theme transitions never filter, replace, or rewrite native images and medi
   };
   await assertMedia();
   for (let cycle = 0; cycle < 2; cycle++) {
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-    await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+    await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
     await expect(youtube.locator(themeStyle)).toHaveCount(1);
     await assertMedia();
     await youtube.locator('html').evaluate((element) => element.toggleAttribute('dark'));
     await assertMedia();
-    await popup.getByRole('slider', { name: 'Effect Strength' }).press('Home');
+    await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('Home');
     await expect(youtube.locator(themeStyle)).toHaveCount(0);
     await assertMedia();
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+    await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
   }
   await native.dispose();
 });
 
 test('native and in-page fullscreen hide window chrome and restore offsets on exit', async ({ popup, youtube }) => {
   await youtube.goto('https://www.youtube.com/watch?v=fixture');
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
   const chrome = youtube.locator('#web-world-themes-window-chrome');
   const root = youtube.locator('html');
   const page = youtube.locator('ytd-page-manager');
@@ -545,8 +545,8 @@ test('a failed feature save restores the saved preference without changing the a
   popup,
   youtube,
 }) => {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  const feature = popup.getByRole('switch', { name: 'Window chrome', exact: true });
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  const feature = popup.getByRole('switch', { name: '窓の飾り', exact: true });
   await expect(feature).toBeChecked();
   await expect(youtube.locator('#web-world-themes-window-chrome')).toHaveCount(1);
   await popup.evaluate(() => {
@@ -558,13 +558,13 @@ test('a failed feature save restores the saved preference without changing the a
   await feature.click();
   await expect(popup.locator('#save-status')).toHaveText('保存できませんでした。もう一度操作してください。');
   await expect(feature).toBeChecked();
-  await expect(popup.getByRole('switch', { name: 'Theme ON / OFF' })).toBeChecked();
+  await expect(popup.getByRole('switch', { name: 'テーマを使う' })).toBeChecked();
   await expect(youtube.locator('#web-world-themes-window-chrome')).toHaveCount(1);
   await expect(youtube.locator(themeStyle)).toHaveCount(1);
 });
 
 test('nested chip shapes follow aria-pressed state without hiding the selected glass', async ({ popup, youtube }) => {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   await youtube.locator('.chip-row').evaluate((element) => {
     const chip = document.createElement('yt-chip-cloud-chip-renderer');
     chip.id = 'nested-chip';

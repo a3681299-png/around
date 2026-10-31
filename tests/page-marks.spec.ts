@@ -1,3 +1,4 @@
+import path from 'node:path';
 import type { Locator, Page } from '@playwright/test';
 import { test, expect } from './fixtures';
 import { clickCanvas, exposeEditorControls, withCanvas } from './helpers/editor-workspace';
@@ -8,8 +9,8 @@ const host = '#web-world-themes-page-marks';
 const COBALT = 'rgb(43, 81, 184)';
 
 async function enable(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
   await expect(youtube.locator(cards).first()).toBeVisible();
 }
 async function openEditor(popup: Page, youtube: Page) {
@@ -304,11 +305,17 @@ test('protection overlays are the vermilion 45° hatch with a mono label, and em
   context,
   extensionId,
 }) => {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   const studio = await context.newPage();
   await studio.goto(`chrome-extension://${extensionId}/studio/index.html`);
   await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
-  await studio.locator('.ww-safety-controls summary').click();
+  // UI0-d round 3: 操作チェック sits in the editor's header while a layer is restricted, so one
+  // layer is made too large for the player first.
+  const panel = studio.locator('#web-world-themes-creator');
+  await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
+  await panel.getByLabel('画像の幅', { exact: true }).fill('1600');
+  await panel.getByLabel('画像の幅', { exact: true }).press('Tab');
+  await studio.locator('.ww-editor-safety .safety-check > summary').click();
   await studio.getByLabel('操作面の保護範囲を表示').check();
   const box = youtube.locator('#web-world-themes-operation-check div').first();
   await expect(box).toHaveCount(1);

@@ -5,8 +5,11 @@ test('site layout reserves a live viewport, keeps DOM/media identities, suspends
   popup,
   youtube,
 }) => {
+  // UI0-d round 3 (stopped, not deleted): this bundles the in-page Studio's site layout
+  // (src/sites/youtube-studio.ts), which was removed with it (docs/ui0d-3.md).
+  test.fixme(true, 'UI0-d round 3: the in-page Studio layout this checks was removed; awaiting a decision.');
   await youtube.setViewportSize({ width: 1366, height: 900 });
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   await youtube.locator('#navigate').click();
   await expect(youtube.locator('#movie_player')).toBeVisible();
   const before = await youtube.locator('ytd-app').boundingBox(),

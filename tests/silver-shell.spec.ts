@@ -13,7 +13,7 @@ async function setStrength(popup: Page, strength: number) {
   await popup.evaluate(async (value) => {
     await chrome.storage.local.set({ 'webWorldThemes.strength': value });
   }, strength);
-  await expect(popup.getByRole('slider', { name: 'Effect Strength' })).toHaveValue(String(strength));
+  await expect(popup.getByRole('slider', { name: 'エフェクトの強さ' })).toHaveValue(String(strength));
 }
 
 async function readColors(page: Page, selector: string) {
@@ -47,7 +47,7 @@ async function readColors(page: Page, selector: string) {
 
 test('all active strengths stay silver, square, and readable in native dark mode', async ({ popup, youtube }) => {
   await youtube.goto('https://www.youtube.com/watch?v=fixture&list=fixture');
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   const root = youtube.locator('html');
   const contentSelectors = [
     '#fixture-current-title',
@@ -125,7 +125,7 @@ test('player and playlist windows track text-node changes, selected rows, and SP
     title: document.querySelector('#fixture-current-title')!,
     comment: document.querySelector('#contenteditable-root')!,
   }));
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   const playerTitle = youtube.locator('#web-world-themes-player-titlebar');
   const playlistTitle = youtube.locator('#web-world-themes-playlist-titlebar');
   const rows = youtube.locator('ytd-playlist-panel-video-renderer');
@@ -221,7 +221,7 @@ test('packaged pixel font loads for chrome and the LCD clock without external fo
     if (request.resourceType() === 'font') fontRequests.push(request.url());
   });
   await youtube.goto('https://www.youtube.com/watch?v=fixture&list=fixture');
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   await expect(youtube.locator('#web-world-themes-clock')).toBeVisible();
   await expect
     .poll(() =>
@@ -313,8 +313,8 @@ test('optional chrome owns every decoration and OFF or zero releases its timers 
     window.__wwTestLifetimes = () => ({ intervals: intervals.size, observers: observers.size });
   })()`);
   const counts = () => evaluate('window.__wwTestLifetimes()');
-  const toggle = popup.getByRole('switch', { name: 'Theme ON / OFF' });
-  const feature = popup.getByRole('switch', { name: 'Window chrome', exact: true });
+  const toggle = popup.getByRole('switch', { name: 'テーマを使う' });
+  const feature = popup.getByRole('switch', { name: '窓の飾り', exact: true });
   const assertAbsent = async () => {
     for (const id of decorationIds) await expect(youtube.locator(`#${id}`)).toHaveCount(0);
   };
@@ -433,8 +433,8 @@ test('native absolute player wrappers keep video dimensions and ancestry through
       })),
     );
   };
-  const toggle = popup.getByRole('switch', { name: 'Theme ON / OFF' });
-  const feature = popup.getByRole('switch', { name: 'Window chrome', exact: true });
+  const toggle = popup.getByRole('switch', { name: 'テーマを使う' });
+  const feature = popup.getByRole('switch', { name: '窓の飾り', exact: true });
   const titlebar = youtube.locator('#web-world-themes-player-titlebar');
   const video = youtube.locator('video');
   await youtube.getByRole('button', { name: 'Play', exact: true }).click();

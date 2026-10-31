@@ -61,7 +61,7 @@ export async function openAssetLab(live = false, file?: string) {
     const page = await context.newPage();
     await page.goto('https://www.youtube.com/watch?v=LC1a-DwUhls', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30000 });
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
     await page.bringToFront();
     await expect(page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
     const tab = await control.evaluate(

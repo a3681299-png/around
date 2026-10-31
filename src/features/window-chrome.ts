@@ -3,7 +3,7 @@ import type { FeatureDefinition } from './types';
 /** Selectors and page layout remain in the adapter, not in the feature registry. */
 export const windowChrome: FeatureDefinition = {
   id: 'window-chrome',
-  label: 'Window chrome',
+  label: '窓の飾り',
   description: 'タイトルバー・動画とリストの小窓・時計を表示',
   // Preserve the existing appearance for users who have no feature preference yet.
   defaultEnabled: true,

@@ -26,7 +26,7 @@ test('layout feasibility on real signed-out YouTube, preserving native media and
     const page = await context.newPage();
     await page.setViewportSize({ width: 1366, height: 900 });
     await page.goto('https://www.youtube.com/watch?v=AS4q9yaWJkI', { waitUntil: 'domcontentloaded' });
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 20_000 });
     await page.bringToFront();
     // The bootstrap player can exist before the native watch columns and title.
@@ -140,14 +140,16 @@ test('production in-page Studio authors on the real signed-out YouTube, without 
     const page = await context.newPage();
     await page.setViewportSize({ width: 1366, height: 900 });
     await page.goto('https://www.youtube.com/watch?v=AS4q9yaWJkI', { waitUntil: 'domcontentloaded' });
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 20_000 });
     await page.bringToFront();
     const nativePlayer = await page.locator('#movie_player').elementHandle(),
       nativeVideo = await page.locator('#movie_player video').elementHandle();
     const appBefore = (await page.locator('ytd-app').boundingBox())!,
       parentBefore = await nativePlayer!.evaluate((node) => node.parentElement?.id);
-    // UI0-d: still on the in-page Studio; opened through its retained message.
+    // UI0-d round 3 (stopped, not deleted): the in-page Studio's own live layout over YouTube
+    // (docs/ui0d-3.md).
+    test.fixme(true, 'UI0-d round 3: the in-page Studio this measures was removed; awaiting a decision.');
     await openRetiredEditor(popup, page, 'inpage');
     const panel = page.locator('#web-world-themes-creator');
     const presentation =

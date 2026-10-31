@@ -1,17 +1,10 @@
-/* The floating editor wears the WWT Studio system (studio-tokens.css): ruled controls on a
-   4px grid, cobalt as the only accent, 12fps steps. Sizes stay on the scale 4·8·12·20·32·52·84·136.
-   Studio's workbench (window, side panel, in-page Studio) uses studio/editor-base.css instead. */
+/* The editor's controls in the WWT Studio system (studio-tokens.css): ruled controls on a 4px grid,
+   cobalt as the only accent, 12fps steps. Sizes stay on the scale 4·8·12·20·32·52·84·136. The
+   workbench (studio/workbench.css) places them in the side panel or the window. */
 :host {
   all: initial !important;
-  position: fixed !important;
-  top: 76px !important;
-  right: 20px !important;
   display: block !important;
   box-sizing: border-box !important;
-  width: var(--panel-width, 340px) !important;
-  max-width: calc(100vw - 40px) !important;
-  height: calc(100dvh - 96px) !important;
-  max-height: 920px !important;
   padding: 4px !important;
   overflow: visible !important;
   z-index: 2147483000 !important;
@@ -28,13 +21,6 @@
   :host {
     color-scheme: light !important;
   }
-}
-:host([data-ww-dock='left']) {
-  left: 20px !important;
-  right: auto !important;
-}
-:host([data-split]) {
-  width: calc(var(--panel-width, 340px) + 340px) !important;
 }
 * {
   box-sizing: border-box;
@@ -480,30 +466,6 @@ ol {
   min-width: 20px;
   min-height: 20px;
 }
-/* The guide's title is its fold: on a low window it shows alone (はじめての制作 ▸), and opens on press. */
-.guide-toggle {
-  min-height: 20px;
-  padding: 0 var(--space-20) 0 0;
-  border: 0;
-  font-weight: 700;
-  font-size: 12px;
-}
-.guide-toggle:hover:not(:disabled),
-.guide-toggle:active:not(:disabled) {
-  background: transparent;
-}
-.guide-toggle::after {
-  /* The arrow is drawing only: empty alt text keeps the button's name 「はじめての制作」. */
-  content: '▾' / '';
-  margin-left: var(--space-4);
-  color: var(--ink-muted);
-}
-.quick-guide[data-folded] .guide-toggle::after {
-  content: '▸' / '';
-}
-.quick-guide[data-folded] ol {
-  display: none;
-}
 .layers-section {
   display: flex;
   flex-direction: column;
@@ -778,23 +740,6 @@ input[type='checkbox']:disabled {
 .ww-appear {
   animation: ww-appear calc(var(--ww-frame) * 3) steps(3, end) var(--ww-delay, 0ms) both;
 }
-/* ww-construct: when the panel opens its ruled edge is drawn in 4 frames, then the content appears
-   in 3. The edge is its own layer over the frame and never takes a click; nothing is clipped. */
-main.ww-construct::before {
-  content: '';
-  position: absolute;
-  inset: -4px;
-  z-index: 20;
-  border: 1px solid var(--line-control);
-  border-radius: 8px;
-  pointer-events: none;
-  animation:
-    ww-construct-edge calc(var(--ww-frame) * 4) steps(4, end) both,
-    ww-fade calc(var(--ww-frame) * 3) steps(3, end) calc(var(--ww-frame) * 7) both;
-}
-main.ww-construct > * {
-  animation: ww-appear calc(var(--ww-frame) * 3) steps(3, end) calc(var(--ww-frame) * 4) both;
-}
 details {
   margin: 0;
   border: 0;
@@ -1009,50 +954,10 @@ footer {
 .context-menu button:hover:not(:disabled) {
   background: var(--cobalt-wash);
 }
-.panel-resize {
-  position: absolute;
-  left: -4px;
-  top: 12px;
-  bottom: 12px;
-  width: 8px;
-  cursor: ew-resize;
-  touch-action: none;
-  border-radius: 4px;
-}
-.panel-resize:hover {
-  background: var(--cobalt-wash);
-}
-:host([data-ww-dock='left']) .panel-resize {
-  left: auto;
-  right: -4px;
-}
-:host([data-minimized]) {
-  height: auto !important;
-}
-:host([data-minimized]) .toolbar,
-:host([data-minimized]) .workspace-nav,
-:host([data-minimized]) .selection-bar,
-:host([data-minimized]) .editor-body,
-:host([data-minimized]) footer,
-:host([data-minimized]) .panel-resize {
-  display: none;
-}
 [hidden] {
   display: none !important;
 }
 @media (max-width: 740px) {
-  :host {
-    top: 64px !important;
-    max-width: calc(100vw - 24px) !important;
-    height: calc(100dvh - 76px) !important;
-    right: 12px !important;
-  }
-  :host([data-ww-dock='left']) {
-    left: 12px !important;
-  }
-  :host([data-split]) {
-    width: var(--panel-width, 340px) !important;
-  }
   .split {
     display: none;
   }
@@ -1065,10 +970,6 @@ footer {
   }
 }
 @media (max-height: 630px) {
-  :host {
-    top: 12px !important;
-    height: calc(100dvh - 24px) !important;
-  }
   .selection {
     margin: 0 0 var(--space-4);
   }

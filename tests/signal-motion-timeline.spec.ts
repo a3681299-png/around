@@ -9,7 +9,7 @@ test('mouse-driven X/rotation lanes edit offsets, custom ranges and curves with 
   popup,
   youtube,
 }) => {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   let { panel } = await openEditor(popup, youtube);
   await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await panel.locator('.timeline-toggle').click();
@@ -67,7 +67,7 @@ test('GIF/image group pursuit with a shared mask records full history, replays/s
   popup,
   youtube,
 }) => {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   let { panel } = await openEditor(popup, youtube);
   await panel
     .getByLabel('画像素材を追加')
@@ -162,6 +162,6 @@ test('GIF/image group pursuit with a shared mask records full history, replays/s
   await panel.locator('.take-position').press('Tab');
   await expect.poll(position).toEqual(paused);
   await panel.locator('.take-live').click();
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
   await expect(youtube.locator('#web-world-themes-decorations')).toHaveCount(0);
 });

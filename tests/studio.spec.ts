@@ -16,7 +16,7 @@ const overlay = '#web-world-themes-decorations',
   images = `${presentation} [data-image-id]`,
   key = 'webWorldThemes.design.youtube';
 async function launch(context: BrowserContext, popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   await youtube.bringToFront();
   const opened = context.waitForEvent('page');
@@ -156,19 +156,20 @@ test('standalone Studio edits a real extension target using shared grouping, eff
   expect(saved.schemaVersion).toBe(13);
   expect(saved.groups?.[0]?.effects?.[0]).toMatchObject({ radiusPx: 180 });
   await studio.screenshot({ path: info.outputPath('studio-workspace.png') });
-  // Quick editing shares the selected group and same Undo stack.
-  await youtube.locator('#web-world-themes-studio-link button').first().click();
-  const quick = youtube.getByRole('dialog', { name: 'デザインエディター' });
-  await expect(quick.locator('.selected-count')).toHaveText('1個選択中');
-  await quick.getByRole('button', { name: 'グループを解除', exact: true }).click();
+  // The page says the edit is in a separate window and offers only ending it (UI0-d: the quick
+  // editor it used to open is gone); nothing else of the editor stands on the page.
+  const badge = youtube.locator('#web-world-themes-studio-link');
+  await expect(badge).toContainText('別ウィンドウで編集中');
+  await expect(badge.getByRole('button')).toHaveText(['編集を終了']);
+  await expect(youtube.locator('#web-world-themes-creator')).toHaveCount(0);
+  await panel.getByRole('button', { name: 'グループを解除', exact: true }).click();
   await expect(panel.locator('.selected-count')).toHaveText('3個選択中');
   await expect(panel.locator('[data-kind="group"]')).toHaveCount(0);
   await panel.getByRole('button', { name: '変更を破棄', exact: true }).click();
   await expect(panel.locator('[data-kind="group"]')).toHaveCount(1);
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
   await expect(youtube.locator(overlay)).toHaveCount(0);
-  await expect(quick).toHaveCount(0);
-  await expect(youtube.locator('#web-world-themes-studio-link')).toHaveCount(0);
+  await expect(badge).toHaveCount(0);
   await expect(panel.getByRole('button', { name: '保存', exact: true })).toBeDisabled();
 });
 
@@ -229,7 +230,7 @@ test('multiple targets stay isolated and a second Studio cannot edit or overwrit
   const firstTarget = await studio.getByLabel('編集するYouTubeタブ').inputValue();
   const second = await context.newPage();
   await second.goto(studio.url());
-  await expect(second.locator('.connection-status')).toContainText('別のStudio');
+  await expect(second.locator('.connection-status')).toContainText('別のエディター');
   await expect(second.locator('.connection-status')).toHaveAttribute('data-connected', 'false');
   await expect(second.getByRole('button', { name: '画像を追加', exact: true })).toBeDisabled();
   await expect(other.locator(images)).toHaveCount(0);
@@ -252,7 +253,7 @@ test('multiple targets stay isolated and a second Studio cannot edit or overwrit
   await expect(second.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
   await expect(youtube.locator(images)).toHaveCount(1);
   await studio.getByRole('button', { name: '接続 / 再開', exact: true }).click();
-  await expect(studio.locator('.connection-status')).toContainText('別のStudio');
+  await expect(studio.locator('.connection-status')).toContainText('別のエディター');
   const anotherTarget = await studio
     .getByLabel('編集するYouTubeタブ')
     .locator('option')
@@ -365,7 +366,7 @@ test('the authenticated Port rejects stale revisions and unrecognized commands w
   youtube,
   extensionId,
 }) => {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   // A Studio extension document supplies the real MV3 sender origin; no page-script bridge exists.
   const control = await context.newPage();
@@ -482,7 +483,7 @@ test('the authenticated Port rejects stale revisions and unrecognized commands w
     (await readFile(path.resolve('tests/fixtures/motion/petal.png'))).toString('base64'),
   );
   expect(result).toMatchObject({ attached: true, snap: true, stale: false, unsafe: false, legacyImport: false });
-  expect(result.legacyError).toBe('未対応のStudio操作です。');
+  expect(result.legacyError).toBe('エディターの操作に対応していません。');
   expect(result.skin).toEqual([false, false, false]);
   expect(result.skinErrors).toEqual(['着せ替えの差し込み口が不正です。', '素材IDが不正です。', '素材IDが不正です。']);
   expect(result.document).toEqual(result.before);

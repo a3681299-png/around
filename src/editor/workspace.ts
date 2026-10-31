@@ -1,8 +1,6 @@
 import { ungroupingReason } from './groups';
-import { oneOf } from '../validation';
 import type { PanelState, PanelOptions } from './panel';
 import { transientPreferences } from '../studio/preferences';
-import { glyphButton } from './icons';
 import { drawPen, drawRule, goldenSpiral, line, arc, svg } from './pen';
 
 type Area = 'layers' | 'properties' | 'help';
@@ -10,7 +8,8 @@ interface TreeView {
   setActive(active: boolean): void;
 }
 
-/** Workspace and onboarding preferences stay outside the artwork, history and Runtime. */
+/** The editor's panes, tabs, selection bar and menus, which the workbench arranges. Onboarding
+ * preferences stay outside the artwork, history and Runtime. */
 export function createWorkspace(
   doc: Document,
   host: HTMLElement,
@@ -21,48 +20,13 @@ export function createWorkspace(
   options: PanelOptions = {},
 ) {
   const preferences = options.preferences ?? transientPreferences;
-  // The floating editor wears the WWT Studio design system; Studio's workbench keeps its own.
-  const floating = Boolean(options.floating);
-  const fullPage = Boolean(options.fullPage),
-    workspaceKey = 'webWorldThemes.studio.workspace.v1';
-  let touched = false,
-    preferencesReady = false,
-    preferenceTimer: ReturnType<typeof setTimeout> | undefined;
-  const remember = () => {
-    if (!options.persistWorkspace) return;
-    touched = true;
-    clearTimeout(preferenceTimer);
-    preferenceTimer = setTimeout(() => {
-      void preferences
-        .write(workspaceKey, {
-          width,
-          dock: host.dataset.wwDock ?? 'right',
-          split,
-          area,
-          minimized: host.hasAttribute('data-minimized'),
-          folds: [...main.querySelectorAll<HTMLDetailsElement>('.inspector-pane details')].map((item) => [
-            item.className,
-            item.open,
-          ]),
-        })
-        .catch(() => undefined);
-    }, 100);
-  };
   const get = <T extends HTMLElement>(selector: string) => main.querySelector<T>(selector)!;
   const body = get('.editor-body'),
     assets = get('.assets'),
     selection = get('.selection');
-  if (fullPage) {
-    get('h2').textContent = 'Web World Themes Studio';
-    get('.eyebrow').textContent = 'CREATOR WORKSPACE';
-    get('.dock').textContent = '左右を入れ替える';
-    get('.dock').title = 'レイヤーとプロパティの位置を入れ替える';
-    get('header').append(get('.toolbar'), get('.actions'));
-    host.toggleAttribute('data-split', true);
-  }
   const compact = doc.defaultView!.matchMedia('(max-width: 740px)');
   let area: Area = 'layers',
-    split = fullPage,
+    split = false,
     state: PanelState | undefined,
     lastCard = false;
   let alive = true;
@@ -103,28 +67,10 @@ export function createWorkspace(
     },
     () => undefined,
   );
-  // On a low window the guide folds to its one-line title, so the layer list shows without scrolling.
-  const lowWindow = floating ? doc.defaultView?.matchMedia('(max-height: 800px)') : undefined;
-  const foldGuide = (folded: boolean) => {
-    const toggle = guide.querySelector<HTMLButtonElement>('.guide-toggle');
-    toggle?.setAttribute('aria-expanded', String(!folded));
-    guide.toggleAttribute('data-folded', folded);
-  };
-  if (floating) {
-    guide.innerHTML = `<button class="dismiss-guide" type="button">×</button><button class="guide-toggle" type="button" aria-controls="ww-guide-steps">はじめての制作</button><ol id="ww-guide-steps"><li>画像やアニメーションを追加</li><li>一覧のチェックで2個以上選択</li><li>グループ化 → 光とマスク → 保存</li></ol>`;
-    glyphButton(guide.querySelector<HTMLButtonElement>('.dismiss-guide')!, 'close', '操作ガイドを閉じる');
-    foldGuide(Boolean(lowWindow?.matches));
-    guide
-      .querySelector('.guide-toggle')!
-      .addEventListener('click', () => foldGuide(!guide.hasAttribute('data-folded')));
-  }
-  const refold = (event: MediaQueryListEvent) => foldGuide(event.matches);
-  lowWindow?.addEventListener('change', refold);
   const empty = doc.createElement('div');
   empty.className = 'empty-layers';
   {
-    // ww-empty: the golden rectangle and its spiral are constructed, then the words appear. Every
-    // surface shows it (UI0-d moved the floating editor's design to the side panel and window).
+    // ww-empty: the golden rectangle and its spiral are constructed, then the words appear.
     empty.classList.add('ww-empty');
     const drawing = svg(doc, '0 0 236 152', 'ww-empty__drawing'),
       g = doc.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -318,18 +264,11 @@ export function createWorkspace(
     get('.group-layers').hidden =
       state?.image?.kind === 'group' || (next === 'properties' && (state?.selectedIds.length ?? 0) < 2);
     get('.grouping-help').hidden = get('.group-layers').hidden;
-    tree.setActive(
-      !layersPane.hidden &&
-        !(split && compact.matches && next === 'properties') &&
-        !host.hasAttribute('data-minimized'),
-    );
+    tree.setActive(!layersPane.hidden && !(split && compact.matches && next === 'properties'));
   }
   nav.addEventListener('click', (event) => {
     const button = (event.target as Element).closest<HTMLButtonElement>('[data-area]');
-    if (button) {
-      show(button.dataset.area as Area);
-      remember();
-    }
+    if (button) show(button.dataset.area as Area);
   });
   // Workbench owns its simultaneous panes; legacy tab adaptation must not hide
   // them after the Workbench's resize handler has already arranged the grid.
@@ -340,14 +279,19 @@ export function createWorkspace(
   nav.addEventListener('keydown', (event) => {
     const button = (event.target as Element).closest<HTMLButtonElement>('[data-area]');
     if (!button || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
-    const tabs = [...nav.querySelectorAll<HTMLButtonElement>('[data-area]')],
-      index = tabs.indexOf(button);
+    // Only the tabs offered here: the side panel's column keeps 使い方 in its ヘルプ menu.
+    const tabs = [...nav.querySelectorAll<HTMLButtonElement>('[data-area]')].filter((tab) => !tab.hidden),
+      index = tabs.indexOf(button),
+      count = tabs.length;
     const next =
-      event.key === 'Home' ? 0 : event.key === 'End' ? 2 : (index + (event.key === 'ArrowRight' ? 1 : -1) + 3) % 3;
+      event.key === 'Home'
+        ? 0
+        : event.key === 'End'
+          ? count - 1
+          : (index + (event.key === 'ArrowRight' ? 1 : -1) + count) % count;
     show(tabs[next]!.dataset.area as Area);
     tabs[next]!.focus();
     event.preventDefault();
-    remember();
   });
   get('.inspect').addEventListener('click', () => show('properties'));
   maskShortcut.addEventListener('click', () => {
@@ -366,7 +310,6 @@ export function createWorkspace(
     splitButton.setAttribute('aria-pressed', String(split));
     splitButton.textContent = split ? '切り替え表示' : '並べる';
     show(area);
-    remember();
   });
   get('.clear-selection').addEventListener('click', clear);
   get('.select-all').addEventListener('click', selectAll);
@@ -376,110 +319,11 @@ export function createWorkspace(
   });
   get('.show-guide').addEventListener('click', () => {
     guide.hidden = false;
-    if (floating) foldGuide(false);
     void preferences.write(guideKey, false).catch(() => undefined);
     show('layers');
   });
-  const minimize = get<HTMLButtonElement>('.minimize');
-  const showMinimized = (value: boolean) => {
-    const label = value ? 'パネルを展開する' : 'パネルを折りたたむ';
-    if (floating) glyphButton(minimize, value ? 'expand' : 'collapse', label, '', 'プレビューを広く見る');
-    else {
-      minimize.textContent = value ? '+' : '−';
-      minimize.setAttribute('aria-label', label);
-    }
-  };
-  minimize.addEventListener('click', () => {
-    const value = !host.hasAttribute('data-minimized');
-    host.toggleAttribute('data-minimized', value);
-    showMinimized(value);
-    show(area);
-    remember();
-  });
-  // Width adjustment also supports the keyboard. Bounds are enforced by CSS on small screens.
-  const resize = doc.createElement('div');
-  resize.className = 'panel-resize';
-  resize.tabIndex = 0;
-  resize.setAttribute('role', 'separator');
-  resize.setAttribute('aria-label', 'パネルの幅');
-  resize.setAttribute('aria-orientation', 'vertical');
-  resize.setAttribute('aria-valuemin', '320');
-  resize.setAttribute('aria-valuemax', '520');
-  // The floating editor is 340 wide (`panel-properties`); the keyboard and drag still step by 20.
-  let width = fullPage ? 300 : floating ? 340 : 360,
-    gesture: { x: number; width: number; id: number } | undefined;
-  const setWidth = (value: number) => {
-    width = Math.max(320, Math.min(520, value));
-    host.style.setProperty('--panel-width', `${width}px`);
-    resize.setAttribute('aria-valuenow', String(width));
-  };
-  setWidth(width);
-  (fullPage ? body : main).append(resize);
-  resize.addEventListener('pointerdown', (event) => {
-    if (event.button !== 0) return;
-    gesture = { x: event.clientX, width, id: event.pointerId };
-    resize.setPointerCapture(event.pointerId);
-    event.preventDefault();
-  });
-  resize.addEventListener('pointermove', (event) => {
-    if (gesture)
-      setWidth(
-        gesture.width +
-          (fullPage ? (host.dataset.wwDock === 'left' ? -1 : 1) : host.dataset.wwDock === 'left' ? 1 : -1) *
-            (event.clientX - gesture.x),
-      );
-  });
-  const endResize = () => {
-    if (gesture) remember();
-    gesture = undefined;
-  };
-  resize.addEventListener('pointerup', endResize);
-  resize.addEventListener('pointercancel', endResize);
-  resize.addEventListener('lostpointercapture', endResize);
-  resize.addEventListener('keydown', (event) => {
-    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-      setWidth(width + (event.key === 'ArrowRight' ? 20 : -20));
-      event.preventDefault();
-      event.stopPropagation();
-      remember();
-    }
-  });
   show(area);
-  if (options.persistWorkspace) {
-    void preferences.read(workspaceKey).then(
-      (raw) => {
-        preferencesReady = true;
-        if (!alive || touched || !raw || typeof raw !== 'object') return;
-        const value = raw as Record<string, unknown>;
-        if (typeof value.width === 'number' && Number.isFinite(value.width)) setWidth(value.width);
-        if (value.dock === 'left' || value.dock === 'right') host.dataset.wwDock = value.dock;
-        if (typeof value.split === 'boolean') split = value.split;
-        host.toggleAttribute('data-split', split);
-        splitButton.setAttribute('aria-pressed', String(split));
-        splitButton.textContent = split ? '切り替え表示' : '並べる';
-        if (typeof value.minimized === 'boolean') host.toggleAttribute('data-minimized', value.minimized);
-        showMinimized(Boolean(value.minimized));
-        if (Array.isArray(value.folds))
-          for (const entry of value.folds) {
-            if (!Array.isArray(entry) || typeof entry[0] !== 'string' || typeof entry[1] !== 'boolean') continue;
-            [...main.querySelectorAll<HTMLDetailsElement>('.inspector-pane details')]
-              .find((item) => item.className === entry[0])
-              ?.toggleAttribute('open', entry[1]);
-          }
-        show(oneOf(value.area, ['layers', 'properties', 'help']) ? value.area : 'layers');
-      },
-      () => {
-        preferencesReady = true;
-      },
-    );
-    main.querySelectorAll('.inspector-pane details').forEach((item) =>
-      item.addEventListener('toggle', () => {
-        if (preferencesReady) remember();
-      }),
-    );
-  }
   return {
-    layoutChanged: remember,
     inspect() {
       show('properties');
     },
@@ -553,10 +397,8 @@ export function createWorkspace(
     },
     destroy() {
       alive = false;
-      clearTimeout(preferenceTimer);
       closeMenu();
       compact.removeEventListener('change', adapt);
-      lowWindow?.removeEventListener('change', refold);
       doc.removeEventListener('keydown', menuKeys, true);
       doc.removeEventListener('pointerdown', outside, true);
     },

@@ -39,7 +39,7 @@ test('modern recommendation durations match playlist LCDs without restyling LIVE
 }) => {
   await installNativeYouTube(youtube, true);
   await addModernBadges(youtube);
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   const duration = youtube.locator('#fixture-duration');
   await expect(duration).toHaveAttribute('data-ww-surface', /duration/);
   await expect(duration.locator('.ytBadgeShapeText')).toHaveCSS('font-size', '12px');
@@ -92,7 +92,7 @@ test('comment vote numbers have readable contrast and native actions survive the
 }) => {
   await installNativeYouTube(youtube, true);
   await addModernBadges(youtube);
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   const count = youtube.locator('#vote-count-middle');
   await expect(count).toHaveAttribute('data-ww-surface', /comment-vote/);
   await count.scrollIntoViewIfNeeded();
@@ -112,9 +112,10 @@ test('presets and palette extremes stay legible in both native modes and persist
 }, testInfo) => {
   test.setTimeout(120_000);
   await installNativeYouTube(youtube, true);
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  const labels: Record<string, string> = { silver: 'シルバー', lavender: 'ラベンダー', mint: 'ミント', pink: 'ピンク' };
   for (const [name, palette] of Object.entries(PALETTE_PRESETS)) {
-    await popup.getByRole('button', { name: name[0]!.toUpperCase() + name.slice(1), exact: true }).click();
+    await popup.getByRole('button', { name: labels[name]!, exact: true }).click();
     await expect(popup.locator('#palette-hue')).toHaveValue(String(palette.hue));
     await expect
       .poll(() => youtube.locator('html').evaluate((el) => el.style.getPropertyValue('--ww-retro-page')))
@@ -143,7 +144,7 @@ test('presets and palette extremes stay legible in both native modes and persist
           }
         }
   }
-  await popup.getByRole('button', { name: 'Mint', exact: true }).click();
+  await popup.getByRole('button', { name: 'ミント', exact: true }).click();
   await feature(popup, 'palette', false);
   await expect
     .poll(() => youtube.locator('html').evaluate((el) => el.style.getPropertyValue('--ww-retro-page')))
@@ -165,7 +166,7 @@ test('background transparency preserves third-party background images and readab
   await youtube.locator('html').evaluate((el) => {
     el.style.backgroundImage = 'linear-gradient(90deg, rgb(1, 20, 50), rgb(60, 30, 90))';
   });
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   await feature(popup, 'transparent-background', true);
   await expect(youtube.locator('body')).toHaveCSS('background-color', /(?:0\)|\/ 0\))/);
   await expect(youtube.locator('html')).toHaveCSS('background-image', /linear-gradient/);
@@ -175,7 +176,7 @@ test('background transparency preserves third-party background images and readab
   await expect(youtube.locator('body')).toHaveCSS('background-color', /0\.5\)/);
   await feature(popup, 'transparent-background', false);
   await expect(youtube.locator('body')).not.toHaveCSS('background-color', /0\.5\)/);
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
   await expect(youtube.locator('html')).toHaveCSS('background-image', /linear-gradient/);
   await expect(youtube.locator('html')).toHaveAttribute('style', /--ww-background-surface-opacity: 0?.5/);
 });

@@ -2,18 +2,12 @@ import type { DesignDocument } from '../design/types';
 import type { ImageEditing } from '../design/image-renderer';
 import { editableSceneSamples, placementFrame } from '../design/frames';
 import type { SiteAdapter } from '../sites/types';
-import { createCreatorPanel } from './panel';
-import { CLOSE_SIDE_PANEL, OPEN_SIDE_PANEL, OPEN_STUDIO_WINDOW } from './messages';
-import { requestStudioSurface } from '../browser/side-panel';
-import type { OpenEditorResponse } from './messages';
+import { CLOSE_SIDE_PANEL } from './messages';
 import { captureLayerThumbnail } from '../renderers/dom/thumbnail';
 import { createEditorSession } from '../editor-core/session';
 import type { EditCommand, EditorCheckpoint, EditorSnapshot } from '../editor-core/types';
 import { shortcutCommand } from '../editor-core/shortcuts';
 import { createBrowserEditorStorage, type BrowserImportSource } from '../browser/storage-adapter';
-import { browserStudioPreferences } from '../browser/preferences';
-import { studioActions } from '../studio/ui-actions';
-import type { StudioLayoutAdapter } from '../studio/layout-types';
 import type { TimelineHost } from '../host/timeline';
 import type { TimelineCommand, TimelineUpdate } from '../timeline/types';
 import type { SkinAssetStatus } from '../design/renderer';
@@ -34,10 +28,12 @@ export interface SkinAssetHost {
   ink(target: string): Readonly<Record<string, InkDecision>> | undefined;
 }
 
+/** Where the connected editor page runs: Chrome's side panel or its own window. */
+export type EditorSurface = 'sidepanel' | 'window';
+
+/** The page's side of editing. The editor itself is the extension page (side panel or window); the
+ * page keeps the document, the marks on its parts and its own clicks, keys and drops. */
 export interface CreatorEditor {
-  open(): OpenEditorResponse;
-  openStudio(): OpenEditorResponse;
-  openSidePanel(): OpenEditorResponse;
   setEnabled(enabled: boolean): void;
   /** Emergency OFF: every mark on the page goes; the editor and its history stay. */
   suspendMarks(value: boolean): void;
@@ -48,9 +44,13 @@ export interface CreatorEditor {
   checkpoint(): EditorCheckpoint;
   readonly historyVersion: number;
   subscribe(listener: (state: EditorSnapshot) => void): () => void;
-  attachStudio(owner: string, resume?: EditorCheckpoint, handoff?: boolean): Promise<EditorSnapshot>;
+  attachStudio(
+    owner: string,
+    resume?: EditorCheckpoint,
+    handoff?: boolean,
+    surface?: EditorSurface,
+  ): Promise<EditorSnapshot>;
   detachStudio(owner: string): void;
-  setSidePanelVisible(owner: string, visible: boolean): void;
   timelineSnapshot(): TimelineUpdate | undefined;
   subscribeTimeline(listener: (update: TimelineUpdate) => void): () => void;
   timelineCommand(owner: string, session: string, command: TimelineCommand): Promise<void>;
@@ -70,7 +70,7 @@ export interface CreatorEditor {
 }
 const PICK_EVENTS = ['pointerdown', 'pointerup', 'mousedown', 'mouseup', 'click', 'auxclick', 'dblclick'] as const;
 const SELECTION_CSS = `html[data-ww-editor-card-picking] [data-ww-surface~="video-card"] { cursor:crosshair !important; }`;
-/** The Studio badge: a small ww-panel in its own shadow root, so the page's styles never reach it. */
+/** The window's badge: a small ww-panel in its own shadow root, so the page's styles never reach it. */
 const BADGE_CSS = `:host{all:initial!important;position:fixed!important;left:12px!important;bottom:12px!important;z-index:2147483001!important}
 .badge{display:flex;align-items:center;gap:var(--space-8);padding:var(--space-4) var(--space-4) var(--space-4) var(--space-12);border:1px solid var(--line);border-radius:var(--radius-float);background:var(--surface);color:var(--ink);box-shadow:var(--shadow-float);font:13px/20px var(--font-ui)}
 button{height:var(--control-dense);padding:0 var(--space-8);border:1px solid var(--line-control);border-radius:var(--radius-control);background:var(--surface-raised);color:var(--ink);font:12px/18px var(--font-ui);cursor:pointer}
@@ -86,20 +86,14 @@ export function createCreatorEditor(
   editImages: (editing: ImageEditing | undefined) => void,
   validate: (design: DesignDocument | undefined) => void,
   timeline?: TimelineHost,
-  openSettings?: () => void,
   skinAssets?: SkinAssetHost,
 ): CreatorEditor {
-  let panel: ReturnType<typeof createCreatorPanel> | undefined,
-    selectionStyle: HTMLStyleElement | undefined,
-    selectedElement: Element | undefined;
+  let selectionStyle: HTMLStyleElement | undefined, selectedElement: Element | undefined;
   let remoteOwner: string | undefined,
+    remoteSurface: EditorSurface | undefined,
     badge: HTMLElement | undefined,
     installed = false,
     destroyed = false;
-  let unprotectToolbar: (() => void) | undefined,
-    sidePanelVisible = false;
-  let layout: StudioLayoutAdapter | undefined,
-    panelMode: 'quick' | 'inpage' | 'sidepanel' = 'quick';
   const consumedKeys = new Set<string>();
   const skinPageListeners = new Set<(info: readonly SkinPageInfo[]) => void>();
   const marks = createPageMarks(doc);
@@ -160,31 +154,13 @@ export function createCreatorEditor(
       importFrame(point) {
         const width = doc.defaultView!.innerWidth,
           height = doc.defaultView!.innerHeight;
-        const canvas = layout?.state().canvas,
-          origin =
-            point ??
-            (canvas
-              ? { x: canvas.left + canvas.width * 0.5, y: canvas.top + canvas.height * 0.48 }
-              : { x: width * 0.45, y: height * 0.45 });
-        const bounds = panel?.host.getBoundingClientRect();
-        if (
-          !layout &&
-          !point &&
-          bounds &&
-          origin.x >= bounds.left &&
-          origin.x <= bounds.right &&
-          origin.y >= bounds.top &&
-          origin.y <= bounds.bottom
-        ) {
-          origin.x = bounds.left >= width - bounds.right ? bounds.left / 2 : bounds.right + (width - bounds.right) / 2;
-        }
-        return { width, height, origin };
+        return { width, height, origin: point ?? { x: width * 0.45, y: height * 0.45 } };
       },
     },
   });
   let state = core.snapshot();
-  const editing = () => state.active && Boolean(panel || remoteOwner);
-  const fullscreen = () => Boolean(doc.fullscreenElement || layout?.state().mode === 'fullscreen');
+  const editing = () => state.active && Boolean(remoteOwner);
+  const fullscreen = () => Boolean(doc.fullscreenElement);
   const dispatch = (command: EditCommand) => {
     void core.execute(command).catch((error: unknown) => {
       if (!destroyed && state.active)
@@ -243,12 +219,9 @@ export function createCreatorEditor(
     }
   }
   const skinTool = () => editing() && state.view.tool === 'skin';
-  /** Only the floating editor on the page picks cards with any tool; from the Studio page (side panel
-   * or window) the page's own clicks stay YouTube's unless the card tool is chosen. */
-  const quickPanel = () => Boolean(panel) && panelMode === 'quick';
-  /** Page presence and art state per part. Throttled: it reads layout, so never per frame. */
-  /** Whether anyone shows the part list: a panel on the page or a connected Studio page. */
-  const skinReaders = () => Boolean(panel) || skinPageListeners.size > 0;
+  /** Page presence and art state per part, for the connected editor page. Throttled: it reads
+   * layout, so never per frame. */
+  const skinReaders = () => skinPageListeners.size > 0;
   const scheduleSkinInfo = () => {
     if (!skinReaders() || !skinTool() || skinInfoTimer !== undefined) return;
     skinInfoTimer = setTimeout(() => {
@@ -263,25 +236,19 @@ export function createCreatorEditor(
         (id) => assets.get(id),
         (id) => skinAssets?.ink(id),
       );
-      panel?.setSkinPage(info);
       skinPageListeners.forEach((listener) => listener(info));
     }, 250);
   };
   function refresh(next = core.snapshot()) {
     state = next;
     if (!state.active) {
-      if (panelMode === 'sidepanel' && panel)
+      // Ending the edit from the side panel closes Chrome's panel too; a window stays for its owner.
+      if (remoteOwner && remoteSurface === 'sidepanel')
         void chrome.runtime.sendMessage({ type: CLOSE_SIDE_PANEL }).catch(() => undefined);
       if (remoteOwner) timeline?.release(remoteOwner);
       if (installed) timeline?.resumeLive();
-      unprotectToolbar?.();
-      unprotectToolbar = undefined;
-      panel?.destroy();
-      panel = undefined;
-      layout?.destroy();
-      layout = undefined;
       remoteOwner = undefined;
-      sidePanelVisible = false;
+      remoteSurface = undefined;
     }
     if (!state.selectedTarget) removeSelection();
     const active = editing();
@@ -299,12 +266,11 @@ export function createCreatorEditor(
     if (skinning) scheduleSkinInfo();
     if (active) {
       doc.documentElement.setAttribute('data-ww-editor-tool', state.view.tool ?? 'select');
-      doc.documentElement.toggleAttribute(
-        'data-ww-editor-card-picking',
-        state.view.tool !== 'browse' && (quickPanel() || state.view.tool === 'card'),
-      );
+      doc.documentElement.toggleAttribute('data-ww-editor-card-picking', state.view.tool === 'card');
     }
-    if (remoteOwner && state.active && !panel && !badge) {
+    // Only a separate window needs saying: the side panel stands beside the page it edits.
+    const windowed = Boolean(remoteOwner) && remoteSurface === 'window' && state.active;
+    if (windowed && !badge) {
       badge = doc.createElement('div');
       badge.id = 'web-world-themes-studio-link';
       badge.setAttribute('data-ww-signal-control', '');
@@ -315,16 +281,13 @@ export function createCreatorEditor(
       box.className = 'badge';
       const label = doc.createElement('span');
       label.textContent = '別ウィンドウで編集中';
-      const quick = doc.createElement('button');
-      quick.textContent = 'クイック編集を表示';
-      quick.addEventListener('click', () => open());
       const stop = doc.createElement('button');
       stop.textContent = '編集を終了';
       stop.addEventListener('click', () => dispatch({ type: 'close' }));
-      box.append(label, quick, stop);
+      box.append(label, stop);
       shadow.append(style, box);
       (doc.body ?? doc.documentElement).append(badge);
-    } else if (!remoteOwner || !state.active || panel) {
+    } else if (!windowed) {
       badge?.remove();
       badge = undefined;
     }
@@ -333,11 +296,6 @@ export function createCreatorEditor(
       lastDesign = design;
       apply(design);
     }
-    if (panelMode === 'sidepanel') {
-      panel?.host.toggleAttribute('data-fullscreen', fullscreen());
-      panel?.host.toggleAttribute('data-sidepanel-visible', sidePanelVisible);
-    }
-    panel?.render(state.view);
     editImages(
       active &&
         !fullscreen() &&
@@ -364,83 +322,14 @@ export function createCreatorEditor(
   function onFullscreen() {
     refresh();
   }
-  function open(mode: 'quick' | 'inpage' | 'sidepanel' = 'quick'): OpenEditorResponse {
-    if (!site.designTargets?.length) return { ok: false, error: 'このサイトには編集できる対象がありません。' };
-    const result = core.open();
-    if (!result.ok) return result;
-    if (panel && mode !== panelMode) {
-      if (panelMode === 'sidepanel') void chrome.runtime.sendMessage({ type: CLOSE_SIDE_PANEL }).catch(() => undefined);
-      unprotectToolbar?.();
-      unprotectToolbar = undefined;
-      panel.destroy();
-      panel = undefined;
-      layout?.destroy();
-      layout = undefined;
-    }
-    if (!panel) {
-      panelMode = mode;
-      if (mode === 'inpage') {
-        layout = site.mountStudio?.((value) => {
-          if (panel) {
-            panel.setHostLayout(value);
-            core.refreshGeometry();
-          }
-        });
-        if (!layout) return { ok: false, error: 'このサイトにはStudioの表示領域を確保するAdapterがありません。' };
-      }
-      panel = createCreatorPanel(
-        doc,
-        studioActions(
-          dispatch,
-          (files) => {
-            void core.import(files);
-          },
-          (id) => captureLayerThumbnail(doc, id),
-        ),
-        site.decorationAnchors,
-        {
-          preferences: browserStudioPreferences,
-          ...(openSettings ? { onSettings: openSettings } : {}),
-          timeline: timeline?.port('inline'),
-          hostLabel: site.id === 'youtube' ? 'YouTube' : site.id,
-          inPage: mode === 'inpage',
-          toolbarOnly: mode === 'sidepanel',
-          ...(mode !== 'sidepanel' && skinTargets.length && skinAssets
-            ? {
-                skin: {
-                  targets: skinTargets,
-                  assetUrl: skinAssets.url,
-                  import: (files: readonly File[], slot: SkinSlot) => void importSkin(files, slot),
-                },
-              }
-            : {}),
-          persistWorkspace: mode === 'inpage',
-          onSurface: (surface) => {
-            if (surface === 'inpage') open('inpage');
-            else
-              void requestStudioSurface(surface === 'sidepanel' ? OPEN_SIDE_PANEL : OPEN_STUDIO_WINDOW).catch(
-                (error: unknown) => core.fail(error instanceof Error ? error.message : 'Studioを開けませんでした。'),
-              );
-          },
-          onLayout: (value) => layout?.update(value),
-        },
-      );
-      (doc.body ?? doc.documentElement).append(panel.host);
-      if (mode === 'sidepanel') unprotectToolbar = site.protectStudioToolbar?.(panel.host);
-      if (layout) panel.setHostLayout(layout.state());
-    }
-    refresh();
-    panel.focus();
-    return { ok: true };
-  }
   const ownUi = (event: Event) =>
     event.composedPath().some((node) => node instanceof Element && node.hasAttribute('data-ww-signal-control'));
   function pickTarget(event: Event): { element: Element; target?: (typeof skinTargets)[number] } | undefined {
     if (
       !editing() ||
       fullscreen() ||
-      state.view.tool === 'browse' ||
-      (!quickPanel() && state.view.tool !== 'card' && state.view.tool !== 'skin') ||
+      // The page's own clicks stay YouTube's unless the card or skin tool is chosen.
+      (state.view.tool !== 'card' && state.view.tool !== 'skin') ||
       ownUi(event)
     )
       return;
@@ -479,7 +368,6 @@ export function createCreatorEditor(
     if (
       !editing() ||
       fullscreen() ||
-      panel?.host.hasAttribute('data-ww-scrubbing') ||
       event.isComposing ||
       event
         .composedPath()
@@ -492,12 +380,7 @@ export function createCreatorEditor(
         )
     )
       return;
-    if (
-      state.view.tool === 'browse' &&
-      !(panel && event.composedPath().includes(panel.host)) &&
-      !['v', 'h'].includes(event.key.toLowerCase())
-    )
-      return;
+    if (state.view.tool === 'browse' && !['v', 'h'].includes(event.key.toLowerCase())) return;
     const command = shortcutCommand(event, state.view, true);
     if (command) dispatch(command);
     else if ((event.key === 'Enter' || event.key === ' ') && pickTarget(event)?.target) {
@@ -526,16 +409,7 @@ export function createCreatorEditor(
     event.preventDefault();
     event.stopImmediatePropagation();
     const files = [...event.dataTransfer.files];
-    // Skin drop zones in the panel name their slot; a drop on a page part dresses that part.
-    const zone = event
-      .composedPath()
-      .find((node): node is HTMLElement => node instanceof HTMLElement && Boolean(node.dataset.skinSlot));
-    const inPanel = Boolean(panel && event.composedPath().includes(panel.host));
-    // While dressing parts, a drop is never a new image layer.
-    if (zone || (skinTool() && inPanel)) {
-      void importSkin(files, (zone?.dataset.skinSlot as SkinSlot | undefined) ?? 'normal');
-      return;
-    }
+    // While dressing parts, a drop on a page part dresses that part and is never a new image layer.
     if (skinTool()) {
       const target = picker.hit(event.target instanceof Element ? event.target : undefined);
       if (!target?.target) {
@@ -547,16 +421,13 @@ export function createCreatorEditor(
       void importSkin(files, 'normal');
       return;
     }
-    void core.import(files, inPanel ? undefined : { x: event.clientX, y: event.clientY });
+    void core.import(files, { x: event.clientX, y: event.clientY });
   }
   const authorize = (owner: string, session: string, revision: number) => {
     if (owner !== remoteOwner || session !== state.sessionId || revision !== state.revision || !state.active)
       throw new Error('編集状態が変わりました。最新の状態を同期して、もう一度操作してください。');
   };
   return {
-    open: () => open(),
-    openStudio: () => open('inpage'),
-    openSidePanel: () => open('sidepanel'),
     snapshot: core.snapshot,
     checkpoint: core.checkpoint,
     subscribe: core.subscribe,
@@ -603,22 +474,24 @@ export function createCreatorEditor(
       }
     },
     reload: core.reload,
-    async attachStudio(owner, resume, handoff = false) {
+    async attachStudio(owner, resume, handoff = false, surface = 'window') {
+      if (!site.designTargets?.length) throw new Error('このサイトには編集できる対象がありません。');
       if (remoteOwner && remoteOwner !== owner && !handoff)
-        throw new Error('このYouTubeは別のStudioで編集中です。そちらの接続を解除してください。');
+        throw new Error('このYouTubeは別のエディターで編集中です。そちらの接続を解除してください。');
       if (handoff && state.view.saving) throw new Error('保存処理の完了後に切り替えてください。');
       if (handoff && core.gestureActive) await core.execute({ type: 'end', cancel: true });
       const existed = state.active,
         opened = core.open();
       if (!opened.ok) throw new Error(opened.error);
       remoteOwner = owner;
-      sidePanelVisible = false;
+      remoteSurface = surface;
       try {
         if (!existed && resume) await core.restore(resume);
         refresh();
         return core.snapshot();
       } catch (error) {
         remoteOwner = undefined;
+        remoteSurface = undefined;
         refresh();
         throw error;
       }
@@ -628,14 +501,9 @@ export function createCreatorEditor(
       if (owner !== remoteOwner) return;
       timeline?.resumeLive();
       remoteOwner = undefined;
-      sidePanelVisible = false;
+      remoteSurface = undefined;
       if (core.gestureActive) dispatch({ type: 'end', cancel: true });
       refresh();
-    },
-    setSidePanelVisible(owner, visible) {
-      if (owner !== remoteOwner) return;
-      sidePanelVisible = visible;
-      if (panelMode === 'sidepanel') panel?.host.toggleAttribute('data-sidepanel-visible', visible);
     },
     timelineSnapshot: () => timeline?.snapshot(),
     subscribeTimeline: (listener) => timeline?.subscribe(listener) ?? (() => undefined),
@@ -674,9 +542,6 @@ export function createCreatorEditor(
       core.destroy();
       unsubscribe();
       bind(false);
-      unprotectToolbar?.();
-      panel?.destroy();
-      layout?.destroy();
       badge?.remove();
     },
   };

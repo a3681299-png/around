@@ -91,6 +91,19 @@ select:focus-visible {
 .connection-status[data-connected='true'] {
   color: var(--ink-muted);
 }
+/* In the editor's status bar the line may shrink; one that would be cut moves into the ⓘ tooltip. */
+.connection-status[slot] {
+  flex: 0 1 auto;
+  min-width: 0;
+  text-overflow: clip;
+}
+.connection-status[data-tip] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
 .studio-mount {
   flex: 1;
   min-height: 0;
@@ -130,4 +143,78 @@ body[data-sidepanel] .connection-bar {
 }
 body[data-sidepanel] .connection-status {
   max-width: 100%;
+}
+
+/* The editor header's safety: 緊急OFF is one ruled word button; 操作チェック joins it only while
+   something is restricted (the 45° diamond: 制限中), and opens a floating panel below. Vermilion is
+   protection: it marks the restriction, never a decoration. */
+.ww-editor-safety {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  white-space: nowrap;
+}
+.ww-editor-safety > button {
+  height: 28px;
+  padding: 0 6px;
+  border: 1px solid var(--line-control);
+  font-size: 12px;
+}
+.ww-editor-safety .safety-state {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.safety-check > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  height: 28px;
+  padding: 0 6px;
+  border: 1px solid var(--line-control);
+  border-radius: var(--radius-control);
+  font-size: 12px;
+  list-style: none;
+  cursor: pointer;
+}
+.safety-check > summary::-webkit-details-marker {
+  display: none;
+}
+.safety-check[data-restricted] > summary {
+  border-color: var(--vermilion);
+  color: var(--vermilion);
+}
+.safety-check[data-restricted] > summary::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border: 1.5px solid currentColor;
+  transform: rotate(45deg);
+}
+.safety-popover {
+  position: absolute;
+  right: 0;
+  top: calc(100% + var(--space-4));
+  z-index: 30;
+  width: min(320px, calc(100vw - 2 * var(--space-8)));
+  max-height: 60vh;
+  overflow: auto;
+  padding: var(--space-8) var(--space-12);
+  background: var(--surface-raised);
+  border-radius: var(--radius-float);
+  box-shadow: var(--shadow-float);
+  white-space: normal;
+  font-size: 12px;
+}
+.safety-popover label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+.safety-popover ul {
+  margin: var(--space-8) 0 0;
+  padding-left: var(--space-20);
 }

@@ -2,7 +2,6 @@ import { oneOf } from '../validation';
 import {
   CLOSE_SIDE_PANEL,
   OPEN_SIDE_PANEL,
-  OPEN_SIDE_PANEL_TOOLS,
   OPEN_STUDIO_WINDOW,
   PREPARE_SIDE_PANEL,
   type OpenEditorResponse,
@@ -36,15 +35,9 @@ export function installSidePanelHost() {
         path: 'studio/index.html?surface=sidepanel&target=' + tabId,
       });
     } else if (raw.type === OPEN_SIDE_PANEL) {
-      // No asynchronous work precedes open: retain the originating click's activation.
-      operation = chrome.sidePanel.open({ tabId }).then(async () => {
-        const result = await chrome.tabs.sendMessage<{ type: string }, OpenEditorResponse>(tabId, {
-          type: OPEN_SIDE_PANEL_TOOLS,
-        });
-        // Studio itself explains an OFF theme and offers display settings. Keep
-        // that entry usable instead of closing the only route back to settings.
-        if (!result?.ok) return;
-      });
+      // No asynchronous work precedes open: retain the originating click's activation. The panel's
+      // page connects to the tab itself and explains an OFF theme there.
+      operation = chrome.sidePanel.open({ tabId });
     } else {
       operation = chrome.windows
         .create({
@@ -59,7 +52,7 @@ export function installSidePanelHost() {
     void operation.then(
       () => respond({ ok: true }),
       (error: unknown) =>
-        respond({ ok: false, error: error instanceof Error ? error.message : 'Studioを開けませんでした。' }),
+        respond({ ok: false, error: error instanceof Error ? error.message : 'エディターを開けませんでした。' }),
     );
     return true;
   });
@@ -73,5 +66,5 @@ export async function requestStudioSurface(
     type,
     ...(tabId === undefined ? {} : { tabId }),
   })) as OpenEditorResponse;
-  if (!result?.ok) throw new Error(result?.error ?? 'Studioを開けませんでした。');
+  if (!result?.ok) throw new Error(result?.error ?? 'エディターを開けませんでした。');
 }

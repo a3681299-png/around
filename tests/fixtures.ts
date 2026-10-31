@@ -154,7 +154,7 @@ export const test = base.extend<{ profile: string; extensionId: string; popup: P
   popup: async ({ context, extensionId }, use) => {
     const popup = await context.newPage();
     await popup.goto(`chrome-extension://${extensionId}/popup/index.html`);
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).waitFor();
+    await popup.getByRole('switch', { name: 'テーマを使う' }).waitFor();
     await use(popup);
   },
   youtube: async ({ context }, use) => {

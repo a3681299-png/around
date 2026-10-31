@@ -9,7 +9,7 @@ test('native drag, text, keyboard and fullscreen controls remain usable with opa
   youtube,
 }, info) => {
   await youtube.goto('https://www.youtube.com/watch?v=fixture');
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   await youtube.evaluate(() => {
     const player = document.querySelector<HTMLElement>('#movie_player')!;
     for (const [id, name, bottom, width] of [
@@ -148,7 +148,7 @@ test('native drag, text, keyboard and fullscreen controls remain usable with opa
 
 test('fullscreen keeps authored painting order across viewport and player anchors', async ({ popup, youtube }) => {
   await youtube.goto('https://www.youtube.com/watch?v=fixture');
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   const { panel: editor } = await openEditor(popup, youtube);
   const files = await youtube.evaluate(() =>
     ['red', 'blue'].map((color) => {
@@ -219,7 +219,7 @@ test('Studio exposes protection overlays, per-layer restrictions and emergency O
   context,
   extensionId,
 }, info) => {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   const studio = await context.newPage();
   await studio.goto(`chrome-extension://${extensionId}/studio/index.html`);
   await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
@@ -227,9 +227,10 @@ test('Studio exposes protection overlays, per-layer restrictions and emergency O
   await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await panel.getByLabel('画像の幅', { exact: true }).fill('1600');
   await panel.getByLabel('画像の幅', { exact: true }).press('Tab');
-  await expect(studio.locator('.ww-safety-controls li[data-layer-id]')).toContainText(['制限中']);
+  // UI0-d round 3: 操作チェック sits in the editor's header while a layer is restricted.
+  await expect(studio.locator('.ww-editor-safety li[data-issue-layer]')).toContainText(['制限中']);
   await expect(panel.locator('.safety-limited-badge')).toHaveText('制限中');
-  await studio.locator('.ww-safety-controls summary').click();
+  await studio.locator('.ww-editor-safety .safety-check > summary').click();
   await studio.getByLabel('操作面の保護範囲を表示').check();
   await expect(youtube.locator('#web-world-themes-operation-check')).toHaveCount(1);
   await studio.screenshot({ path: info.outputPath('studio-operation-restriction.png') });

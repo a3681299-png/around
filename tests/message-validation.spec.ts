@@ -1,31 +1,44 @@
 import { build } from 'esbuild';
 import { test, expect } from './fixtures';
-import { OPEN_CREATOR_EDITOR, OPEN_INPAGE_STUDIO, OPEN_SIDE_PANEL_TOOLS } from '../src/editor/messages';
+import { PROBE_EDITOR_TARGET } from '../src/editor/messages';
 
 test('content messages ignore array types and still accept a string command', async ({ popup, youtube }) => {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
   await youtube.bringToFront();
   const tabId = await popup.evaluate(
     async () => (await chrome.tabs.query({ active: true, currentWindow: true }))[0]!.id!,
   );
-  for (const type of [OPEN_CREATOR_EDITOR, OPEN_INPAGE_STUDIO, OPEN_SIDE_PANEL_TOOLS]) {
-    const response = await popup.evaluate(async ({ type, tabId }) => chrome.tabs.sendMessage(tabId, { type: [type] }), {
+  // UI0-d: the page's one message is the editor-target probe; the editor is the side panel or its
+  // window. The retired in-page editors' messages open nothing, as strings or arrays.
+  const retired = [
+    'web-world-themes:open-creator-editor',
+    'web-world-themes:open-inpage-studio',
+    'web-world-themes:open-side-panel-tools',
+  ];
+  for (const type of [PROBE_EDITOR_TARGET, ...retired].flatMap((value) => [
+    [value],
+    ...(retired.includes(value) ? [value] : []),
+  ])) {
+    const response = await popup.evaluate(async ({ type, tabId }) => chrome.tabs.sendMessage(tabId, { type }), {
       type,
       tabId,
     });
-    expect(response).toBeUndefined();
+    expect(response, JSON.stringify(type)).toBeUndefined();
     await expect(youtube.locator('#web-world-themes-creator')).toHaveCount(0);
   }
   const response = await popup.evaluate(async ({ type, tabId }) => chrome.tabs.sendMessage(tabId, { type }), {
-    type: OPEN_CREATOR_EDITOR,
+    type: PROBE_EDITOR_TARGET,
     tabId,
   });
-  expect(response).toMatchObject({ ok: true });
-  await expect(youtube.locator('#web-world-themes-creator')).toBeVisible();
+  expect(response).toEqual({ siteId: 'youtube' });
 });
 
 test('workspace preferences reject an array area and retain the default active tab', async ({ youtube }) => {
+  // UI0-d round 3 (stopped, not deleted): this checks the in-page Studio's saved workspace (its
+  // `persistWorkspace` tab, width and folds). The in-page Studio and that saving went with it; the
+  // editor page keeps its workbench preferences under its own key (docs/ui0d-3.md).
+  test.fixme(true, 'UI0-d round 3: the in-page Studio workspace this checks was removed; awaiting a decision.');
   const bundle = await build({
     entryPoints: ['src/editor/panel.ts'],
     bundle: true,

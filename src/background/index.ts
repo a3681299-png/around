@@ -141,7 +141,7 @@ async function owner(message: Record<string, unknown>, sender: chrome.runtime.Me
     const context = contexts.find(
       (entry) => entry.documentUrl === sender.url && entry.documentUrl?.split('?')[0] === studioURL,
     );
-    if (!context) throw new Error('Studioのタブが見つかりません。');
+    if (!context) throw new Error('エディターのタブが見つかりません。');
     return { session: message['session'], tabId: context.tabId, documentId: 'studio:' + context.tabId };
   }
   return {

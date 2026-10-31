@@ -11,7 +11,7 @@ test('8 rigged models share one context/assets, respect surface budgets and susp
   context,
 }) => {
   test.setTimeout(60000);
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
   const { panel } = await openEditor(popup, youtube);
   await panel.locator('.file').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
@@ -89,7 +89,7 @@ test('real WebGL loss recreates a context, deletion releases resources and Undo 
   popup,
   youtube,
 }) => {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
   const { panel } = await openEditor(popup, youtube);
   await panel.locator('.file').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
@@ -127,6 +127,6 @@ test('real WebGL loss recreates a context, deletion releases resources and Undo 
   await expect(media).toHaveAttribute('data-renderer', 'three');
   await expect(backend).toHaveCount(1);
   expect(await recovered.evaluate((canvas) => canvas.isConnected)).toBe(true);
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
   await expect(youtube.locator(overlay)).toHaveCount(0);
 });

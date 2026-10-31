@@ -9,7 +9,8 @@ import { buttonIcon } from '../editor/icons';
 import type { SkinSlot } from '../editor-core/skins';
 
 interface StudioPorts {
-  mountSafety?(root: HTMLElement, connection: StudioConnection): () => void;
+  /** 緊急OFF and 操作チェック for the editor's header; `header` is slotted into its menu bar. */
+  mountSafety?(root: HTMLElement, connection: StudioConnection): { header: HTMLElement; destroy(): void };
   openSettings?(target?: number): void;
   hostName: string;
   sidePanel?: boolean;
@@ -83,7 +84,7 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
     clearTimeout(recoveryTimer);
     recoveryTimer = setTimeout(persist, 180);
   });
-  const unmountSafety = ports.mountSafety?.(root, connection);
+  const safety = ports.mountSafety?.(root, connection);
   const dispatch = (command: EditCommand) => {
     if (!connection.isConnected || !connection.state?.active) return;
     importError = undefined;
@@ -148,11 +149,9 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
           ...(ports.openSettings ? { onSettings: () => ports.openSettings!(connection.target) } : {}),
           timeline: connection.timeline,
           hostLabel: ports.hostName,
-          fullPage: true,
           // The arrangement follows the width; the surface (side panel or window) only sets transport.
           sidePanel: builtNarrow,
           surface: ports.sidePanel ? 'sidepanel' : 'window',
-          persistWorkspace: true,
           ...(skinTargets.length && ports.skinAssetUrl
             ? {
                 skin: {
@@ -174,13 +173,15 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
       connectionBar.slot = 'connection';
       message.slot = 'connection-status';
       panel.host.append(connectionBar, message);
+      if (safety) panel.host.append(safety.header);
       if (!builtNarrow) {
         stage = doc.createElement('section');
         stage.className = 'studio-stage';
         stage.setAttribute('aria-label', '素材とプレビュー');
-        stage.innerHTML = `<div class="preview-link"><strong>ライブキャンバス</strong><p>作品は${hostName}のタブで動きます。並べて見ると、パネルと作品を同時に確かめながら編集できます。</p><button class="stage-focus" type="button">${hostName}を表示</button><button class="stage-sidepanel" type="button">サイドパネルで開く</button></div>`;
+        stage.innerHTML = `<div class="preview-link"><strong>ライブキャンバス</strong><p>作品は${hostName}のタブで動きます。並べて見ると、パネルと作品を同時に確かめながら編集できます。</p><button class="stage-focus" type="button">${hostName}を表示</button>${ports.sidePanel ? '' : '<button class="stage-sidepanel" type="button">サイドパネルで開く</button>'}</div>`;
         panel.host.shadowRoot!.querySelector('.canvas-slot')!.append(stage);
-        stage.querySelector('.stage-sidepanel')!.addEventListener('click', () => {
+        // A wide side panel shows the stage too; it is already the side panel.
+        stage.querySelector('.stage-sidepanel')?.addEventListener('click', () => {
           void connection.openWorkspace('sidepanel').catch((error: unknown) => {
             message.textContent = error instanceof Error ? error.message : 'サイドパネルを開けませんでした。';
           });
@@ -325,7 +326,7 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
       }
     },
     destroy() {
-      unmountSafety?.();
+      safety?.destroy();
       unsubscribeSkinPage?.();
       doc.defaultView?.removeEventListener('resize', onResize);
       persist();

@@ -20,7 +20,7 @@ async function probeCode() {
 }
 
 test('default artwork retains its decoder while the compositor clips protected regions', async ({ popup, youtube }) => {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   const { panel: editor } = await openEditor(popup, youtube);
   await exposeEditorControls(editor);
   const data = await youtube.evaluate(() => {
@@ -47,7 +47,7 @@ test('default artwork retains its decoder while the compositor clips protected r
 });
 
 async function opaqueArtwork(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   const { panel: editor } = await openEditor(popup, youtube);
   await exposeEditorControls(editor);
   const data = await youtube.evaluate(() => {
@@ -418,7 +418,7 @@ test('redraws over unchanged protection geometry leave the clip and safety recor
   popup,
   youtube,
 }) => {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   const { panel: editor } = await openEditor(popup, youtube);
   await exposeEditorControls(editor);
   const data = await youtube.evaluate(() => {
@@ -724,7 +724,7 @@ test('manual emergency OFF releases drawing and preserves an unsaved editor and 
   popup,
   youtube,
 }) => {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   const { panel: editor } = await openEditor(popup, youtube);
   await editor.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await expect(editor.locator('.dirty')).toHaveText('未保存');

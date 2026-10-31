@@ -14,7 +14,7 @@ const layers =
     ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]',
   media = `${layers} .media`;
 async function open(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   await youtube.bringToFront();
   const { panel } = await openEditor(popup, youtube);
@@ -476,12 +476,12 @@ test('32 masks share sources, stay idle, detach on background/OFF/zero and remai
   await expect(youtube.locator(`${overlay} .handle:visible`)).toHaveCount(0);
   await youtube.locator('#movie_player [aria-label="Mute"]').click();
   for (const boundary of ['off', 'zero']) {
-    if (boundary === 'off') await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
-    else await popup.getByRole('slider', { name: 'Effect Strength' }).press('Home');
+    if (boundary === 'off') await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+    else await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('Home');
     await expect(youtube.locator(overlay)).toHaveCount(0);
     await expect.poll(stats).toMatchObject({ pointer: 0, video: 0 });
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-    await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+    await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
     await youtube.bringToFront();
     await expect(youtube.locator(media)).toHaveCount(32);
     // After reactivation instrumentation also sees G1's single Host guard.

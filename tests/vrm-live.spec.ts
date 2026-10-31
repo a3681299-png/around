@@ -3,7 +3,7 @@ import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
-import { openRetiredEditor } from './helpers/editor';
+import { openSidePanelFromIcon } from './helpers/editor';
 import { nativeWindow, sidePanelDriver } from './helpers/side-panel';
 import type { DesignDocument } from '../src/design/types';
 import { clearestPoint, declinePromotion } from './helpers/youtube-live';
@@ -41,13 +41,10 @@ test('real YouTube: private local VRM import, MToon, pointer gaze, Studio transf
     const page = await context.newPage();
     await page.goto('https://www.youtube.com/watch?v=LC1a-DwUhls', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 25000 });
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
     await page.bringToFront();
     await expect(page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
-    // UI0-d: still on the in-page Studio; opened through its retained message.
-    await openRetiredEditor(popup, page, 'inpage');
-    const local = page.locator('#web-world-themes-creator');
-    await local.getByRole('button', { name: 'Chromeサイドパネルを開く', exact: true }).click();
+    await openSidePanelFromIcon(popup, page);
     const panel = await sidePanelDriver(context, page, id);
     stage('import private avatar');
     const started = Date.now();

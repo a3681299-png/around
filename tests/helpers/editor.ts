@@ -1,4 +1,5 @@
 import { expect, type Page } from '@playwright/test';
+import { clearestPoint } from './youtube-live';
 
 /**
  * The editor as people use it from UI0-d on: the editor page connected to the YouTube tab. It opens
@@ -38,10 +39,26 @@ export async function closeEditorPages(youtube: Page) {
   await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-editing', /.*/);
 }
 
+/** The in-video icon opens Chrome's side panel within its click while 制作モード is ON (a headed
+ * browser; the panel itself is driven with tests/helpers/side-panel.ts). The icon sits among the
+ * player's controls; a person then moves to the panel, so focus and pointer leave those controls.
+ * In real Chrome the panel takes the focus; driven panels do not, so the test moves them. Until
+ * they leave, the operation guard keeps decorations yielding to those controls (G1). */
+export async function openSidePanelFromIcon(popup: Page, youtube: Page) {
+  const mode = popup.getByRole('switch', { name: '制作モード', exact: true });
+  if (!(await mode.isChecked())) await mode.check();
+  await youtube.bringToFront();
+  await youtube.getByRole('button', { name: 'Web World Themes の設定', exact: true }).click();
+  await youtube.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+  const viewport = await youtube.evaluate(() => ({ width: innerWidth, height: innerHeight }));
+  const away = await clearestPoint(youtube, { left: 0, top: 0, right: viewport.width, bottom: viewport.height });
+  await youtube.mouse.move(away.x, away.y, { steps: 4 });
+}
+
 /**
- * UI0-d, until round 3 decides them: the few checks of what only the floating editor (F) or the
- * in-page Studio (I) has. Neither has an entry any more; their content-script messages remain, so
- * these checks keep running unchanged until each is moved or retired (docs/ui0d-2.md).
+ * UI0-d round 3 removed the floating editor (F) and the in-page Studio (I) with the content-script
+ * messages that opened them. This remains for the before-change builds that still have them
+ * (editor-surfaces-live 'before') and for the tests stopped with test.fixme (docs/ui0d-3.md).
  */
 export async function openRetiredEditor(popup: Page, youtube: Page, kind: 'floating' | 'inpage' = 'floating') {
   await youtube.bringToFront();

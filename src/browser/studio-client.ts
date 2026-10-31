@@ -18,13 +18,7 @@ import type { SkinSlot } from '../editor-core/skins';
 
 import type { StudioConnectionState, StudioConnection } from '../studio/connection';
 import { requestStudioSurface } from './side-panel';
-import {
-  CLOSE_SIDE_PANEL,
-  OPEN_SIDE_PANEL,
-  OPEN_STUDIO_WINDOW,
-  OPEN_INPAGE_STUDIO,
-  type OpenEditorResponse,
-} from '../editor/messages';
+import { OPEN_SIDE_PANEL, OPEN_STUDIO_WINDOW } from '../editor/messages';
 import type { TimelinePort, TimelineCommand, TimelineUpdate } from '../timeline/types';
 export function createStudioClient(
   notify: (value: StudioConnectionState) => void,
@@ -201,7 +195,7 @@ export function createStudioClient(
         if (message.type === 'handoff') {
           stopped = true;
           disconnect();
-          emit('別のStudioへ編集を引き継ぎました。未保存の変更と履歴は対象タブで保持しています。');
+          emit('別のエディターへ編集を引き継ぎました。未保存の変更と履歴は対象タブで保持しています。');
           return;
         }
         if (message.type === 'safety') {
@@ -253,12 +247,10 @@ export function createStudioClient(
         type: 'attach',
         owner,
         ...(backup ? { resume: packCheckpoint(backup) } : {}),
-        ...(visibilityDocument ? { visible: !visibilityDocument.hidden } : {}),
       } as Omit<StudioRequest, 'id'>);
       if (generation !== epoch) return;
       connected = true;
       retries = 0;
-      publishVisibility();
       if (observed) void timeline.dispatch({ type: 'observe', value: true });
       emit('接続中');
     } catch (error) {
@@ -309,15 +301,6 @@ export function createStudioClient(
     }
   };
   chrome.tabs.onRemoved.addListener(onTabRemoved);
-  // Browser-only UI visibility, independent of document revisions and history.
-  function publishVisibility() {
-    if (visibilityDocument && connected)
-      void request({ type: 'surface-visibility', visible: !visibilityDocument.hidden } as Omit<
-        StudioRequest,
-        'id'
-      >).catch(() => undefined);
-  }
-  visibilityDocument?.addEventListener('visibilitychange', publishVisibility);
   /** Runs in order. A failure is told in the connection line; `report` also rejects the caller's
    * promise, so an import's reason can stand where the panel tells it. */
   function enqueue(action: () => Promise<unknown>, report = false) {
@@ -443,7 +426,7 @@ export function createStudioClient(
           const surface = visibilityDocument ? new URL(visibilityDocument.URL).searchParams.get('surface') : undefined;
           const ownerTab = surface === 'sidepanel' ? target : (await chrome.tabs.getCurrent())?.id;
           controller.signal.throwIfAborted();
-          if (ownerTab === undefined) throw new Error('Studioの保持先が見つかりません。');
+          if (ownerTab === undefined) throw new Error('エディターの保持先が見つかりません。');
           const assets = await importStudioAssets(files, lease, controller.signal, ownerTab);
           if (generation !== epoch || !connected) throw new Error('素材の読み込み中に接続が変わりました。');
           const current = state!;
@@ -470,18 +453,9 @@ export function createStudioClient(
       }
     },
     focusTarget,
-    async openWorkspace(surface = 'inpage') {
+    async openWorkspace(surface: 'sidepanel' | 'window') {
       if (tabId === undefined || !connected) throw new Error('先に編集対象へ接続してください。');
-      if (surface === 'sidepanel' || surface === 'window') {
-        await requestStudioSurface(surface === 'sidepanel' ? OPEN_SIDE_PANEL : OPEN_STUDIO_WINDOW, tabId);
-        return;
-      }
-      const response = await chrome.tabs.sendMessage<{ type: string }, OpenEditorResponse>(tabId, {
-        type: OPEN_INPAGE_STUDIO,
-      });
-      await chrome.runtime.sendMessage({ type: CLOSE_SIDE_PANEL, tabId });
-      if (!response?.ok) throw new Error(response?.error ?? '制作画面を開けませんでした。');
-      await focusTarget();
+      await requestStudioSurface(surface === 'sidepanel' ? OPEN_SIDE_PANEL : OPEN_STUDIO_WINDOW, tabId);
     },
     get state() {
       return state;
@@ -501,7 +475,6 @@ export function createStudioClient(
       stopped = true;
       disconnect();
       chrome.tabs.onRemoved.removeListener(onTabRemoved);
-      visibilityDocument?.removeEventListener('visibilitychange', publishVisibility);
     },
   };
 }

@@ -1,5 +1,5 @@
 import { watchSettings } from '../storage/settings';
-import { OPEN_SIDE_PANEL_TOOLS, PROBE_EDITOR_TARGET, PREPARE_SIDE_PANEL } from '../editor/messages';
+import { PROBE_EDITOR_TARGET, PREPARE_SIDE_PANEL } from '../editor/messages';
 import { EMERGENCY_COMMAND, SAFETY_SHORTCUT, safetyShortcut, setEmergencyOff } from '../storage/safety';
 
 export const EDITOR_COMMAND = 'open-editor';
@@ -52,13 +52,8 @@ export function installEditorEntry() {
     const operation =
       id === undefined
         ? standalone()
-        : chrome.sidePanel
-            .open({ tabId: id })
-            .then(async () => {
-              // Keep Studio visible when the theme is OFF; its settings entry remains usable.
-              await chrome.tabs.sendMessage(id, { type: OPEN_SIDE_PANEL_TOOLS }).catch(() => undefined);
-            })
-            .catch(() => standalone(id));
+        : // The panel's page connects to the tab; with the theme OFF it explains so and offers settings.
+          chrome.sidePanel.open({ tabId: id }).catch(() => standalone(id));
     void operation.catch((error: unknown) => console.error('[Web World Themes] エディターを開けませんでした。', error));
   };
   chrome.action.onClicked.addListener(open);

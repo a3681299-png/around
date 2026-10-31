@@ -10,11 +10,12 @@ test('32 layers remain editable with locked/hidden selection; measure quick and 
   popup,
   youtube,
 }, info) => {
+  // UI0-d round 3 (stopped, not deleted): measures the floating editor against the in-page Studio,
+  // both removed. A side panel against window comparison would replace it (docs/ui0d-3.md).
+  test.fixme(true, 'UI0-d round 3: compares two removed editors; awaiting a decision.');
   test.setTimeout(90_000);
   await youtube.setViewportSize({ width: 1366, height: 900 });
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  // UI0-d: measures the floating editor against the in-page Studio, both retired; it stays on them
-  // until round 3 decides (docs/ui0d-2.md).
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   const panel = await openRetiredEditor(popup, youtube);
   await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await expect(youtube.locator(overlay + ' [data-image-id]')).toHaveCount(1);
@@ -107,7 +108,7 @@ test('32 layers remain editable with locked/hidden selection; measure quick and 
   await panel.getByRole('button', { name: '変更を破棄', exact: true }).click();
   await expect(panel.locator('.dirty')).toHaveText('保存済み');
   await youtube.screenshot({ path: info.outputPath('inpage-32-layers.png') });
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
   await expect(panel).toHaveCount(0);
   await expect(youtube.locator(overlay)).toHaveCount(0);
   await expect(youtube.locator('#web-world-themes-studio-layout')).toHaveCount(0);

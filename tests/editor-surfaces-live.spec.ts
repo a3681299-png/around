@@ -140,6 +140,24 @@ for (const scheme of ['light', 'dark'] as const)
         await page.waitForTimeout(800);
         await panel.screenshot(path.join(shots, `${prefix}-${scheme}-sidepanel-layers.png`));
         await page.screenshot({ path: path.join(shots, `${prefix}-${scheme}-sidepanel-page.png`) });
+        // UI0-d round 3: the ＋ menu and, with a restricted layer, 操作チェック in the header.
+        if (prefix !== 'before') {
+          await panel.evaluate(
+            'document.querySelector("#web-world-themes-creator").shadowRoot.querySelector(".add-menu > summary").click()',
+          );
+          await page.waitForTimeout(400);
+          await panel.screenshot(path.join(shots, `${prefix}-${scheme}-sidepanel-add-menu.png`));
+          await panel.evaluate(
+            'document.querySelector("#web-world-themes-creator").shadowRoot.querySelector(".add-menu").open = false',
+          );
+          await panel.fill('[data-image-prop="widthPx"]', '1600');
+          await expect
+            .poll(() => panel.evaluate('document.querySelector(".ww-editor-safety .safety-check")?.hidden'))
+            .toBe(false);
+          await panel.evaluate('document.querySelector(".ww-editor-safety .safety-check > summary").click()');
+          await page.waitForTimeout(400);
+          await panel.screenshot(path.join(shots, `${prefix}-${scheme}-sidepanel-safety.png`));
+        }
       });
     } finally {
       await writeFile(path.join(shots, `${prefix}-${scheme}.json`), JSON.stringify(record, null, 2) + '\n');

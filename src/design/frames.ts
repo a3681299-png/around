@@ -4,21 +4,6 @@ import { placementBounds, type Bounds, type PlacementSample } from './geometry';
 import type { DesignTarget, LayerState, Decoration, GroupLayer } from './types';
 import { movableMedia, parentGroup } from './hierarchy';
 
-export function editableSamples(
-  doc: Document,
-  anchors: readonly DesignTarget[],
-  layers: readonly LayerState[],
-  ids: readonly string[],
-): PlacementSample[] {
-  return layers.flatMap((layer) => {
-    const frame =
-      !layer.locked && layer.visible && ids.includes(layer.id)
-        ? placementFrame(doc, anchors, layer.placement)
-        : undefined;
-    return frame ? [{ id: layer.id, placement: { ...layer.placement }, frame }] : [];
-  });
-}
-
 export function editableSceneSamples(
   doc: Document,
   anchors: readonly DesignTarget[],

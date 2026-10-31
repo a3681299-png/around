@@ -226,14 +226,14 @@ export function createStudioStateDecoder() {
       if (payload.delta) {
         const delta = payload.delta;
         if (!state || !checkpoint || delta.base !== sequence || delta.sequence !== sequence + 1)
-          throw new Error('Studio差分の順序が一致しません。再接続してください。');
+          throw new Error('エディターの差分の順序が一致しません。再接続してください。');
         next = applyTreeChange(state, delta.state);
         if (delta.savedFromDocument) next = { ...next, saved: next.document };
         history = applyHistory(checkpoint.history, delta.history, state.document);
         nextSequence = delta.sequence;
       }
       if (!next) return;
-      if (!history || nextSequence === undefined) throw new Error('Studioの初期状態がありません。');
+      if (!history || nextSequence === undefined) throw new Error('エディターの初期状態がありません。');
       const nextCheckpoint: EditorCheckpoint = {
         version: 1,
         siteId: next.document.siteId,

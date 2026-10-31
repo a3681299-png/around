@@ -89,7 +89,7 @@ test('opt-in resident iframe uses IDB, rejects page messages and reconnects with
     await lab.page.evaluate(() => document.exitFullscreen());
     await lab.call('clear');
     await expect(lab.page.frameLocator('#ww-asset-runtime-lab').locator('canvas')).toHaveCount(0);
-    await lab.popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+    await lab.popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
     await expect(lab.page.locator('#ww-asset-runtime-lab')).toHaveCount(0);
   } finally {
     await lab.context.close();

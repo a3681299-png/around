@@ -2,8 +2,8 @@ import { test, expect } from './fixtures';
 import type { Page } from '@playwright/test';
 
 async function enable(popup: Page) {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
 }
 
 /** Native public YouTube CSS inspected 2026-10-05: the Home chip wrapper is
@@ -98,18 +98,18 @@ for (const dark of [false, true]) {
     await assertChipPosition(youtube, true);
     await expect(youtube.locator('#web-world-themes-window-chrome')).toHaveCount(1);
     await expect(youtube.locator('#web-world-themes-player-titlebar')).toHaveCount(0);
-    await popup.getByRole('switch', { name: 'Window chrome' }).uncheck();
+    await popup.getByRole('switch', { name: '窓の飾り' }).uncheck();
     await assertChipPosition(youtube, true);
     await youtube.evaluate(() => scrollTo(0, 250));
     await assertChipPosition(youtube, false);
-    await popup.getByRole('switch', { name: 'Window chrome' }).check();
+    await popup.getByRole('switch', { name: '窓の飾り' }).check();
     await assertChipPosition(youtube, false);
-    await popup.getByRole('slider', { name: 'Effect Strength' }).press('Home');
+    await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('Home');
     await assertChipPosition(youtube, false);
     await expect(youtube.locator('[data-ww-surface]')).toHaveCount(0);
-    await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+    await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
     await assertChipPosition(youtube, false);
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+    await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
     await assertChipPosition(youtube, false);
     await youtube.evaluate(() => scrollTo(0, 0));
     await assertChipPosition(youtube, true);
@@ -214,16 +214,16 @@ for (const dark of [false, true]) {
       (document.activeElement as HTMLElement)?.blur();
       scrollTo(0, 250);
     });
-    await popup.getByRole('switch', { name: 'Window chrome' }).uncheck();
+    await popup.getByRole('switch', { name: '窓の飾り' }).uncheck();
     await expect(youtube.locator('#masthead-container')).toHaveCSS('opacity', '0');
     await expect(youtube.locator('ytd-app > #frosted-glass')).toHaveCSS('display', 'block');
-    await popup.getByRole('switch', { name: 'Window chrome' }).check();
+    await popup.getByRole('switch', { name: '窓の飾り' }).check();
     await expect(youtube.locator('#masthead-container')).toHaveCSS('opacity', '1');
-    await popup.getByRole('slider', { name: 'Effect Strength' }).press('Home');
+    await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('Home');
     await expect(youtube.locator('#masthead-container')).toHaveCSS('opacity', '0');
-    await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+    await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
     await expect(youtube.locator('#masthead-container')).toHaveCSS('opacity', '1');
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+    await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
     await expect(youtube.locator('#masthead-container')).toHaveCSS('opacity', '0');
     await youtube.evaluate(() => scrollTo(0, 0));
     await expect(youtube.locator('#masthead-container')).toHaveCSS('opacity', '1');

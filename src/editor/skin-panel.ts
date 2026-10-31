@@ -22,8 +22,6 @@ export interface SkinPanelOptions {
   assetUrl(assetId: string): Promise<string | undefined>;
   /** In-page panels import into a skin slot; remote panels omit it. */
   import?(files: readonly File[], slot: SkinSlot): void;
-  /** The floating editor: the WWT Studio design system's empty state and copy. */
-  floating?: boolean;
 }
 export interface SkinPanelActions {
   selectTarget(id: string): void;
@@ -91,12 +89,12 @@ export function createSkinPanel(doc: Document, actions: SkinPanelActions, option
       </details>
       <input type="file" class="skin-file" accept="image/png,image/webp" hidden>
     </div>
-    <p class="skin-note" hidden>このパネルでは絵の取り込みと切り位置の編集ができません。YouTubeのページ内のパネルで編集してください。</p>`;
+    <p class="skin-note" hidden>このパネルでは絵の取り込みと切り位置の編集ができません。</p>`;
   const get = <T extends HTMLElement>(selector: string) => root.querySelector<T>(selector)!;
-  // The floating editor: the standing instructions become the heading's tooltip, and until a part
-  // is chosen a nine-slice frame with a part inside it is constructed (ww-empty).
+  // The standing instructions become the heading's tooltip, and until a part is chosen a nine-slice
+  // frame with a part inside it is constructed (ww-empty).
   const empty = doc.createElement('div');
-  if (options.floating) {
+  {
     const intro = get('.skin-intro');
     get('h3').title = intro.textContent!;
     intro.remove();
@@ -622,9 +620,7 @@ export function createSkinPanel(doc: Document, actions: SkinPanelActions, option
             : page.has(item.id)
               ? `${page.get(item.id)!.count}個`
               : // A count that is not known yet shows nothing.
-                options.floating
-                ? ''
-                : '確認中…',
+                '',
       );
     }
     editor.hidden = !part;

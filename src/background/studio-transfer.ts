@@ -105,16 +105,16 @@ export function createStudioTransferService(ports: Ports) {
       typeof message['session'] !== 'string' ||
       !message['session'].startsWith('studio-upload-')
     )
-      throw new Error('Studio以外からの素材転送は受け付けません。');
+      throw new Error('エディター以外からの素材転送は受け付けません。');
     let source = sender;
     if (!sender.documentId || sender.frameId === undefined) {
       // Chrome omits frameId/documentId on native side-panel Runtime messages.
       // Resolve the live Chrome-owned context, then run owner() with its document ID.
       if (new URL(sender.url!).searchParams.get('surface') !== 'sidepanel')
-        throw new Error('Studioの送信元ドキュメントを確認できません。');
+        throw new Error('エディターの送信元ドキュメントを確認できません。');
       const documentId = await ports.sidePanelDocument(sender.url!);
       if (!documentId || (sender.documentId && sender.documentId !== documentId))
-        throw new Error('Studioの送信元ドキュメントを確認できません。');
+        throw new Error('エディターの送信元ドキュメントを確認できません。');
       source = { ...sender, documentId, frameId: 0 };
     }
     return { lease: await ports.owner(message, source), sender: source };
@@ -174,7 +174,7 @@ export function createStudioTransferService(ports: Ports) {
         !sameSender(grant, source, message['session']) ||
         message['ownerTabId'] !== grant.ownerTabId
       )
-        throw new Error('Studioの転送確認元が一致しません。');
+        throw new Error('エディターの転送確認元が一致しません。');
       if (entry.claimed) return { generation, accepted: true };
       entry.claimed = true;
       void ports
@@ -220,7 +220,7 @@ export function createStudioTransferService(ports: Ports) {
         reply.close();
       };
       if (!source?.id || source.url?.split('?')[0] !== ports.studioURL || source.frameType !== 'top-level')
-        return reject('unauthorized', 'Studio以外からの素材転送は受け付けません。');
+        return reject('unauthorized', 'エディター以外からの素材転送は受け付けません。');
       const grant = typeof data['token'] === 'string' ? grants.get(data['token']) : undefined;
       if (!grant)
         return reject(data['generation'] !== generation ? 'restart' : 'cancelled', '素材転送の許可が失効しました。');
@@ -271,7 +271,7 @@ export function createStudioTransferService(ports: Ports) {
         (async () => {
           const client = await ports.client(source.id!);
           if (!client || client.url !== grant.sender.url || client.frameType !== 'top-level')
-            finish(entry, failure(request, 'unauthorized', 'Studioの転送元が一致しません。'));
+            finish(entry, failure(request, 'unauthorized', 'エディターの転送元が一致しません。'));
           else if (!entry.finished && grants.get(grant.token) === grant)
             post(reply, { type: 'challenge', request, generation, challenge: entry.challenge });
           await done;

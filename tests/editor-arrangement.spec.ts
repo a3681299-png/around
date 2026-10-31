@@ -11,7 +11,7 @@ import { openEditor } from './helpers/editor';
 const cards = '[data-ww-surface~="video-card"]';
 
 async function enable(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   await expect(youtube.locator(cards).first()).toBeVisible();
 }
 const shown = (panel: Locator, selector: string) =>
@@ -121,4 +121,15 @@ test('表示設定 is the same ww-panel in the popup and in the in-video panel, 
   // No word "Studio" on either.
   expect(await popup.locator('.popup').innerText()).not.toContain('Studio');
   expect(await panel.innerText()).not.toContain('Studio');
+  // Headings, labels and choices are Japanese: no English word in them (the site's name and ON/OFF,
+  // as in 緊急OFF, aside).
+  for (const root of [popup.locator('.popup'), panel]) {
+    const english = await root.evaluate((node) => {
+      const scope = (node.shadowRoot ?? node) as ParentNode;
+      return [...scope.querySelectorAll('legend, label, h2, button, .ww-theme-name')]
+        .map((element) => element.textContent!.replace(/YouTube|ON|OFF/g, ''))
+        .filter((text) => /[A-Za-z]{3,}/.test(text));
+    });
+    expect(english).toEqual([]);
+  }
 });

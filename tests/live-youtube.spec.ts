@@ -54,7 +54,7 @@ for (const colorScheme of ['light', 'dark'] as const) {
       await expect(page.locator('ytd-watch-metadata h1').first()).toBeVisible({ timeout: 30_000 });
       await expect(page.locator('ytd-masthead #logo-icon svg').first()).toBeVisible({ timeout: 30_000 });
       await capture('live-native-watch');
-      await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+      await popup.getByRole('switch', { name: 'テーマを使う' }).check();
       await expect(page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
       await expect(page.locator('#web-world-themes-player-titlebar')).toBeVisible();
       await page.evaluate(() => window.scrollTo(0, 0));
@@ -382,7 +382,7 @@ for (const colorScheme of ['light', 'dark'] as const) {
       await inspectPaint('live-top-rest-spa-back');
       await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
       await expect(page.locator('yt-searchbox .ytSearchboxComponentInputBox').first()).toHaveCSS('box-shadow', /inset/);
-      await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+      await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
       await expect(page.locator('#web-world-themes-style')).toHaveCount(0);
       await expect(page.locator('[data-ww-surface]')).toHaveCount(0);
       await capture('live-restored-watch');

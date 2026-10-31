@@ -79,7 +79,7 @@ for (const badSender of [
 ])
   test(`transfer grants reject untrusted Runtime sender ${JSON.stringify(badSender)}`, async () => {
     const h = workerHarness();
-    await expect(h.service.authorize(values, badSender)).rejects.toThrow(/Studio/);
+    await expect(h.service.authorize(values, badSender)).rejects.toThrow(/エディター/);
     expect(h.writes()).toBe(0);
   });
 

@@ -17,8 +17,7 @@ export interface StudioTarget {
   targets: readonly DesignTarget[];
 }
 export type StudioRequest =
-  | { id: number; type: 'attach'; owner: string; resume?: EditorCheckpoint | PackedCheckpoint; visible?: boolean }
-  | { id: number; type: 'surface-visibility'; visible: boolean }
+  | { id: number; type: 'attach'; owner: string; resume?: EditorCheckpoint | PackedCheckpoint }
   | { id: number; type: 'command'; session: string; revision: number; command: EditCommand }
   | { id: number; type: 'import-assets'; session: string; revision: number; assets: string[] }
   // UI skin art into one slot of the selected part (Core accepts exactly one picture).

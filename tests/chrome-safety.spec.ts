@@ -2,8 +2,8 @@ import { test, expect } from './fixtures';
 import type { Page } from '@playwright/test';
 
 async function enable(popup: Page) {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
 }
 
 async function setFeature(popup: Page, id: string, enabled: boolean) {
@@ -97,7 +97,7 @@ test('measured footer reservation yields to watch controls at the screenshot vie
       objectFit: getComputedStyle(element).objectFit,
     })),
   ).toEqual(initial);
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
   await expect(footer).toHaveCount(0);
   expect(
     await root.evaluate((element) =>
@@ -180,7 +180,7 @@ test('gloss, genuine pane focus, daily details, and fullscreen clean up independ
   await setFeature(popup, 'glossy-titlebars', true);
   await expect(playlistTitle).toHaveCSS('background-image', /linear-gradient/);
   await popup.bringToFront();
-  await popup.getByRole('slider', { name: 'Effect Strength' }).focus();
+  await popup.getByRole('slider', { name: 'エフェクトの強さ' }).focus();
   const assertActualFocus = async () => {
     await expect
       .poll(() =>
@@ -219,7 +219,7 @@ test('gloss, genuine pane focus, daily details, and fullscreen clean up independ
   await setFeature(popup, 'focus-titlebars', false);
   await expect(root).not.toHaveAttribute('data-ww-document-active', '');
   await expect(root).not.toHaveAttribute('data-ww-active-pane', /.+/);
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
   await expect(detail).toHaveCount(0);
   await expect(youtube.locator('#web-world-themes-window-chrome')).toHaveCount(0);
 });

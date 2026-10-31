@@ -29,7 +29,7 @@ export interface StudioConnection {
   import(files: readonly File[], slot?: SkinSlot): Promise<void>;
   thumbnail(id: string): Promise<string | undefined>;
   focusTarget(): Promise<void>;
-  openWorkspace(surface?: 'inpage' | 'sidepanel' | 'window'): Promise<void>;
+  openWorkspace(surface: 'sidepanel' | 'window'): Promise<void>;
   readonly state: EditorSnapshot | undefined;
   readonly target: number | undefined;
   readonly isConnected: boolean;

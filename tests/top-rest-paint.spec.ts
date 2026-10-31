@@ -119,8 +119,8 @@ for (const dark of [true, false]) {
     await youtube.setViewportSize({ width: 1917, height: 917 });
     await installNativeYouTube(youtube, dark);
     await installTopRestPaint(youtube);
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-    await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+    await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
     await rest(youtube, 0);
     if (dark) {
       // Negative control: remove only the five new adapter paint rules, leaving
@@ -157,20 +157,20 @@ for (const dark of [true, false]) {
     await youtube.getByRole('textbox', { name: 'Search', exact: true }).fill('');
     await rest(youtube, 0);
     await readable(youtube);
-    await popup.getByRole('switch', { name: 'Window chrome' }).uncheck();
+    await popup.getByRole('switch', { name: '窓の飾り' }).uncheck();
     await rest(youtube, 0);
     await readable(youtube);
-    await popup.getByRole('switch', { name: 'Window chrome' }).check();
-    await popup.getByRole('slider', { name: 'Effect Strength' }).press('Home');
+    await popup.getByRole('switch', { name: '窓の飾り' }).check();
+    await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('Home');
     await expect(youtube.locator('#web-world-themes-style')).toHaveCount(0);
     if (dark) await expect(youtube.locator('#guide-icon')).toHaveCSS('color', 'rgba(255, 255, 255, 0.4)');
-    await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+    await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
     await rest(youtube, 0);
     await readable(youtube);
     await youtube.evaluate(() => document.dispatchEvent(new Event('yt-navigate-finish')));
     await rest(youtube, 0);
     await readable(youtube);
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+    await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
     await expect(youtube.locator('#web-world-themes-style')).toHaveCount(0);
     await expect(youtube.locator('html')).toHaveAttribute('data-ambientlight-enabled', '');
     await expect(youtube.locator('#fixture-top-rest-paint')).toHaveCount(1);

@@ -6,7 +6,7 @@ test('signal space keys edit with mouse/numbers, one-step drag history, key-only
   popup,
   youtube,
 }) => {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   let { panel } = await openEditor(popup, youtube);
   await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await panel.locator('.timeline-toggle').click();

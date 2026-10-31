@@ -17,14 +17,12 @@ import { createModelPanel } from './model-panel';
 import { createMotionPanel } from './motion-panel';
 import { createEffectsPanel } from './effects-panel';
 import { createLayerTree } from './layer-tree';
-import { createWorkspace } from './workspace';
 import { createStudioWorkbench } from '../studio/workbench';
-import { glyph, glyphButton } from './icons';
+import { glyphButton } from './icons';
 import { arc, drawPen, svg } from './pen';
 import { mountNumberScrub } from './number-scrub';
 import { createSkinPanel, SKIN_PANEL_STYLES, type SkinPageInfo, type SkinPanelOptions } from './skin-panel';
 import type { EditorTool, SkinPreview } from '../editor-core/types';
-import type { StudioHostLayout, StudioInsets } from '../studio/layout-types';
 import type { SignalRule } from '../signals/keyframes';
 import type { TimelinePort } from '../timeline/types';
 
@@ -34,22 +32,15 @@ import type { StudioPreferences } from '../studio/preferences';
 export interface PanelOptions {
   onSettings?(): void;
   preferences?: StudioPreferences;
-  fullPage?: boolean;
-  persistWorkspace?: boolean;
-  inPage?: boolean;
   /** The side panel's arrangement (one column, tabs): chosen by width, not by where the page runs. */
   sidePanel?: boolean;
   /** Where this editor page runs, for the 「サイドパネルで開く」/「別ウィンドウで開く」 actions. */
   surface?: 'sidepanel' | 'window';
-  toolbarOnly?: boolean;
-  onSurface?(surface: 'sidepanel' | 'inpage' | 'window'): void;
+  onSurface?(surface: 'sidepanel' | 'window'): void;
   hostLabel?: string;
-  onLayout?(insets: StudioInsets): void;
   timeline?: TimelinePort | undefined;
   /** UI skin editing; omitted where the panel has no native page parts to dress. */
   skin?: SkinPanelOptions;
-  /** Set by the panel itself: the floating editor, which wears the WWT Studio design system. */
-  floating?: boolean;
 }
 
 export interface PanelActions {
@@ -84,7 +75,8 @@ export interface PanelActions {
   thumbnail(id: string): Promise<string | undefined>;
 }
 
-/** This UI has no site selectors, theme CSS or persistence logic. */
+/** The editor page's panel (side panel or window). This UI has no site selectors, theme CSS or
+ * persistence logic. */
 export function createCreatorPanel(
   doc: Document,
   actions: PanelActions,
@@ -95,19 +87,15 @@ export function createCreatorPanel(
   host.id = 'web-world-themes-creator';
   host.setAttribute('data-ww-signal-control', '');
   host.lang = 'ja';
-  host.toggleAttribute('data-studio', Boolean(options.fullPage));
   host.setAttribute('role', 'dialog');
   host.setAttribute('aria-label', 'デザインエディター');
   const shadow = host.attachShadow({ mode: 'open' });
   const sheet = doc.createElement('style');
-  const workbench = Boolean(options.fullPage || options.inPage || options.sidePanel || options.toolbarOnly);
-  // `floating` is the floating editor's own shell only (its header, opening, guide and collapse).
-  // Every panel wears the WWT Studio system; the Studio workbench adds its arrangement on top.
-  const floating = !workbench;
+  // The WWT Studio system; the workbench adds its arrangement on top.
   sheet.textContent = tokens + styles + (options.skin ? SKIN_PANEL_STYLES : '');
   const main = doc.createElement('main');
   main.innerHTML = `
-    <header><div><span class="eyebrow">WORLD CREATOR</span><h2>デザインを編集</h2></div><button class="dock" type="button" title="YouTubeの見たい場所に合わせて左右を切り替え">パネルを左へ</button><button class="minimize" type="button" aria-label="パネルを折りたたむ" title="プレビューを広く見る">−</button><button class="close" type="button" aria-label="編集を終了" title="未保存の変更を破棄して終了">×</button></header>
+    <header><div><span class="eyebrow">WORLD CREATOR</span><h2>デザインを編集</h2></div><button class="dock" type="button" title="YouTubeの見たい場所に合わせて左右を切り替え">パネルを左へ</button><button class="close" type="button" aria-label="編集を終了" title="未保存の変更を破棄して終了">×</button></header>
     <div class="toolbar"><button class="undo" type="button" title="Ctrl＋Z">元に戻す</button><button class="redo" type="button" title="Ctrl＋Shift＋Z / Ctrl＋Y">やり直す</button><span class="dirty" role="status"></span></div>
     <div class="editor-body">
     <section class="assets">
@@ -208,8 +196,6 @@ export function createCreatorPanel(
     tools.append(button);
   }
   get('.toolbar').append(tools);
-  // The floating editor's header: the title alone, then its own controls as ruled icon buttons. The
-  // toolbar is the tools, a ruled separator, undo and redo, then the one save chip.
   const saveState = doc.createElement('div'),
     saveFailure = doc.createElement('div'),
     retry = doc.createElement('button');
@@ -229,21 +215,6 @@ export function createCreatorPanel(
   saveFailure.append(reason, retry);
   saveState.append(get('.dirty'), saveFailure);
   get('.toolbar').append(saveState);
-  if (floating) {
-    get('.eyebrow').remove();
-    glyphButton(get('.dock'), 'dock', 'パネルを左へ', '', 'YouTubeの見たい場所に合わせて左右を切り替え');
-    glyphButton(displaySettings, 'settings', '表示設定', '', 'テーマのON/OFFと強さを開く');
-    glyphButton(get('.minimize'), 'collapse', 'パネルを折りたたむ', '', 'プレビューを広く見る');
-    glyphButton(get('.close'), 'close', '編集を終了', '', '未保存の変更を破棄して終了');
-    get('header').append(get('.dock'), displaySettings, get('.minimize'), get('.close'));
-    const separator = doc.createElement('span');
-    separator.className = 'toolbar-separator';
-    separator.setAttribute('role', 'separator');
-    separator.setAttribute('aria-orientation', 'vertical');
-    get('.toolbar').replaceChildren(tools, separator, get('.undo'), get('.redo'), saveState);
-    // Opening: the panel's ruled edges are drawn in 4 frames, then the content appears in 3.
-    main.classList.add('ww-construct');
-  }
   // ww-rail: the chosen tool gets a G-pen circle, drawn round in 4 frames when it is chosen.
   let ringTool: string | undefined;
   const ringOn = (button: HTMLButtonElement | null) => {
@@ -266,8 +237,7 @@ export function createCreatorPanel(
           begin: actions.beginEdit,
           end: actions.endEdit,
         },
-        // The design system's empty state and copy, on every surface.
-        { ...options.skin, floating: true },
+        options.skin,
       )
     : undefined;
   const backgroundToggle = get<HTMLInputElement>('[data-override="backgroundColor"]');
@@ -298,12 +268,6 @@ export function createCreatorPanel(
   glyphButton(addImage, 'image', '画像を追加');
   glyphButton(addAnimation, 'animation', 'アニメーションを追加');
   glyphButton(addModel, 'model3d', '3Dモデルを追加');
-  if (floating) {
-    // Standing instructions move to a tooltip; the list's heading carries it.
-    const tip = get('.selection-tip');
-    get('.layers-section > summary').title = tip.textContent!;
-    tip.remove();
-  }
   const layers = get<HTMLDivElement>('.layers');
   const anchorSelect = get<HTMLSelectElement>('[data-image-prop="anchor"]');
   for (const anchor of anchors) {
@@ -350,13 +314,12 @@ export function createCreatorPanel(
     actions.imageImport([...(fileInput.files ?? [])]);
     fileInput.value = '';
   });
-  let workspace: ReturnType<typeof createWorkspace> & { setHostLayout?(value: StudioHostLayout): void };
+  let workspace: ReturnType<typeof createStudioWorkbench>;
   const tree = createLayerTree(doc, layers, {
     select: actions.imageSelect,
     change: actions.layerChange,
     reorder: actions.reorder,
     thumbnail: actions.thumbnail,
-    icon: glyph,
     context: (id, x, y) => {
       if (!current?.selectedIds.includes(id)) actions.imageSelect(id);
       // A remote selection must be acknowledged before the menu uses its actions.
@@ -364,13 +327,9 @@ export function createCreatorPanel(
       else pendingContext = { id, x, y };
     },
   });
-  workspace =
-    options.fullPage || options.inPage || options.sidePanel || options.toolbarOnly
-      ? createStudioWorkbench(doc, host, main, tree, actions, options)
-      : createWorkspace(doc, host, main, tree, actions.clearSelection, actions.selectAll, { ...options, floating });
-  // Workspaces rebuild the body, so the skin editor joins the final layout: the Studio's
-  // inspector column, or the quick panel's body.
-  if (skinPanel) (main.querySelector('.studio-inspectors') ?? get('.editor-body')).prepend(skinPanel.element);
+  workspace = createStudioWorkbench(doc, host, main, tree, actions, options);
+  // The workbench rebuilds the body, so the skin editor joins its inspector column.
+  if (skinPanel) get('.studio-inspectors').prepend(skinPanel.element);
   const layerName = get<HTMLInputElement>('.layer-name');
   layerName.addEventListener('change', () => {
     const name = layerName.value.trim();
@@ -438,11 +397,7 @@ export function createCreatorPanel(
   discard.addEventListener('click', actions.discard);
   close.addEventListener('click', actions.close);
   dock.addEventListener('click', () => {
-    const left = host.dataset.wwDock !== 'left';
-    host.dataset.wwDock = left ? 'left' : 'right';
-    const label = options.fullPage ? '左右を入れ替える' : left ? 'パネルを右へ' : 'パネルを左へ';
-    if (floating) dock.setAttribute('aria-label', label);
-    else dock.textContent = label;
+    host.dataset.wwDock = host.dataset.wwDock !== 'left' ? 'left' : 'right';
     workspace.layoutChanged();
   });
   get<HTMLButtonElement>('.reset').addEventListener('click', actions.reset);
@@ -455,20 +410,14 @@ export function createCreatorPanel(
   const stopScrub = mountNumberScrub(doc, host, main, actions.beginEdit, actions.endEdit);
   return {
     host,
-    setHostLayout(value: StudioHostLayout) {
-      workspace.setHostLayout?.(value);
-    },
     focus() {
-      if (options.inPage || options.fullPage) get<HTMLButtonElement>('[data-tool="select"]').focus();
-      else close.focus();
+      get<HTMLButtonElement>('[data-tool="select"]').focus();
     },
     render(state: PanelState) {
       current = state;
       main.toggleAttribute('data-skin-tool', Boolean(skinPanel) && state.tool === 'skin');
       skinPanel?.render(state);
-      imageProperties.hidden =
-        (!state.image && !(options.fullPage || options.inPage || options.sidePanel || options.toolbarOnly)) ||
-        state.selected;
+      imageProperties.hidden = state.selected;
       imageProperties.disabled = !state.image || state.saving || Boolean(state.image?.locked) || state.inheritedLocked;
       imageProperties.toggleAttribute('data-empty', !state.image);
       const opacityDriven = Boolean(
@@ -596,7 +545,7 @@ export function createCreatorPanel(
         get<HTMLSelectElement>('[data-image-prop="renderMode"]').value = renderModeOf(image);
         get<HTMLElement>('.render-mode-help').hidden = renderModeOf(image) !== 'atmosphere';
         setText(get<HTMLOutputElement>('.opacity-value'), `${Math.round(image.opacity * 100)}%`);
-      } else if (options.fullPage || options.inPage) {
+      } else {
         imageProperties
           .querySelectorAll<HTMLInputElement>('input[type="text"],input[type="number"]')
           .forEach((input) => {

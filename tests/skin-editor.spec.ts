@@ -1,14 +1,14 @@
 import { mkdir } from 'node:fs/promises';
 import type { Locator, Page } from '@playwright/test';
 import { test, expect } from './fixtures';
-import { openEditor as openEditorPage, openRetiredEditor } from './helpers/editor';
+import { openEditor as openEditorPage } from './helpers/editor';
 
 const cards = '[data-ww-surface~="video-card"]';
 const shots = process.env.WW_SKIN_SHOTS;
 
 async function enable(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
   await expect(youtube.locator(cards).first()).toBeVisible();
 }
 async function openEditor(popup: Page, youtube: Page) {
@@ -232,15 +232,14 @@ test('skin tool: hover names parts, click dresses every card, guides and state p
   expect(errors).toEqual([]);
 });
 
-test('the in-page Studio shows the skin editor in its inspector column and picks parts from the canvas', async ({
+test('the editor window shows the skin editor in its inspector column and picks parts from the page', async ({
   popup,
   youtube,
 }) => {
   await youtube.setViewportSize({ width: 1366, height: 900 });
   await enable(popup, youtube);
-  // UI0-d: stays on the in-page Studio, whose inspector column on the page it checks
-  // (docs/ui0d-2.md, tests not moved).
-  const panel = await openRetiredEditor(popup, youtube, 'inpage');
+  // UI0-d round 3: the in-page Studio's workbench is the editor window's own.
+  const { panel } = await openEditorPage(popup, youtube, { width: 1366 });
   await panel.getByRole('button', { name: 'UIを着せ替え' }).click();
   const region = panel.getByRole('region', { name: 'UIの着せ替え' });
   await expect(region).toBeVisible();

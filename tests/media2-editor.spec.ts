@@ -3,7 +3,7 @@ import path from 'node:path';
 import { build } from 'esbuild';
 import { readFile } from 'node:fs/promises';
 import { test, expect, launchExtension } from './fixtures';
-import { openEditor, openRetiredEditor } from './helpers/editor';
+import { openEditor } from './helpers/editor';
 import type { Page, Locator } from '@playwright/test';
 import type { DesignDocument } from '../src/design/types';
 
@@ -12,10 +12,10 @@ const overlay = '#web-world-themes-decorations',
     ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',
   layers = `${presentation} [data-image-id]`;
 const file = (name: string) => path.resolve(`tests/fixtures/motion/${name}`);
-async function open(popup: Page, page: Page, retired = false) {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+async function open(popup: Page, page: Page) {
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   await page.bringToFront();
-  const panel = retired ? await openRetiredEditor(popup, page) : (await openEditor(popup, page)).panel;
+  const { panel } = await openEditor(popup, page);
   await exposeEditorControls(panel);
   return panel;
 }
@@ -346,7 +346,7 @@ test('APNG/WebM/image share player-anchored groups, mask signals, history, reduc
   await youtube.locator(`${layers} video`).evaluate((node) => {
     (globalThis as unknown as { oldArtworkVideo: Element }).oldArtworkVideo = node;
   });
-  await popup.getByRole('slider', { name: 'Effect Strength' }).press('Home');
+  await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('Home');
   await expect(youtube.locator(overlay)).toHaveCount(0);
   expect(
     await youtube.evaluate(() => {
@@ -354,10 +354,10 @@ test('APNG/WebM/image share player-anchored groups, mask signals, history, reduc
       return { paused: n.paused, src: n.getAttribute('src') };
     }),
   ).toEqual({ paused: true, src: null });
-  await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+  await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
   await youtube.bringToFront();
   await ready(youtube, 3);
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
   await expect(youtube.locator(overlay)).toHaveCount(0);
 });
 
@@ -394,9 +394,11 @@ test('OFF aborts an unfinished import decoder and closes its late frame without 
   popup,
   youtube,
 }) => {
-  // UI0-d: stays on the floating editor. It patches the decoder where that editor decodes (the
-  // YouTube tab); the editor page decodes in its own page (docs/ui0d-2.md, tests not moved).
-  const panel = await open(popup, youtube, true),
+  // UI0-d round 3 (stopped, not deleted): the floating editor decoded the import in the YouTube tab,
+  // where this patches the decoder. The editor page decodes in its own page, so the patch never runs
+  // (tried). Moving it means patching and aborting there instead: 翔太's decision (docs/ui0d-3.md).
+  test.fixme(true, 'UI0-d round 3: the decoder this patches no longer runs in the YouTube tab; awaiting a decision.');
+  const panel = await open(popup, youtube),
     session = await youtube.context().newCDPSession(youtube);
   const worlds: { id: number; auxData?: { type?: string } }[] = [];
   session.on('Runtime.executionContextCreated', ({ context }) => worlds.push(context));
@@ -425,7 +427,7 @@ test('OFF aborts an unfinished import decoder and closes its late frame without 
         ).result.value,
     )
     .toBe('function');
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
   await expect(panel).toHaveCount(0);
   await expect(youtube.locator(overlay)).toHaveCount(0);
   await expect

@@ -3,7 +3,7 @@ import { mkdir, mkdtemp, writeFile, access } from 'node:fs/promises';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
 import { launchExtension } from './fixtures';
-import { openRetiredEditor } from './helpers/editor';
+import { openSidePanelFromIcon } from './helpers/editor';
 import { sidePanelDriver, nativeWindow } from './helpers/side-panel';
 
 test('official side panel on real YouTube preserves controls, layout, authoring and resize anchors', async () => {
@@ -37,13 +37,11 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
       { waitUntil: 'domcontentloaded' },
     );
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 25_000 });
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
     await expect(page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
     await page.bringToFront();
-    // UI0-d: the in-page Studio has no entry any more; opened through its retained message.
-    await openRetiredEditor(popup, page, 'inpage');
+    await openSidePanelFromIcon(popup, page);
     const local = page.locator('#web-world-themes-creator');
-    await local.getByRole('button', { name: 'Chromeサイドパネルを開く', exact: true }).click();
     const panel = await sidePanelDriver(context, page, id);
     await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
     await expect(page.locator('#web-world-themes-studio-layout')).toHaveCount(0);
@@ -236,8 +234,9 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
     await expect(local).not.toBeVisible();
     await expect.poll(() => page.evaluate(() => Boolean(document.fullscreenElement))).toBe(true);
     await page.evaluate(() => document.exitFullscreen());
-    await expect(local).not.toBeVisible();
-    await expect(local).not.toHaveAttribute('data-fullscreen', '');
+    // UI0-d round 3: no page toolbar exists to step aside in fullscreen; nothing of the editor is
+    // on the page.
+    await expect(local).toHaveCount(0);
     report.checks.fullscreen = true;
     const first = page
         .locator(

@@ -9,7 +9,7 @@ const overlay = '#web-world-themes-decorations';
 const layers = `${overlay} [data-image-id]`;
 
 async function open(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   await youtube.bringToFront();
   const { panel: dialog } = await openEditor(popup, youtube);
@@ -264,11 +264,11 @@ test('normal decoration is click-through; OFF and zero remove images and ON rest
   await expect(youtube).toHaveURL(/\/watch\?/);
   await expect(youtube.locator(layers).locator('img')).toBeVisible();
   for (const boundary of ['off', 'zero'] as const) {
-    if (boundary === 'off') await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
-    else await popup.getByRole('slider', { name: 'Effect Strength' }).press('Home');
+    if (boundary === 'off') await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+    else await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('Home');
     await expect(youtube.locator(overlay)).toHaveCount(0);
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-    await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+    await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
     await expect(youtube.locator(layers).locator('img')).toBeVisible();
   }
 });
@@ -414,13 +414,13 @@ test('turning the theme OFF while a save waits for asset retention still complet
       ),
     )
     .toBe(true);
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
   await expect(youtube.locator(overlay)).toHaveCount(0);
   await worker.evaluate(() => {
     (globalThis as typeof globalThis & { resumeAssetPrune?: () => void }).resumeAssetPrune?.();
   });
   await expect.poll(async () => (await stored(popup)).decorations.length).toBe(1);
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   await expect(youtube.locator(layers)).toHaveCount(1);
   await expect(youtube.locator(layers).locator('img')).toBeVisible();
 });

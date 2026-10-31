@@ -1,0 +1,457 @@
+{
+  "stage": "UI0-d round 3",
+  "measure": "extension CPU per frame (isolated-world callbacks summed per frame), ms",
+  "url": "https://www.youtube.com/results?search_query=lofi+hip+hop",
+  "mode": "ui0d3 (before vs after: closed startup/steady, window hover/scroll)",
+  "measuredAt": "2026-10-31T12:24:01.641Z",
+  "browser": "Chromium 143.0.7499.4 headless, 1920x1080, deviceScaleFactor 1, fresh signed-out profiles",
+  "environment": {
+    "os": "win32 10.0.26300",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13650HX",
+    "node": "v24.16.0"
+  },
+  "builds": {
+    "before": {
+      "revision": "32609a451198db9ad89d02c26ec6402cca804e4a",
+      "contentScriptBytes": 3105446
+    },
+    "after": {
+      "revision": "32609a451198db9ad89d02c26ec6402cca804e4a + round 3 working tree",
+      "contentScriptBytes": 2792095
+    }
+  },
+  "scenes": {
+    "startup": "6s from navigation (commit), editor closed",
+    "steady": "10s pointer movement, editor closed",
+    "hover": "editor window open, skin tool, pointer across cards and controls",
+    "scroll": "editor window open, a card chosen with the card tool, feed scrolled 10s"
+  },
+  "pairs": [
+    {
+      "order": ["before", "after"],
+      "before": {
+        "startup": {
+          "median": 0,
+          "p95": 0.7000000029802322,
+          "max": 7.899999998509884,
+          "frames": 764,
+          "longestCallbackMs": 6.800000004470348,
+          "longTasks": 9
+        },
+        "steady": {
+          "median": 0,
+          "p95": 0,
+          "max": 1,
+          "frames": 1358,
+          "longestCallbackMs": 1,
+          "longTasks": 0
+        },
+        "hover": {
+          "median": 0,
+          "p95": 0.6000000014901161,
+          "max": 3.100000001490116,
+          "frames": 437,
+          "longestCallbackMs": 2.8000000044703484,
+          "longTasks": 0
+        },
+        "scroll": {
+          "median": 0,
+          "p95": 0.4000000059604645,
+          "max": 2,
+          "frames": 1479,
+          "longestCallbackMs": 2,
+          "longTasks": 0
+        }
+      },
+      "after": {
+        "startup": {
+          "median": 0,
+          "p95": 0,
+          "max": 6.599999986588955,
+          "frames": 785,
+          "longestCallbackMs": 5.399999998509884,
+          "longTasks": 6
+        },
+        "steady": {
+          "median": 0,
+          "p95": 0,
+          "max": 0.8999999985098839,
+          "frames": 1370,
+          "longestCallbackMs": 0.8999999985098839,
+          "longTasks": 0
+        },
+        "hover": {
+          "median": 0,
+          "p95": 0.6000000014901161,
+          "max": 2.7000000029802322,
+          "frames": 442,
+          "longestCallbackMs": 2.7000000029802322,
+          "longTasks": 0
+        },
+        "scroll": {
+          "median": 0,
+          "p95": 0.5,
+          "max": 1.7000000029802322,
+          "frames": 1477,
+          "longestCallbackMs": 1.6000000014901161,
+          "longTasks": 0
+        }
+      }
+    },
+    {
+      "order": ["after", "before"],
+      "before": {
+        "startup": {
+          "median": 0,
+          "p95": 0,
+          "max": 7.200000002980232,
+          "frames": 777,
+          "longestCallbackMs": 6,
+          "longTasks": 2
+        },
+        "steady": {
+          "median": 0,
+          "p95": 0,
+          "max": 1,
+          "frames": 1364,
+          "longestCallbackMs": 1,
+          "longTasks": 0
+        },
+        "hover": {
+          "median": 0,
+          "p95": 0.6000000089406967,
+          "max": 2.600000001490116,
+          "frames": 439,
+          "longestCallbackMs": 2.600000001490116,
+          "longTasks": 0
+        },
+        "scroll": {
+          "median": 0,
+          "p95": 0.29999999701976776,
+          "max": 2.100000001490116,
+          "frames": 1462,
+          "longestCallbackMs": 2.100000001490116,
+          "longTasks": 0
+        }
+      },
+      "after": {
+        "startup": {
+          "median": 0,
+          "p95": 0,
+          "max": 7.5,
+          "frames": 753,
+          "longestCallbackMs": 5.899999998509884,
+          "longTasks": 7
+        },
+        "steady": {
+          "median": 0,
+          "p95": 0,
+          "max": 1,
+          "frames": 1368,
+          "longestCallbackMs": 1,
+          "longTasks": 0
+        },
+        "hover": {
+          "median": 0,
+          "p95": 0.6000000014901161,
+          "max": 2.9999999925494194,
+          "frames": 444,
+          "longestCallbackMs": 1.5999999940395355,
+          "longTasks": 0
+        },
+        "scroll": {
+          "median": 0,
+          "p95": 0.20000000298023224,
+          "max": 1.6999999955296516,
+          "frames": 1487,
+          "longestCallbackMs": 1.6000000014901161,
+          "longTasks": 0
+        }
+      }
+    },
+    {
+      "order": ["before", "after"],
+      "before": {
+        "startup": {
+          "median": 0,
+          "p95": 0.5,
+          "max": 6.9000000059604645,
+          "frames": 700,
+          "longestCallbackMs": 6.700000002980232,
+          "longTasks": 6
+        },
+        "steady": {
+          "median": 0,
+          "p95": 0,
+          "max": 1.8000000044703484,
+          "frames": 1366,
+          "longestCallbackMs": 1.8000000044703484,
+          "longTasks": 0
+        },
+        "hover": {
+          "median": 0,
+          "p95": 0.7999999970197678,
+          "max": 2.7999999970197678,
+          "frames": 442,
+          "longestCallbackMs": 2.7000000029802322,
+          "longTasks": 0
+        },
+        "scroll": {
+          "median": 0,
+          "p95": 0.29999999701976776,
+          "max": 1.7000000029802322,
+          "frames": 1497,
+          "longestCallbackMs": 1.7000000029802322,
+          "longTasks": 0
+        }
+      },
+      "after": {
+        "startup": {
+          "median": 0,
+          "p95": 0.19999999552965164,
+          "max": 10,
+          "frames": 798,
+          "longestCallbackMs": 9.899999998509884,
+          "longTasks": 4
+        },
+        "steady": {
+          "median": 0,
+          "p95": 0,
+          "max": 1,
+          "frames": 1361,
+          "longestCallbackMs": 0.8000000044703484,
+          "longTasks": 0
+        },
+        "hover": {
+          "median": 0,
+          "p95": 0.7000000029802322,
+          "max": 2.2999999970197678,
+          "frames": 439,
+          "longestCallbackMs": 1.8999999985098839,
+          "longTasks": 0
+        },
+        "scroll": {
+          "median": 0,
+          "p95": 0.20000000298023224,
+          "max": 2.100000001490116,
+          "frames": 1457,
+          "longestCallbackMs": 1.8999999985098839,
+          "longTasks": 0
+        }
+      }
+    },
+    {
+      "order": ["after", "before"],
+      "before": {
+        "startup": {
+          "median": 0,
+          "p95": 0,
+          "max": 11.5,
+          "frames": 804,
+          "longestCallbackMs": 11.5,
+          "longTasks": 4
+        },
+        "steady": {
+          "median": 0,
+          "p95": 0,
+          "max": 1.1999999955296516,
+          "frames": 1369,
+          "longestCallbackMs": 1.1999999955296516,
+          "longTasks": 0
+        },
+        "hover": {
+          "median": 0,
+          "p95": 0.6000000014901161,
+          "max": 2.7000000029802322,
+          "frames": 444,
+          "longestCallbackMs": 2.7000000029802322,
+          "longTasks": 0
+        },
+        "scroll": {
+          "median": 0,
+          "p95": 0.6000000014901161,
+          "max": 2,
+          "frames": 1479,
+          "longestCallbackMs": 1.7999999970197678,
+          "longTasks": 0
+        }
+      },
+      "after": {
+        "startup": {
+          "median": 0,
+          "p95": 0,
+          "max": 7,
+          "frames": 793,
+          "longestCallbackMs": 6.200000002980232,
+          "longTasks": 3
+        },
+        "steady": {
+          "median": 0,
+          "p95": 0,
+          "max": 1.0999999940395355,
+          "frames": 1371,
+          "longestCallbackMs": 0.8000000044703484,
+          "longTasks": 0
+        },
+        "hover": {
+          "median": 0,
+          "p95": 0.7000000029802322,
+          "max": 2.8000000044703484,
+          "frames": 445,
+          "longestCallbackMs": 2.6999999955296516,
+          "longTasks": 0
+        },
+        "scroll": {
+          "median": 0,
+          "p95": 0.29999999701976776,
+          "max": 1.7000000104308128,
+          "frames": 1489,
+          "longestCallbackMs": 1.7000000029802322,
+          "longTasks": 0
+        }
+      }
+    },
+    {
+      "order": ["before", "after"],
+      "before": {
+        "startup": {
+          "median": 0,
+          "p95": 0.09999999403953552,
+          "max": 6.4000000059604645,
+          "frames": 786,
+          "longestCallbackMs": 5.699999995529652,
+          "longTasks": 5
+        },
+        "steady": {
+          "median": 0,
+          "p95": 0,
+          "max": 0.8000000044703484,
+          "frames": 1369,
+          "longestCallbackMs": 0.7999999970197678,
+          "longTasks": 0
+        },
+        "hover": {
+          "median": 0,
+          "p95": 0.6000000014901161,
+          "max": 3.1999999955296516,
+          "frames": 445,
+          "longestCallbackMs": 3.1999999955296516,
+          "longTasks": 0
+        },
+        "scroll": {
+          "median": 0,
+          "p95": 0.5,
+          "max": 1.8999999985098839,
+          "frames": 1458,
+          "longestCallbackMs": 1.8999999985098839,
+          "longTasks": 0
+        }
+      },
+      "after": {
+        "startup": {
+          "median": 0,
+          "p95": 0.3999999985098839,
+          "max": 8.899999998509884,
+          "frames": 734,
+          "longestCallbackMs": 7,
+          "longTasks": 5
+        },
+        "steady": {
+          "median": 0,
+          "p95": 0,
+          "max": 0.8000000044703484,
+          "frames": 1375,
+          "longestCallbackMs": 0.7000000029802322,
+          "longTasks": 0
+        },
+        "hover": {
+          "median": 0,
+          "p95": 0.6999999955296516,
+          "max": 3,
+          "frames": 442,
+          "longestCallbackMs": 3,
+          "longTasks": 0
+        },
+        "scroll": {
+          "median": 0,
+          "p95": 0.30000000447034836,
+          "max": 1.7000000029802322,
+          "frames": 1490,
+          "longestCallbackMs": 1.6000000014901161,
+          "longTasks": 0
+        }
+      }
+    },
+    {
+      "order": ["after", "before"],
+      "before": {
+        "startup": {
+          "median": 0,
+          "p95": 0.3999999985098839,
+          "max": 10.599999994039536,
+          "frames": 717,
+          "longestCallbackMs": 9.899999998509884,
+          "longTasks": 5
+        },
+        "steady": {
+          "median": 0,
+          "p95": 0,
+          "max": 1.2000000029802322,
+          "frames": 1369,
+          "longestCallbackMs": 0.7999999970197678,
+          "longTasks": 0
+        },
+        "hover": {
+          "median": 0,
+          "p95": 0.6999999955296516,
+          "max": 2.8000000044703484,
+          "frames": 447,
+          "longestCallbackMs": 2.7000000029802322,
+          "longTasks": 0
+        },
+        "scroll": {
+          "median": 0,
+          "p95": 0.29999999701976776,
+          "max": 1.900000013411045,
+          "frames": 1478,
+          "longestCallbackMs": 1.2000000029802322,
+          "longTasks": 0
+        }
+      },
+      "after": {
+        "startup": {
+          "median": 0,
+          "p95": 0,
+          "max": 6.4000000059604645,
+          "frames": 788,
+          "longestCallbackMs": 5.899999998509884,
+          "longTasks": 4
+        },
+        "steady": {
+          "median": 0,
+          "p95": 0,
+          "max": 0.9000000059604645,
+          "frames": 1371,
+          "longestCallbackMs": 0.7999999970197678,
+          "longTasks": 0
+        },
+        "hover": {
+          "median": 0,
+          "p95": 0.6000000014901161,
+          "max": 2.899999998509884,
+          "frames": 442,
+          "longestCallbackMs": 2.899999998509884,
+          "longTasks": 0
+        },
+        "scroll": {
+          "median": 0,
+          "p95": 0.30000000447034836,
+          "max": 1.8000000044703484,
+          "frames": 1481,
+          "longestCallbackMs": 1.8000000044703484,
+          "longTasks": 0
+        }
+      }
+    }
+  ]
+}

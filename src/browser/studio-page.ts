@@ -2,7 +2,7 @@ import { mountStudio } from '../studio/app';
 import { createStudioClient } from './studio-client';
 import { createStudioRecovery } from './studio-recovery';
 import { browserStudioPreferences } from './preferences';
-import { mountSafetyControls } from '../settings/safety-controls';
+import { mountEditorSafety } from '../settings/safety-controls';
 import { skinAssetPort } from './skin-assets';
 import tokens from '../editor/studio-tokens.css';
 
@@ -18,12 +18,12 @@ async function start() {
   const value = params.get('target');
   const target = value && /^\d+$/.test(value) ? Number(value) : undefined;
   const tab = sidePanel ? { id: target } : await chrome.tabs.getCurrent();
-  if (tab?.id === undefined) throw new Error('Studioのタブを取得できません。');
+  if (tab?.id === undefined) throw new Error('エディターのタブを取得できません。');
   // Each preview URL lives until the Studio page closes.
   const skinPreviews = new Map<string, Promise<string | undefined>>();
   const app = mountStudio(document, document.querySelector<HTMLElement>('#studio')!, {
     hostName: 'YouTube',
-    mountSafety: mountSafetyControls,
+    mountSafety: mountEditorSafety,
     sidePanel,
     connect: (notify, checkpoint) => createStudioClient(notify, checkpoint, sidePanel ? document : undefined),
     recovery: createStudioRecovery(tab.id),
@@ -55,5 +55,5 @@ async function start() {
 }
 void start().catch((error: unknown) => {
   document.querySelector('#studio')!.textContent =
-    error instanceof Error ? error.message : 'Studioを起動できませんでした。';
+    error instanceof Error ? error.message : 'エディターを起動できませんでした。';
 });

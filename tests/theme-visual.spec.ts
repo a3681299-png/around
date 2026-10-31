@@ -23,11 +23,11 @@ test('capture the silver software shell on home, watch, playlist, narrow, and fu
     expect(await youtube.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   };
   await capture('fixture-native-home');
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
   await expect(youtube.locator('#web-world-themes-clock')).toBeVisible();
   await capture('fixture-silver-60-home');
-  await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+  await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
   await expect(youtube.locator('html')).toHaveAttribute('style', /--ww-strength: 1;/);
   await capture('fixture-silver-100-home');
   const header = await youtube.locator('ytd-masthead').boundingBox();
@@ -112,12 +112,12 @@ test('capture the silver software shell on home, watch, playlist, narrow, and fu
   await youtube.setViewportSize({ width: 900, height: 760 });
   await capture('fixture-silver-100-900px-watch-playlist');
   await assertNoOverflow();
-  await popup.getByRole('switch', { name: 'Window chrome', exact: true }).uncheck();
+  await popup.getByRole('switch', { name: '窓の飾り', exact: true }).uncheck();
   for (const id of ['window-chrome', 'player-titlebar', 'playlist-titlebar', 'statusbar', 'clock']) {
     await expect(youtube.locator(`#web-world-themes-${id}`)).toHaveCount(0);
   }
   await capture('fixture-silver-chrome-disabled');
-  await popup.getByRole('switch', { name: 'Window chrome', exact: true }).check();
+  await popup.getByRole('switch', { name: '窓の飾り', exact: true }).check();
   await youtube.goto('https://www.youtube.com/');
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
   await capture('fixture-silver-100-900px-home');

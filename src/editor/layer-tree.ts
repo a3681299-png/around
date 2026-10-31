@@ -1,6 +1,6 @@
 import { childrenOf, effectivelyLocked, frontToBack, parentGroup, rootLayers } from '../design/hierarchy';
 import type { Decoration, GroupLayer, ImagePatch, LayerNode } from '../design/types';
-import { icon } from './icons';
+import { glyph } from './icons';
 
 interface TreeState {
   images: readonly Decoration[];
@@ -14,13 +14,11 @@ interface TreeActions {
   reorder(id: string, targetId: string, after: boolean): void;
   context(id: string, x: number, y: number): void;
   thumbnail(id: string): Promise<string | undefined>;
-  /** The icon set to draw with; the floating editor passes the design system's glyphs. */
-  icon?: (name: string) => string;
 }
 
 /** Hierarchy and authoring UI only. Document operations stay in the controller. */
 export function createLayerTree(doc: Document, container: HTMLElement, actions: TreeActions) {
-  const draw = actions.icon ?? icon;
+  const draw = glyph;
   let current: TreeState | undefined,
     key = '',
     lastSelection = '',

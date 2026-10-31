@@ -6,13 +6,7 @@ import { createThemeController } from '../themes/controller';
 import { createSettingsPanel } from '../settings/panel';
 import { mountPixelFont } from '../ui/pixel-font';
 import { createCreatorEditor, type CreatorEditor } from '../editor/controller';
-import {
-  OPEN_CREATOR_EDITOR,
-  OPEN_INPAGE_STUDIO,
-  OPEN_SIDE_PANEL_TOOLS,
-  PREPARE_SIDE_PANEL,
-  PROBE_EDITOR_TARGET,
-} from '../editor/messages';
+import { PREPARE_SIDE_PANEL, PROBE_EDITOR_TARGET } from '../editor/messages';
 import type { UserSettings } from '../storage/settings';
 import { connectStudioHost } from '../browser/studio-host';
 import { ASSET_PROFILE } from '../diagnostics/asset-profile';
@@ -53,7 +47,6 @@ if (site) {
     controller.setImageEditing,
     controller.validateDesign,
     controller.timeline,
-    () => settingsPanel.open(),
     {
       status: controller.skinAssetStatus,
       previews: controller.setSkinPreviews,
@@ -108,26 +101,18 @@ if (site) {
     creator?.setEnabled(settings.enabled && settings.strength > 0);
   };
   let unwatch = watchSettings(update, reportError);
+  // The page answers one question from the extension: whether it is an edit target. The editor
+  // itself is the side panel or its window, which connects through the Studio port.
   const onMessage = (message: unknown, sender: chrome.runtime.MessageSender, respond: (value: unknown) => void) => {
     if (
       sender.id !== chrome.runtime.id ||
       !message ||
       typeof message !== 'object' ||
       !('type' in message) ||
-      !oneOf(message.type, [OPEN_CREATOR_EDITOR, OPEN_INPAGE_STUDIO, OPEN_SIDE_PANEL_TOOLS, PROBE_EDITOR_TARGET])
+      !oneOf(message.type, [PROBE_EDITOR_TARGET])
     )
       return false;
-    if (message.type === PROBE_EDITOR_TARGET) {
-      respond({ siteId: site.id });
-      return false;
-    }
-    respond(
-      message.type === OPEN_SIDE_PANEL_TOOLS
-        ? creator?.openSidePanel()
-        : message.type === OPEN_INPAGE_STUDIO
-          ? creator?.openStudio()
-          : creator?.open(),
-    );
+    respond({ siteId: site.id });
     return false;
   };
   chrome.runtime.onMessage.addListener(onMessage);

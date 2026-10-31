@@ -2,19 +2,26 @@ import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 import type { Locator, Page } from '@playwright/test';
 import { test, expect } from './fixtures';
-import { openRetiredEditor } from './helpers/editor';
+import { openEditor } from './helpers/editor';
 import type { DesignDocument } from '../src/design/types';
 import { beginCanvasGesture } from './helpers/editor-workspace';
+
+// UI0-d round 3 (stopped, not deleted): every check here walks the floating editor's own shell — the
+// guide inside the layer pane, 並べる, プロパティを編集, collapse and its width handle, low-window
+// folding. The editor page keeps the guide in ヘルプ and shows both panes side by side, so these steps
+// do not exist there even in its one-column arrangement (tried at 1440 and 400 px). Moving them means
+// rewriting their steps, which is 翔太's decision (docs/ui0d-3.md).
+test.fixme(true, 'UI0-d round 3: the floating editor these steps walk was removed; awaiting a decision.');
 
 const key = 'webWorldThemes.design.youtube',
   overlay = '#web-world-themes-decorations';
 const layers = `${overlay} [data-image-id]`;
 async function open(popup: Page, page: Page) {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
-  // UI0-d: this suite checks the floating editor's own arrangement (tabs on the page, guide, collapse,
-  // dock, low windows). It stays on that editor until round 3 decides (docs/ui0d-2.md).
-  return openRetiredEditor(popup, page);
+  // UI0-d round 3: the editor page (its window). The floating editor's own shell (width, collapse,
+  // low-window guide folding) went with it; those checks are stopped below (docs/ui0d-3.md).
+  return (await openEditor(popup, page)).panel;
 }
 async function add(panel: Locator, page: Page) {
   const buffers = await page.evaluate(() =>
@@ -229,7 +236,7 @@ test('animation thumbnails are static and independent of playback; error feedbac
   await expect(panel.locator('.dirty')).not.toContainText('保存済み');
   await panel.getByRole('tab', { name: '使い方', exact: true }).click();
   await expect(panel.locator('.status')).toHaveAttribute('data-error', 'true');
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
   await expect(panel).toHaveCount(0);
   await expect(youtube.locator(overlay)).toHaveCount(0);
 });

@@ -16,7 +16,7 @@ const presentation =
 const colors = ['#f04a50', '#3caf78', '#4276ed'],
   names = ['red.png', 'green.png', 'blue.png'];
 async function open(popup: Page, page: Page) {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   await page.bringToFront();
   await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   const { panel } = await openEditor(popup, page);
@@ -453,11 +453,11 @@ test('mixed anchors and interleaved selection are refused; player groups follow 
   await youtube.locator('#movie_player [aria-label="Play"]').click();
   await expect(youtube.locator('#movie_player video')).toHaveJSProperty('paused', false);
   for (const boundary of ['off', 'zero']) {
-    if (boundary === 'off') await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
-    else await popup.getByRole('slider', { name: 'Effect Strength' }).press('Home');
+    if (boundary === 'off') await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+    else await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('Home');
     await expect(youtube.locator(overlay)).toHaveCount(0);
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-    await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+    await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
     await youtube.bringToFront();
     await ready(youtube, 3);
   }
@@ -710,12 +710,12 @@ test('16 groups / 32 media share effect sources and become idle or fully detache
   });
   await expect.poll(stats).toMatchObject({ pointer: 1, video: 5 });
   for (const boundary of ['off', 'zero']) {
-    if (boundary === 'off') await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
-    else await popup.getByRole('slider', { name: 'Effect Strength' }).press('Home');
+    if (boundary === 'off') await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+    else await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('Home');
     await expect(youtube.locator(overlay)).toHaveCount(0);
     await expect.poll(stats).toMatchObject({ pointer: 0, video: 0 });
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-    await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+    await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
     await youtube.bringToFront();
     await ready(youtube, 32);
   }

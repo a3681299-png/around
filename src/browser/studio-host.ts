@@ -1,7 +1,7 @@
 import { createStudioStateEncoder } from '../studio/state-sync';
 import { unpackCheckpoint } from '../studio/checkpoint-codec';
 import type { EditorSnapshot } from '../editor-core/types';
-import type { CreatorEditor } from '../editor/controller';
+import type { CreatorEditor, EditorSurface } from '../editor/controller';
 import type { SiteAdapter } from '../sites/types';
 import {
   STUDIO_PORT,
@@ -51,7 +51,7 @@ export function connectStudioHost(
     if (port.name !== STUDIO_PORT || !trusted(port.sender) || (port.sender?.frameId && port.sender.frameId !== 0))
       return;
     let owner: string | undefined,
-      surface: string | undefined,
+      surface: EditorSurface | undefined,
       closed = false,
       attached = false,
       lastHistory = -1,
@@ -131,9 +131,7 @@ export function connectStudioHost(
           try {
             if (request.type === 'attach') {
               if (typeof request.owner !== 'string' || !/^studio-[\w-]{1,100}$/.test(request.owner))
-                throw new Error('Studioの識別子が不正です。');
-              if (request.visible !== undefined && typeof request.visible !== 'boolean')
-                throw new Error('Studioの表示状態が不正です。');
+                throw new Error('エディターの識別子が不正です。');
               if (owner && owner !== request.owner) throw new Error('接続の所有者が変わりました。');
               owner = request.owner;
               surface = new URL(port.sender!.url!).searchParams.get('surface') === 'sidepanel' ? 'sidepanel' : 'window';
@@ -144,6 +142,7 @@ export function connectStudioHost(
                 request.owner,
                 resume,
                 Boolean(previous && previous !== port && activeSurface !== surface),
+                surface,
               );
               activePort = port;
               activeSurface = surface;
@@ -156,10 +155,6 @@ export function connectStudioHost(
                 ports.get(previous)?.();
                 previous.disconnect();
               }
-              if (surface === 'sidepanel') {
-                editor.openSidePanel();
-                editor.setSidePanelVisible(owner, request.visible !== false);
-              }
               if (closed) {
                 editor.detachStudio(request.owner);
                 return;
@@ -170,19 +165,14 @@ export function connectStudioHost(
               if (update) post({ type: 'timeline', update });
               if (safety) post({ type: 'safety', status: safety.snapshot() });
             } else if (!owner) throw new Error('先に編集対象へ接続してください。');
-            else if (request.type === 'surface-visibility') {
-              if (!attached || activePort !== port || surface !== 'sidepanel' || typeof request.visible !== 'boolean')
-                throw new Error('Studioの表示状態が不正です。');
-              editor.setSidePanelVisible(owner, request.visible);
-              post({ type: 'reply', id: request.id, ok: true });
-            } else if (request.type === 'safety') {
+            else if (request.type === 'safety') {
               if (!attached || activePort !== port || typeof request.overlay !== 'boolean')
                 throw new Error('操作チェックの要求が不正です。');
               safety?.overlay(request.overlay);
               post({ type: 'reply', id: request.id, ok: true });
             } else if (request.type === 'timeline') {
               if (!attached || activePort !== port || typeof request.session !== 'string')
-                throw new Error('Studioへ再接続してください。');
+                throw new Error('エディターを編集対象へ接続し直してください。');
               await editor.timelineCommand(owner, request.session, parseTimelineCommand(request.command));
               post({ type: 'reply', id: request.id, ok: true });
             } else if (request.type === 'command') {
@@ -248,7 +238,7 @@ export function connectStudioHost(
               owner = undefined;
               attached = false;
               post({ type: 'reply', id: request.id, ok: true });
-            } else throw new Error('未対応のStudio操作です。');
+            } else throw new Error('エディターの操作に対応していません。');
           } catch (error) {
             post({
               type: 'reply',

@@ -1,6 +1,5 @@
 import type { DesignTarget } from '../design/types';
 import type { PlaybackSource } from '../signals/types';
-import type { StudioHostLayout, StudioLayoutAdapter } from '../studio/layout-types';
 
 /** The theme sees semantic surfaces; the adapter owns selectors and page lifecycle. */
 export type Surface =
@@ -86,6 +85,4 @@ export interface SiteAdapter {
    * the editor picks parts. Unused parts cost nothing during scans. */
   setDesignParts?(ids: ReadonlySet<string>): void;
   mountSettings(entry: SettingsEntry): () => void;
-  protectStudioToolbar?(toolbar: HTMLElement): () => void;
-  mountStudio?(changed: (state: StudioHostLayout) => void): StudioLayoutAdapter;
 }

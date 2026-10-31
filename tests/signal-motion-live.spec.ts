@@ -3,7 +3,7 @@ import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
-import { openRetiredEditor } from './helpers/editor';
+import { openSidePanelFromIcon } from './helpers/editor';
 import { nativeWindow, sidePanelDriver } from './helpers/side-panel';
 import { declinePromotion } from './helpers/youtube-live';
 import { createTakeSampler, type SignalTake } from '../src/world/takes';
@@ -41,13 +41,11 @@ test('real YouTube: official Studio configures GIF pursuit, records/replays/load
     const page = await context.newPage();
     await page.goto('https://www.youtube.com/watch?v=LC1a-DwUhls', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 25_000 });
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
     await page.bringToFront();
     await expect(page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
-    // UI0-d: still on the in-page Studio; opened through its retained message.
-    await openRetiredEditor(popup, page, 'inpage');
+    await openSidePanelFromIcon(popup, page);
     const local = page.locator('#web-world-themes-creator');
-    await local.getByRole('button', { name: 'Chromeサイドパネルを開く', exact: true }).click();
     const panel = await sidePanelDriver(context, page, id),
       ui = 'document.querySelector("#web-world-themes-creator").shadowRoot';
     stage('GIF pursuit');

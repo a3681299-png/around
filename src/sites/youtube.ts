@@ -8,7 +8,6 @@ import { mountYouTubeComments } from './youtube-comments';
 import { videoCardContainer } from './youtube-cards';
 import { youtubePlaybackSource } from './youtube-signals';
 import { youtubeOperations } from './youtube-operations';
-import { mountYouTubeStudio, protectYouTubeStudioToolbar } from './youtube-studio';
 import { YOUTUBE_DESIGN_TARGETS, YOUTUBE_SKIN_CONTROLS, YOUTUBE_SKIN_MARKS } from './youtube-targets';
 import { createSelectorIndex } from './surface-index';
 import { surfacesFor, YOUTUBE_BASE_INDEX, YOUTUBE_BASE_SELECTORS, YOUTUBE_SURFACE_TARGETS } from './youtube-surfaces';
@@ -43,8 +42,6 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
     signals: { videoPlayback: youtubePlaybackSource(doc) },
     operationSurfaces: () => youtubeOperations(doc),
     mountSettings: (entry) => mountYouTubeSettings(doc, view, entry),
-    protectStudioToolbar: (toolbar) => protectYouTubeStudioToolbar(doc, toolbar),
-    mountStudio: (changed) => mountYouTubeStudio(doc, changed),
     features: {
       'window-chrome': { mount: () => mountYouTubeChrome(doc) },
       'daily-details': { mount: () => mountYouTubeDetails(doc) },

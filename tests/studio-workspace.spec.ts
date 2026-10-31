@@ -1,20 +1,17 @@
 import path from 'node:path';
 import type { Page } from '@playwright/test';
 import { test, expect } from './fixtures';
-import { openRetiredEditor } from './helpers/editor';
+import { openEditor } from './helpers/editor';
 import { beginCanvasGesture } from './helpers/editor-workspace';
 
 const overlay = '#web-world-themes-decorations',
   images =
     ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]';
 async function open(popup: Page, page: Page) {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
   await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
-  // UI0-d: this suite checks the in-page Studio's own arrangement on YouTube. It stays on that
-  // Studio until round 3 decides (docs/ui0d-2.md).
-  const panel = await openRetiredEditor(popup, page, 'inpage');
-  await expect(panel).toHaveAttribute('data-inpage', '');
-  return panel;
+  // UI0-d round 3: the in-page Studio's workbench is the editor page's own (its window).
+  return (await openEditor(popup, page)).panel;
 }
 
 test('one live workspace imports, directly moves, groups, masks and saves without a second window', async ({
@@ -22,6 +19,9 @@ test('one live workspace imports, directly moves, groups, masks and saves withou
   popup,
   youtube,
 }, info) => {
+  // UI0-d round 3 (stopped, not deleted): "without a second window" and the YouTube layout it
+  // reserves are the in-page Studio's own; the editor is a second page now (docs/ui0d-3.md).
+  test.fixme(true, 'UI0-d round 3: checks the removed in-page Studio itself; awaiting a decision.');
   await youtube.setViewportSize({ width: 1366, height: 900 });
   const pages = context.pages().length;
   const panel = await open(popup, youtube);
@@ -71,6 +71,9 @@ test('one live workspace imports, directly moves, groups, masks and saves withou
 });
 
 test('panes resize, mirror, persist and fold into a safe narrow workspace', async ({ popup, youtube }, info) => {
+  // UI0-d round 3 (stopped, not deleted): measures the panes against YouTube's layout, which the
+  // in-page Studio narrowed to make room (docs/ui0d-3.md).
+  test.fixme(true, 'UI0-d round 3: checks the removed in-page Studio layout; awaiting a decision.');
   await youtube.setViewportSize({ width: 1366, height: 900 });
   const panel = await open(popup, youtube);
   await expect.poll(async () => (await youtube.locator('ytd-app').boundingBox())!.width).toBe(862);
@@ -155,37 +158,39 @@ test('tools preserve native playback/navigation and numeric scrubbing is one can
   // pointer gestures need the same enabled check that fill/click provide.
   await expect(width).toBeEnabled();
   await label.scrollIntoViewIfNeeded();
+  // UI0-d round 3: the panel is the editor page's; its pointer and keys are that page's.
+  const editor = panel.page();
   const before = Number(await width.inputValue()),
     box = (await label.boundingBox())!;
-  await youtube.mouse.move(box.x + 5, box.y + box.height / 2);
-  await youtube.mouse.down();
-  await youtube.mouse.move(box.x + 25, box.y + box.height / 2, { steps: 10 });
-  await youtube.mouse.up();
+  await editor.mouse.move(box.x + 5, box.y + box.height / 2);
+  await editor.mouse.down();
+  await editor.mouse.move(box.x + 25, box.y + box.height / 2, { steps: 10 });
+  await editor.mouse.up();
   await expect.poll(async () => Number(await width.inputValue())).toBe(before + 20);
   await panel.getByRole('button', { name: '元に戻す', exact: true }).click();
   await expect.poll(async () => Number(await width.inputValue())).toBe(before);
   await panel.getByRole('button', { name: 'やり直す', exact: true }).click();
   await expect.poll(async () => Number(await width.inputValue())).toBe(before + 20);
   const newBox = (await label.boundingBox())!;
-  await youtube.mouse.move(newBox.x + 5, newBox.y + newBox.height / 2);
-  await youtube.mouse.down();
-  await youtube.mouse.move(newBox.x + 35, newBox.y + newBox.height / 2, { steps: 8 });
-  await youtube.keyboard.press('Escape');
-  await youtube.mouse.up();
+  await editor.mouse.move(newBox.x + 5, newBox.y + newBox.height / 2);
+  await editor.mouse.down();
+  await editor.mouse.move(newBox.x + 35, newBox.y + newBox.height / 2, { steps: 8 });
+  await editor.keyboard.press('Escape');
+  await editor.mouse.up();
   await expect.poll(async () => Number(await width.inputValue())).toBe(before + 20);
   await expect(panel.locator('.selected-count')).toHaveText('1個選択中');
   await panel.getByLabel('レイヤー名', { exact: true }).fill('v h c');
   await expect(panel.getByRole('button', { name: '選択・変形', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await panel.getByRole('button', { name: 'サイト操作', exact: true }).click();
-  await youtube.keyboard.press('Control+z');
+  await editor.keyboard.press('Control+z');
   await expect(panel.getByLabel('レイヤー名', { exact: true })).toHaveValue('petal.png');
   await panel
     .locator('.studio-menu-item > summary')
     .filter({ hasText: /^編集$/ })
     .click();
-  await youtube.keyboard.press('ArrowDown');
+  await editor.keyboard.press('ArrowDown');
   await expect(panel.getByRole('menuitem', { name: '元に戻す', exact: true })).toBeFocused();
-  await youtube.keyboard.press('Escape');
+  await editor.keyboard.press('Escape');
   await expect(panel.locator('.studio-menu-item[open]')).toHaveCount(0);
   await expect(panel.locator('.selected-count')).toHaveText('1個選択中');
 });
@@ -194,6 +199,9 @@ test('fullscreen suspends authoring and help, then SPA/scroll and strength zero 
   popup,
   youtube,
 }) => {
+  // UI0-d round 3 (stopped, not deleted): the in-page Studio hid itself and its help over YouTube's
+  // fullscreen; the editor page is not on YouTube (docs/ui0d-3.md).
+  test.fixme(true, 'UI0-d round 3: checks the removed in-page Studio in fullscreen; awaiting a decision.');
   await youtube.setViewportSize({ width: 1366, height: 900 });
   await youtube.locator('#navigate').click();
   const player = await youtube.locator('#movie_player').elementHandle(),
@@ -247,6 +255,9 @@ test('standalone opens the same live Core; selection, scrubbing, history and rel
   popup,
   youtube,
 }) => {
+  // UI0-d round 3 (stopped, not deleted): synchronises the in-page Studio with a window; the side
+  // panel and window hand-off is checked in side-panel.spec.ts (docs/ui0d-3.md).
+  test.fixme(true, 'UI0-d round 3: the in-page Studio this pairs with a window was removed; awaiting a decision.');
   await youtube.setViewportSize({ width: 1366, height: 900 });
   const inline = await open(popup, youtube);
   const opened = context.waitForEvent('page');
@@ -284,8 +295,6 @@ test('standalone opens the same live Core; selection, scrubbing, history and rel
   await youtube.reload();
   await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true', { timeout: 15_000 });
   await expect(youtube.locator(images)).toHaveCount(1);
-  // UI0-d: the window no longer offers the in-page Studio; its retained message opens it the same way.
-  await openRetiredEditor(popup, youtube, 'inpage');
   await expect(inline).toBeVisible();
   await expect(inline.getByLabel('画像のX位置', { exact: true })).toHaveValue('65');
   await inline.getByRole('button', { name: '保存', exact: true }).click();
@@ -350,7 +359,7 @@ test('all current animation kinds use the live panels, inherited locks, groups, 
   await panel.getByRole('button', { name: '編集を終了', exact: true }).click();
   await youtube.reload();
   await expect(youtube.locator(images)).toHaveCount(5);
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
   await expect(youtube.locator(overlay)).toHaveCount(0);
 });
 
@@ -367,8 +376,8 @@ test('ending immediately after resizing flushes the final workspace preference w
       .dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
     shadow.querySelector<HTMLButtonElement>('.close')!.click();
   });
-  await expect(panel).toHaveCount(0);
-  await expect(youtube.locator('#web-world-themes-studio-layout')).toHaveCount(0);
+  // UI0-d round 3: the editor page stays; ending the edit ends it on the page.
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-editing', /.*/);
   await expect
     .poll(() =>
       popup.evaluate(
@@ -382,10 +391,10 @@ test('ending immediately after resizing flushes the final workspace preference w
       async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
     ),
   ).toBeUndefined();
-  await open(popup, youtube);
-  await expect(panel).toHaveCSS('--inspector-width', '340px');
-  await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
-  await expect(panel.getByRole('button', { name: '編集を終了', exact: true })).toHaveAttribute(
+  const reopened = await open(popup, youtube);
+  await expect(reopened).toHaveCSS('--inspector-width', '340px');
+  await reopened.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
+  await expect(reopened.getByRole('button', { name: '編集を終了', exact: true })).toHaveAttribute(
     'title',
     /未保存の変更を破棄/,
   );

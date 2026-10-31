@@ -4,7 +4,7 @@ import { mkdtemp, mkdir, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
-import { openRetiredEditor } from './helpers/editor';
+import { openEditor } from './helpers/editor';
 
 test('optional real YouTube: saved group, mask, anchors, signals, theater, fullscreen and SPA', async ({}, info) => {
   test.skip(process.env.WW_LIVE_MEDIA !== '1', 'Explicit signed-out real YouTube regression.');
@@ -41,13 +41,11 @@ test('optional real YouTube: saved group, mask, anchors, signals, theater, fulls
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto('https://www.youtube.com/watch?v=AS4q9yaWJkI', { waitUntil: 'domcontentloaded', timeout: 30_000 });
     await expect(page.locator('#movie_player video').first()).toBeAttached({ timeout: 20_000 });
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
     await page.bringToFront();
     await expect(page.locator('[data-ww-surface~="player-window"]')).toBeVisible();
-    // UI0-d: still on the floating editor; opened through its retained message.
-    await openRetiredEditor(popup, page);
-    const panel = page.getByRole('dialog', { name: 'デザインエディター' });
-    await expect(panel).toBeVisible();
+    // UI0-d round 3: the editor window (as a tab); the checks stay on the YouTube page.
+    const { panel } = await openEditor(popup, page);
     await exposeEditorControls(panel);
     await panel
       .getByLabel('アニメーション素材を追加')
@@ -163,7 +161,7 @@ test('optional real YouTube: saved group, mask, anchors, signals, theater, fulls
       await expect(page.locator(`${presentation} .media video`)).toHaveJSProperty('paused', false);
     });
     await check('OFF removes artwork and editing handles', async () => {
-      await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+      await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
       await expect(page.locator(presentation)).toHaveCount(0);
     });
     await mkdir('.work/verification', { recursive: true });

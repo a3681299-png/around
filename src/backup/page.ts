@@ -127,7 +127,7 @@ restore.addEventListener('click', () => {
     await request('restore', checkedFile);
     invalidate();
     status.textContent =
-      '読み込みが完了しました。YouTubeとStudioを再読み込みして、作品と保存テイクを確認してください。';
+      '読み込みが完了しました。YouTubeとエディターを再読み込みして、作品と保存テイクを確認してください。';
   });
 });
 window.addEventListener('pagehide', () => {

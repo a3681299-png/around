@@ -9,8 +9,8 @@ const key = 'webWorldThemes.design.youtube';
 let editor: Locator | undefined;
 
 async function enable(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
   await expect(youtube.locator(cards).first()).toBeVisible();
 }
 
@@ -156,8 +156,8 @@ test('theme OFF and zero remove editing UI, selection, styles, variables and sur
   await save(dialog);
   for (const boundary of ['off', 'zero'] as const) {
     await background(dialog, '#ffddaa');
-    if (boundary === 'off') await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
-    else await popup.getByRole('slider', { name: 'Effect Strength' }).press('Home');
+    if (boundary === 'off') await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+    else await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('Home');
     await expect(
       youtube.locator(
         '[data-ww-surface], [data-ww-editor-selected], #web-world-themes-creator, #web-world-themes-design-style, #web-world-themes-selection-style, #web-world-themes-style',
@@ -176,8 +176,8 @@ test('theme OFF and zero remove editing UI, selection, styles, variables and sur
         })),
     ).toEqual(nativeCard);
     await expect(youtube.locator('ytd-thumbnail #thumbnail').first()).toHaveCSS('border-radius', '16px');
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-    await popup.getByRole('slider', { name: 'Effect Strength' }).press('End');
+    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+    await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
     await expect(youtube.locator(cards).first()).toHaveCSS('background-color', 'rgb(238, 221, 255)');
     dialog = await openEditor(popup, youtube);
     await selectCard(youtube);
@@ -354,7 +354,7 @@ test('independent documents apply without retro styles, palette or features and 
       return design.baseThemeId;
     }, key),
   ).toBeNull();
-  await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
   await expect(
     youtube.locator('[data-ww-surface], #web-world-themes-design-style, #web-world-themes-creator'),
   ).toHaveCount(0);

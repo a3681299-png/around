@@ -37,10 +37,12 @@ test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and 
     const page = await context.newPage();
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto('https://www.youtube.com/watch?v=AS4q9yaWJkI', { waitUntil: 'domcontentloaded' });
-    await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
+    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
     await page.bringToFront();
     await expect(page.locator('[data-ww-surface~="player-window"]')).toBeVisible({ timeout: 20_000 });
-    // UI0-d: the floating editor's live check; opened through its retained message.
+    // UI0-d round 3 (stopped, not deleted): the floating editor's own live check, like
+    // editor-ux.spec.ts (docs/ui0d-3.md).
+    test.fixme(true, 'UI0-d round 3: the floating editor this walks was removed; awaiting a decision.');
     await openRetiredEditor(popup, page);
     const panel = page.getByRole('dialog', { name: 'デザインエディター' });
     await expect(panel).toBeVisible();
@@ -111,7 +113,7 @@ test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and 
         paused = await video.evaluate((node: HTMLVideoElement) => node.paused);
       await page.locator('#movie_player .ytp-play-button').click();
       await expect.poll(() => video.evaluate((node: HTMLVideoElement) => node.paused)).not.toBe(paused);
-      await popup.getByRole('switch', { name: 'Theme ON / OFF' }).uncheck();
+      await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
       await expect(page.locator(presentation)).toHaveCount(0);
       await expect(panel).toHaveCount(0);
     });

@@ -1,8 +1,8 @@
 import { FEATURE_REGISTRY } from '../features';
 import { DEFAULT_PALETTE, PALETTE_CHANNELS, PALETTE_PRESETS } from '../themes/retro/palette';
 
-const paletteLabels = { hue: '色相 / Hue', saturation: '彩度 / Saturation', brightness: '明るさ / Brightness' };
-const presetLabels = { silver: 'Silver', lavender: 'Lavender', mint: 'Mint', pink: 'Pink' };
+const paletteLabels = { hue: '色相', saturation: '彩度', brightness: '明るさ' };
+const presetLabels = { silver: 'シルバー', lavender: 'ラベンダー', mint: 'ミント', pink: 'ピンク' };
 const paletteControls = PALETTE_CHANNELS.map(
   (channel) => `
       <div class="palette-channel">
@@ -69,9 +69,9 @@ export const SETTINGS_MARKUP = `
     </section>
     <fieldset class="ww-group">
       <legend>表示テーマ</legend>
-      <p class="ww-theme-name">YouTube / retro</p>
+      <p class="ww-theme-name">YouTube / レトロ</p>
       <div class="control-row">
-        <label for="theme-enabled">Theme ON / OFF</label>
+        <label for="theme-enabled">テーマを使う</label>
         <div class="toggle-group">
           <output id="theme-state" for="theme-enabled">OFF</output>
           <input id="theme-enabled" type="checkbox" role="switch" disabled />
@@ -81,27 +81,27 @@ export const SETTINGS_MARKUP = `
     <fieldset class="ww-group strength-control">
       <legend>エフェクト</legend>
       <div class="control-row">
-        <label for="effect-strength">Effect Strength</label>
+        <label for="effect-strength">エフェクトの強さ</label>
         <output id="strength-value" for="effect-strength">60%</output>
       </div>
       <input id="effect-strength" type="range" min="0" max="100" step="1" value="60" disabled />
       <div class="range-hints" aria-hidden="true"><span>0%</span><span>100%</span></div>
     </fieldset>
     <fieldset class="ww-group palette-settings">
-      <legend>自動配色 / UI palette</legend>
+      <legend>自動配色</legend>
       <div class="palette-presets" role="group" aria-label="配色プリセット">${presetButtons}
       </div>
       ${paletteControls}
       <p id="palette-help" class="feature-description">UIだけの配色です。動画・画像は元の色を保ちます。配色がOFFでも値は保存されます。</p>
     </fieldset>
     <fieldset class="ww-group noise-control">
-      <legend>表面の質感 / Noise</legend>
+      <legend>表面の質感</legend>
       <div class="control-row">
-        <label for="noise-strength">Noise Strength</label>
+        <label for="noise-strength">粒子の強さ</label>
         <output id="noise-strength-value" for="noise-strength">22%</output>
       </div>
       <input id="noise-strength" type="range" min="0" max="100" step="1" value="22" aria-describedby="noise-help" disabled />
-      <p id="noise-help" class="feature-description">Faint surface grainがONのときだけ、背景にごく薄い粒子を加えます。</p>
+      <p id="noise-help" class="feature-description">「表面のかすかな粒子」がONのときだけ、背景にごく薄い粒子を加えます。</p>
     </fieldset>
     <fieldset class="ww-group feature-settings">
       <legend>表示オプション</legend>

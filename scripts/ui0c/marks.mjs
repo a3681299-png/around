@@ -191,7 +191,14 @@ async function openStudio({ context, popup, page }) {
   const studio = await context.newPage();
   await studio.setViewportSize({ width: 1440, height: 900 });
   await studio.goto(`chrome-extension://${new URL(popup.url()).host}/studio/index.html?target=${tab}`);
-  await studio.locator('.connection-status[data-connected="true"]').waitFor();
+  // The connection line may sit in the status bar's tooltip; its state is what matters.
+  await studio
+    .locator('.connection-status[data-connected="true"]')
+    .waitFor({ state: 'attached' })
+    .catch(async (error) => {
+      const line = await studio.locator('.connection-status').textContent();
+      throw new Error(`Editor window for tab ${tab} did not connect: ${line} (${String(error).slice(0, 80)})`);
+    });
   await page.bringToFront();
   return studio.getByRole('dialog', { name: 'デザインエディター' });
 }
@@ -214,11 +221,68 @@ async function skinSurface(browser, surface) {
   });
   return { hover };
 }
+/**
+ * UI0-d round 3: the page with the editor closed (startup: 6s from navigation; steady: 10s of pointer
+ * movement), then edited from the editor window (skin tool hover; a card chosen with the card tool,
+ * the feed scrolled). Both builds edit through the window, which both have.
+ */
+async function ui0d3(browser) {
+  const { page } = browser;
+  await page.goto(url, { waitUntil: 'commit' });
+  const startup = await measure(browser, async () => {
+    await page.waitForTimeout(6000);
+  });
+  await page.locator('[data-ww-surface~="video-card"]').nth(3).waitFor();
+  await page.waitForTimeout(4000);
+  const steady = await measure(browser, async () => {
+    for (let i = 0; i < 20; i++) {
+      await page.mouse.move(100 + (i % 5) * 300, 200 + (i % 3) * 200, { steps: 10 });
+      await page.waitForTimeout(400);
+    }
+  });
+  let editor = await openStudio(browser);
+  await editor.getByRole('button', { name: 'UIを着せ替え' }).click();
+  await page.waitForTimeout(1500);
+  const hover = await measure(browser, async () => {
+    for (let i = 0; i < 12; i++) {
+      const y = 200 + (i % 4) * 200;
+      await page.mouse.move(80, y, { steps: 2 });
+      await page.mouse.move(900, y + 60, { steps: 20 });
+      await page.waitForTimeout(100);
+    }
+  });
+  // One editor per tab: the first window is closed before the next opens.
+  await editor.page().close();
+  await page.waitForTimeout(500);
+  editor = await openStudio(browser);
+  await editor.getByRole('button', { name: '動画カードを編集' }).click();
+  await page.mouse.move(1700, 300);
+  await page
+    .locator('[data-ww-surface~="video-card"]')
+    .nth(1)
+    .locator('a')
+    .first()
+    .click({ position: { x: 20, y: 20 } });
+  await page.locator('[data-ww-editor-selected]').waitFor();
+  await page.waitForTimeout(1500);
+  const scroll = await measure(browser, async () => {
+    for (let i = 0; i < 40; i++) {
+      await page.mouse.wheel(0, i < 20 ? 90 : -90);
+      await page.waitForTimeout(250);
+    }
+  });
+  return { startup, steady, hover, scroll };
+}
 const surfaceMode = process.env.UI0C_MODE === 'surface';
+const ui0d3Mode = process.env.UI0C_MODE === 'ui0d3';
 
 const result = {
   url,
-  mode: surfaceMode ? 'surface (after build: floating vs window)' : 'build (before vs after)',
+  mode: surfaceMode
+    ? 'surface (after build: floating vs window)'
+    : ui0d3Mode
+      ? 'ui0d3 (before vs after: closed startup/steady, window hover/scroll)'
+      : 'build (before vs after)',
   measuredAt: new Date().toISOString(),
   environment: { os: `${os.platform()} ${os.release()}`, cpu: os.cpus()[0]?.model, node: process.version },
   builds: {},
@@ -240,7 +304,11 @@ for (let pair = 0; pair < pairs; pair++) {
     const browser = await launch(surfaceMode ? builds.after : builds[condition]);
     result.browser = browser.version;
     try {
-      row.blocks[condition] = surfaceMode ? await skinSurface(browser, condition) : await scenarios(browser);
+      row.blocks[condition] = surfaceMode
+        ? await skinSurface(browser, condition)
+        : ui0d3Mode
+          ? await ui0d3(browser)
+          : await scenarios(browser);
     } catch (error) {
       row.blocks[condition] = { error: String(error).slice(0, 600) };
     } finally {

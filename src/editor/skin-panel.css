@@ -1,17 +1,8 @@
-/* The floating editor: the skin editor replaces the layer and property panes. */
-:host(:not([data-workbench])) main[data-skin-tool] .editor-body > :not(.skin),
 main[data-skin-tool] > .workspace-nav,
 main[data-skin-tool] > .selection-bar {
   display: none !important;
 }
-:host(:not([data-workbench])) main[data-skin-tool] .editor-body {
-  border-radius: 4px 4px 0 0;
-}
-:host(:not([data-workbench])) main[data-skin-tool] .editor-body > .skin {
-  overflow: auto;
-  padding: 0 var(--space-12) var(--space-12);
-}
-/* The workbench: it takes the whole inspector column; the canvas and library stay. */
+/* The skin editor takes the whole inspector column; the canvas and library stay. */
 main[data-skin-tool] .studio-inspectors {
   grid-template-rows: minmax(0, 1fr);
 }

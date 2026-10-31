@@ -2,7 +2,7 @@ import { test, expect, type Locator, type Page } from '@playwright/test';
 import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
-import { openRetiredEditor } from './helpers/editor';
+import { openEditor as openEditorPage } from './helpers/editor';
 import { clearestPoint, declinePromotion, errorSummary, waitForAdvertToEnd } from './helpers/youtube-live';
 import { plainSkinDesign, storeDesign } from './helpers/skin-verification';
 import { exposeEditorControls } from './helpers/editor-workspace';
@@ -49,18 +49,20 @@ async function clip(page: Page, name: string, box: { x: number; y: number; width
 }
 async function openEditor(page: Page, popup: Page) {
   await page.bringToFront();
-  // UI0-d: the UI0-c evidence was taken with the floating editor; opened through its retained message.
-  await openRetiredEditor(popup, page);
-  const editor = page.getByRole('dialog', { name: dialogName });
-  await expect(editor).toBeVisible();
+  // UI0-d round 3: the editor window (as a tab); the marks are on the YouTube page.
+  const { panel: editor } = await openEditorPage(popup, page);
+  await expect(editor).toHaveAccessibleName(dialogName);
   return editor;
 }
 async function closeEditor(editor: Locator) {
-  if (!(await editor.isVisible())) return;
-  await editor.getByRole('button', { name: /編集を終了/ }).click();
-  const discard = editor.page().getByRole('button', { name: /破棄|保存しない/ });
-  if (await discard.isVisible().catch(() => false)) await discard.click();
-  await expect(editor).toBeHidden();
+  if (editor.page().isClosed()) return;
+  // The editor window's 編集を終了 ends at once (unsaved changes go, as its title says); then the
+  // window closes as a person closes it.
+  await editor
+    .getByRole('button', { name: /編集を終了/ })
+    .first()
+    .click();
+  await editor.page().close();
 }
 async function moveAway(page: Page) {
   const viewport = page.viewportSize()!;
@@ -189,14 +191,15 @@ for (const scheme of ['light', 'dark'] as const)
         await clip(page, `${scheme}-card-selected-scrolled`, (await card.boundingBox())!);
       });
       await closeEditor(editor);
-      // The Studio badge appears on the page while a Studio window holds the session.
+      // The badge appears on the page while the editor's own window holds the session.
       await step(`${scheme}-studio-badge`, async () => {
         const studio = await context.newPage();
         await studio.goto(`chrome-extension://${extensionId}/studio/index.html`);
         await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
         await page.bringToFront();
         const badge = page.locator('#web-world-themes-studio-link');
-        await expect(badge.getByRole('button', { name: 'クイック編集を表示' })).toBeVisible();
+        await expect(badge).toContainText('別ウィンドウで編集中');
+        await expect(badge.getByRole('button', { name: '編集を終了' })).toBeVisible();
         await clip(page, `${scheme}-studio-badge`, (await badge.boundingBox())!);
         await studio.close();
         await expect(badge).toHaveCount(0);
@@ -305,7 +308,8 @@ for (const scheme of ['light', 'dark'] as const)
           const studio = await context.newPage();
           await studio.goto(`chrome-extension://${extensionId}/studio/index.html`);
           await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
-          await studio.locator('.ww-safety-controls summary').click();
+          // UI0-d round 3: 操作チェック sits in the editor's header while a layer is restricted.
+          await studio.locator('.ww-editor-safety .safety-check > summary').click();
           await studio.getByLabel('操作面の保護範囲を表示').check();
           await page.bringToFront();
           await expect(page.locator('#web-world-themes-operation-check')).toHaveCount(1);

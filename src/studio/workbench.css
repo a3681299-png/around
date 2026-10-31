@@ -25,15 +25,6 @@
   font: 13px/20px var(--font-ui) !important;
   pointer-events: none !important;
 }
-:host([data-workbench][data-inpage]) {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100dvh !important;
-}
-:host([data-workbench][data-fullscreen]) {
-  display: none !important;
-}
 /* Docked surfaces are flat and square (README: Surfaces, Radii). */
 :host([data-workbench]) main {
   position: relative;
@@ -271,10 +262,6 @@
   position: relative;
   background: var(--ground);
 }
-:host([data-inpage]) .canvas-slot {
-  background: transparent;
-  pointer-events: none;
-}
 .studio-inspectors {
   grid-column: 5;
   display: grid;
@@ -484,18 +471,25 @@ footer {
 }
 .status {
   overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
   margin: 0;
+  min-width: 0;
   min-height: 0;
   font-size: 12px;
   color: var(--ink-muted);
   flex: 1;
 }
-.canvas-dimensions {
-  color: var(--ink-muted);
-  font-size: 12px;
+/* A line that would be cut moves into the ⓘ tooltip; it stays in place for assistive technology. */
+.status[data-tip] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.status-tip {
   flex: none;
+  margin-left: auto;
 }
 .context-menu {
   pointer-events: auto;
@@ -645,22 +639,17 @@ label[data-scrub] input {
   cursor: text;
   user-select: text;
 }
-.local-connection {
-  color: var(--ink-muted);
-  font-size: 12px;
-  white-space: nowrap;
-}
-
 /* The native Side Panel owns width. These rules never style the host website. */
 :host([data-sidepanel]) .studio-menu {
   padding-inline: 2px;
 }
 :host([data-sidepanel]) .studio-brand,
-:host([data-sidepanel]) .menu-end > .dock {
+:host([data-sidepanel]) .menu-end > .dock,
+:host([data-sidepanel]) .menu-end > .usage {
   display: none;
 }
 :host([data-sidepanel]) .studio-menu-item > summary {
-  padding-inline: 5px;
+  padding-inline: 4px;
 }
 :host([data-sidepanel]) .editor-body {
   display: block;
@@ -671,7 +660,7 @@ label[data-scrub] input {
 :host([data-sidepanel]) .canvas-slot {
   display: none;
 }
-/* One column with the floating editor's tabs; 並べる stacks both panes. */
+/* One column with tabs; 並べる stacks both panes. */
 :host([data-sidepanel]) .studio-inspectors {
   position: static;
   width: 100%;
@@ -692,14 +681,6 @@ label[data-scrub] input {
 :host([data-sidepanel][data-split]) .studio-inspectors > .layers-pane {
   border-top: 1px solid var(--line);
 }
-:host([data-sidepanel][data-inspectors-wide]) .studio-inspectors {
-  grid-template-columns: minmax(0, var(--inspector-wide-ratio, 50%)) 5px minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr);
-}
-:host([data-sidepanel][data-inspectors-wide]) .inspector-divider {
-  height: 100%;
-  cursor: ew-resize;
-}
 :host([data-sidepanel]) .studio-connection {
   display: none;
 }
@@ -708,9 +689,8 @@ label[data-scrub] input {
   height: auto;
   min-height: var(--control);
   padding-block: 2px;
-}
-:host([data-sidepanel]) .canvas-dimensions {
-  display: none;
+  /* The column's tools fit on one line; the narrow window's sideways scroll would clip the ＋ menu. */
+  overflow: visible;
 }
 :host([data-sidepanel]) footer {
   gap: 6px;
@@ -719,51 +699,6 @@ label[data-scrub] input {
   display: inline-flex;
   gap: 1px;
 }
-:host([data-page-toolbar]) {
-  position: fixed !important;
-  inset: auto auto 32px 12px !important;
-  width: max-content !important;
-  max-width: calc(100vw - 24px) !important;
-  height: 32px !important;
-  z-index: 2147483001 !important;
-}
-:host([data-page-toolbar]) main {
-  height: 32px;
-}
-:host([data-page-toolbar]) .editor-body,
-:host([data-page-toolbar]) .studio-menu,
-:host([data-page-toolbar]) footer {
-  display: none;
-}
-:host([data-page-toolbar]) .toolbar {
-  height: 32px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-control);
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-:host([data-page-toolbar]) .interaction-tools {
-  flex-direction: row;
-  width: auto;
-  padding: 0;
-  gap: 0;
-  border: 0;
-}
-:host([data-page-toolbar]) .interaction-tools .mask-shortcut {
-  display: none;
-}
-:host([data-page-toolbar][data-fullscreen]) {
-  display: none !important;
-}
-:host([data-page-toolbar][data-sidepanel-visible]) {
-  display: none !important;
-}
-
-:host([data-page-toolbar][data-native-overlap]) {
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-
 :host([data-sidepanel]) .toolbar .interaction-tools {
   flex-direction: row;
   width: auto;
@@ -773,4 +708,43 @@ label[data-scrub] input {
 }
 :host([data-sidepanel]) .toolbar .mask-shortcut {
   display: none;
+}
+/* ＋: the three ways of adding material, named in words. */
+.add-menu {
+  position: relative;
+  /* Not a section: none of the inspector's ruled details edge or padding. */
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.add-menu > summary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  list-style: none;
+  cursor: pointer;
+  border-radius: var(--radius-control);
+}
+.add-menu > summary::-webkit-details-marker {
+  display: none;
+}
+.add-menu[open] > summary,
+.add-menu > summary:hover {
+  background: var(--cobalt-wash);
+}
+.add-menu > .menu-popup {
+  top: calc(100% + 2px);
+  left: auto;
+  right: 0;
+}
+.add-menu .menu-popup button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  width: 100%;
+  height: auto;
+  min-height: 28px;
+  justify-content: flex-start;
 }
