@@ -3,6 +3,7 @@ import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
+import { openRetiredEditor } from './helpers/editor';
 import { nativeWindow, sidePanelDriver } from './helpers/side-panel';
 import { declinePromotion } from './helpers/youtube-live';
 import { createTakeSampler, type SignalTake } from '../src/world/takes';
@@ -43,7 +44,8 @@ test('real YouTube: official Studio configures GIF pursuit, records/replays/load
     await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
     await page.bringToFront();
     await expect(page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
-    await popup.locator('#creator-studio-inpage').evaluate((button: HTMLButtonElement) => button.click());
+    // UI0-d: still on the in-page Studio; opened through its retained message.
+    await openRetiredEditor(popup, page, 'inpage');
     const local = page.locator('#web-world-themes-creator');
     await local.getByRole('button', { name: 'Chromeサイドパネルを開く', exact: true }).click();
     const panel = await sidePanelDriver(context, page, id),

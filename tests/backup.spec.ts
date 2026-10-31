@@ -9,6 +9,7 @@ import { modelFixture } from './helpers/model-fixture';
 import { BACKUP_HEADER_BYTES, encodeBackup, sha256 } from '../src/backup/archive';
 import { DEFAULT_SETTINGS, mergeSettings } from '../src/storage/settings';
 import { sidePanelDriver } from './helpers/side-panel';
+import { openEditor } from './helpers/editor';
 
 async function openBackup(popup: Page) {
   const page = await popup.context().newPage();
@@ -58,9 +59,7 @@ test('one file restores saved artwork, originals, takes and settings into a diff
   test.setTimeout(90_000);
   await youtube.goto('https://www.youtube.com/watch?v=fixture');
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await youtube.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const editor = youtube.locator('#web-world-themes-creator');
+  const { panel: editor } = await openEditor(popup, youtube);
   await editor.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await expect(editor.locator('.layer')).toHaveCount(1);
   await editor.locator('.save').click();
@@ -172,9 +171,7 @@ test('backup validates actual raster and model textures, and refuses corrupt fil
   youtube,
 }, info) => {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await youtube.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const editor = youtube.locator('#web-world-themes-creator');
+  const { panel: editor } = await openEditor(popup, youtube);
   await editor.locator('input.model-file').setInputFiles({
     name: 'migration-model.glb',
     mimeType: 'model/gltf-binary',

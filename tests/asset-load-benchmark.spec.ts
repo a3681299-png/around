@@ -113,11 +113,10 @@ test('private local avatar: real YouTube A and controlled A-prime/B/C load perfo
         .locator('video')
         .first()
         .evaluate((v: HTMLVideoElement) => v.pause());
-      await popup.locator('#creator-studio-inpage').evaluate((b: HTMLButtonElement) => b.click());
-      await page
-        .locator('#web-world-themes-creator')
-        .getByRole('button', { name: 'Chromeサイドパネルを開く', exact: true })
-        .click();
+      // UI0-d: the side panel opens straight from 表示設定 (no in-page Studio on the way).
+      await expect(popup.locator('#creator-editor-direct')).toBeEnabled();
+      await popup.locator('#creator-editor-direct').click();
+      await page.bringToFront();
       const panel = await sidePanelDriver(context, page, id);
       const cdp = await context.newCDPSession(page);
       await cdp.send('Performance.enable');

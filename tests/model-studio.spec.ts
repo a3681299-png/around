@@ -15,7 +15,7 @@ test('standalone Studio configures model pursuit and clips, records/seeks poses,
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
   await youtube.bringToFront();
   const opened = context.waitForEvent('page');
-  await popup.locator('#creator-studio-open').evaluate((b: HTMLButtonElement) => b.click());
+  await popup.locator('#creator-editor-window').evaluate((b: HTMLButtonElement) => b.click());
   const studio = await opened;
   await studio.setViewportSize({ width: 1440, height: 1000 });
   await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');

@@ -1,9 +1,9 @@
 import type { Locator, Page } from '@playwright/test';
 import { test, expect } from './fixtures';
 import { clickCanvas, exposeEditorControls, withCanvas } from './helpers/editor-workspace';
+import { openEditor as openEditorPage } from './helpers/editor';
 
 const cards = '[data-ww-surface~="video-card"]';
-const dialogName = 'デザインエディター';
 const host = '#web-world-themes-page-marks';
 const COBALT = 'rgb(43, 81, 184)';
 
@@ -13,15 +13,21 @@ async function enable(popup: Page, youtube: Page) {
   await expect(youtube.locator(cards).first()).toBeVisible();
 }
 async function openEditor(popup: Page, youtube: Page) {
-  await youtube.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const dialog = youtube.getByRole('dialog', { name: dialogName });
-  await expect(dialog).toBeVisible();
-  return dialog;
+  return (await openEditorPage(popup, youtube)).panel;
 }
+/** Ends editing, then closes the editor's page; the YouTube tab is left without an editor. */
 async function closeEditor(dialog: Locator) {
-  await dialog.getByRole('button', { name: /編集を終了/ }).click();
-  await expect(dialog).toBeHidden();
+  await dialog
+    .getByRole('button', { name: /編集を終了/ })
+    .first()
+    .click();
+  const youtube = dialog
+    .page()
+    .context()
+    .pages()
+    .find((page) => page.url().startsWith('https://www.youtube.com/'))!;
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-editing', /.*/);
+  await dialog.page().close();
 }
 /** What the extension leaves on the page: its listeners on document and window (every world, read
  * through DevTools), its elements, styles and attributes. */
@@ -176,6 +182,8 @@ test('the selected video card wears the G-pen frame, which follows scrolling and
   const before = await footprint(youtube);
   const dialog = await openEditor(popup, youtube);
   const card = youtube.locator(cards).first();
+  // From the editor page, a page click picks a card only with the card tool (UI0-d decision 2).
+  await dialog.getByRole('button', { name: '動画カードを編集', exact: true }).click();
   await card.locator('a').first().click();
   await expect(card).toHaveAttribute('data-ww-editor-selected', '');
   const mark = youtube.locator('#web-world-themes-selection-mark .ww-mark');

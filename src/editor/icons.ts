@@ -50,7 +50,7 @@ export function buttonIcon(
   label = button.getAttribute('aria-label') ?? button.textContent!.trim(),
   shortcut = '',
   text = '',
-  draw: (name: string) => string = icon,
+  draw: (name: string) => string = glyph,
 ) {
   button.setAttribute('aria-label', label);
   button.title = `${label}${shortcut ? ` (${shortcut})` : ''}`;
@@ -96,6 +96,28 @@ const GLYPHS: Record<string, string> = {
   grip: '<path d="M6.35 3.67h0m3.3 0h0M6.35 8h0m3.3 0h0m-3.3 4.33h0m3.3 0h0" stroke-width="2"/>',
   more: '<path d="M3.67 8h0M8 8h0m4.33 0h0" stroke-width="2"/>',
   retry: '<path d="M12.95 3.05V6.35H9.65"/><path d="M12.6 6.2A5.2 5.2 0 1 0 13.2 9.65"/>',
+  // UI0-d: the Studio workbench's commands, on the same construction.
+  save: '<path d="M1.5 1.5h9.83l3.17 3.17V14.5h-13ZM4.5 1.5v4.85h6V1.5M4.5 14.5V9.65h7v4.85"/>',
+  discard: '<path d="M3.05 3.05V6.35h3.3"/><path d="M3.4 6.2A5.2 5.2 0 1 1 2.8 9.65"/>',
+  duplicate: '<path d="M6.35 6.35h8.15v8.15H6.35ZM9.65 6.35V1.5H1.5v8.15h4.85"/>',
+  delete: '<path d="M1.5 3.67h13M6.35 3.67V1.5h3.3v2.17M3.05 3.67l.85 10.83h8.2l.85-10.83M6.35 6.35v5.3m3.3-5.3v5.3"/>',
+  ungroup: '<path d="M1.5 1.5h4.85v4.85H1.5Zm8.15 8.15h4.85v4.85H9.65ZM9.65 1.5h4.85v4.85M1.5 9.65v4.85h4.85"/>',
+  mask: '<circle cx="8" cy="8" r="4.33"/><path d="M8 1v1.5M8 13.5V15M1 8h1.5m11 0H15M3.05 3.05l1.06 1.06m7.78 7.78 1.06 1.06M3.05 12.95l1.06-1.06m7.78-7.78 1.06-1.06"/>',
+  help: '<circle cx="8" cy="8" r="7"/><path d="M6.35 6.35a1.65 1.65 0 1 1 2.6 1.35c-.65.45-.95.9-.95 1.65M8 11.95h0"/>',
+  add: '<path d="M3.67 8h8.66M8 3.67v8.66"/>',
+  refresh: '<path d="M12.95 3.05V6.35H9.65"/><path d="M12.6 6.2A5.2 5.2 0 1 0 13.2 9.65"/>',
+  connect:
+    '<path d="m6.35 9.65 3.3-3.3M5.3 11.3l-.8.8a2.33 2.33 0 0 1-3.3-3.3l2.6-2.6a2.33 2.33 0 0 1 3.3 0m3.6-1.5.8-.8a2.33 2.33 0 0 1 3.3 3.3l-2.6 2.6a2.33 2.33 0 0 1-3.3 0"/>',
+  unlink:
+    '<path d="m3.05 3.05 9.9 9.9M5.3 11.3l-.8.8a2.33 2.33 0 0 1-3.3-3.3l2.3-2.3m6.2-1.8.8-.8a2.33 2.33 0 0 1 3.3 3.3l-2.3 2.3"/>',
+  // A ring with its centre: a plain circle would read as a save state.
+  record: '<circle cx="8" cy="8" r="4.33"/><path d="M8 8h0" stroke-width="2.5"/>',
+  play: '<path d="M4.5 2.5v11L13 8Z"/>',
+  stop: '<path d="M3.67 3.67h8.66v8.66H3.67Z"/>',
+  live: '<path d="M1 8h2.94L6 3.05l3.3 9.9L11.35 8H15"/>',
+  external: '<path d="M9.65 1.5h4.85v4.85M14.5 1.5l-7 7M6.35 2.5H1.5v12h12V9.65"/>',
+  workspace: '<path d="M1 2.5h14v11H1ZM1 5.3h14M11 5.3v8.2M3.05 3.9h0m1.95 0h0"/>',
+  window: '<path d="M4.5 4.5h10v10h-10ZM4.5 7.3h10M11.5 4.5v-3h-10v10h3"/>',
 };
 
 /** One glyph of the floating editor's icon set, as an inline 16px SVG. */

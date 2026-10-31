@@ -1,6 +1,7 @@
 import { build } from 'esbuild';
 import type { Page } from '@playwright/test';
 import { test, expect } from './fixtures';
+import { openEditor } from './helpers/editor';
 import path from 'node:path';
 import { exposeEditorControls, withCanvas } from './helpers/editor-workspace';
 
@@ -20,9 +21,7 @@ async function probeCode() {
 
 test('default artwork retains its decoder while the compositor clips protected regions', async ({ popup, youtube }) => {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await youtube.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
-  const editor = youtube.locator('#web-world-themes-creator');
+  const { panel: editor } = await openEditor(popup, youtube);
   await exposeEditorControls(editor);
   const data = await youtube.evaluate(() => {
     const c = document.createElement('canvas');
@@ -49,9 +48,7 @@ test('default artwork retains its decoder while the compositor clips protected r
 
 async function opaqueArtwork(popup: Page, youtube: Page) {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await youtube.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
-  const editor = youtube.locator('#web-world-themes-creator');
+  const { panel: editor } = await openEditor(popup, youtube);
   await exposeEditorControls(editor);
   const data = await youtube.evaluate(() => {
     const c = document.createElement('canvas');
@@ -422,9 +419,7 @@ test('redraws over unchanged protection geometry leave the clip and safety recor
   youtube,
 }) => {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await youtube.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
-  const editor = youtube.locator('#web-world-themes-creator');
+  const { panel: editor } = await openEditor(popup, youtube);
   await exposeEditorControls(editor);
   const data = await youtube.evaluate(() => {
     const c = document.createElement('canvas');
@@ -730,9 +725,7 @@ test('manual emergency OFF releases drawing and preserves an unsaved editor and 
   youtube,
 }) => {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await youtube.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
-  const editor = youtube.locator('#web-world-themes-creator');
+  const { panel: editor } = await openEditor(popup, youtube);
   await editor.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await expect(editor.locator('.dirty')).toHaveText('未保存');
   await popup.getByRole('button', { name: '緊急OFF', exact: true }).click();

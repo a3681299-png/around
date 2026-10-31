@@ -3,6 +3,7 @@ import { mkdtemp, mkdir, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
+import { openRetiredEditor } from './helpers/editor';
 import { sidePanelDriver, nativeWindow } from './helpers/side-panel';
 import { createTakeSampler, type SignalTake } from '../src/world/takes';
 import type { DesignDocument } from '../src/design/types';
@@ -44,11 +45,8 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
     await page.bringToFront();
     await expect(page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
     stage('open Studio');
-    await expect(popup.locator('#creator-studio-inpage')).toBeEnabled();
-    await popup.locator('#creator-studio-inpage').evaluate((button: HTMLButtonElement) => button.click());
-    await expect(popup.locator('#creator-launch-status')).toHaveText(
-      'YouTubeでカードを選ぶか、画像を追加してください。',
-    );
+    // UI0-d: the in-page Studio has no entry any more; opened through its retained message.
+    await openRetiredEditor(popup, page, 'inpage');
     const local = page.locator('#web-world-themes-creator');
     await local.getByRole('button', { name: 'Chromeサイドパネルを開く', exact: true }).click();
     stage('side panel');

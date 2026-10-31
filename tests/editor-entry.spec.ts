@@ -4,6 +4,7 @@ import path from 'node:path';
 import { launchExtension } from './fixtures';
 import { sidePanelDriver } from './helpers/side-panel';
 import { nativeShortcut } from './helpers/native-shortcut';
+import { openEditor } from './helpers/editor';
 
 async function setup() {
   const work = path.resolve('.work');
@@ -85,7 +86,7 @@ test('OFF opens the real action settings; its top button opens the editor and se
     const panel = await sidePanelDriver(context, page, id);
     await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
     await panel.files([path.resolve('tests/fixtures/motion/petal.png')]);
-    await expect.poll(() => panel.text('.dirty')).toBe('未保存の変更');
+    await expect.poll(() => panel.text('.dirty')).toBe('未保存');
     const opened = context.waitForEvent('page');
     await panel.click('.display-settings');
     const settings = await opened;
@@ -94,7 +95,7 @@ test('OFF opens the real action settings; its top button opens the editor and se
     await settings.screenshot({ path: info.outputPath('display-settings.png') });
     // Return directly to the same target and its existing draft.
     await settings.locator('#creator-editor-direct').click();
-    await expect.poll(() => panel.text('.dirty')).toBe('未保存の変更');
+    await expect.poll(() => panel.text('.dirty')).toBe('未保存');
     await panel.screenshot(info.outputPath('editor-settings-entry.png'));
     await panel.detach();
     await action.detach();
@@ -195,27 +196,60 @@ test('settings starts clear of the player, remembers a dragged position, and rem
   }
 });
 
-test('the page editor opens display settings and hands its unsaved draft back to the official panel', async () => {
+test('the editor opens display settings and hands its unsaved draft back to the official panel', async () => {
   test.setTimeout(60_000);
   const { context, page, popup, id } = await setup();
   try {
-    await page.bringToFront();
-    await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-    const editor = page.locator('#web-world-themes-creator');
+    // UI0-d: the editor is the Studio page (here its own window, as a tab); its 表示設定 opens the
+    // same settings as the popup.
+    const { panel: editor } = await openEditor(popup, page);
     await editor.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
     await expect(editor.locator('.dirty')).toHaveText('未保存');
+    const opened = context.waitForEvent('page');
     await editor.locator('.display-settings').click();
-    const settings = page.getByRole('dialog', { name: 'Web World Themes の設定' });
-    await expect(settings).toBeVisible();
+    const settings = await opened;
+    await expect(settings.getByRole('button', { name: 'エディターを開く', exact: true })).toBeEnabled();
+    await expect(settings.getByRole('button', { name: '別ウィンドウで開く', exact: true })).toBeEnabled();
     await settings.getByRole('button', { name: 'エディターを開く', exact: true }).click();
-    await expect(settings).not.toBeVisible();
+    await expect(settings.locator('#creator-launch-status')).toHaveText('サイドパネルで編集中です。');
+    // The side panel belongs to the YouTube tab; here the editor's window is a tab of the same window.
+    await page.bringToFront();
     const panel = await sidePanelDriver(context, page, id);
-    await expect.poll(() => panel.text('.dirty')).toBe('未保存の変更');
+    await expect.poll(() => panel.text('.dirty')).toBe('未保存');
     expect(
       await panel.evaluate(
         'document.querySelector("#web-world-themes-creator").shadowRoot.querySelectorAll(".layer").length',
       ),
     ).toBe(1);
+    await panel.detach();
+  } finally {
+    await context.close();
+  }
+});
+
+test('the in-video icon opens the side panel within its click in 制作モード, and 表示設定 otherwise', async () => {
+  test.setTimeout(60_000);
+  const { context, page, popup, id } = await setup();
+  try {
+    const icon = page.getByRole('button', { name: 'Web World Themes の設定', exact: true });
+    const settings = page.getByRole('dialog', { name: 'Web World Themes の設定' });
+    // OFF: the icon opens 表示設定, with the same two ways into the editor as the popup.
+    await expect(popup.getByRole('switch', { name: '制作モード', exact: true })).not.toBeChecked();
+    await page.bringToFront();
+    await icon.click();
+    await expect(settings).toBeVisible();
+    await expect(settings.getByRole('button', { name: 'エディターを開く', exact: true })).toBeEnabled();
+    await expect(settings.getByRole('button', { name: '別ウィンドウで開く', exact: true })).toBeEnabled();
+    await expect(settings.getByRole('button', { name: /デザインを編集|インページ/ })).toHaveCount(0);
+    await settings.getByRole('button', { name: '設定を閉じる' }).click();
+    // ON: the same click opens Chrome's side panel itself (the click's user activation reaches
+    // chrome.sidePanel.open through the extension message); no settings appear.
+    await popup.getByRole('switch', { name: '制作モード', exact: true }).check();
+    await page.bringToFront();
+    await icon.click();
+    const panel = await sidePanelDriver(context, page, id);
+    await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
+    await expect(settings).toBeHidden();
     await panel.detach();
   } finally {
     await context.close();

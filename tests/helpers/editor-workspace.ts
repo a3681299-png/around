@@ -4,9 +4,11 @@ import { attachOperationDiagnostics } from './operation-diagnostics';
 /** Regression suites exercise both existing control areas in the optional split view.
  * editor-ux.spec.ts separately verifies the default tabbed, mouse-only experience. */
 export async function exposeEditorControls(panel: Locator) {
+  // The editor window's arrangement always shows both panes; the side panel's has the tabs.
   const split = panel.locator('.split');
-  if ((await split.getAttribute('aria-pressed')) !== 'true') await split.click();
-  await panel.getByRole('tab', { name: 'レイヤー', exact: true }).click();
+  if ((await split.isVisible()) && (await split.getAttribute('aria-pressed')) !== 'true') await split.click();
+  const layersTab = panel.getByRole('tab', { name: 'レイヤー', exact: true });
+  if (await layersTab.isVisible()) await layersTab.click();
   const guide = panel.getByRole('button', { name: '操作ガイドを閉じる', exact: true });
   if (await guide.isVisible()) await guide.click();
   const layout = panel.locator('.arrangement-section');

@@ -3,6 +3,7 @@ import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
+import { openRetiredEditor } from './helpers/editor';
 import { beginCanvasGesture, visiblePart } from './helpers/editor-workspace';
 import { errorSummary, waitForAdvertToEnd } from './helpers/youtube-live';
 
@@ -39,7 +40,8 @@ test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and 
     await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
     await page.bringToFront();
     await expect(page.locator('[data-ww-surface~="player-window"]')).toBeVisible({ timeout: 20_000 });
-    await popup.locator('#creator-editor-open').evaluate((node: HTMLButtonElement) => node.click());
+    // UI0-d: the floating editor's live check; opened through its retained message.
+    await openRetiredEditor(popup, page);
     const panel = page.getByRole('dialog', { name: 'デザインエディター' });
     await expect(panel).toBeVisible();
     const overlay = '#web-world-themes-decorations';
@@ -95,7 +97,7 @@ test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and 
       await expect(panel.locator('.dirty')).toHaveText('保存済み');
       await page.reload({ waitUntil: 'domcontentloaded' });
       await expect(page.locator(`${presentation} [data-image-id]`)).toHaveCount(3, { timeout: 20_000 });
-      await popup.locator('#creator-editor-open').evaluate((node: HTMLButtonElement) => node.click());
+      await openRetiredEditor(popup, page);
       await expect(panel).toBeVisible();
       await panel.locator('[data-kind="group"] [data-action="select"]').click();
       await panel.getByRole('button', { name: '光とマスクを設定', exact: true }).click();

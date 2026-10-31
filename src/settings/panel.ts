@@ -1,19 +1,27 @@
-import { mountPixelFont } from '../ui/pixel-font';
 import type { SettingsEntry } from '../sites/types';
 import { bindSettingsForm } from './form';
 import panelStyles from './panel.css';
-import { DEFAULT_THEME, themes } from '../themes';
+import settingsStyles from './settings.css';
+import tokens from '../editor/studio-tokens.css';
+import { glyphButton } from '../editor/icons';
 import { SETTINGS_MARKUP } from './markup';
 import { initialSettingsPosition, SETTINGS_POSITION_KEY, type SettingsRect } from './position';
 
 export interface SettingsPanel extends SettingsEntry {
   open(): void;
+  /** Shows a message in the panel's editor area, opening the panel. */
+  report(message: string): void;
   destroy(): void;
+}
+export interface SettingsEditorEntry {
+  /** The side panel (S) or the editor's own window (W). */
+  open(surface: 'sidepanel' | 'window'): void;
+  /** 制作モード: the in-video icon opens the editor itself instead of these settings. */
+  creatorMode(): boolean;
 }
 
 /** Site-independent editor; Shadow DOM isolates its UI from the host site's CSS. */
-export function createSettingsPanel(doc: Document, openEditor?: () => void): SettingsPanel {
-  const unmountFont = mountPixelFont(doc);
+export function createSettingsPanel(doc: Document, editor?: SettingsEditorEntry): SettingsPanel {
   const button = doc.createElement('button');
   button.type = 'button';
   button.dataset.wwSettingsButton = '';
@@ -29,27 +37,30 @@ export function createSettingsPanel(doc: Document, openEditor?: () => void): Set
 
   const panel = doc.createElement('div');
   panel.id = 'web-world-themes-panel';
-  panel.dataset.wwUi = DEFAULT_THEME;
   panel.hidden = true;
   panel.lang = 'ja';
   panel.setAttribute('role', 'dialog');
   panel.setAttribute('aria-label', 'Web World Themes の設定');
   const shadow = panel.attachShadow({ mode: 'open' });
   const style = doc.createElement('style');
-  style.textContent = [...themes[DEFAULT_THEME].editorStylesheets, panelStyles].join('\n');
+  style.textContent = tokens + settingsStyles + panelStyles;
   shadow.append(style);
   const main = doc.createElement('div');
   main.className = 'settings ww-editor';
   main.innerHTML = SETTINGS_MARKUP;
   shadow.append(main);
   const closeButton = main.querySelector<HTMLButtonElement>('.close')!;
-  const direct = main.querySelector<HTMLButtonElement>('#creator-editor-direct')!;
-  direct.disabled = !openEditor;
-  const onEditor = () => {
+  glyphButton(closeButton, 'close', '設定を閉じる');
+  const direct = main.querySelector<HTMLButtonElement>('#creator-editor-direct')!,
+    separate = main.querySelector<HTMLButtonElement>('#creator-editor-window')!,
+    launchStatus = main.querySelector<HTMLElement>('#creator-launch-status')!;
+  direct.disabled = separate.disabled = !editor;
+  const onEditor = (event: Event) => {
     close();
-    openEditor?.();
+    editor?.open(event.currentTarget === separate ? 'window' : 'sidepanel');
   };
   direct.addEventListener('click', onEditor);
+  separate.addEventListener('click', onEditor);
   const titlebar = main.querySelector<HTMLElement>('.ww-titlebar')!,
     view = doc.defaultView!;
   let avoidRect: (() => SettingsRect | undefined) | undefined;
@@ -157,6 +168,8 @@ export function createSettingsPanel(doc: Document, openEditor?: () => void): Set
   };
   const onClick = () => {
     if (!panel.hidden) close(true);
+    // 制作モード: the icon opens the editor within this click, so Chrome sees the person's gesture.
+    else if (editor?.creatorMode()) editor.open('sidepanel');
     else open();
   };
   const onKeyDown = (event: KeyboardEvent) => {
@@ -186,6 +199,10 @@ export function createSettingsPanel(doc: Document, openEditor?: () => void): Set
     panel,
     close,
     open,
+    report(message) {
+      open();
+      launchStatus.textContent = message;
+    },
     reposition,
     setAvoidRect(get) {
       avoidRect = get;
@@ -193,13 +210,13 @@ export function createSettingsPanel(doc: Document, openEditor?: () => void): Set
     destroy() {
       alive = false;
       close();
-      unmountFont();
       button.removeEventListener('click', onClick);
       button.removeEventListener('click', stopPropagation);
       button.removeEventListener('keydown', onButtonKey);
       button.removeEventListener('keyup', onButtonKey);
       closeButton.removeEventListener('click', onClose);
       direct.removeEventListener('click', onEditor);
+      separate.removeEventListener('click', onEditor);
       titlebar.removeEventListener('pointerdown', startDrag);
       titlebar.removeEventListener('pointermove', moveDrag);
       titlebar.removeEventListener('pointerup', finishDrag);

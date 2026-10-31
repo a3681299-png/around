@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { writeFile } from 'node:fs/promises';
 import { test, expect } from './fixtures';
+import { openRetiredEditor } from './helpers/editor';
 import { renderDiagnostics } from './helpers/render-diagnostics';
 
 for (const viewport of [
@@ -17,9 +18,9 @@ for (const viewport of [
     await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
     // The popup changes optimistically; authoring is enabled after the page receives the save.
     await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
-    await youtube.bringToFront();
-    await popup.locator('#creator-studio-inpage').evaluate((button: HTMLButtonElement) => button.click());
-    const panel = youtube.locator('#web-world-themes-creator');
+    // UI0-d: checks the in-page Studio's arrangement at these widths; stays on it until round 3
+    // decides (docs/ui0d-2.md).
+    const panel = await openRetiredEditor(popup, youtube, 'inpage');
     await expect(panel).toHaveAttribute('data-inpage', '');
     if (viewport.width < 640)
       await panel.getByRole('button', { name: 'プロパティとレイヤーを開閉', exact: true }).click();

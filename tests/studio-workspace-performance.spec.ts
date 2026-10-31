@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { test, expect } from './fixtures';
+import { openRetiredEditor } from './helpers/editor';
 import type { DesignDocument } from '../src/design/types';
 
 const key = 'webWorldThemes.design.youtube',
@@ -12,9 +13,9 @@ test('32 layers remain editable with locked/hidden selection; measure quick and 
   test.setTimeout(90_000);
   await youtube.setViewportSize({ width: 1366, height: 900 });
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await youtube.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const panel = youtube.locator('#web-world-themes-creator');
+  // UI0-d: measures the floating editor against the in-page Studio, both retired; it stays on them
+  // until round 3 decides (docs/ui0d-2.md).
+  const panel = await openRetiredEditor(popup, youtube);
   await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await expect(youtube.locator(overlay + ' [data-image-id]')).toHaveCount(1);
   await panel.getByRole('button', { name: '保存', exact: true }).click();
@@ -46,11 +47,11 @@ test('32 layers remain editable with locked/hidden selection; measure quick and 
   const metrics = async () =>
     Object.fromEntries((await cdp.send('Performance.getMetrics')).metrics.map((item) => [item.name, item.value]));
   const samples: Record<string, unknown> = {};
-  for (const [name, launcher] of [
-    ['quick', '#creator-editor-open'],
-    ['inpage', '#creator-studio-inpage'],
-  ]) {
-    await popup.locator(launcher!).evaluate((button: HTMLButtonElement) => button.click());
+  for (const [name, kind] of [
+    ['quick', 'floating'],
+    ['inpage', 'inpage'],
+  ] as const) {
+    await openRetiredEditor(popup, youtube, kind);
     await panel.getByRole('button', { name: 'すべて選択', exact: true }).click();
     await expect(panel.locator('.selected-count')).toHaveText('32個選択中');
     await youtube.bringToFront();

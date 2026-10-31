@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { test, expect } from './fixtures';
+import { closeEditorPages, openEditor } from './helpers/editor';
 import type { DesignDocument } from '../src/design/types';
 
 test('shared motion UI pursues, stops, rotates, keeps handles aligned and preserves authored placement through Undo/save/reload/OFF', async ({
@@ -7,9 +8,7 @@ test('shared motion UI pursues, stops, rotates, keeps handles aligned and preser
   youtube,
 }) => {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await youtube.bringToFront();
-  await popup.locator('#creator-studio-inpage').evaluate((button: HTMLButtonElement) => button.click());
-  const panel = youtube.locator('#web-world-themes-creator');
+  let { panel } = await openEditor(popup, youtube);
   await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await panel.locator('.save').click();
   await expect(panel.locator('.dirty')).toHaveText('保存済み');
@@ -81,9 +80,11 @@ test('shared motion UI pursues, stops, rotates, keeps handles aligned and preser
   await panel.locator('.layer [data-action="lock"]').click();
   await expect(panel.getByLabel('レイヤーのマウス追跡')).toBeDisabled();
   await panel.locator('.undo').click();
+  // The editor closes with the reload, as before; then it is opened again on the saved work.
+  await closeEditorPages(youtube);
   await youtube.reload();
   await expect(image).toBeVisible();
-  await popup.locator('#creator-studio-inpage').evaluate((button: HTMLButtonElement) => button.click());
+  ({ panel } = await openEditor(popup, youtube));
   await panel.locator('.layer [data-action="select"]').click();
   await expect(panel.getByLabel('レイヤーのマウス追跡')).toBeChecked();
   await panel.getByLabel('追従方式').selectOption('direct');

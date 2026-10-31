@@ -1,0 +1,217 @@
+/* 表示設定 as a WWT Studio ww-panel: the same sheet in the action popup and in the panel the in-video
+   icon opens. Tokens come from editor/studio-tokens.css (declared on :host in the shadow root and on
+   :root in the popup). Ruled controls, cobalt the one accent, nothing below 12px. */
+.ww-editor {
+  display: block;
+  font: 13px/20px var(--font-ui);
+  color: var(--ink);
+  background: var(--surface);
+}
+.ww-editor *,
+.ww-editor *::before,
+.ww-editor *::after {
+  box-sizing: border-box;
+}
+.ww-editor .ww-titlebar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  height: 52px;
+  padding: 0 var(--space-12) 0 var(--space-20);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+.ww-editor .ww-titlebar h2 {
+  flex: 1;
+  margin: 0;
+  font-size: 20px;
+  line-height: 32px;
+  font-weight: 700;
+}
+.ww-editor-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-12) var(--space-20) var(--space-20);
+}
+.ww-editor button {
+  font: inherit;
+  font-size: 13px;
+  min-height: var(--control);
+  padding: 0 var(--space-12);
+  border: 1px solid var(--line-control);
+  border-radius: var(--radius-control);
+  background: var(--surface-raised);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background-color calc(var(--ww-frame) * 2) steps(2, end);
+}
+.ww-editor button:hover:not(:disabled) {
+  background: var(--cobalt-wash);
+}
+.ww-editor button:disabled {
+  color: var(--ink-faint);
+  cursor: default;
+}
+.ww-editor button.primary {
+  border-color: var(--cobalt);
+  background: var(--cobalt);
+  color: var(--on-cobalt);
+  font-weight: 700;
+}
+.ww-editor button.primary:disabled {
+  border-color: var(--line-control);
+  background: var(--surface-sunk);
+  color: var(--ink-faint);
+}
+.ww-editor .icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--control);
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--ink-muted);
+}
+.ww-editor :focus-visible {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 1px;
+}
+.ww-editor .creator-entry {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding-bottom: var(--space-12);
+  border-bottom: 1px solid var(--line);
+}
+.ww-editor .editor-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-8);
+}
+.ww-editor .status {
+  margin: 0;
+  min-height: 0;
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+.ww-editor .status:empty {
+  display: none;
+}
+.ww-editor .control-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+  min-height: var(--control);
+}
+.ww-editor .toggle-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+.ww-editor output {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-muted);
+}
+.ww-editor fieldset {
+  margin: 0;
+  padding: 0 0 var(--space-12);
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  min-width: 0;
+}
+.ww-editor legend {
+  padding: 0;
+  margin-bottom: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+}
+.ww-editor .ww-theme-name {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 12px;
+}
+.ww-editor .feature-description {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+.ww-editor .range-hints {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+/* ww-toggle: a ruled track, cobalt when on, a knob that steps across in 3 frames. */
+.ww-editor input[type='checkbox'][role='switch'] {
+  appearance: none;
+  position: relative;
+  flex: none;
+  width: 32px;
+  height: 20px;
+  margin: 0;
+  border: 1px solid var(--line-control);
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunk);
+  cursor: pointer;
+}
+.ww-editor input[type='checkbox'][role='switch']::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--ink-muted);
+  transition: transform calc(var(--ww-frame) * 3) steps(3, end);
+}
+.ww-editor input[type='checkbox'][role='switch']:checked {
+  border-color: var(--cobalt);
+  background: var(--cobalt);
+}
+.ww-editor input[type='checkbox'][role='switch']:checked::after {
+  background: var(--on-cobalt);
+  transform: translateX(12px);
+}
+.ww-editor input[type='checkbox'][role='switch']:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.ww-editor input[type='range'] {
+  width: 100%;
+  accent-color: var(--cobalt);
+}
+.ww-editor .palette-presets {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+.ww-editor .palette-presets button[aria-pressed='true'] {
+  border-color: var(--cobalt);
+  background: var(--cobalt-wash);
+}
+.ww-editor .feature-control + .feature-control {
+  margin-top: var(--space-8);
+}
+.ww-editor a {
+  color: var(--cobalt);
+}
+.ww-editor details summary {
+  cursor: pointer;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ww-editor button,
+  .ww-editor input[type='checkbox'][role='switch']::after {
+    transition: none;
+  }
+}

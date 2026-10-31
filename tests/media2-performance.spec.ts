@@ -1,4 +1,5 @@
 import { exposeEditorControls } from './helpers/editor-workspace';
+import { openEditor } from './helpers/editor';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { execFile } from 'node:child_process';
@@ -21,12 +22,7 @@ for (const [index, scenario] of cases.entries())
     await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
     await youtube.bringToFront();
     await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
-    const panel = youtube.getByRole('dialog', { name: 'デザインエディター' });
-    await expect(async () => {
-      if (!(await panel.isVisible()))
-        await popup.locator('#creator-editor-open').evaluate((n: HTMLButtonElement) => n.click());
-      await expect(panel).toBeVisible({ timeout: 1000 });
-    }).toPass({ timeout: 10_000 });
+    const { panel } = await openEditor(popup, youtube);
     await exposeEditorControls(panel);
     if (scenario.scroll) {
       await youtube.locator('#navigate').evaluate((n: HTMLButtonElement) => n.click());

@@ -47,26 +47,25 @@ const featureControls = FEATURE_REGISTRY.map(
       </div>`,
 ).join('');
 
-/** One markup template for both editors; theme-specific visuals live in themes/. */
+/** One markup template for the popup and the panel the in-video icon opens. It wears the WWT Studio
+ * design system (settings.css): a tool surface, never the retro theme's window. */
 export const SETTINGS_MARKUP = `
   <header class="ww-titlebar">
-    <span class="ww-app-icon" aria-hidden="true">▶</span>
-    <h2>Theme settings.exe</h2>
-    <button type="button" class="close" aria-label="設定を閉じる">×</button>
+    <h2>表示設定</h2>
+    <button type="button" class="close" aria-label="設定を閉じる"></button>
   </header>
-  <div class="ww-editor-menu">
-    <button type="button" data-settings-focus="theme-enabled">テーマ(T)</button>
-    <button type="button" data-settings-focus="effect-strength">効果(E)</button>
-    <span>retro</span>
-  </div>
   <div class="ww-editor-body">
     <section class="creator-entry">
-      <button type="button" id="creator-editor-direct" disabled>エディターを開く</button>
+      <div class="editor-actions">
+        <button type="button" id="creator-editor-direct" class="primary" disabled>エディターを開く</button>
+        <button type="button" id="creator-editor-window" disabled>別ウィンドウで開く</button>
+      </div>
+      <p id="creator-launch-status" class="status" role="status"></p>
       <div class="control-row">
         <label for="creator-mode">制作モード</label>
         <input id="creator-mode" type="checkbox" role="switch" aria-describedby="creator-mode-help" disabled />
       </div>
-      <p id="creator-mode-help" class="feature-description">ONのとき、拡張アイコンから直接エディターを開きます。表示設定はエディター内から開けます。</p>
+      <p id="creator-mode-help" class="feature-description">ONのとき、拡張アイコンと動画の中のアイコンから直接エディターを開きます。表示設定はエディター内から開けます。</p>
     </section>
     <fieldset class="ww-group">
       <legend>表示テーマ</legend>

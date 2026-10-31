@@ -2,6 +2,7 @@ import { test, expect, type Locator, type Page } from '@playwright/test';
 import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
+import { openRetiredEditor } from './helpers/editor';
 import { clearestPoint, declinePromotion, errorSummary, waitForAdvertToEnd } from './helpers/youtube-live';
 import { plainSkinDesign, storeDesign } from './helpers/skin-verification';
 import { exposeEditorControls } from './helpers/editor-workspace';
@@ -48,8 +49,8 @@ async function clip(page: Page, name: string, box: { x: number; y: number; width
 }
 async function openEditor(page: Page, popup: Page) {
   await page.bringToFront();
-  await expect(popup.locator('#creator-editor-open')).toBeEnabled();
-  await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
+  // UI0-d: the UI0-c evidence was taken with the floating editor; opened through its retained message.
+  await openRetiredEditor(popup, page);
   const editor = page.getByRole('dialog', { name: dialogName });
   await expect(editor).toBeVisible();
   return editor;

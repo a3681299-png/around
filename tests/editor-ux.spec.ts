@@ -2,6 +2,7 @@ import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 import type { Locator, Page } from '@playwright/test';
 import { test, expect } from './fixtures';
+import { openRetiredEditor } from './helpers/editor';
 import type { DesignDocument } from '../src/design/types';
 import { beginCanvasGesture } from './helpers/editor-workspace';
 
@@ -11,11 +12,9 @@ const layers = `${overlay} [data-image-id]`;
 async function open(popup: Page, page: Page) {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
-  await page.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const panel = page.getByRole('dialog', { name: 'デザインエディター' });
-  await expect(panel).toBeVisible();
-  return panel;
+  // UI0-d: this suite checks the floating editor's own arrangement (tabs on the page, guide, collapse,
+  // dock, low windows). It stays on that editor until round 3 decides (docs/ui0d-2.md).
+  return openRetiredEditor(popup, page);
 }
 async function add(panel: Locator, page: Page) {
   const buffers = await page.evaluate(() =>

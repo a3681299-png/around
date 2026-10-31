@@ -1,8 +1,8 @@
+/* The action popup: 表示設定 in the WWT Studio design system (settings/settings.css, injected with
+   the tokens by index.ts). */
 :root {
-  color-scheme: light;
-  font-family: var(--ww-font);
-  color: var(--ww-ink);
-  background: var(--ww-panel);
+  color-scheme: light dark;
+  background: var(--surface);
 }
 body {
   width: 340px;
@@ -14,18 +14,4 @@ body {
   max-height: 580px;
   overflow-y: auto;
   overscroll-behavior: contain;
-}
-.creator-launcher {
-  padding: 12px;
-  border-top: 1px solid var(--ww-border);
-}
-.creator-launcher button {
-  width: 100%;
-  padding: 8px;
-  cursor: pointer;
-  font: inherit;
-}
-.creator-launcher p {
-  margin: 8px 0 0;
-  font-size: 12px;
 }

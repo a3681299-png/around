@@ -2,6 +2,7 @@ import { test, expect, type Page, type TestInfo } from '@playwright/test';
 import { cp, mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
+import { openRetiredEditor } from './helpers/editor';
 import {
   allPartsDesign,
   importSkinArt,
@@ -52,7 +53,8 @@ async function live(headed = false) {
 
 async function openSkin(page: Page, popup: Page, part: string) {
   await page.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((node: HTMLButtonElement) => node.click());
+  // UI0-d: still on the floating editor; opened through its retained message.
+  await openRetiredEditor(popup, page);
   const editor = page.getByRole('dialog', { name: 'デザインエディター' });
   await expect(editor).toBeVisible();
   await editor.getByRole('button', { name: 'UIを着せ替え' }).click();

@@ -3,6 +3,7 @@ import { expect } from '@playwright/test';
 import path from 'node:path';
 import { YOUTUBE_DESIGN_TARGETS } from '../../src/sites/youtube-targets';
 import { parseDesign } from '../../src/design/schema';
+import { openEditor } from './editor';
 
 export const skinParts = YOUTUBE_DESIGN_TARGETS.map((target) => target.id);
 export const partLocator = (page: Page, part: string) =>
@@ -69,16 +70,14 @@ export async function storeDesign(popup: Page, design: object) {
 export async function importSkinArt(page: Page, popup: Page, filename: string) {
   await page.bringToFront();
   await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
-  await expect(popup.locator('#creator-editor-open')).toBeEnabled();
-  await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const editor = page.getByRole('dialog', { name: 'デザインエディター' });
-  await expect(editor).toBeVisible();
+  await expect(popup.locator('#creator-editor-direct')).toBeEnabled();
+  const { studio, panel: editor } = await openEditor(popup, page);
   await editor.getByRole('button', { name: 'UIを着せ替え' }).click();
   await editor.locator('.skin-part[data-target="video-card"]').click();
   const zone = (await editor.locator('.main-drop').isVisible())
     ? editor.locator('.main-drop')
     : editor.getByRole('button', { name: '絵を差し替える' });
-  const [chooser] = await Promise.all([page.waitForEvent('filechooser'), zone.click()]);
+  const [chooser] = await Promise.all([studio.waitForEvent('filechooser'), zone.click()]);
   await chooser.setFiles(path.resolve(filename));
   await expect(editor.locator('.slice')).toBeVisible();
   await editor.getByRole('button', { name: '保存', exact: true }).click();
@@ -86,8 +85,13 @@ export async function importSkinArt(page: Page, popup: Page, filename: string) {
   const saved = await popup.evaluate(
     async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
   );
-  await editor.getByRole('button', { name: /編集を終了/ }).click();
-  await expect(editor).toBeHidden();
+  await editor
+    .getByRole('button', { name: /編集を終了/ })
+    .first()
+    .click();
+  // The editing session ends on the page itself; then the editor's page goes.
+  await expect(page.locator('html')).not.toHaveAttribute('data-ww-editing', /.*/);
+  await studio.close();
   return parseDesign(saved).rules.find((rule) => rule.target === 'video-card')!.skin!.states.normal.assetId;
 }
 export function allPartsDesign(assetId: string, scalePct = 25, slices = { top: 24, right: 24, bottom: 24, left: 24 }) {

@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures';
+import { closeEditorPages, openEditor } from './helpers/editor';
 import { vrmFixture } from './helpers/vrm-fixture';
 import type { DesignDocument } from '../src/design/types';
 import { exposeEditorControls, withCanvas } from './helpers/editor-workspace';
@@ -14,9 +15,7 @@ test('VRM1 renders MToon with alpha, follows the pointer, edits expressions and 
   await writeFile(file, vrmFixture());
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
-  await youtube.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
-  const panel = youtube.locator('#web-world-themes-creator');
+  const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
   await panel.locator('.model-file').setInputFiles(file);
   const media = youtube.locator('#web-world-themes-decorations .model-media');
@@ -99,6 +98,7 @@ test('VRM1 renders MToon with alpha, follows the pointer, edits expressions and 
         .evaluate((c: HTMLCanvasElement) => c.width),
     )
     .toBeGreaterThan(1);
+  await closeEditorPages(youtube);
   await youtube.reload();
   await expect(media).toHaveCount(2);
   await expect(media.first()).toHaveAttribute('data-renderer', 'three');
@@ -167,7 +167,7 @@ for (const large of [false, true])
     await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
     await youtube.bringToFront();
     const opened = context.waitForEvent('page');
-    await popup.locator('#creator-studio-open').evaluate((b: HTMLButtonElement) => b.click());
+    await popup.locator('#creator-editor-window').evaluate((b: HTMLButtonElement) => b.click());
     const studio = await opened;
     await studio.setViewportSize({ width: 1440, height: 1000 });
     await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');

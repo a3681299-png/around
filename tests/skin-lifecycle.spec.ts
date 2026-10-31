@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures';
+import { openEditor } from './helpers/editor';
 import {
   allPartsDesign,
   importSkinArt,
@@ -27,12 +28,13 @@ test('unused parts stay unmarked; the skin tool and each named kind acquire and 
   };
   await storeDesign(popup, empty);
   await only();
-  await youtube.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((node: HTMLButtonElement) => node.click());
-  const editor = youtube.getByRole('dialog', { name: 'デザインエディター' });
+  const { panel: editor } = await openEditor(popup, youtube);
   await editor.getByRole('button', { name: 'UIを着せ替え' }).click();
   for (const part of skinParts) await expect(partLocator(youtube, part).first(), part).toBeVisible();
-  await editor.getByRole('button', { name: /編集を終了/ }).click();
+  await editor
+    .getByRole('button', { name: /編集を終了/ })
+    .first()
+    .click();
   await only();
   for (const part of optional) {
     await storeDesign(popup, { ...empty, rules: [{ kind: 'surface-style', target: part, style: {} }] });

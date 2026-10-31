@@ -122,8 +122,9 @@ export function createWorkspace(
   lowWindow?.addEventListener('change', refold);
   const empty = doc.createElement('div');
   empty.className = 'empty-layers';
-  if (floating) {
-    // ww-empty: the golden rectangle and its spiral are constructed, then the words appear.
+  {
+    // ww-empty: the golden rectangle and its spiral are constructed, then the words appear. Every
+    // surface shows it (UI0-d moved the floating editor's design to the side panel and window).
     empty.classList.add('ww-empty');
     const drawing = svg(doc, '0 0 236 152', 'ww-empty__drawing'),
       g = doc.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -165,8 +166,7 @@ export function createWorkspace(
     actions.append(add);
     [title, text, actions].forEach((node, i) => node.style.setProperty('--ww-delay', `${Math.round((20 + i) * 83)}ms`));
     empty.append(drawing, title, text, actions);
-  } else
-    empty.innerHTML = `<strong>最初の素材を置いてみましょう</strong><p>画像やアニメーションを追加すると、YouTubeの上でドラッグして動かせます。</p><button type="button">素材を選ぶ</button><p class="hint">このパネルへファイルをドロップしても追加できます。</p>`;
+  }
   const layerSection = get<HTMLDetailsElement>('.layers-section');
   layersPane.append(assets, guide, layerSection, empty);
   empty.querySelector('button')!.addEventListener('click', () => get<HTMLButtonElement>('.add-image').click());

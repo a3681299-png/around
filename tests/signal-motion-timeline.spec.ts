@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { mkdir } from 'node:fs/promises';
 import { test, expect } from './fixtures';
+import { closeEditorPages, openEditor } from './helpers/editor';
 import type { DesignDocument } from '../src/design/types';
 import { createTakeSampler, type SignalTake } from '../src/world/takes';
 
@@ -9,9 +10,7 @@ test('mouse-driven X/rotation lanes edit offsets, custom ranges and curves with 
   youtube,
 }) => {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await youtube.bringToFront();
-  await popup.locator('#creator-studio-inpage').evaluate((button: HTMLButtonElement) => button.click());
-  const panel = youtube.locator('#web-world-themes-creator');
+  let { panel } = await openEditor(popup, youtube);
   await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await panel.locator('.timeline-toggle').click();
   await panel.getByLabel('キーの対象プロパティ').selectOption('position.x');
@@ -54,8 +53,10 @@ test('mouse-driven X/rotation lanes edit offsets, custom ranges and curves with 
     .toBeCloseTo(design.decorations[0]!.placement.x * 1100 - 200 + (650 * 500) / 1100, 3);
   await mkdir('.work/verification', { recursive: true });
   await panel.screenshot({ path: '.work/verification/signal-v2-key-editor.png' });
+  // The editor closes with the reload, as before; then it is opened again on the saved work.
+  await closeEditorPages(youtube);
   await youtube.reload();
-  await popup.locator('#creator-studio-inpage').evaluate((button: HTMLButtonElement) => button.click());
+  ({ panel } = await openEditor(popup, youtube));
   await panel.locator('.layer [data-action="select"]').click();
   await panel.getByLabel('キーの対象プロパティ').selectOption('rotation');
   await expect(panel.getByLabel('駆動元シグナル')).toHaveValue('layer-distance');
@@ -67,9 +68,7 @@ test('GIF/image group pursuit with a shared mask records full history, replays/s
   youtube,
 }) => {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await youtube.bringToFront();
-  await popup.locator('#creator-studio-inpage').evaluate((button: HTMLButtonElement) => button.click());
-  const panel = youtube.locator('#web-world-themes-creator');
+  let { panel } = await openEditor(popup, youtube);
   await panel
     .getByLabel('画像素材を追加')
     .setInputFiles(Array(2).fill(path.resolve('tests/fixtures/motion/petal.png')));
@@ -153,8 +152,10 @@ test('GIF/image group pursuit with a shared mask records full history, replays/s
   await panel.locator('.take-position').press('Tab');
   await expect.poll(position).toEqual(paused);
   await panel.screenshot({ path: '.work/verification/signal-v2-motion-take.png' });
+  // The editor closes with the reload, as before; then it is opened again on the saved work.
+  await closeEditorPages(youtube);
   await youtube.reload();
-  await popup.locator('#creator-studio-inpage').evaluate((button: HTMLButtonElement) => button.click());
+  ({ panel } = await openEditor(popup, youtube));
   await panel.locator('.take-library-select').selectOption(take.id);
   await expect(panel.locator('.take-source')).toHaveText('PREVIEW');
   await panel.locator('.take-position').fill(String(at / 1000));

@@ -3,6 +3,7 @@ import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
+import { openRetiredEditor } from './helpers/editor';
 import { beginCanvasGesture, visiblePart } from './helpers/editor-workspace';
 
 test('layout feasibility on real signed-out YouTube, preserving native media and DOM parents', async () => {
@@ -33,7 +34,7 @@ test('layout feasibility on real signed-out YouTube, preserving native media and
     await expect(page.locator('ytd-watch-flexy #movie_player')).toBeVisible({ timeout: 30_000 });
     await expect(page.locator('ytd-watch-metadata h1').first()).toBeVisible({ timeout: 30_000 });
     const opened = context.waitForEvent('page');
-    await popup.locator('#creator-studio-open').evaluate((button: HTMLButtonElement) => button.click());
+    await popup.locator('#creator-editor-window').evaluate((button: HTMLButtonElement) => button.click());
     const oldStudio = await opened;
     await oldStudio.setViewportSize({ width: 1366, height: 900 });
     await expect(oldStudio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
@@ -146,7 +147,8 @@ test('production in-page Studio authors on the real signed-out YouTube, without 
       nativeVideo = await page.locator('#movie_player video').elementHandle();
     const appBefore = (await page.locator('ytd-app').boundingBox())!,
       parentBefore = await nativePlayer!.evaluate((node) => node.parentElement?.id);
-    await popup.locator('#creator-studio-inpage').evaluate((button: HTMLButtonElement) => button.click());
+    // UI0-d: still on the in-page Studio; opened through its retained message.
+    await openRetiredEditor(popup, page, 'inpage');
     const panel = page.locator('#web-world-themes-creator');
     const presentation =
       ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)';
@@ -301,7 +303,7 @@ test('production in-page Studio authors on the real signed-out YouTube, without 
     report.checks.exitRestore = true;
     await page.reload({ waitUntil: 'domcontentloaded' });
     await expect(page.locator(presentation + ' [data-image-id]')).toHaveCount(3);
-    await popup.locator('#creator-studio-inpage').evaluate((button: HTMLButtonElement) => button.click());
+    await openRetiredEditor(popup, page, 'inpage');
     await expect(panel.locator('[data-kind="group"]')).toHaveCount(1);
     await expect(panel.locator('.dirty')).toHaveText('保存済み');
     report.checks.savedReload = true;

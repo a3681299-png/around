@@ -29,7 +29,7 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
     /[&<>"']/g,
     (value) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[value]!,
   );
-  root.innerHTML = `<header class="connection-bar"><strong>WORLD THEMES STUDIO</strong><label>編集対象 <select aria-label="編集する${hostName}タブ"><option value="">対象を選ぶ</option></select></label><button class="refresh-targets" type="button" title="開いている対応タブを取得">タブを更新</button><button class="connect-target" type="button">接続 / 再開</button><button class="disconnect-target" type="button">接続を解除</button><button class="focus-target" type="button">${hostName}を表示</button><span class="connection-status" role="status" aria-live="polite">接続先を選んでください。</span></header><p class="recovery-status" role="status"></p><div class="studio-mount"><section class="connection-empty"><h1>Webサイトが、あなたのキャンバスに。</h1><p>${hostName}を開いてテーマをONにし、上の一覧から接続してください。Studioの変更は実際の${hostName}タブへ反映されます。</p><p>Studioと${hostName}を並べると、制作パネルと作品を同時に見ながら編集できます。</p></section></div>`;
+  root.innerHTML = `<header class="connection-bar"><strong>WORLD THEMES STUDIO</strong><label>編集対象 <select aria-label="編集する${hostName}タブ"><option value="">対象を選ぶ</option></select></label><button class="refresh-targets" type="button" title="開いている対応タブを取得">タブを更新</button><button class="connect-target" type="button">接続 / 再開</button><button class="disconnect-target" type="button">接続を解除</button><button class="focus-target" type="button">${hostName}を表示</button><span class="connection-status" role="status" aria-live="polite">接続先を選んでください。</span></header><p class="recovery-status" role="status"></p><div class="studio-mount"><section class="connection-empty"><h1>Webサイトが、あなたのキャンバスに。</h1><p>${hostName}を開いてテーマをONにし、上の一覧から接続してください。エディターの変更は実際の${hostName}タブへ反映されます。</p><p>エディターと${hostName}を並べると、パネルと作品を同時に見ながら編集できます。</p></section></div>`;
   const get = <T extends HTMLElement>(selector: string) => root.querySelector<T>(selector)!;
   const targetSelect = get<HTMLSelectElement>('select'),
     mount = get('.studio-mount'),
@@ -52,6 +52,7 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
   ])
     buttonIcon(get<HTMLButtonElement>('.' + selector), name!);
   let alive = true,
+    importError: string | undefined,
     targets: StudioTarget[] = [],
     panel: ReturnType<typeof createCreatorPanel> | undefined,
     paneTarget: number | undefined;
@@ -85,6 +86,7 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
   const unmountSafety = ports.mountSafety?.(root, connection);
   const dispatch = (command: EditCommand) => {
     if (!connection.isConnected || !connection.state?.active) return;
+    importError = undefined;
     pendingCommands++;
     panel?.host.setAttribute('aria-busy', 'true');
     void connection.dispatch(command).finally(() => {
@@ -93,9 +95,24 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
       if (!pendingCommands && latest) render(latest);
     });
   };
-  const importSkin = (files: readonly File[], slot: SkinSlot) => {
-    if (connection.isConnected) void connection.import(files, slot);
+  // A side panel's width (320–480, up to half a window) gets the one-column arrangement with tabs.
+  const narrow = () => (doc.defaultView?.innerWidth ?? 0) < 720;
+  let builtNarrow = narrow();
+  const onResize = () => {
+    if (alive && panel && latest && builtNarrow !== narrow()) render(latest);
   };
+  doc.defaultView?.addEventListener('resize', onResize);
+  // A file this page could not read or send never reaches the YouTube tab, so the page tells it in the
+  // status line itself until the next command or import.
+  const importFiles = (files: readonly File[], slot?: SkinSlot) => {
+    if (!connection.isConnected) return;
+    importError = undefined;
+    void connection.import(files, slot).catch((error: unknown) => {
+      importError = error instanceof Error ? error.message : '素材を読み込めませんでした。';
+      if (latest) render(latest);
+    });
+  };
+  const importSkin = (files: readonly File[], slot: SkinSlot) => importFiles(files, slot);
   // The page measures its parts only while the skin tool is open.
   const unsubscribeSkinPage = connection.skinPage?.subscribe((info) => panel?.setSkinPage(info));
   function render(value: StudioConnectionState) {
@@ -108,7 +125,8 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
     get<HTMLButtonElement>('.disconnect-target').disabled = !value.connected;
     get<HTMLButtonElement>('.focus-target').disabled = value.target === undefined;
     if (!value.state || (pendingCommands && value.connected && value.target === paneTarget)) return;
-    if (!panel || paneTarget !== value.target) {
+    if (!panel || paneTarget !== value.target || builtNarrow !== narrow()) {
+      builtNarrow = narrow();
       panel?.destroy();
       mount.replaceChildren();
       paneTarget = value.target;
@@ -120,7 +138,7 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
         studioActions(
           dispatch,
           (files) => {
-            if (connection.isConnected) void connection.import(files);
+            importFiles(files);
           },
           (id) => connection.thumbnail(id),
         ),
@@ -131,7 +149,9 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
           timeline: connection.timeline,
           hostLabel: ports.hostName,
           fullPage: true,
-          sidePanel: Boolean(ports.sidePanel),
+          // The arrangement follows the width; the surface (side panel or window) only sets transport.
+          sidePanel: builtNarrow,
+          surface: ports.sidePanel ? 'sidepanel' : 'window',
           persistWorkspace: true,
           ...(skinTargets.length && ports.skinAssetUrl
             ? {
@@ -154,11 +174,11 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
       connectionBar.slot = 'connection';
       message.slot = 'connection-status';
       panel.host.append(connectionBar, message);
-      if (!ports.sidePanel) {
+      if (!builtNarrow) {
         stage = doc.createElement('section');
         stage.className = 'studio-stage';
         stage.setAttribute('aria-label', '素材とプレビュー');
-        stage.innerHTML = `<div class="preview-link"><button class="stage-sidepanel" type="button">Chromeサイドパネルで編集</button><strong>ライブキャンバス</strong><p>${hostName}の画面に制作UIを配置して、作品を直接編集できます。</p><button class="stage-inpage" type="button">${hostName}でStudioを開く</button><button class="stage-focus" type="button">${hostName}を表示</button></div>`;
+        stage.innerHTML = `<div class="preview-link"><strong>ライブキャンバス</strong><p>作品は${hostName}のタブで動きます。並べて見ると、パネルと作品を同時に確かめながら編集できます。</p><button class="stage-focus" type="button">${hostName}を表示</button><button class="stage-sidepanel" type="button">サイドパネルで開く</button></div>`;
         panel.host.shadowRoot!.querySelector('.canvas-slot')!.append(stage);
         stage.querySelector('.stage-sidepanel')!.addEventListener('click', () => {
           void connection.openWorkspace('sidepanel').catch((error: unknown) => {
@@ -166,16 +186,15 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
           });
         });
         stage.querySelector('.stage-focus')!.addEventListener('click', focusTarget);
-        stage.querySelector('.stage-inpage')!.addEventListener('click', () => {
-          void connection.openWorkspace().catch((error: unknown) => {
-            message.textContent = error instanceof Error ? error.message : '制作画面を開けませんでした。';
-          });
-        });
       }
     }
     const ready = value.connected && value.state.active;
     panel.host.toggleAttribute('data-disconnected', !ready);
-    panel.render({ ...value.state.view, saving: value.state.view.saving || !ready });
+    panel.render({
+      ...value.state.view,
+      saving: value.state.view.saving || !ready,
+      ...(importError ? { status: importError, error: true } : {}),
+    });
   }
   async function refreshTargets() {
     const epoch = ++refreshEpoch;
@@ -285,7 +304,7 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
         .find((node): node is HTMLElement => node instanceof HTMLElement && Boolean(node.dataset.skinSlot));
       if (zone || connection.state?.view.tool === 'skin')
         importSkin(files, (zone?.dataset.skinSlot as SkinSlot | undefined) ?? 'normal');
-      else void connection.import(files);
+      else importFiles(files);
     }
   };
   // Bubble phase lets menus and focused input controls own their shortcuts first.
@@ -308,6 +327,7 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
     destroy() {
       unmountSafety?.();
       unsubscribeSkinPage?.();
+      doc.defaultView?.removeEventListener('resize', onResize);
       persist();
       alive = false;
       connection.destroy();

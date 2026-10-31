@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures';
+import { closeEditorPages, openEditor } from './helpers/editor';
 import { exposeEditorControls, withCanvas, beginCanvasGesture } from './helpers/editor-workspace';
 import { modelFixture } from './helpers/model-fixture';
 import type { DesignDocument } from '../src/design/types';
@@ -12,10 +13,7 @@ test('GLB renders alpha, shares resources, edits/drags/duplicates/undoes, saves 
 }) => {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
-  await youtube.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
-  const panel = youtube.getByRole('dialog', { name: 'デザインエディター' });
-  await expect(panel).toBeVisible();
+  const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
   await panel
     .locator('.model-file')
@@ -69,6 +67,7 @@ test('GLB renders alpha, shares resources, edits/drags/duplicates/undoes, saves 
   expect(saved.schemaVersion).toBe(13);
   expect(saved.decorations[0]).toMatchObject({ kind: 'model3d', model: { rotationY: 35 } });
   expect(saved.decorations[0]!.assetId).toBe(saved.decorations[1]!.assetId);
+  await closeEditorPages(youtube);
   await youtube.reload();
   await expect(media.first()).toHaveAttribute('data-renderer', 'three', { timeout: 20000 });
   expect(
@@ -88,9 +87,7 @@ test('arbitrary clips animate pixels, pause, crossfade, change speed and preserv
 }) => {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
-  await youtube.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
-  const panel = youtube.getByRole('dialog', { name: 'デザインエディター' });
+  const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
   await panel
     .locator('.model-file')
@@ -139,9 +136,7 @@ test('selected head bone adds a bounded look to the paused animated pose and OFF
 }) => {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
-  await youtube.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
-  const panel = youtube.locator('#web-world-themes-creator');
+  const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
   await panel
     .locator('.model-file')
@@ -168,9 +163,7 @@ test('selected head bone adds a bounded look to the paused animated pose and OFF
 test('optional glTF node names are not required for cloned rig animation', async ({ popup, youtube }) => {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
-  await youtube.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
-  const panel = youtube.locator('#web-world-themes-creator');
+  const { panel } = await openEditor(popup, youtube);
   await panel.locator('.model-file').setInputFiles({
     name: 'Unnamed.glb',
     mimeType: 'model/gltf-binary',

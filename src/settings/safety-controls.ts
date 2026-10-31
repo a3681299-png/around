@@ -89,12 +89,21 @@ export function mountSafetyControls(root: HTMLElement, connection?: StudioConnec
     };
     observer = new MutationObserver(badges);
     observer.observe(root, { childList: true, subtree: true });
+    // A status sent before the tab handled the request must not flip the box back meanwhile.
+    let requested: boolean | undefined;
     overlay.addEventListener('change', () => {
-      void connection.safety!.overlay(overlay.checked).catch(reportFailure);
+      const value = (requested = overlay.checked);
+      void connection
+        .safety!.overlay(value)
+        .catch(reportFailure)
+        .finally(() => {
+          if (requested === value) requested = undefined;
+          if (latest && requested === undefined) overlay.checked = latest.overlay;
+        });
     });
     unsubscribe = connection.safety.subscribe((status) => {
       latest = status;
-      overlay.checked = status.overlay;
+      if (requested === undefined) overlay.checked = status.overlay;
       report.replaceChildren();
       for (const issue of status.issues) {
         const li = doc.createElement('li');

@@ -1,4 +1,5 @@
 import { test, expect, launchExtension } from './fixtures';
+import { openEditor } from './helpers/editor';
 import { cp, mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { nativeShortcut } from './helpers/native-shortcut';
@@ -99,9 +100,7 @@ test('forced state and compact previews survive neither save/reload nor an Undo/
 }) => {
   await storeDesign(popup, plainSkinDesign);
   await importSkinArt(youtube, popup, 'tests/fixtures/skins/frame-light.png');
-  await youtube.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const editor = youtube.getByRole('dialog', { name: 'デザインエディター' });
+  const { panel: editor } = await openEditor(popup, youtube);
   await editor.getByRole('button', { name: 'UIを着せ替え' }).click();
   await editor.locator('.skin-part[data-target="video-card"]').click();
   await editor.locator('.skin-compact > summary').click();

@@ -2,6 +2,7 @@ import { build } from 'esbuild';
 import path from 'node:path';
 import type { Page, Locator } from '@playwright/test';
 import { expect } from '../fixtures';
+import { openEditor } from './editor';
 
 export const overlay = '#web-world-themes-decorations',
   media = `${overlay} .media`;
@@ -59,17 +60,16 @@ export async function open(popup: Page, page: Page): Promise<Locator> {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   await page.bringToFront();
   await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
-  await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const panel = page.getByRole('dialog', { name: 'デザインエディター' });
-  await expect(panel).toBeVisible();
-  return panel;
+  return (await openEditor(popup, page)).panel;
 }
 export async function image(panel: Locator, page: Page) {
   await panel
     .getByLabel('画像素材を追加', { exact: true })
     .setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await expect(page.locator(media)).toHaveAttribute('data-playback', 'still');
-  await panel.getByRole('button', { name: 'プロパティを編集', exact: true }).click();
+  // The editor window shows the properties beside the layers; only a tabbed arrangement switches.
+  const inspect = panel.getByRole('button', { name: 'プロパティを編集', exact: true });
+  if (await inspect.isVisible()) await inspect.click();
 }
 export async function save(panel: Locator) {
   await panel.getByRole('button', { name: '保存', exact: true }).click();

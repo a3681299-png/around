@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures';
+import { openEditor } from './helpers/editor';
 import { modelFixture } from './helpers/model-fixture';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -12,9 +13,7 @@ test('8 rigged models share one context/assets, respect surface budgets and susp
   test.setTimeout(60000);
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
-  await youtube.bringToFront();
-  await popup.locator('#creator-studio-inpage').evaluate((b: HTMLButtonElement) => b.click());
-  const panel = youtube.locator('#web-world-themes-creator');
+  const { panel } = await openEditor(popup, youtube);
   await panel.locator('.file').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await expect(youtube.locator(`${overlay} img`)).toBeVisible();
   await expect(panel.locator('.add-model')).toBeEnabled();
@@ -92,9 +91,7 @@ test('real WebGL loss recreates a context, deletion releases resources and Undo 
 }) => {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
-  await youtube.bringToFront();
-  await popup.locator('#creator-studio-inpage').evaluate((b: HTMLButtonElement) => b.click());
-  const panel = youtube.locator('#web-world-themes-creator');
+  const { panel } = await openEditor(popup, youtube);
   await panel.locator('.file').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await expect(youtube.locator(`${overlay} img`)).toBeVisible();
   await expect(panel.locator('.add-model')).toBeEnabled();

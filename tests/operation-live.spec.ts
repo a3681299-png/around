@@ -2,6 +2,7 @@ import { test, expect, type Page } from '@playwright/test';
 import { mkdir, mkdtemp } from 'node:fs/promises';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
+import { openRetiredEditor } from './helpers/editor';
 import { exposeEditorControls } from './helpers/editor-workspace';
 import { declinePromotion, waitForAdvertToEnd } from './helpers/youtube-live';
 
@@ -99,7 +100,8 @@ test('optional real YouTube operation checks with and without authored paint', a
     await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
     await page.bringToFront();
     const before = await nativeInputs(page);
-    await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
+    // UI0-d: still on the floating editor; opened through its retained message.
+    await openRetiredEditor(popup, page);
     const editor = page.locator('#web-world-themes-creator');
     await exposeEditorControls(editor);
     await editor.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));

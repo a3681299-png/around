@@ -1,6 +1,7 @@
 import { exposeEditorControls, withCanvas, clickCanvas, beginCanvasGesture } from './helpers/editor-workspace';
 import type { Page, Locator } from '@playwright/test';
 import { test, expect } from './fixtures';
+import { openEditor, openRetiredEditor } from './helpers/editor';
 import type { DesignDocument } from '../src/design/types';
 
 const key = 'webWorldThemes.design.youtube';
@@ -9,13 +10,10 @@ const images =
   ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]';
 const rows = '[data-layer-id]';
 
-async function open(popup: Page, page: Page) {
+async function open(popup: Page, page: Page, retired = false) {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
-  await page.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const dialog = page.getByRole('dialog', { name: 'デザインエディター' });
-  await expect(dialog).toBeVisible();
+  const dialog = retired ? await openRetiredEditor(popup, page) : (await openEditor(popup, page)).panel;
   await exposeEditorControls(dialog);
   return dialog;
 }
@@ -46,8 +44,8 @@ async function save(dialog: Locator) {
   await dialog.getByRole('button', { name: '保存', exact: true }).click();
   await expect(dialog.locator('.status')).toHaveText('保存しました。');
 }
-async function seed(popup: Page, page: Page, count = 3) {
-  const dialog = await open(popup, page);
+async function seed(popup: Page, page: Page, count = 3, retired = false) {
+  const dialog = await open(popup, page, retired);
   await importOne(dialog, page);
   await save(dialog);
   const doc = await stored(popup),
@@ -72,7 +70,7 @@ async function seed(popup: Page, page: Page, count = 3) {
     design: doc,
   });
   await expect(page.locator(images)).toHaveCount(count);
-  return open(popup, page);
+  return open(popup, page, retired);
 }
 const image = (page: Page, id: number) => page.locator(`${images}[data-image-id="image-${id}"]`);
 const row = (dialog: Locator, id: number) => dialog.locator(`${rows}[data-layer-id="image-${id}"]`);
@@ -180,7 +178,9 @@ test('32 layers combine hidden and locked selection without moving or deleting p
   popup,
   youtube,
 }) => {
-  const dialog = await seed(popup, youtube, 32);
+  // UI0-d: stays on the floating editor; its last check folds that editor's layer list, which the
+  // editor page does not have (docs/ui0d-2.md, tests not moved).
+  const dialog = await seed(popup, youtube, 32, true);
   await row(dialog, 0).getByRole('button', { name: 'ロック', exact: true }).click();
   await row(dialog, 1).getByRole('button', { name: '非表示にする' }).click();
   for (const id of [0, 1, 2, 31])

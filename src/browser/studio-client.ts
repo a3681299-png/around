@@ -318,8 +318,11 @@ export function createStudioClient(
       >).catch(() => undefined);
   }
   visibilityDocument?.addEventListener('visibilitychange', publishVisibility);
-  function enqueue(action: () => Promise<unknown>) {
+  /** Runs in order. A failure is told in the connection line; `report` also rejects the caller's
+   * promise, so an import's reason can stand where the panel tells it. */
+  function enqueue(action: () => Promise<unknown>, report = false) {
     const generation = epoch;
+    let failure: unknown;
     commands = commands
       .catch(() => undefined)
       .then(async () => {
@@ -328,9 +331,14 @@ export function createStudioClient(
         emit('接続中');
       })
       .catch((error: unknown) => {
+        failure = error ?? new Error('操作に失敗しました。');
         if (generation === epoch) emit(error instanceof Error ? error.message : '操作に失敗しました。');
       });
-    return commands;
+    return report
+      ? commands.then(() => {
+          if (failure !== undefined) throw failure;
+        })
+      : commands;
   }
   const focusTarget = async () => {
     if (tabId === undefined) return;
@@ -451,7 +459,7 @@ export function createStudioClient(
           if (pendingImport?.controller === controller) pendingImport = undefined;
           await releaseAssets(lease).catch(() => undefined);
         }
-      });
+      }, true);
     },
     async thumbnail(id: string) {
       if (!connected) return;

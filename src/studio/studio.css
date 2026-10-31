@@ -1,10 +1,11 @@
+/* The Studio page around the editor. Colours and faces are the WWT Studio tokens, which the page's
+   script declares on :root from editor/studio-tokens.css; Payne's grey or Gesso by the system
+   scheme, like the editor. Nothing is set below 12px. */
 :root {
-  color-scheme: dark;
-  font:
-    12px/1.4 system-ui,
-    sans-serif;
-  color: #e3e4e8;
-  background: #202123;
+  color-scheme: light dark;
+  font: 13px/20px var(--font-ui);
+  color: var(--ink);
+  background: var(--surface-sunk);
 }
 * {
   box-sizing: border-box;
@@ -23,31 +24,31 @@ body,
 .connection-bar {
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
   padding: 0;
   margin: 0;
   background: transparent;
   border: 0;
   min-width: 0;
-  font-size: 11px;
-  height: 26px;
+  font-size: 12px;
+  height: var(--control);
 }
 .connection-bar label {
   display: flex;
   align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  color: #a5a7af;
+  gap: var(--space-4);
+  font-size: 12px;
+  color: var(--ink-muted);
 }
 button,
 select {
   font: inherit;
-  color: #e3e4e8;
+  color: var(--ink);
   background: transparent;
   border: 0;
-  border-radius: 2px;
-  height: 24px;
-  padding: 3px 5px;
+  border-radius: var(--radius-control);
+  height: 28px;
+  padding: var(--space-4);
 }
 button {
   cursor: pointer;
@@ -56,11 +57,11 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  min-width: 26px;
+  width: 28px;
+  min-width: 28px;
 }
 button:hover:not(:disabled) {
-  background: #414248;
+  background: var(--cobalt-wash);
 }
 button:disabled {
   opacity: 0.4;
@@ -70,25 +71,25 @@ select {
   min-width: 130px;
   max-width: 290px;
   width: min(24vw, 290px);
-  background: #242528;
-  border: 1px solid #484950;
+  background: var(--surface-sunk);
+  border: 1px solid var(--line-control);
 }
 button:focus-visible,
 select:focus-visible {
-  outline: 2px solid #b6a4e5;
-  outline-offset: -2px;
+  outline: 2px solid var(--cobalt);
+  outline-offset: 1px;
 }
 .connection-status {
   display: block;
   max-width: 350px;
-  font-size: 10px;
-  color: #d0b387;
+  font-size: 12px;
+  color: var(--ink-muted);
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
 }
 .connection-status[data-connected='true'] {
-  color: #b3c7b7;
+  color: var(--ink-muted);
 }
 .studio-mount {
   flex: 1;
@@ -97,22 +98,23 @@ select:focus-visible {
   display: flex;
 }
 .connection-empty {
-  padding: 28px;
-  max-width: 550px;
+  padding: var(--space-32);
+  max-width: 552px;
   margin: auto;
-  color: #a5a7af;
+  color: var(--ink-muted);
 }
 .connection-empty h1 {
-  font-size: 16px;
-  font-weight: 600;
-  color: #e3e4e8;
+  font-size: 20px;
+  line-height: 32px;
+  font-weight: 700;
+  color: var(--ink);
 }
 .recovery-status {
   margin: 0;
-  padding: 0 8px;
-  font-size: 11px;
-  color: #dfb87a;
-  background: #202123;
+  padding: 0 var(--space-8);
+  font-size: 12px;
+  color: var(--ink);
+  background: var(--surface-sunk);
 }
 
 body[data-sidepanel] .connection-bar label,
@@ -123,8 +125,8 @@ body[data-sidepanel] .disconnect-target {
 }
 body[data-sidepanel] .connection-bar {
   height: auto;
-  min-height: 28px;
-  padding: 3px 8px;
+  min-height: var(--control);
+  padding: var(--space-4) var(--space-8);
 }
 body[data-sidepanel] .connection-status {
   max-width: 100%;

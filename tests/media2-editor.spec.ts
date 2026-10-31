@@ -3,6 +3,7 @@ import path from 'node:path';
 import { build } from 'esbuild';
 import { readFile } from 'node:fs/promises';
 import { test, expect, launchExtension } from './fixtures';
+import { openEditor, openRetiredEditor } from './helpers/editor';
 import type { Page, Locator } from '@playwright/test';
 import type { DesignDocument } from '../src/design/types';
 
@@ -11,12 +12,10 @@ const overlay = '#web-world-themes-decorations',
     ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',
   layers = `${presentation} [data-image-id]`;
 const file = (name: string) => path.resolve(`tests/fixtures/motion/${name}`);
-async function open(popup: Page, page: Page) {
+async function open(popup: Page, page: Page, retired = false) {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   await page.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const panel = page.getByRole('dialog', { name: 'デザインエディター' });
-  await expect(panel).toBeVisible();
+  const panel = retired ? await openRetiredEditor(popup, page) : (await openEditor(popup, page)).panel;
   await exposeEditorControls(panel);
   return panel;
 }
@@ -395,7 +394,9 @@ test('OFF aborts an unfinished import decoder and closes its late frame without 
   popup,
   youtube,
 }) => {
-  const panel = await open(popup, youtube),
+  // UI0-d: stays on the floating editor. It patches the decoder where that editor decodes (the
+  // YouTube tab); the editor page decodes in its own page (docs/ui0d-2.md, tests not moved).
+  const panel = await open(popup, youtube, true),
     session = await youtube.context().newCDPSession(youtube);
   const worlds: { id: number; auxData?: { type?: string } }[] = [];
   session.on('Runtime.executionContextCreated', ({ context }) => worlds.push(context));

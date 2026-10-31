@@ -4,6 +4,13 @@ import { createStudioRecovery } from './studio-recovery';
 import { browserStudioPreferences } from './preferences';
 import { mountSafetyControls } from '../settings/safety-controls';
 import { skinAssetPort } from './skin-assets';
+import tokens from '../editor/studio-tokens.css';
+
+// The page around the editor wears the same tokens as the editor's shadow root. They are declared
+// for :host there; here the page itself is the host.
+const pageTokens = document.createElement('style');
+pageTokens.textContent = tokens.replaceAll(':host', ':root');
+document.head.append(pageTokens);
 
 async function start() {
   const params = new URL(location.href).searchParams,

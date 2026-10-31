@@ -1,7 +1,5 @@
 import tokens from './studio-tokens.css';
 import styles from './panel.css';
-import studioBaseStyles from '../studio/editor-base.css';
-import studioSkinStyles from '../studio/editor-skin-base.css';
 import {
   IMAGE_LIMITS,
   STYLE_LIMITS,
@@ -21,7 +19,7 @@ import { createEffectsPanel } from './effects-panel';
 import { createLayerTree } from './layer-tree';
 import { createWorkspace } from './workspace';
 import { createStudioWorkbench } from '../studio/workbench';
-import { buttonIcon, glyph, glyphButton } from './icons';
+import { glyph, glyphButton } from './icons';
 import { arc, drawPen, svg } from './pen';
 import { mountNumberScrub } from './number-scrub';
 import { createSkinPanel, SKIN_PANEL_STYLES, type SkinPageInfo, type SkinPanelOptions } from './skin-panel';
@@ -39,7 +37,10 @@ export interface PanelOptions {
   fullPage?: boolean;
   persistWorkspace?: boolean;
   inPage?: boolean;
+  /** The side panel's arrangement (one column, tabs): chosen by width, not by where the page runs. */
   sidePanel?: boolean;
+  /** Where this editor page runs, for the 「サイドパネルで開く」/「別ウィンドウで開く」 actions. */
+  surface?: 'sidepanel' | 'window';
   toolbarOnly?: boolean;
   onSurface?(surface: 'sidepanel' | 'inpage' | 'window'): void;
   hostLabel?: string;
@@ -100,11 +101,10 @@ export function createCreatorPanel(
   const shadow = host.attachShadow({ mode: 'open' });
   const sheet = doc.createElement('style');
   const workbench = Boolean(options.fullPage || options.inPage || options.sidePanel || options.toolbarOnly);
+  // `floating` is the floating editor's own shell only (its header, opening, guide and collapse).
+  // Every panel wears the WWT Studio system; the Studio workbench adds its arrangement on top.
   const floating = !workbench;
-  // Only the floating editor wears the WWT Studio system so far; Studio keeps its base styles.
-  sheet.textContent = workbench
-    ? studioBaseStyles + (options.skin ? studioSkinStyles : '')
-    : tokens + styles + (options.skin ? SKIN_PANEL_STYLES : '');
+  sheet.textContent = tokens + styles + (options.skin ? SKIN_PANEL_STYLES : '');
   const main = doc.createElement('main');
   main.innerHTML = `
     <header><div><span class="eyebrow">WORLD CREATOR</span><h2>デザインを編集</h2></div><button class="dock" type="button" title="YouTubeの見たい場所に合わせて左右を切り替え">パネルを左へ</button><button class="minimize" type="button" aria-label="パネルを折りたたむ" title="プレビューを広く見る">−</button><button class="close" type="button" aria-label="編集を終了" title="未保存の変更を破棄して終了">×</button></header>
@@ -203,8 +203,7 @@ export function createCreatorPanel(
     const button = doc.createElement('button');
     button.type = 'button';
     button.dataset.tool = tool;
-    if (floating) glyphButton(button, tool, label, key);
-    else buttonIcon(button, tool, label, key);
+    glyphButton(button, tool, label, key);
     button.addEventListener('click', () => actions.tool(tool));
     tools.append(button);
   }
@@ -214,6 +213,22 @@ export function createCreatorPanel(
   const saveState = doc.createElement('div'),
     saveFailure = doc.createElement('div'),
     retry = doc.createElement('button');
+  glyphButton(get('.undo'), 'undo', '元に戻す', 'Ctrl＋Z');
+  glyphButton(get('.redo'), 'redo', 'やり直す', 'Ctrl＋Shift＋Z / Ctrl＋Y');
+  // The one save chip. A failed save keeps its words in the chip, then one reason and the way out.
+  saveState.className = 'save-state';
+  saveFailure.className = 'save-failure';
+  saveFailure.hidden = true;
+  const reason = doc.createElement('p');
+  reason.className = 'save-reason';
+  reason.textContent = 'ブラウザの保存領域に書き込めませんでした。';
+  retry.type = 'button';
+  retry.className = 'retry-save';
+  retry.textContent = 'もう一度保存';
+  retry.addEventListener('click', actions.save);
+  saveFailure.append(reason, retry);
+  saveState.append(get('.dirty'), saveFailure);
+  get('.toolbar').append(saveState);
   if (floating) {
     get('.eyebrow').remove();
     glyphButton(get('.dock'), 'dock', 'パネルを左へ', '', 'YouTubeの見たい場所に合わせて左右を切り替え');
@@ -221,25 +236,10 @@ export function createCreatorPanel(
     glyphButton(get('.minimize'), 'collapse', 'パネルを折りたたむ', '', 'プレビューを広く見る');
     glyphButton(get('.close'), 'close', '編集を終了', '', '未保存の変更を破棄して終了');
     get('header').append(get('.dock'), displaySettings, get('.minimize'), get('.close'));
-    glyphButton(get('.undo'), 'undo', '元に戻す', 'Ctrl＋Z');
-    glyphButton(get('.redo'), 'redo', 'やり直す', 'Ctrl＋Shift＋Z / Ctrl＋Y');
     const separator = doc.createElement('span');
     separator.className = 'toolbar-separator';
     separator.setAttribute('role', 'separator');
     separator.setAttribute('aria-orientation', 'vertical');
-    // A failed save keeps its words in the chip, then one reason and the way out.
-    saveState.className = 'save-state';
-    saveFailure.className = 'save-failure';
-    saveFailure.hidden = true;
-    const reason = doc.createElement('p');
-    reason.className = 'save-reason';
-    reason.textContent = 'ブラウザの保存領域に書き込めませんでした。';
-    retry.type = 'button';
-    retry.className = 'retry-save';
-    retry.textContent = 'もう一度保存';
-    retry.addEventListener('click', actions.save);
-    saveFailure.append(reason, retry);
-    saveState.append(get('.dirty'), saveFailure);
     get('.toolbar').replaceChildren(tools, separator, get('.undo'), get('.redo'), saveState);
     // Opening: the panel's ruled edges are drawn in 4 frames, then the content appears in 3.
     main.classList.add('ww-construct');
@@ -247,7 +247,7 @@ export function createCreatorPanel(
   // ww-rail: the chosen tool gets a G-pen circle, drawn round in 4 frames when it is chosen.
   let ringTool: string | undefined;
   const ringOn = (button: HTMLButtonElement | null) => {
-    if (!floating || ringTool === button?.dataset.tool) return;
+    if (ringTool === button?.dataset.tool) return;
     tools.querySelector('.tool-ring')?.remove();
     ringTool = button?.dataset.tool;
     if (!button) return;
@@ -266,7 +266,8 @@ export function createCreatorPanel(
           begin: actions.beginEdit,
           end: actions.endEdit,
         },
-        { ...options.skin, floating },
+        // The design system's empty state and copy, on every surface.
+        { ...options.skin, floating: true },
       )
     : undefined;
   const backgroundToggle = get<HTMLInputElement>('[data-override="backgroundColor"]');
@@ -294,10 +295,9 @@ export function createCreatorPanel(
   const addImage = get<HTMLButtonElement>('.add-image');
   const addAnimation = get<HTMLButtonElement>('.add-animation');
   const animationInput = get<HTMLInputElement>('.animation-file');
-  const iconButton = floating ? glyphButton : buttonIcon;
-  iconButton(addImage, 'image', '画像を追加');
-  iconButton(addAnimation, 'animation', 'アニメーションを追加');
-  iconButton(addModel, 'model3d', '3Dモデルを追加');
+  glyphButton(addImage, 'image', '画像を追加');
+  glyphButton(addAnimation, 'animation', 'アニメーションを追加');
+  glyphButton(addModel, 'model3d', '3Dモデルを追加');
   if (floating) {
     // Standing instructions move to a tooltip; the list's heading carries it.
     const tip = get('.selection-tip');
@@ -356,7 +356,7 @@ export function createCreatorPanel(
     change: actions.layerChange,
     reorder: actions.reorder,
     thumbnail: actions.thumbnail,
-    ...(floating ? { icon: glyph } : {}),
+    icon: glyph,
     context: (id, x, y) => {
       if (!current?.selectedIds.includes(id)) actions.imageSelect(id);
       // A remote selection must be acknowledged before the menu uses its actions.
@@ -538,41 +538,23 @@ export function createCreatorPanel(
         button.disabled = state.saving || !availability.allowed;
       });
       const saveFailed = state.error && state.status.startsWith('保存でき');
+      // The chip carries the save state only, in the README's words; other errors are told in the
+      // footer.
       setText(
         get<HTMLElement>('.dirty'),
-        floating
-          ? // The chip carries the save state only, in the README's words; other errors are told in
-            // the footer.
-            saveFailed
-            ? '保存できませんでした'
-            : state.saving
-              ? '処理中…'
-              : state.dirty
-                ? '未保存'
-                : '保存済み'
-          : state.error
-            ? saveFailed
-              ? '保存失敗'
-              : '操作失敗・要確認'
-            : state.saving
-              ? '処理中…'
-              : state.dirty
-                ? '未保存の変更'
-                : '保存済み',
+        saveFailed ? '保存できませんでした' : state.saving ? '処理中…' : state.dirty ? '未保存' : '保存済み',
       );
       get<HTMLElement>('.dirty').dataset.dirty = String(state.dirty);
-      if (floating) {
-        get<HTMLElement>('.dirty').dataset.state = saveFailed
-          ? 'failed'
-          : state.saving
-            ? 'saving'
-            : state.dirty
-              ? 'dirty'
-              : 'saved';
-        saveFailure.hidden = !saveFailed;
-        saveState.toggleAttribute('data-failed', Boolean(saveFailed));
-        retry.disabled = state.saving;
-      }
+      get<HTMLElement>('.dirty').dataset.state = saveFailed
+        ? 'failed'
+        : state.saving
+          ? 'saving'
+          : state.dirty
+            ? 'dirty'
+            : 'saved';
+      saveFailure.hidden = !saveFailed;
+      saveState.toggleAttribute('data-failed', Boolean(saveFailed));
+      retry.disabled = state.saving;
       setText(
         get<HTMLElement>('.layer-count'),
         `${state.images.length} / ${IMAGE_LIMITS.count}${state.groups.length ? `・グループ${state.groups.length}` : ''}`,
@@ -660,7 +642,7 @@ export function createCreatorPanel(
       status.dataset.error = String(state.error);
       // The save state shows in the header chip alone. Save messages still reach assistive technology
       // through this live region, but are not drawn a second time in the footer.
-      if (floating) status.toggleAttribute('data-save', state.status === '保存しました。' || Boolean(saveFailed));
+      status.toggleAttribute('data-save', state.status === '保存しました。' || Boolean(saveFailed));
       workspace.render(state);
       if (pendingContext && state.selectedIds.includes(pendingContext.id)) {
         workspace.context(pendingContext.x, pendingContext.y);

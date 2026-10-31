@@ -314,7 +314,7 @@ export function createCreatorEditor(
       style.textContent = tokens + BADGE_CSS;
       box.className = 'badge';
       const label = doc.createElement('span');
-      label.textContent = 'Studioで編集中';
+      label.textContent = '別ウィンドウで編集中';
       const quick = doc.createElement('button');
       quick.textContent = 'クイック編集を表示';
       quick.addEventListener('click', () => open());

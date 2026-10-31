@@ -307,8 +307,8 @@ test('window chrome recovers once after DOM replacement and OFF restores the nat
   await expect(chrome).toHaveCount(1);
   await youtube.getByRole('button', { name: 'SPA navigation' }).click();
   await expect(chrome).toHaveCount(1);
-  await popup.getByRole('button', { name: '効果(E)', exact: true }).click();
-  await expect(popup.getByRole('slider', { name: 'Effect Strength' })).toBeFocused();
+  // UI0-d: 表示設定 no longer wears the retro window, so its 「効果(E)」 menu (focus the strength
+  // slider) is gone with it (docs/ui0d-2.md).
   await toggle.uncheck();
   await expect(chrome).toHaveCount(0);
   await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-window-chrome', '');

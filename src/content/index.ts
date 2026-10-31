@@ -4,6 +4,7 @@ import { watchSettings } from '../storage/settings';
 import { DEFAULT_THEME, themes } from '../themes';
 import { createThemeController } from '../themes/controller';
 import { createSettingsPanel } from '../settings/panel';
+import { mountPixelFont } from '../ui/pixel-font';
 import { createCreatorEditor, type CreatorEditor } from '../editor/controller';
 import {
   OPEN_CREATOR_EDITOR,
@@ -18,7 +19,7 @@ import { ASSET_PROFILE } from '../diagnostics/asset-profile';
 import { installAssetRuntimeHost } from '../diagnostics/asset-runtime-host';
 import { createAssetReadHost } from '../browser/asset-read-host';
 import { requestStudioSurface } from '../browser/side-panel';
-import { OPEN_SIDE_PANEL } from '../editor/messages';
+import { OPEN_SIDE_PANEL, OPEN_STUDIO_WINDOW } from '../editor/messages';
 import { watchEmergencyOff } from '../storage/safety';
 import { skinAssetPort } from '../browser/skin-assets';
 
@@ -76,12 +77,23 @@ if (site) {
     creator?.suspendMarks(value);
   });
   void chrome.runtime.sendMessage({ type: PREPARE_SIDE_PANEL }).catch(() => undefined);
-  const settingsPanel = createSettingsPanel(document, () => {
-    void requestStudioSurface(OPEN_SIDE_PANEL).catch((error: unknown) => {
-      settingsPanel.open();
-      settingsPanel.panel.shadowRoot!.querySelector('#save-status')!.textContent =
-        error instanceof Error ? error.message : 'エディターを開けませんでした。';
-    });
+  // The retro theme's window chrome and LCD clock use the packaged pixel face (the settings panel,
+  // which used to load it, now wears the WWT Studio system).
+  const unmountFont = mountPixelFont(document);
+  let creatorMode = false;
+  // The side panel first; where Chrome will not open it, the editor's own window.
+  const settingsPanel = createSettingsPanel(document, {
+    open(surface) {
+      // The side panel request goes first and at once: Chrome opens it only within the click.
+      const opened =
+        surface === 'window'
+          ? requestStudioSurface(OPEN_STUDIO_WINDOW)
+          : requestStudioSurface(OPEN_SIDE_PANEL).catch(() => requestStudioSurface(OPEN_STUDIO_WINDOW));
+      void opened.catch((error: unknown) =>
+        settingsPanel.report(error instanceof Error ? error.message : 'エディターを開けませんでした。'),
+      );
+    },
+    creatorMode: () => creatorMode,
   });
   // The settings entry stays available independently of the theme's ON/OFF state.
   const unmountSettings = site.mountSettings(settingsPanel);
@@ -91,6 +103,7 @@ if (site) {
     console.error('[Web World Themes] 設定を読み込めませんでした。', error);
   };
   const update = (settings: UserSettings) => {
+    creatorMode = settings.creatorMode;
     controller.update(settings);
     creator?.setEnabled(settings.enabled && settings.strength > 0);
   };
@@ -134,6 +147,7 @@ if (site) {
     window.removeEventListener('pageshow', onPageShow);
     unmountSettings();
     settingsPanel.destroy();
+    unmountFont();
     disconnectStudio();
     creator?.destroy();
     controller.destroy();

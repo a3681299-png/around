@@ -48,19 +48,17 @@ const skinStyle = (card: Locator) =>
     return { source: style.borderImageSource, slice: style.borderImageSlice, repeat: style.borderImageRepeat };
   });
 
-// Round 2 adds 400px here, once the side panel's arrangement follows the window width; until then
-// the window arrangement closes its inspector at that width. The real side panel is covered in
+// The window's arrangement and the side panel's (by width). The real side panel is covered in
 // tests/side-panel.spec.ts.
-for (const width of [1440])
+for (const width of [1440, 400])
   test(`skin editing from the Studio page (${width}px): parts, import, slots, preview, drop, undo and save`, async ({
-    context,
     popup,
     youtube,
   }) => {
     const errors: string[] = [];
     youtube.on('pageerror', (error) => errors.push(error.message));
     await enable(popup, youtube);
-    const { studio, panel } = await openEditor(context, popup, youtube, { width });
+    const { studio, panel } = await openEditor(popup, youtube, { width });
     studio.on('pageerror', (error) => errors.push(error.message));
 
     // The tool is offered, and the page reports the parts it found.
@@ -144,12 +142,11 @@ for (const width of [1440])
   });
 
 test('from the Studio page, a click on the page picks a video card only with the card tool', async ({
-  context,
   popup,
   youtube,
 }) => {
   await enable(popup, youtube);
-  const { panel } = await openEditor(context, popup, youtube);
+  const { panel } = await openEditor(popup, youtube);
   const card = youtube.locator(cards).first();
   // The select tool leaves the page's own clicks alone: no card is chosen.
   await panel.getByRole('button', { name: '選択・変形' }).click();

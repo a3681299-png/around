@@ -1,6 +1,7 @@
 import { test, expect } from './fixtures';
 import path from 'node:path';
 import { exposeEditorControls } from './helpers/editor-workspace';
+import { openEditor } from './helpers/editor';
 import type { DesignDocument } from '../src/design/types';
 
 test('native drag, text, keyboard and fullscreen controls remain usable with opaque artwork', async ({
@@ -86,8 +87,7 @@ test('native drag, text, keyboard and fullscreen controls remain usable with opa
       await info.attach(name, { body: picture, contentType: 'image/png' });
     }
   };
-  await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
-  const editor = youtube.locator('#web-world-themes-creator');
+  let { panel: editor } = await openEditor(popup, youtube);
   await exposeEditorControls(editor);
   const opaque = await youtube.evaluate(() => {
     const c = document.createElement('canvas');
@@ -109,7 +109,7 @@ test('native drag, text, keyboard and fullscreen controls remain usable with opa
   }
   await editor.locator('.save').click();
   await expect(editor.locator('.dirty')).toHaveText('保存済み');
-  await editor.getByRole('button', { name: '編集を終了', exact: true }).click();
+  await editor.getByRole('button', { name: '編集を終了', exact: true }).first().click();
   await expect
     .poll(async () =>
       JSON.parse(
@@ -127,7 +127,7 @@ test('native drag, text, keyboard and fullscreen controls remain usable with opa
   expect(await run()).toEqual(baseline);
   // Repeat against the other production composition path: moving the original
   // opaque media into the player must never expose its reserved controls.
-  await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
+  ({ panel: editor } = await openEditor(popup, youtube));
   await exposeEditorControls(editor);
   await editor.locator('[data-layer-id] [data-action="select"]').click();
   await editor.getByLabel('配置の基準').selectOption('video-player');
@@ -137,7 +137,7 @@ test('native drag, text, keyboard and fullscreen controls remain usable with opa
   }
   await editor.locator('.save').click();
   await expect(editor.locator('.dirty')).toHaveText('保存済み');
-  await editor.getByRole('button', { name: '編集を終了', exact: true }).click();
+  await editor.getByRole('button', { name: '編集を終了', exact: true }).first().click();
   const playerPaint = youtube.locator('#web-world-themes-video-decorations');
   await expect(playerPaint.locator('[data-image-id]')).toBeVisible();
   await expect(playerPaint).toHaveCSS('clip-path', 'inset(64px 0px 112px)');
@@ -149,8 +149,7 @@ test('native drag, text, keyboard and fullscreen controls remain usable with opa
 test('fullscreen keeps authored painting order across viewport and player anchors', async ({ popup, youtube }) => {
   await youtube.goto('https://www.youtube.com/watch?v=fixture');
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
-  await popup.locator('#creator-editor-open').evaluate((b: HTMLButtonElement) => b.click());
-  const editor = youtube.locator('#web-world-themes-creator');
+  const { panel: editor } = await openEditor(popup, youtube);
   const files = await youtube.evaluate(() =>
     ['red', 'blue'].map((color) => {
       const c = document.createElement('canvas');
@@ -170,7 +169,7 @@ test('fullscreen keeps authored painting order across viewport and player anchor
   );
   await editor.locator('.save').click();
   await expect(editor.locator('.dirty')).toHaveText('保存済み');
-  await editor.getByRole('button', { name: '編集を終了', exact: true }).click();
+  await editor.getByRole('button', { name: '編集を終了', exact: true }).first().click();
   const design = await popup.evaluate(
     async () =>
       (await chrome.storage.local.get('webWorldThemes.design.youtube'))[
@@ -237,5 +236,6 @@ test('Studio exposes protection overlays, per-layer restrictions and emergency O
   await youtube.screenshot({ path: info.outputPath('operation-envelopes.png') });
   await studio.getByRole('button', { name: '緊急OFF', exact: true }).click();
   await expect(youtube.locator('#web-world-themes-decorations')).toHaveCount(0);
-  await expect(panel.locator('.dirty')).toHaveText('未保存の変更');
+  // UI0-d: one save chip, in the design system's words (was 未保存の変更 in the Studio).
+  await expect(panel.locator('.dirty')).toHaveText('未保存');
 });

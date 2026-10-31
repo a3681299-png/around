@@ -4,6 +4,7 @@ import { mkdtemp, mkdir, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
+import { openRetiredEditor } from './helpers/editor';
 
 test('optional real YouTube: saved group, mask, anchors, signals, theater, fullscreen and SPA', async ({}, info) => {
   test.skip(process.env.WW_LIVE_MEDIA !== '1', 'Explicit signed-out real YouTube regression.');
@@ -43,7 +44,8 @@ test('optional real YouTube: saved group, mask, anchors, signals, theater, fulls
     await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
     await page.bringToFront();
     await expect(page.locator('[data-ww-surface~="player-window"]')).toBeVisible();
-    await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
+    // UI0-d: still on the floating editor; opened through its retained message.
+    await openRetiredEditor(popup, page);
     const panel = page.getByRole('dialog', { name: 'デザインエディター' });
     await expect(panel).toBeVisible();
     await exposeEditorControls(panel);

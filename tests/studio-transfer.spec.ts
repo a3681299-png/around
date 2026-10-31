@@ -19,7 +19,7 @@ async function openStudio(context: BrowserContext, popup: Page, youtube: Page) {
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
   await youtube.bringToFront();
   const opened = context.waitForEvent('page');
-  await popup.locator('#creator-studio-open').evaluate((button: HTMLButtonElement) => button.click());
+  await popup.locator('#creator-editor-window').evaluate((button: HTMLButtonElement) => button.click());
   const studio = await opened;
   await studio.setViewportSize({ width: 1440, height: 1000 });
   await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');

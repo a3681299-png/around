@@ -1,6 +1,7 @@
 import { exposeEditorControls, withCanvas, beginCanvasGesture } from './helpers/editor-workspace';
 import type { Page, Locator, BrowserContext } from '@playwright/test';
 import { test, expect, launchExtension } from './fixtures';
+import { closeEditorPages, openEditor } from './helpers/editor';
 import type { DesignDocument } from '../src/design/types';
 
 const key = 'webWorldThemes.design.youtube';
@@ -11,9 +12,7 @@ async function open(popup: Page, youtube: Page) {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   await youtube.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const dialog = youtube.getByRole('dialog', { name: 'デザインエディター' });
-  await expect(dialog).toBeVisible();
+  const { panel: dialog } = await openEditor(popup, youtube);
   await exposeEditorControls(dialog);
   return dialog;
 }
@@ -139,6 +138,7 @@ test('import a transparent image, drag and resize it, save, reload and restart w
   expect(JSON.stringify(design)).not.toMatch(/data:image|base64|blob:/);
   expect(await assets(context)).toHaveLength(1);
   const persisted = design.decorations[0]!;
+  await closeEditorPages(youtube);
   await youtube.reload();
   await expect(youtube.locator(layers).locator('img')).toBeVisible();
   await expect(youtube.locator(layers)).not.toHaveAttribute('data-editable');
@@ -291,7 +291,7 @@ test('viewport placement follows resizing without scroll drift; player anchors f
   const resized = (await image.boundingBox())!;
   await youtube.evaluate(() => window.scrollTo(0, 300));
   expect((await image.boundingBox())!.y).toBeCloseTo(resized.y, 0);
-  await dialog.getByRole('button', { name: 'パネルを左へ' }).click();
+  // UI0-d: the editor is its own page; nothing needs moving off the page (was: パネルを左へ).
   await youtube.locator('#navigate').click();
   await expect(youtube).toHaveURL(/\/watch\?/);
   const beforeAnchor = (await image.boundingBox())!;

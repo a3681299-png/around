@@ -3,6 +3,7 @@ import type { CDPSession, Locator, Page } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { test, expect, launchExtension } from './fixtures';
+import { openEditor } from './helpers/editor';
 import type { DesignDocument, GroupLayer } from '../src/design/types';
 import { defaultCircleMask } from '../src/effects/types';
 
@@ -18,9 +19,7 @@ async function open(popup: Page, page: Page) {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   await page.bringToFront();
   await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
-  await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const panel = page.getByRole('dialog', { name: 'デザインエディター' });
-  await expect(panel).toBeVisible();
+  const { panel } = await openEditor(popup, page);
   await exposeEditorControls(panel);
   return panel;
 }
@@ -198,7 +197,7 @@ test('three images group, move as one, share a mouse/video mask, save, restart a
   await panel.getByLabel('円形マスクを使う').check();
   await number(panel, '光の半径', 120);
   await number(panel, '境界のぼかし', 25);
-  await panel.getByRole('button', { name: 'パネルを左へ', exact: true }).click();
+  // UI0-d: the editor is its own page; nothing needs moving off the artwork (was: パネルを左へ).
   const content = youtube.locator(`${compositions} .group-content`);
   for (const image of await youtube.locator(images).all()) {
     const rect = (await image.boundingBox())!,

@@ -104,19 +104,21 @@ export function createStudioWorkbench(
 
   const menu = doc.createElement('nav');
   menu.className = 'studio-menu';
-  menu.setAttribute('aria-label', 'Studioメニュー');
+  menu.setAttribute('aria-label', 'エディターのメニュー');
   const brand = doc.createElement('span');
   brand.className = 'studio-brand';
-  brand.textContent = 'Studio';
+  brand.textContent = 'エディター';
   menu.append(brand);
   const legacyControls = doc.createElement('div');
   legacyControls.className = 'legacy-workspace';
   legacyControls.hidden = true;
   main.append(legacyControls);
-  legacyControls.append(oldHeader, get('.workspace-nav'), get('.panel-resize'));
+  // The side panel's arrangement keeps the floating editor's tabs: one column, レイヤー / プロパティ.
+  const nav = get('.workspace-nav');
+  legacyControls.append(oldHeader, ...(options.sidePanel ? [] : [nav]), get('.panel-resize'));
   const helpDialog = doc.createElement('dialog');
   helpDialog.className = 'studio-help';
-  helpDialog.setAttribute('aria-label', 'Studioの使い方');
+  helpDialog.setAttribute('aria-label', 'エディターの使い方');
   main.append(helpDialog);
   const closeHelp = make('ヘルプを閉じる', 'close', () => helpDialog.close());
   helpDialog.append(closeHelp, help, get('.quick-guide'));
@@ -271,9 +273,11 @@ export function createStudioWorkbench(
   const tools = get('.interaction-tools');
   const undo = get('.undo'),
     redo = get('.redo'),
-    dirty = get('.dirty'),
+    dirty = get('.save-state'),
     save = get('.save'),
     discard = get('.discard');
+  // On the toolbar, save is an icon among icons; the panel's one primary button stays a word button.
+  save.classList.remove('primary');
   const connection = doc.createElement('slot');
   connection.name = 'connection';
   connection.className = 'studio-connection';
@@ -341,7 +345,11 @@ export function createStudioWorkbench(
   divider.setAttribute('role', 'separator');
   divider.setAttribute('aria-label', 'プロパティとレイヤーの高さ');
   divider.setAttribute('aria-orientation', 'horizontal');
-  right.append(inspector, divider, layers);
+  if (options.sidePanel) {
+    // The tabs choose the one pane shown; 使い方 lives in the ヘルプ menu's dialog here.
+    nav.querySelector<HTMLElement>('[data-area="help"]')!.hidden = true;
+    right.append(nav, inspector, layers);
+  } else right.append(inspector, divider, layers);
   const canvas = doc.createElement('section');
   canvas.className = 'canvas-slot';
   canvas.setAttribute('aria-label', 'ライブキャンバス');
@@ -382,7 +390,8 @@ export function createStudioWorkbench(
   });
   get('.inspector-empty').textContent = '未選択';
   function enforce() {
-    layers.hidden = inspector.hidden = false;
+    // The window shows both panes; the side panel's tabs (the workspace's own) choose one.
+    if (!options.sidePanel) layers.hidden = inspector.hidden = false;
     get('.inspect').hidden = true;
     selection.hidden = true;
     sourceSelection.hidden = true;
@@ -404,6 +413,7 @@ export function createStudioWorkbench(
     get('.inspector-empty').hidden = true;
     tree.setActive(
       !options.toolbarOnly &&
+        !layers.hidden &&
         !host.hasAttribute('data-right-closed') &&
         !allClosed &&
         !host.hasAttribute('data-fullscreen'),
@@ -504,23 +514,21 @@ export function createStudioWorkbench(
   }
   const surfaces = doc.createElement('div');
   surfaces.className = 'surface-actions';
+  // The editor's two places: the side panel and its own window. Each offers the other.
+  const here = options.surface ?? (options.sidePanel ? 'sidepanel' : options.fullPage ? 'window' : undefined);
   for (const [surface, label, icon] of [
-    ['sidepanel', 'Chromeサイドパネルを開く', 'dock'],
-    ['inpage', '従来のインページStudioへ切替', 'workspace'],
-    ['window', '独立Studioへ切替', 'window'],
+    ['sidepanel', 'サイドパネルで開く', 'dock'],
+    ['window', '別ウィンドウで開く', 'window'],
   ] as const) {
-    if (
-      (surface === 'sidepanel' && options.sidePanel) ||
-      (surface === 'inpage' && options.inPage) ||
-      (surface === 'window' && options.fullPage && !options.sidePanel) ||
-      !options.onSurface
-    )
-      continue;
+    if (surface === here || !options.onSurface) continue;
     surfaces.append(make(label, icon, () => options.onSurface?.(surface)));
   }
   menuEnd.prepend(surfaces);
   if (options.sidePanel || options.toolbarOnly) {
+    // The floating editor's order: the tools first, then undo and redo; adding and saving follow.
     toolbar.replaceChildren(
+      tools,
+      separator(),
       undo,
       redo,
       save,
@@ -529,8 +537,6 @@ export function createStudioWorkbench(
       get('.add-image'),
       get('.add-animation'),
       get('.add-model'),
-      separator(),
-      tools,
     );
     dock.hidden = true;
     toggleLeft.hidden = toggleRight.hidden = hideAll.hidden = true;

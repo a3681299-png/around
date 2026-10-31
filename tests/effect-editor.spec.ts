@@ -3,6 +3,7 @@ import type { Page, Locator, CDPSession } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { test, expect, launchExtension } from './fixtures';
+import { openEditor } from './helpers/editor';
 import type { DesignDocument } from '../src/design/types';
 import { defaultCircleMask } from '../src/effects/types';
 import { isolate } from './helpers/world-host';
@@ -16,9 +17,7 @@ async function open(popup: Page, youtube: Page) {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   await youtube.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const panel = youtube.getByRole('dialog', { name: 'デザインエディター' });
-  await expect(panel).toBeVisible();
+  const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
   return panel;
 }

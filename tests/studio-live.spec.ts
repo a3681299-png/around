@@ -45,7 +45,7 @@ test('optional real signed-out YouTube: independent Studio creation, bidirection
     await expect(youtube.locator('[data-ww-surface~="player-window"]')).toBeVisible({ timeout: 20_000 });
     await youtube.bringToFront();
     const opened = context.waitForEvent('page');
-    await popup.locator('#creator-studio-open').evaluate((button: HTMLButtonElement) => button.click());
+    await popup.locator('#creator-editor-window').evaluate((button: HTMLButtonElement) => button.click());
     const studio = await opened;
     await studio.setViewportSize({ width: 1440, height: 900 });
     await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');

@@ -1,9 +1,9 @@
 import { mkdir } from 'node:fs/promises';
 import type { Locator, Page } from '@playwright/test';
 import { test, expect } from './fixtures';
+import { openEditor as openEditorPage, openRetiredEditor } from './helpers/editor';
 
 const cards = '[data-ww-surface~="video-card"]';
-const dialogName = 'デザインエディター';
 const shots = process.env.WW_SKIN_SHOTS;
 
 async function enable(popup: Page, youtube: Page) {
@@ -12,11 +12,7 @@ async function enable(popup: Page, youtube: Page) {
   await expect(youtube.locator(cards).first()).toBeVisible();
 }
 async function openEditor(popup: Page, youtube: Page) {
-  await youtube.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const dialog = youtube.getByRole('dialog', { name: dialogName });
-  await expect(dialog).toBeVisible();
-  return dialog;
+  return (await openEditorPage(popup, youtube)).panel;
 }
 /** A 48×48 frame: red corners, green edges, blue centre, so slices are visible in pixels. */
 async function framePng(page: Page, colors = ['#e53935', '#43a047', '#1e88e5']): Promise<Buffer> {
@@ -40,8 +36,9 @@ async function framePng(page: Page, colors = ['#e53935', '#43a047', '#1e88e5']):
   }, colors);
   return Buffer.from(data);
 }
-async function importInto(youtube: Page, zone: Locator, name: string, buffer: Buffer) {
-  const chooser = youtube.waitForEvent('filechooser');
+async function importInto(_youtube: Page, zone: Locator, name: string, buffer: Buffer) {
+  // The chooser opens on the page that holds the panel.
+  const chooser = zone.page().waitForEvent('filechooser');
   await zone.click();
   await (await chooser).setFiles({ name, mimeType: 'image/png', buffer });
 }
@@ -142,12 +139,13 @@ test('skin tool: hover names parts, click dresses every card, guides and state p
   const guide = dialog.locator('.slice-guide[data-side="left"]');
   await guide.scrollIntoViewIfNeeded();
   const box = (await guide.boundingBox())!;
-  await youtube.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-  await youtube.mouse.down();
-  for (let step = 1; step <= 4; step++)
-    await youtube.mouse.move(box.x + box.width / 2 + step * 6, box.y + box.height / 2);
+  // The guide is on the editor's page; its pointer drives it.
+  const pointer = dialog.page().mouse;
+  await pointer.move(box.x + box.width / 2, box.y + box.height / 2);
+  await pointer.down();
+  for (let step = 1; step <= 4; step++) await pointer.move(box.x + box.width / 2 + step * 6, box.y + box.height / 2);
   await expect.poll(async () => (await skinStyle(card)).slice).not.toBe('16 fill');
-  await youtube.mouse.up();
+  await pointer.up();
   const dragged = await skinStyle(card);
   expect(dragged.slice).toMatch(/^16 16 16 \d+ fill$/);
   await shot(youtube, 'skin-slice-edit');
@@ -187,7 +185,8 @@ test('skin tool: hover names parts, click dresses every card, guides and state p
   await expect.poll(async () => (await skinStyle(card)).repeat).toBe('round');
   const hoverSource = (await skinStyle(card)).source;
   const bytes = [...(await framePng(youtube, ['#000000', '#ffffff', '#ff00ff']))];
-  const transfer = await youtube.evaluateHandle((bytes) => {
+  // The drop lands on the editor's page, so its data is made there.
+  const transfer = await dialog.page().evaluateHandle((bytes) => {
     const data = new DataTransfer();
     data.items.add(new File([new Uint8Array(bytes)], 'dropped.png', { type: 'image/png' }));
     return data;
@@ -239,10 +238,9 @@ test('the in-page Studio shows the skin editor in its inspector column and picks
 }) => {
   await youtube.setViewportSize({ width: 1366, height: 900 });
   await enable(popup, youtube);
-  await youtube.bringToFront();
-  await popup.locator('#creator-studio-inpage').evaluate((button: HTMLButtonElement) => button.click());
-  const panel = youtube.getByRole('dialog', { name: dialogName });
-  await expect(panel).toBeVisible();
+  // UI0-d: stays on the in-page Studio, whose inspector column on the page it checks
+  // (docs/ui0d-2.md, tests not moved).
+  const panel = await openRetiredEditor(popup, youtube, 'inpage');
   await panel.getByRole('button', { name: 'UIを着せ替え' }).click();
   const region = panel.getByRole('region', { name: 'UIの着せ替え' });
   await expect(region).toBeVisible();

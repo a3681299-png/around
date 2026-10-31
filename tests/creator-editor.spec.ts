@@ -1,10 +1,12 @@
 import { exposeEditorControls } from './helpers/editor-workspace';
 import type { Page, Locator } from '@playwright/test';
 import { test, expect } from './fixtures';
+import { openEditor as openEditorPage } from './helpers/editor';
 
 const cards = '[data-ww-surface~="video-card"]';
 const key = 'webWorldThemes.design.youtube';
-const dialogName = 'デザインエディター';
+// The open editor, so a card pick can first choose the card tool (UI0-d decision 2).
+let editor: Locator | undefined;
 
 async function enable(popup: Page, youtube: Page) {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
@@ -13,17 +15,15 @@ async function enable(popup: Page, youtube: Page) {
 }
 
 async function openEditor(popup: Page, youtube: Page) {
-  await youtube.bringToFront();
-  // A real action popup leaves YouTube as the active tab. Our test popup is an
-  // extension page, so click without activating that separate test-only tab.
-  await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const dialog = youtube.getByRole('dialog', { name: dialogName });
-  await expect(dialog).toBeVisible();
+  const { panel: dialog } = await openEditorPage(popup, youtube);
   await exposeEditorControls(dialog);
+  editor = dialog;
   return dialog;
 }
 
 async function selectCard(youtube: Page, card = youtube.locator(cards).first()) {
+  // From the editor page, a page click picks a card only with the card tool.
+  await editor!.getByRole('button', { name: '動画カードを編集', exact: true }).click();
   await card.locator('a').first().click();
   await expect(card).toHaveAttribute('data-ww-editor-selected', '');
   return card;
@@ -201,7 +201,7 @@ test('home, search and recommendations keep the draft across SPA and release sta
   await expect(youtube.locator('[data-ww-editor-selected]')).toHaveCount(0);
   await expect(dialog.locator('.properties')).toBeHidden();
   await selectCard(youtube);
-  await dialog.getByRole('button', { name: 'パネルを左へ' }).click();
+  // UI0-d: the editor is its own page; nothing needs moving off the page (was: パネルを左へ).
   await youtube.locator('#navigate').click();
   await expect(youtube).toHaveURL(/\/watch\?/);
   await expect(youtube.locator('.related yt-lockup-view-model').first()).toHaveAttribute(
@@ -368,10 +368,17 @@ test('unknown versions remain stored, disable editing and recover after a suppor
   await popup.evaluate(async (designKey) => {
     await chrome.storage.local.set({ [designKey]: { schemaVersion: 99, custom: 'keep me' } });
   }, key);
+  // The editor page connects to the tab, which refuses: the reason shows in the connection line.
   await youtube.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  await expect(popup.locator('#creator-launch-status')).toContainText('バージョン');
-  await expect(youtube.locator('#web-world-themes-creator')).toHaveCount(0);
+  const tab = await popup.evaluate(
+    async () => (await chrome.tabs.query({ active: true, currentWindow: true }))[0]!.id!,
+  );
+  const refused = await youtube.context().newPage();
+  await refused.goto(new URL(`../studio/index.html?target=${tab}`, popup.url()).href);
+  await expect(refused.locator('.connection-status')).toContainText('バージョン');
+  await expect(refused.locator('.connection-status')).toHaveAttribute('data-connected', 'false');
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-editing', /.*/);
+  await refused.close();
   expect(
     await popup.evaluate(async (designKey) => (await chrome.storage.local.get(designKey))[designKey], key),
   ).toEqual({ schemaVersion: 99, custom: 'keep me' });

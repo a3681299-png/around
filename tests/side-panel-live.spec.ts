@@ -3,6 +3,7 @@ import { mkdir, mkdtemp, writeFile, access } from 'node:fs/promises';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
 import { launchExtension } from './fixtures';
+import { openRetiredEditor } from './helpers/editor';
 import { sidePanelDriver, nativeWindow } from './helpers/side-panel';
 
 test('official side panel on real YouTube preserves controls, layout, authoring and resize anchors', async () => {
@@ -39,10 +40,8 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
     await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
     await expect(page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
     await page.bringToFront();
-    await popup.locator('#creator-studio-inpage').evaluate((button: HTMLButtonElement) => button.click());
-    await expect(popup.locator('#creator-launch-status')).toHaveText(
-      'YouTubeでカードを選ぶか、画像を追加してください。',
-    );
+    // UI0-d: the in-page Studio has no entry any more; opened through its retained message.
+    await openRetiredEditor(popup, page, 'inpage');
     const local = page.locator('#web-world-themes-creator');
     await local.getByRole('button', { name: 'Chromeサイドパネルを開く', exact: true }).click();
     const panel = await sidePanelDriver(context, page, id);

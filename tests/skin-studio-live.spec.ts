@@ -45,7 +45,7 @@ test('optional real YouTube UI0-d: skin editing from the Studio window tab', asy
   const record: Record<string, unknown> = {};
   try {
     const { popup, page } = await prepare(context);
-    const { studio, panel } = await openEditor(context, popup, page);
+    const { studio, panel } = await openEditor(popup, page);
     await panel.getByRole('button', { name: 'UIを着せ替え' }).click();
     const region = panel.getByRole('region', { name: 'UIの着せ替え' });
     await expect(region.locator('.skin-part[data-target="video-card"] .state')).toHaveText(/^[0-9]+個$/);

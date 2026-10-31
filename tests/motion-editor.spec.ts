@@ -4,6 +4,7 @@ import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { test, expect, launchExtension } from './fixtures';
+import { closeEditorPages, openEditor } from './helpers/editor';
 import type { DesignDocument } from '../src/design/types';
 import { emptyDesign } from '../src/design/schema';
 
@@ -16,9 +17,7 @@ async function open(popup: Page, page: Page) {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   await page.bringToFront();
-  await popup.locator('#creator-editor-open').evaluate((button: HTMLButtonElement) => button.click());
-  const panel = page.getByRole('dialog', { name: 'デザインエディター' });
-  await expect(panel).toBeVisible();
+  const { panel } = await openEditor(popup, page);
   await exposeEditorControls(panel);
   return panel;
 }
@@ -123,6 +122,7 @@ for (const [extension, format] of [
       ],
     });
     expect(JSON.stringify(saved)).not.toMatch(/data:image|base64|blob:/);
+    await closeEditorPages(youtube);
     await youtube.reload();
     await ready(youtube, 1);
     await expect(layer).not.toHaveAttribute('data-editable');

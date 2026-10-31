@@ -1,6 +1,7 @@
 import path from 'node:path';
 import type { Page } from '@playwright/test';
 import { test, expect } from './fixtures';
+import { openRetiredEditor } from './helpers/editor';
 import { beginCanvasGesture } from './helpers/editor-workspace';
 
 const overlay = '#web-world-themes-decorations',
@@ -9,9 +10,9 @@ const overlay = '#web-world-themes-decorations',
 async function open(popup: Page, page: Page) {
   await popup.getByRole('switch', { name: 'Theme ON / OFF' }).check();
   await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
-  await page.bringToFront();
-  await popup.locator('#creator-studio-inpage').evaluate((button: HTMLButtonElement) => button.click());
-  const panel = page.getByRole('dialog', { name: 'デザインエディター' });
+  // UI0-d: this suite checks the in-page Studio's own arrangement on YouTube. It stays on that
+  // Studio until round 3 decides (docs/ui0d-2.md).
+  const panel = await openRetiredEditor(popup, page, 'inpage');
   await expect(panel).toHaveAttribute('data-inpage', '');
   return panel;
 }
@@ -77,8 +78,9 @@ test('panes resize, mirror, persist and fold into a safe narrow workspace', asyn
     layers = (await panel.locator('.layers-pane').boundingBox())!;
   expect(inspector.x).toBe(layers.x);
   expect(inspector.y + inspector.height).toBeLessThanOrEqual(layers.y);
-  expect((await panel.locator('.toolbar').boundingBox())!.height).toBe(28);
-  expect((await panel.locator('.studio-menu').boundingBox())!.height).toBe(28);
+  // UI0-d: the design system's control row is 32px (`control`); the old Studio's was 28px.
+  expect((await panel.locator('.toolbar').boundingBox())!.height).toBe(32);
+  expect((await panel.locator('.studio-menu').boundingBox())!.height).toBe(32);
   await panel.getByRole('separator', { name: 'パネルの幅', exact: true }).focus();
   await youtube.keyboard.press('ArrowRight');
   await expect(panel).toHaveCSS('--inspector-width', '340px');
@@ -248,7 +250,7 @@ test('standalone opens the same live Core; selection, scrubbing, history and rel
   await youtube.setViewportSize({ width: 1366, height: 900 });
   const inline = await open(popup, youtube);
   const opened = context.waitForEvent('page');
-  await popup.locator('#creator-studio-open').evaluate((button: HTMLButtonElement) => button.click());
+  await popup.locator('#creator-editor-window').evaluate((button: HTMLButtonElement) => button.click());
   const studio = await opened;
   await studio.setViewportSize({ width: 1440, height: 900 });
   await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
@@ -282,7 +284,8 @@ test('standalone opens the same live Core; selection, scrubbing, history and rel
   await youtube.reload();
   await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true', { timeout: 15_000 });
   await expect(youtube.locator(images)).toHaveCount(1);
-  await studio.getByRole('button', { name: 'YouTubeでStudioを開く', exact: true }).click();
+  // UI0-d: the window no longer offers the in-page Studio; its retained message opens it the same way.
+  await openRetiredEditor(popup, youtube, 'inpage');
   await expect(inline).toBeVisible();
   await expect(inline.getByLabel('画像のX位置', { exact: true })).toHaveValue('65');
   await inline.getByRole('button', { name: '保存', exact: true }).click();
@@ -340,7 +343,7 @@ test('all current animation kinds use the live panels, inherited locks, groups, 
   await panel.getByRole('button', { name: '保存', exact: true }).click();
   await expect(panel.locator('.dirty')).toHaveText('保存済み');
   await panel.getByLabel('画像の幅', { exact: true }).fill('250');
-  await expect(panel.locator('.dirty')).toHaveText('未保存の変更');
+  await expect(panel.locator('.dirty')).toHaveText('未保存');
   await panel.getByRole('button', { name: '変更を破棄', exact: true }).click();
   await expect(panel.getByLabel('画像の幅', { exact: true })).not.toHaveValue('250');
   await expect(panel.locator('.dirty')).toHaveText('保存済み');
