@@ -20,6 +20,7 @@ description: WWTのe2eテストと本物のYouTubeでのテストを書く・直
 - 1件ごとに拡張入りの Chromium を起動し直すので、1件あたり数秒かかる。同じ準備で確かめられることは1つのテストにまとめ、似たテストを増やしすぎない
 - 新しい実サイトのテストは `test.skip(process.env.WW_LIVE_<名前> !== '1', '理由')` で始め、既存の `*-live.spec.ts` と同じ形にする
 - e2e は `workers: 1` で順に動く。ネイティブの Chrome ウィンドウ（サイドパネル・ショートカット）を使うテストは、Linux では `xvfb-run` が要る
+- 手元では、表示ありのテストの窓を画面の外に出す（AGENTS.md の「手元でテストの窓を前に出さない」）。`npm run test:e2e` なら自動で `WW_TEST_WINDOW_OFFSCREEN=1` が付く。新しいテストで Chrome を自分で起動しない
 - 拡張は `tests/fixtures.ts` の `launchExtension()` で読み込む。読み込む dist は `WW_TEST_EXTENSION_PATH`（既定は `dist`）。e2e の前に `npm run build` を忘れない
 
 ## 実サイトのテストを書くときの決まり

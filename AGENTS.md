@@ -35,6 +35,19 @@ e2e は全件で約23分かかる。毎回すべて回さず、変更の場所�
 - CI は push のたびに unit と e2e の全件を回す（e2e は4台に分けて並べる）。CI が落ちたら、次の作業より先に直す
 - `workers: 1` は変えない。手元で e2e を並列にしない（ネイティブのウィンドウと計測が取り合うため）
 
+### 開発用の Chrome を作業の前に出さない
+
+翔太は、エージェントが動いている同じ PC で作業している。エージェントが開く Chrome（テスト・計測・スクリーンショット・本物の YouTube での確認・使い捨てのスクリプト、すべて）の窓が、翔太の作業の前に被さらないようにする。
+
+- 表示が要らないなら headless で開く。スクリーンショットや DOM の確認だけなら、たいてい headless で足りる
+- 表示ありが要るとき（サイドパネル・ネイティブの窓・音声付きの再生・GPU）は、画面の外に置く。引数は `tests/fixtures.ts` の `launchExtension()` と同じにする：`--window-position=-4000,0`・`--disable-backgrounding-occluded-windows`・`--disable-features=CalculateNativeWinOcclusion`・`--autoplay-policy=no-user-gesture-required`。最小化はしない（Chrome が描画と再生を止める）
+- 使い捨てのスクリプトでも、上の2つのどちらかにする。ふつうの位置に表示ありの窓を開かない
+- `page.bringToFront()` は、テストがフォーカスを必要とするときだけ使う
+- テストは必ず `npm run test:unit` / `npm run test:e2e`（`scripts/test.mjs`）から回す。`npx playwright test` を直接使わない。`scripts/test.mjs` は、CI 以外で `WW_TEST_WINDOW_OFFSCREEN=1` を自動で付け、表示ありのテストの窓を画面の外に出す（描画と再生は止まらない）
+- 計測のスクリプトも、表示ありで動かすときは画面の外に出す（`G11_HEADED=1`・`UI1_HEADED=1` は、もとから画面の外に置く）。新しい計測やテストで Chrome を開くときも、`tests/fixtures.ts` の `launchExtension()` を使うか、同じ引数で画面の外に置く
+- 画面の外でも、`bringToFront` やネイティブのキー操作（`tests/editor-entry.spec.ts`・`tests/side-panel.spec.ts`）は、キーボードのフォーカスを一瞬取る。これらは e2e 全件を回すときだけにし、回す前に「1〜2分、キーボードのフォーカスを取ります」と翔太に一言伝える
+- 窓を目で見たいときだけ `WW_TEST_WINDOW_OFFSCREEN=0` を付ける。画面の外でだけ落ちるテストがあれば、`0` と比べて報告する
+
 ## 計測
 
 - **性能を測るのは、ページの上で動く処理を変えたときだけ**（content script・`src/sites/`・`src/world/`・`src/host/`・描画）。エディターやサイドパネルの見た目だけの変更では、交互計測をしない

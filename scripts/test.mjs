@@ -11,6 +11,10 @@ const child = spawn(process.execPath, [join(root, 'node_modules/@playwright/test
   env: {
     ...process.env,
     PLAYWRIGHT_BROWSERS_PATH: process.env.PLAYWRIGHT_BROWSERS_PATH ?? join(root, '.work/browsers'),
+    // On a developer's own machine, headed test windows open off the visible desktop so they do not
+    // cover the work in progress (tests/fixtures.ts keeps them rendering). CI runs under its own
+    // display server and keeps the default. Set WW_TEST_WINDOW_OFFSCREEN=0 to watch the windows.
+    WW_TEST_WINDOW_OFFSCREEN: process.env.WW_TEST_WINDOW_OFFSCREEN ?? (process.env.CI ? undefined : '1'),
   },
 });
 child.once('error', (error) => {
