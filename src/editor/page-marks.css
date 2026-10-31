@@ -1,0 +1,111 @@
+/* The marks the editor draws on the real page (docs/wwt-studio-design-system/components/PageHighlight):
+   ww-mark, ww-tag and ww-unsupported, inside one shadow root so nothing reaches the page. They sit
+   over any picture (white or dark YouTube, bright or dark video), so they keep one set of values,
+   Gesso's, whatever the system colour scheme: cobalt and its tag hold 4.5:1 on white, and a white
+   edge carries the line over dark pictures. Nothing here takes input. */
+:host {
+  all: initial !important;
+  position: fixed !important;
+  inset: 0 !important;
+  margin: 0 !important;
+  pointer-events: none !important;
+  z-index: 2147482999 !important;
+  contain: strict !important;
+  --cobalt: #2b51b8;
+  --on-cobalt: #ffffff;
+  --surface-raised: #fbfaf8;
+  --ink-muted: #53575f;
+  --ink-faint: #80838a;
+  --line-control: #7d7f86;
+  --edge: rgba(255, 255, 255, 0.85);
+  --radius-control: 4px;
+  --font-ui: 'BIZ UDPGothic', 'Hiragino Sans', 'Yu Gothic UI', 'Meiryo UI', 'Noto Sans JP', system-ui, sans-serif;
+  --ww-frame: 83ms;
+  --ww-pen-h: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 4' preserveAspectRatio='none'%3E%3Cpath d='M0 2C24 .4 52 .1 100 2C52 3.9 24 3.6 0 2Z'/%3E%3C/svg%3E");
+  --ww-pen-v: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 100' preserveAspectRatio='none'%3E%3Cpath d='M2 0C.4 24 .1 52 2 100C3.9 52 3.6 24 2 0Z'/%3E%3C/svg%3E");
+}
+:host([hidden]) {
+  display: none !important;
+}
+/* One mark: the part's box grown by the overshoot (4px) on every side. */
+.mark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+.mark[hidden] {
+  display: none;
+}
+/* The filter draws the white edge around the masked strokes of the child. */
+.ww-mark {
+  position: absolute;
+  inset: 0;
+  filter: drop-shadow(0 0 0.5px var(--edge)) drop-shadow(0 0 1px var(--edge));
+}
+.ww-mark::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--cobalt);
+  -webkit-mask:
+    var(--ww-pen-h) 0 2.5px / 100% 3px no-repeat,
+    var(--ww-pen-h) 0 calc(100% - 2.5px) / 100% 3px no-repeat,
+    var(--ww-pen-v) 2.5px 0 / 3px 100% no-repeat,
+    var(--ww-pen-v) calc(100% - 2.5px) 0 / 3px 100% no-repeat;
+  mask:
+    var(--ww-pen-h) 0 2.5px / 100% 3px no-repeat,
+    var(--ww-pen-h) 0 calc(100% - 2.5px) / 100% 3px no-repeat,
+    var(--ww-pen-v) 2.5px 0 / 3px 100% no-repeat,
+    var(--ww-pen-v) calc(100% - 2.5px) 0 / 3px 100% no-repeat;
+  animation: ww-stroke calc(var(--ww-frame) * 4) steps(4, end);
+}
+/* Ruled, on the part's own box. */
+.ww-unsupported {
+  position: absolute;
+  inset: 4px;
+  border: 1px dashed var(--ink-faint);
+  border-radius: var(--radius-control);
+  box-shadow: 0 0 0 1px var(--edge);
+}
+.ww-tag {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  margin-top: 4px;
+  padding: 0 8px;
+  border-radius: var(--radius-control);
+  background: var(--cobalt);
+  color: var(--on-cobalt);
+  font: 400 12px/20px var(--font-ui);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.ww-tag--off {
+  background: var(--surface-raised);
+  color: var(--ink-muted);
+  box-shadow: 0 0 0 1px var(--line-control);
+}
+/* Near the bottom of the window the tag sits just above the frame instead. */
+.mark[data-tag-above] .ww-tag {
+  top: auto;
+  bottom: 100%;
+  margin: 0 0 4px;
+}
+@keyframes ww-stroke {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ww-mark::before {
+    animation: none;
+  }
+}

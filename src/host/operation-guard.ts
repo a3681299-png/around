@@ -103,8 +103,15 @@ export function createOperationGuardHost(
       const shadow = overlayHost.shadowRoot!;
       shadow.replaceChildren();
       const style = doc.createElement('style');
+      // ww-protect: the 45° vermilion hatch (the one diagonal, and the one red, in the system), a ruled
+      // edge, and the part's ID in mono on the first line, kept off the hatch by its own ground.
+      // Gesso's values: the marks sit over any picture. YouTube has dozens of overlapping envelopes,
+      // so the hatch is fixed to the window (overlaps share the same lines) and there is no wash,
+      // which would build up into an opaque block.
       style.textContent =
-        ':host{all:initial!important;position:fixed!important;inset:0!important;pointer-events:none!important;z-index:2147481999!important}div{position:absolute;border:1px dashed #b55b00;background:#eeac3315;box-sizing:border-box;font:11px sans-serif;color:#a34c00;pointer-events:none}';
+        ':host{all:initial!important;position:fixed!important;inset:0!important;pointer-events:none!important;z-index:2147481999!important}' +
+        "div{position:absolute;box-sizing:border-box;padding:4px;border:1px solid #bf3f1d;background:repeating-linear-gradient(45deg,#bf3f1d 0 1.2px,transparent 1.2px 6px) fixed;box-shadow:inset 0 0 0 1px rgba(255,255,255,.5);font:500 12px/20px 'IBM Plex Mono',ui-monospace,'SFMono-Regular','Cascadia Mono',Consolas,'BIZ UDPGothic','Yu Gothic UI','Meiryo UI',monospace;font-variant-numeric:tabular-nums;color:#bf3f1d;white-space:nowrap;pointer-events:none}" +
+        "div::first-line{background:#fbfaf8}div::before,div::after{content:'\\a0'}";
       shadow.append(style);
       for (const surface of surfaces.surfaces.filter((s) => s.availability.visible)) {
         const box = doc.createElement('div'),

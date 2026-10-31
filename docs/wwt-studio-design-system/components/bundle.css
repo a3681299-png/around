@@ -720,9 +720,14 @@
     var(--ww-pen-v) calc(100% - 2.5px) 0 / 3px 100% no-repeat;
   animation: ww-stroke calc(var(--ww-frame) * 4) steps(4, end);
 }
+/* Other instances of the part are ruled, not inked: 1px solid cobalt at 50%, never drawn in.
+   In the extension it is a CSS outline on each part (offset 4px), so the page never tracks them. */
 .ww-mark--sibling {
-  opacity: 0.5;
+  background: none;
+  -webkit-mask: none;
+  mask: none;
   animation: none;
+  border: 1px solid color-mix(in srgb, var(--cobalt) 50%, transparent);
 }
 .ww-tag {
   position: absolute;

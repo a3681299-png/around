@@ -42,13 +42,18 @@ export interface ImageEditing {
   error(message: string): void;
 }
 
+// Editing marks are ruled (docs/wwt-studio-design-system): 1px cobalt with a white edge, square
+// handles. They use Gesso's values whatever the colour scheme, since they sit over any picture.
+// Handles keep a 14px hit area around their 12px square; rotation is a square with its glyph,
+// because a circle means 保存済み.
 const CSS = `
+:host { --cobalt:#2b51b8; --ink-muted:#53575f; --edge:rgba(255,255,255,.85); --rotate:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 6 6'%3E%3Cpath d='M5 3A2 2 0 1 1 3 1' fill='none' stroke='black' stroke-width='1' stroke-linecap='round'/%3E%3Cpath d='M2.6 0L4.2 1L2.6 2Z'/%3E%3C/svg%3E"); }
 :host { all:initial !important; position:fixed !important; inset:0 !important; width:100vw !important; height:100vh !important; margin:0 !important; padding:0 !important; border:0 !important; background:transparent !important; overflow:hidden !important; pointer-events:none !important; z-index:var(--ww-decoration-z,2147482000) !important; clip-path:var(--ww-decoration-clip,none) !important; }
 * { box-sizing:border-box; }
 .image, .selection-frame { position:absolute; transform-origin:center; pointer-events:none; touch-action:none; }
 .composition { position:absolute; pointer-events:none; }
 .group-content { position:absolute; inset:0; pointer-events:none; isolation:isolate; }
-.selection-frame[data-group] { border-style:dashed; border-color:#196f95; }
+.selection-frame[data-group] { border-style:dashed; box-shadow:none; outline:1px dashed var(--edge); }
 .group-edge { display:none; position:absolute; }
 .selection-frame[data-group-movable] .group-edge { display:block; pointer-events:auto; cursor:move; }
 [data-group-edge="top"], [data-group-edge="bottom"] { left:0; right:0; height:8px; }
@@ -57,18 +62,20 @@ const CSS = `
 [data-group-edge="left"] { left:-4px; } [data-group-edge="right"] { right:-4px; }
 [hidden] { display:none !important; }
 .image[data-editable] { pointer-events:auto; cursor:move; }
-.selection-frame { z-index:1000; border:2px solid #6350ca; box-shadow:0 0 0 1px white, inset 0 0 0 1px white; }
-.selection-frame[data-locked] { border-color:#966000; border-style:dashed; }
-.group-frame { position:absolute; border:1px dashed #6350ca; box-shadow:0 0 0 1px white; pointer-events:none; z-index:1001; }
-.guide { position:absolute; background:#ce267e; box-shadow:0 0 0 1px #ffffffbb; pointer-events:none; z-index:1002; }
+.selection-frame { z-index:1000; border:1px solid var(--cobalt); box-shadow:0 0 0 1px var(--edge), inset 0 0 0 1px var(--edge); }
+.selection-frame[data-locked] { border-color:var(--ink-muted); border-style:dashed; box-shadow:none; outline:1px dashed var(--edge); }
+.group-frame { position:absolute; border:1px dashed var(--cobalt); box-shadow:0 0 0 1px var(--edge); pointer-events:none; z-index:1001; }
+.guide { position:absolute; background:var(--cobalt); box-shadow:0 0 0 1px var(--edge); pointer-events:none; z-index:1002; }
 .media, img, canvas, svg, video { display:block; width:100%; height:100%; border:0; user-select:none; pointer-events:none; }
-.handle { display:none; position:absolute; width:14px; height:14px; padding:0; border:2px solid #6350ca; box-shadow:0 0 0 1px white; border-radius:2px; background:white; touch-action:none; }
+.handle { display:none; position:absolute; width:14px; height:14px; padding:0; border:0; background:transparent; touch-action:none; }
+.handle::before { content:''; position:absolute; inset:1px; box-sizing:border-box; border:1px solid var(--cobalt); background:white; box-shadow:0 0 0 1px var(--edge); }
+[data-handle="rotate"]::after { content:''; position:absolute; inset:3px; background:var(--cobalt); -webkit-mask:var(--rotate) center / 100% 100% no-repeat; mask:var(--rotate) center / 100% 100% no-repeat; }
 .selection-frame[data-transformable] .handle { display:block; pointer-events:auto; }
 [data-handle="nw"] { left:-7px; top:-7px; cursor:nwse-resize; }
 [data-handle="ne"] { right:-7px; top:-7px; cursor:nesw-resize; }
 [data-handle="sw"] { left:-7px; bottom:-7px; cursor:nesw-resize; }
 [data-handle="se"] { right:-7px; bottom:-7px; cursor:nwse-resize; }
-[data-handle="rotate"] { left:calc(50% - 7px); top:-32px; border-radius:50%; cursor:grab; }
+[data-handle="rotate"] { left:calc(50% - 7px); top:-32px; cursor:grab; }
 `;
 
 // Plane hosts reuse the screen CSS; later !important rules in the same sheet win.

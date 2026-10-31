@@ -3,6 +3,7 @@ import { SKIN_FORCE_ATTRIBUTE, SKIN_FORCE_COMPACT_ATTRIBUTE, type SkinAssetStatu
 import type { DesignTarget } from '../design/types';
 import type { SkinPreview } from '../editor-core/types';
 import type { SkinPageInfo } from './skin-panel';
+import type { PageMarks } from './page-marks';
 
 const PICKING = 'data-ww-skin-picking',
   SELECTED = 'data-ww-skin-selected';
@@ -37,7 +38,12 @@ export interface SkinHit {
 }
 
 /** Page side of the skin editor. Event-driven only; nothing runs per frame while idle. */
-export function createSkinPicker(doc: Document, targets: readonly DesignTarget[], siteControls?: string) {
+export function createSkinPicker(
+  doc: Document,
+  targets: readonly DesignTarget[],
+  marks: PageMarks,
+  siteControls?: string,
+) {
   const controls = siteControls ? `${CONTROL}, ${siteControls}` : CONTROL;
   const parts = targets.filter((target) => target.skin && isDesignId(target.surface));
   const selector = (target: DesignTarget) => `[data-ww-surface~="${target.surface}"]`;
@@ -46,8 +52,8 @@ export function createSkinPicker(doc: Document, targets: readonly DesignTarget[]
     pointer: Element | undefined,
     request: number | undefined,
     shownKey = '',
-    box: HTMLDivElement | undefined,
-    label: HTMLSpanElement | undefined;
+    tag = '';
+  const hover = marks.mark('web-world-themes-skin-hover');
 
   const hit = (node: Element | undefined): SkinHit | undefined => {
     if (!node || node.closest('[data-ww-signal-control], [id^="web-world-themes-"]')) return;
@@ -62,22 +68,8 @@ export function createSkinPicker(doc: Document, targets: readonly DesignTarget[]
     return control ? { element: control } : undefined;
   };
 
-  const ensureBox = () => {
-    if (box) return box;
-    box = doc.createElement('div');
-    box.id = 'web-world-themes-skin-hover';
-    box.setAttribute('aria-hidden', 'true');
-    box.style.cssText =
-      'position:fixed;left:0;top:0;z-index:2147482999;pointer-events:none;box-sizing:border-box;border-radius:4px;display:none;';
-    label = doc.createElement('span');
-    label.style.cssText =
-      'position:absolute;left:-2px;bottom:100%;margin-bottom:4px;padding:2px 7px;border-radius:5px;font:600 12px/1.5 system-ui,sans-serif;white-space:nowrap;box-shadow:0 2px 6px #0006;';
-    box.append(label);
-    (doc.body ?? root).append(box);
-    return box;
-  };
   const hide = () => {
-    if (box) box.style.display = 'none';
+    hover.hide();
     shownKey = '';
   };
   const draw = () => {
@@ -86,28 +78,16 @@ export function createSkinPicker(doc: Document, targets: readonly DesignTarget[]
     if (!found) return hide();
     const rect = found.element.getBoundingClientRect();
     if (!rect.width || !rect.height) return hide();
-    const element = ensureBox();
-    const supported = Boolean(found.target);
     const key = found.target ? found.target.id : 'unsupported';
     if (key !== shownKey) {
       shownKey = key;
       const count = found.target ? doc.querySelectorAll(selector(found.target)).length : 0;
-      label!.textContent = found.target
+      tag = found.target
         ? `${found.target.label}${count > 1 ? `・ページ上に${count}個` : ''}　クリックで選択`
-        : '未対応：この部品は着せ替えできません';
-      label!.style.color = supported ? '#16101f' : '#f1f1f1';
-      label!.style.background = supported ? '#baa0f8' : '#55545f';
-      element.style.border = supported ? '2px solid #baa0f8' : '2px dashed #8d8b99';
-      element.style.background = supported ? '#baa0f81f' : '#00000014';
+        : '未対応';
     }
-    element.style.display = 'block';
-    element.style.transform = `translate(${rect.left}px, ${rect.top}px)`;
-    element.style.width = `${rect.width}px`;
-    element.style.height = `${rect.height}px`;
-    // Keep the name readable at the top edge of the window.
-    label!.style.top = rect.top < 26 ? '100%' : '';
-    label!.style.bottom = rect.top < 26 ? '' : '100%';
-    label!.style.marginTop = rect.top < 26 ? '4px' : '';
+    // A new part under the pointer draws its frame in; the same part only follows scrolling.
+    hover.show(rect, found.element, found.target ? 'mark' : 'unsupported', tag);
   };
   const schedule = () => {
     request ??= doc.defaultView!.requestAnimationFrame(draw);
@@ -149,12 +129,10 @@ export function createSkinPicker(doc: Document, targets: readonly DesignTarget[]
       parts
         .map(
           (target) =>
-            `html[${SELECTED}="${target.id}"] ${selector(target)}{outline:2px dashed #baa0f8 !important;outline-offset:2px !important;}`,
+            // Ruled, not inked: every part of the kind, wherever it scrolls, without tracking each one.
+            `html[${SELECTED}="${target.id}"] ${selector(target)}{outline:1px solid rgb(43 81 184 / 0.5) !important;outline-offset:4px !important;}`,
         )
-        .join('\n') +
-      `\nhtml[${PICKING}] body{cursor:crosshair !important;}` +
-      // A forced preview shows the true look, without the editor's selection outline.
-      `\nhtml[data-ww-editing]:is([${SKIN_FORCE_ATTRIBUTE}],[${SKIN_FORCE_COMPACT_ATTRIBUTE}]) [data-ww-editor-selected]{outline:none !important;}`,
+        .join('\n') + `\nhtml[${PICKING}] body{cursor:crosshair !important;}`,
     /** Outlines are hidden while a forced preview shows the true look. */
     setSelection(targetId: string | undefined, outline: boolean) {
       const value = targetId && outline && parts.some((target) => target.id === targetId) ? targetId : undefined;
@@ -210,8 +188,7 @@ export function createSkinPicker(doc: Document, targets: readonly DesignTarget[]
     destroy() {
       setActive(false);
       if (request !== undefined) doc.defaultView?.cancelAnimationFrame(request);
-      box?.remove();
-      box = undefined;
+      hide();
       root.removeAttribute(SELECTED);
       root.removeAttribute(SKIN_FORCE_ATTRIBUTE);
       root.removeAttribute(SKIN_FORCE_COMPACT_ATTRIBUTE);

@@ -19,6 +19,8 @@ import type { TimelineCommand, TimelineUpdate } from '../timeline/types';
 import type { SkinAssetStatus } from '../design/renderer';
 import type { InkDecision } from '../design/contrast';
 import { createSkinPicker } from './skin-picker';
+import { createPageMarks } from './page-marks';
+import tokens from './studio-tokens.css';
 import type { SkinSlot } from '../editor-core/skins';
 
 /** The page renderer's view of skin art, for previews and "not applied" reasons. */
@@ -36,6 +38,8 @@ export interface CreatorEditor {
   openStudio(): OpenEditorResponse;
   openSidePanel(): OpenEditorResponse;
   setEnabled(enabled: boolean): void;
+  /** Emergency OFF: every mark on the page goes; the editor and its history stay. */
+  suspendMarks(value: boolean): void;
   refreshSelection(): void;
   reload(): void;
   destroy(): void;
@@ -54,8 +58,13 @@ export interface CreatorEditor {
   thumbnail(id: string): Promise<string | undefined>;
 }
 const PICK_EVENTS = ['pointerdown', 'pointerup', 'mousedown', 'mouseup', 'click', 'auxclick', 'dblclick'] as const;
-const SELECTION_CSS = `html[data-ww-editor-card-picking] [data-ww-surface~="video-card"] { cursor:crosshair !important; }
-html[data-ww-editing] [data-ww-editor-selected] { outline:2px dashed #695089 !important; outline-offset:3px !important; }`;
+const SELECTION_CSS = `html[data-ww-editor-card-picking] [data-ww-surface~="video-card"] { cursor:crosshair !important; }`;
+/** The Studio badge: a small ww-panel in its own shadow root, so the page's styles never reach it. */
+const BADGE_CSS = `:host{all:initial!important;position:fixed!important;left:12px!important;bottom:12px!important;z-index:2147483001!important}
+.badge{display:flex;align-items:center;gap:var(--space-8);padding:var(--space-4) var(--space-4) var(--space-4) var(--space-12);border:1px solid var(--line);border-radius:var(--radius-float);background:var(--surface);color:var(--ink);box-shadow:var(--shadow-float);font:13px/20px var(--font-ui)}
+button{height:var(--control-dense);padding:0 var(--space-8);border:1px solid var(--line-control);border-radius:var(--radius-control);background:var(--surface-raised);color:var(--ink);font:12px/18px var(--font-ui);cursor:pointer}
+button:hover{background:var(--cobalt-wash)}
+button:focus-visible{outline:2px solid var(--cobalt);outline-offset:1px}`;
 
 /** Browser Host. Core owns documents/history; this adapter owns DOM and rendering. */
 export function createCreatorEditor(
@@ -81,7 +90,46 @@ export function createCreatorEditor(
   let layout: StudioLayoutAdapter | undefined,
     panelMode: 'quick' | 'inpage' | 'sidepanel' = 'quick';
   const consumedKeys = new Set<string>();
-  const picker = createSkinPicker(doc, site.designTargets ?? [], site.skinControls);
+  const marks = createPageMarks(doc);
+  const picker = createSkinPicker(doc, site.designTargets ?? [], marks, site.skinControls);
+  const selectionMark = marks.mark('web-world-themes-selection-mark');
+  let marksSuspended = false,
+    followed: Element | undefined,
+    followRequest: number | undefined,
+    followResize: ResizeObserver | undefined;
+  const view = doc.defaultView!;
+  /** One read and one write per frame at most, and only after a scroll or a size change. */
+  const placeSelection = () => {
+    followRequest = undefined;
+    const rect = followed?.getBoundingClientRect();
+    if (!rect?.width || !rect.height) selectionMark.hide();
+    else selectionMark.show(rect, followed);
+  };
+  const scheduleSelection = () => {
+    followRequest ??= view.requestAnimationFrame(placeSelection);
+  };
+  /** The selected part's frame follows it while editing: listeners exist only while one is shown. */
+  const follow = (element: Element | undefined) => {
+    if (element === followed) return;
+    if (followed) {
+      doc.removeEventListener('scroll', scheduleSelection, { capture: true });
+      view.removeEventListener('resize', scheduleSelection);
+      followResize?.disconnect();
+      followResize = undefined;
+    }
+    followed = element;
+    if (!element) {
+      if (followRequest !== undefined) view.cancelAnimationFrame(followRequest);
+      followRequest = undefined;
+      selectionMark.hide();
+      return;
+    }
+    doc.addEventListener('scroll', scheduleSelection, { capture: true, passive: true });
+    view.addEventListener('resize', scheduleSelection, { passive: true });
+    followResize = new ResizeObserver(scheduleSelection);
+    followResize.observe(element);
+    scheduleSelection();
+  };
   const skinTargets = (site.designTargets ?? []).filter((target) => target.skin);
   let skinInfoTimer: ReturnType<typeof setTimeout> | undefined;
   let lastDesign: DesignDocument | undefined,
@@ -134,6 +182,16 @@ export function createCreatorEditor(
   const removeSelection = () => {
     selectedElement?.removeAttribute('data-ww-editor-selected');
     selectedElement = undefined;
+    follow(undefined);
+  };
+  /** A forced skin preview shows the true look, so the frame steps aside, like any mark in fullscreen. */
+  const syncSelectionMark = () => {
+    const preview = state.view.tool === 'skin' ? state.view.skinPreview : undefined;
+    follow(
+      installed && !marksSuspended && !fullscreen() && !preview?.state && !preview?.compact
+        ? selectedElement
+        : undefined,
+    );
   };
   function bind(active: boolean) {
     if (installed === active) return;
@@ -167,6 +225,7 @@ export function createCreatorEditor(
       picker.setActive(false);
       picker.setSelection(undefined, false);
       picker.setPreview(undefined, undefined);
+      marks.clear();
       if (skinInfoTimer !== undefined) clearTimeout(skinInfoTimer);
       skinInfoTimer = undefined;
     }
@@ -214,7 +273,11 @@ export function createCreatorEditor(
     picker.setActive(skinning);
     skinAssets?.previews(skinning);
     const preview = skinning ? state.view.skinPreview : undefined;
-    picker.setSelection(skinning ? state.view.target : undefined, !preview?.state && !preview?.compact);
+    picker.setSelection(
+      skinning && !marksSuspended ? state.view.target : undefined,
+      !preview?.state && !preview?.compact,
+    );
+    syncSelectionMark();
     picker.setPreview(skinning ? state.view.target : undefined, preview);
     if (skinning) scheduleSkinInfo();
     if (active) {
@@ -228,17 +291,21 @@ export function createCreatorEditor(
       badge = doc.createElement('div');
       badge.id = 'web-world-themes-studio-link';
       badge.setAttribute('data-ww-signal-control', '');
-      badge.style.cssText =
-        'position:fixed;bottom:12px;left:12px;z-index:2147483001;background:#242331;color:white;padding:8px;border:1px solid #baa0f8;border-radius:8px;font:12px system-ui;';
+      const shadow = badge.attachShadow({ mode: 'open' }),
+        style = doc.createElement('style'),
+        box = doc.createElement('div');
+      style.textContent = tokens + BADGE_CSS;
+      box.className = 'badge';
       const label = doc.createElement('span');
-      label.textContent = 'Studioで編集中 ';
+      label.textContent = 'Studioで編集中';
       const quick = doc.createElement('button');
       quick.textContent = 'クイック編集を表示';
       quick.addEventListener('click', () => open());
       const stop = doc.createElement('button');
       stop.textContent = '編集を終了';
       stop.addEventListener('click', () => dispatch({ type: 'close' }));
-      badge.append(label, quick, stop);
+      box.append(label, quick, stop);
+      shadow.append(style, box);
       (doc.body ?? doc.documentElement).append(badge);
     } else if (!remoteOwner || !state.active || panel) {
       badge?.remove();
@@ -372,6 +439,7 @@ export function createCreatorEditor(
     dispatch({ type: 'select-target', target: id });
     selectedElement = element;
     selectedElement.setAttribute('data-ww-editor-selected', '');
+    syncSelectionMark();
   };
   function onPick(event: Event) {
     const target = pickTarget(event);
@@ -382,7 +450,7 @@ export function createCreatorEditor(
     event.stopImmediatePropagation();
     if (state.view.saving || !['click', 'auxclick'].includes(event.type) || !target) return;
     if (!target.target) {
-      core.fail('この部品は着せ替えに対応していません。紫の枠が出る部品を選んでください。');
+      core.fail('この部品は着せ替えに対応していません。名札の付く枠が出る部品を選んでください。');
       return;
     }
     selectElement(target.element, target.target.id);
@@ -454,7 +522,7 @@ export function createCreatorEditor(
     if (skinTool()) {
       const target = picker.hit(event.target instanceof Element ? event.target : undefined);
       if (!target?.target) {
-        core.fail('絵は紫の枠が出る部品の上、またはパネルの枠にドロップしてください。');
+        core.fail('絵は名札の付く枠が出る部品の上、またはパネルの枠にドロップしてください。');
         return;
       }
       // select-target applies synchronously, so the import sees the new part.
@@ -479,8 +547,16 @@ export function createCreatorEditor(
       return core.historyVersion;
     },
     setEnabled: core.setEnabled,
+    suspendMarks(value) {
+      if (value === marksSuspended) return;
+      marksSuspended = value;
+      marks.setSuspended(value);
+      refresh();
+    },
     refreshSelection() {
       scheduleSkinInfo();
+      // The page changed around the selected part: place its frame again on the next frame.
+      if (followed) scheduleSelection();
       // A skin edit follows the part's kind, not one element: YouTube re-renders buttons often.
       if (skinTool() && selectedElement && !selectedElement.isConnected) removeSelection();
       else if (
@@ -566,6 +642,8 @@ export function createCreatorEditor(
     destroy() {
       destroyed = true;
       picker.destroy();
+      follow(undefined);
+      marks.clear();
       core.destroy();
       unsubscribe();
       bind(false);

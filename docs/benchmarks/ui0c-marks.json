@@ -1,0 +1,102 @@
+{
+  "stage": "UI0-c",
+  "kind": "short check, 2 alternated pairs (not the full gate)",
+  "url": "https://www.youtube.com/results?search_query=lofi+hip+hop",
+  "measuredAt": "2026-10-31T05:54:06.386Z",
+  "browser": "143.0.7499.4",
+  "environment": {
+    "os": "win32 10.0.26300",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13650HX",
+    "node": "v24.16.0"
+  },
+  "builds": {
+    "before": "890d157bcbb3215c36f4865a58c56a088e1d447c",
+    "after": "890d157bcbb3215c36f4865a58c56a088e1d447c + UI0-c working tree"
+  },
+  "pairs": [
+    {
+      "pair": 0,
+      "order": ["before", "after"],
+      "blocks": {
+        "before": {
+          "hover": {
+            "frames": 438,
+            "medianMs": 0,
+            "p95Ms": 0.9,
+            "maxMs": 3,
+            "longestCallbackMs": 2.7,
+            "longTasksOver50ms": 0
+          },
+          "scroll": {
+            "frames": 1457,
+            "medianMs": 0,
+            "p95Ms": 0.9,
+            "maxMs": 8.4,
+            "longestCallbackMs": 8.4,
+            "longTasksOver50ms": 0
+          }
+        },
+        "after": {
+          "hover": {
+            "frames": 436,
+            "medianMs": 0,
+            "p95Ms": 0.6,
+            "maxMs": 3,
+            "longestCallbackMs": 1.8,
+            "longTasksOver50ms": 0
+          },
+          "scroll": {
+            "frames": 1461,
+            "medianMs": 0,
+            "p95Ms": 0.8,
+            "maxMs": 7.8,
+            "longestCallbackMs": 6.9,
+            "longTasksOver50ms": 0
+          }
+        }
+      }
+    },
+    {
+      "pair": 1,
+      "order": ["after", "before"],
+      "blocks": {
+        "after": {
+          "hover": {
+            "frames": 435,
+            "medianMs": 0,
+            "p95Ms": 0.8,
+            "maxMs": 4,
+            "longestCallbackMs": 4,
+            "longTasksOver50ms": 0
+          },
+          "scroll": {
+            "frames": 1473,
+            "medianMs": 0,
+            "p95Ms": 0.8,
+            "maxMs": 8.2,
+            "longestCallbackMs": 7.2,
+            "longTasksOver50ms": 0
+          }
+        },
+        "before": {
+          "hover": {
+            "frames": 441,
+            "medianMs": 0,
+            "p95Ms": 0.8,
+            "maxMs": 2.9,
+            "longestCallbackMs": 1.8,
+            "longTasksOver50ms": 0
+          },
+          "scroll": {
+            "frames": 1475,
+            "medianMs": 0,
+            "p95Ms": 0.8,
+            "maxMs": 7.4,
+            "longestCallbackMs": 7.1,
+            "longTasksOver50ms": 0
+          }
+        }
+      }
+    }
+  ]
+}

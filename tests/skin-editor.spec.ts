@@ -114,7 +114,8 @@ test('skin tool: hover names parts, click dresses every card, guides and state p
   const count = await youtube.locator(cards).count();
   expect(count).toBeGreaterThan(1);
   await expect(dialog.locator('.skin-reach')).toHaveText(`ページ上の${count}個に同時に反映されます`);
-  await expect(youtube.locator(cards).nth(1)).toHaveCSS('outline-style', 'dashed');
+  // UI0-c: the kind is ruled (1px solid cobalt at 50%), not the old purple dashes.
+  await expect(youtube.locator(cards).nth(1)).toHaveCSS('outline-style', 'solid');
 
   // Import the normal art through the shared asset import; all cards change, none move.
   await importInto(youtube, dialog.locator('.main-drop'), 'frame.png', await framePng(youtube));

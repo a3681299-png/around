@@ -71,7 +71,10 @@ if (site) {
     },
   );
   const disconnectStudio = connectStudioHost(document, site, creator, controller.safety);
-  const unwatchEmergency = watchEmergencyOff((value) => controller.suspend(value));
+  const unwatchEmergency = watchEmergencyOff((value) => {
+    controller.suspend(value);
+    creator?.suspendMarks(value);
+  });
   void chrome.runtime.sendMessage({ type: PREPARE_SIDE_PANEL }).catch(() => undefined);
   const settingsPanel = createSettingsPanel(document, () => {
     void requestStudioSurface(OPEN_SIDE_PANEL).catch((error: unknown) => {
