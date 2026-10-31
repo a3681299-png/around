@@ -648,8 +648,14 @@ label[data-scrub] input {
 :host([data-sidepanel]) .menu-end > .usage {
   display: none;
 }
+/* At 360px the header holds four menus, the window button, 緊急OFF, 操作チェック and 表示設定 on
+   one line, with room for wider platform fonts. */
 :host([data-sidepanel]) .studio-menu-item > summary {
-  padding-inline: 4px;
+  padding-inline: 3px;
+}
+:host([data-sidepanel]) .menu-end .icon-button {
+  width: 24px;
+  min-width: 24px;
 }
 :host([data-sidepanel]) .editor-body {
   display: block;
