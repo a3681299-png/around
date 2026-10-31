@@ -131,8 +131,8 @@ F は、レイヤー・グループ・画像・アニメーション・3D・効�
 | I・道具の帯：`controller.ts` の `open('inpage' / 'sidepanel')`・`layout`・`unprotectToolbar`・`panelMode`                                                                                                                  | 約 80（概算）  | 同上                                                                                                    |
 | I・道具の帯：`workbench.ts` の `inPage`・`toolbarOnly` の分岐、`app.ts` の「YouTubeでStudioを開く」、`studio-client.ts` の `openWorkspace('inpage')`、`messages.ts` の `OPEN_INPAGE_STUDIO`・`OPEN_SIDE_PANEL_TOOLS`       | 約 60（概算）  | 同上                                                                                                    |
 | F・I の入り口：`launcher.ts` の 2 つのボタンと処理、`content/index.ts` の `OPEN_CREATOR_EDITOR`                                                                                                                            | 約 40（概算）  | 入り口を変えたあと                                                                                      |
-| F：`src/editor/workspace.ts`                                                                                                                                                                                               | 564            | 「決めてほしいこと」1 で A を選んだとき（B なら S の土台として残す）                                    |
-| F：`src/editor/panel.css`                                                                                                                                                                                                  | 1091           | 同上（B なら残し、作業台用に広げる）                                                                    |
+| F：`src/editor/workspace.ts`                                                                                                                                                                                               | 564            | 3 回目（決定 1 が A のため消す）                                                                        |
+| F：`src/editor/panel.css`                                                                                                                                                                                                  | 1091           | 同上（中身は 2 回目で作業台へ移してから）                                                               |
 | F：`src/editor/skin-panel.css`（`SKIN_PANEL_STYLES`）                                                                                                                                                                      | 443            | 着せ替えを作業台へ移し、作業台の着せ替えの見た目を 1 つにしたあと                                       |
 | F の分岐：`floating`（`panel.ts` 17 か所・`workspace.ts` 9・`skin-panel.ts` 5・`layer-tree.ts` 1）                                                                                                                         | 約 150（概算） | 作業台にデザインシステムを入れたあと                                                                    |
 | 複製：`src/studio/editor-base.css`・`editor-skin-base.css`（UI0-a で作った、変更前の `panel.css`・`skin-panel.css` の複製）                                                                                                | 924＋425       | 作業台にデザインシステムを入れたあと                                                                    |
@@ -156,7 +156,7 @@ knip が挙げなかった、依存の未使用・リストにない依存は 0 
 
 ### 2 回目：作業台をデザインシステムにして、入り口と e2e を移す
 
-- 作業台にデザインシステムを入れる（「決めてほしいこと」1 の方針で）。並び方を窓の幅で切り替える（3）
+- 作業台（`workbench.ts`）を土台のまま、デザインシステムを入れる（決定 1 の A）：`panel.css` の中身・`glyph`・保存のチップ・空の状態の作図を作業台へ移し、S の並び方は F と同じ「タブ・1 列」に寄せる。並び方を窓の幅で切り替える（3）
 - 入り口を変える（上の 3 の表）。F・I はコードに残すが、ポップアップからは開けなくする
 - F・I を入り口にしていた e2e（F 116 件・I 24 件、実サイトを除く）を、W のタブ（幅 400px と 1440px）に移す。`editor-ux` を S の並び方の e2e に作り直す
 - 回すテスト：unit 全件、e2e 全件。実サイト：S（幅 400px 前後のノート PC の大きさ）と W で、UI0-b・UI0-c と同じ組み合わせのスクリーンショット（白・ダーク、明るい動画・暗い動画）
@@ -179,7 +179,7 @@ knip が挙げなかった、依存の未使用・リストにない依存は 0 
 
 ## 決めてほしいこと（翔太・レビュー役）
 
-1. **1 本化した作業台の土台をどちらにするか**
+1. **1 本化した作業台の土台をどちらにするか** — **決定：A（翔太、2026-10-31）**
    - A：今の作業台（`workbench.ts`）を土台にして、デザインシステムの見た目（`panel.css` の中身、`glyph`、保存のチップ、空の状態）を移す。`workspace.ts`・`panel.css` は消す。Timeline・ライブラリ・接続の帯はそのまま
    - B：F の中身（`workspace.ts`＋`panel.css`。340px・1 列・タブ。デザインシステム済み）を S の土台にし、W は同じ部品を広く並べる。作業台の古い見た目（`editor-base.css`・`workbench.css` の大半）を消す。Timeline・ライブラリ・接続の帯・緊急OFFは B に移す
    - 僕の案：**A**。README の「サイドパネル（320〜480px）＝ヘッダー・タブ・1 列」は B に近いが、S・W だけにある機能（Timeline・ライブラリ・接続・保護の表示）が多く、移す量は A の方が少ない。A でも、S の並び方は F と同じ「タブ・1 列」に寄せる
