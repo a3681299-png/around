@@ -44,7 +44,7 @@ F の選び方（どの道具でもカードを選ぶ）は、この回では変
 | e2e（全件） | 320 件（271 実行、49 件は `WW_LIVE_*` 未指定でスキップ）。271 件成功、失敗 0、16.5 分                                                                                                                                                        |
 | e2e（途中） | `skin-studio`（2 件、3 回繰り返して成功）・`studio`・`skin-editor`・`skin-lifecycle`・`skin-refresh`・`skin-verification`・`studio-transfer`・`studio-workspace`・`creator-editor`・`page-marks`（計 52 件成功）、`side-panel` の新しい 1 件 |
 | 実サイト    | `WW_LIVE_SKIN_STUDIO=1` の `skin-studio-live.spec.ts`：W（タブ）と S（本物のサイドパネル、画面の外）で 1 回ずつ。どちらも、部品の一覧（16 個）・ページでの部品の選択・絵の取り込み・プレビュー・元に戻す まで成功                            |
-| CI          | TBD                                                                                                                                                                                                                                          |
+| CI          | `7070a29`（run 41183027196）：unit と e2e の 4 分割、すべて成功                                                                                                                                                                              |
 
 ### 足したテスト
 
