@@ -54,23 +54,3 @@ export async function openSidePanelFromIcon(popup: Page, youtube: Page) {
   const away = await clearestPoint(youtube, { left: 0, top: 0, right: viewport.width, bottom: viewport.height });
   await youtube.mouse.move(away.x, away.y, { steps: 4 });
 }
-
-/**
- * UI0-d round 3 removed the floating editor (F) and the in-page Studio (I) with the content-script
- * messages that opened them. This remains for the before-change builds that still have them
- * (editor-surfaces-live 'before') and for the tests stopped with test.fixme (docs/ui0d-3.md).
- */
-export async function openRetiredEditor(popup: Page, youtube: Page, kind: 'floating' | 'inpage' = 'floating') {
-  await youtube.bringToFront();
-  await popup.evaluate(
-    async (type) => {
-      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      const response = await chrome.tabs.sendMessage(tab!.id!, { type });
-      if (!response?.ok) throw new Error(response?.error ?? 'The retired editor did not open.');
-    },
-    kind === 'floating' ? 'web-world-themes:open-creator-editor' : 'web-world-themes:open-inpage-studio',
-  );
-  const panel = youtube.getByRole('dialog', { name: 'デザインエディター' });
-  await expect(panel).toBeVisible();
-  return panel;
-}

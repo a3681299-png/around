@@ -4,7 +4,7 @@ import path from 'node:path';
 import { launchExtension } from './fixtures';
 import { declinePromotion, errorSummary } from './helpers/youtube-live';
 import { plainSkinDesign, storeDesign } from './helpers/skin-verification';
-import { openEditor, openRetiredEditor } from './helpers/editor';
+import { openEditor } from './helpers/editor';
 import { sidePanelDriver } from './helpers/side-panel';
 
 /*
@@ -98,15 +98,6 @@ for (const scheme of ['light', 'dark'] as const)
         await settings.screenshot({ path: path.join(shots, `${prefix}-${scheme}-settings-video.png`) });
         await settings.getByRole('button', { name: '設定を閉じる' }).click();
       });
-      if (prefix === 'before')
-        await step(`${scheme}-floating`, async () => {
-          await page.bringToFront();
-          const editor = await openRetiredEditor(popup, page);
-          await expect(editor).toBeVisible();
-          await editor.getByLabel('画像素材を追加').setInputFiles([petal, petal]);
-          await page.waitForTimeout(800);
-          await page.screenshot({ path: path.join(shots, `${prefix}-${scheme}-floating.png`) });
-        });
     } finally {
       await context.close();
     }

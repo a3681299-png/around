@@ -3,7 +3,7 @@ import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
-import { openRetiredEditor } from './helpers/editor';
+import { openEditor } from './helpers/editor';
 import { beginCanvasGesture, visiblePart } from './helpers/editor-workspace';
 import { errorSummary, waitForAdvertToEnd } from './helpers/youtube-live';
 
@@ -40,12 +40,8 @@ test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and 
     await popup.getByRole('switch', { name: 'テーマを使う' }).check();
     await page.bringToFront();
     await expect(page.locator('[data-ww-surface~="player-window"]')).toBeVisible({ timeout: 20_000 });
-    // UI0-d round 3 (stopped, not deleted): the floating editor's own live check, like
-    // editor-ux.spec.ts (docs/ui0d-3.md).
-    test.fixme(true, 'UI0-d round 3: the floating editor this walks was removed; awaiting a decision.');
-    await openRetiredEditor(popup, page);
-    const panel = page.getByRole('dialog', { name: 'デザインエディター' });
-    await expect(panel).toBeVisible();
+    // UI0-d 3.1: the editor's window (as a tab); the artwork and its checks stay on the YouTube page.
+    let { panel } = await openEditor(popup, page);
     const overlay = '#web-world-themes-decorations';
     const presentation =
       ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)';
@@ -58,8 +54,8 @@ test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and 
       await panel.getByRole('button', { name: '選択解除', exact: true }).click();
       for (const checkbox of await panel.locator('[data-multiselect]').all()) await checkbox.check();
       await expect(panel.locator('.selected-count')).toHaveText('3個選択中');
-      await expect(panel.locator('.thumbnail img')).toHaveCount(3);
-      await page.screenshot({ path: '.work/verification/editor-ux-live-layers.png' });
+      await expect(panel.locator('.layers .thumbnail img')).toHaveCount(3);
+      await panel.page().screenshot({ path: '.work/verification/editor-ux-live-layers.png' });
       await panel.getByRole('button', { name: '選択をグループ化', exact: true }).click();
       await expect(panel.locator('[data-kind="group"]')).toHaveCount(1);
       const image = page.locator(`${presentation} [data-image-id]`).first(),
@@ -99,8 +95,7 @@ test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and 
       await expect(panel.locator('.dirty')).toHaveText('保存済み');
       await page.reload({ waitUntil: 'domcontentloaded' });
       await expect(page.locator(`${presentation} [data-image-id]`)).toHaveCount(3, { timeout: 20_000 });
-      await openRetiredEditor(popup, page);
-      await expect(panel).toBeVisible();
+      ({ panel } = await openEditor(popup, page));
       await panel.locator('[data-kind="group"] [data-action="select"]').click();
       await panel.getByRole('button', { name: '光とマスクを設定', exact: true }).click();
       await expect(panel.getByLabel('光の半径', { exact: true })).toHaveValue('180');
@@ -115,7 +110,7 @@ test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and 
       await expect.poll(() => video.evaluate((node: HTMLVideoElement) => node.paused)).not.toBe(paused);
       await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
       await expect(page.locator(presentation)).toHaveCount(0);
-      await expect(panel).toHaveCount(0);
+      await expect(page.locator('html')).not.toHaveAttribute('data-ww-editing', /.*/);
     });
   } catch (error) {
     results.push({

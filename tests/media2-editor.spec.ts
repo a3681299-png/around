@@ -394,71 +394,45 @@ test('OFF aborts an unfinished import decoder and closes its late frame without 
   popup,
   youtube,
 }) => {
-  // UI0-d round 3 (stopped, not deleted): the floating editor decoded the import in the YouTube tab,
-  // where this patches the decoder. The editor page decodes in its own page, so the patch never runs
-  // (tried). Moving it means patching and aborting there instead: 翔太's decision (docs/ui0d-3.md).
-  test.fixme(true, 'UI0-d round 3: the decoder this patches no longer runs in the YouTube tab; awaiting a decision.');
+  // UI0-d 3.1: the editor page reads and checks what it imports, so its decoder is the one held.
   const panel = await open(popup, youtube),
-    session = await youtube.context().newCDPSession(youtube);
-  const worlds: { id: number; auxData?: { type?: string } }[] = [];
-  session.on('Runtime.executionContextCreated', ({ context }) => worlds.push(context));
-  await session.send('Runtime.enable');
-  const id = worlds.find((world) => world.auxData?.type === 'isolated')!.id;
-  await session.send('Runtime.evaluate', {
-    contextId: id,
-    expression: `
-    globalThis.preflightCloses = 0; const Decoder = ImageDecoder;
+    editor = panel.page();
+  type Probe = typeof globalThis & {
+    preflightCloses: number;
+    releasePreflight?: () => void;
+    delayedFrame?: VideoFrame;
+  };
+  await editor.evaluate(() => {
+    const probe = globalThis as Probe,
+      Decoder = ImageDecoder;
+    probe.preflightCloses = 0;
     globalThis.ImageDecoder = class extends Decoder {
-      async decode(options) { const result = await super.decode(options); globalThis.delayedFrame = result.image;
-        await new Promise(resolve => { globalThis.releasePreflight = resolve; }); return result; }
-      close() { globalThis.preflightCloses++; super.close(); }
-    };`,
+      override async decode(options?: ImageDecodeOptions) {
+        const result = await super.decode(options);
+        probe.delayedFrame = result.image;
+        await new Promise<void>((resolve) => {
+          probe.releasePreflight = resolve;
+        });
+        return result;
+      }
+      override close() {
+        probe.preflightCloses++;
+        super.close();
+      }
+    };
   });
   await panel.getByLabel('アニメーション素材を追加').setInputFiles(file('petal.gif'));
-  await expect
-    .poll(
-      async () =>
-        (
-          await session.send('Runtime.evaluate', {
-            contextId: id,
-            expression: 'typeof globalThis.releasePreflight',
-            returnByValue: true,
-          })
-        ).result.value,
-    )
-    .toBe('function');
+  await expect.poll(() => editor.evaluate(() => typeof (globalThis as Probe).releasePreflight)).toBe('function');
   await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
-  await expect(panel).toHaveCount(0);
+  // The editing on the page ends, as the floating editor closed.
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-editing', /.*/);
   await expect(youtube.locator(overlay)).toHaveCount(0);
-  await expect
-    .poll(
-      async () =>
-        (
-          await session.send('Runtime.evaluate', {
-            contextId: id,
-            expression: 'globalThis.preflightCloses',
-            returnByValue: true,
-          })
-        ).result.value,
-    )
-    .toBe(1);
-  await session.send('Runtime.evaluate', { contextId: id, expression: 'globalThis.releasePreflight()' });
-  await expect
-    .poll(
-      async () =>
-        (
-          await session.send('Runtime.evaluate', {
-            contextId: id,
-            expression: 'globalThis.delayedFrame.codedWidth',
-            returnByValue: true,
-          })
-        ).result.value,
-    )
-    .toBe(0);
+  await expect.poll(() => editor.evaluate(() => (globalThis as Probe).preflightCloses)).toBe(1);
+  await editor.evaluate(() => (globalThis as Probe).releasePreflight!());
+  await expect.poll(() => editor.evaluate(() => (globalThis as Probe).delayedFrame!.codedWidth)).toBe(0);
   expect(
     await popup.evaluate(
       async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
     ),
   ).toBeUndefined();
-  await session.detach();
 });

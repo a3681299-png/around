@@ -114,6 +114,9 @@ export function createStudioClient(
     state = next;
     if (!connected) return;
     if (!next.active) {
+      // The edit ended on the page (OFF, strength zero or 編集を終了): an import still being read
+      // here can no longer land, so its reading stops and its decoded frames close now.
+      cancelImport();
       backup = undefined;
       if (tabId !== undefined) checkpointChanged(tabId, undefined);
     } else {
