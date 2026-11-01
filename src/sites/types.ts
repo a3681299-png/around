@@ -73,6 +73,10 @@ export interface SiteAdapter {
   readonly decorationAnchors?: readonly DesignTarget[];
   /** Site-specific native controls the skin picker labels as 未対応 when no part covers them. */
   readonly skinControls?: string;
+  /** When `node` is inside a layer the site draws over its parts (YouTube's inline preview over a
+   * video card, outside the card), the element at (x, y) beneath that layer; otherwise undefined.
+   * A hit test at one point, never a document query: callers find the part with `closest`. */
+  beneathOverlay?(node: Element, x: number, y: number): Element | undefined;
   /** Native media discovery belongs to the site; consumers only receive signals. */
   readonly signals?: { readonly videoPlayback?: PlaybackSource };
   readonly operationSurfaces?: () => import('../host/operation-source').OperationSource;

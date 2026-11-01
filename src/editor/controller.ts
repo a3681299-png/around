@@ -97,7 +97,13 @@ export function createCreatorEditor(
   const consumedKeys = new Set<string>();
   const skinPageListeners = new Set<(info: readonly SkinPageInfo[]) => void>();
   const marks = createPageMarks(doc);
-  const picker = createSkinPicker(doc, site.designTargets ?? [], marks, site.skinControls);
+  const picker = createSkinPicker(
+    doc,
+    site.designTargets ?? [],
+    marks,
+    site.skinControls,
+    site.beneathOverlay?.bind(site),
+  );
   const selectionMark = marks.mark('web-world-themes-selection-mark');
   let marksSuspended = false,
     followed: Element | undefined,
@@ -331,6 +337,14 @@ export function createCreatorEditor(
   }
   const ownUi = (event: Event) =>
     event.composedPath().some((node) => node instanceof Element && node.hasAttribute('data-ww-signal-control'));
+  /** The element a pick lands on. A click on a layer the site draws over its parts (YouTube's
+   * inline preview over a card) lands on the part beneath it, found from the site's marks. */
+  const pickedNode = (event: Event) => {
+    const node = event.target instanceof Element ? event.target : undefined;
+    return node && event instanceof MouseEvent
+      ? (site.beneathOverlay?.(node, event.clientX, event.clientY) ?? node)
+      : node;
+  };
   function pickTarget(event: Event): { element: Element; target?: (typeof skinTargets)[number] } | undefined {
     if (
       !editing() ||
@@ -340,7 +354,7 @@ export function createCreatorEditor(
       ownUi(event)
     )
       return;
-    const node = event.target instanceof Element ? event.target : undefined;
+    const node = pickedNode(event);
     if (state.view.tool === 'skin') return picker.hit(node);
     for (const target of site.designTargets ?? []) {
       const element = node?.closest(`[data-ww-surface~="${target.surface}"]`);
@@ -354,8 +368,21 @@ export function createCreatorEditor(
     selectedElement.setAttribute('data-ww-editor-selected', '');
     syncSelectionMark();
   };
+  /** What the last press landed on. When the site's layer appears between press and release (the
+   * inline preview), the browser sends the click to a common ancestor; it completes this press. */
+  let pressed: ReturnType<typeof pickTarget>;
   function onPick(event: Event) {
-    const target = pickTarget(event);
+    let target = pickTarget(event);
+    if (event.type === 'pointerdown') pressed = target;
+    else if (
+      !target &&
+      event.type === 'click' &&
+      pressed &&
+      event.target instanceof Node &&
+      event.target.contains(pressed.element)
+    )
+      target = pressed;
+    if (event.type === 'click' || event.type === 'auxclick') pressed = undefined;
     // While choosing parts, the page never navigates or toggles from a stray click.
     const blocking = Boolean(target) || (skinTool() && !fullscreen() && !ownUi(event));
     if (!blocking || ('button' in event && event.button === 2)) return;
@@ -418,7 +445,7 @@ export function createCreatorEditor(
     const files = [...event.dataTransfer.files];
     // While dressing parts, a drop on a page part dresses that part and is never a new image layer.
     if (skinTool()) {
-      const target = picker.hit(event.target instanceof Element ? event.target : undefined);
+      const target = picker.hit(pickedNode(event));
       if (!target?.target) {
         core.fail('絵は名札の付く枠が出る部品の上、またはパネルの枠にドロップしてください。');
         return;

@@ -43,6 +43,8 @@ export function createSkinPicker(
   targets: readonly DesignTarget[],
   marks: PageMarks,
   siteControls?: string,
+  /** The site's SiteAdapter.beneathOverlay: a part under the site's own layer is still framed. */
+  beneath?: (node: Element, x: number, y: number) => Element | undefined,
 ) {
   const controls = siteControls ? `${CONTROL}, ${siteControls}` : CONTROL;
   const parts = targets.filter((target) => target.skin && isDesignId(target.surface));
@@ -50,6 +52,7 @@ export function createSkinPicker(
   const root = doc.documentElement;
   let active = false,
     pointer: Element | undefined,
+    at = { x: 0, y: 0 },
     request: number | undefined,
     shownKey = '',
     tag = '';
@@ -74,7 +77,8 @@ export function createSkinPicker(
   };
   const draw = () => {
     request = undefined;
-    const found = active ? hit(pointer) : undefined;
+    // Once per frame, and a hit test only while the pointer is on the site's own layer.
+    const found = active && pointer ? hit(beneath?.(pointer, at.x, at.y) ?? pointer) : undefined;
     if (!found) return hide();
     const rect = found.element.getBoundingClientRect();
     if (!rect.width || !rect.height) return hide();
@@ -95,6 +99,7 @@ export function createSkinPicker(
   const onMove = (event: PointerEvent) => {
     const node = event.composedPath()[0];
     pointer = node instanceof Element ? node : undefined;
+    at = { x: event.clientX, y: event.clientY };
     schedule();
   };
   const onLeave = (event: PointerEvent) => {

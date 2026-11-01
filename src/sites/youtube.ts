@@ -13,6 +13,8 @@ import { createSelectorIndex } from './surface-index';
 import { surfacesFor, YOUTUBE_BASE_INDEX, YOUTUBE_BASE_SELECTORS, YOUTUBE_SURFACE_TARGETS } from './youtube-surfaces';
 
 const SURFACE_ATTRIBUTE = 'data-ww-surface';
+/** YouTube's hover preview player, drawn over a card's thumbnail outside the card. */
+const INLINE_PREVIEW = 'ytd-video-preview';
 
 const navigationEvents = ['yt-navigate-finish', 'yt-page-data-updated'] as const;
 const durationSelector =
@@ -38,6 +40,13 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
     stylesheet: `${stylesheet}\n${chromeStylesheet}`,
     designTargets: YOUTUBE_DESIGN_TARGETS,
     skinControls: YOUTUBE_SKIN_CONTROLS,
+    beneathOverlay(node, x, y) {
+      // A resting pointer on a thumbnail brings the inline preview over the card; the card stays
+      // where it was, beneath it.
+      const overlay = node.closest(INLINE_PREVIEW);
+      if (!overlay) return undefined;
+      return doc.elementsFromPoint(x, y).find((element) => !overlay.contains(element) && !element.contains(overlay));
+    },
     decorationAnchors: [{ id: 'video-player', surface: 'player-window', label: '動画プレイヤー' }],
     signals: { videoPlayback: youtubePlaybackSource(doc) },
     operationSurfaces: () => youtubeOperations(doc),
