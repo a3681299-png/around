@@ -218,7 +218,7 @@ export function createCreatorEditor(
       skinInfoTimer = undefined;
     }
   }
-  const skinTool = () => editing() && state.view.tool === 'skin';
+  const skinTool = () => editing() && !marksSuspended && state.view.tool === 'skin';
   /** Page presence and art state per part, for the connected editor page. Throttled: it reads
    * layout, so never per frame. */
   const skinReaders = () => skinPageListeners.size > 0;
@@ -252,8 +252,9 @@ export function createCreatorEditor(
     }
     if (!state.selectedTarget) removeSelection();
     const active = editing();
-    bind(active);
-    const skinning = active && state.view.tool === 'skin' && !fullscreen();
+    // Emergency OFF keeps the draft and Undo, but releases the page's input as well as its paint.
+    bind(active && !marksSuspended);
+    const skinning = skinTool() && !fullscreen();
     picker.setActive(skinning);
     skinAssets?.previews(skinning);
     const preview = skinning ? state.view.skinPreview : undefined;
@@ -264,7 +265,7 @@ export function createCreatorEditor(
     syncSelectionMark();
     picker.setPreview(skinning ? state.view.target : undefined, preview);
     if (skinning) scheduleSkinInfo();
-    if (active) {
+    if (active && !marksSuspended) {
       doc.documentElement.setAttribute('data-ww-editor-tool', state.view.tool ?? 'select');
       doc.documentElement.toggleAttribute('data-ww-editor-card-picking', state.view.tool === 'card');
     }
@@ -298,6 +299,7 @@ export function createCreatorEditor(
     }
     editImages(
       active &&
+        !marksSuspended &&
         !fullscreen() &&
         state.view.tool !== 'browse' &&
         state.view.tool !== 'card' &&
