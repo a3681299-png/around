@@ -420,6 +420,7 @@ export function createImageRenderer(
               (local || atmosphere || (page ? pageRegions.length > 0 : regions.length > 0));
             return {
               id: layer.layer.id,
+              ...(layer.layer.name ? { name: layer.layer.name } : {}),
               bounds: layer.bounds ?? { left: 0, top: 0, right: 0, bottom: 0 },
               opacity: layer.effectiveOpacity,
               // The atmosphere plane takes no input; its handles stay on the clipped screen plane.
@@ -871,9 +872,11 @@ export function createImageRenderer(
       undefined,
       () =>
         safety?.pause(
-          'WebGLコンテキストが失われたため3Dの描画を停止しました。',
+          'ブラウザーが3Dの描画を打ち切ったため、3Dモデルの表示を止めました。',
           true,
           images.filter((i) => i.kind === 'model3d').map((i) => i.id),
+          [],
+          'しばらくすると、自動で描き直します。',
         ),
     );
     effects = createEffectController(

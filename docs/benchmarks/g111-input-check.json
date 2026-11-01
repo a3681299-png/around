@@ -1,0 +1,170 @@
+{
+  "stage": "G1.1.1",
+  "harness": "scripts/ui0c/marks.mjs UI0C_MODE=ui0d3, 2 alternating pairs, headless, signed-out fresh profiles",
+  "url": "https://www.youtube.com/results?search_query=lofi+hip+hop",
+  "measuredAt": "2026-11-01T08:54:17.726Z",
+  "browser": "143.0.7499.4",
+  "environment": {
+    "os": "win32 10.0.26300",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13650HX",
+    "node": "v24.16.0"
+  },
+  "before": {
+    "revision": "e6cf9bce999852e6658f21119550e0282b7965b1"
+  },
+  "after": {
+    "revision": "e6cf9bce999852e6658f21119550e0282b7965b1",
+    "dirtySource": true
+  },
+  "metric": "extension CPU per frame (ms), isolated-world callbacks",
+  "pairs": [
+    {
+      "pair": 0,
+      "order": ["before", "after"],
+      "blocks": {
+        "before": {
+          "startup": {
+            "frames": 797,
+            "median": 0,
+            "p95": 0.10000000149011612,
+            "max": 11.799999998882413,
+            "longestCallbackMs": 11.799999998882413,
+            "longTasks": 4
+          },
+          "steady": {
+            "frames": 1370,
+            "median": 0,
+            "p95": 0,
+            "max": 1.799999998882413,
+            "longestCallbackMs": 1.3999999985098839,
+            "longTasks": 0
+          },
+          "hover": {
+            "frames": 439,
+            "median": 0,
+            "p95": 0.900000000372529,
+            "max": 2.099999999627471,
+            "longestCallbackMs": 2.099999999627471,
+            "longTasks": 0
+          },
+          "scroll": {
+            "frames": 1476,
+            "median": 0,
+            "p95": 0.599999999627471,
+            "max": 2.399999998509884,
+            "longestCallbackMs": 1.5,
+            "longTasks": 0
+          }
+        },
+        "after": {
+          "startup": {
+            "frames": 778,
+            "median": 0,
+            "p95": 0,
+            "max": 7.399999998509884,
+            "longestCallbackMs": 6.599999999627471,
+            "longTasks": 6
+          },
+          "steady": {
+            "frames": 1362,
+            "median": 0,
+            "p95": 0,
+            "max": 1.099999999627471,
+            "longestCallbackMs": 1,
+            "longTasks": 0
+          },
+          "hover": {
+            "frames": 436,
+            "median": 0,
+            "p95": 0.6999999992549419,
+            "max": 1.800000000745058,
+            "longestCallbackMs": 1.700000001117587,
+            "longTasks": 0
+          },
+          "scroll": {
+            "frames": 1476,
+            "median": 0,
+            "p95": 0.2999999988824129,
+            "max": 2.199999999254942,
+            "longestCallbackMs": 2,
+            "longTasks": 0
+          }
+        }
+      }
+    },
+    {
+      "pair": 1,
+      "order": ["after", "before"],
+      "blocks": {
+        "after": {
+          "startup": {
+            "frames": 765,
+            "median": 0,
+            "p95": 0.19999999925494194,
+            "max": 10.59999999590218,
+            "longestCallbackMs": 9.699999999254942,
+            "longTasks": 6
+          },
+          "steady": {
+            "frames": 1360,
+            "median": 0,
+            "p95": 0,
+            "max": 0.900000000372529,
+            "longestCallbackMs": 0.6999999992549419,
+            "longTasks": 0
+          },
+          "hover": {
+            "frames": 440,
+            "median": 0,
+            "p95": 0.6999999992549419,
+            "max": 4.599999999627471,
+            "longestCallbackMs": 3.099999999627471,
+            "longTasks": 0
+          },
+          "scroll": {
+            "frames": 1499,
+            "median": 0,
+            "p95": 0.30000000074505806,
+            "max": 1.6000000014901161,
+            "longestCallbackMs": 1.6000000014901161,
+            "longTasks": 0
+          }
+        },
+        "before": {
+          "startup": {
+            "frames": 747,
+            "median": 0,
+            "p95": 0.5,
+            "max": 10.499999998137355,
+            "longestCallbackMs": 8.799999998882413,
+            "longTasks": 8
+          },
+          "steady": {
+            "frames": 1364,
+            "median": 0,
+            "p95": 0,
+            "max": 0.8000000007450581,
+            "longestCallbackMs": 0.7000000011175871,
+            "longTasks": 0
+          },
+          "hover": {
+            "frames": 439,
+            "median": 0,
+            "p95": 0.8000000007450581,
+            "max": 2.000000001862645,
+            "longestCallbackMs": 1.900000000372529,
+            "longTasks": 0
+          },
+          "scroll": {
+            "frames": 1478,
+            "median": 0,
+            "p95": 0.5,
+            "max": 1.700000001117587,
+            "longestCallbackMs": 1.700000001117587,
+            "longTasks": 0
+          }
+        }
+      }
+    }
+  ]
+}

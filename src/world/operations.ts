@@ -50,6 +50,8 @@ export interface PaintFootprint {
   animated?: boolean;
   clip?: PlacementFrame;
   id: string;
+  /** The layer's name as the creator sees it, for stop messages only (shown as text). */
+  name?: string;
   bounds: Bounds;
   opacity: number;
   pointerEvents: boolean;

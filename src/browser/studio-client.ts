@@ -352,6 +352,9 @@ export function createStudioClient(
       async overlay(value) {
         await request({ type: 'safety', overlay: value } as Omit<StudioRequest, 'id'>);
       },
+      async resume() {
+        await request({ type: 'safety-resume' } as Omit<StudioRequest, 'id'>);
+      },
     },
     async targets(): Promise<StudioTarget[]> {
       const tabs = await chrome.tabs.query({});

@@ -20,7 +20,7 @@ export async function ui0dOperationProbeBuild(native: string, output: string) {
     charset: 'utf8',
     legalComments: 'none',
     loader: { '.css': 'text' },
-    dropLabels: ['WW_TEST_PAGE_CHANGE'],
+    dropLabels: ['WW_TEST_PAGE_CHANGE', 'WW_GUARD_TRACE'],
     define: { __WW_WORLD_MODE__: '"runtime"', __WW_WORLD_DEVTOOLS__: 'false', __WW_ASSET_PROFILE__: 'false' },
     plugins: [
       {

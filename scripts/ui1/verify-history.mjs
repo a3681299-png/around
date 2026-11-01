@@ -14,7 +14,7 @@ const result = await build({
   write: false,
   format: 'esm',
   platform: 'node',
-  dropLabels: ['WW_TEST_PAGE_CHANGE'],
+  dropLabels: ['WW_TEST_PAGE_CHANGE', 'WW_GUARD_TRACE'],
 });
 const historical = await import(
   'data:text/javascript;base64,' + Buffer.from(result.outputFiles[0].text).toString('base64')

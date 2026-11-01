@@ -14,8 +14,29 @@ export interface SafetyStatus {
   issues: readonly SafetyIssue[];
   surfaces: OperationSnapshot;
   approaching: boolean;
+  /** What a stop protected, one sentence; empty while drawing. */
   stopped: string;
+  /** How to fix it, one sentence. */
+  remedy: string;
+  /** Automatic recovery has ended; only 描画を再開 (resume) brings drawing back. */
+  latched: boolean;
   overlay: boolean;
+}
+// Stops say what they protected and how to fix it, one sentence each, in the creator's words
+// (docs/wwt-studio-design-system/README.md, Copy).
+const COVERED = 'クリックがページの操作部品に届くよう、絵の表示を止めました。';
+const MOVED = 'ページの操作部品が動いた直後の入力だったため、絵の表示を一時的に止めました。';
+const SHIFTED = 'ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。';
+const HOLD = 'ページの操作部品が動いている間は、絵の表示を止めています。';
+const CLAIMED = '編集の枠の下にページの操作部品があったため、その操作を止めました。';
+const SETTLES = '動きが落ち着くと、自動で表示に戻ります。';
+const RESUME = '操作チェックの「描画を再開」を押してください。';
+const quote = (names: readonly string[]) => names.map((name) => `「${name}」`).join('と');
+/** The remedy for a stop: the named layers to move, and 描画を再開 once recovery has ended. */
+function remedyFor(latched: boolean, names: readonly string[], remedy: string) {
+  if (latched)
+    return names.length ? `${quote(names)}を操作部品から離してから、${RESUME}` : `絵の位置を確かめてから、${RESUME}`;
+  return names.length ? `${quote(names)}を操作部品から離すか、小さくしてください。` : remedy;
 }
 export interface OperationGuardHost {
   setActive(value: boolean): void;
@@ -25,7 +46,16 @@ export interface OperationGuardHost {
   snapshot(): SafetyStatus;
   subscribe(listener: (value: SafetyStatus) => void): () => void;
   overlay(value: boolean): void;
-  pause(reason: string, repeatedFailure?: boolean, layerIds?: readonly string[]): void;
+  /** `names`: layers the creator can move to fix it; `remedy`: how it recovers otherwise. */
+  pause(
+    reason: string,
+    repeatedFailure?: boolean,
+    layerIds?: readonly string[],
+    names?: readonly string[],
+    remedy?: string,
+  ): void;
+  /** 描画を再開 from the editor: ends a stop, including a latched one, and counts failures anew. */
+  resume(): void;
   /** Input-time check for an editor gesture: false (and drawing paused) when a fresh read finds
    * a protected surface under the point. */
   claim(point: Point): boolean;
@@ -76,6 +106,7 @@ export function createOperationGuardHost(
   let lastActivity = view.performance.now(),
     interacting = false,
     stopped = '',
+    stoppedRemedy = '',
     stableAt = 0,
     failures = 0,
     lastGeneration = surfaces.generation.geometry;
@@ -88,15 +119,40 @@ export function createOperationGuardHost(
     lastStatus = '',
     timer: number | undefined,
     holdTimer: number | undefined;
-  const HOLD = '操作面が変化している間は、まとめて確認するまで描画を停止しています。';
-  const snapshot = (): SafetyStatus => ({ issues, surfaces, approaching: proximity.safe, stopped, overlay });
+  const latched = () => failures >= 3 || latchedLayers.size > 0;
+  const snapshot = (): SafetyStatus => ({
+    issues,
+    surfaces,
+    approaching: proximity.safe,
+    stopped,
+    remedy: stopped ? stoppedRemedy : '',
+    latched: latched(),
+    overlay,
+  });
   // Same objects and flags as the last publish cannot change the signature below.
   let published: readonly unknown[] = [];
   const publish = () => {
-    const inputs = [issues, stopped, overlay, proximity.safe, overlay ? surfaces : null, overlayHost];
+    const inputs = [
+      issues,
+      stopped,
+      stoppedRemedy,
+      latched(),
+      overlay,
+      proximity.safe,
+      overlay ? surfaces : null,
+      overlayHost,
+    ];
     if (inputs.length === published.length && inputs.every((value, i) => value === published[i])) return;
     published = inputs;
-    const signature = JSON.stringify([issues, stopped, overlay, proximity.safe, overlay ? surfaces : null]);
+    const signature = JSON.stringify([
+      issues,
+      stopped,
+      stoppedRemedy,
+      latched(),
+      overlay,
+      proximity.safe,
+      overlay ? surfaces : null,
+    ]);
     if (signature === lastStatus) return;
     lastStatus = signature;
     if (overlayHost) {
@@ -138,7 +194,13 @@ export function createOperationGuardHost(
     }
     listeners.forEach((listener) => listener(snapshot()));
   };
-  function pause(reason: string, repeatedFailure = false, layerIds?: readonly string[]) {
+  function pause(
+    reason: string,
+    repeatedFailure = false,
+    layerIds?: readonly string[],
+    names: readonly string[] = [],
+    remedy = SETTLES,
+  ) {
     stopped = reason;
     stoppedIds = layerIds ? new Set(layerIds) : undefined;
     if (repeatedFailure && layerIds)
@@ -148,6 +210,7 @@ export function createOperationGuardHost(
         if (count >= 3) latchedLayers.set(id, reason);
       }
     else if (repeatedFailure) failures++;
+    stoppedRemedy = remedyFor(failures >= 3, names, remedy);
     stableAt = view.performance.now();
     issues = paints
       .filter((p) => !stoppedIds || stoppedIds.has(p.id))
@@ -156,10 +219,7 @@ export function createOperationGuardHost(
         surfaceId: 'host',
         severity: 'enforced',
         reason,
-        remedy:
-          failures >= 3
-            ? '破綻が繰り返されたため自動復帰を止めました。対象を確認してページを再読み込みしてください。'
-            : '操作を終え、配置基準が安定すると復帰します。',
+        remedy: stoppedRemedy,
       }));
     invalidate(layerIds ?? true);
     publish();
@@ -169,6 +229,21 @@ export function createOperationGuardHost(
         if (active) invalidate();
       }, 400);
   }
+  /** Names of the drawn layers at a covered click: the ones a creator can move away. */
+  const layersAt = ({ clientX: x, clientY: y }: MouseEvent) => [
+    ...new Set(
+      paints
+        .filter(
+          (p) =>
+            p.name &&
+            x >= p.bounds.left - p.outset &&
+            x <= p.bounds.right + p.outset &&
+            y >= p.bounds.top - p.outset &&
+            y <= p.bounds.bottom + p.outset,
+        )
+        .map((p) => p.name!),
+    ),
+  ];
   const activity = (event: Event) => {
     if (event.type === 'visibilitychange' || event.type === 'blur') {
       lastActivity = view.performance.now();
@@ -206,7 +281,8 @@ export function createOperationGuardHost(
       // one, so a geometry change is never mistaken for a repeated failure.
       const valid = source.validate(surfaces, event);
       const geometryChanged = source.capture().generation.geometry !== surfaces.generation.geometry;
-      if (!valid) pause('入力直前に操作面の世代またはクリック先が変わりました。', !geometryChanged);
+      if (!valid && geometryChanged) pause(MOVED);
+      else if (!valid) pause(COVERED, true, undefined, event instanceof MouseEvent ? layersAt(event) : []);
     }
     // Pointer paths are tested immediately, including movement across a control.
     const next = stepProximity(proximity, source.capture(), {
@@ -293,6 +369,7 @@ export function createOperationGuardHost(
         // drawing, keep the boundary comparison pending and come back when the window ends.
         if (!stopped) {
           stopped = HOLD;
+          stoppedRemedy = remedyFor(false, [], SETTLES);
           stoppedIds = undefined;
         }
         if (holdTimer === undefined)
@@ -310,7 +387,7 @@ export function createOperationGuardHost(
           const nextBoundary = boundaryKey(surfaces);
           if (nextBoundary !== boundary) {
             boundary = nextBoundary;
-            pause('操作面の保護範囲が変わったため、安定するまで描画を停止しています。');
+            pause(SHIFTED);
           }
         }
       }
@@ -351,12 +428,12 @@ export function createOperationGuardHost(
     },
     claim(point) {
       if (editorClaims(source.capture({ fresh: true }), point)) return true;
-      pause('入力直前の照合で、編集ハンドルの下に本物の操作面がありました。');
+      pause(CLAIMED, false, undefined, [], '操作部品から離れた場所で、絵をつかんでください。');
       return false;
     },
     commit(next) {
       paints = next;
-      if (!source.validate(surfaces)) pause('反映前に操作面の幾何世代が変わりました。');
+      if (!source.validate(surfaces)) pause(SHIFTED);
       const pausedIssues: SafetyIssue[] = stopped
         ? next
             .filter((p) => !stoppedIds || stoppedIds.has(p.id))
@@ -366,10 +443,7 @@ export function createOperationGuardHost(
               severity: 'enforced',
               action: 'stop',
               reason: stopped,
-              remedy:
-                failures >= 3
-                  ? '破綻が繰り返されたためページの再読み込みが必要です。'
-                  : '操作を終え、配置基準が安定すると復帰します。',
+              remedy: stoppedRemedy,
             }))
         : [];
       for (const id of latchedLayers.keys())
@@ -390,7 +464,7 @@ export function createOperationGuardHost(
               severity: 'enforced',
               action: 'stop',
               reason: latchedLayers.get(p.id)!,
-              remedy: '同じレイヤーの破綻が繰り返されたため、確認後にページを再読み込みしてください。',
+              remedy: `絵の状態を確かめてから、${RESUME}`,
             })),
         ];
         if (reduced.matches || proximity.safe)
@@ -440,6 +514,20 @@ export function createOperationGuardHost(
       publish();
     },
     pause,
+    resume() {
+      // Trusted editor UI only (never artwork): the same covered click stops drawing again, and
+      // three in a row end automatic recovery again.
+      failures = 0;
+      layerFailures.clear();
+      latchedLayers.clear();
+      stopped = stoppedRemedy = '';
+      stoppedIds = undefined;
+      issues = [];
+      stableAt = view.performance.now();
+      published = [];
+      invalidate();
+      publish();
+    },
     destroy() {
       unsubscribeSource();
       active = false;

@@ -15,6 +15,7 @@ export interface StudioConnection {
   readonly safety?: {
     subscribe(listener: (status: import('../host/operation-guard').SafetyStatus) => void): () => void;
     overlay(value: boolean): Promise<void>;
+    resume(): Promise<void>;
   };
   readonly timeline?: TimelinePort;
   /** The skin tool's part list as the page found it; sent only while the tool is open. */

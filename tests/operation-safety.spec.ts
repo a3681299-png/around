@@ -1059,6 +1059,184 @@ test('input during a burst of real geometry changes pauses but never counts as a
   expect(result).toEqual({ paused: true, recovered: true });
 });
 
+/** G1.1.1: a hidden control (YouTube keeps hover-only buttons in the layout) is not under the
+ * pointer, while a visible one that a page element covers still is. */
+async function clickFixture(youtube: Page) {
+  await youtube.addScriptTag({ content: await probeCode() });
+  await youtube.evaluate(() => {
+    const app = document.querySelector('ytd-app')!;
+    const place = (node: HTMLElement, left: number, z = 1) =>
+      node.setAttribute(
+        'style',
+        `position:fixed;left:${left}px;top:420px;width:60px;height:40px;z-index:${z};margin:0;padding:0;border:0`,
+      );
+    // A hover-only button, hidden, over the picture it would sit on: the picture takes the click.
+    const hidden = document.createElement('button'),
+      picture = document.createElement('div');
+    hidden.textContent = 'あとで見る';
+    place(picture, 300, 2);
+    place(hidden, 300, 3);
+    hidden.style.visibility = 'hidden';
+    // A visible button that a page element takes the click from.
+    const shown = document.createElement('button'),
+      cover = document.createElement('div');
+    shown.textContent = '再生';
+    cover.id = 'g111-cover';
+    place(shown, 500, 1);
+    place(cover, 500, 5);
+    app.append(picture, hidden, shown, cover);
+  });
+}
+const click = (x: number) => {
+  for (const type of ['pointerdown', 'pointerup'])
+    document.dispatchEvent(new PointerEvent(type, { clientX: x, clientY: 440, bubbles: true }));
+};
+
+test('a click over a hidden native control is not a failure; a visible control a page element covers still stops drawing', async ({
+  youtube,
+}) => {
+  // The probe keeps the WW_GUARD_TRACE label, as the development build does.
+  const traces: string[] = [];
+  youtube.on('console', (message) => {
+    if (message.text().startsWith('[Web World Themes G1] クリック先')) traces.push(message.text());
+  });
+  await clickFixture(youtube);
+  const result = await youtube.evaluate(async (clickSource) => {
+    const click = new Function('x', clickSource) as (x: number) => void;
+    const api = (window as any).G1Probe;
+    const frame = () => new Promise<number>((resolve) => requestAnimationFrame(resolve));
+    const settle = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 450));
+      for (let i = 0; i < 3; i++) host.sample(await frame());
+    };
+    const source = api.youtubeOperations(document);
+    const host = api.createOperationGuardHost(document, source, () => undefined);
+    await settle();
+    const snapshot = source.capture();
+    const hiddenValid = source.validate(snapshot, new PointerEvent('pointerdown', { clientX: 330, clientY: 440 }));
+    const coveredValid = source.validate(snapshot, new PointerEvent('pointerdown', { clientX: 530, clientY: 440 }));
+    for (let i = 0; i < 3; i++) {
+      click(330);
+      await settle();
+    }
+    const hidden = { stopped: host.snapshot().stopped, latched: host.snapshot().latched };
+    for (let i = 0; i < 3; i++) {
+      click(530);
+      await settle();
+    }
+    const covered = { stopped: host.snapshot().stopped, latched: host.snapshot().latched };
+    host.destroy();
+    return { hiddenValid, coveredValid, hidden, covered };
+  }, `(${click.toString()})(x)`);
+  expect(result.hiddenValid).toBe(true);
+  expect(result.coveredValid).toBe(false);
+  expect(result.hidden).toEqual({ stopped: '', latched: false });
+  expect(result.covered.stopped).toBeTruthy();
+  expect(result.covered.latched).toBe(true);
+  // Only the covered control is traced: the expected target and the element that took the click.
+  expect(traces.length).toBeGreaterThanOrEqual(4);
+  const trace = JSON.parse(traces[0]!.slice(traces[0]!.indexOf('{')));
+  expect(trace).toMatchObject({
+    event: 'pointerdown',
+    point: { x: 530, y: 440 },
+    actual: { element: 'div#g111-cover' },
+  });
+  expect(trace.expected).toEqual([expect.objectContaining({ element: 'button', label: '再生' })]);
+  expect(traces.join('\n')).not.toContain('あとで見る');
+});
+
+test('描画を再開 releases a latched stop, and the same covered click stops drawing again', async ({ youtube }) => {
+  await clickFixture(youtube);
+  const result = await youtube.evaluate(async (clickSource) => {
+    const click = new Function('x', clickSource) as (x: number) => void;
+    const api = (window as any).G1Probe;
+    const frame = () => new Promise<number>((resolve) => requestAnimationFrame(resolve));
+    const source = api.youtubeOperations(document);
+    let stops = 0;
+    const host = api.createOperationGuardHost(document, source, (stop: unknown) => {
+      if (stop) stops++;
+    });
+    const settle = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 450));
+      for (let i = 0; i < 3; i++) host.sample(await frame());
+    };
+    await settle();
+    for (let i = 0; i < 3; i++) {
+      click(530);
+      await settle();
+    }
+    const latched = host.snapshot().latched;
+    host.resume();
+    const resumed = { stopped: host.snapshot().stopped, latched: host.snapshot().latched };
+    await settle();
+    const before = stops;
+    click(530);
+    const again = { stopped: Boolean(host.snapshot().stopped), hid: stops > before };
+    await settle();
+    // One covered click after resuming pauses again and recovers; three latch again.
+    const recovered = !host.snapshot().stopped;
+    for (let i = 0; i < 2; i++) {
+      click(530);
+      await settle();
+    }
+    const relatched = host.snapshot().latched;
+    host.destroy();
+    return { latched, resumed, again, recovered, relatched };
+  }, `(${click.toString()})(x)`);
+  expect(result).toEqual({
+    latched: true,
+    resumed: { stopped: '', latched: false },
+    again: { stopped: true, hid: true },
+    recovered: true,
+    relatched: true,
+  });
+});
+
+test('the stop says what it protected and how to fix it, one sentence each, naming the layer to move', async ({
+  youtube,
+}) => {
+  await clickFixture(youtube);
+  const result = await youtube.evaluate(async (clickSource) => {
+    const click = new Function('x', clickSource) as (x: number) => void;
+    const api = (window as any).G1Probe;
+    const frame = () => new Promise<number>((resolve) => requestAnimationFrame(resolve));
+    const source = api.youtubeOperations(document);
+    const host = api.createOperationGuardHost(document, source, () => undefined);
+    await new Promise((resolve) => setTimeout(resolve, 450));
+    for (let i = 0; i < 3; i++) host.sample(await frame());
+    const paint = (id: string, name: string, left: number) => ({
+      id,
+      name,
+      bounds: { left, top: 400, right: left + 100, bottom: 480 },
+      opacity: 1,
+      pointerEvents: false,
+      outset: 0,
+      composition: 'overlay',
+    });
+    host.commit([paint('a', 'さくら', 480), paint('b', '遠くの雲', 20)]);
+    click(530);
+    const once = { stopped: host.snapshot().stopped, remedy: host.snapshot().remedy };
+    for (let i = 0; i < 2; i++) {
+      await new Promise((resolve) => setTimeout(resolve, 450));
+      host.sample(await frame());
+      click(530);
+    }
+    const latched = { stopped: host.snapshot().stopped, remedy: host.snapshot().remedy };
+    host.destroy();
+    return { once, latched };
+  }, `(${click.toString()})(x)`);
+  for (const message of [result.once, result.latched]) {
+    for (const sentence of [message.stopped, message.remedy]) {
+      expect(sentence).toMatch(/^[^。]+。$/);
+      expect(sentence).not.toMatch(/世代|幾何|照合|ハンドル|配置基準|操作面/);
+    }
+    expect(message.remedy).toContain('「さくら」');
+    expect(message.remedy).not.toContain('遠くの雲');
+  }
+  expect(result.latched.remedy).toContain('描画を再開');
+  expect(result.once.remedy).not.toContain('描画を再開');
+});
+
 test('focus inside the extension own player-local host never counts as focus on a native surface', async ({
   youtube,
 }) => {

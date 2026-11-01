@@ -24,6 +24,8 @@ export type StudioRequest =
   | { id: number; type: 'import-skin'; session: string; revision: number; assets: string[]; slot: SkinSlot }
   | { id: number; type: 'thumbnail'; layer: string }
   | { id: number; type: 'safety'; overlay: boolean }
+  // 描画を再開 in 操作チェック: ends a stop the guard no longer recovers from by itself.
+  | { id: number; type: 'safety-resume' }
   | { id: number; type: 'timeline'; session: string; command: TimelineCommand }
   | { id: number; type: 'detach' };
 // Safety has a separate Host channel; no artwork command can relax protection.

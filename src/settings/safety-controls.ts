@@ -81,8 +81,13 @@ export function mountEditorSafety(root: HTMLElement, connection: StudioConnectio
     popover = doc.createElement('div'),
     label = doc.createElement('label'),
     overlay = doc.createElement('input'),
-    report = doc.createElement('ul');
-  off.type = resume.type = 'button';
+    report = doc.createElement('ul'),
+    restart = doc.createElement('button');
+  off.type = resume.type = restart.type = 'button';
+  // Shown only once the guard no longer recovers by itself; the page decides again on every input.
+  restart.className = 'safety-resume';
+  restart.textContent = '描画を再開';
+  restart.hidden = true;
   off.className = 'emergency-off';
   off.textContent = '緊急OFF';
   off.title = 'ページ上の描画をすぐに止めます。作品とUndoは保持します。';
@@ -97,7 +102,7 @@ export function mountEditorSafety(root: HTMLElement, connection: StudioConnectio
   popover.className = 'safety-popover';
   overlay.type = 'checkbox';
   label.append(overlay, '操作面の保護範囲を表示');
-  popover.append(label, report);
+  popover.append(label, report, restart);
   check.append(summary, popover);
   header.append(off, resume, check, state);
   const reportFailure = (error: unknown) => {
@@ -110,6 +115,15 @@ export function mountEditorSafety(root: HTMLElement, connection: StudioConnectio
     resume.hidden = !value;
     resume.title = value ? OFF_STATE : '';
     state.textContent = value ? OFF_STATE : '';
+  });
+  restart.addEventListener('click', () => {
+    restart.disabled = true;
+    void connection
+      .safety!.resume()
+      .catch(reportFailure)
+      .finally(() => {
+        restart.disabled = false;
+      });
   });
   let latest: SafetyStatus | undefined;
   // Shown while something is restricted or stopped, and while its overlay is on (so it can be put
@@ -188,9 +202,11 @@ export function mountEditorSafety(root: HTMLElement, connection: StudioConnectio
     }
     if (status.stopped) {
       const li = doc.createElement('li');
-      li.textContent = status.stopped;
+      li.className = 'safety-stop';
+      li.textContent = status.remedy ? `${status.stopped}${status.remedy}` : status.stopped;
       report.append(li);
     }
+    restart.hidden = !status.latched;
     showCheck();
     badges();
   });

@@ -40,6 +40,38 @@ test('development counters cannot be written to the normal dist', () => {
   ).toThrow(/Development page-change probes must stay inside .work/);
 });
 
+test('G1.1.1: only the explicit development build records why an input check stopped drawing', async () => {
+  await mkdir('.work', { recursive: true });
+  for (const enabled of [false, true]) {
+    const output = await mkdtemp(path.resolve('.work/guard-trace-test-'));
+    try {
+      execFileSync(process.execPath, ['scripts/build.mjs'], {
+        env: {
+          ...process.env,
+          WW_ASSET_PROFILE: '0',
+          WW_PAGE_CHANGE_PROBE: '0',
+          WW_BUILD_OUT: '.work/' + path.basename(output),
+          WW_GUARD_TRACE: enabled ? '1' : '0',
+        },
+        stdio: 'pipe',
+      });
+      const code = await readFile(path.join(output, 'content/index.js'), 'utf8');
+      expect(code.includes('[Web World Themes G1]')).toBe(enabled);
+      expect(code.includes('クリック先の照合が合いませんでした')).toBe(enabled);
+    } finally {
+      if (path.dirname(output) !== path.resolve('.work') || !path.basename(output).startsWith('guard-trace-test-'))
+        throw new Error('Unexpected test output');
+      await rm(output, { recursive: true, force: true });
+    }
+  }
+  expect(() =>
+    execFileSync(process.execPath, ['scripts/build.mjs'], {
+      env: { ...process.env, WW_ASSET_PROFILE: '0', WW_BUILD_OUT: 'dist', WW_GUARD_TRACE: '1' },
+      stdio: 'pipe',
+    }),
+  ).toThrow(/Development guard traces must stay inside .work/);
+});
+
 test('CPU measurement build refuses a destination outside .work before building', () => {
   expect(() => execFileSync(process.execPath, ['scripts/ui1/build.mjs', '.', 'dist'], { stdio: 'pipe' })).toThrow(
     /Measurement builds must stay inside/,

@@ -1,6 +1,7 @@
 import type { OperationSnapshot, OperationSurface } from '../world/operations';
 import type { PlacementFrame } from '../world/geometry';
 import { scrollsWithPage } from './operation-composition';
+import { traceMissedInput, traceMovedInput } from './guard-trace';
 
 /** Attributes a site selector may test; a change can add or drop a candidate by itself. */
 const MATCHING_ATTRIBUTES = new Set(['class', 'role', 'href', 'contenteditable']);
@@ -431,23 +432,39 @@ export function createOperationSource(
       if (!issued.has(snapshot) || snapshot.generation.documentId !== documentId) return false;
       // Input-time reads never trust the incremental view or wait for a window.
       const next = capture({ fresh: Boolean(event) });
-      if (next.generation.geometry !== snapshot.generation.geometry || !next.supported) return false;
+      if (next.generation.geometry !== snapshot.generation.geometry || !next.supported) {
+        WW_GUARD_TRACE: if (event) traceMovedInput(event, snapshot.generation.geometry, next.generation.geometry);
+        return false;
+      }
       if (!(event instanceof MouseEvent)) return true;
       const hit = doc.elementFromPoint(event.clientX, event.clientY);
-      return rows
-        .filter((row) => {
-          if (doc.fullscreenElement && !doc.fullscreenElement.contains(row.element)) return false;
-          const r = row.element.getBoundingClientRect();
-          return (
-            event.clientX >= r.left && event.clientX <= r.right && event.clientY >= r.top && event.clientY <= r.bottom
-          );
-        })
-        .every((row) =>
-          Boolean(
-            hit &&
-            (row.element.contains(hit) || hit.contains(row.element) || event.composedPath().includes(row.element)),
-          ),
+      const missed = rows.filter((row) => {
+        if (doc.fullscreenElement && !doc.fullscreenElement.contains(row.element)) return false;
+        const r = row.element.getBoundingClientRect();
+        if (!(
+          event.clientX >= r.left &&
+          event.clientX <= r.right &&
+          event.clientY >= r.top &&
+          event.clientY <= r.bottom
+        ))
+          return false;
+        // A control that is not shown (YouTube keeps hover-only buttons in the layout) cannot be
+        // under the pointer, so another element taking the click is not a covered control.
+        // Same test as a snapshot's availability.visible; read only for controls at the point.
+        if (
+          !row.element.isConnected ||
+          !r.width ||
+          !r.height ||
+          !(row.visible ?? doc.defaultView!.getComputedStyle(row.element).visibility !== 'hidden')
+        )
+          return false;
+        return !(
+          hit &&
+          (row.element.contains(hit) || hit.contains(row.element) || event.composedPath().includes(row.element))
         );
+      });
+      WW_GUARD_TRACE: if (missed.length) traceMissedInput(event, hit, missed);
+      return !missed.length;
     },
     videoSlot,
     editorCentre,

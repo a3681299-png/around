@@ -170,6 +170,10 @@ export function connectStudioHost(
                 throw new Error('操作チェックの要求が不正です。');
               safety?.overlay(request.overlay);
               post({ type: 'reply', id: request.id, ok: true });
+            } else if (request.type === 'safety-resume') {
+              if (!attached || activePort !== port) throw new Error('操作チェックの要求が不正です。');
+              safety?.resume();
+              post({ type: 'reply', id: request.id, ok: true });
             } else if (request.type === 'timeline') {
               if (!attached || activePort !== port || typeof request.session !== 'string')
                 throw new Error('エディターを編集対象へ接続し直してください。');
