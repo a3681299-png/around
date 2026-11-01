@@ -30,7 +30,7 @@ async function setup() {
   const page = await context.newPage();
   await page.goto('https://www.youtube.com/watch?v=fixture');
   await popup.getByRole('switch', { name: 'テーマを使う' }).check();
-  await expect(page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+  await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   await expect(popup.locator('#creator-editor-direct')).toBeEnabled();
   await page.bringToFront();
   return { context, page, popup, id, profile, extension };
@@ -47,7 +47,7 @@ test('the emergency accelerator is assigned, latches drawing OFF, and unrelated 
     ).toBe('Alt+Shift+Q');
     await nativeShortcut(page, profile, extension, 'Q');
     await expect(popup.getByRole('button', { name: '描画を再開' })).toBeVisible();
-    await expect(page.locator('html')).not.toHaveAttribute('data-ww-theme', 'retro');
+    await expect(page.locator('html')).not.toHaveAttribute('data-ww-site', 'youtube');
     // A previously approved YouTube tab must lose its approval on navigation.
     const unrelated = page;
     await unrelated.goto('https://example.com/');
@@ -143,7 +143,7 @@ test('settings starts clear of the player, remembers a dragged position, and rem
     const panel = page.getByRole('dialog', { name: 'Web World Themes の設定' });
     for (const enabled of [false, true]) {
       await popup.getByRole('switch', { name: 'テーマを使う' }).setChecked(enabled);
-      await expect.poll(() => page.locator('html').getAttribute('data-ww-theme')).toBe(enabled ? 'retro' : null);
+      await expect.poll(() => page.locator('html').getAttribute('data-ww-site')).toBe(enabled ? 'youtube' : null);
       for (const [width, height] of [
         [1920, 1080],
         [1100, 760],

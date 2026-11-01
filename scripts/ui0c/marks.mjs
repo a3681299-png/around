@@ -29,6 +29,24 @@ const builds = {
   after: inWork(process.env.UI0C_AFTER ?? '.work/ui0c-after'),
 };
 const plain = { schemaVersion: 13, id: 'ui0c-plain', siteId: 'youtube', baseThemeId: null, rules: [], decorations: [] };
+// UI0C_FEATURES=off: every retro display option stored OFF as well (the baseline for the retro
+// theme's removal). Builds without those options ignore the keys.
+const RETRO_FEATURES = [
+  'window-chrome',
+  'palette',
+  'glossy-titlebars',
+  'focus-titlebars',
+  'daily-details',
+  'surface-noise',
+  'bbs-comments',
+  'transparent-background',
+  'lcd-durations',
+  'readable-votes',
+];
+const featureValues =
+  process.env.UI0C_FEATURES === 'off'
+    ? Object.fromEntries(RETRO_FEATURES.map((id) => [`webWorldThemes.features.${id}`, false]))
+    : {};
 
 function stats(values) {
   const sorted = [...values].sort((a, b) => a - b),
@@ -74,14 +92,15 @@ async function launch(build) {
   const popup = await context.newPage();
   await popup.goto(`chrome-extension://${new URL(worker.url()).host}/popup/index.html`);
   await popup.evaluate(
-    (design) =>
+    ({ design, features }) =>
       chrome.storage.local.set({
         'webWorldThemes.enabled': true,
         'webWorldThemes.strength': 100,
         'webWorldThemes.safety.emergencyOff': false,
         'webWorldThemes.design.youtube': design,
+        ...features,
       }),
-    plain,
+    { design: plain, features: featureValues },
   );
   const page = await context.newPage();
   page.setDefaultTimeout(30000);
@@ -284,6 +303,7 @@ const result = {
       ? 'ui0d3 (before vs after: closed startup/steady, window hover/scroll)'
       : 'build (before vs after)',
   measuredAt: new Date().toISOString(),
+  features: process.env.UI0C_FEATURES === 'off' ? 'all retro display options stored OFF' : 'stored defaults',
   environment: { os: `${os.platform()} ${os.release()}`, cpu: os.cpus()[0]?.model, node: process.version },
   builds: {},
   pairs: [],

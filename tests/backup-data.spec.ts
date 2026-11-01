@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { readFile } from 'node:fs/promises';
 import { emptyDesign } from '../src/design/schema';
 import { DEFAULT_SETTINGS, mergeSettings } from '../src/storage/settings';
 import {
@@ -218,4 +219,47 @@ test('backup worker authenticates its live top-level page and refuses other exte
     expect(enqueued).toBe(false);
     expect(reply).toMatchObject({ ok: false, error: expect.stringContaining('専用ページ') });
   }
+});
+
+/*
+ * History: a real backup and real storage from the build that still had the retro theme
+ * (tests/fixtures/backups/provenance.json). They stay readable after the theme's settings are gone.
+ */
+/** The archive's JSON as written (its originals are decoded with the browser in legacy-data.spec.ts). */
+async function historyManifest(): Promise<unknown> {
+  const bytes = await readFile('tests/fixtures/backups/pre-removal.wwbackup'),
+    length = new DataView(bytes.buffer, bytes.byteOffset).getUint32(BACKUP_HEADER_BYTES - 36, true);
+  return JSON.parse(new TextDecoder().decode(bytes.subarray(BACKUP_HEADER_BYTES, BACKUP_HEADER_BYTES + length)));
+}
+const historyStorage = async () =>
+  JSON.parse(await readFile('tests/fixtures/backups/pre-removal-storage.json', 'utf8')) as Record<string, unknown>;
+
+test('a backup made with the retro theme still parses, restores its artwork and keeps the switch and 制作モード', async () => {
+  const manifest = parseBackupManifest(await historyManifest()),
+    storage = await historyStorage();
+  expect(manifest.designs).toEqual([storage['webWorldThemes.design.youtube']]);
+  expect(manifest.designs[0]!.baseThemeId).toBe('retro');
+  expect(manifest.settings).toMatchObject({ enabled: true, creatorMode: true });
+  for (const applySettings of [false, true]) {
+    const { values } = planRestore({ manifest, assets: [] }, {}, [], [], applySettings);
+    expect(values['webWorldThemes.design.youtube']).toEqual(storage['webWorldThemes.design.youtube']);
+    if (applySettings)
+      expect(values).toMatchObject({ 'webWorldThemes.enabled': true, 'webWorldThemes.creatorMode': true });
+    else expect(Object.keys(values)).toEqual(['webWorldThemes.design.youtube']);
+  }
+});
+
+test('the retro settings in an old backup are still checked: an invalid value refuses the whole backup', async () => {
+  const valid = parseBackupManifest(await historyManifest());
+  for (const settings of [
+    { ...valid.settings, strength: 101 },
+    { ...valid.settings, noiseStrength: 0.5 },
+    { ...valid.settings, palette: { ...valid.settings.palette, hue: 361 } },
+    { ...valid.settings, palette: { ...valid.settings.palette, glow: 1 } },
+    { ...valid.settings, features: { ...valid.settings.features, 'window-chrome': 'yes' } },
+    { ...valid.settings, features: { ...valid.settings.features, 'unknown-option': true } },
+  ]) {
+    expect(() => parseBackupManifest({ ...valid, settings }), JSON.stringify(settings)).toThrow(/バックアップ/);
+  }
+  expect(() => parseBackupManifest(valid)).not.toThrow();
 });

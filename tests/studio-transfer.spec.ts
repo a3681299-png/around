@@ -16,7 +16,7 @@ import {
 
 async function openStudio(context: BrowserContext, popup: Page, youtube: Page) {
   await popup.getByRole('switch', { name: 'テーマを使う' }).check();
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+  await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   await youtube.bringToFront();
   const opened = context.waitForEvent('page');
   await popup.locator('#creator-editor-window').evaluate((button: HTMLButtonElement) => button.click());

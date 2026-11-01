@@ -102,7 +102,7 @@ test('opt-in remaining scenarios: page reload, sequential different models and c
     for (let n = 0; n < 5; n++) {
       const start = performance.now();
       await lab.page.reload({ waitUntil: 'domcontentloaded' });
-      await expect(lab.page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+      await expect(lab.page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
       await lab.page
         .locator('video')
         .first()
@@ -175,7 +175,7 @@ test('opt-in actual playing YouTube dropped-frame deltas versus idle and loading
   try {
     const resetVideo = async (ids = [lab.asset.id]) => {
       await lab.page.reload({ waitUntil: 'domcontentloaded' });
-      await expect(lab.page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+      await expect(lab.page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
       const { session } = await lab.control.evaluate(({ ids, tab }) => (globalThis as any).wwAssetLab.open(ids, tab), {
         ids,
         tab: lab.tab,

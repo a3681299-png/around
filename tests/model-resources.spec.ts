@@ -12,7 +12,7 @@ test('8 rigged models share one context/assets, respect surface budgets and susp
 }) => {
   test.setTimeout(60000);
   await popup.getByRole('switch', { name: 'テーマを使う' }).check();
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+  await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await panel.locator('.file').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await expect(youtube.locator(`${overlay} img`)).toBeVisible();
@@ -90,7 +90,7 @@ test('real WebGL loss recreates a context, deletion releases resources and Undo 
   youtube,
 }) => {
   await popup.getByRole('switch', { name: 'テーマを使う' }).check();
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+  await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await panel.locator('.file').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await expect(youtube.locator(`${overlay} img`)).toBeVisible();

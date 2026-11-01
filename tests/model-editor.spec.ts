@@ -12,7 +12,7 @@ test('GLB renders alpha, shares resources, edits/drags/duplicates/undoes, saves 
   context,
 }) => {
   await popup.getByRole('switch', { name: 'テーマを使う' }).check();
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+  await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
   await panel
@@ -86,7 +86,7 @@ test('arbitrary clips animate pixels, pause, crossfade, change speed and preserv
   youtube,
 }) => {
   await popup.getByRole('switch', { name: 'テーマを使う' }).check();
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+  await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
   await panel
@@ -135,7 +135,7 @@ test('selected head bone adds a bounded look to the paused animated pose and OFF
   youtube,
 }) => {
   await popup.getByRole('switch', { name: 'テーマを使う' }).check();
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+  await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
   await panel
@@ -162,7 +162,7 @@ test('selected head bone adds a bounded look to the paused animated pose and OFF
 
 test('optional glTF node names are not required for cloned rig animation', async ({ popup, youtube }) => {
   await popup.getByRole('switch', { name: 'テーマを使う' }).check();
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+  await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await panel.locator('.model-file').setInputFiles({
     name: 'Unnamed.glb',

@@ -3,7 +3,7 @@ import { PROBE_EDITOR_TARGET } from '../src/editor/messages';
 
 test('content messages ignore array types and still accept a string command', async ({ popup, youtube }) => {
   await popup.getByRole('switch', { name: 'テーマを使う' }).check();
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+  await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   await youtube.bringToFront();
   const tabId = await popup.evaluate(
     async () => (await chrome.tabs.query({ active: true, currentWindow: true }))[0]!.id!,

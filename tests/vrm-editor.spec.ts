@@ -14,7 +14,7 @@ test('VRM1 renders MToon with alpha, follows the pointer, edits expressions and 
   await mkdir(path.dirname(file), { recursive: true });
   await writeFile(file, vrmFixture());
   await popup.getByRole('switch', { name: 'テーマを使う' }).check();
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+  await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
   await panel.locator('.model-file').setInputFiles(file);
@@ -164,7 +164,7 @@ for (const large of [false, true])
     await mkdir(path.dirname(file), { recursive: true });
     await writeFile(file, bytes);
     await popup.getByRole('switch', { name: 'テーマを使う' }).check();
-    await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+    await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
     await youtube.bringToFront();
     const opened = context.waitForEvent('page');
     await popup.locator('#creator-editor-window').evaluate((b: HTMLButtonElement) => b.click());

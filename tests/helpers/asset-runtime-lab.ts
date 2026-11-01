@@ -63,7 +63,7 @@ export async function openAssetLab(live = false, file?: string) {
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30000 });
     await popup.getByRole('switch', { name: 'テーマを使う' }).check();
     await page.bringToFront();
-    await expect(page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+    await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
     const tab = await control.evaluate(
       async () => (await chrome.tabs.query({ active: true, lastFocusedWindow: true }))[0]!.id!,
     );

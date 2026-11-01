@@ -43,7 +43,7 @@ test('real YouTube: private local VRM import, MToon, pointer gaze, Studio transf
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 25000 });
     await popup.getByRole('switch', { name: 'テーマを使う' }).check();
     await page.bringToFront();
-    await expect(page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+    await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
     await openSidePanelFromIcon(popup, page);
     const panel = await sidePanelDriver(context, page, id);
     stage('import private avatar');

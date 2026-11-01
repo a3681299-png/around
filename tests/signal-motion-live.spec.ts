@@ -43,7 +43,7 @@ test('real YouTube: official Studio configures GIF pursuit, records/replays/load
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 25_000 });
     await popup.getByRole('switch', { name: 'テーマを使う' }).check();
     await page.bringToFront();
-    await expect(page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+    await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
     await openSidePanelFromIcon(popup, page);
     const local = page.locator('#web-world-themes-creator');
     const panel = await sidePanelDriver(context, page, id),

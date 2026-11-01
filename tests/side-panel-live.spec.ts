@@ -38,7 +38,7 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
     );
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 25_000 });
     await popup.getByRole('switch', { name: 'テーマを使う' }).check();
-    await expect(page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+    await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
     await page.bringToFront();
     await openSidePanelFromIcon(popup, page);
     const local = page.locator('#web-world-themes-creator');

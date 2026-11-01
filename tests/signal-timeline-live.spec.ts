@@ -43,7 +43,7 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 25_000 });
     await popup.getByRole('switch', { name: 'テーマを使う' }).check();
     await page.bringToFront();
-    await expect(page.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+    await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
     stage('open Studio');
     await openSidePanelFromIcon(popup, page);
     const local = page.locator('#web-world-themes-creator');

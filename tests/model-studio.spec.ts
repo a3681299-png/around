@@ -12,7 +12,7 @@ test('standalone Studio configures model pursuit and clips, records/seeks poses,
 }) => {
   test.setTimeout(60000);
   await popup.getByRole('switch', { name: 'テーマを使う' }).check();
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-theme', 'retro');
+  await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   await youtube.bringToFront();
   const opened = context.waitForEvent('page');
   await popup.locator('#creator-editor-window').evaluate((b: HTMLButtonElement) => b.click());

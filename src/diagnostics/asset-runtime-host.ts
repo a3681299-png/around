@@ -193,7 +193,8 @@ export function installAssetRuntimeHost(doc: Document) {
     }
   }
   const observer = new MutationObserver(() => {
-    if (!doc.documentElement.hasAttribute('data-ww-theme')) destroy();
+    // The site mark is present only while artwork is shown (not OFF, emergency OFF or zero).
+    if (!doc.documentElement.hasAttribute('data-ww-site')) destroy();
   });
   function destroy() {
     observer.disconnect();
@@ -217,7 +218,7 @@ export function installAssetRuntimeHost(doc: Document) {
         session = secret;
         await worker({ action: 'attach' });
         await connect();
-        observer.observe(doc.documentElement, { attributes: true, attributeFilter: ['data-ww-theme'] });
+        observer.observe(doc.documentElement, { attributes: true, attributeFilter: ['data-ww-site'] });
         return { generation };
       },
       show,
