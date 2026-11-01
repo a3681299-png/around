@@ -75,6 +75,16 @@ test('UI0-d header and real emergency accelerator stop skins, page marks and the
       await expect.poll(painted).toMatch(/^url\("blob:/);
       await expect(page.locator('html')).toHaveAttribute('data-ww-editing', '');
     }
+    await panel.click('[data-tool="card"]');
+    await card.click();
+    await expect(card).toHaveAttribute('data-ww-editor-selected', '');
+    await expect(page.locator('#web-world-themes-selection-mark')).toBeVisible();
+    await panel.evaluate('document.querySelector(".ww-editor-safety > .emergency-off").click()');
+    await expect(page.locator('#web-world-themes-page-marks')).toHaveCount(0);
+    await expect.poll(() => nativeCard.getAttribute('data-ww-editor-selected')).toBe(null);
+    await panel.evaluate('document.querySelector(".emergency-resume").click()');
+    await expect(card).toHaveAttribute('data-ww-editor-selected', '');
+    await expect(page.locator('#web-world-themes-selection-mark')).toBeVisible();
   } finally {
     await context.close();
   }

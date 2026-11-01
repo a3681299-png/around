@@ -190,6 +190,7 @@ export function createCreatorEditor(
       selectionStyle.textContent = SELECTION_CSS + '\n' + picker.css();
       (doc.head ?? doc.documentElement).append(selectionStyle);
       doc.documentElement.setAttribute('data-ww-editing', '');
+      selectedElement?.setAttribute('data-ww-editor-selected', '');
       PICK_EVENTS.forEach((name) => doc.addEventListener(name, onPick, true));
       doc.addEventListener('keydown', onKeyDown, true);
       doc.addEventListener('keyup', onKeyUp, true);
@@ -204,7 +205,11 @@ export function createCreatorEditor(
       doc.removeEventListener('drop', onDrop, true);
       doc.removeEventListener('fullscreenchange', onFullscreen);
       consumedKeys.clear();
-      removeSelection();
+      if (marksSuspended && editing()) {
+        // The suspended page takes no input, but resume must frame the same selected part.
+        selectedElement?.removeAttribute('data-ww-editor-selected');
+        follow(undefined);
+      } else removeSelection();
       selectionStyle?.remove();
       selectionStyle = undefined;
       doc.documentElement.removeAttribute('data-ww-editing');
@@ -250,8 +255,8 @@ export function createCreatorEditor(
       remoteOwner = undefined;
       remoteSurface = undefined;
     }
-    if (!state.selectedTarget) removeSelection();
     const active = editing();
+    if (!state.selectedTarget || !active || !selectedElement?.isConnected) removeSelection();
     // Emergency OFF keeps the draft and Undo, but releases the page's input as well as its paint.
     bind(active && !marksSuspended);
     const skinning = skinTool() && !fullscreen();
