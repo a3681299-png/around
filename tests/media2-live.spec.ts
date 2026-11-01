@@ -41,7 +41,7 @@ test('optional real YouTube: saved group, mask, anchors, signals, theater, fulls
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto('https://www.youtube.com/watch?v=AS4q9yaWJkI', { waitUntil: 'domcontentloaded', timeout: 30_000 });
     await expect(page.locator('#movie_player video').first()).toBeAttached({ timeout: 20_000 });
-    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+    await popup.getByRole('switch', { name: '作品を表示する' }).check();
     await page.bringToFront();
     await expect(page.locator('[data-ww-surface~="player-window"]')).toBeVisible();
     // UI0-d round 3: the editor window (as a tab); the checks stay on the YouTube page.
@@ -161,7 +161,7 @@ test('optional real YouTube: saved group, mask, anchors, signals, theater, fulls
       await expect(page.locator(`${presentation} .media video`)).toHaveJSProperty('paused', false);
     });
     await check('OFF removes artwork and editing handles', async () => {
-      await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+      await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
       await expect(page.locator(presentation)).toHaveCount(0);
     });
     await mkdir('.work/verification', { recursive: true });

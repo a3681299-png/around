@@ -13,7 +13,7 @@ const key = 'webWorldThemes.design.youtube',
   overlay = '#web-world-themes-decorations';
 const layers = `${overlay} [data-image-id]`;
 async function open(popup: Page, page: Page) {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   return (await openEditor(popup, page)).panel;
 }
@@ -219,7 +219,7 @@ test('animation thumbnails are static and independent of playback; error feedbac
   const help = await openHelp(panel);
   await help.getByRole('button', { name: 'ヘルプを閉じる', exact: true }).click();
   await expect(panel.locator('.status')).toHaveAttribute('data-error', 'true');
-  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+  await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
   await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-editing', /.*/);
   await expect(youtube.locator(overlay)).toHaveCount(0);
 });

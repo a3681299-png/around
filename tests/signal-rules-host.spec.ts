@@ -86,6 +86,6 @@ test('saved page progress rules drive DOM opacity in both directions and restore
     document.body.style.minHeight = '6000px';
   });
   await go(0.25);
-  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+  await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
   await expect(youtube.locator(overlay)).toHaveCount(0);
 });

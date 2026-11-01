@@ -11,7 +11,7 @@ test('standalone Studio configures model pursuit and clips, records/seeks poses,
   youtube,
 }) => {
   test.setTimeout(60000);
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   await youtube.bringToFront();
   const opened = context.waitForEvent('page');

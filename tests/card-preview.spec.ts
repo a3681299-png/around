@@ -39,7 +39,7 @@ async function overlay(youtube: Page, tag: 'ytd-video-preview' | 'tp-yt-iron-dro
 const clicks = (youtube: Page) => youtube.locator('#g111-layer').evaluate((node: HTMLElement) => node.dataset.clicks);
 
 async function start(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   await expect(youtube.locator(cards).first()).toBeVisible();
   return openEditor(popup, youtube);
 }

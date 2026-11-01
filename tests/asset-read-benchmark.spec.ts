@@ -114,7 +114,7 @@ test('opt-in saved-source benchmark on real YouTube: reload and same-tab redispl
       }));
       return parseDesign(doc);
     };
-    await control.evaluate(async () => chrome.storage.local.set({ 'webWorldThemes.enabled': true }));
+    await control.evaluate(async () => chrome.storage.local.set({ 'webWorldThemes.showArtwork': true }));
     const page = await context.newPage();
     await page.addInitScript(() => {
       (globalThis as any).__c3Paints = [];

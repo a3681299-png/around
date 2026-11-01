@@ -237,7 +237,7 @@ test('ending a display during the original read revokes the capability and canno
   await dialog.locator('.model-file').setInputFiles({ name: 'test.vrm', mimeType: '', buffer: vrmFixture() });
   const storage = await frame(context);
   await expect.poll(() => storage.evaluate(() => (globalThis as any).__readEntered)).toBe(true);
-  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+  await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
   await expect(youtube.locator('.model-media')).toHaveCount(0);
   await expect
     .poll(async () =>

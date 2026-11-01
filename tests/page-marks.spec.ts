@@ -9,8 +9,7 @@ const host = '#web-world-themes-page-marks';
 const COBALT = 'rgb(43, 81, 184)';
 
 async function enable(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
-  await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   await expect(youtube.locator(cards).first()).toBeVisible();
 }
 async function openEditor(popup: Page, youtube: Page) {
@@ -313,7 +312,7 @@ test('protection overlays are the vermilion 45° hatch with a mono label, and em
   context,
   extensionId,
 }) => {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   const studio = await context.newPage();
   await studio.goto(`chrome-extension://${extensionId}/studio/index.html`);
   await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');

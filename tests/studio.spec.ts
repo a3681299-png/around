@@ -16,7 +16,7 @@ const overlay = '#web-world-themes-decorations',
   images = `${presentation} [data-image-id]`,
   key = 'webWorldThemes.design.youtube';
 async function launch(context: BrowserContext, popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   await youtube.bringToFront();
   const opened = context.waitForEvent('page');
@@ -167,7 +167,7 @@ test('standalone Studio edits a real extension target using shared grouping, eff
   await expect(panel.locator('[data-kind="group"]')).toHaveCount(0);
   await panel.getByRole('button', { name: '変更を破棄', exact: true }).click();
   await expect(panel.locator('[data-kind="group"]')).toHaveCount(1);
-  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+  await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
   await expect(youtube.locator(overlay)).toHaveCount(0);
   await expect(badge).toHaveCount(0);
   await expect(panel.getByRole('button', { name: '保存', exact: true })).toBeDisabled();
@@ -368,7 +368,7 @@ test('animation playback, groups, player anchors, SPA, scrolling and strength ze
   await youtube.reload();
   await expect(youtube.locator(images)).toHaveCount(3);
   await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
-  await popup.locator('#effect-strength').fill('0');
+  await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
   await expect(youtube.locator(overlay)).toHaveCount(0);
   await expect(youtube.locator('[data-ww-editing]')).toHaveCount(0);
 });
@@ -379,7 +379,7 @@ test('the authenticated Port rejects stale revisions and unrecognized commands w
   youtube,
   extensionId,
 }) => {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   // A Studio extension document supplies the real MV3 sender origin; no page-script bridge exists.
   const control = await context.newPage();

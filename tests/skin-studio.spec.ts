@@ -11,8 +11,7 @@ const cards = '[data-ww-surface~="video-card"]';
 const key = 'webWorldThemes.design.youtube';
 
 async function enable(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
-  await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   await expect(youtube.locator(cards).first()).toBeVisible();
 }
 /** A 48×48 frame: corners, edges and centre in three colours, so slices show in pixels. */

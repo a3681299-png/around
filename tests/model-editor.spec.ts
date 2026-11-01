@@ -11,7 +11,7 @@ test('GLB renders alpha, shares resources, edits/drags/duplicates/undoes, saves 
   youtube,
   context,
 }) => {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
@@ -76,7 +76,7 @@ test('GLB renders alpha, shares resources, edits/drags/duplicates/undoes, saves 
       .first()
       .evaluate((e) => getComputedStyle(e).pointerEvents),
   ).toBe('none');
-  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+  await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
   await expect(youtube.locator(overlay)).toHaveCount(0);
   expect(context.serviceWorkers().length).toBeGreaterThan(0);
 });
@@ -85,7 +85,7 @@ test('arbitrary clips animate pixels, pause, crossfade, change speed and preserv
   popup,
   youtube,
 }) => {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
@@ -134,7 +134,7 @@ test('selected head bone adds a bounded look to the paused animated pose and OFF
   popup,
   youtube,
 }) => {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
@@ -161,7 +161,7 @@ test('selected head bone adds a bounded look to the paused animated pose and OFF
 });
 
 test('optional glTF node names are not required for cloned rig animation', async ({ popup, youtube }) => {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await panel.locator('.model-file').setInputFiles({

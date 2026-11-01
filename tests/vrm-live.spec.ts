@@ -41,7 +41,7 @@ test('real YouTube: private local VRM import, MToon, pointer gaze, Studio transf
     const page = await context.newPage();
     await page.goto('https://www.youtube.com/watch?v=LC1a-DwUhls', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 25000 });
-    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+    await popup.getByRole('switch', { name: '作品を表示する' }).check();
     await page.bringToFront();
     await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
     await openSidePanelFromIcon(popup, page);
@@ -222,7 +222,7 @@ test('real YouTube: private local VRM import, MToon, pointer gaze, Studio transf
     await expect(media).toBeVisible();
     expect(await page.evaluate(() => (globalThis as { vrmDocumentToken?: number }).vrmDocumentToken)).toBe(31);
     report.checks.spaDocumentPreserved = true;
-    await popup.locator('#effect-strength').fill('0');
+    await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
     await expect(
       page.locator(
         ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',

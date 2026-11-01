@@ -29,7 +29,7 @@ async function setup() {
   await popup.goto('chrome-extension://' + id + '/popup/index.html');
   const page = await context.newPage();
   await page.goto('https://www.youtube.com/watch?v=fixture');
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   await expect(popup.locator('#creator-editor-direct')).toBeEnabled();
   await page.bringToFront();
@@ -90,7 +90,7 @@ test('OFF opens the real action settings; its top button opens the editor and se
     const opened = context.waitForEvent('page');
     await panel.click('.display-settings');
     const settings = await opened;
-    await expect(settings.getByRole('switch', { name: 'テーマを使う' })).toBeChecked();
+    await expect(settings.getByRole('switch', { name: '作品を表示する' })).toBeChecked();
     await expect(settings.locator('#creator-editor-direct')).toBeEnabled();
     await settings.screenshot({ path: info.outputPath('display-settings.png') });
     // Return directly to the same target and its existing draft.
@@ -142,7 +142,7 @@ test('settings starts clear of the player, remembers a dragged position, and rem
     const icon = page.getByRole('button', { name: 'Web World Themes の設定', exact: true });
     const panel = page.getByRole('dialog', { name: 'Web World Themes の設定' });
     for (const enabled of [false, true]) {
-      await popup.getByRole('switch', { name: 'テーマを使う' }).setChecked(enabled);
+      await popup.getByRole('switch', { name: '作品を表示する' }).setChecked(enabled);
       await expect.poll(() => page.locator('html').getAttribute('data-ww-site')).toBe(enabled ? 'youtube' : null);
       for (const [width, height] of [
         [1920, 1080],
@@ -190,7 +190,7 @@ test('settings starts clear of the player, remembers a dragged position, and rem
     await page.getByRole('button', { name: 'Fullscreen', exact: true }).click();
     await icon.click();
     await expect(panel).toBeVisible();
-    await expect(panel.getByRole('slider', { name: 'エフェクトの強さ' })).toBeEnabled();
+    await expect(panel.getByRole('switch', { name: '作品を表示する' })).toBeEnabled();
   } finally {
     await context.close();
   }

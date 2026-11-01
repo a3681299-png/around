@@ -173,8 +173,8 @@ export function createCreatorPanel(
   const displaySettings = doc.createElement('button');
   displaySettings.type = 'button';
   displaySettings.className = 'display-settings';
-  displaySettings.textContent = '表示設定';
-  displaySettings.title = 'テーマのON/OFFと強さを開く';
+  displaySettings.textContent = '設定';
+  displaySettings.title = '作品の表示のON/OFFと緊急OFFを開く';
   displaySettings.hidden = !options.onSettings;
   displaySettings.addEventListener('click', () => options.onSettings?.());
   main.querySelector('header')!.append(displaySettings);

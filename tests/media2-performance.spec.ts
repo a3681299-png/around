@@ -19,7 +19,7 @@ const cases = [
 
 for (const [index, scenario] of cases.entries())
   test(`media benchmark: ${scenario.name}`, async ({ popup, youtube, context }, info) => {
-    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+    await popup.getByRole('switch', { name: '作品を表示する' }).check();
     await youtube.bringToFront();
     await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
     const { panel } = await openEditor(popup, youtube);

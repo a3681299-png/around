@@ -31,10 +31,15 @@ function manifest(): BackupManifest {
 
 test('older backups fill missing settings with defaults while rejecting unknown or invalid supplied values', () => {
   expect(parseBackupSettings({})).toEqual(DEFAULT_SETTINGS);
-  expect(parseBackupSettings({ enabled: true, features: {}, palette: { hue: 25 } })).toEqual({
+  // The retro theme's items are checked, then dropped.
+  expect(parseBackupSettings({ enabled: true, strength: 40, features: {}, palette: { hue: 25 } })).toEqual({
     ...DEFAULT_SETTINGS,
     enabled: true,
-    palette: { ...DEFAULT_SETTINGS.palette, hue: 25 },
+  });
+  // The strength slider at 0% was OFF: such a backup restores OFF.
+  expect(parseBackupSettings({ enabled: true, creatorMode: true, strength: 0 })).toEqual({
+    creatorMode: true,
+    enabled: false,
   });
   for (const settings of [
     { enabled: undefined },
@@ -239,25 +244,30 @@ test('a backup made with the retro theme still parses, restores its artwork and 
     storage = await historyStorage();
   expect(manifest.designs).toEqual([storage['webWorldThemes.design.youtube']]);
   expect(manifest.designs[0]!.baseThemeId).toBe('retro');
-  expect(manifest.settings).toMatchObject({ enabled: true, creatorMode: true });
+  expect(manifest.settings).toEqual({ enabled: true, creatorMode: true });
   for (const applySettings of [false, true]) {
     const { values } = planRestore({ manifest, assets: [] }, {}, [], [], applySettings);
     expect(values['webWorldThemes.design.youtube']).toEqual(storage['webWorldThemes.design.youtube']);
+    // The switch is restored as 作品を表示する; the retro items are not written back.
     if (applySettings)
-      expect(values).toMatchObject({ 'webWorldThemes.enabled': true, 'webWorldThemes.creatorMode': true });
+      expect(values).toEqual({
+        'webWorldThemes.design.youtube': storage['webWorldThemes.design.youtube'],
+        'webWorldThemes.showArtwork': true,
+        'webWorldThemes.creatorMode': true,
+      });
     else expect(Object.keys(values)).toEqual(['webWorldThemes.design.youtube']);
   }
 });
 
 test('the retro settings in an old backup are still checked: an invalid value refuses the whole backup', async () => {
-  const valid = parseBackupManifest(await historyManifest());
+  const valid = (await historyManifest()) as { settings: Record<string, Record<string, unknown>> };
   for (const settings of [
     { ...valid.settings, strength: 101 },
     { ...valid.settings, noiseStrength: 0.5 },
-    { ...valid.settings, palette: { ...valid.settings.palette, hue: 361 } },
-    { ...valid.settings, palette: { ...valid.settings.palette, glow: 1 } },
-    { ...valid.settings, features: { ...valid.settings.features, 'window-chrome': 'yes' } },
-    { ...valid.settings, features: { ...valid.settings.features, 'unknown-option': true } },
+    { ...valid.settings, palette: { ...valid.settings['palette'], hue: 361 } },
+    { ...valid.settings, palette: { ...valid.settings['palette'], glow: 1 } },
+    { ...valid.settings, features: { ...valid.settings['features'], 'window-chrome': 'yes' } },
+    { ...valid.settings, features: { ...valid.settings['features'], 'unknown-option': true } },
   ]) {
     expect(() => parseBackupManifest({ ...valid, settings }), JSON.stringify(settings)).toThrow(/バックアップ/);
   }

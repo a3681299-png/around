@@ -55,7 +55,6 @@ export function createPageController(
       guardWanted({
         suspended,
         enabled: Boolean(current?.enabled),
-        strength: current?.strength ?? 0,
         layers: design?.decorations.length ?? 0,
         editing,
       }),
@@ -63,6 +62,8 @@ export function createPageController(
   let disconnect: (() => void) | undefined;
   let current: UserSettings | undefined;
   let design: DesignDocument | undefined;
+  /** 作品を表示する is ON and 緊急OFF is not holding the page. */
+  const shown = () => !suspended && Boolean(current?.enabled);
 
   const deactivate = () => {
     safety?.setActive(false);
@@ -74,7 +75,7 @@ export function createPageController(
 
   const followPage = (change?: SitePageChange, marked?: readonly Element[]) => {
     WW_TEST_PAGE_CHANGE: if (legacyPageChange()) return render();
-    if (suspended || !current?.enabled || current.strength === 0) return;
+    if (!shown()) return;
     designRenderer.refresh(change, marked);
     images.refresh();
     // Text can alter geometry too; active editors compare their anchor snapshot.
@@ -82,7 +83,7 @@ export function createPageController(
   };
 
   const render = () => {
-    if (suspended || !current?.enabled || current.strength === 0) return;
+    if (!shown()) return;
     inspect();
     syncParts();
     designRenderer.update(design);
@@ -132,7 +133,7 @@ export function createPageController(
       if (value === suspended) return;
       suspended = value;
       if (value) deactivate();
-      else if (current?.enabled && current.strength > 0) {
+      else if (current?.enabled) {
         connect();
         render();
       }
@@ -140,7 +141,7 @@ export function createPageController(
     timeline,
     update(settings) {
       current = settings;
-      if (suspended || !settings.enabled || settings.strength === 0) {
+      if (!shown()) {
         deactivate();
         return;
       }
@@ -158,11 +159,11 @@ export function createPageController(
       // The skin tool lists and highlights every part, used or not.
       if (picking === enabled) return;
       picking = enabled;
-      if (!suspended && current?.enabled && current.strength > 0) syncParts();
+      if (shown()) syncParts();
     },
     setImageEditing(next) {
       editing = Boolean(next);
-      if (!suspended && current?.enabled && current.strength > 0) inspect();
+      if (shown()) inspect();
       images.edit(next);
     },
     validateDesign(input) {

@@ -9,8 +9,7 @@ const key = 'webWorldThemes.design.youtube';
 let editor: Locator | undefined;
 
 async function enable(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
-  await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   await expect(youtube.locator(cards).first()).toBeVisible();
 }
 
@@ -139,7 +138,7 @@ test('pick a card, preview all properties locally, save across tabs, discard, re
   await expect(youtube).toHaveURL(/\/watch\?v=fixture/);
 });
 
-test('theme OFF and zero remove editing UI, selection, styles, variables and surfaces, then restore the saved design on ON', async ({
+test('OFF and 緊急OFF remove editing UI, selection, styles, variables and surfaces; ON restores the saved design and 描画を再開 the unsaved one', async ({
   popup,
   youtube,
 }) => {
@@ -155,10 +154,10 @@ test('theme OFF and zero remove editing UI, selection, styles, variables and sur
   await selectCard(youtube);
   await background(dialog, '#eeddff');
   await save(dialog);
-  for (const boundary of ['off', 'zero'] as const) {
+  for (const boundary of ['off', 'emergency'] as const) {
     await background(dialog, '#ffddaa');
-    if (boundary === 'off') await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
-    else await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('Home');
+    if (boundary === 'off') await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
+    else await popup.getByRole('button', { name: '緊急OFF', exact: true }).click();
     await expect(
       youtube.locator(
         '[data-ww-surface], [data-ww-editor-selected], #web-world-themes-creator, #web-world-themes-design-style, #web-world-themes-selection-style, #web-world-themes-style',
@@ -177,11 +176,17 @@ test('theme OFF and zero remove editing UI, selection, styles, variables and sur
         })),
     ).toEqual(nativeCard);
     await expect(youtube.locator('ytd-thumbnail #thumbnail').first()).toHaveCSS('border-radius', '16px');
-    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
-    await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
-    await expect(youtube.locator(cards).first()).toHaveCSS('background-color', 'rgb(238, 221, 255)');
-    dialog = await openEditor(popup, youtube);
-    await selectCard(youtube);
+    if (boundary === 'off') {
+      await popup.getByRole('switch', { name: '作品を表示する' }).check();
+      await expect(youtube.locator(cards).first()).toHaveCSS('background-color', 'rgb(238, 221, 255)');
+      dialog = await openEditor(popup, youtube);
+      await selectCard(youtube);
+    } else {
+      // 緊急OFF keeps the unsaved edit and its Undo until 描画を再開 (docs/operation-safety.md).
+      await popup.getByRole('button', { name: '描画を再開', exact: true }).click();
+      await expect(youtube.locator(cards).first()).toHaveCSS('background-color', 'rgb(255, 221, 170)');
+      await expect(dialog.locator('.dirty')).toHaveText('未保存');
+    }
   }
 });
 
@@ -362,7 +367,7 @@ for (const baseThemeId of [null, 'retro'] as const) {
         return design.baseThemeId;
       }, key),
     ).toBe(baseThemeId);
-    await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+    await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
     await expect(
       youtube.locator('[data-ww-surface], #web-world-themes-design-style, #web-world-themes-creator'),
     ).toHaveCount(0);

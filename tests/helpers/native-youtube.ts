@@ -205,15 +205,6 @@ export async function installNativeYouTube(page: Page, dark: boolean, options: {
   });
 }
 
-export async function setNativeTheme(popup: Page, enabled: boolean, strength: number) {
-  await popup.evaluate(
-    async ({ enabled, strength }) => {
-      await chrome.storage.local.set({ 'webWorldThemes.enabled': enabled, 'webWorldThemes.strength': strength });
-    },
-    { enabled, strength },
-  );
-}
-
 /** Decode only through the browser's own canvas; no new image dependency or network. */
 export async function pixels(page: Page, png: Buffer, points: Array<{ x: number; y: number }>) {
   return page.evaluate(

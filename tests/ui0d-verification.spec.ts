@@ -10,7 +10,7 @@ import { sidePanelDriver } from './helpers/side-panel';
 test('UI0-d in-video entry falls back to W when Chrome refuses S', async ({ popup, youtube }) => {
   const extensionContext = popup.context();
   await youtube.goto('https://www.youtube.com/watch?v=fixture');
-  await popup.getByRole('switch', { name: 'テーマを使う', exact: true }).check();
+  await popup.getByRole('switch', { name: '作品を表示する', exact: true }).check();
   await popup.getByRole('switch', { name: '制作モード', exact: true }).check();
   const worker = extensionContext.serviceWorkers()[0] ?? (await extensionContext.waitForEvent('serviceworker'));
   await worker.evaluate(() => {
@@ -34,7 +34,7 @@ test('UI0-d rejects forged skin channels, slots, bytes and another target sessio
   youtube,
   extensionId,
 }, info) => {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   const { studio, panel } = await openEditor(popup, youtube);
   await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await expect(youtube.locator('[data-image-id]')).toHaveCount(1);
@@ -151,7 +151,7 @@ test('UI0-d native panel Undo and Redo each act once across both focus locations
     await popup.goto(`chrome-extension://${id}/popup/index.html`);
     const page = await context.newPage();
     await page.goto('https://www.youtube.com/watch?v=fixture');
-    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+    await popup.getByRole('switch', { name: '作品を表示する' }).check();
     await page.bringToFront();
     const tab = await popup.evaluate(
       async () => (await chrome.tabs.query({ active: true, currentWindow: true }))[0]!.id!,

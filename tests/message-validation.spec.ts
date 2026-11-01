@@ -2,7 +2,7 @@ import { test, expect } from './fixtures';
 import { PROBE_EDITOR_TARGET } from '../src/editor/messages';
 
 test('content messages ignore array types and still accept a string command', async ({ popup, youtube }) => {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   await youtube.bringToFront();
   const tabId = await popup.evaluate(

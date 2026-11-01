@@ -22,7 +22,7 @@ async function setup() {
   await popup.goto(`chrome-extension://${id}/popup/index.html`);
   const page = await context.newPage();
   await page.goto('https://www.youtube.com/watch?v=fixture');
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   // UI0-d: `local` is where the retired in-page editors stood; nothing of the editor may appear there.
   return { context, page, popup, id, local: page.locator('#web-world-themes-creator') };
 }
@@ -215,7 +215,7 @@ test('side panel and standalone hand off unsaved Undo and asset leases, while ta
     await expect.poll(() => value('[data-image-prop="rotationDeg"]')).toBe('0');
     await next.click('.discard');
     await expect(page.locator('#web-world-themes-decorations [data-image-id]')).toHaveCount(0);
-    await popup.locator('#effect-strength').fill('0');
+    await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
     await expect(page.locator('[data-ww-editing]')).toHaveCount(0);
     await expect(local).toHaveCount(0);
     await expect(page.locator('#web-world-themes-decorations')).toHaveCount(0);
@@ -283,7 +283,7 @@ test('tab-specific panels isolate drafts and recovery; a closed panel leaves no 
     const reopened = await sidePanelDriver(context, secondPage, id, target);
     await expect.poll(() => reopened.text('.dirty')).toBe('未保存');
     await expect.poll(() => reopened.text('.layer-title')).toBe('次のタブ');
-    await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+    await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
     for (const targetPage of [page, secondPage]) {
       await expect(targetPage.locator('[data-ww-editing]')).toHaveCount(0);
       await expect(targetPage.locator('#web-world-themes-decorations')).toHaveCount(0);
@@ -703,7 +703,7 @@ test('timeline keeps layer controls reachable in narrow and wide native panels',
       await panel.click('.layer [data-action="lock"]');
     }
     await expect(local).not.toBeVisible();
-    await expect(popup.getByRole('switch', { name: 'テーマを使う' })).toBeChecked();
+    await expect(popup.getByRole('switch', { name: '作品を表示する' })).toBeChecked();
   } finally {
     await context.close();
   }
@@ -828,7 +828,7 @@ test('official panel records raw signals, plays/seeks without live input, and re
     await expect.poll(() => panel.text('.take-saved')).toBe('テイク保存済み');
     await expect.poll(() => panel.text('.take-source')).toBe('PREVIEW');
     await panel.click('.take-live');
-    await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+    await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
     await expect(page.locator('#web-world-themes-decorations')).toHaveCount(0);
   } finally {
     await context.close();

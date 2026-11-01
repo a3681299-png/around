@@ -41,7 +41,7 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
     const page = await context.newPage();
     await page.goto('https://www.youtube.com/watch?v=LC1a-DwUhls', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 25_000 });
-    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+    await popup.getByRole('switch', { name: '作品を表示する' }).check();
     await page.bringToFront();
     await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
     stage('open Studio');
@@ -192,7 +192,7 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
     await expect.poll(() => media.evaluate((node: HTMLElement) => Number(node.style.opacity))).toBeCloseTo(expected, 5);
     report.checks.savedRuleAndTakeReload = true;
     await panel.click('.take-live');
-    await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+    await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
     await expect(
       page.locator(
         ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',

@@ -2,13 +2,14 @@ import type { Page } from '@playwright/test';
 import { test, expect, launchExtension } from './fixtures';
 
 /*
- * The extension's own lifetime on the page: the ON/OFF switch, the strength, settings that survive,
- * other hosts left alone, the in-video settings icon and native YouTube left working. The page
- * shows only the artwork (the retro theme is gone, docs/theme-removal.md), so each check saves an
- * artwork that dresses the video cards.
+ * The extension's own lifetime on the page: 作品を表示する (ON for a new creator), settings that
+ * survive, other hosts left alone, the in-video settings icon and native YouTube left working. The
+ * page shows only the artwork (the retro theme is gone, docs/theme-removal.md), so each check saves
+ * an artwork that dresses the video cards. Tests that need the switch OFF first say so.
  */
 const artworkStyle = '#web-world-themes-design-style';
 const cards = '[data-ww-surface~="video-card"]';
+const show = { name: '作品を表示する' } as const;
 const artwork = {
   schemaVersion: 13,
   id: 'extension-artwork',
@@ -30,12 +31,39 @@ const nativeCard = (page: Page) =>
       radius: getComputedStyle(node).borderRadius,
     }));
 
+test('a new creator sees saved artwork at once: 作品を表示する starts ON and nothing has to be pressed', async ({
+  popup,
+  youtube,
+}) => {
+  await expect(popup.getByRole('switch', show)).toBeChecked();
+  await expect(popup.locator('#show-artwork-state')).toHaveText('ON');
+  await expect(popup.getByRole('switch', { name: '制作モード' })).not.toBeChecked();
+  // Shown with no artwork: the page is followed, and nothing is drawn.
+  await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+  await expect(youtube.locator(artworkStyle)).toHaveCount(0);
+  await storeArtwork(popup);
+  await expect(youtube.locator(cards).first()).toHaveCSS('background-color', dressed);
+  // Reading the defaults wrote no setting (the artwork's own caches are not settings).
+  expect(
+    await popup.evaluate(async () =>
+      Object.keys(
+        await chrome.storage.local.get([
+          'webWorldThemes.showArtwork',
+          'webWorldThemes.creatorMode',
+          'webWorldThemes.enabled',
+          'webWorldThemes.strength',
+        ]),
+      ),
+    ),
+  ).toEqual([]);
+});
+
 test('popup changes reach existing YouTube tabs and OFF restores native styles', async ({
   context,
   popup,
   youtube,
 }) => {
-  const toggle = popup.getByRole('switch', { name: 'テーマを使う' });
+  const toggle = popup.getByRole('switch', show);
   await expect(toggle).toBeEnabled();
   await toggle.uncheck();
   await storeArtwork(popup);
@@ -67,23 +95,21 @@ test('settings survive popup closure, page reload, and a browser restart', async
   profile,
 }) => {
   await storeArtwork(popup);
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
-  const slider = popup.getByRole('slider', { name: 'エフェクトの強さ' });
-  await slider.press('Home');
-  for (let step = 0; step < 37; step++) await slider.press('ArrowRight');
+  await popup.getByRole('switch', show).uncheck();
   await expect(popup.locator('#save-status')).toHaveText('保存しました。');
-  await expect(youtube.locator(cards).first()).toHaveCSS('background-color', dressed);
+  await expect(youtube.locator(artworkStyle)).toHaveCount(0);
   await popup.close();
   await youtube.reload();
-  await expect(youtube.locator(cards).first()).toHaveCSS('background-color', dressed);
+  await expect(youtube.locator('ytd-rich-grid-media').first()).toBeVisible();
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-site', 'youtube');
   await context.close();
 
   const restarted = await launchExtension(profile);
   try {
     const nextPopup = await restarted.newPage();
     await nextPopup.goto(`chrome-extension://${extensionId}/popup/index.html`);
-    await expect(nextPopup.getByRole('switch', { name: 'テーマを使う' })).toBeChecked();
-    await expect(nextPopup.getByRole('slider', { name: 'エフェクトの強さ' })).toHaveValue('37');
+    await expect(nextPopup.getByRole('switch', show)).not.toBeChecked();
+    await nextPopup.getByRole('switch', show).check();
     const nextPage = await restarted.newPage();
     await nextPage.goto('https://www.youtube.com/');
     await expect(nextPage.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
@@ -100,7 +126,7 @@ test('SPA replacement, lazy DOM insertion, changing IDs, and a removed artwork s
   const errors: string[] = [];
   youtube.on('pageerror', (error) => errors.push(error.message));
   await storeArtwork(popup);
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', show).check();
   await expect(youtube.locator(cards).first()).toHaveCSS('background-color', dressed);
   await youtube.getByRole('button', { name: 'SPA navigation' }).click();
   await expect(youtube).toHaveURL(/\/watch\?v=fixture$/);
@@ -128,19 +154,9 @@ test('SPA replacement, lazy DOM insertion, changing IDs, and a removed artwork s
   expect(errors).toEqual([]);
 });
 
-test('zero strength shows nothing, and the native dark mode is followed, never repainted', async ({
-  popup,
-  youtube,
-}) => {
-  const toggle = popup.getByRole('switch', { name: 'テーマを使う' });
-  const slider = popup.getByRole('slider', { name: 'エフェクトの強さ' });
+test('the native dark mode is followed, never repainted', async ({ popup, youtube }) => {
   await storeArtwork(popup);
-  await toggle.check();
-  await slider.press('Home');
-  await expect(toggle).toBeChecked();
-  await expect(youtube.locator(artworkStyle)).toHaveCount(0);
-  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-site', 'youtube');
-  await slider.press('End');
+  await popup.getByRole('switch', show).check();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-mode', 'light');
   await expect(youtube.locator('body')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
   await youtube.locator('html').evaluate((element) => element.setAttribute('dark', ''));
@@ -150,18 +166,23 @@ test('zero strength shows nothing, and the native dark mode is followed, never r
   await expect(youtube.locator(cards).first()).toHaveCSS('background-color', dressed);
 });
 
-test('invalid settings are normalized and other hosts / excluded YouTube pages stay untouched', async ({
+test('an invalid stored switch reads as the default without a write, and other hosts stay untouched', async ({
   context,
   popup,
   youtube,
 }) => {
-  await expect(popup.getByRole('switch', { name: 'テーマを使う' })).toBeEnabled();
   await storeArtwork(popup);
-  await popup.evaluate(async () => {
-    await chrome.storage.local.set({ 'webWorldThemes.enabled': true, 'webWorldThemes.strength': 999 });
-  });
-  await expect(popup.getByRole('slider', { name: 'エフェクトの強さ' })).toHaveValue('100');
+  await popup.evaluate(() => chrome.storage.local.set({ 'webWorldThemes.showArtwork': false }));
+  await expect(popup.getByRole('switch', show)).not.toBeChecked();
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-site', 'youtube');
+  await popup.evaluate(() => chrome.storage.local.set({ 'webWorldThemes.showArtwork': 'yes' }));
+  await expect(popup.getByRole('switch', show)).toBeChecked();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+  expect(
+    await popup.evaluate(
+      async () => (await chrome.storage.local.get('webWorldThemes.showArtwork'))['webWorldThemes.showArtwork'],
+    ),
+  ).toBe('yes');
   for (const url of [
     'https://example.com/',
     'https://www.youtube.com/embed/fixture',
@@ -174,18 +195,12 @@ test('invalid settings are normalized and other hosts / excluded YouTube pages s
     await expect(page.locator('html')).not.toHaveAttribute('data-ww-site', /.*/);
     await page.close();
   }
-  await popup.evaluate(async () => {
-    await chrome.storage.local.set({ 'webWorldThemes.enabled': 'yes', 'webWorldThemes.strength': 'invalid' });
-  });
-  await expect(popup.getByRole('switch', { name: 'テーマを使う' })).not.toBeChecked();
-  await expect(popup.getByRole('slider', { name: 'エフェクトの強さ' })).toHaveValue('60');
-  await expect(youtube.locator(artworkStyle)).toHaveCount(0);
 });
 
 test('a storage write failure shows an error and restores the saved popup state', async ({ popup, youtube }) => {
-  const toggle = popup.getByRole('switch', { name: 'テーマを使う' });
+  const toggle = popup.getByRole('switch', show);
   await expect(toggle).toBeEnabled();
-  await toggle.uncheck();
+  await expect(toggle).toBeChecked();
   // Fault injection only; all other tests use the actual extension storage APIs.
   await popup.evaluate(() => {
     chrome.storage.local.set = async () => {
@@ -194,8 +209,8 @@ test('a storage write failure shows an error and restores the saved popup state'
   });
   await toggle.click();
   await expect(popup.locator('#save-status')).toHaveText('保存できませんでした。もう一度操作してください。');
-  await expect(toggle).not.toBeChecked();
-  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-site', 'youtube');
+  await expect(toggle).toBeChecked();
+  await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
 });
 
 test('the first right-hand player icon opens shared settings even when the switch is OFF', async ({
@@ -203,7 +218,7 @@ test('the first right-hand player icon opens shared settings even when the switc
   popup,
   youtube,
 }) => {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+  await popup.getByRole('switch', show).uncheck();
   await youtube.goto('https://www.youtube.com/watch?v=fixture');
   const icon = youtube.getByRole('button', { name: 'Web World Themes の設定', exact: true });
   const panel = youtube.getByRole('dialog', { name: 'Web World Themes の設定' });
@@ -211,13 +226,11 @@ test('the first right-hand player icon opens shared settings even when the switc
   await expect(icon).toHaveCount(1);
   await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-site', 'youtube');
   await icon.click();
-  const toggle = panel.getByRole('switch', { name: 'テーマを使う' });
-  const slider = panel.getByRole('slider', { name: 'エフェクトの強さ' });
+  const toggle = panel.getByRole('switch', show);
   await expect(panel).not.toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
   await expect(panel).toHaveCSS('border-top-width', '1px');
   await expect(toggle).toBeEnabled();
   await expect(toggle).not.toBeChecked();
-  await expect(slider).toHaveValue('60');
 
   // Metadata and native control updates are not a navigation; keep editing open.
   await youtube.evaluate(() => {
@@ -234,23 +247,19 @@ test('the first right-hand player icon opens shared settings even when the switc
   const second = await context.newPage();
   await second.goto('https://www.youtube.com/results?search_query=fixture');
   await toggle.check();
-  await slider.press('Home');
-  for (let step = 0; step < 23; step++) await slider.press('ArrowRight');
   await expect(panel.locator('#save-status')).toHaveText('保存しました。');
-  await expect(popup.getByRole('switch', { name: 'テーマを使う' })).toBeChecked();
-  await expect(popup.getByRole('slider', { name: 'エフェクトの強さ' })).toHaveValue('23');
+  await expect(popup.getByRole('switch', show)).toBeChecked();
   await expect(second.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   await expect(youtube.locator('html')).not.toHaveAttribute('data-player-key-count', /.+/);
 
-  await slider.press('Escape');
+  await toggle.press('Escape');
   await expect(panel).not.toBeVisible();
   await expect(icon).toBeFocused();
   await icon.press('Enter');
-  await expect(slider).toHaveValue('23');
+  await expect(toggle).toBeChecked();
   await expect(youtube.locator('html')).not.toHaveAttribute('data-player-key-count', /.+/);
-  await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
-  await expect(slider).toHaveValue('100');
-  await toggle.uncheck();
+  await popup.getByRole('switch', show).uncheck();
+  await expect(toggle).not.toBeChecked();
   await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-site', 'youtube');
   await expect(icon).toBeVisible();
   await expect(panel).toBeVisible();
@@ -265,12 +274,13 @@ test('player replacement and control-bar rebuild keep one icon at the left edge;
   popup,
   youtube,
 }) => {
+  await popup.getByRole('switch', show).uncheck();
   await youtube.getByRole('button', { name: 'SPA navigation' }).click();
   const icon = youtube.getByRole('button', { name: 'Web World Themes の設定', exact: true });
   const panel = youtube.getByRole('dialog', { name: 'Web World Themes の設定' });
   await expect(icon).toHaveCount(1);
   await icon.click();
-  await expect(panel.getByRole('slider', { name: 'エフェクトの強さ' })).toBeEnabled();
+  await expect(panel.getByRole('switch', show)).toBeEnabled();
   await youtube.getByRole('button', { name: 'SPA navigation' }).click();
   await expect(panel).not.toBeVisible();
   await expect(icon).toHaveCount(1);
@@ -287,11 +297,10 @@ test('player replacement and control-bar rebuild keep one icon at the left edge;
   await expect.poll(() => youtube.evaluate(() => document.fullscreenElement?.id)).toBe('movie_player');
   await icon.click();
   await expect(panel).toBeVisible();
-  await panel.getByRole('switch', { name: 'テーマを使う' }).check();
-  await panel.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
-  await expect(popup.getByRole('slider', { name: 'エフェクトの強さ' })).toHaveValue('100');
+  await panel.getByRole('switch', show).check();
+  await expect(popup.getByRole('switch', show)).toBeChecked();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
-  await panel.getByRole('slider', { name: 'エフェクトの強さ' }).press('Escape');
+  await panel.getByRole('switch', show).press('Escape');
   await expect(panel).not.toBeVisible();
   await expect.poll(() => youtube.evaluate(() => document.fullscreenElement?.id)).toBe('movie_player');
   await youtube.evaluate(() => document.exitFullscreen());
@@ -299,12 +308,8 @@ test('player replacement and control-bar rebuild keep one icon at the left edge;
   await expect(youtube.locator('[data-ww-settings-button]')).toHaveCount(0);
 });
 
-test('repeated ON, OFF, and zero strength leave no stale surfaces, attributes or layout offsets', async ({
-  popup,
-  youtube,
-}) => {
-  const toggle = popup.getByRole('switch', { name: 'テーマを使う' });
-  const slider = popup.getByRole('slider', { name: 'エフェクトの強さ' });
+test('repeated ON and OFF leave no stale surfaces, attributes or layout offsets', async ({ popup, youtube }) => {
+  const toggle = popup.getByRole('switch', show);
   const root = youtube.locator('html');
   await toggle.uncheck();
   await storeArtwork(popup);
@@ -326,15 +331,9 @@ test('repeated ON, OFF, and zero strength leave no stale surfaces, attributes or
   };
   for (let cycle = 0; cycle < 3; cycle++) {
     await toggle.check();
-    await slider.press('End');
     await expect(youtube.locator(artworkStyle)).toHaveCount(1);
     // The artwork dresses parts in place; nothing of YouTube's moves.
     expect((await youtube.locator('ytd-masthead').boundingBox())!.height).toBe(nativeHeader!.height);
-    await slider.press('Home');
-    await expect(toggle).toBeChecked();
-    await assertNative();
-    await slider.press('End');
-    await expect(youtube.locator(artworkStyle)).toHaveCount(1);
     await toggle.uncheck();
     await assertNative();
   }
@@ -354,8 +353,7 @@ test('native search, history navigation, comment typing, and local video playbac
   const errors: string[] = [];
   youtube.on('pageerror', (error) => errors.push(error.message));
   await storeArtwork(popup);
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
-  await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
+  await popup.getByRole('switch', show).check();
   await expect(youtube.locator(artworkStyle)).toHaveCount(1);
   const search = youtube.getByRole('textbox', { name: 'Search', exact: true });
   await search.fill('海辺 ambient 2003');
@@ -374,7 +372,7 @@ test('native search, history navigation, comment typing, and local video playbac
   await expect.poll(() => video.evaluate((element) => (element as HTMLVideoElement).paused)).toBe(false);
   await expect.poll(() => video.evaluate((element) => (element as HTMLVideoElement).currentTime)).toBeGreaterThan(0);
   const initialTime = await video.evaluate((element) => (element as HTMLVideoElement).currentTime);
-  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+  await popup.getByRole('switch', show).uncheck();
   await expect(youtube.locator(artworkStyle)).toHaveCount(0);
   await expect(comment).toHaveText('Nice colors! こんにちは');
   await expect
@@ -395,6 +393,7 @@ test('switching the artwork on and off never filters, replaces, or rewrites nati
   youtube,
 }) => {
   await storeArtwork(popup);
+  await popup.getByRole('switch', show).uncheck();
   await youtube.goto('https://www.youtube.com/watch?v=fixture');
   const native = await youtube.evaluateHandle(() => ({
     images: Array.from(document.images).map((image) => ({
@@ -436,22 +435,20 @@ test('switching the artwork on and off never filters, replaces, or rewrites nati
   };
   await assertMedia();
   for (let cycle = 0; cycle < 2; cycle++) {
-    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
-    await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
+    await popup.getByRole('switch', show).check();
     await expect(youtube.locator(artworkStyle)).toHaveCount(1);
     await assertMedia();
     await youtube.locator('html').evaluate((element) => element.toggleAttribute('dark'));
     await assertMedia();
-    await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('Home');
+    await popup.getByRole('switch', show).uncheck();
     await expect(youtube.locator(artworkStyle)).toHaveCount(0);
     await assertMedia();
-    await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
   }
   await native.dispose();
 });
 
 test('nested chip shapes follow aria-pressed state without hiding the selected glass', async ({ popup, youtube }) => {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', show).check();
   await youtube.locator('.chip-row').evaluate((element) => {
     const chip = document.createElement('yt-chip-cloud-chip-renderer');
     chip.id = 'nested-chip';

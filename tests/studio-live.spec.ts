@@ -41,7 +41,7 @@ test('optional real signed-out YouTube: independent Studio creation, bidirection
     const youtube = await context.newPage();
     await youtube.setViewportSize({ width: 1280, height: 900 });
     await youtube.goto('https://www.youtube.com/watch?v=AS4q9yaWJkI', { waitUntil: 'domcontentloaded' });
-    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+    await popup.getByRole('switch', { name: '作品を表示する' }).check();
     await expect(youtube.locator('[data-ww-surface~="player-window"]')).toBeVisible({ timeout: 20_000 });
     await youtube.bringToFront();
     const opened = context.waitForEvent('page');
@@ -128,7 +128,7 @@ test('optional real signed-out YouTube: independent Studio creation, bidirection
       await expect(panel.locator('[data-kind="group"]')).toHaveCount(1);
     });
     await check('theme OFF completely removes editing and decorations', async () => {
-      await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+      await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
       await expect(youtube.locator(presentation)).toHaveCount(0);
       await expect(youtube.locator('[data-ww-editing]')).toHaveCount(0);
       await expect(youtube.locator('#web-world-themes-studio-link')).toHaveCount(0);

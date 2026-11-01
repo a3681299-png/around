@@ -14,7 +14,7 @@ const layers =
   ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]';
 const fixture = (extension: string) => path.resolve(`tests/fixtures/motion/petal.${extension}`);
 async function open(popup: Page, page: Page) {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   await page.bringToFront();
   const { panel } = await openEditor(popup, page);
@@ -221,12 +221,12 @@ test('player anchors follow SPA; normal animation stays click-through and OFF/ze
   await expect(youtube.locator(layers)).toBeHidden();
   await youtube.locator('#navigate').click();
   await ready(youtube, 1);
-  for (const boundary of ['off', 'zero'] as const) {
-    if (boundary === 'off') await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
-    else await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('Home');
+  for (const boundary of ['off', 'emergency'] as const) {
+    if (boundary === 'off') await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
+    else await popup.getByRole('button', { name: '緊急OFF', exact: true }).click();
     await expect(youtube.locator(overlay)).toHaveCount(0);
-    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
-    await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
+    if (boundary === 'off') await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    else await popup.getByRole('button', { name: '描画を再開', exact: true }).click();
     await youtube.bringToFront();
     await ready(youtube, 1);
   }
@@ -385,7 +385,7 @@ test('eight animations share decoders, stay bounded, respect reduced motion/hidd
     expression: 'delete document.hidden; document.dispatchEvent(new Event("visibilitychange"));',
   });
   await expect(youtube.locator(`${layers} .media[data-playback="playing"]`)).toHaveCount(8);
-  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+  await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
   await expect(youtube.locator(overlay)).toHaveCount(0);
   const stopped = (
     await runtime.session.send('Runtime.evaluate', {

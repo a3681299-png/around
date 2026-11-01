@@ -15,7 +15,7 @@ const stopped = (youtube: Page) =>
 
 /** One image layer keeps the guard watching from load, as on a page with artwork. */
 async function editWithLayer(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   await expect(youtube.locator(cards).first()).toBeVisible();
   const { studio, panel } = await openEditor(popup, youtube);
   await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));

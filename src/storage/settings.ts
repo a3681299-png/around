@@ -1,118 +1,69 @@
-import { FEATURE_REGISTRY, defaultFeaturePreferences, featureEnabled } from '../features';
-import type { FeaturePreferences } from '../features';
-import {
-  DEFAULT_PALETTE,
-  PALETTE_CHANNELS,
-  normalizePaletteChannel,
-  type PaletteSettings,
-} from '../themes/retro/palette';
-
 export interface UserSettings {
   creatorMode: boolean;
+  /** 作品を表示する: the artwork is drawn and edited on the page. */
   enabled: boolean;
-  strength: number;
-  features: FeaturePreferences;
-  palette: PaletteSettings;
-  noiseStrength: number;
 }
 
-/** A feature patch is merged, never used to replace another feature's preferences. */
-export type SettingsPatch = Partial<Omit<UserSettings, 'palette'>> & { palette?: Partial<PaletteSettings> };
+export type SettingsPatch = Partial<UserSettings>;
 
 export const DEFAULT_SETTINGS: Readonly<UserSettings> = Object.freeze({
   creatorMode: false,
-  enabled: false,
-  strength: 60,
-  palette: DEFAULT_PALETTE,
-  noiseStrength: 22,
-  features: Object.freeze(defaultFeaturePreferences()),
+  // A new creator's artwork shows at once; with no artwork nothing is drawn.
+  enabled: true,
 });
 
-// Keep the original global keys: existing installations require no destructive migration.
 export const SETTINGS_KEYS = {
   creatorMode: 'webWorldThemes.creatorMode',
-  enabled: 'webWorldThemes.enabled',
-  strength: 'webWorldThemes.strength',
-  noiseStrength: 'webWorldThemes.noiseStrength',
+  enabled: 'webWorldThemes.showArtwork',
 } as const;
 
-export const PALETTE_SETTINGS_KEYS = Object.freeze({
-  hue: 'webWorldThemes.palette.hue',
-  saturation: 'webWorldThemes.palette.saturation',
-  brightness: 'webWorldThemes.palette.brightness',
+/** Written until the retro theme was removed (docs/theme-removal.md). They are read only while
+ * 作品を表示する has never been saved, and never written or removed. */
+export const LEGACY_SETTINGS_KEYS = Object.freeze({
+  enabled: 'webWorldThemes.enabled',
+  strength: 'webWorldThemes.strength',
 });
 
-export const FEATURE_SETTINGS_KEYS: Readonly<Record<string, string>> = Object.freeze(
-  Object.fromEntries(FEATURE_REGISTRY.map((feature) => [feature.id, `webWorldThemes.features.${feature.id}`])),
-);
-
-function normalizeEnabled(value: unknown): boolean {
-  return typeof value === 'boolean' ? value : DEFAULT_SETTINGS.enabled;
-}
-
-export function normalizeStrength(value: unknown): number {
-  return typeof value === 'number' && Number.isFinite(value)
-    ? Math.round(Math.min(100, Math.max(0, value)))
-    : DEFAULT_SETTINGS.strength;
-}
-
-export function normalizeNoiseStrength(value: unknown): number {
-  return typeof value === 'number' && Number.isFinite(value)
-    ? Math.round(Math.min(100, Math.max(0, value)))
-    : DEFAULT_SETTINGS.noiseStrength;
+/** The retro strength slider at 0% meant OFF; its stored value was normalized like this. */
+export function legacyStrengthOff(value: unknown): boolean {
+  return typeof value === 'number' && Number.isFinite(value) && Math.round(Math.min(100, Math.max(0, value))) === 0;
 }
 
 export function mergeSettings(settings: UserSettings, patch: SettingsPatch): UserSettings {
-  return {
-    ...settings,
-    ...patch,
-    features: { ...settings.features, ...patch.features },
-    palette: { ...settings.palette, ...patch.palette },
-  };
+  return { ...settings, ...patch };
 }
 
+/**
+ * Reads the settings. The first read after the retro theme's removal settles 作品を表示する for
+ * someone who turned the theme off with the strength slider: with the new key unsaved and the old
+ * strength at 0%, OFF is saved once. Every later read finds the new key and changes nothing, so
+ * any number of reads, from any page, give the same result.
+ */
 export async function readSettings(): Promise<UserSettings> {
   const stored = await chrome.storage.local.get([
     ...Object.values(SETTINGS_KEYS),
-    ...Object.values(FEATURE_SETTINGS_KEYS),
-    ...Object.values(PALETTE_SETTINGS_KEYS),
+    ...Object.values(LEGACY_SETTINGS_KEYS),
   ]);
-  return {
-    creatorMode: stored[SETTINGS_KEYS.creatorMode] === true,
-    enabled: normalizeEnabled(stored[SETTINGS_KEYS.enabled]),
-    strength: normalizeStrength(stored[SETTINGS_KEYS.strength]),
-    noiseStrength: normalizeNoiseStrength(stored[SETTINGS_KEYS.noiseStrength]),
-    palette: {
-      hue: normalizePaletteChannel('hue', stored[PALETTE_SETTINGS_KEYS.hue]),
-      saturation: normalizePaletteChannel('saturation', stored[PALETTE_SETTINGS_KEYS.saturation]),
-      brightness: normalizePaletteChannel('brightness', stored[PALETTE_SETTINGS_KEYS.brightness]),
-    },
-    features: Object.fromEntries(
-      FEATURE_REGISTRY.map((feature) => [
-        feature.id,
-        featureEnabled(feature, stored[FEATURE_SETTINGS_KEYS[feature.id]!]),
-      ]),
-    ),
-  };
+  const saved = stored[SETTINGS_KEYS.enabled];
+  let enabled: boolean;
+  if (typeof saved === 'boolean') enabled = saved;
+  else {
+    if (legacyStrengthOff(stored[LEGACY_SETTINGS_KEYS.strength])) {
+      enabled = false;
+      await chrome.storage.local.set({ [SETTINGS_KEYS.enabled]: false });
+    } else {
+      const legacy = stored[LEGACY_SETTINGS_KEYS.enabled];
+      enabled = typeof legacy === 'boolean' ? legacy : DEFAULT_SETTINGS.enabled;
+    }
+  }
+  return { creatorMode: stored[SETTINGS_KEYS.creatorMode] === true, enabled };
 }
 
 /** Separate keys prevent concurrent editors from overwriting unrelated preferences. */
 export async function updateSettings(patch: SettingsPatch): Promise<void> {
-  const values: Record<string, boolean | number> = {};
+  const values: Record<string, boolean> = {};
   if ('creatorMode' in patch) values[SETTINGS_KEYS.creatorMode] = patch.creatorMode === true;
-  if ('enabled' in patch) values[SETTINGS_KEYS.enabled] = normalizeEnabled(patch.enabled);
-  if ('strength' in patch) values[SETTINGS_KEYS.strength] = normalizeStrength(patch.strength);
-  if ('noiseStrength' in patch) values[SETTINGS_KEYS.noiseStrength] = normalizeNoiseStrength(patch.noiseStrength);
-  for (const channel of PALETTE_CHANNELS) {
-    if (patch.palette && Object.hasOwn(patch.palette, channel)) {
-      values[PALETTE_SETTINGS_KEYS[channel]] = normalizePaletteChannel(channel, patch.palette[channel]);
-    }
-  }
-  for (const feature of FEATURE_REGISTRY) {
-    if (patch.features && Object.hasOwn(patch.features, feature.id)) {
-      values[FEATURE_SETTINGS_KEYS[feature.id]!] = featureEnabled(feature, patch.features[feature.id]);
-    }
-  }
+  if ('enabled' in patch) values[SETTINGS_KEYS.enabled] = patch.enabled !== false;
   if (Object.keys(values).length > 0) await chrome.storage.local.set(values);
 }
 
@@ -125,43 +76,43 @@ export function watchSettings(
   let initialized = false;
   let current: UserSettings = mergeSettings(DEFAULT_SETTINGS, {});
   let buffered: SettingsPatch = {};
+  let reread = 0;
 
+  const apply = (patch: SettingsPatch) => {
+    if (!initialized) {
+      buffered = { ...buffered, ...patch };
+      return;
+    }
+    current = mergeSettings(current, patch);
+    listener(mergeSettings(current, {}));
+  };
   const onChanged = (changes: Record<string, chrome.storage.StorageChange>, area: string): void => {
     if (area !== 'local' || !active) return;
     const patch: SettingsPatch = {};
     const creatorMode = changes[SETTINGS_KEYS.creatorMode];
     if (creatorMode) patch.creatorMode = creatorMode.newValue === true;
     const enabled = changes[SETTINGS_KEYS.enabled];
-    const strength = changes[SETTINGS_KEYS.strength];
-    if (enabled) patch.enabled = normalizeEnabled(enabled.newValue);
-    if (strength) patch.strength = normalizeStrength(strength.newValue);
-    const noiseStrength = changes[SETTINGS_KEYS.noiseStrength];
-    if (noiseStrength) patch.noiseStrength = normalizeNoiseStrength(noiseStrength.newValue);
-    for (const channel of PALETTE_CHANNELS) {
-      const change = changes[PALETTE_SETTINGS_KEYS[channel]];
-      if (change) {
-        patch.palette ??= {};
-        patch.palette[channel] = normalizePaletteChannel(channel, change.newValue);
-      }
-    }
-    const features: Record<string, boolean> = {};
-    for (const feature of FEATURE_REGISTRY) {
-      const change = changes[FEATURE_SETTINGS_KEYS[feature.id]!];
-      if (change) features[feature.id] = featureEnabled(feature, change.newValue);
-    }
-    if (Object.keys(features).length > 0) patch.features = features;
-    if (Object.keys(patch).length === 0) return;
-    if (!initialized) {
-      buffered = {
-        ...buffered,
-        ...patch,
-        features: { ...buffered.features, ...patch.features },
-        palette: { ...buffered.palette, ...patch.palette },
-      };
-      return;
-    }
-    current = mergeSettings(current, patch);
-    listener(mergeSettings(current, {}));
+    if (enabled) {
+      if (typeof enabled.newValue === 'boolean') patch.enabled = enabled.newValue;
+      // Removed (a storage reset): the value is derived again, as on a first read.
+      else reread++;
+    } else if (Object.values(LEGACY_SETTINGS_KEYS).some((key) => changes[key])) reread++;
+    if (Object.keys(patch).length > 0) apply(patch);
+    if (reread > 0 && initialized) derive();
+  };
+  /** 作品を表示する depends on the legacy keys while it is unsaved: derive it again. */
+  const derive = () => {
+    const ticket = reread;
+    void readSettings().then(
+      (stored) => {
+        if (!active || ticket !== reread) return;
+        reread = 0;
+        if (stored.enabled !== current.enabled) apply({ enabled: stored.enabled });
+      },
+      (error: unknown) => {
+        if (active) onError(error);
+      },
+    );
   };
 
   chrome.storage.onChanged.addListener(onChanged);
@@ -172,6 +123,8 @@ export function watchSettings(
       initialized = true;
       buffered = {};
       listener(mergeSettings(current, {}));
+      // A legacy key changed while the first read was on its way.
+      if (reread > 0) derive();
     })
     .catch((error: unknown) => {
       if (active) onError(error);

@@ -97,7 +97,7 @@ test('optional real YouTube operation checks with and without authored paint', a
     const url = process.env.WW_LIVE_VIDEO_URL ?? 'https://www.youtube.com/watch?v=LC1a-DwUhls';
     await page.goto(url, { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30_000 });
-    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+    await popup.getByRole('switch', { name: '作品を表示する' }).check();
     await page.bringToFront();
     const before = await nativeInputs(page);
     // UI0-d round 3: the editor window (as a tab); the operation checks stay on the YouTube page.

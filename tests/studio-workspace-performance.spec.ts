@@ -74,7 +74,7 @@ test('32 layers remain editable with locked/hidden selection; measure the page w
     await popup.goto(`chrome-extension://${id}/popup/index.html`);
     const youtube = await context.newPage();
     await youtube.goto('https://www.youtube.com/watch?v=fixture');
-    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+    await popup.getByRole('switch', { name: '作品を表示する' }).check();
     let { panel, studio } = await openEditor(popup, youtube);
     await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
     await expect(youtube.locator(overlay + ' [data-image-id]')).toHaveCount(1);
@@ -142,7 +142,7 @@ test('32 layers remain editable with locked/hidden selection; measure the page w
     await panel.getByRole('button', { name: '変更を破棄', exact: true }).click();
     await expect(panel.locator('.dirty')).toHaveText('保存済み');
     await studio.screenshot({ path: info.outputPath('window-32-layers.png') });
-    await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+    await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
     await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-editing', /.*/);
     await expect(youtube.locator(overlay)).toHaveCount(0);
     const report = {

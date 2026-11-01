@@ -37,7 +37,7 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
       { waitUntil: 'domcontentloaded' },
     );
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 25_000 });
-    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+    await popup.getByRole('switch', { name: '作品を表示する' }).check();
     await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
     await page.bringToFront();
     await openSidePanelFromIcon(popup, page);
@@ -270,7 +270,7 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
     await page.goBack({ waitUntil: 'domcontentloaded' });
     await expect(player).toBeVisible();
     report.checks.spa = true;
-    await popup.locator('#effect-strength').fill('0');
+    await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
     await expect(local).toHaveCount(0);
     await expect(
       page.locator(

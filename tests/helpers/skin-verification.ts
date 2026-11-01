@@ -59,8 +59,7 @@ export const plainSkinDesign = {
 export async function storeDesign(popup: Page, design: object) {
   await popup.evaluate(async (design) => {
     await chrome.storage.local.set({
-      'webWorldThemes.enabled': true,
-      'webWorldThemes.strength': 100,
+      'webWorldThemes.showArtwork': true,
       'webWorldThemes.safety.emergencyOff': false,
       'webWorldThemes.design.youtube': design,
     });

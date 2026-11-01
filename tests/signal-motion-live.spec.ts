@@ -41,7 +41,7 @@ test('real YouTube: official Studio configures GIF pursuit, records/replays/load
     const page = await context.newPage();
     await page.goto('https://www.youtube.com/watch?v=LC1a-DwUhls', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 25_000 });
-    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+    await popup.getByRole('switch', { name: '作品を表示する' }).check();
     await page.bringToFront();
     await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
     await openSidePanelFromIcon(popup, page);
@@ -238,7 +238,7 @@ test('real YouTube: official Studio configures GIF pursuit, records/replays/load
       await player.locator('.ytp-settings-button').click();
     }
     report.checks.windowWidthsAndSettingsClicks = [1366, 1920, 1000];
-    await popup.locator('#effect-strength').fill('0');
+    await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
     await expect(
       page.locator(
         ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',

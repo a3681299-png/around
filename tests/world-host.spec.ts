@@ -55,7 +55,7 @@ test('explicit isolated developer recording replays live fixture evaluations and
   expect(JSON.stringify(value.recording)).not.toMatch(
     /PRIVATE_FORM_VALUE|https?:|cookie|authorization|innerHTML|keyCode/,
   );
-  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+  await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
   await expect(youtube.locator(overlay)).toHaveCount(0);
   expect(await runtime.evaluate('typeof globalThis.__wwWorldRuntime')).toBe('undefined');
   await runtime.session.detach();
@@ -73,6 +73,9 @@ test('recording-only listeners stop after artwork changes and idle/OFF leaves no
   const runtime = await isolate(youtube, extensionId);
   await reinject(runtime, 'runtime', true);
   await expect.poll(() => runtime.evaluate('Boolean(globalThis.__wwWorldRuntime?.frame())')).toBe(true);
+  // The open editor reattaches to the reinjected page and binds its own page listeners (a click
+  // among them) as it marks the page as editing; only listeners added after that are counted.
+  await expect.poll(() => runtime.evaluate('document.documentElement.hasAttribute("data-ww-editing")')).toBe(true);
   await runtime.evaluate(`(() => {
     const listeners = new Map(), add = EventTarget.prototype.addEventListener, remove = EventTarget.prototype.removeEventListener;
     globalThis.__worldRafs = 0;
@@ -107,7 +110,7 @@ test('recording-only listeners stop after artwork changes and idle/OFF leaves no
   const before = (await stats()).rafs;
   await youtube.waitForTimeout(150);
   expect((await stats()).rafs).toBe(before);
-  await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('Home');
+  await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
   await expect(youtube.locator(overlay)).toHaveCount(0);
   expect(await runtime.evaluate('typeof globalThis.__wwWorldRuntime')).toBe('undefined');
   await runtime.session.detach();
@@ -130,7 +133,7 @@ test('legacy rollback build preserves mask editing and normal click-through', as
   await expect(youtube.locator(media)).toHaveCSS('mask-image', /radial-gradient/);
   await youtube.locator('#movie_player [aria-label="Mute"]').click();
   await expect(youtube.locator(`${overlay} .handle:visible`)).toHaveCount(0);
-  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+  await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
   await expect(youtube.locator(overlay)).toHaveCount(0);
   await runtime.session.detach();
 });

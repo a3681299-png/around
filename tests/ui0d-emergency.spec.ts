@@ -24,7 +24,7 @@ test('UI0-d header and real emergency accelerator stop skins, page marks and the
     await popup.goto(`chrome-extension://${id}/popup/index.html`);
     const page = await context.newPage();
     await page.goto('https://www.youtube.com/watch?v=fixture');
-    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+    await popup.getByRole('switch', { name: '作品を表示する' }).check();
     await page.bringToFront();
     const tab = await popup.evaluate(
       async () => (await chrome.tabs.query({ active: true, currentWindow: true }))[0]!.id!,

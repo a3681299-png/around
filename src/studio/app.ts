@@ -40,7 +40,7 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
   const settingsButton = doc.createElement('button');
   settingsButton.type = 'button';
   settingsButton.className = 'studio-display-settings';
-  settingsButton.textContent = '表示設定';
+  settingsButton.textContent = '設定';
   settingsButton.hidden = !ports.openSettings;
   settingsButton.addEventListener('click', () => ports.openSettings?.(connection.target));
   connectionBar.append(settingsButton);

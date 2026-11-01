@@ -13,7 +13,7 @@ const overlay = '#web-world-themes-decorations',
   layers = `${presentation} [data-image-id]`;
 const file = (name: string) => path.resolve(`tests/fixtures/motion/${name}`);
 async function open(popup: Page, page: Page) {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   await page.bringToFront();
   const { panel } = await openEditor(popup, page);
   await exposeEditorControls(panel);
@@ -346,7 +346,7 @@ test('APNG/WebM/image share player-anchored groups, mask signals, history, reduc
   await youtube.locator(`${layers} video`).evaluate((node) => {
     (globalThis as unknown as { oldArtworkVideo: Element }).oldArtworkVideo = node;
   });
-  await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('Home');
+  await popup.getByRole('button', { name: '緊急OFF', exact: true }).click();
   await expect(youtube.locator(overlay)).toHaveCount(0);
   expect(
     await youtube.evaluate(() => {
@@ -354,10 +354,10 @@ test('APNG/WebM/image share player-anchored groups, mask signals, history, reduc
       return { paused: n.paused, src: n.getAttribute('src') };
     }),
   ).toEqual({ paused: true, src: null });
-  await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
+  await popup.getByRole('button', { name: '描画を再開', exact: true }).click();
   await youtube.bringToFront();
   await ready(youtube, 3);
-  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+  await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
   await expect(youtube.locator(overlay)).toHaveCount(0);
 });
 
@@ -423,7 +423,7 @@ test('OFF aborts an unfinished import decoder and closes its late frame without 
   });
   await panel.getByLabel('アニメーション素材を追加').setInputFiles(file('petal.gif'));
   await expect.poll(() => editor.evaluate(() => typeof (globalThis as Probe).releasePreflight)).toBe('function');
-  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+  await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
   // The editing on the page ends, as the floating editor closed.
   await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-editing', /.*/);
   await expect(youtube.locator(overlay)).toHaveCount(0);

@@ -437,12 +437,11 @@ test('atmosphere crosses protected surfaces but never takes input or skips verif
 });
 
 test('native-surface inspection runs only while artwork or the editor can paint', () => {
-  const on = { suspended: false, enabled: true, strength: 60, layers: 1, editing: false };
+  const on = { suspended: false, enabled: true, layers: 1, editing: false };
   expect(guardWanted(on)).toBe(true);
   expect(guardWanted({ ...on, layers: 0 })).toBe(false); // No artwork: nothing can cover a control.
   expect(guardWanted({ ...on, layers: 0, editing: true })).toBe(true); // The editor may add one at any time.
-  expect(guardWanted({ ...on, enabled: false })).toBe(false); // Theme OFF.
-  expect(guardWanted({ ...on, strength: 0 })).toBe(false); // Strength zero.
+  expect(guardWanted({ ...on, enabled: false })).toBe(false); // 作品を表示する OFF.
   expect(guardWanted({ ...on, suspended: true, editing: true })).toBe(false); // Emergency OFF / fullscreen suspend.
 });
 

@@ -37,7 +37,7 @@ test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and 
     const page = await context.newPage();
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto('https://www.youtube.com/watch?v=AS4q9yaWJkI', { waitUntil: 'domcontentloaded' });
-    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+    await popup.getByRole('switch', { name: '作品を表示する' }).check();
     await page.bringToFront();
     await expect(page.locator('[data-ww-surface~="player-window"]')).toBeVisible({ timeout: 20_000 });
     // UI0-d 3.1: the editor's window (as a tab); the artwork and its checks stay on the YouTube page.
@@ -108,7 +108,7 @@ test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and 
         paused = await video.evaluate((node: HTMLVideoElement) => node.paused);
       await page.locator('#movie_player .ytp-play-button').click();
       await expect.poll(() => video.evaluate((node: HTMLVideoElement) => node.paused)).not.toBe(paused);
-      await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+      await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
       await expect(page.locator(presentation)).toHaveCount(0);
       await expect(page.locator('html')).not.toHaveAttribute('data-ww-editing', /.*/);
     });

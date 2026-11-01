@@ -2,14 +2,7 @@ import { isAssetId, parseDesign } from '../design/schema';
 import type { DesignDocument } from '../design/types';
 import { parseSignalTake, type SignalTake } from '../world/takes';
 import { ASSET_LIMITS, TAKE_LIMITS } from '../assets/limits';
-import { FEATURE_REGISTRY } from '../features';
-import {
-  DEFAULT_SETTINGS,
-  SETTINGS_KEYS,
-  FEATURE_SETTINGS_KEYS,
-  PALETTE_SETTINGS_KEYS,
-  type UserSettings,
-} from '../storage/settings';
+import { DEFAULT_SETTINGS, SETTINGS_KEYS, type UserSettings } from '../storage/settings';
 import { backupObject, backupNumber } from './data';
 import { oneOf } from '../validation';
 
@@ -56,38 +49,44 @@ const failure = () => new Error('バックアップの値または上限が不�
 const flag = (value: unknown): value is boolean => typeof value === 'boolean';
 const sizedArray = (value: unknown, max: number): value is unknown[] => Array.isArray(value) && value.length <= max;
 
+/** The retro theme's settings in backups made before its removal (docs/theme-removal.md). They
+ * are checked exactly as before, so a damaged old backup is still refused, and then dropped. */
+const LEGACY_NUMBERS = ['strength', 'noiseStrength'] as const;
+const LEGACY_FEATURES = [
+  'window-chrome',
+  'palette',
+  'glossy-titlebars',
+  'focus-titlebars',
+  'daily-details',
+  'surface-noise',
+  'bbs-comments',
+  'transparent-background',
+  'lcd-durations',
+  'readable-votes',
+];
+const LEGACY_PALETTE = { hue: 360, saturation: 100, brightness: 100 } as const;
+
 export function parseBackupSettings(raw: unknown): UserSettings {
-  const supplied = backupObject(raw, [...Object.keys(SETTINGS_KEYS), 'features', 'palette']);
+  const supplied = backupObject(raw, [...Object.keys(SETTINGS_KEYS), ...LEGACY_NUMBERS, 'features', 'palette']);
   const value = { ...DEFAULT_SETTINGS, ...supplied };
-  for (const key of Object.keys(SETTINGS_KEYS)) {
-    if (key === 'enabled' || key === 'creatorMode') {
-      if (!flag(value[key as keyof UserSettings])) throw failure();
-    } else if (
-      !backupNumber(value[key as keyof UserSettings], 0, 100) ||
-      !Number.isInteger(value[key as keyof UserSettings])
-    )
+  for (const key of Object.keys(SETTINGS_KEYS)) if (!flag(value[key as keyof UserSettings])) throw failure();
+  for (const key of LEGACY_NUMBERS)
+    if (Object.hasOwn(supplied, key) && (!backupNumber(supplied[key], 0, 100) || !Number.isInteger(supplied[key])))
       throw failure();
-  }
-  const features = backupObject(
-    Object.hasOwn(supplied, 'features') ? supplied['features'] : {},
-    FEATURE_REGISTRY.map((entry) => entry.id),
-  );
+  const features = backupObject(Object.hasOwn(supplied, 'features') ? supplied['features'] : {}, LEGACY_FEATURES);
   if (Object.values(features).some((entry) => !flag(entry))) throw failure();
   const palette = backupObject(
     Object.hasOwn(supplied, 'palette') ? supplied['palette'] : {},
-    Object.keys(PALETTE_SETTINGS_KEYS),
+    Object.keys(LEGACY_PALETTE),
   );
-  for (const key of Object.keys(PALETTE_SETTINGS_KEYS))
-    if (
-      Object.hasOwn(palette, key) &&
-      (!backupNumber(palette[key], 0, key === 'hue' ? 360 : 100) || !Number.isInteger(palette[key]))
-    )
+  for (const [key, max] of Object.entries(LEGACY_PALETTE))
+    if (Object.hasOwn(palette, key) && (!backupNumber(palette[key], 0, max) || !Number.isInteger(palette[key])))
       throw failure();
   return {
-    ...value,
-    features: { ...DEFAULT_SETTINGS.features, ...features },
-    palette: { ...DEFAULT_SETTINGS.palette, ...palette },
-  } as UserSettings;
+    creatorMode: value.creatorMode as boolean,
+    // The strength slider at 0% was OFF: restoring such settings keeps the artwork hidden.
+    enabled: (value.enabled as boolean) && supplied['strength'] !== 0,
+  };
 }
 
 export function backupDesigns(local: Record<string, unknown>): DesignDocument[] {
@@ -155,14 +154,9 @@ export function parseBackupPreferences(raw: unknown): Record<string, unknown> {
 }
 
 export function settingsStorageValues(settings: UserSettings): Record<string, unknown> {
-  return Object.fromEntries([
-    ...Object.entries(SETTINGS_KEYS).map(([field, key]) => [key, settings[field as keyof UserSettings]]),
-    ...Object.entries(FEATURE_SETTINGS_KEYS).map(([field, key]) => [key, settings.features[field]]),
-    ...Object.entries(PALETTE_SETTINGS_KEYS).map(([field, key]) => [
-      key,
-      settings.palette[field as keyof UserSettings['palette']],
-    ]),
-  ]);
+  return Object.fromEntries(
+    Object.entries(SETTINGS_KEYS).map(([field, key]) => [key, settings[field as keyof UserSettings]]),
+  );
 }
 
 export function parseBackupManifest(raw: unknown): BackupManifest {

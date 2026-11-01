@@ -7,7 +7,7 @@ const overlay = '#web-world-themes-decorations',
   images =
     ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]';
 async function open(popup: Page, page: Page) {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   // UI0-d round 3: the in-page Studio's workbench is the editor page's own (its window).
   return (await openEditor(popup, page)).panel;
@@ -139,7 +139,7 @@ test('all current animation kinds use the live panels, inherited locks, groups, 
   await panel.getByRole('button', { name: '編集を終了', exact: true }).click();
   await youtube.reload();
   await expect(youtube.locator(images)).toHaveCount(5);
-  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+  await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
   await expect(youtube.locator(overlay)).toHaveCount(0);
 });
 

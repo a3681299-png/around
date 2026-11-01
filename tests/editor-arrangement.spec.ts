@@ -11,7 +11,7 @@ import { openEditor } from './helpers/editor';
 const cards = '[data-ww-surface~="video-card"]';
 
 async function enable(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   await expect(youtube.locator(cards).first()).toBeVisible();
 }
 const shown = (panel: Locator, selector: string) =>
@@ -86,7 +86,7 @@ test('the editor wears the design system: tokens follow the scheme, nothing belo
   }
 });
 
-test('表示設定 is the same ww-panel in the popup and in the in-video panel, with the two ways into the editor', async ({
+test('設定 is the same ww-panel in the popup and in the in-video panel, with the two ways into the editor', async ({
   popup,
   youtube,
 }) => {
@@ -112,7 +112,7 @@ test('表示設定 is the same ww-panel in the popup and in the in-video panel, 
   const fromVideo = await contents(panel);
   expect(fromPopup).toEqual(fromVideo);
   expect(fromPopup).toMatchObject({
-    title: '表示設定',
+    title: '設定',
     buttons: ['エディターを開く', '別ウィンドウで開く'],
     retro: false,
     background: 'none',
@@ -126,7 +126,7 @@ test('表示設定 is the same ww-panel in the popup and in the in-video panel, 
   for (const root of [popup.locator('.popup'), panel]) {
     const english = await root.evaluate((node) => {
       const scope = (node.shadowRoot ?? node) as ParentNode;
-      return [...scope.querySelectorAll('legend, label, h2, button, .ww-theme-name')]
+      return [...scope.querySelectorAll('legend, label, h2, button')]
         .map((element) => element.textContent!.replace(/YouTube|ON|OFF/g, ''))
         .filter((text) => /[A-Za-z]{3,}/.test(text));
     });

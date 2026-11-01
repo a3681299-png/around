@@ -88,7 +88,7 @@ if (site) {
   const update = (settings: UserSettings) => {
     creatorMode = settings.creatorMode;
     controller.update(settings);
-    creator?.setEnabled(settings.enabled && settings.strength > 0);
+    creator?.setEnabled(settings.enabled);
   };
   let unwatch = watchSettings(update, reportError);
   // The page answers one question from the extension: whether it is an edit target. The editor

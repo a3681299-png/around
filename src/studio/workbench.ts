@@ -237,9 +237,9 @@ export function createStudioWorkbench(
   usage.classList.add('usage');
   menuEnd.append(dock, usage, close);
   const displaySettings = get<HTMLButtonElement>('.display-settings');
-  // In the column the header is short: 表示設定 is its icon (still named 表示設定), and 使い方 stays
+  // In the column the header is short: 設定 is its icon (still named 設定), and 使い方 stays
   // in the ヘルプ menu only.
-  if (options.sidePanel) buttonIcon(displaySettings, 'settings', '表示設定');
+  if (options.sidePanel) buttonIcon(displaySettings, 'settings', '設定');
   if (options.onSettings) menuEnd.prepend(displaySettings);
   // 緊急OFF (and 操作チェック while something is restricted): one press away in the header.
   const safety = doc.createElement('slot');

@@ -65,11 +65,10 @@ export interface OperationGuardHost {
 export function guardWanted(state: {
   suspended: boolean;
   enabled: boolean;
-  strength: number;
   layers: number;
   editing: boolean;
 }): boolean {
-  return !state.suspended && state.enabled && state.strength > 0 && (state.layers > 0 || state.editing);
+  return !state.suspended && state.enabled && (state.layers > 0 || state.editing);
 }
 export function createOperationGuardHost(
   doc: Document,

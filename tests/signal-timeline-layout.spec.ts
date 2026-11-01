@@ -15,7 +15,7 @@ for (const viewport of [
     youtube,
   }, info) => {
     await youtube.setViewportSize(viewport);
-    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+    await popup.getByRole('switch', { name: '作品を表示する' }).check();
     // The popup changes optimistically; authoring is enabled after the page receives the save.
     await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
     // UI0-d round 3: the in-page Studio's workbench is the editor window's own, at the same sizes.

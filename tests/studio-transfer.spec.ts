@@ -15,7 +15,7 @@ import {
 } from '../src/assets/studio-transfer-protocol';
 
 async function openStudio(context: BrowserContext, popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   await youtube.bringToFront();
   const opened = context.waitForEvent('page');

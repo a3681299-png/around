@@ -13,7 +13,7 @@ test('VRM1 renders MToon with alpha, follows the pointer, edits expressions and 
   const file = info.outputPath('original.vrm');
   await mkdir(path.dirname(file), { recursive: true });
   await writeFile(file, vrmFixture());
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
@@ -108,7 +108,7 @@ test('VRM1 renders MToon with alpha, follows the pointer, edits expressions and 
       .first()
       .evaluate((e) => getComputedStyle(e).pointerEvents),
   ).toBe('none');
-  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+  await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
   await expect(youtube.locator('#web-world-themes-decorations')).toHaveCount(0);
 });
 
@@ -163,7 +163,7 @@ for (const large of [false, true])
       file = info.outputPath(large ? 'original-padded.vrm' : 'original-small.vrm');
     await mkdir(path.dirname(file), { recursive: true });
     await writeFile(file, bytes);
-    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+    await popup.getByRole('switch', { name: '作品を表示する' }).check();
     await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
     await youtube.bringToFront();
     const opened = context.waitForEvent('page');
@@ -206,6 +206,6 @@ for (const large of [false, true])
     await youtube.reload();
     await expect(media.first()).toHaveAttribute('data-renderer', 'three', large ? { timeout: 30000 } : {});
     await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
-    await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+    await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
     await expect(youtube.locator('#web-world-themes-decorations')).toHaveCount(0);
   });

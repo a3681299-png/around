@@ -57,7 +57,7 @@ export async function reinject(
   await runtime.evaluate(bundle.outputFiles[0]!.text);
 }
 export async function open(popup: Page, page: Page): Promise<Locator> {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   await page.bringToFront();
   await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   return (await openEditor(popup, page)).panel;

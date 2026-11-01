@@ -7,8 +7,7 @@ const cards = '[data-ww-surface~="video-card"]';
 const shots = process.env.WW_SKIN_SHOTS;
 
 async function enable(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
-  await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   await expect(youtube.locator(cards).first()).toBeVisible();
 }
 async function openEditor(popup: Page, youtube: Page) {

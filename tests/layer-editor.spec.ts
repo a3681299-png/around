@@ -11,7 +11,7 @@ const images =
 const rows = '[data-layer-id]';
 
 async function open(popup: Page, page: Page) {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   const dialog = (await openEditor(popup, page)).panel;
   await exposeEditorControls(dialog);

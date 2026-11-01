@@ -16,7 +16,7 @@ const presentation =
 const colors = ['#f04a50', '#3caf78', '#4276ed'],
   names = ['red.png', 'green.png', 'blue.png'];
 async function open(popup: Page, page: Page) {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   await page.bringToFront();
   await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   const { panel } = await openEditor(popup, page);
@@ -452,12 +452,12 @@ test('mixed anchors and interleaved selection are refused; player groups follow 
   expect(await stored(popup)).toEqual(saved);
   await youtube.locator('#movie_player [aria-label="Play"]').click();
   await expect(youtube.locator('#movie_player video')).toHaveJSProperty('paused', false);
-  for (const boundary of ['off', 'zero']) {
-    if (boundary === 'off') await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
-    else await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('Home');
+  for (const boundary of ['off', 'emergency']) {
+    if (boundary === 'off') await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
+    else await popup.getByRole('button', { name: '緊急OFF', exact: true }).click();
     await expect(youtube.locator(overlay)).toHaveCount(0);
-    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
-    await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
+    if (boundary === 'off') await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    else await popup.getByRole('button', { name: '描画を再開', exact: true }).click();
     await youtube.bringToFront();
     await ready(youtube, 3);
   }
@@ -709,13 +709,13 @@ test('16 groups / 32 media share effect sources and become idle or fully detache
     expression: 'delete document.hidden; document.dispatchEvent(new Event("visibilitychange"));',
   });
   await expect.poll(stats).toMatchObject({ pointer: 1, video: 5 });
-  for (const boundary of ['off', 'zero']) {
-    if (boundary === 'off') await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
-    else await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('Home');
+  for (const boundary of ['off', 'emergency']) {
+    if (boundary === 'off') await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
+    else await popup.getByRole('button', { name: '緊急OFF', exact: true }).click();
     await expect(youtube.locator(overlay)).toHaveCount(0);
     await expect.poll(stats).toMatchObject({ pointer: 0, video: 0 });
-    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
-    await popup.getByRole('slider', { name: 'エフェクトの強さ' }).press('End');
+    if (boundary === 'off') await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    else await popup.getByRole('button', { name: '描画を再開', exact: true }).click();
     await youtube.bringToFront();
     await ready(youtube, 32);
   }

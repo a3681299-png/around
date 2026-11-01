@@ -58,7 +58,7 @@ test('one file restores saved artwork, originals, takes and settings into a diff
 }, info) => {
   test.setTimeout(90_000);
   await youtube.goto('https://www.youtube.com/watch?v=fixture');
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   const { panel: editor } = await openEditor(popup, youtube);
   await editor.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await expect(editor.locator('.layer')).toHaveCount(1);
@@ -168,7 +168,7 @@ test('backup validates actual raster and model textures, and refuses corrupt fil
   popup,
   youtube,
 }, info) => {
-  await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
   const { panel: editor } = await openEditor(popup, youtube);
   await editor.locator('input.model-file').setInputFiles({
     name: 'migration-model.glb',
@@ -237,7 +237,7 @@ test('restored spare originals survive unrelated cleanup from the native panel w
     await popup.goto('chrome-extension://' + id + '/popup/index.html');
     const page = await context.newPage();
     await page.goto('https://www.youtube.com/watch?v=fixture');
-    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+    await popup.getByRole('switch', { name: '作品を表示する' }).check();
     await page.getByRole('button', { name: 'Web World Themes の設定', exact: true }).click();
     await page
       .getByRole('dialog', { name: 'Web World Themes の設定' })

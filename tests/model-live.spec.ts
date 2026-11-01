@@ -42,7 +42,7 @@ test('real YouTube: official Studio places a rig, switches run/idle, replays mod
     const page = await context.newPage();
     await page.goto('https://www.youtube.com/watch?v=LC1a-DwUhls', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 25000 });
-    await popup.getByRole('switch', { name: 'テーマを使う' }).check();
+    await popup.getByRole('switch', { name: '作品を表示する' }).check();
     await page.bringToFront();
     await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
     await openSidePanelFromIcon(popup, page);
@@ -235,7 +235,7 @@ test('real YouTube: official Studio places a rig, switches run/idle, replays mod
     report.checks.modelStats = await page
       .locator('#web-world-themes-decorations')
       .evaluate((e: HTMLElement) => JSON.parse(e.dataset.wwModelStats!));
-    await popup.locator('#effect-strength').fill('0');
+    await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
     await expect(
       page.locator(
         ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',
