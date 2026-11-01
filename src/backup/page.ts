@@ -1,12 +1,11 @@
 import { BACKUP_MESSAGE, type BackupReply, type BackupSummary } from './protocol';
 import { BACKUP_LIMITS, BACKUP_MESSAGES } from './schema';
-import { DEFAULT_THEME, themes } from '../themes';
-import { mountPixelFont } from '../ui/pixel-font';
+import settingsStyles from '../settings/settings.css';
+import tokens from '../editor/studio-tokens.css';
 
-mountPixelFont(document);
-document.documentElement.dataset.wwUi = DEFAULT_THEME;
+// The same WWT Studio sheet as the settings; here the page itself is the token host.
 const style = document.createElement('style');
-style.textContent = themes[DEFAULT_THEME].editorStylesheets.join('\n');
+style.textContent = tokens.replaceAll(':host', ':root') + settingsStyles;
 document.head.append(style);
 const get = <T extends HTMLElement>(selector: string) => document.querySelector<T>(selector)!;
 get('.identity').textContent = '拡張ID: ' + chrome.runtime.id + ' / 読み込み先: ' + chrome.runtime.getURL('');

@@ -1,34 +1,22 @@
 import { createYouTubeAdapter } from '../../src/sites/youtube';
-import { createThemeController } from '../../src/themes/controller';
-import { retroTheme } from '../../src/themes/retro';
+import { createPageController } from '../../src/host/page-controller';
 import { DEFAULT_SETTINGS } from '../../src/storage/settings';
 import { emptyDesign } from '../../src/design/schema';
 import type { DesignDocument } from '../../src/design/types';
 
 export function mount() {
-  const counts = { themeWrites: 0, variables: 0, compiles: 0, featureRefreshes: 0, surfaces: 0 };
+  const counts = { variables: 0, compiles: 0, surfaces: 0 };
   (globalThis as any).__pageChanges = counts;
   const root = document.documentElement,
-    nativeSet = root.style.setProperty.bind(root.style),
-    variableNames = new Set(['--ww-strength', ...Object.keys(retroTheme.variables(DEFAULT_SETTINGS))]);
+    nativeSet = root.style.setProperty.bind(root.style);
+  // Nothing on the page follows a text change by writing variables on the root.
   root.style.setProperty = (name, value, priority) => {
-    if (variableNames.has(name)) counts.themeWrites++;
+    if (name.startsWith('--ww-')) counts.variables++;
     nativeSet(name, value, priority);
   };
-  const controller = createThemeController(
-    document,
-    createYouTubeAdapter(document, window),
-    {
-      ...retroTheme,
-      variables(settings) {
-        counts.variables++;
-        return retroTheme.variables(settings);
-      },
-    },
-    () => counts.surfaces++,
-  );
+  const controller = createPageController(document, createYouTubeAdapter(document, window), () => counts.surfaces++);
   const design: DesignDocument = {
-    ...emptyDesign('youtube', 'retro'),
+    ...emptyDesign('youtube', null),
     rules: [{ kind: 'surface-style', target: 'video-card', style: { backgroundColor: '#c9d4e8', borderRadiusPx: 8 } }],
   };
   controller.updateDesign(design);

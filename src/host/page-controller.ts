@@ -1,4 +1,3 @@
-import { createFeatureController } from '../features/controller';
 import { compileDesign, createDesignRenderer, type SkinAssetPort, type SkinAssetStatus } from '../design/renderer';
 import type { InkDecision } from '../design/contrast';
 import { readDesign } from '../design/immutable';
@@ -6,15 +5,16 @@ import type { DesignDocument } from '../design/types';
 import { createImageRenderer, type ImageEditing } from '../design/image-renderer';
 import type { SiteAdapter, SitePageChange } from '../sites/types';
 import type { UserSettings } from '../storage/settings';
-import type { ThemeDefinition } from './types';
-import { createTimelineHost, type TimelineHost } from '../host/timeline';
+import { createTimelineHost, type TimelineHost } from './timeline';
 import { createTakeStorage } from '../browser/take-storage';
-import { createOperationGuardHost, guardWanted, type OperationGuardHost } from '../host/operation-guard';
+import { createOperationGuardHost, guardWanted, type OperationGuardHost } from './operation-guard';
 import { legacyPageChange } from '../diagnostics/page-change-probe';
 
-const STYLE_ID = 'web-world-themes-style';
+/** The only base an artwork may still name: artwork saved while the retro theme existed (until
+ * retro-theme-final) names it, and draws exactly as artwork with no base. */
+const LEGACY_BASE_THEME = 'retro';
 
-export interface ThemeController {
+export interface PageController {
   safety: OperationGuardHost | undefined;
   suspend(value: boolean): void;
   timeline: TimelineHost;
@@ -29,14 +29,14 @@ export interface ThemeController {
   destroy(): void;
 }
 
-export function createThemeController(
+/** Everything the page draws for the artwork — skin CSS, image and model layers, operation safety
+ * and the timeline — started once and following the page while artwork is shown. */
+export function createPageController(
   doc: Document,
   site: SiteAdapter,
-  theme: ThemeDefinition,
   onSurfacesChanged?: () => void,
   skinAssets?: SkinAssetPort,
-): ThemeController {
-  const features = createFeatureController({ document: doc, site });
+): PageController {
   const designRenderer = createDesignRenderer(doc, site.designTargets ?? [], skinAssets, () => onSurfacesChanged?.());
   const timeline = createTimelineHost(doc, site.id, createTakeStorage(site.id));
   const safety = site.operationSurfaces
@@ -60,43 +60,21 @@ export function createThemeController(
         editing,
       }),
     );
-  const variables = new Set<string>();
   let disconnect: (() => void) | undefined;
-  let style: HTMLStyleElement | undefined;
   let current: UserSettings | undefined;
   let design: DesignDocument | undefined;
-  const root = doc.documentElement;
-  const css = [site.stylesheet, ...theme.stylesheets].join('\n');
 
-  const clearVariables = () => {
-    variables.forEach((name) => root.style.removeProperty(name));
-    variables.clear();
-  };
-  const removeBase = () => {
-    style?.remove();
-    style = undefined;
-    root.removeAttribute('data-ww-theme');
-    root.style.removeProperty('--ww-strength');
-    clearVariables();
-  };
   const deactivate = () => {
     safety?.setActive(false);
     images.destroy();
     designRenderer.destroy();
-    features.destroy();
     disconnect?.();
     disconnect = undefined;
-    removeBase();
   };
 
   const followPage = (change?: SitePageChange, marked?: readonly Element[]) => {
     WW_TEST_PAGE_CHANGE: if (legacyPageChange()) return render();
     if (suspended || !current?.enabled || current.strength === 0) return;
-    if (design?.baseThemeId !== null) {
-      // Reattach the cached sheet after head replacement; settings have not changed.
-      if (style && !style.isConnected) (doc.head ?? root).append(style);
-      if (change !== 'content') features.refresh();
-    }
     designRenderer.refresh(change, marked);
     images.refresh();
     // Text can alter geometry too; active editors compare their anchor snapshot.
@@ -106,29 +84,6 @@ export function createThemeController(
   const render = () => {
     if (suspended || !current?.enabled || current.strength === 0) return;
     inspect();
-    if (design?.baseThemeId === null) {
-      // Independent designs use native site styling plus their own rules only.
-      features.destroy();
-      removeBase();
-    } else {
-      root.setAttribute('data-ww-theme', theme.id);
-      root.style.setProperty('--ww-strength', String(current.strength / 100));
-      const next = theme.variables?.(current) ?? {};
-      for (const name of variables) if (!Object.hasOwn(next, name)) root.style.removeProperty(name);
-      variables.clear();
-      for (const [name, value] of Object.entries(next)) {
-        root.style.setProperty(name, value);
-        variables.add(name);
-      }
-      if (!style) {
-        style = doc.createElement('style');
-        style.id = STYLE_ID;
-        style.textContent = css;
-      }
-      if (!style.isConnected) (doc.head ?? root).append(style);
-      features.update(current.features);
-      features.refresh();
-    }
     syncParts();
     designRenderer.update(design);
     images.update(design?.decorations ?? [], design?.groups ?? [], design?.signalRules ?? []);
@@ -154,7 +109,7 @@ export function createThemeController(
 
   const validateDesign = (input: DesignDocument | undefined) => {
     const next = input ? readDesign(input) : undefined;
-    if (next && (next.siteId !== site.id || (next.baseThemeId !== null && next.baseThemeId !== theme.id))) {
+    if (next && (next.siteId !== site.id || (next.baseThemeId !== null && next.baseThemeId !== LEGACY_BASE_THEME))) {
       throw new Error('このサイトまたは基底テーマには対応していません。');
     }
     if (next) compileDesign(next, site.designTargets ?? []);

@@ -1,10 +1,8 @@
 import { test, expect } from '@playwright/test';
-import { FEATURE_REGISTRY, defaultFeaturePreferences, type FeatureDefinition } from '../src/features';
-import { createFeatureController } from '../src/features/controller';
+import { FEATURE_REGISTRY, defaultFeaturePreferences } from '../src/features';
 import { bindSettingsForm } from '../src/settings/form';
-import { createThemeController } from '../src/themes/controller';
-import { DEFAULT_PALETTE, PALETTE_CHANNELS, PALETTE_PRESETS, PALETTE_VARIABLES } from '../src/themes/retro/palette';
-import { retroVariables } from '../src/themes/retro/variables';
+import { createPageController } from '../src/host/page-controller';
+import { DEFAULT_PALETTE, PALETTE_CHANNELS, PALETTE_PRESETS } from '../src/themes/retro/palette';
 import type { SiteAdapter } from '../src/sites/types';
 import {
   DEFAULT_SETTINGS,
@@ -58,7 +56,6 @@ function fakeStorage(initial: StorageData = {}) {
 function fakeSite(overrides: Partial<SiteAdapter> = {}): SiteAdapter {
   return {
     id: 'fixture',
-    stylesheet: '',
     connect: () => () => {},
     mountSettings: () => () => {},
     ...overrides,
@@ -166,79 +163,9 @@ test('unsubscribing before the initial read resolves prevents late application',
   expect(storage.listeners.size).toBe(0);
 });
 
-test('registry lifecycle mounts once, independently toggles modules, and cleans up once', () => {
-  const counts: Record<string, { mounts: number; refreshes: number; destroys: number }> = {};
-  const definitions: FeatureDefinition[] = ['first', 'second'].map((id) => {
-    const count = (counts[id] = { mounts: 0, refreshes: 0, destroys: 0 });
-    return {
-      id,
-      label: id,
-      description: id,
-      defaultEnabled: true,
-      mount: () => {
-        count.mounts++;
-        return {
-          refresh: () => {
-            count.refreshes++;
-          },
-          destroy: () => {
-            count.destroys++;
-          },
-        };
-      },
-    };
-  });
-  const controller = createFeatureController({ document: {} as Document, site: fakeSite() }, definitions);
-  controller.update({ first: true, second: true, unknown: true });
-  controller.update({ first: true, second: true });
-  controller.refresh();
-  expect(counts).toEqual({
-    first: { mounts: 1, refreshes: 1, destroys: 0 },
-    second: { mounts: 1, refreshes: 1, destroys: 0 },
-  });
-  controller.update({ first: false, second: true });
-  controller.refresh();
-  expect(counts.first).toEqual({ mounts: 1, refreshes: 1, destroys: 1 });
-  expect(counts.second).toEqual({ mounts: 1, refreshes: 2, destroys: 0 });
-  controller.update({ first: true, second: true });
-  controller.destroy();
-  controller.destroy();
-  controller.refresh();
-  expect(counts.first).toEqual({ mounts: 2, refreshes: 1, destroys: 2 });
-  expect(counts.second).toEqual({ mounts: 1, refreshes: 2, destroys: 1 });
-});
-
-test('the registered feature defaults on and gracefully skips an unsupported adapter', () => {
-  const unsupported = createFeatureController({ document: fakeDocument().doc, site: fakeSite() });
-  expect(() => {
-    unsupported.update();
-    unsupported.refresh();
-    unsupported.destroy();
-  }).not.toThrow();
-  let mounts = 0;
-  let destroys = 0;
-  const site = fakeSite({
-    features: {
-      'window-chrome': {
-        mount: () => {
-          mounts++;
-          return {
-            destroy: () => {
-              destroys++;
-            },
-          };
-        },
-      },
-    },
-  });
-  const supported = createFeatureController({ document: fakeDocument().doc, site });
-  supported.update({ 'window-chrome': false });
-  expect(mounts).toBe(0);
-  supported.update();
-  supported.update();
-  expect(mounts).toBe(1);
-  supported.destroy();
-  expect(destroys).toBe(1);
+test('the saved display-option keys keep their IDs and defaults', () => {
+  // The page draws none of them any more; their stored values stay readable (docs/theme-removal.md).
+  expect(defaultFeaturePreferences()['window-chrome']).toBe(true);
   expect(FEATURE_REGISTRY.map(({ id }) => id)).toEqual([
     'window-chrome',
     'palette',
@@ -288,13 +215,10 @@ function fakeDocument() {
   return { doc, attributes, properties, styles };
 }
 
-test('theme OFF, zero, and repeated destroy clean feature and adapter lifetimes', () => {
+test('OFF, zero, and repeated destroy disconnect the page once and leave nothing on the root', () => {
   const { doc, attributes, properties, styles } = fakeDocument();
-  let mounts = 0;
-  let destroys = 0;
   let connections = 0;
   let disconnections = 0;
-  let refreshes = 0;
   let onPageChange: (() => void) | undefined;
   const site = fakeSite({
     connect: (callback) => {
@@ -305,52 +229,26 @@ test('theme OFF, zero, and repeated destroy clean feature and adapter lifetimes'
         onPageChange = undefined;
       };
     },
-    features: {
-      'window-chrome': {
-        mount: () => {
-          mounts++;
-          return {
-            refresh: () => {
-              refreshes++;
-            },
-            destroy: () => {
-              destroys++;
-            },
-          };
-        },
-      },
-    },
   });
-  const controller = createThemeController(doc, site, {
-    id: 'fixture',
-    name: 'Fixture',
-    stylesheets: [],
-    editorStylesheets: [],
-  });
+  const controller = createPageController(doc, site);
   const active = { ...DEFAULT_SETTINGS, enabled: true };
   controller.update(active);
   controller.update({ ...active, strength: 90 });
-  expect(mounts).toBe(1);
+  // A strength change while shown is not a second connection.
   expect(connections).toBe(1);
-  expect(properties.get('--ww-strength')).toBe('0.9');
-  styles[0]!.remove();
-  onPageChange?.();
-  expect(styles[0]!.isConnected).toBe(true);
-  expect(refreshes).toBe(3);
+  expect(() => onPageChange?.()).not.toThrow();
   controller.update({ ...active, strength: 0 });
-  expect(destroys).toBe(1);
   expect(disconnections).toBe(1);
-  expect(attributes.size).toBe(0);
-  expect(properties.size).toBe(0);
-  expect(styles[0]!.isConnected).toBe(false);
+  expect(onPageChange).toBeUndefined();
+  // The display options are no longer the page's: changing one draws nothing new.
   controller.update({ ...active, features: { 'window-chrome': false } });
   expect(connections).toBe(2);
-  expect(mounts).toBe(1);
   controller.update(active);
-  expect(mounts).toBe(2);
+  expect(connections).toBe(2);
   controller.update({ ...active, enabled: false });
+  expect(disconnections).toBe(2);
   controller.destroy();
-  expect(destroys).toBe(2);
+  controller.destroy();
   expect(disconnections).toBe(2);
   expect(attributes.size).toBe(0);
   expect(properties.size).toBe(0);
@@ -610,15 +508,9 @@ test('invalid stored channels and noise use bounded defaults without rewriting s
   expect(normalizeNoiseStrength(NaN)).toBe(DEFAULT_SETTINGS.noiseStrength);
 });
 
-test('palette and noise variables follow independent toggles and leave nothing after OFF or zero', () => {
-  const { doc, properties } = fakeDocument();
-  const controller = createThemeController(doc, fakeSite(), {
-    id: 'fixture',
-    name: 'Fixture',
-    stylesheets: [],
-    editorStylesheets: [],
-    variables: retroVariables,
-  });
+test('a saved palette and noise strength no longer write anything on the page', () => {
+  const { doc, properties, attributes } = fakeDocument();
+  const controller = createPageController(doc, fakeSite());
   const active = mergeSettings(DEFAULT_SETTINGS, {
     enabled: true,
     palette: PALETTE_PRESETS.mint,
@@ -626,19 +518,8 @@ test('palette and noise variables follow independent toggles and leave nothing a
     features: { palette: true, 'surface-noise': true },
   });
   controller.update(active);
-  expect(PALETTE_VARIABLES.every((name) => properties.has(name))).toBe(true);
-  expect(properties.get('--ww-noise-strength')).toBe('0.41');
-  controller.update(mergeSettings(active, { features: { palette: false } }));
-  expect(PALETTE_VARIABLES.every((name) => !properties.has(name))).toBe(true);
-  expect(properties.get('--ww-noise-strength')).toBe('0.41');
-  controller.update(mergeSettings(active, { features: { 'surface-noise': false } }));
-  expect(properties.has('--ww-noise-strength')).toBe(false);
-  expect(PALETTE_VARIABLES.every((name) => properties.has(name))).toBe(true);
-  controller.update(mergeSettings(active, { enabled: false }));
   expect(properties.size).toBe(0);
-  controller.update(active);
-  controller.update(mergeSettings(active, { strength: 0 }));
-  expect(properties.size).toBe(0);
+  expect(attributes.size).toBe(0);
   controller.destroy();
   expect(active.palette).toEqual(PALETTE_PRESETS.mint);
   expect(active.noiseStrength).toBe(41);

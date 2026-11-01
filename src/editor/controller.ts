@@ -81,7 +81,7 @@ button:focus-visible{outline:2px solid var(--cobalt);outline-offset:1px}`;
 export function createCreatorEditor(
   doc: Document,
   site: SiteAdapter,
-  baseThemeId: string,
+  baseThemeId: string | null,
   apply: (design: DesignDocument | undefined) => void,
   editImages: (editing: ImageEditing | undefined) => void,
   validate: (design: DesignDocument | undefined) => void,

@@ -30,7 +30,7 @@ e2e は全件で約23分かかる。毎回すべて回さず、変更の場所�
 | 引き渡しの前（完了報告を書く前） | unit 全件 ＋ e2e 全件                                                                        |
 | 検証（別の担当）                 | 対象コミットの CI の結果を使う。e2e 全件は回し直さない。足したテストと実サイトの確認だけ回す |
 
-- 中核：`src/design/renderer.ts`・`src/design/schema.ts`・`src/design/migrations.ts`・`src/validation.ts`・`src/sites/`・`src/themes/controller.ts`・`src/world/`・`src/host/`・`src/content/`・`manifest.json`・`scripts/build.mjs`・`playwright.config.ts`・`tests/fixtures.ts`
+- 中核：`src/design/renderer.ts`・`src/design/schema.ts`・`src/design/migrations.ts`・`src/validation.ts`・`src/sites/`・`src/world/`・`src/host/`（`src/host/page-controller.ts` を含む）・`src/content/`・`manifest.json`・`scripts/build.mjs`・`playwright.config.ts`・`tests/fixtures.ts`
 - 「触った部分の e2e」は、変えたモジュールの名前で `tests/` を検索して選ぶ（`git grep -l <モジュール名> tests/`）。選んだ spec を完了報告に書く
 - CI は push のたびに unit と e2e の全件を回す（e2e は4台に分けて並べる）。CI が落ちたら、次の作業より先に直す
 - `workers: 1` は変えない。手元で e2e を並列にしない（ネイティブのウィンドウと計測が取り合うため）

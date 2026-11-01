@@ -1,7 +1,7 @@
 import type { DesignTarget } from '../design/types';
 import type { PlaybackSource } from '../signals/types';
 
-/** The theme sees semantic surfaces; the adapter owns selectors and page lifecycle. */
+/** Consumers see semantic surfaces; the adapter owns selectors and page lifecycle. */
 export type Surface =
   | 'page'
   | 'panel'
@@ -53,22 +53,11 @@ export interface SettingsEntry {
   reposition?(): void;
 }
 
-/** A mounted capability owns everything it adds, including listeners and observers. */
-export interface SiteFeatureInstance {
-  refresh?(): void;
-  destroy(): void;
-}
-
-export interface SiteFeatureCapability {
-  mount(): SiteFeatureInstance;
-}
-
-/** The adapter classifies page work; themes do not inspect site-specific DOM. */
+/** The adapter classifies page work; the artwork's renderers do not inspect site-specific DOM. */
 export type SitePageChange = 'content' | 'structure' | 'navigation' | 'mode' | 'fullscreen';
 
 export interface SiteAdapter {
   readonly id: string;
-  readonly stylesheet: string;
   readonly designTargets?: readonly DesignTarget[];
   readonly decorationAnchors?: readonly DesignTarget[];
   /** Site-specific native controls the skin picker labels as 未対応 when no part covers them. */
@@ -80,8 +69,6 @@ export interface SiteAdapter {
   /** Native media discovery belongs to the site; consumers only receive signals. */
   readonly signals?: { readonly videoPlayback?: PlaybackSource };
   readonly operationSurfaces?: () => import('../host/operation-source').OperationSource;
-  /** Optional site-owned implementations; unsupported features are safely skipped. */
-  readonly features?: Readonly<Record<string, SiteFeatureCapability>>;
   /** `marked` lists elements whose semantic surfaces changed in this batch, so consumers
    * never need a whole-document query to find new parts. */
   connect(onPageChange: (change?: SitePageChange, marked?: readonly Element[]) => void): () => void;

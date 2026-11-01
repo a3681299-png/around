@@ -1,8 +1,14 @@
-import { windowChrome } from './window-chrome';
 import { personalizationFeatures } from './personalization';
 import type { FeatureDefinition, FeaturePreferences } from './types';
 
-/** Add a module here to expose its default, saved toggle, and lifecycle together. */
+const windowChrome: FeatureDefinition = {
+  id: 'window-chrome',
+  label: '窓の飾り',
+  description: 'タイトルバー・動画とリストの小窓・時計を表示',
+  defaultEnabled: true,
+};
+
+/** The saved toggles' IDs, defaults and labels, in their original order. */
 export const FEATURE_REGISTRY: readonly FeatureDefinition[] = Object.freeze([windowChrome, ...personalizationFeatures]);
 
 export function defaultFeaturePreferences(): FeaturePreferences {
@@ -13,4 +19,4 @@ export function featureEnabled(feature: FeatureDefinition, value: unknown): bool
   return typeof value === 'boolean' ? value : feature.defaultEnabled;
 }
 
-export type { FeatureContext, FeatureDefinition, FeaturePreferences } from './types';
+export type { FeatureDefinition, FeaturePreferences } from './types';

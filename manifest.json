@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Web World Themes",
   "version": "0.1.0",
-  "description": "YouTubeのUIを着せ替える拡張機能。仮のretroテーマをON/OFFし、強さを調整できます。",
+  "description": "YouTubeの上に、自分で作った世界（UIの着せ替え・画像・3Dモデル）を表示する拡張機能です。",
   "minimum_chrome_version": "120",
   "permissions": ["storage", "sidePanel"],
   "background": {
@@ -35,10 +35,6 @@
     "extension_pages": "script-src 'self'; object-src 'none'"
   },
   "web_accessible_resources": [
-    {
-      "resources": ["assets/fonts/PixelMplus12-Regular.woff2"],
-      "matches": ["https://www.youtube.com/*"]
-    },
     {
       "resources": ["assets/read-frame.html"],
       "matches": ["https://www.youtube.com/*"]

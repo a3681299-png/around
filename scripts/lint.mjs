@@ -17,21 +17,15 @@ async function check(directory) {
     const source = await readFile(file, 'utf8');
     const label = relative(root, file).replaceAll('\\', '/');
     if (/[^\S\r\n]+$/m.test(source)) errors.push(`${label}: trailing whitespace`);
-    if (/^src\/(?:themes|design|editor|world|renderers)\//.test(label) && /\b(?:ytd|ytm|yt)-[a-z]/.test(source)) {
+    if (/^src\/(?:design|editor|world|renderers|host)\//.test(label) && /\b(?:ytd|ytm|yt)-[a-z]/.test(source)) {
       errors.push(`${label}: keep YouTube selectors inside the site adapter`);
     }
     if (!file.endsWith('.css')) continue;
     const result = await transform(source, { loader: 'css', sourcefile: label, logLevel: 'silent' });
     errors.push(...result.warnings.map((warning) => `${label}: ${warning.text}`));
-    if (label.startsWith('src/themes/') && /\b(?:ytd|ytm|yt)-[a-z]/.test(source)) {
-      errors.push(`${label}: keep YouTube selectors inside the site adapter`);
-    }
-    if (label.startsWith('src/themes/retro/') && !label.endsWith('tokens.css') && /#[\da-f]{3,8}\b/i.test(source)) {
-      errors.push(`${label}: define decoration colors in tokens.css`);
-    }
   }
 }
 await check(join(root, 'src'));
 errors.push(...(await skillProblems()));
 if (errors.length) throw new Error(errors.join('\n'));
-console.log('Source whitespace, CSS syntax, theme selector boundaries, color tokens and skill metadata checked.');
+console.log('Source whitespace, CSS syntax, site selector boundaries and skill metadata checked.');

@@ -120,7 +120,8 @@ export interface EditorGeometry {
 }
 export interface EditorPorts<Source> {
   siteId: string;
-  baseThemeId: string;
+  /** New artwork's base: null since the retro theme was removed. */
+  baseThemeId: string | null;
   targets: readonly DesignTarget[];
   makeId(kind: 'image' | 'group' | 'session'): string;
   geometry: EditorGeometry;

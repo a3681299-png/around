@@ -1,37 +1,11 @@
 import type { FeatureDefinition } from './types';
 
-/** Small independent lifetimes: site capabilities own DOM, CSS options own one flag. */
-function option(
-  id: string,
-  label: string,
-  description: string,
-  defaultEnabled: boolean,
-  siteOwned = false,
-): FeatureDefinition {
-  return {
-    id,
-    label,
-    description,
-    defaultEnabled,
-    mount: ({ document: doc, site }) => {
-      const capability = site.features?.[id];
-      if (siteOwned && !capability) return undefined;
-      const attribute = `data-ww-feature-${id}`;
-      doc.documentElement.setAttribute(attribute, '');
-      const instance = capability?.mount();
-      return {
-        refresh() {
-          if (!doc.documentElement.hasAttribute(attribute)) doc.documentElement.setAttribute(attribute, '');
-          instance?.refresh?.();
-        },
-        destroy() {
-          instance?.destroy();
-          doc.documentElement.removeAttribute(attribute);
-        },
-      };
-    },
-  };
-}
+const option = (id: string, label: string, description: string, defaultEnabled: boolean): FeatureDefinition => ({
+  id,
+  label,
+  description,
+  defaultEnabled,
+});
 
 export const personalizationFeatures: readonly FeatureDefinition[] = [
   option('palette', 'UIの配色', '色相・彩度・明るさでUIの色を調整（映像は変更しません）', true),
@@ -41,15 +15,13 @@ export const personalizationFeatures: readonly FeatureDefinition[] = [
     '操作中の小窓の色',
     '実際に操作した小窓を青く表示。別タブや別ウィンドウへ移ると解除',
     false,
-    true,
   ),
-  option('daily-details', '日替わりの小さな飾り', '余白に日替わりの小さな顔文字とASCIIを表示', true, true),
+  option('daily-details', '日替わりの小さな飾り', '余白に日替わりの小さな顔文字とASCIIを表示', true),
   option('surface-noise', '表面のかすかな粒子', '背景と装飾部分だけにごく薄いディザを追加', false),
   option(
     'bbs-comments',
     '掲示板風のコメント',
     '表示中のコメントを順番付きの掲示板風に。正確な日時がある場合のみ併記',
-    true,
     true,
   ),
   option('transparent-background', '透明な背景', 'ページの地色を透明に。カードや本文の読みやすさは維持', false),

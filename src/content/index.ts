@@ -1,10 +1,8 @@
 import { getSiteAdapter } from '../sites';
 import { oneOf } from '../validation';
 import { watchSettings } from '../storage/settings';
-import { DEFAULT_THEME, themes } from '../themes';
-import { createThemeController } from '../themes/controller';
+import { createPageController } from '../host/page-controller';
 import { createSettingsPanel } from '../settings/panel';
-import { mountPixelFont } from '../ui/pixel-font';
 import { createCreatorEditor, type CreatorEditor } from '../editor/controller';
 import { PREPARE_SIDE_PANEL, PROBE_EDITOR_TARGET } from '../editor/messages';
 import type { UserSettings } from '../storage/settings';
@@ -29,20 +27,15 @@ if (site) {
   lifetime.__webWorldThemesCleanup?.();
   const assetReader = createAssetReadHost(document);
   let creator: CreatorEditor | undefined;
-  const controller = createThemeController(
-    document,
-    site,
-    themes[DEFAULT_THEME],
-    () => creator?.refreshSelection(),
-    skinAssetPort,
-  );
+  const controller = createPageController(document, site, () => creator?.refreshSelection(), skinAssetPort);
   // Panel previews share the renderer's loader; each preview URL lives until the page unloads.
   const previewUrls = new Map<string, Promise<string | undefined>>();
   controller.suspend(true);
   creator = createCreatorEditor(
     document,
     site,
-    DEFAULT_THEME,
+    // New artwork names no base theme (docs/theme-removal.md).
+    null,
     controller.updateDesign,
     controller.setImageEditing,
     controller.validateDesign,
@@ -70,9 +63,6 @@ if (site) {
     creator?.suspendMarks(value);
   });
   void chrome.runtime.sendMessage({ type: PREPARE_SIDE_PANEL }).catch(() => undefined);
-  // The retro theme's window chrome and LCD clock use the packaged pixel face (the settings panel,
-  // which used to load it, now wears the WWT Studio system).
-  const unmountFont = mountPixelFont(document);
   let creatorMode = false;
   // The side panel first; where Chrome will not open it, the editor's own window.
   const settingsPanel = createSettingsPanel(document, {
@@ -88,7 +78,7 @@ if (site) {
     },
     creatorMode: () => creatorMode,
   });
-  // The settings entry stays available independently of the theme's ON/OFF state.
+  // The settings entry stays available independently of the ON/OFF state.
   const unmountSettings = site.mountSettings(settingsPanel);
   const reportError = (error: unknown) => {
     controller.destroy();
@@ -132,7 +122,6 @@ if (site) {
     window.removeEventListener('pageshow', onPageShow);
     unmountSettings();
     settingsPanel.destroy();
-    unmountFont();
     disconnectStudio();
     creator?.destroy();
     controller.destroy();

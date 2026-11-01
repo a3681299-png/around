@@ -300,7 +300,20 @@ test('Studio and canvas shortcuts share target geometry, input guards and direct
   await expect(youtube.locator(images)).toHaveCount(1);
   await expect(panel.locator('.selected-count')).toHaveText('0個選択中');
   await youtube.bringToFront();
-  await first.click();
+  // Click the image where it is on top: native YouTube content (a comment avatar on the fixture)
+  // can lie over part of it, and a click there is the page's own.
+  const box = (await first.boundingBox())!;
+  const position = await first.evaluate((image, box) => {
+    const host = image.getRootNode() instanceof ShadowRoot ? (image.getRootNode() as ShadowRoot).host : image;
+    for (let y = 0.2; y < 1; y += 0.2)
+      for (let x = 0.2; x < 1; x += 0.2) {
+        const top = document.elementFromPoint(box.x + box.width * x, box.y + box.height * y);
+        if (top === host || top === image) return { x: box.width * x, y: box.height * y };
+      }
+    return undefined;
+  }, box);
+  expect(position, 'some part of the image is on top').toBeDefined();
+  await first.click({ position: position! });
   await expect(panel.locator('.selected-count')).toHaveText('1個選択中');
   await expect(panel.getByLabel('レイヤー名', { exact: true })).toHaveValue('petal.png');
   await panel.locator('.layer').getByRole('button', { name: 'ロック', exact: true }).click();

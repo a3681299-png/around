@@ -98,7 +98,6 @@ test('one file restores saved artwork, originals, takes and settings into a diff
   const before = await youtube.screenshot({
     path: info.outputPath('source-artwork.png'),
     animations: 'disabled',
-    mask: [youtube.locator('#web-world-themes-clock, #web-world-themes-daily-detail')],
   });
   const root = path.resolve('.work');
   await mkdir(root, { recursive: true });
@@ -149,7 +148,6 @@ test('one file restores saved artwork, originals, takes and settings into a diff
     const after = await canvas.screenshot({
       path: info.outputPath('restored-artwork.png'),
       animations: 'disabled',
-      mask: [canvas.locator('#web-world-themes-clock, #web-world-themes-daily-detail')],
     });
     await info.attach('source-artwork.png', { body: before, contentType: 'image/png' });
     await info.attach('restored-artwork.png', { body: after, contentType: 'image/png' });
@@ -200,14 +198,16 @@ test('backup validates actual raster and model textures, and refuses corrupt fil
   await page.locator('#backup-file').setInputFiles(archive);
   await page.locator('#backup-inspect').click();
   await expect(page.locator('#backup-restore')).toBeEnabled();
+  // The saved artwork changes after the check (new artwork names no base; the legacy base differs).
   await popup.evaluate(async () => {
     const key = 'webWorldThemes.design.youtube',
       value = (await chrome.storage.local.get(key))[key] as Record<string, unknown>;
-    await chrome.storage.local.set({ [key]: { ...value, baseThemeId: null } });
+    if (value['baseThemeId'] !== null) throw new Error('New artwork must name no base theme.');
+    await chrome.storage.local.set({ [key]: { ...value, baseThemeId: 'retro' } });
   });
   await page.locator('#backup-restore').click();
   await expect(page.locator('.backup-status')).toContainText('衝突');
-  expect((await readCounts(page)).local['webWorldThemes.design.youtube']).toMatchObject({ baseThemeId: null });
+  expect((await readCounts(page)).local['webWorldThemes.design.youtube']).toMatchObject({ baseThemeId: 'retro' });
 });
 
 test('backup transport refuses a different extension page', async ({ popup }) => {

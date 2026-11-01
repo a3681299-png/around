@@ -112,7 +112,8 @@ test('pick a card, preview all properties locally, save across tabs, discard, re
   expect(stored).toMatchObject({
     schemaVersion: 13,
     siteId: 'youtube',
-    baseThemeId: 'retro',
+    // New artwork names no base theme since the retro theme was removed.
+    baseThemeId: null,
     rules: [
       {
         kind: 'surface-style',
@@ -320,45 +321,53 @@ test('real storage quota failure preserves the preview and retry saves it', asyn
   await expect(youtube.locator(cards).first()).toHaveCSS('background-color', 'rgb(221, 255, 238)');
 });
 
-test('independent documents apply without retro styles, palette or features and OFF restores native styling', async ({
-  popup,
-  youtube,
-}) => {
-  await enable(popup, youtube);
-  await popup.evaluate(async (designKey) => {
-    await chrome.storage.local.set({
-      [designKey]: {
-        schemaVersion: 1,
-        id: 'independent',
-        siteId: 'youtube',
-        baseThemeId: null,
-        rules: [
-          { kind: 'surface-style', target: 'video-card', style: { backgroundColor: '#ddeeff', borderRadiusPx: 18 } },
-        ],
+for (const baseThemeId of [null, 'retro'] as const) {
+  test(`version 1 artwork based on ${baseThemeId ?? 'nothing'} draws on native YouTube, keeps its base when edited, and OFF restores native styling`, async ({
+    popup,
+    youtube,
+  }) => {
+    await enable(popup, youtube);
+    await popup.evaluate(
+      async ({ designKey, baseThemeId }) => {
+        await chrome.storage.local.set({
+          [designKey]: {
+            schemaVersion: 1,
+            id: 'independent',
+            siteId: 'youtube',
+            baseThemeId,
+            rules: [
+              {
+                kind: 'surface-style',
+                target: 'video-card',
+                style: { backgroundColor: '#ddeeff', borderRadiusPx: 18 },
+              },
+            ],
+          },
+        });
       },
-    });
-  }, key);
-  await expect(youtube.locator(cards).first()).toHaveCSS('background-color', 'rgb(221, 238, 255)');
-  await expect(youtube.locator('#web-world-themes-style')).toHaveCount(0);
-  await expect(youtube.locator('#web-world-themes-window-chrome')).toHaveCount(0);
-  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-theme');
-  expect((await youtube.locator('html').getAttribute('style')) ?? '').not.toContain('--ww-retro');
-  await expect(youtube.locator('ytd-thumbnail #thumbnail').first()).toHaveCSS('border-radius', '16px');
-  const dialog = await openEditor(popup, youtube);
-  await selectCard(youtube);
-  await background(dialog, '#eeffdd');
-  await save(dialog);
-  expect(
-    await popup.evaluate(async (designKey) => {
-      const design = (await chrome.storage.local.get(designKey))[designKey] as { baseThemeId: string | null };
-      return design.baseThemeId;
-    }, key),
-  ).toBeNull();
-  await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
-  await expect(
-    youtube.locator('[data-ww-surface], #web-world-themes-design-style, #web-world-themes-creator'),
-  ).toHaveCount(0);
-});
+      { designKey: key, baseThemeId },
+    );
+    await expect(youtube.locator(cards).first()).toHaveCSS('background-color', 'rgb(221, 238, 255)');
+    await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-theme');
+    expect((await youtube.locator('html').getAttribute('style')) ?? '').not.toContain('--ww-');
+    await expect(youtube.locator('ytd-thumbnail #thumbnail').first()).toHaveCSS('border-radius', '16px');
+    const dialog = await openEditor(popup, youtube);
+    await selectCard(youtube);
+    await background(dialog, '#eeffdd');
+    await save(dialog);
+    // An edit keeps the artwork's own base: existing artwork is never rewritten to another one.
+    expect(
+      await popup.evaluate(async (designKey) => {
+        const design = (await chrome.storage.local.get(designKey))[designKey] as { baseThemeId: string | null };
+        return design.baseThemeId;
+      }, key),
+    ).toBe(baseThemeId);
+    await popup.getByRole('switch', { name: 'テーマを使う' }).uncheck();
+    await expect(
+      youtube.locator('[data-ww-surface], #web-world-themes-design-style, #web-world-themes-creator'),
+    ).toHaveCount(0);
+  });
+}
 
 test('unknown versions remain stored, disable editing and recover after a supported document arrives', async ({
   popup,
@@ -388,7 +397,7 @@ test('unknown versions remain stored, disable editing and recover after a suppor
   await openEditor(popup, youtube);
 });
 
-test('resetting overrides restores retro and persists the reset; only storage and the approved official sidePanel permission are requested', async ({
+test('resetting overrides restores the native card and persists the reset; only storage and the approved official sidePanel permission are requested', async ({
   popup,
   youtube,
 }) => {
@@ -396,6 +405,7 @@ test('resetting overrides restores retro and persists the reset; only storage an
   const dialog = await openEditor(popup, youtube);
   const card = await selectCard(youtube);
   const initial = await card.evaluate((node) => getComputedStyle(node).background);
+  const radius = await card.evaluate((node) => getComputedStyle(node).borderRadius);
   await background(dialog, '#ddeeff');
   await save(dialog);
   await dialog.getByRole('button', { name: 'カードの変更をリセット' }).click();
@@ -403,7 +413,13 @@ test('resetting overrides restores retro and persists the reset; only storage an
   await save(dialog);
   await expect(youtube.locator('#web-world-themes-design-style')).toHaveCount(0);
   await youtube.reload();
-  await expect(youtube.locator(cards).first()).toHaveCSS('border-radius', '0px');
+  await expect(youtube.locator(cards).first()).toHaveCSS('border-radius', radius);
+  expect(
+    await youtube
+      .locator(cards)
+      .first()
+      .evaluate((node) => getComputedStyle(node).background),
+  ).toBe(initial);
   const manifest = await popup.evaluate(() => chrome.runtime.getManifest());
   expect(manifest.permissions).toEqual(['storage', 'sidePanel']);
   expect(manifest.host_permissions).toBeUndefined();

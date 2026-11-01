@@ -437,7 +437,11 @@ test('redraws over unchanged protection geometry leave the clip and safety recor
   const result = await youtube.evaluate(async () => {
     const host = document.querySelector('#web-world-themes-decorations')!;
     const frame = () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    for (let i = 0; i < 30 && host.getAttribute('data-ww-safety')?.includes('"stopped":"操作'); i++) await frame();
+    // The new layer's reads arrive in a burst and are held until their coalescing window ends; wait
+    // for that hold to clear (any stop, whatever its wording), then let one more window pass so the
+    // first resize, like the others, is read on its own rather than inside the last read's window.
+    for (let i = 0; i < 60 && !host.getAttribute('data-ww-safety')?.includes('"stopped":""'); i++) await frame();
+    await new Promise((resolve) => setTimeout(resolve, 250));
     await frame();
     const clip = (host as HTMLElement).style.getPropertyValue('--ww-decoration-clip');
     const writes: string[] = [];

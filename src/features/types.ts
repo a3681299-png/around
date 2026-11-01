@@ -1,18 +1,11 @@
-import type { SiteAdapter, SiteFeatureInstance } from '../sites/types';
-
-/** Only registered IDs are persisted or mounted. Missing values use registry defaults. */
+/** Only registered IDs are persisted. Missing values use registry defaults. */
 export type FeaturePreferences = Readonly<Record<string, boolean>>;
 
-export interface FeatureContext {
-  readonly document: Document;
-  readonly site: SiteAdapter;
-}
-
+/** A retro display option's saved toggle. The page no longer draws any of them (the retro theme
+ * is gone, docs/theme-removal.md); the settings keep reading and writing them until round 3. */
 export interface FeatureDefinition {
   readonly id: string;
   readonly label: string;
   readonly description: string;
   readonly defaultEnabled: boolean;
-  /** Return undefined when this site does not support the feature. */
-  mount(context: FeatureContext): SiteFeatureInstance | undefined;
 }

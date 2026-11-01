@@ -1,10 +1,5 @@
-import stylesheet from './youtube.css';
-import chromeStylesheet from './youtube-chrome.css';
 import type { SiteAdapter, SitePageChange } from './types';
 import { mountYouTubeSettings } from './youtube-player';
-import { mountYouTubeChrome } from './youtube-chrome';
-import { mountYouTubeDetails, mountYouTubeFocus } from './youtube-details';
-import { mountYouTubeComments } from './youtube-comments';
 import { videoCardContainer } from './youtube-cards';
 import { youtubePlaybackSource } from './youtube-signals';
 import { youtubeOperations } from './youtube-operations';
@@ -37,7 +32,6 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
     partsChanged: ((added: typeof YOUTUBE_SKIN_MARKS, removed: boolean) => void) | undefined;
   return {
     id: 'youtube',
-    stylesheet: `${stylesheet}\n${chromeStylesheet}`,
     designTargets: YOUTUBE_DESIGN_TARGETS,
     skinControls: YOUTUBE_SKIN_CONTROLS,
     beneathOverlay(node, x, y) {
@@ -51,12 +45,6 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
     signals: { videoPlayback: youtubePlaybackSource(doc) },
     operationSurfaces: () => youtubeOperations(doc),
     mountSettings: (entry) => mountYouTubeSettings(doc, view, entry),
-    features: {
-      'window-chrome': { mount: () => mountYouTubeChrome(doc) },
-      'daily-details': { mount: () => mountYouTubeDetails(doc) },
-      'focus-titlebars': { mount: () => mountYouTubeFocus(doc) },
-      'bbs-comments': { mount: () => mountYouTubeComments(doc) },
-    },
     setDesignParts(ids) {
       const next = YOUTUBE_SKIN_MARKS.filter((mark) => ids.has(mark.part));
       if (next.length === partMarks.length && next.every((mark, position) => mark === partMarks[position])) return;
@@ -181,8 +169,6 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
               record.type === 'attributes' ||
               (record.type === 'childList' &&
                 ([...record.addedNodes].some((node) => node instanceof Element && !owned(node)) ||
-                  // Detached top-level feature UI must be restored too. Changes
-                  // inside an owned region (clock/title text) still stay content-only.
                   [...record.removedNodes].some((node) => node instanceof Element)));
             if (record.attributeName === 'fullscreen') change = 'fullscreen';
             else if (structural && change === 'content') change = 'structure';

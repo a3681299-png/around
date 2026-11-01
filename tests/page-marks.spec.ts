@@ -209,6 +209,14 @@ test('the selected video card wears the G-pen frame, which follows scrolling and
   expect(added(shown.document, before.document)).toEqual(expect.arrayContaining(['Web World Themes:scroll:true']));
   expect(added(shown.window, before.window)).toEqual(expect.arrayContaining(['Web World Themes:resize:false']));
 
+  // The fixture page is barely taller than the window; room below lets the card scroll its 180px
+  // (the retro theme's status bar used to add that room).
+  await youtube.evaluate(() => {
+    const room = document.createElement('div');
+    room.id = 'scroll-room';
+    room.style.height = '1200px';
+    document.body.append(room);
+  });
   const top = (await card.boundingBox())!.y;
   await youtube.mouse.wheel(0, 180);
   await expect.poll(async () => (await card.boundingBox())!.y).toBeLessThan(top - 100);

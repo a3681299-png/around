@@ -159,7 +159,7 @@ if (watching) {
   await Promise.all(builds.map((build) => build.watch()));
   const refresh = () => copyStaticFiles().catch((error) => console.error(error));
   const watchers = [
-    watch(join(root, 'assets/fonts'), refresh),
+    watch(join(root, 'assets'), { recursive: true }, refresh),
     watch(join(root, 'src/studio'), (_event, file) => {
       if (file === 'index.html' || file === 'studio.css') refresh();
     }),

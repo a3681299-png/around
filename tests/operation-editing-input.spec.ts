@@ -73,14 +73,23 @@ test('a covered control stops drawing until 描画を再開, and the same covere
     await youtube.mouse.click(at.x, at.y);
     await youtube.waitForTimeout(500);
   };
-  // The first click after the cover appeared follows a page change: a pause, never a failure.
-  await youtube.mouse.click(at.x, at.y);
-  await expect
-    .poll(() => stopped(youtube))
-    .toBe('ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。');
-  await youtube.waitForTimeout(500);
+  // The cover moves no control, so each click it takes is a failure from the first one on. A stop
+  // below three failures recovers by itself, possibly between two polls, so every stop the overlay
+  // publishes is recorded rather than sampled.
+  await youtube.locator(overlay).evaluate((node: HTMLElement) => {
+    const seen: string[] = ((window as unknown as { __g111Stops: string[] }).__g111Stops = []);
+    new MutationObserver(() => {
+      const value = JSON.parse(node.dataset.wwSafety ?? '{}').stopped ?? '';
+      if (value) seen.push(value);
+    }).observe(node, { attributes: true, attributeFilter: ['data-ww-safety'] });
+  });
+  const seen = () => youtube.evaluate(() => (window as unknown as { __g111Stops: string[] }).__g111Stops);
+  await coveredClick();
+  expect(await seen()).toContain('クリックがページの操作部品に届くよう、絵の表示を止めました。');
+  // One failure stops drawing for a moment only: it recovers, and there is nothing to resume.
+  await expect.poll(() => stopped(youtube)).toBe('');
   await expect(studio.locator('.ww-editor-safety .safety-resume')).toBeHidden();
-  for (let i = 0; i < 3; i++) await coveredClick();
+  for (let i = 0; i < 2; i++) await coveredClick();
   await youtube.waitForTimeout(800);
   expect(await stopped(youtube)).toBe('クリックがページの操作部品に届くよう、絵の表示を止めました。');
   const check = studio.locator('.ww-editor-safety .safety-check');

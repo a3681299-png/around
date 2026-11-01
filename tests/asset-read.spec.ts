@@ -114,7 +114,6 @@ test('official binary reads detach the original, reject page-forged ports and ex
   const manifest = await popup.evaluate(() => chrome.runtime.getManifest());
   expect(manifest.permissions).toEqual(['storage', 'sidePanel']);
   expect(manifest.web_accessible_resources!.flatMap((r) => (typeof r === 'string' ? [r] : r.resources))).toEqual([
-    'assets/fonts/PixelMplus12-Regular.woff2',
     ASSET_READ_FRAME,
   ]);
 });
