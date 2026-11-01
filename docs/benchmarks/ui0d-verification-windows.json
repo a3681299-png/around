@@ -1,0 +1,2140 @@
+{
+  "stage": "UI0-d independent verification",
+  "measuredAt": "2026-11-01T06:06:32.826Z",
+  "url": "https://www.youtube.com/results?search_query=lofi+hip+hop",
+  "scenario": "Native S attached: 6s steady, then 6s from search submit (search to search SPA)",
+  "environment": {
+    "os": "win32 10.0.26300",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13650HX",
+    "node": "v24.16.0",
+    "outerWindow": [1920, 1080],
+    "deviceScaleFactor": 1
+  },
+  "builds": {
+    "before": {
+      "source": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\.work\\ui0dv-base",
+      "revision": "3cfa6ae701d02b5be7d97c63e61193b3360950d5",
+      "dirtySource": false,
+      "probe": "isolated-world-v3",
+      "asyncContinuations": "lowered-promises",
+      "busyMs": 0,
+      "busyAfterAwait": false,
+      "disableInk": false
+    },
+    "after": {
+      "source": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor",
+      "revision": "138298ff8fc96f12fcee2b0effcb3cd93d6c568f",
+      "dirtySource": false,
+      "probe": "isolated-world-v3",
+      "asyncContinuations": "lowered-promises",
+      "busyMs": 0,
+      "busyAfterAwait": false,
+      "disableInk": false
+    }
+  },
+  "pairs": [
+    {
+      "pair": 1,
+      "order": ["before", "after"],
+      "blocks": {
+        "before": {
+          "host": {
+            "Started": "2026-11-01T15:06:33.3213871+09:00",
+            "DurationMs": 10016.989,
+            "LogicalProcessors": 20,
+            "OwnerPid": 31204,
+            "CurrentSessionPid": 11048,
+            "BackgroundPercent": 1.731,
+            "OtherCodeSessions": [
+              {
+                "Pid": 20908,
+                "Name": "claude.exe",
+                "CpuMs": 15.625,
+                "OneCorePct": 0.156
+              },
+              {
+                "Pid": 19384,
+                "Name": "codex.exe",
+                "CpuMs": 15.625,
+                "OneCorePct": 0.156
+              }
+            ],
+            "TopBackground": [
+              {
+                "Pid": 11432,
+                "Name": "ChatGPT",
+                "CpuMs": 1437.5,
+                "OneCorePct": 14.351
+              },
+              {
+                "Pid": 10972,
+                "Name": "ChatGPT",
+                "CpuMs": 1171.875,
+                "OneCorePct": 11.699
+              },
+              {
+                "Pid": 25540,
+                "Name": "brave",
+                "CpuMs": 109.375,
+                "OneCorePct": 1.092
+              },
+              {
+                "Pid": 20140,
+                "Name": "HuionTablet",
+                "CpuMs": 78.125,
+                "OneCorePct": 0.78
+              },
+              {
+                "Pid": 11048,
+                "Name": "codex",
+                "CpuMs": 78.125,
+                "OneCorePct": 0.78
+              },
+              {
+                "Pid": 20388,
+                "Name": "DeepL",
+                "CpuMs": 62.5,
+                "OneCorePct": 0.624
+              },
+              {
+                "Pid": 20024,
+                "Name": "ChatGPT",
+                "CpuMs": 62.5,
+                "OneCorePct": 0.624
+              },
+              {
+                "Pid": 25532,
+                "Name": "claude",
+                "CpuMs": 62.5,
+                "OneCorePct": 0.624
+              },
+              {
+                "Pid": 26560,
+                "Name": "ChatGPT",
+                "CpuMs": 46.875,
+                "OneCorePct": 0.468
+              },
+              {
+                "Pid": 18828,
+                "Name": "MiniMax Code",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              },
+              {
+                "Pid": 22380,
+                "Name": "brave",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              },
+              {
+                "Pid": 3260,
+                "Name": "brave",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              }
+            ],
+            "CodeQuiet": true,
+            "Quiet": true,
+            "Criterion": "Background CPU <= 5% of all logical CPUs; each other code-session tree <= 5% of one core. No other tests/builds are launched during measurement."
+          },
+          "viewport": {
+            "width": 1541,
+            "height": 993,
+            "visibility": "visible",
+            "dpr": 1
+          },
+          "panel": {
+            "width": 360,
+            "connected": "true"
+          },
+          "steady": {
+            "stats": {
+              "count": 868,
+              "median": 0,
+              "p95": 0,
+              "max": 0
+            },
+            "callbackKinds": {},
+            "clock": {
+              "source": "document-start-main-world-raf-timestamps",
+              "timeOrigin": 1793513204227.9,
+              "start": 12635.100000000093,
+              "end": 18652.899999999907,
+              "originalProbeStart": 12635.100000000093,
+              "originalProbeFrameCount": 867,
+              "beforeExtensionFrames": 0
+            },
+            "totalMs": 0,
+            "longestCallbackMs": 0,
+            "fullFrame": {
+              "count": 868,
+              "median": 6.9295,
+              "p95": 7.789,
+              "max": 16.718
+            },
+            "panelConnected": "true",
+            "url": "https://www.youtube.com/results?search_query=lofi+hip+hop"
+          },
+          "spa": {
+            "stats": {
+              "count": 816,
+              "median": 0,
+              "p95": 0.2999999998137355,
+              "max": 21.200000000186265
+            },
+            "callbackKinds": {
+              "event": 22,
+              "MutationObserver": 196,
+              "raf": 49,
+              "microtask": 25,
+              "ResizeObserver": 9,
+              "setTimeout": 11,
+              "promise": 2
+            },
+            "clock": {
+              "source": "document-start-main-world-raf-timestamps",
+              "timeOrigin": 1793513204227.9,
+              "start": 19004.899999999907,
+              "end": 25072.600000000093,
+              "originalProbeStart": 19004.899999999907,
+              "originalProbeFrameCount": 816,
+              "beforeExtensionFrames": 0
+            },
+            "totalMs": 159.09999999869615,
+            "longestCallbackMs": 10.899999999906868,
+            "fullFrame": {
+              "count": 816,
+              "median": 6.9775,
+              "p95": 25.606,
+              "max": 86.428
+            },
+            "panelConnected": "true",
+            "url": "https://www.youtube.com/results?search_query=ambient+music"
+          },
+          "sameDocument": true
+        },
+        "after": {
+          "host": {
+            "Started": "2026-11-01T15:07:10.9460062+09:00",
+            "DurationMs": 10009.6,
+            "LogicalProcessors": 20,
+            "OwnerPid": 31204,
+            "CurrentSessionPid": 11048,
+            "BackgroundPercent": 1.631,
+            "OtherCodeSessions": [
+              {
+                "Pid": 20908,
+                "Name": "claude.exe",
+                "CpuMs": 0,
+                "OneCorePct": 0
+              },
+              {
+                "Pid": 19384,
+                "Name": "codex.exe",
+                "CpuMs": 0,
+                "OneCorePct": 0
+              }
+            ],
+            "TopBackground": [
+              {
+                "Pid": 10972,
+                "Name": "ChatGPT",
+                "CpuMs": 1218.75,
+                "OneCorePct": 12.176
+              },
+              {
+                "Pid": 11432,
+                "Name": "ChatGPT",
+                "CpuMs": 1109.375,
+                "OneCorePct": 11.083
+              },
+              {
+                "Pid": 20024,
+                "Name": "ChatGPT",
+                "CpuMs": 250,
+                "OneCorePct": 2.498
+              },
+              {
+                "Pid": 11048,
+                "Name": "codex",
+                "CpuMs": 125,
+                "OneCorePct": 1.249
+              },
+              {
+                "Pid": 21072,
+                "Name": "ChatGPT",
+                "CpuMs": 78.125,
+                "OneCorePct": 0.781
+              },
+              {
+                "Pid": 9960,
+                "Name": "HuionTabletCore",
+                "CpuMs": 78.125,
+                "OneCorePct": 0.781
+              },
+              {
+                "Pid": 20140,
+                "Name": "HuionTablet",
+                "CpuMs": 62.5,
+                "OneCorePct": 0.624
+              },
+              {
+                "Pid": 15108,
+                "Name": "ChatGPT",
+                "CpuMs": 62.5,
+                "OneCorePct": 0.624
+              },
+              {
+                "Pid": 20388,
+                "Name": "DeepL",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              },
+              {
+                "Pid": 9380,
+                "Name": "ipf_helper",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              },
+              {
+                "Pid": 25532,
+                "Name": "claude",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              },
+              {
+                "Pid": 26704,
+                "Name": "pwsh",
+                "CpuMs": 15.625,
+                "OneCorePct": 0.156
+              }
+            ],
+            "CodeQuiet": true,
+            "Quiet": true,
+            "Criterion": "Background CPU <= 5% of all logical CPUs; each other code-session tree <= 5% of one core. No other tests/builds are launched during measurement."
+          },
+          "viewport": {
+            "width": 1541,
+            "height": 993,
+            "visibility": "visible",
+            "dpr": 1
+          },
+          "panel": {
+            "width": 360,
+            "connected": "true"
+          },
+          "steady": {
+            "stats": {
+              "count": 866,
+              "median": 0,
+              "p95": 0,
+              "max": 0
+            },
+            "callbackKinds": {},
+            "clock": {
+              "source": "document-start-main-world-raf-timestamps",
+              "timeOrigin": 1793513241895.9,
+              "start": 12138.80000000028,
+              "end": 18144.5,
+              "originalProbeStart": 12138.80000000028,
+              "originalProbeFrameCount": 866,
+              "beforeExtensionFrames": 0
+            },
+            "totalMs": 0,
+            "longestCallbackMs": 0,
+            "fullFrame": {
+              "count": 867,
+              "median": 6.906,
+              "p95": 7.663,
+              "max": 17.823
+            },
+            "panelConnected": "true",
+            "url": "https://www.youtube.com/results?search_query=lofi+hip+hop"
+          },
+          "spa": {
+            "stats": {
+              "count": 821,
+              "median": 0,
+              "p95": 0.3000000002793968,
+              "max": 20.100000000558794
+            },
+            "callbackKinds": {
+              "event": 17,
+              "MutationObserver": 190,
+              "raf": 49,
+              "microtask": 25,
+              "ResizeObserver": 8,
+              "setTimeout": 11,
+              "promise": 2
+            },
+            "clock": {
+              "source": "document-start-main-world-raf-timestamps",
+              "timeOrigin": 1793513241895.9,
+              "start": 18498.200000000186,
+              "end": 24552.5,
+              "originalProbeStart": 18498.200000000186,
+              "originalProbeFrameCount": 821,
+              "beforeExtensionFrames": 0
+            },
+            "totalMs": 162.20000000251457,
+            "longestCallbackMs": 12.100000000093132,
+            "fullFrame": {
+              "count": 821,
+              "median": 6.971,
+              "p95": 25.135,
+              "max": 134.228
+            },
+            "panelConnected": "true",
+            "url": "https://www.youtube.com/results?search_query=ambient+music"
+          },
+          "sameDocument": true
+        }
+      }
+    },
+    {
+      "pair": 2,
+      "order": ["after", "before"],
+      "blocks": {
+        "after": {
+          "host": {
+            "Started": "2026-11-01T15:07:48.0104794+09:00",
+            "DurationMs": 10015.123,
+            "LogicalProcessors": 20,
+            "OwnerPid": 31204,
+            "CurrentSessionPid": 11048,
+            "BackgroundPercent": 1.942,
+            "OtherCodeSessions": [
+              {
+                "Pid": 20908,
+                "Name": "claude.exe",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              },
+              {
+                "Pid": 19384,
+                "Name": "codex.exe",
+                "CpuMs": 0,
+                "OneCorePct": 0
+              }
+            ],
+            "TopBackground": [
+              {
+                "Pid": 10972,
+                "Name": "ChatGPT",
+                "CpuMs": 1687.5,
+                "OneCorePct": 16.85
+              },
+              {
+                "Pid": 11432,
+                "Name": "ChatGPT",
+                "CpuMs": 1296.875,
+                "OneCorePct": 12.949
+              },
+              {
+                "Pid": 21072,
+                "Name": "ChatGPT",
+                "CpuMs": 125,
+                "OneCorePct": 1.248
+              },
+              {
+                "Pid": 22380,
+                "Name": "brave",
+                "CpuMs": 109.375,
+                "OneCorePct": 1.092
+              },
+              {
+                "Pid": 9960,
+                "Name": "HuionTabletCore",
+                "CpuMs": 93.75,
+                "OneCorePct": 0.936
+              },
+              {
+                "Pid": 20388,
+                "Name": "DeepL",
+                "CpuMs": 78.125,
+                "OneCorePct": 0.78
+              },
+              {
+                "Pid": 20024,
+                "Name": "ChatGPT",
+                "CpuMs": 78.125,
+                "OneCorePct": 0.78
+              },
+              {
+                "Pid": 26560,
+                "Name": "ChatGPT",
+                "CpuMs": 46.875,
+                "OneCorePct": 0.468
+              },
+              {
+                "Pid": 22064,
+                "Name": "brave",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              },
+              {
+                "Pid": 20908,
+                "Name": "claude",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              },
+              {
+                "Pid": 9380,
+                "Name": "ipf_helper",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              },
+              {
+                "Pid": 21864,
+                "Name": "brave",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              }
+            ],
+            "CodeQuiet": true,
+            "Quiet": true,
+            "Criterion": "Background CPU <= 5% of all logical CPUs; each other code-session tree <= 5% of one core. No other tests/builds are launched during measurement."
+          },
+          "viewport": {
+            "width": 1541,
+            "height": 993,
+            "visibility": "visible",
+            "dpr": 1
+          },
+          "panel": {
+            "width": 360,
+            "connected": "true"
+          },
+          "steady": {
+            "stats": {
+              "count": 867,
+              "median": 0,
+              "p95": 0,
+              "max": 0
+            },
+            "callbackKinds": {},
+            "clock": {
+              "source": "document-start-main-world-raf-timestamps",
+              "timeOrigin": 1793513278946.5,
+              "start": 12579.19999999972,
+              "end": 18595,
+              "originalProbeStart": 12579.19999999972,
+              "originalProbeFrameCount": 867,
+              "beforeExtensionFrames": 0
+            },
+            "totalMs": 0,
+            "longestCallbackMs": 0,
+            "fullFrame": {
+              "count": 867,
+              "median": 6.917,
+              "p95": 7.805,
+              "max": 16.542
+            },
+            "panelConnected": "true",
+            "url": "https://www.youtube.com/results?search_query=lofi+hip+hop"
+          },
+          "spa": {
+            "stats": {
+              "count": 815,
+              "median": 0,
+              "p95": 0.2999999998137355,
+              "max": 21.5
+            },
+            "callbackKinds": {
+              "event": 17,
+              "MutationObserver": 189,
+              "raf": 44,
+              "microtask": 22,
+              "ResizeObserver": 8,
+              "setTimeout": 11,
+              "promise": 2
+            },
+            "clock": {
+              "source": "document-start-main-world-raf-timestamps",
+              "timeOrigin": 1793513278946.5,
+              "start": 18944.299999999814,
+              "end": 25005.399999999907,
+              "originalProbeStart": 18944.299999999814,
+              "originalProbeFrameCount": 815,
+              "beforeExtensionFrames": 0
+            },
+            "totalMs": 153.50000000325963,
+            "longestCallbackMs": 11.5,
+            "fullFrame": {
+              "count": 816,
+              "median": 6.969,
+              "p95": 25.29,
+              "max": 98.034
+            },
+            "panelConnected": "true",
+            "url": "https://www.youtube.com/results?search_query=ambient+music"
+          },
+          "sameDocument": true
+        },
+        "before": {
+          "host": {
+            "Started": "2026-11-01T15:08:25.4854483+09:00",
+            "DurationMs": 10026.363,
+            "LogicalProcessors": 20,
+            "OwnerPid": 31204,
+            "CurrentSessionPid": 11048,
+            "BackgroundPercent": 1.87,
+            "OtherCodeSessions": [
+              {
+                "Pid": 20908,
+                "Name": "claude.exe",
+                "CpuMs": 15.625,
+                "OneCorePct": 0.156
+              },
+              {
+                "Pid": 19384,
+                "Name": "codex.exe",
+                "CpuMs": 0,
+                "OneCorePct": 0
+              }
+            ],
+            "TopBackground": [
+              {
+                "Pid": 11432,
+                "Name": "ChatGPT",
+                "CpuMs": 1375,
+                "OneCorePct": 13.714
+              },
+              {
+                "Pid": 10972,
+                "Name": "ChatGPT",
+                "CpuMs": 1359.375,
+                "OneCorePct": 13.558
+              },
+              {
+                "Pid": 20024,
+                "Name": "ChatGPT",
+                "CpuMs": 265.625,
+                "OneCorePct": 2.649
+              },
+              {
+                "Pid": 21072,
+                "Name": "ChatGPT",
+                "CpuMs": 109.375,
+                "OneCorePct": 1.091
+              },
+              {
+                "Pid": 25540,
+                "Name": "brave",
+                "CpuMs": 109.375,
+                "OneCorePct": 1.091
+              },
+              {
+                "Pid": 9960,
+                "Name": "HuionTabletCore",
+                "CpuMs": 93.75,
+                "OneCorePct": 0.935
+              },
+              {
+                "Pid": 12204,
+                "Name": "brave",
+                "CpuMs": 78.125,
+                "OneCorePct": 0.779
+              },
+              {
+                "Pid": 20140,
+                "Name": "HuionTablet",
+                "CpuMs": 46.875,
+                "OneCorePct": 0.468
+              },
+              {
+                "Pid": 18512,
+                "Name": "MiniMax Code",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              },
+              {
+                "Pid": 22380,
+                "Name": "brave",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              },
+              {
+                "Pid": 9380,
+                "Name": "ipf_helper",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              },
+              {
+                "Pid": 20452,
+                "Name": "powershell",
+                "CpuMs": 15.625,
+                "OneCorePct": 0.156
+              }
+            ],
+            "CodeQuiet": true,
+            "Quiet": true,
+            "Criterion": "Background CPU <= 5% of all logical CPUs; each other code-session tree <= 5% of one core. No other tests/builds are launched during measurement."
+          },
+          "viewport": {
+            "width": 1541,
+            "height": 993,
+            "visibility": "visible",
+            "dpr": 1
+          },
+          "panel": {
+            "width": 360,
+            "connected": "true"
+          },
+          "steady": {
+            "stats": {
+              "count": 866,
+              "median": 0,
+              "p95": 0,
+              "max": 0
+            },
+            "callbackKinds": {},
+            "clock": {
+              "source": "document-start-main-world-raf-timestamps",
+              "timeOrigin": 1793513316419.8,
+              "start": 12276.100000000093,
+              "end": 18281.30000000028,
+              "originalProbeStart": 12276.100000000093,
+              "originalProbeFrameCount": 866,
+              "beforeExtensionFrames": 0
+            },
+            "totalMs": 0,
+            "longestCallbackMs": 0,
+            "fullFrame": {
+              "count": 866,
+              "median": 6.9115,
+              "p95": 7.711,
+              "max": 15.96
+            },
+            "panelConnected": "true",
+            "url": "https://www.youtube.com/results?search_query=lofi+hip+hop"
+          },
+          "spa": {
+            "stats": {
+              "count": 818,
+              "median": 0,
+              "p95": 0.20000000018626451,
+              "max": 21.800000000279397
+            },
+            "callbackKinds": {
+              "event": 22,
+              "MutationObserver": 181,
+              "raf": 44,
+              "microtask": 22,
+              "ResizeObserver": 10,
+              "setTimeout": 11,
+              "promise": 2
+            },
+            "clock": {
+              "source": "document-start-main-world-raf-timestamps",
+              "timeOrigin": 1793513316419.8,
+              "start": 18621.600000000093,
+              "end": 24679,
+              "originalProbeStart": 18621.600000000093,
+              "originalProbeFrameCount": 818,
+              "beforeExtensionFrames": 0
+            },
+            "totalMs": 167.29999999934807,
+            "longestCallbackMs": 18.899999999906868,
+            "fullFrame": {
+              "count": 818,
+              "median": 6.984999999999999,
+              "p95": 24.951,
+              "max": 78.572
+            },
+            "panelConnected": "true",
+            "url": "https://www.youtube.com/results?search_query=ambient+music"
+          },
+          "sameDocument": true
+        }
+      }
+    },
+    {
+      "pair": 3,
+      "order": ["before", "after"],
+      "blocks": {
+        "before": {
+          "host": {
+            "Started": "2026-11-01T15:09:02.6432538+09:00",
+            "DurationMs": 10013.678,
+            "LogicalProcessors": 20,
+            "OwnerPid": 31204,
+            "CurrentSessionPid": 11048,
+            "BackgroundPercent": 2.044,
+            "OtherCodeSessions": [
+              {
+                "Pid": 20908,
+                "Name": "claude.exe",
+                "CpuMs": 0,
+                "OneCorePct": 0
+              },
+              {
+                "Pid": 19384,
+                "Name": "codex.exe",
+                "CpuMs": 0,
+                "OneCorePct": 0
+              }
+            ],
+            "TopBackground": [
+              {
+                "Pid": 10972,
+                "Name": "ChatGPT",
+                "CpuMs": 2312.5,
+                "OneCorePct": 23.093
+              },
+              {
+                "Pid": 11432,
+                "Name": "ChatGPT",
+                "CpuMs": 1015.625,
+                "OneCorePct": 10.142
+              },
+              {
+                "Pid": 21072,
+                "Name": "ChatGPT",
+                "CpuMs": 125,
+                "OneCorePct": 1.248
+              },
+              {
+                "Pid": 24292,
+                "Name": "ChatGPT",
+                "CpuMs": 93.75,
+                "OneCorePct": 0.936
+              },
+              {
+                "Pid": 9960,
+                "Name": "HuionTabletCore",
+                "CpuMs": 78.125,
+                "OneCorePct": 0.78
+              },
+              {
+                "Pid": 20024,
+                "Name": "ChatGPT",
+                "CpuMs": 62.5,
+                "OneCorePct": 0.624
+              },
+              {
+                "Pid": 20140,
+                "Name": "HuionTablet",
+                "CpuMs": 46.875,
+                "OneCorePct": 0.468
+              },
+              {
+                "Pid": 9380,
+                "Name": "ipf_helper",
+                "CpuMs": 46.875,
+                "OneCorePct": 0.468
+              },
+              {
+                "Pid": 22380,
+                "Name": "brave",
+                "CpuMs": 46.875,
+                "OneCorePct": 0.468
+              },
+              {
+                "Pid": 31716,
+                "Name": "OneDrive.Sync.Service",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              },
+              {
+                "Pid": 25532,
+                "Name": "claude",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              },
+              {
+                "Pid": 26116,
+                "Name": "brave",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              }
+            ],
+            "CodeQuiet": true,
+            "Quiet": true,
+            "Criterion": "Background CPU <= 5% of all logical CPUs; each other code-session tree <= 5% of one core. No other tests/builds are launched during measurement."
+          },
+          "viewport": {
+            "width": 1541,
+            "height": 993,
+            "visibility": "visible",
+            "dpr": 1
+          },
+          "panel": {
+            "width": 360,
+            "connected": "true"
+          },
+          "steady": {
+            "stats": {
+              "count": 865,
+              "median": 0,
+              "p95": 0,
+              "max": 0
+            },
+            "callbackKinds": {},
+            "clock": {
+              "source": "document-start-main-world-raf-timestamps",
+              "timeOrigin": 1793513353629.2,
+              "start": 12294.399999999907,
+              "end": 18302.5,
+              "originalProbeStart": 12294.399999999907,
+              "originalProbeFrameCount": 866,
+              "beforeExtensionFrames": 0
+            },
+            "totalMs": 0,
+            "longestCallbackMs": 0,
+            "fullFrame": {
+              "count": 865,
+              "median": 6.919,
+              "p95": 7.752,
+              "max": 20.736
+            },
+            "panelConnected": "true",
+            "url": "https://www.youtube.com/results?search_query=lofi+hip+hop"
+          },
+          "spa": {
+            "stats": {
+              "count": 820,
+              "median": 0,
+              "p95": 0.3000000002793968,
+              "max": 22.100000000093132
+            },
+            "callbackKinds": {
+              "event": 22,
+              "MutationObserver": 184,
+              "raf": 49,
+              "microtask": 25,
+              "ResizeObserver": 10,
+              "setTimeout": 11,
+              "promise": 2
+            },
+            "clock": {
+              "source": "document-start-main-world-raf-timestamps",
+              "timeOrigin": 1793513353629.2,
+              "start": 18640.599999999627,
+              "end": 24705,
+              "originalProbeStart": 18640.599999999627,
+              "originalProbeFrameCount": 820,
+              "beforeExtensionFrames": 0
+            },
+            "totalMs": 163.6999999997206,
+            "longestCallbackMs": 13,
+            "fullFrame": {
+              "count": 820,
+              "median": 6.952500000000001,
+              "p95": 25.167,
+              "max": 93.855
+            },
+            "panelConnected": "true",
+            "url": "https://www.youtube.com/results?search_query=ambient+music"
+          },
+          "sameDocument": true
+        },
+        "after": {
+          "host": {
+            "Started": "2026-11-01T15:09:40.0091570+09:00",
+            "DurationMs": 10019.584,
+            "LogicalProcessors": 20,
+            "OwnerPid": 31204,
+            "CurrentSessionPid": 11048,
+            "BackgroundPercent": 1.848,
+            "OtherCodeSessions": [
+              {
+                "Pid": 20908,
+                "Name": "claude.exe",
+                "CpuMs": 62.5,
+                "OneCorePct": 0.624
+              },
+              {
+                "Pid": 19384,
+                "Name": "codex.exe",
+                "CpuMs": 0,
+                "OneCorePct": 0
+              }
+            ],
+            "TopBackground": [
+              {
+                "Pid": 10972,
+                "Name": "ChatGPT",
+                "CpuMs": 1328.125,
+                "OneCorePct": 13.255
+              },
+              {
+                "Pid": 11432,
+                "Name": "ChatGPT",
+                "CpuMs": 1203.125,
+                "OneCorePct": 12.008
+              },
+              {
+                "Pid": 20024,
+                "Name": "ChatGPT",
+                "CpuMs": 453.125,
+                "OneCorePct": 4.522
+              },
+              {
+                "Pid": 11048,
+                "Name": "codex",
+                "CpuMs": 171.875,
+                "OneCorePct": 1.715
+              },
+              {
+                "Pid": 20140,
+                "Name": "HuionTablet",
+                "CpuMs": 78.125,
+                "OneCorePct": 0.78
+              },
+              {
+                "Pid": 26148,
+                "Name": "ChatGPT",
+                "CpuMs": 78.125,
+                "OneCorePct": 0.78
+              },
+              {
+                "Pid": 20908,
+                "Name": "claude",
+                "CpuMs": 62.5,
+                "OneCorePct": 0.624
+              },
+              {
+                "Pid": 9960,
+                "Name": "HuionTabletCore",
+                "CpuMs": 46.875,
+                "OneCorePct": 0.468
+              },
+              {
+                "Pid": 24292,
+                "Name": "ChatGPT",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              },
+              {
+                "Pid": 25532,
+                "Name": "claude",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              },
+              {
+                "Pid": 22380,
+                "Name": "brave",
+                "CpuMs": 15.625,
+                "OneCorePct": 0.156
+              },
+              {
+                "Pid": 25540,
+                "Name": "brave",
+                "CpuMs": 15.625,
+                "OneCorePct": 0.156
+              }
+            ],
+            "CodeQuiet": true,
+            "Quiet": true,
+            "Criterion": "Background CPU <= 5% of all logical CPUs; each other code-session tree <= 5% of one core. No other tests/builds are launched during measurement."
+          },
+          "viewport": {
+            "width": 1541,
+            "height": 993,
+            "visibility": "visible",
+            "dpr": 1
+          },
+          "panel": {
+            "width": 360,
+            "connected": "true"
+          },
+          "steady": {
+            "stats": {
+              "count": 867,
+              "median": 0,
+              "p95": 0,
+              "max": 0
+            },
+            "callbackKinds": {},
+            "clock": {
+              "source": "document-start-main-world-raf-timestamps",
+              "timeOrigin": 1793513390968.4,
+              "start": 12292.299999999814,
+              "end": 18308.200000000186,
+              "originalProbeStart": 12292.299999999814,
+              "originalProbeFrameCount": 867,
+              "beforeExtensionFrames": 0
+            },
+            "totalMs": 0,
+            "longestCallbackMs": 0,
+            "fullFrame": {
+              "count": 868,
+              "median": 6.928,
+              "p95": 7.729,
+              "max": 17.395
+            },
+            "panelConnected": "true",
+            "url": "https://www.youtube.com/results?search_query=lofi+hip+hop"
+          },
+          "spa": {
+            "stats": {
+              "count": 813,
+              "median": 0,
+              "p95": 0.3000000002793968,
+              "max": 22.300000000279397
+            },
+            "callbackKinds": {
+              "event": 17,
+              "MutationObserver": 192,
+              "raf": 46,
+              "microtask": 24,
+              "ResizeObserver": 9,
+              "setTimeout": 11,
+              "promise": 2
+            },
+            "clock": {
+              "source": "document-start-main-world-raf-timestamps",
+              "timeOrigin": 1793513390968.4,
+              "start": 18647.100000000093,
+              "end": 24710.200000000186,
+              "originalProbeStart": 18647.100000000093,
+              "originalProbeFrameCount": 813,
+              "beforeExtensionFrames": 0
+            },
+            "totalMs": 162.79999999981374,
+            "longestCallbackMs": 11.899999999906868,
+            "fullFrame": {
+              "count": 813,
+              "median": 6.974,
+              "p95": 25.397,
+              "max": 107.159
+            },
+            "panelConnected": "true",
+            "url": "https://www.youtube.com/results?search_query=ambient+music"
+          },
+          "sameDocument": true
+        }
+      }
+    },
+    {
+      "pair": 4,
+      "order": ["after", "before"],
+      "blocks": {
+        "after": {
+          "host": {
+            "Started": "2026-11-01T15:10:17.2410765+09:00",
+            "DurationMs": 10021.016,
+            "LogicalProcessors": 20,
+            "OwnerPid": 31204,
+            "CurrentSessionPid": 11048,
+            "BackgroundPercent": 2.011,
+            "OtherCodeSessions": [
+              {
+                "Pid": 20908,
+                "Name": "claude.exe",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              },
+              {
+                "Pid": 19384,
+                "Name": "codex.exe",
+                "CpuMs": 0,
+                "OneCorePct": 0
+              }
+            ],
+            "TopBackground": [
+              {
+                "Pid": 11432,
+                "Name": "ChatGPT",
+                "CpuMs": 1500,
+                "OneCorePct": 14.969
+              },
+              {
+                "Pid": 10972,
+                "Name": "ChatGPT",
+                "CpuMs": 1390.625,
+                "OneCorePct": 13.877
+              },
+              {
+                "Pid": 25540,
+                "Name": "brave",
+                "CpuMs": 578.125,
+                "OneCorePct": 5.769
+              },
+              {
+                "Pid": 11048,
+                "Name": "codex",
+                "CpuMs": 171.875,
+                "OneCorePct": 1.715
+              },
+              {
+                "Pid": 22380,
+                "Name": "brave",
+                "CpuMs": 62.5,
+                "OneCorePct": 0.624
+              },
+              {
+                "Pid": 9380,
+                "Name": "ipf_helper",
+                "CpuMs": 46.875,
+                "OneCorePct": 0.468
+              },
+              {
+                "Pid": 20024,
+                "Name": "ChatGPT",
+                "CpuMs": 46.875,
+                "OneCorePct": 0.468
+              },
+              {
+                "Pid": 9960,
+                "Name": "HuionTabletCore",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              },
+              {
+                "Pid": 20908,
+                "Name": "claude",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              },
+              {
+                "Pid": 5788,
+                "Name": "HuionServer",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              },
+              {
+                "Pid": 21072,
+                "Name": "ChatGPT",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              },
+              {
+                "Pid": 12204,
+                "Name": "brave",
+                "CpuMs": 15.625,
+                "OneCorePct": 0.156
+              }
+            ],
+            "CodeQuiet": true,
+            "Quiet": true,
+            "Criterion": "Background CPU <= 5% of all logical CPUs; each other code-session tree <= 5% of one core. No other tests/builds are launched during measurement."
+          },
+          "viewport": {
+            "width": 1541,
+            "height": 993,
+            "visibility": "visible",
+            "dpr": 1
+          },
+          "panel": {
+            "width": 360,
+            "connected": "true"
+          },
+          "steady": {
+            "stats": {
+              "count": 867,
+              "median": 0,
+              "p95": 0,
+              "max": 0
+            },
+            "callbackKinds": {},
+            "clock": {
+              "source": "document-start-main-world-raf-timestamps",
+              "timeOrigin": 1793513428205.4,
+              "start": 12547.100000000093,
+              "end": 18554.5,
+              "originalProbeStart": 12547.100000000093,
+              "originalProbeFrameCount": 866,
+              "beforeExtensionFrames": 0
+            },
+            "totalMs": 0,
+            "longestCallbackMs": 0,
+            "fullFrame": {
+              "count": 867,
+              "median": 6.904,
+              "p95": 7.676,
+              "max": 18.466
+            },
+            "panelConnected": "true",
+            "url": "https://www.youtube.com/results?search_query=lofi+hip+hop"
+          },
+          "spa": {
+            "stats": {
+              "count": 797,
+              "median": 0,
+              "p95": 0.3000000002793968,
+              "max": 20.700000000651926
+            },
+            "callbackKinds": {
+              "event": 18,
+              "MutationObserver": 207,
+              "raf": 56,
+              "microtask": 28,
+              "ResizeObserver": 10,
+              "setTimeout": 12,
+              "promise": 2
+            },
+            "clock": {
+              "source": "document-start-main-world-raf-timestamps",
+              "timeOrigin": 1793513428205.4,
+              "start": 18898,
+              "end": 24964.100000000093,
+              "originalProbeStart": 18898,
+              "originalProbeFrameCount": 797,
+              "beforeExtensionFrames": 0
+            },
+            "totalMs": 169.10000000102445,
+            "longestCallbackMs": 10,
+            "fullFrame": {
+              "count": 797,
+              "median": 6.988,
+              "p95": 25.437,
+              "max": 101.033
+            },
+            "panelConnected": "true",
+            "url": "https://www.youtube.com/results?search_query=ambient+music"
+          },
+          "sameDocument": true
+        },
+        "before": {
+          "host": {
+            "Started": "2026-11-01T15:10:54.6969511+09:00",
+            "DurationMs": 10015.79,
+            "LogicalProcessors": 20,
+            "OwnerPid": 31204,
+            "CurrentSessionPid": 11048,
+            "BackgroundPercent": 1.708,
+            "OtherCodeSessions": [
+              {
+                "Pid": 20908,
+                "Name": "claude.exe",
+                "CpuMs": 46.875,
+                "OneCorePct": 0.468
+              },
+              {
+                "Pid": 19384,
+                "Name": "codex.exe",
+                "CpuMs": 0,
+                "OneCorePct": 0
+              }
+            ],
+            "TopBackground": [
+              {
+                "Pid": 10972,
+                "Name": "ChatGPT",
+                "CpuMs": 1187.5,
+                "OneCorePct": 11.856
+              },
+              {
+                "Pid": 11432,
+                "Name": "ChatGPT",
+                "CpuMs": 828.125,
+                "OneCorePct": 8.268
+              },
+              {
+                "Pid": 25540,
+                "Name": "brave",
+                "CpuMs": 359.375,
+                "OneCorePct": 3.588
+              },
+              {
+                "Pid": 20024,
+                "Name": "ChatGPT",
+                "CpuMs": 296.875,
+                "OneCorePct": 2.964
+              },
+              {
+                "Pid": 21072,
+                "Name": "ChatGPT",
+                "CpuMs": 140.625,
+                "OneCorePct": 1.404
+              },
+              {
+                "Pid": 9960,
+                "Name": "HuionTabletCore",
+                "CpuMs": 62.5,
+                "OneCorePct": 0.624
+              },
+              {
+                "Pid": 17948,
+                "Name": "MiniMax Code",
+                "CpuMs": 62.5,
+                "OneCorePct": 0.624
+              },
+              {
+                "Pid": 20140,
+                "Name": "HuionTablet",
+                "CpuMs": 46.875,
+                "OneCorePct": 0.468
+              },
+              {
+                "Pid": 20908,
+                "Name": "claude",
+                "CpuMs": 46.875,
+                "OneCorePct": 0.468
+              },
+              {
+                "Pid": 18512,
+                "Name": "MiniMax Code",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              },
+              {
+                "Pid": 9380,
+                "Name": "ipf_helper",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              },
+              {
+                "Pid": 10660,
+                "Name": "taskhostw",
+                "CpuMs": 31.25,
+                "OneCorePct": 0.312
+              }
+            ],
+            "CodeQuiet": true,
+            "Quiet": true,
+            "Criterion": "Background CPU <= 5% of all logical CPUs; each other code-session tree <= 5% of one core. No other tests/builds are launched during measurement."
+          },
+          "viewport": {
+            "width": 1541,
+            "height": 993,
+            "visibility": "visible",
+            "dpr": 1
+          },
+          "panel": {
+            "width": 360,
+            "connected": "true"
+          },
+          "steady": {
+            "stats": {
+              "count": 866,
+              "median": 0,
+              "p95": 0,
+              "max": 0
+            },
+            "callbackKinds": {},
+            "clock": {
+              "source": "document-start-main-world-raf-timestamps",
+              "timeOrigin": 1793513465620.8,
+              "start": 12264.600000000093,
+              "end": 18266.80000000028,
+              "originalProbeStart": 12264.600000000093,
+              "originalProbeFrameCount": 866,
+              "beforeExtensionFrames": 0
+            },
+            "totalMs": 0,
+            "longestCallbackMs": 0,
+            "fullFrame": {
+              "count": 865,
+              "median": 6.913,
+              "p95": 7.8,
+              "max": 18.909
+            },
+            "panelConnected": "true",
+            "url": "https://www.youtube.com/results?search_query=lofi+hip+hop"
+          },
+          "spa": {
+            "stats": {
+              "count": 816,
+              "median": 0,
+              "p95": 0.3000000002793968,
+              "max": 23.199999999720603
+            },
+            "callbackKinds": {
+              "event": 22,
+              "MutationObserver": 195,
+              "raf": 47,
+              "microtask": 23,
+              "ResizeObserver": 10,
+              "setTimeout": 11,
+              "promise": 2
+            },
+            "clock": {
+              "source": "document-start-main-world-raf-timestamps",
+              "timeOrigin": 1793513465620.8,
+              "start": 18611.30000000028,
+              "end": 24672.5,
+              "originalProbeStart": 18611.30000000028,
+              "originalProbeFrameCount": 816,
+              "beforeExtensionFrames": 0
+            },
+            "totalMs": 165.10000000009313,
+            "longestCallbackMs": 12.100000000093132,
+            "fullFrame": {
+              "count": 816,
+              "median": 6.976,
+              "p95": 25.413,
+              "max": 142.592
+            },
+            "panelConnected": "true",
+            "url": "https://www.youtube.com/results?search_query=ambient+music"
+          },
+          "sameDocument": true
+        }
+      }
+    }
+  ],
+  "allowBackground": true,
+  "profiling": false,
+  "chrome": "143.0.7499.4",
+  "calibration": {
+    "pass": true,
+    "delta": {
+      "median": 2,
+      "p95": 2.1000000000931323
+    },
+    "results": [
+      {
+        "build": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\.work\\ui0dv-after",
+        "metadata": {
+          "source": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor",
+          "revision": "138298ff8fc96f12fcee2b0effcb3cd93d6c568f",
+          "dirtySource": false,
+          "probe": "isolated-world-v3",
+          "asyncContinuations": "lowered-promises",
+          "busyMs": 0,
+          "busyAfterAwait": false,
+          "disableInk": false
+        },
+        "chrome": "143.0.7499.4",
+        "contextId": 5,
+        "world": {
+          "id": 5,
+          "origin": "chrome-extension://hgfaenhioinhmjkocondmfkpdkedaohm",
+          "name": "Web World Themes",
+          "uniqueId": "1472374260882039862.-7565638322576067879",
+          "auxData": {
+            "isDefault": false,
+            "type": "isolated",
+            "frameId": "A971D47B816F72BBF219099E14F95EF6"
+          }
+        },
+        "median": 0,
+        "p95": 0,
+        "frames": 435,
+        "host": {
+          "Started": "2026-11-01T15:04:59.8867858+09:00",
+          "DurationMs": 10016.336,
+          "LogicalProcessors": 20,
+          "OwnerPid": 28100,
+          "CurrentSessionPid": 11048,
+          "BackgroundPercent": 1.583,
+          "OtherCodeSessions": [
+            {
+              "Pid": 20908,
+              "Name": "claude.exe",
+              "CpuMs": 15.625,
+              "OneCorePct": 0.156
+            },
+            {
+              "Pid": 19384,
+              "Name": "codex.exe",
+              "CpuMs": 0,
+              "OneCorePct": 0
+            }
+          ],
+          "TopBackground": [
+            {
+              "Pid": 10972,
+              "Name": "ChatGPT",
+              "CpuMs": 1453.125,
+              "OneCorePct": 14.508
+            },
+            {
+              "Pid": 11432,
+              "Name": "ChatGPT",
+              "CpuMs": 1046.875,
+              "OneCorePct": 10.452
+            },
+            {
+              "Pid": 20024,
+              "Name": "ChatGPT",
+              "CpuMs": 93.75,
+              "OneCorePct": 0.936
+            },
+            {
+              "Pid": 11048,
+              "Name": "codex",
+              "CpuMs": 93.75,
+              "OneCorePct": 0.936
+            },
+            {
+              "Pid": 15108,
+              "Name": "ChatGPT",
+              "CpuMs": 78.125,
+              "OneCorePct": 0.78
+            },
+            {
+              "Pid": 20140,
+              "Name": "HuionTablet",
+              "CpuMs": 62.5,
+              "OneCorePct": 0.624
+            },
+            {
+              "Pid": 9960,
+              "Name": "HuionTabletCore",
+              "CpuMs": 46.875,
+              "OneCorePct": 0.468
+            },
+            {
+              "Pid": 22380,
+              "Name": "brave",
+              "CpuMs": 46.875,
+              "OneCorePct": 0.468
+            },
+            {
+              "Pid": 20388,
+              "Name": "DeepL",
+              "CpuMs": 31.25,
+              "OneCorePct": 0.312
+            },
+            {
+              "Pid": 22064,
+              "Name": "brave",
+              "CpuMs": 15.625,
+              "OneCorePct": 0.156
+            },
+            {
+              "Pid": 26560,
+              "Name": "ChatGPT",
+              "CpuMs": 15.625,
+              "OneCorePct": 0.156
+            },
+            {
+              "Pid": 11912,
+              "Name": "explorer",
+              "CpuMs": 15.625,
+              "OneCorePct": 0.156
+            }
+          ],
+          "CodeQuiet": true,
+          "Quiet": true,
+          "Criterion": "Background CPU <= 5% of all logical CPUs; each other code-session tree <= 5% of one core. No other tests/builds are launched during measurement."
+        }
+      },
+      {
+        "build": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\.work\\ui0dv-busy",
+        "metadata": {
+          "source": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor",
+          "revision": "138298ff8fc96f12fcee2b0effcb3cd93d6c568f",
+          "dirtySource": false,
+          "probe": "isolated-world-v3",
+          "asyncContinuations": "lowered-promises",
+          "busyMs": 2,
+          "busyAfterAwait": true,
+          "disableInk": false
+        },
+        "chrome": "143.0.7499.4",
+        "contextId": 7,
+        "world": {
+          "id": 7,
+          "origin": "chrome-extension://pjpjdepjbnicgjkmnchfmgpldgbmebji",
+          "name": "Web World Themes",
+          "uniqueId": "-9109340852371595552.-2782667491687631550",
+          "auxData": {
+            "isDefault": false,
+            "type": "isolated",
+            "frameId": "6903F893C3B39952E7D443BED224290C"
+          }
+        },
+        "median": 2,
+        "p95": 2.1000000000931323,
+        "frames": 436,
+        "host": {
+          "Started": "2026-11-01T15:05:23.9216528+09:00",
+          "DurationMs": 10011.77,
+          "LogicalProcessors": 20,
+          "OwnerPid": 28100,
+          "CurrentSessionPid": 11048,
+          "BackgroundPercent": 2.239,
+          "OtherCodeSessions": [
+            {
+              "Pid": 20908,
+              "Name": "claude.exe",
+              "CpuMs": 62.5,
+              "OneCorePct": 0.624
+            },
+            {
+              "Pid": 19384,
+              "Name": "codex.exe",
+              "CpuMs": 0,
+              "OneCorePct": 0
+            }
+          ],
+          "TopBackground": [
+            {
+              "Pid": 10972,
+              "Name": "ChatGPT",
+              "CpuMs": 1281.25,
+              "OneCorePct": 12.797
+            },
+            {
+              "Pid": 11432,
+              "Name": "ChatGPT",
+              "CpuMs": 968.75,
+              "OneCorePct": 9.676
+            },
+            {
+              "Pid": 21072,
+              "Name": "ChatGPT",
+              "CpuMs": 765.625,
+              "OneCorePct": 7.647
+            },
+            {
+              "Pid": 12204,
+              "Name": "brave",
+              "CpuMs": 406.25,
+              "OneCorePct": 4.058
+            },
+            {
+              "Pid": 17064,
+              "Name": "pwsh",
+              "CpuMs": 140.625,
+              "OneCorePct": 1.405
+            },
+            {
+              "Pid": 11048,
+              "Name": "codex",
+              "CpuMs": 140.625,
+              "OneCorePct": 1.405
+            },
+            {
+              "Pid": 10660,
+              "Name": "taskhostw",
+              "CpuMs": 93.75,
+              "OneCorePct": 0.936
+            },
+            {
+              "Pid": 20024,
+              "Name": "ChatGPT",
+              "CpuMs": 62.5,
+              "OneCorePct": 0.624
+            },
+            {
+              "Pid": 26148,
+              "Name": "ChatGPT",
+              "CpuMs": 62.5,
+              "OneCorePct": 0.624
+            },
+            {
+              "Pid": 26116,
+              "Name": "brave",
+              "CpuMs": 62.5,
+              "OneCorePct": 0.624
+            },
+            {
+              "Pid": 20908,
+              "Name": "claude",
+              "CpuMs": 62.5,
+              "OneCorePct": 0.624
+            },
+            {
+              "Pid": 28068,
+              "Name": "codex-code-mode-host",
+              "CpuMs": 46.875,
+              "OneCorePct": 0.468
+            }
+          ],
+          "CodeQuiet": true,
+          "Quiet": true,
+          "Criterion": "Background CPU <= 5% of all logical CPUs; each other code-session tree <= 5% of one core. No other tests/builds are launched during measurement."
+        }
+      }
+    ]
+  },
+  "operationSnapshots": [
+    {
+      "label": "before-S",
+      "viewport": {
+        "width": 1920,
+        "height": 993
+      },
+      "geometry": {
+        "documentId": 1,
+        "geometry": 6
+      },
+      "top": {
+        "left": 16,
+        "top": 68,
+        "width": 1403.40625,
+        "height": 64
+      },
+      "bottom": {
+        "left": 16,
+        "top": 745.40625,
+        "width": 1403.40625,
+        "height": 112
+      },
+      "player": {
+        "x": 16,
+        "y": 68,
+        "width": 1403.40625,
+        "height": 789.40625
+      },
+      "hits": [
+        {
+          "selector": ".ytp-play-button",
+          "width": 40,
+          "height": 40,
+          "hit": true
+        },
+        {
+          "selector": ".ytp-settings-button",
+          "width": 48,
+          "height": 40,
+          "hit": true
+        },
+        {
+          "selector": ".ytp-size-button",
+          "width": 48,
+          "height": 40,
+          "hit": true
+        },
+        {
+          "selector": ".ytp-fullscreen-button",
+          "width": 48,
+          "height": 40,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "label": "after-S",
+      "viewport": {
+        "width": 1541,
+        "height": 993
+      },
+      "geometry": {
+        "documentId": 1,
+        "geometry": 12
+      },
+      "top": {
+        "left": 16,
+        "top": 68,
+        "width": 1115.375,
+        "height": 64
+      },
+      "bottom": {
+        "left": 16,
+        "top": 583.390625,
+        "width": 1115.375,
+        "height": 112
+      },
+      "player": {
+        "x": 16,
+        "y": 68,
+        "width": 1115.375,
+        "height": 627.390625
+      },
+      "hits": [
+        {
+          "selector": ".ytp-play-button",
+          "width": 40,
+          "height": 40,
+          "hit": true
+        },
+        {
+          "selector": ".ytp-settings-button",
+          "width": 48,
+          "height": 40,
+          "hit": true
+        },
+        {
+          "selector": ".ytp-size-button",
+          "width": 48,
+          "height": 40,
+          "hit": true
+        },
+        {
+          "selector": ".ytp-fullscreen-button",
+          "width": 48,
+          "height": 40,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "label": "theater-S",
+      "viewport": {
+        "width": 1541,
+        "height": 993
+      },
+      "geometry": {
+        "documentId": 1,
+        "geometry": 14
+      },
+      "top": {
+        "left": 0,
+        "top": 56,
+        "width": 1526,
+        "height": 64
+      },
+      "bottom": {
+        "left": 0,
+        "top": 768,
+        "width": 1526,
+        "height": 112
+      },
+      "player": {
+        "x": 0,
+        "y": 56,
+        "width": 1526,
+        "height": 824
+      },
+      "hits": [
+        {
+          "selector": ".ytp-play-button",
+          "width": 40,
+          "height": 40,
+          "hit": true
+        },
+        {
+          "selector": ".ytp-settings-button",
+          "width": 48,
+          "height": 40,
+          "hit": true
+        },
+        {
+          "selector": ".ytp-size-button",
+          "width": 48,
+          "height": 40,
+          "hit": true
+        },
+        {
+          "selector": ".ytp-fullscreen-button",
+          "width": 48,
+          "height": 40,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "label": "normal-S",
+      "viewport": {
+        "width": 1541,
+        "height": 993
+      },
+      "geometry": {
+        "documentId": 1,
+        "geometry": 15
+      },
+      "top": {
+        "left": 16,
+        "top": 68,
+        "width": 1115.375,
+        "height": 64
+      },
+      "bottom": {
+        "left": 16,
+        "top": 583.390625,
+        "width": 1115.375,
+        "height": 112
+      },
+      "player": {
+        "x": 16,
+        "y": 68,
+        "width": 1115.375,
+        "height": 627.390625
+      },
+      "hits": [
+        {
+          "selector": ".ytp-play-button",
+          "width": 40,
+          "height": 40,
+          "hit": true
+        },
+        {
+          "selector": ".ytp-settings-button",
+          "width": 48,
+          "height": 40,
+          "hit": true
+        },
+        {
+          "selector": ".ytp-size-button",
+          "width": 48,
+          "height": 40,
+          "hit": true
+        },
+        {
+          "selector": ".ytp-fullscreen-button",
+          "width": 48,
+          "height": 40,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "label": "fullscreen-S",
+      "viewport": {
+        "width": 1541,
+        "height": 993
+      },
+      "geometry": {
+        "documentId": 1,
+        "geometry": 18
+      },
+      "top": {
+        "left": 0,
+        "top": 0,
+        "width": 1541,
+        "height": 64
+      },
+      "bottom": {
+        "left": 0,
+        "top": 881,
+        "width": 1541,
+        "height": 112
+      },
+      "player": {
+        "x": 0,
+        "y": 0,
+        "width": 1541,
+        "height": 993
+      },
+      "hits": [
+        {
+          "selector": ".ytp-play-button",
+          "width": 40,
+          "height": 40,
+          "hit": true
+        },
+        {
+          "selector": ".ytp-settings-button",
+          "width": 48,
+          "height": 40,
+          "hit": true
+        },
+        {
+          "selector": ".ytp-size-button",
+          "width": 0,
+          "height": 0,
+          "hit": false
+        },
+        {
+          "selector": ".ytp-fullscreen-button",
+          "width": 48,
+          "height": 40,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "label": "exit-fullscreen-S",
+      "viewport": {
+        "width": 1541,
+        "height": 993
+      },
+      "geometry": {
+        "documentId": 1,
+        "geometry": 21
+      },
+      "top": {
+        "left": 16,
+        "top": 68,
+        "width": 1115.375,
+        "height": 64
+      },
+      "bottom": {
+        "left": 16,
+        "top": 583.390625,
+        "width": 1115.375,
+        "height": 112
+      },
+      "player": {
+        "x": 16,
+        "y": 68,
+        "width": 1115.375,
+        "height": 627.390625
+      },
+      "hits": [
+        {
+          "selector": ".ytp-play-button",
+          "width": 40,
+          "height": 40,
+          "hit": true
+        },
+        {
+          "selector": ".ytp-settings-button",
+          "width": 48,
+          "height": 40,
+          "hit": true
+        },
+        {
+          "selector": ".ytp-size-button",
+          "width": 48,
+          "height": 40,
+          "hit": true
+        },
+        {
+          "selector": ".ytp-fullscreen-button",
+          "width": 48,
+          "height": 40,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "label": "SPA-S",
+      "viewport": {
+        "width": 1541,
+        "height": 993
+      },
+      "geometry": {
+        "documentId": 1,
+        "geometry": 26
+      },
+      "top": {
+        "left": 16,
+        "top": 68,
+        "width": 1115.375,
+        "height": 64
+      },
+      "bottom": {
+        "left": 16,
+        "top": 583.390625,
+        "width": 1115.375,
+        "height": 112
+      },
+      "player": {
+        "x": 16,
+        "y": 68,
+        "width": 1115.375,
+        "height": 627.390625
+      },
+      "hits": [
+        {
+          "selector": ".ytp-play-button",
+          "width": 40,
+          "height": 40,
+          "hit": true
+        },
+        {
+          "selector": ".ytp-settings-button",
+          "width": 48,
+          "height": 40,
+          "hit": true
+        },
+        {
+          "selector": ".ytp-size-button",
+          "width": 48,
+          "height": 40,
+          "hit": true
+        },
+        {
+          "selector": ".ytp-fullscreen-button",
+          "width": 48,
+          "height": 40,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "label": "emergency-off-S",
+      "editing": false,
+      "drawing": false,
+      "skin": "none",
+      "marks": 0,
+      "resume": true
+    },
+    {
+      "label": "resume-S",
+      "editing": true,
+      "drawing": true,
+      "skin": "blob"
+    }
+  ],
+  "rawDirectory": ".work/ui0d-performance",
+  "calibrationCleanup": "After samples completed, owned headless browser shutdown was completed with close-test-browser.ps1; capture values unchanged."
+}
