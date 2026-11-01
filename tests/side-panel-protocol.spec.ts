@@ -1,6 +1,66 @@
 import { test, expect } from '@playwright/test';
 import type { BrowserContext, Page } from '@playwright/test';
 import { sidePanelDriver } from './helpers/side-panel';
+import { installEditorEntry } from '../src/browser/editor-entry';
+
+test('the actual action handler opens S synchronously and falls back to W only on rejection', async () => {
+  const originalChrome = globalThis.chrome;
+  let action: ((tab?: chrome.tabs.Tab) => void) | undefined,
+    rejectPanel = false;
+  const opened: number[] = [],
+    windows: unknown[] = [];
+  const event = () => ({ addListener() {}, removeListener() {} });
+  globalThis.chrome = {
+    action: {
+      onClicked: {
+        ...event(),
+        addListener(listener: typeof action) {
+          action = listener;
+        },
+      },
+      setPopup: async () => {},
+    },
+    commands: { onCommand: event() },
+    runtime: { onMessage: event(), getURL: (file: string) => 'chrome-extension://test/' + file },
+    tabs: { onUpdated: event(), onRemoved: event() },
+    storage: { onChanged: event(), local: { get: async () => ({}) } },
+    sidePanel: {
+      open: async ({ tabId }: { tabId: number }) => {
+        opened.push(tabId);
+        if (rejectPanel) throw Error('No S');
+      },
+    },
+    windows: {
+      create: async (options: unknown) => {
+        windows.push(options);
+        return {};
+      },
+    },
+  } as unknown as typeof chrome;
+  const cleanup = installEditorEntry();
+  try {
+    const tab = { id: 117, status: 'complete', url: 'https://www.youtube.com/watch?v=fixture' } as chrome.tabs.Tab;
+    action!(tab);
+    // A storage await before open would lose Chrome's activation. The call must already exist.
+    expect(opened).toEqual([117]);
+    await Promise.resolve();
+    expect(windows).toEqual([]);
+    rejectPanel = true;
+    action!(tab);
+    await expect.poll(() => windows.length).toBe(1);
+    expect(opened).toEqual([117, 117]);
+    expect(windows).toEqual([
+      { url: 'chrome-extension://test/studio/index.html?target=117', type: 'popup', width: 1440, height: 900 },
+    ]);
+    action!({ ...tab, url: 'https://example.com/' });
+    expect(opened).toEqual([117, 117]);
+    expect(windows).toHaveLength(1);
+  } finally {
+    cleanup();
+    if (originalChrome) globalThis.chrome = originalChrome;
+    else Reflect.deleteProperty(globalThis, 'chrome');
+  }
+});
 
 function transport(action: 'close-without-reply' | 'error') {
   let targetAlive = true,
