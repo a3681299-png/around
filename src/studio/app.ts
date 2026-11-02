@@ -30,7 +30,7 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
     /[&<>"']/g,
     (value) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[value]!,
   );
-  root.innerHTML = `<header class="connection-bar"><strong>WORLD THEMES STUDIO</strong><label>編集対象 <select aria-label="編集する${hostName}タブ"><option value="">対象を選ぶ</option></select></label><button class="refresh-targets" type="button" title="開いている対応タブを取得">タブを更新</button><button class="connect-target" type="button">接続 / 再開</button><button class="disconnect-target" type="button">接続を解除</button><button class="focus-target" type="button">${hostName}を表示</button><span class="connection-status" role="status" aria-live="polite">接続先を選んでください。</span></header><p class="recovery-status" role="status"></p><div class="studio-mount"><section class="connection-empty"><h1>Webサイトが、あなたのキャンバスに。</h1><p>${hostName}を開いてテーマをONにし、上の一覧から接続してください。エディターの変更は実際の${hostName}タブへ反映されます。</p><p>エディターと${hostName}を並べると、パネルと作品を同時に見ながら編集できます。</p></section></div>`;
+  root.innerHTML = `<header class="connection-bar"><label>編集対象 <select aria-label="編集する${hostName}タブ"><option value="">対象を選ぶ</option></select></label><button class="refresh-targets" type="button" title="開いている対応タブを取得">タブを更新</button><button class="connect-target" type="button">接続 / 再開</button><button class="disconnect-target" type="button">接続を解除</button><button class="focus-target" type="button">${hostName}を表示</button><span class="connection-status" role="status" aria-live="polite">接続先を選んでください。</span></header><p class="recovery-status" role="status"></p><div class="studio-mount"><section class="connection-empty"><h1>Webサイトが、あなたのキャンバスに。</h1><p>${hostName}を開いて「作品を表示する」をONにし、上の一覧から接続してください。エディターの変更は実際の${hostName}タブへ反映されます。</p><p>エディターと${hostName}を並べると、パネルと作品を同時に見ながら編集できます。</p></section></div>`;
   const get = <T extends HTMLElement>(selector: string) => root.querySelector<T>(selector)!;
   const targetSelect = get<HTMLSelectElement>('select'),
     mount = get('.studio-mount'),
@@ -44,7 +44,6 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
   settingsButton.hidden = !ports.openSettings;
   settingsButton.addEventListener('click', () => ports.openSettings?.(connection.target));
   connectionBar.append(settingsButton);
-  connectionBar.querySelector('strong')!.remove();
   for (const [selector, name] of [
     ['refresh-targets', 'refresh'],
     ['connect-target', 'connect'],

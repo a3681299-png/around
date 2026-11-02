@@ -111,7 +111,7 @@ export function createPageController(
   const validateDesign = (input: DesignDocument | undefined) => {
     const next = input ? readDesign(input) : undefined;
     if (next && (next.siteId !== site.id || (next.baseThemeId !== null && next.baseThemeId !== LEGACY_BASE_THEME))) {
-      throw new Error('このサイトまたは基底テーマには対応していません。');
+      throw new Error('このサイト用の作品ではないため、表示できません。');
     }
     if (next) compileDesign(next, site.designTargets ?? []);
     if (

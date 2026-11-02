@@ -300,7 +300,7 @@ export function createTimelineHost(doc: Document, siteId: string, storage: TakeS
         emit(true);
         return;
       }
-      if (!binding) throw new Error('先に素材を配置してテーマをONにしてください。');
+      if (!binding) throw new Error('先に素材を配置し、「作品を表示する」をONにしてください。');
       if (value.type === 'record') {
         live();
         binding.refresh();

@@ -162,7 +162,7 @@ export function createCreatorPanel(
         <p class="hint">再生予算を超えた素材は一時待機します。ほかの素材を非表示にすると再開できます。</p>
       </fieldset>
     </fieldset>
-    <p class="hint card-help">チェックを外した項目はテーマの見た目に戻ります。</p>
+    <p class="hint card-help">チェックを外した項目はサイト本来の見た目に戻ります。</p>
     <p class="hint multi-help" hidden>複数選択は一括移動に対応しています。拡縮・回転は1枚ずつ操作してください。</p>
     </details>
     </div>

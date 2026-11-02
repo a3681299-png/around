@@ -234,7 +234,7 @@ export function createStudioClient(
               ? '接続中'
               : state?.enabled
                 ? '編集を終了しました。接続ボタンで再開できます。'
-                : 'テーマがOFFまたは強さ0%です。',
+                : '「作品を表示する」がOFFです。ONにしてから接続してください。',
           );
         } else if (message.type === 'reply') {
           const entry = pending.get(message.id);

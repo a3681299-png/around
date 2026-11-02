@@ -86,13 +86,16 @@ test('unknown initial settings are pending, while the first explicit OFF remains
     await Promise.resolve();
     expect(editor.open()).toMatchObject({ ok: false, error: /設定を読み込み中/ });
     editor.setEnabled(false);
-    expect(editor.open()).toMatchObject({ ok: false, error: /テーマをON/ });
+    expect(editor.open()).toMatchObject({
+      ok: false,
+      error: '「作品を表示する」がOFFです。ONにしてから編集してください。',
+    });
     expect(editor.snapshot()).toMatchObject({ enabled: false, active: false });
     editor.setEnabled(true);
     expect(editor.open().ok).toBe(true);
     editor.setEnabled(false);
     expect(editor.snapshot()).toMatchObject({ enabled: false, active: false });
-    expect(editor.open()).toMatchObject({ ok: false, error: /テーマをON/ });
+    expect(editor.open()).toMatchObject({ ok: false, error: /「作品を表示する」がOFF/ });
   } finally {
     editor.destroy();
   }

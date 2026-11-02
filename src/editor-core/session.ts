@@ -703,7 +703,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
 
   function open(): { ok: boolean; error?: string } {
     if (!settingsReceived) return { ok: false, error: '設定を読み込み中です。少し待ってから開いてください。' };
-    if (!enabled) return { ok: false, error: 'テーマをONにし、強さを1%以上にしてから編集してください。' };
+    if (!enabled) return { ok: false, error: '「作品を表示する」がOFFです。ONにしてから編集してください。' };
     if (!loaded) return { ok: false, error: 'デザインを読み込み中です。少し待ってから開いてください。' };
     if (loadError) return { ok: false, error: loadError };
     if (active) return { ok: true };
