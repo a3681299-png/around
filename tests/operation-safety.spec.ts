@@ -443,6 +443,8 @@ test('redraws over unchanged protection geometry leave the clip and safety recor
     for (let i = 0; i < 60 && !host.getAttribute('data-ww-safety')?.includes('"stopped":""'); i++) await frame();
     await new Promise((resolve) => setTimeout(resolve, 250));
     await frame();
+    // An exhausted wait must fail even when an already-stopped renderer makes no further writes.
+    const ready = JSON.parse(host.getAttribute('data-ww-safety') ?? '{}').stopped;
     const clip = (host as HTMLElement).style.getPropertyValue('--ww-decoration-clip');
     const writes: string[] = [];
     const observer = new MutationObserver((records) => records.forEach((r) => writes.push(r.attributeName!)));
@@ -455,8 +457,9 @@ test('redraws over unchanged protection geometry leave the clip and safety recor
       await new Promise((resolve) => setTimeout(resolve, 250));
     }
     observer.disconnect();
-    return { clip, writes };
+    return { clip, writes, ready };
   });
+  expect(result.ready).toBe('');
   expect(result.clip).toContain('path(');
   expect(result.writes).toEqual([]);
 });

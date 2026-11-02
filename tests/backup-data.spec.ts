@@ -273,3 +273,26 @@ test('the retro settings in an old backup are still checked: an invalid value re
   }
   expect(() => parseBackupManifest(valid)).not.toThrow();
 });
+
+test('old backup archives with valid hashes still reject every invalid legacy settings family', async () => {
+  const valid = (await historyManifest()) as { settings: Record<string, unknown> };
+  const bytes = await readFile('tests/fixtures/backups/pre-removal.wwbackup');
+  const length = new DataView(bytes.buffer, bytes.byteOffset).getUint32(BACKUP_HEADER_BYTES - 36, true);
+  const payload = new Uint8Array(bytes.subarray(BACKUP_HEADER_BYTES + length));
+  for (const patch of [
+    { strength: -1 },
+    { strength: '0' },
+    { noiseStrength: 101 },
+    { noiseStrength: false },
+    { palette: { hue: -1 } },
+    { palette: { saturation: 101 } },
+    { palette: { brightness: '70' } },
+    { palette: { unknown: 0 } },
+    { features: { 'window-chrome': 1 } },
+    { features: { unknown: true } },
+    { unknown: true },
+  ]) {
+    const archive = await uncheckedArchive({ ...valid, settings: { ...valid.settings, ...patch } }, payload);
+    await expect(decodeBackup(archive), JSON.stringify(patch)).rejects.toThrow(/バックアップ/);
+  }
+});
