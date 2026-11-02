@@ -4,6 +4,9 @@ import { test, expect } from './fixtures';
 import { openEditor } from './helpers/editor';
 import path from 'node:path';
 import { exposeEditorControls, withCanvas } from './helpers/editor-workspace';
+import type { DesignDocument } from '../src/design/types';
+import { parseDesign } from '../src/design/schema';
+import { defaultScrollOpacityRule, defaultSignalRule, type SignalRule } from '../src/signals/keyframes';
 
 async function probeCode() {
   const result = await build({
@@ -727,6 +730,249 @@ test('leaving a native control restores motion after hysteresis without another 
   await youtube.evaluate(() => (window as any).g1FinishApproach());
 });
 
+type Rect = { left: number; top: number; width: number; height: number };
+interface SeededLayer {
+  id: string;
+  /** Viewport centre and size, in CSS pixels. */
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+/** Saves `layers` (copies of one opaque image) as screen-plane artwork with `rules`, then ends
+ * editing so only the page's own guard, renderer and pointer remain. */
+async function seedLayers(
+  popup: Page,
+  youtube: Page,
+  layers: readonly SeededLayer[],
+  rules: (viewport: { width: number; height: number }) => SignalRule[],
+) {
+  const editor = await opaqueArtwork(popup, youtube);
+  await editor.getByRole('button', { name: '保存', exact: true }).click();
+  await expect(editor.locator('.status')).toHaveText('保存しました。');
+  await editor.getByRole('button', { name: '編集を終了', exact: true }).click();
+  const viewport = await youtube.evaluate(() => ({ width: innerWidth, height: innerHeight }));
+  const key = 'webWorldThemes.design.youtube';
+  const base = await popup.evaluate(async (k) => (await chrome.storage.local.get(k))[k] as DesignDocument, key);
+  const design: DesignDocument = {
+    ...base,
+    decorations: layers.map((layer, zIndex) => ({
+      ...base.decorations[0]!,
+      id: layer.id,
+      name: layer.id,
+      zIndex,
+      placement: {
+        ...base.decorations[0]!.placement,
+        anchor: { kind: 'viewport' },
+        x: layer.x / viewport.width,
+        y: layer.y / viewport.height,
+        widthPx: layer.width,
+        heightPx: layer.height,
+        rotationDeg: 0,
+      },
+    })),
+    signalRules: rules(viewport),
+  };
+  // The content script accepts only a valid document; fail here with the reason instead.
+  parseDesign(design);
+  await popup.evaluate(async ({ k, design }) => chrome.storage.local.set({ [k]: design }), { k: key, design });
+  await expect
+    .poll(() =>
+      youtube.evaluate(() =>
+        [
+          ...(document
+            .querySelector('#web-world-themes-decorations')
+            ?.shadowRoot?.querySelectorAll<HTMLElement>('[data-image-id]') ?? []),
+        ]
+          .map((node) => node.dataset.imageId)
+          .sort(),
+      ),
+    )
+    .toEqual(layers.map((layer) => layer.id).sort());
+  await settled(youtube);
+}
+/** Layers flattened by an approach (G1.2): only the held roots. */
+const heldLayers = (youtube: Page) =>
+  youtube.locator('#web-world-themes-decorations').evaluate((host: HTMLElement) =>
+    (JSON.parse(host.dataset.wwSafety ?? '{"issues":[]}').issues as { layerId: string; surfaceId: string }[])
+      .filter((issue) => issue.surfaceId === 'native.approach')
+      .map((issue) => issue.layerId)
+      .sort(),
+  );
+/** What a layer shows: its opacity times every element's down to the picture. */
+const alphaOf = (youtube: Page, id: string) =>
+  youtube.evaluate((id) => {
+    const node = document
+      .querySelector('#web-world-themes-decorations')!
+      .shadowRoot!.querySelector<HTMLElement>(`[data-image-id="${id}"]`)!;
+    let alpha = 1;
+    for (
+      let element: Element | null = node.querySelector('img, canvas, video');
+      element;
+      element = element.parentElement
+    ) {
+      alpha *= Number(getComputedStyle(element).opacity);
+      if (element === node) break;
+    }
+    return alpha;
+  }, id);
+/** Room to scroll, below everything the page draws (no control is added). */
+const scrollRoom = (youtube: Page) =>
+  youtube.evaluate(() => {
+    const room = document.createElement('div');
+    room.id = 'g12-scroll-room';
+    room.style.height = '3000px';
+    document.querySelector('ytd-page-manager')!.append(room);
+  });
+const scrollToProgress = (youtube: Page, progress: number) =>
+  youtube.evaluate(async (progress) => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    scrollTo(0, Math.round(max * progress));
+    for (let i = 0; i < 3; i++) await new Promise(requestAnimationFrame);
+  }, progress);
+const centreOf = (r: Rect) => ({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
+
+test('G1.2 ①②④: near a control, only the layer over it is held; a layer elsewhere keeps following the scroll', async ({
+  popup,
+  youtube,
+}) => {
+  await scrollRoom(youtube);
+  // The masthead is fixed: its Account button stays under a resting pointer while the page scrolls.
+  const account = await youtube.getByRole('button', { name: 'Account' }).evaluate((element) => {
+    const r = element.getBoundingClientRect();
+    return { left: r.left, top: r.top, width: r.width, height: r.height };
+  });
+  const viewport = youtube.viewportSize()!;
+  const away = { x: Math.round(viewport.width * 0.6), y: Math.round(viewport.height * 0.75) };
+  await seedLayers(
+    popup,
+    youtube,
+    [
+      { id: 'over-account', ...centreOf(account), width: 80, height: 60 },
+      { id: 'elsewhere', ...away, width: 80, height: 60 },
+    ],
+    () => [defaultScrollOpacityRule('over-account'), defaultScrollOpacityRule('elsewhere')],
+  );
+  // Nothing is near yet: both layers follow the scroll.
+  await scrollToProgress(youtube, 0.25);
+  await expect.poll(() => alphaOf(youtube, 'elsewhere')).toBeCloseTo(0.5, 1);
+  await expect.poll(() => alphaOf(youtube, 'over-account')).toBeCloseTo(0.5, 1);
+  const clipBefore = await youtube
+    .locator('#web-world-themes-decorations')
+    .evaluate((host) => getComputedStyle(host).clipPath);
+  // ② The pointer rests on the Account button: only the layer painted over it is held.
+  await youtube.mouse.move(centreOf(account).x, centreOf(account).y, { steps: 4 });
+  await expect.poll(() => heldLayers(youtube)).toEqual(['over-account']);
+  await expect.poll(() => alphaOf(youtube, 'over-account')).toBe(1);
+  // ① The layer elsewhere keeps following the scroll under the resting pointer.
+  const followed: number[] = [];
+  for (const progress of [0.3, 0.4, 0.45]) {
+    await scrollToProgress(youtube, progress);
+    await expect.poll(() => alphaOf(youtube, 'elsewhere')).toBeCloseTo(progress * 2, 1);
+    followed.push(await alphaOf(youtube, 'elsewhere'));
+    expect(await heldLayers(youtube)).toEqual(['over-account']);
+    expect(await alphaOf(youtube, 'over-account')).toBe(1);
+  }
+  expect(new Set(followed).size).toBe(3);
+  // ④ The clip is the same whether or not a layer is held, and the button stays the hit target.
+  expect(
+    await youtube.locator('#web-world-themes-decorations').evaluate((host) => getComputedStyle(host).clipPath),
+  ).toBe(clipBefore);
+  expect(
+    await youtube
+      .getByRole('button', { name: 'Account' })
+      .evaluate((element, p) => document.elementFromPoint(p.x, p.y) === element, centreOf(account)),
+  ).toBe(true);
+  // ② Leaving releases the held layer after the 350ms hysteresis, without another pointer event.
+  await youtube.mouse.move(away.x, away.y, { steps: 4 });
+  const left = Date.now();
+  await expect.poll(() => heldLayers(youtube), { intervals: [50] }).toEqual([]);
+  expect(Date.now() - left).toBeGreaterThanOrEqual(300);
+  await expect.poll(() => alphaOf(youtube, 'over-account')).toBeCloseTo(0.9, 1);
+});
+
+test('G1.2 ③: a layer that moves onto a near control is held within two frames and not released until the control clears', async ({
+  popup,
+  youtube,
+}) => {
+  await scrollRoom(youtube);
+  const account = await youtube.getByRole('button', { name: 'Account' }).evaluate((element) => {
+    const r = element.getBoundingClientRect();
+    return { left: r.left, top: r.top, width: r.width, height: r.height };
+  });
+  const start = { x: 320, y: centreOf(account).y };
+  // The scroll slides the layer along the masthead, from the guide's edge onto the Account button.
+  const distance = centreOf(account).x - start.x;
+  await seedLayers(popup, youtube, [{ id: 'mover', ...start, width: 40, height: 40 }], () => [
+    {
+      ...defaultSignalRule('mover', 'position.x', defaultScrollOpacityRule('mover').source),
+      keyframes: [
+        { id: 'key-start', input: 0, value: 0, easing: 'linear' },
+        { id: 'key-end', input: 1, value: distance, easing: 'linear' },
+      ],
+    },
+  ]);
+  await scrollToProgress(youtube, 0);
+  await youtube.mouse.move(centreOf(account).x, centreOf(account).y, { steps: 4 });
+  // The near controls: every masthead button within the 40px entering margin of the pointer
+  // (the Create button sits beside Account).
+  const near = await youtube.evaluate((p) => {
+    const rects = [...document.querySelectorAll('ytd-masthead button')]
+      .map((element) => element.getBoundingClientRect())
+      .filter((r) => Math.max(r.left - p.x, p.x - r.right, r.top - p.y, p.y - r.bottom) <= 40);
+    const left = Math.min(...rects.map((r) => r.left)),
+      right = Math.max(...rects.map((r) => r.right)),
+      top = Math.min(...rects.map((r) => r.top)),
+      bottom = Math.max(...rects.map((r) => r.bottom));
+    return { left, top, width: right - left, height: bottom - top };
+  }, centreOf(account));
+  // The way in passed the search box, which the mover overlaps: that hold clears after 350ms.
+  await expect.poll(() => heldLayers(youtube)).toEqual([]);
+  // Every frame: where the mover is painted, and whether the guard holds it.
+  await youtube.evaluate((account) => {
+    const host = document.querySelector<HTMLElement>('#web-world-themes-decorations')!;
+    const node = host.shadowRoot!.querySelector<HTMLElement>('[data-image-id="mover"]')!;
+    const held = () =>
+      (JSON.parse(host.dataset.wwSafety ?? '{"issues":[]}').issues as { layerId: string; surfaceId: string }[]).some(
+        (issue) => issue.layerId === 'mover' && issue.surfaceId === 'native.approach',
+      );
+    const log = ((window as any).g12Frames = [] as { over: boolean; held: boolean }[]);
+    const changes = ((window as any).g12Changes = [] as boolean[]);
+    let last = held();
+    new MutationObserver(() => {
+      if (held() !== last) changes.push((last = held()));
+    }).observe(host, { attributes: true, attributeFilter: ['data-ww-safety'] });
+    const tick = () => {
+      const r = node.getBoundingClientRect();
+      log.push({
+        over:
+          r.right > account.left &&
+          r.left < account.left + account.width &&
+          r.bottom > account.top &&
+          r.top < account.top + account.height,
+        held: held(),
+      });
+      if ((window as any).g12Frames) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, near);
+  for (let step = 1; step <= 40; step++) await scrollToProgress(youtube, step / 40);
+  const during = await youtube.evaluate(() => ({
+    frames: (window as any).g12Frames as { over: boolean; held: boolean }[],
+    changes: [...((window as any).g12Changes as boolean[])],
+  }));
+  // It reached the control, was held, went back to its authored place, and stayed held there.
+  expect(during.frames.some((frame) => frame.over)).toBe(true);
+  expect(during.frames.filter((frame) => frame.over && !frame.held).length).toBeLessThanOrEqual(2);
+  expect(during.changes).toEqual([true]);
+  expect(during.frames.at(-1)).toEqual({ over: false, held: true });
+  // Leaving the control releases it once.
+  await youtube.mouse.move(start.x, 400, { steps: 4 });
+  await expect.poll(() => heldLayers(youtube)).toEqual([]);
+  expect(await youtube.evaluate(() => (window as any).g12Changes)).toEqual([true, false]);
+  await youtube.evaluate(() => ((window as any).g12Frames = undefined));
+});
+
 test('manual emergency OFF releases drawing and preserves an unsaved editor and Undo until explicit resume', async ({
   popup,
   youtube,
@@ -1092,6 +1338,29 @@ async function clickFixture(youtube: Page) {
     place(shown, 500, 1);
     place(cover, 500, 5);
     app.append(picture, hidden, shown, cover);
+    // G1.2 (D8): a button that takes no pointer input (pointer-events: none from its wrapper)
+    // over a picture; at 900 the same, with a pressable button the picture covers.
+    for (const [left, pressable] of [
+      [700, false],
+      [900, true],
+    ] as const) {
+      const backdrop = document.createElement('div'),
+        wrapper = document.createElement('div'),
+        inert = document.createElement('button');
+      inert.textContent = '飾りのボタン';
+      inert.style.cssText = 'width:100%;height:100%;margin:0;padding:0;border:0';
+      place(backdrop, left, 2);
+      place(wrapper, left, 3);
+      wrapper.style.pointerEvents = 'none';
+      wrapper.append(inert);
+      if (pressable) {
+        const under = document.createElement('button');
+        under.textContent = '押せるボタン';
+        place(under, left, 1);
+        app.append(under);
+      }
+      app.append(backdrop, wrapper);
+    }
   });
 }
 const click = (x: number) => {
@@ -1132,14 +1401,29 @@ test('a click over a hidden native control is not a failure; a visible control a
       await settle();
     }
     const covered = { stopped: host.snapshot().stopped, latched: host.snapshot().latched };
+    host.resume();
+    await settle();
+    const fresh = source.capture();
+    const inertValid = source.validate(fresh, new PointerEvent('pointerdown', { clientX: 730, clientY: 440 }));
+    const inertCoveredValid = source.validate(fresh, new PointerEvent('pointerdown', { clientX: 930, clientY: 440 }));
+    for (let i = 0; i < 3; i++) {
+      click(730);
+      await settle();
+    }
+    const inert = { stopped: host.snapshot().stopped, latched: host.snapshot().latched };
     host.destroy();
-    return { hiddenValid, coveredValid, hidden, covered };
+    return { hiddenValid, coveredValid, hidden, covered, inertValid, inertCoveredValid, inert };
   }, `(${click.toString()})(x)`);
   expect(result.hiddenValid).toBe(true);
   expect(result.coveredValid).toBe(false);
   expect(result.hidden).toEqual({ stopped: '', latched: false });
   expect(result.covered.stopped).toBeTruthy();
   expect(result.covered.latched).toBe(true);
+  // D8: a control that takes no pointer input is not covered; a pressable one at the same kind
+  // of point, under the same picture, still is.
+  expect(result.inertValid).toBe(true);
+  expect(result.inertCoveredValid).toBe(false);
+  expect(result.inert).toEqual({ stopped: '', latched: false });
   // Only the covered control is traced: the expected target and the element that took the click.
   expect(traces.length).toBeGreaterThanOrEqual(4);
   const trace = JSON.parse(traces[0]!.slice(traces[0]!.indexOf('{')));

@@ -108,8 +108,14 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
       return { x, y };
     }, gif);
     await page.mouse.move(pointer.x, pointer.y, { steps: 4 });
-    const under: unknown[] = [];
-    report.checks['pointer'] = { point: pointer, gif, under };
+    const gifId = await media.first().evaluate((node) => node.closest<HTMLElement>('[data-image-id]')?.dataset.imageId);
+    const under: {
+      progress: number;
+      hit: string | null;
+      control: string | null;
+      approach?: { near: string[]; held: Record<string, string[]> } | null;
+    }[] = [];
+    report.checks['pointer'] = { point: pointer, gif, gifId, under };
     const verifyScroll = async (progress: number) => {
       await page.evaluate((value) => {
         const root = document.scrollingElement!;
@@ -173,12 +179,23 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
           }, pointer);
           throw error;
         });
+      // A WW_GUARD_TRACE build records the near controls and the roots they hold at this scroll.
+      under.at(-1)!.approach = await page.evaluate(() => {
+        const log = JSON.parse(document.documentElement.getAttribute('data-ww-guard-approach') ?? 'null') as
+          { change: string; near?: string[]; held?: Record<string, string[]> }[] | null;
+        const last = log?.filter((entry) => entry.change === 'approach').at(-1);
+        return last ? { near: last.near ?? [], held: last.held ?? {} } : null;
+      });
     };
     for (const progress of [0, 0.25, 0.5, 0.75, 1, 0.5, 0]) await verifyScroll(progress);
     for (const progress of [0, 0.5, 1, 0.5, 0]) {
       await page.waitForTimeout(100);
       await verifyScroll(progress);
     }
+    // With the record (a WW_GUARD_TRACE build): whenever a control passed under the resting pointer,
+    // the approach held only roots over it, never the GIF.
+    for (const step of under.filter((entry) => entry.control && entry.approach))
+      expect(Object.keys(step.approach!.held), JSON.stringify(step)).not.toContain(gifId);
     report.checks.scrollSpeedAndDirectionIndependent = true;
     stage('record');
     await panel.click('.take-record');

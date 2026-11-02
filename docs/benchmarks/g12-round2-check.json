@@ -1,0 +1,219 @@
+{
+  "stage": "G1.2 round 2, hypothesis check (2 pairs)",
+  "harness": "scripts/g11/run.mjs, one harness run per build and pair (G11_PAIR_COUNT=1), builds alternating before/after/after/before",
+  "before": "b4e88c8 (Host restricts the whole page)",
+  "after": "b4e88c8 + G1.2 round 2 working tree (Host holds only roots over a near control)",
+  "browser": "Playwright Chromium (.work/browsers), headless, 1920x1080",
+  "url": "https://www.youtube.com/watch?v=M7lc1UVf-VE",
+  "date": "2026-11-02",
+  "unit": "extension CPU ms per frame",
+  "note": "steady: one layer whose X follows the idle time, pointer resting, no scroll; guarded blocks only (the idle time is a Host sample). Compare guarded blocks across builds.",
+  "modes": {
+    "scroll": [
+      {
+        "pair": 0,
+        "build": "after",
+        "guarded": false,
+        "frames": 958,
+        "median": 1,
+        "p95": 1.599999999627471,
+        "max": 4.599999999627471,
+        "recaptures": 0
+      },
+      {
+        "pair": 0,
+        "build": "after",
+        "guarded": true,
+        "frames": 928,
+        "median": 1.300000000745058,
+        "p95": 2.099999999627471,
+        "max": 15.399999998509884,
+        "recaptures": 36
+      },
+      {
+        "pair": 0,
+        "build": "before",
+        "guarded": false,
+        "frames": 943,
+        "median": 1,
+        "p95": 1.800000000745058,
+        "max": 4.400000000372529,
+        "recaptures": 0
+      },
+      {
+        "pair": 0,
+        "build": "before",
+        "guarded": true,
+        "frames": 928,
+        "median": 1.200000001117587,
+        "p95": 2.199999999254942,
+        "max": 14.799999998882413,
+        "recaptures": 36
+      },
+      {
+        "pair": 1,
+        "build": "after",
+        "guarded": false,
+        "frames": 938,
+        "median": 1.099999999627471,
+        "p95": 2,
+        "max": 4.400000000372529,
+        "recaptures": 0
+      },
+      {
+        "pair": 1,
+        "build": "after",
+        "guarded": true,
+        "frames": 890,
+        "median": 1.400000000372529,
+        "p95": 2.5,
+        "max": 18.699999999254942,
+        "recaptures": 36
+      },
+      {
+        "pair": 1,
+        "build": "before",
+        "guarded": false,
+        "frames": 912,
+        "median": 1,
+        "p95": 1.699999999254942,
+        "max": 4.199999999254942,
+        "recaptures": 0
+      },
+      {
+        "pair": 1,
+        "build": "before",
+        "guarded": true,
+        "frames": 907,
+        "median": 1.199999999254942,
+        "p95": 2.199999999254942,
+        "max": 16.5,
+        "recaptures": 37
+      }
+    ],
+    "startup": [
+      {
+        "pair": 0,
+        "build": "after",
+        "guarded": false,
+        "frames": 696,
+        "median": 1.299999998882413,
+        "p95": 2.099999999627471,
+        "max": 22.5,
+        "recaptures": 1
+      },
+      {
+        "pair": 0,
+        "build": "after",
+        "guarded": true,
+        "frames": 692,
+        "median": 1.5,
+        "p95": 2.699999999254942,
+        "max": 22.300000000745058,
+        "recaptures": 17
+      },
+      {
+        "pair": 0,
+        "build": "before",
+        "guarded": false,
+        "frames": 684,
+        "median": 1.200000001117587,
+        "p95": 2.100000001490116,
+        "max": 23,
+        "recaptures": 1
+      },
+      {
+        "pair": 0,
+        "build": "before",
+        "guarded": true,
+        "frames": 681,
+        "median": 1.199999999254942,
+        "p95": 2.5,
+        "max": 18.800000000745058,
+        "recaptures": 17
+      },
+      {
+        "pair": 1,
+        "build": "after",
+        "guarded": false,
+        "frames": 693,
+        "median": 1,
+        "p95": 2,
+        "max": 21.40000000037253,
+        "recaptures": 1
+      },
+      {
+        "pair": 1,
+        "build": "after",
+        "guarded": true,
+        "frames": 678,
+        "median": 1.3999999985098839,
+        "p95": 2.699999999254942,
+        "max": 20.799999998882413,
+        "recaptures": 17
+      },
+      {
+        "pair": 1,
+        "build": "before",
+        "guarded": false,
+        "frames": 696,
+        "median": 0.900000000372529,
+        "p95": 1.900000000372529,
+        "max": 21.300000000745058,
+        "recaptures": 1
+      },
+      {
+        "pair": 1,
+        "build": "before",
+        "guarded": true,
+        "frames": 673,
+        "median": 1.200000001117587,
+        "p95": 2.199999999254942,
+        "max": 21,
+        "recaptures": 16
+      }
+    ],
+    "steady": [
+      {
+        "pair": 0,
+        "build": "after",
+        "guarded": true,
+        "frames": 863,
+        "median": 1.699999999254942,
+        "p95": 2.099999999627471,
+        "max": 7.099999999627471,
+        "recaptures": 0
+      },
+      {
+        "pair": 0,
+        "build": "before",
+        "guarded": true,
+        "frames": 863,
+        "median": 1.900000000372529,
+        "p95": 2.900000000372529,
+        "max": 5.599999999627471,
+        "recaptures": 0
+      },
+      {
+        "pair": 1,
+        "build": "after",
+        "guarded": true,
+        "frames": 865,
+        "median": 1.699999999254942,
+        "p95": 2.199999999254942,
+        "max": 5.599999999627471,
+        "recaptures": 0
+      },
+      {
+        "pair": 1,
+        "build": "before",
+        "guarded": true,
+        "frames": 865,
+        "median": 1.700000001117587,
+        "p95": 2.199999999254942,
+        "max": 5.900000000372529,
+        "recaptures": 0
+      }
+    ]
+  }
+}

@@ -92,6 +92,9 @@ test('a covered control stops drawing until 描画を再開, and the same covere
   for (let i = 0; i < 2; i++) await coveredClick();
   await youtube.waitForTimeout(800);
   expect(await stopped(youtube)).toBe('クリックがページの操作部品に届くよう、絵の表示を止めました。');
+  // A stopped layer shows no editing handles (G1.2 keeps this whatever an approach holds).
+  await expect(youtube.locator(overlay + ' [data-image-id]')).toHaveAttribute('data-safety-limited', '');
+  await expect(youtube.locator(overlay + ' [data-frame-id]')).toBeHidden();
   const check = studio.locator('.ww-editor-safety .safety-check');
   await check.locator('summary').click();
   const resume = check.getByRole('button', { name: '描画を再開', exact: true });

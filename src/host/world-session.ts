@@ -143,7 +143,9 @@ export function createWorldSession(
   };
   const paint = (time: number) => {
     if (!context || !prepared) return;
-    const overridden = timeline?.preview(context.scene);
+    // Host restrictions are sampled first: a preview or take mixes in the live approach (G1.2).
+    const safety = context.safety?.sample(time);
+    const overridden = timeline?.preview(context.scene, safety?.approach);
     if (wasPreview && !overridden) state = rebaseWorldClock(state, time);
     wasPreview = Boolean(overridden);
     if (sources.overflowed && timeline?.recording)
@@ -170,16 +172,15 @@ export function createWorldSession(
         ...(context.holdTransforms ? { holdTransforms: true } : {}),
       },
     };
-    if (context.safety) {
-      const safety = context.safety.sample(timeMs);
+    if (safety) {
       input.signals.samples = { ...input.signals.samples, 'user.idle.duration': safety.idleSeconds };
-      input.environment.safeInteraction = safety.approaching;
+      if (safety.approach) input.environment.approach = safety.approach;
     }
-    // User/Host restrictions also override a recorded or previewed frame.
-    const result =
-      input.environment.reducedMotion || input.environment.safeInteraction
-        ? evaluatePreparedWorld(prepared, state, input, context.scene.signalRules)
-        : (overridden ?? evaluatePreparedWorld(prepared, state, input, context.scene.signalRules));
+    // Reduced motion overrides a recorded or previewed frame whole; an approach is already
+    // mixed into it, on the held roots only.
+    const result = input.environment.reducedMotion
+      ? evaluatePreparedWorld(prepared, state, input, context.scene.signalRules)
+      : (overridden ?? evaluatePreparedWorld(prepared, state, input, context.scene.signalRules));
     if (!overridden) {
       if (
         !context.scene.signalRules?.length &&

@@ -8,7 +8,12 @@ import {
   ATMOSPHERE_ALPHA_CAP,
   initialProximity,
   stepProximity,
+  stepApproach,
+  initialApproach,
+  approachLayers,
+  approachRectOf,
   editorClaims,
+  type ApproachState,
   type OperationSnapshot,
   type OperationSurface,
   type PaintFootprint,
@@ -271,6 +276,99 @@ test('proximity uses original coordinates, the pointer path and hysteresis, incl
   expect(
     stepProximity({ safe: false, clearSince: 0 }, snapshot([focused]), { timeMs: 1000, interacting: false }).safe,
   ).toBe(true);
+});
+const away = surface({
+  id: 'like',
+  kind: 'click',
+  shape: { left: 700, top: 200, width: 60, height: 30 },
+  protectedEnvelope: { left: 696, top: 196, width: 68, height: 38 },
+});
+const dynamicPaint = (id: string, left: number, top: number, patch: Partial<PaintFootprint> = {}) =>
+  paint({ id, dynamic: true, bounds: { left, top, right: left + 50, bottom: top + 20 }, ...patch });
+const heldRoots = (state: ApproachState) => [...state.held.keys()].sort();
+test('G1.2: each approached control keeps its own hysteresis (40px to enter, 72px to stay, 350ms)', () => {
+  const s = snapshot([surface(), away]);
+  const step = (state: ApproachState, timeMs: number, point?: { x: number; y: number }) =>
+    stepApproach(state, s, { timeMs, keyed: false, ...(point ? { point } : {}) }, []);
+  // The seek band is 100..300 x 200..230. 50px above it is outside the entering margin.
+  let state = step(initialApproach(), 0, { x: 200, y: 150 });
+  expect([...state.near.keys()]).toEqual([]);
+  state = step(state, 10, { x: 200, y: 165 });
+  expect([...state.near.keys()]).toEqual(['seek']);
+  // Inside the staying margin it stays near; the far control never joins.
+  state = step(state, 20, { x: 200, y: 140 });
+  expect(state.near.get('seek')).toMatchObject({ clearSince: null });
+  state = step(state, 30, { x: 200, y: 100 });
+  expect(state.near.get('seek')).toMatchObject({ clearSince: 30 });
+  expect(step(state, 379, { x: 200, y: 100 }).near.has('seek')).toBe(true);
+  expect(step(state, 380, { x: 200, y: 100 }).near.has('seek')).toBe(false);
+  expect(state.near.has('like')).toBe(false);
+});
+test('G1.2: only dynamic roots painted over a near control are held, as root units', () => {
+  const s = snapshot([surface(), away]);
+  const paints = [
+    dynamicPaint('over-seek', 120, 205),
+    dynamicPaint('far', 400, 500),
+    dynamicPaint('still', 120, 205, { dynamic: false }),
+    dynamicPaint('child-a', 600, 600, { root: 'group' }),
+    dynamicPaint('child-b', 250, 210, { root: 'group' }),
+    // Overlap only (D3): touching the edge is not overlapping.
+    dynamicPaint('beside', 300, 205),
+  ];
+  const state = stepApproach(initialApproach(), s, { timeMs: 0, keyed: false, point: { x: 200, y: 215 } }, paints);
+  expect(heldRoots(state)).toEqual(['group', 'over-seek']);
+  expect(approachLayers(state)).toEqual({
+    layers: { 'over-seek': [approachRectOf(surface())], group: [approachRectOf(surface())] },
+  });
+  expect(approachLayers(initialApproach())).toBeUndefined();
+});
+test('G1.2: a held root stays held until its control clears, even after it moves away', () => {
+  const s = snapshot([surface(), away]);
+  let paints = [dynamicPaint('mover', 120, 205)];
+  let state = stepApproach(initialApproach(), s, { timeMs: 0, keyed: false, point: { x: 200, y: 215 } }, paints);
+  expect(heldRoots(state)).toEqual(['mover']);
+  // Back at its resting place, far from the control: still held while the control is near.
+  paints = [dynamicPaint('mover', 500, 500)];
+  state = stepApproach(state, s, { timeMs: 100, keyed: false, point: { x: 200, y: 215 } }, paints);
+  expect(heldRoots(state)).toEqual(['mover']);
+  state = stepApproach(state, s, { timeMs: 200, keyed: false, point: { x: 200, y: 500 } }, paints);
+  state = stepApproach(state, s, { timeMs: 549, keyed: false, point: { x: 200, y: 500 } }, paints);
+  expect(heldRoots(state)).toEqual(['mover']);
+  state = stepApproach(state, s, { timeMs: 550, keyed: false, point: { x: 200, y: 500 } }, paints);
+  expect(heldRoots(state)).toEqual([]);
+  // A layer that moves onto a near control later is held from that frame on.
+  state = stepApproach(state, s, { timeMs: 600, keyed: false, point: { x: 720, y: 215 } }, paints);
+  expect(heldRoots(state)).toEqual([]);
+  paints = [dynamicPaint('mover', 690, 200)];
+  state = stepApproach(state, s, { timeMs: 616, keyed: false, point: { x: 720, y: 215 } }, paints);
+  expect(heldRoots(state)).toEqual(['mover']);
+  expect(state.held.get('mover')).toEqual(['like']);
+});
+test('G1.2: an approach without a pointer holds the layers over its control (D2)', () => {
+  const player = { left: 16, top: 145, width: 1050, height: 590 };
+  const video = surface({
+    id: 'player.video',
+    kind: 'gesture',
+    shape: player,
+    protectedEnvelope: player,
+    policy: { transform: 'fixed-plane', occlusion: 'allow', input: 'native-only' },
+  });
+  const seek = surface({ shape: { left: 100, top: 900, width: 200, height: 30 } });
+  seek.protectedEnvelope = { left: 96, top: 896, width: 208, height: 38 };
+  const paints = [dynamicPaint('on-seek', 120, 905), dynamicPaint('on-video', 500, 400), dynamicPaint('far', 1500, 50)];
+  const held = (surfaces: OperationSurface[], input: Partial<Parameters<typeof stepApproach>[2]>) =>
+    heldRoots(stepApproach(initialApproach(), snapshot(surfaces), { timeMs: 0, keyed: false, ...input }, paints));
+  const focused = { ...seek, availability: { ...seek.availability, focused: true } };
+  const dragging = { ...seek, availability: { ...seek.availability, dragging: true } };
+  expect(held([video, focused], {})).toEqual(['on-seek']);
+  expect(held([video, dragging], {})).toEqual(['on-seek']);
+  // A key typed with focus on a control holds only that control's layers.
+  expect(held([video, focused], { keyed: true })).toEqual(['on-seek']);
+  // A key on the page (YouTube's k, j, l) goes to the player: the layers over the player.
+  expect(held([video, seek], { keyed: true })).toEqual(['on-video']);
+  // A press away from every control holds what is painted within 40px of the press.
+  expect(held([video, seek], { pressed: { x: 1490, y: 30 } })).toEqual(['far']);
+  expect(held([video, seek], { pressed: { x: 1400, y: 30 } })).toEqual([]);
 });
 test('idle is a registry numeric host sample, and artwork cannot change Host protection or emergency state', () => {
   expect(SIGNAL_REGISTRY.numericSource('user.idle.duration', 'page', 'y')).toBe(true);

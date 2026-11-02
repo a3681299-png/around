@@ -49,6 +49,8 @@ export function traceApproach(
     point?: { x: number; y: number };
     interacting?: boolean;
     surfaces?: readonly import('../world/operations').OperationSurface[];
+    /** G1.2: the near controls and the roots they hold, after this change. */
+    approach?: import('../world/operations').ApproachState;
   },
 ) {
   const near = (record.surfaces ?? []).filter(
@@ -84,6 +86,8 @@ export function traceApproach(
           dragging: ids((s) => s.availability.dragging),
           captured: ids((s) => s.availability.captured),
           nearPoint: near.slice(0, 6).map((s) => ({ id: s.id, shape: s.shape })),
+          near: [...(record.approach?.near.keys() ?? [])],
+          held: Object.fromEntries(record.approach?.held ?? []),
           active: describe(doc.activeElement)?.element ?? null,
           hasFocus: doc.hasFocus(),
         }

@@ -451,13 +451,13 @@ export function createOperationSource(
         // A control that is not shown (YouTube keeps hover-only buttons in the layout) cannot be
         // under the pointer, so another element taking the click is not a covered control.
         // Same test as a snapshot's availability.visible; read only for controls at the point.
-        if (
-          !row.element.isConnected ||
-          !r.width ||
-          !r.height ||
-          !(row.visible ?? doc.defaultView!.getComputedStyle(row.element).visibility !== 'hidden')
-        )
-          return false;
+        if (!row.element.isConnected || !r.width || !r.height) return false;
+        const style = doc.defaultView!.getComputedStyle(row.element);
+        if (!(row.visible ?? style.visibility !== 'hidden')) return false;
+        // A control that takes no pointer input (pointer-events: none, inherited from an
+        // ancestor too) is not covered when the click reaches what is beneath it (D8). The
+        // extension never writes pointer-events on the site's elements, so this is the site's own.
+        if (style.pointerEvents === 'none') return false;
         return !(
           hit &&
           (row.element.contains(hit) || hit.contains(row.element) || event.composedPath().includes(row.element))

@@ -1,8 +1,10 @@
 import {
+  approachLayers,
   editorClaims,
   guardPaint,
-  initialProximity,
-  stepProximity,
+  initialApproach,
+  stepApproach,
+  type ApproachState,
   type OperationSnapshot,
   type PaintFootprint,
   type SafetyIssue,
@@ -10,6 +12,7 @@ import {
 import type { OperationSource } from './operation-source';
 import { traceApproach } from './guard-trace';
 import type { Point } from '../world/geometry';
+import type { WorldApproach } from '../world/types';
 
 export interface SafetyStatus {
   issues: readonly SafetyIssue[];
@@ -41,7 +44,8 @@ function remedyFor(latched: boolean, names: readonly string[], remedy: string) {
 }
 export interface OperationGuardHost {
   setActive(value: boolean): void;
-  sample(time: number): { approaching: boolean; idleSeconds: number };
+  /** `approach`: the roots that yield to a near control (G1.2), absent when none do. */
+  sample(time: number): { approach?: WorldApproach; idleSeconds: number };
   commit(paints: readonly PaintFootprint[]): ReadonlySet<string>;
   readonly source: OperationSource;
   snapshot(): SafetyStatus;
@@ -83,9 +87,12 @@ export function createOperationGuardHost(
   const layerFailures = new Map<string, number>(),
     latchedLayers = new Map<string, string>();
   let surfaces = source.capture(),
-    proximity = { ...initialProximity(), safe: false },
+    approach: ApproachState = initialApproach(),
     point: Point | undefined,
-    before: Point | undefined;
+    before: Point | undefined,
+    /** Where the pointer is held down, and whether a key is, until released. */
+    pressed: Point | undefined,
+    keyed = false;
   const boundaryKey = (snapshot: OperationSnapshot) =>
     JSON.stringify([
       snapshot.supported,
@@ -120,10 +127,31 @@ export function createOperationGuardHost(
     timer: number | undefined,
     holdTimer: number | undefined;
   const latched = () => failures >= 3 || latchedLayers.size > 0;
+  const approaching = () => approach.near.size > 0;
+  /** Near controls, and the roots over them in the last committed paint. */
+  const step = (timeMs: number, snapshot: OperationSnapshot) =>
+    stepApproach(
+      approach,
+      snapshot,
+      {
+        timeMs,
+        ...(point ? { point } : {}),
+        ...(before ? { previousPoint: before } : {}),
+        ...(pressed ? { pressed } : {}),
+        keyed,
+      },
+      paints,
+    );
+  /** Whether the held roots differ: the only change the world (and a redraw) depends on. */
+  const heldChanged = (next: ApproachState) =>
+    next.held.size !== approach.held.size || [...next.held.keys()].some((root) => !approach.held.has(root));
+  const nearChanged = (next: ApproachState) =>
+    next.near.size !== approach.near.size || [...next.near.keys()].some((key) => !approach.near.has(key));
+  const clearing = () => [...approach.near.values()].some((entry) => entry.clearSince !== null);
   const snapshot = (): SafetyStatus => ({
     issues,
     surfaces,
-    approaching: proximity.safe,
+    approaching: approaching(),
     stopped,
     remedy: stopped ? stoppedRemedy : '',
     latched: latched(),
@@ -138,7 +166,7 @@ export function createOperationGuardHost(
       stoppedRemedy,
       latched(),
       overlay,
-      proximity.safe,
+      approaching(),
       overlay ? surfaces : null,
       overlayHost,
     ];
@@ -150,7 +178,7 @@ export function createOperationGuardHost(
       stoppedRemedy,
       latched(),
       overlay,
-      proximity.safe,
+      approaching(),
       overlay ? surfaces : null,
     ]);
     if (signature === lastStatus) return;
@@ -248,8 +276,8 @@ export function createOperationGuardHost(
     if (event.type === 'visibilitychange' || event.type === 'blur') {
       WW_GUARD_TRACE: traceApproach(doc, 'forget', { value: interacting, event });
       lastActivity = view.performance.now();
-      before = point = undefined;
-      interacting = false;
+      before = point = pressed = undefined;
+      interacting = keyed = false;
       return;
     }
     lastActivity = view.performance.now();
@@ -260,9 +288,9 @@ export function createOperationGuardHost(
       // Authoring UI owns its input region. Native hit/paint protection remains
       // enforced, while Timeline/numeric previews can show their authored values.
       WW_GUARD_TRACE: if (interacting || point) traceApproach(doc, 'forget', { value: interacting, event });
-      before = point = undefined;
-      interacting = false;
-      proximity = { safe: false, clearSince: null };
+      before = point = pressed = undefined;
+      interacting = keyed = false;
+      approach = initialApproach();
       return;
     }
     if (event instanceof PointerEvent) {
@@ -272,6 +300,8 @@ export function createOperationGuardHost(
     if (event.type === 'pointerdown' || event.type === 'keydown') {
       WW_GUARD_TRACE: if (!interacting) traceApproach(doc, 'interacting', { value: true, event });
       interacting = true;
+      if (event.type === 'keydown') keyed = true;
+      else pressed = point;
     }
     if (
       event.type === 'pointerup' ||
@@ -280,7 +310,8 @@ export function createOperationGuardHost(
       event.type === 'blur'
     ) {
       WW_GUARD_TRACE: if (interacting) traceApproach(doc, 'interacting', { value: false, event });
-      interacting = false;
+      interacting = keyed = false;
+      pressed = undefined;
     }
     if (!owned && (event.type === 'keydown' || event.type === 'pointerdown' || event.type === 'focusin')) {
       // validate() reads the page synchronously; the snapshot it leaves behind is the current
@@ -291,31 +322,31 @@ export function createOperationGuardHost(
       else if (!valid) pause(COVERED, true, undefined, event instanceof MouseEvent ? layersAt(event) : []);
     }
     // Pointer paths are tested immediately, including movement across a control.
-    const next = stepProximity(proximity, source.capture(), {
-      timeMs: lastActivity,
-      ...(point ? { point } : {}),
-      ...(before ? { previousPoint: before } : {}),
-      interacting,
-    });
-    const changed = next.safe !== proximity.safe;
-    WW_GUARD_TRACE: if (changed)
+    const next = step(lastActivity, source.capture());
+    const changed = heldChanged(next);
+    WW_GUARD_TRACE: if (changed || nearChanged(next))
       traceApproach(doc, 'approach', {
-        value: next.safe,
+        value: next.near.size > 0,
         event,
         ...(point ? { point } : {}),
         interacting,
         surfaces: source.capture().surfaces,
+        approach: next,
       });
-    proximity = next;
-    // Consume this path once. A following frame can then test the stationary
-    // endpoint and start its clear hysteresis without another pointer event.
+    approach = next;
+    // Consume this path once and test the stationary endpoint now: controls only the path came
+    // near start their clear hysteresis without another pointer event or a redraw. The
+    // endpoint is on the path, so it can only clear controls, never hold another root.
     before = point;
-    if (next.safe && next.clearSince !== null && timer === undefined && paints.some((p) => p.dynamic))
+    if (event instanceof PointerEvent && approach.near.size) approach = step(lastActivity, source.capture());
+    // A clearing control (and the roots it holds) is released by a later frame; make sure one comes.
+    if (clearing() && timer === undefined && paints.some((p) => p.dynamic))
       timer = view.setTimeout(() => {
         timer = undefined;
         if (active) invalidate();
       }, 360);
-    if ((changed || (next.safe && event instanceof PointerEvent)) && paints.some((p) => p.dynamic)) invalidate();
+    // Only the held roots reach the world: redraw when they change, not on every move.
+    if (changed) invalidate();
     else publish();
   };
   const events = [
@@ -364,9 +395,9 @@ export function createOperationGuardHost(
         view.addEventListener('blur', activity);
         reduced.addEventListener('change', changed);
         lastActivity = view.performance.now();
-        before = point = undefined;
-        interacting = false;
-        proximity = { safe: false, clearSince: null };
+        before = point = pressed = undefined;
+        interacting = keyed = false;
+        approach = initialApproach();
       } else {
         overlay = false;
         overlayHost?.remove();
@@ -417,20 +448,18 @@ export function createOperationGuardHost(
         stopped = '';
         issues = [];
       }
-      const next = stepProximity(proximity, surfaces, {
-        timeMs: time,
-        ...(point ? { point } : {}),
-        ...(before ? { previousPoint: before } : {}),
-        interacting,
-      });
-      WW_GUARD_TRACE: if (next.safe !== proximity.safe)
+      // The world evaluation that follows in this frame reads the result: a root moving onto a
+      // near control is held from here, one frame after the paint that put it there.
+      const next = step(time, surfaces);
+      WW_GUARD_TRACE: if (heldChanged(next) || nearChanged(next))
         traceApproach(doc, 'approach', {
-          value: next.safe,
+          value: next.near.size > 0,
           ...(point ? { point } : {}),
           interacting,
           surfaces: surfaces.surfaces,
+          approach: next,
         });
-      proximity = next;
+      approach = next;
       before = point;
       publish();
       if (stopped && failures < 3 && timer === undefined)
@@ -438,13 +467,14 @@ export function createOperationGuardHost(
           timer = undefined;
           if (active) invalidate();
         }, 360);
-      if (proximity.safe && proximity.clearSince !== null && timer === undefined && paints.some((p) => p.dynamic))
+      if (clearing() && timer === undefined && paints.some((p) => p.dynamic))
         timer = view.setTimeout(() => {
           timer = undefined;
           if (active) invalidate();
         }, 360);
+      const layers = approachLayers(approach);
       return {
-        approaching: proximity.safe,
+        ...(layers ? { approach: layers } : {}),
         idleSeconds: doc.hidden ? 0 : Math.max(0, Math.min(1e9, (time - lastActivity) / 1000)),
       };
     },
@@ -456,6 +486,22 @@ export function createOperationGuardHost(
     commit(next) {
       paints = next;
       if (!source.validate(surfaces)) pause(SHIFTED);
+      // A root this paint put onto a near control is held from the next frame, even when nothing
+      // else would draw one (it stopped there).
+      if (approach.near.size) {
+        const after = step(view.performance.now(), surfaces);
+        if (heldChanged(after)) {
+          WW_GUARD_TRACE: traceApproach(doc, 'approach', {
+            value: after.near.size > 0,
+            ...(point ? { point } : {}),
+            interacting,
+            surfaces: surfaces.surfaces,
+            approach: after,
+          });
+          approach = after;
+          invalidate();
+        }
+      }
       const pausedIssues: SafetyIssue[] = stopped
         ? next
             .filter((p) => !stoppedIds || stoppedIds.has(p.id))
@@ -489,11 +535,14 @@ export function createOperationGuardHost(
               remedy: `絵の状態を確かめてから、${RESUME}`,
             })),
         ];
-        if (reduced.matches || proximity.safe)
+        // Approach: only the held roots are flattened (G1.2); reduced motion flattens everything.
+        if (reduced.matches || approach.held.size)
           issues = [
             ...issues,
             ...next
-              .filter((p) => p.dynamic || (reduced.matches && p.animated))
+              .filter((p) =>
+                reduced.matches ? p.dynamic || p.animated : p.dynamic && approach.held.has(p.root ?? p.id),
+              )
               .map((p): SafetyIssue => ({
                 layerId: p.id,
                 surfaceId: reduced.matches ? 'environment.reduced-motion' : 'native.approach',

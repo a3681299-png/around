@@ -3,6 +3,8 @@ import path from 'node:path';
 import { exposeEditorControls } from './helpers/editor-workspace';
 import { openEditor } from './helpers/editor';
 import type { DesignDocument } from '../src/design/types';
+import { parseDesign } from '../src/design/schema';
+import { defaultFollowMotion } from '../src/signals/motion';
 
 test('native drag, text, keyboard and fullscreen controls remain usable with opaque artwork', async ({
   popup,
@@ -142,6 +144,40 @@ test('native drag, text, keyboard and fullscreen controls remain usable with opa
   await expect(playerPaint.locator('[data-image-id]')).toBeVisible();
   await expect(playerPaint).toHaveCSS('clip-path', 'inset(64px 0px 112px)');
   await preserved('native-seek-player');
+  expect(await run()).toEqual(baseline);
+  // G1.2: the same opaque layer, now moving (it follows the pointer). Only the roots over a near
+  // control are held; the controls stay usable while it moves everywhere else.
+  const key = 'webWorldThemes.design.youtube';
+  const saved = await popup.evaluate(async (k) => (await chrome.storage.local.get(k))[k] as DesignDocument, key);
+  const moving: DesignDocument = {
+    ...saved,
+    decorations: saved.decorations.map((layer) => ({ ...layer, motion: defaultFollowMotion() })),
+  };
+  parseDesign(moving);
+  await popup.evaluate(async ({ k, design }) => chrome.storage.local.set({ [k]: design }), { k: key, design: moving });
+  await expect
+    .poll(
+      async () =>
+        JSON.parse((await youtube.locator('#web-world-themes-decorations').getAttribute('data-ww-safety')) ?? '{}')
+          .stopped,
+    )
+    .toBe('');
+  await expect(playerPaint.locator('[data-image-id]')).toBeVisible();
+  // It is held at the seek bar: the run below meets a moving layer that the approach holds.
+  const seekBox = (await youtube.locator('#g1-seek').boundingBox())!;
+  await youtube.mouse.move(seekBox.x + 20, seekBox.y + seekBox.height / 2, { steps: 4 });
+  await expect
+    .poll(
+      async () =>
+        JSON.parse(
+          (await youtube.locator('#web-world-themes-decorations').getAttribute('data-ww-safety')) ?? '{}',
+        ).issues?.filter((i: any) => i.surfaceId === 'native.approach').length,
+    )
+    .toBe(1);
+  // Off the seek bar again (its own hover colour is not part of the comparison), as before.
+  const fullscreen = (await youtube.getByRole('button', { name: 'Fullscreen', exact: true }).boundingBox())!;
+  await youtube.mouse.move(fullscreen.x + fullscreen.width / 2, fullscreen.y + fullscreen.height / 2, { steps: 4 });
+  await preserved('native-seek-moving');
   expect(await run()).toEqual(baseline);
   await youtube.screenshot({ path: info.outputPath('opaque-paint-native-controls.png') });
 });

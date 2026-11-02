@@ -12,6 +12,9 @@ const spa = mode === 'spa';
 // scroll (G1.2): every layer fades with the page scroll; the pointer rests where the page's links
 // scroll under it (the left edge of the column below the player) while the wheel scrolls down and up.
 const scroll = mode === 'scroll';
+// steady (G1.2): one layer moves all the time (its X follows the idle time, which grows every frame
+// while the pointer rests), with no scroll and no input, so the extension draws every frame.
+const steady = mode === 'steady';
 process.env.G11_STARTUP = mode === 'startup' ? '1' : '0';
 process.env.G11_FRAMES_ONLY = mode === 'minute' ? '0' : '1';
 process.env.G11_PERF_ONLY = mode === 'areas' ? '0' : '1';
@@ -391,7 +394,26 @@ try {
                 blend: { mode: 'replace', priority: 0 },
               })),
             }
-          : {}),
+          : steady
+            ? {
+                // The editor's default transform rule (defaultSignalRule), on the idle time: 0..30s
+                // moves the layer -200..200px. The settle and the block end well inside 30s.
+                signalRules: [
+                  {
+                    id: 'position-x-g11-layer-0',
+                    enabled: true,
+                    source: { signal: 'user.idle.duration', axis: 'y', space: 'page', inputRange: [0, 30] },
+                    target: { layerId: 'g11-layer-0', property: 'position.x' },
+                    keyframes: [
+                      { id: 'key-start', input: 0, value: -200, easing: 'linear' },
+                      { id: 'key-end', input: 1, value: 200, easing: 'linear' },
+                    ],
+                    evaluation: { mode: 'follow', smoothing: { kind: 'none' } },
+                    blend: { mode: 'add', priority: 0 },
+                  },
+                ],
+              }
+            : {}),
       };
       await popup.evaluate(
         async (design) => chrome.storage.local.set({ 'webWorldThemes.design.youtube': design }),
@@ -504,7 +526,9 @@ try {
       'utf8',
     );
     for (let pair = result.pairs.length; pair < pairCount; pair++) {
-      const order = pair % 2 ? [true, false] : [false, true];
+      // steady: the idle time is a Host sample, so without the guard the layer stands still and the
+      // extension draws nothing. Only guarded blocks are measured (G1.2 compares builds, both guarded).
+      const order = steady ? [true] : pair % 2 ? [true, false] : [false, true];
       const row = { pair, order: order.map((v) => (v ? 'guarded' : 'unguarded')), blocks: [] };
       for (const guarded of order) {
         if (process.env.G11_FRAMES_ONLY === '1') {

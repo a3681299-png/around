@@ -1,4 +1,5 @@
 import type { Bounds, PlacementFrame, Point } from './geometry';
+import type { WorldApproach } from './types';
 
 /** Host-owned numbers. Artwork cannot supply or relax this contract. */
 export interface OperationSurface {
@@ -50,6 +51,8 @@ export interface PaintFootprint {
   animated?: boolean;
   clip?: PlacementFrame;
   id: string;
+  /** The layer's root (its group, or itself): an approach holds roots as units (G1.2). */
+  root?: string;
   /** The layer's name as the creator sees it, for stop messages only (shown as text). */
   name?: string;
   bounds: Bounds;
@@ -444,4 +447,94 @@ export function stepProximity(
   if (near) return { safe: true, clearSince: null };
   const clearSince = previous.clearSince ?? input.timeMs;
   return { safe: previous.safe && input.timeMs - clearSince < 350, clearSince };
+}
+export const approachRectOf = (surface: OperationSurface) => approachRect(surface) ?? surface.shape;
+/** G1.2: one approached control, with its own hysteresis. */
+export interface NearSurface {
+  rect: PlacementFrame;
+  clearSince: number | null;
+}
+export interface ApproachState {
+  near: ReadonlyMap<string, NearSurface>;
+  /** Held root → the near controls holding it. A root is released only when they have all
+   * cleared, never because it moved off them (no flip-flop on its own motion). */
+  held: ReadonlyMap<string, readonly string[]>;
+}
+export const initialApproach = (): ApproachState => ({ near: new Map(), held: new Map() });
+const PRESSED = 'pointer.pressed';
+/** Which controls are near (each 40px to enter, 72px to stay, 350ms to clear), and which roots
+ * yield to them: the dynamic roots whose last painted bounds overlap a near control. */
+export function stepApproach(
+  previous: ApproachState,
+  snapshot: OperationSnapshot,
+  input: { timeMs: number; point?: Point; previousPoint?: Point; pressed?: Point; keyed: boolean },
+  paints: readonly PaintFootprint[],
+): ApproachState {
+  const hits = new Map<string, PlacementFrame>(),
+    byId = new Map<string, OperationSurface>();
+  let focusedControl = false;
+  for (const surface of snapshot.surfaces) {
+    byId.set(surface.id, surface);
+    const forbid = surface.policy.occlusion !== 'allow',
+      rect = approachRect(surface);
+    // Focus on an area that may be covered (the video itself) is not an approach to a control.
+    if (forbid && surface.availability.focused) focusedControl = true;
+    if (
+      (forbid && surface.availability.focused) ||
+      surface.availability.dragging ||
+      surface.availability.captured ||
+      (surface.availability.visible &&
+        forbid &&
+        input.point &&
+        rect !== undefined &&
+        segmentHits(input.previousPoint ?? input.point, input.point, rect, previous.near.has(surface.id) ? 72 : 40))
+    )
+      hits.set(surface.id, rect ?? surface.shape);
+  }
+  // A press holds what is painted around it, whether or not a control is there.
+  if (input.pressed)
+    hits.set(PRESSED, { left: input.pressed.x - 40, top: input.pressed.y - 40, width: 80, height: 80 });
+  // D2: a key without a focused control (YouTube's k, j, l on the page) goes to the player.
+  if (input.keyed && !focusedControl)
+    for (const surface of snapshot.surfaces)
+      if (surface.availability.visible && surface.policy.occlusion === 'allow')
+        hits.set(surface.id, approachRectOf(surface));
+  const near = new Map<string, NearSurface>();
+  for (const [key, rect] of hits) near.set(key, { rect, clearSince: null });
+  for (const [key, entry] of previous.near) {
+    if (near.has(key)) continue;
+    const clearSince = entry.clearSince ?? input.timeMs;
+    const surface = byId.get(key);
+    if (input.timeMs - clearSince < 350)
+      near.set(key, { rect: surface ? approachRectOf(surface) : entry.rect, clearSince });
+  }
+  const held = new Map<string, string[]>();
+  for (const [root, keys] of previous.held) {
+    const kept = keys.filter((key) => near.has(key));
+    if (kept.length) held.set(root, kept);
+  }
+  for (const paint of paints) {
+    if (!paint.dynamic) continue;
+    const root = paint.root ?? paint.id,
+      area = {
+        left: paint.bounds.left - paint.outset,
+        top: paint.bounds.top - paint.outset,
+        right: paint.bounds.right + paint.outset,
+        bottom: paint.bounds.bottom + paint.outset,
+      };
+    for (const [key, entry] of near) {
+      if (!intersects(area, entry.rect)) continue;
+      const keys = held.get(root);
+      if (!keys) held.set(root, [key]);
+      else if (!keys.includes(key)) keys.push(key);
+    }
+  }
+  return { near, held };
+}
+/** The world's view of an approach: held roots and their near controls' rectangles. */
+export function approachLayers(state: ApproachState): WorldApproach | undefined {
+  if (!state.held.size) return undefined;
+  const layers: Record<string, PlacementFrame[]> = {};
+  for (const [root, keys] of state.held) layers[root] = keys.map((key) => state.near.get(key)!.rect);
+  return { layers };
 }

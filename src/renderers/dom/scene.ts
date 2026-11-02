@@ -420,6 +420,7 @@ export function createImageRenderer(
               (local || atmosphere || (page ? pageRegions.length > 0 : regions.length > 0));
             return {
               id: layer.layer.id,
+              root,
               ...(layer.layer.name ? { name: layer.layer.name } : {}),
               bounds: layer.bounds ?? { left: 0, top: 0, right: 0, bottom: 0 },
               opacity: layer.effectiveOpacity,
