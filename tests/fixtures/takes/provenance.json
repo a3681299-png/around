@@ -1,0 +1,8 @@
+{
+  "pre-g12-take.json": {
+    "writtenBy": "preG12Take() in tests/model-motion.spec.ts, recorded with createWorldRecorder and sampled with createTakeSampler",
+    "code": "188a4d8 (world, host and recording code identical to 557b978, before G1.2)",
+    "date": "2026-11-02",
+    "contents": "120 inputs at 60fps; frames 40-69 carry environment.safeInteraction: true (the whole-page G1 restriction). expected: sampler.at() results at 8 positions, before, during and after the restriction"
+  }
+}

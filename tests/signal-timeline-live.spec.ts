@@ -45,7 +45,7 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
     await page.bringToFront();
     await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
     stage('open Studio');
-    await openSidePanelFromIcon(popup, page);
+    const pointer = await openSidePanelFromIcon(popup, page);
     const local = page.locator('#web-world-themes-creator');
     stage('side panel');
     const panel = await sidePanelDriver(context, page, id),
@@ -93,11 +93,25 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
     const media = page.locator(
       ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) .media',
     );
+    // G1.2 (D9): where the pointer rests against the GIF, and which native controls pass under it.
+    const under: unknown[] = [];
+    report.checks['pointer'] = { point: pointer, gif: await media.first().boundingBox(), under };
     const verifyScroll = async (progress: number) => {
       await page.evaluate((value) => {
         const root = document.scrollingElement!;
         scrollTo(0, Math.round((root.scrollHeight - root.clientHeight) * value));
       }, progress);
+      under.push({
+        progress,
+        ...(await page.evaluate(({ x, y }) => {
+          const hit = document.elementFromPoint(x, y),
+            control = hit?.closest('a[href], button, [role="button"], input, [role="slider"]');
+          return {
+            hit: hit ? `${hit.tagName.toLowerCase()}${hit.id ? '#' + hit.id : ''}` : null,
+            control: control ? `${control.tagName.toLowerCase()}${control.id ? '#' + control.id : ''}` : null,
+          };
+        }, pointer)),
+      });
       await expect
         .poll(() =>
           media.evaluate((node: HTMLElement) => {
@@ -107,7 +121,42 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
             return Math.abs(Number(node.style.opacity) - (1 - Math.abs(value * 2 - 1)));
           }),
         )
-        .toBeLessThan(0.0001);
+        .toBeLessThan(0.0001)
+        .catch(async (error: Error) => {
+          // Keep why the opacity did not follow: the guard's record and the scroll it was drawn for.
+          report.checks['scrollFailure'] = await media.evaluate((node: HTMLElement, { x, y }) => {
+            const root = document.scrollingElement!;
+            return {
+              // Native controls within the approach rule's 72px of the resting pointer.
+              near: [
+                ...document.querySelectorAll(
+                  'a[href], button, [role="button"], input, textarea, [contenteditable="true"], [role="slider"], [role="dialog"], [role="menu"], tp-yt-paper-dialog, ytd-searchbox, yt-searchbox',
+                ),
+              ]
+                .filter((e) => !e.closest('[id^="web-world-themes"]'))
+                .map((e) => ({ e, r: e.getBoundingClientRect() }))
+                .filter(
+                  ({ r }) =>
+                    r.width > 0 && r.height > 0 && Math.max(r.left - x, x - r.right, r.top - y, y - r.bottom) <= 72,
+                )
+                .slice(0, 8)
+                .map(({ e, r }) => ({
+                  element: `${e.tagName.toLowerCase()}${e.id ? '#' + e.id : ''} ${e.closest('ytd-guide-renderer, ytd-mini-guide-renderer, ytd-masthead, #secondary, #below')?.tagName.toLowerCase() ?? ''}`,
+                  rect: [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)],
+                })),
+              opacity: node.style.opacity,
+              scrollTop: root.scrollTop,
+              range: root.scrollHeight - root.clientHeight,
+              visibility: (node.closest('[data-frame-id]') as HTMLElement | null)?.style.visibility,
+              safety: [...document.querySelectorAll('[id^="web-world-themes-"][id$="decorations"]')].map((host) => [
+                host.id,
+                host.getAttribute('data-ww-safety'),
+              ]),
+              active: document.activeElement?.tagName,
+            };
+          }, pointer);
+          throw error;
+        });
     };
     for (const progress of [0, 0.25, 0.5, 0.75, 1, 0.5, 0]) await verifyScroll(progress);
     for (const progress of [0, 0.5, 1, 0.5, 0]) {

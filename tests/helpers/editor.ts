@@ -53,4 +53,5 @@ export async function openSidePanelFromIcon(popup: Page, youtube: Page) {
   const viewport = await youtube.evaluate(() => ({ width: innerWidth, height: innerHeight }));
   const away = await clearestPoint(youtube, { left: 0, top: 0, right: viewport.width, bottom: viewport.height });
   await youtube.mouse.move(away.x, away.y, { steps: 4 });
+  return away;
 }

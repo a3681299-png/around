@@ -21,9 +21,31 @@ export interface WorldInput extends WorldGeometry {
   deltaMs: number;
   signals: SignalSnapshot;
   events: readonly WorldEvent[];
-  environment: { hidden: boolean; reducedMotion: boolean; holdTransforms?: boolean; safeInteraction?: boolean };
+  environment: {
+    hidden: boolean;
+    reducedMotion: boolean;
+    holdTransforms?: boolean;
+    /** Every layer yields to an approached control (the whole-page G1 rule, and old takes). */
+    safeInteraction?: boolean;
+    /** Host-owned, never artwork or a recording (G1.2): only these roots yield. */
+    approach?: WorldApproach;
+  };
   /** Reserved input, not a request to access a global random generator. */
   seed?: number;
+}
+/** The roots (groups or ungrouped layers) over an approached native control, each with that
+ * control's rectangles. G1.2 returns them to their resting state; the rectangles are reserved
+ * for a later avoiding motion and are not read yet. */
+export interface WorldApproach {
+  layers: Readonly<Record<string, readonly PlacementFrame[]>>;
+}
+/** Whether a layer, or the group it belongs to, yields to an approached control. */
+export function yields(environment: WorldInput['environment'], id: string, parentId?: string) {
+  const layers = environment.approach?.layers;
+  return Boolean(
+    environment.safeInteraction ||
+    (layers && (Object.hasOwn(layers, id) || (parentId !== undefined && Object.hasOwn(layers, parentId)))),
+  );
 }
 export interface LayerEvaluation {
   layer: Decoration;

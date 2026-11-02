@@ -1,5 +1,5 @@
 import type { ModelDecoration } from '../design/types';
-import type { WorldInput, WorldLayout } from './types';
+import { yields, type WorldInput, type WorldLayout } from './types';
 import type { MotionState } from './motion';
 import { object, numeric } from '../models/types';
 import { oneOf } from '../validation';
@@ -91,34 +91,40 @@ export function evaluateModels(
     const layer = entry.layer,
       model = layer.model,
       before = previous?.[layer.id];
+    // Reduced motion and the whole-page rule (old takes) start again from rest. A root held
+    // over an approached control pauses where it is, like a hidden page, and resumes from there.
+    const restart = input.environment.reducedMotion || Boolean(input.environment.safeInteraction),
+      paused = !restart && yields(input.environment, layer.id, entry.parentId);
     const running =
-      entry.renderable &&
-      (!visible || visible.has(layer.id)) &&
-      !input.environment.hidden &&
-      !input.environment.reducedMotion &&
-      !input.environment.safeInteraction;
+      entry.renderable && (!visible || visible.has(layer.id)) && !input.environment.hidden && !restart && !paused;
     const dt = running && before && !before.suspended ? input.deltaMs : 0,
       delta = model.playing ? dt * model.speed : 0;
     const body = motion?.bodies[layer.id] ?? (entry.parentId ? motion?.bodies[entry.parentId] : undefined);
     const speedPx = body ? Math.hypot(body.velocity.x, body.velocity.y) : 0,
       l = model.locomotion;
-    const phase: ModelState['phase'] = !l.enabled
-      ? 'manual'
-      : speedPx >= l.runSpeed || (before?.phase === 'run' && speedPx >= l.runSpeed * 0.9)
-        ? 'run'
-        : speedPx >= l.walkSpeed || (before?.phase === 'walk' && speedPx >= l.walkSpeed * 0.8)
-          ? 'walk'
-          : 'idle';
+    // A paused body has no velocity; keep its gait and clip instead of fading to idle.
+    const phase: ModelState['phase'] =
+      paused && before
+        ? before.phase
+        : !l.enabled
+          ? 'manual'
+          : speedPx >= l.runSpeed || (before?.phase === 'run' && speedPx >= l.runSpeed * 0.9)
+            ? 'run'
+            : speedPx >= l.walkSpeed || (before?.phase === 'walk' && speedPx >= l.walkSpeed * 0.8)
+              ? 'walk'
+              : 'idle';
     const clip =
-      phase === 'manual'
-        ? model.clip
-        : phase === 'idle'
-          ? (l.idle ?? model.clip)
-          : phase === 'run'
-            ? (l.run ?? l.walk ?? model.clip)
-            : (l.walk ?? model.clip);
+      paused && before
+        ? before.clip
+        : phase === 'manual'
+          ? model.clip
+          : phase === 'idle'
+            ? (l.idle ?? model.clip)
+            : phase === 'run'
+              ? (l.run ?? l.walk ?? model.clip)
+              : (l.walk ?? model.clip);
     let next: ModelState =
-      before && !input.environment.reducedMotion && !input.environment.safeInteraction
+      before && !restart
         ? { ...before }
         : {
             clip,
@@ -200,7 +206,7 @@ export function evaluateModels(
       id: layer.id,
       blend,
       speedPx,
-      ...(input.environment.reducedMotion || input.environment.safeInteraction ? { resetDynamics: true } : {}),
+      ...(restart || paused ? { resetDynamics: true } : {}),
     });
     const duration = clip === null ? 0 : (layer.source.clips[clip]?.duration ?? 0) * 1000;
     needsFrame ||=

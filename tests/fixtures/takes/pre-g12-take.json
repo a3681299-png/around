@@ -1,0 +1,6000 @@
+{
+ "take": {
+  "format": "ww-signal-take",
+  "formatVersion": 1,
+  "runtimeVersion": "1.3.0",
+  "id": "pre-g12",
+  "name": "Before G1.2",
+  "siteId": "youtube",
+  "initialState": {
+   "runtimeVersion": "1.3.0",
+   "timeMs": null,
+   "effects": {
+    "fades": {},
+    "visibility": {}
+   },
+   "machine": {
+    "video": "paused",
+    "events": []
+   }
+  },
+  "inputs": [
+   {
+    "timeMs": 0,
+    "deltaMs": 0,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 0,
+     "scroll": {
+      "x": 0,
+      "y": 0,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 16.666666666666668,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 16.666666666666668,
+     "scroll": {
+      "x": 0,
+      "y": 9,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 33.333333333333336,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 33.333333333333336,
+     "scroll": {
+      "x": 0,
+      "y": 18,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 50,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 50,
+     "scroll": {
+      "x": 0,
+      "y": 27,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 66.66666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 66.66666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 36,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 83.33333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 83.33333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 45,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 100,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 100,
+     "scroll": {
+      "x": 0,
+      "y": 54,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 116.66666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 116.66666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 63,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 133.33333333333334,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 133.33333333333334,
+     "scroll": {
+      "x": 0,
+      "y": 72,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 150,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 150,
+     "scroll": {
+      "x": 0,
+      "y": 81,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 166.66666666666666,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 166.66666666666666,
+     "scroll": {
+      "x": 0,
+      "y": 90,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 183.33333333333334,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 183.33333333333334,
+     "scroll": {
+      "x": 0,
+      "y": 99,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 200,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 200,
+     "scroll": {
+      "x": 0,
+      "y": 108,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 216.66666666666666,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 216.66666666666666,
+     "scroll": {
+      "x": 0,
+      "y": 117,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 233.33333333333334,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 233.33333333333334,
+     "scroll": {
+      "x": 0,
+      "y": 126,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 250,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 250,
+     "scroll": {
+      "x": 0,
+      "y": 135,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 266.6666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 266.6666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 144,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 283.3333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 283.3333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 153,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 300,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 300,
+     "scroll": {
+      "x": 0,
+      "y": 162,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 316.6666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 316.6666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 171,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 333.3333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 333.3333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 180,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 350,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 350,
+     "scroll": {
+      "x": 0,
+      "y": 189,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 366.6666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 366.6666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 198,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 383.3333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 383.3333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 207,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 400,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 400,
+     "scroll": {
+      "x": 0,
+      "y": 216,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 416.6666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 416.6666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 225,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 433.3333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 433.3333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 234,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 450,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 450,
+     "scroll": {
+      "x": 0,
+      "y": 243,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 466.6666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 466.6666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 252,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 483.3333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 483.3333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 261,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 500,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 500,
+     "scroll": {
+      "x": 0,
+      "y": 270,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 516.6666666666666,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 516.6666666666666,
+     "scroll": {
+      "x": 0,
+      "y": 279,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 533.3333333333334,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 533.3333333333334,
+     "scroll": {
+      "x": 0,
+      "y": 288,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 550,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 550,
+     "scroll": {
+      "x": 0,
+      "y": 297,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 566.6666666666666,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 566.6666666666666,
+     "scroll": {
+      "x": 0,
+      "y": 306,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 583.3333333333334,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 583.3333333333334,
+     "scroll": {
+      "x": 0,
+      "y": 315,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 600,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 600,
+     "scroll": {
+      "x": 0,
+      "y": 324,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 616.6666666666666,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 616.6666666666666,
+     "scroll": {
+      "x": 0,
+      "y": 333,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 633.3333333333334,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 633.3333333333334,
+     "scroll": {
+      "x": 0,
+      "y": 342,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 650,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 650,
+     "scroll": {
+      "x": 0,
+      "y": 351,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 666.6666666666666,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 666.6666666666666,
+     "scroll": {
+      "x": 0,
+      "y": 360,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 683.3333333333334,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 683.3333333333334,
+     "scroll": {
+      "x": 0,
+      "y": 369,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 700,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 700,
+     "scroll": {
+      "x": 0,
+      "y": 378,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 716.6666666666666,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 716.6666666666666,
+     "scroll": {
+      "x": 0,
+      "y": 387,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 733.3333333333334,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 733.3333333333334,
+     "scroll": {
+      "x": 0,
+      "y": 396,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 750,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 750,
+     "scroll": {
+      "x": 0,
+      "y": 405,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 766.6666666666666,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 766.6666666666666,
+     "scroll": {
+      "x": 0,
+      "y": 414,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 783.3333333333334,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 783.3333333333334,
+     "scroll": {
+      "x": 0,
+      "y": 423,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 800,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 800,
+     "scroll": {
+      "x": 0,
+      "y": 432,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 816.6666666666666,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 816.6666666666666,
+     "scroll": {
+      "x": 0,
+      "y": 441,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 833.3333333333334,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 833.3333333333334,
+     "scroll": {
+      "x": 0,
+      "y": 450,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 850,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 850,
+     "scroll": {
+      "x": 0,
+      "y": 459,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 866.6666666666666,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 866.6666666666666,
+     "scroll": {
+      "x": 0,
+      "y": 468,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 883.3333333333334,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 883.3333333333334,
+     "scroll": {
+      "x": 0,
+      "y": 477,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 900,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 900,
+     "scroll": {
+      "x": 0,
+      "y": 486,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 916.6666666666666,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 916.6666666666666,
+     "scroll": {
+      "x": 0,
+      "y": 495,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 933.3333333333334,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 933.3333333333334,
+     "scroll": {
+      "x": 0,
+      "y": 504,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 950,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 950,
+     "scroll": {
+      "x": 0,
+      "y": 513,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 966.6666666666666,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 966.6666666666666,
+     "scroll": {
+      "x": 0,
+      "y": 522,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 983.3333333333334,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 983.3333333333334,
+     "scroll": {
+      "x": 0,
+      "y": 531,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 1000,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1000,
+     "scroll": {
+      "x": 0,
+      "y": 540,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 1016.6666666666666,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1016.6666666666666,
+     "scroll": {
+      "x": 0,
+      "y": 549,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 1033.3333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1033.3333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 558,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 1050,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1050,
+     "scroll": {
+      "x": 0,
+      "y": 567,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 1066.6666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1066.6666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 576,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 1083.3333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1083.3333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 585,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 1100,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1100,
+     "scroll": {
+      "x": 0,
+      "y": 594,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 1116.6666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1116.6666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 603,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 1133.3333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1133.3333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 612,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 1150,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1150,
+     "scroll": {
+      "x": 0,
+      "y": 621,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false,
+     "safeInteraction": true
+    }
+   },
+   {
+    "timeMs": 1166.6666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1166.6666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 630,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1183.3333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1183.3333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 639,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1200,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1200,
+     "scroll": {
+      "x": 0,
+      "y": 648,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1216.6666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1216.6666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 657,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1233.3333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1233.3333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 666,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1250,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1250,
+     "scroll": {
+      "x": 0,
+      "y": 675,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1266.6666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1266.6666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 684,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1283.3333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1283.3333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 693,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1300,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1300,
+     "scroll": {
+      "x": 0,
+      "y": 702,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1316.6666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1316.6666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 711,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1333.3333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1333.3333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 720,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1350,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1350,
+     "scroll": {
+      "x": 0,
+      "y": 729,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1366.6666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1366.6666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 738,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1383.3333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1383.3333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 747,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1400,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1400,
+     "scroll": {
+      "x": 0,
+      "y": 756,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1416.6666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1416.6666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 765,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1433.3333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1433.3333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 774,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1450,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1450,
+     "scroll": {
+      "x": 0,
+      "y": 783,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1466.6666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1466.6666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 792,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1483.3333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1483.3333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 801,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1500,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1500,
+     "scroll": {
+      "x": 0,
+      "y": 810,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1516.6666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1516.6666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 819,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1533.3333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1533.3333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 828,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1550,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1550,
+     "scroll": {
+      "x": 0,
+      "y": 837,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1566.6666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1566.6666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 846,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1583.3333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1583.3333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 855,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1600,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1600,
+     "scroll": {
+      "x": 0,
+      "y": 864,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1616.6666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1616.6666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 873,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1633.3333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1633.3333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 882,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1650,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1650,
+     "scroll": {
+      "x": 0,
+      "y": 891,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1666.6666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1666.6666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 900,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1683.3333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1683.3333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 909,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1700,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1700,
+     "scroll": {
+      "x": 0,
+      "y": 918,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1716.6666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1716.6666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 927,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1733.3333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1733.3333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 936,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1750,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1750,
+     "scroll": {
+      "x": 0,
+      "y": 945,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1766.6666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1766.6666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 954,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1783.3333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1783.3333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 963,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1800,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1800,
+     "scroll": {
+      "x": 0,
+      "y": 972,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1816.6666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1816.6666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 981,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1833.3333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1833.3333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 990,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1850,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1850,
+     "scroll": {
+      "x": 0,
+      "y": 999,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1866.6666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1866.6666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 8,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1883.3333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1883.3333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 17,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1900,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1900,
+     "scroll": {
+      "x": 0,
+      "y": 26,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1916.6666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1916.6666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 35,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1933.3333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1933.3333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 44,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1950,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1950,
+     "scroll": {
+      "x": 0,
+      "y": 53,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1966.6666666666667,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1966.6666666666667,
+     "scroll": {
+      "x": 0,
+      "y": 62,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   },
+   {
+    "timeMs": 1983.3333333333333,
+    "deltaMs": 16.666666666666668,
+    "viewport": {
+     "width": 1000,
+     "height": 800
+    },
+    "anchors": {},
+    "signals": {
+     "pointer": {
+      "x": 850,
+      "y": 400
+     },
+     "playing": true,
+     "pointerTimeMs": 1983.3333333333333,
+     "scroll": {
+      "x": 0,
+      "y": 71,
+      "maxX": 0,
+      "maxY": 1000
+     }
+    },
+    "events": [],
+    "environment": {
+     "hidden": false,
+     "reducedMotion": false
+    }
+   }
+  ]
+ },
+ "expected": [
+  {
+   "positionMs": 0,
+   "result": {
+    "state": {
+     "runtimeVersion": "1.3.0",
+     "timeMs": 0,
+     "effects": {
+      "fades": {},
+      "visibility": {
+       "rig": true,
+       "petal": false
+      }
+     },
+     "machine": {
+      "video": "playing",
+      "events": []
+     },
+     "motion": {
+      "bodies": {
+       "rig": {
+        "signature": "{\"kind\":\"pointer-follow\",\"enabled\":true,\"mode\":\"pursuit\",\"lagMs\":180,\"maxSpeed\":400,\"acceleration\":1200,\"deceleration\":1600,\"stopRadius\":48,\"orientToMovement\":true,\"rotationOffsetDeg\":0}",
+        "offset": {
+         "x": 0,
+         "y": 0
+        },
+        "velocity": {
+         "x": 0,
+         "y": 0
+        },
+        "heading": 0
+       },
+       "petal": {
+        "signature": "{\"kind\":\"pointer-follow\",\"enabled\":true,\"mode\":\"smooth\",\"lagMs\":180,\"maxSpeed\":400,\"acceleration\":1200,\"deceleration\":1600,\"stopRadius\":48,\"orientToMovement\":true,\"rotationOffsetDeg\":0}",
+        "offset": {
+         "x": 0,
+         "y": 0
+        },
+        "velocity": {
+         "x": 0,
+         "y": 0
+        },
+        "heading": 0
+       }
+      },
+      "pointer": {
+       "point": {
+        "x": 850,
+        "y": 400
+       },
+       "timeMs": 0,
+       "speed": 0
+      }
+     },
+     "models": {
+      "rig": {
+       "clip": 0,
+       "timeMs": 0,
+       "previousClip": null,
+       "previousTimeMs": 0,
+       "fadeElapsedMs": 250,
+       "fadeDurationMs": 250,
+       "yawDeg": 0,
+       "lookYaw": 0,
+       "lookPitch": 0,
+       "suspended": false,
+       "phase": "idle"
+      }
+     }
+    },
+    "frame": {
+     "timeMs": 0,
+     "layout": {
+      "layers": [
+       {
+        "layer": {
+         "kind": "model3d",
+         "id": "rig",
+         "name": "Rig",
+         "assetId": "asset-ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+         "source": {
+          "format": "glb",
+          "clips": [
+           {
+            "name": "Rest / 待機",
+            "duration": 2
+           },
+           {
+            "name": "Stride",
+            "duration": 2
+           },
+           {
+            "name": "Sprint",
+            "duration": 2
+           }
+          ],
+          "bones": [
+           {
+            "node": 2,
+            "name": "Hips"
+           },
+           {
+            "node": 3,
+            "name": "Head"
+           }
+          ],
+          "vertices": 8,
+          "triangles": 12,
+          "textureBytes": 4
+         },
+         "model": {
+          "rotationX": 0,
+          "rotationY": 0,
+          "rotationZ": 0,
+          "clip": 0,
+          "playing": true,
+          "loop": true,
+          "speed": 1,
+          "crossFadeMs": 250,
+          "inPlace": true,
+          "locomotion": {
+           "enabled": true,
+           "idle": 0,
+           "walk": 1,
+           "run": 2,
+           "walkSpeed": 10,
+           "runSpeed": 200,
+           "faceMovement": true,
+           "forwardDeg": 0
+          },
+          "look": {
+           "enabled": false,
+           "bone": null,
+           "yawLimit": 50,
+           "pitchLimit": 30,
+           "lagMs": 160
+          }
+         },
+         "opacity": 1,
+         "visible": true,
+         "locked": false,
+         "zIndex": 0,
+         "placement": {
+          "anchor": {
+           "kind": "viewport"
+          },
+          "x": 0.2,
+          "y": 0.5,
+          "widthPx": 200,
+          "heightPx": 200,
+          "rotationDeg": 25
+         },
+         "motion": {
+          "kind": "pointer-follow",
+          "enabled": true,
+          "mode": "pursuit",
+          "lagMs": 180,
+          "maxSpeed": 400,
+          "acceleration": 1200,
+          "deceleration": 1600,
+          "stopRadius": 48,
+          "orientToMovement": true,
+          "rotationOffsetDeg": 0
+         }
+        },
+        "frame": {
+         "left": 0,
+         "top": 0,
+         "width": 1000,
+         "height": 800
+        },
+        "bounds": {
+         "left": 67.10739512226507,
+         "right": 332.8926048777349,
+         "top": 267.1073951222651,
+         "bottom": 532.8926048777349
+        },
+        "position": {
+         "x": 200,
+         "y": 400
+        },
+        "localPosition": {
+         "x": 200,
+         "y": 400
+        },
+        "visible": true,
+        "locked": false,
+        "effectiveOpacity": 1,
+        "renderable": true
+       },
+       {
+        "layer": {
+         "kind": "image",
+         "id": "petal",
+         "name": "Petal",
+         "assetId": "asset-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+         "opacity": 0,
+         "visible": true,
+         "locked": false,
+         "zIndex": 1,
+         "placement": {
+          "anchor": {
+           "kind": "viewport"
+          },
+          "x": 0.7,
+          "y": 0.3,
+          "widthPx": 120,
+          "heightPx": 90,
+          "rotationDeg": 0
+         },
+         "motion": {
+          "kind": "pointer-follow",
+          "enabled": true,
+          "mode": "smooth",
+          "lagMs": 180,
+          "maxSpeed": 400,
+          "acceleration": 1200,
+          "deceleration": 1600,
+          "stopRadius": 48,
+          "orientToMovement": true,
+          "rotationOffsetDeg": 0
+         }
+        },
+        "frame": {
+         "left": 0,
+         "top": 0,
+         "width": 1000,
+         "height": 800
+        },
+        "bounds": {
+         "left": 640,
+         "right": 760,
+         "top": 195,
+         "bottom": 285
+        },
+        "position": {
+         "x": 700,
+         "y": 240
+        },
+        "localPosition": {
+         "x": 700,
+         "y": 240
+        },
+        "visible": true,
+        "locked": false,
+        "effectiveOpacity": 0,
+        "renderable": false
+       }
+      ],
+      "groups": [],
+      "roots": [
+       "rig",
+       "petal"
+      ]
+     },
+     "effects": [
+      {
+       "id": "rig",
+       "visible": true
+      },
+      {
+       "id": "petal",
+       "visible": false
+      }
+     ],
+     "machine": {
+      "video": "playing",
+      "events": []
+     },
+     "needsFrame": true,
+     "subscriptions": {
+      "pointer": false,
+      "video": false
+     },
+     "models": [
+      {
+       "clip": 0,
+       "timeMs": 0,
+       "previousClip": null,
+       "previousTimeMs": 0,
+       "fadeElapsedMs": 250,
+       "fadeDurationMs": 250,
+       "yawDeg": 0,
+       "lookYaw": 0,
+       "lookPitch": 0,
+       "suspended": false,
+       "phase": "idle",
+       "id": "rig",
+       "blend": 1,
+       "speedPx": 0
+      }
+     ]
+    },
+    "input": {
+     "timeMs": 0,
+     "deltaMs": 0,
+     "viewport": {
+      "width": 1000,
+      "height": 800
+     },
+     "anchors": {},
+     "signals": {
+      "pointer": {
+       "x": 850,
+       "y": 400
+      },
+      "playing": true,
+      "pointerTimeMs": 0,
+      "scroll": {
+       "x": 0,
+       "y": 0,
+       "maxX": 0,
+       "maxY": 1000
+      }
+     },
+     "events": [],
+     "environment": {
+      "hidden": false,
+      "reducedMotion": false
+     }
+    }
+   }
+  },
+  {
+   "positionMs": 600,
+   "result": {
+    "state": {
+     "runtimeVersion": "1.3.0",
+     "timeMs": 600,
+     "effects": {
+      "fades": {},
+      "visibility": {
+       "rig": true,
+       "petal": true
+      }
+     },
+     "machine": {
+      "video": "playing",
+      "events": []
+     },
+     "motion": {
+      "bodies": {
+       "rig": {
+        "signature": "{\"kind\":\"pointer-follow\",\"enabled\":true,\"mode\":\"pursuit\",\"lagMs\":180,\"maxSpeed\":400,\"acceleration\":1200,\"deceleration\":1600,\"stopRadius\":48,\"orientToMovement\":true,\"rotationOffsetDeg\":0}",
+        "offset": {
+         "x": 174.16666666666788,
+         "y": 0
+        },
+        "velocity": {
+         "x": 400,
+         "y": 0
+        },
+        "heading": 0
+       },
+       "petal": {
+        "signature": "{\"kind\":\"pointer-follow\",\"enabled\":true,\"mode\":\"smooth\",\"lagMs\":180,\"maxSpeed\":400,\"acceleration\":1200,\"deceleration\":1600,\"stopRadius\":48,\"orientToMovement\":true,\"rotationOffsetDeg\":0}",
+        "offset": {
+         "x": 112.99087455312622,
+         "y": 120.52359952333478
+        },
+        "velocity": {
+         "x": 23.765766492833873,
+         "y": 25.350150925689377
+        },
+        "heading": 46.847610266
+       }
+      },
+      "pointer": {
+       "point": {
+        "x": 850,
+        "y": 400
+       },
+       "timeMs": 600,
+       "speed": 0
+      }
+     },
+     "models": {
+      "rig": {
+       "clip": 2,
+       "timeMs": 433.3333333333335,
+       "previousClip": null,
+       "previousTimeMs": 0,
+       "fadeElapsedMs": 250,
+       "fadeDurationMs": 250,
+       "yawDeg": 89.39358477008227,
+       "lookYaw": 0,
+       "lookPitch": 0,
+       "suspended": false,
+       "phase": "run"
+      }
+     }
+    },
+    "frame": {
+     "timeMs": 600,
+     "layout": {
+      "layers": [
+       {
+        "layer": {
+         "kind": "model3d",
+         "id": "rig",
+         "name": "Rig",
+         "assetId": "asset-ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+         "source": {
+          "format": "glb",
+          "clips": [
+           {
+            "name": "Rest / 待機",
+            "duration": 2
+           },
+           {
+            "name": "Stride",
+            "duration": 2
+           },
+           {
+            "name": "Sprint",
+            "duration": 2
+           }
+          ],
+          "bones": [
+           {
+            "node": 2,
+            "name": "Hips"
+           },
+           {
+            "node": 3,
+            "name": "Head"
+           }
+          ],
+          "vertices": 8,
+          "triangles": 12,
+          "textureBytes": 4
+         },
+         "model": {
+          "rotationX": 0,
+          "rotationY": 0,
+          "rotationZ": 0,
+          "clip": 0,
+          "playing": true,
+          "loop": true,
+          "speed": 1,
+          "crossFadeMs": 250,
+          "inPlace": true,
+          "locomotion": {
+           "enabled": true,
+           "idle": 0,
+           "walk": 1,
+           "run": 2,
+           "walkSpeed": 10,
+           "runSpeed": 200,
+           "faceMovement": true,
+           "forwardDeg": 0
+          },
+          "look": {
+           "enabled": false,
+           "bone": null,
+           "yawLimit": 50,
+           "pitchLimit": 30,
+           "lagMs": 160
+          }
+         },
+         "opacity": 1,
+         "visible": true,
+         "locked": false,
+         "zIndex": 0,
+         "placement": {
+          "anchor": {
+           "kind": "viewport"
+          },
+          "x": 0.37416666666666787,
+          "y": 0.5,
+          "widthPx": 200,
+          "heightPx": 200,
+          "rotationDeg": 25
+         },
+         "motion": {
+          "kind": "pointer-follow",
+          "enabled": true,
+          "mode": "pursuit",
+          "lagMs": 180,
+          "maxSpeed": 400,
+          "acceleration": 1200,
+          "deceleration": 1600,
+          "stopRadius": 48,
+          "orientToMovement": true,
+          "rotationOffsetDeg": 0
+         }
+        },
+        "frame": {
+         "left": 0,
+         "top": 0,
+         "width": 1000,
+         "height": 800
+        },
+        "bounds": {
+         "left": 241.27406178893295,
+         "right": 507.0592715444028,
+         "top": 267.1073951222651,
+         "bottom": 532.8926048777349
+        },
+        "position": {
+         "x": 374.1666666666679,
+         "y": 400
+        },
+        "localPosition": {
+         "x": 374.1666666666679,
+         "y": 400
+        },
+        "visible": true,
+        "locked": false,
+        "effectiveOpacity": 1,
+        "renderable": true
+       },
+       {
+        "layer": {
+         "kind": "image",
+         "id": "petal",
+         "name": "Petal",
+         "assetId": "asset-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+         "opacity": 0.648,
+         "visible": true,
+         "locked": false,
+         "zIndex": 1,
+         "placement": {
+          "anchor": {
+           "kind": "viewport"
+          },
+          "x": 0.8129908745531261,
+          "y": 0.45065449940416846,
+          "widthPx": 120,
+          "heightPx": 90,
+          "rotationDeg": 46.847610266
+         },
+         "motion": {
+          "kind": "pointer-follow",
+          "enabled": true,
+          "mode": "smooth",
+          "lagMs": 180,
+          "maxSpeed": 400,
+          "acceleration": 1200,
+          "deceleration": 1600,
+          "stopRadius": 48,
+          "orientToMovement": true,
+          "rotationOffsetDeg": 0
+         }
+        },
+        "frame": {
+         "left": 0,
+         "top": 0,
+         "width": 1000,
+         "height": 800
+        },
+        "bounds": {
+         "left": 739.1252326339437,
+         "right": 886.8565164723085,
+         "top": 285.9740164752691,
+         "bottom": 435.0731825714005
+        },
+        "position": {
+         "x": 812.9908745531261,
+         "y": 360.5235995233348
+        },
+        "localPosition": {
+         "x": 812.9908745531261,
+         "y": 360.5235995233348
+        },
+        "visible": true,
+        "locked": false,
+        "effectiveOpacity": 0.648,
+        "renderable": true
+       }
+      ],
+      "groups": [],
+      "roots": [
+       "rig",
+       "petal"
+      ]
+     },
+     "effects": [
+      {
+       "id": "rig",
+       "visible": true
+      },
+      {
+       "id": "petal",
+       "visible": true
+      }
+     ],
+     "machine": {
+      "video": "playing",
+      "events": []
+     },
+     "needsFrame": true,
+     "subscriptions": {
+      "pointer": false,
+      "video": false
+     },
+     "models": [
+      {
+       "clip": 2,
+       "timeMs": 433.3333333333335,
+       "previousClip": null,
+       "previousTimeMs": 0,
+       "fadeElapsedMs": 250,
+       "fadeDurationMs": 250,
+       "yawDeg": 89.39358477008227,
+       "lookYaw": 0,
+       "lookPitch": 0,
+       "suspended": false,
+       "phase": "run",
+       "id": "rig",
+       "blend": 1,
+       "speedPx": 400
+      }
+     ]
+    },
+    "input": {
+     "timeMs": 600,
+     "deltaMs": 16.666666666666668,
+     "viewport": {
+      "width": 1000,
+      "height": 800
+     },
+     "anchors": {},
+     "signals": {
+      "pointer": {
+       "x": 850,
+       "y": 400
+      },
+      "playing": true,
+      "pointerTimeMs": 600,
+      "scroll": {
+       "x": 0,
+       "y": 324,
+       "maxX": 0,
+       "maxY": 1000
+      }
+     },
+     "events": [],
+     "environment": {
+      "hidden": false,
+      "reducedMotion": false
+     }
+    }
+   }
+  },
+  {
+   "positionMs": 700,
+   "result": {
+    "state": {
+     "runtimeVersion": "1.3.0",
+     "timeMs": 700,
+     "effects": {
+      "fades": {},
+      "visibility": {
+       "rig": true,
+       "petal": true
+      }
+     },
+     "machine": {
+      "video": "playing",
+      "events": []
+     },
+     "motion": {
+      "bodies": {
+       "rig": {
+        "signature": "{\"kind\":\"pointer-follow\",\"enabled\":true,\"mode\":\"pursuit\",\"lagMs\":180,\"maxSpeed\":400,\"acceleration\":1200,\"deceleration\":1600,\"stopRadius\":48,\"orientToMovement\":true,\"rotationOffsetDeg\":0}",
+        "offset": {
+         "x": 194.1666666666681,
+         "y": 0
+        },
+        "velocity": {
+         "x": 0,
+         "y": 0
+        },
+        "heading": 0
+       },
+       "petal": {
+        "signature": "{\"kind\":\"pointer-follow\",\"enabled\":true,\"mode\":\"smooth\",\"lagMs\":180,\"maxSpeed\":400,\"acceleration\":1200,\"deceleration\":1600,\"stopRadius\":48,\"orientToMovement\":true,\"rotationOffsetDeg\":0}",
+        "offset": {
+         "x": 114.00465849541547,
+         "y": 121.60496906177661
+        },
+        "velocity": {
+         "x": 0,
+         "y": 0
+        },
+        "heading": 46.847610266
+       }
+      },
+      "pointer": {
+       "point": {
+        "x": 850,
+        "y": 400
+       },
+       "timeMs": 700,
+       "speed": 0
+      }
+     },
+     "models": {
+      "rig": {
+       "clip": 0,
+       "timeMs": 0,
+       "previousClip": null,
+       "previousTimeMs": 0,
+       "fadeElapsedMs": 250,
+       "fadeDurationMs": 250,
+       "yawDeg": 0,
+       "lookYaw": 0,
+       "lookPitch": 0,
+       "suspended": true,
+       "phase": "idle"
+      }
+     }
+    },
+    "frame": {
+     "timeMs": 700,
+     "layout": {
+      "layers": [
+       {
+        "layer": {
+         "kind": "model3d",
+         "id": "rig",
+         "name": "Rig",
+         "assetId": "asset-ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+         "source": {
+          "format": "glb",
+          "clips": [
+           {
+            "name": "Rest / 待機",
+            "duration": 2
+           },
+           {
+            "name": "Stride",
+            "duration": 2
+           },
+           {
+            "name": "Sprint",
+            "duration": 2
+           }
+          ],
+          "bones": [
+           {
+            "node": 2,
+            "name": "Hips"
+           },
+           {
+            "node": 3,
+            "name": "Head"
+           }
+          ],
+          "vertices": 8,
+          "triangles": 12,
+          "textureBytes": 4
+         },
+         "model": {
+          "rotationX": 0,
+          "rotationY": 0,
+          "rotationZ": 0,
+          "clip": 0,
+          "playing": true,
+          "loop": true,
+          "speed": 1,
+          "crossFadeMs": 250,
+          "inPlace": true,
+          "locomotion": {
+           "enabled": true,
+           "idle": 0,
+           "walk": 1,
+           "run": 2,
+           "walkSpeed": 10,
+           "runSpeed": 200,
+           "faceMovement": true,
+           "forwardDeg": 0
+          },
+          "look": {
+           "enabled": false,
+           "bone": null,
+           "yawLimit": 50,
+           "pitchLimit": 30,
+           "lagMs": 160
+          }
+         },
+         "opacity": 1,
+         "visible": true,
+         "locked": false,
+         "zIndex": 0,
+         "placement": {
+          "anchor": {
+           "kind": "viewport"
+          },
+          "x": 0.3941666666666681,
+          "y": 0.5,
+          "widthPx": 200,
+          "heightPx": 200,
+          "rotationDeg": 25
+         },
+         "motion": {
+          "kind": "pointer-follow",
+          "enabled": true,
+          "mode": "pursuit",
+          "lagMs": 180,
+          "maxSpeed": 400,
+          "acceleration": 1200,
+          "deceleration": 1600,
+          "stopRadius": 48,
+          "orientToMovement": true,
+          "rotationOffsetDeg": 0
+         }
+        },
+        "frame": {
+         "left": 0,
+         "top": 0,
+         "width": 1000,
+         "height": 800
+        },
+        "bounds": {
+         "left": 261.2740617889332,
+         "right": 527.059271544403,
+         "top": 267.1073951222651,
+         "bottom": 532.8926048777349
+        },
+        "position": {
+         "x": 394.1666666666681,
+         "y": 400
+        },
+        "localPosition": {
+         "x": 394.1666666666681,
+         "y": 400
+        },
+        "visible": true,
+        "locked": false,
+        "effectiveOpacity": 1,
+        "renderable": true
+       },
+       {
+        "layer": {
+         "kind": "image",
+         "id": "petal",
+         "name": "Petal",
+         "assetId": "asset-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+         "opacity": 1,
+         "visible": true,
+         "locked": false,
+         "zIndex": 1,
+         "placement": {
+          "anchor": {
+           "kind": "viewport"
+          },
+          "x": 0.8140046584954155,
+          "y": 0.45200621132722074,
+          "widthPx": 120,
+          "heightPx": 90,
+          "rotationDeg": 46.847610266
+         },
+         "motion": {
+          "kind": "pointer-follow",
+          "enabled": true,
+          "mode": "smooth",
+          "lagMs": 180,
+          "maxSpeed": 400,
+          "acceleration": 1200,
+          "deceleration": 1600,
+          "stopRadius": 48,
+          "orientToMovement": true,
+          "rotationOffsetDeg": 0
+         }
+        },
+        "frame": {
+         "left": 0,
+         "top": 0,
+         "width": 1000,
+         "height": 800
+        },
+        "bounds": {
+         "left": 740.1390165762331,
+         "right": 887.8703004145979,
+         "top": 287.05538601371086,
+         "bottom": 436.15455210984237
+        },
+        "position": {
+         "x": 814.0046584954155,
+         "y": 361.6049690617766
+        },
+        "localPosition": {
+         "x": 814.0046584954155,
+         "y": 361.6049690617766
+        },
+        "visible": true,
+        "locked": false,
+        "effectiveOpacity": 1,
+        "renderable": true
+       }
+      ],
+      "groups": [],
+      "roots": [
+       "rig",
+       "petal"
+      ]
+     },
+     "effects": [
+      {
+       "id": "rig",
+       "visible": true
+      },
+      {
+       "id": "petal",
+       "visible": true
+      }
+     ],
+     "machine": {
+      "video": "playing",
+      "events": []
+     },
+     "needsFrame": false,
+     "subscriptions": {
+      "pointer": false,
+      "video": false
+     },
+     "models": [
+      {
+       "clip": 0,
+       "timeMs": 0,
+       "previousClip": null,
+       "previousTimeMs": 0,
+       "fadeElapsedMs": 250,
+       "fadeDurationMs": 250,
+       "yawDeg": 0,
+       "lookYaw": 0,
+       "lookPitch": 0,
+       "suspended": true,
+       "phase": "idle",
+       "id": "rig",
+       "blend": 1,
+       "speedPx": 0,
+       "resetDynamics": true
+      }
+     ]
+    },
+    "input": {
+     "timeMs": 700,
+     "deltaMs": 16.666666666666668,
+     "viewport": {
+      "width": 1000,
+      "height": 800
+     },
+     "anchors": {},
+     "signals": {
+      "pointer": {
+       "x": 850,
+       "y": 400
+      },
+      "playing": true,
+      "pointerTimeMs": 700,
+      "scroll": {
+       "x": 0,
+       "y": 378,
+       "maxX": 0,
+       "maxY": 1000
+      }
+     },
+     "events": [],
+     "environment": {
+      "hidden": false,
+      "reducedMotion": false,
+      "safeInteraction": true
+     }
+    }
+   }
+  },
+  {
+   "positionMs": 900,
+   "result": {
+    "state": {
+     "runtimeVersion": "1.3.0",
+     "timeMs": 900,
+     "effects": {
+      "fades": {},
+      "visibility": {
+       "rig": true,
+       "petal": true
+      }
+     },
+     "machine": {
+      "video": "playing",
+      "events": []
+     },
+     "motion": {
+      "bodies": {
+       "rig": {
+        "signature": "{\"kind\":\"pointer-follow\",\"enabled\":true,\"mode\":\"pursuit\",\"lagMs\":180,\"maxSpeed\":400,\"acceleration\":1200,\"deceleration\":1600,\"stopRadius\":48,\"orientToMovement\":true,\"rotationOffsetDeg\":0}",
+        "offset": {
+         "x": 194.1666666666681,
+         "y": 0
+        },
+        "velocity": {
+         "x": 0,
+         "y": 0
+        },
+        "heading": 0
+       },
+       "petal": {
+        "signature": "{\"kind\":\"pointer-follow\",\"enabled\":true,\"mode\":\"smooth\",\"lagMs\":180,\"maxSpeed\":400,\"acceleration\":1200,\"deceleration\":1600,\"stopRadius\":48,\"orientToMovement\":true,\"rotationOffsetDeg\":0}",
+        "offset": {
+         "x": 114.00465849541547,
+         "y": 121.60496906177661
+        },
+        "velocity": {
+         "x": 0,
+         "y": 0
+        },
+        "heading": 46.847610266
+       }
+      },
+      "pointer": {
+       "point": {
+        "x": 850,
+        "y": 400
+       },
+       "timeMs": 900,
+       "speed": 0
+      }
+     },
+     "models": {
+      "rig": {
+       "clip": 0,
+       "timeMs": 0,
+       "previousClip": null,
+       "previousTimeMs": 0,
+       "fadeElapsedMs": 250,
+       "fadeDurationMs": 250,
+       "yawDeg": 0,
+       "lookYaw": 0,
+       "lookPitch": 0,
+       "suspended": true,
+       "phase": "idle"
+      }
+     }
+    },
+    "frame": {
+     "timeMs": 900,
+     "layout": {
+      "layers": [
+       {
+        "layer": {
+         "kind": "model3d",
+         "id": "rig",
+         "name": "Rig",
+         "assetId": "asset-ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+         "source": {
+          "format": "glb",
+          "clips": [
+           {
+            "name": "Rest / 待機",
+            "duration": 2
+           },
+           {
+            "name": "Stride",
+            "duration": 2
+           },
+           {
+            "name": "Sprint",
+            "duration": 2
+           }
+          ],
+          "bones": [
+           {
+            "node": 2,
+            "name": "Hips"
+           },
+           {
+            "node": 3,
+            "name": "Head"
+           }
+          ],
+          "vertices": 8,
+          "triangles": 12,
+          "textureBytes": 4
+         },
+         "model": {
+          "rotationX": 0,
+          "rotationY": 0,
+          "rotationZ": 0,
+          "clip": 0,
+          "playing": true,
+          "loop": true,
+          "speed": 1,
+          "crossFadeMs": 250,
+          "inPlace": true,
+          "locomotion": {
+           "enabled": true,
+           "idle": 0,
+           "walk": 1,
+           "run": 2,
+           "walkSpeed": 10,
+           "runSpeed": 200,
+           "faceMovement": true,
+           "forwardDeg": 0
+          },
+          "look": {
+           "enabled": false,
+           "bone": null,
+           "yawLimit": 50,
+           "pitchLimit": 30,
+           "lagMs": 160
+          }
+         },
+         "opacity": 1,
+         "visible": true,
+         "locked": false,
+         "zIndex": 0,
+         "placement": {
+          "anchor": {
+           "kind": "viewport"
+          },
+          "x": 0.3941666666666681,
+          "y": 0.5,
+          "widthPx": 200,
+          "heightPx": 200,
+          "rotationDeg": 25
+         },
+         "motion": {
+          "kind": "pointer-follow",
+          "enabled": true,
+          "mode": "pursuit",
+          "lagMs": 180,
+          "maxSpeed": 400,
+          "acceleration": 1200,
+          "deceleration": 1600,
+          "stopRadius": 48,
+          "orientToMovement": true,
+          "rotationOffsetDeg": 0
+         }
+        },
+        "frame": {
+         "left": 0,
+         "top": 0,
+         "width": 1000,
+         "height": 800
+        },
+        "bounds": {
+         "left": 261.2740617889332,
+         "right": 527.059271544403,
+         "top": 267.1073951222651,
+         "bottom": 532.8926048777349
+        },
+        "position": {
+         "x": 394.1666666666681,
+         "y": 400
+        },
+        "localPosition": {
+         "x": 394.1666666666681,
+         "y": 400
+        },
+        "visible": true,
+        "locked": false,
+        "effectiveOpacity": 1,
+        "renderable": true
+       },
+       {
+        "layer": {
+         "kind": "image",
+         "id": "petal",
+         "name": "Petal",
+         "assetId": "asset-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+         "opacity": 1,
+         "visible": true,
+         "locked": false,
+         "zIndex": 1,
+         "placement": {
+          "anchor": {
+           "kind": "viewport"
+          },
+          "x": 0.8140046584954155,
+          "y": 0.45200621132722074,
+          "widthPx": 120,
+          "heightPx": 90,
+          "rotationDeg": 46.847610266
+         },
+         "motion": {
+          "kind": "pointer-follow",
+          "enabled": true,
+          "mode": "smooth",
+          "lagMs": 180,
+          "maxSpeed": 400,
+          "acceleration": 1200,
+          "deceleration": 1600,
+          "stopRadius": 48,
+          "orientToMovement": true,
+          "rotationOffsetDeg": 0
+         }
+        },
+        "frame": {
+         "left": 0,
+         "top": 0,
+         "width": 1000,
+         "height": 800
+        },
+        "bounds": {
+         "left": 740.1390165762331,
+         "right": 887.8703004145979,
+         "top": 287.05538601371086,
+         "bottom": 436.15455210984237
+        },
+        "position": {
+         "x": 814.0046584954155,
+         "y": 361.6049690617766
+        },
+        "localPosition": {
+         "x": 814.0046584954155,
+         "y": 361.6049690617766
+        },
+        "visible": true,
+        "locked": false,
+        "effectiveOpacity": 1,
+        "renderable": true
+       }
+      ],
+      "groups": [],
+      "roots": [
+       "rig",
+       "petal"
+      ]
+     },
+     "effects": [
+      {
+       "id": "rig",
+       "visible": true
+      },
+      {
+       "id": "petal",
+       "visible": true
+      }
+     ],
+     "machine": {
+      "video": "playing",
+      "events": []
+     },
+     "needsFrame": false,
+     "subscriptions": {
+      "pointer": false,
+      "video": false
+     },
+     "models": [
+      {
+       "clip": 0,
+       "timeMs": 0,
+       "previousClip": null,
+       "previousTimeMs": 0,
+       "fadeElapsedMs": 250,
+       "fadeDurationMs": 250,
+       "yawDeg": 0,
+       "lookYaw": 0,
+       "lookPitch": 0,
+       "suspended": true,
+       "phase": "idle",
+       "id": "rig",
+       "blend": 1,
+       "speedPx": 0,
+       "resetDynamics": true
+      }
+     ]
+    },
+    "input": {
+     "timeMs": 900,
+     "deltaMs": 16.666666666666668,
+     "viewport": {
+      "width": 1000,
+      "height": 800
+     },
+     "anchors": {},
+     "signals": {
+      "pointer": {
+       "x": 850,
+       "y": 400
+      },
+      "playing": true,
+      "pointerTimeMs": 900,
+      "scroll": {
+       "x": 0,
+       "y": 486,
+       "maxX": 0,
+       "maxY": 1000
+      }
+     },
+     "events": [],
+     "environment": {
+      "hidden": false,
+      "reducedMotion": false,
+      "safeInteraction": true
+     }
+    }
+   }
+  },
+  {
+   "positionMs": 1100,
+   "result": {
+    "state": {
+     "runtimeVersion": "1.3.0",
+     "timeMs": 1100,
+     "effects": {
+      "fades": {},
+      "visibility": {
+       "rig": true,
+       "petal": true
+      }
+     },
+     "machine": {
+      "video": "playing",
+      "events": []
+     },
+     "motion": {
+      "bodies": {
+       "rig": {
+        "signature": "{\"kind\":\"pointer-follow\",\"enabled\":true,\"mode\":\"pursuit\",\"lagMs\":180,\"maxSpeed\":400,\"acceleration\":1200,\"deceleration\":1600,\"stopRadius\":48,\"orientToMovement\":true,\"rotationOffsetDeg\":0}",
+        "offset": {
+         "x": 194.1666666666681,
+         "y": 0
+        },
+        "velocity": {
+         "x": 0,
+         "y": 0
+        },
+        "heading": 0
+       },
+       "petal": {
+        "signature": "{\"kind\":\"pointer-follow\",\"enabled\":true,\"mode\":\"smooth\",\"lagMs\":180,\"maxSpeed\":400,\"acceleration\":1200,\"deceleration\":1600,\"stopRadius\":48,\"orientToMovement\":true,\"rotationOffsetDeg\":0}",
+        "offset": {
+         "x": 114.00465849541547,
+         "y": 121.60496906177661
+        },
+        "velocity": {
+         "x": 0,
+         "y": 0
+        },
+        "heading": 46.847610266
+       }
+      },
+      "pointer": {
+       "point": {
+        "x": 850,
+        "y": 400
+       },
+       "timeMs": 1100,
+       "speed": 0
+      }
+     },
+     "models": {
+      "rig": {
+       "clip": 0,
+       "timeMs": 0,
+       "previousClip": null,
+       "previousTimeMs": 0,
+       "fadeElapsedMs": 250,
+       "fadeDurationMs": 250,
+       "yawDeg": 0,
+       "lookYaw": 0,
+       "lookPitch": 0,
+       "suspended": true,
+       "phase": "idle"
+      }
+     }
+    },
+    "frame": {
+     "timeMs": 1100,
+     "layout": {
+      "layers": [
+       {
+        "layer": {
+         "kind": "model3d",
+         "id": "rig",
+         "name": "Rig",
+         "assetId": "asset-ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+         "source": {
+          "format": "glb",
+          "clips": [
+           {
+            "name": "Rest / 待機",
+            "duration": 2
+           },
+           {
+            "name": "Stride",
+            "duration": 2
+           },
+           {
+            "name": "Sprint",
+            "duration": 2
+           }
+          ],
+          "bones": [
+           {
+            "node": 2,
+            "name": "Hips"
+           },
+           {
+            "node": 3,
+            "name": "Head"
+           }
+          ],
+          "vertices": 8,
+          "triangles": 12,
+          "textureBytes": 4
+         },
+         "model": {
+          "rotationX": 0,
+          "rotationY": 0,
+          "rotationZ": 0,
+          "clip": 0,
+          "playing": true,
+          "loop": true,
+          "speed": 1,
+          "crossFadeMs": 250,
+          "inPlace": true,
+          "locomotion": {
+           "enabled": true,
+           "idle": 0,
+           "walk": 1,
+           "run": 2,
+           "walkSpeed": 10,
+           "runSpeed": 200,
+           "faceMovement": true,
+           "forwardDeg": 0
+          },
+          "look": {
+           "enabled": false,
+           "bone": null,
+           "yawLimit": 50,
+           "pitchLimit": 30,
+           "lagMs": 160
+          }
+         },
+         "opacity": 1,
+         "visible": true,
+         "locked": false,
+         "zIndex": 0,
+         "placement": {
+          "anchor": {
+           "kind": "viewport"
+          },
+          "x": 0.3941666666666681,
+          "y": 0.5,
+          "widthPx": 200,
+          "heightPx": 200,
+          "rotationDeg": 25
+         },
+         "motion": {
+          "kind": "pointer-follow",
+          "enabled": true,
+          "mode": "pursuit",
+          "lagMs": 180,
+          "maxSpeed": 400,
+          "acceleration": 1200,
+          "deceleration": 1600,
+          "stopRadius": 48,
+          "orientToMovement": true,
+          "rotationOffsetDeg": 0
+         }
+        },
+        "frame": {
+         "left": 0,
+         "top": 0,
+         "width": 1000,
+         "height": 800
+        },
+        "bounds": {
+         "left": 261.2740617889332,
+         "right": 527.059271544403,
+         "top": 267.1073951222651,
+         "bottom": 532.8926048777349
+        },
+        "position": {
+         "x": 394.1666666666681,
+         "y": 400
+        },
+        "localPosition": {
+         "x": 394.1666666666681,
+         "y": 400
+        },
+        "visible": true,
+        "locked": false,
+        "effectiveOpacity": 1,
+        "renderable": true
+       },
+       {
+        "layer": {
+         "kind": "image",
+         "id": "petal",
+         "name": "Petal",
+         "assetId": "asset-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+         "opacity": 1,
+         "visible": true,
+         "locked": false,
+         "zIndex": 1,
+         "placement": {
+          "anchor": {
+           "kind": "viewport"
+          },
+          "x": 0.8140046584954155,
+          "y": 0.45200621132722074,
+          "widthPx": 120,
+          "heightPx": 90,
+          "rotationDeg": 46.847610266
+         },
+         "motion": {
+          "kind": "pointer-follow",
+          "enabled": true,
+          "mode": "smooth",
+          "lagMs": 180,
+          "maxSpeed": 400,
+          "acceleration": 1200,
+          "deceleration": 1600,
+          "stopRadius": 48,
+          "orientToMovement": true,
+          "rotationOffsetDeg": 0
+         }
+        },
+        "frame": {
+         "left": 0,
+         "top": 0,
+         "width": 1000,
+         "height": 800
+        },
+        "bounds": {
+         "left": 740.1390165762331,
+         "right": 887.8703004145979,
+         "top": 287.05538601371086,
+         "bottom": 436.15455210984237
+        },
+        "position": {
+         "x": 814.0046584954155,
+         "y": 361.6049690617766
+        },
+        "localPosition": {
+         "x": 814.0046584954155,
+         "y": 361.6049690617766
+        },
+        "visible": true,
+        "locked": false,
+        "effectiveOpacity": 1,
+        "renderable": true
+       }
+      ],
+      "groups": [],
+      "roots": [
+       "rig",
+       "petal"
+      ]
+     },
+     "effects": [
+      {
+       "id": "rig",
+       "visible": true
+      },
+      {
+       "id": "petal",
+       "visible": true
+      }
+     ],
+     "machine": {
+      "video": "playing",
+      "events": []
+     },
+     "needsFrame": false,
+     "subscriptions": {
+      "pointer": false,
+      "video": false
+     },
+     "models": [
+      {
+       "clip": 0,
+       "timeMs": 0,
+       "previousClip": null,
+       "previousTimeMs": 0,
+       "fadeElapsedMs": 250,
+       "fadeDurationMs": 250,
+       "yawDeg": 0,
+       "lookYaw": 0,
+       "lookPitch": 0,
+       "suspended": true,
+       "phase": "idle",
+       "id": "rig",
+       "blend": 1,
+       "speedPx": 0,
+       "resetDynamics": true
+      }
+     ]
+    },
+    "input": {
+     "timeMs": 1100,
+     "deltaMs": 16.666666666666668,
+     "viewport": {
+      "width": 1000,
+      "height": 800
+     },
+     "anchors": {},
+     "signals": {
+      "pointer": {
+       "x": 850,
+       "y": 400
+      },
+      "playing": true,
+      "pointerTimeMs": 1100,
+      "scroll": {
+       "x": 0,
+       "y": 594,
+       "maxX": 0,
+       "maxY": 1000
+      }
+     },
+     "events": [],
+     "environment": {
+      "hidden": false,
+      "reducedMotion": false,
+      "safeInteraction": true
+     }
+    }
+   }
+  },
+  {
+   "positionMs": 1160,
+   "result": {
+    "state": {
+     "runtimeVersion": "1.3.0",
+     "timeMs": 1160,
+     "effects": {
+      "fades": {},
+      "visibility": {
+       "rig": true,
+       "petal": true
+      }
+     },
+     "machine": {
+      "video": "playing",
+      "events": []
+     },
+     "motion": {
+      "bodies": {
+       "rig": {
+        "signature": "{\"kind\":\"pointer-follow\",\"enabled\":true,\"mode\":\"pursuit\",\"lagMs\":180,\"maxSpeed\":400,\"acceleration\":1200,\"deceleration\":1600,\"stopRadius\":48,\"orientToMovement\":true,\"rotationOffsetDeg\":0}",
+        "offset": {
+         "x": 194.1666666666681,
+         "y": 0
+        },
+        "velocity": {
+         "x": 0,
+         "y": 0
+        },
+        "heading": 0
+       },
+       "petal": {
+        "signature": "{\"kind\":\"pointer-follow\",\"enabled\":true,\"mode\":\"smooth\",\"lagMs\":180,\"maxSpeed\":400,\"acceleration\":1200,\"deceleration\":1600,\"stopRadius\":48,\"orientToMovement\":true,\"rotationOffsetDeg\":0}",
+        "offset": {
+         "x": 114.00465849541547,
+         "y": 121.60496906177661
+        },
+        "velocity": {
+         "x": 0,
+         "y": 0
+        },
+        "heading": 46.847610266
+       }
+      },
+      "pointer": {
+       "point": {
+        "x": 850,
+        "y": 400
+       },
+       "timeMs": 1160,
+       "speed": 0
+      }
+     },
+     "models": {
+      "rig": {
+       "clip": 0,
+       "timeMs": 0,
+       "previousClip": null,
+       "previousTimeMs": 0,
+       "fadeElapsedMs": 250,
+       "fadeDurationMs": 250,
+       "yawDeg": 0,
+       "lookYaw": 0,
+       "lookPitch": 0,
+       "suspended": true,
+       "phase": "idle"
+      }
+     }
+    },
+    "frame": {
+     "timeMs": 1160,
+     "layout": {
+      "layers": [
+       {
+        "layer": {
+         "kind": "model3d",
+         "id": "rig",
+         "name": "Rig",
+         "assetId": "asset-ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+         "source": {
+          "format": "glb",
+          "clips": [
+           {
+            "name": "Rest / 待機",
+            "duration": 2
+           },
+           {
+            "name": "Stride",
+            "duration": 2
+           },
+           {
+            "name": "Sprint",
+            "duration": 2
+           }
+          ],
+          "bones": [
+           {
+            "node": 2,
+            "name": "Hips"
+           },
+           {
+            "node": 3,
+            "name": "Head"
+           }
+          ],
+          "vertices": 8,
+          "triangles": 12,
+          "textureBytes": 4
+         },
+         "model": {
+          "rotationX": 0,
+          "rotationY": 0,
+          "rotationZ": 0,
+          "clip": 0,
+          "playing": true,
+          "loop": true,
+          "speed": 1,
+          "crossFadeMs": 250,
+          "inPlace": true,
+          "locomotion": {
+           "enabled": true,
+           "idle": 0,
+           "walk": 1,
+           "run": 2,
+           "walkSpeed": 10,
+           "runSpeed": 200,
+           "faceMovement": true,
+           "forwardDeg": 0
+          },
+          "look": {
+           "enabled": false,
+           "bone": null,
+           "yawLimit": 50,
+           "pitchLimit": 30,
+           "lagMs": 160
+          }
+         },
+         "opacity": 1,
+         "visible": true,
+         "locked": false,
+         "zIndex": 0,
+         "placement": {
+          "anchor": {
+           "kind": "viewport"
+          },
+          "x": 0.3941666666666681,
+          "y": 0.5,
+          "widthPx": 200,
+          "heightPx": 200,
+          "rotationDeg": 25
+         },
+         "motion": {
+          "kind": "pointer-follow",
+          "enabled": true,
+          "mode": "pursuit",
+          "lagMs": 180,
+          "maxSpeed": 400,
+          "acceleration": 1200,
+          "deceleration": 1600,
+          "stopRadius": 48,
+          "orientToMovement": true,
+          "rotationOffsetDeg": 0
+         }
+        },
+        "frame": {
+         "left": 0,
+         "top": 0,
+         "width": 1000,
+         "height": 800
+        },
+        "bounds": {
+         "left": 261.2740617889332,
+         "right": 527.059271544403,
+         "top": 267.1073951222651,
+         "bottom": 532.8926048777349
+        },
+        "position": {
+         "x": 394.1666666666681,
+         "y": 400
+        },
+        "localPosition": {
+         "x": 394.1666666666681,
+         "y": 400
+        },
+        "visible": true,
+        "locked": false,
+        "effectiveOpacity": 1,
+        "renderable": true
+       },
+       {
+        "layer": {
+         "kind": "image",
+         "id": "petal",
+         "name": "Petal",
+         "assetId": "asset-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+         "opacity": 1,
+         "visible": true,
+         "locked": false,
+         "zIndex": 1,
+         "placement": {
+          "anchor": {
+           "kind": "viewport"
+          },
+          "x": 0.8140046584954155,
+          "y": 0.45200621132722074,
+          "widthPx": 120,
+          "heightPx": 90,
+          "rotationDeg": 46.847610266
+         },
+         "motion": {
+          "kind": "pointer-follow",
+          "enabled": true,
+          "mode": "smooth",
+          "lagMs": 180,
+          "maxSpeed": 400,
+          "acceleration": 1200,
+          "deceleration": 1600,
+          "stopRadius": 48,
+          "orientToMovement": true,
+          "rotationOffsetDeg": 0
+         }
+        },
+        "frame": {
+         "left": 0,
+         "top": 0,
+         "width": 1000,
+         "height": 800
+        },
+        "bounds": {
+         "left": 740.1390165762331,
+         "right": 887.8703004145979,
+         "top": 287.05538601371086,
+         "bottom": 436.15455210984237
+        },
+        "position": {
+         "x": 814.0046584954155,
+         "y": 361.6049690617766
+        },
+        "localPosition": {
+         "x": 814.0046584954155,
+         "y": 361.6049690617766
+        },
+        "visible": true,
+        "locked": false,
+        "effectiveOpacity": 1,
+        "renderable": true
+       }
+      ],
+      "groups": [],
+      "roots": [
+       "rig",
+       "petal"
+      ]
+     },
+     "effects": [
+      {
+       "id": "rig",
+       "visible": true
+      },
+      {
+       "id": "petal",
+       "visible": true
+      }
+     ],
+     "machine": {
+      "video": "playing",
+      "events": []
+     },
+     "needsFrame": false,
+     "subscriptions": {
+      "pointer": false,
+      "video": false
+     },
+     "models": [
+      {
+       "clip": 0,
+       "timeMs": 0,
+       "previousClip": null,
+       "previousTimeMs": 0,
+       "fadeElapsedMs": 250,
+       "fadeDurationMs": 250,
+       "yawDeg": 0,
+       "lookYaw": 0,
+       "lookPitch": 0,
+       "suspended": true,
+       "phase": "idle",
+       "id": "rig",
+       "blend": 1,
+       "speedPx": 0,
+       "resetDynamics": true
+      }
+     ]
+    },
+    "input": {
+     "timeMs": 1160,
+     "deltaMs": 10,
+     "viewport": {
+      "width": 1000,
+      "height": 800
+     },
+     "anchors": {},
+     "signals": {
+      "pointer": {
+       "x": 850,
+       "y": 400
+      },
+      "playing": true,
+      "pointerTimeMs": 1160,
+      "scroll": {
+       "x": 0,
+       "y": 626.4,
+       "maxX": 0,
+       "maxY": 1000
+      }
+     },
+     "events": [],
+     "environment": {
+      "hidden": false,
+      "reducedMotion": false,
+      "safeInteraction": true
+     }
+    }
+   }
+  },
+  {
+   "positionMs": 1500,
+   "result": {
+    "state": {
+     "runtimeVersion": "1.3.0",
+     "timeMs": 1500,
+     "effects": {
+      "fades": {},
+      "visibility": {
+       "rig": true,
+       "petal": true
+      }
+     },
+     "machine": {
+      "video": "playing",
+      "events": []
+     },
+     "motion": {
+      "bodies": {
+       "rig": {
+        "signature": "{\"kind\":\"pointer-follow\",\"enabled\":true,\"mode\":\"pursuit\",\"lagMs\":180,\"maxSpeed\":400,\"acceleration\":1200,\"deceleration\":1600,\"stopRadius\":48,\"orientToMovement\":true,\"rotationOffsetDeg\":0}",
+        "offset": {
+         "x": 268.33333333333485,
+         "y": 0
+        },
+        "velocity": {
+         "x": 400,
+         "y": 0
+        },
+        "heading": 0
+       },
+       "petal": {
+        "signature": "{\"kind\":\"pointer-follow\",\"enabled\":true,\"mode\":\"smooth\",\"lagMs\":180,\"maxSpeed\":400,\"acceleration\":1200,\"deceleration\":1600,\"stopRadius\":48,\"orientToMovement\":true,\"rotationOffsetDeg\":0}",
+        "offset": {
+         "x": 116.71785275842478,
+         "y": 124.49904294231919
+        },
+        "velocity": {
+         "x": 2.575449135180604,
+         "y": 2.7471457441926908
+        },
+        "heading": 46.847610266
+       }
+      },
+      "pointer": {
+       "point": {
+        "x": 850,
+        "y": 400
+       },
+       "timeMs": 1500,
+       "speed": 0
+      }
+     },
+     "models": {
+      "rig": {
+       "clip": 2,
+       "timeMs": 183.33333333333331,
+       "previousClip": 1,
+       "previousTimeMs": 333.33333333333337,
+       "fadeElapsedMs": 183.33333333333331,
+       "fadeDurationMs": 250,
+       "yawDeg": 84.4041128380095,
+       "lookYaw": 0,
+       "lookPitch": 0,
+       "suspended": false,
+       "phase": "run"
+      }
+     }
+    },
+    "frame": {
+     "timeMs": 1500,
+     "layout": {
+      "layers": [
+       {
+        "layer": {
+         "kind": "model3d",
+         "id": "rig",
+         "name": "Rig",
+         "assetId": "asset-ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+         "source": {
+          "format": "glb",
+          "clips": [
+           {
+            "name": "Rest / 待機",
+            "duration": 2
+           },
+           {
+            "name": "Stride",
+            "duration": 2
+           },
+           {
+            "name": "Sprint",
+            "duration": 2
+           }
+          ],
+          "bones": [
+           {
+            "node": 2,
+            "name": "Hips"
+           },
+           {
+            "node": 3,
+            "name": "Head"
+           }
+          ],
+          "vertices": 8,
+          "triangles": 12,
+          "textureBytes": 4
+         },
+         "model": {
+          "rotationX": 0,
+          "rotationY": 0,
+          "rotationZ": 0,
+          "clip": 0,
+          "playing": true,
+          "loop": true,
+          "speed": 1,
+          "crossFadeMs": 250,
+          "inPlace": true,
+          "locomotion": {
+           "enabled": true,
+           "idle": 0,
+           "walk": 1,
+           "run": 2,
+           "walkSpeed": 10,
+           "runSpeed": 200,
+           "faceMovement": true,
+           "forwardDeg": 0
+          },
+          "look": {
+           "enabled": false,
+           "bone": null,
+           "yawLimit": 50,
+           "pitchLimit": 30,
+           "lagMs": 160
+          }
+         },
+         "opacity": 1,
+         "visible": true,
+         "locked": false,
+         "zIndex": 0,
+         "placement": {
+          "anchor": {
+           "kind": "viewport"
+          },
+          "x": 0.4683333333333349,
+          "y": 0.5,
+          "widthPx": 200,
+          "heightPx": 200,
+          "rotationDeg": 25
+         },
+         "motion": {
+          "kind": "pointer-follow",
+          "enabled": true,
+          "mode": "pursuit",
+          "lagMs": 180,
+          "maxSpeed": 400,
+          "acceleration": 1200,
+          "deceleration": 1600,
+          "stopRadius": 48,
+          "orientToMovement": true,
+          "rotationOffsetDeg": 0
+         }
+        },
+        "frame": {
+         "left": 0,
+         "top": 0,
+         "width": 1000,
+         "height": 800
+        },
+        "bounds": {
+         "left": 335.4407284556,
+         "right": 601.2259382110699,
+         "top": 267.1073951222651,
+         "bottom": 532.8926048777349
+        },
+        "position": {
+         "x": 468.3333333333349,
+         "y": 400
+        },
+        "localPosition": {
+         "x": 468.3333333333349,
+         "y": 400
+        },
+        "visible": true,
+        "locked": false,
+        "effectiveOpacity": 1,
+        "renderable": true
+       },
+       {
+        "layer": {
+         "kind": "image",
+         "id": "petal",
+         "name": "Petal",
+         "assetId": "asset-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+         "opacity": 0.3799999999999999,
+         "visible": true,
+         "locked": false,
+         "zIndex": 1,
+         "placement": {
+          "anchor": {
+           "kind": "viewport"
+          },
+          "x": 0.8167178527584247,
+          "y": 0.455623803677899,
+          "widthPx": 120,
+          "heightPx": 90,
+          "rotationDeg": 46.847610266
+         },
+         "motion": {
+          "kind": "pointer-follow",
+          "enabled": true,
+          "mode": "smooth",
+          "lagMs": 180,
+          "maxSpeed": 400,
+          "acceleration": 1200,
+          "deceleration": 1600,
+          "stopRadius": 48,
+          "orientToMovement": true,
+          "rotationOffsetDeg": 0
+         }
+        },
+        "frame": {
+         "left": 0,
+         "top": 0,
+         "width": 1000,
+         "height": 800
+        },
+        "bounds": {
+         "left": 742.8522108392423,
+         "right": 890.5834946776071,
+         "top": 289.94945989425344,
+         "bottom": 439.04862599038495
+        },
+        "position": {
+         "x": 816.7178527584247,
+         "y": 364.4990429423192
+        },
+        "localPosition": {
+         "x": 816.7178527584247,
+         "y": 364.4990429423192
+        },
+        "visible": true,
+        "locked": false,
+        "effectiveOpacity": 0.3799999999999999,
+        "renderable": true
+       }
+      ],
+      "groups": [],
+      "roots": [
+       "rig",
+       "petal"
+      ]
+     },
+     "effects": [
+      {
+       "id": "rig",
+       "visible": true
+      },
+      {
+       "id": "petal",
+       "visible": true
+      }
+     ],
+     "machine": {
+      "video": "playing",
+      "events": []
+     },
+     "needsFrame": true,
+     "subscriptions": {
+      "pointer": false,
+      "video": false
+     },
+     "models": [
+      {
+       "clip": 2,
+       "timeMs": 183.33333333333331,
+       "previousClip": 1,
+       "previousTimeMs": 333.33333333333337,
+       "fadeElapsedMs": 183.33333333333331,
+       "fadeDurationMs": 250,
+       "yawDeg": 84.4041128380095,
+       "lookYaw": 0,
+       "lookPitch": 0,
+       "suspended": false,
+       "phase": "run",
+       "id": "rig",
+       "blend": 0.7333333333333333,
+       "speedPx": 400
+      }
+     ]
+    },
+    "input": {
+     "timeMs": 1500,
+     "deltaMs": 16.666666666666668,
+     "viewport": {
+      "width": 1000,
+      "height": 800
+     },
+     "anchors": {},
+     "signals": {
+      "pointer": {
+       "x": 850,
+       "y": 400
+      },
+      "playing": true,
+      "pointerTimeMs": 1500,
+      "scroll": {
+       "x": 0,
+       "y": 810,
+       "maxX": 0,
+       "maxY": 1000
+      }
+     },
+     "events": [],
+     "environment": {
+      "hidden": false,
+      "reducedMotion": false
+     }
+    }
+   }
+  },
+  {
+   "positionMs": 1983,
+   "result": {
+    "state": {
+     "runtimeVersion": "1.3.0",
+     "timeMs": 1983,
+     "effects": {
+      "fades": {},
+      "visibility": {
+       "rig": true,
+       "petal": true
+      }
+     },
+     "machine": {
+      "video": "playing",
+      "events": []
+     },
+     "motion": {
+      "bodies": {
+       "rig": {
+        "signature": "{\"kind\":\"pointer-follow\",\"enabled\":true,\"mode\":\"pursuit\",\"lagMs\":180,\"maxSpeed\":400,\"acceleration\":1200,\"deceleration\":1600,\"stopRadius\":48,\"orientToMovement\":true,\"rotationOffsetDeg\":0}",
+        "offset": {
+         "x": 461.53333333333194,
+         "y": 0
+        },
+        "velocity": {
+         "x": 400,
+         "y": 0
+        },
+        "heading": 0
+       },
+       "petal": {
+        "signature": "{\"kind\":\"pointer-follow\",\"enabled\":true,\"mode\":\"smooth\",\"lagMs\":180,\"maxSpeed\":400,\"acceleration\":1200,\"deceleration\":1600,\"stopRadius\":48,\"orientToMovement\":true,\"rotationOffsetDeg\":0}",
+        "offset": {
+         "x": 117.13987190413582,
+         "y": 124.94919669774481
+        },
+        "velocity": {
+         "x": 0.17566768101450972,
+         "y": 0.1873788597488103
+        },
+        "heading": 46.847610265
+       }
+      },
+      "pointer": {
+       "point": {
+        "x": 850,
+        "y": 400
+       },
+       "timeMs": 1983,
+       "speed": 0
+      }
+     },
+     "models": {
+      "rig": {
+       "clip": 2,
+       "timeMs": 666.3333333333331,
+       "previousClip": null,
+       "previousTimeMs": 0,
+       "fadeElapsedMs": 250,
+       "fadeDurationMs": 250,
+       "yawDeg": 89.90003829411125,
+       "lookYaw": 0,
+       "lookPitch": 0,
+       "suspended": false,
+       "phase": "run"
+      }
+     }
+    },
+    "frame": {
+     "timeMs": 1983,
+     "layout": {
+      "layers": [
+       {
+        "layer": {
+         "kind": "model3d",
+         "id": "rig",
+         "name": "Rig",
+         "assetId": "asset-ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+         "source": {
+          "format": "glb",
+          "clips": [
+           {
+            "name": "Rest / 待機",
+            "duration": 2
+           },
+           {
+            "name": "Stride",
+            "duration": 2
+           },
+           {
+            "name": "Sprint",
+            "duration": 2
+           }
+          ],
+          "bones": [
+           {
+            "node": 2,
+            "name": "Hips"
+           },
+           {
+            "node": 3,
+            "name": "Head"
+           }
+          ],
+          "vertices": 8,
+          "triangles": 12,
+          "textureBytes": 4
+         },
+         "model": {
+          "rotationX": 0,
+          "rotationY": 0,
+          "rotationZ": 0,
+          "clip": 0,
+          "playing": true,
+          "loop": true,
+          "speed": 1,
+          "crossFadeMs": 250,
+          "inPlace": true,
+          "locomotion": {
+           "enabled": true,
+           "idle": 0,
+           "walk": 1,
+           "run": 2,
+           "walkSpeed": 10,
+           "runSpeed": 200,
+           "faceMovement": true,
+           "forwardDeg": 0
+          },
+          "look": {
+           "enabled": false,
+           "bone": null,
+           "yawLimit": 50,
+           "pitchLimit": 30,
+           "lagMs": 160
+          }
+         },
+         "opacity": 1,
+         "visible": true,
+         "locked": false,
+         "zIndex": 0,
+         "placement": {
+          "anchor": {
+           "kind": "viewport"
+          },
+          "x": 0.661533333333332,
+          "y": 0.5,
+          "widthPx": 200,
+          "heightPx": 200,
+          "rotationDeg": 25
+         },
+         "motion": {
+          "kind": "pointer-follow",
+          "enabled": true,
+          "mode": "pursuit",
+          "lagMs": 180,
+          "maxSpeed": 400,
+          "acceleration": 1200,
+          "deceleration": 1600,
+          "stopRadius": 48,
+          "orientToMovement": true,
+          "rotationOffsetDeg": 0
+         }
+        },
+        "frame": {
+         "left": 0,
+         "top": 0,
+         "width": 1000,
+         "height": 800
+        },
+        "bounds": {
+         "left": 528.640728455597,
+         "right": 794.4259382110669,
+         "top": 267.1073951222651,
+         "bottom": 532.8926048777349
+        },
+        "position": {
+         "x": 661.5333333333319,
+         "y": 400
+        },
+        "localPosition": {
+         "x": 661.5333333333319,
+         "y": 400
+        },
+        "visible": true,
+        "locked": false,
+        "effectiveOpacity": 1,
+        "renderable": true
+       },
+       {
+        "layer": {
+         "kind": "image",
+         "id": "petal",
+         "name": "Petal",
+         "assetId": "asset-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+         "opacity": 0.14164000000000007,
+         "visible": true,
+         "locked": false,
+         "zIndex": 1,
+         "placement": {
+          "anchor": {
+           "kind": "viewport"
+          },
+          "x": 0.8171398719041357,
+          "y": 0.45618649587218096,
+          "widthPx": 120,
+          "heightPx": 90,
+          "rotationDeg": 46.847610265
+         },
+         "motion": {
+          "kind": "pointer-follow",
+          "enabled": true,
+          "mode": "smooth",
+          "lagMs": 180,
+          "maxSpeed": 400,
+          "acceleration": 1200,
+          "deceleration": 1600,
+          "stopRadius": 48,
+          "orientToMovement": true,
+          "rotationOffsetDeg": 0
+         }
+        },
+        "frame": {
+         "left": 0,
+         "top": 0,
+         "width": 1000,
+         "height": 800
+        },
+        "bounds": {
+         "left": 743.2742299847265,
+         "right": 891.0055138235449,
+         "top": 290.3996136498223,
+         "bottom": 439.4987797456672
+        },
+        "position": {
+         "x": 817.1398719041357,
+         "y": 364.94919669774475
+        },
+        "localPosition": {
+         "x": 817.1398719041357,
+         "y": 364.94919669774475
+        },
+        "visible": true,
+        "locked": false,
+        "effectiveOpacity": 0.14164000000000007,
+        "renderable": true
+       }
+      ],
+      "groups": [],
+      "roots": [
+       "rig",
+       "petal"
+      ]
+     },
+     "effects": [
+      {
+       "id": "rig",
+       "visible": true
+      },
+      {
+       "id": "petal",
+       "visible": true
+      }
+     ],
+     "machine": {
+      "video": "playing",
+      "events": []
+     },
+     "needsFrame": true,
+     "subscriptions": {
+      "pointer": false,
+      "video": false
+     },
+     "models": [
+      {
+       "clip": 2,
+       "timeMs": 666.3333333333331,
+       "previousClip": null,
+       "previousTimeMs": 0,
+       "fadeElapsedMs": 250,
+       "fadeDurationMs": 250,
+       "yawDeg": 89.90003829411125,
+       "lookYaw": 0,
+       "lookPitch": 0,
+       "suspended": false,
+       "phase": "run",
+       "id": "rig",
+       "blend": 1,
+       "speedPx": 400
+      }
+     ]
+    },
+    "input": {
+     "timeMs": 1983,
+     "deltaMs": 16.333333333333258,
+     "viewport": {
+      "width": 1000,
+      "height": 800
+     },
+     "anchors": {},
+     "signals": {
+      "pointer": {
+       "x": 850,
+       "y": 400
+      },
+      "playing": true,
+      "pointerTimeMs": 1983,
+      "scroll": {
+       "x": 0,
+       "y": 70.82000000000004,
+       "maxX": 0,
+       "maxY": 1000
+      }
+     },
+     "events": [],
+     "environment": {
+      "hidden": false,
+      "reducedMotion": false
+     }
+    }
+   }
+  }
+ ]
+}

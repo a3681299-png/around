@@ -312,6 +312,96 @@ test('reduced motion and native approach return transforms to authored values wi
   expect(JSON.stringify(scene)).toBe(before);
 });
 
+test('G1.2: an approach that holds every root equals the whole-page restriction for rules and follow motion', () => {
+  const { scene, inputs } = worldScenario(8);
+  scene.signalRules = scene.decorations.map((layer) => defaultScrollOpacityRule(layer.id));
+  scene.decorations = scene.decorations.map((layer, i) =>
+    i % 2 ? { ...layer, motion: { ...defaultFollowMotion(), mode: 'direct' as const } } : layer,
+  );
+  const roots = evaluateWorld(scene, initialWorldState(), inputs[0]!).frame.layout.roots;
+  let all = initialWorldState(),
+    whole = initialWorldState();
+  for (const input of inputs.slice(0, 40)) {
+    const signals = { ...input.signals, scroll: { x: 0, y: input.timeMs % 900, maxX: 0, maxY: 1000 } };
+    const a = evaluateWorld(scene, all, {
+      ...input,
+      signals,
+      environment: { ...input.environment, approach: { layers: Object.fromEntries(roots.map((id) => [id, []])) } },
+    });
+    const b = evaluateWorld(scene, whole, {
+      ...input,
+      signals,
+      environment: { ...input.environment, safeInteraction: true },
+    });
+    expect(a.frame.layout).toEqual(b.frame.layout);
+    expect(a.state.motion).toEqual(b.state.motion);
+    all = a.state;
+    whole = b.state;
+  }
+});
+
+test('G1.2: only held roots return their rules to authored values; other layers keep their signal values', () => {
+  const { scene, inputs } = worldScenario(4);
+  scene.groups = [{ ...scene.groups![0]!, children: ['image-0', 'image-1'] }];
+  scene.decorations = scene.decorations.map((layer) => ({ ...layer, visible: true, opacity: 0.75 }));
+  scene.signalRules = [
+    defaultScrollOpacityRule('image-0'),
+    defaultScrollOpacityRule('group-0'),
+    defaultScrollOpacityRule('image-2'),
+    defaultScrollOpacityRule('image-3'),
+  ];
+  const input = {
+    ...inputs[0]!,
+    signals: { ...inputs[0]!.signals, scroll: { x: 0, y: 250, maxX: 0, maxY: 1000 } },
+  };
+  const free = evaluateWorld(scene, initialWorldState(), input).frame.layout;
+  const held = evaluateWorld(scene, initialWorldState(), {
+    ...input,
+    environment: {
+      ...input.environment,
+      approach: { layers: { 'group-0': [{ left: 0, top: 0, width: 10, height: 10 }], 'image-3': [] } },
+    },
+  }).frame.layout;
+  const opacity = (layout: typeof free, id: string) =>
+    [...layout.layers, ...layout.groups].find((entry) => entry.layer.id === id)!.layer.opacity;
+  // The group is held: its own rule and its children's rules return to the authored values.
+  expect(opacity(held, 'group-0')).toBe(scene.groups[0]!.opacity);
+  expect(opacity(held, 'image-0')).toBe(0.75);
+  expect(opacity(held, 'image-3')).toBe(0.75);
+  // A root that is not held keeps exactly the value it has without any approach.
+  expect(opacity(held, 'image-2')).toBe(opacity(free, 'image-2'));
+  expect(opacity(free, 'image-2')).not.toBe(0.75);
+});
+
+test('G1.2: a held follow layer stops where it is; a layer that is not held keeps following', () => {
+  const { scene, inputs } = worldScenario(2);
+  scene.groups = [];
+  scene.decorations = scene.decorations.map((layer) => ({
+    ...layer,
+    visible: true,
+    opacity: 1,
+    motion: { ...defaultFollowMotion(), mode: 'smooth' as const },
+  }));
+  let state = initialWorldState();
+  const at = (n: number, environment: object = {}) => ({
+    ...inputs[0]!,
+    timeMs: n * 16,
+    deltaMs: n ? 16 : 0,
+    signals: { ...inputs[0]!.signals, pointer: { x: 900, y: 600 } },
+    environment: { hidden: false, reducedMotion: false, ...environment },
+  });
+  for (let n = 0; n < 20; n++) state = evaluateWorld(scene, state, at(n)).state;
+  const moved = state.motion!.bodies['image-0']!.offset,
+    other = state.motion!.bodies['image-1']!.offset;
+  expect(Math.hypot(moved.x, moved.y)).toBeGreaterThan(1);
+  const held = evaluateWorld(scene, state, at(20, { approach: { layers: { 'image-0': [] } } })).state.motion!;
+  expect(held.bodies['image-0']!.offset).toEqual(moved);
+  expect(held.bodies['image-0']!.velocity).toEqual({ x: 0, y: 0 });
+  expect(
+    Math.hypot(held.bodies['image-1']!.offset.x - other.x, held.bodies['image-1']!.offset.y - other.y),
+  ).toBeGreaterThan(0);
+});
+
 test('guardPaint reuses per-snapshot envelopes without changing a single issue', () => {
   let seed = 7;
   const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
