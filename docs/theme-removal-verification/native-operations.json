@@ -1,0 +1,37 @@
+{
+  "source": "Playwright assertion and console output excerpts from this verification; cause unresolved",
+  "currentOnEmpty": [
+    { "stage": "seek", "expectedFractionGreaterThan": 0.3, "receivedFraction": 0.028588231189023965 },
+    {
+      "stage": "volume",
+      "seekTime": 75.188731,
+      "duration": 214.941,
+      "volumeBefore": 0.4405548685786286,
+      "volumeAfter": 0.4405548685786286
+    },
+    {
+      "stage": "keyboard-k",
+      "seekTime": 75.188731,
+      "duration": 214.941,
+      "expectedPaused": true,
+      "receivedPaused": false
+    }
+  ],
+  "oldBuild": {
+    "commit": "6ce22ce3ae5f851557ee4fa1f3016cbc65f72a56",
+    "result": "passed",
+    "before": { "seekFraction": 0.3488409051786304, "volume": 0.27754956720453605 },
+    "after": { "seekFraction": 0.3488409051786304, "volume": 0.27754956720453605 }
+  },
+  "currentOffThenAuthoredOn": {
+    "result": "passed",
+    "before": { "seekFraction": 0.3488409051786304, "volume": 0.27754956720453605 },
+    "after": { "seekFraction": 0.3488409051786304, "volume": 0.27754956720453605 },
+    "volumeAudit": {
+      "initialRect": { "x": 120, "y": 431.75, "width": 52, "height": 40 },
+      "quieter": 0.12335536320201601,
+      "mousedown": { "x": 135, "y": 451, "targetClass": "ytp-volume-slider-handle", "rectUnchanged": true },
+      "mouseup": { "x": 153, "y": 451, "targetClass": "ytp-volume-slider-handle", "rectUnchanged": true }
+    }
+  }
+}

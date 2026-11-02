@@ -1,0 +1,10 @@
+{
+  "scenario": {
+    "name": "untouched-empty",
+    "artwork": false,
+    "expected": true
+  },
+  "id": "eicfcakjofagleapfppkfphmblnmfeid",
+  "before": {},
+  "after": {}
+}

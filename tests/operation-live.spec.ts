@@ -45,12 +45,42 @@ async function nativeInputs(page: Page) {
   // YouTube expands the volume panel on hover. Its visible, intermediate box
   // is not yet a usable coordinate for a raw native drag.
   await (await slider.elementHandle())!.waitForElementState('stable');
+  await slider.evaluate((node) => {
+    const records: unknown[] = [];
+    const record = (event: MouseEvent) => {
+      const rect = node.getBoundingClientRect();
+      records.push({
+        type: event.type,
+        x: event.clientX,
+        y: event.clientY,
+        target: (event.target as Element)?.outerHTML.slice(0, 250),
+        slider: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
+      });
+    };
+    document.addEventListener('mousedown', record, true);
+    document.addEventListener('mouseup', record, true);
+    (window as unknown as { operationVolumeAudit: () => unknown[] }).operationVolumeAudit = () => {
+      document.removeEventListener('mousedown', record, true);
+      document.removeEventListener('mouseup', record, true);
+      return records;
+    };
+  });
   const volume = (await slider.boundingBox())!;
   await page.mouse.move(volume.x + volume.width * 0.3, volume.y + volume.height / 2);
   await page.mouse.down();
   const quieter = await video.evaluate((v: HTMLVideoElement) => v.volume);
   await page.mouse.move(volume.x + volume.width * 0.65, volume.y + volume.height / 2, { steps: 6 });
   await page.mouse.up();
+  console.log(
+    'LIVE_VOLUME_INPUT ' +
+      JSON.stringify({
+        box: volume,
+        quieter,
+        events: await page.evaluate(() =>
+          (window as unknown as { operationVolumeAudit: () => unknown[] }).operationVolumeAudit(),
+        ),
+      }),
+  );
   await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.volume)).toBeGreaterThan(quieter);
   await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.volume)).toBeLessThan(1);
   await player.focus();
@@ -98,8 +128,11 @@ test('optional real YouTube operation checks with and without authored paint', a
     await page.goto(url, { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30_000 });
     await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    if (process.env.WW_LIVE_OPERATIONS_OFF === '1')
+      await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
     await page.bringToFront();
     const before = await nativeInputs(page);
+    await popup.getByRole('switch', { name: '作品を表示する' }).check();
     // UI0-d round 3: the editor window (as a tab); the operation checks stay on the YouTube page.
     const { panel: editor } = await openEditor(popup, page);
     await exposeEditorControls(editor);

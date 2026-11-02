@@ -1,0 +1,52 @@
+{
+  "scenario": {
+    "name": "theme-off",
+    "enabled": false,
+    "strength": 37,
+    "artwork": true,
+    "expected": false
+  },
+  "id": "cppaebpfnlmghlgiglljoogedgdjcnje",
+  "before": {
+    "webWorldThemes.design.youtube": {
+      "baseThemeId": "retro",
+      "decorations": [],
+      "id": "upgrade-artwork",
+      "rules": [
+        {
+          "kind": "surface-style",
+          "style": {
+            "backgroundColor": "#ddeeff",
+            "borderRadiusPx": 18
+          },
+          "target": "video-card"
+        }
+      ],
+      "schemaVersion": 13,
+      "siteId": "youtube"
+    },
+    "webWorldThemes.enabled": false,
+    "webWorldThemes.strength": 37
+  },
+  "after": {
+    "webWorldThemes.design.youtube": {
+      "baseThemeId": "retro",
+      "decorations": [],
+      "id": "upgrade-artwork",
+      "rules": [
+        {
+          "kind": "surface-style",
+          "style": {
+            "backgroundColor": "#ddeeff",
+            "borderRadiusPx": 18
+          },
+          "target": "video-card"
+        }
+      ],
+      "schemaVersion": 13,
+      "siteId": "youtube"
+    },
+    "webWorldThemes.enabled": false,
+    "webWorldThemes.strength": 37
+  }
+}
