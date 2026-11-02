@@ -47,8 +47,13 @@ execFileSync(process.execPath, ['scripts/build.mjs'], {
   stdio: 'inherit',
   env: { ...process.env, WW_BUILD_OUT: out, WW_ASSET_PROFILE: '0', WW_WORLD_MODE: 'runtime' },
 });
+// Every instrumentation point must be applied. A file that moved is otherwise skipped silently by
+// its onLoad filter (src/themes/controller.ts became src/host/page-controller.ts in the retro
+// theme's removal, and the guard switch stopped existing without any error).
+const applied = new Set();
 function replaceOnce(text, before, after, label) {
   if (text.split(before).length !== 2) throw new Error('Unexpected G1 instrumentation point: ' + label);
+  applied.add(label);
   return text.replace(before, after);
 }
 const prefix = `
@@ -138,7 +143,7 @@ await build({
             loader: 'ts',
           };
         });
-        builder.onLoad({ filter: /src[\\/]themes[\\/]controller\.ts$/ }, async ({ path: file }) => {
+        builder.onLoad({ filter: /src[\\/]host[\\/]page-controller\.ts$/ }, async ({ path: file }) => {
           let text = await readFile(file, 'utf8');
           text = replaceOnce(
             text,
@@ -175,6 +180,15 @@ await build({
     },
   ],
 });
+const missing = [
+  'controller access',
+  'comparison switch',
+  'full renderer redraw',
+  'recapture start',
+  'recapture end',
+  ...(process.env.G11_DIAG_PAGE === '1' ? ['empty page paint diagnostic'] : []),
+].filter((label) => !applied.has(label));
+if (missing.length) throw new Error('G1 instrumentation not applied: ' + missing.join(', '));
 const manifest = JSON.parse(await readFile('manifest.json', 'utf8'));
 const builtManifest = JSON.parse(await readFile(path.join(out, 'manifest.json'), 'utf8'));
 if (JSON.stringify(manifest) !== JSON.stringify(builtManifest)) throw new Error('Manifest changed');

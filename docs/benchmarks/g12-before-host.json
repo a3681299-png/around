@@ -1,0 +1,125 @@
+{
+  "stage": "G1.2 before the Host change",
+  "harness": "scripts/g11/run.mjs (popup flow and guard switch fixed; scroll mode added)",
+  "code": "0aa2737 (+ WW_GUARD_TRACE-only lines, dropped from this build)",
+  "browser": "Playwright Chromium (.work/browsers), headless, 1920x1080",
+  "url": "https://www.youtube.com/watch?v=M7lc1UVf-VE",
+  "date": "2026-11-02",
+  "unit": "extension CPU ms per frame",
+  "modes": {
+    "scroll": [
+      {
+        "pair": 0,
+        "guarded": false,
+        "frames": 899,
+        "median": 1.1000000000931323,
+        "p95": 2.2999999998137355,
+        "max": 4.599999999627471,
+        "rafP95": 13.799999999999272
+      },
+      {
+        "pair": 0,
+        "guarded": true,
+        "frames": 909,
+        "median": 1.3000000002793968,
+        "p95": 2.6999999997206032,
+        "max": 25.100000000093132,
+        "rafP95": 13.899999999999636
+      },
+      {
+        "pair": 1,
+        "guarded": true,
+        "frames": 913,
+        "median": 1.1999999997206032,
+        "p95": 2.1000000000931323,
+        "max": 16.200000000186265,
+        "rafP95": 13.699999999998909
+      },
+      {
+        "pair": 1,
+        "guarded": false,
+        "frames": 935,
+        "median": 1,
+        "p95": 1.7999999998137355,
+        "max": 4.2000000001862645,
+        "rafP95": 7.5
+      }
+    ],
+    "startup": [
+      {
+        "pair": 0,
+        "guarded": false,
+        "frames": 676,
+        "median": 1.3000000002793968,
+        "p95": 2.2000000001862645,
+        "max": 22.899999999906868,
+        "rafP95": 7.400000000000546
+      },
+      {
+        "pair": 0,
+        "guarded": true,
+        "frames": 666,
+        "median": 1.3999999999068677,
+        "p95": 2.6000000000931323,
+        "max": 21.699999999720603,
+        "rafP95": 13.900000000000091
+      },
+      {
+        "pair": 1,
+        "guarded": true,
+        "frames": 680,
+        "median": 1.2000000001862645,
+        "p95": 2.5,
+        "max": 18.90000000037253,
+        "rafP95": 13.799999999999727
+      },
+      {
+        "pair": 1,
+        "guarded": false,
+        "frames": 692,
+        "median": 1.2000000001862645,
+        "p95": 2.1000000005587935,
+        "max": 17.50000000046566,
+        "rafP95": 7.699999999999818
+      }
+    ],
+    "spa": [
+      {
+        "pair": 0,
+        "guarded": false,
+        "frames": 666,
+        "median": 1,
+        "p95": 2,
+        "max": 18.600000000093132,
+        "rafP95": 13.799999999999272
+      },
+      {
+        "pair": 0,
+        "guarded": true,
+        "frames": 689,
+        "median": 1.2999999998137355,
+        "p95": 2.7999999998137355,
+        "max": 18.100000000093132,
+        "rafP95": 13.399999999999636
+      },
+      {
+        "pair": 1,
+        "guarded": true,
+        "frames": 674,
+        "median": 1.1000000000931323,
+        "p95": 2.7000000001862645,
+        "max": 24.09999999962747,
+        "rafP95": 13.899999999999636
+      },
+      {
+        "pair": 1,
+        "guarded": false,
+        "frames": 708,
+        "median": 1.1000000000931323,
+        "p95": 2.1000000000931323,
+        "max": 14.999999999534339,
+        "rafP95": 7.5
+      }
+    ]
+  }
+}

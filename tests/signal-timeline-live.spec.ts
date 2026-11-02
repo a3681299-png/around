@@ -45,7 +45,7 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
     await page.bringToFront();
     await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
     stage('open Studio');
-    const pointer = await openSidePanelFromIcon(popup, page);
+    await openSidePanelFromIcon(popup, page);
     const local = page.locator('#web-world-themes-creator');
     stage('side panel');
     const panel = await sidePanelDriver(context, page, id),
@@ -93,9 +93,23 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
     const media = page.locator(
       ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) .media',
     );
-    // G1.2 (D9): where the pointer rests against the GIF, and which native controls pass under it.
+    // G1.2 (D9): the pointer rests where the page's links scroll under it, as a person's does while
+    // scrolling with the wheel: the left edge of the column below the player (descriptions, comment
+    // avatars and links), clear of the GIF. Only a layer over the approached link may yield there;
+    // the GIF keeps following the scroll. The record shows which controls passed under the pointer.
+    const gif = (await media.first().boundingBox())!;
+    const pointer = await page.evaluate((gif) => {
+      const below = document.querySelector('ytd-watch-flexy #below')!.getBoundingClientRect(),
+        x = below.left + 20,
+        clear = (y: number) =>
+          x < gif.x - 40 || x > gif.x + gif.width + 40 || y < gif.y - 40 || y > gif.y + gif.height + 40;
+      const y = [innerHeight / 2, innerHeight * 0.75, innerHeight * 0.25].find(clear);
+      if (y === undefined) throw new Error(`No point clear of the GIF at x=${x}: ${JSON.stringify(gif)}`);
+      return { x, y };
+    }, gif);
+    await page.mouse.move(pointer.x, pointer.y, { steps: 4 });
     const under: unknown[] = [];
-    report.checks['pointer'] = { point: pointer, gif: await media.first().boundingBox(), under };
+    report.checks['pointer'] = { point: pointer, gif, under };
     const verifyScroll = async (progress: number) => {
       await page.evaluate((value) => {
         const root = document.scrollingElement!;
@@ -153,6 +167,8 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
                 host.getAttribute('data-ww-safety'),
               ]),
               active: document.activeElement?.tagName,
+              // Only a WW_GUARD_TRACE build writes this: why the approach rule turned on or off.
+              approach: JSON.parse(document.documentElement.getAttribute('data-ww-guard-approach') ?? 'null'),
             };
           }, pointer);
           throw error;

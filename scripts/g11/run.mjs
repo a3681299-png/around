@@ -5,10 +5,13 @@ import { execFile } from 'node:child_process';
 import { workPath, extensionPath, browserPath, createProfile, revision } from './environment.mjs';
 
 const mode = process.argv[2];
-if (!['startup', 'spa', 'steady', 'minute', 'areas', 'smoke'].includes(mode))
-  throw new Error('Usage: node scripts/g11/run.mjs startup|spa|steady|minute|areas|smoke');
+if (!['startup', 'spa', 'steady', 'scroll', 'minute', 'areas', 'smoke'].includes(mode))
+  throw new Error('Usage: node scripts/g11/run.mjs startup|spa|steady|scroll|minute|areas|smoke');
 // spa: settle on the video, start recording, then follow a related-video link in the same document.
 const spa = mode === 'spa';
+// scroll (G1.2): every layer fades with the page scroll; the pointer rests where the page's links
+// scroll under it (the left edge of the column below the player) while the wheel scrolls down and up.
+const scroll = mode === 'scroll';
 process.env.G11_STARTUP = mode === 'startup' ? '1' : '0';
 process.env.G11_FRAMES_ONLY = mode === 'minute' ? '0' : '1';
 process.env.G11_PERF_ONLY = mode === 'areas' ? '0' : '1';
@@ -311,17 +314,31 @@ try {
       await selectContext();
     }
     if (process.env.G11_REUSE_SCENE !== '1') {
-      await popup.locator('#creator-editor-open').evaluate((b) => b.click());
-      const editor = page.locator('#web-world-themes-creator');
+      // From UI0-d the editor is the extension's editor page connected to this tab, as in
+      // tests/helpers/editor.ts (openEditor); the popup no longer opens an in-page editor.
+      await page.bringToFront();
+      const tab = await popup.evaluate(
+        async () => (await chrome.tabs.query({ active: true, currentWindow: true }))[0]?.id,
+      );
+      if (tab === undefined) throw new Error('No active YouTube tab to edit.');
+      const studio = await context.newPage();
+      await studio.setViewportSize({ width: 1440, height: 900 });
+      await studio.goto(`chrome-extension://${id}/studio/index.html?target=${tab}`);
+      await studio.locator('.connection-status[data-connected="true"]').waitFor();
+      const editor = studio.getByRole('dialog', { name: 'デザインエディター' });
+      await editor.waitFor();
+      await page.bringToFront();
       const split = editor.locator('.split');
-      if ((await split.getAttribute('aria-pressed')) !== 'true') await split.click();
-      await editor.getByRole('tab', { name: 'レイヤー', exact: true }).click();
+      if ((await split.isVisible()) && (await split.getAttribute('aria-pressed')) !== 'true') await split.click();
+      const layersTab = editor.getByRole('tab', { name: 'レイヤー', exact: true });
+      if (await layersTab.isVisible()) await layersTab.click();
       const guide = editor.getByRole('button', { name: '操作ガイドを閉じる', exact: true });
       if (await guide.isVisible()) await guide.click();
       await editor.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
       await editor.locator('.save').click();
       await editor.locator('.dirty').filter({ hasText: '保存済み' }).waitFor();
       await editor.getByRole('button', { name: '編集を終了', exact: true }).click();
+      await studio.close();
       const imported = await popup.evaluate(
         async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
       );
@@ -357,6 +374,24 @@ try {
           locked: false,
           children: [`g11-layer-${2 * i}`, `g11-layer-${2 * i + 1}`],
         })),
+        // The same rule the editor's scroll preset makes (src/signals/keyframes.ts, defaultScrollOpacityRule).
+        ...(scroll
+          ? {
+              signalRules: Array.from({ length: 32 }, (_, i) => ({
+                id: `scroll-g11-layer-${i}`,
+                enabled: true,
+                source: { signal: 'page.scroll.progress', axis: 'y', space: 'page', inputRange: [0, 1] },
+                target: { layerId: `g11-layer-${i}`, property: 'opacity' },
+                keyframes: [
+                  { id: 'key-start', input: 0, value: 0, easing: 'linear' },
+                  { id: 'key-middle', input: 0.5, value: 1, easing: 'linear' },
+                  { id: 'key-end', input: 1, value: 0, easing: 'linear' },
+                ],
+                evaluation: { mode: 'follow', smoothing: { kind: 'none' } },
+                blend: { mode: 'replace', priority: 0 },
+              })),
+            }
+          : {}),
       };
       await popup.evaluate(
         async (design) => chrome.storage.local.set({ 'webWorldThemes.design.youtube': design }),
@@ -535,7 +570,18 @@ try {
           });
           if (!navigation.to) throw new Error('No related video link for the SPA block.');
         }
-        await page.waitForTimeout(6000);
+        if (scroll) {
+          const point = await page.evaluate(() => {
+            const below = document.querySelector('ytd-watch-flexy #below').getBoundingClientRect();
+            return { x: below.left + 20, y: innerHeight / 2 };
+          });
+          await page.mouse.move(point.x, point.y, { steps: 4 });
+          // 6s, as the other blocks: 30 wheel steps down, then 30 back up.
+          for (let i = 0; i < 60; i++) {
+            await page.mouse.wheel(0, i < 30 ? 90 : -90);
+            await page.waitForTimeout(100);
+          }
+        } else await page.waitForTimeout(6000);
         const data = await evaluate('__g11Probe.end()');
         if (profiling) {
           const { profile } = await session.send('Profiler.stop');

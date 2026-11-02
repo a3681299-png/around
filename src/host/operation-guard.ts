@@ -8,6 +8,7 @@ import {
   type SafetyIssue,
 } from '../world/operations';
 import type { OperationSource } from './operation-source';
+import { traceApproach } from './guard-trace';
 import type { Point } from '../world/geometry';
 
 export interface SafetyStatus {
@@ -245,6 +246,7 @@ export function createOperationGuardHost(
   ];
   const activity = (event: Event) => {
     if (event.type === 'visibilitychange' || event.type === 'blur') {
+      WW_GUARD_TRACE: traceApproach(doc, 'forget', { value: interacting, event });
       lastActivity = view.performance.now();
       before = point = undefined;
       interacting = false;
@@ -257,6 +259,7 @@ export function createOperationGuardHost(
     if (owned) {
       // Authoring UI owns its input region. Native hit/paint protection remains
       // enforced, while Timeline/numeric previews can show their authored values.
+      WW_GUARD_TRACE: if (interacting || point) traceApproach(doc, 'forget', { value: interacting, event });
       before = point = undefined;
       interacting = false;
       proximity = { safe: false, clearSince: null };
@@ -266,13 +269,17 @@ export function createOperationGuardHost(
       before = point;
       point = { x: event.clientX, y: event.clientY };
     }
-    if (event.type === 'pointerdown' || event.type === 'keydown') interacting = true;
+    if (event.type === 'pointerdown' || event.type === 'keydown') {
+      WW_GUARD_TRACE: if (!interacting) traceApproach(doc, 'interacting', { value: true, event });
+      interacting = true;
+    }
     if (
       event.type === 'pointerup' ||
       event.type === 'pointercancel' ||
       event.type === 'keyup' ||
       event.type === 'blur'
     ) {
+      WW_GUARD_TRACE: if (interacting) traceApproach(doc, 'interacting', { value: false, event });
       interacting = false;
     }
     if (!owned && (event.type === 'keydown' || event.type === 'pointerdown' || event.type === 'focusin')) {
@@ -291,6 +298,14 @@ export function createOperationGuardHost(
       interacting,
     });
     const changed = next.safe !== proximity.safe;
+    WW_GUARD_TRACE: if (changed)
+      traceApproach(doc, 'approach', {
+        value: next.safe,
+        event,
+        ...(point ? { point } : {}),
+        interacting,
+        surfaces: source.capture().surfaces,
+      });
     proximity = next;
     // Consume this path once. A following frame can then test the stationary
     // endpoint and start its clear hysteresis without another pointer event.
@@ -402,12 +417,20 @@ export function createOperationGuardHost(
         stopped = '';
         issues = [];
       }
-      proximity = stepProximity(proximity, surfaces, {
+      const next = stepProximity(proximity, surfaces, {
         timeMs: time,
         ...(point ? { point } : {}),
         ...(before ? { previousPoint: before } : {}),
         interacting,
       });
+      WW_GUARD_TRACE: if (next.safe !== proximity.safe)
+        traceApproach(doc, 'approach', {
+          value: next.safe,
+          ...(point ? { point } : {}),
+          interacting,
+          surfaces: surfaces.surfaces,
+        });
+      proximity = next;
       before = point;
       publish();
       if (stopped && failures < 3 && timer === undefined)

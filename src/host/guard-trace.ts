@@ -37,6 +37,64 @@ export function traceMissedInput(
   );
 }
 
+/** Changes of the approach rule and of the input state it reads, newest last. Kept on the root
+ * element as data-ww-guard-approach as well, so a live test can read it from the page. */
+const approachLog: unknown[] = [];
+export function traceApproach(
+  doc: Document,
+  change: 'approach' | 'interacting' | 'forget',
+  record: {
+    value: boolean;
+    event?: Event;
+    point?: { x: number; y: number };
+    interacting?: boolean;
+    surfaces?: readonly import('../world/operations').OperationSurface[];
+  },
+) {
+  const near = (record.surfaces ?? []).filter(
+    (s) =>
+      s.availability.visible &&
+      s.policy.occlusion !== 'allow' &&
+      record.point &&
+      Math.max(
+        s.shape.left - record.point.x,
+        record.point.x - (s.shape.left + s.shape.width),
+        s.shape.top - record.point.y,
+        record.point.y - (s.shape.top + s.shape.height),
+      ) <= 72,
+  );
+  const ids = (test: (s: import('../world/operations').OperationSurface) => boolean) =>
+    (record.surfaces ?? []).filter(test).map((s) => s.id);
+  const entry = {
+    at: Math.round(doc.defaultView!.performance.now()),
+    change,
+    value: record.value,
+    ...(record.event
+      ? {
+          event: record.event.type,
+          ...(record.event instanceof KeyboardEvent ? { key: record.event.key } : {}),
+          target: describe(record.event.target instanceof Element ? record.event.target : null)?.element ?? null,
+        }
+      : {}),
+    ...(change === 'approach'
+      ? {
+          point: record.point ?? null,
+          interacting: record.interacting,
+          focused: ids((s) => s.availability.focused && s.policy.occlusion !== 'allow'),
+          dragging: ids((s) => s.availability.dragging),
+          captured: ids((s) => s.availability.captured),
+          nearPoint: near.slice(0, 6).map((s) => ({ id: s.id, shape: s.shape })),
+          active: describe(doc.activeElement)?.element ?? null,
+          hasFocus: doc.hasFocus(),
+        }
+      : {}),
+  };
+  approachLog.push(entry);
+  if (approachLog.length > 40) approachLog.shift();
+  doc.documentElement.setAttribute('data-ww-guard-approach', JSON.stringify(approachLog));
+  console.info('[Web World Themes G1] 接近の判定', JSON.stringify(entry));
+}
+
 export function traceMovedInput(event: Event | undefined, held: number, now: number) {
   console.info(
     '[Web World Themes G1] 入力の直前に操作部品が動きました',
