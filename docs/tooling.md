@@ -91,7 +91,9 @@ Signal Timelineの性能比較テストは、整形済みのJavaScriptを基準�
 - claude-mem 9.0.2 には、これを止める設定がない。書き込みの処理（`worker-service.cjs`）が飛ばすのは、`.git` があるフォルダ（リポジトリの直下）だけ
 - `.gitignore` に、直下以外の `CLAUDE.md` を足した（直下の `CLAUDE.md` は `@AGENTS.md` のまま追跡する）。G1.2 の1回目でうっかりコミットした `tests/fixtures/takes/CLAUDE.md` は、追跡だけ外した
 - `scripts/install-skills.mjs` は、スキルのフォルダの `CLAUDE.md` を写さず、比べもしない（claude-mem が `agent-skills/wwt-perf/` にも書き、入れた先へ写っていた）
-- `.gitignore` はコミットを防ぐだけで、Claude Code が読むのは止めない。止めるには、Claude Code の設定 `claudeMdExcludes`（読まない `CLAUDE.md` の glob）が使える。まだ入れていない（設定を変えるかは翔太が決める）
+- `.gitignore` はコミットを防ぐだけで、Claude Code が読むのは止めない。そこで、Claude Code の設定 `claudeMdExcludes`（読まない `CLAUDE.md` の glob。絶対パスで照合）を、作業ツリーの `.claude/settings.local.json` に入れた（2026-11-03、翔太の決定）。値は `["**/web-world-themes/.work/creator-editor/*/**/CLAUDE.md"]`。直下の `CLAUDE.md`（`@AGENTS.md`）は外れない。このファイルはコミットしない（`.git/info/exclude` に足した。作業ツリーごとの設定なので、別の作業ツリーでは入れ直す）
+- 確かめたこと：`src/zz-canary/CLAUDE.md`（目印の語を書いた一時のファイル）を置き、新しいセッション（`claude -p`）に `src/host/operation-guard.ts` と同じフォルダのファイルを読ませた。設定の前は目印の語が届いた。設定の後は、受け取ったのがグローバルの `CLAUDE.md`・作業ツリー直下の `CLAUDE.md`・`AGENTS.md` の3つだけで、`src/host/CLAUDE.md` と目印の語は届かなかった。目印のフォルダは消した
+- 設定が効くのは、設定を入れた後に始めたセッションだけ。すでに動いているセッションは、フォルダの `CLAUDE.md` を読み続ける
 
 ### そのほか
 
