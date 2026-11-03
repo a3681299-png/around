@@ -1,0 +1,185 @@
+======== cpu-current.cpuprofile (docs/benchmarks/g12-verification)
+extension stacks total (incl. native under ext): 1563.6 ms
+
+# inclusive per function
+   1543.8  (anon)
+   1337.1  paint
+    560.3  sample
+    501.2  capture
+    482.1  applyLayout
+    207.3  above
+    204.0  rank2
+    197.0  draw
+    159.5  fixedContainingBlock
+    117.8  reconcile
+    117.8  update
+    102.8  overlaySlot
+    102.8  verifiedOverlaySlot
+     82.1  evaluatePreparedWorld
+     68.8  commit
+     59.3  syncSources
+     56.9  step
+     54.4  scrolls
+     52.9  fixedAncestor
+     52.5  sampleScroll
+     46.3  evaluateTransforms
+     46.0  stepApproach
+     43.2  configure
+     33.0  style
+     29.8  scrollBox
+
+# outermost extension entry
+   1542.2  (anon):8
+     19.8  pump:114
+      1.6  (anon):54094
+
+# applyLayout inclusive by callers
+    426.8  anon:54524 < anon:53370 < paint < anon:53121 < anon:8
+     42.8  anon:54524 < anon:53370 < paint < reconcile < update
+     12.4  draw < anon:54336 < anon:8
+
+# fixedContainingBlock inclusive by callers
+     49.3  overlaySlot < verifiedOverlaySlot < anon:54524 < anon:53370 < paint
+     38.7  rank2 < rank2 < rank2 < rank2 < rank2
+     23.0  rank2 < rank2 < rank2 < above < anon:4318
+     18.7  overlaySlot < verifiedOverlaySlot < draw < anon:54336 < anon:8
+     10.9  rank2 < rank2 < above < anon:4318 < anon:4317
+     10.7  rank2 < above < anon:4318 < anon:4317 < anon:4280
+
+# rank2 inclusive by callers
+     50.3  rank2 < rank2 < rank2 < rank2 < rank2
+     43.6  rank2 < rank2 < above < anon:4318 < anon:4317
+     31.6  rank2 < above < anon:4318 < anon:4317 < anon:4280
+     29.0  above < anon:4318 < anon:4317 < anon:4280 < capture
+     26.3  rank2 < rank2 < rank2 < rank2 < above
+     21.6  rank2 < rank2 < rank2 < above < anon:4318
+
+# capture inclusive by callers
+    450.0  sample < paint < anon:53121 < anon:8
+     22.1  activity < anon:8
+     21.2  applyLayout < anon:54524 < anon:53370 < paint < anon:53121
+      4.6  validate < commit < applyLayout < anon:54524 < anon:53370
+      2.7  paint < anon:53121 < anon:8
+      0.6  paint < reconcile < update < update < draw
+
+# commit inclusive by callers
+     57.4  applyLayout < anon:54524 < anon:53370 < paint < anon:53121
+     11.4  applyLayout < anon:54524 < anon:53370 < paint < reconcile
+
+# guardPaint inclusive by callers
+     20.6  commit < applyLayout < anon:54524 < anon:53370 < paint
+
+# protectionClip inclusive by callers
+      6.6  applyLayout < anon:54524 < anon:53370 < paint < anon:53121
+
+# stepApproach inclusive by callers
+     33.0  step < sample < paint < anon:53121 < anon:8
+     11.4  step < commit < applyLayout < anon:54524 < anon:53370
+      1.6  step < sample < draw < anon:54336 < anon:8
+
+# sample inclusive by callers
+    545.0  paint < anon:53121 < anon:8
+     10.9  draw < anon:54336 < anon:8
+      4.4  paint < reconcile < update < update < draw
+
+# draw inclusive by callers
+    197.0  anon:54336 < anon:8
+======== cpu-before.cpuprofile (docs/benchmarks/g12-verification)
+extension stacks total (incl. native under ext): 774.4 ms
+
+# inclusive per function
+    764.4  (anon)
+    593.1  draw
+    464.1  capture
+    437.3  sample
+    186.7  above
+    158.0  paint
+    110.3  update
+    107.3  reconcile
+     94.7  fixedContainingBlock
+     87.6  applyLayout
+     60.0  rank2
+     56.3  activity
+     51.7  fixedAncestor
+     51.7  scrolls
+     40.9  style
+     40.8  scrollBox
+     30.2  handle
+     26.3  nearestScroller
+     25.1  overlaySlot
+     24.7  commit
+     23.3  relevant
+     22.0  verifiedOverlaySlot
+     18.9  syncSources
+     17.5  sampleScroll
+     14.5  stickyAncestor
+
+# outermost extension entry
+    764.4  (anon):8
+     10.0  pump:114
+
+# applyLayout inclusive by callers
+     50.7  anon:54398 < anon:53358 < paint < reconcile < update
+     18.5  draw < anon:54210 < anon:8
+     18.4  anon:54398 < anon:53358 < paint < anon:53109 < anon:8
+
+# fixedContainingBlock inclusive by callers
+     53.4  above < anon:4316 < anon:4315 < anon:4278 < capture
+      9.9  rank2 < rank2 < rank2 < rank2 < rank2
+      8.9  overlaySlot < verifiedOverlaySlot < draw < anon:54210 < anon:8
+      8.0  rank2 < above < anon:4316 < anon:4315 < anon:4278
+      5.1  rank2 < rank2 < above < anon:4316 < anon:4315
+      3.4  rank2 < rank2 < rank2 < above < anon:4316
+
+# rank2 inclusive by callers
+     23.6  rank2 < rank2 < rank2 < rank2 < rank2
+     14.2  above < anon:4316 < anon:4315 < anon:4278 < capture
+      9.6  rank2 < rank2 < above < anon:4316 < anon:4315
+      6.6  rank2 < above < anon:4316 < anon:4315 < anon:4278
+      3.0  rank2 < rank2 < rank2 < rank2 < above
+      2.9  rank2 < rank2 < rank2 < above < anon:4316
+
+# capture inclusive by callers
+    377.4  sample < draw < anon:54210 < anon:8
+     50.1  activity < anon:8
+     34.2  sample < paint < anon:53109 < anon:8
+      1.5  validate < commit < applyLayout < anon:54398 < anon:53358
+      0.9  paint < anon:53109 < anon:8
+      0.0  paint < reconcile < update < update < draw
+
+# commit inclusive by callers
+     20.5  applyLayout < anon:54398 < anon:53358 < paint < reconcile
+      4.1  applyLayout < anon:54398 < anon:53358 < paint < anon:53109
+
+# guardPaint inclusive by callers
+     10.4  commit < applyLayout < anon:54398 < anon:53358 < paint
+
+# protectionClip inclusive by callers
+      1.6  applyLayout < anon:54398 < anon:53358 < paint < reconcile
+      0.3  applyLayout < anon:54398 < anon:53358 < paint < anon:53109
+
+# sample inclusive by callers
+    390.9  draw < anon:54210 < anon:8
+     37.4  paint < anon:53109 < anon:8
+      9.0  paint < reconcile < update < update < draw
+
+# draw inclusive by callers
+    593.1  anon:54210 < anon:8
+
+======== applyLayout lines (current; bundle .work/g12v-perf/content/index.js @67ad03d)
+applyLayout: 190 ticks ≈ 349.3 ms
+   88.2 ms  L53960  Object.assign(entry.node.style, size, {
+   73.5 ms  L53965  Object.assign(entry.controls.style, size, {
+   62.5 ms  L54094  const id2 = entry.controls.dataset.frameId, parentId = layout.layers.find((l) => l.layer.id === id2)?.parentId
+   25.7 ms  L54151  const record5 = JSON.stringify({ stopped: safety.snapshot().stopped, issues: safety.snapshot().issues });
+   12.9 ms  L54160  if (entry.node.style.visibility !== (stopped ? "hidden" : ""))
+   12.9 ms  L53961  left: `${local.x}px`,
+    9.2 ms  L54118  const blocked = safety.commit(
+    7.4 ms  L54166  if (stopped) entry.controls.hidden = true;
+    5.5 ms  L54164  if (entry.node.style.pointerEvents !== (stopped ? "none" : ""))
+    5.5 ms  L53972  const roots = new Map([...layout.groups, ...layout.layers].map((entry) => [entry.layer.id, entry]));
+    5.5 ms  L54083  if (container.children[index3] !== node) container.insertBefore(node, container.children[index3] ?? null);
+    5.5 ms  L53955  const entry = nodes.get(layer.layer.id);
+    3.7 ms  L54152  if (record5 !== writtenSafety || host.dataset.wwSafety !== record5) {
+    3.7 ms  L54119  layout.layers.filter((l) => l.layer.visible && (!l.frame || l.visible)).map((layer) => {
+    3.7 ms  L54157  const entry = nodes.get(layer.layer.id);
