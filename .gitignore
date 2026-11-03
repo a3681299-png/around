@@ -14,3 +14,9 @@ Desktop.ini
 
 # Private test avatar: redistribution permission has not been confirmed.
 PochibyKT_Pochi*
+
+# claude-mem writes a CLAUDE.md of notes into every folder it sees. Claude Code reads those as
+# instructions next to AGENTS.md, and Codex does not, so only the root CLAUDE.md (@AGENTS.md)
+# belongs to the repository.
+CLAUDE.md
+!/CLAUDE.md

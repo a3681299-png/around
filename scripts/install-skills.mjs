@@ -5,7 +5,7 @@
 // Only the folders named in agent-skills/ are replaced; other installed skills are left untouched.
 import { cp, mkdir, readdir, readFile, rm } from 'node:fs/promises';
 import { homedir } from 'node:os';
-import { join, relative } from 'node:path';
+import { basename, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -14,6 +14,9 @@ const destinations = [
   { tool: 'Claude Code', directory: join(homedir(), '.claude/skills') },
   { tool: 'Codex', directory: join(homedir(), '.agents/skills') },
 ];
+
+/** claude-mem writes a CLAUDE.md of notes into folders it sees; it is not part of a skill. */
+const copied = (file) => basename(file) !== 'CLAUDE.md';
 
 async function files(directory) {
   const found = new Map();
@@ -27,6 +30,7 @@ async function files(directory) {
     }
     for (const entry of entries) {
       const file = join(at, entry.name);
+      if (!copied(file)) continue;
       if (entry.isDirectory()) await walk(file);
       // Compare text with normalized line endings so a CRLF checkout matches its own copy.
       else
@@ -89,7 +93,7 @@ if (/install-skills\.mjs$/.test(process.argv[1] ?? '')) {
       await mkdir(directory, { recursive: true });
       for (const name of await names()) {
         await rm(join(directory, name), { recursive: true, force: true });
-        await cp(join(skillSource, name), join(directory, name), { recursive: true });
+        await cp(join(skillSource, name), join(directory, name), { recursive: true, filter: copied });
       }
       console.log(`${tool}: ${directory}`);
     }
