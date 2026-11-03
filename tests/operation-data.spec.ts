@@ -18,6 +18,7 @@ import {
   type OperationSurface,
   type PaintFootprint,
 } from '../src/world/operations';
+import type { Point } from '../src/world/geometry';
 import { SIGNAL_REGISTRY } from '../src/signals/registry';
 import { parseEditCommand } from '../src/studio/protocol';
 import { parseDesign, emptyDesign } from '../src/design/schema';
@@ -385,6 +386,76 @@ test('G1.2 (D11): near one end of a long control, only layers near the pointer a
     paints,
   );
   expect(heldRoots(state)).toEqual(['edge', 'far-end', 'near-end']);
+});
+test('G1.2: the banded candidate index finds exactly the controls a full scan finds', () => {
+  let seed = 12;
+  const random = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+  // Every visible, uncoverable control whose approach box the path passes within the margin.
+  const reference = (snap: OperationSnapshot, from: Point, to: Point, near: ReadonlySet<string>) =>
+    snap.surfaces
+      .filter((s) => s.availability.visible && s.policy.occlusion !== 'allow')
+      .filter((s) => {
+        const r = approachRectOf(s),
+          m = near.has(s.id) ? 72 : 40;
+        if (r.width <= 0 || r.height <= 0) return false;
+        let low = 0,
+          high = 1;
+        for (const [a, d, min, max] of [
+          [from.x, to.x - from.x, r.left - m, r.left + r.width + m],
+          [from.y, to.y - from.y, r.top - m, r.top + r.height + m],
+        ] as const) {
+          if (d === 0) {
+            if (a < min || a > max) return false;
+          } else {
+            const s1 = (min - a) / d,
+              s2 = (max - a) / d;
+            low = Math.max(low, Math.min(s1, s2));
+            high = Math.min(high, Math.max(s1, s2));
+            if (low > high) return false;
+          }
+        }
+        return true;
+      })
+      .map((s) => s.id)
+      .sort();
+  for (let run = 0; run < 300; run++) {
+    const surfaces = Array.from({ length: 1 + Math.floor(random() * 60) }, (_, i) => {
+      const left = random() * 2000 - 200,
+        top = random() * 12000 - 4000,
+        width = random() < 0.1 ? 3000 : 4 + random() * 400,
+        height = random() < 0.1 ? 9000 : 4 + random() * 200;
+      return surface({
+        id: `c${i}`,
+        shape: { left, top, width, height },
+        protectedEnvelope: { left: left - 4, top: top - 4, width: width + 8, height: height + 8 },
+        availability: { ...surface().availability, visible: random() > 0.2 },
+        ...(random() < 0.1
+          ? {
+              policy: { transform: 'fixed-plane' as const, occlusion: 'allow' as const, input: 'native-only' as const },
+            }
+          : {}),
+      });
+    });
+    const snap = snapshot(surfaces),
+      from = { x: random() * 1800, y: random() * 1000 },
+      to = random() < 0.5 ? from : { x: random() * 1800, y: random() * 1000 };
+    const first = stepApproach(
+      initialApproach(),
+      snap,
+      { timeMs: 0, keyed: false, previousPoint: from, point: to },
+      [],
+    );
+    expect([...first.near.keys()].sort(), `run ${run}`).toEqual(reference(snap, from, to, new Set()));
+    // The staying margin for controls already near.
+    const second = stepApproach(first, snap, { timeMs: 1, keyed: false, point: to }, []);
+    expect(
+      [...second.near.entries()]
+        .filter(([, entry]) => entry.clearSince === null)
+        .map(([id]) => id)
+        .sort(),
+      `run ${run}`,
+    ).toEqual(reference(snap, to, to, new Set(first.near.keys())));
+  }
 });
 test('G1.2: an approach without a pointer holds the layers over its control (D2)', () => {
   const player = { left: 16, top: 145, width: 1050, height: 590 };

@@ -395,21 +395,32 @@ export interface ProximityState {
 }
 export const initialProximity = (): ProximityState => ({ safe: true, clearSince: null });
 function segmentHits(a: Point, b: Point, rect: PlacementFrame, margin: number) {
+  return pathNear(a, b, rect.left, rect.top, rect.left + rect.width, rect.top + rect.height, margin);
+}
+/** Whether the path from a to b passes within margin of the box. Allocation free: it runs for
+ * every candidate (several hundred on YouTube) on every input and two or three times a frame. */
+function pathNear(a: Point, b: Point, left: number, top: number, right: number, bottom: number, margin: number) {
   let low = 0,
     high = 1;
-  for (const [start, delta, min, max] of [
-    [a.x, b.x - a.x, rect.left - margin, rect.left + rect.width + margin],
-    [a.y, b.y - a.y, rect.top - margin, rect.top + rect.height + margin],
-  ]) {
-    if (delta === 0) {
-      if (start! < min! || start! > max!) return false;
-    } else {
-      const x = (min! - start!) / delta!,
-        y = (max! - start!) / delta!;
-      low = Math.max(low, Math.min(x, y));
-      high = Math.min(high, Math.max(x, y));
-      if (low > high) return false;
-    }
+  const dx = b.x - a.x,
+    dy = b.y - a.y;
+  if (dx === 0) {
+    if (a.x < left - margin || a.x > right + margin) return false;
+  } else {
+    const s = (left - margin - a.x) / dx,
+      t = (right + margin - a.x) / dx;
+    low = Math.max(low, Math.min(s, t));
+    high = Math.min(high, Math.max(s, t));
+    if (low > high) return false;
+  }
+  if (dy === 0) {
+    if (a.y < top - margin || a.y > bottom + margin) return false;
+  } else {
+    const s = (top - margin - a.y) / dy,
+      t = (bottom + margin - a.y) / dy;
+    low = Math.max(low, Math.min(s, t));
+    high = Math.min(high, Math.max(s, t));
+    if (low > high) return false;
   }
   return true;
 }
@@ -475,6 +486,79 @@ export interface ApproachState {
 }
 export const initialApproach = (): ApproachState => ({ near: new Map(), held: new Map() });
 const PRESSED = 'pointer.pressed';
+/** Height of one band of the approach index. */
+const BAND = 128;
+interface ApproachIndex {
+  surfaces: OperationSurface[];
+  /** Approach boxes (approachRect) as left, top, right, bottom, one per entry of `surfaces`. */
+  boxes: Float64Array;
+  /** Entries whose box meets the band from `top` to `bottom`, ascending, each once. */
+  within(top: number, bottom: number): number[];
+  byId: Map<string, OperationSurface>;
+  /** Near wherever the pointer is: a focused control that may not be covered, a drag, a capture. */
+  engaged: OperationSurface[];
+  focusedControl: boolean;
+  /** Visible areas that may be covered (the video itself): where page keys go. */
+  players: OperationSurface[];
+}
+/** Snapshots are immutable, so one index serves every input and frame until the next capture. */
+const approachIndexes = new WeakMap<OperationSnapshot, ApproachIndex>();
+function approachIndexOf(snapshot: OperationSnapshot): ApproachIndex {
+  let index = approachIndexes.get(snapshot);
+  if (index) return index;
+  const surfaces: OperationSurface[] = [],
+    corners: number[] = [],
+    bands = new Map<number, number[]>(),
+    tall: number[] = [],
+    byId = new Map<string, OperationSurface>(),
+    engaged: OperationSurface[] = [],
+    players: OperationSurface[] = [];
+  let focusedControl = false;
+  for (const surface of snapshot.surfaces) {
+    byId.set(surface.id, surface);
+    const forbid = surface.policy.occlusion !== 'allow',
+      { availability } = surface;
+    if (forbid && availability.focused) focusedControl = true;
+    if (availability.visible && !forbid) players.push(surface);
+    if ((forbid && availability.focused) || availability.dragging || availability.captured) {
+      engaged.push(surface);
+      continue;
+    }
+    const rect = availability.visible && forbid ? approachRect(surface) : undefined;
+    if (!rect) continue;
+    const entry = surfaces.length,
+      first = Math.floor(rect.top / BAND),
+      last = Math.floor((rect.top + rect.height) / BAND);
+    surfaces.push(surface);
+    corners.push(rect.left, rect.top, rect.left + rect.width, rect.top + rect.height);
+    // A box over many bands (a whole-window menu) is tested on every query instead.
+    if (last - first > 64) tall.push(entry);
+    else
+      for (let band = first; band <= last; band++) {
+        const list = bands.get(band);
+        if (list) list.push(entry);
+        else bands.set(band, [entry]);
+      }
+  }
+  const boxes = Float64Array.from(corners);
+  index = {
+    surfaces,
+    boxes,
+    within(top, bottom) {
+      const found = [...tall];
+      for (let band = Math.floor(top / BAND), end = Math.floor(bottom / BAND); band <= end; band++)
+        for (const entry of bands.get(band) ?? []) found.push(entry);
+      found.sort((a, b) => a - b);
+      return found.filter((entry, i) => entry !== found[i - 1]);
+    },
+    byId,
+    engaged,
+    focusedControl,
+    players,
+  };
+  approachIndexes.set(snapshot, index);
+  return index;
+}
 /** Which controls are near (each 40px to enter, 72px to stay, 350ms to clear), and which roots
  * yield to them: the dynamic roots whose last painted bounds overlap a near control. */
 export function stepApproach(
@@ -483,33 +567,36 @@ export function stepApproach(
   input: { timeMs: number; point?: Point; previousPoint?: Point; pressed?: Point; keyed: boolean },
   paints: readonly PaintFootprint[],
 ): ApproachState {
-  const near = new Map<string, NearSurface>(),
-    byId = new Map<string, OperationSurface>();
-  const from = input.previousPoint ?? input.point,
-    // D11: a control the pointer alone made near yields only within 72px of the pointer's path.
-    area = input.point && {
-      left: Math.min(from!.x, input.point.x) - 72,
-      top: Math.min(from!.y, input.point.y) - 72,
-      width: Math.abs(input.point.x - from!.x) + 144,
-      height: Math.abs(input.point.y - from!.y) + 144,
-    };
-  let focusedControl = false;
-  for (const surface of snapshot.surfaces) {
-    byId.set(surface.id, surface);
-    const forbid = surface.policy.occlusion !== 'allow',
-      rect = approachRect(surface);
-    // Focus on an area that may be covered (the video itself) is not an approach to a control.
-    if (forbid && surface.availability.focused) focusedControl = true;
-    if ((forbid && surface.availability.focused) || surface.availability.dragging || surface.availability.captured)
-      near.set(surface.id, { rect: rect ?? surface.shape, clearSince: null });
-    else if (
-      surface.availability.visible &&
-      forbid &&
-      input.point &&
-      rect !== undefined &&
-      segmentHits(from!, input.point, rect, previous.near.has(surface.id) ? 72 : 40)
-    )
-      near.set(surface.id, { rect: overlapOf(rect, area!), area: area!, clearSince: null });
+  // Runs on every input and two or three times a frame: only the candidates in the bands the
+  // pointer's path can reach are tested (several hundred controls on YouTube otherwise).
+  const index = approachIndexOf(snapshot),
+    near = new Map<string, NearSurface>();
+  for (const surface of index.engaged) near.set(surface.id, { rect: approachRectOf(surface), clearSince: null });
+  if (input.point) {
+    const to = input.point,
+      from = input.previousPoint ?? to,
+      // D11: a control the pointer alone made near yields only within 72px of the pointer's path.
+      area = {
+        left: Math.min(from.x, to.x) - 72,
+        top: Math.min(from.y, to.y) - 72,
+        width: Math.abs(to.x - from.x) + 144,
+        height: Math.abs(to.y - from.y) + 144,
+      };
+    for (const box of index.within(area.top, area.top + area.height)) {
+      const surface = index.surfaces[box]!,
+        b = index.boxes;
+      if (near.has(surface.id)) continue;
+      const left = b[box * 4]!,
+        top = b[box * 4 + 1]!,
+        right = b[box * 4 + 2]!,
+        bottom = b[box * 4 + 3]!;
+      if (pathNear(from, to, left, top, right, bottom, previous.near.has(surface.id) ? 72 : 40))
+        near.set(surface.id, {
+          rect: overlapOf({ left, top, width: right - left, height: bottom - top }, area),
+          area,
+          clearSince: null,
+        });
+    }
   }
   // A press holds what is painted around it, whether or not a control is there.
   if (input.pressed)
@@ -518,14 +605,12 @@ export function stepApproach(
       clearSince: null,
     });
   // D2: a key without a focused control (YouTube's k, j, l on the page) goes to the player.
-  if (input.keyed && !focusedControl)
-    for (const surface of snapshot.surfaces)
-      if (surface.availability.visible && surface.policy.occlusion === 'allow')
-        near.set(surface.id, { rect: approachRectOf(surface), clearSince: null });
+  if (input.keyed && !index.focusedControl)
+    for (const surface of index.players) near.set(surface.id, { rect: approachRectOf(surface), clearSince: null });
   for (const [key, entry] of previous.near) {
     if (near.has(key)) continue;
     const clearSince = entry.clearSince ?? input.timeMs;
-    const surface = byId.get(key);
+    const surface = index.byId.get(key);
     // A clearing control keeps following the page, inside the area where the pointer last was.
     const rect = surface ? approachRectOf(surface) : entry.rect;
     if (input.timeMs - clearSince < 350)
@@ -540,17 +625,20 @@ export function stepApproach(
     const kept = keys.filter((key) => near.has(key));
     if (kept.length) held.set(root, kept);
   }
+  if (!near.size) return { near, held };
+  const targets = [...near].filter(([, entry]) => entry.rect.width > 0 && entry.rect.height > 0);
   for (const paint of paints) {
     if (!paint.dynamic) continue;
     const root = paint.root ?? paint.id,
-      area = {
-        left: paint.bounds.left - paint.outset,
-        top: paint.bounds.top - paint.outset,
-        right: paint.bounds.right + paint.outset,
-        bottom: paint.bounds.bottom + paint.outset,
-      };
-    for (const [key, entry] of near) {
-      if (!entry.rect.width || !entry.rect.height || !intersects(area, entry.rect)) continue;
+      { bounds, outset } = paint;
+    for (const [key, { rect }] of targets) {
+      if (
+        bounds.right + outset <= rect.left ||
+        bounds.left - outset >= rect.left + rect.width ||
+        bounds.bottom + outset <= rect.top ||
+        bounds.top - outset >= rect.top + rect.height
+      )
+        continue;
       const keys = held.get(root);
       if (!keys) held.set(root, [key]);
       else if (!keys.includes(key)) keys.push(key);

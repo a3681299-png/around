@@ -129,8 +129,19 @@ export function createOperationGuardHost(
   const latched = () => failures >= 3 || latchedLayers.size > 0;
   const approaching = () => approach.near.size > 0;
   /** Near controls, and the roots over them in the last committed paint. */
-  const step = (timeMs: number, snapshot: OperationSnapshot) =>
-    stepApproach(
+  // The renderer and the world evaluation both sample in one frame. With the same inputs, a
+  // second step within half a frame would only move a clear deadline by those milliseconds.
+  let stepped: { approach: ApproachState; inputs: readonly unknown[]; timeMs: number } | undefined;
+  const step = (timeMs: number, snapshot: OperationSnapshot) => {
+    const inputs = [snapshot, point, before, pressed, keyed, paints];
+    if (
+      stepped?.approach === approach &&
+      timeMs - stepped.timeMs < 8 &&
+      timeMs >= stepped.timeMs &&
+      inputs.every((value, i) => value === stepped!.inputs[i])
+    )
+      return approach;
+    const next = stepApproach(
       approach,
       snapshot,
       {
@@ -142,6 +153,9 @@ export function createOperationGuardHost(
       },
       paints,
     );
+    stepped = { approach: next, inputs, timeMs };
+    return next;
+  };
   /** Whether the held roots differ: the only change the world (and a redraw) depends on. */
   const heldChanged = (next: ApproachState) =>
     next.held.size !== approach.held.size || [...next.held.keys()].some((root) => !approach.held.has(root));
