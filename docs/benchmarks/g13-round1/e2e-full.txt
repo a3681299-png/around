@@ -1,0 +1,25 @@
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    .work\test-results\e2e\studio-workspace-all-curre-f9d64-oups-masks-and-save-discard-e2e\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    .work\test-results\e2e\studio-workspace-all-curre-f9d64-oups-masks-and-save-discard-e2e\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: .work\test-results\e2e\studio-workspace-all-curre-f9d64-oups-masks-and-save-discard-e2e\error-context.md
+
+    attachment #6: trace (application/zip) ─────────────────────────────────────────────────────────
+    .work\test-results\e2e\studio-workspace-all-curre-f9d64-oups-masks-and-save-discard-e2e\trace.zip
+    Usage:
+
+        npx playwright show-trace .work\test-results\e2e\studio-workspace-all-curre-f9d64-oups-masks-and-save-discard-e2e\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4 failed
+    [e2e] › tests\layer-editor.spec.ts:97:1 › layer panel renames, reorders by drag, synchronizes selection, locks, duplicates and persists visibility 
+    [e2e] › tests\media2-editor.spec.ts:393:1 › OFF aborts an unfinished import decoder and closes its late frame without saving an asset 
+    [e2e] › tests\page-marks.spec.ts:309:1 › protection overlays are the vermilion 45° hatch with a mono label, and emergency OFF removes them 
+    [e2e] › tests\studio-workspace.spec.ts:84:1 › all current animation kinds use the live panels, inherited locks, groups, masks and save/discard 
+  60 skipped
+  253 passed (19.2m)

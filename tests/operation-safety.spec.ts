@@ -1892,3 +1892,352 @@ test('operation guard frame overhead alternates baseline and guarded frames (inf
     contentType: 'application/json',
   });
 });
+
+/** Adds `G1Paint(id, rect)` to the page: a paint footprint for guard probes, an opaque overlay
+ * rectangle that moves every frame. */
+const addProbePaint = (youtube: Page) =>
+  youtube.evaluate(() => {
+    (window as any).G1Paint = (id: string, r: { left: number; top: number; width: number; height: number }) => ({
+      id,
+      root: id,
+      bounds: { left: r.left, top: r.top, right: r.left + r.width, bottom: r.top + r.height },
+      opacity: 1,
+      pointerEvents: false,
+      outset: 0,
+      composition: 'overlay',
+      dynamic: true,
+    });
+  });
+
+test('G1.3: a uniform page scroll keeps the layout generation; reads in the window are shifted, not held', async ({
+  youtube,
+}) => {
+  await youtube.addScriptTag({ content: await probeCode() });
+  await scrollRoom(youtube);
+  const result = await youtube.evaluate(async () => {
+    const api = (window as any).G1Probe;
+    const frame = () => new Promise<number>((resolve) => requestAnimationFrame(resolve));
+    const source = api.youtubeOperations(document);
+    // The first read starts observing every control; their first size reports settle first.
+    source.capture({ fresh: true });
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    await frame();
+    const first = source.capture({ fresh: true });
+    await frame();
+    scrollBy(0, 90);
+    await frame();
+    await frame();
+    const shifted = source.capture({ coalesce: true });
+    const deferred = source.deferredFor();
+    await new Promise((resolve) => setTimeout(resolve, 260));
+    await frame();
+    const reread = source.capture({ coalesce: true });
+    const byId = (snapshot: any) => new Map(snapshot.surfaces.map((s: any) => [s.id, s]));
+    const visible = first.surfaces.filter((s: any) => s.availability.visible);
+    // Surfaces in a sticky column (an unbounded box) stay put: they may be stuck.
+    const moving = visible.filter((s: any) => s.scrolls && !(s.scrollBox && s.scrollBox.height >= 1e6)),
+      fixed = visible.filter((s: any) => !s.scrolls);
+    const at = byId(shifted);
+    return {
+      layout: typeof first.generation.layout,
+      scrolled: shifted.scroll.y - first.scroll.y,
+      moving: moving.length,
+      movingShifted: moving.every((s: any) => Math.abs((at.get(s.id) as any).shape.top - (s.shape.top - 90)) < 0.5),
+      fixedKept: fixed.every((s: any) => (at.get(s.id) as any).shape.top === s.shape.top),
+      shiftedLayout: shifted.generation.layout === first.generation.layout,
+      deferred,
+      rereadFresh: reread !== shifted,
+      rereadLayout: reread.generation.layout === first.generation.layout,
+      rereadGeometry: reread.generation.geometry !== first.generation.geometry,
+    };
+  });
+  expect(result.layout).toBe('number');
+  expect(result.scrolled).toBe(90);
+  expect(result.moving).toBeGreaterThan(3);
+  expect(result).toMatchObject({
+    movingShifted: true,
+    fixedKept: true,
+    shiftedLayout: true,
+    deferred: 0,
+    rereadFresh: true,
+    rereadLayout: true,
+    rereadGeometry: true,
+  });
+});
+
+test('G1.3: continuous page scrolling neither stops drawing nor hides a layer', async ({ youtube }) => {
+  await youtube.addScriptTag({ content: await probeCode() });
+  await addProbePaint(youtube);
+  await scrollRoom(youtube);
+  const result = await youtube.evaluate(async () => {
+    const api = (window as any).G1Probe;
+    const paint = (window as any).G1Paint;
+    const frame = () => new Promise<number>((resolve) => requestAnimationFrame(resolve));
+    const source = api.youtubeOperations(document);
+    const stops: unknown[] = [];
+    const host = api.createOperationGuardHost(document, source, (stop: unknown) => {
+      if (stop) stops.push(stop);
+    });
+    const paints = [paint('layer', { left: innerWidth / 2 - 60, top: innerHeight / 2 - 40, width: 120, height: 80 })];
+    // The first read starts observing every control; their first size reports settle first.
+    await new Promise((resolve) => setTimeout(resolve, 450));
+    for (let i = 0; i < 3; i++) {
+      host.sample(await frame());
+      host.commit(paints);
+    }
+    stops.length = 0;
+    const frames: { stopped: string; blocked: number }[] = [];
+    const start = performance.now();
+    while (performance.now() - start < 700) {
+      scrollBy(0, 30);
+      host.sample(await frame());
+      frames.push({ stopped: host.snapshot().stopped, blocked: host.commit(paints).size });
+    }
+    host.destroy();
+    return {
+      frames: frames.length,
+      stopped: frames.filter((f) => f.stopped).length,
+      blocked: frames.filter((f) => f.blocked).length,
+      stops: stops.length,
+      scrollY,
+    };
+  });
+  expect(result.frames).toBeGreaterThan(20);
+  expect(result.scrollY).toBeGreaterThan(600);
+  expect(result).toMatchObject({ stopped: 0, blocked: 0, stops: 0 });
+});
+
+test('G1.3: an inner scroll, a new element or a control moved by its own style still hides everything', async ({
+  youtube,
+}) => {
+  await youtube.addScriptTag({ content: await probeCode() });
+  const result = await youtube.evaluate(async () => {
+    const api = (window as any).G1Probe;
+    const frame = () => new Promise<number>((resolve) => requestAnimationFrame(resolve));
+    const settle = async (host: any) => {
+      await new Promise((resolve) => setTimeout(resolve, 450));
+      for (let i = 0; i < 3; i++) host.sample(await frame());
+    };
+    // A scrolling panel with a button inside it, in the page.
+    const panel = document.createElement('div');
+    panel.style.cssText = 'position:absolute;left:300px;top:200px;width:200px;height:120px;overflow:auto';
+    panel.innerHTML = '<div style="height:400px"><button style="margin-top:40px">Inner</button></div>';
+    document.querySelector('ytd-app')!.append(panel);
+    const cases: Record<string, { stops: unknown[]; stopped: string }> = {};
+    const run = async (name: string, change: () => void) => {
+      const source = api.youtubeOperations(document);
+      const stops: unknown[] = [];
+      const host = api.createOperationGuardHost(document, source, (stop: unknown) => {
+        if (stop) stops.push(stop);
+      });
+      await settle(host);
+      stops.length = 0;
+      change();
+      await Promise.resolve();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      host.sample(await frame());
+      cases[name] = { stops: [...stops], stopped: host.snapshot().stopped };
+      host.destroy();
+    };
+    await run('inner scroll', () => {
+      panel.scrollTop = 60;
+      panel.dispatchEvent(new Event('scroll'));
+    });
+    await run('added element', () => document.querySelector('ytd-app')!.append(document.createElement('div')));
+    const like = document.querySelector<HTMLElement>('button[aria-label="Like video"], button[aria-label="Account"]')!;
+    await run('moved by its own style', () => {
+      like.style.position = 'relative';
+      like.style.top = '40px';
+    });
+    like.style.position = like.style.top = '';
+    panel.remove();
+    return cases;
+  });
+  for (const [name, value] of Object.entries(result)) {
+    expect(value.stops, name).toContain(true);
+    expect(value.stopped, name).toBeTruthy();
+  }
+});
+
+test('G1.3: a look change inside a control hides only the layer over it, until the next frame', async ({ youtube }) => {
+  await youtube.addScriptTag({ content: await probeCode() });
+  await addProbePaint(youtube);
+  const result = await youtube.evaluate(async () => {
+    const api = (window as any).G1Probe;
+    const paint = (window as any).G1Paint;
+    const frame = () => new Promise<number>((resolve) => requestAnimationFrame(resolve));
+    const source = api.youtubeOperations(document);
+    const stops: unknown[] = [];
+    const host = api.createOperationGuardHost(document, source, (stop: unknown) => {
+      if (stop) stops.push(stop);
+    });
+    // A guide link: cut from the clip (not drawn above the artwork), so its look can be checked.
+    const link = document.querySelectorAll<HTMLElement>('ytd-guide-entry-renderer a#endpoint')[1]!;
+    const r = link.getBoundingClientRect();
+    const paints = [
+      paint('over', { left: r.left - 10, top: r.top - 10, width: r.width + 20, height: r.height + 20 }),
+      paint('away', { left: innerWidth - 200, top: innerHeight - 140, width: 100, height: 100 }),
+    ];
+    await new Promise((resolve) => setTimeout(resolve, 450));
+    for (let i = 0; i < 3; i++) {
+      host.sample(await frame());
+      host.commit(paints);
+    }
+    const change = async (element: HTMLElement) => {
+      stops.length = 0;
+      // A hover look: a class on the control, its box unchanged.
+      element.classList.add('g13-hover');
+      await Promise.resolve();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      const atMutation = [...stops];
+      host.sample(await frame());
+      const next = { stopped: host.snapshot().stopped, blocked: [...host.commit(paints)] };
+      element.classList.remove('g13-hover');
+      await new Promise((resolve) => setTimeout(resolve, 450));
+      for (let i = 0; i < 3; i++) {
+        host.sample(await frame());
+        host.commit(paints);
+      }
+      return { atMutation, next };
+    };
+    const look = await change(link);
+    // The masthead's Account button is drawn above the artwork: a change of its look may change
+    // that order, which a box cannot show, so everything is hidden as before.
+    const above = await change(document.querySelector<HTMLElement>('button[aria-label="Account"]')!);
+    host.destroy();
+    return { look, above: above.atMutation };
+  });
+  // Hidden before the next paint: only the layer over the control.
+  expect(result.look.atMutation).toEqual([['over']]);
+  // The next frame confirms the control did not move: nothing stays hidden.
+  expect(result.look.next).toEqual({ stopped: '', blocked: [] });
+  expect(result.above).toContain(true);
+});
+
+test('G1.3: a press right after a page scroll reaches the control; a covered control still stops drawing', async ({
+  youtube,
+}) => {
+  await youtube.addScriptTag({ content: await probeCode() });
+  await scrollRoom(youtube);
+  const result = await youtube.evaluate(async () => {
+    const api = (window as any).G1Probe;
+    const frame = () => new Promise<number>((resolve) => requestAnimationFrame(resolve));
+    const source = api.youtubeOperations(document);
+    const host = api.createOperationGuardHost(document, source, () => undefined);
+    await new Promise((resolve) => setTimeout(resolve, 450));
+    for (let i = 0; i < 3; i++) host.sample(await frame());
+    // A press at the centre of `element`, delivered as the browser would: to whatever is on top there.
+    const press = (element: Element) => {
+      const r = element.getBoundingClientRect(),
+        x = r.left + r.width / 2,
+        y = r.top + r.height / 2;
+      const target = document.elementFromPoint(x, y)!;
+      for (const type of ['pointerdown', 'pointerup'])
+        target.dispatchEvent(new PointerEvent(type, { clientX: x, clientY: y, bubbles: true, composed: true }));
+    };
+    // The page scrolls and the press follows at once, before any frame reads the page again.
+    // A chip in the page content, which the guard reads as a control; still below the masthead.
+    const link = document.querySelectorAll<HTMLElement>('yt-chip-cloud-chip-renderer button')[1]!;
+    const top = link.getBoundingClientRect().top;
+    scrollBy(0, 40);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    if (link.getBoundingClientRect().top !== top - 40) throw new Error('The page did not scroll under the chip');
+    press(link);
+    const afterScroll = host.snapshot().stopped;
+    // A page element over the control takes the press: still a covered control.
+    await new Promise((resolve) => setTimeout(resolve, 450));
+    for (let i = 0; i < 3; i++) host.sample(await frame());
+    const r = link.getBoundingClientRect();
+    const cover = document.createElement('div');
+    cover.style.cssText = `position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;z-index:9`;
+    document.body.append(cover);
+    press(link);
+    const covered = host.snapshot().stopped;
+    cover.remove();
+    host.destroy();
+    return { afterScroll, covered };
+  });
+  expect(result.afterScroll).toBe('');
+  expect(result.covered).toBe('クリックがページの操作部品に届くよう、絵の表示を止めました。');
+});
+
+test('G1.3: a screen-plane layer stays shown while the wheel scrolls, and its clip keeps excluding the controls under it', async ({
+  popup,
+  youtube,
+}) => {
+  await scrollRoom(youtube);
+  // A column of native buttons in the page that the wheel scrolls under the layer.
+  await youtube.evaluate(() => {
+    const column = document.createElement('div');
+    column.style.cssText = 'display:flex;flex-direction:column;gap:40px;align-items:center;padding-top:200px';
+    for (let i = 0; i < 16; i++) {
+      const button = document.createElement('button');
+      button.textContent = `Native ${i}`;
+      column.append(button);
+    }
+    document.querySelector('ytd-page-manager')!.prepend(column);
+  });
+  const viewport = youtube.viewportSize()!;
+  const centre = { x: Math.round(viewport.width / 2), y: Math.round(viewport.height * 0.55) };
+  await seedLayers(popup, youtube, [{ id: 'over-grid', ...centre, width: 360, height: 220 }], () => []);
+  // The pointer rests in the page, away from the layer, as a person's does while scrolling.
+  await youtube.mouse.move(viewport.width - 30, viewport.height - 30);
+  await settled(youtube);
+  // An independent read of the page in the main world, every frame: the controls the clip must
+  // exclude (visible, never to be covered, cut by the clip rather than drawn above the artwork).
+  await youtube.addScriptTag({ content: await probeCode() });
+  await youtube.evaluate(() => {
+    const reader = (window as any).G1Probe.youtubeOperations(document);
+    const host = document.querySelector<HTMLElement>('#web-world-themes-decorations')!;
+    const frame = host.shadowRoot!.querySelector<HTMLElement>('[data-image-id="over-grid"]')!;
+    const rows: Record<string, unknown>[] = ((window as any).g13Rows = []);
+    (window as any).g13Recording = true;
+    const sample = () => {
+      const clip = host.style.getPropertyValue('--ww-decoration-clip');
+      const regions = [...clip.matchAll(/M(-?[\d.]+) (-?[\d.]+)h(-?[\d.]+)v(-?[\d.]+)/g)].map((m) =>
+        m.slice(1).map(Number),
+      );
+      const box = frame.getBoundingClientRect();
+      const under = (reader.capture({ fresh: true }).surfaces as any[]).filter(
+        (s) =>
+          s.availability.visible &&
+          s.policy.occlusion === 'forbid' &&
+          s.compositionCapability === 'exclusion' &&
+          s.shape.left + s.shape.width > box.left &&
+          s.shape.left < box.right &&
+          s.shape.top + s.shape.height > box.top &&
+          s.shape.top < box.bottom,
+      );
+      // Each such control's centre lies outside every drawable region of the clip.
+      const inClip = under.filter((s) => {
+        const x = s.shape.left + s.shape.width / 2,
+          y = s.shape.top + s.shape.height / 2;
+        return regions.some(([l, t, w, h]) => x > l! && x < l! + w! && y > t! && y < t! + h!);
+      });
+      rows.push({
+        shown:
+          frame.style.visibility !== 'hidden' && !/"stopped":"[^"]/.test(host.getAttribute('data-ww-safety') ?? ''),
+        stopped: JSON.parse(host.getAttribute('data-ww-safety') ?? '{}').stopped ?? '',
+        under: under.length,
+        inClip: inClip.map((s) => [s.id, [s.shape.left, s.shape.top, s.shape.width, s.shape.height].map(Math.round)]),
+      });
+      if ((window as any).g13Recording) requestAnimationFrame(sample);
+    };
+    requestAnimationFrame(sample);
+  });
+  for (let i = 0; i < 16; i++) {
+    await youtube.mouse.wheel(0, i < 8 ? 90 : -90);
+    await youtube.waitForTimeout(70);
+  }
+  const rows = await youtube.evaluate(() => {
+    (window as any).g13Recording = false;
+    return (window as any).g13Rows as { shown: boolean; stopped: string; under: number; inClip: unknown[] }[];
+  });
+  expect(rows.length).toBeGreaterThan(30);
+  expect(rows.filter((r) => r.under).length, 'controls passed under the layer').toBeGreaterThan(10);
+  expect(
+    rows.filter((r) => !r.shown),
+    JSON.stringify(rows.filter((r) => !r.shown).slice(0, 3)),
+  ).toEqual([]);
+  expect(rows.filter((r) => r.inClip.length)).toEqual([]);
+});

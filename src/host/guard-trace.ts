@@ -121,10 +121,14 @@ export function traceGeometryCause(kind: string, detail?: Event | readonly Mutat
     for (const r of detail as readonly MutationRecord[]) {
       if (mutated.length >= 12) break;
       const target = r.target instanceof Element ? (describe(r.target)?.element ?? '?') : r.target.nodeName;
+      // childList: element nodes only (text-only changes never reach the guard).
+      const elements = (nodes: NodeList) => [...nodes].filter((n) => n instanceof Element).length;
       mutated.push(
-        r.type === 'attributes'
-          ? `${target}[${r.attributeName}]`
-          : `${target}(+${r.addedNodes.length}/-${r.removedNodes.length})`,
+        `${kind === 'mutation-look' ? 'look ' : kind === 'mutation-layout' ? 'layout ' : ''}${
+          r.type === 'attributes'
+            ? `${target}[${r.attributeName}]`
+            : `${target}(+${elements(r.addedNodes)}/-${elements(r.removedNodes)} elements)`
+        }`,
       );
     }
 }

@@ -240,10 +240,23 @@ async function run(label: string, extensionPath: string, options: { calibration?
     await page.mouse.move(rest.x, rest.y);
     await page.waitForTimeout(1000);
     output.rest = rest;
-    const measure = async (body: () => Promise<void>) => {
+    // G13_CPUPROFILE=1: a V8 profile of each scroll and SPA block. It adds overhead; such runs are
+    // for finding the heavy functions only, never for the verdict.
+    const measure = async (body: () => Promise<void>, name?: string) => {
+      const profiling = Boolean(name) && process.env.G13_CPUPROFILE === '1';
+      if (profiling) {
+        await cdp.send('Profiler.enable');
+        await cdp.send('Profiler.setSamplingInterval', { interval: 100 });
+        await cdp.send('Profiler.start');
+      }
       await evaluate('__ui1Probe.begin()');
       await body();
-      return summarize(await evaluate('__ui1Probe.end()'));
+      const summary = summarize(await evaluate('__ui1Probe.end()'));
+      if (profiling) {
+        const { profile } = await cdp.send('Profiler.stop');
+        await writeFile(path.join(out, `${label}-${name}.cpuprofile`), JSON.stringify(profile));
+      }
+      return summary;
     };
     if (options.calibration) {
       output.phases.calibration = await measure(() => page.waitForTimeout(6000));
@@ -269,19 +282,7 @@ async function run(label: string, extensionPath: string, options: { calibration?
       await page.mouse.move(point.x, point.y);
       await page.waitForTimeout(1000);
       await startVisibility(page);
-      // G13_CPUPROFILE=1: a V8 profile of each scroll block. It adds overhead; such runs are for
-      // finding the heavy functions only, never for the verdict.
-      const profiling = process.env.G13_CPUPROFILE === '1';
-      if (profiling) {
-        await cdp.send('Profiler.enable');
-        await cdp.send('Profiler.setSamplingInterval', { interval: 100 });
-        await cdp.send('Profiler.start');
-      }
-      const summary = await measure(wheel);
-      if (profiling) {
-        const { profile } = await cdp.send('Profiler.stop');
-        await writeFile(path.join(out, `${label}-${name}.cpuprofile`), JSON.stringify(profile));
-      }
+      const summary = await measure(wheel, name);
       output.phases[name] = { ...summary, point, visibility: await endVisibility(page) };
     };
     // Far: a free spot of the fixed masthead, clear of its controls. Nothing scrolls under it, so
@@ -312,7 +313,7 @@ async function run(label: string, extensionPath: string, options: { calibration?
         await search.press('Enter');
         await expect(page).toHaveURL(/results\?search_query=/);
         await page.waitForTimeout(6000);
-      });
+      }, 'spa');
     }
     await cdp.detach();
     return output;

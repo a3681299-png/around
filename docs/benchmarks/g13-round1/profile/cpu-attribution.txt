@@ -1,0 +1,164 @@
+======== g12head scrollNear
+extension stacks total (incl. native under ext): 364.3 ms
+
+# inclusive per function
+    354.1  (anon)
+    286.4  paint
+    135.4  sample
+    102.1  capture
+     94.2  applyLayout
+     66.1  draw
+     37.4  above
+     36.9  rank2
+     36.8  update
+     35.5  reconcile
+     25.2  fixedContainingBlock
+     25.1  evaluatePreparedWorld
+     20.4  step
+     19.5  commit
+     17.4  verifiedOverlaySlot
+     16.8  overlaySlot
+     15.5  stepApproach
+     15.2  sampleScroll
+     14.6  syncSources
+     12.8  evaluateTransforms
+     12.4  publish
+     11.2  configure
+     11.1  evaluateEffects
+     10.2  pump
+      8.4  scrollBox
+
+# outermost extension entry
+    354.1  (anon):8
+     10.2  pump:114
+
+# applyLayout inclusive by callers
+     74.0  anon:54524 < anon:53370 < paint < anon:53121 < anon:8
+     18.3  anon:54524 < anon:53370 < paint < reconcile < update
+      1.8  draw < anon:54336 < anon:8
+
+# fixedContainingBlock inclusive by callers
+      7.3  overlaySlot < verifiedOverlaySlot < anon:54524 < anon:53370 < paint
+======== g12head spa
+extension stacks total (incl. native under ext): 717.9 ms
+
+# inclusive per function
+    707.0  (anon)
+    487.9  paint
+    205.6  applyLayout
+    137.9  overlaySlot
+    127.6  verifiedOverlaySlot
+    111.9  fixedContainingBlock
+    105.4  draw
+     95.7  sample
+     91.4  capture
+     44.4  evaluatePreparedWorld
+     42.6  flush
+     41.2  activity
+     32.4  validate
+     32.2  step
+     32.1  update
+     31.7  commit
+     31.3  scan
+     31.0  reconcile
+     22.9  stepApproach
+     21.8  evaluateTransforms
+     16.0  handle
+     15.1  evaluateEffects
+     13.7  relevant
+     12.3  publish
+     11.2  syncSources
+
+# outermost extension entry
+    705.9  (anon):8
+     10.9  pump:114
+      1.2  (anon):53121
+
+# applyLayout inclusive by callers
+    187.2  anon:54524 < anon:53370 < paint < anon:53121 < anon:8
+     16.1  anon:54524 < anon:53370 < paint < reconcile < update
+      2.2  draw < anon:54336 < anon:8
+
+# fixedContainingBlock inclusive by callers
+======== r1 scrollNear
+extension stacks total (incl. native under ext): 479.7 ms
+
+# inclusive per function
+    470.9  (anon)
+    388.9  paint
+    195.5  applyLayout
+    163.3  capture
+    123.5  sample
+     64.8  draw
+     62.1  shifted
+     43.0  update
+     37.8  reconcile
+     32.8  commit
+     31.7  verifiedOverlaySlot
+     29.7  overlaySlot
+     29.7  rank2
+     29.7  above
+     29.2  fixedContainingBlock
+     24.8  step
+     18.9  stepApproach
+     18.2  evaluatePreparedWorld
+     17.7  syncSources
+     16.7  handle
+     13.6  sampleScroll
+     13.2  activity
+     12.6  scrollBox
+     11.9  configure
+     11.0  lookOnly
+
+# outermost extension entry
+    470.9  (anon):8
+      8.8  pump:114
+
+# applyLayout inclusive by callers
+    175.9  anon:54655 < anon:53501 < paint < anon:53252 < anon:8
+     15.2  anon:54655 < anon:53501 < paint < reconcile < update
+      4.5  draw < anon:54467 < anon:8
+
+# fixedContainingBlock inclusive by callers
+      7.5  overlaySlot < verifiedOverlaySlot < anon:54655 < anon:53501 < paint
+======== r1 spa
+extension stacks total (incl. native under ext): 860.7 ms
+
+# inclusive per function
+    844.7  (anon)
+    543.1  paint
+    200.1  applyLayout
+    153.9  overlaySlot
+    149.9  sample
+    147.5  capture
+    143.7  draw
+    139.6  verifiedOverlaySlot
+    132.9  fixedContainingBlock
+     64.2  flush
+     57.3  evaluatePreparedWorld
+     51.3  update
+     50.6  reconcile
+     44.7  scan
+     42.6  activity
+     40.1  handle
+     38.4  commit
+     34.3  step
+     34.0  validate
+     29.5  evaluateTransforms
+     28.5  relevant
+     28.0  stepApproach
+     26.5  syncSources
+     20.8  evaluateEffects
+     16.8  within
+
+# outermost extension entry
+    844.2  (anon):8
+     15.9  pump:114
+      0.5  (anon):4220
+
+# applyLayout inclusive by callers
+    178.7  anon:54655 < anon:53501 < paint < anon:53252 < anon:8
+     17.0  anon:54655 < anon:53501 < paint < reconcile < update
+      4.4  draw < anon:54467 < anon:8
+
+# fixedContainingBlock inclusive by callers

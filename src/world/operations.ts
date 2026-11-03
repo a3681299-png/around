@@ -28,7 +28,11 @@ export interface OperationSurface {
   scrollBox?: PlacementFrame;
 }
 export interface OperationSnapshot {
-  generation: { documentId: number; geometry: number };
+  /** geometry: changes whenever a surface moves on screen. layout (G1.3): changes only when a
+   * surface moves in document coordinates, so a uniform page scroll keeps it. */
+  generation: { documentId: number; geometry: number; layout?: number };
+  /** The page scroll offset the surfaces were read (or shifted) at (G1.3). */
+  scroll?: { x: number; y: number };
   viewport: { width: number; height: number };
   surfaces: readonly OperationSurface[];
   supported: boolean;

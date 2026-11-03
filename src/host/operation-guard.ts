@@ -9,9 +9,9 @@ import {
   type PaintFootprint,
   type SafetyIssue,
 } from '../world/operations';
-import type { OperationSource } from './operation-source';
+import { layoutOf, type OperationSource } from './operation-source';
 import { traceApproach, traceGuardStop } from './guard-trace';
-import type { Point } from '../world/geometry';
+import type { PlacementFrame, Point } from '../world/geometry';
 import type { WorldApproach } from '../world/types';
 
 export interface SafetyStatus {
@@ -93,22 +93,33 @@ export function createOperationGuardHost(
     /** Where the pointer is held down, and whether a key is, until released. */
     pressed: Point | undefined,
     keyed = false;
-  const boundaryKey = (snapshot: OperationSnapshot) =>
-    JSON.stringify([
+  const round = (value: number) => Math.round(value * 100) / 100;
+  // In document coordinates (G1.3): a page scroll moves the inner scroll boxes of page content
+  // with everything else, which is no change of the boundary. Sticky columns are unbounded.
+  const boundaryKey = (snapshot: OperationSnapshot) => {
+    const sx = snapshot.scroll?.x ?? 0,
+      sy = snapshot.scroll?.y ?? 0;
+    return JSON.stringify([
       snapshot.supported,
       snapshot.viewport,
       snapshot.surfaces
         .filter((s) => s.availability.visible)
-        .map((s) => [
-          s.id,
-          s.compositionCapability,
-          s.policy,
-          s.protectedEnvelope.left,
-          s.protectedEnvelope.width,
-          ...(s.scrolls ? [] : [s.protectedEnvelope.top, s.protectedEnvelope.height]),
-          s.scrollBox ? [s.scrollBox.left, s.scrollBox.top, s.scrollBox.width, s.scrollBox.height] : null,
-        ]),
+        .map((s) => {
+          const box = s.scrollBox,
+            bx = s.scrolls && box && box.height < 1e6 ? sx : 0,
+            by = s.scrolls && box && box.height < 1e6 ? sy : 0;
+          return [
+            s.id,
+            s.compositionCapability,
+            s.policy,
+            round(s.protectedEnvelope.left + (s.scrolls ? sx : 0)),
+            round(s.protectedEnvelope.width),
+            ...(s.scrolls ? [] : [s.protectedEnvelope.top, s.protectedEnvelope.height]),
+            box ? [round(box.left + bx), round(box.top + by), round(box.width), round(box.height)] : null,
+          ];
+        }),
     ]);
+  };
   let boundary = boundaryKey(surfaces);
   let lastActivity = view.performance.now(),
     interacting = false,
@@ -116,7 +127,24 @@ export function createOperationGuardHost(
     stoppedRemedy = '',
     stableAt = 0,
     failures = 0,
-    lastGeneration = surfaces.generation.geometry;
+    lastGeneration = layoutOf(surfaces);
+  /** Paints over controls whose look just changed (G1.3, D9): hidden from that change until the
+   * next frame samples the page. The change itself was checked not to move any control. */
+  let looked: ReadonlySet<string> = new Set();
+  const paintsOver = (regions: readonly PlacementFrame[]) =>
+    new Set(
+      paints
+        .filter((p) =>
+          regions.some(
+            (r) =>
+              p.bounds.right + p.outset > r.left &&
+              p.bounds.left - p.outset < r.left + r.width &&
+              p.bounds.bottom + p.outset > r.top &&
+              p.bounds.top - p.outset < r.top + r.height,
+          ),
+        )
+        .map((p) => p.id),
+    );
   let issues: readonly SafetyIssue[] = [],
     paints: readonly PaintFootprint[] = [],
     overlay = false,
@@ -331,7 +359,8 @@ export function createOperationGuardHost(
       // validate() reads the page synchronously; the snapshot it leaves behind is the current
       // one, so a geometry change is never mistaken for a repeated failure.
       const valid = source.validate(surfaces, event);
-      const geometryChanged = source.capture().generation.geometry !== surfaces.generation.geometry;
+      // A page scroll keeps the layout: a press right after it is not one after a move (G1.3, D3).
+      const geometryChanged = layoutOf(source.capture()) !== layoutOf(surfaces);
       if (!valid && geometryChanged) pause(MOVED);
       else if (!valid) pause(COVERED, true, undefined, event instanceof MouseEvent ? layersAt(event) : []);
     }
@@ -380,6 +409,15 @@ export function createOperationGuardHost(
   const changed = () => invalidate();
   const unsubscribeSource = source.subscribe(() => {
     boundaryDirty = true;
+    const change = source.pending();
+    // A page scroll moves no surface against the clip (G1.3): redraw, hide nothing.
+    if (change === 'scroll') return invalidate();
+    // A look change the source checked moved no control: hide only the paints over those
+    // controls, until the next frame (D9).
+    if (change === 'look') {
+      looked = new Set([...looked, ...paintsOver(source.lookRegions())]);
+      return invalidate([...looked]);
+    }
     // Hide before paint without forcing native layout in every observer
     // microtask. Input validation still performs a fresh synchronous read.
     invalidate(true);
@@ -422,6 +460,16 @@ export function createOperationGuardHost(
     source,
     sample(time) {
       surfaces = source.capture({ coalesce: true });
+      // This frame reads the page again: paints held for a look change are drawn as decided below.
+      looked = new Set();
+      // A shifted read is checked against a full one when its window ends, even if nothing else
+      // asks for a frame by then.
+      const settles = source.settlesIn();
+      if (settles > 0 && holdTimer === undefined)
+        holdTimer = view.setTimeout(() => {
+          holdTimer = undefined;
+          if (active) invalidate();
+        }, Math.ceil(settles));
       const wait = source.deferredFor();
       if (wait > 0) {
         // Native changes are still arriving and this snapshot is not current: hold all
@@ -456,7 +504,8 @@ export function createOperationGuardHost(
           }
         }
       }
-      const generation = surfaces.generation.geometry;
+      // Stable means no surface moved in the document: a page scroll does not restart the wait.
+      const generation = layoutOf(surfaces);
       if (generation !== lastGeneration) {
         lastGeneration = generation;
         stableAt = time;
@@ -557,6 +606,17 @@ export function createOperationGuardHost(
               action: 'stop',
               reason: latchedLayers.get(p.id)!,
               remedy: `絵の状態を確かめてから、${RESUME}`,
+            })),
+          // Over a control whose look changed since the last sample (D9).
+          ...next
+            .filter((p) => looked.has(p.id) && !stopped)
+            .map((p): SafetyIssue => ({
+              layerId: p.id,
+              surfaceId: 'host',
+              severity: 'enforced',
+              action: 'stop',
+              reason: HOLD,
+              remedy: SETTLES,
             })),
         ];
         // Approach: only the held roots are flattened (G1.2); reduced motion flattens everything.

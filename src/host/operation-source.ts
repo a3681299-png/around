@@ -11,6 +11,24 @@ const MAX_INCREMENTAL_ROOTS = 64;
 const FULL_SCAN_INTERVAL_MS = 1000;
 /** Changes inside this window after a read wait for its end; callers hold drawing meanwhile. */
 export const COALESCE_MS = 200;
+/** A look change (class/style) above more controls than this is treated as a layout change. */
+const MAX_LOOK_ROWS = 32;
+/** The two attributes a control's look changes through (hover marks, inline styles). The others
+ * the observer sees (hidden, disabled, aria-*, role, tabindex, contenteditable, href) can show,
+ * hide, open or change what a control is, so they always count as a layout change. */
+const LOOK_ATTRIBUTES = new Set(['class', 'style']);
+export type PendingChange = 'none' | 'scroll' | 'look' | 'layout';
+const RANK: Record<PendingChange, number> = { none: 0, scroll: 1, look: 2, layout: 3 };
+/** Sticky columns are read as unbounded boxes (±1e7); they never move with a page scroll. */
+const UNBOUNDED_BOX = 1e6;
+/** Document coordinates are compared at 1/100 px, below any rounding a scroll can introduce. */
+const round = (value: number) => Math.round(value * 100) / 100;
+/** `frame` moved by (-dx, -dy): where a box that scrolls with the page is after the page scrolled
+ * by (dx, dy). */
+const moved = (frame: PlacementFrame, dx: number, dy: number) =>
+  Object.freeze({ left: frame.left - dx, top: frame.top - dy, width: frame.width, height: frame.height });
+/** Snapshots from older callers carry no layout generation; their geometry stands in. */
+export const layoutOf = (snapshot: OperationSnapshot) => snapshot.generation.layout ?? snapshot.generation.geometry;
 
 let nextDocumentId = 0;
 const documentIds = new WeakMap<Document, number>();
@@ -46,8 +64,15 @@ export interface OperationSource {
    * fresh: an input-time read of the whole document that never trusts a cached snapshot. */
   capture(options?: { coalesce?: boolean; fresh?: boolean }): OperationSnapshot;
   validate(snapshot: OperationSnapshot, event?: Event): boolean;
-  /** Milliseconds until a pending change may be read; 0 when the last capture is current. */
+  /** Milliseconds until a pending layout change may be read; 0 when the last capture is current or
+   * only a page scroll or a checked look change is pending (those reads are shifted, G1.3). */
   deferredFor(): number;
+  /** Milliseconds until a pending change of any kind is read again. */
+  settlesIn(): number;
+  /** The kind of change since the last read. */
+  pending(): PendingChange;
+  /** While only looks changed: the envelopes of those controls, where they are now. */
+  lookRegions(): readonly PlacementFrame[];
   /** zIndex: the local plane's order inside the player, just above its media and below its UI. */
   videoSlot(): { parent: HTMLElement; rect: PlacementFrame; top: number; bottom: number; zIndex: number } | undefined;
   overlaySlot(): { parent: HTMLElement; zIndex: number } | undefined;
@@ -72,6 +97,8 @@ export function createOperationSource(
   const issued = new WeakSet<OperationSnapshot>();
   let generation = 0,
     previous = '',
+    layoutGeneration = 0,
+    previousLayout = '',
     rows: readonly OperationCandidate[] = [],
     dragging: Element | undefined,
     captured: Element | undefined;
@@ -89,6 +116,23 @@ export function createOperationSource(
     deferredUntil = 0;
   const added = new Set<Element>(),
     touched = new Set<Element>();
+  /** What changed since the last read (G1.3), in rising order: nothing that moves a surface
+   * (focus, pointer state); only the page scrolled, which moves every surface that scrolls with it
+   * by the same amount; the look of a few controls changed while their boxes stayed (checked when
+   * the change arrives); or anything that can move surfaces around. Only the last keeps callers
+   * waiting for a read (deferredFor). */
+  let pending: PendingChange = 'none';
+  const changedLooks = new Set<HTMLElement>();
+  /** Per element, the rows read for it at the last read, with what a look change may not alter. */
+  let readRows = new Map<
+    Element,
+    { id: string; rect: PlacementFrame; visible: boolean; disabled: boolean; scrolls: boolean; plain: boolean }[]
+  >();
+  const raise = (kind: PendingChange) => {
+    if (RANK[kind] <= RANK[pending]) return false;
+    pending = kind;
+    return true;
+  };
   const collect = (records: readonly MutationRecord[]) => {
     for (const r of records) {
       if (fullScan) return;
@@ -111,11 +155,19 @@ export function createOperationSource(
   };
   // Focus and pointer state never move a surface; only geometry changes are coalesced.
   let geometryDirty = false;
+  /** Resize, fonts and ResizeObserver (a surface's size changed): anything may have moved. */
   const changed = () => {
     // The trace tells scroll, resize and fonts apart with its own listeners; the rest is resize-observer.
     WW_GUARD_TRACE: traceGeometryCause('changed');
     geometryDirty = true;
-    mark();
+    change('layout');
+  };
+  /** A page scroll moves every surface that scrolls with the page by the same amount, which a
+   * shifted snapshot follows exactly. A scroll inside an element moves only its contents. */
+  const scrolled = (event: Event) => {
+    WW_GUARD_TRACE: traceGeometryCause('changed');
+    geometryDirty = true;
+    change(event.target === doc ? 'scroll' : 'layout');
   };
   const mark = () => {
     if (!dirty) {
@@ -126,22 +178,80 @@ export function createOperationSource(
   // Records taken synchronously by capture() notify listeners at the same microtask
   // checkpoint the observer callback would have used, never inside the caller's frame.
   let notifyPending = false;
+  /** Listeners hear the first change after a read and every rise in its kind, since what they
+   * hide depends on it (pending()). */
+  const change = (kind: PendingChange, deliver = true) => {
+    const rose = raise(kind);
+    if (dirty && !rose) return;
+    dirty = true;
+    if (deliver) listeners.forEach((listener) => listener());
+    else if (!notifyPending) {
+      notifyPending = true;
+      queueMicrotask(() => {
+        notifyPending = false;
+        listeners.forEach((listener) => listener());
+      });
+    }
+  };
   const handle = (records: readonly MutationRecord[], deliver: boolean) => {
     collect(records);
     if (!relevant(records)) return;
-    WW_GUARD_TRACE: traceGeometryCause('mutation', records);
     geometryDirty = true;
-    if (deliver) mark();
-    else if (!dirty) {
-      dirty = true;
-      if (!notifyPending) {
-        notifyPending = true;
-        queueMicrotask(() => {
-          notifyPending = false;
-          listeners.forEach((listener) => listener());
-        });
+    const kind = lookOnly(records) ? 'look' : 'layout';
+    WW_GUARD_TRACE: traceGeometryCause(kind === 'look' ? 'mutation-look' : 'mutation-layout', records);
+    change(kind, deliver);
+  };
+  /** True when every relevant record only changed how a few controls look: a class or style on
+   * a control or on an element holding at most MAX_LOOK_ROWS of them, none of which moved,
+   * resized, appeared, disappeared or was drawn above the artwork (its order cannot be checked
+   * here). Reads those controls' boxes now, before the next paint; a change of any kind falls
+   * back to a layout change, which hides everything as before (D9). */
+  const lookOnly = (records: readonly MutationRecord[]) => {
+    if (!cached?.scroll || !cached.supported || pending === 'layout') return false;
+    const view = doc.defaultView!,
+      dx = view.scrollX - cached.scroll.x,
+      dy = view.scrollY - cached.scroll.y;
+    const looks: HTMLElement[] = [];
+    for (const r of records) {
+      if (!(r.target instanceof Element) || r.target.closest('[id^="web-world-themes"]')) continue;
+      const added = [...r.addedNodes, ...r.removedNodes].some(
+        (n) => n instanceof Element && !n.id.startsWith('web-world-themes'),
+      );
+      if (r.type === 'childList') {
+        if (added) return false;
+        continue;
+      }
+      if (!LOOK_ATTRIBUTES.has(r.attributeName ?? '')) {
+        if (relevant([r])) return false;
+        continue;
+      }
+      const target = r.target;
+      const under = rows.filter((row) => row.element === target || target.contains(row.element));
+      if (!under.length) continue;
+      if (under.length > MAX_LOOK_ROWS) return false;
+      for (const row of under) {
+        const read = readRows.get(row.element);
+        if (!read || read.some((entry) => !entry.plain)) return false;
+        const box = row.element.getBoundingClientRect();
+        const visible = box.width > 0 && box.height > 0 && view.getComputedStyle(row.element).visibility !== 'hidden';
+        for (const entry of read) {
+          const sx = entry.scrolls ? dx : 0,
+            sy = entry.scrolls ? dy : 0;
+          if (
+            entry.visible !== visible ||
+            entry.disabled !== row.element.matches(':disabled,[aria-disabled="true"]') ||
+            Math.abs(box.left - (entry.rect.left - sx)) > 0.5 ||
+            Math.abs(box.top - (entry.rect.top - sy)) > 0.5 ||
+            Math.abs(box.width - entry.rect.width) > 0.5 ||
+            Math.abs(box.height - entry.rect.height) > 0.5
+          )
+            return false;
+        }
+        looks.push(row.element);
       }
     }
+    looks.forEach((element) => changedLooks.add(element));
+    return true;
   };
   const relevant = (records: readonly MutationRecord[]) =>
     records.some(
@@ -189,7 +299,7 @@ export function createOperationSource(
     WW_GUARD_TRACE: traceGeometryCause('focus');
     mark();
   };
-  doc.addEventListener('scroll', changed, { capture: true, passive: true });
+  doc.addEventListener('scroll', scrolled, { capture: true, passive: true });
   doc.addEventListener('focusin', focusChanged, true);
   doc.addEventListener('focusout', focusChanged, true);
   doc.defaultView!.addEventListener('resize', changed);
@@ -221,6 +331,46 @@ export function createOperationSource(
   doc.defaultView!.addEventListener('blur', up);
   doc.defaultView!.addEventListener('focus', mark);
   types.forEach((type, i) => doc.addEventListener(type, handlers[i]!, { capture: true, passive: true }));
+  /** Milliseconds until the pending change of any kind is read again (the answer check). */
+  const settlesIn = () =>
+    dirty && geometryDirty && deferredUntil ? Math.max(0, deferredUntil - doc.defaultView!.performance.now()) : 0;
+  /** The last read as it is after the page scrolled: every surface that scrolls with the page
+   * moved by the same amount, the rest unchanged. The same layout generation, a new scroll. One
+   * object per offset, so the frame's readers share it. */
+  let shift: { base: OperationSnapshot; x: number; y: number; snapshot: OperationSnapshot } | undefined;
+  const shifted = (base: OperationSnapshot): OperationSnapshot => {
+    const view = doc.defaultView!,
+      x = view.scrollX,
+      y = view.scrollY;
+    const dx = x - (base.scroll?.x ?? x),
+      dy = y - (base.scroll?.y ?? y);
+    if (!dx && !dy) return base;
+    if (shift?.base === base && shift.x === x && shift.y === y) return shift.snapshot;
+    // A surface in a sticky column stays where it was read: it may be stuck, and every plane
+    // excludes its whole column anyway.
+    const surfaces = base.surfaces.map((surface) =>
+      surface.scrolls && !(surface.scrollBox && surface.scrollBox.height >= UNBOUNDED_BOX)
+        ? Object.freeze({
+            ...surface,
+            shape: moved(surface.shape, dx, dy),
+            protectedEnvelope: moved(surface.protectedEnvelope, dx, dy),
+            ...(surface.scrollBox && surface.scrollBox.height < UNBOUNDED_BOX
+              ? { scrollBox: moved(surface.scrollBox, dx, dy) }
+              : {}),
+          })
+        : surface,
+    );
+    const snapshot = Object.freeze({
+      generation: base.generation,
+      scroll: Object.freeze({ x, y }),
+      viewport: base.viewport,
+      supported: base.supported,
+      surfaces: Object.freeze(surfaces),
+    });
+    issued.add(snapshot);
+    shift = { base, x, y, snapshot };
+    return snapshot;
+  };
   function capture(options?: { coalesce?: boolean; fresh?: boolean }): OperationSnapshot {
     if (options?.fresh) {
       dirty = true;
@@ -228,8 +378,8 @@ export function createOperationSource(
       forced = true;
     }
     // Undelivered records are the only way a read element can have left the document.
-    const pending = observer.takeRecords();
-    if (pending.length) handle(pending, false);
+    const taken = observer.takeRecords();
+    if (taken.length) handle(taken, false);
     // Focus can leave with a removed element without any focus event; compare it directly.
     if (doc.activeElement !== readActive || doc.hasFocus() !== readFocus) dirty = true;
     if (!dirty && cached && doc.documentElement === root) return cached;
@@ -246,13 +396,17 @@ export function createOperationSource(
       now - capturedAt < COALESCE_MS
     ) {
       deferredUntil = capturedAt + COALESCE_MS;
-      return cached;
+      // Only a page scroll or a checked look change since the read: the read, shifted by the
+      // scroll, is where every surface is now (G1.3). Anything else: the caller holds drawing.
+      return pending === 'layout' ? cached : shifted(cached);
     }
     forced = false;
     geometryDirty = false;
     deferredUntil = 0;
     capturedAt = now;
     dirty = false;
+    pending = 'none';
+    changedLooks.clear();
     const scan: DiscoveryScan = {
       full: fullScan || now - lastFullScan >= FULL_SCAN_INTERVAL_MS,
       added: [...added],
@@ -353,6 +507,52 @@ export function createOperationSource(
       generation++;
       previous = signature;
     }
+    // The same in document coordinates: a uniform page scroll leaves it unchanged (G1.3).
+    // Screen-fixed surfaces do not move with the page. A surface in a sticky column (an unbounded
+    // scroll box) may be stuck or travelling at any scroll, so only its column counts, as every
+    // plane already excludes it along that whole column.
+    const scroll = { x: doc.defaultView!.scrollX, y: doc.defaultView!.scrollY };
+    const inDocument = (frame: PlacementFrame, moves: boolean, sticky: boolean) =>
+      sticky
+        ? [round(frame.left + scroll.x), round(frame.width)]
+        : moves && frame.height < UNBOUNDED_BOX
+          ? [round(frame.left + scroll.x), round(frame.top + scroll.y), round(frame.width), round(frame.height)]
+          : [round(frame.left), round(frame.top), round(frame.width), round(frame.height)];
+    const layoutSignature = JSON.stringify([
+      identity,
+      // A surface that is not visible has no box anyone uses (it reads as 0×0 at the origin).
+      surfaces.map(({ shape, protectedEnvelope, scrollBox, policy, compositionCapability, availability, scrolls }) =>
+        availability.visible
+          ? [
+              inDocument(shape, scrolls, Boolean(scrollBox && scrollBox.height >= UNBOUNDED_BOX)),
+              inDocument(protectedEnvelope, scrolls, Boolean(scrollBox && scrollBox.height >= UNBOUNDED_BOX)),
+              scrollBox ? inDocument(scrollBox, scrolls, scrollBox.height >= UNBOUNDED_BOX) : null,
+              policy,
+              compositionCapability,
+              availability.disabled,
+            ]
+          : [policy, compositionCapability, availability.disabled],
+      ),
+    ]);
+    if (layoutSignature !== previousLayout) {
+      layoutGeneration++;
+      previousLayout = layoutSignature;
+    }
+    readRows = new Map();
+    rows.forEach((row, i) => {
+      const surface = surfaces[i]!;
+      const list = readRows.get(row.element) ?? [];
+      list.push({
+        id: surface.id,
+        // The element's own box, as read above (the adapter's rect is the same reading).
+        rect: surface.shape,
+        visible: surface.availability.visible,
+        disabled: surface.availability.disabled,
+        scrolls: surface.scrolls,
+        plain: surface.compositionCapability === 'exclusion' || surface.compositionCapability === 'native-underlay',
+      });
+      readRows.set(row.element, list);
+    });
     surfaces.forEach((surface) => {
       surface.generation.geometry = generation;
       Object.freeze(surface.generation);
@@ -363,7 +563,8 @@ export function createOperationSource(
       Object.freeze(surface);
     });
     cached = Object.freeze({
-      generation: Object.freeze({ documentId, geometry: generation }),
+      generation: Object.freeze({ documentId, geometry: generation, layout: layoutGeneration }),
+      scroll: Object.freeze(scroll),
       viewport: Object.freeze({ width: doc.defaultView!.innerWidth, height: doc.defaultView!.innerHeight }),
       supported: surfaces.every((s) => s.compositionCapability !== 'unsupported'),
       surfaces: Object.freeze(surfaces),
@@ -388,7 +589,7 @@ export function createOperationSource(
       observer.disconnect();
       resize.disconnect();
       types.forEach((type, i) => doc.removeEventListener(type, handlers[i]!, true));
-      doc.removeEventListener('scroll', changed, true);
+      doc.removeEventListener('scroll', scrolled, true);
       doc.removeEventListener('focusin', focusChanged, true);
       doc.removeEventListener('focusout', focusChanged, true);
       doc.defaultView!.removeEventListener('resize', changed);
@@ -416,7 +617,7 @@ export function createOperationSource(
         resize.observe(doc.documentElement);
         observed.forEach((e) => resize.observe(e));
         types.forEach((type, i) => doc.addEventListener(type, handlers[i]!, { capture: true, passive: true }));
-        doc.addEventListener('scroll', changed, { capture: true, passive: true });
+        doc.addEventListener('scroll', scrolled, { capture: true, passive: true });
         doc.addEventListener('focusin', focusChanged, true);
         doc.addEventListener('focusout', focusChanged, true);
         doc.defaultView!.addEventListener('resize', changed);
@@ -436,14 +637,24 @@ export function createOperationSource(
     },
     capture,
     deferredFor() {
-      return dirty && deferredUntil ? Math.max(0, deferredUntil - doc.defaultView!.performance.now()) : 0;
+      return pending === 'layout' ? settlesIn() : 0;
+    },
+    settlesIn,
+    pending: () => (dirty ? pending : 'none'),
+    lookRegions() {
+      if (pending !== 'look' || !cached) return [];
+      const now = shifted(cached),
+        ids = new Set([...changedLooks].flatMap((element) => readRows.get(element)?.map((row) => row.id) ?? []));
+      return now.surfaces.filter((s) => ids.has(s.id)).map((s) => s.scrollBox ?? s.protectedEnvelope);
     },
     validate(snapshot, event) {
       if (!issued.has(snapshot) || snapshot.generation.documentId !== documentId) return false;
       // Input-time reads never trust the incremental view or wait for a window.
       const next = capture({ fresh: Boolean(event) });
-      if (next.generation.geometry !== snapshot.generation.geometry || !next.supported) {
-        WW_GUARD_TRACE: if (event) traceMovedInput(event, snapshot.generation.geometry, next.generation.geometry);
+      // A page scroll keeps the layout: what was drawn for the snapshot still avoids every surface
+      // (G1.3, D3). The point of an input is checked against the page itself below.
+      if (layoutOf(next) !== layoutOf(snapshot) || !next.supported) {
+        WW_GUARD_TRACE: if (event) traceMovedInput(event, layoutOf(snapshot), layoutOf(next));
         return false;
       }
       if (!(event instanceof MouseEvent)) return true;
@@ -491,7 +702,7 @@ export function createOperationSource(
       observer.disconnect();
       resize.disconnect();
       listeners.clear();
-      doc.removeEventListener('scroll', changed, true);
+      doc.removeEventListener('scroll', scrolled, true);
       doc.removeEventListener('focusin', focusChanged, true);
       doc.removeEventListener('focusout', focusChanged, true);
       doc.defaultView!.removeEventListener('resize', changed);
