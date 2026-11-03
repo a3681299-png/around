@@ -722,4 +722,6 @@ try {
     clearTimeout(timer);
   }
   console.log('SAVED ' + output);
+  // Over 20 GB, at most once a day: the oldest outputs go by the rules of scripts/clean-work.mjs.
+  (await import('../clean-work.mjs')).autoClean(path.resolve('.'));
 }

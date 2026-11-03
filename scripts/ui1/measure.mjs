@@ -466,4 +466,8 @@ try {
 } finally {
   await shared?.context.close();
   console.log('SAVED ' + path.join(work, 'result.json'));
+  // Over 20 GB, at most once a day: the oldest outputs go by the rules of scripts/clean-work.mjs.
+  (await import('../clean-work.mjs')).autoClean(
+    path.dirname(path.dirname(path.dirname(fileURLToPath(import.meta.url)))),
+  );
 }

@@ -21,6 +21,9 @@ child.once('error', (error) => {
   console.error(error);
   process.exitCode = 1;
 });
-child.once('exit', (code) => {
+child.once('exit', async (code) => {
   process.exitCode = code ?? 1;
+  // Test and measurement outputs pile up in .work: at most once a day, over 20 GB, the oldest
+  // are deleted by the rules of scripts/clean-work.mjs (docs/tooling.md).
+  if (!install) (await import('./clean-work.mjs')).autoClean(root);
 });
