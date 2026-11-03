@@ -134,12 +134,20 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
           };
         }, pointer)),
       });
+      // G1.3: the GIF follows the scroll and is shown at the same time. An opacity that follows
+      // while the guard hides the layer (its frame's visibility, a stop in data-ww-safety) is not a
+      // pass. The media element itself is hidden at opacity 0 by the renderer, which is not a stop.
       await expect
         .poll(() =>
           media.evaluate((node: HTMLElement) => {
             const root = document.scrollingElement!,
               range = root.scrollHeight - root.clientHeight,
               value = range > 0 ? root.scrollTop / range : 0;
+            const host = (node.getRootNode() as ShadowRoot).host,
+              frame = node.closest<HTMLElement>('[data-image-id]');
+            const stopped = JSON.parse(host?.getAttribute('data-ww-safety') ?? '{}').stopped ?? '';
+            if (frame?.style.visibility === 'hidden' || getComputedStyle(host).visibility === 'hidden' || stopped)
+              return 1;
             return Math.abs(Number(node.style.opacity) - (1 - Math.abs(value * 2 - 1)));
           }),
         )
@@ -170,6 +178,7 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
               scrollTop: root.scrollTop,
               range: root.scrollHeight - root.clientHeight,
               visibility: (node.closest('[data-frame-id]') as HTMLElement | null)?.style.visibility,
+              frameVisibility: node.closest<HTMLElement>('[data-image-id]')?.style.visibility ?? null,
               safety: [...document.querySelectorAll('[id^="web-world-themes-"][id$="decorations"]')].map((host) => [
                 host.id,
                 host.getAttribute('data-ww-safety'),
@@ -246,6 +255,117 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
     for (const step of under.filter((entry) => entry.control && entry.approach))
       expect(Object.keys(step.approach!.held), JSON.stringify(step)).not.toContain(gifId);
     report.checks.scrollSpeedAndDirectionIndependent = true;
+    stage('wheel scroll');
+    // G1.3: real wheel input at about 90ms, as a person scrolls, with the pointer resting at the D9
+    // point. Every presented frame between the first and the last wheel records whether the GIF is
+    // shown. A WW_GUARD_TRACE build also records why the guard stopped; only a stop that follows a
+    // read where the page's controls really changed (added, removed or moved in document
+    // coordinates) is explained. Every other hidden frame fails the test (D5).
+    await page.evaluate(() => scrollTo(0, 0));
+    await page.mouse.move(pointer.x, pointer.y);
+    await expect
+      .poll(() =>
+        media.evaluate(
+          (node: HTMLElement) =>
+            JSON.parse((node.getRootNode() as ShadowRoot).host?.getAttribute('data-ww-safety') ?? '{}').stopped ?? '',
+        ),
+      )
+      .toBe('');
+    await page.waitForTimeout(250);
+    await media.first().evaluate((node: HTMLElement) => {
+      document.documentElement.removeAttribute('data-ww-guard-geometry');
+      const frames: unknown[] = ((window as any).wwWheelFrames = []);
+      (window as any).wwWheelEvents = [];
+      (window as any).wwWheelRecording = true;
+      document.addEventListener(
+        'wheel',
+        (event) => (window as any).wwWheelEvents.push({ t: performance.now(), deltaY: event.deltaY }),
+        { capture: true, passive: true },
+      );
+      const host = (node.getRootNode() as ShadowRoot).host,
+        frame = node.closest<HTMLElement>('[data-image-id]');
+      const sample = (t: number) => {
+        const r = node.getBoundingClientRect();
+        frames.push({
+          t,
+          scrollY,
+          // The guard hides the layer's frame; the media alone is hidden at opacity 0 (not a stop).
+          visible: frame?.style.visibility !== 'hidden' && getComputedStyle(host).visibility !== 'hidden',
+          stopped: JSON.parse(host.getAttribute('data-ww-safety') ?? '{}').stopped ?? '',
+          rect: [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)],
+        });
+        if ((window as any).wwWheelRecording) requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    });
+    const wheelNear: unknown[] = [];
+    for (let i = 0; i < 24; i++) {
+      await page.mouse.wheel(0, i < 12 ? 90 : -90);
+      await page.waitForTimeout(70);
+      // Native controls within 72px of the resting pointer at this step (D9, D11).
+      if (i % 4 === 3)
+        wheelNear.push(
+          await page.evaluate(
+            ({ x, y }) =>
+              [
+                ...document.querySelectorAll(
+                  'a[href], button, [role="button"], input, textarea, [contenteditable="true"], [role="slider"], ytd-searchbox, yt-searchbox',
+                ),
+              ]
+                .filter((e) => !e.closest('[id^="web-world-themes"]'))
+                .map((e) => e.getBoundingClientRect())
+                .filter(
+                  (r) =>
+                    r.width > 0 && r.height > 0 && Math.max(r.left - x, x - r.right, r.top - y, y - r.bottom) <= 72,
+                )
+                .slice(0, 4)
+                .map((r) => [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)]),
+            pointer,
+          ),
+        );
+    }
+    const wheel = await page.evaluate(() => {
+      (window as any).wwWheelRecording = false;
+      return {
+        frames: (window as any).wwWheelFrames as { t: number; visible: boolean; stopped: string }[],
+        events: (window as any).wwWheelEvents as { t: number }[],
+        geometry: JSON.parse(document.documentElement.getAttribute('data-ww-guard-geometry') ?? 'null') as
+          { at: number; change: string; added?: number; removed?: number; documentMoved?: number }[] | null,
+      };
+    });
+    const first = wheel.events[0]!.t,
+      last = wheel.events.at(-1)!.t;
+    const during = wheel.frames.filter((f) => f.t >= first && f.t <= last);
+    // With the trace: from a stop that follows a read with a real change of the controls, to its
+    // release. The trace keeps earlier entries; only this wheel's (from one read window before) count.
+    const explainedSpans: [number, number][] = [];
+    const geometry = wheel.geometry?.filter((g) => g.at >= first - 250);
+    if (geometry)
+      for (const [i, entry] of geometry.entries()) {
+        if (entry.change !== 'shifted' && entry.change !== 'hold') continue;
+        const read = geometry
+          .slice(0, i + 1)
+          .reverse()
+          .find((g) => g.change === 'read');
+        if (!read || !(read.added || read.removed || read.documentMoved)) continue;
+        const release = geometry.slice(i).find((g) => g.change === 'release');
+        explainedSpans.push([entry.at, release?.at ?? Infinity]);
+      }
+    const hidden = during.filter((f) => !f.visible);
+    const unexplained = hidden.filter((f) => !explainedSpans.some(([a, b]) => f.t >= a && f.t <= b));
+    report.checks['wheel'] = {
+      events: wheel.events.length,
+      frames: during.length,
+      hidden: hidden.length,
+      unexplained: unexplained.length,
+      explainedSpans,
+      traced: Boolean(wheel.geometry),
+      stops: [...new Set(hidden.map((f) => f.stopped))],
+      near: wheelNear,
+      samples: during.filter((_, i) => i % 10 === 0),
+    };
+    expect(during.length, 'frames sampled during the wheel').toBeGreaterThan(20);
+    expect(unexplained.length, JSON.stringify(report.checks['wheel']).slice(0, 2000)).toBe(0);
     stage('record');
     await panel.click('.take-record');
     await expect

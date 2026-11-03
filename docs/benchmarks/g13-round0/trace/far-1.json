@@ -1,0 +1,5746 @@
+{
+  "label": "far-1",
+  "pointerMode": "far",
+  "point": {
+    "x": 1400,
+    "y": 418.75
+  },
+  "far": {
+    "x": 459.375,
+    "y": 980
+  },
+  "frames": [
+    {
+      "t": 6869.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 6876.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 6883.6,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6911.3,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6932.2,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6939.7,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6952.9,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6959.8,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6966.8,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6980.7,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6987.7,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 6994.6,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7001.5,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7008.5,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7016,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7022.5,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7029.6,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7036.4,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7043.4,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7050.2,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7064.2,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7078.3,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7091.9,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7105.9,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7119.6,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7133.5,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7140.4,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7161.3,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7168.3,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7175.2,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7189.6,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7195.9,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7202.9,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7209.8,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7216.8,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7223.7,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7230.7,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7244.6,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7258.5,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7265.4,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7272.5,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7279.4,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7286.3,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7293.3,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7300.3,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7307.1,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7314.2,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7334.9,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7348.8,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7355.7,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7362.7,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7376.8,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7383.7,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7390.5,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7397.3,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7411.4,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7418.2,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7425.3,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7432.1,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7439.3,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7445.9,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7453,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7460,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7466.9,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7473.8,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7480.8,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7487.5,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7501.6,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7515.3,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7529.2,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7536.3,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7543.2,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7550.1,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7557,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7564,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7570.9,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7578.2,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7591.7,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7605.9,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7619.6,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7633.4,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7640.4,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7647.3,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7654.5,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7661.3,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7668.2,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7682,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7688.9,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7695.8,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7702.8,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7709.9,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7716.8,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7730.7,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7737.6,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7744.6,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7751.5,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7765.3,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7779.2,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7786.2,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7793.2,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7800.3,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7807,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7814,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7821,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7827.8,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7834.9,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7841.7,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7848.7,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7855.6,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7862.6,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7869.5,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7876.5,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7883.3,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7890.5,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7897.2,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7904.2,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7911.2,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7918,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7932,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7946.3,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7960,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7966.8,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7973.8,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7980.8,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7987.6,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7994.5,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8001.5,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8009,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8015.4,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8029.6,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8036.3,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8043.4,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8050.5,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8057.2,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8064.3,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8071.3,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8078.2,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8084.9,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8091.7,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8099.1,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8112.6,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8126.7,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8140.5,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8154.1,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8168.1,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8175,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8182,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8195.8,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8209.7,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8223.6,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8230.6,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8237.7,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8245.1,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8251.5,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8258.5,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8265.7,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8272.4,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8279.5,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8293.5,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8300.1,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8307,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8313.9,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8321.2,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8327.8,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8341.9,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8355.9,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8362.6,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8383.4,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8397.2,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8411.2,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8418,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8425.3,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8431.9,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8439.1,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8445.8,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8459.7,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8466.6,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8473.9,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8480.9,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8487.5,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8494.5,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8501.6,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8508.3,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8515.3,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8522.3,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8529.1,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8550.2,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8556.9,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8563.8,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8571.1,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8577.8,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8584.7,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8591.9,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8598.6,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8605.8,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8612.5,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8626.8,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8633.3,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8640.4,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8647.2,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8654.5,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8661.5,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8675.3,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8681.9,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8689.1,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8695.8,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8709.6,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8716.5,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8723.5,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8730.6,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8744.5,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8751.7,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8758.3,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8765.3,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8772.6,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8779.4,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8793.1,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8799.8,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8807,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8814.2,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8821.1,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8827.8,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8835.3,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8841.6,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8848.7,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8855.9,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8862.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8876.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8883.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8890.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8897.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8904.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8911.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8925,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8932,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8945.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8952.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8959.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8966.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8980.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8987.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8994.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9001.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9008.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9015.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9022.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9029.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9036.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9043.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9050.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9057.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9063.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9071.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9078.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9084.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9092,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9098.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9105.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9112.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9119.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9126.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9133.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9140.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9147.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9154.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9161.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9168.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9175.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9181.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9188.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9195.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9202.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9209.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9216.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9224.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9230.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9237.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9244.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9251.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9258.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9265.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9272.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9279.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9286.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 9293,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9300.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9306.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9313.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9320.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9327.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9334.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9341.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9348.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9355.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9362.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9369.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9376.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9383.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9390.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9397,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9404.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9410.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9417.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9424.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9432,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9438.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9445.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9452.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9459.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9466.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9473.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9480.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9487.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9494.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9501.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9508.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9515.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9522,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9529.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9536,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9542.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9549.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9557.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9563.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9570.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9577.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9584.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9591.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9598.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9605.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9612.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9619.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9626.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9633.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9640,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9646.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9653.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9661.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9667.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9674.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9681.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9688.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9695.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9702.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9710.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9716.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9723.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9730.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9737.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9744.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9751.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9758.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9765.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9772.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9779.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9786,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9793.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9799.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9806.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9813.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9820.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9827.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9834.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9841.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9848.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9855.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9862.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9869.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9876.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9883.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9890.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9897.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9904.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9910.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9918,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9924.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9931.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9938.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9945.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9952.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9959.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9967.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9973.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9980.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9987.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9994.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10001.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10008.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10015.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10022.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10029.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10036.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10042.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10049.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10056.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10063.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10070.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10077.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10084.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10091.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10098.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10105.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10112.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10119.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10126.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10133.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10140.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    }
+  ],
+  "wheel": [
+    {
+      "t": 6885.300000000745,
+      "deltaY": 90
+    },
+    {
+      "t": 6967.699999999255,
+      "deltaY": 90
+    },
+    {
+      "t": 7051,
+      "deltaY": 90
+    },
+    {
+      "t": 7141.300000000745,
+      "deltaY": 90
+    },
+    {
+      "t": 7231.5,
+      "deltaY": 90
+    },
+    {
+      "t": 7320.800000000745,
+      "deltaY": 90
+    },
+    {
+      "t": 7398.10000000149,
+      "deltaY": 90
+    },
+    {
+      "t": 7488.300000000745,
+      "deltaY": 90
+    },
+    {
+      "t": 7578.900000002235,
+      "deltaY": 90
+    },
+    {
+      "t": 7669.199999999255,
+      "deltaY": 90
+    },
+    {
+      "t": 7752.60000000149,
+      "deltaY": 90
+    },
+    {
+      "t": 7842.300000000745,
+      "deltaY": 90
+    },
+    {
+      "t": 7933.199999999255,
+      "deltaY": -90
+    },
+    {
+      "t": 8016.400000002235,
+      "deltaY": -90
+    },
+    {
+      "t": 8099.699999999255,
+      "deltaY": -90
+    },
+    {
+      "t": 8183.400000002235,
+      "deltaY": -90
+    },
+    {
+      "t": 8280.199999999255,
+      "deltaY": -90
+    },
+    {
+      "t": 8363.400000002235,
+      "deltaY": -90
+    },
+    {
+      "t": 8446.400000002235,
+      "deltaY": -90
+    },
+    {
+      "t": 8535.300000000745,
+      "deltaY": -90
+    },
+    {
+      "t": 8613.10000000149,
+      "deltaY": -90
+    },
+    {
+      "t": 8696.400000002235,
+      "deltaY": -90
+    },
+    {
+      "t": 8780.10000000149,
+      "deltaY": -90
+    },
+    {
+      "t": 8863.5,
+      "deltaY": -90
+    }
+  ],
+  "geometry": [
+    {
+      "at": 1895,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {},
+      "mutated": [],
+      "visible": 13,
+      "added": 13,
+      "removed": 0,
+      "addedIds": [
+        "player.video",
+        "player.controls.bottom",
+        "player.controls.top",
+        "player.seek.0",
+        "player.seek.1",
+        "control.4"
+      ],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 3265,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation": 33,
+        "focus": 1,
+        "resize-observer": 1
+      },
+      "mutated": [
+        "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox[class]",
+        "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox[class]",
+        "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox[class]",
+        "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox[class]",
+        "video.video-stream.html5-main-video[style]",
+        "video.video-stream.html5-main-video[style]",
+        "video.video-stream.html5-main-video[style]",
+        "div.ytp-hover-progress[class]",
+        "div.ytp-scrubber-button.ytp-swatch-background-color.ytp-hide-scrubber-button[class]",
+        "div.ytp-time-display.notranslate[class]",
+        "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox[class]",
+        "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox[class]"
+      ],
+      "visible": 34,
+      "added": 28,
+      "removed": 7,
+      "addedIds": ["search.0", "navigation.0", "navigation.1", "control.1", "control.2", "control.5"],
+      "removedIds": ["control.30", "control.33", "control.34", "control.40", "control.41", "control.42"],
+      "viewportMoved": 6,
+      "documentMoved": 6,
+      "documentMovedIds": [
+        "player.video",
+        "player.controls.bottom",
+        "player.controls.top",
+        "player.seek.0",
+        "player.seek.1",
+        "control.4"
+      ]
+    },
+    {
+      "at": 3579,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation": 16,
+        "fonts": 1,
+        "resize-observer": 1
+      },
+      "mutated": [
+        "yt-floating-button-view-model.ytFloatingButtonViewModelHost.style-scope.ytd-structured-description-content-renderer[class]",
+        "div#contents.style-scope.ytd-item-section-renderer(+1/-0)",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+1/-0)",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+1/-0)",
+        "span.yt-icon-shape.ytSpecIconShapeHost[class]",
+        "span.yt-icon-shape.ytSpecIconShapeHost(+1/-0)",
+        "span.yt-icon-shape.style-scope.yt-icon[class]",
+        "span.yt-icon-shape.style-scope.yt-icon(+1/-0)",
+        "span.yt-icon-shape.style-scope.yt-icon[class]",
+        "span.yt-icon-shape.style-scope.yt-icon(+1/-0)"
+      ],
+      "visible": 46,
+      "added": 12,
+      "removed": 0,
+      "addedIds": ["control.108", "control.110", "control.112", "control.114", "control.116", "control.118"],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 3580,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "search.0",
+          "navigation.0",
+          "navigation.1",
+          "control.1",
+          "control.2",
+          "control.5",
+          "control.7",
+          "control.8"
+        ],
+        "removed": ["control.30", "control.33", "control.34", "control.40", "control.41", "control.42", "control.44"],
+        "changed": [
+          {
+            "id": "player.video",
+            "before": "[\"player.video\",\"native-underlay\",{\"transform\":\"fixed-plane\",\"occlusion\":\"allow\",\"input\":\"native-only\"},24,990,null]",
+            "after": "[\"player.video\",\"native-underlay\",{\"transform\":\"fixed-plane\",\"occlusion\":\"allow\",\"input\":\"native-only\"},16,1046.40625,null]"
+          },
+          {
+            "id": "player.controls.bottom",
+            "before": "[\"player.controls.bottom\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,990,null]",
+            "after": "[\"player.controls.bottom\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},16,1046.40625,null]"
+          },
+          {
+            "id": "player.controls.top",
+            "before": "[\"player.controls.top\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,990,null]",
+            "after": "[\"player.controls.top\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},16,1046.40625,null]"
+          },
+          {
+            "id": "player.seek.0",
+            "before": "[\"player.seek.0\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},32,974,null]",
+            "after": "[\"player.seek.0\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,1030,null]"
+          },
+          {
+            "id": "player.seek.1",
+            "before": "[\"player.seek.1\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},32,974,null]",
+            "after": "[\"player.seek.1\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,1030,null]"
+          },
+          {
+            "id": "control.4",
+            "before": "[\"control.4\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},481,76,null]",
+            "after": "[\"control.4\",\"native-above\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},415,523,12,32,null]"
+          }
+        ],
+        "changedCount": 6
+      }
+    },
+    {
+      "at": 3802,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation": 11,
+        "resize-observer": 1
+      },
+      "mutated": [
+        "html(+1/-0)",
+        "div#contents.style-scope.ytd-item-section-renderer(+2/-0)",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+1/-0)",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+1/-0)",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+1/-0)",
+        "yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+1/-0)",
+        "div#contents.style-scope.ytd-item-section-renderer(+3/-0)",
+        "ytd-continuation-item-renderer.style-scope.ytd-item-section-renderer(+11/-0)"
+      ],
+      "visible": 50,
+      "added": 4,
+      "removed": 0,
+      "addedIds": ["control.132", "control.134", "control.136", "control.138"],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 3802,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": ["control.132", "control.134", "control.136", "control.138"],
+        "removed": [],
+        "changed": [],
+        "changedCount": 0
+      }
+    },
+    {
+      "at": 4020,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation": 134,
+        "resize-observer": 1
+      },
+      "mutated": [
+        "head(+0/-1)",
+        "span.ytAttributedStringHost.ytListItemViewModelTitle.ytListItemViewModelSingleLineTitle[style]",
+        "span.ytAttributedStringHost.ytListItemViewModelTrailingLabel.ytListItemViewModelTrailing[style]",
+        "span.ytAttributedStringHost.ytListItemViewModelTitle.ytListItemViewModelSingleLineTitle[style]",
+        "yt-list-item-view-count-view-model.ytListItemViewCountViewModelHost.ytListItemViewModelAccessory.ytListItemViewModelTrailing[style]",
+        "span.ytAttributedStringHost.ytListItemViewModelTitle.ytListItemViewModelSingleLineTitle[style]",
+        "yt-list-item-like-count-view-model.ytListItemLikeCountViewModelHost.ytListItemViewModelAccessory.ytListItemViewModelTrailing[style]",
+        "span.ytAttributedStringHost.ytListItemViewModelTitle.ytListItemViewModelSingleLineTitle[style]",
+        "span.ytAttributedStringHost.ytListItemViewModelTrailingLabel.ytListItemViewModelTrailing[style]",
+        "span.ytAttributedStringHost.ytListItemViewModelTitle.ytListItemViewModelSingleLineTitle[style]",
+        "yt-list-item-view-count-view-model.ytListItemViewCountViewModelHost.ytListItemViewModelAccessory.ytListItemViewModelTrailing[style]",
+        "span.ytAttributedStringHost.ytListItemViewModelTitle.ytListItemViewModelSingleLineTitle[style]"
+      ],
+      "visible": 50,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 4294,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation": 5
+      },
+      "mutated": [
+        "yt-formatted-string.count-text.style-scope.ytd-comments-header-renderer[class]",
+        "yt-formatted-string.count-text.style-scope.ytd-comments-header-renderer(+0/-1)",
+        "yt-formatted-string.count-text.style-scope.ytd-comments-header-renderer(+2/-0)",
+        "div#simple-box.style-scope.ytd-comments-header-renderer(+1/-0)",
+        "ytd-comment-simplebox-renderer.style-scope.ytd-comments-header-renderer(+9/-0)",
+        "yt-formatted-string#simplebox-placeholder.style-scope.ytd-comment-simplebox-renderer(+0/-1)",
+        "yt-formatted-string#simplebox-placeholder.style-scope.ytd-comment-simplebox-renderer(+4/-0)",
+        "yt-img-shadow#author-thumbnail.style-scope.ytd-comment-simplebox-renderer.no-transition(+0/-1)",
+        "yt-img-shadow#author-thumbnail.style-scope.ytd-comment-simplebox-renderer.no-transition(+4/-0)",
+        "yt-img-shadow#author-thumbnail.style-scope.ytd-comment-simplebox-renderer.no-transition[class]",
+        "yt-img-shadow#author-thumbnail.style-scope.ytd-comment-simplebox-renderer.no-transition[class]",
+        "yt-img-shadow#author-thumbnail.style-scope.ytd-comment-simplebox-renderer.no-transition[style]"
+      ],
+      "visible": 62,
+      "added": 30,
+      "removed": 18,
+      "addedIds": ["comment.0", "control.85", "control.86", "control.90", "control.91", "control.92"],
+      "removedIds": ["control.104", "control.106", "control.108", "control.110", "control.112", "control.114"],
+      "viewportMoved": 1,
+      "documentMoved": 1,
+      "documentMovedIds": ["control.102"]
+    },
+    {
+      "at": 4294,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "comment.0",
+          "control.85",
+          "control.86",
+          "control.90",
+          "control.91",
+          "control.92",
+          "control.96",
+          "control.97"
+        ],
+        "removed": [
+          "control.104",
+          "control.106",
+          "control.108",
+          "control.110",
+          "control.112",
+          "control.114",
+          "control.116",
+          "control.118"
+        ],
+        "changed": [
+          {
+            "id": "control.102",
+            "before": "[\"control.102\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.102\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},120.1875,40,null]"
+          }
+        ],
+        "changedCount": 1
+      }
+    },
+    {
+      "at": 4527,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation": 19,
+        "resize-observer": 1
+      },
+      "mutated": [
+        "div#contents.style-scope.ytd-item-section-renderer(+2/-0)",
+        "ytd-comment-thread-renderer.style-scope.ytd-item-section-renderer(+9/-0)",
+        "yt-icon.style-scope.ytd-comment-thread-renderer(+3/-0)",
+        "yt-icon.style-scope.ytd-comment-thread-renderer[class]",
+        "yt-formatted-string.style-scope.ytd-comment-thread-renderer(+4/-0)",
+        "ytd-comment-view-model#comment.style-scope.ytd-comment-thread-renderer(+0/-1)",
+        "ytd-comment-view-model#comment.style-scope.ytd-comment-thread-renderer(+11/-0)",
+        "yt-img-shadow.style-scope.ytd-comment-view-model.no-transition(+0/-1)",
+        "yt-img-shadow.style-scope.ytd-comment-view-model.no-transition(+4/-0)",
+        "yt-img-shadow.style-scope.ytd-comment-view-model.no-transition[class]",
+        "ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1)",
+        "ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1)"
+      ],
+      "visible": 113,
+      "added": 60,
+      "removed": 9,
+      "addedIds": ["control.108", "control.112", "control.113", "control.114", "control.118", "control.119"],
+      "removedIds": ["control.129", "control.137", "control.143", "control.147", "control.149", "control.153"],
+      "viewportMoved": 10,
+      "documentMoved": 10,
+      "documentMovedIds": ["control.125", "control.127", "control.131", "control.133", "control.135", "control.139"]
+    },
+    {
+      "at": 4528,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "control.108",
+          "control.112",
+          "control.113",
+          "control.114",
+          "control.118",
+          "control.119",
+          "control.123",
+          "control.124"
+        ],
+        "removed": [
+          "control.129",
+          "control.137",
+          "control.143",
+          "control.147",
+          "control.149",
+          "control.153",
+          "control.155",
+          "control.157"
+        ],
+        "changed": [
+          {
+            "id": "control.125",
+            "before": "[\"control.125\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.125\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},156.234375,61.671875,null]"
+          },
+          {
+            "id": "control.127",
+            "before": "[\"control.127\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.127\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},12,44,null]"
+          },
+          {
+            "id": "control.131",
+            "before": "[\"control.131\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.131\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},56,40,null]"
+          },
+          {
+            "id": "control.133",
+            "before": "[\"control.133\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.133\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},160.1875,61.671875,null]"
+          },
+          {
+            "id": "control.135",
+            "before": "[\"control.135\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.135\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},12,44,null]"
+          },
+          {
+            "id": "control.139",
+            "before": "[\"control.139\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.139\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},56,40,null]"
+          },
+          {
+            "id": "control.141",
+            "before": "[\"control.141\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.141\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},156.234375,61.671875,null]"
+          },
+          {
+            "id": "control.145",
+            "before": "[\"control.145\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.145\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},48,123.46875,null]"
+          }
+        ],
+        "changedCount": 10
+      }
+    },
+    {
+      "at": 4741,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation": 75,
+        "resize-observer": 1
+      },
+      "mutated": [
+        "div#contents.style-scope.ytd-item-section-renderer(+3/-0)",
+        "ytd-comment-thread-renderer.style-scope.ytd-item-section-renderer(+9/-0)",
+        "yt-icon.style-scope.ytd-comment-thread-renderer(+3/-0)",
+        "yt-icon.style-scope.ytd-comment-thread-renderer[class]",
+        "yt-formatted-string.style-scope.ytd-comment-thread-renderer(+4/-0)",
+        "ytd-comment-view-model#comment.style-scope.ytd-comment-thread-renderer(+0/-1)",
+        "ytd-comment-view-model#comment.style-scope.ytd-comment-thread-renderer(+11/-0)",
+        "yt-img-shadow.style-scope.ytd-comment-view-model.no-transition(+0/-1)",
+        "yt-img-shadow.style-scope.ytd-comment-view-model.no-transition(+4/-0)",
+        "yt-img-shadow.style-scope.ytd-comment-view-model.no-transition[class]",
+        "ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1)",
+        "ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1)"
+      ],
+      "visible": 139,
+      "added": 31,
+      "removed": 5,
+      "addedIds": ["control.213", "control.217", "control.218", "control.219", "control.223", "control.224"],
+      "removedIds": ["control.234", "control.250", "control.258", "control.264", "control.266"],
+      "viewportMoved": 14,
+      "documentMoved": 14,
+      "documentMovedIds": ["control.230", "control.232", "control.236", "control.238", "control.240", "control.242"]
+    },
+    {
+      "at": 4741,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "control.213",
+          "control.217",
+          "control.218",
+          "control.219",
+          "control.223",
+          "control.224",
+          "control.228",
+          "control.229"
+        ],
+        "removed": ["control.234", "control.250", "control.258", "control.264", "control.266"],
+        "changed": [
+          {
+            "id": "control.230",
+            "before": "[\"control.230\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.230\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},156.234375,61.671875,null]"
+          },
+          {
+            "id": "control.232",
+            "before": "[\"control.232\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.232\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},12,44,null]"
+          },
+          {
+            "id": "control.236",
+            "before": "[\"control.236\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.236\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},56,40,null]"
+          },
+          {
+            "id": "control.238",
+            "before": "[\"control.238\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.238\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},156.234375,61.671875,null]"
+          },
+          {
+            "id": "control.240",
+            "before": "[\"control.240\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.240\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},12,44,null]"
+          },
+          {
+            "id": "control.242",
+            "before": "[\"control.242\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.242\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},64,75.6875,null]"
+          },
+          {
+            "id": "control.244",
+            "before": "[\"control.244\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.244\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},56,40,null]"
+          },
+          {
+            "id": "control.246",
+            "before": "[\"control.246\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.246\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},149.5,61.671875,null]"
+          }
+        ],
+        "changedCount": 14
+      }
+    },
+    {
+      "at": 4943,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "resize-observer": 1
+      },
+      "mutated": [],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 5211,
+      "change": "release",
+      "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "at": 5349,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation": 1
+      },
+      "mutated": [
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytCollectionThumbnailViewModelHostHasStacks.ytThumbnailViewModelAspectRatio16By9(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytCollectionThumbnailViewModelHostHasStacks.ytThumbnailViewModelAspectRatio16By9(+1/-0)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytCollectionThumbnailViewModelHostHasStacks.ytThumbnailViewModelAspectRatio16By9(+1/-0)",
+        "span.yt-icon-shape.ytSpecIconShapeHost[class]",
+        "span.yt-icon-shape.ytSpecIconShapeHost(+1/-0)"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 6907,
+      "change": "read",
+      "scroll": [0, 90],
+      "bumped": true,
+      "causes": {
+        "mutation": 2,
+        "scroll": 1
+      },
+      "mutated": [
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelVisible.ytLockupMetadataViewModelShowMenuButtonOnHover[class]",
+        "div#player-container.style-scope.ytd-watch-flexy[style]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 130,
+      "documentMoved": 0
+    },
+    {
+      "at": 6907,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,600.59375,726,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,510.59375,726,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,600.59375,726,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,510.59375,726,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,600.59375,726,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,510.59375,726,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},771.640625,94.765625,[402.265625,700.09375,668.140625,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},771.640625,94.765625,[402.265625,610.09375,668.140625,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},858.40625,64,[402.265625,700.09375,668.140625,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},858.40625,64,[402.265625,610.09375,668.140625,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},922.40625,48,[402.265625,700.09375,668.140625,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},922.40625,48,[402.265625,610.09375,668.140625,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},970.40625,48,[402.265625,700.09375,668.140625,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},970.40625,48,[402.265625,610.09375,668.140625,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1018.40625,48,[402.265625,700.09375,668.140625,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1018.40625,48,[402.265625,610.09375,668.140625,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 7115,
+      "change": "read",
+      "scroll": [0, 270],
+      "bumped": true,
+      "causes": {
+        "mutation": 2,
+        "scroll": 2
+      },
+      "mutated": [
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]",
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelVisible.ytLockupMetadataViewModelShowMenuButtonOnHover[class]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 130,
+      "documentMoved": 0
+    },
+    {
+      "at": 7115,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,510.59375,726,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,330.59375,726,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,510.59375,726,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,330.59375,726,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,510.59375,726,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,330.59375,726,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},771.640625,94.765625,[402.265625,610.09375,668.140625,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},771.640625,94.765625,[402.265625,430.09375,668.140625,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},858.40625,64,[402.265625,610.09375,668.140625,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},858.40625,64,[402.265625,430.09375,668.140625,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},922.40625,48,[402.265625,610.09375,668.140625,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},922.40625,48,[402.265625,430.09375,668.140625,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},970.40625,48,[402.265625,610.09375,668.140625,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},970.40625,48,[402.265625,430.09375,668.140625,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1018.40625,48,[402.265625,610.09375,668.140625,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1018.40625,48,[402.265625,430.09375,668.140625,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 7321,
+      "change": "read",
+      "scroll": [0, 540],
+      "bumped": true,
+      "causes": {
+        "mutation": 4,
+        "scroll": 2
+      },
+      "mutated": [
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]",
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelVisible.ytLockupMetadataViewModelShowMenuButtonOnHover[class]",
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 130,
+      "documentMoved": 0
+    },
+    {
+      "at": 7523,
+      "change": "read",
+      "scroll": [0, 720],
+      "bumped": true,
+      "causes": {
+        "scroll": 3,
+        "mutation": 4
+      },
+      "mutated": [
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]",
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelVisible.ytLockupMetadataViewModelShowMenuButtonOnHover[class]",
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 130,
+      "documentMoved": 0
+    },
+    {
+      "at": 7523,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,330.59375,726,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,-119.40625,726,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,330.59375,726,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,-119.40625,726,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,330.59375,726,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,-119.40625,726,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},771.640625,94.765625,[402.265625,430.09375,668.140625,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},771.640625,94.765625,[402.265625,-19.90625,668.140625,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},858.40625,64,[402.265625,430.09375,668.140625,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},858.40625,64,[402.265625,-19.90625,668.140625,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},922.40625,48,[402.265625,430.09375,668.140625,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},922.40625,48,[402.265625,-19.90625,668.140625,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},970.40625,48,[402.265625,430.09375,668.140625,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},970.40625,48,[402.265625,-19.90625,668.140625,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1018.40625,48,[402.265625,430.09375,668.140625,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1018.40625,48,[402.265625,-19.90625,668.140625,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 7723,
+      "change": "read",
+      "scroll": [0, 900],
+      "bumped": true,
+      "causes": {
+        "scroll": 2,
+        "mutation": 2
+      },
+      "mutated": [
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]",
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelVisible.ytLockupMetadataViewModelShowMenuButtonOnHover[class]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 130,
+      "documentMoved": 0
+    },
+    {
+      "at": 7723,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,-119.40625,726,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,-299.40625,726,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,-119.40625,726,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,-299.40625,726,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,-119.40625,726,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,-299.40625,726,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},771.640625,94.765625,[402.265625,-19.90625,668.140625,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},771.640625,94.765625,[402.265625,-199.90625,668.140625,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},858.40625,64,[402.265625,-19.90625,668.140625,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},858.40625,64,[402.265625,-199.90625,668.140625,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},922.40625,48,[402.265625,-19.90625,668.140625,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},922.40625,48,[402.265625,-199.90625,668.140625,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},970.40625,48,[402.265625,-19.90625,668.140625,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},970.40625,48,[402.265625,-199.90625,668.140625,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1018.40625,48,[402.265625,-19.90625,668.140625,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1018.40625,48,[402.265625,-199.90625,668.140625,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 7926,
+      "change": "read",
+      "scroll": [0, 1080],
+      "bumped": true,
+      "causes": {
+        "mutation": 2,
+        "scroll": 2
+      },
+      "mutated": [
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]",
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelVisible.ytLockupMetadataViewModelShowMenuButtonOnHover[class]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 130,
+      "documentMoved": 0
+    },
+    {
+      "at": 7927,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,-299.40625,726,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,-479.40625,726,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,-299.40625,726,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,-479.40625,726,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,-299.40625,726,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,-479.40625,726,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},771.640625,94.765625,[402.265625,-199.90625,668.140625,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},771.640625,94.765625,[402.265625,-379.90625,668.140625,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},858.40625,64,[402.265625,-199.90625,668.140625,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},858.40625,64,[402.265625,-379.90625,668.140625,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},922.40625,48,[402.265625,-199.90625,668.140625,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},922.40625,48,[402.265625,-379.90625,668.140625,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},970.40625,48,[402.265625,-199.90625,668.140625,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},970.40625,48,[402.265625,-379.90625,668.140625,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1018.40625,48,[402.265625,-199.90625,668.140625,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1018.40625,48,[402.265625,-379.90625,668.140625,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 8133,
+      "change": "read",
+      "scroll": [0, 810],
+      "bumped": true,
+      "causes": {
+        "scroll": 3,
+        "mutation": 4
+      },
+      "mutated": [
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]",
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelVisible.ytLockupMetadataViewModelShowMenuButtonOnHover[class]",
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 130,
+      "documentMoved": 0
+    },
+    {
+      "at": 8134,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,-479.40625,726,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,-209.40625,726,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,-479.40625,726,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,-209.40625,726,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,-479.40625,726,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,-209.40625,726,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},771.640625,94.765625,[402.265625,-379.90625,668.140625,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},771.640625,94.765625,[402.265625,-109.90625,668.140625,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},858.40625,64,[402.265625,-379.90625,668.140625,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},858.40625,64,[402.265625,-109.90625,668.140625,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},922.40625,48,[402.265625,-379.90625,668.140625,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},922.40625,48,[402.265625,-109.90625,668.140625,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},970.40625,48,[402.265625,-379.90625,668.140625,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},970.40625,48,[402.265625,-109.90625,668.140625,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1018.40625,48,[402.265625,-379.90625,668.140625,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1018.40625,48,[402.265625,-109.90625,668.140625,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 8334,
+      "change": "read",
+      "scroll": [0, 630],
+      "bumped": true,
+      "causes": {
+        "scroll": 2,
+        "mutation": 2
+      },
+      "mutated": [
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]",
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelVisible.ytLockupMetadataViewModelShowMenuButtonOnHover[class]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 130,
+      "documentMoved": 0
+    },
+    {
+      "at": 8335,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,-209.40625,726,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,-29.40625,726,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,-209.40625,726,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,-29.40625,726,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,-209.40625,726,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,-29.40625,726,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},771.640625,94.765625,[402.265625,-109.90625,668.140625,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},771.640625,94.765625,[402.265625,70.09375,668.140625,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},858.40625,64,[402.265625,-109.90625,668.140625,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},858.40625,64,[402.265625,70.09375,668.140625,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},922.40625,48,[402.265625,-109.90625,668.140625,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},922.40625,48,[402.265625,70.09375,668.140625,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},970.40625,48,[402.265625,-109.90625,668.140625,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},970.40625,48,[402.265625,70.09375,668.140625,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1018.40625,48,[402.265625,-109.90625,668.140625,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1018.40625,48,[402.265625,70.09375,668.140625,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 8535,
+      "change": "read",
+      "scroll": [0, 360],
+      "bumped": true,
+      "causes": {
+        "mutation": 2,
+        "scroll": 2
+      },
+      "mutated": [
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]",
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelVisible.ytLockupMetadataViewModelShowMenuButtonOnHover[class]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 130,
+      "documentMoved": 0
+    },
+    {
+      "at": 8737,
+      "change": "read",
+      "scroll": [0, 180],
+      "bumped": true,
+      "causes": {
+        "mutation": 4,
+        "scroll": 3
+      },
+      "mutated": [
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]",
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelVisible.ytLockupMetadataViewModelShowMenuButtonOnHover[class]",
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 130,
+      "documentMoved": 0
+    },
+    {
+      "at": 8737,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,-29.40625,726,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,420.59375,726,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,-29.40625,726,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,420.59375,726,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,-29.40625,726,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,420.59375,726,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},771.640625,94.765625,[402.265625,70.09375,668.140625,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},771.640625,94.765625,[402.265625,520.09375,668.140625,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},858.40625,64,[402.265625,70.09375,668.140625,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},858.40625,64,[402.265625,520.09375,668.140625,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},922.40625,48,[402.265625,70.09375,668.140625,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},922.40625,48,[402.265625,520.09375,668.140625,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},970.40625,48,[402.265625,70.09375,668.140625,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},970.40625,48,[402.265625,520.09375,668.140625,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1018.40625,48,[402.265625,70.09375,668.140625,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1018.40625,48,[402.265625,520.09375,668.140625,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 8941,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation": 3,
+        "scroll": 2
+      },
+      "mutated": [
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]",
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelVisible.ytLockupMetadataViewModelShowMenuButtonOnHover[class]",
+        "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+        "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+        "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 130,
+      "documentMoved": 0
+    },
+    {
+      "at": 8942,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [],
+        "removed": [],
+        "changed": [
+          {
+            "id": "control.46",
+            "before": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,420.59375,726,56]]",
+            "after": "[\"control.46\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,48,[28,600.59375,726,56]]"
+          },
+          {
+            "id": "control.49",
+            "before": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,420.59375,726,56]]",
+            "after": "[\"control.49\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},76,48,[28,600.59375,726,56]]"
+          },
+          {
+            "id": "control.50",
+            "before": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,420.59375,726,56]]",
+            "after": "[\"control.50\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},140,75.296875,[28,600.59375,726,56]]"
+          },
+          {
+            "id": "control.66",
+            "before": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},771.640625,94.765625,[402.265625,520.09375,668.140625,52]]",
+            "after": "[\"control.66\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},771.640625,94.765625,[402.265625,700.09375,668.140625,52]]"
+          },
+          {
+            "id": "control.67",
+            "before": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},858.40625,64,[402.265625,520.09375,668.140625,52]]",
+            "after": "[\"control.67\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},858.40625,64,[402.265625,700.09375,668.140625,52]]"
+          },
+          {
+            "id": "control.68",
+            "before": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},922.40625,48,[402.265625,520.09375,668.140625,52]]",
+            "after": "[\"control.68\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},922.40625,48,[402.265625,700.09375,668.140625,52]]"
+          },
+          {
+            "id": "control.70",
+            "before": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},970.40625,48,[402.265625,520.09375,668.140625,52]]",
+            "after": "[\"control.70\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},970.40625,48,[402.265625,700.09375,668.140625,52]]"
+          },
+          {
+            "id": "control.72",
+            "before": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1018.40625,48,[402.265625,520.09375,668.140625,52]]",
+            "after": "[\"control.72\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1018.40625,48,[402.265625,700.09375,668.140625,52]]"
+          }
+        ],
+        "changedCount": 8
+      }
+    },
+    {
+      "at": 9140,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation": 1
+      },
+      "mutated": ["div#player-container.style-scope.ytd-watch-flexy[style]"],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 9288,
+      "change": "release",
+      "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    }
+  ],
+  "approach": [
+    {
+      "at": 5324,
+      "change": "approach",
+      "value": true,
+      "event": "pointermove",
+      "target": "div.ytp-cued-thumbnail-overlay-image",
+      "point": {
+        "x": 466.6666564941406,
+        "y": 139.5833282470703
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "player.controls.bottom",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 1046.40625,
+            "height": 588.59375
+          }
+        },
+        {
+          "id": "player.controls.top",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 1046.40625,
+            "height": 588.59375
+          }
+        }
+      ],
+      "near": ["player.controls.top"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 5691,
+      "change": "approach",
+      "value": false,
+      "point": {
+        "x": 1400,
+        "y": 418.75
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [],
+      "near": [],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 6908,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 418.75
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.285",
+          "shape": {
+            "left": 1384,
+            "top": 457.9375,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.285"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 7115,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 418.75
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.287",
+          "shape": {
+            "left": 1384,
+            "top": 407.421875,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.287", "control.285"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 7321,
+      "change": "approach",
+      "value": true,
+      "event": "wheel",
+      "target": "div.ytSpecTouchFeedbackShapeFill",
+      "point": {
+        "x": 1400,
+        "y": 418.75
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.291",
+          "shape": {
+            "left": 1384,
+            "top": 396.390625,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.291", "control.287", "control.285"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 7461,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 418.75
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.291",
+          "shape": {
+            "left": 1384,
+            "top": 396.390625,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.291", "control.287"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 7524,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 418.75
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.293",
+          "shape": {
+            "left": 1384,
+            "top": 345.875,
+            "width": 40,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.295",
+          "shape": {
+            "left": 1384,
+            "top": 475.359375,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.293", "control.291", "control.287"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 7669,
+      "change": "approach",
+      "value": true,
+      "event": "wheel",
+      "target": "span.ytAttributedStringHost.ytContentMetadataViewModelMetadataText.ytContentMetadataViewModelMetadataTextLastPart",
+      "point": {
+        "x": 1400,
+        "y": 418.75
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.293",
+          "shape": {
+            "left": 1384,
+            "top": 345.875,
+            "width": 40,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.295",
+          "shape": {
+            "left": 1384,
+            "top": 475.359375,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.293", "control.291"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 7723,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 418.75
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.297",
+          "shape": {
+            "left": 1384,
+            "top": 424.84375,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.297", "control.293", "control.291"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 7871,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 418.75
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.297",
+          "shape": {
+            "left": 1384,
+            "top": 424.84375,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.297", "control.293"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 7927,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 418.75
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.299",
+          "shape": {
+            "left": 1384,
+            "top": 374.328125,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.299", "control.297", "control.293"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8073,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 418.75
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.299",
+          "shape": {
+            "left": 1384,
+            "top": 374.328125,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.299", "control.297"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8134,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 418.75
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.295",
+          "shape": {
+            "left": 1384,
+            "top": 385.359375,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.295", "control.299", "control.297"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8274,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 418.75
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.295",
+          "shape": {
+            "left": 1384,
+            "top": 385.359375,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.295", "control.299"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8335,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 418.75
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.293",
+          "shape": {
+            "left": 1384,
+            "top": 435.875,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.293", "control.295", "control.299"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8483,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 418.75
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.293",
+          "shape": {
+            "left": 1384,
+            "top": 435.875,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.293", "control.295"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8535,
+      "change": "approach",
+      "value": true,
+      "event": "wheel",
+      "target": "a.ytLockupMetadataViewModelTitle",
+      "point": {
+        "x": 1400,
+        "y": 418.75
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.287",
+          "shape": {
+            "left": 1384,
+            "top": 317.421875,
+            "width": 40,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.289",
+          "shape": {
+            "left": 1384,
+            "top": 446.90625,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.289", "control.293", "control.295"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8684,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 418.75
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.287",
+          "shape": {
+            "left": 1384,
+            "top": 317.421875,
+            "width": 40,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.289",
+          "shape": {
+            "left": 1384,
+            "top": 446.90625,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.289", "control.293"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8738,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 418.75
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.285",
+          "shape": {
+            "left": 1384,
+            "top": 367.9375,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.285", "control.289", "control.293"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8885,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 418.75
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.285",
+          "shape": {
+            "left": 1384,
+            "top": 367.9375,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.285", "control.289"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 9088,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 1400,
+        "y": 418.75
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [],
+      "near": ["control.285"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 9288,
+      "change": "approach",
+      "value": false,
+      "point": {
+        "x": 1400,
+        "y": 418.75
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [],
+      "near": [],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    }
+  ]
+}

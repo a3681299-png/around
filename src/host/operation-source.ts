@@ -1,7 +1,7 @@
 import type { OperationSnapshot, OperationSurface } from '../world/operations';
 import type { PlacementFrame } from '../world/geometry';
 import { scrollsWithPage } from './operation-composition';
-import { traceMissedInput, traceMovedInput } from './guard-trace';
+import { traceGeometryCause, traceGeometryRead, traceMissedInput, traceMovedInput } from './guard-trace';
 
 /** Attributes a site selector may test; a change can add or drop a candidate by itself. */
 const MATCHING_ATTRIBUTES = new Set(['class', 'role', 'href', 'contenteditable']);
@@ -112,6 +112,8 @@ export function createOperationSource(
   // Focus and pointer state never move a surface; only geometry changes are coalesced.
   let geometryDirty = false;
   const changed = () => {
+    // The trace tells scroll, resize and fonts apart with its own listeners; the rest is resize-observer.
+    WW_GUARD_TRACE: traceGeometryCause('changed');
     geometryDirty = true;
     mark();
   };
@@ -127,6 +129,7 @@ export function createOperationSource(
   const handle = (records: readonly MutationRecord[], deliver: boolean) => {
     collect(records);
     if (!relevant(records)) return;
+    WW_GUARD_TRACE: traceGeometryCause('mutation', records);
     geometryDirty = true;
     if (deliver) mark();
     else if (!dirty) {
@@ -183,6 +186,7 @@ export function createOperationSource(
   const focusChanged = (event: Event) => {
     const related = (event as FocusEvent).relatedTarget;
     if (owned(event) && (!(related instanceof Element) || related.closest('[id^="web-world-themes"]'))) return;
+    WW_GUARD_TRACE: traceGeometryCause('focus');
     mark();
   };
   doc.addEventListener('scroll', changed, { capture: true, passive: true });
@@ -190,6 +194,11 @@ export function createOperationSource(
   doc.addEventListener('focusout', focusChanged, true);
   doc.defaultView!.addEventListener('resize', changed);
   doc.fonts?.addEventListener('loadingdone', changed);
+  WW_GUARD_TRACE: {
+    doc.addEventListener('scroll', (event) => traceGeometryCause('scroll', event), { capture: true, passive: true });
+    doc.defaultView!.addEventListener('resize', () => traceGeometryCause('resize'));
+    doc.fonts?.addEventListener('loadingdone', () => traceGeometryCause('fonts'));
+  }
   let serial = 0;
   const down = (event: Event) => {
     if (owned(event)) return;
@@ -360,6 +369,7 @@ export function createOperationSource(
       surfaces: Object.freeze(surfaces),
     });
     issued.add(cached);
+    WW_GUARD_TRACE: traceGeometryRead(doc, cached, rows);
     return cached;
   }
   // The slot reads computed styles of the overlay's ancestors, which a stylesheet can change

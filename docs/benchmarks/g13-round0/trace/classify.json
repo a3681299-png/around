@@ -1,0 +1,133 @@
+[
+  {
+    "label": "codex-1",
+    "pointer": "codex",
+    "framesInWheel": 255,
+    "hidden": {
+      "probe-0": 255,
+      "probe-1": 255
+    },
+    "reads": 13,
+    "readsBumped": 11,
+    "readsWithMutation": 9,
+    "readsScrollOnly": 4,
+    "readsDocumentMoved": 0,
+    "readsAddedOrRemoved": 0,
+    "scrollOnlyMoved": [],
+    "mutatedTargets": [
+      "div.ytp-scrubber-container[style]",
+      "div.ytp-play-progress.ytp-swatch-background-color[style]",
+      "div.ytp-hover-progress[style]",
+      "div.ytp-hover-progress[class]",
+      "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+      "div.ytp-time-display.notranslate[class]",
+      "button.ytp-button.ytp-suggested-action-badge.ytp-suggested-action-badge-with-controls[style]",
+      "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox[class]",
+      "yt-attributed-string#attributed-snippet-text.style-scope.ytd-text-inline-expander(+1/-1)",
+      "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+      "div#player-container.style-scope.ytd-watch-flexy[style]"
+    ],
+    "holds": 1,
+    "shifted": 9,
+    "shiftedByEntry": {
+      "boundary": 9
+    },
+    "shiftedScrollBoxTopOnly": 9,
+    "scrollBoxRowsChanged": 8
+  },
+  {
+    "label": "codex-2",
+    "pointer": "codex",
+    "framesInWheel": 276,
+    "hidden": {
+      "probe-0": 276,
+      "probe-1": 276
+    },
+    "reads": 12,
+    "readsBumped": 10,
+    "readsWithMutation": 5,
+    "readsScrollOnly": 7,
+    "readsDocumentMoved": 0,
+    "readsAddedOrRemoved": 0,
+    "scrollOnlyMoved": [],
+    "mutatedTargets": [
+      "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox[class]",
+      "yt-attributed-string#attributed-snippet-text.style-scope.ytd-text-inline-expander(+1/-1)",
+      "img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]"
+    ],
+    "holds": 1,
+    "shifted": 9,
+    "shiftedByEntry": {
+      "boundary": 9
+    },
+    "shiftedScrollBoxTopOnly": 9,
+    "scrollBoxRowsChanged": 8
+  },
+  {
+    "label": "near-1",
+    "pointer": "near",
+    "framesInWheel": 245,
+    "hidden": {
+      "probe-0": 244,
+      "probe-1": 244
+    },
+    "reads": 14,
+    "readsBumped": 10,
+    "readsWithMutation": 14,
+    "readsScrollOnly": 0,
+    "readsDocumentMoved": 0,
+    "readsAddedOrRemoved": 0,
+    "scrollOnlyMoved": [],
+    "mutatedTargets": [
+      "div.ytp-scrubber-container[style]",
+      "div.ytp-play-progress.ytp-swatch-background-color[style]",
+      "div.ytp-hover-progress[style]",
+      "div.ytp-hover-progress[class]",
+      "div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+      "div.ytp-time-display.notranslate[class]",
+      "span.ytp-time-current(+0/-1)",
+      "span.ytp-time-current(+1/-0)",
+      "yt-sub-thread.ytSubThreadHost.ytSubThreadHasButton.ytSubThreadTopLevelThread[class]",
+      "yt-sub-thread.ytSubThreadHost.ytSubThreadHasButton.ytSubThreadHovered[class]",
+      "div.ytp-load-progress[style]"
+    ],
+    "holds": 5,
+    "shifted": 9,
+    "shiftedByEntry": {
+      "boundary": 9
+    },
+    "shiftedScrollBoxTopOnly": 9,
+    "scrollBoxRowsChanged": 8
+  },
+  {
+    "label": "far-1",
+    "pointer": "far",
+    "framesInWheel": 224,
+    "hidden": {
+      "probe-0": 224,
+      "probe-1": 224
+    },
+    "reads": 12,
+    "readsBumped": 11,
+    "readsWithMutation": 12,
+    "readsScrollOnly": 0,
+    "readsDocumentMoved": 0,
+    "readsAddedOrRemoved": 0,
+    "scrollOnlyMoved": [],
+    "mutatedTargets": [
+      "yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost.ytSpecTouchFeedbackShapeTouchResponse.ytSpecTouchFeedbackShapeThumbnailSizeMedium[class]",
+      "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+0/-1)",
+      "yt-thumbnail-view-model.ytThumbnailViewModelHost.ytThumbnailViewModelAspectRatio16By9.ytThumbnailViewModelMedium(+1/-0)",
+      "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelVisible.ytLockupMetadataViewModelShowMenuButtonOnHover[class]",
+      "div#player-container.style-scope.ytd-watch-flexy[style]",
+      "div.ytLockupMetadataViewModelMenuButton.ytLockupMetadataViewModelShowMenuButtonOnHover[class]"
+    ],
+    "holds": 0,
+    "shifted": 9,
+    "shiftedByEntry": {
+      "boundary": 9
+    },
+    "shiftedScrollBoxTopOnly": 9,
+    "scrollBoxRowsChanged": 8
+  }
+]

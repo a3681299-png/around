@@ -10,7 +10,7 @@ import {
   type SafetyIssue,
 } from '../world/operations';
 import type { OperationSource } from './operation-source';
-import { traceApproach } from './guard-trace';
+import { traceApproach, traceGuardStop } from './guard-trace';
 import type { Point } from '../world/geometry';
 import type { WorldApproach } from '../world/types';
 
@@ -427,6 +427,7 @@ export function createOperationGuardHost(
         // Native changes are still arriving and this snapshot is not current: hold all
         // drawing, keep the boundary comparison pending and come back when the window ends.
         if (!stopped) {
+          WW_GUARD_TRACE: traceGuardStop(doc, 'hold', { wait });
           stopped = HOLD;
           stoppedRemedy = remedyFor(false, [], SETTLES);
           stoppedIds = undefined;
@@ -445,6 +446,11 @@ export function createOperationGuardHost(
           boundaryDirty = false;
           const nextBoundary = boundaryKey(surfaces);
           if (nextBoundary !== boundary) {
+            WW_GUARD_TRACE: traceGuardStop(doc, 'shifted', {
+              entry: 'boundary',
+              before: boundary,
+              after: nextBoundary,
+            });
             boundary = nextBoundary;
             pause(SHIFTED);
           }
@@ -459,6 +465,7 @@ export function createOperationGuardHost(
         (s) => s.availability.editing || s.availability.dragging || s.availability.captured,
       );
       if (stopped && stopped !== HOLD && failures < 3 && !interacting && !nativeEditing && time - stableAt >= 350) {
+        WW_GUARD_TRACE: traceGuardStop(doc, 'release', { reason: stopped });
         stopped = '';
         issues = [];
       }
@@ -499,7 +506,10 @@ export function createOperationGuardHost(
     },
     commit(next) {
       paints = next;
-      if (!source.validate(surfaces)) pause(SHIFTED);
+      if (!source.validate(surfaces)) {
+        WW_GUARD_TRACE: traceGuardStop(doc, 'shifted', { entry: 'validate' });
+        pause(SHIFTED);
+      }
       // A root this paint put onto a near control is held from the next frame, even when nothing
       // else would draw one (it stopped there).
       if (approach.near.size) {
