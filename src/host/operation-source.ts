@@ -6,7 +6,10 @@ import {
   traceGeometryRead,
   traceMissedInput,
   traceMovedInput,
+  traceReplace,
+  traceSkipSweep,
   traceSubtreeCheck,
+  traceSweep,
 } from './guard-trace';
 
 /** Attributes a site selector may test; a change can add or drop a candidate by itself. */
@@ -28,6 +31,13 @@ const LOOK_ATTRIBUTES = new Set(['class', 'style']);
  * added ones can be a control. Everything is hidden until the next read checks those subtrees. */
 export type PendingChange = 'none' | 'scroll' | 'look' | 'subtree' | 'layout';
 const RANK: Record<PendingChange, number> = { none: 0, scroll: 1, look: 2, subtree: 3, layout: 4 };
+/** How long only shiftable changes (a page scroll, checked looks, checked subtrees) wait before
+ * the answer check starts a round (D14③ compared 1000ms; see docs/g13-plan.md). */
+const ANSWER_CHECK_MS = COALESCE_MS;
+/** The answer check in groups (D14②): six groups, one per frame, a round in about 100ms at 60fps. */
+const SWEEP_GROUPS = 6;
+/** Reads less than this apart belong to one frame (they share one group's check). */
+const SWEEP_FRAME_MS = 8;
 /** Sticky columns are read as unbounded boxes (±1e7); they never move with a page scroll. */
 const UNBOUNDED_BOX = 1e6;
 /** Document coordinates are compared at 1/100 px, below any rounding a scroll can introduce. */
@@ -102,7 +112,10 @@ export function createOperationSource(
   editorCentre: OperationSource['editorCentre'] = () => undefined,
   /** The adapter's candidate test for an inserted subtree (the same selectors its incremental
    * discovery uses). Without it, every element added or removed is a layout change. */
-  holdsCandidate?: (root: Element) => boolean,
+  holdsCandidate?: (root: Element, deep?: boolean) => boolean,
+  /** The adapter's group for a control (D14): where a control resized by its own look can have
+   * moved others. Without it, the element whose class or style changed. */
+  groupOf?: (element: Element) => Element | undefined,
 ): OperationSource {
   if (!documentIds.has(doc)) documentIds.set(doc, ++nextDocumentId);
   const documentId = documentIds.get(doc)!;
@@ -111,6 +124,8 @@ export function createOperationSource(
     previous = '',
     layoutGeneration = 0,
     previousLayout = '',
+    /** The rows' identities at the last whole read; a replaced box keeps them. */
+    readIdentity: readonly unknown[] = [],
     rows: readonly OperationCandidate[] = [],
     dragging: Element | undefined,
     captured: Element | undefined;
@@ -138,7 +153,16 @@ export function createOperationSource(
   /** Per element, the rows read for it at the last read, with what a look change may not alter. */
   let readRows = new Map<
     Element,
-    { id: string; rect: PlacementFrame; visible: boolean; disabled: boolean; scrolls: boolean; plain: boolean }[]
+    {
+      id: string;
+      rect: PlacementFrame;
+      visible: boolean;
+      disabled: boolean;
+      scrolls: boolean;
+      /** In a sticky column: stuck or travelling at any scroll, so its height in the page is free. */
+      sticky: boolean;
+      plain: boolean;
+    }[]
   >();
   /** What else arrived since the read, for when a subtree check lowers the pending kind again. */
   let sawScroll = false,
@@ -186,7 +210,10 @@ export function createOperationSource(
     geometryDirty = true;
     change(event.target === doc ? 'scroll' : 'layout');
   };
+  /** Focus, pointer or capture state changed: only a whole read records it (never a group check). */
+  let stateDirty = false;
   const mark = () => {
+    stateDirty = true;
     if (!dirty) {
       dirty = true;
       listeners.forEach((listener) => listener());
@@ -221,31 +248,95 @@ export function createOperationSource(
   /** True when every one of these read controls is where the last read put it (moved only by the
    * page scroll since), as large, shown or hidden and enabled or disabled as it was, and is cut
    * from the clip rather than drawn above the artwork (an order a box cannot show). */
-  const unchanged = (elements: readonly HTMLElement[]) => {
+  const unchanged = (elements: readonly HTMLElement[]) => elements.every((element) => compare(element) === 'same');
+  /** One read control against the last read: 'same'; 'box' when only its box changed (it is shown,
+   * enabled or disabled, and cut from the clip as before); 'other' for anything a box cannot
+   * replace (shown or hidden, enabled or disabled, drawn above the artwork, gone). The box read is
+   * left in `boxes` for a replacement (D14). */
+  const boxes = new Map<Element, DOMRect>();
+  const compare = (element: HTMLElement, cutOnly = true): 'same' | 'box' | 'other' => {
     const view = doc.defaultView!,
       dx = view.scrollX - (cached?.scroll?.x ?? view.scrollX),
       dy = view.scrollY - (cached?.scroll?.y ?? view.scrollY);
-    for (const element of elements) {
-      const read = readRows.get(element);
-      if (!read || read.some((entry) => !entry.plain) || !element.isConnected) return false;
-      const box = element.getBoundingClientRect();
-      const visible = box.width > 0 && box.height > 0 && view.getComputedStyle(element).visibility !== 'hidden';
-      const disabled = element.matches(':disabled,[aria-disabled="true"]');
-      for (const entry of read) {
-        const sx = entry.scrolls ? dx : 0,
-          sy = entry.scrolls ? dy : 0;
-        if (
-          entry.visible !== visible ||
-          entry.disabled !== disabled ||
-          Math.abs(box.left - (entry.rect.left - sx)) > 0.5 ||
-          Math.abs(box.top - (entry.rect.top - sy)) > 0.5 ||
-          Math.abs(box.width - entry.rect.width) > 0.5 ||
-          Math.abs(box.height - entry.rect.height) > 0.5
-        )
-          return false;
-      }
+    const read = readRows.get(element);
+    if (!read || (cutOnly && read.some((entry) => !entry.plain)) || !element.isConnected) return 'other';
+    const box = element.getBoundingClientRect();
+    const visible = box.width > 0 && box.height > 0 && view.getComputedStyle(element).visibility !== 'hidden';
+    const disabled = element.matches(':disabled,[aria-disabled="true"]');
+    let result: 'same' | 'box' = 'same';
+    for (const entry of read) {
+      const sx = entry.scrolls ? dx : 0,
+        sy = entry.scrolls ? dy : 0;
+      if (entry.visible !== visible || entry.disabled !== disabled) return 'other';
+      // A control that is not shown has no box anyone uses (it reads as 0×0 at the origin).
+      if (!visible) continue;
+      if (
+        Math.abs(box.left - (entry.rect.left - sx)) > 0.5 ||
+        // A sticky column's control may be stuck: only its column is compared, as everywhere.
+        (!entry.sticky && Math.abs(box.top - (entry.rect.top - sy)) > 0.5) ||
+        Math.abs(box.width - entry.rect.width) > 0.5 ||
+        Math.abs(box.height - entry.rect.height) > 0.5
+      )
+        result = 'box';
     }
+    boxes.set(element, box);
+    return result;
+  };
+  /** Controls a look change resized (D14): the change stays a look change when every other control
+   * in their group is where it was. Their new boxes replace the old ones in the read (`replace`). */
+  const resized = new Set<HTMLElement>();
+  const lookResized = (target: Element, elements: readonly HTMLElement[]) => {
+    const status = elements.map((element) => compare(element));
+    if (status.includes('other')) return false;
+    const grown = elements.filter((_, i) => status[i] === 'box');
+    if (!grown.length) return true;
+    // A control whose band the adapter derives (the player's control bars) is not a box to replace.
+    if (rows.some((row) => row.envelope && grown.includes(row.element))) return false;
+    const group = groupOf?.(target) ?? target;
+    const others = [
+      ...new Set(
+        rows
+          .filter((row) => row.element !== group && group.contains(row.element) && !elements.includes(row.element))
+          .map((row) => row.element),
+      ),
+    ];
+    if (others.length > MAX_LOOK_ROWS * 2 || !unchanged(others)) return false;
+    grown.forEach((element) => resized.add(element));
     return true;
+  };
+  /** The answer check in groups (D14②): when a window that only scrolled, changed looks or changed
+   * subtrees ends, the read controls are compared with the page one group per frame (box, shown,
+   * enabled) instead of reading the whole page in one frame. Any difference reads the whole page
+   * at once. A round with no difference makes the shifted read current. */
+  let sweepGroup = 0,
+    sweepAt = -Infinity;
+  const sweep = (now: number): 'pending' | 'done' | 'changed' => {
+    // One group per frame: later reads in the same frame share the result.
+    if (now - sweepAt < SWEEP_FRAME_MS) return 'pending';
+    sweepAt = now;
+    const elements = [...readRows.keys()] as HTMLElement[],
+      size = Math.ceil(elements.length / SWEEP_GROUPS),
+      group = elements.slice(sweepGroup * size, (sweepGroup + 1) * size);
+    let started = 0;
+    WW_GUARD_TRACE: started = doc.defaultView!.performance.now();
+    const differs = group.find((element) => compare(element, false) !== 'same');
+    const same = !differs;
+    WW_GUARD_TRACE: traceSweep(
+      doc,
+      sweepGroup,
+      SWEEP_GROUPS,
+      group.length,
+      doc.defaultView!.performance.now() - started,
+      same
+        ? 'same'
+        : `changed ${differs!.tagName} ${JSON.stringify(readRows.get(differs!))} now ${JSON.stringify(differs!.getBoundingClientRect())} scroll ${doc.defaultView!.scrollY} read ${cached?.scroll?.y}`,
+    );
+    if (!same) {
+      sweepGroup = 0;
+      return 'changed';
+    }
+    sweepGroup = (sweepGroup + 1) % SWEEP_GROUPS;
+    return sweepGroup ? 'pending' : 'done';
   };
   /** Subtrees whose children changed since the last read, checked once by the next read (D11). */
   const changedSubtrees = new Set<Element>();
@@ -268,7 +359,7 @@ export function createOperationSource(
         const addedElements = [...r.addedNodes].filter(own),
           removedElements = [...r.removedNodes].filter(own);
         if (!addedElements.length && !removedElements.length) continue;
-        if (!holdsCandidate || addedElements.some(holdsCandidate)) return 'layout';
+        if (!holdsCandidate || addedElements.some((n) => holdsCandidate(n))) return 'layout';
         if (removedElements.some((n) => rows.some((row) => n === row.element || n.contains(row.element))))
           return 'layout';
         changedSubtrees.add(target);
@@ -283,11 +374,53 @@ export function createOperationSource(
       if (!under.length) continue;
       if (under.length > MAX_LOOK_ROWS) return 'layout';
       const elements = [...new Set(under.map((row) => row.element))];
-      if (!unchanged(elements)) return 'layout';
+      if (!lookResized(target, elements)) return 'layout';
       looks.push(...elements);
     }
     looks.forEach((element) => changedLooks.add(element));
+    if (resized.size) replace();
     return kind;
+  };
+  /** The last read with the resized controls' new boxes (D14), as a whole read would give it: the
+   * same signatures, so the next whole read of an unchanged page keeps both generations. */
+  const replace = () => {
+    if (!cached?.scroll) return;
+    const view = doc.defaultView!,
+      dx = view.scrollX - cached.scroll.x,
+      dy = view.scrollY - cached.scroll.y;
+    const surfaces = cached.surfaces.map((surface, i) => {
+      const element = rows[i]?.element,
+        box = element && resized.has(element) ? boxes.get(element) : undefined;
+      if (!box) return surface;
+      // In the read's own coordinates: a surface that scrolls with the page moved with it since.
+      const sx = surface.scrolls ? dx : 0,
+        sy = surface.scrolls ? dy : 0;
+      const shape = Object.freeze({ left: box.left + sx, top: box.top + sy, width: box.width, height: box.height });
+      return Object.freeze({
+        ...surface,
+        shape,
+        protectedEnvelope: Object.freeze({
+          left: shape.left - 4,
+          top: shape.top - 4,
+          width: shape.width + 8,
+          height: shape.height + 8,
+        }),
+      });
+    });
+    for (const element of resized) {
+      const box = boxes.get(element)!;
+      readRows.get(element)?.forEach((entry) => {
+        entry.rect = {
+          left: box.left + (entry.scrolls ? dx : 0),
+          top: box.top + (entry.scrolls ? dy : 0),
+          width: box.width,
+          height: box.height,
+        };
+      });
+    }
+    resized.clear();
+    cached = seal(surfaces, cached.scroll, cached.viewport);
+    WW_GUARD_TRACE: traceReplace(doc, surfaces.length);
   };
   /** The next read's check of the changed subtrees (D11), once however many changes the frame had:
    * every read control inside them is unchanged. Elements outside are not read; one an addition
@@ -451,8 +584,9 @@ export function createOperationSource(
     const taken = observer.takeRecords();
     if (taken.length) handle(taken, false);
     // Focus can leave with a removed element without any focus event; compare it directly.
-    if (doc.activeElement !== readActive || doc.hasFocus() !== readFocus) dirty = true;
-    if (!dirty && cached && doc.documentElement === root) return cached;
+    if (doc.activeElement !== readActive || doc.hasFocus() !== readFocus) dirty = stateDirty = true;
+    // Current: the read, shifted by any page scroll a round of the answer check has accepted.
+    if (!dirty && cached && doc.documentElement === root) return shifted(cached);
     const now = doc.defaultView!.performance.now();
     const inWindow = now - capturedAt < COALESCE_MS;
     // A page scroll, a checked look change or changed subtrees after a quiet period open a window
@@ -460,7 +594,7 @@ export function createOperationSource(
     // the window's end to check it. Other changes are read at once, as before.
     const shiftable = pending === 'scroll' || pending === 'look' || pending === 'subtree';
     if (!inWindow && shiftable && !deferredUntil && geometryDirty && cached && !forced)
-      deferredUntil = now + COALESCE_MS;
+      deferredUntil = now + ANSWER_CHECK_MS;
     // A burst of native changes is read once per window, not once per frame. The stale
     // snapshot is only for callers that hold drawing; input checks force a fresh read.
     // Other reads inside the same held window share that caller's snapshot.
@@ -472,7 +606,7 @@ export function createOperationSource(
       doc.documentElement === root &&
       (inWindow || (shiftable && deferredUntil > now))
     ) {
-      if (inWindow) deferredUntil = capturedAt + COALESCE_MS;
+      if (inWindow) deferredUntil = capturedAt + (shiftable ? ANSWER_CHECK_MS : COALESCE_MS);
       // Added or removed elements: this read checks their subtrees once (D11). Unchanged, the
       // pending kind is what else arrived; changed, it is a layout change and drawing waits.
       if (pending === 'subtree')
@@ -484,6 +618,47 @@ export function createOperationSource(
       if (pending !== 'layout') return shifted(cached);
       if (inWindow) return cached;
     }
+    // The window ended with only shiftable changes: check the read one group per frame instead of
+    // reading the whole page now (D14②). An element whose class, role, href or contenteditable
+    // made it a candidate or stopped it being one still needs the whole read, as does any
+    // difference a group finds. (Added subtrees were checked to hold no candidate, D11.)
+    if (
+      shiftable &&
+      geometryDirty &&
+      cached &&
+      !forced &&
+      !fullScan &&
+      !stateDirty &&
+      holdsCandidate &&
+      ![...touched].some((element) => readRows.has(element) !== holdsCandidate(element, false)) &&
+      doc.documentElement === root &&
+      (pending !== 'subtree' || subtreesUnchanged())
+    ) {
+      if (pending === 'subtree') pending = sawLook ? 'look' : sawScroll ? 'scroll' : 'none';
+      const step = sweep(now);
+      if (step === 'pending') return shifted(cached);
+      if (step === 'done') {
+        // The shifted read is the page: nothing is pending until the next change.
+        geometryDirty = dirty = false;
+        deferredUntil = 0;
+        capturedAt = now;
+        pending = 'none';
+        sawScroll = sawLook = false;
+        changedLooks.clear();
+        return shifted(cached);
+      }
+    }
+    WW_GUARD_TRACE: if (shiftable && cached)
+      traceSkipSweep(doc, {
+        geometryDirty,
+        forced,
+        fullScan,
+        stateDirty,
+        touched: [...touched].filter((element) => readRows.has(element) !== holdsCandidate?.(element, false)).length,
+        pending,
+      });
+    sweepGroup = 0;
+    stateDirty = false;
     forced = false;
     geometryDirty = false;
     deferredUntil = 0;
@@ -577,9 +752,40 @@ export function createOperationSource(
         ...(row.scrollBox ? { scrollBox: Object.freeze({ ...row.scrollBox }) } : {}),
       };
     });
+    readIdentity = identity;
+    const scroll = { x: doc.defaultView!.scrollX, y: doc.defaultView!.scrollY };
+    readRows = new Map();
+    rootSize = root.getBoundingClientRect();
+    rows.forEach((row, i) => {
+      const surface = surfaces[i]!;
+      const list = readRows.get(row.element) ?? [];
+      list.push({
+        id: surface.id,
+        // The element's own box, as read above (the adapter's rect is the same reading).
+        rect: surface.shape,
+        visible: surface.availability.visible,
+        disabled: surface.availability.disabled,
+        scrolls: surface.scrolls,
+        sticky: Boolean(surface.scrollBox && surface.scrollBox.height >= UNBOUNDED_BOX),
+        plain: surface.compositionCapability === 'exclusion' || surface.compositionCapability === 'native-underlay',
+      });
+      readRows.set(row.element, list);
+    });
+    cached = seal(surfaces, scroll, { width: doc.defaultView!.innerWidth, height: doc.defaultView!.innerHeight });
+    WW_GUARD_TRACE: traceGeometryRead(doc, cached, rows);
+    return cached;
+  }
+  /** Signs, numbers and freezes a read (a whole one, or one with replaced boxes): the geometry
+   * generation changes when any surface moves on screen, the layout generation only when one moves
+   * in document coordinates. */
+  function seal(
+    read: readonly OperationSurface[],
+    scroll: { x: number; y: number },
+    viewport: { width: number; height: number },
+  ): OperationSnapshot {
     const signature = JSON.stringify([
-      identity,
-      surfaces.map(({ shape, protectedEnvelope, scrollBox, policy, compositionCapability, availability }) => [
+      readIdentity,
+      read.map(({ shape, protectedEnvelope, scrollBox, policy, compositionCapability, availability }) => [
         shape,
         protectedEnvelope,
         scrollBox ?? null,
@@ -597,7 +803,6 @@ export function createOperationSource(
     // Screen-fixed surfaces do not move with the page. A surface in a sticky column (an unbounded
     // scroll box) may be stuck or travelling at any scroll, so only its column counts, as every
     // plane already excludes it along that whole column.
-    const scroll = { x: doc.defaultView!.scrollX, y: doc.defaultView!.scrollY };
     const inDocument = (frame: PlacementFrame, moves: boolean, sticky: boolean) =>
       sticky
         ? [round(frame.left + scroll.x), round(frame.width)]
@@ -605,9 +810,9 @@ export function createOperationSource(
           ? [round(frame.left + scroll.x), round(frame.top + scroll.y), round(frame.width), round(frame.height)]
           : [round(frame.left), round(frame.top), round(frame.width), round(frame.height)];
     const layoutSignature = JSON.stringify([
-      identity,
+      readIdentity,
       // A surface that is not visible has no box anyone uses (it reads as 0×0 at the origin).
-      surfaces.map(({ shape, protectedEnvelope, scrollBox, policy, compositionCapability, availability, scrolls }) =>
+      read.map(({ shape, protectedEnvelope, scrollBox, policy, compositionCapability, availability, scrolls }) =>
         availability.visible
           ? [
               inDocument(shape, scrolls, Boolean(scrollBox && scrollBox.height >= UNBOUNDED_BOX)),
@@ -624,41 +829,25 @@ export function createOperationSource(
       layoutGeneration++;
       previousLayout = layoutSignature;
     }
-    readRows = new Map();
-    rootSize = root.getBoundingClientRect();
-    rows.forEach((row, i) => {
-      const surface = surfaces[i]!;
-      const list = readRows.get(row.element) ?? [];
-      list.push({
-        id: surface.id,
-        // The element's own box, as read above (the adapter's rect is the same reading).
-        rect: surface.shape,
-        visible: surface.availability.visible,
-        disabled: surface.availability.disabled,
-        scrolls: surface.scrolls,
-        plain: surface.compositionCapability === 'exclusion' || surface.compositionCapability === 'native-underlay',
-      });
-      readRows.set(row.element, list);
-    });
-    surfaces.forEach((surface) => {
-      surface.generation.geometry = generation;
-      Object.freeze(surface.generation);
-      Object.freeze(surface.shape);
-      Object.freeze(surface.protectedEnvelope);
-      Object.freeze(surface.availability);
-      Object.freeze(surface.policy);
-      Object.freeze(surface);
-    });
-    cached = Object.freeze({
+    const surfaces = read.map((surface) =>
+      Object.freeze({
+        ...surface,
+        generation: Object.freeze({ documentId, geometry: generation }),
+        shape: Object.freeze(surface.shape),
+        protectedEnvelope: Object.freeze(surface.protectedEnvelope),
+        availability: Object.freeze(surface.availability),
+        policy: Object.freeze(surface.policy),
+      }),
+    );
+    const snapshot = Object.freeze({
       generation: Object.freeze({ documentId, geometry: generation, layout: layoutGeneration }),
-      scroll: Object.freeze(scroll),
-      viewport: Object.freeze({ width: doc.defaultView!.innerWidth, height: doc.defaultView!.innerHeight }),
+      scroll: Object.freeze({ ...scroll }),
+      viewport: Object.freeze({ ...viewport }),
       supported: surfaces.every((s) => s.compositionCapability !== 'unsupported'),
       surfaces: Object.freeze(surfaces),
     });
-    issued.add(cached);
-    WW_GUARD_TRACE: traceGeometryRead(doc, cached, rows);
-    return cached;
+    issued.add(snapshot);
+    return snapshot;
   }
   // The slot reads computed styles of the overlay's ancestors, which a stylesheet can change
   // without any MutationRecord. Calls within one task (one draw) share a read; the next task

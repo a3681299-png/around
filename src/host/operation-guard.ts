@@ -504,6 +504,9 @@ export function createOperationGuardHost(
         if (boundaryDirty) {
           boundaryDirty = false;
           const nextBoundary = boundaryKey(surfaces);
+          // A control the source re-read in its group and replaced (a look change that resized
+          // it, D14) moved nothing else: its new box is the boundary, with nothing to wait for.
+          if (nextBoundary !== boundary && source.pending() === 'look') boundary = nextBoundary;
           if (nextBoundary !== boundary) {
             WW_GUARD_TRACE: traceGuardStop(doc, 'shifted', {
               entry: 'boundary',

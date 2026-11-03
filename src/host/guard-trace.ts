@@ -294,6 +294,18 @@ export function traceGuardStop(
   });
 }
 
+/** D14①: a read whose resized controls' boxes were replaced without a whole read. */
+export function traceReplace(doc: Document, surfaces: number) {
+  writeGeometry(doc, { change: 'replace', surfaces });
+}
+/** D14②: one group of the answer check, with its size and how long it took. */
+export function traceSweep(doc: Document, group: number, groups: number, rows: number, ms: number, result: string) {
+  writeGeometry(doc, { change: 'sweep', group, groups, rows, ms: Math.round(ms * 1000) / 1000, result });
+}
+/** D14②: why a window of shiftable changes ended in a whole read instead of group checks. */
+export function traceSkipSweep(doc: Document, why: Record<string, unknown>) {
+  writeGeometry(doc, { change: 'whole-read', ...why });
+}
 /** D11: one check of the subtrees whose children changed, with how many it read. */
 export function traceSubtreeCheck(doc: Document, unchanged: boolean, roots: number, controls: number) {
   writeGeometry(doc, { change: 'subtree-check', result: unchanged ? 'unchanged' : 'changed', roots, controls });

@@ -1,0 +1,393 @@
+{
+  "completed": false,
+  "checks": {
+    "stage": "wheel scroll",
+    "gifRuleEditedAndSaved": true,
+    "pointer": {
+      "point": {
+        "x": 36,
+        "y": 456.5
+      },
+      "gif": {
+        "x": 563.4375,
+        "y": 313.34375,
+        "width": 260,
+        "height": 195
+      },
+      "gifId": "image-e85d59e1-fb38-42fb-991f-37add4ca5ebd",
+      "under": [
+        {
+          "progress": 0,
+          "hit": "video",
+          "control": null,
+          "approach": {
+            "near": [],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.25,
+          "hit": "div",
+          "control": null,
+          "approach": {
+            "near": [],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.5,
+          "hit": "ytd-continuation-item-renderer",
+          "control": null,
+          "approach": {
+            "near": [],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.75,
+          "hit": "div#primary",
+          "control": null,
+          "approach": {
+            "near": [],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 1,
+          "hit": "div#primary",
+          "control": null,
+          "approach": {
+            "near": ["control.184", "control.188"],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.5,
+          "hit": "button#author-thumbnail-button",
+          "control": "button#author-thumbnail-button",
+          "approach": {
+            "near": ["control.216", "control.184", "control.188"],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0,
+          "hit": "video",
+          "control": null,
+          "approach": {
+            "near": ["control.216", "control.184", "control.188"],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0,
+          "hit": "video",
+          "control": null,
+          "approach": {
+            "near": ["control.216", "control.184", "control.188"],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.5,
+          "hit": "button#author-thumbnail-button",
+          "control": "button#author-thumbnail-button",
+          "approach": {
+            "near": ["control.216"],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 1,
+          "hit": "div#primary",
+          "control": null,
+          "approach": {
+            "near": ["control.216"],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0.5,
+          "hit": "button#author-thumbnail-button",
+          "control": "button#author-thumbnail-button",
+          "approach": {
+            "near": ["control.216"],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        },
+        {
+          "progress": 0,
+          "hit": "video",
+          "control": null,
+          "approach": {
+            "near": ["control.216"],
+            "held": {}
+          },
+          "gifAt": {
+            "rect": [563, 313, 260, 195],
+            "visibility": "",
+            "stopped": "",
+            "viewport": [1541, 913]
+          },
+          "nearGif": []
+        }
+      ]
+    },
+    "scrollSpeedAndDirectionIndependent": true,
+    "wheel": {
+      "events": 24,
+      "frames": 190,
+      "hidden": 62,
+      "unexplained": 52,
+      "explainedSpans": [[8061, 8465]],
+      "traced": true,
+      "stops": [
+        "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+        "ページの操作部品が動いている間は、絵の表示を止めています。",
+        ""
+      ],
+      "near": [
+        [
+          [16, 383, 52, 43],
+          [68, 385, 176, 22]
+        ],
+        [
+          [60, 361, 32, 32],
+          [52, 405, 115, 40],
+          [16, 461, 36, 39],
+          [68, 461, 49, 20]
+        ],
+        [
+          [16, 393, 36, 39],
+          [68, 394, 91, 18],
+          [60, 441, 32, 32],
+          [52, 485, 104, 40]
+        ],
+        [
+          [60, 361, 32, 32],
+          [52, 405, 115, 40],
+          [16, 461, 36, 39],
+          [68, 461, 49, 20]
+        ],
+        [
+          [16, 383, 52, 43],
+          [68, 385, 176, 22]
+        ],
+        []
+      ],
+      "samples": [
+        {
+          "t": 8286.6,
+          "scrollY": 90,
+          "visible": false,
+          "stopped": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 8495.1,
+          "scrollY": 180,
+          "visible": false,
+          "stopped": "ページの操作部品が動いている間は、絵の表示を止めています。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 8675.6,
+          "scrollY": 360,
+          "visible": false,
+          "stopped": "ページの操作部品が動いている間は、絵の表示を止めています。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 8821.4,
+          "scrollY": 540,
+          "visible": false,
+          "stopped": "ページの操作部品が動いている間は、絵の表示を止めています。",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 8932.4,
+          "scrollY": 630,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 9029.6,
+          "scrollY": 720,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 9112.9,
+          "scrollY": 810,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 9196.2,
+          "scrollY": 900,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 9279.5,
+          "scrollY": 990,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 9369.8,
+          "scrollY": 1080,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 9446.2,
+          "scrollY": 990,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 9564.3,
+          "scrollY": 900,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 9675.4,
+          "scrollY": 810,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 9751.7,
+          "scrollY": 720,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 9848.9,
+          "scrollY": 630,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 9939.2,
+          "scrollY": 540,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 10022.5,
+          "scrollY": 450,
+          "visible": true,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 10182.1,
+          "scrollY": 270,
+          "visible": false,
+          "stopped": "",
+          "rect": [563, 313, 260, 195]
+        },
+        {
+          "t": 10341.9,
+          "scrollY": 180,
+          "visible": false,
+          "stopped": "ページの操作部品が動いている間は、絵の表示を止めています。",
+          "rect": [563, 313, 260, 195]
+        }
+      ]
+    }
+  },
+  "browser": "143.0.7499.4"
+}

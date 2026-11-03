@@ -1946,9 +1946,10 @@ test('G1.3: a uniform page scroll keeps the layout generation; reads in the wind
       fixedKept: fixed.every((s: any) => (at.get(s.id) as any).shape.top === s.shape.top),
       shiftedLayout: shifted.generation.layout === first.generation.layout,
       deferred,
-      rereadFresh: reread !== shifted,
+      // After the window, the answer check goes group by group (D14②): the read in use is where
+      // the page is now, with the same layout.
+      rereadCurrent: reread.scroll.y === scrollY,
       rereadLayout: reread.generation.layout === first.generation.layout,
-      rereadGeometry: reread.generation.geometry !== first.generation.geometry,
     };
   });
   expect(result.layout).toBe('number');
@@ -1959,9 +1960,8 @@ test('G1.3: a uniform page scroll keeps the layout generation; reads in the wind
     fixedKept: true,
     shiftedLayout: true,
     deferred: 0,
-    rereadFresh: true,
+    rereadCurrent: true,
     rereadLayout: true,
-    rereadGeometry: true,
   });
 });
 
@@ -2331,4 +2331,150 @@ test('G1.3: a screen-plane layer stays shown while the wheel scrolls, and its cl
     JSON.stringify(rows.filter((r) => !r.shown).slice(0, 3)),
   ).toEqual([]);
   expect(rows.filter((r) => r.inClip.length)).toEqual([]);
+});
+
+test('G1.3 (D14①): a look change that resizes one control re-reads its group and replaces it; one that moves a neighbour hides everything', async ({
+  youtube,
+}) => {
+  await youtube.goto('https://www.youtube.com/watch?v=fixture');
+  await youtube.addScriptTag({ content: await probeCode() });
+  await addProbePaint(youtube);
+  const result = await youtube.evaluate(async () => {
+    // Styles first: a stylesheet added later is itself a layout change.
+    const style = document.createElement('style');
+    style.textContent = '.g13-grow{transform:scale(1.5)}.g13-wide{width:160px!important}';
+    document.head.append(style);
+    const api = (window as any).G1Probe;
+    const paint = (window as any).G1Paint;
+    const frame = () => new Promise<number>((resolve) => requestAnimationFrame(resolve));
+    const play = document.querySelector<HTMLElement>('.html5-video-player button[aria-label="Play"]')!;
+    const source = api.youtubeOperations(document);
+    const stops: unknown[] = [];
+    const host = api.createOperationGuardHost(document, source, (stop: unknown) => {
+      if (stop) stops.push(stop);
+    });
+    const r = play.getBoundingClientRect();
+    const paints = [
+      paint('over', { left: r.left - 30, top: r.top - 30, width: r.width + 60, height: r.height + 60 }),
+      paint('away', { left: innerWidth - 160, top: 100, width: 100, height: 100 }),
+    ];
+    const settle = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 450));
+      for (let i = 0; i < 3; i++) {
+        host.sample(await frame());
+        host.commit(paints);
+      }
+    };
+    const reads = (since: number) =>
+      (JSON.parse(document.documentElement.getAttribute('data-ww-guard-geometry') ?? '[]') as any[]).filter(
+        (entry) => entry.change === 'read' && entry.at >= since,
+      ).length;
+    const playSurface = () =>
+      (host.snapshot().surfaces.surfaces as any[]).find(
+        (s) => Math.abs(s.shape.left + s.shape.width / 2 - (r.left + r.width / 2)) < 2 && s.shape.width < r.width * 2,
+      );
+    const change = async (name: string) => {
+      await settle();
+      const since = Math.floor(performance.now());
+      stops.length = 0;
+      play.classList.add(name);
+      await Promise.resolve();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      const atMutation = [...stops];
+      host.sample(await frame());
+      const next = {
+        stopped: host.snapshot().stopped,
+        blocked: [...host.commit(paints)],
+        height: playSurface()?.shape.height,
+        expected: play.getBoundingClientRect().height,
+        reads: reads(since),
+      };
+      play.classList.remove(name);
+      return { atMutation, next };
+    };
+    const grow = await change('g13-grow');
+    const wide = await change('g13-wide');
+    host.destroy();
+    style.remove();
+    return { grow, wide, height: r.height };
+  });
+  // Only the paint over the control is hidden, and the next frame draws with its new box, read
+  // within its group only: no whole-page read.
+  expect(result.grow.atMutation).toEqual([['over']]);
+  expect(result.grow.next.stopped).toBe('');
+  expect(result.grow.next.blocked).toEqual([]);
+  expect(result.grow.next.height).toBeCloseTo(result.grow.next.expected, 1);
+  expect(result.grow.next.height).toBeGreaterThan(result.height * 1.4);
+  expect(result.grow.next.reads).toBe(0);
+  // Wider, it pushes the next control along: everything is hidden, as for any layout change.
+  expect(result.wide.atMutation).toContain(true);
+});
+
+test('G1.3 (D14②): while the page scrolls, the answer check reads one group of controls per frame and finds a control moved without any mutation', async ({
+  youtube,
+}) => {
+  await youtube.addScriptTag({ content: await probeCode() });
+  await scrollRoom(youtube);
+  const result = await youtube.evaluate(async () => {
+    const api = (window as any).G1Probe;
+    const frame = () => new Promise<number>((resolve) => requestAnimationFrame(resolve));
+    const source = api.youtubeOperations(document);
+    const host = api.createOperationGuardHost(document, source, () => undefined);
+    await new Promise((resolve) => setTimeout(resolve, 450));
+    for (let i = 0; i < 3; i++) host.sample(await frame());
+    const log = (since: number) =>
+      (JSON.parse(document.documentElement.getAttribute('data-ww-guard-geometry') ?? '[]') as any[]).filter(
+        (entry) => entry.at >= since,
+      );
+    // 1. Quiet scrolling: the checks go round group by group, one per frame, with no whole read.
+    let since = Math.floor(performance.now());
+    for (let i = 0; i < 40; i++) {
+      scrollBy(0, 4);
+      host.sample(await frame());
+    }
+    const quiet = log(since);
+    // 2. A guide link moved by an animation (no DOM mutation) while the page keeps scrolling.
+    const link = document.querySelectorAll<HTMLElement>('ytd-guide-entry-renderer a#endpoint')[2]!;
+    const before = link.getBoundingClientRect().left;
+    link.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(300px)' }], {
+      duration: 1,
+      fill: 'forwards',
+    });
+    since = Math.floor(performance.now());
+    const moved = performance.now();
+    let found = -1,
+      last = moved,
+      longest = 0;
+    for (let i = 0; i < 60 && found < 0; i++) {
+      scrollBy(0, 4);
+      const time = await frame();
+      longest = Math.max(longest, time - last);
+      last = time;
+      host.sample(time);
+      const surface = (host.snapshot().surfaces.surfaces as any[]).find(
+        (s) =>
+          Math.abs(s.shape.left - (before + 300)) < 2 &&
+          Math.abs(s.shape.width - link.getBoundingClientRect().width) < 2,
+      );
+      if (surface) found = time - moved;
+    }
+    host.destroy();
+    return {
+      quietReads: quiet.filter((e) => e.change === 'read').length,
+      quietChecks: quiet.filter((e) => e.change === 'sweep').map((e) => [e.group, e.groups]),
+      found,
+      longest,
+      movedLog: log(since).map((e) => e.change),
+    };
+  });
+  // The first scroll after quiet opens the window; afterwards no whole read while only scrolling.
+  expect(result.quietReads, JSON.stringify(result)).toBe(0);
+  const groups = result.quietChecks[0]?.[1] as number;
+  expect(groups).toBeGreaterThan(1);
+  // One group per frame, in order, round and round.
+  expect(result.quietChecks.slice(0, groups).map(([group]) => group)).toEqual([...Array(groups).keys()]);
+  // The moved link is found at the latest when the window that may be open ends (200ms) and one
+  // round of groups has followed (one frame each, plus the frame that reads the whole page).
+  expect(result.found, JSON.stringify(result.movedLog)).toBeGreaterThanOrEqual(0);
+  expect(result.found, JSON.stringify(result)).toBeLessThanOrEqual(200 + (groups + 2) * result.longest);
 });
