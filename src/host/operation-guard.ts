@@ -35,6 +35,17 @@ const HOLD = 'ページの操作部品が動いている間は、絵の表示を
 const CLAIMED = '編集の枠の下にページの操作部品があったため、その操作を止めました。';
 const SETTLES = '動きが落ち着くと、自動で表示に戻ります。';
 const RESUME = '操作チェックの「描画を再開」を押してください。';
+const sameIssues = (a: readonly SafetyIssue[], b: readonly SafetyIssue[]) =>
+  a.length === b.length &&
+  a.every(
+    (x, i) =>
+      x.layerId === b[i]!.layerId &&
+      x.surfaceId === b[i]!.surfaceId &&
+      x.severity === b[i]!.severity &&
+      x.action === b[i]!.action &&
+      x.reason === b[i]!.reason &&
+      x.remedy === b[i]!.remedy,
+  );
 const quote = (names: readonly string[]) => names.map((name) => `「${name}」`).join('と');
 /** The remedy for a stop: the named layers to move, and 描画を再開 once recovery has ended. */
 function remedyFor(latched: boolean, names: readonly string[], remedy: string) {
@@ -554,6 +565,7 @@ export function createOperationGuardHost(
       return false;
     },
     commit(next) {
+      const previousIssues = issues;
       paints = next;
       if (!source.validate(surfaces)) {
         WW_GUARD_TRACE: traceGuardStop(doc, 'shifted', { entry: 'validate' });
@@ -641,6 +653,9 @@ export function createOperationGuardHost(
               })),
           ];
       }
+      // The same issues as the last commit keep that array, so publish and the renderer's record
+      // stop at an identity check instead of serialising every frame (G1.3, c3).
+      if (sameIssues(previousIssues, issues)) issues = previousIssues;
       publish();
       return new Set(
         issues.filter((i) => i.severity === 'enforced' && (!i.action || i.action === 'stop')).map((i) => i.layerId),

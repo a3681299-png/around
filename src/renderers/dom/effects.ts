@@ -19,6 +19,8 @@ export function createEffectController(
   timeline?: TimelineHost,
   applyLayout?: (layout: WorldLayout) => void,
   applyModels?: (frame: WorldFrame) => void,
+  /** Runs before this frame writes any style: the place for reads its layout will need (c4). */
+  beforeWrites?: () => void,
 ) {
   if (WORLD_MODE === 'legacy') {
     const legacy = createLegacyEffectController(doc, playback);
@@ -38,6 +40,7 @@ export function createEffectController(
     doc,
     playback,
     (frame) => {
+      beforeWrites?.();
       const byId = new Map(frame.effects.map((effect) => [effect.id, effect]));
       const evaluatedLayers = new Map(
         [...frame.layout.groups, ...frame.layout.layers].map((value) => [value.layer.id, value.layer]),

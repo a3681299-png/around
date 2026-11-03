@@ -105,7 +105,9 @@ export function traceApproach(
  * the root element as data-ww-guard-geometry, newest last. */
 const geometryLog: unknown[] = [];
 let causes: Record<string, number> = {};
-let mutated: string[] = [];
+let mutated: string[] = [],
+  looked: string[] = [],
+  firstLayout: number | undefined;
 let lastRead: Map<string, { viewport: string; document: string; element: Element }> | undefined;
 let lastGeneration = -1;
 const writeGeometry = (doc: Document, entry: Record<string, unknown>) => {
@@ -117,20 +119,35 @@ export function traceGeometryCause(kind: string, detail?: Event | readonly Mutat
   if (kind === 'scroll' && detail instanceof Event)
     kind = detail.target instanceof Document ? 'scroll' : 'inner-scroll';
   causes[kind] = (causes[kind] ?? 0) + 1;
-  if (Array.isArray(detail) && mutated.length < 12)
-    for (const r of detail as readonly MutationRecord[]) {
-      if (mutated.length >= 12) break;
-      const target = r.target instanceof Element ? (describe(r.target)?.element ?? '?') : r.target.nodeName;
-      // childList: element nodes only (text-only changes never reach the guard).
-      const elements = (nodes: NodeList) => [...nodes].filter((n) => n instanceof Element).length;
-      mutated.push(
-        `${kind === 'mutation-look' ? 'look ' : kind === 'mutation-layout' ? 'layout ' : ''}${
-          r.type === 'attributes'
-            ? `${target}[${r.attributeName}]`
-            : `${target}(+${elements(r.addedNodes)}/-${elements(r.removedNodes)} elements)`
-        }`,
-      );
-    }
+  if (!Array.isArray(detail)) return;
+  // childList: element nodes only (text-only changes never reach the guard).
+  const elements = (nodes: NodeList) => [...nodes].filter((n) => n instanceof Element).length;
+  // A batch that was not a look change lists what made it so first: element additions or
+  // removals, then attributes other than class/style. Look changes keep only a few entries, so a
+  // playing seek bar does not crowd the reason out.
+  const weight = (r: MutationRecord) =>
+    r.type === 'childList'
+      ? elements(r.addedNodes) + elements(r.removedNodes)
+        ? 2
+        : 0
+      : /^(class|style)$/.test(r.attributeName ?? '')
+        ? 0
+        : 1;
+  const list = kind === 'mutation-look' ? looked : mutated,
+    cap = kind === 'mutation-look' ? 4 : 16;
+  // The batch that first made this window a layout change: the reason drawing waited.
+  if (kind === 'mutation-layout' && !firstLayout) firstLayout = mutated.length;
+  for (const r of [...(detail as readonly MutationRecord[])].sort((a, b) => weight(b) - weight(a))) {
+    if (list.length >= cap) break;
+    const target = r.target instanceof Element ? (describe(r.target)?.element ?? '?') : r.target.nodeName;
+    list.push(
+      `${kind.startsWith('mutation-') ? kind.slice('mutation-'.length) + ' ' : ''}${
+        r.type === 'attributes'
+          ? `${target}[${r.attributeName}]`
+          : `${target}(+${elements(r.addedNodes)}/-${elements(r.removedNodes)} elements)`
+      }`,
+    );
+  }
 }
 /** Ancestors (self included) whose position can change with scroll without any mutation (D7). */
 const scrollDependent = (element: Element) => {
@@ -213,7 +230,8 @@ export function traceGeometryRead(
     scroll: [sx, sy],
     bumped,
     causes,
-    mutated,
+    mutated: [...mutated, ...looked],
+    ...(firstLayout !== undefined ? { firstLayout: mutated[firstLayout] ?? null } : {}),
     visible: next.size,
     added: added.length,
     removed: removed.length,
@@ -238,6 +256,8 @@ export function traceGeometryRead(
   });
   causes = {};
   mutated = [];
+  looked = [];
+  firstLayout = undefined;
   lastRead = next;
 }
 export function traceGuardStop(
@@ -272,6 +292,11 @@ export function traceGuardStop(
     ...(detail.reason ? { reason: detail.reason } : {}),
     ...(diff ? { diff } : {}),
   });
+}
+
+/** D11: one check of the subtrees whose children changed, with how many it read. */
+export function traceSubtreeCheck(doc: Document, unchanged: boolean, roots: number, controls: number) {
+  writeGeometry(doc, { change: 'subtree-check', result: unchanged ? 'unchanged' : 'changed', roots, controls });
 }
 
 export function traceMovedInput(event: Event | undefined, held: number, now: number) {

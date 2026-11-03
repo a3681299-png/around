@@ -350,7 +350,8 @@ test('G1.3 alternating pairs on the formal scenes', async () => {
   test.setTimeout(3600000);
   await mkdir(out, { recursive: true });
   const names = Object.keys(builds);
-  if (names.length !== 2) throw new Error('G13_BUILDS needs two builds: a=<path>,b=<path>');
+  // Two builds alternate; one build alone is for a profile of that build only.
+  if (names.length < 1 || names.length > 2) throw new Error('G13_BUILDS needs one or two builds: a=<path>,b=<path>');
   const result: any = { date: new Date().toISOString(), builds, pairs: [], reference3d: [] };
   const save = () => writeFile(path.join(out, 'performance.json'), JSON.stringify(result, null, 2));
   for (let pair = 0; pair < Number(process.env.G13_PAIRS ?? 2); pair++) {

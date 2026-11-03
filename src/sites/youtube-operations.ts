@@ -212,5 +212,8 @@ export function youtubeOperations(doc: Document) {
       const { r } = verified;
       return { left: r.left, top: r.top + 64, width: r.width, height: r.height - 176 };
     },
+    // D11: an inserted subtree with no element any selector can match adds no control. The same
+    // test as incremental discovery's, on the inserted subtree only.
+    (root) => root.matches(candidateSelector) || Boolean(root.querySelector(candidateSelector)),
   );
 }

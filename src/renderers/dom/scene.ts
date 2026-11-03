@@ -155,6 +155,7 @@ export function createImageRenderer(
   // The last values written to the host; identical frames skip the attribute writes.
   let writtenClip = '',
     writtenSafety = '';
+  let recordedIssues: unknown, recordedStopped: string | undefined;
   // Set when the effect session applies its final layout (and protection) inside a draw.
   let effectLayoutApplied = false;
   const applyLayout = (
@@ -163,6 +164,17 @@ export function createImageRenderer(
     protect = true,
   ) => {
     lastLayout = layout;
+    // Positions are collected first and written once at the end, after the plane adjustments
+    // below, and only where they differ from what the element has: an unchanged frame writes
+    // nothing, and no read in between sees half-written geometry (G1.3, c1).
+    const staged = new Map<HTMLElement, Record<string, string>>();
+    const stage = (element: HTMLElement, values: Record<string, string>) => {
+      const current = staged.get(element);
+      if (current) Object.assign(current, values);
+      else staged.set(element, { ...values });
+    };
+    const stagedPx = (element: HTMLElement, key: 'left' | 'top') =>
+      parseFloat(staged.get(element)?.[key] ?? element.style[key]);
     const parents = new Map(layout.groups.map((group) => [group.layer.id, group]));
     for (const group of layout.groups) {
       const entry = compositions.get(group.layer.id);
@@ -176,8 +188,9 @@ export function createImageRenderer(
         height: `${p.heightPx}px`,
         transform: `rotate(${p.rotationDeg}deg)`,
       };
-      Object.assign(entry.node.style, geometry);
-      Object.assign(entry.controls.style, geometry);
+      stage(entry.node, geometry);
+      // A hidden handle (not selected for editing) is placed by the draw that shows it.
+      if (!entry.controls.hidden) stage(entry.controls, geometry);
     }
     for (const layer of layout.layers) {
       const entry = nodes.get(layer.layer.id);
@@ -187,16 +200,19 @@ export function createImageRenderer(
         point = layer.position;
       const parentAngle = layer.parentId ? (parents.get(layer.parentId)?.layer.placement.rotationDeg ?? 0) : 0;
       const size = { width: `${p.widthPx}px`, height: `${p.heightPx}px` };
-      Object.assign(entry.node.style, size, {
+      stage(entry.node, {
+        ...size,
         left: `${local.x}px`,
         top: `${local.y}px`,
         transform: `translate(-50%, -50%) rotate(${rotation(p.rotationDeg - parentAngle)}deg)`,
       });
-      Object.assign(entry.controls.style, size, {
-        left: `${point.x}px`,
-        top: `${point.y}px`,
-        transform: `translate(-50%, -50%) rotate(${p.rotationDeg}deg)`,
-      });
+      if (!entry.controls.hidden)
+        stage(entry.controls, {
+          ...size,
+          left: `${point.x}px`,
+          top: `${point.y}px`,
+          transform: `translate(-50%, -50%) rotate(${p.rotationDeg}deg)`,
+        });
     }
     if (safety && protect) {
       const roots = new Map([...layout.groups, ...layout.layers].map((entry) => [entry.layer.id, entry]));
@@ -367,32 +383,39 @@ export function createImageRenderer(
                 : imageLayer!,
           index = local ? localIndex++ : page ? pageIndex++ : atmosphere ? atmosphereIndex++ : globalIndex++;
         if (container.children[index] !== node) container.insertBefore(node, container.children[index] ?? null);
-        if (local && slot) {
-          node.style.left = parseFloat(node.style.left) - slot.rect.left + 'px';
-          node.style.top = parseFloat(node.style.top) - slot.rect.top + 'px';
-        }
-        if (page) {
-          node.style.left = parseFloat(node.style.left) + scroll.x + 'px';
-          node.style.top = parseFloat(node.style.top) + scroll.y + 'px';
-        }
+        if (local && slot)
+          stage(node, {
+            left: stagedPx(node, 'left') - slot.rect.left + 'px',
+            top: stagedPx(node, 'top') - slot.rect.top + 'px',
+          });
+        if (page)
+          stage(node, {
+            left: stagedPx(node, 'left') + scroll.x + 'px',
+            top: stagedPx(node, 'top') + scroll.y + 'px',
+          });
       }
       // Editor handles own only their visible authored bounds, inside the same
       // native clip. Drag/volume bands never become editor-owned.
-      for (const entry of [...nodes.values(), ...compositions.values()]) {
-        const id = entry.controls.dataset.frameId!,
-          parentId = layout.layers.find((l) => l.layer.id === id)?.parentId;
+      // One lookup table per layout, not a search of every layer per handle (c2).
+      const parentIds = new Map(layout.layers.map((l) => [l.layer.id, l.parentId]));
+      // The maps are keyed by the handle's frame id (data-frame-id), which a DOM read would repeat.
+      for (const [id, entry] of [...nodes, ...compositions]) {
+        const parentId = parentIds.get(id);
         const local = localRoots.has(parentId ?? id),
           page = inPlane(parentId ?? id, PAGE),
           root = local ? videoSlot!.shadow : page ? pagePlane!.shadow : shadow!;
         if (entry.controls.parentNode !== root) root.append(entry.controls);
-        if (local && slot) {
-          entry.controls.style.left = parseFloat(entry.controls.style.left) - slot.rect.left + 'px';
-          entry.controls.style.top = parseFloat(entry.controls.style.top) - slot.rect.top + 'px';
-        }
-        if (page) {
-          entry.controls.style.left = parseFloat(entry.controls.style.left) + scroll.x + 'px';
-          entry.controls.style.top = parseFloat(entry.controls.style.top) + scroll.y + 'px';
-        }
+        if (entry.controls.hidden) continue;
+        if (local && slot)
+          stage(entry.controls, {
+            left: stagedPx(entry.controls, 'left') - slot.rect.left + 'px',
+            top: stagedPx(entry.controls, 'top') - slot.rect.top + 'px',
+          });
+        if (page)
+          stage(entry.controls, {
+            left: stagedPx(entry.controls, 'left') + scroll.x + 'px',
+            top: stagedPx(entry.controls, 'top') + scroll.y + 'px',
+          });
       }
       if (!localRoots.size) {
         videoSlot?.host.remove();
@@ -464,10 +487,20 @@ export function createImageRenderer(
             };
           }),
       );
-      const record = JSON.stringify({ stopped: safety.snapshot().stopped, issues: safety.snapshot().issues });
-      if (record !== writtenSafety || host!.dataset.wwSafety !== record) {
-        host!.dataset.wwSafety = record;
-        writtenSafety = record;
+      // The guard keeps the same issues array while nothing changed: serialise only on a change (c3).
+      const status = safety.snapshot();
+      if (
+        status.issues !== recordedIssues ||
+        status.stopped !== recordedStopped ||
+        host!.dataset.wwSafety !== writtenSafety
+      ) {
+        const record = JSON.stringify({ stopped: status.stopped, issues: status.issues });
+        recordedIssues = status.issues;
+        recordedStopped = status.stopped;
+        if (record !== writtenSafety || host!.dataset.wwSafety !== record) {
+          host!.dataset.wwSafety = record;
+          writtenSafety = record;
+        }
       }
       for (const layer of layout.layers) {
         const entry = nodes.get(layer.layer.id);
@@ -489,6 +522,10 @@ export function createImageRenderer(
         else if (!stopped && wasStopped) entry.media.update(layer.layer, layer.visible);
       }
     }
+    // Reading an inline value is a declaration lookup, not a style or layout read.
+    for (const [element, values] of staged)
+      for (const key in values)
+        if (element.style.getPropertyValue(key) !== values[key]) element.style.setProperty(key, values[key]!);
     const selected =
       editing && editing.selectedIds.length > 1
         ? [...layout.groups, ...layout.layers].filter(
@@ -890,6 +927,9 @@ export function createImageRenderer(
         applyLayout(layout, safety?.source.overlaySlot());
       },
       (frame) => models?.evaluate(frame),
+      // The slot reads computed styles of the overlay's ancestors; read before this frame's style
+      // writes, the read needs no style recalculation, and the layout below reuses it (same task).
+      () => safety?.source.overlaySlot(),
     );
     imageLayer = doc.createElement('div');
     imageLayer.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:0';

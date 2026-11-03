@@ -2007,7 +2007,7 @@ test('G1.3: continuous page scrolling neither stops drawing nor hides a layer', 
   expect(result).toMatchObject({ stopped: 0, blocked: 0, stops: 0 });
 });
 
-test('G1.3: an inner scroll, a new element or a control moved by its own style still hides everything', async ({
+test('G1.3: an inner scroll, a new control or a control moved by its own style hides everything until a full read', async ({
   youtube,
 }) => {
   await youtube.addScriptTag({ content: await probeCode() });
@@ -2023,7 +2023,7 @@ test('G1.3: an inner scroll, a new element or a control moved by its own style s
     panel.style.cssText = 'position:absolute;left:300px;top:200px;width:200px;height:120px;overflow:auto';
     panel.innerHTML = '<div style="height:400px"><button style="margin-top:40px">Inner</button></div>';
     document.querySelector('ytd-app')!.append(panel);
-    const cases: Record<string, { stops: unknown[]; stopped: string }> = {};
+    const cases: Record<string, { stops: unknown[]; stopped: string; reread: boolean }> = {};
     const run = async (name: string, change: () => void) => {
       const source = api.youtubeOperations(document);
       const stops: unknown[] = [];
@@ -2031,19 +2031,26 @@ test('G1.3: an inner scroll, a new element or a control moved by its own style s
         if (stop) stops.push(stop);
       });
       await settle(host);
+      const layout = host.snapshot().surfaces.generation.layout;
       stops.length = 0;
       change();
       await Promise.resolve();
       await new Promise((resolve) => setTimeout(resolve, 0));
       host.sample(await frame());
-      cases[name] = { stops: [...stops], stopped: host.snapshot().stopped };
+      cases[name] = {
+        stops: [...stops],
+        stopped: host.snapshot().stopped,
+        // The next frame either holds drawing or draws from a full read that saw the change; never
+        // from the earlier read shifted by the scroll.
+        reread: host.snapshot().surfaces.generation.layout !== layout,
+      };
       host.destroy();
     };
     await run('inner scroll', () => {
       panel.scrollTop = 60;
       panel.dispatchEvent(new Event('scroll'));
     });
-    await run('added element', () => document.querySelector('ytd-app')!.append(document.createElement('div')));
+    await run('added control', () => document.querySelector('ytd-app')!.append(document.createElement('button')));
     const like = document.querySelector<HTMLElement>('button[aria-label="Like video"], button[aria-label="Account"]')!;
     await run('moved by its own style', () => {
       like.style.position = 'relative';
@@ -2054,8 +2061,9 @@ test('G1.3: an inner scroll, a new element or a control moved by its own style s
     return cases;
   });
   for (const [name, value] of Object.entries(result)) {
+    // Hidden before the next paint.
     expect(value.stops, name).toContain(true);
-    expect(value.stopped, name).toBeTruthy();
+    expect(Boolean(value.stopped) || value.reread, JSON.stringify({ name, ...value })).toBe(true);
   }
 });
 
@@ -2112,6 +2120,89 @@ test('G1.3: a look change inside a control hides only the layer over it, until t
   // The next frame confirms the control did not move: nothing stays hidden.
   expect(result.look.next).toEqual({ stopped: '', blocked: [] });
   expect(result.above).toContain(true);
+});
+
+test('G1.3 (D11): elements added without controls are checked in their subtree once, next frame; controls added, removed or moved still hold', async ({
+  youtube,
+}) => {
+  await youtube.addScriptTag({ content: await probeCode() });
+  await addProbePaint(youtube);
+  const result = await youtube.evaluate(async () => {
+    const api = (window as any).G1Probe;
+    const paint = (window as any).G1Paint;
+    const frame = () => new Promise<number>((resolve) => requestAnimationFrame(resolve));
+    // Boxes of a fixed size, so the document's own height never changes (that is a layout change
+    // of its own, seen by the ResizeObserver on the root element).
+    const boxes = [0, 1, 2].map((i) => {
+      const box = document.createElement('div');
+      box.style.cssText = `position:absolute;left:${300 + i * 220}px;top:220px;width:200px;height:160px;overflow:hidden`;
+      box.innerHTML = '<p>text</p><button>Inside</button>';
+      document.querySelector('ytd-app')!.append(box);
+      return box;
+    });
+    const source = api.youtubeOperations(document);
+    const stops: unknown[] = [];
+    const host = api.createOperationGuardHost(document, source, (stop: unknown) => {
+      if (stop) stops.push(stop);
+    });
+    const paints = [paint('layer', { left: 40, top: innerHeight - 140, width: 100, height: 100 })];
+    const settle = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 450));
+      for (let i = 0; i < 3; i++) {
+        host.sample(await frame());
+        host.commit(paints);
+      }
+      document.documentElement.removeAttribute('data-ww-guard-geometry');
+    };
+    // The trace keeps earlier entries: only those after `since` belong to this change.
+    const checks = (since: number) =>
+      (JSON.parse(document.documentElement.getAttribute('data-ww-guard-geometry') ?? '[]') as any[]).filter(
+        (entry) => entry.change === 'subtree-check' && entry.at >= since,
+      );
+    const run = async (change: () => void) => {
+      await settle();
+      const layout = host.snapshot().surfaces.generation.layout,
+        since = Math.floor(performance.now());
+      stops.length = 0;
+      change();
+      await Promise.resolve();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      const atMutation = [...stops];
+      host.sample(await frame());
+      const next = { stopped: host.snapshot().stopped, blocked: host.commit(paints).size };
+      // A full read that saw the change, not the earlier read shifted.
+      const reread = host.snapshot().surfaces.generation.layout !== layout;
+      return { atMutation, next, reread, checks: checks(since) };
+    };
+    const element = (html: string) => {
+      const span = document.createElement('span');
+      span.innerHTML = html;
+      return span;
+    };
+    // Three subtrees changed in one task: hidden at once, checked together once, shown again.
+    const plain = await run(() => boxes.forEach((box) => box.firstElementChild!.append(element('<b>more</b>'))));
+    const control = await run(() => boxes[0]!.append(element('<button>New</button>')));
+    const removed = await run(() => boxes[1]!.querySelector('button')!.remove());
+    // An element pushed in above the button moves it inside the same subtree.
+    const pushed = await run(() =>
+      boxes[2]!.insertBefore(element('<div style="height:40px">tall</div>'), boxes[2]!.lastElementChild),
+    );
+    host.destroy();
+    boxes.forEach((box) => box.remove());
+    return { plain, control, removed, pushed };
+  });
+  expect(result.plain.atMutation, JSON.stringify(result)).toContain(true);
+  expect(result.plain.next).toEqual({ stopped: '', blocked: 0 });
+  expect(result.plain.checks).toEqual([expect.objectContaining({ roots: 3, result: 'unchanged' })]);
+  // Hidden before the next paint; the next frame holds drawing or draws from a full read that saw
+  // the new, removed or moved control.
+  for (const name of ['control', 'removed', 'pushed'] as const) {
+    expect(result[name].atMutation, name).toContain(true);
+    expect(Boolean(result[name].next.stopped) || result[name].reread, JSON.stringify({ name, ...result[name] })).toBe(
+      true,
+    );
+  }
+  expect(result.pushed.checks).toEqual([expect.objectContaining({ result: 'changed' })]);
 });
 
 test('G1.3: a press right after a page scroll reaches the control; a covered control still stops drawing', async ({

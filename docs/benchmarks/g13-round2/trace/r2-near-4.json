@@ -1,0 +1,7637 @@
+{
+  "label": "r2-near-4",
+  "pointerMode": "near",
+  "point": {
+    "x": 36,
+    "y": 500
+  },
+  "far": {
+    "x": 481.25,
+    "y": 980
+  },
+  "comments": [11600.699999999255, 14685.89999999851],
+  "frames": [
+    {
+      "t": 7574.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7623.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7672,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7741.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7790,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7838.6,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7859.4,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7887.1,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7908.1,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7935.8,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7949.7,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7963.6,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7977.6,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 7991.4,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8033,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8074.6,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8095.5,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8109.4,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8157.9,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8178.8,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8192.6,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8206.6,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8220.5,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8234.5,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8241.4,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8262.3,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "t": 8276.1,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8283.1,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8296.8,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8310.7,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8331.6,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8359.4,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8387.1,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8401,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8421.9,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": ""
+    },
+    {
+      "t": 8442.6,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8449.7,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8470.5,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8491.2,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8512.1,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8526.1,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8539.9,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8574.6,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8595.4,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8609.4,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8630.1,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": ""
+    },
+    {
+      "t": 8658,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8678.7,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8692.7,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8699.5,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8713.4,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8727.3,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8741.1,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8783,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8796.9,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8810.6,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8824.9,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": ""
+    },
+    {
+      "t": 8838.5,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8852.4,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8859.3,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8866.2,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8880.2,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8894,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8900.9,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8915.3,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8928.7,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8949.6,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8956.4,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 8984.3,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 8991.2,
+      "scrollY": 1080,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9012,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9025.9,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9039.8,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9053.7,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9060.6,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9074.5,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9088.5,
+      "scrollY": 990,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9102.2,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9116.3,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9123.2,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9137,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9144,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9157.9,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9164.8,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9206.5,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9220.4,
+      "scrollY": 900,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9241.3,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9276,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9296.7,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9317.6,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9331.4,
+      "scrollY": 810,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9345.4,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9352.3,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9366.1,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9373.3,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9400.8,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9414.7,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9422,
+      "scrollY": 720,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9442.7,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9463.3,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9477.3,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9484.2,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9498.1,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9518.9,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9525.8,
+      "scrollY": 630,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9539.8,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9567.5,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9588.5,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9623.1,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9643.9,
+      "scrollY": 540,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9657.8,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9699.5,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9727.3,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9741.3,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9762,
+      "scrollY": 450,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9783.1,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9803.7,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9845.3,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9859.2,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9880.1,
+      "scrollY": 360,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 9900.9,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9950.9,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9970.2,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 9984.3,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 10005,
+      "scrollY": 270,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 10046.7,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 10116,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 10122.9,
+      "scrollY": 180,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 10143.9,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 10171.5,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 10206.7,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 10234.2,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 10296.5,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10310.5,
+      "scrollY": 90,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10338.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 10387,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 10407.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 10442.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 10484.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10505.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10518.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10539.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10553.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10574.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10595.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10616.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10630,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10650.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10692.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10713.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10727.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10741.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10761.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10775.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10789.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10803.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10824.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10838.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10852.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10872.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10886.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10900.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10914.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10921.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10935.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10942.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10956.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10963.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10977.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10984,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 10997.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11011.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11018.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11032.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11046.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11060.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11081.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11102,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11123.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11143.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11157.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11171.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11185.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11199.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11206.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11220,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11234,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11240.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11261.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11289.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11296.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11310.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11317.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11331.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11345.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11352,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11366,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11379.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11386.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11400.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11407.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11421.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11435.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11442.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11456.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11463.1,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11490.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11497.8,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11511.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11518.7,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11532.6,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11539.5,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11553.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11560.3,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11574.2,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11581.4,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11595,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11602,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11615.9,
+      "scrollY": 0,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11629.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 11657.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 11671.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 11692.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11706.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11713,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11726.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11740.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11747.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11761.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11768.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11782.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11796.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11803.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11817.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11824.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11838.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11851.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11858.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11879.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11900.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11914.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11928.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11935.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11949.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11963,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11977,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11984,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 11997.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12011.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12018.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12032.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12039.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12053.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12067.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12074.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12088.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12108.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12115.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12130.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12137.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12150.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12157.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12171.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12185.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12199.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12206.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12220,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12226.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12240.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12247.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12261.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12268.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12282.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12289.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12317.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12324,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12337.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12344.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12358.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12365.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12379.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12393.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12401,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12414.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12421.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12435.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12442.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12456.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12463,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12476.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12490.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12498.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12525.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12532.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12546.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12553.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12560.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12581,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12595,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12601.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12615.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12622.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12643.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12657.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12671.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12678.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12692.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12706,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12740.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12754.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12775.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12796.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12810.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12831,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12851.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12872.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12893.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12907.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12914.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12935.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12949.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12956,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12963,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12976.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12983.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 12997.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13004.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13018.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13025.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13039.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13046.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13060.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13067.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13081,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13088,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13101.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13109,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13122.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13143.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13157.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13164.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13178.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13192.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13206,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13212.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13226.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13240.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13247.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13261.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13275.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13282.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13296.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13310.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13324.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13365.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13386.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13407.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13428.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13449,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13469.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13490.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13511.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13532.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13566.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13587.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13608.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13629.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13650.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13671.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13692.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13705.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13719.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13726.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13740.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13754.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13768.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13782.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13789.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13796.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13810.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13824.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13837.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13844.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13851.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13865.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13872.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13886.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13893.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13907.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13921.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13928.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13942,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13962.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13969.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13983.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13990.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 13997.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14011.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14018.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14032.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14046.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14053.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14066.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14074.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14087.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14094.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14108.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14115.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14129.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14143.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14171.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14184.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14191.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14199,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14212.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14219.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14233.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14247.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14255.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14268.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14275.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14289.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14296,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14303.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14323.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14330.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14351.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14379.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14386.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14393.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14407,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14414.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14428,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14434.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14448.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14455.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14469.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14483.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14497.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14504.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14518.3,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14525.2,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14539.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14546.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14553,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14573.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14587.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14594.7,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14608.5,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14615.6,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14629.4,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14643.1,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": true,
+        "probe-1": true
+      },
+      "safety": ""
+    },
+    {
+      "t": 14657,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": ""
+    },
+    {
+      "t": 14670.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 14677.9,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    },
+    {
+      "t": 14684.8,
+      "scrollY": 120,
+      "layers": {
+        "probe-0": false,
+        "probe-1": false
+      },
+      "safety": "ページの操作部品が動いている間は、絵の表示を止めています。"
+    }
+  ],
+  "wheel": [
+    {
+      "t": 7752.300000000745,
+      "deltaY": 90
+    },
+    {
+      "t": 7890.800000000745,
+      "deltaY": 90
+    },
+    {
+      "t": 7995.10000000149,
+      "deltaY": 90
+    },
+    {
+      "t": 8113.39999999851,
+      "deltaY": 90
+    },
+    {
+      "t": 8201,
+      "deltaY": 90
+    },
+    {
+      "t": 8324,
+      "deltaY": 90
+    },
+    {
+      "t": 8428.10000000149,
+      "deltaY": 90
+    },
+    {
+      "t": 8534.699999999255,
+      "deltaY": 90
+    },
+    {
+      "t": 8638.5,
+      "deltaY": 90
+    },
+    {
+      "t": 8729.89999999851,
+      "deltaY": 90
+    },
+    {
+      "t": 8829.699999999255,
+      "deltaY": 90
+    },
+    {
+      "t": 8918.800000000745,
+      "deltaY": 90
+    },
+    {
+      "t": 9017.60000000149,
+      "deltaY": -90
+    },
+    {
+      "t": 9106.199999999255,
+      "deltaY": -90
+    },
+    {
+      "t": 9229,
+      "deltaY": -90
+    },
+    {
+      "t": 9347.39999999851,
+      "deltaY": -90
+    },
+    {
+      "t": 9447.800000000745,
+      "deltaY": -90
+    },
+    {
+      "t": 9549.60000000149,
+      "deltaY": -90
+    },
+    {
+      "t": 9665.39999999851,
+      "deltaY": -90
+    },
+    {
+      "t": 9788.300000000745,
+      "deltaY": -90
+    },
+    {
+      "t": 9905.199999999255,
+      "deltaY": -90
+    },
+    {
+      "t": 10066.10000000149,
+      "deltaY": -90
+    },
+    {
+      "t": 10151.89999999851,
+      "deltaY": -90
+    },
+    {
+      "t": 10343.10000000149,
+      "deltaY": -90
+    },
+    {
+      "t": 11643.60000000149,
+      "deltaY": 120
+    }
+  ],
+  "geometry": [
+    {
+      "at": 1968,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {},
+      "mutated": [],
+      "visible": 13,
+      "added": 13,
+      "removed": 0,
+      "addedIds": [
+        "player.video",
+        "player.controls.bottom",
+        "player.controls.top",
+        "player.seek.0",
+        "player.seek.1",
+        "control.4"
+      ],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 4011,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation-subtree": 3,
+        "mutation-layout": 48,
+        "focus": 1,
+        "resize-observer": 2
+      },
+      "mutated": [
+        "subtree body(+0/-1 elements)",
+        "subtree body(+1/-0 elements)",
+        "subtree body(+0/-1 elements)",
+        "subtree div#video-preview.style-scope.ytd-app(+1/-0 elements)",
+        "subtree ytd-video-preview-loader.ytdVideoPreviewLoaderHost(+1/-0 elements)",
+        "subtree ytd-player(+1/-0 elements)",
+        "subtree ytd-video-preview-loader.ytdVideoPreviewLoaderHost[class]",
+        "subtree ytd-video-preview-loader.ytdVideoPreviewLoaderHost[class]",
+        "layout ytd-page-manager#page-manager.style-scope.ytd-app(+1/-0 elements)",
+        "layout ytd-watch-flexy.style-scope.ytd-page-manager.watch-root-element(+10/-0 elements)",
+        "layout ytd-thumbnail.player-container-background-image.style-scope.ytd-watch-flexy(+1/-0 elements)",
+        "layout ytd-thumbnail.player-container-background-image.style-scope.ytd-watch-flexy(+1/-0 elements)",
+        "layout ytd-player#ytd-player.style-scope.ytd-watch-flexy(+1/-0 elements)",
+        "layout ytd-playlist-panel-renderer#playlist.style-scope.ytd-watch-flexy(+1/-0 elements)",
+        "layout yt-formatted-string.style-scope.ytd-playlist-panel-renderer(+1/-0 elements)",
+        "layout yt-formatted-string.byline-title.style-scope.ytd-playlist-panel-renderer(+1/-0 elements)"
+      ],
+      "firstLayout": "layout ytd-page-manager#page-manager.style-scope.ytd-app(+1/-0 elements)",
+      "visible": 34,
+      "added": 28,
+      "removed": 7,
+      "addedIds": ["search.0", "navigation.0", "navigation.1", "control.1", "control.2", "control.5"],
+      "removedIds": ["control.30", "control.33", "control.34", "control.40", "control.41", "control.42"],
+      "viewportMoved": 6,
+      "documentMoved": 6,
+      "documentMovedIds": [
+        "player.video",
+        "player.controls.bottom",
+        "player.controls.top",
+        "player.seek.0",
+        "player.seek.1",
+        "control.4"
+      ]
+    },
+    {
+      "at": 4415,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 2,
+        "mutation-layout": 9,
+        "fonts": 1
+      },
+      "mutated": [
+        "layout div#contents.style-scope.ytd-item-section-renderer(+1/-0 elements)",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+1/-0 elements)",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+0/-0 elements)",
+        "layout html(+1/-0 elements)",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div#contents.style-scope.ytd-item-section-renderer(+1/-0 elements)",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+1/-0 elements)",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "look yt-floating-button-view-model.ytFloatingButtonViewModelHost.style-scope.ytd-structured-description-content-renderer[class]",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]"
+      ],
+      "firstLayout": "layout html(+1/-0 elements)",
+      "visible": 36,
+      "added": 2,
+      "removed": 0,
+      "addedIds": ["control.110", "control.112"],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 4416,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "search.0",
+          "navigation.0",
+          "navigation.1",
+          "control.1",
+          "control.2",
+          "control.5",
+          "control.7",
+          "control.8"
+        ],
+        "removed": ["control.30", "control.33", "control.34", "control.40", "control.41", "control.42", "control.44"],
+        "changed": [
+          {
+            "id": "player.video",
+            "before": "[\"player.video\",\"native-underlay\",{\"transform\":\"fixed-plane\",\"occlusion\":\"allow\",\"input\":\"native-only\"},24,990,null]",
+            "after": "[\"player.video\",\"native-underlay\",{\"transform\":\"fixed-plane\",\"occlusion\":\"allow\",\"input\":\"native-only\"},16,996,null]"
+          },
+          {
+            "id": "player.controls.bottom",
+            "before": "[\"player.controls.bottom\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,990,null]",
+            "after": "[\"player.controls.bottom\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},16,996,null]"
+          },
+          {
+            "id": "player.controls.top",
+            "before": "[\"player.controls.top\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,990,null]",
+            "after": "[\"player.controls.top\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},16,996,null]"
+          },
+          {
+            "id": "player.seek.0",
+            "before": "[\"player.seek.0\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},32,974,null]",
+            "after": "[\"player.seek.0\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,980,null]"
+          },
+          {
+            "id": "player.seek.1",
+            "before": "[\"player.seek.1\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},32,974,null]",
+            "after": "[\"player.seek.1\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},24,980,null]"
+          },
+          {
+            "id": "control.4",
+            "before": "[\"control.4\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},481,76,null]",
+            "after": "[\"control.4\",\"native-above\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},415,523,12,32,null]"
+          }
+        ],
+        "changedCount": 6
+      }
+    },
+    {
+      "at": 4626,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation-layout": 5
+      },
+      "mutated": [
+        "layout div#contents.style-scope.ytd-item-section-renderer(+1/-0 elements)",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+1/-0 elements)",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+0/-0 elements)",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div#contents.style-scope.ytd-item-section-renderer(+1/-0 elements)",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+1/-0 elements)",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+0/-0 elements)"
+      ],
+      "firstLayout": "layout div.ytp-scrubber-container[style]",
+      "visible": 39,
+      "added": 3,
+      "removed": 0,
+      "addedIds": ["control.114", "control.116", "control.118"],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 4627,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": ["control.114", "control.116", "control.118"],
+        "removed": [],
+        "changed": [],
+        "changedCount": 0
+      }
+    },
+    {
+      "at": 5505,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 1,
+        "mutation-layout": 1
+      },
+      "mutated": [
+        "layout div#contents.style-scope.ytd-item-section-renderer(+1/-0 elements)",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+1/-0 elements)",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+0/-0 elements)",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "firstLayout": "layout div#contents.style-scope.ytd-item-section-renderer(+1/-0 elements)",
+      "visible": 40,
+      "added": 1,
+      "removed": 0,
+      "addedIds": ["control.120"],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 5505,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": ["control.120"],
+        "removed": [],
+        "changed": [],
+        "changedCount": 0
+      }
+    },
+    {
+      "at": 5716,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 1,
+        "mutation-layout": 7
+      },
+      "mutated": [
+        "layout div#contents.style-scope.ytd-item-section-renderer(+1/-0 elements)",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+1/-0 elements)",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+0/-0 elements)",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div#contents.style-scope.ytd-item-section-renderer(+2/-0 elements)",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+1/-0 elements)",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper(+1/-0 elements)",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "layout yt-lockup-view-model.ytd-item-section-renderer.lockup.ytLockupViewModelWrapper[class]",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "firstLayout": "layout div.ytp-scrubber-container[style]",
+      "visible": 50,
+      "added": 10,
+      "removed": 0,
+      "addedIds": ["control.122", "control.124", "control.126", "control.128", "control.130", "control.132"],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 5716,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "control.122",
+          "control.124",
+          "control.126",
+          "control.128",
+          "control.130",
+          "control.132",
+          "control.134",
+          "control.136"
+        ],
+        "removed": [],
+        "changed": [],
+        "changedCount": 0
+      }
+    },
+    {
+      "at": 5816,
+      "change": "subtree-check",
+      "result": "unchanged",
+      "roots": 6,
+      "controls": 0
+    },
+    {
+      "at": 5859,
+      "change": "subtree-check",
+      "result": "changed",
+      "roots": 2,
+      "controls": 160
+    },
+    {
+      "at": 5957,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation-look": 15,
+        "mutation-subtree": 7,
+        "mutation-layout": 8
+      },
+      "mutated": [
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost(+1/-0 elements)",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost[class]",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost(+1/-0 elements)",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost[class]",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost(+1/-0 elements)",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost[class]",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost(+1/-0 elements)",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost[class]",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost(+1/-0 elements)",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost[class]",
+        "subtree span.yt-icon-shape.style-scope.yt-icon(+1/-0 elements)",
+        "subtree span.yt-icon-shape.style-scope.yt-icon[class]",
+        "subtree ytd-app(+1/-0 elements)",
+        "subtree yt-page-navigation-progress.style-scope.ytd-app(+1/-0 elements)",
+        "subtree yt-page-navigation-progress.style-scope.ytd-app[hidden]",
+        "layout div.ytp-scrubber-container[style]",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "firstLayout": "layout div.ytp-scrubber-container[style]",
+      "visible": 50,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 6064,
+      "change": "release",
+      "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "at": 6065,
+      "change": "hold",
+      "wait": 87
+    },
+    {
+      "at": 6157,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation-look": 1,
+        "mutation-layout": 19
+      },
+      "mutated": [
+        "layout div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox[class]",
+        "layout div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox[class]",
+        "layout div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox[class]",
+        "layout div.ytp-button.ytp-suggested-action-badge.ytp-suggested-action[class]",
+        "layout div.ytp-button.ytp-suggested-action-badge.ytp-timely-shelf-present[class]",
+        "layout button.ytp-button.ytp-suggested-action-badge.ytp-suggested-action-badge-with-controls[class]",
+        "layout div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox[class]",
+        "layout button.ytp-button.ytp-suggested-action-badge.ytp-suggested-action-badge-with-controls[class]",
+        "layout button.ytp-button.ytp-suggested-action-badge.ytp-suggested-action-badge-with-controls[class]",
+        "layout button.ytp-button.ytp-suggested-action-badge.ytp-suggested-action-badge-with-controls[class]",
+        "layout div.ytp-suggested-action-badge-expanded-content-container[style]",
+        "layout button.ytp-button.ytp-suggested-action-badge.ytp-suggested-action-badge-with-controls[class]",
+        "layout button.ytp-button.ytp-suggested-action-badge.ytp-suggested-action-badge-with-controls[style]",
+        "layout div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox[class]",
+        "layout div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox[class]",
+        "layout div.ytp-button.ytp-suggested-action-badge.ytp-suggested-action[class]",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "firstLayout": "layout div.ytp-suggested-action-badge-expanded-content-container[style]",
+      "visible": 50,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 6175,
+      "change": "hold",
+      "wait": 177
+    },
+    {
+      "at": 6366,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation-layout": 144
+      },
+      "mutated": [
+        "layout div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox[class]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout button.ytp-button.ytp-suggested-action-badge.ytp-suggested-action-badge-with-controls[style]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]"
+      ],
+      "firstLayout": "layout div.ytp-scrubber-container[style]",
+      "visible": 50,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 6502,
+      "change": "subtree-check",
+      "result": "unchanged",
+      "roots": 1,
+      "controls": 0
+    },
+    {
+      "at": 6541,
+      "change": "subtree-check",
+      "result": "unchanged",
+      "roots": 1,
+      "controls": 0
+    },
+    {
+      "at": 6560,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation-look": 22,
+        "mutation-subtree": 3
+      },
+      "mutated": [
+        "subtree head(+1/-0 elements)",
+        "subtree head(+0/-1 elements)",
+        "subtree head(+1/-0 elements)",
+        "subtree span.ytAttributedStringHost.ytListItemViewModelTitle.ytListItemViewModelSingleLineTitle[style]",
+        "subtree span.ytAttributedStringHost.ytListItemViewModelTrailingLabel.ytListItemViewModelTrailing[style]",
+        "subtree span.ytAttributedStringHost.ytListItemViewModelTitle.ytListItemViewModelSingleLineTitle[style]",
+        "subtree yt-list-item-view-count-view-model.ytListItemViewCountViewModelHost.ytListItemViewModelAccessory.ytListItemViewModelTrailing[style]",
+        "subtree span.ytAttributedStringHost.ytListItemViewModelTitle.ytListItemViewModelSingleLineTitle[style]",
+        "subtree yt-list-item-like-count-view-model.ytListItemLikeCountViewModelHost.ytListItemViewModelAccessory.ytListItemViewModelTrailing[style]",
+        "subtree span.ytAttributedStringHost.ytListItemViewModelTitle.ytListItemViewModelSingleLineTitle[style]",
+        "subtree span.ytAttributedStringHost.ytListItemViewModelTrailingLabel.ytListItemViewModelTrailing[style]",
+        "subtree span.ytAttributedStringHost.ytListItemViewModelTitle.ytListItemViewModelSingleLineTitle[style]",
+        "subtree yt-list-item-view-count-view-model.ytListItemViewCountViewModelHost.ytListItemViewModelAccessory.ytListItemViewModelTrailing[style]",
+        "subtree span.ytAttributedStringHost.ytListItemViewModelTitle.ytListItemViewModelSingleLineTitle[style]",
+        "subtree yt-list-item-like-count-view-model.ytListItemLikeCountViewModelHost.ytListItemViewModelAccessory.ytListItemViewModelTrailing[style]",
+        "subtree span.ytIconWrapperHost.ytListItemViewModelAccessory.ytListItemViewModelImage[style]",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "visible": 50,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 6774,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation-subtree": 1,
+        "mutation-layout": 6
+      },
+      "mutated": [
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost(+1/-0 elements)",
+        "subtree span.yt-icon-shape.ytSpecIconShapeHost[class]",
+        "layout yt-formatted-string.count-text.style-scope.ytd-comments-header-renderer(+2/-0 elements)",
+        "layout div#simple-box.style-scope.ytd-comments-header-renderer(+1/-0 elements)",
+        "layout ytd-comment-simplebox-renderer.style-scope.ytd-comments-header-renderer(+3/-0 elements)",
+        "layout yt-formatted-string#simplebox-placeholder.style-scope.ytd-comment-simplebox-renderer(+1/-0 elements)",
+        "layout yt-img-shadow#author-thumbnail.style-scope.ytd-comment-simplebox-renderer.no-transition(+1/-0 elements)",
+        "layout yt-attributed-string(+1/-0 elements)",
+        "layout yt-formatted-string#simplebox-placeholder.style-scope.ytd-comment-simplebox-renderer(+0/-1 elements)",
+        "layout yt-attributed-string(+0/-1 elements)",
+        "layout span#sort-menu.style-scope.ytd-comments-header-renderer(+1/-0 elements)",
+        "layout yt-sort-filter-sub-menu-renderer.style-scope.ytd-comments-header-renderer(+3/-0 elements)",
+        "layout tp-yt-paper-tooltip.style-scope.yt-sort-filter-sub-menu-renderer(+1/-0 elements)",
+        "layout yt-dropdown-menu.style-scope.yt-sort-filter-sub-menu-renderer.has-items(+1/-0 elements)",
+        "layout tp-yt-paper-menu-button#menu-button.style-scope.yt-dropdown-menu(+0/-1 elements)",
+        "layout tp-yt-paper-button#label.dropdown-trigger.style-scope.yt-dropdown-menu(+0/-1 elements)"
+      ],
+      "firstLayout": "layout yt-formatted-string.count-text.style-scope.ytd-comments-header-renderer(+2/-0 elements)",
+      "visible": 62,
+      "added": 31,
+      "removed": 19,
+      "addedIds": ["comment.0", "control.85", "control.86", "control.90", "control.91", "control.92"],
+      "removedIds": ["control.104", "control.106", "control.108", "control.110", "control.112", "control.114"],
+      "viewportMoved": 1,
+      "documentMoved": 1,
+      "documentMovedIds": ["control.102"]
+    },
+    {
+      "at": 6775,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "comment.0",
+          "control.85",
+          "control.86",
+          "control.90",
+          "control.91",
+          "control.92",
+          "control.96",
+          "control.97"
+        ],
+        "removed": [
+          "control.104",
+          "control.106",
+          "control.108",
+          "control.110",
+          "control.112",
+          "control.114",
+          "control.116",
+          "control.118"
+        ],
+        "changed": [
+          {
+            "id": "control.102",
+            "before": "[\"control.102\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.102\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},120.19,40,null]"
+          }
+        ],
+        "changedCount": 1
+      }
+    },
+    {
+      "at": 6837,
+      "change": "subtree-check",
+      "result": "unchanged",
+      "roots": 1,
+      "controls": 0
+    },
+    {
+      "at": 6947,
+      "change": "release",
+      "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "at": 7024,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation-subtree": 1,
+        "mutation-look": 1,
+        "mutation-layout": 11
+      },
+      "mutated": [
+        "subtree head(+0/-1 elements)",
+        "layout div#contents.style-scope.ytd-item-section-renderer(+1/-0 elements)",
+        "layout ytd-comment-thread-renderer.style-scope.ytd-item-section-renderer(+3/-0 elements)",
+        "layout yt-formatted-string.style-scope.ytd-comment-thread-renderer(+1/-0 elements)",
+        "layout ytd-comment-view-model#comment.style-scope.ytd-comment-thread-renderer(+4/-0 elements)",
+        "layout yt-img-shadow.style-scope.ytd-comment-view-model.no-transition(+1/-0 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+5/-0 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+0/-1 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+1/-0 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+0/-1 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+1/-0 elements)",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]"
+      ],
+      "firstLayout": "layout div#contents.style-scope.ytd-item-section-renderer(+1/-0 elements)",
+      "visible": 75,
+      "added": 32,
+      "removed": 19,
+      "addedIds": ["control.108", "control.112", "control.113", "control.114", "control.116", "control.120"],
+      "removedIds": ["control.125", "control.127", "control.131", "control.133", "control.135", "control.137"],
+      "viewportMoved": 1,
+      "documentMoved": 1,
+      "documentMovedIds": ["control.129"]
+    },
+    {
+      "at": 7025,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "control.108",
+          "control.112",
+          "control.113",
+          "control.114",
+          "control.116",
+          "control.120",
+          "control.121",
+          "control.122"
+        ],
+        "removed": [
+          "control.125",
+          "control.127",
+          "control.131",
+          "control.133",
+          "control.135",
+          "control.137",
+          "control.139",
+          "control.141"
+        ],
+        "changed": [
+          {
+            "id": "control.129",
+            "before": "[\"control.129\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.129\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},120.19,40,null]"
+          }
+        ],
+        "changedCount": 1
+      }
+    },
+    {
+      "at": 7250,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 1,
+        "mutation-layout": 14
+      },
+      "mutated": [
+        "layout div#contents.style-scope.ytd-item-section-renderer(+1/-0 elements)",
+        "layout ytd-comment-thread-renderer.style-scope.ytd-item-section-renderer(+3/-0 elements)",
+        "layout yt-formatted-string.style-scope.ytd-comment-thread-renderer(+1/-0 elements)",
+        "layout ytd-comment-view-model#comment.style-scope.ytd-comment-thread-renderer(+4/-0 elements)",
+        "layout yt-img-shadow.style-scope.ytd-comment-view-model.no-transition(+1/-0 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+5/-0 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+0/-1 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+1/-0 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+0/-1 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+1/-0 elements)",
+        "layout div#content.style-scope.ytd-expander(+0/-1 elements)",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "firstLayout": null,
+      "visible": 94,
+      "added": 37,
+      "removed": 18,
+      "addedIds": ["control.135", "control.137", "control.139", "control.140", "control.141", "control.143"],
+      "removedIds": ["control.152", "control.154", "control.158", "control.160", "control.162", "control.166"],
+      "viewportMoved": 2,
+      "documentMoved": 2,
+      "documentMovedIds": ["control.156", "control.164"]
+    },
+    {
+      "at": 7250,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "control.135",
+          "control.137",
+          "control.139",
+          "control.140",
+          "control.141",
+          "control.143",
+          "control.147",
+          "control.148"
+        ],
+        "removed": [
+          "control.152",
+          "control.154",
+          "control.158",
+          "control.160",
+          "control.162",
+          "control.166",
+          "control.168",
+          "control.170"
+        ],
+        "changed": [
+          {
+            "id": "control.156",
+            "before": "[\"control.156\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.156\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},109.5,40,null]"
+          },
+          {
+            "id": "control.164",
+            "before": "[\"control.164\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.164\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},116.23,40,null]"
+          }
+        ],
+        "changedCount": 2
+      }
+    },
+    {
+      "at": 7494,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 1,
+        "mutation-layout": 17
+      },
+      "mutated": [
+        "layout div#contents.style-scope.ytd-item-section-renderer(+1/-0 elements)",
+        "layout ytd-comment-thread-renderer.style-scope.ytd-item-section-renderer(+3/-0 elements)",
+        "layout yt-formatted-string.style-scope.ytd-comment-thread-renderer(+1/-0 elements)",
+        "layout ytd-comment-view-model#comment.style-scope.ytd-comment-thread-renderer(+4/-0 elements)",
+        "layout yt-img-shadow.style-scope.ytd-comment-view-model.no-transition(+1/-0 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+5/-0 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+0/-1 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+1/-0 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+0/-1 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+1/-0 elements)",
+        "layout div#content.style-scope.ytd-expander(+0/-1 elements)",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]"
+      ],
+      "firstLayout": null,
+      "visible": 115,
+      "added": 34,
+      "removed": 13,
+      "addedIds": ["control.170", "control.174", "control.175", "control.176", "control.178", "control.182"],
+      "removedIds": ["control.187", "control.189", "control.193", "control.195", "control.199", "control.207"],
+      "viewportMoved": 7,
+      "documentMoved": 7,
+      "documentMovedIds": ["control.191", "control.197", "control.201", "control.203", "control.205", "control.209"]
+    },
+    {
+      "at": 7495,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "control.170",
+          "control.174",
+          "control.175",
+          "control.176",
+          "control.178",
+          "control.182",
+          "control.183",
+          "control.184"
+        ],
+        "removed": [
+          "control.187",
+          "control.189",
+          "control.193",
+          "control.195",
+          "control.199",
+          "control.207",
+          "control.213",
+          "control.215"
+        ],
+        "changed": [
+          {
+            "id": "control.191",
+            "before": "[\"control.191\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.191\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},109.5,40,null]"
+          },
+          {
+            "id": "control.197",
+            "before": "[\"control.197\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.197\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},12,44,null]"
+          },
+          {
+            "id": "control.201",
+            "before": "[\"control.201\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.201\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},56,40,null]"
+          },
+          {
+            "id": "control.203",
+            "before": "[\"control.203\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.203\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},156.23,61.67,null]"
+          },
+          {
+            "id": "control.205",
+            "before": "[\"control.205\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.205\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},12,44,null]"
+          },
+          {
+            "id": "control.209",
+            "before": "[\"control.209\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.209\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},56,40,null]"
+          },
+          {
+            "id": "control.211",
+            "before": "[\"control.211\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.211\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},156.23,61.67,null]"
+          }
+        ],
+        "changedCount": 7
+      }
+    },
+    {
+      "at": 7730,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 1,
+        "mutation-layout": 14
+      },
+      "mutated": [
+        "layout div#contents.style-scope.ytd-item-section-renderer(+1/-0 elements)",
+        "layout ytd-comment-thread-renderer.style-scope.ytd-item-section-renderer(+3/-0 elements)",
+        "layout yt-formatted-string.style-scope.ytd-comment-thread-renderer(+1/-0 elements)",
+        "layout ytd-comment-view-model#comment.style-scope.ytd-comment-thread-renderer(+4/-0 elements)",
+        "layout yt-img-shadow.style-scope.ytd-comment-view-model.no-transition(+1/-0 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+5/-0 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+0/-1 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+1/-0 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+0/-1 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+1/-0 elements)",
+        "layout div#content.style-scope.ytd-expander(+0/-1 elements)",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "firstLayout": null,
+      "visible": 135,
+      "added": 37,
+      "removed": 17,
+      "addedIds": ["control.213", "control.217", "control.218", "control.219", "control.221", "control.225"],
+      "removedIds": ["control.230", "control.232", "control.236", "control.238", "control.240", "control.244"],
+      "viewportMoved": 3,
+      "documentMoved": 3,
+      "documentMovedIds": ["control.234", "control.242", "control.250"]
+    },
+    {
+      "at": 7730,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "control.213",
+          "control.217",
+          "control.218",
+          "control.219",
+          "control.221",
+          "control.225",
+          "control.226",
+          "control.227"
+        ],
+        "removed": [
+          "control.230",
+          "control.232",
+          "control.236",
+          "control.238",
+          "control.240",
+          "control.244",
+          "control.246",
+          "control.248"
+        ],
+        "changed": [
+          {
+            "id": "control.234",
+            "before": "[\"control.234\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.234\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},116.23,40,null]"
+          },
+          {
+            "id": "control.242",
+            "before": "[\"control.242\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.242\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},116.23,40,null]"
+          },
+          {
+            "id": "control.250",
+            "before": "[\"control.250\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},1380,48,null]",
+            "after": "[\"control.250\",\"exclusion\",{\"transform\":\"fixed-plane\",\"occlusion\":\"forbid\",\"input\":\"native-only\"},116.23,40,null]"
+          }
+        ],
+        "changedCount": 3
+      }
+    },
+    {
+      "at": 7933,
+      "change": "read",
+      "scroll": [0, 180],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 1,
+        "mutation-layout": 10,
+        "scroll": 2
+      },
+      "mutated": [
+        "layout div#contents.style-scope.ytd-item-section-renderer(+1/-0 elements)",
+        "layout ytd-comment-thread-renderer.style-scope.ytd-item-section-renderer(+3/-0 elements)",
+        "layout yt-formatted-string.style-scope.ytd-comment-thread-renderer(+1/-0 elements)",
+        "layout ytd-comment-view-model#comment.style-scope.ytd-comment-thread-renderer(+4/-0 elements)",
+        "layout yt-img-shadow.style-scope.ytd-comment-view-model.no-transition(+1/-0 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+0/-1 elements)",
+        "layout ytd-expander#expander.style-scope.ytd-comment-view-model(+5/-0 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+0/-1 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+1/-0 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+0/-1 elements)",
+        "layout tp-yt-paper-button#less.style-scope.ytd-expander(+1/-0 elements)",
+        "layout div#content.style-scope.ytd-expander(+0/-1 elements)",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "firstLayout": null,
+      "visible": 139,
+      "added": 8,
+      "removed": 4,
+      "addedIds": ["control.253", "control.257", "control.258", "control.259", "control.310", "control.312"],
+      "removedIds": ["control.270", "control.272", "control.274", "control.276"],
+      "viewportMoved": 122,
+      "documentMoved": 16,
+      "documentMovedIds": ["control.278", "control.280", "control.282", "control.284", "control.286", "control.288"]
+    },
+    {
+      "at": 7934,
+      "change": "shifted",
+      "entry": "boundary",
+      "diff": {
+        "added": [
+          "control.253",
+          "control.257",
+          "control.258",
+          "control.259",
+          "control.310",
+          "control.312",
+          "control.314",
+          "control.316"
+        ],
+        "removed": ["control.270", "control.272", "control.274", "control.276"],
+        "changed": [],
+        "changedCount": 0
+      }
+    },
+    {
+      "at": 8154,
+      "change": "read",
+      "scroll": [0, 360],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 4,
+        "mutation-subtree": 5,
+        "mutation-layout": 30,
+        "scroll": 2
+      },
+      "mutated": [
+        "subtree yt-attributed-string#attributed-snippet-text.style-scope.ytd-text-inline-expander(+0/-1 elements)",
+        "subtree yt-attributed-string#attributed-snippet-text.style-scope.ytd-text-inline-expander(+1/-0 elements)",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-load-progress[style]",
+        "look div.ytp-hover-progress[style]"
+      ],
+      "firstLayout": null,
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 130,
+      "documentMoved": 0
+    },
+    {
+      "at": 8270,
+      "change": "release",
+      "reason": "ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。"
+    },
+    {
+      "at": 8283,
+      "change": "hold",
+      "wait": 55
+    },
+    {
+      "at": 8357,
+      "change": "read",
+      "scroll": [0, 540],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 3,
+        "scroll": 2,
+        "mutation-layout": 11
+      },
+      "mutated": [
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-load-progress[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-load-progress[style]",
+        "look div.ytp-hover-progress[style]"
+      ],
+      "firstLayout": "layout div.ytp-scrubber-container[style]",
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 130,
+      "documentMoved": 0
+    },
+    {
+      "at": 8435,
+      "change": "hold",
+      "wait": 109
+    },
+    {
+      "at": 8568,
+      "change": "read",
+      "scroll": [0, 720],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 4,
+        "scroll": 2,
+        "mutation-layout": 9
+      },
+      "mutated": [
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "firstLayout": "layout div.ytp-scrubber-container[style]",
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 130,
+      "documentMoved": 0
+    },
+    {
+      "at": 8649,
+      "change": "hold",
+      "wait": 107
+    },
+    {
+      "at": 8774,
+      "change": "read",
+      "scroll": [0, 900],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 4,
+        "scroll": 2,
+        "mutation-layout": 8
+      },
+      "mutated": [
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]"
+      ],
+      "firstLayout": "layout div.ytp-scrubber-container[style]",
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 130,
+      "documentMoved": 0
+    },
+    {
+      "at": 8835,
+      "change": "hold",
+      "wait": 121
+    },
+    {
+      "at": 8977,
+      "change": "read",
+      "scroll": [0, 1080],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 4,
+        "scroll": 2,
+        "mutation-layout": 13
+      },
+      "mutated": [
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "firstLayout": "layout div.ytp-scrubber-container[style]",
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 130,
+      "documentMoved": 0
+    },
+    {
+      "at": 9022,
+      "change": "hold",
+      "wait": 143
+    },
+    {
+      "at": 9197,
+      "change": "read",
+      "scroll": [0, 900],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 3,
+        "scroll": 2,
+        "mutation-layout": 15
+      },
+      "mutated": [
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "firstLayout": "layout div.ytp-scrubber-container[style]",
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 130,
+      "documentMoved": 0
+    },
+    {
+      "at": 9254,
+      "change": "hold",
+      "wait": 119
+    },
+    {
+      "at": 9393,
+      "change": "read",
+      "scroll": [0, 720],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 2,
+        "scroll": 2,
+        "mutation-layout": 10
+      },
+      "mutated": [
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "firstLayout": "layout div.ytp-scrubber-container[style]",
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 130,
+      "documentMoved": 0
+    },
+    {
+      "at": 9456,
+      "change": "hold",
+      "wait": 126
+    },
+    {
+      "at": 9614,
+      "change": "read",
+      "scroll": [0, 540],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 4,
+        "scroll": 2,
+        "mutation-layout": 11
+      },
+      "mutated": [
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "firstLayout": "layout div.ytp-scrubber-container[style]",
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 130,
+      "documentMoved": 0
+    },
+    {
+      "at": 9671,
+      "change": "hold",
+      "wait": 127
+    },
+    {
+      "at": 9834,
+      "change": "read",
+      "scroll": [0, 360],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 3,
+        "scroll": 2,
+        "mutation-layout": 7
+      },
+      "mutated": [
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "firstLayout": "layout div.ytp-scrubber-container[style]",
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 130,
+      "documentMoved": 0
+    },
+    {
+      "at": 9947,
+      "change": "hold",
+      "wait": 66
+    },
+    {
+      "at": 10039,
+      "change": "read",
+      "scroll": [0, 270],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 3,
+        "mutation-subtree": 5,
+        "mutation-layout": 15,
+        "scroll": 1
+      },
+      "mutated": [
+        "subtree yt-attributed-string#attributed-snippet-text.style-scope.ytd-text-inline-expander(+0/-1 elements)",
+        "subtree yt-attributed-string#attributed-snippet-text.style-scope.ytd-text-inline-expander(+1/-0 elements)",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "firstLayout": null,
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 130,
+      "documentMoved": 0
+    },
+    {
+      "at": 10108,
+      "change": "hold",
+      "wait": 110
+    },
+    {
+      "at": 10275,
+      "change": "read",
+      "scroll": [0, 90],
+      "bumped": true,
+      "causes": {
+        "mutation-subtree": 5,
+        "mutation-layout": 17,
+        "scroll": 2
+      },
+      "mutated": [
+        "subtree yt-attributed-string#attributed-snippet-text.style-scope.ytd-text-inline-expander(+0/-1 elements)",
+        "subtree yt-attributed-string#attributed-snippet-text.style-scope.ytd-text-inline-expander(+1/-0 elements)",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]",
+        "subtree img.ytCoreImageHost.ytAttributedStringImageElement.ytAttributedStringImageAlignmentVerticalCenter[class]"
+      ],
+      "firstLayout": null,
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 130,
+      "documentMoved": 0
+    },
+    {
+      "at": 10352,
+      "change": "hold",
+      "wait": 90
+    },
+    {
+      "at": 10469,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 3,
+        "scroll": 1,
+        "mutation-layout": 5
+      },
+      "mutated": [
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div#player-container.style-scope.ytd-watch-flexy[style]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]"
+      ],
+      "firstLayout": "layout div.ytp-scrubber-container[style]",
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 130,
+      "documentMoved": 0
+    },
+    {
+      "at": 10682,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation-look": 10
+      },
+      "mutated": [
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 10872,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation-look": 11
+      },
+      "mutated": [
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 11076,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation-look": 17
+      },
+      "mutated": [
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 11284,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation-look": 13
+      },
+      "mutated": [
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 11485,
+      "change": "read",
+      "scroll": [0, 0],
+      "bumped": false,
+      "causes": {
+        "mutation-look": 17
+      },
+      "mutated": [
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 11654,
+      "change": "hold",
+      "wait": 21
+    },
+    {
+      "at": 11688,
+      "change": "read",
+      "scroll": [0, 120],
+      "bumped": true,
+      "causes": {
+        "mutation-look": 13,
+        "scroll": 1,
+        "mutation-layout": 4
+      },
+      "mutated": [
+        "layout div#player-container.style-scope.ytd-watch-flexy[style]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "layout div.ytp-hover-progress[style]",
+        "layout div.ytp-hover-progress[class]",
+        "layout div.ytp-scrubber-button.ytp-swatch-background-color[class]",
+        "layout div.ytp-time-display.notranslate[class]",
+        "layout div.ytp-scrubber-container[style]",
+        "layout div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "firstLayout": "layout div.ytp-scrubber-container[style]",
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 130,
+      "documentMoved": 0
+    },
+    {
+      "at": 11898,
+      "change": "read",
+      "scroll": [0, 120],
+      "bumped": false,
+      "causes": {
+        "mutation-look": 17
+      },
+      "mutated": [
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 12104,
+      "change": "read",
+      "scroll": [0, 120],
+      "bumped": false,
+      "causes": {
+        "mutation-look": 17
+      },
+      "mutated": [
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 12314,
+      "change": "read",
+      "scroll": [0, 120],
+      "bumped": false,
+      "causes": {
+        "mutation-look": 18
+      },
+      "mutated": [
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 12521,
+      "change": "read",
+      "scroll": [0, 120],
+      "bumped": false,
+      "causes": {
+        "mutation-look": 18
+      },
+      "mutated": [
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 12735,
+      "change": "read",
+      "scroll": [0, 120],
+      "bumped": false,
+      "causes": {
+        "mutation-look": 16
+      },
+      "mutated": [
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 12933,
+      "change": "read",
+      "scroll": [0, 120],
+      "bumped": false,
+      "causes": {
+        "mutation-look": 11
+      },
+      "mutated": [
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 13141,
+      "change": "read",
+      "scroll": [0, 120],
+      "bumped": false,
+      "causes": {
+        "mutation-look": 19
+      },
+      "mutated": [
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 13362,
+      "change": "read",
+      "scroll": [0, 120],
+      "bumped": false,
+      "causes": {
+        "mutation-look": 16
+      },
+      "mutated": [
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 13562,
+      "change": "read",
+      "scroll": [0, 120],
+      "bumped": false,
+      "causes": {
+        "mutation-look": 9
+      },
+      "mutated": [
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 13755,
+      "change": "read",
+      "scroll": [0, 120],
+      "bumped": false,
+      "causes": {
+        "mutation-look": 11
+      },
+      "mutated": [
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 13958,
+      "change": "read",
+      "scroll": [0, 120],
+      "bumped": false,
+      "causes": {
+        "mutation-look": 18
+      },
+      "mutated": [
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 14167,
+      "change": "read",
+      "scroll": [0, 120],
+      "bumped": false,
+      "causes": {
+        "mutation-look": 18
+      },
+      "mutated": [
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 14374,
+      "change": "read",
+      "scroll": [0, 120],
+      "bumped": false,
+      "causes": {
+        "mutation-look": 17
+      },
+      "mutated": [
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 14573,
+      "change": "read",
+      "scroll": [0, 120],
+      "bumped": false,
+      "causes": {
+        "mutation-look": 18
+      },
+      "mutated": [
+        "look div.ytp-scrubber-container[style]",
+        "look div.ytp-play-progress.ytp-swatch-background-color[style]",
+        "look div.ytp-hover-progress[style]",
+        "look div.ytp-hover-progress[class]"
+      ],
+      "visible": 139,
+      "added": 0,
+      "removed": 0,
+      "addedIds": [],
+      "removedIds": [],
+      "viewportMoved": 0,
+      "documentMoved": 0
+    },
+    {
+      "at": 14668,
+      "change": "hold",
+      "wait": 96
+    }
+  ],
+  "approach": [
+    {
+      "at": 5990,
+      "change": "approach",
+      "value": true,
+      "event": "pointermove",
+      "target": "div#contentContainer.style-scope.tp-yt-app-drawer",
+      "point": {
+        "x": 12,
+        "y": 166.6666717529297
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "player.controls.bottom",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.controls.top",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        }
+      ],
+      "near": ["player.controls.top"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 6013,
+      "change": "approach",
+      "value": true,
+      "event": "pointermove",
+      "target": "video.video-stream.html5-main-video",
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "player.controls.bottom",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.controls.top",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.seek.0",
+          "shape": {
+            "left": 28,
+            "top": 566.25,
+            "width": 972,
+            "height": 6
+          }
+        },
+        {
+          "id": "player.seek.1",
+          "shape": {
+            "left": 28,
+            "top": 566.25,
+            "width": 972,
+            "height": 6
+          }
+        }
+      ],
+      "near": ["player.controls.bottom", "player.controls.top"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 6368,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "player.controls.bottom",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.controls.top",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.seek.0",
+          "shape": {
+            "left": 28,
+            "top": 566.25,
+            "width": 972,
+            "height": 6
+          }
+        },
+        {
+          "id": "player.seek.1",
+          "shape": {
+            "left": 28,
+            "top": 566.25,
+            "width": 972,
+            "height": 6
+          }
+        }
+      ],
+      "near": ["player.controls.bottom"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8358,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.86",
+          "shape": {
+            "left": 16,
+            "top": 428.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.90",
+          "shape": {
+            "left": 60,
+            "top": 474.25,
+            "width": 32,
+            "height": 32
+          }
+        },
+        {
+          "id": "control.96",
+          "shape": {
+            "left": 52,
+            "top": 518.25,
+            "width": 104.0625,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.86", "control.90", "control.96", "player.controls.bottom"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8428,
+      "change": "approach",
+      "value": true,
+      "event": "wheel",
+      "target": "img#img.style-scope.yt-img-shadow",
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.96",
+          "shape": {
+            "left": 52,
+            "top": 428.25,
+            "width": 104.0625,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.97",
+          "shape": {
+            "left": 16,
+            "top": 484.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.101",
+          "shape": {
+            "left": 60,
+            "top": 530.25,
+            "width": 32,
+            "height": 32
+          }
+        }
+      ],
+      "near": ["control.96", "control.97", "control.101", "control.86", "control.90", "player.controls.bottom"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8487,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.86",
+          "shape": {
+            "left": 16,
+            "top": 428.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.90",
+          "shape": {
+            "left": 60,
+            "top": 474.25,
+            "width": 32,
+            "height": 32
+          }
+        },
+        {
+          "id": "control.96",
+          "shape": {
+            "left": 52,
+            "top": 518.25,
+            "width": 104.0625,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.86", "control.90", "control.96", "control.97", "control.101"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8568,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.97",
+          "shape": {
+            "left": 16,
+            "top": 394.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.101",
+          "shape": {
+            "left": 60,
+            "top": 440.25,
+            "width": 32,
+            "height": 32
+          }
+        },
+        {
+          "id": "control.107",
+          "shape": {
+            "left": 52,
+            "top": 484.25,
+            "width": 115.46875,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.108",
+          "shape": {
+            "left": 16,
+            "top": 540.25,
+            "width": 36,
+            "height": 39
+          }
+        }
+      ],
+      "near": ["control.97", "control.101", "control.107", "control.86", "control.90", "control.96"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8638,
+      "change": "approach",
+      "value": true,
+      "event": "wheel",
+      "target": "div#author-thumbnail.style-scope.ytd-comment-view-model",
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.107",
+          "shape": {
+            "left": 52,
+            "top": 394.25,
+            "width": 115.46875,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.108",
+          "shape": {
+            "left": 16,
+            "top": 450.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.112",
+          "shape": {
+            "left": 60,
+            "top": 496.25,
+            "width": 32,
+            "height": 32
+          }
+        },
+        {
+          "id": "control.116",
+          "shape": {
+            "left": 16,
+            "top": 544.25,
+            "width": 36,
+            "height": 39
+          }
+        }
+      ],
+      "near": [
+        "control.107",
+        "control.108",
+        "control.112",
+        "control.97",
+        "control.101",
+        "control.86",
+        "control.90",
+        "control.96"
+      ],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8775,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.112",
+          "shape": {
+            "left": 60,
+            "top": 406.25,
+            "width": 32,
+            "height": 32
+          }
+        },
+        {
+          "id": "control.116",
+          "shape": {
+            "left": 16,
+            "top": 454.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.120",
+          "shape": {
+            "left": 60,
+            "top": 500.25,
+            "width": 32,
+            "height": 32
+          }
+        },
+        {
+          "id": "control.124",
+          "shape": {
+            "left": 16,
+            "top": 548.25,
+            "width": 36,
+            "height": 39
+          }
+        }
+      ],
+      "near": [
+        "control.112",
+        "control.116",
+        "control.120",
+        "control.97",
+        "control.101",
+        "control.107",
+        "control.108",
+        "control.86",
+        "control.90",
+        "control.96"
+      ],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8829,
+      "change": "approach",
+      "value": true,
+      "event": "wheel",
+      "target": "div.thread-hitbox.style-scope.ytd-comment-thread-renderer",
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.120",
+          "shape": {
+            "left": 60,
+            "top": 410.25,
+            "width": 32,
+            "height": 32
+          }
+        },
+        {
+          "id": "control.124",
+          "shape": {
+            "left": 16,
+            "top": 458.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.128",
+          "shape": {
+            "left": 60,
+            "top": 504.25,
+            "width": 32,
+            "height": 32
+          }
+        },
+        {
+          "id": "control.134",
+          "shape": {
+            "left": 52,
+            "top": 548.25,
+            "width": 115.46875,
+            "height": 40
+          }
+        }
+      ],
+      "near": [
+        "control.120",
+        "control.124",
+        "control.128",
+        "control.112",
+        "control.116",
+        "control.97",
+        "control.101",
+        "control.107",
+        "control.108",
+        "control.86",
+        "control.90",
+        "control.96"
+      ],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8899,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.112",
+          "shape": {
+            "left": 60,
+            "top": 406.25,
+            "width": 32,
+            "height": 32
+          }
+        },
+        {
+          "id": "control.116",
+          "shape": {
+            "left": 16,
+            "top": 454.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.120",
+          "shape": {
+            "left": 60,
+            "top": 500.25,
+            "width": 32,
+            "height": 32
+          }
+        },
+        {
+          "id": "control.124",
+          "shape": {
+            "left": 16,
+            "top": 548.25,
+            "width": 36,
+            "height": 39
+          }
+        }
+      ],
+      "near": [
+        "control.112",
+        "control.116",
+        "control.120",
+        "control.124",
+        "control.128",
+        "control.97",
+        "control.101",
+        "control.107",
+        "control.108"
+      ],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 8978,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.128",
+          "shape": {
+            "left": 60,
+            "top": 414.25,
+            "width": 32,
+            "height": 32
+          }
+        },
+        {
+          "id": "control.134",
+          "shape": {
+            "left": 52,
+            "top": 458.25,
+            "width": 115.46875,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.135",
+          "shape": {
+            "left": 16,
+            "top": 514.25,
+            "width": 36,
+            "height": 39
+          }
+        }
+      ],
+      "near": [
+        "control.128",
+        "control.134",
+        "control.135",
+        "control.112",
+        "control.116",
+        "control.120",
+        "control.124",
+        "control.97",
+        "control.101",
+        "control.107",
+        "control.108"
+      ],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 9106,
+      "change": "approach",
+      "value": true,
+      "event": "wheel",
+      "target": "div#author-thumbnail.style-scope.ytd-comment-view-model",
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.128",
+          "shape": {
+            "left": 60,
+            "top": 414.25,
+            "width": 32,
+            "height": 32
+          }
+        },
+        {
+          "id": "control.134",
+          "shape": {
+            "left": 52,
+            "top": 458.25,
+            "width": 115.46875,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.135",
+          "shape": {
+            "left": 16,
+            "top": 514.25,
+            "width": 36,
+            "height": 39
+          }
+        }
+      ],
+      "near": ["control.128", "control.134", "control.135", "control.120", "control.124", "control.112", "control.116"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 9393,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.97",
+          "shape": {
+            "left": 16,
+            "top": 394.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.101",
+          "shape": {
+            "left": 60,
+            "top": 440.25,
+            "width": 32,
+            "height": 32
+          }
+        },
+        {
+          "id": "control.107",
+          "shape": {
+            "left": 52,
+            "top": 484.25,
+            "width": 115.46875,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.108",
+          "shape": {
+            "left": 16,
+            "top": 540.25,
+            "width": 36,
+            "height": 39
+          }
+        }
+      ],
+      "near": [
+        "control.101",
+        "control.107",
+        "control.112",
+        "control.116",
+        "control.120",
+        "control.124",
+        "control.128",
+        "control.134",
+        "control.135"
+      ],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 9447,
+      "change": "approach",
+      "value": true,
+      "event": "wheel",
+      "target": "img#img.style-scope.yt-img-shadow",
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.96",
+          "shape": {
+            "left": 52,
+            "top": 428.25,
+            "width": 104.0625,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.97",
+          "shape": {
+            "left": 16,
+            "top": 484.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.101",
+          "shape": {
+            "left": 60,
+            "top": 530.25,
+            "width": 32,
+            "height": 32
+          }
+        }
+      ],
+      "near": [
+        "control.96",
+        "control.97",
+        "control.101",
+        "control.107",
+        "control.112",
+        "control.116",
+        "control.120",
+        "control.124",
+        "control.128",
+        "control.134",
+        "control.135"
+      ],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 9525,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.97",
+          "shape": {
+            "left": 16,
+            "top": 394.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.101",
+          "shape": {
+            "left": 60,
+            "top": 440.25,
+            "width": 32,
+            "height": 32
+          }
+        },
+        {
+          "id": "control.107",
+          "shape": {
+            "left": 52,
+            "top": 484.25,
+            "width": 115.46875,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.108",
+          "shape": {
+            "left": 16,
+            "top": 540.25,
+            "width": 36,
+            "height": 39
+          }
+        }
+      ],
+      "near": [
+        "control.97",
+        "control.101",
+        "control.107",
+        "control.96",
+        "control.112",
+        "control.116",
+        "control.120",
+        "control.124"
+      ],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 9614,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.86",
+          "shape": {
+            "left": 16,
+            "top": 428.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.90",
+          "shape": {
+            "left": 60,
+            "top": 474.25,
+            "width": 32,
+            "height": 32
+          }
+        },
+        {
+          "id": "control.96",
+          "shape": {
+            "left": 52,
+            "top": 518.25,
+            "width": 104.0625,
+            "height": 40
+          }
+        }
+      ],
+      "near": [
+        "control.86",
+        "control.90",
+        "control.96",
+        "control.97",
+        "control.101",
+        "control.107",
+        "control.112",
+        "control.116",
+        "control.120",
+        "control.124"
+      ],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 9664,
+      "change": "approach",
+      "value": true,
+      "event": "wheel",
+      "target": "ytd-item-section-renderer#sections.style-scope.ytd-comments",
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "comment.0",
+          "shape": {
+            "left": 16,
+            "top": 461.25,
+            "width": 980,
+            "height": 25
+          }
+        },
+        {
+          "id": "control.86",
+          "shape": {
+            "left": 16,
+            "top": 518.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.90",
+          "shape": {
+            "left": 60,
+            "top": 564.25,
+            "width": 32,
+            "height": 32
+          }
+        }
+      ],
+      "near": [
+        "comment.0",
+        "control.86",
+        "control.90",
+        "control.96",
+        "control.97",
+        "control.101",
+        "control.107",
+        "control.112",
+        "control.116",
+        "control.120",
+        "control.124"
+      ],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 9737,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "control.86",
+          "shape": {
+            "left": 16,
+            "top": 428.25,
+            "width": 36,
+            "height": 39
+          }
+        },
+        {
+          "id": "control.90",
+          "shape": {
+            "left": 60,
+            "top": 474.25,
+            "width": 32,
+            "height": 32
+          }
+        },
+        {
+          "id": "control.96",
+          "shape": {
+            "left": 52,
+            "top": 518.25,
+            "width": 104.0625,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["control.86", "control.90", "control.96", "comment.0", "control.97", "control.101", "control.107"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 9955,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "comment.0",
+          "shape": {
+            "left": 16,
+            "top": 551.25,
+            "width": 980,
+            "height": 25
+          }
+        }
+      ],
+      "near": ["comment.0", "control.86", "control.90", "control.96"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 10165,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [],
+      "near": ["comment.0"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 10277,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "player.controls.bottom",
+          "shape": {
+            "left": 16,
+            "top": -22,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.controls.top",
+          "shape": {
+            "left": 16,
+            "top": -22,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.seek.0",
+          "shape": {
+            "left": 28,
+            "top": 476.25,
+            "width": 972,
+            "height": 6
+          }
+        },
+        {
+          "id": "player.seek.1",
+          "shape": {
+            "left": 28,
+            "top": 476.25,
+            "width": 972,
+            "height": 6
+          }
+        },
+        {
+          "id": "control.46",
+          "shape": {
+            "left": 28,
+            "top": 490.25,
+            "width": 40,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.49",
+          "shape": {
+            "left": 80,
+            "top": 490.25,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["player.controls.bottom", "player.seek.0", "player.seek.1", "control.46", "comment.0"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 10364,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "player.controls.bottom",
+          "shape": {
+            "left": 16,
+            "top": -22,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.controls.top",
+          "shape": {
+            "left": 16,
+            "top": -22,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.seek.0",
+          "shape": {
+            "left": 28,
+            "top": 476.25,
+            "width": 972,
+            "height": 6
+          }
+        },
+        {
+          "id": "player.seek.1",
+          "shape": {
+            "left": 28,
+            "top": 476.25,
+            "width": 972,
+            "height": 6
+          }
+        },
+        {
+          "id": "control.46",
+          "shape": {
+            "left": 28,
+            "top": 490.25,
+            "width": 40,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.49",
+          "shape": {
+            "left": 80,
+            "top": 490.25,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["player.controls.bottom", "player.seek.0", "player.seek.1", "control.46"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 10817,
+      "change": "approach",
+      "value": true,
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "player.controls.bottom",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.controls.top",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.seek.0",
+          "shape": {
+            "left": 28,
+            "top": 566.25,
+            "width": 972,
+            "height": 6
+          }
+        },
+        {
+          "id": "player.seek.1",
+          "shape": {
+            "left": 28,
+            "top": 566.25,
+            "width": 972,
+            "height": 6
+          }
+        }
+      ],
+      "near": ["player.controls.bottom", "player.seek.0", "player.seek.1"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    },
+    {
+      "at": 11643,
+      "change": "approach",
+      "value": true,
+      "event": "wheel",
+      "target": "div.ytp-left-controls",
+      "point": {
+        "x": 36,
+        "y": 500
+      },
+      "interacting": false,
+      "focused": [],
+      "dragging": [],
+      "captured": [],
+      "nearPoint": [
+        {
+          "id": "player.controls.bottom",
+          "shape": {
+            "left": 16,
+            "top": -52,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.controls.top",
+          "shape": {
+            "left": 16,
+            "top": -52,
+            "width": 996,
+            "height": 560.25
+          }
+        },
+        {
+          "id": "player.seek.0",
+          "shape": {
+            "left": 28,
+            "top": 446.25,
+            "width": 972,
+            "height": 6
+          }
+        },
+        {
+          "id": "player.seek.1",
+          "shape": {
+            "left": 28,
+            "top": 446.25,
+            "width": 972,
+            "height": 6
+          }
+        },
+        {
+          "id": "control.46",
+          "shape": {
+            "left": 28,
+            "top": 460.25,
+            "width": 40,
+            "height": 40
+          }
+        },
+        {
+          "id": "control.49",
+          "shape": {
+            "left": 80,
+            "top": 460.25,
+            "width": 40,
+            "height": 40
+          }
+        }
+      ],
+      "near": ["player.controls.bottom", "player.seek.0", "player.seek.1", "control.46"],
+      "held": {},
+      "active": "div#movie_player.html5-video-player.ytp-transparent.ytp-exp-bottom-control-flexbox",
+      "hasFocus": true
+    }
+  ]
+}

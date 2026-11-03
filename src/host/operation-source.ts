@@ -1,7 +1,13 @@
 import type { OperationSnapshot, OperationSurface } from '../world/operations';
 import type { PlacementFrame } from '../world/geometry';
 import { scrollsWithPage } from './operation-composition';
-import { traceGeometryCause, traceGeometryRead, traceMissedInput, traceMovedInput } from './guard-trace';
+import {
+  traceGeometryCause,
+  traceGeometryRead,
+  traceMissedInput,
+  traceMovedInput,
+  traceSubtreeCheck,
+} from './guard-trace';
 
 /** Attributes a site selector may test; a change can add or drop a candidate by itself. */
 const MATCHING_ATTRIBUTES = new Set(['class', 'role', 'href', 'contenteditable']);
@@ -11,14 +17,17 @@ const MAX_INCREMENTAL_ROOTS = 64;
 const FULL_SCAN_INTERVAL_MS = 1000;
 /** Changes inside this window after a read wait for its end; callers hold drawing meanwhile. */
 export const COALESCE_MS = 200;
-/** A look change (class/style) above more controls than this is treated as a layout change. */
-const MAX_LOOK_ROWS = 32;
+/** A look change (class/style) above more controls than this is treated as a layout change. The
+ * player's own class (its controls shown or auto-hidden) sits above about 40 of them (round 2). */
+const MAX_LOOK_ROWS = 64;
 /** The two attributes a control's look changes through (hover marks, inline styles). The others
  * the observer sees (hidden, disabled, aria-*, role, tabindex, contenteditable, href) can show,
  * hide, open or change what a control is, so they always count as a layout change. */
 const LOOK_ATTRIBUTES = new Set(['class', 'style']);
-export type PendingChange = 'none' | 'scroll' | 'look' | 'layout';
-const RANK: Record<PendingChange, number> = { none: 0, scroll: 1, look: 2, layout: 3 };
+/** subtree (G1.3, D11): elements were added or removed where no read control is, and none of the
+ * added ones can be a control. Everything is hidden until the next read checks those subtrees. */
+export type PendingChange = 'none' | 'scroll' | 'look' | 'subtree' | 'layout';
+const RANK: Record<PendingChange, number> = { none: 0, scroll: 1, look: 2, subtree: 3, layout: 4 };
 /** Sticky columns are read as unbounded boxes (±1e7); they never move with a page scroll. */
 const UNBOUNDED_BOX = 1e6;
 /** Document coordinates are compared at 1/100 px, below any rounding a scroll can introduce. */
@@ -91,6 +100,9 @@ export function createOperationSource(
   videoSlot: OperationSource['videoSlot'],
   overlaySlot: OperationSource['overlaySlot'] = () => ({ parent: doc.body ?? doc.documentElement, zIndex: 2147482000 }),
   editorCentre: OperationSource['editorCentre'] = () => undefined,
+  /** The adapter's candidate test for an inserted subtree (the same selectors its incremental
+   * discovery uses). Without it, every element added or removed is a layout change. */
+  holdsCandidate?: (root: Element) => boolean,
 ): OperationSource {
   if (!documentIds.has(doc)) documentIds.set(doc, ++nextDocumentId);
   const documentId = documentIds.get(doc)!;
@@ -128,7 +140,12 @@ export function createOperationSource(
     Element,
     { id: string; rect: PlacementFrame; visible: boolean; disabled: boolean; scrolls: boolean; plain: boolean }[]
   >();
+  /** What else arrived since the read, for when a subtree check lowers the pending kind again. */
+  let sawScroll = false,
+    sawLook = false;
   const raise = (kind: PendingChange) => {
+    if (kind === 'scroll') sawScroll = true;
+    if (kind === 'look') sawLook = true;
     if (RANK[kind] <= RANK[pending]) return false;
     pending = kind;
     return true;
@@ -197,61 +214,98 @@ export function createOperationSource(
     collect(records);
     if (!relevant(records)) return;
     geometryDirty = true;
-    const kind = lookOnly(records) ? 'look' : 'layout';
-    WW_GUARD_TRACE: traceGeometryCause(kind === 'look' ? 'mutation-look' : 'mutation-layout', records);
+    const kind = classify(records);
+    WW_GUARD_TRACE: traceGeometryCause(`mutation-${kind}`, records);
     change(kind, deliver);
   };
-  /** True when every relevant record only changed how a few controls look: a class or style on
-   * a control or on an element holding at most MAX_LOOK_ROWS of them, none of which moved,
-   * resized, appeared, disappeared or was drawn above the artwork (its order cannot be checked
-   * here). Reads those controls' boxes now, before the next paint; a change of any kind falls
-   * back to a layout change, which hides everything as before (D9). */
-  const lookOnly = (records: readonly MutationRecord[]) => {
-    if (!cached?.scroll || !cached.supported || pending === 'layout') return false;
+  /** True when every one of these read controls is where the last read put it (moved only by the
+   * page scroll since), as large, shown or hidden and enabled or disabled as it was, and is cut
+   * from the clip rather than drawn above the artwork (an order a box cannot show). */
+  const unchanged = (elements: readonly HTMLElement[]) => {
     const view = doc.defaultView!,
-      dx = view.scrollX - cached.scroll.x,
-      dy = view.scrollY - cached.scroll.y;
+      dx = view.scrollX - (cached?.scroll?.x ?? view.scrollX),
+      dy = view.scrollY - (cached?.scroll?.y ?? view.scrollY);
+    for (const element of elements) {
+      const read = readRows.get(element);
+      if (!read || read.some((entry) => !entry.plain) || !element.isConnected) return false;
+      const box = element.getBoundingClientRect();
+      const visible = box.width > 0 && box.height > 0 && view.getComputedStyle(element).visibility !== 'hidden';
+      const disabled = element.matches(':disabled,[aria-disabled="true"]');
+      for (const entry of read) {
+        const sx = entry.scrolls ? dx : 0,
+          sy = entry.scrolls ? dy : 0;
+        if (
+          entry.visible !== visible ||
+          entry.disabled !== disabled ||
+          Math.abs(box.left - (entry.rect.left - sx)) > 0.5 ||
+          Math.abs(box.top - (entry.rect.top - sy)) > 0.5 ||
+          Math.abs(box.width - entry.rect.width) > 0.5 ||
+          Math.abs(box.height - entry.rect.height) > 0.5
+        )
+          return false;
+      }
+    }
+    return true;
+  };
+  /** Subtrees whose children changed since the last read, checked once by the next read (D11). */
+  const changedSubtrees = new Set<Element>();
+  /** The kind of a batch of relevant records:
+   * - look: only a class or style changed, on a control or an element holding at most
+   *   MAX_LOOK_ROWS of them, and those controls' boxes (read now, before the next paint) did not
+   *   change (D9);
+   * - subtree: elements were added or removed, none of the added ones holds a candidate and none
+   *   of the removed ones held a read control; their parents are checked by the next read (D11);
+   * - layout: anything else, which hides everything until a full read as before. */
+  const classify = (records: readonly MutationRecord[]): PendingChange => {
+    if (!cached?.scroll || !cached.supported || pending === 'layout') return 'layout';
     const looks: HTMLElement[] = [];
+    let kind: PendingChange = 'look';
     for (const r of records) {
       if (!(r.target instanceof Element) || r.target.closest('[id^="web-world-themes"]')) continue;
-      const added = [...r.addedNodes, ...r.removedNodes].some(
-        (n) => n instanceof Element && !n.id.startsWith('web-world-themes'),
-      );
+      const target = r.target;
       if (r.type === 'childList') {
-        if (added) return false;
+        const own = (n: Node): n is Element => n instanceof Element && !n.id.startsWith('web-world-themes');
+        const addedElements = [...r.addedNodes].filter(own),
+          removedElements = [...r.removedNodes].filter(own);
+        if (!addedElements.length && !removedElements.length) continue;
+        if (!holdsCandidate || addedElements.some(holdsCandidate)) return 'layout';
+        if (removedElements.some((n) => rows.some((row) => n === row.element || n.contains(row.element))))
+          return 'layout';
+        changedSubtrees.add(target);
+        kind = 'subtree';
         continue;
       }
       if (!LOOK_ATTRIBUTES.has(r.attributeName ?? '')) {
-        if (relevant([r])) return false;
+        if (relevant([r])) return 'layout';
         continue;
       }
-      const target = r.target;
       const under = rows.filter((row) => row.element === target || target.contains(row.element));
       if (!under.length) continue;
-      if (under.length > MAX_LOOK_ROWS) return false;
-      for (const row of under) {
-        const read = readRows.get(row.element);
-        if (!read || read.some((entry) => !entry.plain)) return false;
-        const box = row.element.getBoundingClientRect();
-        const visible = box.width > 0 && box.height > 0 && view.getComputedStyle(row.element).visibility !== 'hidden';
-        for (const entry of read) {
-          const sx = entry.scrolls ? dx : 0,
-            sy = entry.scrolls ? dy : 0;
-          if (
-            entry.visible !== visible ||
-            entry.disabled !== row.element.matches(':disabled,[aria-disabled="true"]') ||
-            Math.abs(box.left - (entry.rect.left - sx)) > 0.5 ||
-            Math.abs(box.top - (entry.rect.top - sy)) > 0.5 ||
-            Math.abs(box.width - entry.rect.width) > 0.5 ||
-            Math.abs(box.height - entry.rect.height) > 0.5
-          )
-            return false;
-        }
-        looks.push(row.element);
-      }
+      if (under.length > MAX_LOOK_ROWS) return 'layout';
+      const elements = [...new Set(under.map((row) => row.element))];
+      if (!unchanged(elements)) return 'layout';
+      looks.push(...elements);
     }
     looks.forEach((element) => changedLooks.add(element));
-    return true;
+    return kind;
+  };
+  /** The next read's check of the changed subtrees (D11), once however many changes the frame had:
+   * every read control inside them is unchanged. Elements outside are not read; one an addition
+   * pushed is either seen by the ResizeObserver on the root (the page grew) or by the full read at
+   * the end of the window, which compares the whole layout. */
+  const subtreesUnchanged = () => {
+    const roots = [...changedSubtrees];
+    changedSubtrees.clear();
+    const inside = [
+      ...new Set(
+        rows
+          .filter((row) => roots.some((root) => root === row.element || root.contains(row.element)))
+          .map((r) => r.element),
+      ),
+    ];
+    const result = roots.every((root) => root.isConnected) && unchanged(inside);
+    WW_GUARD_TRACE: traceSubtreeCheck(doc, result, roots.length, inside.length);
+    return result;
   };
   const relevant = (records: readonly MutationRecord[]) =>
     records.some(
@@ -286,7 +340,20 @@ export function createOperationSource(
       'href',
     ],
   });
-  const resize = new ResizeObserver(changed);
+  /** The root's box at the last read, for the ResizeObserver reports below. */
+  let rootSize: PlacementFrame | undefined;
+  // Observing an element starts with a report of its current size. A report of the size the last
+  // read already saw is no change; only a different size (or one not read) can have moved others.
+  const resize = new ResizeObserver((entries) => {
+    const different = entries.some((entry) => {
+      const box = entry.borderBoxSize?.[0],
+        read = entry.target === root ? rootSize : readRows.get(entry.target)?.[0]?.rect;
+      return (
+        !box || !read || Math.abs(box.inlineSize - read.width) > 0.5 || Math.abs(box.blockSize - read.height) > 0.5
+      );
+    });
+    if (different) changed();
+  });
   resize.observe(doc.documentElement);
   // The extension's own UI (editor handles, panels) is never a native surface; its gestures
   // must not mark the page as changed, or a drag would hold and hide its own handles.
@@ -348,8 +415,11 @@ export function createOperationSource(
     if (shift?.base === base && shift.x === x && shift.y === y) return shift.snapshot;
     // A surface in a sticky column stays where it was read: it may be stuck, and every plane
     // excludes its whole column anyway.
+    // Only visible surfaces are moved: nothing reads the box of one that is not shown.
     const surfaces = base.surfaces.map((surface) =>
-      surface.scrolls && !(surface.scrollBox && surface.scrollBox.height >= UNBOUNDED_BOX)
+      surface.availability.visible &&
+      surface.scrolls &&
+      !(surface.scrollBox && surface.scrollBox.height >= UNBOUNDED_BOX)
         ? Object.freeze({
             ...surface,
             shape: moved(surface.shape, dx, dy),
@@ -384,6 +454,13 @@ export function createOperationSource(
     if (doc.activeElement !== readActive || doc.hasFocus() !== readFocus) dirty = true;
     if (!dirty && cached && doc.documentElement === root) return cached;
     const now = doc.defaultView!.performance.now();
+    const inWindow = now - capturedAt < COALESCE_MS;
+    // A page scroll, a checked look change or changed subtrees after a quiet period open a window
+    // of their own (G1.3, D11): the shifted read serves now, and the whole page is read once at
+    // the window's end to check it. Other changes are read at once, as before.
+    const shiftable = pending === 'scroll' || pending === 'look' || pending === 'subtree';
+    if (!inWindow && shiftable && !deferredUntil && geometryDirty && cached && !forced)
+      deferredUntil = now + COALESCE_MS;
     // A burst of native changes is read once per window, not once per frame. The stale
     // snapshot is only for callers that hold drawing; input checks force a fresh read.
     // Other reads inside the same held window share that caller's snapshot.
@@ -393,12 +470,19 @@ export function createOperationSource(
       cached &&
       !forced &&
       doc.documentElement === root &&
-      now - capturedAt < COALESCE_MS
+      (inWindow || (shiftable && deferredUntil > now))
     ) {
-      deferredUntil = capturedAt + COALESCE_MS;
+      if (inWindow) deferredUntil = capturedAt + COALESCE_MS;
+      // Added or removed elements: this read checks their subtrees once (D11). Unchanged, the
+      // pending kind is what else arrived; changed, it is a layout change and drawing waits.
+      if (pending === 'subtree')
+        if (subtreesUnchanged()) pending = sawLook ? 'look' : sawScroll ? 'scroll' : 'none';
+        else raise('layout');
       // Only a page scroll or a checked look change since the read: the read, shifted by the
-      // scroll, is where every surface is now (G1.3). Anything else: the caller holds drawing.
-      return pending === 'layout' ? cached : shifted(cached);
+      // scroll, is where every surface is now (G1.3). A layout change inside the window holds
+      // drawing until its end; one found after a quiet period is read now (below), as before.
+      if (pending !== 'layout') return shifted(cached);
+      if (inWindow) return cached;
     }
     forced = false;
     geometryDirty = false;
@@ -406,7 +490,9 @@ export function createOperationSource(
     capturedAt = now;
     dirty = false;
     pending = 'none';
+    sawScroll = sawLook = false;
     changedLooks.clear();
+    changedSubtrees.clear();
     const scan: DiscoveryScan = {
       full: fullScan || now - lastFullScan >= FULL_SCAN_INTERVAL_MS,
       added: [...added],
@@ -539,6 +625,7 @@ export function createOperationSource(
       previousLayout = layoutSignature;
     }
     readRows = new Map();
+    rootSize = root.getBoundingClientRect();
     rows.forEach((row, i) => {
       const surface = surfaces[i]!;
       const list = readRows.get(row.element) ?? [];

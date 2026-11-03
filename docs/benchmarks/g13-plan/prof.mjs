@@ -22,6 +22,9 @@ const inclusive = new Map(); // function -> ms
 const entry = new Map(); // outermost ext frame -> ms
 const callers = new Map(); // target -> (caller path) -> ms
 const targets = [
+  'verifiedOverlaySlot',
+  'shifted',
+  'handle',
   'applyLayout',
   'fixedContainingBlock',
   'rank2',
