@@ -317,9 +317,10 @@ test('G1.2: only dynamic roots painted over a near control are held, as root uni
   ];
   const state = stepApproach(initialApproach(), s, { timeMs: 0, keyed: false, point: { x: 200, y: 215 } }, paints);
   expect(heldRoots(state)).toEqual(['group', 'over-seek']);
-  expect(approachLayers(state)).toEqual({
-    layers: { 'over-seek': [approachRectOf(surface())], group: [approachRectOf(surface())] },
-  });
+  // D11: the seek band, narrowed to 72px around the pointer.
+  const area = { left: 128, top: 200, width: 144, height: 30 };
+  expect(approachRectOf(surface())).toEqual({ left: 100, top: 200, width: 200, height: 30 });
+  expect(approachLayers(state)).toEqual({ layers: { 'over-seek': [area], group: [area] } });
   expect(approachLayers(initialApproach())).toBeUndefined();
 });
 test('G1.2: a held root stays held until its control clears, even after it moves away', () => {
@@ -343,6 +344,47 @@ test('G1.2: a held root stays held until its control clears, even after it moves
   state = stepApproach(state, s, { timeMs: 616, keyed: false, point: { x: 720, y: 215 } }, paints);
   expect(heldRoots(state)).toEqual(['mover']);
   expect(state.held.get('mover')).toEqual(['like']);
+});
+test('G1.2 (D11): near one end of a long control, only layers near the pointer are held', () => {
+  // A link 900px wide; the pointer comes near its left end only.
+  const long = surface({
+    id: 'long-link',
+    kind: 'click',
+    shape: { left: 100, top: 400, width: 900, height: 20 },
+    protectedEnvelope: { left: 96, top: 396, width: 908, height: 28 },
+  });
+  const s = snapshot([long]);
+  const paints = [
+    dynamicPaint('near-end', 130, 405),
+    dynamicPaint('far-end', 900, 405),
+    dynamicPaint('edge', 150, 405),
+  ];
+  let state = stepApproach(initialApproach(), s, { timeMs: 0, keyed: false, point: { x: 80, y: 410 } }, paints);
+  expect([...state.near.keys()]).toEqual(['long-link']);
+  // 72px around the pointer reaches x=152: the layers there are held, the far end is not.
+  expect(heldRoots(state)).toEqual(['edge', 'near-end']);
+  expect(state.near.get('long-link')!.rect).toEqual({ left: 100, top: 400, width: 52, height: 20 });
+  // While it clears, the narrowed area stays where the pointer was.
+  state = stepApproach(state, s, { timeMs: 10, keyed: false, point: { x: 80, y: 600 } }, paints);
+  expect(state.near.get('long-link')).toMatchObject({ clearSince: 10 });
+  expect(heldRoots(state)).toEqual(['edge', 'near-end']);
+  // A path along the link narrows to the swept area: from x=80 to x=500, and 72px beyond.
+  state = stepApproach(
+    initialApproach(),
+    s,
+    { timeMs: 0, keyed: false, previousPoint: { x: 80, y: 380 }, point: { x: 500, y: 380 } },
+    [...paints, dynamicPaint('middle', 520, 405)],
+  );
+  expect(heldRoots(state)).toEqual(['edge', 'middle', 'near-end']);
+  // Focus, drag, capture, keys and presses keep the whole control.
+  const focused = { ...long, availability: { ...long.availability, focused: true } };
+  state = stepApproach(
+    initialApproach(),
+    snapshot([focused]),
+    { timeMs: 0, keyed: false, point: { x: 80, y: 410 } },
+    paints,
+  );
+  expect(heldRoots(state)).toEqual(['edge', 'far-end', 'near-end']);
 });
 test('G1.2: an approach without a pointer holds the layers over its control (D2)', () => {
   const player = { left: 16, top: 145, width: 1050, height: 590 };

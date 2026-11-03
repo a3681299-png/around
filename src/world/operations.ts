@@ -451,8 +451,21 @@ export function stepProximity(
 export const approachRectOf = (surface: OperationSurface) => approachRect(surface) ?? surface.shape;
 /** G1.2: one approached control, with its own hysteresis. */
 export interface NearSurface {
+  /** Where layers yield: the control, or (D11) its part within 72px of the pointer's path. */
   rect: PlacementFrame;
+  /** D11: the pointer's path and 72px around it, when only the pointer made the control near. */
+  area?: PlacementFrame;
   clearSince: number | null;
+}
+/** The overlap of two frames; empty (zero size) when they do not meet. */
+function overlapOf(a: PlacementFrame, b: PlacementFrame): PlacementFrame {
+  const left = Math.max(a.left, b.left),
+    top = Math.max(a.top, b.top),
+    right = Math.min(a.left + a.width, b.left + b.width),
+    bottom = Math.min(a.top + a.height, b.top + b.height);
+  return right > left && bottom > top
+    ? { left, top, width: right - left, height: bottom - top }
+    : { left, top, width: 0, height: 0 };
 }
 export interface ApproachState {
   near: ReadonlyMap<string, NearSurface>;
@@ -470,8 +483,16 @@ export function stepApproach(
   input: { timeMs: number; point?: Point; previousPoint?: Point; pressed?: Point; keyed: boolean },
   paints: readonly PaintFootprint[],
 ): ApproachState {
-  const hits = new Map<string, PlacementFrame>(),
+  const near = new Map<string, NearSurface>(),
     byId = new Map<string, OperationSurface>();
+  const from = input.previousPoint ?? input.point,
+    // D11: a control the pointer alone made near yields only within 72px of the pointer's path.
+    area = input.point && {
+      left: Math.min(from!.x, input.point.x) - 72,
+      top: Math.min(from!.y, input.point.y) - 72,
+      width: Math.abs(input.point.x - from!.x) + 144,
+      height: Math.abs(input.point.y - from!.y) + 144,
+    };
   let focusedControl = false;
   for (const surface of snapshot.surfaces) {
     byId.set(surface.id, surface);
@@ -479,34 +500,40 @@ export function stepApproach(
       rect = approachRect(surface);
     // Focus on an area that may be covered (the video itself) is not an approach to a control.
     if (forbid && surface.availability.focused) focusedControl = true;
-    if (
-      (forbid && surface.availability.focused) ||
-      surface.availability.dragging ||
-      surface.availability.captured ||
-      (surface.availability.visible &&
-        forbid &&
-        input.point &&
-        rect !== undefined &&
-        segmentHits(input.previousPoint ?? input.point, input.point, rect, previous.near.has(surface.id) ? 72 : 40))
+    if ((forbid && surface.availability.focused) || surface.availability.dragging || surface.availability.captured)
+      near.set(surface.id, { rect: rect ?? surface.shape, clearSince: null });
+    else if (
+      surface.availability.visible &&
+      forbid &&
+      input.point &&
+      rect !== undefined &&
+      segmentHits(from!, input.point, rect, previous.near.has(surface.id) ? 72 : 40)
     )
-      hits.set(surface.id, rect ?? surface.shape);
+      near.set(surface.id, { rect: overlapOf(rect, area!), area: area!, clearSince: null });
   }
   // A press holds what is painted around it, whether or not a control is there.
   if (input.pressed)
-    hits.set(PRESSED, { left: input.pressed.x - 40, top: input.pressed.y - 40, width: 80, height: 80 });
+    near.set(PRESSED, {
+      rect: { left: input.pressed.x - 40, top: input.pressed.y - 40, width: 80, height: 80 },
+      clearSince: null,
+    });
   // D2: a key without a focused control (YouTube's k, j, l on the page) goes to the player.
   if (input.keyed && !focusedControl)
     for (const surface of snapshot.surfaces)
       if (surface.availability.visible && surface.policy.occlusion === 'allow')
-        hits.set(surface.id, approachRectOf(surface));
-  const near = new Map<string, NearSurface>();
-  for (const [key, rect] of hits) near.set(key, { rect, clearSince: null });
+        near.set(surface.id, { rect: approachRectOf(surface), clearSince: null });
   for (const [key, entry] of previous.near) {
     if (near.has(key)) continue;
     const clearSince = entry.clearSince ?? input.timeMs;
     const surface = byId.get(key);
+    // A clearing control keeps following the page, inside the area where the pointer last was.
+    const rect = surface ? approachRectOf(surface) : entry.rect;
     if (input.timeMs - clearSince < 350)
-      near.set(key, { rect: surface ? approachRectOf(surface) : entry.rect, clearSince });
+      near.set(key, {
+        rect: entry.area ? overlapOf(rect, entry.area) : rect,
+        ...(entry.area ? { area: entry.area } : {}),
+        clearSince,
+      });
   }
   const held = new Map<string, string[]>();
   for (const [root, keys] of previous.held) {
@@ -523,7 +550,7 @@ export function stepApproach(
         bottom: paint.bounds.bottom + paint.outset,
       };
     for (const [key, entry] of near) {
-      if (!intersects(area, entry.rect)) continue;
+      if (!entry.rect.width || !entry.rect.height || !intersects(area, entry.rect)) continue;
       const keys = held.get(root);
       if (!keys) held.set(root, [key]);
       else if (!keys.includes(key)) keys.push(key);

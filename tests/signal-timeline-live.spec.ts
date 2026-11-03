@@ -114,6 +114,8 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
       hit: string | null;
       control: string | null;
       approach?: { near: string[]; held: Record<string, string[]> } | null;
+      nearGif?: unknown[];
+      gifAt?: unknown;
     }[] = [];
     report.checks['pointer'] = { point: pointer, gif, gifId, under };
     const verifyScroll = async (progress: number) => {
@@ -186,6 +188,53 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
         const last = log?.filter((entry) => entry.change === 'approach').at(-1);
         return last ? { near: last.near ?? [], held: last.held ?? {} } : null;
       });
+      // Native controls within 72px of the resting pointer that also reach under the GIF (D11).
+      under.at(-1)!.gifAt = await media.first().evaluate((node: HTMLElement) => {
+        const g = node.getBoundingClientRect(),
+          frame = node.closest<HTMLElement>('[data-image-id]');
+        return {
+          rect: [Math.round(g.left), Math.round(g.top), Math.round(g.width), Math.round(g.height)],
+          visibility: frame?.style.visibility ?? null,
+          // Why drawing is held at this moment (the guard's record), if it is.
+          stopped:
+            JSON.parse(
+              (node.getRootNode() as ShadowRoot).host?.getAttribute('data-ww-safety') ??
+                document.querySelector('#web-world-themes-decorations')?.getAttribute('data-ww-safety') ??
+                '{}',
+            ).stopped ?? null,
+          viewport: [innerWidth, innerHeight],
+        };
+      });
+      under.at(-1)!.nearGif = await media.first().evaluate((node: HTMLElement, { x, y }) => {
+        const g = node.getBoundingClientRect();
+        return [
+          ...document.querySelectorAll(
+            'a[href], button, [role="button"], input, textarea, [contenteditable="true"], [role="slider"], ytd-searchbox, yt-searchbox',
+          ),
+        ]
+          .filter((e) => !e.closest('[id^="web-world-themes"]'))
+          .map((e) => ({ e, r: e.getBoundingClientRect() }))
+          .filter(
+            ({ r }) =>
+              r.width > 0 &&
+              r.height > 0 &&
+              Math.max(r.left - x, x - r.right, r.top - y, y - r.bottom) <= 72 &&
+              r.right > g.left &&
+              r.left < g.right &&
+              r.bottom > g.top &&
+              r.top < g.bottom,
+          )
+          .slice(0, 4)
+          .map(({ e, r }) => ({
+            element: `${e.tagName.toLowerCase()}${e.id ? '#' + e.id : ''}${[...e.classList]
+              .slice(0, 2)
+              .map((name) => '.' + name)
+              .join('')}`,
+            label: (e.getAttribute('aria-label') ?? e.textContent ?? '').trim().slice(0, 40),
+            within: e.parentElement?.closest('[id]')?.id ?? null,
+            rect: [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)],
+          }));
+      }, pointer);
     };
     for (const progress of [0, 0.25, 0.5, 0.75, 1, 0.5, 0]) await verifyScroll(progress);
     for (const progress of [0, 0.5, 1, 0.5, 0]) {
