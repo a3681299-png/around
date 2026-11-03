@@ -1,0 +1,45 @@
+{
+  "from": {
+    "x": 0,
+    "y": 0
+  },
+  "to": {
+    "x": 1000,
+    "y": 800
+  },
+  "control": {
+    "left": 0,
+    "top": 0,
+    "width": 1000,
+    "height": 800
+  },
+  "layer": {
+    "left": 0,
+    "top": 700,
+    "right": 20,
+    "bottom": 720
+  },
+  "minimumCornerDistanceToSegment": 534.1142656590328,
+  "actualHeld": [["remote-corner", ["large-control"]]],
+  "near": [
+    [
+      "large-control",
+      {
+        "rect": {
+          "left": 0,
+          "top": 0,
+          "width": 1000,
+          "height": 800
+        },
+        "area": {
+          "left": -72,
+          "top": -72,
+          "width": 1144,
+          "height": 944
+        },
+        "clearSince": null
+      }
+    ]
+  ],
+  "note": "D11 uses an axis-aligned path bounding rectangle, not exact 72px distance from a diagonal segment; conservative extra hold."
+}

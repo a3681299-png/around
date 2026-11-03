@@ -1,0 +1,21 @@
+{
+  "baseline": "557b9788eaf719a724c9f7f78be54735fe947b38",
+  "target": "67ad03d4da2226104c38eef099db7ba296f74736",
+  "measuredAt": "2026-11-03T06:49:27.873Z",
+  "browser": "143.0.7499.4",
+  "os": "Windows 11 Pro",
+  "release": "10.0.26300",
+  "arch": "x64",
+  "cpu": "13th Gen Intel(R) Core(TM) i7-13650HX",
+  "threads": 20,
+  "backgroundCpu": "not recorded",
+  "gpuTime": "not recorded",
+  "droppedVideoFrames": "not recorded",
+  "trackedSourceChangesFromTarget": "",
+  "buildNote": "dirtySource=true at build time included unrelated untracked CLAUDE.md notes; tracked product source was unchanged",
+  "buildHashes": {
+    "traceContent": "1c5c8f16e6232e00a3aef0dee64b68de3a4289dc2c19e3bfaa42729243118bb1",
+    "currentPerfContent": "3ea0b217ad16d297debf17a60a4ac72be8196cedb593820a73552b35361a4a71",
+    "beforePerfContent": "dae037dac90087f61868f12277f1743c01293938cc541e4ff768171498ed446c"
+  }
+}
