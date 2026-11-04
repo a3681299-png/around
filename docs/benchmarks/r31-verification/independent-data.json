@@ -1,0 +1,317 @@
+{
+  "checks": [
+    {
+      "name": "compatibility:history-v10.json",
+      "version": 10,
+      "cssHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "parsedHash": "cff853a53941c99b032288f51422ccedb78982a58e3be8025224087648d0e054",
+      "framesHash": "5bd27db73f09467fc84ad5cee2cf7848a7002354e99c2149f8f962e4f5b8c840",
+      "frames": 100,
+      "pass": true
+    },
+    {
+      "name": "compatibility:history-v11.json",
+      "version": 11,
+      "cssHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "parsedHash": "cb1ee5c77d6ed15badefc162187b50c7642cbb1b165acf94ca6905f268dd1476",
+      "framesHash": "4d769ed9ba8dbd965810ce459667f3c5bdfaddcb137ccdeee8d7482c800eb193",
+      "frames": 100,
+      "pass": true
+    },
+    {
+      "name": "compatibility:history-v12.json",
+      "version": 12,
+      "cssHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "parsedHash": "c81333169e74751c71ba6c873eeddb1c23664aa057253ea31c6d1729d101392a",
+      "framesHash": "837488c77ba73a26d2f144a25040d9d204869e432fa007fe0dd37b1100242f4b",
+      "frames": 100,
+      "pass": true
+    },
+    {
+      "name": "compatibility:history-v13.json",
+      "version": 13,
+      "cssHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "parsedHash": "cb1ee5c77d6ed15badefc162187b50c7642cbb1b165acf94ca6905f268dd1476",
+      "framesHash": "4d769ed9ba8dbd965810ce459667f3c5bdfaddcb137ccdeee8d7482c800eb193",
+      "frames": 100,
+      "pass": true
+    },
+    {
+      "name": "compatibility:history-v7.json",
+      "version": 7,
+      "cssHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "parsedHash": "a0562105effafc35692fefc117594ecdca6aebeb5a596615903e2c93dc6277af",
+      "framesHash": "49cdbbc17a7a1c6f115053d3b73c13d3ab6ae4f45970dd44abccbf47dd7b361f",
+      "frames": 100,
+      "pass": true
+    },
+    {
+      "name": "compatibility:history-v8.json",
+      "version": 8,
+      "cssHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "parsedHash": "884f38f1ee8a5aefcec68c0ff7325722b14bb28515b4fced4261ffa66627b20b",
+      "framesHash": "f2af80a92a76483711b49e8ae4d808bfc629c1f26b9cdf8eb37126216f1d5cb3",
+      "frames": 100,
+      "pass": true
+    },
+    {
+      "name": "compatibility:history-v9.json",
+      "version": 9,
+      "cssHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "parsedHash": "e71bfee3eebff7048a024199fa00ac53740a9fdb211170dbd5cd989dc1a23cfe",
+      "framesHash": "c5badd5218fb7aeb58c5f7c089638f00398dc597e31e1c4c9bc3fca4dfa7dc44",
+      "frames": 100,
+      "pass": true
+    },
+    {
+      "name": "compatibility:v1.json",
+      "version": 1,
+      "cssHash": "dab250da30205c01dac89fc588ec23d2ee07024a08bdc9b437dba8439fd9aa36",
+      "parsedHash": "274953637b7b6c130ade0197f57accf9acac255a6ee8a354bfc443f7172a2c02",
+      "framesHash": "df1624728be2ebc276909b0e4823ce3d4a69b32e557f1d816f45dc697278d0cb",
+      "frames": 100,
+      "pass": true
+    },
+    {
+      "name": "compatibility:v2.json",
+      "version": 2,
+      "cssHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "parsedHash": "29f5387cbafd9ef9b37e15f504893600b08ab8c59e459563f0ef0d1c765cf316",
+      "framesHash": "51e57915858cb073d9e929498b6c1384978e103826e6b4fc30afa889be57b3ca",
+      "frames": 100,
+      "pass": true
+    },
+    {
+      "name": "compatibility:v3.json",
+      "version": 3,
+      "cssHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "parsedHash": "a8f3ef54f2edb0311d913aa522e6cba18e88ab0b6718dea1ca46550fa1ed2b29",
+      "framesHash": "f96b6644edcc24bd6f3ce851f5d9a25491a6fb3e6d7c30421f7bd8134555d459",
+      "frames": 100,
+      "pass": true
+    },
+    {
+      "name": "compatibility:v4.json",
+      "version": 4,
+      "cssHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "parsedHash": "79777ef7999e20e3ceb30864d709f43367c737c517ad65b392d86daf4c9fe7aa",
+      "framesHash": "3757a2416c5f0742270bb74b9f2cc6ed8d633e54661ad119636b7635b3c9a8c1",
+      "frames": 100,
+      "pass": true
+    },
+    {
+      "name": "compatibility:v5.json",
+      "version": 5,
+      "cssHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "parsedHash": "a9293431d400a8b5f7850f879bb1dd1a30fc56bc5f84fb1f98778f18a79e3fc1",
+      "framesHash": "12a392202718947b87962c218213dde6d6f8cd99ac0b814b980054279a9ae935",
+      "frames": 100,
+      "pass": true
+    },
+    {
+      "name": "compatibility:v6.json",
+      "version": 6,
+      "cssHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "parsedHash": "116752c1e4419564c047c38375217fc992c3798470059d66ea06d32c5dc63da3",
+      "framesHash": "ada44e50b53d3daafb738cc404c6d495d0ab81f7d30d763ea2000f1cab87613a",
+      "frames": 100,
+      "pass": true
+    },
+    {
+      "name": "compatibility:v7.json",
+      "version": 7,
+      "cssHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "parsedHash": "b810c460f7185d3b73679b871951f6937f30ce134de4ecab6ee0aab9756e20aa",
+      "framesHash": "e1932f41664328febda3d1c833620156efb198de44de030345c59befc714ee0f",
+      "frames": 100,
+      "pass": true
+    },
+    {
+      "name": "compatibility:v8.json",
+      "version": 8,
+      "cssHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "parsedHash": "d50a319c04d24f03aeb3e21f642689379f0ad5815dcacbc86fc010ebbb9c6d93",
+      "framesHash": "cfd9ce47aacf2ee76d01760d59a92ca56c6a07eb46385ec984bbe7860745771a",
+      "frames": 100,
+      "pass": true
+    },
+    {
+      "name": "compatibility:v9.json",
+      "version": 9,
+      "cssHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "parsedHash": "3f5ac7cb38b7f7f83109a60a81002db37313d891432a03898f71ced6a213cee2",
+      "framesHash": "f4c739b2ad5d7134841d316f7cfb09b80a18a87ce8f7921e4b0eaff2dfa62dc3",
+      "frames": 100,
+      "pass": true
+    },
+    {
+      "name": "vrma-reject:mesh",
+      "bytes": 1580,
+      "error": "VRMアニメーションに不要なデータが含まれています。",
+      "pass": true
+    },
+    {
+      "name": "vrma-reject:image",
+      "bytes": 1580,
+      "error": "VRMアニメーションに不要なデータが含まれています。",
+      "pass": true
+    },
+    {
+      "name": "vrma-reject:uri",
+      "bytes": 1608,
+      "error": "外部URL・data URIを含むVRMアニメーションは読み込めません。",
+      "pass": true
+    },
+    {
+      "name": "vrma-reject:nested-uri",
+      "bytes": 1616,
+      "error": "外部URL・data URIを含むVRMアニメーションは読み込めません。",
+      "pass": true
+    },
+    {
+      "name": "vrma-reject:expression",
+      "bytes": 1584,
+      "error": "表情を含むVRMアニメーションは未対応です。",
+      "pass": true
+    },
+    {
+      "name": "vrma-reject:other-extension",
+      "bytes": 1592,
+      "error": "未対応のglTF拡張です。",
+      "pass": true
+    },
+    {
+      "name": "vrma-reject:unknown-bone",
+      "bytes": 1584,
+      "error": "未知の人型の骨の名前です。",
+      "pass": true
+    },
+    {
+      "name": "vrma-reject:head-translation",
+      "bytes": 1568,
+      "error": "腰の移動と骨の回転だけを使えます。",
+      "pass": true
+    },
+    {
+      "name": "vrma-reject:scale",
+      "bytes": 1560,
+      "error": "腰の移動と骨の回転だけを使えます。",
+      "pass": true
+    },
+    {
+      "name": "vrma-reject:truncated",
+      "bytes": 100,
+      "error": "GLBが破損しているか、初版で未対応の構造です。",
+      "pass": true
+    },
+    {
+      "name": "vrma-reject:oversized",
+      "bytes": 8388609,
+      "error": "静止PNG・WebP画像を選択してください。",
+      "pass": true
+    },
+    {
+      "name": "vrma-reject:nan-key",
+      "bytes": 1568,
+      "error": "VRMアニメーション（.vrma）が破損しているか、未対応の構造です。",
+      "pass": true
+    },
+    {
+      "name": "vrma-reject:infinite-key",
+      "bytes": 1568,
+      "error": "VRMアニメーション（.vrma）が破損しているか、未対応の構造です。",
+      "pass": true
+    },
+    {
+      "name": "vrma-reject:nan-position",
+      "bytes": 1568,
+      "error": "VRMアニメーション（.vrma）が破損しているか、未対応の構造です。",
+      "pass": true
+    },
+    {
+      "name": "vrma-reject:infinite-quaternion",
+      "bytes": 1568,
+      "error": "VRMアニメーション（.vrma）が破損しているか、未対応の構造です。",
+      "pass": true
+    },
+    {
+      "name": "vrma-reject:duration-601",
+      "bytes": 1568,
+      "error": "VRMアニメーションが長すぎます。",
+      "pass": true
+    },
+    {
+      "name": "vrma-reject:duration-1e8",
+      "bytes": 1576,
+      "error": "VRMアニメーション（.vrma）が破損しているか、未対応の構造です。",
+      "pass": true
+    },
+    {
+      "name": "vrma-reject:derived-hips-infinity",
+      "pass": false,
+      "error": "derived-hips-infinity accepted by import inspector"
+    },
+    {
+      "name": "vrma-reject:bad-scene-index",
+      "pass": false,
+      "error": "bad-scene-index accepted by import inspector"
+    },
+    {
+      "name": "vrma-reject:bad-scene-root",
+      "pass": false,
+      "error": "bad-scene-root accepted by import inspector"
+    },
+    {
+      "name": "vrma-duration-boundary",
+      "pass": true
+    },
+    {
+      "name": "measured-facts:duration",
+      "pass": true
+    },
+    {
+      "name": "measured-facts:bones",
+      "pass": true
+    },
+    {
+      "name": "measured-facts:restHipsHeight",
+      "pass": true
+    },
+    {
+      "name": "measured-facts:hipsTravel",
+      "pass": true
+    },
+    {
+      "name": "measured-facts:hipsTranslation",
+      "pass": true
+    },
+    {
+      "name": "character-origin-overrides-body-and-off",
+      "cases": 6,
+      "pass": true
+    },
+    {
+      "name": "embedded-vrm-real-loader-pose-parity",
+      "frames": 180,
+      "inPlaceModes": [false, true],
+      "hash": "d7900cb78185c4961997a2aec3249ca8fdd619f2704f1d02080748dbb3c6e501",
+      "pass": true
+    }
+  ],
+  "failures": [
+    {
+      "name": "vrma-reject:derived-hips-infinity",
+      "error": "derived-hips-infinity accepted by import inspector"
+    },
+    {
+      "name": "vrma-reject:bad-scene-index",
+      "error": "bad-scene-index accepted by import inspector"
+    },
+    {
+      "name": "vrma-reject:bad-scene-root",
+      "error": "bad-scene-root accepted by import inspector"
+    }
+  ],
+  "total": 44,
+  "passed": 41
+}

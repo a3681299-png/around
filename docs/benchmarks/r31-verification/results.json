@@ -1,0 +1,1231 @@
+{
+  "target": "800373875d9a933b101e4e1cfdbfe7cfa40412e8",
+  "before": "8e63f0d451eeaf7811b7e0b5b60070d10b5233a9",
+  "tests": {
+    "windows-all": {
+      "startTime": "2026-11-04T09:48:34.764Z",
+      "duration": 1006163.0599999999,
+      "expected": 257,
+      "skipped": 61,
+      "unexpected": 11,
+      "flaky": 0
+    },
+    "unit-windows": {
+      "startTime": "2026-11-04T11:19:17.842Z",
+      "duration": 12850.227,
+      "expected": 496,
+      "skipped": 1,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "before-version-assertions": {
+      "startTime": "2026-11-04T11:19:31.861Z",
+      "duration": 67261.93,
+      "expected": 8,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "before-flakes": {
+      "startTime": "2026-11-04T11:20:41.128Z",
+      "duration": 92540.03899999999,
+      "expected": 30,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "after-flakes": {
+      "startTime": "2026-11-04T11:22:14.601Z",
+      "duration": 89150.49799999999,
+      "expected": 30,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "extra-final": {
+      "startTime": "2026-11-04T11:24:56.547Z",
+      "duration": 52229.996,
+      "expected": 4,
+      "skipped": 0,
+      "unexpected": 4,
+      "flaky": 0
+    },
+    "live-normal-final": {
+      "startTime": "2026-11-04T11:23:44.717Z",
+      "duration": 36023.068999999996,
+      "expected": 2,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "live-probe-final": {
+      "startTime": "2026-11-04T11:24:21.727Z",
+      "duration": 33975.108,
+      "expected": 2,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "sidepanel-visual-final": {
+      "startTime": "2026-11-04T11:32:29.084Z",
+      "duration": 31228.034,
+      "expected": 2,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "perf-final-tests": {
+      "startTime": "2026-11-04T10:46:59.868Z",
+      "duration": 1935287.243,
+      "expected": 0,
+      "skipped": 0,
+      "unexpected": 1,
+      "flaky": 0
+    },
+    "perf-complete-tests": {
+      "startTime": "2026-11-04T11:36:06.443Z",
+      "duration": 609275.375,
+      "expected": 0,
+      "skipped": 0,
+      "unexpected": 1,
+      "flaky": 0
+    },
+    "studio-window-shot-tests": {
+      "startTime": "2026-11-04T11:54:46.708Z",
+      "duration": 9426.756,
+      "expected": 1,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "character-live": {
+      "startTime": "2026-11-04T09:46:14.606Z",
+      "duration": 16534.021999999997,
+      "expected": 1,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "performance": {
+    "qualifiedPairs": [2, 4],
+    "allPhasesPass": false,
+    "aggregates": {
+      "no-character:startup": {
+        "pairs": [2, 4],
+        "pairCount": 2,
+        "before": {
+          "cpu": {
+            "count": 841,
+            "median": 0.20000000298023224,
+            "p95": 3.100000023841858,
+            "max": 24.100000008940697
+          },
+          "gpu": {
+            "count": 0,
+            "median": null,
+            "p95": null,
+            "max": null
+          },
+          "frame": {
+            "count": 851,
+            "median": 15.235,
+            "p95": 49.803,
+            "max": 1079.396
+          },
+          "video": {
+            "total": 198,
+            "dropped": 0
+          },
+          "perPair": [
+            {
+              "cpu": {
+                "count": 460,
+                "median": 0.20000000298023224,
+                "p95": 2.2999999970197678,
+                "max": 16.899999991059303
+              },
+              "gpu": {
+                "count": 0,
+                "median": null,
+                "p95": null,
+                "max": null
+              },
+              "video": {
+                "total": 97,
+                "dropped": 0,
+                "counterReset": false
+              }
+            },
+            {
+              "cpu": {
+                "count": 381,
+                "median": 0.20000000298023224,
+                "p95": 5.999999970197678,
+                "max": 24.100000008940697
+              },
+              "gpu": {
+                "count": 0,
+                "median": null,
+                "p95": null,
+                "max": null
+              },
+              "video": {
+                "total": 101,
+                "dropped": 0,
+                "counterReset": false
+              }
+            }
+          ]
+        },
+        "after": {
+          "cpu": {
+            "count": 931,
+            "median": 0.10000000894069672,
+            "p95": 3.4000000059604645,
+            "max": 31.100000008940697
+          },
+          "gpu": {
+            "count": 0,
+            "median": null,
+            "p95": null,
+            "max": null
+          },
+          "frame": {
+            "count": 939,
+            "median": 13.085,
+            "p95": 50.386,
+            "max": 759.512
+          },
+          "video": {
+            "total": 219,
+            "dropped": 0
+          },
+          "perPair": [
+            {
+              "cpu": {
+                "count": 566,
+                "median": 0.20000000298023224,
+                "p95": 2.500000014901161,
+                "max": 31.100000008940697
+              },
+              "gpu": {
+                "count": 0,
+                "median": null,
+                "p95": null,
+                "max": null
+              },
+              "video": {
+                "total": 113,
+                "dropped": 0,
+                "counterReset": false
+              }
+            },
+            {
+              "cpu": {
+                "count": 365,
+                "median": 0,
+                "p95": 6.799999982118607,
+                "max": 17.899999991059303
+              },
+              "gpu": {
+                "count": 0,
+                "median": null,
+                "p95": null,
+                "max": null
+              },
+              "video": {
+                "total": 106,
+                "dropped": 0,
+                "counterReset": false
+              }
+            }
+          ]
+        },
+        "delta": {
+          "median": -0.09999999403953552,
+          "p95": 0.29999998211860657
+        },
+        "numericBudgetMet": true,
+        "pass": false
+      },
+      "no-character:steady": {
+        "pairs": [1, 2, 4, 7],
+        "pairCount": 4,
+        "before": {
+          "cpu": {
+            "count": 3507,
+            "median": 0,
+            "p95": 0,
+            "max": 4
+          },
+          "gpu": {
+            "count": 0,
+            "median": null,
+            "p95": null,
+            "max": null
+          },
+          "frame": {
+            "count": 3581,
+            "median": 6.936,
+            "p95": 7.989,
+            "max": 49.246
+          },
+          "video": {
+            "total": 580,
+            "dropped": 0
+          },
+          "perPair": [
+            {
+              "cpu": {
+                "count": 875,
+                "median": 0,
+                "p95": 0,
+                "max": 4
+              },
+              "gpu": {
+                "count": 0,
+                "median": null,
+                "p95": null,
+                "max": null
+              },
+              "video": {
+                "total": 147,
+                "dropped": 0,
+                "counterReset": false
+              }
+            },
+            {
+              "cpu": {
+                "count": 877,
+                "median": 0,
+                "p95": 0,
+                "max": 3.5999999940395355
+              },
+              "gpu": {
+                "count": 0,
+                "median": null,
+                "p95": null,
+                "max": null
+              },
+              "video": {
+                "total": 142,
+                "dropped": 0,
+                "counterReset": false
+              }
+            },
+            {
+              "cpu": {
+                "count": 876,
+                "median": 0,
+                "p95": 0,
+                "max": 1.6000000089406967
+              },
+              "gpu": {
+                "count": 0,
+                "median": null,
+                "p95": null,
+                "max": null
+              },
+              "video": {
+                "total": 147,
+                "dropped": 0,
+                "counterReset": false
+              }
+            },
+            {
+              "cpu": {
+                "count": 879,
+                "median": 0,
+                "p95": 0,
+                "max": 2.2999999970197678
+              },
+              "gpu": {
+                "count": 0,
+                "median": null,
+                "p95": null,
+                "max": null
+              },
+              "video": {
+                "total": 144,
+                "dropped": 0,
+                "counterReset": false
+              }
+            }
+          ]
+        },
+        "after": {
+          "cpu": {
+            "count": 3508,
+            "median": 0,
+            "p95": 0,
+            "max": 4.100000008940697
+          },
+          "gpu": {
+            "count": 0,
+            "median": null,
+            "p95": null,
+            "max": null
+          },
+          "frame": {
+            "count": 3575,
+            "median": 6.942,
+            "p95": 8.096,
+            "max": 82.469
+          },
+          "video": {
+            "total": 579,
+            "dropped": 0
+          },
+          "perPair": [
+            {
+              "cpu": {
+                "count": 876,
+                "median": 0,
+                "p95": 0,
+                "max": 4.100000008940697
+              },
+              "gpu": {
+                "count": 0,
+                "median": null,
+                "p95": null,
+                "max": null
+              },
+              "video": {
+                "total": 146,
+                "dropped": 0,
+                "counterReset": false
+              }
+            },
+            {
+              "cpu": {
+                "count": 876,
+                "median": 0,
+                "p95": 0,
+                "max": 1.2000000029802322
+              },
+              "gpu": {
+                "count": 0,
+                "median": null,
+                "p95": null,
+                "max": null
+              },
+              "video": {
+                "total": 141,
+                "dropped": 0,
+                "counterReset": false
+              }
+            },
+            {
+              "cpu": {
+                "count": 879,
+                "median": 0,
+                "p95": 0,
+                "max": 1.8999999910593033
+              },
+              "gpu": {
+                "count": 0,
+                "median": null,
+                "p95": null,
+                "max": null
+              },
+              "video": {
+                "total": 146,
+                "dropped": 0,
+                "counterReset": false
+              }
+            },
+            {
+              "cpu": {
+                "count": 877,
+                "median": 0,
+                "p95": 0,
+                "max": 2.5
+              },
+              "gpu": {
+                "count": 0,
+                "median": null,
+                "p95": null,
+                "max": null
+              },
+              "video": {
+                "total": 146,
+                "dropped": 0,
+                "counterReset": false
+              }
+            }
+          ]
+        },
+        "delta": {
+          "median": 0,
+          "p95": 0
+        },
+        "numericBudgetMet": true,
+        "pass": true
+      },
+      "no-character:spa": {
+        "pairs": [1, 2, 4, 7],
+        "pairCount": 4,
+        "before": {
+          "cpu": {
+            "count": 2990,
+            "median": 0,
+            "p95": 1.5999999940395355,
+            "max": 30.599999994039536
+          },
+          "gpu": {
+            "count": 0,
+            "median": null,
+            "p95": null,
+            "max": null
+          },
+          "frame": {
+            "count": 3065,
+            "median": 7.002,
+            "p95": 25.988,
+            "max": 149.888
+          },
+          "video": {
+            "total": 0,
+            "dropped": 0
+          },
+          "perPair": [
+            {
+              "cpu": {
+                "count": 740,
+                "median": 0,
+                "p95": 1.2999999970197678,
+                "max": 24.900000005960464
+              },
+              "gpu": null,
+              "video": {
+                "total": 0,
+                "dropped": 0,
+                "counterReset": true
+              }
+            },
+            {
+              "cpu": {
+                "count": 750,
+                "median": 0,
+                "p95": 1.300000011920929,
+                "max": 19.200000032782555
+              },
+              "gpu": null,
+              "video": {
+                "total": 0,
+                "dropped": 0,
+                "counterReset": true
+              }
+            },
+            {
+              "cpu": {
+                "count": 758,
+                "median": 0,
+                "p95": 1.7000000029802322,
+                "max": 22.000000029802322
+              },
+              "gpu": null,
+              "video": {
+                "total": 0,
+                "dropped": 0,
+                "counterReset": true
+              }
+            },
+            {
+              "cpu": {
+                "count": 742,
+                "median": 0,
+                "p95": 1.7999999970197678,
+                "max": 30.599999994039536
+              },
+              "gpu": null,
+              "video": {
+                "total": 0,
+                "dropped": 0,
+                "counterReset": true
+              }
+            }
+          ]
+        },
+        "after": {
+          "cpu": {
+            "count": 2893,
+            "median": 0,
+            "p95": 1.800000011920929,
+            "max": 40.700000032782555
+          },
+          "gpu": {
+            "count": 0,
+            "median": null,
+            "p95": null,
+            "max": null
+          },
+          "frame": {
+            "count": 2961,
+            "median": 6.994,
+            "p95": 26.135,
+            "max": 175.436
+          },
+          "video": {
+            "total": 0,
+            "dropped": 0
+          },
+          "perPair": [
+            {
+              "cpu": {
+                "count": 612,
+                "median": 0,
+                "p95": 6.0999999940395355,
+                "max": 40.700000032782555
+              },
+              "gpu": null,
+              "video": {
+                "total": 0,
+                "dropped": 0,
+                "counterReset": true
+              }
+            },
+            {
+              "cpu": {
+                "count": 766,
+                "median": 0,
+                "p95": 0.8999999910593033,
+                "max": 19.69999998807907
+              },
+              "gpu": null,
+              "video": {
+                "total": 0,
+                "dropped": 0,
+                "counterReset": true
+              }
+            },
+            {
+              "cpu": {
+                "count": 754,
+                "median": 0,
+                "p95": 1.199999988079071,
+                "max": 21.899999991059303
+              },
+              "gpu": null,
+              "video": {
+                "total": 0,
+                "dropped": 0,
+                "counterReset": true
+              }
+            },
+            {
+              "cpu": {
+                "count": 761,
+                "median": 0,
+                "p95": 1.199999988079071,
+                "max": 18.599999979138374
+              },
+              "gpu": null,
+              "video": {
+                "total": 0,
+                "dropped": 0,
+                "counterReset": true
+              }
+            }
+          ]
+        },
+        "delta": {
+          "median": 0,
+          "p95": 0.20000001788139343
+        },
+        "numericBudgetMet": true,
+        "pass": true
+      },
+      "character:startup": {
+        "pairs": [1, 2, 4, 7],
+        "pairCount": 4,
+        "before": {
+          "cpu": {
+            "count": 1695,
+            "median": 1.1000000089406967,
+            "p95": 5.899999991059303,
+            "max": 30.999999955296516
+          },
+          "gpu": {
+            "count": 41,
+            "median": 1.008489,
+            "p95": 3.50052,
+            "max": 13.351926
+          },
+          "frame": {
+            "count": 1712,
+            "median": 13.1965,
+            "p95": 52.067,
+            "max": 1087.214
+          },
+          "video": {
+            "total": 404,
+            "dropped": 0
+          },
+          "perPair": [
+            {
+              "cpu": {
+                "count": 427,
+                "median": 1.0999999940395355,
+                "p95": 5.099999979138374,
+                "max": 22.899999991059303
+              },
+              "gpu": {
+                "count": 10,
+                "median": 0.770337,
+                "p95": 3.50052,
+                "max": 3.50052
+              },
+              "video": {
+                "total": 99,
+                "dropped": 0,
+                "counterReset": false
+              }
+            },
+            {
+              "cpu": {
+                "count": 427,
+                "median": 1.1000000089406967,
+                "p95": 5.899999991059303,
+                "max": 30.999999955296516
+              },
+              "gpu": {
+                "count": 10,
+                "median": 0.991587,
+                "p95": 5.446613,
+                "max": 5.446613
+              },
+              "video": {
+                "total": 102,
+                "dropped": 0,
+                "counterReset": false
+              }
+            },
+            {
+              "cpu": {
+                "count": 406,
+                "median": 1.1000000089406967,
+                "p95": 6.000000014901161,
+                "max": 23
+              },
+              "gpu": {
+                "count": 10,
+                "median": 2.063541,
+                "p95": 13.351926,
+                "max": 13.351926
+              },
+              "video": {
+                "total": 101,
+                "dropped": 0,
+                "counterReset": false
+              }
+            },
+            {
+              "cpu": {
+                "count": 435,
+                "median": 1.199999988079071,
+                "p95": 7.199999958276749,
+                "max": 22.200000017881393
+              },
+              "gpu": {
+                "count": 11,
+                "median": 0.914582,
+                "p95": 1.953487,
+                "max": 1.953487
+              },
+              "video": {
+                "total": 102,
+                "dropped": 0,
+                "counterReset": false
+              }
+            }
+          ]
+        },
+        "after": {
+          "cpu": {
+            "count": 1861,
+            "median": 1.0999999940395355,
+            "p95": 5,
+            "max": 63.69999998807907
+          },
+          "gpu": {
+            "count": 44,
+            "median": 1.218436,
+            "p95": 2.654008,
+            "max": 4.057967
+          },
+          "frame": {
+            "count": 1877,
+            "median": 13.562,
+            "p95": 50.473,
+            "max": 1086.161
+          },
+          "video": {
+            "total": 429,
+            "dropped": 0
+          },
+          "perPair": [
+            {
+              "cpu": {
+                "count": 419,
+                "median": 1.1000000089406967,
+                "p95": 5.799999997019768,
+                "max": 63.69999998807907
+              },
+              "gpu": {
+                "count": 11,
+                "median": 0.741978,
+                "p95": 4.057967,
+                "max": 4.057967
+              },
+              "video": {
+                "total": 109,
+                "dropped": 0,
+                "counterReset": false
+              }
+            },
+            {
+              "cpu": {
+                "count": 535,
+                "median": 1.0999999940395355,
+                "p95": 4,
+                "max": 21.5
+              },
+              "gpu": {
+                "count": 11,
+                "median": 0.968801,
+                "p95": 1.999114,
+                "max": 1.999114
+              },
+              "video": {
+                "total": 105,
+                "dropped": 0,
+                "counterReset": false
+              }
+            },
+            {
+              "cpu": {
+                "count": 417,
+                "median": 1.199999988079071,
+                "p95": 7.0999999940395355,
+                "max": 25.49999998509884
+              },
+              "gpu": {
+                "count": 10,
+                "median": 1.3526555,
+                "p95": 2.376665,
+                "max": 2.376665
+              },
+              "video": {
+                "total": 104,
+                "dropped": 0,
+                "counterReset": false
+              }
+            },
+            {
+              "cpu": {
+                "count": 490,
+                "median": 1.0499999895691872,
+                "p95": 4.600000008940697,
+                "max": 25.700000017881393
+              },
+              "gpu": {
+                "count": 12,
+                "median": 1.218436,
+                "p95": 3.947447,
+                "max": 3.947447
+              },
+              "video": {
+                "total": 111,
+                "dropped": 0,
+                "counterReset": false
+              }
+            }
+          ]
+        },
+        "delta": {
+          "median": -1.4901161193847656e-8,
+          "p95": -0.8999999910593033
+        },
+        "numericBudgetMet": true,
+        "pass": true
+      },
+      "character:steady": {
+        "pairs": [1, 2, 4, 7],
+        "pairCount": 4,
+        "before": {
+          "cpu": {
+            "count": 3509,
+            "median": 0.7000000029802322,
+            "p95": 1.7000000178813934,
+            "max": 10.900000005960464
+          },
+          "gpu": {
+            "count": 98,
+            "median": 1.0888535,
+            "p95": 2.093488,
+            "max": 3.231978
+          },
+          "frame": {
+            "count": 3579,
+            "median": 6.98,
+            "p95": 12.846,
+            "max": 43.408
+          },
+          "video": {
+            "total": 579,
+            "dropped": 0
+          },
+          "perPair": [
+            {
+              "cpu": {
+                "count": 878,
+                "median": 0.7000000029802322,
+                "p95": 1.6000000089406967,
+                "max": 9.099999994039536
+              },
+              "gpu": {
+                "count": 25,
+                "median": 0.994947,
+                "p95": 1.750364,
+                "max": 2.093488
+              },
+              "video": {
+                "total": 147,
+                "dropped": 0,
+                "counterReset": false
+              }
+            },
+            {
+              "cpu": {
+                "count": 875,
+                "median": 0.7000000029802322,
+                "p95": 1.7000000029802322,
+                "max": 10.900000005960464
+              },
+              "gpu": {
+                "count": 24,
+                "median": 1.0540094999999998,
+                "p95": 1.897759,
+                "max": 2.274426
+              },
+              "video": {
+                "total": 141,
+                "dropped": 0,
+                "counterReset": false
+              }
+            },
+            {
+              "cpu": {
+                "count": 878,
+                "median": 0.7999999970197678,
+                "p95": 1.9000000059604645,
+                "max": 5.299999982118607
+              },
+              "gpu": {
+                "count": 25,
+                "median": 1.090468,
+                "p95": 2.017759,
+                "max": 3.231978
+              },
+              "video": {
+                "total": 147,
+                "dropped": 0,
+                "counterReset": false
+              }
+            },
+            {
+              "cpu": {
+                "count": 878,
+                "median": 0.7000000029802322,
+                "p95": 1.7999999970197678,
+                "max": 4.700000002980232
+              },
+              "gpu": {
+                "count": 24,
+                "median": 1.1961970000000002,
+                "p95": 2.098019,
+                "max": 2.266978
+              },
+              "video": {
+                "total": 144,
+                "dropped": 0,
+                "counterReset": false
+              }
+            }
+          ]
+        },
+        "after": {
+          "cpu": {
+            "count": 3517,
+            "median": 0.7999999970197678,
+            "p95": 1.8999999910593033,
+            "max": 7.600000008940697
+          },
+          "gpu": {
+            "count": 97,
+            "median": 1.118957,
+            "p95": 1.983124,
+            "max": 2.573332
+          },
+          "frame": {
+            "count": 3584,
+            "median": 6.983499999999999,
+            "p95": 12.853,
+            "max": 33.357
+          },
+          "video": {
+            "total": 577,
+            "dropped": 0
+          },
+          "perPair": [
+            {
+              "cpu": {
+                "count": 881,
+                "median": 0.7000000029802322,
+                "p95": 1.7000000029802322,
+                "max": 5.5
+              },
+              "gpu": {
+                "count": 24,
+                "median": 1.046223,
+                "p95": 1.791509,
+                "max": 2.064895
+              },
+              "video": {
+                "total": 145,
+                "dropped": 0,
+                "counterReset": false
+              }
+            },
+            {
+              "cpu": {
+                "count": 875,
+                "median": 0.7000000029802322,
+                "p95": 1.699999988079071,
+                "max": 3.499999985098839
+              },
+              "gpu": {
+                "count": 24,
+                "median": 0.8841135,
+                "p95": 1.983124,
+                "max": 2.573332
+              },
+              "video": {
+                "total": 145,
+                "dropped": 0,
+                "counterReset": false
+              }
+            },
+            {
+              "cpu": {
+                "count": 879,
+                "median": 0.7999999970197678,
+                "p95": 1.800000011920929,
+                "max": 4.799999997019768
+              },
+              "gpu": {
+                "count": 24,
+                "median": 1.2232025,
+                "p95": 1.95354,
+                "max": 2.135259
+              },
+              "video": {
+                "total": 142,
+                "dropped": 0,
+                "counterReset": false
+              }
+            },
+            {
+              "cpu": {
+                "count": 882,
+                "median": 0.8999999910593033,
+                "p95": 2.1000000089406967,
+                "max": 7.600000008940697
+              },
+              "gpu": {
+                "count": 25,
+                "median": 1.207915,
+                "p95": 1.828905,
+                "max": 2.302238
+              },
+              "video": {
+                "total": 145,
+                "dropped": 0,
+                "counterReset": false
+              }
+            }
+          ]
+        },
+        "delta": {
+          "median": 0.09999999403953552,
+          "p95": 0.19999997317790985
+        },
+        "numericBudgetMet": true,
+        "pass": true
+      },
+      "character:spa": {
+        "pairs": [1, 2, 4],
+        "pairCount": 3,
+        "before": {
+          "cpu": {
+            "count": 2321,
+            "median": 0,
+            "p95": 1.5999999940395355,
+            "max": 23.700000017881393
+          },
+          "gpu": {
+            "count": 0,
+            "median": null,
+            "p95": null,
+            "max": null
+          },
+          "frame": {
+            "count": 2374,
+            "median": 6.9955,
+            "p95": 25.871,
+            "max": 113.488
+          },
+          "video": {
+            "total": 0,
+            "dropped": 0
+          },
+          "perPair": [
+            {
+              "cpu": {
+                "count": 799,
+                "median": 0,
+                "p95": 1.2999999970197678,
+                "max": 17.399999991059303
+              },
+              "gpu": null,
+              "video": {
+                "total": 0,
+                "dropped": 0,
+                "counterReset": true
+              }
+            },
+            {
+              "cpu": {
+                "count": 780,
+                "median": 0,
+                "p95": 1.2000000029802322,
+                "max": 19.000000029802322
+              },
+              "gpu": null,
+              "video": {
+                "total": 0,
+                "dropped": 0,
+                "counterReset": true
+              }
+            },
+            {
+              "cpu": {
+                "count": 742,
+                "median": 0,
+                "p95": 2.1000000089406967,
+                "max": 23.700000017881393
+              },
+              "gpu": null,
+              "video": {
+                "total": 0,
+                "dropped": 0,
+                "counterReset": true
+              }
+            }
+          ]
+        },
+        "after": {
+          "cpu": {
+            "count": 2310,
+            "median": 0,
+            "p95": 1.2000000029802322,
+            "max": 33.29999999701977
+          },
+          "gpu": {
+            "count": 0,
+            "median": null,
+            "p95": null,
+            "max": null
+          },
+          "frame": {
+            "count": 2365,
+            "median": 7.033,
+            "p95": 25.97,
+            "max": 144.994
+          },
+          "video": {
+            "total": 0,
+            "dropped": 0
+          },
+          "perPair": [
+            {
+              "cpu": {
+                "count": 783,
+                "median": 0,
+                "p95": 1.2000000029802322,
+                "max": 33.29999999701977
+              },
+              "gpu": null,
+              "video": {
+                "total": 0,
+                "dropped": 0,
+                "counterReset": true
+              }
+            },
+            {
+              "cpu": {
+                "count": 750,
+                "median": 0,
+                "p95": 1,
+                "max": 18.200000017881393
+              },
+              "gpu": null,
+              "video": {
+                "total": 0,
+                "dropped": 0,
+                "counterReset": true
+              }
+            },
+            {
+              "cpu": {
+                "count": 777,
+                "median": 0,
+                "p95": 1.2999999970197678,
+                "max": 18.700000002980232
+              },
+              "gpu": null,
+              "video": {
+                "total": 0,
+                "dropped": 0,
+                "counterReset": true
+              }
+            }
+          ]
+        },
+        "delta": {
+          "median": 0,
+          "p95": -0.3999999910593033
+        },
+        "numericBudgetMet": true,
+        "pass": false
+      }
+    }
+  },
+  "independentData": [
+    {
+      "name": "vrma-reject:derived-hips-infinity",
+      "error": "derived-hips-infinity accepted by import inspector"
+    },
+    {
+      "name": "vrma-reject:bad-scene-index",
+      "error": "bad-scene-index accepted by import inspector"
+    },
+    {
+      "name": "vrma-reject:bad-scene-root",
+      "error": "bad-scene-root accepted by import inspector"
+    }
+  ],
+  "privateArtifactsCommitted": false
+}

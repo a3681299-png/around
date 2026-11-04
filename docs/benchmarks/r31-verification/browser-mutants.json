@@ -1,0 +1,188 @@
+[
+  {
+    "Fault": "vrma",
+    "Test": ".work/r31-tools/extra.spec.ts",
+    "Pattern": "malformed motion: mesh",
+    "ExitCode": 1,
+    "results": {
+      "stats": {
+        "startTime": "2026-11-04T10:24:41.043Z",
+        "duration": 3546.205,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "file": "extra.spec.ts",
+          "line": 104,
+          "title": "import rejects malformed motion: mesh",
+          "status": "unexpected",
+          "errors": [
+            "Error: malformed motion must not be attached\n\nexpect(received).toBe(expected) // Object.is equality\n\nExpected: 0\nReceived: 1\n\n  117 |     result.count=await panel.locator('.character-motions li').count();result.status=await panel.locator('.status').textContent();result.characterStatus=await panel.locator('.character-status').textContent();\n  118 |     await panel.locator('.save').click();await expect(panel.locator('.dirty')).toHaveText('保存済み');result.saved=await storage(popup);result.metadata=await metadata(popup);\n> 119 |     expect(result.count,'malformed motion must not be attached').toBe(0);\n      |                                                                  ^\n  120 |   }finally{await report('import-'+variant+'-'+path.basename(normal),result);await context.close()}\n  121 | });\n  122 |\n    at WORKTREE\\.work\\r31-tools\\extra.spec.ts:119:66"
+          ]
+        }
+      ]
+    },
+    "build": {
+      "fault": "vrma",
+      "source": "8003738",
+      "method": "esbuild dependency wrapper",
+      "hashes": {
+        "content/index.js": "92e7ba5cbe04e287bb7026b160243803047ff2a81763fe468de82809e9abddec",
+        "background/index.js": "59baeae7553c8095ba68c788dbf0b5c6e421baafc87e0b327b268260b87d370a",
+        "assets/read-frame.js": "146213dc49a4550883aab5b9f3af1950d9a761fec55a988de71b9202ca8259bb",
+        "studio/index.js": "3355022c32e2dfffc02855ff500b1bf5037227d68a56e0a3a5e2dd1ebd30ab7e",
+        "backup/index.js": "30487af33c30641d5cc7df91d1c553db150ab5fc83154f25352538c3c5efaff1"
+      }
+    }
+  },
+  {
+    "Fault": "clip",
+    "Test": "tests/g14-idle-recheck.spec.ts",
+    "Pattern": "longer interval without a new drawing input",
+    "ExitCode": 1,
+    "results": {
+      "stats": {
+        "startTime": "2026-11-04T10:24:45.387Z",
+        "duration": 7062.173000000001,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "file": "g14-idle-recheck.spec.ts",
+          "line": 16,
+          "title": "G1.4: a silent move stays protected through a longer interval without a new drawing input",
+          "status": "unexpected",
+          "errors": [
+            "Error: cut out before the move\n\nexpect(received).toEqual(expected) // deep equality\n\n- Expected  -   1\n+ Received  + 324\n\n- Array []\n+ Array [\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305,\n+     \"moved\": false,\n+     \"t\": 0.5,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305,\n+     \"moved\": false,\n+     \"t\": 8.600000008940697,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 14.600000008940697,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 21.700000002980232,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 28.799999997019768,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 35.5,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 42.70000000298023,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 51.1000000089407,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 56.20000000298023,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 63.1000000089407,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 70.1000000089407,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 77.6000000089407,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 84,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 91,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 98,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 104.79999999701977,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 111.70000000298023,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 118.79999999701977,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 125.90000000596046,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 133.40000000596046,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 139.5,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 146.40000000596046,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 153.40000000596046,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 160.29999999701977,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 167.20000000298023,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 174.20000000298023,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 181.20000000298023,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 188,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 194.90000000596046,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 201.90000000596046,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 208.90000000596046,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 215.90000000596046,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 222.90000000596046,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 229.6000000089407,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 236.5,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\": 305.359375,\n+     \"moved\": false,\n+     \"t\": 245,\n+     \"x\": 405,\n+   },\n+   Object {\n+     \"covered\": true,\n+     \"left\""
+          ]
+        }
+      ]
+    },
+    "build": {
+      "fault": "clip",
+      "source": "8003738",
+      "method": "esbuild dependency wrapper",
+      "hashes": {
+        "content/index.js": "3b151845bbf8b9e04ac369f8640c54bf3a67e0124eb41c4a75ac7386c34f11a4"
+      }
+    }
+  },
+  {
+    "Fault": "input",
+    "Test": "tests/operation-editing-input.spec.ts",
+    "Pattern": "a covered control stops drawing until",
+    "ExitCode": 1,
+    "results": {
+      "stats": {
+        "startTime": "2026-11-04T10:24:53.260Z",
+        "duration": 3585.086,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "file": "operation-editing-input.spec.ts",
+          "line": 54,
+          "title": "a covered control stops drawing until 描画を再開, and the same covered click stops it again",
+          "status": "unexpected",
+          "errors": [
+            "Error: expect(received).toContain(expected) // indexOf\n\nExpected value: \"クリックがページの操作部品に届くよう、絵の表示を止めました。\"\nReceived array: []\n\n  86 |   const seen = () => youtube.evaluate(() => (window as unknown as { __g111Stops: string[] }).__g111Stops);\n  87 |   await coveredClick();\n> 88 |   expect(await seen()).toContain('クリックがページの操作部品に届くよう、絵の表示を止めました。');\n     |                        ^\n  89 |   // One failure stops drawing for a moment only: it recovers, and there is nothing to resume.\n  90 |   await expect.poll(() => stopped(youtube)).toBe('');\n  91 |   await expect(studio.locator('.ww-editor-safety .safety-resume')).toBeHidden();\n    at WORKTREE\\tests\\operation-editing-input.spec.ts:88:24"
+          ]
+        }
+      ]
+    },
+    "build": {
+      "fault": "input",
+      "source": "8003738",
+      "method": "esbuild dependency wrapper",
+      "hashes": {
+        "content/index.js": "7769a1c46aa87a99502ccaa6e0f8abbba909c6b0d0e2ff681012c7ea2f0a5905"
+      }
+    }
+  },
+  {
+    "Fault": "approach",
+    "Test": "tests/operation-safety.spec.ts",
+    "Pattern": "near a control, only the layer|a layer that moves onto a near control",
+    "ExitCode": 1,
+    "results": {
+      "stats": {
+        "startTime": "2026-11-04T10:24:57.745Z",
+        "duration": 15608.605,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 2,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "file": "operation-safety.spec.ts",
+          "line": 850,
+          "title": "G1.2 ①②④: near a control, only the layer over it is held; a layer elsewhere keeps following the scroll",
+          "status": "unexpected",
+          "errors": [
+            "Error: expect(received).toEqual(expected) // deep equality\n\n- Expected  - 3\n+ Received  + 1\n\n- Array [\n-   \"over-account\",\n- ]\n+ Array []\n\nCall Log:\n- Timeout 5000ms exceeded while waiting on the predicate\n\n  878 |   // ② The pointer rests on the Account button: only the layer painted over it is held.\n  879 |   await youtube.mouse.move(centreOf(account).x, centreOf(account).y, { steps: 4 });\n> 880 |   await expect.poll(() => heldLayers(youtube)).toEqual(['over-account']);\n      |                                                ^\n  881 |   await expect.poll(() => alphaOf(youtube, 'over-account')).toBe(1);\n  882 |   // ① The layer elsewhere keeps following the scroll under the resting pointer.\n  883 |   const followed: number[] = [];\n    at WORKTREE\\tests\\operation-safety.spec.ts:880:48"
+          ]
+        },
+        {
+          "file": "operation-safety.spec.ts",
+          "line": 909,
+          "title": "G1.2 ③: a layer that moves onto a near control is held within two frames and not released until the control clears",
+          "status": "unexpected",
+          "errors": [
+            "Error: expect(received).toBeLessThanOrEqual(expected)\n\nExpected: <= 2\nReceived:    15\n\n  979 |   // It reached the control, was held, went back to its authored place, and stayed held there.\n  980 |   expect(during.frames.some((frame) => frame.over)).toBe(true);\n> 981 |   expect(during.frames.filter((frame) => frame.over && !frame.held).length).toBeLessThanOrEqual(2);\n      |                                                                             ^\n  982 |   expect(during.changes).toEqual([true]);\n  983 |   expect(during.frames.at(-1)).toEqual({ over: false, held: true });\n  984 |   // Leaving the control releases it once.\n    at WORKTREE\\tests\\operation-safety.spec.ts:981:77"
+          ]
+        }
+      ]
+    },
+    "build": {
+      "fault": "approach",
+      "source": "8003738",
+      "method": "esbuild dependency wrapper",
+      "hashes": {
+        "content/index.js": "3a804802e9ab3f779d2dc53e39ccee16f7c6d177d993f4ad2cf70bd51a8891a9"
+      }
+    }
+  },
+  {
+    "Fault": "hold",
+    "Test": "tests/g13-look-regression.spec.ts",
+    "Pattern": "G1.3",
+    "ExitCode": 0,
+    "results": {
+      "stats": {
+        "startTime": "2026-11-04T10:25:14.159Z",
+        "duration": 4593.108,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "file": "g13-look-regression.spec.ts",
+          "line": 9,
+          "title": "G1.3: a resized group must not expose a control outside the group",
+          "status": "expected",
+          "errors": []
+        }
+      ]
+    },
+    "build": {
+      "fault": "hold",
+      "source": "8003738",
+      "method": "esbuild dependency wrapper",
+      "hashes": {
+        "content/index.js": "22087e9d62435d95aaba15a32840d1db2ddba10cca5a1e533160786759479230"
+      }
+    }
+  }
+]
