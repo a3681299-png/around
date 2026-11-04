@@ -1,0 +1,160 @@
+{
+  "unit-all": {
+    "startTime": "2026-11-04T13:34:26.695Z",
+    "duration": 10207.853000000001,
+    "expected": 519,
+    "skipped": 1,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "targeted": {
+    "startTime": "2026-11-04T13:34:26.686Z",
+    "duration": 81873.481,
+    "expected": 14,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "windows-first": {
+    "startTime": "2026-11-04T12:55:42.337Z",
+    "duration": 1185832.119,
+    "expected": 271,
+    "skipped": 61,
+    "unexpected": 2,
+    "flaky": 0,
+    "failures": [
+      {
+        "file": "side-panel.spec.ts",
+        "line": 838,
+        "title": "the official panel dresses UI parts: page part list, picking on the page and art through its own lease",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\tests\\side-panel.spec.ts",
+              "column": 96,
+              "line": 857
+            },
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/^url\\(\"blob:/\u001b[39m\nReceived string:  \u001b[31m\"none\"\u001b[39m\n\nCall Log:\n- Timeout 5000ms exceeded while waiting on the predicate\n\n  855 |     // The side panel's upload is leased to its tab only after the background finds the real panel.\n  856 |     await panel.files([path.resolve('tests/fixtures/skins/frame-light.png')], '.skin-file');\n> 857 |     await expect.poll(() => card.evaluate((node) => getComputedStyle(node).borderImageSource)).toMatch(/^url\\(\"blob:/);\n      |                                                                                                ^\n  858 |     await expect\n  859 |       .poll(() =>\n  860 |         panel.evaluate<number>(\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\tests\\side-panel.spec.ts:857:96"
+          }
+        ]
+      },
+      {
+        "file": "signal-motion-editor.spec.ts",
+        "line": 7,
+        "title": "shared motion UI pursues, stops, rotates, keeps handles aligned and preserves authored placement through Undo/save/reload/OFF",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\tests\\signal-motion-editor.spec.ts",
+              "column": 6,
+              "line": 43
+            },
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m10\u001b[39m\nReceived:   \u001b[31m3.1270423725942496\u001b[39m\n\nCall Log:\n- Timeout 5000ms exceeded while waiting on the predicate\n\n  41 |   await expect\n  42 |     .poll(async () => Math.hypot((await point()).x - start.x, (await point()).y - start.y))\n> 43 |     .toBeGreaterThan(10);\n     |      ^\n  44 |   await expect\n  45 |     .poll(\n  46 |       async () => {\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\tests\\signal-motion-editor.spec.ts:43:6"
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "windows-all": {
+    "startTime": "2026-11-04T13:36:55.929Z",
+    "duration": 1112551.514,
+    "expected": 272,
+    "skipped": 61,
+    "unexpected": 2,
+    "flaky": 0,
+    "failures": [
+      {
+        "file": "operation-safety.spec.ts",
+        "line": 850,
+        "title": "G1.2 ①②④: near a control, only the layer over it is held; a layer elsewhere keeps following the scroll",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\tests\\operation-safety.spec.ts",
+              "column": 29,
+              "line": 905
+            },
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: >= \u001b[32m300\u001b[39m\nReceived:    \u001b[31m148\u001b[39m\n\n  903 |   const left = Date.now();\n  904 |   await expect.poll(() => heldLayers(youtube), { intervals: [50] }).toEqual([]);\n> 905 |   expect(Date.now() - left).toBeGreaterThanOrEqual(300);\n      |                             ^\n  906 |   await expect.poll(() => alphaOf(youtube, 'over-account')).toBeCloseTo(0.9, 1);\n  907 | });\n  908 |\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\tests\\operation-safety.spec.ts:905:29"
+          }
+        ]
+      },
+      {
+        "file": "studio-transfer.spec.ts",
+        "line": 211,
+        "title": "a binary message arriving after release cannot recreate the upload lease",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\tests\\studio-transfer.spec.ts",
+              "column": 56,
+              "line": 18
+            },
+            "message": "Error: locator.check: Clicking the checkbox did not change its state\nCall log:\n\u001b[2m  - waiting for getByRole('switch', { name: '作品を表示する' })\u001b[22m\n\u001b[2m    - locator resolved to <input disabled role=\"switch\" type=\"checkbox\" id=\"show-artwork\" aria-describedby=\"show-artwork-help\"/>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is not stable\u001b[22m\n\u001b[2m  - retrying click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - performing click action\u001b[22m\n\u001b[2m    - click action done\u001b[22m\n\u001b[2m    - waiting for scheduled navigations to finish\u001b[22m\n\u001b[2m    - navigations have finished\u001b[22m\n\n\n  16 |\n  17 | async function openStudio(context: BrowserContext, popup: Page, youtube: Page) {\n> 18 |   await popup.getByRole('switch', { name: '作品を表示する' }).check();\n     |                                                        ^\n  19 |   await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');\n  20 |   await youtube.bringToFront();\n  21 |   const opened = context.waitForEvent('page');\n    at openStudio (C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\tests\\studio-transfer.spec.ts:18:56)\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\tests\\studio-transfer.spec.ts:216:28"
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "character-live": {
+    "startTime": "2026-11-04T12:42:23.135Z",
+    "duration": 18995.2,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "repeat-before": {
+    "startTime": "2026-11-04T13:17:29.242Z",
+    "duration": 115137.011,
+    "expected": 20,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "repeat-after": {
+    "startTime": "2026-11-04T13:19:25.363Z",
+    "duration": 113015.579,
+    "expected": 20,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "repeat2-before": {
+    "startTime": "2026-11-04T13:56:22.030Z",
+    "duration": 65203.034,
+    "expected": 20,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "repeat2-after": {
+    "startTime": "2026-11-04T13:57:28.134Z",
+    "duration": 64030.928,
+    "expected": 20,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "typecheck-build": {
+    "log": "build.txt"
+  },
+  "lint": {
+    "log": "lint.txt"
+  }
+}

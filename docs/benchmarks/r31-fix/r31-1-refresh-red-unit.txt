@@ -1,0 +1,36 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> web-world-themes@0.1.0 test:unit
+> node scripts/test.mjs --project=unit tests/backup-data.spec.ts --grep restoring over a legacy VRM
+
+
+Running 1 test using 1 worker
+
+(node:59772) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x  1 [unit] › tests\backup-data.spec.ts:34:1 › restoring over a legacy VRM asset tolerates only its absent body, retaining its record and leases (12ms)
+
+
+  1) [unit] › tests\backup-data.spec.ts:34:1 › restoring over a legacy VRM asset tolerates only its absent body, retaining its record and leases
+
+    Error: expect(received).toHaveProperty(path, value)
+
+    Expected path: "refreshed"
+    Received path: []
+
+    Expected value: [{"blob": {Symbol(kHandle): {}, Symbol(kLength): 5708, Symbol(kType): ""}, "byteLength": 5708, "height": 256, "id": "asset-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "leases": [{"documentId": "doc", "session": "old", "tabId": 5}], "mime": "model/gltf-binary", "model": {"bones": [{"name": "Hips", "node": 2}, {"name": "Head", "node": 3}, {"name": "spine", "node": 4}, {"name": "leftUpperArm", "node": 5}, {"name": "leftLowerArm", "node": 6}, {"name": "leftHand", "node": 7}, {"name": "leftUpperLeg", "node": 8}, {"name": "leftLowerLeg", "node": 9}, {"name": "leftFoot", "node": 10}, {"name": "leftEye", "node": 11}, …], "clips": [{"duration": 2, "name": "Rest / 待機"}, {"duration": 2, "name": "Stride"}, {"duration": 2, "name": "Sprint"}], "format": "vrm", "textureBytes": 4, "triangles": 12, "vertices": 8, "vrm": {"body": {"armLength": 0.29999999999999993, "armRatio": 0.27272727272727265, "headLength": 0.25, "headsTall": 4.4, "height": 1.1, "hipsHeight": 0.5, "hipsRatio": 0.45454545454545453, "legLength": 0.2618033988749895, "legRatio": 0.23800308988635407, "shoulderWidth": 0.3}, "expressions": ["happy", "blink"], "humanoid": [{"bone": "hips", "node": 2}, {"bone": "head", "node": 3}, {"bone": "spine", "node": 4}, {"bone": "leftUpperArm", "node": 5}, {"bone": "leftLowerArm", "node": 6}, {"bone": "leftHand", "node": 7}, {"bone": "leftUpperLeg", "node": 8}, {"bone": "leftLowerLeg", "node": 9}, {"bone": "leftFoot", "node": 10}, {"bone": "leftEye", "node": 11}, …], "lookAt": true, "mtoon": true, "springBone": true, "version": "1.0"}}, "name": "Original.vrm", "width": 256}]
+    Received value: {"added": [], "values": {}}
+
+      48 |   const plan = planRestore(backup, {}, [legacy], [], false);
+      49 |   expect(plan.added).toEqual([]);
+    > 50 |   expect(plan).toHaveProperty('refreshed', [{ ...legacy, model: row.model }]);
+         |                ^
+      51 |   expect(legacy).toEqual(original);
+      52 |   expect(() => planRestore(backup, {}, [{ ...legacy, width: legacy.width + 1 }], [], false)).toThrow('一致');
+      53 |   legacy.model.vrm!.body = structuredClone(row.model!.vrm!.body!);
+        at WORKTREE\tests\backup-data.spec.ts:50:16
+
+    Error Context: .work\test-results\unit\backup-data-restoring-over-14ae4-ining-its-record-and-leases-unit\error-context.md
+
+  1 failed
+    [unit] › tests\backup-data.spec.ts:34:1 › restoring over a legacy VRM asset tolerates only its absent body, retaining its record and leases

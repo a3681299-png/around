@@ -1,0 +1,282 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> web-world-themes@0.1.0 test:unit
+> node scripts/test.mjs --project=unit tests/editor-core.spec.ts --grep reimporting a VRM
+
+
+Running 1 test using 1 worker
+
+(node:50496) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x  1 [unit] › tests\editor-core.spec.ts:858:1 › reimporting a VRM refreshes its body without adding a layer or losing edits and history (21ms)
+
+
+  1) [unit] › tests\editor-core.spec.ts:858:1 › reimporting a VRM refreshes its body without adding a layer or losing edits and history
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  -   1
+    + Received  + 225
+
+    @@ -140,10 +140,234 @@
+              "format": "vrm",
+              "textureBytes": 4,
+              "triangles": 12,
+              "vertices": 8,
+              "vrm": Object {
+    +           "expressions": Array [
+    +             "happy",
+    +             "blink",
+    +           ],
+    +           "humanoid": Array [
+    +             Object {
+    +               "bone": "hips",
+    +               "node": 2,
+    +             },
+    +             Object {
+    +               "bone": "head",
+    +               "node": 3,
+    +             },
+    +             Object {
+    +               "bone": "spine",
+    +               "node": 4,
+    +             },
+    +             Object {
+    +               "bone": "leftUpperArm",
+    +               "node": 5,
+    +             },
+    +             Object {
+    +               "bone": "leftLowerArm",
+    +               "node": 6,
+    +             },
+    +             Object {
+    +               "bone": "leftHand",
+    +               "node": 7,
+    +             },
+    +             Object {
+    +               "bone": "leftUpperLeg",
+    +               "node": 8,
+    +             },
+    +             Object {
+    +               "bone": "leftLowerLeg",
+    +               "node": 9,
+    +             },
+    +             Object {
+    +               "bone": "leftFoot",
+    +               "node": 10,
+    +             },
+    +             Object {
+    +               "bone": "leftEye",
+    +               "node": 11,
+    +             },
+    +             Object {
+    +               "bone": "rightUpperArm",
+    +               "node": 12,
+    +             },
+    +             Object {
+    +               "bone": "rightLowerArm",
+    +               "node": 13,
+    +             },
+    +             Object {
+    +               "bone": "rightHand",
+    +               "node": 14,
+    +             },
+    +             Object {
+    +               "bone": "rightUpperLeg",
+    +               "node": 15,
+    +             },
+    +             Object {
+    +               "bone": "rightLowerLeg",
+    +               "node": 16,
+    +             },
+    +             Object {
+    +               "bone": "rightFoot",
+    +               "node": 17,
+    +             },
+    +             Object {
+    +               "bone": "rightEye",
+    +               "node": 18,
+    +             },
+    +           ],
+    +           "lookAt": true,
+    +           "mtoon": true,
+    +           "springBone": true,
+    +           "version": "1.0",
+    +         },
+    +       },
+    +       "visible": true,
+    +       "zIndex": 0,
+    +     },
+    +     Object {
+    +       "assetId": "asset-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    +       "id": "image-5",
+    +       "kind": "model3d",
+    +       "locked": false,
+    +       "model": Object {
+    +         "clip": 0,
+    +         "crossFadeMs": 250,
+    +         "inPlace": true,
+    +         "locomotion": Object {
+    +           "enabled": false,
+    +           "faceMovement": true,
+    +           "forwardDeg": 0,
+    +           "idle": null,
+    +           "run": null,
+    +           "runSpeed": 220,
+    +           "walk": null,
+    +           "walkSpeed": 10,
+    +         },
+    +         "look": Object {
+    +           "bone": 3,
+    +           "enabled": true,
+    +           "lagMs": 160,
+    +           "pitchLimit": 30,
+    +           "yawLimit": 50,
+    +         },
+    +         "loop": true,
+    +         "playing": true,
+    +         "rotationX": 0,
+    +         "rotationY": 0,
+    +         "rotationZ": 0,
+    +         "speed": 1,
+    +         "vrm": Object {
+    +           "expressions": Object {},
+    +           "headFollow": true,
+    +           "lookAt": true,
+    +           "springBone": true,
+    +         },
+    +       },
+    +       "name": "Renamed.vrm",
+    +       "opacity": 1,
+    +       "placement": Object {
+    +         "anchor": Object {
+    +           "kind": "viewport",
+    +         },
+    +         "heightPx": 200,
+    +         "rotationDeg": 0,
+    +         "widthPx": 200,
+    +         "x": 0.45,
+    +         "y": 0.45,
+    +       },
+    +       "source": Object {
+    +         "bones": Array [
+    +           Object {
+    +             "name": "Hips",
+    +             "node": 2,
+    +           },
+    +           Object {
+    +             "name": "Head",
+    +             "node": 3,
+    +           },
+    +           Object {
+    +             "name": "spine",
+    +             "node": 4,
+    +           },
+    +           Object {
+    +             "name": "leftUpperArm",
+    +             "node": 5,
+    +           },
+    +           Object {
+    +             "name": "leftLowerArm",
+    +             "node": 6,
+    +           },
+    +           Object {
+    +             "name": "leftHand",
+    +             "node": 7,
+    +           },
+    +           Object {
+    +             "name": "leftUpperLeg",
+    +             "node": 8,
+    +           },
+    +           Object {
+    +             "name": "leftLowerLeg",
+    +             "node": 9,
+    +           },
+    +           Object {
+    +             "name": "leftFoot",
+    +             "node": 10,
+    +           },
+    +           Object {
+    +             "name": "leftEye",
+    +             "node": 11,
+    +           },
+    +           Object {
+    +             "name": "rightUpperArm",
+    +             "node": 12,
+    +           },
+    +           Object {
+    +             "name": "rightLowerArm",
+    +             "node": 13,
+    +           },
+    +           Object {
+    +             "name": "rightHand",
+    +             "node": 14,
+    +           },
+    +           Object {
+    +             "name": "rightUpperLeg",
+    +             "node": 15,
+    +           },
+    +           Object {
+    +             "name": "rightLowerLeg",
+    +             "node": 16,
+    +           },
+    +           Object {
+    +             "name": "rightFoot",
+    +             "node": 17,
+    +           },
+    +           Object {
+    +             "name": "rightEye",
+    +             "node": 18,
+    +           },
+    +         ],
+    +         "clips": Array [
+    +           Object {
+    +             "duration": 2,
+    +             "name": "Rest / 待機",
+    +           },
+    +           Object {
+    +             "duration": 2,
+    +             "name": "Stride",
+    +           },
+    +           Object {
+    +             "duration": 2,
+    +             "name": "Sprint",
+    +           },
+    +         ],
+    +         "format": "vrm",
+    +         "textureBytes": 4,
+    +         "triangles": 12,
+    +         "vertices": 8,
+    +         "vrm": Object {
+                "body": Object {
+                  "armLength": 0.29999999999999993,
+                  "armRatio": 0.27272727272727265,
+                  "headLength": 0.25,
+                  "headsTall": 4.4,
+    @@ -233,11 +457,11 @@
+                "springBone": true,
+                "version": "1.0",
+              },
+            },
+            "visible": true,
+    -       "zIndex": 0,
+    +       "zIndex": 1,
+          },
+        ],
+        "id": "youtube-custom",
+        "rules": Array [],
+        "schemaVersion": 14,
+
+      873 |     expected.decorations[0].source = measured;
+      874 |     await h.editor.import([{ id, name: 'Renamed.vrm', width: 200, height: 200, model: measured }]);
+    > 875 |     expect(h.editor.snapshot().document).toEqual(expected);
+          |                                          ^
+      876 |     await h.editor.execute({ type: 'undo' });
+      877 |     expect(h.editor.snapshot().document).toEqual(before);
+      878 |     await h.editor.execute({ type: 'redo' });
+        at WORKTREE\tests\editor-core.spec.ts:875:42
+
+    Error Context: .work\test-results\unit\editor-core-reimporting-a--f049f-or-losing-edits-and-history-unit\error-context.md
+
+  1 failed
+    [unit] › tests\editor-core.spec.ts:858:1 › reimporting a VRM refreshes its body without adding a layer or losing edits and history

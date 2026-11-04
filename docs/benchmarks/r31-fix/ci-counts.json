@@ -1,0 +1,29 @@
+{
+  "run": 41839637095,
+  "headSha": "447b2bf31e319051e327f9ada2b83954276b8ff8",
+  "unit": {
+    "passed": 517,
+    "skipped": 3
+  },
+  "e2e": {
+    "passed": 274,
+    "skipped": 61
+  },
+  "nativeEntry": {
+    "passed": 4,
+    "skipped": 0
+  },
+  "sourceLines": [
+    "e2e (4)\tRun xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" npm run test:e2e -- --shard=4/4\t2026-11-04T13:42:32.9512550Z   22 skipped",
+    "e2e (4)\tRun xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" npm run test:e2e -- --shard=4/4\t2026-11-04T13:42:32.9517478Z   56 passed (5.2m)",
+    "e2e (1)\tRun xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" npm run test:e2e -- tests/editor-entry.spec.ts tests/side-panel.spec.ts --grep \"OFF opens|ON action|hand off unsaved|timeline keeps layer controls\" --output=.work/native-entry-results\t2026-11-04T13:37:33.5888117Z   4 passed (17.6s)",
+    "e2e (1)\tRun xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" npm run test:e2e -- --shard=1/4\t2026-11-04T13:41:24.2757848Z   20 skipped",
+    "e2e (1)\tRun xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" npm run test:e2e -- --shard=1/4\t2026-11-04T13:41:24.2758233Z   64 passed (3.8m)",
+    "unit\tRun npm run test:unit\t2026-11-04T13:38:36.6687980Z   3 skipped",
+    "unit\tRun npm run test:unit\t2026-11-04T13:38:36.6688459Z   517 passed (24.3s)",
+    "e2e (2)\tRun xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" npm run test:e2e -- --shard=2/4\t2026-11-04T13:49:04.2927749Z   3 skipped",
+    "e2e (2)\tRun xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" npm run test:e2e -- --shard=2/4\t2026-11-04T13:49:04.2937302Z   125 passed (11.1m)",
+    "e2e (3)\tRun xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" npm run test:e2e -- --shard=3/4\t2026-11-04T13:40:41.5804396Z   16 skipped",
+    "e2e (3)\tRun xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" npm run test:e2e -- --shard=3/4\t2026-11-04T13:40:41.5805144Z   29 passed (3.0m)"
+  ]
+}

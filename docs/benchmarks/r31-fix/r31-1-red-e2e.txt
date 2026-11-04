@@ -1,0 +1,61 @@
+
+> web-world-themes@0.1.0 test:e2e
+> node scripts/test.mjs --project=e2e tests/backup.spec.ts --grep historical v13 VRM backup
+
+
+Running 1 test using 1 worker
+
+(node:49960) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x  1 [e2e] › tests\backup.spec.ts:56:1 › a historical v13 VRM backup restores and re-exports, while forged body facts are refused (7.1s)
+
+
+  1) [e2e] › tests\backup.spec.ts:56:1 › a historical v13 VRM backup restores and re-exports, while forged body facts are refused
+
+    Error: expect(locator).toBeEnabled() failed
+
+    Locator:  locator('#backup-restore')
+    Expected: enabled
+    Received: disabled
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeEnabled" locator('#backup-restore') with timeout 5000ms
+      - waiting for locator('#backup-restore')
+        14 × locator resolved to <button disabled type="button" id="backup-restore">確認したバックアップを読み込む</button>
+           - unexpected value "disabled"
+
+
+      68 |   await page.locator('#backup-file').setInputFiles(file);
+      69 |   await page.locator('#backup-inspect').click();
+    > 70 |   await expect(page.locator('#backup-restore')).toBeEnabled();
+         |                                                 ^
+      71 |   await page.locator('#backup-restore').click();
+      72 |   await expect(page.locator('.backup-status')).toContainText('読み込みが完了');
+      73 |   const restored = await readCounts(page);
+        at WORKTREE\tests\backup.spec.ts:70:49
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    .work\test-results\e2e\backup-a-historical-v13-VR-96e56-rged-body-facts-are-refused-e2e\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    .work\test-results\e2e\backup-a-historical-v13-VR-96e56-rged-body-facts-are-refused-e2e\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    .work\test-results\e2e\backup-a-historical-v13-VR-96e56-rged-body-facts-are-refused-e2e\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: .work\test-results\e2e\backup-a-historical-v13-VR-96e56-rged-body-facts-are-refused-e2e\error-context.md
+
+    attachment #6: trace (application/zip) ─────────────────────────────────────────────────────────
+    .work\test-results\e2e\backup-a-historical-v13-VR-96e56-rged-body-facts-are-refused-e2e\trace.zip
+    Usage:
+
+        npx playwright show-trace .work\test-results\e2e\backup-a-historical-v13-VR-96e56-rged-body-facts-are-refused-e2e\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [e2e] › tests\backup.spec.ts:56:1 › a historical v13 VRM backup restores and re-exports, while forged body facts are refused
