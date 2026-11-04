@@ -26,7 +26,9 @@ Bundled locally from [pixiv/three-vrm](https://github.com/pixiv/three-vrm).
 Copyright (c) 2019-2026 pixiv Inc. MIT license, preserved verbatim in
 `assets/licenses/three-vrm-MIT.txt`. The bundled core, MToon, HDR emissive,
 VRM 0.x material compatibility, node constraint and spring bone packages
-use the same upstream license. Package versions are pinned in package-lock.json.
+use the same upstream license. `@pixiv/three-vrm-animation` 3.5.5 (VRM Animation
+`.vrma` loading) comes from the same repository under the same license. Package
+versions are pinned in package-lock.json.
 
 No third-party avatar, model texture or avatar screenshot is included.
 An avatar's own license remains separate from these software licenses.
