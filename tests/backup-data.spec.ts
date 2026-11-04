@@ -15,6 +15,8 @@ import { createBackupService } from '../src/background/backup';
 import { BACKUP_MESSAGE } from '../src/backup/protocol';
 import { modelFixture } from './helpers/model-fixture';
 import type { StoredAsset } from '../src/assets/repository';
+import { vrmFixture } from './helpers/vrm-fixture';
+import { inspectAsset } from '../src/assets/inspect';
 
 function manifest(): BackupManifest {
   return {
@@ -28,6 +30,29 @@ function manifest(): BackupManifest {
     assets: [],
   };
 }
+
+test('restoring over a legacy VRM asset tolerates only its absent body, retaining its record and leases', () => {
+  const bytes = vrmFixture(),
+    row: StoredAsset = {
+      ...inspectAsset(bytes),
+      id: `asset-${'b'.repeat(64)}`,
+      name: 'Original.vrm',
+      byteLength: bytes.length,
+      blob: new Blob([new Uint8Array(bytes)]),
+      leases: [],
+    },
+    legacy = { ...row, model: structuredClone(row.model!), leases: [{ session: 'old', tabId: 5, documentId: 'doc' }] };
+  delete legacy.model.vrm!.body;
+  const original = structuredClone(legacy),
+    backup = { manifest: manifest(), assets: [row] };
+  expect(planRestore(backup, {}, [legacy], [], false).added).toEqual([]);
+  expect(legacy).toEqual(original);
+  expect(() => planRestore(backup, {}, [{ ...legacy, width: legacy.width + 1 }], [], false)).toThrow('一致');
+  legacy.model.vrm!.body = structuredClone(row.model!.vrm!.body!);
+  expect(planRestore(backup, {}, [legacy], [], false).added).toEqual([]);
+  legacy.model.vrm!.body.height += 0.01;
+  expect(() => planRestore(backup, {}, [legacy], [], false)).toThrow('一致');
+});
 
 test('older backups fill missing settings with defaults while rejecting unknown or invalid supplied values', () => {
   expect(parseBackupSettings({})).toEqual(DEFAULT_SETTINGS);

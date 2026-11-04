@@ -21,6 +21,16 @@ export interface VrmInfo {
   /** v14: body measured at import (head from head-weighted vertices). Absent for older imports. */
   body?: BodyMeasure;
 }
+
+/** Old imports legitimately lack a reproducible body measure; every supplied fact still has to match. */
+export function sameModelInfo(source: ModelInfo, measured: ModelInfo | undefined): boolean {
+  if (!measured) return false;
+  if (source.vrm && source.vrm.body === undefined && measured.vrm) {
+    const { body: _body, ...legacyVrm } = measured.vrm;
+    return JSON.stringify(source) === JSON.stringify({ ...measured, vrm: legacyVrm });
+  }
+  return JSON.stringify(source) === JSON.stringify(measured);
+}
 export interface VrmSettings {
   lookAt: boolean;
   headFollow: boolean;

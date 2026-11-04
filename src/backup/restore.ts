@@ -8,6 +8,7 @@ import { validateTakeMerge } from '../browser/take-repository';
 import type { SignalTake } from '../world/takes';
 import { BACKUP_LIBRARY_LEASE, type StoredAsset } from '../assets/repository';
 import type { ValidatedBackup } from './archive';
+import { sameModelInfo } from '../models/types';
 
 /** Additive restore. An existing artwork/take is never silently replaced. */
 export function planRestore(
@@ -33,8 +34,15 @@ export function planRestore(
   const assets = new Map(existingAssets.map((row) => [row.id, row]));
   for (const row of backup.assets) {
     const existing = assets.get(row.id);
-    const metadata = ({ blob: _blob, leases: _leases, name: _name, ...info }: StoredAsset) => info;
-    if (existing && (!sameBackupData(metadata(existing), metadata(row)) || existing.blob.size !== row.blob.size))
+    const metadata = ({ blob: _blob, leases: _leases, name: _name, model: _model, ...info }: StoredAsset) => info;
+    // Reinspection can add body to a pre-v14 destination too. Only that missing fact is optional;
+    // the worker still hashes reused originals before accepting the restore.
+    if (
+      existing &&
+      (!sameBackupData(metadata(existing), metadata(row)) ||
+        (existing.model ? !sameModelInfo(existing.model, row.model) : Boolean(row.model)) ||
+        existing.blob.size !== row.blob.size)
+    )
       throw new Error('既存素材のIDと内容が一致しません。');
     if (!existing) assets.set(row.id, row);
   }

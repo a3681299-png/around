@@ -1,5 +1,6 @@
 import { SKIN_LIMITS, type Decoration, type DesignDocument, type SkinFrame } from '../design/types';
 import type { AssetMetadata } from './validation';
+import { sameModelInfo } from '../models/types';
 
 /** Metadata is produced by the worker's bounded file inspector, never by JSON. */
 export function validateDesignAssets(layers: readonly Decoration[], assets: ReadonlyMap<string, AssetMetadata>): void {
@@ -7,7 +8,7 @@ export function validateDesignAssets(layers: readonly Decoration[], assets: Read
     const asset = assets.get(layer.assetId);
     if (!asset) throw new Error('保存する素材が見つかりません。');
     if (
-      (layer.kind === 'model3d' && (!asset.model || JSON.stringify(asset.model) !== JSON.stringify(layer.source))) ||
+      (layer.kind === 'model3d' && !sameModelInfo(layer.source, asset.model)) ||
       (layer.kind !== 'model3d' && asset.model) ||
       asset.vrmAnimation ||
       (layer.kind === 'image' && asset.animation) ||
