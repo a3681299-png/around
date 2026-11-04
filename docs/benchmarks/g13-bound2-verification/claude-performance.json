@@ -1,0 +1,697 @@
+{
+  "date": "2026-11-04T02:15:46.740Z",
+  "builds": {
+    "before": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\.work\\g13-g12head\\.work\\g13-perf",
+    "after": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\.work\\g13b-head\\.work\\g13-perf"
+  },
+  "pairs": [
+    {
+      "pair": 0,
+      "order": ["before", "after"],
+      "before": {
+        "label": "before",
+        "build": {
+          "source": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\.work\\g13-g12head",
+          "revision": "4d3f39b8707db63de81466d7cba4f833dde979d9",
+          "dirtySource": false,
+          "probe": "isolated-world-v3",
+          "asyncContinuations": "lowered-promises",
+          "busyMs": 0,
+          "busyAfterAwait": false,
+          "disableInk": false
+        },
+        "browser": "143.0.7499.4",
+        "url": "https://www.youtube.com/watch?v=LC1a-DwUhls",
+        "viewport": {
+          "width": 1920,
+          "height": 1080
+        },
+        "model": false,
+        "phases": {
+          "startup": {
+            "cpuMs": {
+              "n": 155,
+              "median": 2.3999999910593033,
+              "p95": 25.799999997019768,
+              "max": 37.29999999701977
+            },
+            "intervalMs": {
+              "n": 155,
+              "median": 8.300000011920929,
+              "p95": 89.29999999701977,
+              "max": 496.69999998807907
+            },
+            "callbacks": 1671,
+            "kinds": {
+              "load": 1,
+              "event": 11,
+              "promise": 139,
+              "microtask": 203,
+              "MutationObserver": 987,
+              "raf": 283,
+              "ResizeObserver": 21,
+              "event-property": 2,
+              "setTimeout": 21,
+              "chrome-event": 3
+            }
+          },
+          "steady": {
+            "cpuMs": {
+              "n": 809,
+              "median": 1,
+              "p95": 1.5999999940395355,
+              "max": 3
+            },
+            "intervalMs": {
+              "n": 809,
+              "median": 6.799999997019768,
+              "p95": 14.5,
+              "max": 18.400000005960464
+            },
+            "callbacks": 1616,
+            "kinds": {
+              "raf": 808,
+              "microtask": 808
+            }
+          },
+          "scrollFar": {
+            "cpuMs": {
+              "n": 342,
+              "median": 1.2999999970197678,
+              "p95": 6.9000000059604645,
+              "max": 39.5
+            },
+            "intervalMs": {
+              "n": 342,
+              "median": 7.200000002980232,
+              "p95": 17.599999994039536,
+              "max": 49.599999994039536
+            },
+            "callbacks": 1005,
+            "kinds": {
+              "raf": 414,
+              "microtask": 383,
+              "event": 160,
+              "MutationObserver": 27,
+              "setTimeout": 21
+            },
+            "point": {
+              "x": 240,
+              "y": 10
+            },
+            "visibility": {
+              "frames": 347,
+              "shown": 8,
+              "approachFrames": 0
+            }
+          },
+          "scrollNear": {
+            "cpuMs": {
+              "n": 269,
+              "median": 1.5,
+              "p95": 16.19999998807907,
+              "max": 37.70000000298023
+            },
+            "intervalMs": {
+              "n": 269,
+              "median": 8.899999991059303,
+              "p95": 33,
+              "max": 58.8999999910593
+            },
+            "callbacks": 1057,
+            "kinds": {
+              "raf": 361,
+              "microtask": 314,
+              "event": 160,
+              "MutationObserver": 198,
+              "setTimeout": 24
+            },
+            "point": {
+              "x": 36,
+              "y": 540
+            },
+            "visibility": {
+              "frames": 274,
+              "shown": 8,
+              "approachFrames": 0
+            }
+          },
+          "spa": {
+            "cpuMs": {
+              "n": 432,
+              "median": 1.6000000089406967,
+              "p95": 17.700000002980232,
+              "max": 64.19999995827675
+            },
+            "intervalMs": {
+              "n": 432,
+              "median": 7.200000002980232,
+              "p95": 48.29999999701977,
+              "max": 377.79999999701977
+            },
+            "callbacks": 1767,
+            "kinds": {
+              "raf": 582,
+              "microtask": 470,
+              "event": 18,
+              "MutationObserver": 514,
+              "ResizeObserver": 24,
+              "setTimeout": 31,
+              "promise": 128
+            }
+          }
+        },
+        "networkErrors": [
+          {
+            "url": "https://www.youtube.com/api/stats/qoe",
+            "error": "net::ERR_ABORTED"
+          },
+          {
+            "url": "https://www.youtube.com/api/stats/qoe",
+            "error": "net::ERR_ABORTED"
+          }
+        ],
+        "rest": {
+          "x": 116,
+          "y": 431
+        }
+      },
+      "after": {
+        "label": "after",
+        "build": {
+          "source": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\.work\\g13b-head",
+          "revision": "20ffdc360df7d6a013cbfde595aa62cc138ca413",
+          "dirtySource": false,
+          "probe": "isolated-world-v3",
+          "asyncContinuations": "lowered-promises",
+          "busyMs": 0,
+          "busyAfterAwait": false,
+          "disableInk": false
+        },
+        "browser": "143.0.7499.4",
+        "url": "https://www.youtube.com/watch?v=LC1a-DwUhls",
+        "viewport": {
+          "width": 1920,
+          "height": 1080
+        },
+        "model": false,
+        "phases": {
+          "startup": {
+            "cpuMs": {
+              "n": 342,
+              "median": 1.2999999970197678,
+              "p95": 8.499999985098839,
+              "max": 53.3999999910593
+            },
+            "intervalMs": {
+              "n": 342,
+              "median": 7,
+              "p95": 31.400000005960464,
+              "max": 440.3999999910593
+            },
+            "callbacks": 1620,
+            "kinds": {
+              "load": 1,
+              "promise": 139,
+              "event": 11,
+              "microtask": 379,
+              "MutationObserver": 631,
+              "raf": 426,
+              "ResizeObserver": 14,
+              "event-property": 2,
+              "chrome-event": 3,
+              "setTimeout": 14
+            }
+          },
+          "steady": {
+            "cpuMs": {
+              "n": 865,
+              "median": 1.2000000029802322,
+              "p95": 1.9000000059604645,
+              "max": 2.4000000059604645
+            },
+            "intervalMs": {
+              "n": 865,
+              "median": 6.9000000059604645,
+              "p95": 7.9000000059604645,
+              "max": 23.399999991059303
+            },
+            "callbacks": 1728,
+            "kinds": {
+              "raf": 864,
+              "microtask": 864
+            }
+          },
+          "scrollFar": {
+            "cpuMs": {
+              "n": 344,
+              "median": 1,
+              "p95": 4.300000011920929,
+              "max": 15.099999994039536
+            },
+            "intervalMs": {
+              "n": 344,
+              "median": 7,
+              "p95": 16.200000002980232,
+              "max": 120.3999999910593
+            },
+            "callbacks": 1466,
+            "kinds": {
+              "raf": 436,
+              "microtask": 394,
+              "event": 160,
+              "MutationObserver": 329,
+              "promise": 126,
+              "setTimeout": 18,
+              "ResizeObserver": 3
+            },
+            "point": {
+              "x": 240,
+              "y": 10
+            },
+            "visibility": {
+              "frames": 347,
+              "shown": 268,
+              "approachFrames": 0
+            }
+          },
+          "scrollNear": {
+            "cpuMs": {
+              "n": 221,
+              "median": 1.800000011920929,
+              "p95": 8.500000014901161,
+              "max": 30.799999997019768
+            },
+            "intervalMs": {
+              "n": 221,
+              "median": 13.200000002980232,
+              "p95": 32.79999999701977,
+              "max": 69
+            },
+            "callbacks": 1192,
+            "kinds": {
+              "raf": 312,
+              "microtask": 276,
+              "event": 160,
+              "MutationObserver": 169,
+              "promise": 254,
+              "setTimeout": 21
+            },
+            "point": {
+              "x": 36,
+              "y": 540
+            },
+            "visibility": {
+              "frames": 227,
+              "shown": 200,
+              "approachFrames": 0
+            }
+          },
+          "spa": {
+            "cpuMs": {
+              "n": 523,
+              "median": 1.5,
+              "p95": 11.599999979138374,
+              "max": 65.90000002086163
+            },
+            "intervalMs": {
+              "n": 523,
+              "median": 7.0999999940395355,
+              "p95": 44.8999999910593,
+              "max": 432.29999999701977
+            },
+            "callbacks": 1836,
+            "kinds": {
+              "raf": 680,
+              "microtask": 575,
+              "event": 18,
+              "MutationObserver": 450,
+              "ResizeObserver": 21,
+              "setTimeout": 28,
+              "promise": 64
+            }
+          }
+        },
+        "networkErrors": [
+          {
+            "url": "https://www.youtube.com/api/stats/qoe",
+            "error": "net::ERR_ABORTED"
+          },
+          {
+            "url": "https://www.youtube.com/api/stats/qoe",
+            "error": "net::ERR_ABORTED"
+          }
+        ],
+        "rest": {
+          "x": 116,
+          "y": 449.8984375
+        }
+      }
+    },
+    {
+      "pair": 1,
+      "order": ["after", "before"],
+      "after": {
+        "label": "after",
+        "build": {
+          "source": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\.work\\g13b-head",
+          "revision": "20ffdc360df7d6a013cbfde595aa62cc138ca413",
+          "dirtySource": false,
+          "probe": "isolated-world-v3",
+          "asyncContinuations": "lowered-promises",
+          "busyMs": 0,
+          "busyAfterAwait": false,
+          "disableInk": false
+        },
+        "browser": "143.0.7499.4",
+        "url": "https://www.youtube.com/watch?v=LC1a-DwUhls",
+        "viewport": {
+          "width": 1920,
+          "height": 1080
+        },
+        "model": false,
+        "phases": {
+          "startup": {
+            "cpuMs": {
+              "n": 423,
+              "median": 1.2999999970197678,
+              "p95": 4,
+              "max": 29.100000008940697
+            },
+            "intervalMs": {
+              "n": 423,
+              "median": 7,
+              "p95": 20.599999994039536,
+              "max": 376
+            },
+            "callbacks": 1757,
+            "kinds": {
+              "load": 1,
+              "promise": 139,
+              "event": 11,
+              "MutationObserver": 629,
+              "microtask": 455,
+              "raf": 497,
+              "ResizeObserver": 10,
+              "event-property": 2,
+              "chrome-event": 3,
+              "setTimeout": 10
+            }
+          },
+          "steady": {
+            "cpuMs": {
+              "n": 871,
+              "median": 0.7999999970197678,
+              "p95": 1.7000000029802322,
+              "max": 3.6000000089406967
+            },
+            "intervalMs": {
+              "n": 871,
+              "median": 6.9000000059604645,
+              "p95": 7.9000000059604645,
+              "max": 19.399999991059303
+            },
+            "callbacks": 1740,
+            "kinds": {
+              "raf": 870,
+              "microtask": 870
+            }
+          },
+          "scrollFar": {
+            "cpuMs": {
+              "n": 244,
+              "median": 1.6000000089406967,
+              "p95": 13.399999991059303,
+              "max": 45.80000001192093
+            },
+            "intervalMs": {
+              "n": 244,
+              "median": 8.400000005960464,
+              "p95": 82.20000000298023,
+              "max": 168.40000000596046
+            },
+            "callbacks": 1351,
+            "kinds": {
+              "raf": 351,
+              "microtask": 296,
+              "event": 160,
+              "MutationObserver": 386,
+              "promise": 126,
+              "setTimeout": 24,
+              "ResizeObserver": 8
+            },
+            "point": {
+              "x": 240,
+              "y": 10
+            },
+            "visibility": {
+              "frames": 247,
+              "shown": 209,
+              "approachFrames": 0
+            }
+          },
+          "scrollNear": {
+            "cpuMs": {
+              "n": 204,
+              "median": 2,
+              "p95": 9.900000020861626,
+              "max": 44.6000000089407
+            },
+            "intervalMs": {
+              "n": 204,
+              "median": 16.299999997019768,
+              "p95": 41.29999999701977,
+              "max": 107.79999999701977
+            },
+            "callbacks": 1157,
+            "kinds": {
+              "raf": 295,
+              "microtask": 259,
+              "event": 160,
+              "MutationObserver": 168,
+              "promise": 254,
+              "setTimeout": 21
+            },
+            "point": {
+              "x": 36,
+              "y": 540
+            },
+            "visibility": {
+              "frames": 210,
+              "shown": 194,
+              "approachFrames": 0
+            }
+          },
+          "spa": {
+            "cpuMs": {
+              "n": 443,
+              "median": 1.300000011920929,
+              "p95": 13.100000008940697,
+              "max": 96.89999997615814
+            },
+            "intervalMs": {
+              "n": 443,
+              "median": 7.0999999940395355,
+              "p95": 50.79999999701977,
+              "max": 596.5
+            },
+            "callbacks": 1665,
+            "kinds": {
+              "raf": 598,
+              "microtask": 501,
+              "event": 18,
+              "MutationObserver": 435,
+              "ResizeObserver": 22,
+              "setTimeout": 27,
+              "promise": 64
+            }
+          }
+        },
+        "networkErrors": [
+          {
+            "url": "https://www.youtube.com/api/stats/qoe",
+            "error": "net::ERR_ABORTED"
+          },
+          {
+            "url": "https://www.youtube.com/api/stats/qoe",
+            "error": "net::ERR_ABORTED"
+          }
+        ],
+        "rest": {
+          "x": 116,
+          "y": 449.8984375
+        }
+      },
+      "before": {
+        "label": "before",
+        "build": {
+          "source": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\creator-editor\\.work\\g13-g12head",
+          "revision": "4d3f39b8707db63de81466d7cba4f833dde979d9",
+          "dirtySource": false,
+          "probe": "isolated-world-v3",
+          "asyncContinuations": "lowered-promises",
+          "busyMs": 0,
+          "busyAfterAwait": false,
+          "disableInk": false
+        },
+        "browser": "143.0.7499.4",
+        "url": "https://www.youtube.com/watch?v=LC1a-DwUhls",
+        "viewport": {
+          "width": 1920,
+          "height": 1080
+        },
+        "model": false,
+        "phases": {
+          "startup": {
+            "cpuMs": {
+              "n": 158,
+              "median": 2,
+              "p95": 21.700000032782555,
+              "max": 44.799999952316284
+            },
+            "intervalMs": {
+              "n": 158,
+              "median": 7.300000004470348,
+              "p95": 106.30000001192093,
+              "max": 338.40000000596046
+            },
+            "callbacks": 1621,
+            "kinds": {
+              "load": 1,
+              "promise": 139,
+              "event": 11,
+              "microtask": 195,
+              "MutationObserver": 968,
+              "raf": 265,
+              "ResizeObserver": 17,
+              "event-property": 2,
+              "chrome-event": 3,
+              "setTimeout": 20
+            }
+          },
+          "steady": {
+            "cpuMs": {
+              "n": 806,
+              "median": 1,
+              "p95": 1.7000000029802322,
+              "max": 2.199999988079071
+            },
+            "intervalMs": {
+              "n": 806,
+              "median": 6.5999999940395355,
+              "p95": 14.200000002980232,
+              "max": 32.19999998807907
+            },
+            "callbacks": 1610,
+            "kinds": {
+              "raf": 805,
+              "microtask": 805
+            }
+          },
+          "scrollFar": {
+            "cpuMs": {
+              "n": 318,
+              "median": 1.3000000193715096,
+              "p95": 10.599999994039536,
+              "max": 25.5
+            },
+            "intervalMs": {
+              "n": 318,
+              "median": 7.350000001490116,
+              "p95": 21.799999997019768,
+              "max": 37.1000000089407
+            },
+            "callbacks": 964,
+            "kinds": {
+              "raf": 391,
+              "microtask": 360,
+              "event": 160,
+              "MutationObserver": 32,
+              "setTimeout": 21
+            },
+            "point": {
+              "x": 240,
+              "y": 10
+            },
+            "visibility": {
+              "frames": 324,
+              "shown": 9,
+              "approachFrames": 0
+            }
+          },
+          "scrollNear": {
+            "cpuMs": {
+              "n": 272,
+              "median": 1.5,
+              "p95": 16.799999997019768,
+              "max": 26.400000005960464
+            },
+            "intervalMs": {
+              "n": 272,
+              "median": 9.149999998509884,
+              "p95": 29.400000005960464,
+              "max": 59
+            },
+            "callbacks": 1129,
+            "kinds": {
+              "raf": 364,
+              "microtask": 318,
+              "event": 160,
+              "MutationObserver": 200,
+              "setTimeout": 23,
+              "promise": 64
+            },
+            "point": {
+              "x": 36,
+              "y": 540
+            },
+            "visibility": {
+              "frames": 277,
+              "shown": 8,
+              "approachFrames": 0
+            }
+          },
+          "spa": {
+            "cpuMs": {
+              "n": 470,
+              "median": 1.5,
+              "p95": 13.400000005960464,
+              "max": 55.59999996423721
+            },
+            "intervalMs": {
+              "n": 470,
+              "median": 7.200000002980232,
+              "p95": 38.70000000298023,
+              "max": 438
+            },
+            "callbacks": 1775,
+            "kinds": {
+              "raf": 631,
+              "microtask": 514,
+              "event": 18,
+              "MutationObserver": 496,
+              "ResizeObserver": 22,
+              "setTimeout": 30,
+              "promise": 64
+            }
+          }
+        },
+        "networkErrors": [
+          {
+            "url": "https://www.youtube.com/api/stats/qoe",
+            "error": "net::ERR_ABORTED"
+          },
+          {
+            "url": "https://www.youtube.com/api/stats/qoe",
+            "error": "net::ERR_ABORTED"
+          }
+        ],
+        "rest": {
+          "x": 116,
+          "y": 431
+        }
+      }
+    }
+  ],
+  "reference3d": []
+}
