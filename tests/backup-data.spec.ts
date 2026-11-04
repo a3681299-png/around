@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
-import { emptyDesign } from '../src/design/schema';
+import { emptyDesign, parseDesign } from '../src/design/schema';
 import { DEFAULT_SETTINGS, mergeSettings } from '../src/storage/settings';
 import {
   BACKUP_LIMITS,
@@ -242,16 +242,19 @@ const historyStorage = async () =>
 test('a backup made with the retro theme still parses, restores its artwork and keeps the switch and 制作モード', async () => {
   const manifest = parseBackupManifest(await historyManifest()),
     storage = await historyStorage();
-  expect(manifest.designs).toEqual([storage['webWorldThemes.design.youtube']]);
+  // The stored v13 artwork reads as the current version with nothing else changed.
+  const stored = parseDesign(storage['webWorldThemes.design.youtube']);
+  expect({ ...stored, schemaVersion: 13 }).toEqual(storage['webWorldThemes.design.youtube']);
+  expect(manifest.designs).toEqual([stored]);
   expect(manifest.designs[0]!.baseThemeId).toBe('retro');
   expect(manifest.settings).toEqual({ enabled: true, creatorMode: true });
   for (const applySettings of [false, true]) {
     const { values } = planRestore({ manifest, assets: [] }, {}, [], [], applySettings);
-    expect(values['webWorldThemes.design.youtube']).toEqual(storage['webWorldThemes.design.youtube']);
+    expect(values['webWorldThemes.design.youtube']).toEqual(stored);
     // The switch is restored as 作品を表示する; the retro items are not written back.
     if (applySettings)
       expect(values).toEqual({
-        'webWorldThemes.design.youtube': storage['webWorldThemes.design.youtube'],
+        'webWorldThemes.design.youtube': stored,
         'webWorldThemes.showArtwork': true,
         'webWorldThemes.creatorMode': true,
       });

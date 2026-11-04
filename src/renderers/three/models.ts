@@ -17,8 +17,10 @@ import {
 import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { clone } from 'three/addons/utils/SkeletonUtils.js';
 import { createRigPlayer } from './rig-player';
-import { VRMLoaderPlugin, VRMUtils } from '@pixiv/three-vrm';
+import { VRMLoaderPlugin, VRMUtils, type VRM } from '@pixiv/three-vrm';
+import type { AnimationClip } from 'three';
 import { createVrmPlayer, isVrm, disposeInstanceSkeletons } from './vrm-player';
+import { parseVrmAnimation, vrmAnimationClip } from './vrma-clip';
 import type { ModelEvaluation } from '../../world/models';
 import type { WorldFrame } from '../../world/types';
 import { loadAsset } from '../../assets/client';
@@ -398,6 +400,38 @@ export function createModelRenderer(
     profiled?: boolean;
     preparing?: boolean;
     posePrepared?: boolean;
+    /** The character motion list the clips below belong to (asset IDs in order). */
+    motionKey?: string;
+    motionClips?: AnimationClip[] | undefined;
+    motionAbort?: AbortController;
+    playerMotions?: AnimationClip[] | undefined;
+  }
+  /** Reads each motion asset, validates it again and turns it into a clip on this VRM. */
+  function loadMotions(i: Instance, layer: ModelDecoration, avatar: VRM, key: string) {
+    i.motionAbort?.abort();
+    const abort = new AbortController();
+    i.motionAbort = abort;
+    i.motionKey = key;
+    i.motionClips = undefined;
+    void Promise.all(
+      layer.character!.motions.map(async (motion) => {
+        const { blob, metadata } = await readAsset(motion.assetId, abort.signal);
+        if (!blob || !metadata.vrmAnimation) throw new Error('キャラの動作の素材が見つかりません。');
+        const clip = vrmAnimationClip(await parseVrmAnimation(new Uint8Array(await blob.arrayBuffer())), avatar);
+        clip.name = motion.id;
+        return clip;
+      }),
+    )
+      .then((clips) => {
+        if (abort.signal.aborted || !i.alive || i.motionKey !== key) return;
+        i.motionClips = clips;
+        i.dirty = true;
+        schedule();
+      })
+      .catch((error: unknown) => {
+        if (abort.signal.aborted || !i.alive) return;
+        report(error instanceof Error ? error.message : 'キャラの動作を読み込めません。');
+      });
   }
   const cancel = () => {
     if (frame !== undefined) view.cancelAnimationFrame(frame);
@@ -478,12 +512,18 @@ export function createModelRenderer(
         );
         const avatar = isVrm(i.source!);
         const playerStart = trace ? performance.now() : 0;
-        if (i.inPlace !== m.inPlace || (!i.player && !i.vrmPlayer)) {
+        // A character plays its .vrma motions; they load once per motion list, then the player
+        // is rebuilt on them. Until they arrive the model holds its rest pose.
+        const motionKey = avatar && i.layer.character ? i.layer.character.motions.map((x) => x.assetId).join() : '';
+        if (motionKey && i.motionKey !== motionKey) loadMotions(i, i.layer, avatar!, motionKey);
+        const motions = motionKey && i.motionKey === motionKey ? i.motionClips : undefined;
+        if (i.inPlace !== m.inPlace || (!i.player && !i.vrmPlayer) || i.playerMotions !== motions) {
           i.player?.destroy();
           i.vrmPlayer?.destroy();
-          if (avatar) i.vrmPlayer = createVrmPlayer(i.source!, avatar, m.inPlace);
+          if (avatar) i.vrmPlayer = createVrmPlayer(i.source!, avatar, m.inPlace, motions);
           else i.player = createRigPlayer(i.source!, i.root, m.inPlace);
           i.inPlace = m.inPlace;
+          i.playerMotions = motions;
         }
         if (ASSET_PROFILE && trace) profileEnd(trace, 'first.player-create', playerStart);
         if (i.evaluation) {
@@ -700,6 +740,10 @@ export function createModelRenderer(
         i.vrmPlayer?.destroy();
         delete i.player;
         delete i.vrmPlayer;
+        i.motionAbort?.abort();
+        delete i.motionKey;
+        delete i.motionClips;
+        delete i.playerMotions;
         if (i.root) {
           if (!i.source || !isVrm(i.source)) disposeInstanceSkeletons(i.root);
           i.visual.clear();

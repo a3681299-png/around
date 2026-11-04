@@ -102,6 +102,7 @@ export interface EditorAsset {
   height: number;
   model?: import('../models/types').ModelInfo;
   animation?: { format: AnimationFormat };
+  vrmAnimation?: import('../characters/motion-info').VrmAnimationInfo;
 }
 export interface EditorStorage<Source> {
   read(): Promise<DesignDocument | undefined>;

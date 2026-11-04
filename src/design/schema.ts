@@ -17,6 +17,7 @@ import {
   renderModeOf,
 } from './types';
 import { MODEL_LIMITS, parseModelInfo, parseModelSettings } from '../models/types';
+import { modelClips, parseCharacter } from '../characters/settings';
 import { ASSET_MESSAGES } from '../assets/limits';
 import { ANIMATION_LIMITS } from '../assets/motion-types';
 import { parseEffects } from '../effects/schema';
@@ -255,6 +256,7 @@ const DECORATION_FIELDS = [
   'model',
   'source',
   'renderMode',
+  'character',
 ] as const;
 const DECORATION_KINDS = ['image', 'animation', 'model3d'] as const;
 export function parseDecoration(value: unknown): Decoration {
@@ -289,9 +291,14 @@ export function parseDecoration(value: unknown): Decoration {
   if (item['kind'] === 'model3d') {
     if (Object.hasOwn(item, 'format') || Object.hasOwn(item, 'playback')) throw new Error('3D素材の設定が不正です。');
     const source = parseModelInfo(item['source']);
-    return { ...common, kind: 'model3d', source, model: parseModelSettings(item['model'], source) };
+    if (!Object.hasOwn(item, 'character'))
+      return { ...common, kind: 'model3d', source, model: parseModelSettings(item['model'], source) };
+    // With a character, clip indices address its motions instead of the model's embedded clips.
+    const character = parseCharacter(item['character'], source);
+    const model = parseModelSettings(item['model'], { ...source, clips: modelClips({ source, character }) });
+    return { ...common, kind: 'model3d', source, model, character };
   }
-  if (Object.hasOwn(item, 'model') || Object.hasOwn(item, 'source'))
+  if (Object.hasOwn(item, 'model') || Object.hasOwn(item, 'source') || Object.hasOwn(item, 'character'))
     throw new Error('3D素材以外には3D設定を指定できません。');
   if (item['kind'] === 'image') {
     if (Object.hasOwn(item, 'format') || Object.hasOwn(item, 'playback'))
@@ -371,7 +378,7 @@ export function parseDesign(value: unknown): DesignDocument {
     ? parseSignalRules(data['signalRules'], new Set([...decorations, ...groups].map((layer) => layer.id)))
     : [];
   return {
-    schemaVersion: 13,
+    schemaVersion: 14,
     id: data['id'],
     siteId: data['siteId'],
     baseThemeId: data['baseThemeId'],
@@ -383,7 +390,7 @@ export function parseDesign(value: unknown): DesignDocument {
 }
 
 export function emptyDesign(siteId: string, baseThemeId: string | null): DesignDocument {
-  return parseDesign({ schemaVersion: 13, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
+  return parseDesign({ schemaVersion: 14, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
 }
 
 export function sameDesign(a: DesignDocument | undefined, b: DesignDocument | undefined): boolean {

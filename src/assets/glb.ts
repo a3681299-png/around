@@ -2,6 +2,8 @@ import { MODEL_LIMITS, type ModelInfo } from '../models/types';
 import { ASSET_MESSAGES, MODEL_RESOURCE_LIMITS } from './limits';
 import type { AssetInfo } from './validation';
 import { inspectVrm, VRM_EXTENSIONS } from './vrm';
+import { measureBody } from '../characters/humanoid';
+import { vrmBodyFacts } from '../characters/vrm-body';
 
 type Obj = Record<string, any>; // glTF is untrusted; every used index/range is checked below.
 const bad = (message = 'GLBが破損しているか、初版で未対応の構造です。') => new Error(message);
@@ -411,7 +413,10 @@ export function inspectGlb(bytes: Uint8Array): { info: AssetInfo; json: Obj; bin
   };
   materials.forEach(checkTextures);
   for (const mesh of meshes) for (const p of mesh.primitives) if (p.material !== undefined) ref(p.material, materials);
-  const vrm = inspectVrm(json);
+  const inspected = inspectVrm(json);
+  // Body facts read the validated JSON/BIN once; an unmeasurable rig simply has none.
+  const body = inspected && measureBody(vrmBodyFacts(json, bin) ?? { bones: {}, crown: NaN, floor: NaN });
+  const vrm = inspected && (body ? { ...inspected, body } : inspected);
   vrm?.humanoid.forEach((b) => boneIds.add(b.node));
   if (boneIds.size > MODEL_LIMITS.bones) throw bad();
   const info: AssetInfo = {

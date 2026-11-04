@@ -12,6 +12,8 @@ const unitSpecs = [
   'asset-runtime',
   'asset-shared-pool',
   'character-body',
+  'character-data',
+  'character-manifest',
   'design',
   'design-migrations',
   'editor-core',

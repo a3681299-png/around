@@ -5,7 +5,10 @@ import type { DesignDocument } from './types';
 export function designAssetIds(design: Pick<DesignDocument, 'decorations' | 'rules'>): string[] {
   return [
     ...new Set([
-      ...design.decorations.map((layer) => layer.assetId),
+      ...design.decorations.flatMap((layer) => [
+        layer.assetId,
+        ...(layer.kind === 'model3d' && layer.character ? layer.character.motions.map((m) => m.assetId) : []),
+      ]),
       ...design.rules.flatMap((rule) => (rule.skin ? skinAssetIds(rule.skin) : [])),
     ]),
   ];

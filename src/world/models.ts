@@ -3,6 +3,7 @@ import { yields, type WorldInput, type WorldLayout } from './types';
 import type { MotionState } from './motion';
 import { object, numeric } from '../models/types';
 import { oneOf } from '../validation';
+import { modelClips, motionUsable } from '../characters/settings';
 
 export interface ModelState {
   clip: number | null;
@@ -72,7 +73,7 @@ export function parseModelStates(value: unknown, ids?: ReadonlySet<string>): Rec
 }
 const wrap = (angle: number) => ((((angle + 180) % 360) + 360) % 360) - 180;
 function advance(layer: ModelDecoration, clip: number | null, time: number, delta: number) {
-  const duration = clip === null ? 0 : (layer.source.clips[clip]?.duration ?? 0) * 1000;
+  const duration = clip === null ? 0 : (modelClips(layer)[clip]?.duration ?? 0) * 1000;
   return duration <= 0 ? 0 : layer.model.loop ? (time + delta) % duration : Math.min(duration, time + delta);
 }
 /** Explicit clock/state only. Renderer never owns clip time or transitions. */
@@ -113,7 +114,7 @@ export function evaluateModels(
             : speedPx >= l.walkSpeed || (before?.phase === 'walk' && speedPx >= l.walkSpeed * 0.8)
               ? 'walk'
               : 'idle';
-    const clip =
+    const chosen =
       paused && before
         ? before.clip
         : phase === 'manual'
@@ -123,6 +124,12 @@ export function evaluateModels(
             : phase === 'run'
               ? (l.run ?? l.walk ?? model.clip)
               : (l.walk ?? model.clip);
+    // A standard motion the body measure (or the user) rules out holds the rest pose instead;
+    // the character's own motions always play (docs/r3-plan.md, R3-1b).
+    const clip =
+      chosen !== null && layer.character && !motionUsable(layer.character, chosen, layer.source.vrm?.body)
+        ? null
+        : chosen;
     let next: ModelState =
       before && !restart
         ? { ...before }
@@ -208,7 +215,7 @@ export function evaluateModels(
       speedPx,
       ...(restart || paused ? { resetDynamics: true } : {}),
     });
-    const duration = clip === null ? 0 : (layer.source.clips[clip]?.duration ?? 0) * 1000;
+    const duration = clip === null ? 0 : (modelClips(layer)[clip]?.duration ?? 0) * 1000;
     needsFrame ||=
       running &&
       model.playing &&

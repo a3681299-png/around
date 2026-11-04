@@ -1,7 +1,7 @@
 import { ASSET_LIMITS, ASSET_MESSAGES } from '../assets/limits';
 import { IMAGE_LIMITS } from './types';
 
-// Intermediate objects are untrusted. Only schema.ts's final v13 validation may
+// Intermediate objects are untrusted. Only schema.ts's final v14 validation may
 // produce a DesignDocument; migration never grants immutable.ts's validated mark.
 type Data = Record<string, unknown>;
 interface Shape {
@@ -26,6 +26,7 @@ const group9 = [...group6, 'motion'];
 const layer12 = [...layer10, 'renderMode'];
 const group12 = [...group9, 'renderMode'];
 const rule1 = ['kind', 'target', 'style'];
+const rule13 = [...rule1, 'skin'];
 const images = ['image'];
 const media = [...images, 'animation'];
 const models = [...media, 'model3d'];
@@ -153,6 +154,21 @@ export function migrateV12ToV13(value: unknown): Data {
   return next(stage(value, 12, { root: root8, layer: layer12, kinds: models, group: group12, rule: rule1 }), 13);
 }
 
+export function migrateV13ToV14(value: unknown): Data {
+  // Layers and source facts pass unchanged through every earlier step, so this gate covers
+  // v1–v13: a character and a measured body are new in v14; older VRM layers keep their own
+  // clips and simply have no measure.
+  const data = stage(value, 13, { root: root8, layer: layer12, kinds: models, group: group12, rule: rule13 });
+  for (const value of list(data['decorations'])) {
+    const layer = record(value);
+    if (layer['kind'] !== 'model3d' || layer['source'] === undefined) continue;
+    const vrm = record(layer['source'])['vrm'];
+    if (vrm !== undefined && Object.hasOwn(record(vrm), 'body'))
+      throw new Error('体型の測定にはDesignDocument v14が必要です。');
+  }
+  return next(data, 14);
+}
+
 export const DESIGN_MIGRATIONS = Object.freeze([
   migrateV1ToV2,
   migrateV2ToV3,
@@ -166,14 +182,15 @@ export const DESIGN_MIGRATIONS = Object.freeze([
   migrateV10ToV11,
   migrateV11ToV12,
   migrateV12ToV13,
+  migrateV13ToV14,
 ]);
 
-/** Pure chain; a returned v13 object is still unvalidated external input. */
+/** Pure chain; a returned v14 object is still unvalidated external input. */
 export function migrateDesign(value: unknown): Data {
   let data = record(value);
   const version = data['schemaVersion'];
-  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 13)
+  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 14)
     throw new Error('このデザインのバージョンには対応していません。');
-  for (let from = version; from < 13; from++) data = DESIGN_MIGRATIONS[from - 1]!(data);
+  for (let from = version; from < 14; from++) data = DESIGN_MIGRATIONS[from - 1]!(data);
   return data;
 }

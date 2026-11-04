@@ -45,7 +45,7 @@ export function fitSkinScale(
 
 /** Static raster images only, small enough to paint on many parts at once. */
 export function skinAssetProblem(asset: EditorAsset): string | undefined {
-  if (asset.model || asset.animation) return '着せ替えにはPNG・WebPの静止画像を使ってください。';
+  if (asset.model || asset.animation || asset.vrmAnimation) return '着せ替えにはPNG・WebPの静止画像を使ってください。';
   if (asset.width > SKIN_LIMITS.edge || asset.height > SKIN_LIMITS.edge)
     return `着せ替えの画像は${SKIN_LIMITS.edge}×${SKIN_LIMITS.edge}px以内にしてください。`;
 }

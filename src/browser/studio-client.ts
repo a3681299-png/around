@@ -15,6 +15,7 @@ import { importStudioAssets } from '../assets/studio-upload';
 import type { SafetyStatus } from '../host/operation-guard';
 import type { SkinPageInfo } from '../editor/skin-status';
 import type { SkinSlot } from '../editor-core/skins';
+import type { MotionLabel } from '../characters/manifest';
 
 import type { StudioConnectionState, StudioConnection } from '../studio/connection';
 import { requestStudioSurface } from './side-panel';
@@ -449,6 +450,47 @@ export function createStudioClient(
           await releaseAssets(lease).catch(() => undefined);
         }
       }, true);
+    },
+    async importMotions(
+      files: readonly File[],
+      layer: string,
+      labels: readonly [string, MotionLabel][],
+      origin: 'standard' | 'character',
+    ) {
+      // A motion folder is larger than one import batch; send it in batches the shared limits allow.
+      for (let start = 0; start < files.length; start += ASSET_LIMITS.batchCount) {
+        const batch = files.slice(start, start + ASSET_LIMITS.batchCount);
+        await enqueue(async () => {
+          const generation = epoch;
+          if (batch.reduce((n, f) => n + f.size, 0) > ASSET_LIMITS.batchBytes) throw new Error(ASSET_MESSAGES.batch);
+          const lease = `studio-upload-${crypto.randomUUID()}`,
+            controller = new AbortController(),
+            target = tabId;
+          pendingImport = { controller, lease };
+          try {
+            const surface = visibilityDocument
+              ? new URL(visibilityDocument.URL).searchParams.get('surface')
+              : undefined;
+            const ownerTab = surface === 'sidepanel' ? target : (await chrome.tabs.getCurrent())?.id;
+            if (ownerTab === undefined) throw new Error('エディターの保持先が見つかりません。');
+            const assets = await importStudioAssets(batch, lease, controller.signal, ownerTab);
+            if (generation !== epoch || !connected) throw new Error('素材の読み込み中に接続が変わりました。');
+            const current = state!;
+            await request({
+              type: 'import-motions',
+              session: current.sessionId,
+              revision: current.revision,
+              assets: assets.map((a) => a.id),
+              layer,
+              labels: [...labels],
+              origin,
+            } as Omit<StudioRequest, 'id'>);
+          } finally {
+            if (pendingImport?.controller === controller) pendingImport = undefined;
+            await releaseAssets(lease).catch(() => undefined);
+          }
+        }, true);
+      }
     },
     async thumbnail(id: string) {
       if (!connected) return;

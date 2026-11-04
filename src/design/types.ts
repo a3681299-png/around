@@ -38,7 +38,7 @@ export interface SurfaceStyleRule {
 }
 
 export interface DesignDocument {
-  schemaVersion: 13;
+  schemaVersion: 14;
   id: string;
   siteId: string;
   /** null uses native site styling; a built-in theme is an optional starting point. */
@@ -118,7 +118,10 @@ export interface ModelDecoration extends LayerState {
   assetId: string;
   source: import('../models/types').ModelInfo;
   model: import('../models/types').ModelSettings;
+  /** v14. With it, model clip indices address character.motions (src/characters/settings.ts). */
+  character?: CharacterSettings;
 }
+export type CharacterSettings = import('../characters/settings').CharacterSettings;
 export type Decoration = ImageDecoration | AnimationDecoration | ModelDecoration;
 
 export type ImagePatch = Partial<
@@ -127,6 +130,7 @@ export type ImagePatch = Partial<
   placement?: Partial<LayerPlacement>;
   playback?: Partial<PlaybackSettings>;
   model?: import('../models/types').ModelPatch;
+  character?: import('../characters/settings').CharacterPatch;
 };
 
 /** Bundled site knowledge. A condition is a selector with one `&` for the target element. */

@@ -25,3 +25,9 @@ UI1（v13）では `history-v12.json` を追加した。v12で `renderMode` を�
 
 `css-expected.json` は、変更前の `29b8d5b` の `compileDesign` で全fixtureを組み立てたCSS。
 v13の着せ替えを追加したレンダラーでも、既存作品の見た目（CSS）がバイト単位で変わらないことを確かめる固定の比較対象。
+
+R3-1b（v14）では `history-v13.json` を追加した。v13を導入した `3e18edc` の `tests/vrm-data.spec.ts` の
+「VRM1 preserves humanoid, expression, spring and MToon capabilities with v11 roundtrip」が、最初に `parseDesign` へ渡して受理された入力（VRMの3Dレイヤー1枚）である。
+取得には `scripts/capture-design-chain-fixtures.mjs` を1件だけに絞った使い捨ての写しを使った（そのテストが `three` を読むため、`three`・`@pixiv` を外部として扱う1行を足した。元のスクリプトは変えていない）。
+期待値（`chain-expected.json`・`css-expected.json` の `history-v13.json`）は、変更前の `133f88b` のパーサーと `compileDesign` で取った。
+v14への版上げで、`chain-expected.json` の全件の `schemaVersion` を14にした（ほかの値は変えていない）。

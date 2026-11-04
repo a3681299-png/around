@@ -3,6 +3,7 @@ import type { StudioTarget } from './protocol';
 import type { TimelinePort } from '../timeline/types';
 import type { SkinPageInfo } from '../editor/skin-status';
 import type { SkinSlot } from '../editor-core/skins';
+import type { MotionLabel } from '../characters/manifest';
 
 export interface StudioConnectionState {
   target: number | undefined;
@@ -28,6 +29,13 @@ export interface StudioConnection {
   dispatch(command: EditCommand): Promise<void>;
   /** Image layers, or UI skin art when `slot` names one of the selected part's slots. */
   import(files: readonly File[], slot?: SkinSlot): Promise<void>;
+  /** .vrma motions for one VRM layer, sent in batches within the shared import limit. */
+  importMotions?(
+    files: readonly File[],
+    layer: string,
+    labels: readonly [string, MotionLabel][],
+    origin: 'standard' | 'character',
+  ): Promise<void>;
   thumbnail(id: string): Promise<string | undefined>;
   focusTarget(): Promise<void>;
   openWorkspace(surface: 'sidepanel' | 'window'): Promise<void>;

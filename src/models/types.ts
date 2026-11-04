@@ -1,4 +1,5 @@
 import { oneOf } from '../validation';
+import type { BodyMeasure } from '../characters/humanoid';
 
 /** Data only. Node/clip indices refer to the immutable GLB asset. */
 export interface ModelInfo {
@@ -17,6 +18,8 @@ export interface VrmInfo {
   lookAt: boolean;
   springBone: boolean;
   mtoon: boolean;
+  /** v14: body measured at import (head from head-weighted vertices). Absent for older imports. */
+  body?: BodyMeasure;
 }
 export interface VrmSettings {
   lookAt: boolean;
@@ -112,6 +115,24 @@ const label = (v: unknown) => {
   if (typeof v !== 'string' || v.length > 120 || /[\u0000-\u001f]/.test(v)) throw new Error('3D素材名が不正です。');
   return v;
 };
+const BODY_RANGES = Object.freeze({
+  height: 100,
+  headLength: 100,
+  headsTall: 100,
+  legLength: 100,
+  legRatio: 10,
+  armLength: 100,
+  armRatio: 10,
+  hipsHeight: 100,
+  hipsRatio: 10,
+  shoulderWidth: 100,
+});
+/** Metres and ratios measured at import; bounded so a stored document cannot carry extremes. */
+export function parseBodyMeasure(value: unknown): BodyMeasure {
+  const keys = Object.keys(BODY_RANGES) as (keyof BodyMeasure)[],
+    v = object(value, keys);
+  return Object.fromEntries(keys.map((key) => [key, numeric(v[key], 0, BODY_RANGES[key])])) as unknown as BodyMeasure;
+}
 export function parseModelInfo(value: unknown): ModelInfo {
   const v = object(value, ['format', 'vrm', 'clips', 'bones', 'vertices', 'triangles', 'textureBytes']);
   if (
@@ -135,7 +156,7 @@ export function parseModelInfo(value: unknown): ModelInfo {
   if (new Set(bones.map((b) => b.node)).size !== bones.length) throw new Error('ボーンが重複しています。');
   let vrm: VrmInfo | undefined;
   if (v['format'] === 'vrm') {
-    const r = object(v['vrm'], ['version', 'humanoid', 'expressions', 'lookAt', 'springBone', 'mtoon']);
+    const r = object(v['vrm'], ['version', 'humanoid', 'expressions', 'lookAt', 'springBone', 'mtoon', 'body']);
     if (
       !oneOf(r['version'], ['1.0', '0.x']) ||
       !Array.isArray(r['humanoid']) ||
@@ -163,6 +184,7 @@ export function parseModelInfo(value: unknown): ModelInfo {
       lookAt: bool(r['lookAt']),
       springBone: bool(r['springBone']),
       mtoon: bool(r['mtoon']),
+      ...(r['body'] === undefined ? {} : { body: parseBodyMeasure(r['body']) }),
     };
   } else if (v['vrm'] !== undefined) throw new Error('GLBにVRM情報は指定できません。');
   return {

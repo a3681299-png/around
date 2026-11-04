@@ -1,15 +1,21 @@
-import { Euler, Quaternion, type Object3D } from 'three';
+import { Euler, Quaternion, type AnimationClip, type Object3D } from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import type { VRM } from '@pixiv/three-vrm';
 import { createRigPlayer } from './rig-player';
 import type { ModelEvaluation } from '../../world/models';
 import type { ModelSettings } from '../../models/types';
 
-/** VRM components stay attached to their own scene. Runtime supplies pose and clock. */
-export function createVrmPlayer(gltf: GLTF, vrm: VRM, inPlace: boolean) {
-  const rig = createRigPlayer(gltf, vrm.scene, inPlace),
+/**
+ * VRM components stay attached to their own scene. Runtime supplies pose and clock.
+ * Embedded GLB clips address raw bones; a character's .vrma clips (`motions`) address the
+ * normalized bones, so only then does humanoid.update() copy normalized → raw. One player
+ * never mixes the two kinds.
+ */
+export function createVrmPlayer(gltf: GLTF, vrm: VRM, inPlace: boolean, motions?: readonly AnimationClip[]) {
+  const hips = motions ? vrm.humanoid.getNormalizedBoneNode('hips') : undefined;
+  const rig = createRigPlayer(gltf, vrm.scene, inPlace, motions, hips ? new Set([hips.name]) : undefined),
     head = vrm.humanoid.getRawBoneNode('head');
-  vrm.humanoid.autoUpdateHumanBones = false; // Embedded GLB clips address raw bones. Future VRMA addresses normalized bones.
+  vrm.humanoid.autoUpdateHumanBones = Boolean(motions);
   vrm.scene.updateWorldMatrix(true, true);
   const parent = vrm.scene.parent,
     baseSpace = parent?.getWorldQuaternion(new Quaternion()) ?? new Quaternion();
@@ -27,6 +33,9 @@ export function createVrmPlayer(gltf: GLTF, vrm: VRM, inPlace: boolean) {
     paint(frame: ModelEvaluation, model: ModelSettings, timeMs: number) {
       restore();
       rig.paint(frame, { ...model, look: { ...model.look, enabled: false } });
+      // Normalized → raw copy (VRM.update's first step) before the head offset, so .vrma poses
+      // keep the look-at turn. Without .vrma motions autoUpdateHumanBones is off: a no-op.
+      vrm.humanoid.update();
       const options = model.vrm!,
         active = !frame.suspended && model.playing;
       const elapsed = previousTime === undefined ? 0 : timeMs - previousTime;
@@ -64,8 +73,7 @@ export function createVrmPlayer(gltf: GLTF, vrm: VRM, inPlace: boolean) {
         vrm.lookAt.pitch = follow && options.lookAt ? frame.lookPitch * (1 - headFraction) : 0;
       }
       vrm.scene.updateWorldMatrix(true, true);
-      // Same order as VRM.update, with an explicit pause for SpringBone.
-      vrm.humanoid.update();
+      // Same order as VRM.update (humanoid already updated above), with an explicit pause for SpringBone.
       vrm.lookAt?.update(dt);
       expressions?.update();
       vrm.nodeConstraintManager?.update();

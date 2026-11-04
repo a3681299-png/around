@@ -17,7 +17,7 @@ export async function validateAssetBytes(
   });
   // Service workers validate raster frame 0; container validation precedes decoding.
   // Video playback probing remains at the existing content importer boundary.
-  if (!info.model && info.animation?.format !== 'lottie' && info.animation?.format !== 'webm') {
+  if (!info.model && !info.vrmAnimation && info.animation?.format !== 'lottie' && info.animation?.format !== 'webm') {
     const bitmap = await createImageBitmap(blob);
     try {
       if (bitmap.width !== info.width || bitmap.height !== info.height)

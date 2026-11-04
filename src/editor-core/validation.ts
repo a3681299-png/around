@@ -2,6 +2,7 @@ import { isDesignId, parseDecoration, parsePlacement, parseSurfaceStyle } from '
 import { IMAGE_LIMITS, type ImagePatch } from '../design/types';
 import { ANIMATION_LIMITS } from '../assets/motion-types';
 import { MODEL_LIMITS } from '../models/types';
+import { CHARACTER_LIMITS } from '../characters/settings';
 import { parseSignalRules } from '../signals/keyframe-schema';
 import type { PlacementChange } from '../world/geometry';
 import type { SignalRule } from '../signals/keyframes';
@@ -145,8 +146,9 @@ export function parseImagePatch(value: unknown): ImagePatch {
     'playback',
     'model',
     'renderMode',
+    'character',
   ]);
-  const { placement, playback, model, renderMode, ...properties } = input;
+  const { placement, playback, model, renderMode, character, ...properties } = input;
   // Normal is a real request in a patch even though saved data stores it by omission.
   if (Object.hasOwn(input, 'renderMode') && renderMode !== 'normal' && renderMode !== 'atmosphere')
     throw new Error('描画モードが不正です。');
@@ -189,6 +191,20 @@ export function parseImagePatch(value: unknown): ImagePatch {
     result['model'] = model;
   }
   if (Object.hasOwn(input, 'renderMode')) result['renderMode'] = renderMode;
+  if (Object.hasOwn(input, 'character')) {
+    // Membership of the kept IDs is checked against the layer by applyCharacterPatch.
+    const c = commandObject(character, ['standardMotions', 'keep']);
+    if (Object.hasOwn(c, 'standardMotions') && !['auto', 'on', 'off'].includes(c['standardMotions'] as string))
+      throw new Error('標準の動作の設定が不正です。');
+    if (
+      Object.hasOwn(c, 'keep') &&
+      (!Array.isArray(c['keep']) ||
+        c['keep'].length > CHARACTER_LIMITS.motions ||
+        c['keep'].some((id) => typeof id !== 'string' || !/^[a-z][a-z0-9-]{0,63}$/.test(id)))
+    )
+      throw new Error('キャラの動作の指定が不正です。');
+    result['character'] = c;
+  }
   return JSON.parse(JSON.stringify(result)) as ImagePatch;
 }
 export function parsePlacements(value: unknown): PlacementChange[] {

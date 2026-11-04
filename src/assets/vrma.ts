@@ -1,5 +1,6 @@
 import { HUMAN_BONES, isHumanBone, type HumanBone, type Vec3 } from '../characters/humanoid';
 import { nodeWorlds, transform } from '../characters/gltf-space';
+import type { VrmAnimationInfo } from '../characters/motion-info';
 
 /**
  * VRM Animation (.vrma) is untrusted input. It may only carry humanoid bone rotations and the
@@ -16,19 +17,7 @@ export const VRMA_LIMITS = Object.freeze({
   keys: 400_000,
   durationSeconds: 600,
 });
-export interface VrmAnimationInfo {
-  format: 'vrma';
-  name: string;
-  /** Seconds; 0 for a one-frame pose. */
-  duration: number;
-  /** Humanoid bones the file maps, in the engine's bone order. */
-  bones: HumanBone[];
-  hipsTranslation: boolean;
-  /** Hips height of the file's own rest pose (metres); players scale hips motion by model/this. */
-  restHipsHeight: number;
-  /** Last minus first hips position in the file's own units (x, up, forward). */
-  hipsTravel: Vec3;
-}
+export type { VrmAnimationInfo } from '../characters/motion-info';
 
 const bad = (message = 'VRMアニメーション（.vrma）が破損しているか、未対応の構造です。') => new Error(message);
 const TOP_LEVEL = new Set([
@@ -91,6 +80,16 @@ function container(bytes: Uint8Array): { json: Obj; bin: Uint8Array } {
   }
   if (at !== bytes.length || !json || json['asset']?.version !== '2.0') throw bad();
   return { json, bin };
+}
+
+/** Routing only (inspect.ts): a GLB whose JSON declares VRM Animation. Full checks follow. */
+export function isVrmaContainer(bytes: Uint8Array): boolean {
+  try {
+    const { json } = container(bytes);
+    return Boolean(json['extensions']?.VRMC_vrm_animation);
+  } catch {
+    return false;
+  }
 }
 
 export function inspectVrma(bytes: Uint8Array): { info: VrmAnimationInfo; json: Obj; bin: Uint8Array } {

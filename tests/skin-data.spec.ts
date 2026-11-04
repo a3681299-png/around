@@ -53,7 +53,7 @@ test('v13 skin rules roundtrip canonically, freeze, and keep the existing style 
   const parsed = parseDesign(
     doc([{ kind: 'surface-style', target: 'subscribe-button', style: { backgroundColor: '#ABCDEF' }, skin: skin() }]),
   );
-  expect(parsed.schemaVersion).toBe(13);
+  expect(parsed.schemaVersion).toBe(14);
   expect(parsed.rules[0]).toStrictEqual({
     kind: 'surface-style',
     target: 'subscribe-button',
@@ -139,7 +139,7 @@ test('skin data rejects executable or out-of-range values at the entrance', () =
   expect(() => commitDesign(edited, committed)).toThrow();
 });
 
-test('v12 documents cannot carry skins and migrate to v13 without any other change', () => {
+test('v12 documents cannot carry skins and migrate to v14 without any other change', () => {
   const rule = { kind: 'surface-style', target: 'video-card', style: {}, skin: skin() };
   expect(() => parseDesign(doc([rule], 12))).toThrow();
   for (const version of [1, 2, 6, 11]) {
@@ -148,7 +148,7 @@ test('v12 documents cannot carry skins and migrate to v13 without any other chan
   }
   const v12 = JSON.parse(readFileSync(fixtures + 'history-v12.json', 'utf8'));
   const migrated = parseDesign(v12);
-  expect(migrated.schemaVersion).toBe(13);
+  expect(migrated.schemaVersion).toBe(14);
   expect({ ...migrated, schemaVersion: 12 }).toStrictEqual(
     JSON.parse(JSON.stringify({ ...migrated, schemaVersion: 12 })),
   );

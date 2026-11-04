@@ -14,7 +14,8 @@ import { ASSET_LIMITS } from '../assets/validation';
 import { ASSET_MESSAGES } from '../assets/limits';
 import { parseTimelineCommand } from '../timeline/types';
 import { loadAssetMetadata } from '../assets/client';
-import { isAssetId } from '../design/schema';
+import { isAssetId, isDesignId } from '../design/schema';
+import { parseMotionLabels } from '../characters/manifest';
 import { SKIN_STATES, type SkinState } from '../design/types';
 import type { OperationGuardHost } from '../host/operation-guard';
 
@@ -227,6 +228,28 @@ export function connectStudioHost(
                 request.revision,
                 { kind: 'stored-assets', items, length: items.length },
                 request.slot,
+              );
+              post({ type: 'reply', id: request.id, ok: true, ...statePayload(state) });
+            } else if (request.type === 'import-motions') {
+              if (
+                !Array.isArray(request.assets) ||
+                !request.assets.length ||
+                request.assets.length > ASSET_LIMITS.batchCount ||
+                !request.assets.every(isAssetId) ||
+                !isDesignId(request.layer) ||
+                (request.origin !== 'standard' && request.origin !== 'character')
+              )
+                throw new Error('動作の追加の指定が不正です。');
+              const labels = parseMotionLabels(request.labels);
+              const items = await Promise.all(request.assets.map((id) => loadAssetMetadata(id)));
+              const state = await editor.importMotions(
+                owner,
+                request.session,
+                request.revision,
+                { kind: 'stored-assets', items, length: items.length },
+                request.layer,
+                labels,
+                request.origin,
               );
               post({ type: 'reply', id: request.id, ok: true, ...statePayload(state) });
             } else if (request.type === 'thumbnail') {

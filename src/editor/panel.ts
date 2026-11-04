@@ -13,7 +13,7 @@ import { ATMOSPHERE_ALPHA_CAP } from '../world/operations';
 import { ANIMATION_LIMITS } from '../assets/motion-types';
 import { ASSET_MESSAGES } from '../assets/limits';
 import type { Alignment, Distribution } from '../design/layout';
-import { createModelPanel } from './model-panel';
+import { createModelPanel, type MotionImportOptions } from './model-panel';
 import { createMotionPanel } from './motion-panel';
 import { createEffectsPanel } from './effects-panel';
 import { createLayerTree } from './layer-tree';
@@ -41,6 +41,8 @@ export interface PanelOptions {
   timeline?: TimelinePort | undefined;
   /** UI skin editing; omitted where the panel has no native page parts to dress. */
   skin?: SkinPanelOptions;
+  /** Character motions for a VRM layer; omitted where no connection can carry the files. */
+  motions?: MotionImportOptions;
 }
 
 export interface PanelActions {
@@ -252,7 +254,7 @@ export function createCreatorPanel(
   const changeImage = (patch: ImagePatch) => actions.imageChange(patch, current?.image?.id);
   const effects = createEffectsPanel(doc, changeImage);
   const motion = createMotionPanel(doc, changeImage, actions.beginEdit, actions.endEdit);
-  const model = createModelPanel(doc, changeImage, actions.beginEdit, actions.endEdit);
+  const model = createModelPanel(doc, changeImage, actions.beginEdit, actions.endEdit, options.motions);
   imageProperties.append(model.fieldset, motion.fieldset, effects.fieldset);
   const modelInput = get<HTMLInputElement>('.model-file'),
     addModel = get<HTMLButtonElement>('.add-model');

@@ -22,6 +22,17 @@ export type StudioRequest =
   | { id: number; type: 'import-assets'; session: string; revision: number; assets: string[] }
   // UI skin art into one slot of the selected part (Core accepts exactly one picture).
   | { id: number; type: 'import-skin'; session: string; revision: number; assets: string[]; slot: SkinSlot }
+  // .vrma motions for one VRM layer's character; labels come from the folder's manifest.json.
+  | {
+      id: number;
+      type: 'import-motions';
+      session: string;
+      revision: number;
+      assets: string[];
+      layer: string;
+      labels: [string, { name: string; role: string; loop: boolean }][];
+      origin: 'standard' | 'character';
+    }
   | { id: number; type: 'thumbnail'; layer: string }
   | { id: number; type: 'safety'; overlay: boolean }
   // 描画を再開 in 操作チェック: ends a stop the guard no longer recovers from by itself.

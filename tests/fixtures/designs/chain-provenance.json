@@ -40,5 +40,12 @@
     "file": "tests/design-migrations.spec.ts",
     "test": "v12 renderMode keeps normal by omission, stores atmosphere, and keeps a group undivided",
     "extraction": "first explicit parseDesign input with a group accepted by the historical parser; expected result captured with 29b8d5b"
+  },
+  {
+    "version": 13,
+    "commit": "3e18edcadf07fe04aa0195556bdb97149aeed017",
+    "file": "tests/vrm-data.spec.ts",
+    "test": "VRM1 preserves humanoid, expression, spring and MToon capabilities with v11 roundtrip",
+    "extraction": "first explicit parseDesign input accepted by the historical parser; expected result captured with 133f88b"
   }
 ]

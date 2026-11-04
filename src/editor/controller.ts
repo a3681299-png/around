@@ -17,6 +17,7 @@ import { createPageMarks } from './page-marks';
 import tokens from './studio-tokens.css';
 import type { SkinSlot } from '../editor-core/skins';
 import type { SkinPageInfo } from './skin-status';
+import type { MotionLabel } from '../characters/manifest';
 
 /** The page renderer's view of skin art, for previews and "not applied" reasons. */
 export interface SkinAssetHost {
@@ -63,6 +64,16 @@ export interface CreatorEditor {
     revision: number,
     files: BrowserImportSource,
     slot: SkinSlot,
+  ): Promise<EditorSnapshot>;
+  /** .vrma motions for one VRM layer, from a connected Studio page (labels from a manifest). */
+  importMotions(
+    owner: string,
+    session: string,
+    revision: number,
+    files: BrowserImportSource,
+    layer: string,
+    labels: ReadonlyMap<string, MotionLabel>,
+    origin: 'standard' | 'character',
   ): Promise<EditorSnapshot>;
   /** The skin tool's part list (page presence, art and ink state), throttled, while the tool is open. */
   subscribeSkinPage(listener: (info: readonly SkinPageInfo[]) => void): () => void;
@@ -560,6 +571,11 @@ export function createCreatorEditor(
     async importSkin(owner, session, revision, files, slot) {
       authorize(owner, session, revision);
       await core.importSkin(files, slot);
+      return core.snapshot();
+    },
+    async importMotions(owner, session, revision, files, layer, labels, origin) {
+      authorize(owner, session, revision);
+      await core.importMotions(layer, files, labels, origin);
       return core.snapshot();
     },
     subscribeSkinPage(listener) {

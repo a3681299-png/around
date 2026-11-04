@@ -11,6 +11,8 @@ export interface AssetInfo {
   height: number;
   model?: import('../models/types').ModelInfo;
   animation?: import('./motion-types').AnimationInfo;
+  /** A VRM Animation (.vrma): a character motion, never a layer of its own. */
+  vrmAnimation?: import('../characters/motion-info').VrmAnimationInfo;
 }
 export interface AssetMetadata extends AssetInfo {
   id: string;

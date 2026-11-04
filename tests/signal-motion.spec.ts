@@ -258,7 +258,7 @@ test('v8 artwork and Runtime 1.1 takes migrate without mutation; malformed motio
       signalRules: [defaultScrollOpacityRule('image-0')],
     },
     before = JSON.stringify(doc);
-  expect(parseDesign(doc).schemaVersion).toBe(13);
+  expect(parseDesign(doc).schemaVersion).toBe(14);
   expect(JSON.stringify(doc)).toBe(before);
   const old = {
     format: 'ww-signal-take',

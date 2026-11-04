@@ -13,10 +13,21 @@ import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import type { ModelSettings } from '../../models/types';
 import type { ModelEvaluation } from '../../world/models';
 
-/** Clip sampling only. Time/transition decisions are supplied by World Runtime. */
-export function createRigPlayer(gltf: GLTF, root: Object3D, inPlace: boolean) {
+/**
+ * Clip sampling only. Time/transition decisions are supplied by World Runtime.
+ * `motions` replaces the model's embedded clips (a character's .vrma clips); `rootNames` marks
+ * the nodes whose horizontal travel In-place removes when they are not the model's own root
+ * (a VRM's normalized hips sit under the normalized rig, not directly under the scene).
+ */
+export function createRigPlayer(
+  gltf: GLTF,
+  root: Object3D,
+  inPlace: boolean,
+  motions?: readonly AnimationClip[],
+  rootNames?: ReadonlySet<string>,
+) {
   const mixer = new AnimationMixer(root);
-  const clips = gltf.animations.map(
+  const clips = (motions ?? gltf.animations).map(
     (source) =>
       new AnimationClip(
         source.name,
@@ -29,7 +40,12 @@ export function createRigPlayer(gltf: GLTF, root: Object3D, inPlace: boolean) {
           if (
             parsed.propertyName !== 'position' ||
             !node ||
-            !(node === root || node.parent === root || (bone?.isBone && !(node.parent as typeof bone)?.isBone))
+            !(
+              node === root ||
+              node.parent === root ||
+              rootNames?.has(node.name) ||
+              (bone?.isBone && !(node.parent as typeof bone)?.isBone)
+            )
           )
             return track;
           // Immutable tracks are shared with the asset. Copy only root translations

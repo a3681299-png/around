@@ -9,10 +9,18 @@ export function validateDesignAssets(layers: readonly Decoration[], assets: Read
     if (
       (layer.kind === 'model3d' && (!asset.model || JSON.stringify(asset.model) !== JSON.stringify(layer.source))) ||
       (layer.kind !== 'model3d' && asset.model) ||
+      asset.vrmAnimation ||
       (layer.kind === 'image' && asset.animation) ||
       (layer.kind === 'animation' && asset.animation?.format !== layer.format)
     )
       throw new Error('レイヤーと素材の形式が一致しません。');
+    // A character's motions must be the very .vrma facts the worker measured at import.
+    if (layer.kind === 'model3d')
+      for (const motion of layer.character?.motions ?? []) {
+        const stored = assets.get(motion.assetId);
+        if (!stored?.vrmAnimation || JSON.stringify(stored.vrmAnimation) !== JSON.stringify(motion.source))
+          throw new Error('キャラの動作と素材が一致しません。');
+      }
   }
 }
 

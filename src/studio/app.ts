@@ -151,6 +151,20 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
           // The arrangement follows the width; the surface (side panel or window) only sets transport.
           sidePanel: builtNarrow,
           surface: ports.sidePanel ? 'sidepanel' : 'window',
+          ...(connection.importMotions
+            ? {
+                motions: {
+                  import: (files, layer, labels, origin) => {
+                    if (!connection.isConnected) return;
+                    importError = undefined;
+                    void connection.importMotions!(files, layer, labels, origin).catch((error: unknown) => {
+                      importError = error instanceof Error ? error.message : '動作を読み込めませんでした。';
+                      if (latest) render(latest);
+                    });
+                  },
+                },
+              }
+            : {}),
           ...(skinTargets.length && ports.skinAssetUrl
             ? {
                 skin: {

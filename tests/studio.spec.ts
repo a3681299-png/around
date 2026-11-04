@@ -153,7 +153,7 @@ test('standalone Studio edits a real extension target using shared grouping, eff
   await panel.getByLabel('動画の一時停止で隠す', { exact: true }).check();
   await save(panel);
   const saved = await stored(popup);
-  expect(saved.schemaVersion).toBe(13);
+  expect(saved.schemaVersion).toBe(14);
   expect(saved.groups?.[0]?.effects?.[0]).toMatchObject({ radiusPx: 180 });
   await studio.screenshot({ path: info.outputPath('studio-workspace.png') });
   // The page says the edit is in a separate window and offers only ending it (UI0-d: the quick

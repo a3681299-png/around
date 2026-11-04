@@ -147,7 +147,7 @@ test('existing v10 GLB settings migrate without losing authored clips, assets or
     };
   const before = JSON.stringify(doc),
     migrated = parseDesign(doc);
-  expect(migrated.schemaVersion).toBe(13);
+  expect(migrated.schemaVersion).toBe(14);
   expect(migrated.decorations).toEqual(doc.decorations);
   expect(JSON.stringify(doc)).toBe(before);
 });

@@ -1,6 +1,8 @@
 import { parseEditCommand } from './commands';
 import { editorCapabilities } from './capabilities';
 import { defaultModelSettings, patchModel } from '../models/types';
+import { applyCharacterPatch, modelClips } from '../characters/settings';
+import { draftMotions, type MotionLabel } from '../characters/manifest';
 import { ASSET_MESSAGES } from '../assets/limits';
 import { emptyDesign, sameDesign } from '../design/schema';
 import { readDesign, editDesign, commitDesign, shareDesign, freezeTree } from '../design/immutable';
@@ -275,25 +277,33 @@ export function createEditorSession<Source extends { readonly length: number }>(
       patch = { ...patch, placement: reanchorPlacement(current.placement, from, to, patch.placement.anchor) };
     }
     const next = editDesign(draft);
-    const { playback, model, ...properties } = patch;
+    const { playback, model, character, ...properties } = patch;
+    next.decorations = next.decorations.map((image) => {
+      if (image.id !== id || image.kind !== 'model3d') return image;
+      // A character's motions are the clip list; reshaping them first keeps model indices aligned.
+      const reshaped =
+        character && image.character
+          ? applyCharacterPatch({ source: image.source, character: image.character, model: image.model }, character)
+          : undefined;
+      const layer = reshaped ? { ...image, ...reshaped } : image;
+      return {
+        ...layer,
+        ...properties,
+        placement: { ...image.placement, ...patch.placement },
+        model: patchModel(layer.model, model, { ...image.source, clips: modelClips(layer) }),
+      };
+    });
     next.decorations = next.decorations.map((image) =>
-      image.id !== id
+      image.id !== id || image.kind === 'model3d'
         ? image
-        : image.kind === 'model3d'
+        : image.kind === 'animation'
           ? {
               ...image,
               ...properties,
               placement: { ...image.placement, ...patch.placement },
-              model: patchModel(image.model, model, image.source),
+              playback: { ...image.playback, ...playback },
             }
-          : image.kind === 'animation'
-            ? {
-                ...image,
-                ...properties,
-                placement: { ...image.placement, ...patch.placement },
-                playback: { ...image.playback, ...playback },
-              }
-            : { ...image, ...properties, placement: { ...image.placement, ...patch.placement } },
+          : { ...image, ...properties, placement: { ...image.placement, ...patch.placement } },
     );
     updateDraft(next);
   }
@@ -449,6 +459,8 @@ export function createEditorSession<Source extends { readonly length: number }>(
     try {
       const assets = await storage.import(files, importSession);
       if (epoch !== importEpoch || !active) return;
+      if (assets.some((asset) => asset.vrmAnimation))
+        throw new Error('動作（.vrma）は、VRMモデルの設定の「動作を追加」から読み込んでください。');
       before = draft;
       const next = editDesign(draft);
       let importedSelection: string | undefined;
@@ -615,6 +627,89 @@ export function createEditorSession<Source extends { readonly length: number }>(
       if (epoch !== importEpoch || !active) return;
       if (before && before !== draft) updateDraft(before, false);
       status = reason instanceof Error ? reason.message : '画像を読み込めませんでした。';
+      error = true;
+      leased = '';
+      settleAssets();
+    } finally {
+      void releaseAssets(importSession).catch(() => undefined);
+      if (epoch === importEpoch) {
+        importing = false;
+        render();
+      }
+    }
+  };
+
+  /**
+   * .vrma motions join one VRM layer's character instead of becoming layers. The labels come
+   * from a manifest the panel read; every number stored comes from the imported files.
+   */
+  const addMotions = async (
+    layerId: string,
+    files: Source,
+    labels: ReadonlyMap<string, MotionLabel>,
+    origin: 'standard' | 'character',
+  ) => {
+    if (!active || !assetSession || saving || importing || !files.length) return;
+    const layer = draft.decorations.find((item) => item.id === layerId);
+    if (layer?.kind !== 'model3d' || !layer.source.vrm) return refuse('動作はVRMモデルのレイヤーに追加してください。');
+    finishGesture();
+    const epoch = importEpoch,
+      importSession = ports.makeId('session');
+    let before: DesignDocument | undefined;
+    importing = true;
+    status = '動作を読み込んでいます…';
+    error = false;
+    render();
+    try {
+      const assets = await storage.import(files, importSession);
+      if (epoch !== importEpoch || !active) return;
+      const motions = assets.map((asset) => {
+        if (!asset.vrmAnimation) throw new Error(`${asset.name} はVRMアニメーション（.vrma）ではありません。`);
+        return { id: asset.id, name: asset.name, vrmAnimation: asset.vrmAnimation };
+      });
+      before = draft;
+      const current = draft.decorations.find((item) => item.id === layerId);
+      if (current?.kind !== 'model3d') throw new Error('動作を追加するレイヤーが見つかりません。');
+      const character = current.character ?? { standardMotions: 'auto' as const, motions: [] };
+      const next = editDesign(draft);
+      next.decorations = next.decorations.map((item) =>
+        item.id === layerId && item.kind === 'model3d'
+          ? {
+              ...item,
+              character: {
+                ...character,
+                motions: [...character.motions, ...draftMotions(character.motions, motions, labels, origin)],
+              },
+              // The clip list changes from the model's own clips to the motions on first use.
+              ...(current.character
+                ? {}
+                : {
+                    model: {
+                      ...item.model,
+                      clip: 0,
+                      locomotion: { ...item.model.locomotion, idle: null, walk: null, run: null },
+                    },
+                  }),
+            }
+          : item,
+      );
+      await checkDesignAssets(next, importSession);
+      if (epoch !== importEpoch || !active) return;
+      if (before !== draft) {
+        before = undefined;
+        throw new Error('別のタブの保存値が変わったため、素材の追加を中止しました。もう一度読み込んでください。');
+      }
+      updateDraft(next, false);
+      leased = '';
+      await syncAssets();
+      if (epoch !== importEpoch || !active) return;
+      history.record(before, draft);
+      status = `${motions.length}個の動作を追加しました。`;
+      settleAssets();
+    } catch (reason) {
+      if (epoch !== importEpoch || !active) return;
+      if (before && before !== draft) updateDraft(before, false);
+      status = reason instanceof Error ? reason.message : '動作を読み込めませんでした。';
       error = true;
       leased = '';
       settleAssets();
@@ -911,6 +1006,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     restore,
     import: addImages,
     importSkin: addSkinImage,
+    importMotions: addMotions,
     subscribe(listener: (state: EditorSnapshot) => void) {
       listeners.add(listener);
       return () => listeners.delete(listener);
