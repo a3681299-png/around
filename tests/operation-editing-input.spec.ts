@@ -106,7 +106,8 @@ test('a covered control stops drawing until 描画を再開, and the same covere
   await resume.click();
   await expect.poll(() => stopped(youtube)).toBe('');
   await expect(resume).toBeHidden();
-  // With nothing restricted for a moment, 操作チェック folds away as usual.
+  // 描画を再開 is the report's action, so it folds away like a menu after one, even though the
+  // layer's handle clip (a restriction of its own) keeps 操作チェック in the header.
   await expect.poll(() => check.evaluate((node: HTMLDetailsElement) => node.open)).toBe(false);
   await youtube.mouse.click(at.x, at.y);
   await expect.poll(() => stopped(youtube)).toBeTruthy();

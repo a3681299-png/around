@@ -120,6 +120,13 @@ export function mountEditorSafety(root: HTMLElement, connection: StudioConnectio
     restart.disabled = true;
     void connection
       .safety!.resume()
+      // Its action done, the report folds away like a menu. It used to close only because the
+      // guard published an empty list for a moment, which also closed reports opened meanwhile.
+      .then(() => {
+        if (!check.open) return;
+        check.open = false;
+        summary.focus();
+      })
       .catch(reportFailure)
       .finally(() => {
         restart.disabled = false;
