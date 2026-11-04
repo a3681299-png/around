@@ -1,0 +1,96 @@
+{
+  "browser": "153.0.8010.12",
+  "noDefaults": true,
+  "rows": [
+    {
+      "name": "shown",
+      "hidden": false,
+      "ms": 1506.699999988079,
+      "reads": 3,
+      "rects": 57,
+      "invalidations": []
+    },
+    {
+      "name": "empty-after-shown",
+      "hidden": false,
+      "ms": 1519.2000000029802,
+      "reads": 0,
+      "rects": 0,
+      "invalidations": []
+    },
+    {
+      "name": "shown-again",
+      "hidden": false,
+      "ms": 1509.5,
+      "reads": 3,
+      "rects": 57,
+      "invalidations": []
+    },
+    {
+      "name": "transparent-after-shown",
+      "hidden": false,
+      "ms": 1519.2999999970198,
+      "reads": 0,
+      "rects": 0,
+      "invalidations": []
+    },
+    {
+      "name": "shown-before-background",
+      "hidden": false,
+      "ms": 1514.8999999910593,
+      "reads": 3,
+      "rects": 57,
+      "invalidations": []
+    },
+    {
+      "name": "real-hidden",
+      "hidden": true,
+      "ms": 1507.5,
+      "reads": 0,
+      "rects": 0,
+      "invalidations": []
+    },
+    {
+      "name": "returned",
+      "hidden": false,
+      "ms": 1508.5,
+      "reads": 3,
+      "rects": 57,
+      "invalidations": []
+    },
+    {
+      "name": "inactive-after-shown",
+      "hidden": false,
+      "ms": 1517.8999999910593,
+      "reads": 0,
+      "rects": 0,
+      "invalidations": []
+    },
+    {
+      "name": "shown-before-destroy",
+      "hidden": false,
+      "ms": 1509,
+      "reads": 3,
+      "rects": 57,
+      "invalidations": []
+    },
+    {
+      "name": "destroyed",
+      "hidden": false,
+      "ms": 1510.6000000089407,
+      "reads": 0,
+      "rects": 0,
+      "invalidations": []
+    }
+  ],
+  "visibility": [
+    {
+      "at": 8346.29999999702,
+      "hidden": true
+    },
+    {
+      "at": 9930.39999999106,
+      "hidden": false
+    }
+  ]
+}

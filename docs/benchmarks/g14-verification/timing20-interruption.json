@@ -1,0 +1,7 @@
+{
+  "completedTests": 3,
+  "completedStatus": "passed",
+  "failureKind": "execution environment interrupted the process",
+  "toolError": "Network access to dc.services.visualstudio.com was blocked: domain is not on the allowlist for the current sandbox mode.",
+  "handling": "Keep the partial log and images. Start a separate complete set of 20 with the same target/build/test, outside the network sandbox. Do not count the partial run as a failure or part of the formal 20."
+}

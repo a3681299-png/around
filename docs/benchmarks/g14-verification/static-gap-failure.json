@@ -1,0 +1,29 @@
+{
+  "area": {
+    "x": 1368,
+    "y": 446,
+    "width": 8,
+    "height": 64,
+    "kind": "exposed gap between player and secondary"
+  },
+  "color": [255, 255, 255, 255],
+  "dimensions": {
+    "width": 1920,
+    "height": 1080
+  },
+  "picture": "after-static-1793771404874.png",
+  "bounds": {
+    "x": 1364,
+    "y": 414,
+    "width": 8,
+    "height": 64
+  },
+  "paintState": {
+    "name": "g14-solid.png",
+    "visibility": "visible",
+    "opacity": "1",
+    "clip": "path('M0 0h12v1080h-12ZM1364 0h496v1080h-496ZM1908 0h12v1080h-12Z')",
+    "safety": "{\"stopped\":\"\",\"issues\":[]}",
+    "media": "{\"encodedBytes\":279,\"decodedBytes\":16384,\"cacheBytes\":0,\"allocations\":2,\"inFlight\":0,\"peakDecodedBytes\":28672,\"deferredDraws\":0,\"drawEstimateMs\":0.25}"
+  }
+}

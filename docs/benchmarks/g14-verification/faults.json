@@ -1,0 +1,31 @@
+[
+  {
+    "fault": "clip",
+    "source": "ed03b29",
+    "method": "esbuild module wrapper",
+    "contentSha256": "5df236fd1313737824c189e7a63d1e121cad88b696ba77bfbcba5868a983ae56"
+  },
+  {
+    "fault": "input",
+    "source": "ed03b29",
+    "method": "esbuild module wrapper",
+    "contentSha256": "a3e2735b303a65c18604eb8984dc32c35edb7678ffc133f125e4cebda0b91b97"
+  },
+  {
+    "fault": "approach",
+    "source": "ed03b29",
+    "method": "esbuild module wrapper",
+    "contentSha256": "64f7f1c0e2b30cce8d4b18074bcc89bfd9dff9e144f0c3a8aea4ef36b0884689"
+  },
+  {
+    "fault": "hold",
+    "source": "ed03b29",
+    "method": "esbuild module wrapper",
+    "contentSha256": "46cbab063bcf80b555c20705f2e0efa1fd5b1778511d701d7ec3bf155c3b4cbc"
+  },
+  {
+    "fault": "idle",
+    "method": "WW_NO_IDLE_RECHECK=1; drop WW_IDLE_RECHECK in app and probe",
+    "contentSha256": "14543c67c02ccef4fa379b5f9191a9d132701bf5666bb67fa564fc5b2bab8171"
+  }
+]

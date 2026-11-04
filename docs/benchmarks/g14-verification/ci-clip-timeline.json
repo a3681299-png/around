@@ -1,0 +1,140 @@
+{
+  "artifactId": 13295926442,
+  "artifactSha256": "6880fce3d1d22ba3affaa441af06247bd302633b84a65476ee2300527e953131",
+  "beforeHitAssert": 538269.462,
+  "movePlayerCall": 538269.881,
+  "twoRaf": {
+    "start": 538280.205,
+    "end": 538311.187
+  },
+  "staleHitAssert": 538334.954,
+  "snapshots": [
+    {
+      "at": 538019.193,
+      "rows": [
+        [
+          "DIV",
+          {
+            "id": "web-world-themes-decorations",
+            "data-ww-media-stats": "{\"encodedBytes\":0,\"decodedBytes\":0,\"cacheBytes\":0,\"allocations\":0,\"inFlight\":1,\"peakDecodedBytes\":0,\"deferredDraws\":0,\"drawEstimateMs\":0.25}",
+            "data-ww-safety": "{\"stopped\":\"ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。\",\"issues\":[{\"layerId\":\"image-bd7fd72b-9fef-4786-92a0-40861d614465\",\"surfaceId\":\"player.video\",\"severity\":\"enforced\",\"action\":\"clip\",\"reason\":\"制作ハンドルが本物の操作を奪う位置です。\",\"remedy\":\"保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。\"},{\"layerId\":\"image-bd7fd72b-9fef-4786-92a0-40861d614465\",\"surfaceId\":\"host\",\"severity\":\"enforced\",\"action\":\"stop\",\"reason\":\"ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。\",\"remedy\":\"動きが落ち着くと、自動で表示に戻ります。\"}]}",
+            "style": "--ww-decoration-z: 1; --ww-decoration-clip: path('M0 0h196v70h-196ZM0 206h196v58h-196ZM0 358h196v402h-196ZM0 315h4v43h-4ZM172 315h24v43h-24ZM0 264h4v51h-4ZM172 264h24v51h-24ZM0 163h4v43h-4ZM172 163h24v43h-24ZM0 120h4v43h-4ZM172 120h24v43h-24ZM0 70h4v50h-4ZM172 70h24v50h-24ZM772 0h328v760h-328ZM200 182h568v143.5h-568Z');"
+          }
+        ],
+        [
+          "DIV",
+          {
+            "class": "image",
+            "data-image-id": "image-bd7fd72b-9fef-4786-92a0-40861d614465",
+            "role": "img",
+            "aria-label": "opaque.png",
+            "tabindex": "0",
+            "data-safety-limited": "",
+            "data-selected": "",
+            "data-editable": "",
+            "style": "visibility: hidden; left: 495px; top: 342px; width: 120px; height: 80px; transform: translate(-50%, -50%) rotate(0deg); z-index: 100; pointer-events: none;"
+          }
+        ]
+      ]
+    },
+    {
+      "at": 538176.221,
+      "rows": [
+        [
+          "DIV",
+          {
+            "id": "web-world-themes-decorations",
+            "data-ww-media-stats": "{\"encodedBytes\":236,\"decodedBytes\":12288,\"cacheBytes\":0,\"allocations\":2,\"inFlight\":0,\"peakDecodedBytes\":12288,\"deferredDraws\":0,\"drawEstimateMs\":0.25}",
+            "data-ww-safety": "{\"stopped\":\"\",\"issues\":[]}",
+            "style": "--ww-decoration-z: 1; --ww-decoration-clip: path('M0 0h196v70h-196ZM0 206h196v58h-196ZM0 358h196v402h-196ZM0 315h4v43h-4ZM172 315h24v43h-24ZM0 264h4v51h-4ZM172 264h24v51h-24ZM0 163h4v43h-4ZM172 163h24v43h-24ZM0 120h4v43h-4ZM172 120h24v43h-24ZM0 70h4v50h-4ZM172 70h24v50h-24ZM772 0h328v760h-328ZM200 182h568v143.5h-568Z');"
+          }
+        ],
+        [
+          "DIV",
+          {
+            "class": "image",
+            "data-image-id": "image-bd7fd72b-9fef-4786-92a0-40861d614465",
+            "role": "img",
+            "aria-label": "opaque.png",
+            "tabindex": "0",
+            "data-selected": "",
+            "data-editable": "",
+            "style": "left: 484px; top: 253.764px; width: 120px; height: 80px; transform: translate(-50%, -50%) rotate(0deg); z-index: 100;"
+          }
+        ]
+      ]
+    },
+    {
+      "at": 538208.265,
+      "rows": [
+        [
+          "DIV",
+          {
+            "__playwright_target__": "",
+            "id": "web-world-themes-decorations",
+            "data-ww-media-stats": "{\"encodedBytes\":236,\"decodedBytes\":12288,\"cacheBytes\":0,\"allocations\":2,\"inFlight\":0,\"peakDecodedBytes\":12288,\"deferredDraws\":0,\"drawEstimateMs\":0.25}",
+            "data-ww-safety": "{\"stopped\":\"\",\"issues\":[]}",
+            "style": "--ww-decoration-z: 1; --ww-decoration-clip: path('M0 0h196v70h-196ZM0 206h196v58h-196ZM0 358h196v402h-196ZM0 315h4v43h-4ZM172 315h24v43h-24ZM0 264h4v51h-4ZM172 264h24v51h-24ZM0 163h4v43h-4ZM172 163h24v43h-24ZM0 120h4v43h-4ZM172 120h24v43h-24ZM0 70h4v50h-4ZM172 70h24v50h-24ZM772 0h328v760h-328ZM200 182h568v143.5h-568Z');"
+          }
+        ]
+      ]
+    },
+    {
+      "at": 538212.637,
+      "rows": [
+        [
+          "DIV",
+          {
+            "id": "web-world-themes-decorations",
+            "data-ww-media-stats": "{\"encodedBytes\":236,\"decodedBytes\":12288,\"cacheBytes\":0,\"allocations\":2,\"inFlight\":0,\"peakDecodedBytes\":12288,\"deferredDraws\":0,\"drawEstimateMs\":0.25}",
+            "data-ww-safety": "{\"stopped\":\"\",\"issues\":[]}",
+            "style": "--ww-decoration-z: 1; --ww-decoration-clip: path('M0 0h196v70h-196ZM0 206h196v58h-196ZM0 358h196v402h-196ZM0 315h4v43h-4ZM172 315h24v43h-24ZM0 264h4v51h-4ZM172 264h24v51h-24ZM0 163h4v43h-4ZM172 163h24v43h-24ZM0 120h4v43h-4ZM172 120h24v43h-24ZM0 70h4v50h-4ZM172 70h24v50h-24ZM772 0h328v760h-328ZM200 182h568v143.5h-568Z');"
+          }
+        ]
+      ]
+    },
+    {
+      "at": 538245.431,
+      "rows": [
+        [
+          "DIV",
+          {
+            "__playwright_target__": "",
+            "id": "web-world-themes-decorations",
+            "data-ww-media-stats": "{\"encodedBytes\":236,\"decodedBytes\":12288,\"cacheBytes\":0,\"allocations\":2,\"inFlight\":0,\"peakDecodedBytes\":12288,\"deferredDraws\":0,\"drawEstimateMs\":0.25}",
+            "data-ww-safety": "{\"stopped\":\"\",\"issues\":[]}",
+            "style": "--ww-decoration-z: 1; --ww-decoration-clip: path('M0 0h196v70h-196ZM0 206h196v58h-196ZM0 358h196v402h-196ZM0 315h4v43h-4ZM172 315h24v43h-24ZM0 264h4v51h-4ZM172 264h24v51h-24ZM0 163h4v43h-4ZM172 163h24v43h-24ZM0 120h4v43h-4ZM172 120h24v43h-24ZM0 70h4v50h-4ZM172 70h24v50h-24ZM772 0h328v760h-328ZM200 182h568v143.5h-568Z');"
+          }
+        ]
+      ]
+    },
+    {
+      "at": 538249.519,
+      "rows": [
+        [
+          "DIV",
+          {
+            "id": "web-world-themes-decorations",
+            "data-ww-media-stats": "{\"encodedBytes\":236,\"decodedBytes\":12288,\"cacheBytes\":0,\"allocations\":2,\"inFlight\":0,\"peakDecodedBytes\":12288,\"deferredDraws\":0,\"drawEstimateMs\":0.25}",
+            "data-ww-safety": "{\"stopped\":\"\",\"issues\":[]}",
+            "style": "--ww-decoration-z: 1; --ww-decoration-clip: path('M0 0h196v70h-196ZM0 206h196v58h-196ZM0 358h196v402h-196ZM0 315h4v43h-4ZM172 315h24v43h-24ZM0 264h4v51h-4ZM172 264h24v51h-24ZM0 163h4v43h-4ZM172 163h24v43h-24ZM0 120h4v43h-4ZM172 120h24v43h-24ZM0 70h4v50h-4ZM172 70h24v50h-24ZM772 0h328v760h-328ZM200 182h568v143.5h-568Z');"
+          }
+        ]
+      ]
+    },
+    {
+      "at": 538317.351,
+      "rows": [
+        [
+          "DIV",
+          {
+            "id": "web-world-themes-decorations",
+            "data-ww-media-stats": "{\"encodedBytes\":236,\"decodedBytes\":12288,\"cacheBytes\":0,\"allocations\":2,\"inFlight\":0,\"peakDecodedBytes\":12288,\"deferredDraws\":0,\"drawEstimateMs\":0.25}",
+            "data-ww-safety": "{\"stopped\":\"\",\"issues\":[{\"layerId\":\"image-bd7fd72b-9fef-4786-92a0-40861d614465\",\"surfaceId\":\"player.video\",\"severity\":\"enforced\",\"action\":\"clip\",\"reason\":\"制作ハンドルが本物の操作を奪う位置です。\",\"remedy\":\"保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。\"}]}",
+            "style": "--ww-decoration-z: 1; --ww-decoration-clip: path('M0 0h196v70h-196ZM0 206h196v58h-196ZM0 358h196v402h-196ZM0 315h4v43h-4ZM172 315h24v43h-24ZM0 264h4v51h-4ZM172 264h24v51h-24ZM0 163h4v43h-4ZM172 163h24v43h-24ZM0 120h4v43h-4ZM172 120h24v43h-24ZM0 70h4v50h-4ZM172 70h24v50h-24ZM772 0h328v760h-328ZM200 54.25h568v143.5h-568Z');"
+          }
+        ]
+      ]
+    }
+  ]
+}

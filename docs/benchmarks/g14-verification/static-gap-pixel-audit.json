@@ -1,0 +1,18 @@
+{
+  "image": "perf-gap-failed.png",
+  "sha256": "b8d68efb99ed3f2213f3f3c07e3452b60d7d25b16b879891ec4288d197959bcb",
+  "region": {
+    "x": 1364,
+    "y": 414,
+    "width": 8,
+    "height": 64
+  },
+  "pixels": 512,
+  "colors": [
+    {
+      "rgba": [255, 255, 255, 255],
+      "count": 512
+    }
+  ],
+  "center": [255, 255, 255, 255]
+}

@@ -1,0 +1,1907 @@
+{
+  "rawArtifact": {
+    "file": "visual-raw.json.gz",
+    "sha256": "b81cbfb52548d3ae428c02f1b93d605c9e9d94e55b846e7d3d94bf7751192ad4",
+    "bytes": 32554
+  },
+  "runs": [
+    {
+      "label": "after",
+      "browser": "153.0.8010.12",
+      "at": 11099,
+      "noInputSince": 8052.5,
+      "hidden": false,
+      "clip": "path('M0 0h12v1000h-12ZM1016 0h364v1000h-364ZM1428 0h12v1000h-12Z')",
+      "safety": {
+        "stopped": "",
+        "issues": [
+          {
+            "layerId": "g14",
+            "surfaceId": "player.controls.bottom",
+            "severity": "enforced",
+            "action": "clip",
+            "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+            "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+          },
+          {
+            "layerId": "g14-row",
+            "surfaceId": "player.controls.bottom",
+            "severity": "enforced",
+            "action": "clip",
+            "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+            "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+          }
+        ]
+      },
+      "layers": [
+        {
+          "host": "web-world-themes-decorations",
+          "id": "g14",
+          "rect": {
+            "x": 226.109375,
+            "y": 220,
+            "width": 220,
+            "height": 160,
+            "top": 220,
+            "right": 446.109375,
+            "bottom": 380,
+            "left": 226.109375
+          },
+          "visibility": "visible",
+          "opacity": "1",
+          "clip": "path(\"M 0 0 H 12 V 1000 H 0 Z M 1016 0 H 1380 V 1000 H 1016 Z M 1428 0 H 1440 V 1000 H 1428 Z\")",
+          "nodeClip": "none"
+        },
+        {
+          "host": "web-world-themes-decorations",
+          "id": "g14-row",
+          "rect": {
+            "x": 680,
+            "y": 655,
+            "width": 360,
+            "height": 90,
+            "top": 655,
+            "right": 1040,
+            "bottom": 745,
+            "left": 680
+          },
+          "visibility": "visible",
+          "opacity": "1",
+          "clip": "path(\"M 0 0 H 12 V 1000 H 0 Z M 1016 0 H 1380 V 1000 H 1016 Z M 1428 0 H 1440 V 1000 H 1428 Z\")",
+          "nodeClip": "none"
+        }
+      ],
+      "player": {
+        "x": 16,
+        "y": 68,
+        "width": 996,
+        "height": 560.25,
+        "top": 68,
+        "right": 1012,
+        "bottom": 628.25,
+        "left": 16
+      },
+      "nativeViewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "nativePlayer": [
+        {
+          "id": "player.video",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "gesture",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          },
+          "protectedEnvelope": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          },
+          "availability": {
+            "present": true,
+            "visible": true,
+            "disabled": false,
+            "focused": true,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "allow",
+            "input": "native-only"
+          },
+          "compositionCapability": "native-underlay",
+          "scrolls": true
+        },
+        {
+          "id": "player.controls.bottom",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "drag",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          },
+          "protectedEnvelope": {
+            "left": 16,
+            "top": 516.25,
+            "width": 996,
+            "height": 112
+          },
+          "availability": {
+            "present": true,
+            "visible": true,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        },
+        {
+          "id": "player.controls.top",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "click",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          },
+          "protectedEnvelope": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 64
+          },
+          "availability": {
+            "present": true,
+            "visible": true,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        },
+        {
+          "id": "player.seek.0",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "drag",
+          "shape": {
+            "left": 28,
+            "top": 566.25,
+            "width": 972,
+            "height": 6
+          },
+          "protectedEnvelope": {
+            "left": 24,
+            "top": 562.25,
+            "width": 980,
+            "height": 14
+          },
+          "availability": {
+            "present": true,
+            "visible": true,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        },
+        {
+          "id": "player.seek.1",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "drag",
+          "shape": {
+            "left": 28,
+            "top": 566.25,
+            "width": 972,
+            "height": 6
+          },
+          "protectedEnvelope": {
+            "left": 24,
+            "top": 562.25,
+            "width": 980,
+            "height": 14
+          },
+          "availability": {
+            "present": true,
+            "visible": true,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        },
+        {
+          "id": "player.volume.0",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "drag",
+          "shape": {
+            "left": 120,
+            "top": 580.25,
+            "width": 0,
+            "height": 40
+          },
+          "protectedEnvelope": {
+            "left": 116,
+            "top": 576.25,
+            "width": 8,
+            "height": 48
+          },
+          "availability": {
+            "present": true,
+            "visible": false,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        },
+        {
+          "id": "player.volume.1",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "drag",
+          "shape": {
+            "left": 120,
+            "top": 580.25,
+            "width": 0,
+            "height": 40
+          },
+          "protectedEnvelope": {
+            "left": 116,
+            "top": 576.25,
+            "width": 8,
+            "height": 48
+          },
+          "availability": {
+            "present": true,
+            "visible": false,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        }
+      ],
+      "rechecks": []
+    },
+    {
+      "label": "before",
+      "browser": "153.0.8010.12",
+      "at": 9424.29999999702,
+      "noInputSince": 6404.100000008941,
+      "hidden": false,
+      "clip": "path('M0 0h12v1000h-12ZM1016 0h364v1000h-364ZM1428 0h12v1000h-12Z')",
+      "safety": {
+        "stopped": "",
+        "issues": [
+          {
+            "layerId": "g14",
+            "surfaceId": "player.controls.bottom",
+            "severity": "enforced",
+            "action": "clip",
+            "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+            "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+          },
+          {
+            "layerId": "g14-row",
+            "surfaceId": "player.controls.bottom",
+            "severity": "enforced",
+            "action": "clip",
+            "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+            "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+          }
+        ]
+      },
+      "layers": [
+        {
+          "host": "web-world-themes-decorations",
+          "id": "g14",
+          "rect": {
+            "x": 226.109375,
+            "y": 220,
+            "width": 220,
+            "height": 160,
+            "top": 220,
+            "right": 446.109375,
+            "bottom": 380,
+            "left": 226.109375
+          },
+          "visibility": "visible",
+          "opacity": "1",
+          "clip": "path(\"M 0 0 H 12 V 1000 H 0 Z M 1016 0 H 1380 V 1000 H 1016 Z M 1428 0 H 1440 V 1000 H 1428 Z\")",
+          "nodeClip": "none"
+        },
+        {
+          "host": "web-world-themes-decorations",
+          "id": "g14-row",
+          "rect": {
+            "x": 680,
+            "y": 655,
+            "width": 360,
+            "height": 90,
+            "top": 655,
+            "right": 1040,
+            "bottom": 745,
+            "left": 680
+          },
+          "visibility": "visible",
+          "opacity": "1",
+          "clip": "path(\"M 0 0 H 12 V 1000 H 0 Z M 1016 0 H 1380 V 1000 H 1016 Z M 1428 0 H 1440 V 1000 H 1428 Z\")",
+          "nodeClip": "none"
+        }
+      ],
+      "player": {
+        "x": 16,
+        "y": 68,
+        "width": 996,
+        "height": 560.25,
+        "top": 68,
+        "right": 1012,
+        "bottom": 628.25,
+        "left": 16
+      },
+      "nativeViewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "nativePlayer": [
+        {
+          "id": "player.video",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "gesture",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          },
+          "protectedEnvelope": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          },
+          "availability": {
+            "present": true,
+            "visible": true,
+            "disabled": false,
+            "focused": true,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "allow",
+            "input": "native-only"
+          },
+          "compositionCapability": "native-underlay",
+          "scrolls": true
+        },
+        {
+          "id": "player.controls.bottom",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "drag",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          },
+          "protectedEnvelope": {
+            "left": 16,
+            "top": 516.25,
+            "width": 996,
+            "height": 112
+          },
+          "availability": {
+            "present": true,
+            "visible": true,
+            "disabled": false,
+            "focused": true,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        },
+        {
+          "id": "player.controls.top",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "click",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          },
+          "protectedEnvelope": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 64
+          },
+          "availability": {
+            "present": true,
+            "visible": true,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        },
+        {
+          "id": "player.seek.0",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "drag",
+          "shape": {
+            "left": 28,
+            "top": 566.25,
+            "width": 972,
+            "height": 6
+          },
+          "protectedEnvelope": {
+            "left": 24,
+            "top": 562.25,
+            "width": 980,
+            "height": 14
+          },
+          "availability": {
+            "present": true,
+            "visible": true,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        },
+        {
+          "id": "player.seek.1",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "drag",
+          "shape": {
+            "left": 28,
+            "top": 566.25,
+            "width": 972,
+            "height": 6
+          },
+          "protectedEnvelope": {
+            "left": 24,
+            "top": 562.25,
+            "width": 980,
+            "height": 14
+          },
+          "availability": {
+            "present": true,
+            "visible": true,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        },
+        {
+          "id": "player.volume.0",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "drag",
+          "shape": {
+            "left": 120,
+            "top": 580.25,
+            "width": 0,
+            "height": 40
+          },
+          "protectedEnvelope": {
+            "left": 116,
+            "top": 576.25,
+            "width": 8,
+            "height": 48
+          },
+          "availability": {
+            "present": true,
+            "visible": false,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        },
+        {
+          "id": "player.volume.1",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "drag",
+          "shape": {
+            "left": 120,
+            "top": 580.25,
+            "width": 0,
+            "height": 40
+          },
+          "protectedEnvelope": {
+            "left": 116,
+            "top": 576.25,
+            "width": 8,
+            "height": 48
+          },
+          "availability": {
+            "present": true,
+            "visible": false,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        }
+      ],
+      "rechecks": []
+    },
+    {
+      "label": "g12",
+      "browser": "153.0.8010.12",
+      "at": 9593.40000000596,
+      "noInputSince": 6561.70000000298,
+      "hidden": false,
+      "clip": "path('M0 0h12v1000h-12ZM1016 0h364v1000h-364ZM1428 0h12v1000h-12Z')",
+      "safety": {
+        "stopped": "",
+        "issues": [
+          {
+            "layerId": "g14",
+            "surfaceId": "player.controls.bottom",
+            "severity": "enforced",
+            "action": "clip",
+            "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+            "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+          },
+          {
+            "layerId": "g14-row",
+            "surfaceId": "player.controls.bottom",
+            "severity": "enforced",
+            "action": "clip",
+            "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+            "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+          }
+        ]
+      },
+      "layers": [
+        {
+          "host": "web-world-themes-decorations",
+          "id": "g14",
+          "rect": {
+            "x": 226.109375,
+            "y": 220,
+            "width": 220,
+            "height": 160,
+            "top": 220,
+            "right": 446.109375,
+            "bottom": 380,
+            "left": 226.109375
+          },
+          "visibility": "visible",
+          "opacity": "1",
+          "clip": "path(\"M 0 0 H 12 V 1000 H 0 Z M 1016 0 H 1380 V 1000 H 1016 Z M 1428 0 H 1440 V 1000 H 1428 Z\")",
+          "nodeClip": "none"
+        },
+        {
+          "host": "web-world-themes-decorations",
+          "id": "g14-row",
+          "rect": {
+            "x": 680,
+            "y": 655,
+            "width": 360,
+            "height": 90,
+            "top": 655,
+            "right": 1040,
+            "bottom": 745,
+            "left": 680
+          },
+          "visibility": "visible",
+          "opacity": "1",
+          "clip": "path(\"M 0 0 H 12 V 1000 H 0 Z M 1016 0 H 1380 V 1000 H 1016 Z M 1428 0 H 1440 V 1000 H 1428 Z\")",
+          "nodeClip": "none"
+        }
+      ],
+      "player": {
+        "x": 16,
+        "y": 68,
+        "width": 996,
+        "height": 560.25,
+        "top": 68,
+        "right": 1012,
+        "bottom": 628.25,
+        "left": 16
+      },
+      "nativeViewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "nativePlayer": [
+        {
+          "id": "player.video",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "gesture",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          },
+          "protectedEnvelope": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          },
+          "availability": {
+            "present": true,
+            "visible": true,
+            "disabled": false,
+            "focused": true,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "allow",
+            "input": "native-only"
+          },
+          "compositionCapability": "native-underlay",
+          "scrolls": true
+        },
+        {
+          "id": "player.controls.bottom",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "drag",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          },
+          "protectedEnvelope": {
+            "left": 16,
+            "top": 516.25,
+            "width": 996,
+            "height": 112
+          },
+          "availability": {
+            "present": true,
+            "visible": true,
+            "disabled": false,
+            "focused": true,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        },
+        {
+          "id": "player.controls.top",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "click",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          },
+          "protectedEnvelope": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 64
+          },
+          "availability": {
+            "present": true,
+            "visible": true,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        },
+        {
+          "id": "player.seek.0",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "drag",
+          "shape": {
+            "left": 28,
+            "top": 566.25,
+            "width": 972,
+            "height": 6
+          },
+          "protectedEnvelope": {
+            "left": 24,
+            "top": 562.25,
+            "width": 980,
+            "height": 14
+          },
+          "availability": {
+            "present": true,
+            "visible": true,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        },
+        {
+          "id": "player.seek.1",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "drag",
+          "shape": {
+            "left": 28,
+            "top": 566.25,
+            "width": 972,
+            "height": 6
+          },
+          "protectedEnvelope": {
+            "left": 24,
+            "top": 562.25,
+            "width": 980,
+            "height": 14
+          },
+          "availability": {
+            "present": true,
+            "visible": true,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        },
+        {
+          "id": "player.volume.0",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "drag",
+          "shape": {
+            "left": 120,
+            "top": 580.25,
+            "width": 0,
+            "height": 40
+          },
+          "protectedEnvelope": {
+            "left": 116,
+            "top": 576.25,
+            "width": 8,
+            "height": 48
+          },
+          "availability": {
+            "present": true,
+            "visible": false,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        },
+        {
+          "id": "player.volume.1",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "drag",
+          "shape": {
+            "left": 120,
+            "top": 580.25,
+            "width": 0,
+            "height": 40
+          },
+          "protectedEnvelope": {
+            "left": 116,
+            "top": 576.25,
+            "width": 8,
+            "height": 48
+          },
+          "availability": {
+            "present": true,
+            "visible": false,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        }
+      ],
+      "rechecks": []
+    },
+    {
+      "label": "trace",
+      "browser": "153.0.8010.12",
+      "at": 7504.399999991059,
+      "noInputSince": 4476.29999999702,
+      "hidden": false,
+      "clip": "path('M0 0h12v1000h-12ZM951.203125 0h428.796875v1000h-428.796875ZM1428 0h12v1000h-12Z')",
+      "safety": {
+        "stopped": "",
+        "issues": [
+          {
+            "layerId": "g14",
+            "surfaceId": "player.controls.bottom",
+            "severity": "enforced",
+            "action": "clip",
+            "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+            "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+          },
+          {
+            "layerId": "g14-row",
+            "surfaceId": "player.controls.bottom",
+            "severity": "enforced",
+            "action": "clip",
+            "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+            "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+          }
+        ]
+      },
+      "layers": [
+        {
+          "host": "web-world-themes-decorations",
+          "id": "g14",
+          "rect": {
+            "x": 226.109375,
+            "y": 220,
+            "width": 220,
+            "height": 160,
+            "top": 220,
+            "right": 446.109375,
+            "bottom": 380,
+            "left": 226.109375
+          },
+          "visibility": "visible",
+          "opacity": "1",
+          "clip": "path(\"M 0 0 H 12 V 1000 H 0 Z M 951.203 0 H 1380 V 1000 H 951.203 Z M 1428 0 H 1440 V 1000 H 1428 Z\")",
+          "nodeClip": "none"
+        },
+        {
+          "host": "web-world-themes-decorations",
+          "id": "g14-row",
+          "rect": {
+            "x": 680,
+            "y": 655,
+            "width": 360,
+            "height": 90,
+            "top": 655,
+            "right": 1040,
+            "bottom": 745,
+            "left": 680
+          },
+          "visibility": "visible",
+          "opacity": "1",
+          "clip": "path(\"M 0 0 H 12 V 1000 H 0 Z M 951.203 0 H 1380 V 1000 H 951.203 Z M 1428 0 H 1440 V 1000 H 1428 Z\")",
+          "nodeClip": "none"
+        }
+      ],
+      "player": {
+        "x": 16,
+        "y": 68,
+        "width": 931.203125,
+        "height": 523.796875,
+        "top": 68,
+        "right": 947.203125,
+        "bottom": 591.796875,
+        "left": 16
+      },
+      "nativeViewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "nativePlayer": [
+        {
+          "id": "player.video",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "gesture",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 931.203125,
+            "height": 523.796875
+          },
+          "protectedEnvelope": {
+            "left": 16,
+            "top": 68,
+            "width": 931.203125,
+            "height": 523.796875
+          },
+          "availability": {
+            "present": true,
+            "visible": true,
+            "disabled": false,
+            "focused": true,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "allow",
+            "input": "native-only"
+          },
+          "compositionCapability": "native-underlay",
+          "scrolls": true
+        },
+        {
+          "id": "player.controls.bottom",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "drag",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 931.203125,
+            "height": 523.796875
+          },
+          "protectedEnvelope": {
+            "left": 16,
+            "top": 479.796875,
+            "width": 931.203125,
+            "height": 112
+          },
+          "availability": {
+            "present": true,
+            "visible": true,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        },
+        {
+          "id": "player.controls.top",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "click",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 931.203125,
+            "height": 523.796875
+          },
+          "protectedEnvelope": {
+            "left": 16,
+            "top": 68,
+            "width": 931.203125,
+            "height": 64
+          },
+          "availability": {
+            "present": true,
+            "visible": true,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        },
+        {
+          "id": "player.seek.0",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "drag",
+          "shape": {
+            "left": 28,
+            "top": 529.796875,
+            "width": 907,
+            "height": 6
+          },
+          "protectedEnvelope": {
+            "left": 24,
+            "top": 525.796875,
+            "width": 915,
+            "height": 14
+          },
+          "availability": {
+            "present": true,
+            "visible": true,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        },
+        {
+          "id": "player.seek.1",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "drag",
+          "shape": {
+            "left": 28,
+            "top": 529.796875,
+            "width": 907,
+            "height": 6
+          },
+          "protectedEnvelope": {
+            "left": 24,
+            "top": 525.796875,
+            "width": 915,
+            "height": 14
+          },
+          "availability": {
+            "present": true,
+            "visible": true,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        },
+        {
+          "id": "player.volume.0",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "drag",
+          "shape": {
+            "left": 120,
+            "top": 543.796875,
+            "width": 0,
+            "height": 40
+          },
+          "protectedEnvelope": {
+            "left": 116,
+            "top": 539.796875,
+            "width": 8,
+            "height": 48
+          },
+          "availability": {
+            "present": true,
+            "visible": false,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        },
+        {
+          "id": "player.volume.1",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "drag",
+          "shape": {
+            "left": 120,
+            "top": 543.796875,
+            "width": 0,
+            "height": 40
+          },
+          "protectedEnvelope": {
+            "left": 116,
+            "top": 539.796875,
+            "width": 8,
+            "height": 48
+          },
+          "availability": {
+            "present": true,
+            "visible": false,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        }
+      ],
+      "rechecks": []
+    },
+    {
+      "label": "record",
+      "browser": "153.0.8010.12",
+      "at": 12285,
+      "noInputSince": 6260,
+      "hidden": false,
+      "clip": "path('M0 0h12v1000h-12ZM1016 0h364v1000h-364ZM1428 0h12v1000h-12Z')",
+      "safety": {
+        "stopped": "",
+        "issues": [
+          {
+            "layerId": "g14",
+            "surfaceId": "player.controls.bottom",
+            "severity": "enforced",
+            "action": "clip",
+            "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+            "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+          },
+          {
+            "layerId": "g14-row",
+            "surfaceId": "player.controls.bottom",
+            "severity": "enforced",
+            "action": "clip",
+            "reason": "操作面の前面を覆う部分をクリップしました。影・ぼかしの範囲も含みます。",
+            "remedy": "保護範囲の外へ位置・大きさを変えてください。映像上の非操作描画にはプレイヤー基準を使えます。"
+          }
+        ]
+      },
+      "layers": [
+        {
+          "host": "web-world-themes-decorations",
+          "id": "g14",
+          "rect": {
+            "x": 226.109375,
+            "y": 220,
+            "width": 220,
+            "height": 160,
+            "top": 220,
+            "right": 446.109375,
+            "bottom": 380,
+            "left": 226.109375
+          },
+          "visibility": "visible",
+          "opacity": "1",
+          "clip": "path(\"M 0 0 H 12 V 1000 H 0 Z M 1016 0 H 1380 V 1000 H 1016 Z M 1428 0 H 1440 V 1000 H 1428 Z\")",
+          "nodeClip": "none"
+        },
+        {
+          "host": "web-world-themes-decorations",
+          "id": "g14-row",
+          "rect": {
+            "x": 680,
+            "y": 655,
+            "width": 360,
+            "height": 90,
+            "top": 655,
+            "right": 1040,
+            "bottom": 745,
+            "left": 680
+          },
+          "visibility": "visible",
+          "opacity": "1",
+          "clip": "path(\"M 0 0 H 12 V 1000 H 0 Z M 1016 0 H 1380 V 1000 H 1016 Z M 1428 0 H 1440 V 1000 H 1428 Z\")",
+          "nodeClip": "none"
+        }
+      ],
+      "player": {
+        "x": 16,
+        "y": 68,
+        "width": 996,
+        "height": 560.25,
+        "top": 68,
+        "right": 1012,
+        "bottom": 628.25,
+        "left": 16
+      },
+      "nativeViewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "nativePlayer": [
+        {
+          "id": "player.video",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "gesture",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          },
+          "protectedEnvelope": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          },
+          "availability": {
+            "present": true,
+            "visible": true,
+            "disabled": false,
+            "focused": true,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "allow",
+            "input": "native-only"
+          },
+          "compositionCapability": "native-underlay",
+          "scrolls": true
+        },
+        {
+          "id": "player.controls.bottom",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "drag",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          },
+          "protectedEnvelope": {
+            "left": 16,
+            "top": 516.25,
+            "width": 996,
+            "height": 112
+          },
+          "availability": {
+            "present": true,
+            "visible": true,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        },
+        {
+          "id": "player.controls.top",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "click",
+          "shape": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 560.25
+          },
+          "protectedEnvelope": {
+            "left": 16,
+            "top": 68,
+            "width": 996,
+            "height": 64
+          },
+          "availability": {
+            "present": true,
+            "visible": true,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        },
+        {
+          "id": "player.seek.0",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "drag",
+          "shape": {
+            "left": 28,
+            "top": 566.25,
+            "width": 972,
+            "height": 6
+          },
+          "protectedEnvelope": {
+            "left": 24,
+            "top": 562.25,
+            "width": 980,
+            "height": 14
+          },
+          "availability": {
+            "present": true,
+            "visible": true,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        },
+        {
+          "id": "player.seek.1",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "drag",
+          "shape": {
+            "left": 28,
+            "top": 566.25,
+            "width": 972,
+            "height": 6
+          },
+          "protectedEnvelope": {
+            "left": 24,
+            "top": 562.25,
+            "width": 980,
+            "height": 14
+          },
+          "availability": {
+            "present": true,
+            "visible": true,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        },
+        {
+          "id": "player.volume.0",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "drag",
+          "shape": {
+            "left": 120,
+            "top": 580.25,
+            "width": 0,
+            "height": 40
+          },
+          "protectedEnvelope": {
+            "left": 116,
+            "top": 576.25,
+            "width": 8,
+            "height": 48
+          },
+          "availability": {
+            "present": true,
+            "visible": false,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        },
+        {
+          "id": "player.volume.1",
+          "owner": "native",
+          "generation": {
+            "documentId": 1,
+            "geometry": 1
+          },
+          "kind": "drag",
+          "shape": {
+            "left": 120,
+            "top": 580.25,
+            "width": 0,
+            "height": 40
+          },
+          "protectedEnvelope": {
+            "left": 116,
+            "top": 576.25,
+            "width": 8,
+            "height": 48
+          },
+          "availability": {
+            "present": true,
+            "visible": false,
+            "disabled": false,
+            "focused": false,
+            "editing": false,
+            "dragging": false,
+            "captured": false
+          },
+          "policy": {
+            "transform": "fixed-plane",
+            "occlusion": "forbid",
+            "input": "native-only"
+          },
+          "compositionCapability": "exclusion",
+          "scrolls": true
+        }
+      ],
+      "rechecks": [
+        {
+          "at": 6646.70000000298,
+          "ms": 5.200000002980232,
+          "options": {
+            "coalesce": true
+          },
+          "generation": {
+            "documentId": 1,
+            "geometry": 8,
+            "layout": 8
+          },
+          "stack": "Error\n    at source.capture (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:4746:21)\n    at recheck (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:55750:27)"
+        },
+        {
+          "at": 7069.600000008941,
+          "ms": 3.0999999940395355,
+          "options": {
+            "coalesce": true
+          },
+          "generation": {
+            "documentId": 1,
+            "geometry": 8,
+            "layout": 8
+          },
+          "stack": "Error\n    at source.capture (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:4746:21)\n    at recheck (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:55750:27)"
+        },
+        {
+          "at": 7493.5,
+          "ms": 4.300000011920929,
+          "options": {
+            "coalesce": true
+          },
+          "generation": {
+            "documentId": 1,
+            "geometry": 8,
+            "layout": 8
+          },
+          "stack": "Error\n    at source.capture (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:4746:21)\n    at recheck (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:55750:27)"
+        },
+        {
+          "at": 7912,
+          "ms": 2.9000000059604645,
+          "options": {
+            "coalesce": true
+          },
+          "generation": {
+            "documentId": 1,
+            "geometry": 8,
+            "layout": 8
+          },
+          "stack": "Error\n    at source.capture (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:4746:21)\n    at recheck (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:55750:27)"
+        },
+        {
+          "at": 8342.70000000298,
+          "ms": 3.9000000059604645,
+          "options": {
+            "coalesce": true
+          },
+          "generation": {
+            "documentId": 1,
+            "geometry": 8,
+            "layout": 8
+          },
+          "stack": "Error\n    at source.capture (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:4746:21)\n    at recheck (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:55750:27)"
+        },
+        {
+          "at": 8766.70000000298,
+          "ms": 3.6000000089406967,
+          "options": {
+            "coalesce": true
+          },
+          "generation": {
+            "documentId": 1,
+            "geometry": 8,
+            "layout": 8
+          },
+          "stack": "Error\n    at source.capture (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:4746:21)\n    at recheck (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:55750:27)"
+        },
+        {
+          "at": 9193.60000000894,
+          "ms": 4.5999999940395355,
+          "options": {
+            "coalesce": true
+          },
+          "generation": {
+            "documentId": 1,
+            "geometry": 8,
+            "layout": 8
+          },
+          "stack": "Error\n    at source.capture (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:4746:21)\n    at recheck (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:55750:27)"
+        },
+        {
+          "at": 9625.20000000298,
+          "ms": 1.6000000089406967,
+          "options": {
+            "coalesce": true
+          },
+          "generation": {
+            "documentId": 1,
+            "geometry": 8,
+            "layout": 8
+          },
+          "stack": "Error\n    at source.capture (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:4746:21)\n    at recheck (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:55750:27)"
+        },
+        {
+          "at": 10041.70000000298,
+          "ms": 3.2000000029802322,
+          "options": {
+            "coalesce": true
+          },
+          "generation": {
+            "documentId": 1,
+            "geometry": 8,
+            "layout": 8
+          },
+          "stack": "Error\n    at source.capture (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:4746:21)\n    at recheck (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:55750:27)"
+        },
+        {
+          "at": 10476,
+          "ms": 6.200000002980232,
+          "options": {
+            "coalesce": true
+          },
+          "generation": {
+            "documentId": 1,
+            "geometry": 8,
+            "layout": 8
+          },
+          "stack": "Error\n    at source.capture (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:4746:21)\n    at recheck (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:55750:27)"
+        },
+        {
+          "at": 10894,
+          "ms": 6.100000008940697,
+          "options": {
+            "coalesce": true
+          },
+          "generation": {
+            "documentId": 1,
+            "geometry": 8,
+            "layout": 8
+          },
+          "stack": "Error\n    at source.capture (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:4746:21)\n    at recheck (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:55750:27)"
+        },
+        {
+          "at": 11318.5,
+          "ms": 5.300000011920929,
+          "options": {
+            "coalesce": true
+          },
+          "generation": {
+            "documentId": 1,
+            "geometry": 8,
+            "layout": 8
+          },
+          "stack": "Error\n    at source.capture (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:4746:21)\n    at recheck (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:55750:27)"
+        },
+        {
+          "at": 11745.800000011921,
+          "ms": 3.2999999970197678,
+          "options": {
+            "coalesce": true
+          },
+          "generation": {
+            "documentId": 1,
+            "geometry": 8,
+            "layout": 8
+          },
+          "stack": "Error\n    at source.capture (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:4746:21)\n    at recheck (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:55750:27)"
+        },
+        {
+          "at": 12162.5,
+          "ms": 2.5,
+          "options": {
+            "coalesce": true
+          },
+          "generation": {
+            "documentId": 1,
+            "geometry": 8,
+            "layout": 8
+          },
+          "stack": "Error\n    at source.capture (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:4746:21)\n    at recheck (chrome-extension://nbcpilhpggfdfekplnngnanfonpkafag/content/index.js:55750:27)"
+        }
+      ]
+    }
+  ]
+}

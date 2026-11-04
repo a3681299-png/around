@@ -1,0 +1,41 @@
+{
+  "none": {
+    "reads": 0,
+    "invalidations": []
+  },
+  "transparent": {
+    "reads": 0,
+    "invalidations": []
+  },
+  "stopped": {
+    "reads": 0,
+    "invalidations": [
+      {
+        "at": 404.5,
+        "hide": false
+      }
+    ]
+  },
+  "hidden": {
+    "reads": 0,
+    "invalidations": []
+  },
+  "hiddenLater": {
+    "reads": 0,
+    "invalidations": []
+  },
+  "shown": {
+    "reads": 3,
+    "invalidations": []
+  },
+  "moved": {
+    "reads": 1,
+    "invalidations": [
+      {
+        "at": 414.90000000596046,
+        "hide": true
+      }
+    ]
+  },
+  "movedAt": 9352.60000000894
+}
