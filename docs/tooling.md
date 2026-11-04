@@ -139,7 +139,16 @@ node scripts/clean-work.mjs
 - worktree は外さない（手で実行したときだけ）
 - CI と、`WW_CLEAN_WORK=0` を付けたときは動かない
 
-### 2026-11-04 の dry-run（まだ消していない）
+### 2026-11-04 の整理（実行済み）
+
+dry-run の一覧を翔太が確かめてから実行した。実行後の `.work` は 7.6GB（426 個）、worktree は比べる基準の2つだけ。実行の記録は `.work/g13fix-evidence/clean-run.txt`。
+
+`main-base`（`6721ce4`）と `ui0d3-base`（`32609a4`）は、未コミットの変更をパッチに残してから外した（翔太の決定）。どちらのパッチも、元のコミットの上で `git apply --check` が通ることを確かめた。
+
+- `.work/main-base-6721ce4-uncommitted.patch`：`tests/fixtures.ts`・`tests/live-youtube.spec.ts`・`tests/model-live.spec.ts`・`tests/signal-motion-live.spec.ts`・`tests/studio-workspace-live.spec.ts`・`tests/vrm-live.spec.ts` の変更と、未追跡だった `tests/helpers/youtube-live.ts`・`tests/helpers/youtube-theater.ts`
+- `.work/ui0d3-base-32609a4-uncommitted.patch`：`tests/side-panel.spec.ts`・`tests/signal-timeline-live.spec.ts` の変更
+
+#### 実行前の dry-run
 
 worktree は比べる基準の2つ（`g13-g12head`＝`4d3f39b`・`g13-before`＝`557b978`）だけを残す規則にしてから取り直した。結果は `.work/g13fix-evidence/clean-dry-run.txt`・`.work/clean-work-plan.txt`。
 
@@ -151,4 +160,4 @@ worktree は比べる基準の2つ（`g13-g12head`＝`4d3f39b`・`g13-before`＝
 | 残す          | 432 個                                                                                                                                    | 8.55 GB      |
 | 空く          |                                                                                                                                           | **45.85 GB** |
 
-残すものの内訳：docs などが名前を出しているもの 93 個・4.39GB、各仲間の新しい3回分 278 個・1.84GB、最近書かれたもの 46 個・0.49GB、比べる基準の worktree 2 個・0.34GB。`main-base`（0.81GB）と `ui0d3-base`（0.19GB）は、テストのファイルに未コミットの変更があるので「使用中」として残る（消すと変更が失われる。扱いは翔太が決める）。
+残すものの内訳：docs などが名前を出しているもの 93 個・4.39GB、各仲間の新しい3回分 278 個・1.84GB、最近書かれたもの 46 個・0.49GB、比べる基準の worktree 2 個・0.34GB。`main-base`（0.81GB）と `ui0d3-base`（0.19GB）は、テストのファイルに未コミットの変更があるので「使用中」として残った（上のとおり、パッチに残してから手で外した）。
