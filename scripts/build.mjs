@@ -17,6 +17,10 @@ if (pageChangeProbe && !outputName.startsWith('.work/'))
 // Logs why an input check stopped drawing (expected and actual click target); src/host/guard-trace.ts.
 const guardTrace = process.env.WW_GUARD_TRACE === '1';
 if (guardTrace && !outputName.startsWith('.work/')) throw new Error('Development guard traces must stay inside .work.');
+// Breaks the guard on purpose: no idle recheck of drawn artwork (G1.4), to see its tests fail.
+const noIdleRecheck = process.env.WW_NO_IDLE_RECHECK === '1';
+if (noIdleRecheck && !outputName.startsWith('.work/'))
+  throw new Error('Builds without the idle recheck must stay inside .work.');
 const watching = process.argv.includes('--watch');
 const worldMode = process.env.WW_WORLD_MODE ?? 'runtime';
 if (!['legacy', 'compare', 'runtime'].includes(worldMode))
@@ -92,7 +96,11 @@ const shared = {
   charset: 'utf8',
   legalComments: 'none',
   logLevel: 'info',
-  dropLabels: [...(pageChangeProbe ? [] : ['WW_TEST_PAGE_CHANGE']), ...(guardTrace ? [] : ['WW_GUARD_TRACE'])],
+  dropLabels: [
+    ...(pageChangeProbe ? [] : ['WW_TEST_PAGE_CHANGE']),
+    ...(guardTrace ? [] : ['WW_GUARD_TRACE']),
+    ...(noIdleRecheck ? ['WW_IDLE_RECHECK'] : []),
+  ],
   define: {
     __WW_PAGE_CHANGE_LEGACY__: String(pageChangeProbe && process.env.WW_PAGE_CHANGE_LEGACY === '1'),
     __WW_WORLD_MODE__: JSON.stringify(worldMode),

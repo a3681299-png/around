@@ -164,7 +164,39 @@ export function createOperationGuardHost(
   let overlayHost: HTMLElement | undefined,
     lastStatus = '',
     timer: number | undefined,
-    holdTimer: number | undefined;
+    holdTimer: number | undefined,
+    recheckTimer: number | undefined,
+    /** The last commit left some artwork drawn: a layer not stopped and not fully transparent. */
+    shownArt = false;
+  const cancelRecheck = () => {
+    if (recheckTimer !== undefined) view.clearTimeout(recheckTimer);
+    recheckTimer = undefined;
+  };
+  /** Artwork drawn from a read stays on screen until the next redraw, which may not come (it can
+   * follow the pointer only): a control that moved with no mutation stayed under it for over a
+   * second (G1.4, docs/g13-bound2-verification.md). So when the read's trust runs out, the guard
+   * reads the page itself, which checks every group (TRUST_MS); a moved control hides the artwork
+   * and redraws it with the new cut-outs. Nothing moved: no redraw, only the next recheck. Only
+   * while artwork is drawn and the tab is in front; nothing is scheduled otherwise.
+   * One timer at most: the oldest check never goes back, so a timer already set fires no later
+   * than the trust runs out, and a frame that read the page meanwhile only moves it on. */
+  const scheduleRecheck = () => {
+    if (recheckTimer !== undefined || !active || !enabled || !shownArt || doc.hidden) return;
+    const wait = source.trustExpiresIn();
+    if (wait === undefined) return;
+    // The trust runs out strictly past TRUST_MS (the source compares with `>`).
+    recheckTimer = view.setTimeout(recheck, Math.ceil(wait) + 1);
+  };
+  const recheck = () => {
+    recheckTimer = undefined;
+    if (!active || !enabled || !shownArt || doc.hidden) return;
+    if ((source.trustExpiresIn() ?? 0) > 0) return scheduleRecheck();
+    const drawn = surfaces.generation.geometry;
+    // A held read (a burst still arriving) has its own timer and hides the artwork already.
+    const read = source.capture({ coalesce: true });
+    if (read.generation.geometry !== drawn) return invalidate(true);
+    scheduleRecheck();
+  };
   const latched = () => failures >= 3 || latchedLayers.size > 0;
   /** The issues without the guard's own stop entries (all, or those with this reason). A stop that
    * ends keeps the layers' restrictions until the next paint recomputes them: an empty list in
@@ -338,6 +370,8 @@ export function createOperationGuardHost(
       lastActivity = view.performance.now();
       before = point = pressed = undefined;
       interacting = keyed = false;
+      // A tab at the back is rechecked by its first read when it comes back (G1.3), not idly.
+      if (doc.hidden) cancelRecheck();
       return;
     }
     lastActivity = view.performance.now();
@@ -458,6 +492,7 @@ export function createOperationGuardHost(
       if (holdTimer !== undefined) view.clearTimeout(holdTimer);
       holdTimer = undefined;
       timer = undefined;
+      cancelRecheck();
       if (value) {
         events.forEach((type) => doc.addEventListener(type, activity, { capture: true, passive: true }));
         doc.addEventListener('scroll', changed, { capture: true, passive: true });
@@ -664,9 +699,13 @@ export function createOperationGuardHost(
       // stop at an identity check instead of serialising every frame (G1.3, c3).
       if (sameIssues(previousIssues, issues)) issues = previousIssues;
       publish();
-      return new Set(
+      const blocked = new Set(
         issues.filter((i) => i.severity === 'enforced' && (!i.action || i.action === 'stop')).map((i) => i.layerId),
       );
+      shownArt = next.some((p) => p.opacity > 0 && !blocked.has(p.id));
+      if (!shownArt) cancelRecheck();
+      WW_IDLE_RECHECK: scheduleRecheck();
+      return blocked;
     },
     snapshot,
     subscribe(listener) {
@@ -708,6 +747,7 @@ export function createOperationGuardHost(
     destroy() {
       unsubscribeSource();
       active = false;
+      cancelRecheck();
       if (timer !== undefined) view.clearTimeout(timer);
       if (holdTimer !== undefined) view.clearTimeout(holdTimer);
       holdTimer = undefined;

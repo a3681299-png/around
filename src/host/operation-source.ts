@@ -80,6 +80,11 @@ export interface OperationSource {
   deferredFor(): number;
   /** Milliseconds until a pending change of any kind is read again. */
   settlesIn(): number;
+  /** Milliseconds until the last read is no longer trusted without checking every group (TRUST_MS
+   * after the oldest group's check), 0 once it is past; undefined before the first read. A read
+   * past it checks the page, so artwork drawn from it is rechecked then even if nothing redraws
+   * (G1.4). */
+  trustExpiresIn(): number | undefined;
   /** The kind of change since the last read. */
   pending(): PendingChange;
   /** While only looks changed: the envelopes of those controls, where they are now. */
@@ -858,6 +863,8 @@ export function createOperationSource(
       return pending === 'layout' ? settlesIn() : 0;
     },
     settlesIn,
+    trustExpiresIn: () =>
+      cached ? Math.max(0, answer.oldest() + TRUST_MS - doc.defaultView!.performance.now()) : undefined,
     pending: () => (dirty ? pending : 'none'),
     lookRegions() {
       if (pending !== 'look' || !cached) return [];
