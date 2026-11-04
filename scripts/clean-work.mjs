@@ -5,8 +5,8 @@
 //
 // Rules, in order: the Playwright browsers (.work/browsers), patches (*.patch), anything the docs,
 // scripts or tests name as .work/<name>, and anything with a file written in the last 12 hours are
-// kept. A worktree is kept when it is in use (a tracked change, locked, or this checkout) or is a
-// comparison base (KEEP_WORKTREES); any other is removed, by a manual run only. Every other output is grouped into a family (its name up to
+// kept. A worktree is kept when it is in use (a tracked change, locked, or this checkout), has a
+// branch checked out, or is a comparison base (KEEP_WORKTREES); any other is removed, by a manual run only. Every other output is grouped into a family (its name up to
 // the first "-", "_" or ".", such as g13r0 for g13r0-trace) and each family keeps its newest
 // three. Folders of browser profiles (*-profiles) are sorted the same way one level down.
 //
@@ -36,8 +36,11 @@ export function decide(entries, { now, keep = KEEP_PER_FAMILY, recentMs = RECENT
     const set = (action, reason) => decisions.set(e.name, { ...e, action, reason });
     // A worktree is judged apart: docs name old ones as the place a result came from, which the
     // commit recorded with it already identifies, so only the comparison bases stay.
+    // One with a branch checked out is someone's working checkout (run from the main checkout,
+    // creator-editor is not "this checkout"); only detached ones are verification copies.
     if (e.kind === 'worktree')
       if (e.inUse) set('keep', 'worktree in use');
+      else if (e.branch) set('keep', 'worktree on a branch');
       else if (KEEP_WORKTREES.includes(e.name)) set('keep', 'comparison base');
       else if (automatic) set('keep', 'worktree (manual only)');
       else set('remove-worktree', 'unused');
@@ -120,6 +123,7 @@ function worktrees(root, work) {
   for (const line of git(root, ['worktree', 'list', '--porcelain']).split('\n')) {
     if (line.startsWith('worktree ')) rows.push((current = { path: path.resolve(line.slice(9)), locked: false }));
     else if (line.startsWith('locked') && current) current.locked = true;
+    else if (line.startsWith('branch ') && current) current.branch = line.slice(7).replace(/^refs\/heads\//, '');
   }
   const own = path.resolve(root);
   return new Map(
@@ -132,7 +136,10 @@ function worktrees(root, work) {
         } catch {}
         return [
           path.basename(row.path),
-          { inUse: row.locked || changed || row.path.toLowerCase() === own.toLowerCase() },
+          {
+            inUse: row.locked || changed || row.path.toLowerCase() === own.toLowerCase(),
+            ...(row.branch ? { branch: row.branch } : {}),
+          },
         ];
       }),
   );

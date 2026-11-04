@@ -84,6 +84,20 @@ test('worktrees are removed through git only when unused, and never by the autom
   });
 });
 
+test('a worktree with a branch checked out is kept, even run from another checkout and in the automatic clean-up', () => {
+  // The main checkout's .work holds the working checkout on its branch (creator-editor) beside
+  // the verifier's detached ones; run from main, none of them is "this checkout".
+  const worktrees = [
+    entry('creator-editor', 100, { kind: 'worktree', inUse: false, branch: 'codex/creator-editor-spike' }),
+    entry('g13-fix-verify', 100, { kind: 'worktree', inUse: false }),
+  ];
+  expect(run(worktrees)).toEqual({
+    'creator-editor': 'keep:worktree on a branch',
+    'g13-fix-verify': 'remove-worktree:unused',
+  });
+  expect(run(worktrees, { automatic: true })['creator-editor']).toBe('keep:worktree on a branch');
+});
+
 test('only the comparison bases are kept among unused worktrees, even when docs name the others or they are recent', () => {
   const result = run(
     [
