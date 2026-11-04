@@ -229,7 +229,7 @@ test('three images group, move as one, share a mouse/video mask, save, restart a
   await save(panel);
   const saved = await stored(popup);
   expect(saved).toMatchObject({
-    schemaVersion: 13,
+    schemaVersion: 14,
     groups: [{ name: '海の世界', effects: [{ radiusPx: 120, featherPx: 25 }] }],
   });
   expect(saved.decorations).toHaveLength(3);

@@ -110,7 +110,7 @@ for (const [extension, format] of [
     await save(panel);
     const saved = await stored(popup);
     expect(saved).toMatchObject({
-      schemaVersion: 13,
+      schemaVersion: 14,
       decorations: [
         {
           kind: 'animation',

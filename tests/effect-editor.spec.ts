@@ -168,7 +168,7 @@ test('effect edits survive undo, redo, discard, tab sync, reload and a persisten
   await save(panel);
   const saved = await stored(popup);
   expect(saved).toMatchObject({
-    schemaVersion: 13,
+    schemaVersion: 14,
     decorations: [{ effects: [{ kind: 'mask', radiusPx: 130, featherPx: 25, intensity: 0.65 }] }],
   });
   for (let i = 0; i < 8; i++) await youtube.mouse.move(200 + i * 20, 300);
