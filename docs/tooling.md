@@ -98,6 +98,8 @@ Signal Timelineの性能比較テストは、整形済みのJavaScriptを基準�
 ### そのほか
 
 - グローバルの `~/.claude/CLAUDE.md` の環境の行を、「Claude Code が動くのはノートPC（Intel i7-13650HX）。デスクトップは Ryzen 5 5600X だが Claude Code は使わない」に直した（リポジトリの外）
+- コミットメッセージには、本文も含めて CI を飛ばす指示の文字を、説明のつもりでも書かない。GitHub は本文のどこかにあれば CI を飛ばす（2026-11-04、本文で前のコミットのことを説明しただけの空のコミットで CI が起動しなかった）
+- worktree は必ず `scripts/clean-work.mjs` で外す。worktree の `node_modules` がこのチェックアウトの `node_modules` へのジャンクションのことがあり、手で `git worktree remove --force` を使うと中までたどって消す（2026-11-04、creator-editor の `node_modules` が空になり、`npm ci` で入れ直した）
 
 ## .work の整理（2026-11-03）
 
