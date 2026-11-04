@@ -6,7 +6,6 @@ import {
   traceGeometryRead,
   traceMissedInput,
   traceMovedInput,
-  traceReplace,
   traceSkipSweep,
   traceSubtreeCheck,
   traceSweep,
@@ -38,6 +37,14 @@ const ANSWER_CHECK_MS = COALESCE_MS;
 const SWEEP_GROUPS = 6;
 /** Reads less than this apart belong to one frame (they share one group's check). */
 const SWEEP_FRAME_MS = 8;
+/** A round advances by time, not by reads: at least one group per read, and as many as two frames
+ * a group have come due, so a round ends in SWEEP_GROUPS × this however seldom the page is read. */
+const SWEEP_GROUP_MS = 2 * 17;
+/** How old the last check of the whole page (a whole read, or a finished round of groups) may be
+ * for a read to be shifted and trusted: the window, then a round. A control that moves without any
+ * mutation is found within it; past it (a quiet spell, sparse reads), every group still unchecked
+ * is checked in that read before the shifted read is used (G1.3 verification). */
+const TRUST_MS = ANSWER_CHECK_MS + SWEEP_GROUPS * SWEEP_GROUP_MS;
 /** Sticky columns are read as unbounded boxes (±1e7); they never move with a page scroll. */
 const UNBOUNDED_BOX = 1e6;
 /** Document coordinates are compared at 1/100 px, below any rounding a scroll can introduce. */
@@ -113,9 +120,6 @@ export function createOperationSource(
   /** The adapter's candidate test for an inserted subtree (the same selectors its incremental
    * discovery uses). Without it, every element added or removed is a layout change. */
   holdsCandidate?: (root: Element, deep?: boolean) => boolean,
-  /** The adapter's group for a control (D14): where a control resized by its own look can have
-   * moved others. Without it, the element whose class or style changed. */
-  groupOf?: (element: Element) => Element | undefined,
 ): OperationSource {
   if (!documentIds.has(doc)) documentIds.set(doc, ++nextDocumentId);
   const documentId = documentIds.get(doc)!;
@@ -140,6 +144,9 @@ export function createOperationSource(
     lastFullScan = -Infinity,
     forced = false,
     capturedAt = -Infinity,
+    // The last check of the whole page: a whole read, or a round of the answer check with no
+    // difference. Unlike `capturedAt` it does not move the coalescing window.
+    checkedAt = -Infinity,
     deferredUntil = 0;
   const added = new Set<Element>(),
     touched = new Set<Element>();
@@ -248,26 +255,26 @@ export function createOperationSource(
   /** True when every one of these read controls is where the last read put it (moved only by the
    * page scroll since), as large, shown or hidden and enabled or disabled as it was, and is cut
    * from the clip rather than drawn above the artwork (an order a box cannot show). */
-  const unchanged = (elements: readonly HTMLElement[]) => elements.every((element) => compare(element) === 'same');
-  /** One read control against the last read: 'same'; 'box' when only its box changed (it is shown,
-   * enabled or disabled, and cut from the clip as before); 'other' for anything a box cannot
-   * replace (shown or hidden, enabled or disabled, drawn above the artwork, gone). The box read is
-   * left in `boxes` for a replacement (D14). */
-  const boxes = new Map<Element, DOMRect>();
-  const compare = (element: HTMLElement, cutOnly = true): 'same' | 'box' | 'other' => {
+  const unchanged = (elements: readonly HTMLElement[], cutOnly = true) =>
+    elements.every((element) => same(element, cutOnly));
+  /** One read control against the last read: where the read put it (moved only by the page scroll
+   * since), as large, shown or hidden and enabled or disabled as it was. `cutOnly`: it must also be
+   * cut from the clip rather than drawn above the artwork, an order a box cannot show. A resized
+   * control is not "the same": a resize can push controls anywhere else on the page, which only a
+   * whole read sees (the D14① replacement exposed such a control and was removed). */
+  const same = (element: HTMLElement, cutOnly = true) => {
     const view = doc.defaultView!,
       dx = view.scrollX - (cached?.scroll?.x ?? view.scrollX),
       dy = view.scrollY - (cached?.scroll?.y ?? view.scrollY);
     const read = readRows.get(element);
-    if (!read || (cutOnly && read.some((entry) => !entry.plain)) || !element.isConnected) return 'other';
+    if (!read || (cutOnly && read.some((entry) => !entry.plain)) || !element.isConnected) return false;
     const box = element.getBoundingClientRect();
     const visible = box.width > 0 && box.height > 0 && view.getComputedStyle(element).visibility !== 'hidden';
     const disabled = element.matches(':disabled,[aria-disabled="true"]');
-    let result: 'same' | 'box' = 'same';
     for (const entry of read) {
       const sx = entry.scrolls ? dx : 0,
         sy = entry.scrolls ? dy : 0;
-      if (entry.visible !== visible || entry.disabled !== disabled) return 'other';
+      if (entry.visible !== visible || entry.disabled !== disabled) return false;
       // A control that is not shown has no box anyone uses (it reads as 0×0 at the origin).
       if (!visible) continue;
       if (
@@ -277,31 +284,8 @@ export function createOperationSource(
         Math.abs(box.width - entry.rect.width) > 0.5 ||
         Math.abs(box.height - entry.rect.height) > 0.5
       )
-        result = 'box';
+        return false;
     }
-    boxes.set(element, box);
-    return result;
-  };
-  /** Controls a look change resized (D14): the change stays a look change when every other control
-   * in their group is where it was. Their new boxes replace the old ones in the read (`replace`). */
-  const resized = new Set<HTMLElement>();
-  const lookResized = (target: Element, elements: readonly HTMLElement[]) => {
-    const status = elements.map((element) => compare(element));
-    if (status.includes('other')) return false;
-    const grown = elements.filter((_, i) => status[i] === 'box');
-    if (!grown.length) return true;
-    // A control whose band the adapter derives (the player's control bars) is not a box to replace.
-    if (rows.some((row) => row.envelope && grown.includes(row.element))) return false;
-    const group = groupOf?.(target) ?? target;
-    const others = [
-      ...new Set(
-        rows
-          .filter((row) => row.element !== group && group.contains(row.element) && !elements.includes(row.element))
-          .map((row) => row.element),
-      ),
-    ];
-    if (others.length > MAX_LOOK_ROWS * 2 || !unchanged(others)) return false;
-    grown.forEach((element) => resized.add(element));
     return true;
   };
   /** The answer check in groups (D14②): when a window that only scrolled, changed looks or changed
@@ -309,35 +293,47 @@ export function createOperationSource(
    * enabled) instead of reading the whole page in one frame. Any difference reads the whole page
    * at once. A round with no difference makes the shifted read current. */
   let sweepGroup = 0,
-    sweepAt = -Infinity;
-  const sweep = (now: number): 'pending' | 'done' | 'changed' => {
+    sweepAt = -Infinity,
+    roundStart = 0;
+  /** `catchUp`: the last check is older than TRUST_MS, so every group still unchecked is checked now. */
+  const sweep = (now: number, catchUp = false): 'pending' | 'done' | 'changed' => {
     // One group per frame: later reads in the same frame share the result.
-    if (now - sweepAt < SWEEP_FRAME_MS) return 'pending';
+    if (!catchUp && now - sweepAt < SWEEP_FRAME_MS) return 'pending';
     sweepAt = now;
+    if (!sweepGroup) roundStart = now;
+    const due = catchUp
+      ? SWEEP_GROUPS
+      : Math.max(sweepGroup + 1, Math.min(SWEEP_GROUPS, 1 + Math.floor((now - roundStart) / SWEEP_GROUP_MS)));
     const elements = [...readRows.keys()] as HTMLElement[],
-      size = Math.ceil(elements.length / SWEEP_GROUPS),
-      group = elements.slice(sweepGroup * size, (sweepGroup + 1) * size);
-    let started = 0;
-    WW_GUARD_TRACE: started = doc.defaultView!.performance.now();
-    const differs = group.find((element) => compare(element, false) !== 'same');
-    const same = !differs;
-    WW_GUARD_TRACE: traceSweep(
-      doc,
-      sweepGroup,
-      SWEEP_GROUPS,
-      group.length,
-      doc.defaultView!.performance.now() - started,
-      same
-        ? 'same'
-        : `changed ${differs!.tagName} ${JSON.stringify(readRows.get(differs!))} now ${JSON.stringify(differs!.getBoundingClientRect())} scroll ${doc.defaultView!.scrollY} read ${cached?.scroll?.y}`,
-    );
-    if (!same) {
-      sweepGroup = 0;
-      return 'changed';
+      size = Math.ceil(elements.length / SWEEP_GROUPS);
+    while (sweepGroup < due) {
+      const group = elements.slice(sweepGroup * size, (sweepGroup + 1) * size);
+      let started = 0;
+      WW_GUARD_TRACE: started = doc.defaultView!.performance.now();
+      const differs = group.find((element) => !same(element, false));
+      WW_GUARD_TRACE: traceSweep(
+        doc,
+        sweepGroup,
+        SWEEP_GROUPS,
+        group.length,
+        doc.defaultView!.performance.now() - started,
+        differs
+          ? `changed ${differs.tagName} ${JSON.stringify(readRows.get(differs))} now ${JSON.stringify(differs.getBoundingClientRect())} scroll ${doc.defaultView!.scrollY} read ${cached?.scroll?.y}`
+          : 'same',
+      );
+      if (differs) {
+        sweepGroup = 0;
+        return 'changed';
+      }
+      sweepGroup++;
     }
-    sweepGroup = (sweepGroup + 1) % SWEEP_GROUPS;
-    return sweepGroup ? 'pending' : 'done';
+    if (sweepGroup < SWEEP_GROUPS) return 'pending';
+    sweepGroup = 0;
+    checkedAt = now;
+    return 'done';
   };
+  /** One step of the answer check, caught up when the last check is past TRUST_MS. */
+  const check = (now: number) => sweep(now, now - checkedAt > TRUST_MS);
   /** Subtrees whose children changed since the last read, checked once by the next read (D11). */
   const changedSubtrees = new Set<Element>();
   /** The kind of a batch of relevant records:
@@ -374,53 +370,11 @@ export function createOperationSource(
       if (!under.length) continue;
       if (under.length > MAX_LOOK_ROWS) return 'layout';
       const elements = [...new Set(under.map((row) => row.element))];
-      if (!lookResized(target, elements)) return 'layout';
+      if (!unchanged(elements)) return 'layout';
       looks.push(...elements);
     }
     looks.forEach((element) => changedLooks.add(element));
-    if (resized.size) replace();
     return kind;
-  };
-  /** The last read with the resized controls' new boxes (D14), as a whole read would give it: the
-   * same signatures, so the next whole read of an unchanged page keeps both generations. */
-  const replace = () => {
-    if (!cached?.scroll) return;
-    const view = doc.defaultView!,
-      dx = view.scrollX - cached.scroll.x,
-      dy = view.scrollY - cached.scroll.y;
-    const surfaces = cached.surfaces.map((surface, i) => {
-      const element = rows[i]?.element,
-        box = element && resized.has(element) ? boxes.get(element) : undefined;
-      if (!box) return surface;
-      // In the read's own coordinates: a surface that scrolls with the page moved with it since.
-      const sx = surface.scrolls ? dx : 0,
-        sy = surface.scrolls ? dy : 0;
-      const shape = Object.freeze({ left: box.left + sx, top: box.top + sy, width: box.width, height: box.height });
-      return Object.freeze({
-        ...surface,
-        shape,
-        protectedEnvelope: Object.freeze({
-          left: shape.left - 4,
-          top: shape.top - 4,
-          width: shape.width + 8,
-          height: shape.height + 8,
-        }),
-      });
-    });
-    for (const element of resized) {
-      const box = boxes.get(element)!;
-      readRows.get(element)?.forEach((entry) => {
-        entry.rect = {
-          left: box.left + (entry.scrolls ? dx : 0),
-          top: box.top + (entry.scrolls ? dy : 0),
-          width: box.width,
-          height: box.height,
-        };
-      });
-    }
-    resized.clear();
-    cached = seal(surfaces, cached.scroll, cached.viewport);
-    WW_GUARD_TRACE: traceReplace(doc, surfaces.length);
   };
   /** The next read's check of the changed subtrees (D11), once however many changes the frame had:
    * every read control inside them is unchanged. Elements outside are not read; one an addition
@@ -585,9 +539,18 @@ export function createOperationSource(
     if (taken.length) handle(taken, false);
     // Focus can leave with a removed element without any focus event; compare it directly.
     if (doc.activeElement !== readActive || doc.hasFocus() !== readFocus) dirty = stateDirty = true;
-    // Current: the read, shifted by any page scroll a round of the answer check has accepted.
-    if (!dirty && cached && doc.documentElement === root) return shifted(cached);
     const now = doc.defaultView!.performance.now();
+    // Current: the read, shifted by any page scroll a round of the answer check has accepted.
+    // A control can move with no notification at all (an animation, a transform from a style
+    // sheet), so a quiet read is trusted for ANSWER_CHECK_MS only: after that, rounds of the
+    // answer check run while the page is read, and a read whose last check is older than TRUST_MS
+    // checks every group still unchecked first. A silent move is found within TRUST_MS (G1.3
+    // verification: a quiet spell kept a moved control at its old box for 500ms and more).
+    if (!dirty && cached && doc.documentElement === root) {
+      if (now - checkedAt <= ANSWER_CHECK_MS || check(now) !== 'changed') return shifted(cached);
+      dirty = geometryDirty = true;
+      forced = true;
+    }
     const inWindow = now - capturedAt < COALESCE_MS;
     // A page scroll, a checked look change or changed subtrees after a quiet period open a window
     // of their own (G1.3, D11): the shifted read serves now, and the whole page is read once at
@@ -615,6 +578,9 @@ export function createOperationSource(
       // Only a page scroll or a checked look change since the read: the read, shifted by the
       // scroll, is where every surface is now (G1.3). A layout change inside the window holds
       // drawing until its end; one found after a quiet period is read now (below), as before.
+      // A shifted read is trusted only while the last check is within TRUST_MS; past it, every
+      // group is checked now, and a difference is a layout change (G1.3 verification).
+      if (pending !== 'layout' && now - checkedAt > TRUST_MS && check(now) === 'changed') raise('layout');
       if (pending !== 'layout') return shifted(cached);
       if (inWindow) return cached;
     }
@@ -624,6 +590,7 @@ export function createOperationSource(
     // difference a group finds. (Added subtrees were checked to hold no candidate, D11.)
     if (
       shiftable &&
+      pending !== 'layout' &&
       geometryDirty &&
       cached &&
       !forced &&
@@ -635,7 +602,7 @@ export function createOperationSource(
       (pending !== 'subtree' || subtreesUnchanged())
     ) {
       if (pending === 'subtree') pending = sawLook ? 'look' : sawScroll ? 'scroll' : 'none';
-      const step = sweep(now);
+      const step = check(now);
       if (step === 'pending') return shifted(cached);
       if (step === 'done') {
         // The shifted read is the page: nothing is pending until the next change.
@@ -662,7 +629,7 @@ export function createOperationSource(
     forced = false;
     geometryDirty = false;
     deferredUntil = 0;
-    capturedAt = now;
+    capturedAt = checkedAt = now;
     dirty = false;
     pending = 'none';
     sawScroll = sawLook = false;

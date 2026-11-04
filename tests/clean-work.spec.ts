@@ -75,11 +75,29 @@ test('protected entries do not count towards a family’s newest three', () => {
 test('worktrees are removed through git only when unused, and never by the automatic clean-up', () => {
   const worktrees = [
     entry('g12-557', 100, { kind: 'worktree', inUse: false }),
-    entry('g13-before', 100, { kind: 'worktree', inUse: true }),
+    entry('main-base', 100, { kind: 'worktree', inUse: true }),
   ];
-  expect(run(worktrees)).toEqual({ 'g12-557': 'remove-worktree:unused', 'g13-before': 'keep:worktree in use' });
+  expect(run(worktrees)).toEqual({ 'g12-557': 'remove-worktree:unused', 'main-base': 'keep:worktree in use' });
   expect(run(worktrees, { automatic: true })).toEqual({
     'g12-557': 'keep:worktree (manual only)',
-    'g13-before': 'keep:worktree in use',
+    'main-base': 'keep:worktree in use',
+  });
+});
+
+test('only the comparison bases are kept among unused worktrees, even when docs name the others or they are recent', () => {
+  const result = run(
+    [
+      entry('g13-g12head', 100, { kind: 'worktree', inUse: false }),
+      entry('g13-before', 100, { kind: 'worktree', inUse: false }),
+      entry('main-base', 100, { kind: 'worktree', inUse: false }),
+      entry('g12-recent', 1, { kind: 'worktree', inUse: false }),
+    ],
+    { referenced: new Set(['main-base']) },
+  );
+  expect(result).toEqual({
+    'g13-g12head': 'keep:comparison base',
+    'g13-before': 'keep:comparison base',
+    'main-base': 'remove-worktree:unused',
+    'g12-recent': 'remove-worktree:unused',
   });
 });

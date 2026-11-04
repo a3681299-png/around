@@ -5,8 +5,8 @@
 //
 // Rules, in order: the Playwright browsers (.work/browsers), patches (*.patch), anything the docs,
 // scripts or tests name as .work/<name>, and anything with a file written in the last 12 hours are
-// kept. A worktree is removed only when it is not in use (no tracked change, not locked, not this
-// checkout) and only by a manual run. Every other output is grouped into a family (its name up to
+// kept. A worktree is kept when it is in use (a tracked change, locked, or this checkout) or is a
+// comparison base (KEEP_WORKTREES); any other is removed, by a manual run only. Every other output is grouped into a family (its name up to
 // the first "-", "_" or ".", such as g13r0 for g13r0-trace) and each family keeps its newest
 // three. Folders of browser profiles (*-profiles) are sorted the same way one level down.
 //
@@ -19,6 +19,8 @@ import { fileURLToPath } from 'node:url';
 
 const HOUR = 3600e3;
 export const KEEP_PER_FAMILY = 3;
+/** The worktrees measurements are compared against (G1.3: 4d3f39b and 557b978). */
+export const KEEP_WORKTREES = ['g13-g12head', 'g13-before'];
 export const RECENT_MS = 12 * HOUR;
 export const AUTO_LIMIT_BYTES = 20 * 1024 ** 3;
 const AUTO_EVERY_MS = 24 * HOUR;
@@ -32,15 +34,18 @@ export function decide(entries, { now, keep = KEEP_PER_FAMILY, recentMs = RECENT
   const candidates = [];
   for (const e of entries) {
     const set = (action, reason) => decisions.set(e.name, { ...e, action, reason });
-    if (e.name === 'browsers') set('keep', 'browsers');
+    // A worktree is judged apart: docs name old ones as the place a result came from, which the
+    // commit recorded with it already identifies, so only the comparison bases stay.
+    if (e.kind === 'worktree')
+      if (e.inUse) set('keep', 'worktree in use');
+      else if (KEEP_WORKTREES.includes(e.name)) set('keep', 'comparison base');
+      else if (automatic) set('keep', 'worktree (manual only)');
+      else set('remove-worktree', 'unused');
+    else if (e.name === 'browsers') set('keep', 'browsers');
     else if (e.name.startsWith('.') || e.name === 'CLAUDE.md') set('keep', 'internal');
     else if (e.name.endsWith('.patch')) set('keep', 'patch');
     else if (referenced.has(e.name)) set('keep', 'docs');
     else if (now - e.newestMs < recentMs) set('keep', 'recent');
-    else if (e.kind === 'worktree')
-      if (e.inUse) set('keep', 'worktree in use');
-      else if (automatic) set('keep', 'worktree (manual only)');
-      else set('remove-worktree', 'unused');
     else candidates.push(e);
   }
   const families = new Map();

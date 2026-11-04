@@ -249,6 +249,54 @@ test('fullscreen keeps authored painting order across viewport and player anchor
   await expect.poll(pixel).toEqual([255, 0, 0, 255]);
 });
 
+test('an opened 操作チェック stays open while the guard releases its first stop', async ({
+  popup,
+  youtube,
+  context,
+  extensionId,
+}) => {
+  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  const studio = await context.newPage();
+  // Every hidden/open change of the fold, from before the editor mounts it.
+  await studio.addInitScript(() => {
+    const log: { hidden: boolean; open: boolean; summary: string }[] = ((window as any).__fold = []);
+    const watch = (): void => {
+      const check = document.querySelector<HTMLDetailsElement>('.ww-editor-safety .safety-check');
+      if (!check) {
+        setTimeout(watch, 20);
+        return;
+      }
+      new MutationObserver(() => {
+        log.push({
+          hidden: check.hidden === true,
+          open: check.open,
+          summary: check.querySelector('summary')!.textContent ?? '',
+        });
+      }).observe(check, { attributes: true, attributeFilter: ['open', 'hidden'] });
+    };
+    addEventListener('DOMContentLoaded', watch);
+  });
+  await studio.goto(`chrome-extension://${extensionId}/studio/index.html`);
+  await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
+  const panel = studio.locator('#web-world-themes-creator');
+  await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
+  await panel.getByLabel('画像の幅', { exact: true }).fill('1600');
+  await panel.getByLabel('画像の幅', { exact: true }).press('Tab');
+  await studio.locator('.ww-editor-safety li[data-issue-layer]').first().waitFor({ state: 'attached' });
+  await studio.locator('.ww-editor-safety .safety-check > summary').click();
+  // The guard's first stop (the page's controls moved as the layer arrived) releases in this time.
+  await studio.waitForTimeout(1500);
+  const log = await studio.evaluate(() => (window as any).__fold as { hidden: boolean }[]);
+  // The layer stays restricted throughout, so the fold never hides (which would close it).
+  expect(
+    log.filter((entry) => entry.hidden),
+    JSON.stringify(log),
+  ).toEqual([]);
+  await expect(studio.locator('.ww-editor-safety .safety-check')).toHaveJSProperty('open', true);
+  // The artwork is still on the page (restricted, not removed).
+  await expect(youtube.locator('#web-world-themes-decorations')).toHaveCount(1);
+});
+
 test('Studio exposes protection overlays, per-layer restrictions and emergency OFF', async ({
   popup,
   youtube,

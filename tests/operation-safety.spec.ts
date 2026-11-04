@@ -2161,6 +2161,9 @@ test('G1.3 (D11): elements added without controls are checked in their subtree o
       );
     const run = async (change: () => void) => {
       await settle();
+      // A whole read just before: the change comes while that read is trusted (a read older than
+      // the answer check bound is never shifted, so the next frame would read the page whole).
+      source.capture({ fresh: true });
       const layout = host.snapshot().surfaces.generation.layout,
         since = Math.floor(performance.now());
       stops.length = 0;
@@ -2333,7 +2336,7 @@ test('G1.3: a screen-plane layer stays shown while the wheel scrolls, and its cl
   expect(rows.filter((r) => r.inClip.length)).toEqual([]);
 });
 
-test('G1.3 (D14①): a look change that resizes one control re-reads its group and replaces it; one that moves a neighbour hides everything', async ({
+test('G1.3: a look change that resizes a control hides everything and draws next from a whole read', async ({
   youtube,
 }) => {
   await youtube.goto('https://www.youtube.com/watch?v=fixture');
@@ -2398,16 +2401,13 @@ test('G1.3 (D14①): a look change that resizes one control re-reads its group a
     style.remove();
     return { grow, wide, height: r.height };
   });
-  // Only the paint over the control is hidden, and the next frame draws with its new box, read
-  // within its group only: no whole-page read.
-  expect(result.grow.atMutation).toEqual([['over']]);
-  expect(result.grow.next.stopped).toBe('');
-  expect(result.grow.next.blocked).toEqual([]);
-  expect(result.grow.next.height).toBeCloseTo(result.grow.next.expected, 1);
-  expect(result.grow.next.height).toBeGreaterThan(result.height * 1.4);
-  expect(result.grow.next.reads).toBe(0);
-  // Wider, it pushes the next control along: everything is hidden, as for any layout change.
-  expect(result.wide.atMutation).toContain(true);
+  // A resize can push controls anywhere on the page (G1.3 verification: one outside its group was
+  // exposed while its box alone was replaced). Everything is hidden before the next paint, and the
+  // next frame draws from a whole read that has the new box, or holds drawing.
+  for (const name of ['grow', 'wide'] as const) {
+    expect(result[name].atMutation, name).toContain(true);
+    expect(Boolean(result[name].next.stopped) || result[name].next.reads > 0, JSON.stringify(result[name])).toBe(true);
+  }
 });
 
 test('G1.3 (D14②): while the page scrolls, the answer check reads one group of controls per frame and finds a control moved without any mutation', async ({
@@ -2467,7 +2467,8 @@ test('G1.3 (D14②): while the page scrolls, the answer check reads one group of
       movedLog: log(since).map((e) => e.change),
     };
   });
-  // The first scroll after quiet opens the window; afterwards no whole read while only scrolling.
+  // No whole read while only scrolling: the first scroll after the quiet settle checks every group
+  // before the shifted read is used (the last check is older than the answer check bound).
   expect(result.quietReads, JSON.stringify(result)).toBe(0);
   const groups = result.quietChecks[0]?.[1] as number;
   expect(groups).toBeGreaterThan(1);
@@ -2477,4 +2478,71 @@ test('G1.3 (D14②): while the page scrolls, the answer check reads one group of
   // round of groups has followed (one frame each, plus the frame that reads the whole page).
   expect(result.found, JSON.stringify(result.movedLog)).toBeGreaterThanOrEqual(0);
   expect(result.found, JSON.stringify(result)).toBeLessThanOrEqual(200 + (groups + 2) * result.longest);
+});
+
+test('G1.3: a read older than the answer check bound is never shifted; the first scroll after a quiet spell reads the page', async ({
+  youtube,
+}) => {
+  await youtube.addScriptTag({ content: await probeCode() });
+  await scrollRoom(youtube);
+  const result = await youtube.evaluate(async () => {
+    const api = (window as any).G1Probe;
+    const frame = () => new Promise<number>((resolve) => requestAnimationFrame(resolve));
+    const source = api.youtubeOperations(document);
+    source.capture({ fresh: true });
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    await frame();
+    source.capture({ fresh: true });
+    // Quiet: a guide link moves without any mutation (an animation), and nothing reads the page.
+    const link = document.querySelectorAll<HTMLElement>('ytd-guide-entry-renderer a#endpoint')[2]!;
+    const before = link.getBoundingClientRect().left;
+    link.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(300px)' }], {
+      duration: 1,
+      fill: 'forwards',
+    });
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    // Then the page scrolls: the 600ms-old read must not be shifted and trusted.
+    scrollBy(0, 30);
+    await frame();
+    const snapshot = source.capture({ coalesce: true });
+    const moved = (snapshot.surfaces as any[]).some(
+      (s) => Math.abs(s.shape.left - (before + 300)) < 2 && s.availability.visible,
+    );
+    const stale = (snapshot.surfaces as any[]).some(
+      (s) => Math.abs(s.shape.left - before) < 0.5 && Math.abs(s.shape.top - link.getBoundingClientRect().top) < 2,
+    );
+    // Still quiet, read every frame (an animated layer draws): a second link moved without any
+    // mutation is found within the bound, by the groups checked while nothing is pending.
+    const other = document.querySelectorAll<HTMLElement>('ytd-guide-entry-renderer a#endpoint')[3]!;
+    // Nothing pending: a whole read, then a quiet spell longer than the window.
+    source.capture({ fresh: true });
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    await frame();
+    const quietPending = source.pending();
+    // The first link sits at the same left, so the second is told apart by its top.
+    const otherBefore = other.getBoundingClientRect().left;
+    const otherTop = other.getBoundingClientRect().top;
+    other.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(300px)' }], {
+      duration: 1,
+      fill: 'forwards',
+    });
+    const start = performance.now();
+    let found = -1;
+    while (performance.now() - start < 1500 && found < 0) {
+      await frame();
+      const read = source.capture({ coalesce: true });
+      if (
+        (read.surfaces as any[]).some(
+          (s) => Math.abs(s.shape.left - (otherBefore + 300)) < 2 && Math.abs(s.shape.top - otherTop) < 2,
+        )
+      )
+        found = performance.now() - start;
+    }
+    source.destroy();
+    return { moved, stale, scroll: snapshot.scroll.y === scrollY, found, quietPending };
+  });
+  expect(result).toMatchObject({ moved: true, stale: false, scroll: true, quietPending: 'none' });
+  // TRUST_MS: 200ms + six groups at two frames each (34ms), plus the frame that reads it.
+  expect(result.found).toBeGreaterThanOrEqual(0);
+  expect(result.found).toBeLessThanOrEqual(200 + 6 * 34 + 34);
 });

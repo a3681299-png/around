@@ -294,10 +294,6 @@ export function traceGuardStop(
   });
 }
 
-/** D14①: a read whose resized controls' boxes were replaced without a whole read. */
-export function traceReplace(doc: Document, surfaces: number) {
-  writeGeometry(doc, { change: 'replace', surfaces });
-}
 /** D14②: one group of the answer check, with its size and how long it took. */
 export function traceSweep(doc: Document, group: number, groups: number, rows: number, ms: number, result: string) {
   writeGeometry(doc, { change: 'sweep', group, groups, rows, ms: Math.round(ms * 1000) / 1000, result });

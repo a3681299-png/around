@@ -215,9 +215,5 @@ export function youtubeOperations(doc: Document) {
     // D11: an inserted subtree with no element any selector can match adds no control. The same
     // test as incremental discovery's, on the inserted subtree only.
     (root, deep = true) => root.matches(candidateSelector) || (deep && Boolean(root.querySelector(candidateSelector))),
-    // D14: the part of the page a control's own look change can move others in. The player's
-    // controls share one bar; the masthead, the column beside the video, the comments and the
-    // column below the player each lay out on their own.
-    (element) => element.closest('.html5-video-player, ytd-masthead, #secondary, ytd-comments, #below') ?? undefined,
   );
 }

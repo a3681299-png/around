@@ -166,6 +166,13 @@ export function createOperationGuardHost(
     timer: number | undefined,
     holdTimer: number | undefined;
   const latched = () => failures >= 3 || latchedLayers.size > 0;
+  /** The issues without the guard's own stop entries (all, or those with this reason). A stop that
+   * ends keeps the layers' restrictions until the next paint recomputes them: an empty list in
+   * between reads as "nothing restricted" and hid the editor's open 操作チェック (G1.3 fix). */
+  const withoutStops = (reason?: string) =>
+    issues.filter(
+      (i) => !(i.surfaceId === 'host' && i.action === 'stop' && (reason === undefined || i.reason === reason)),
+    );
   const approaching = () => approach.near.size > 0;
   /** Near controls, and the roots over them in the last committed paint. */
   // The renderer and the world evaluation both sample in one frame. With the same inputs, a
@@ -499,14 +506,11 @@ export function createOperationGuardHost(
       } else {
         if (stopped === HOLD) {
           stopped = '';
-          issues = [];
+          issues = withoutStops(HOLD);
         }
         if (boundaryDirty) {
           boundaryDirty = false;
           const nextBoundary = boundaryKey(surfaces);
-          // A control the source re-read in its group and replaced (a look change that resized
-          // it, D14) moved nothing else: its new box is the boundary, with nothing to wait for.
-          if (nextBoundary !== boundary && source.pending() === 'look') boundary = nextBoundary;
           if (nextBoundary !== boundary) {
             WW_GUARD_TRACE: traceGuardStop(doc, 'shifted', {
               entry: 'boundary',
@@ -529,8 +533,8 @@ export function createOperationGuardHost(
       );
       if (stopped && stopped !== HOLD && failures < 3 && !interacting && !nativeEditing && time - stableAt >= 350) {
         WW_GUARD_TRACE: traceGuardStop(doc, 'release', { reason: stopped });
+        issues = withoutStops(stopped);
         stopped = '';
-        issues = [];
       }
       // The world evaluation that follows in this frame reads the result: a root moving onto a
       // near control is held from here, one frame after the paint that put it there.
@@ -695,7 +699,7 @@ export function createOperationGuardHost(
       latchedLayers.clear();
       stopped = stoppedRemedy = '';
       stoppedIds = undefined;
-      issues = [];
+      issues = withoutStops();
       stableAt = view.performance.now();
       published = [];
       invalidate();
