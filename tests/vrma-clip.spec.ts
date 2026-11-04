@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { AnimationMixer, VectorKeyframeTrack } from 'three';
 import { VRMLoaderPlugin, type VRM } from '@pixiv/three-vrm';
 import { parseVrmAnimation, vrmAnimationClip } from '../src/renderers/three/vrma-clip';
-import { vrmaFixture } from './helpers/vrma-fixture';
+import { vrmaFixture, overflowingHipsVrma } from './helpers/vrma-fixture';
 import { vrmFixture } from './helpers/vrm-fixture';
 
 /** The test rig without its texture: node has no image decoder. */
@@ -59,4 +59,8 @@ test('bytes that fail inspection never reach the loader', async () => {
   await expect(
     parseVrmAnimation(new Uint8Array(vrmaFixture({}, (j) => (j.buffers[0].uri = 'https://example.com/x.bin')))),
   ).rejects.toThrow();
+});
+
+test('overflowing derived hips height is refused before the animation loader', async () => {
+  await expect(parseVrmAnimation(new Uint8Array(overflowingHipsVrma()))).rejects.toThrow();
 });

@@ -135,31 +135,60 @@ export function inspectVrma(bytes: Uint8Array): { info: VrmAnimationInfo; json: 
   const buffers = list(json['buffers'], 1),
     views = list(json['bufferViews'], VRMA_LIMITS.accessors),
     accessors = list(json['accessors'], VRMA_LIMITS.accessors),
-    nodes = list(json['nodes'], VRMA_LIMITS.nodes);
+    nodes = list(json['nodes'], VRMA_LIMITS.nodes),
+    scenes = list(json['scenes'], VRMA_LIMITS.nodes);
   if (buffers.length !== 1 || int(buffers[0]!['byteLength'], bin.length) < bin.length - 3) throw bad();
   const ref = (n: unknown, items: Obj[]) => items[int(n, items.length - 1)]!;
+  // The animation loader reads a scene before bones. Check every scene, including unused ones,
+  // so no out-of-range root or default scene can reach GLTFLoader.
+  ref(json['scene'] === undefined ? 0 : json['scene'], scenes);
+  for (const scene of scenes) {
+    if (scene['nodes'] !== undefined && (!Array.isArray(scene['nodes']) || scene['nodes'].length > nodes.length))
+      throw bad();
+    for (const node of (scene['nodes'] as unknown[] | undefined) ?? []) ref(node, nodes);
+  }
+  const bufferLength = buffers[0]!['byteLength'] as number;
   for (const v of views) {
     if (v['buffer'] !== 0 || v['byteStride'] !== undefined) throw bad();
-    const start = int(v['byteOffset'] ?? 0, bin.length);
-    if (!int(v['byteLength'], bin.length - start)) throw bad();
+    const start = int(v['byteOffset'] ?? 0, bufferLength);
+    if (start % 4 || !int(v['byteLength'], bufferLength - start)) throw bad();
   }
   // Animation data is float only: SCALAR times, VEC3 translations, VEC4 rotations.
   const width: Record<string, number> = { SCALAR: 1, VEC3: 3, VEC4: 4 };
   const data = new DataView(bin.buffer, bin.byteOffset, bin.byteLength);
+  const checked = new Map<number, { type: string; count: number; at: (i: number, c: number) => number }>();
+  let floatValues = 0;
   const floats = (index: unknown): { type: string; count: number; at: (i: number, c: number) => number } => {
-    const a = ref(index, accessors);
-    if (a['sparse'] || a['componentType'] !== 5126 || !width[a['type']] || a['normalized']) throw bad();
+    const id = int(index, accessors.length - 1),
+      cached = checked.get(id);
+    if (cached) return cached;
+    const a = accessors[id]!;
+    if (
+      a['sparse'] !== undefined ||
+      a['componentType'] !== 5126 ||
+      typeof a['type'] !== 'string' ||
+      !Object.hasOwn(width, a['type']) ||
+      a['normalized']
+    )
+      throw bad();
     const view = ref(a['bufferView'], views),
       count = int(a['count'], VRMA_LIMITS.keys),
       n = width[a['type']]!,
       start = int(a['byteOffset'] ?? 0, view['byteLength']);
     if (!count || start % 4 || start + count * n * 4 > view['byteLength']) throw bad();
+    // One time plus three VEC4s per CUBICSPLINE key is the largest supported motion.
+    // Shared/unused accessors cannot multiply the inspection work beyond that budget.
+    floatValues += count * n;
+    if (floatValues > VRMA_LIMITS.keys * 13) throw bad('キーフレームが多すぎます。');
     const base = (view['byteOffset'] ?? 0) + start;
     const at = (i: number, c: number) => data.getFloat32(base + (i * n + c) * 4, true);
     for (let i = 0; i < count; i++)
       for (let c = 0; c < n; c++) if (!Number.isFinite(at(i, c)) || Math.abs(at(i, c)) > 1e6) throw bad();
-    return { type: a['type'], count, at };
+    const result = { type: a['type'] as string, count, at };
+    checked.set(id, result);
+    return result;
   };
+  accessors.forEach((_, index) => floats(index));
 
   const parent = new Map<number, number>();
   for (const [i, node] of nodes.entries()) {
@@ -212,6 +241,10 @@ export function inspectVrma(bytes: Uint8Array): { info: VrmAnimationInfo; json: 
   const samplers = list(animation['samplers'], VRMA_LIMITS.channels),
     channels = list(animation['channels'], VRMA_LIMITS.channels);
   if (!channels.length) throw bad();
+  for (const sampler of samplers) {
+    ref(sampler['input'], accessors);
+    ref(sampler['output'], accessors);
+  }
   let duration = 0,
     keys = 0,
     hipsTranslation = false,
@@ -256,7 +289,10 @@ export function inspectVrma(bytes: Uint8Array): { info: VrmAnimationInfo; json: 
   }
 
   // Rest hips height in world space, as @pixiv/three-vrm-animation reads it (hips.getWorldPosition).
-  const restHipsHeight = transform(nodeWorlds(nodes)(hipsNode), 0, 0, 0)[1];
+  const restHipsPosition = transform(nodeWorlds(nodes)(hipsNode), 0, 0, 0),
+    restHipsHeight = restHipsPosition[1];
+  // Finite local transforms can overflow when multiplied along the parent chain.
+  if (!restHipsPosition.every(Number.isFinite)) throw bad('腰の位置が有限の数値ではありません。');
   if (!(restHipsHeight > 1e-3)) throw bad('腰の高さが0です。');
   const name =
     typeof animation['name'] === 'string' ? animation['name'].replace(/[\u0000-\u001f]/g, '').slice(0, 120) : '';

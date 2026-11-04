@@ -94,3 +94,19 @@ export function vrmaFixture(
   bin.copy(result, at + 8);
   return result;
 }
+
+/** Finite local values whose ancestor product overflows the measured world-space hips height. */
+export function overflowingHipsVrma(): Buffer {
+  return vrmaFixture({}, (j) => {
+    j.nodes[1].translation[1] = 1e6;
+    j.nodes[0].children = [];
+    let parent = 0;
+    for (let i = 0; i < 51; i++) {
+      const index = j.nodes.length;
+      j.nodes.push({ scale: [1e6, 1e6, 1e6], children: [] });
+      j.nodes[parent].children = [index];
+      parent = index;
+    }
+    j.nodes[parent].children = [1];
+  });
+}
