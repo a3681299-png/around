@@ -1,6 +1,7 @@
 import type { OperationSnapshot, OperationSurface } from '../world/operations';
 import type { PlacementFrame } from '../world/geometry';
 import { scrollsWithPage } from './operation-composition';
+import { ANSWER_CHECK_MS, COALESCE_MS, SWEEP_GROUPS, TRUST_MS, createAnswerCheck } from './answer-check';
 import {
   traceGeometryCause,
   traceGeometryRead,
@@ -17,8 +18,7 @@ const MATCHING_ATTRIBUTES = new Set(['class', 'role', 'href', 'contenteditable']
 const MAX_INCREMENTAL_ROOTS = 64;
 /** Bounds how long a change the observer could not describe can go unnoticed. */
 const FULL_SCAN_INTERVAL_MS = 1000;
-/** Changes inside this window after a read wait for its end; callers hold drawing meanwhile. */
-export const COALESCE_MS = 200;
+export { COALESCE_MS };
 /** A look change (class/style) above more controls than this is treated as a layout change. The
  * player's own class (its controls shown or auto-hidden) sits above about 40 of them (round 2). */
 const MAX_LOOK_ROWS = 64;
@@ -30,21 +30,6 @@ const LOOK_ATTRIBUTES = new Set(['class', 'style']);
  * added ones can be a control. Everything is hidden until the next read checks those subtrees. */
 export type PendingChange = 'none' | 'scroll' | 'look' | 'subtree' | 'layout';
 const RANK: Record<PendingChange, number> = { none: 0, scroll: 1, look: 2, subtree: 3, layout: 4 };
-/** How long only shiftable changes (a page scroll, checked looks, checked subtrees) wait before
- * the answer check starts a round (D14③ compared 1000ms; see docs/g13-plan.md). */
-const ANSWER_CHECK_MS = COALESCE_MS;
-/** The answer check in groups (D14②): six groups, one per frame, a round in about 100ms at 60fps. */
-const SWEEP_GROUPS = 6;
-/** Reads less than this apart belong to one frame (they share one group's check). */
-const SWEEP_FRAME_MS = 8;
-/** A round advances by time, not by reads: at least one group per read, and as many as two frames
- * a group have come due, so a round ends in SWEEP_GROUPS × this however seldom the page is read. */
-const SWEEP_GROUP_MS = 2 * 17;
-/** How old the last check of the whole page (a whole read, or a finished round of groups) may be
- * for a read to be shifted and trusted: the window, then a round. A control that moves without any
- * mutation is found within it; past it (a quiet spell, sparse reads), every group still unchecked
- * is checked in that read before the shifted read is used (G1.3 verification). */
-const TRUST_MS = ANSWER_CHECK_MS + SWEEP_GROUPS * SWEEP_GROUP_MS;
 /** Sticky columns are read as unbounded boxes (±1e7); they never move with a page scroll. */
 const UNBOUNDED_BOX = 1e6;
 /** Document coordinates are compared at 1/100 px, below any rounding a scroll can introduce. */
@@ -144,10 +129,10 @@ export function createOperationSource(
     lastFullScan = -Infinity,
     forced = false,
     capturedAt = -Infinity,
-    // The last check of the whole page: a whole read, or a round of the answer check with no
-    // difference. Unlike `capturedAt` it does not move the coalescing window.
-    checkedAt = -Infinity,
     deferredUntil = 0;
+  /** Each group's last check (a whole read checks them all). Unlike `capturedAt`, they do not move
+   * the coalescing window; a read is only as current as the oldest of them. */
+  const answer = createAnswerCheck();
   const added = new Set<Element>(),
     touched = new Set<Element>();
   /** What changed since the last read (G1.3), in rising order: nothing that moves a surface
@@ -291,22 +276,15 @@ export function createOperationSource(
   /** The answer check in groups (D14②): when a window that only scrolled, changed looks or changed
    * subtrees ends, the read controls are compared with the page one group per frame (box, shown,
    * enabled) instead of reading the whole page in one frame. Any difference reads the whole page
-   * at once. A round with no difference makes the shifted read current. */
-  let sweepGroup = 0,
-    sweepAt = -Infinity,
-    roundStart = 0;
-  /** `catchUp`: the last check is older than TRUST_MS, so every group still unchecked is checked now. */
+   * at once. A round with no difference makes the shifted read current. Which groups a read
+   * compares, and each group's last check, are in `answer` (src/host/answer-check.ts). */
   const sweep = (now: number, catchUp = false): 'pending' | 'done' | 'changed' => {
-    // One group per frame: later reads in the same frame share the result.
-    if (!catchUp && now - sweepAt < SWEEP_FRAME_MS) return 'pending';
-    sweepAt = now;
-    if (!sweepGroup) roundStart = now;
-    const due = catchUp
-      ? SWEEP_GROUPS
-      : Math.max(sweepGroup + 1, Math.min(SWEEP_GROUPS, 1 + Math.floor((now - roundStart) / SWEEP_GROUP_MS)));
+    // One group per frame: later reads in the same frame share the result (no groups due).
+    const due = answer.due(now, catchUp);
+    if (!due.length) return 'pending';
     const elements = [...readRows.keys()] as HTMLElement[],
       size = Math.ceil(elements.length / SWEEP_GROUPS);
-    while (sweepGroup < due) {
+    for (const sweepGroup of due) {
       const group = elements.slice(sweepGroup * size, (sweepGroup + 1) * size);
       let started = 0;
       WW_GUARD_TRACE: started = doc.defaultView!.performance.now();
@@ -322,18 +300,15 @@ export function createOperationSource(
           : 'same',
       );
       if (differs) {
-        sweepGroup = 0;
+        answer.changed();
         return 'changed';
       }
-      sweepGroup++;
+      answer.passed(sweepGroup, now);
     }
-    if (sweepGroup < SWEEP_GROUPS) return 'pending';
-    sweepGroup = 0;
-    checkedAt = now;
-    return 'done';
+    return answer.roundDone() ? 'done' : 'pending';
   };
-  /** One step of the answer check, caught up when the last check is past TRUST_MS. */
-  const check = (now: number) => sweep(now, now - checkedAt > TRUST_MS);
+  /** One step of the answer check, caught up when the oldest group's check is past TRUST_MS. */
+  const check = (now: number) => sweep(now, now - answer.oldest() > TRUST_MS);
   /** Subtrees whose children changed since the last read, checked once by the next read (D11). */
   const changedSubtrees = new Set<Element>();
   /** The kind of a batch of relevant records:
@@ -547,7 +522,7 @@ export function createOperationSource(
     // checks every group still unchecked first. A silent move is found within TRUST_MS (G1.3
     // verification: a quiet spell kept a moved control at its old box for 500ms and more).
     if (!dirty && cached && doc.documentElement === root) {
-      if (now - checkedAt <= ANSWER_CHECK_MS || check(now) !== 'changed') return shifted(cached);
+      if (now - answer.oldest() <= ANSWER_CHECK_MS || check(now) !== 'changed') return shifted(cached);
       dirty = geometryDirty = true;
       forced = true;
     }
@@ -580,7 +555,7 @@ export function createOperationSource(
       // drawing until its end; one found after a quiet period is read now (below), as before.
       // A shifted read is trusted only while the last check is within TRUST_MS; past it, every
       // group is checked now, and a difference is a layout change (G1.3 verification).
-      if (pending !== 'layout' && now - checkedAt > TRUST_MS && check(now) === 'changed') raise('layout');
+      if (pending !== 'layout' && now - answer.oldest() > TRUST_MS && check(now) === 'changed') raise('layout');
       if (pending !== 'layout') return shifted(cached);
       if (inWindow) return cached;
     }
@@ -624,12 +599,12 @@ export function createOperationSource(
         touched: [...touched].filter((element) => readRows.has(element) !== holdsCandidate?.(element, false)).length,
         pending,
       });
-    sweepGroup = 0;
     stateDirty = false;
     forced = false;
     geometryDirty = false;
     deferredUntil = 0;
-    capturedAt = checkedAt = now;
+    capturedAt = now;
+    answer.readAll(now);
     dirty = false;
     pending = 'none';
     sawScroll = sawLook = false;
