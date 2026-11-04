@@ -45,7 +45,9 @@ test('restoring over a legacy VRM asset tolerates only its absent body, retainin
   delete legacy.model.vrm!.body;
   const original = structuredClone(legacy),
     backup = { manifest: manifest(), assets: [row] };
-  expect(planRestore(backup, {}, [legacy], [], false).added).toEqual([]);
+  const plan = planRestore(backup, {}, [legacy], [], false);
+  expect(plan.added).toEqual([]);
+  expect(plan).toHaveProperty('refreshed', [{ ...legacy, model: row.model }]);
   expect(legacy).toEqual(original);
   expect(() => planRestore(backup, {}, [{ ...legacy, width: legacy.width + 1 }], [], false)).toThrow('一致');
   legacy.model.vrm!.body = structuredClone(row.model!.vrm!.body!);
@@ -223,6 +225,7 @@ test('backup worker authenticates its live top-level page and refuses other exte
       pending: Promise<unknown> | undefined,
       reply: unknown;
     const service = createBackupService({
+      assetsChanged() {},
       pageURL: 'chrome-extension://example/backup/index.html',
       client: async () => client,
       enqueue: async (operation) => {

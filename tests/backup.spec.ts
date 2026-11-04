@@ -12,6 +12,8 @@ import { sidePanelDriver } from './helpers/side-panel';
 import { openEditor } from './helpers/editor';
 import { parseDesign } from '../src/design/schema';
 import { inspectAsset } from '../src/assets/inspect';
+import { BACKUP_LIBRARY_LEASE, type StoredAsset } from '../src/assets/repository';
+import { ASSET_MESSAGE } from '../src/assets/protocol';
 
 async function openBackup(popup: Page) {
   const page = await popup.context().newPage();
@@ -104,6 +106,108 @@ test('a historical v13 VRM backup restores and re-exports, while forged body fac
   await expect(page.locator('.backup-status')).toContainText('レイヤーと素材の形式が一致しません');
   await expect(page.locator('#backup-restore')).toBeDisabled();
   expect(await readCounts(page)).toEqual(restored);
+});
+
+test('backup refreshes an existing legacy VRM record and cached metadata before saving a measured source', async ({
+  popup,
+}, info) => {
+  const bytes = await readFile('tests/fixtures/backups/legacy-v13-vrm.wwbackup'),
+    length = bytes.readUInt32LE(BACKUP_HEADER_BYTES - 36),
+    original = JSON.parse(bytes.subarray(BACKUP_HEADER_BYTES, BACKUP_HEADER_BYTES + length).toString('utf8')),
+    payload = bytes.subarray(BACKUP_HEADER_BYTES + length),
+    measured = inspectAsset(payload),
+    legacy = structuredClone(measured),
+    expected = parseDesign(original.designs[0]),
+    layer = expected.decorations[0];
+  if (layer?.kind !== 'model3d' || !layer.source.vrm) throw new Error('Expected a historical VRM');
+  delete legacy.model!.vrm!.body;
+  layer.source.vrm.body = measured.model!.vrm!.body!;
+  const asset = original.assets[0];
+  await popup.evaluate(
+    async ({ asset, legacy, payload, lease }) => {
+      await new Promise<void>((resolve, reject) => {
+        const request = indexedDB.open('web-world-themes-assets', 1);
+        request.onupgradeneeded = () => request.result.createObjectStore('assets', { keyPath: 'id' });
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => {
+          const db = request.result,
+            tx = db.transaction('assets', 'readwrite');
+          tx.objectStore('assets').put({
+            ...legacy,
+            ...asset,
+            blob: new Blob([new Uint8Array(payload)]),
+            leases: [lease],
+          });
+          tx.oncomplete = () => {
+            db.close();
+            resolve();
+          };
+          tx.onabort = tx.onerror = () => {
+            db.close();
+            reject(tx.error);
+          };
+        };
+      });
+    },
+    { asset, legacy, payload: [...payload], lease: BACKUP_LIBRARY_LEASE },
+  );
+  const metadata = () =>
+    popup.evaluate(
+      async ({ type, id }) => (await chrome.runtime.sendMessage({ type, action: 'get-metadata', id })).value,
+      { type: ASSET_MESSAGE, id: asset.id },
+    );
+  expect((await metadata()).model.vrm.body).toBeUndefined(); // Prime the worker's legacy row cache.
+  const text = Buffer.from(JSON.stringify({ ...original, designs: [expected] })),
+    header = Buffer.from(bytes.subarray(0, BACKUP_HEADER_BYTES));
+  header.writeUInt32LE(text.length, BACKUP_HEADER_BYTES - 36);
+  Buffer.from(await sha256(new Uint8Array(text)), 'hex').copy(header, BACKUP_HEADER_BYTES - 32);
+  const page = await openBackup(popup);
+  await page.locator('#backup-file').setInputFiles({
+    name: 'measured-source.wwbackup',
+    mimeType: 'application/octet-stream',
+    buffer: Buffer.concat([header, text, payload]),
+  });
+  await page.locator('#backup-inspect').click();
+  await expect(page.locator('#backup-restore')).toBeEnabled();
+  await page.locator('#backup-restore').click();
+  await expect(page.locator('.backup-status')).toContainText('読み込みが完了');
+  expect((await metadata()).model.vrm.body).toEqual(measured.model!.vrm!.body);
+  const restored = await readCounts(page);
+  expect(restored.assets).toBe(1);
+  expect(restored.local['webWorldThemes.design.youtube']).toEqual(expected);
+  const saved = await popup.evaluate(
+    async ({ type, design }) =>
+      chrome.runtime.sendMessage({
+        type,
+        action: 'save',
+        session: 'backup-refreshed-check',
+        design,
+      }),
+    { type: ASSET_MESSAGE, design: expected },
+  );
+  expect(saved).toMatchObject({ ok: true });
+  const leases = await popup.evaluate(
+    (id) =>
+      new Promise<StoredAsset['leases']>((resolve, reject) => {
+        const request = indexedDB.open('web-world-themes-assets', 1);
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => {
+          const db = request.result,
+            get = db.transaction('assets').objectStore('assets').get(id);
+          get.onsuccess = () => {
+            resolve(get.result.leases);
+            db.close();
+          };
+          get.onerror = () => {
+            reject(get.error);
+            db.close();
+          };
+        };
+      }),
+    asset.id,
+  );
+  expect(leases).toContainEqual(BACKUP_LIBRARY_LEASE);
+  await downloadBackup(page, info.outputPath('refreshed-vrm.wwbackup'));
 });
 
 test('one file restores saved artwork, originals, takes and settings into a different profile and extension ID', async ({

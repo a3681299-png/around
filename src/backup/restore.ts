@@ -32,6 +32,7 @@ export function planRestore(
       throw new Error('作品IDまたは保存先が衝突しています: ' + siteId + '。既存の作品は上書きしません。');
   }
   const assets = new Map(existingAssets.map((row) => [row.id, row]));
+  const refreshed: StoredAsset[] = [];
   for (const row of backup.assets) {
     const existing = assets.get(row.id);
     const metadata = ({ blob: _blob, leases: _leases, name: _name, model: _model, ...info }: StoredAsset) => info;
@@ -44,6 +45,16 @@ export function planRestore(
         existing.blob.size !== row.blob.size)
     )
       throw new Error('既存素材のIDと内容が一致しません。');
+    if (existing?.model?.vrm && existing.model.vrm.body === undefined && row.model?.vrm?.body) {
+      // The restored artwork may already include body. Persist the verified measurement too,
+      // or its next save would compare it against the old, unmeasured destination record.
+      const next = {
+        ...existing,
+        model: { ...existing.model, vrm: { ...existing.model.vrm, body: row.model.vrm.body } },
+      };
+      assets.set(row.id, next);
+      refreshed.push(next);
+    }
     if (!existing) assets.set(row.id, row);
   }
   if (
@@ -70,5 +81,5 @@ export function planRestore(
       // after migration, so retain them as a backup library within the normal quotas.
       leases: references.has(row.id) ? [] : [BACKUP_LIBRARY_LEASE],
     }));
-  return { values, added };
+  return { values, added, refreshed };
 }

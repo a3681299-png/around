@@ -315,7 +315,12 @@ const studioTransfer = createStudioTransferService({
   importBatch,
 });
 self.addEventListener('message', (event) => studioTransfer.receive(event as unknown as StudioTransferEvent));
-const backups = createBackupService({ pageURL: backupPageURL(), client: (id) => workerClients.get(id), enqueue });
+const backups = createBackupService({
+  pageURL: backupPageURL(),
+  client: (id) => workerClients.get(id),
+  enqueue,
+  assetsChanged: (ids) => ids.forEach((id) => sourceRows.delete(id)),
+});
 self.addEventListener('message', (event) => backups.receive(event as unknown as StudioTransferEvent));
 
 async function handle(
