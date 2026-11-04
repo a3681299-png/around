@@ -1,6 +1,7 @@
 import { build } from 'esbuild';
 import type { Page } from '@playwright/test';
-import { test, expect } from './fixtures';
+import { test, expect, launchExtension } from './fixtures';
+import { noIdleRecheckBuild } from './helpers/no-idle-recheck-build';
 import { openEditor } from './helpers/editor';
 import path from 'node:path';
 import { exposeEditorControls, withCanvas } from './helpers/editor-workspace';
@@ -230,49 +231,63 @@ test('editing lets viewport artwork own the verified video centre, never the ban
   });
 });
 
-test('a stale screen-plane handle over a moved control band never takes the input meant for it', async ({
-  popup,
-  youtube,
-}) => {
-  const { node, hit } = await viewportArtworkOverVideo(popup, youtube);
-  await withCanvas(youtube, async () => {
-    await settled(youtube);
-    const box = (await node.boundingBox())!;
-    const center = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
-    expect(await hit(center)).toMatchObject({ own: true });
-    // Move the player like an asynchronous scroll would, with no DOM mutation, resize or scroll
-    // event: its bottom control band now lies under the handle while the clip is still stale.
-    const native = await youtube.locator('#movie_player').evaluate((player, y) => {
-      const r = player.getBoundingClientRect();
-      const shift = r.bottom - 56 - y;
-      player.animate([{ transform: `translateY(${-shift}px)` }, { transform: `translateY(${-shift}px)` }], {
-        duration: 600000,
-        fill: 'forwards',
-      });
-      const w = window as unknown as { nativeClicks: number };
-      w.nativeClicks = 0;
-      player.addEventListener('click', (event) => {
-        if (!event.composedPath().some((n) => n instanceof Element && n.id.startsWith('web-world-themes')))
-          w.nativeClicks++;
-      });
-      return { shift };
-    }, center.y);
-    expect(native.shift).toBeGreaterThan(50);
-    await youtube.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
-    // The scenario is real: the stale handle is still the hit target over the band.
-    expect(await hit(center)).toMatchObject({ own: true });
-    await youtube.mouse.move(center.x, center.y);
-    await youtube.mouse.down();
-    await youtube.mouse.move(center.x - 30, center.y - 10, { steps: 6 });
-    await youtube.mouse.up();
-    // No gesture started: the artwork did not move.
-    expect((await node.boundingBox())!.x).toBeCloseTo(box.x, 0);
-    // The handle no longer covers the band; the next press reaches the native player.
-    await expect.poll(async () => (await hit(center)).own).toBe(false);
-    await youtube.mouse.click(center.x, center.y);
-    expect(await youtube.evaluate(() => (window as unknown as { nativeClicks: number }).nativeClicks)).toBe(1);
-  });
+/** The build without the idle recheck (G1.4): its timer could update the clip before the press
+ * below, on CI between the move and the stale-handle check (run 41772161277), so the input-time
+ * defence would not be what is tested. The input must still be refused and reach the player. */
+const withoutIdleRecheck = test.extend({
+  context: async ({ profile }, use) => {
+    const context = await launchExtension(profile, true, { extensionPath: await noIdleRecheckBuild() });
+    try {
+      await use(context);
+    } finally {
+      await context.close();
+    }
+  },
 });
+
+withoutIdleRecheck(
+  'a stale screen-plane handle over a moved control band never takes the input meant for it',
+  async ({ popup, youtube }) => {
+    const { node, hit } = await viewportArtworkOverVideo(popup, youtube);
+    await withCanvas(youtube, async () => {
+      await settled(youtube);
+      const box = (await node.boundingBox())!;
+      const center = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+      expect(await hit(center)).toMatchObject({ own: true });
+      // Move the player like an asynchronous scroll would, with no DOM mutation, resize or scroll
+      // event: its bottom control band now lies under the handle while the clip is still stale.
+      const native = await youtube.locator('#movie_player').evaluate((player, y) => {
+        const r = player.getBoundingClientRect();
+        const shift = r.bottom - 56 - y;
+        player.animate([{ transform: `translateY(${-shift}px)` }, { transform: `translateY(${-shift}px)` }], {
+          duration: 600000,
+          fill: 'forwards',
+        });
+        const w = window as unknown as { nativeClicks: number };
+        w.nativeClicks = 0;
+        player.addEventListener('click', (event) => {
+          if (!event.composedPath().some((n) => n instanceof Element && n.id.startsWith('web-world-themes')))
+            w.nativeClicks++;
+        });
+        return { shift };
+      }, center.y);
+      expect(native.shift).toBeGreaterThan(50);
+      await youtube.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+      // The scenario is real: the stale handle is still the hit target over the band.
+      expect(await hit(center)).toMatchObject({ own: true });
+      await youtube.mouse.move(center.x, center.y);
+      await youtube.mouse.down();
+      await youtube.mouse.move(center.x - 30, center.y - 10, { steps: 6 });
+      await youtube.mouse.up();
+      // No gesture started: the artwork did not move.
+      expect((await node.boundingBox())!.x).toBeCloseTo(box.x, 0);
+      // The handle no longer covers the band; the next press reaches the native player.
+      await expect.poll(async () => (await hit(center)).own).toBe(false);
+      await youtube.mouse.click(center.x, center.y);
+      expect(await youtube.evaluate(() => (window as unknown as { nativeClicks: number }).nativeClicks)).toBe(1);
+    });
+  },
+);
 
 /** A visible native button in the middle of the player, like YouTube's large play button on a
  * video that has not started. Its clicks are counted. */
