@@ -5,6 +5,7 @@ import { changeAssets, getAsset, keepAssetLease, type AssetLease, type StoredAss
 import { ASSET_LIMITS, base64ToBytes, bytesToBase64, type AssetMetadata, type AssetInfo } from '../assets/validation';
 import { validateAssetBytes } from '../assets/validate-bytes';
 import { validateDocumentAssets } from '../assets/design-assets';
+import { sameModelInfo } from '../models/types';
 import { designAssetIds } from '../design/references';
 import { isAssetId, isDesignId, parseDesign } from '../design/schema';
 import { saveDesign } from '../storage/designs';
@@ -265,9 +266,18 @@ async function importBatch(
       const put = new Map<string, StoredAsset>();
       for (const asset of assets) {
         const existing = combined.get(asset.id);
-        const next = existing
+        let next = existing
           ? { ...existing, leases: [...existing.leases.filter((entry) => entry.session !== lease.session), lease] }
           : asset;
+        if (existing?.model?.vrm && !existing.model.vrm.body && asset.model?.vrm?.body) {
+          if (!sameModelInfo(existing.model, asset.model)) throw new Error('既存素材の情報が一致しません。');
+          // The SHA and all other facts match. Add the newly measured body without replacing
+          // the original record, its name, blob or other sessions' leases.
+          next = {
+            ...next,
+            model: { ...existing.model, vrm: { ...existing.model.vrm, body: asset.model.vrm.body } },
+          };
+        }
         combined.set(asset.id, next);
         put.set(asset.id, next);
       }
@@ -280,6 +290,8 @@ async function importBatch(
       return { value: undefined, put: [...put.values()] };
     }),
   );
+  // A read may already have cached the legacy row before this import measured it.
+  for (const asset of assets) sourceRows.delete(asset.id);
   return assets.map(({ blob: _blob, leases: _leases, ...metadata }) => metadata);
 }
 

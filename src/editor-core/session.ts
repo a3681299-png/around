@@ -1,6 +1,6 @@
 import { parseEditCommand } from './commands';
 import { editorCapabilities } from './capabilities';
-import { defaultModelSettings, patchModel } from '../models/types';
+import { defaultModelSettings, patchModel, sameModelInfo } from '../models/types';
 import { applyCharacterPatch, modelClips } from '../characters/settings';
 import { draftMotions, type MotionLabel } from '../characters/manifest';
 import { ASSET_MESSAGES } from '../assets/limits';
@@ -466,6 +466,22 @@ export function createEditorSession<Source extends { readonly length: number }>(
       let importedSelection: string | undefined;
       const { width, height, origin } = ports.geometry.importFrame(point);
       assets.forEach((asset, index) => {
+        const model = asset.model;
+        if (model?.vrm) {
+          const existing = next.decorations.filter((layer) => layer.kind === 'model3d' && layer.assetId === asset.id);
+          if (existing.length) {
+            // Re-reading a VRM is the advertised path to measure an old import. Refresh each
+            // instance's source, keeping its placement, settings, motions and identity. Authors
+            // can still make intentional copies with Duplicate.
+            next.decorations = next.decorations.map((layer) => {
+              if (layer.kind !== 'model3d' || layer.assetId !== asset.id) return layer;
+              if (!sameModelInfo(layer.source, model)) throw new Error('既存モデルと素材の情報が一致しません。');
+              return { ...layer, source: model };
+            });
+            importedSelection = existing[0]!.id;
+            return;
+          }
+        }
         const scale = Math.max(
           IMAGE_LIMITS.minSize / Math.min(asset.width, asset.height),
           Math.min(260 / asset.width, 200 / asset.height, (width * 0.28) / asset.width, (height * 0.3) / asset.height),

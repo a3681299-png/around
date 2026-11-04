@@ -14,6 +14,8 @@ import { packCheckpoint, unpackCheckpoint } from '../src/studio/checkpoint-codec
 import { defaultModelSettings } from '../src/models/types';
 import { defaultFollowMotion } from '../src/signals/motion';
 import { commitDesign, editDesign, freezeTree, readDesign, shareDesign } from '../src/design/immutable';
+import { inspectAsset } from '../src/assets/inspect';
+import { vrmFixture } from './helpers/vrm-fixture';
 
 function harness(validateAssets: () => Promise<void> = async () => undefined) {
   let value: DesignDocument | undefined,
@@ -851,4 +853,35 @@ test('geometry snapshots during asset preflight preserve selection until import 
   await h.editor.execute({ type: 'undo' });
   expect(h.editor.snapshot().document).toEqual(old.document);
   h.editor.destroy();
+});
+
+test('reimporting a VRM refreshes its body without adding a layer or losing edits and history', async () => {
+  const h = harness(),
+    measured = inspectAsset(vrmFixture()).model!,
+    legacy = structuredClone(measured),
+    id = `asset-${'c'.repeat(64)}`;
+  delete legacy.vrm!.body;
+  await Promise.resolve();
+  h.editor.setEnabled(true);
+  h.editor.open();
+  try {
+    await h.editor.import([{ id, name: 'Legacy.vrm', width: 200, height: 200, model: legacy }]);
+    await h.editor.execute({ type: 'change', patch: { name: 'Keep edits', opacity: 0.6, model: { playing: false } } });
+    const before = h.editor.snapshot().document,
+      expected = structuredClone(before);
+    if (expected.decorations[0]?.kind !== 'model3d') throw new Error('Expected a model layer');
+    expected.decorations[0].source = measured;
+    await h.editor.import([{ id, name: 'Renamed.vrm', width: 200, height: 200, model: measured }]);
+    expect(h.editor.snapshot().document).toEqual(expected);
+    await h.editor.execute({ type: 'undo' });
+    expect(h.editor.snapshot().document).toEqual(before);
+    await h.editor.execute({ type: 'redo' });
+    expect(h.editor.snapshot().document).toEqual(expected);
+    await h.editor.import([{ id, name: 'Renamed.vrm', width: 200, height: 200, model: measured }]);
+    expect(h.editor.snapshot().document).toEqual(expected);
+    await h.editor.execute({ type: 'save' });
+    expect(await h.ports.storage.read()).toEqual(expected);
+  } finally {
+    h.editor.destroy();
+  }
 });
