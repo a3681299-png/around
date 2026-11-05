@@ -3,7 +3,7 @@ import { yields, type WorldInput, type WorldLayout } from './types';
 import type { MotionState } from './motion';
 import { object, numeric } from '../models/types';
 import { oneOf } from '../validation';
-import { modelClips, motionUsable } from '../characters/settings';
+import { DEFAULT_CHARACTER_PERSONALITY, modelClips, motionUsable } from '../characters/settings';
 import { evaluateBodyMotion, layerSeed, parseBodyState, type BodyMotionState, type BodyPose } from './body-motion';
 
 export interface ModelState {
@@ -218,7 +218,8 @@ export function evaluateModels(
     // A character's computed motion on top of its clip (R3-2). Layers without a character, and
     // every artwork made before characters existed, are evaluated exactly as before.
     let pose: BodyPose | undefined;
-    if (layer.character && layer.source.vrm) {
+    // v15: the author may stop the computed motion altogether (absent: on, as in v14).
+    if (layer.character && layer.source.vrm && layer.character.computedMotion !== false) {
       const role = clip === null ? undefined : layer.character.motions[clip]?.role,
         clipSeconds = clip === null ? 0 : (modelClips(layer)[clip]?.duration ?? 0);
       // The author's own motion (a path, a timed clip that is not a held pose) comes first.
@@ -239,11 +240,17 @@ export function evaluateModels(
         idleSeconds: typeof idle === 'number' ? idle : undefined,
         scrollY: input.signals.scroll?.y,
         events: input.events,
+        // v15: the autonomy only when the author turned it on (absent: off, older artwork).
+        ...(layer.character.autonomy
+          ? { personality: layer.character.personality ?? DEFAULT_CHARACTER_PERSONALITY }
+          : {}),
+        // G1.2 holds a root over an approached control: a move away from the pointer continues.
+        ...(paused ? { yielding: true } : {}),
       });
       next.body = body.state;
       pose = body.pose;
-      // Breathing never stops while the character is shown.
-      needsFrame ||= running;
+      // Breathing never stops while the character is shown; a held move finishes its way.
+      needsFrame ||= running || (paused && Boolean(body.state.autonomy));
     }
     state[layer.id] = next;
     evaluations.push({
