@@ -283,7 +283,7 @@ flowchart LR
 | 型・lint        | 通過                                                                                                                                                                                                                                                                    |
 | e2e（触った所） | `operation-bands`（3）・`operation-player-overlays`（2）・`character-autonomy-editor`・`playground`（6）・`operation-controls`、版の期待値を変えた spec（`creator-editor`・`effect-editor`・`group-editor`・`media2-editor`・`motion-editor` ほか）。全件は回していない |
 | 実サイト        | `bands-live`（ポインター・`k`・ArrowRight・Tab で問題 0・帯の画素 0、一時停止でポインターが上＝帯 0、広告で帯 0）。`autonomy-live` 2件（家・逃げる・帰る・近づく、シアターモード・全画面）                                                                              |
-| CI              | 載せ直す前の `aa383b7` は通過。載せ直した後の `f972cce`・`b6720e8` は下に追記する                                                                                                                                                                                       |
+| CI              | 載せ直す前の `aa383b7` は通過。載せ直した後：`f972cce` 通過、`b6720e8` 失敗（lint：計測の JSON の書式、`08de13d` で直した。e2e：`g13-sparse-visual` 1件。製品コードが同じ前後のコミットでは通り、手元で単独 3/3 通過したので揺れとして記録）、報告の `08de13d` 通過     |
 
 ## スクリーンショット
 
