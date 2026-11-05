@@ -61,7 +61,10 @@ export async function openAssetLab(live = false, file?: string) {
     const page = await context.newPage();
     await page.goto('https://www.youtube.com/watch?v=LC1a-DwUhls', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30000 });
-    await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    // check() reads the state before it waits; wait for the loaded (enabled) switch first.
+    const showArtwork = popup.getByRole('switch', { name: '作品を表示する' });
+    await expect(showArtwork).toBeEnabled();
+    await showArtwork.check();
     await page.bringToFront();
     await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
     const tab = await control.evaluate(

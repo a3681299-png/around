@@ -15,7 +15,11 @@ import {
 } from '../src/assets/studio-transfer-protocol';
 
 async function openStudio(context: BrowserContext, popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  // check() reads the state before it waits; until settings load the popup shows a disabled,
+  // unchecked placeholder (then ON), so a check() started early would turn it OFF.
+  const showArtwork = popup.getByRole('switch', { name: '作品を表示する' });
+  await expect(showArtwork).toBeEnabled();
+  await showArtwork.check();
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   await youtube.bringToFront();
   const opened = context.waitForEvent('page');

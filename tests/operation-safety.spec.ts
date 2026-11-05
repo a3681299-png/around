@@ -23,8 +23,16 @@ async function probeCode() {
   return result.outputFiles[0]!.text;
 }
 
+/** check() reads the state before it waits; the popup shows a disabled, unchecked placeholder
+ * until settings load (then ON), so a check() started early would turn it OFF. */
+async function showArtwork(popup: Page) {
+  const toggle = popup.getByRole('switch', { name: '作品を表示する' });
+  await expect(toggle).toBeEnabled();
+  await toggle.check();
+}
+
 test('default artwork retains its decoder while the compositor clips protected regions', async ({ popup, youtube }) => {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   const { panel: editor } = await openEditor(popup, youtube);
   await exposeEditorControls(editor);
   const data = await youtube.evaluate(() => {
@@ -51,7 +59,7 @@ test('default artwork retains its decoder while the compositor clips protected r
 });
 
 async function opaqueArtwork(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   const { panel: editor } = await openEditor(popup, youtube);
   await exposeEditorControls(editor);
   const data = await youtube.evaluate(() => {
@@ -436,7 +444,7 @@ test('redraws over unchanged protection geometry leave the clip and safety recor
   popup,
   youtube,
 }) => {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   const { panel: editor } = await openEditor(popup, youtube);
   await exposeEditorControls(editor);
   const data = await youtube.evaluate(() => {
@@ -899,8 +907,10 @@ test('G1.2 ①②④: near a control, only the layer over it is held; a layer el
       .evaluate((element, p) => document.elementFromPoint(p.x, p.y) === element, centreOf(account)),
   ).toBe(true);
   // ② Leaving releases the held layer after the 350ms hysteresis, without another pointer event.
-  await youtube.mouse.move(away.x, away.y, { steps: 4 });
+  // The first of the four steps is already past the 72 px exit margin, so the hysteresis starts
+  // there: time from before the move, not from when the whole move resolves (it can take ~280ms).
   const left = Date.now();
+  await youtube.mouse.move(away.x, away.y, { steps: 4 });
   await expect.poll(() => heldLayers(youtube), { intervals: [50] }).toEqual([]);
   expect(Date.now() - left).toBeGreaterThanOrEqual(300);
   await expect.poll(() => alphaOf(youtube, 'over-account')).toBeCloseTo(0.9, 1);
@@ -992,7 +1002,7 @@ test('manual emergency OFF releases drawing and preserves an unsaved editor and 
   popup,
   youtube,
 }) => {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   const { panel: editor } = await openEditor(popup, youtube);
   await editor.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await expect(editor.locator('.dirty')).toHaveText('未保存');

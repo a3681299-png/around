@@ -57,7 +57,10 @@ export async function reinject(
   await runtime.evaluate(bundle.outputFiles[0]!.text);
 }
 export async function open(popup: Page, page: Page): Promise<Locator> {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  // check() reads the state before it waits; wait for the loaded (enabled) switch first.
+  const showArtwork = popup.getByRole('switch', { name: '作品を表示する' });
+  await expect(showArtwork).toBeEnabled();
+  await showArtwork.check();
   await page.bringToFront();
   await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   return (await openEditor(popup, page)).panel;
