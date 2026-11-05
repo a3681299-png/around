@@ -467,12 +467,13 @@ export function createEditorSession<Source extends { readonly length: number }>(
       const { width, height, origin } = ports.geometry.importFrame(point);
       assets.forEach((asset, index) => {
         const model = asset.model;
-        if (model?.vrm) {
+        if (model?.vrm?.body) {
           const existing = next.decorations.filter((layer) => layer.kind === 'model3d' && layer.assetId === asset.id);
-          if (existing.length) {
-            // Re-reading a VRM is the advertised path to measure an old import. Refresh each
-            // instance's source, keeping its placement, settings, motions and identity. Authors
-            // can still make intentional copies with Duplicate.
+          // Re-reading a VRM is the advertised path to measure an old import: while any instance
+          // still lacks its body, refresh every instance (placement, settings, motions and
+          // identity kept) and add none. Once all are measured, reading the file again adds
+          // another instance, as before (Shota's decision, 2026-11-05).
+          if (existing.some((layer) => layer.kind === 'model3d' && !layer.source.vrm?.body)) {
             next.decorations = next.decorations.map((layer) => {
               if (layer.kind !== 'model3d' || layer.assetId !== asset.id) return layer;
               if (!sameModelInfo(layer.source, model)) throw new Error('既存モデルと素材の情報が一致しません。');

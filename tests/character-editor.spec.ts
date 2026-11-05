@@ -98,12 +98,11 @@ test('reimporting the same historical VRM measures its existing record and layer
   await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
   await panel.locator('.layer').first().click();
   await expect(panel.locator('.character-body')).not.toContainText('体型を測れていません');
+  // Every layer is measured now: reading the same file again adds a second instance, as it did
+  // before the body measure (Shota's decision, 2026-11-05). The record is still the one row.
   await panel.locator('.model-file').setInputFiles(input);
-  await expect(panel.locator('.layer')).toHaveCount(1);
-  // An identical second import has nothing to save; wait for its completed status.
-  await expect(panel.locator('.status')).toHaveText('保存済みの見た目です。');
-  await expect(panel.locator('.save')).toBeDisabled();
-  await expect(panel.locator('.dirty')).toHaveText('保存済み');
+  await expect(panel.locator('.layer')).toHaveCount(2);
+  await expect(panel.locator('.save')).toBeEnabled();
   expect(await stored()).toEqual(expected);
   expect(await rows()).toHaveLength(1);
 });

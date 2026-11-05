@@ -877,10 +877,40 @@ test('reimporting a VRM refreshes its body without adding a layer or losing edit
     expect(h.editor.snapshot().document).toEqual(before);
     await h.editor.execute({ type: 'redo' });
     expect(h.editor.snapshot().document).toEqual(expected);
-    await h.editor.import([{ id, name: 'Renamed.vrm', width: 200, height: 200, model: measured }]);
-    expect(h.editor.snapshot().document).toEqual(expected);
     await h.editor.execute({ type: 'save' });
     expect(await h.ports.storage.read()).toEqual(expected);
+    // Every layer is measured now: reading the same VRM again adds a second instance as it
+    // always did (Shota's decision, 2026-11-05), leaving the first one untouched.
+    await h.editor.import([{ id, name: 'Renamed.vrm', width: 200, height: 200, model: measured }]);
+    const twice = h.editor.snapshot().document.decorations;
+    expect(twice).toHaveLength(2);
+    expect(twice[0]).toEqual(expected.decorations[0]);
+    expect(twice[1]).toMatchObject({ kind: 'model3d', assetId: id, source: measured });
+  } finally {
+    h.editor.destroy();
+  }
+});
+
+test('reimporting refreshes every unmeasured copy of a VRM and adds none; a fully measured VRM adds a layer', async () => {
+  const h = harness(),
+    measured = inspectAsset(vrmFixture()).model!,
+    legacy = structuredClone(measured),
+    id = `asset-${'e'.repeat(64)}`;
+  delete legacy.vrm!.body;
+  await Promise.resolve();
+  h.editor.setEnabled(true);
+  h.editor.open();
+  try {
+    await h.editor.import([{ id, name: 'Legacy.vrm', width: 200, height: 200, model: legacy }]);
+    await h.editor.execute({ type: 'duplicate' });
+    const ids = h.editor.snapshot().document.decorations.map((layer) => layer.id);
+    expect(ids).toHaveLength(2);
+    await h.editor.import([{ id, name: 'Legacy.vrm', width: 200, height: 200, model: measured }]);
+    const refreshed = h.editor.snapshot().document.decorations;
+    expect(refreshed.map((layer) => layer.id)).toEqual(ids);
+    for (const layer of refreshed) expect(layer).toMatchObject({ kind: 'model3d', source: measured });
+    await h.editor.import([{ id, name: 'Legacy.vrm', width: 200, height: 200, model: measured }]);
+    expect(h.editor.snapshot().document.decorations).toHaveLength(3);
   } finally {
     h.editor.destroy();
   }
