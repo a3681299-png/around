@@ -32,6 +32,13 @@ e2e は全件で約23分かかる。毎回すべて回さず、いつ・誰が�
 | 段階の最後         | —                                                                                                                         | 独立の検証（対象コミットの CI の結果を使い、足したテストと実サイトの確認を回す） |
 
 - Codex が確かめている間、Claude Code はコードを変えない。docs や、検証に影響しない作業だけをする
+
+### 1回の作業の大きさ（2026-11-05、翔太の決定）
+
+- 1回の作業は、R の段階のまとまった塊にする。塊の中は小さなコミットに分け、区切りごとに「作業の途中」の確認（型チェック・lint・unit・触った部分の e2e・スクリーンショット）を回す。Codex の検証は塊の終わりに1回
+- 1回の作業で、作品データの版上げは1段まで
+- 途中で計画と大きく違う判断が要ったら、そこで止めて報告する
+- 「同じ問題への挑戦は3回まで」は、塊の中の個々の不具合ごとに数える
 - 中核（下の一覧）を触った回は、完了報告にそう書く。Codex は、その回の e2e 全件（Windows）を必ず回す
 - Claude Code の「性能の調査」（仮説を確かめる短い計測・CPU プロファイル）は、作業の途中でしてよい。合否を決める交互計測は Codex がする
 - 中核：`src/design/renderer.ts`・`src/design/schema.ts`・`src/design/migrations.ts`・`src/validation.ts`・`src/sites/`・`src/world/`・`src/host/`（`src/host/page-controller.ts` を含む）・`src/content/`・`manifest.json`・`scripts/build.mjs`・`playwright.config.ts`・`tests/fixtures.ts`

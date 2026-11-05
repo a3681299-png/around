@@ -1105,3 +1105,14 @@ GPUの定常参考値は、変更前 **1.14 / 2.16ms**、修正後 **1.18 / 2.13
 
 - scene の root が親のない node かは検査していない。今のローダーは例外にならないが、R3-2 以降で node の階層を自分で読むなら、そこで確かめる
 - R31-2 で、float でない accessor・4の倍数でない bufferView・scene のないファイルを断るようになった。Blender の VRM アドオン以外の書き出し（Unity の UniVRM など）の .vrma は試していない
+
+---
+
+# R3-1：閉じた（2026-11-05）
+
+翔太の決定で R3-1 を閉じた。次の回の最初に、次の2つをする。
+
+1. **同じ VRM の再取り込みを元の挙動に戻す**（翔太の決定）：体型がない層があるときだけ、その層と素材の記録に体型を補う。全部の層に体型があれば、従来どおり新しい層を作る（`src/editor-core/session.ts` の `addImages`）。回帰テスト：体型のない層があるときは層が増えない／全部にあるときは層が1枚増える、の両方
+2. **テストの揺れ2件を直す**
+   - `tests/operation-safety.spec.ts:850`：解除までの計時を、離れる `mouse.move` の後からではなく、離れる1歩目を送る前から始める（1歩目で出口の72pxを越えるため）。下限は「1歩目から350ms」
+   - 「作品を表示する」の `check()` が popup の読み込みと競合する件：`tests/studio-transfer.spec.ts:18`・`tests/operation-safety.spec.ts:27`・`:54`・`tests/helpers/world-host.ts:60`・`tests/helpers/asset-runtime-lab.ts:64` の5か所で、`check()` の前に `await expect(switch).toBeEnabled()` を置く
