@@ -1,0 +1,16 @@
+{
+  "box": {
+    "x": 126,
+    "y": 594,
+    "width": 88,
+    "height": 38
+  },
+  "resident": {
+    "x": 70,
+    "y": 488,
+    "width": 200,
+    "height": 250
+  },
+  "hit": "play",
+  "samePixels": true
+}
