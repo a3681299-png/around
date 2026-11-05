@@ -1,4 +1,5 @@
 import tseslint from 'typescript-eslint';
+import { browserBoundaryConfig } from './scripts/browser-boundary.mjs';
 
 export default [
   { ignores: ['.work/**', 'dist/**', 'node_modules/**', 'assets/**', 'src/vendor/**', 'tests/fixtures/**'] },
@@ -15,4 +16,5 @@ export default [
       '@typescript-eslint/switch-exhaustiveness-check': 'error',
     },
   },
+  ...browserBoundaryConfig,
 ];
