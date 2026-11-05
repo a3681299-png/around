@@ -248,7 +248,7 @@ flowchart LR
 | 家に帰る | `run` の 0.01〜0.17s | `return.png`：右上から走って戻ってくる                                  |
 | 近づく   | `walk` の 0.62s      | `approach.png`：左へ歩いて寄っている                                    |
 
-4回回して、休む・逃げるは毎回、家に帰る・近づくは3回でそれぞれの動作が流れた（届かなかった回は、ガードが描画を止めていた）。保存した作品（素材を除いた層の JSON）は `.work/behaviour-motions-live/design-kept.json`。翔太の Chrome では、エディターでトルーシェと4本を読み込み、自律を on にして、表の通りに選べば同じになる。
+今の形のテストで3回回して、休む・逃げる・家に帰るは3回とも、近づくは2回、それぞれの動作が区間の中で流れた（届かなかった1回は、家に帰る途中からガードが描画を止めたままだった）。それより前の2回は、テストが行動の瞬間を読み損ねていた（読み方を直した）。保存した作品（素材を除いた層の JSON）は `.work/behaviour-motions-live/design-kept.json`。翔太の Chrome では、エディターでトルーシェと4本を読み込み、自律を on にして、表の通りに選べば同じになる。
 
 # 塊3の完了報告（2026-11-05、Claude Code）
 
@@ -303,13 +303,13 @@ flowchart LR
 
 ## テスト
 
-| 種類            | 件数・結果                                                                                                                                                                                                                                                                                                                                                         |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| unit            | 566 通過（新規：`autonomy` 8・`character-v15`・`behaviour-motions` 7）                                                                                                                                                                                                                                                                                             |
-| 型・lint        | 通過                                                                                                                                                                                                                                                                                                                                                               |
-| e2e（触った所） | `operation-bands`（3）・`operation-player-overlays`（2）・`character-autonomy-editor`・`playground`（6）・`operation-controls`、版の期待値を変えた spec（`creator-editor`・`effect-editor`・`group-editor`・`media2-editor`・`motion-editor` ほか）。全件は回していない                                                                                            |
-| 実サイト        | `bands-live`（ポインター・`k`・ArrowRight・Tab で問題 0・帯の画素 0、一時停止でポインターが上＝帯 0、広告で帯 0）。`autonomy-live` 2件（家・逃げる・帰る・近づく、シアターモード・全画面）。`behaviour-motions-live`（手元のモデル、4回）。割り当ての後の e2e：`playground`・`model-editor`・`vrm-editor`・`character-autonomy-editor`・`model-animation` 13件通過 |
-| CI              | 載せ直す前の `aa383b7` は通過。載せ直した後：`f972cce` 通過、`b6720e8` 失敗（lint：計測の JSON の書式、`08de13d` で直した。e2e：`g13-sparse-visual` 1件。製品コードが同じ前後のコミットでは通り、手元で単独 3/3 通過したので揺れとして記録）、報告の `08de13d` 通過                                                                                                |
+| 種類            | 件数・結果                                                                                                                                                                                                                                                                                                                                                                 |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| unit            | 566 通過（新規：`autonomy` 8・`character-v15`・`behaviour-motions` 7）                                                                                                                                                                                                                                                                                                     |
+| 型・lint        | 通過                                                                                                                                                                                                                                                                                                                                                                       |
+| e2e（触った所） | `operation-bands`（3）・`operation-player-overlays`（2）・`character-autonomy-editor`・`playground`（6）・`operation-controls`、版の期待値を変えた spec（`creator-editor`・`effect-editor`・`group-editor`・`media2-editor`・`motion-editor` ほか）。全件は回していない                                                                                                    |
+| 実サイト        | `bands-live`（ポインター・`k`・ArrowRight・Tab で問題 0・帯の画素 0、一時停止でポインターが上＝帯 0、広告で帯 0）。`autonomy-live` 2件（家・逃げる・帰る・近づく、シアターモード・全画面）。`behaviour-motions-live`（手元のモデル、今の形で3回）。割り当ての後の e2e：`playground`・`model-editor`・`vrm-editor`・`character-autonomy-editor`・`model-animation` 13件通過 |
+| CI              | 載せ直す前の `aa383b7` は通過。載せ直した後：`f972cce` 通過、`b6720e8` 失敗（lint：計測の JSON の書式、`08de13d` で直した。e2e：`g13-sparse-visual` 1件。製品コードが同じ前後のコミットでは通り、手元で単独 3/3 通過したので揺れとして記録）、報告の `08de13d` 通過                                                                                                        |
 
 ## スクリーンショット
 
