@@ -9,6 +9,8 @@ on:
         fix/youtube-silver-native-surfaces,
         codex/extension-completion,
         codex/creator-editor-spike,
+        # The next chunk's branch while Codex verifies the previous one (AGENTS.md).
+        'codex/chunk*',
       ]
   pull_request:
 
