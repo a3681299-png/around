@@ -17,6 +17,17 @@ const selectors: [string, OperationCandidate['kind'], string][] = [
     'native-menu',
     '.ytp-popup:not(button), .ytp-settings-menu, ytd-menu-popup-renderer, tp-yt-paper-dialog, [role="menu"], [role="dialog"], [role="listbox"], select',
   ],
+  // What YouTube puts over the picture that can be pressed: the end screen's video and channel
+  // cards, the autoplay "next" card and its countdown, the info cards' teaser, the products
+  // shelf and the advert's own links (the skip button is a button, below). Several are links or
+  // focusable boxes rather than buttons, so the generic control selector alone missed them.
+  // Over the local plane they are above the artwork by stacking order; elsewhere (a menu, an
+  // advert or a central button keeps the local plane off) only these surfaces keep them clear.
+  [
+    'player.overlay',
+    'click',
+    '.html5-video-player a[href], .html5-video-player [tabindex]:not([tabindex="-1"]), .ytp-ce-element, .ytp-cards-teaser, .ytp-featured-product, .ytp-suggested-action, .ytp-autonav-endscreen-countdown-overlay',
+  ],
   [
     'control',
     'click',
