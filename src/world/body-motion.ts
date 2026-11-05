@@ -112,6 +112,7 @@ export interface BodyContext {
   /** The layer's anchor point in page px, and its height in px (scales moves). */
   position: Point | undefined;
   heightPx: number;
+  widthPx?: number;
   /** The anchor's frame (same space as position): the autonomy keeps the body inside it. */
   room?: { left: number; top: number; width: number; height: number };
   pointer: Point | undefined;
@@ -220,6 +221,7 @@ export function evaluateBodyMotion(
       deltaMs: context.deltaMs,
       home: context.position!,
       heightPx: context.heightPx,
+      ...(context.widthPx ? { widthPx: context.widthPx } : {}),
       ...(context.room ? { room: context.room } : {}),
       pointer: context.pointer,
       idleSeconds: idle,

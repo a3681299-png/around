@@ -236,6 +236,7 @@ export function evaluateModels(
         reducedMotion: input.environment.reducedMotion,
         position: entry.position,
         heightPx: layer.placement.heightPx,
+        widthPx: layer.placement.widthPx,
         pointer: input.signals.pointer,
         idleSeconds: typeof idle === 'number' ? idle : undefined,
         scrollY: input.signals.scroll?.y,

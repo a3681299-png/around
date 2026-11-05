@@ -64,6 +64,8 @@ export interface AutonomyContext {
   /** Home: the authored anchor point (page px), and the character's drawn height (px). */
   home: Point;
   heightPx: number;
+  /** Its drawn width (px): with the height, the box that must stay inside the room. */
+  widthPx?: number;
   /** The part it lives on (its anchor's frame, the same space as home): it never leaves it. */
   room?: { left: number; top: number; width: number; height: number };
   pointer: Point | undefined;
@@ -159,16 +161,17 @@ export function evaluateAutonomy(
     doze: s.sleepy > 0.6 && s.alert < 0.2 ? s.sleepy : 0,
     return: offHome && away && s.alert < 0.45 ? 0.5 : 0,
   };
-  // Offsets that keep the body inside its room (a margin of its own half width/height).
-  const room = context.room;
+  // Offsets that keep the whole drawn box inside its room (a margin of its half width/height).
+  // Where the room is narrower than the box, the box's middle stays at the room's middle.
+  const room = context.room,
+    halfW = (context.widthPx ?? 0.8 * h) / 2,
+    halfH = h / 2;
+  const keep = (value: number, low: number, high: number) =>
+    low > high ? (low + high) / 2 : Math.max(low, Math.min(high, value));
   const keepX = (x: number) =>
-    room
-      ? Math.max(room.left + 0.35 * h, Math.min(room.left + room.width - 0.35 * h, context.home.x + x)) - context.home.x
-      : x;
+    room ? keep(context.home.x + x, room.left + halfW, room.left + room.width - halfW) - context.home.x : x;
   const keepY = (y: number) =>
-    room
-      ? Math.max(room.top + 0.5 * h, Math.min(room.top + room.height - 0.5 * h, context.home.y + y)) - context.home.y
-      : y;
+    room ? keep(context.home.y + y, room.top + halfH, room.top + room.height - halfH) - context.home.y : y;
   let best: Behaviour = 'rest';
   for (const b of BEHAVIOURS) if (scores[b] > scores[best]) best = b;
   if (best !== s.behaviour && (t - s.since >= AUTONOMY.dwellMs || best === 'flee')) {
