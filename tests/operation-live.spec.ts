@@ -65,22 +65,33 @@ async function nativeInputs(page: Page) {
       return records;
     };
   });
-  const volume = (await slider.boundingBox())!;
+  // Read the slider's box again right before pressing, until two reads a frame apart agree:
+  // YouTube may still move its player while the page finishes its layout (once the box moved
+  // by (-8, +33.75) between the read and the press, docs/playground-plan.md 「塊1の修正」).
+  const settledBox = async () => {
+    let last = (await slider.boundingBox())!;
+    for (let i = 0; i < 20; i++) {
+      await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+      const now = (await slider.boundingBox())!;
+      if (now.x === last.x && now.y === last.y && now.width === last.width && now.height === last.height) return now;
+      last = now;
+    }
+    throw new Error('The volume slider kept moving: ' + JSON.stringify(last));
+  };
+  const volume = await settledBox();
   await page.mouse.move(volume.x + volume.width * 0.3, volume.y + volume.height / 2);
   await page.mouse.down();
   const quieter = await video.evaluate((v: HTMLVideoElement) => v.volume);
   await page.mouse.move(volume.x + volume.width * 0.65, volume.y + volume.height / 2, { steps: 6 });
   await page.mouse.up();
-  console.log(
-    'LIVE_VOLUME_INPUT ' +
-      JSON.stringify({
-        box: volume,
-        quieter,
-        events: await page.evaluate(() =>
-          (window as unknown as { operationVolumeAudit: () => unknown[] }).operationVolumeAudit(),
-        ),
-      }),
-  );
+  const events = (await page.evaluate(() =>
+    (window as unknown as { operationVolumeAudit: () => unknown[] }).operationVolumeAudit(),
+  )) as { type: string; x: number; y: number; target: string; slider: { x: number; y: number } }[];
+  console.log('LIVE_VOLUME_INPUT ' + JSON.stringify({ box: volume, quieter, events }));
+  // The press reached the slider itself, at the box that was read (not a stale place).
+  const press = events.find((event) => event.type === 'mousedown');
+  expect(press?.target, 'mousedown target').toMatch(/ytp-volume-slider/);
+  expect(press?.slider).toEqual({ x: volume.x, y: volume.y, width: volume.width, height: volume.height });
   await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.volume)).toBeGreaterThan(quieter);
   await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.volume)).toBeLessThan(1);
   await player.focus();
