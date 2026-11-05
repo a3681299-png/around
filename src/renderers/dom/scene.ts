@@ -86,7 +86,12 @@ const PAGE_CSS =
 const ATMOSPHERE_CSS =
   CSS +
   `:host{opacity:${ATMOSPHERE_ALPHA_CAP}!important;clip-path:none!important;filter:none!important}*{filter:none!important;backdrop-filter:none!important;box-shadow:none!important;text-shadow:none!important}.image,.image[data-editable],.composition{pointer-events:none!important}`;
-type Plane = { host: HTMLElement; content: HTMLElement; shadow: ShadowRoot };
+// Under the content (an adapter's underlay slot), atmosphere covers nothing, so it needs neither
+// the opacity cap nor the clip; it still takes no input and keeps the effect restrictions.
+const UNDERLAY_CSS =
+  CSS +
+  `:host{clip-path:none!important;filter:none!important}*{filter:none!important;backdrop-filter:none!important;box-shadow:none!important;text-shadow:none!important}.image,.image[data-editable],.composition{pointer-events:none!important}`;
+type Plane = { host: HTMLElement; content: HTMLElement; shadow: ShadowRoot; under?: boolean };
 const ATMOSPHERE = 0,
   PAGE = 1,
   SCREEN = 2;
@@ -291,8 +296,21 @@ export function createImageRenderer(
       }
       const inPlane = (id: string, plane: number) => planes.get(id) === plane;
       const used = new Set(planes.values());
-      if (used.has(ATMOSPHERE))
-        atmospherePlane ??= createPlane('web-world-themes-atmosphere-decorations', ATMOSPHERE_CSS, false);
+      // Fullscreen keeps every root in the player's own plane; the underlay is the page's.
+      const underlay = used.has(ATMOSPHERE) && !doc.fullscreenElement ? safety.source.underlaySlot() : undefined;
+      if (atmospherePlane && Boolean(atmospherePlane.under) !== Boolean(underlay)) {
+        // The two places use different CSS (the cap); rebuild rather than restyle in place.
+        atmospherePlane.host.remove();
+        atmospherePlane = undefined;
+      }
+      if (used.has(ATMOSPHERE) && !atmospherePlane) {
+        atmospherePlane = createPlane(
+          'web-world-themes-atmosphere-decorations',
+          underlay ? UNDERLAY_CSS : ATMOSPHERE_CSS,
+          false,
+        );
+        atmospherePlane.under = Boolean(underlay);
+      }
       if (used.has(PAGE)) pagePlane ??= createPlane('web-world-themes-page-decorations', PAGE_CSS, true);
       const parent = host!.parentElement;
       // DOM order in the shared overlay parent is the paint order: atmosphere, page, screen.
@@ -303,6 +321,13 @@ export function createImageRenderer(
         if (!plane) continue;
         if (!used.has(value) || !parent) {
           plane.host.remove();
+          continue;
+        }
+        if (value === ATMOSPHERE && underlay) {
+          // First in its parent: painted before (under) every sibling of the same stacking level.
+          if (plane.host.parentElement !== underlay.parent || plane.host !== underlay.parent.firstChild)
+            underlay.parent.insertBefore(plane.host, underlay.parent.firstChild);
+          plane.host.style.setProperty('--ww-decoration-z', String(underlay.zIndex));
           continue;
         }
         const before = value === PAGE ? host! : (used.has(PAGE) && pagePlane?.host) || host!;

@@ -88,6 +88,24 @@ test('without the extension, 適用 switches the site to the artwork and back', 
   expect(problems).toEqual([]);
 });
 
+test('the background layer is drawn under the content: the video picture is not veiled', async ({ page }) => {
+  await open(page);
+  const player = (await page.locator('.player').boundingBox())!;
+  // The left half of the paused picture, away from the character on the right.
+  const clip = { x: player.x + 20, y: player.y + 60, width: player.width / 2 - 40, height: player.height - 120 };
+  await expect.poll(() => page.evaluate(() => document.querySelector('video')!.readyState)).toBeGreaterThanOrEqual(2);
+  // An empty stretch of the page beside the player, where the room should show.
+  const margin = { x: 10, y: 80, width: 80, height: 80 };
+  const plain = await page.screenshot({ clip }),
+    plainMargin = await page.screenshot({ clip: margin });
+  await page.locator('#apply').click();
+  await expect(model(page)).toHaveAttribute('data-renderer', 'three', { timeout: 20000 });
+  // The room is visible beside the content ...
+  await expect.poll(async () => (await page.screenshot({ clip: margin })).equals(plainMargin)).toBe(false);
+  // ... but nothing is painted over the picture.
+  expect((await page.screenshot({ clip })).equals(plain)).toBe(true);
+});
+
 test('Alt+Shift+Q takes every effect off, and pressing it again brings them back', async ({ page }) => {
   await open(page);
   const plain = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);

@@ -93,6 +93,10 @@ export interface OperationSource {
   /** zIndex: the local plane's order inside the player, just above its media and below its UI. */
   videoSlot(): { parent: HTMLElement; rect: PlacementFrame; top: number; bottom: number; zIndex: number } | undefined;
   overlaySlot(): { parent: HTMLElement; zIndex: number } | undefined;
+  /** A place under the page's content for atmosphere layers, when the adapter owns the page's
+   * stacking (the Playground). Undefined on sites we only decorate (YouTube): there, atmosphere
+   * stays over the content with its opacity cap. Drawn under the content, it covers nothing. */
+  underlaySlot(): { parent: HTMLElement; zIndex: number } | undefined;
   /** Explicit editing only: the player's video centre (minus its control bands) while no menu,
    * error or advert covers it. Unlike videoSlot it stays available when native controls appear in
    * the centre; those are cut from the clip and refused at input time instead. */
@@ -111,6 +115,7 @@ export function createOperationSource(
   /** The adapter's candidate test for an inserted subtree (the same selectors its incremental
    * discovery uses). Without it, every element added or removed is a layout change. */
   holdsCandidate?: (root: Element, deep?: boolean) => boolean,
+  underlaySlot: OperationSource['underlaySlot'] = () => undefined,
 ): OperationSource {
   if (!documentIds.has(doc)) documentIds.set(doc, ++nextDocumentId);
   const documentId = documentIds.get(doc)!;
@@ -918,6 +923,7 @@ export function createOperationSource(
     videoSlot,
     editorCentre,
     overlaySlot: verifiedOverlaySlot,
+    underlaySlot,
     pageSlot() {
       const overlay = verifiedOverlaySlot();
       if (!overlay || doc.fullscreenElement) return undefined;
