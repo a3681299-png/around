@@ -1,8 +1,8 @@
-import { importAssets, readImportFile, releaseAssets } from './client';
-import { ASSET_MESSAGE } from './protocol';
-import { validateImportBatchSizes } from './import-validation';
+import { importAssets, readImportFile, releaseAssets } from './asset-client';
+import { ASSET_MESSAGE } from '../assets/protocol';
+import { validateImportBatchSizes } from '../assets/import-validation';
 import { isAssetId } from '../design/schema';
-import { ASSET_LIMITS } from './limits';
+import { ASSET_LIMITS } from '../assets/limits';
 import {
   ASSET_PROFILE,
   newAssetProfile,
@@ -21,8 +21,8 @@ import {
   type StudioTransferFile,
   type StudioTransferReply,
   type StudioTransferRequest,
-} from './studio-transfer-protocol';
-import type { AssetMetadata } from './validation';
+} from '../assets/studio-transfer-protocol';
+import type { AssetMetadata } from '../assets/validation';
 
 class WorkerRestarted extends Error {}
 class TransferUnavailable extends Error {}

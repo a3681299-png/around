@@ -6,6 +6,7 @@ import tokens from '../editor/studio-tokens.css';
 import { glyphButton } from '../editor/icons';
 import { SETTINGS_MARKUP } from './markup';
 import { initialSettingsPosition, SETTINGS_POSITION_KEY, type SettingsRect } from './position';
+import { readStoredPosition, saveStoredPosition } from '../browser/settings-store';
 
 export interface SettingsPanel extends SettingsEntry {
   open(): void;
@@ -95,10 +96,8 @@ export function createSettingsPanel(doc: Document, editor?: SettingsEditorEntry)
     }
     place(position.x, position.y, position.maxHeight);
   };
-  void chrome.storage.local
-    .get(SETTINGS_POSITION_KEY)
-    .then((values) => {
-      const value = values[SETTINGS_POSITION_KEY] as { x?: unknown; y?: unknown } | undefined;
+  void readStoredPosition(SETTINGS_POSITION_KEY)
+    .then((value) => {
       if (
         !alive ||
         positionTouched ||
@@ -132,7 +131,7 @@ export function createSettingsPanel(doc: Document, editor?: SettingsEditorEntry)
     if (!gesture) return;
     gesture = undefined;
     if (saved)
-      void chrome.storage.local.set({ [SETTINGS_POSITION_KEY]: saved }).catch(() => {
+      void saveStoredPosition(SETTINGS_POSITION_KEY, saved).catch(() => {
         main.querySelector('#save-status')!.textContent = '設定ウィンドウの位置を保存できませんでした。';
       });
   };

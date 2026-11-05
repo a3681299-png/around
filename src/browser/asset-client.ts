@@ -1,9 +1,12 @@
+// The extension's asset storage (IndexedDB through the worker). Page code reaches it only
+// through the AssetPort that the content entry hands to the page controller.
 import type { DesignDocument } from '../design/types';
-import { ASSET_LIMITS, base64ToBytes, bytesToBase64, type AssetMetadata } from './validation';
-import { ASSET_MESSAGES } from './limits';
-import { inspectAsset } from './inspect';
-import { validateAnimatedFrames } from './decode';
-import { ASSET_MESSAGE, type AssetWireFile } from './protocol';
+import { ASSET_LIMITS, base64ToBytes, bytesToBase64, type AssetMetadata } from '../assets/validation';
+import { ASSET_MESSAGES } from '../assets/limits';
+import { inspectAsset } from '../assets/inspect';
+import { validateAnimatedFrames } from '../assets/decode';
+import { ASSET_MESSAGE, type AssetWireFile } from '../assets/protocol';
+import { assetSourceBytes, type AssetPort, type LoadedAsset } from '../assets/port';
 import {
   ASSET_PROFILE,
   assetProfile,
@@ -14,10 +17,10 @@ import {
   profileEnd,
   flushAssetProfile,
 } from '../diagnostics/asset-profile';
-import { createSourceCache } from './source-cache';
-import { prepareVerifiedSource, type VerifiedModelSource } from './verified-source';
-import { validateImportBatchSizes } from './import-validation';
-import { readAssetBuffer } from './read-adapter';
+import { createSourceCache } from '../assets/source-cache';
+import { prepareVerifiedSource } from '../assets/verified-source';
+import { validateImportBatchSizes } from '../assets/import-validation';
+import { readAssetBuffer } from '../assets/read-adapter';
 
 async function request<T>(action: string, values: Record<string, unknown>): Promise<T> {
   const trace = ASSET_PROFILE
@@ -162,10 +165,7 @@ async function fetchChunks(id: string, signal: AbortSignal): Promise<{ metadata:
   return { metadata: result.metadata, bytes };
 }
 
-export type LoadedAsset = { metadata: AssetMetadata } & (
-  { blob: Blob; modelBuffer?: never } | { modelBuffer: VerifiedModelSource; blob?: never }
-);
-export const assetSourceBytes = (asset: LoadedAsset) => asset.modelBuffer?.byteLength ?? asset.blob!.size;
+export { assetSourceBytes, type LoadedAsset } from '../assets/port';
 
 async function fetchAsset(id: string, signal: AbortSignal, binaryEnabled = true): Promise<LoadedAsset> {
   signal.throwIfAborted();
@@ -214,6 +214,8 @@ export async function loadAsset(id: string, signal?: AbortSignal): Promise<Loade
   return { ...asset, metadata: structuredClone(asset.metadata) };
 }
 export const clearAssetSources = () => sources.clear();
+/** The extension's AssetPort for the page runtime. */
+export const extensionAssets: AssetPort = { load: loadAsset, clear: clearAssetSources };
 /** Explicit legacy comparator for profiling; it shares the production inspector. */
 export const loadAssetChunks = (id: string, signal = new AbortController().signal) => fetchAsset(id, signal, false);
 export const loadAssetMetadata = (id: string) => request<AssetMetadata>('get-metadata', { id });

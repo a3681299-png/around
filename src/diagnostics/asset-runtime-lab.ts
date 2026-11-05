@@ -1,4 +1,4 @@
-import { importAssets, releaseAssets, retainAssets } from '../assets/client';
+import { importAssets, releaseAssets, retainAssets } from '../browser/asset-client';
 import { getAsset } from '../assets/repository';
 import { ASSET_LIMITS } from '../assets/validation';
 import { ASSET_LAB_MESSAGE } from './asset-runtime-broker';

@@ -23,7 +23,7 @@ import { createVrmPlayer, isVrm, disposeInstanceSkeletons } from './vrm-player';
 import { parseVrmAnimation, vrmAnimationClip } from './vrma-clip';
 import type { ModelEvaluation } from '../../world/models';
 import type { WorldFrame } from '../../world/types';
-import { loadAsset } from '../../assets/client';
+import type { AssetPort } from '../../assets/port';
 import { parseVerifiedModelSource, verifiedModelBytes } from '../../assets/verified-source';
 import { ASSET_MESSAGES, MODEL_RESOURCE_LIMITS } from '../../assets/limits';
 import { inspectGlb } from '../../assets/glb';
@@ -107,7 +107,8 @@ export function createModelRenderer(
   report: (message: string) => void,
   observe: (stats: Record<string, unknown>) => void,
   parent: ShadowRoot,
-  readAsset: typeof loadAsset = loadAsset,
+  /** The page's AssetPort.load: renderers never pick an asset store themselves. */
+  readAsset: AssetPort['load'],
   labOptions?: ModelRendererLabOptions,
   onContextLost?: () => void,
 ) {

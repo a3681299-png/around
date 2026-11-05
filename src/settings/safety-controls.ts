@@ -1,4 +1,4 @@
-import { safetyShortcut, setEmergencyOff, watchEmergencyOff } from '../storage/safety';
+import { safetyShortcut, setEmergencyOff, watchEmergencyOff } from '../browser/safety-store';
 import type { StudioConnection } from '../studio/connection';
 import type { SafetyStatus } from '../host/operation-guard';
 

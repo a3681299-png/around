@@ -2,7 +2,8 @@ import { test, expect } from '@playwright/test';
 import { compileDesign } from '../src/design/renderer';
 import { emptyDesign, parseDesign } from '../src/design/schema';
 import type { DesignDocument } from '../src/design/types';
-import { designKey, readDesign, saveDesign, watchDesign } from '../src/storage/designs';
+import { designKey } from '../src/storage/designs';
+import { readDesign, saveDesign, watchDesign } from '../src/browser/design-store';
 
 const targets = [{ id: 'video-card', surface: 'video-card', label: '動画カード' }];
 function sample(): DesignDocument {

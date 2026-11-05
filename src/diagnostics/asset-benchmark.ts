@@ -1,4 +1,4 @@
-import { importAssets, loadAsset, loadAssetMetadata, releaseAssets } from '../assets/client';
+import { importAssets, loadAsset, loadAssetMetadata, releaseAssets } from '../browser/asset-client';
 import { getAsset } from '../assets/repository';
 import { inspectAsset } from '../assets/inspect';
 import type { AssetMetadata } from '../assets/validation';

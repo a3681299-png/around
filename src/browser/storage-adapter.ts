@@ -1,6 +1,6 @@
 import type { EditorStorage } from '../editor-core/types';
-import { checkDesignAssets, commitDesign, importAssets, releaseAssets, retainAssets } from '../assets/client';
-import { readDesign, watchDesign } from '../storage/designs';
+import { checkDesignAssets, commitDesign, importAssets, releaseAssets, retainAssets } from './asset-client';
+import { readDesign, watchDesign } from './design-store';
 import { ASSET_LIMITS, type AssetMetadata } from '../assets/validation';
 
 export type BrowserImportSource =

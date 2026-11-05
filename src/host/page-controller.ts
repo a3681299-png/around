@@ -6,7 +6,8 @@ import { createImageRenderer, type ImageEditing } from '../design/image-renderer
 import type { SiteAdapter, SitePageChange } from '../sites/types';
 import type { UserSettings } from '../storage/settings';
 import { createTimelineHost, type TimelineHost } from './timeline';
-import { createTakeStorage } from '../browser/take-storage';
+import type { TakeStorage } from '../timeline/types';
+import type { AssetPort } from '../assets/port';
 import { createOperationGuardHost, guardWanted, type OperationGuardHost } from './operation-guard';
 import { legacyPageChange } from '../diagnostics/page-change-probe';
 
@@ -29,23 +30,40 @@ export interface PageController {
   destroy(): void;
 }
 
+/** What the page runtime reads and keeps outside the page. The extension's implementations live
+ * in `src/browser/`; another host (the Playground) passes its own. The runtime never imports them. */
+export interface PagePorts {
+  assets: AssetPort;
+  takes: TakeStorage;
+  skinAssets?: SkinAssetPort;
+}
+
 /** Everything the page draws for the artwork — skin CSS, image and model layers, operation safety
  * and the timeline — started once and following the page while artwork is shown. */
 export function createPageController(
   doc: Document,
   site: SiteAdapter,
+  ports: PagePorts,
   onSurfacesChanged?: () => void,
-  skinAssets?: SkinAssetPort,
 ): PageController {
-  const designRenderer = createDesignRenderer(doc, site.designTargets ?? [], skinAssets, () => onSurfacesChanged?.());
-  const timeline = createTimelineHost(doc, site.id, createTakeStorage(site.id));
+  const designRenderer = createDesignRenderer(doc, site.designTargets ?? [], ports.skinAssets, () =>
+    onSurfacesChanged?.(),
+  );
+  const timeline = createTimelineHost(doc, site.id, ports.takes);
   const safety = site.operationSurfaces
     ? createOperationGuardHost(doc, site.operationSurfaces(), (stop) => {
         if (stop) images.holdSafety(stop === true ? undefined : stop);
         images.refresh();
       })
     : undefined;
-  const images = createImageRenderer(doc, site.decorationAnchors ?? [], site.signals?.videoPlayback, timeline, safety);
+  const images = createImageRenderer(
+    doc,
+    ports.assets,
+    site.decorationAnchors ?? [],
+    site.signals?.videoPlayback,
+    timeline,
+    safety,
+  );
   let suspended = false,
     editing = false;
   // Observation starts only once settings and artwork call for it.

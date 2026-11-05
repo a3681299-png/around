@@ -1,17 +1,16 @@
 import { test, expect } from '@playwright/test';
 import { bindSettingsForm } from '../src/settings/form';
 import { createPageController } from '../src/host/page-controller';
+import { createMemoryTakeStorage } from '../src/timeline/memory-takes';
 import type { SiteAdapter } from '../src/sites/types';
 import {
   DEFAULT_SETTINGS,
   LEGACY_SETTINGS_KEYS,
   SETTINGS_KEYS,
   mergeSettings,
-  readSettings,
-  updateSettings,
-  watchSettings,
   type UserSettings,
 } from '../src/storage/settings';
+import { readSettings, updateSettings, watchSettings } from '../src/browser/settings-store';
 
 /*
  * The settings after the retro theme's removal: 作品を表示する (ON by default) and 制作モード. The
@@ -255,7 +254,10 @@ test('OFF, 緊急OFF and repeated destroy disconnect the page once and leave not
       };
     },
   });
-  const controller = createPageController(doc, site);
+  const controller = createPageController(doc, site, {
+    assets: { load: () => Promise.reject(new Error('No assets in this test')), clear() {} },
+    takes: createMemoryTakeStorage(),
+  });
   const shown = { ...DEFAULT_SETTINGS, enabled: true };
   controller.update(shown);
   controller.update({ ...shown, creatorMode: true });

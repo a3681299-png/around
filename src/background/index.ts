@@ -8,7 +8,7 @@ import { validateDocumentAssets } from '../assets/design-assets';
 import { sameModelInfo } from '../models/types';
 import { designAssetIds } from '../design/references';
 import { isAssetId, isDesignId, parseDesign } from '../design/schema';
-import { saveDesign } from '../storage/designs';
+import { saveDesign } from '../browser/design-store';
 import { installTakeStorage } from '../browser/take-repository';
 import { createAssetTransfers } from '../assets/transfers';
 import { createWorkQueue } from '../assets/work-queue';

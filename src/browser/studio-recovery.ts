@@ -1,6 +1,6 @@
 import { packCheckpoint, unpackCheckpoint } from '../studio/checkpoint-codec';
 import type { StudioRecovery } from '../studio/connection';
-import { retainStudioAssets, releaseAssets } from '../assets/client';
+import { retainStudioAssets, releaseAssets } from './asset-client';
 import { designAssetIds } from '../design/references';
 
 const prefix = 'webWorldThemes.studio.session.';

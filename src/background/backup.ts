@@ -3,7 +3,7 @@ import { BACKUP_PREFERENCE_KEYS, backupDesigns, type BackupManifest } from '../b
 import { backupObject, sameBackupData } from '../backup/data';
 import { encodeBackup, decodeBackup, sha256 } from '../backup/archive';
 import { planRestore } from '../backup/restore';
-import { readSettings } from '../storage/settings';
+import { readSettings } from '../browser/settings-store';
 import { changeAssets } from '../assets/repository';
 import { readStoredTakes, restoreTakes } from '../browser/take-repository';
 import { oneOf } from '../validation';

@@ -5,7 +5,7 @@ import { legacyLayout } from './legacy-evaluation';
 import { assertWorldParity } from './parity';
 import { createModelRenderer } from '../three/models';
 import { createMediaController } from '../../media/controller';
-import { clearAssetSources } from '../../assets/client';
+import type { AssetPort } from '../../assets/port';
 import { createEffectController, type EffectTarget } from './effects';
 import type { PlaybackSource } from '../../signals/types';
 import {
@@ -94,6 +94,7 @@ const ATMOSPHERE = 0,
 /** Shared layer layout/gestures; media decoding and playback live in media/. */
 export function createImageRenderer(
   doc: Document,
+  assets: AssetPort,
   anchors: readonly DesignTarget[],
   playback?: PlaybackSource,
   timeline?: TimelineHost,
@@ -891,6 +892,7 @@ export function createImageRenderer(
     shadow.append(style);
     media = createMediaController(
       doc,
+      assets.load,
       (message) => editing?.error(message),
       (stats) => {
         if (host) host.dataset.wwMediaStats = JSON.stringify(stats);
@@ -906,7 +908,7 @@ export function createImageRenderer(
         if (host) host.dataset.wwModelStats = JSON.stringify(stats);
       },
       shadow,
-      undefined,
+      assets.load,
       undefined,
       () =>
         safety?.pause(
@@ -965,7 +967,7 @@ export function createImageRenderer(
     models = undefined;
     media?.destroy();
     media = undefined;
-    clearAssetSources();
+    assets.clear();
     gesture = undefined;
     if (frame !== undefined) view.cancelAnimationFrame(frame);
     frame = undefined;

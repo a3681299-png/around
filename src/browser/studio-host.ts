@@ -13,7 +13,7 @@ import {
 import { ASSET_LIMITS } from '../assets/validation';
 import { ASSET_MESSAGES } from '../assets/limits';
 import { parseTimelineCommand } from '../timeline/types';
-import { loadAssetMetadata } from '../assets/client';
+import { loadAssetMetadata } from './asset-client';
 import { isAssetId, isDesignId } from '../design/schema';
 import { parseMotionLabels } from '../characters/manifest';
 import { SKIN_STATES, type SkinState } from '../design/types';

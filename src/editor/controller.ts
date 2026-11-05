@@ -2,7 +2,7 @@ import type { DesignDocument } from '../design/types';
 import type { ImageEditing } from '../design/image-renderer';
 import { editableSceneSamples, placementFrame } from '../design/frames';
 import type { SiteAdapter } from '../sites/types';
-import { CLOSE_SIDE_PANEL } from './messages';
+import { closeSidePanel } from '../browser/side-panel';
 import { captureLayerThumbnail } from '../renderers/dom/thumbnail';
 import { createEditorSession } from '../editor-core/session';
 import type { EditCommand, EditorCheckpoint, EditorSnapshot } from '../editor-core/types';
@@ -265,8 +265,7 @@ export function createCreatorEditor(
     state = next;
     if (!state.active) {
       // Ending the edit from the side panel closes Chrome's panel too; a window stays for its owner.
-      if (remoteOwner && remoteSurface === 'sidepanel')
-        void chrome.runtime.sendMessage({ type: CLOSE_SIDE_PANEL }).catch(() => undefined);
+      if (remoteOwner && remoteSurface === 'sidepanel') closeSidePanel();
       if (remoteOwner) timeline?.release(remoteOwner);
       if (installed) timeline?.resumeLive();
       remoteOwner = undefined;

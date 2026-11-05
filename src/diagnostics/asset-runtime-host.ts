@@ -1,7 +1,7 @@
 import { ASSET_LAB_MESSAGE } from './asset-runtime-broker';
 import { createAssetLabScene } from './asset-runtime-scene';
 import type { AssetMetadata } from '../assets/validation';
-import { loadAssetChunks, clearAssetSources, type LoadedAsset } from '../assets/client';
+import { loadAssetChunks, clearAssetSources, type LoadedAsset } from '../browser/asset-client';
 import { newAssetProfile, linkAssetProfile, profileEnd } from './asset-profile';
 
 /** Experimental isolated-world bridge. Never installed by the ordinary build. */

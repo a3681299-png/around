@@ -1,4 +1,4 @@
-import { loadAsset } from '../assets/client';
+import type { AssetPort } from '../assets/port';
 import { inspectLottie } from '../assets/lottie';
 import { prepareMediaTimeline } from '../world/media-time';
 import { MediaBudgetUnavailable, type MediaBudget } from './budget';
@@ -22,7 +22,7 @@ export interface MediaResource {
   destroy(): void;
 }
 
-export function createResourceCache(budget: MediaBudget) {
+export function createResourceCache(budget: MediaBudget, loadAsset: AssetPort['load']) {
   const cache = new Map<string, ResourceEntry>();
   let closed = false;
   const acquire = (id: string): ResourceEntry => {

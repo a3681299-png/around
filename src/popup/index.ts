@@ -3,7 +3,7 @@ import { SETTINGS_MARKUP } from '../settings/markup';
 import settingsStyles from '../settings/settings.css';
 import tokens from '../editor/studio-tokens.css';
 import { glyphButton } from '../editor/icons';
-import { mountCreatorLauncher } from '../editor/launcher';
+import { mountCreatorLauncher } from '../browser/editor-launcher';
 
 // The popup wears the same 表示設定 as the in-video panel; here the page itself is the token host.
 const style = document.createElement('style');

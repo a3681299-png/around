@@ -10,8 +10,8 @@ import {
 import type { EditCommand, EditorCheckpoint, EditorSnapshot } from '../editor-core/types';
 import { ASSET_LIMITS } from '../assets/validation';
 import { ASSET_MESSAGES } from '../assets/limits';
-import { releaseAssets } from '../assets/client';
-import { importStudioAssets } from '../assets/studio-upload';
+import { releaseAssets } from './asset-client';
+import { importStudioAssets } from './studio-upload';
 import type { SafetyStatus } from '../host/operation-guard';
 import type { SkinPageInfo } from '../editor/skin-status';
 import type { SkinSlot } from '../editor-core/skins';

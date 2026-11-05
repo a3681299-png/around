@@ -1,12 +1,6 @@
-import {
-  DEFAULT_SETTINGS,
-  readSettings,
-  mergeSettings,
-  updateSettings,
-  watchSettings,
-  type UserSettings,
-  type SettingsPatch,
-} from '../storage/settings';
+import { DEFAULT_SETTINGS, mergeSettings, type UserSettings, type SettingsPatch } from '../storage/settings';
+import { readSettings, updateSettings, watchSettings } from '../browser/settings-store';
+import { extensionPageUrl } from '../browser/side-panel';
 import { mountSafetyControls } from './safety-controls';
 
 /** Both the extension popup and the in-page panel share this storage binding. */
@@ -14,7 +8,7 @@ export function bindSettingsForm(root: ParentNode): () => void {
   const safetyRoot = root.querySelector<HTMLElement>('.ww-editor-body');
   const unmountSafety = safetyRoot ? mountSafetyControls(safetyRoot) : undefined;
   const backup = root.querySelector<HTMLAnchorElement>('.backup-open');
-  if (backup) backup.href = chrome.runtime.getURL('backup/index.html');
+  if (backup) backup.href = extensionPageUrl('backup/index.html');
   function required<T extends HTMLElement>(selector: string): T {
     const element = root.querySelector<T>(selector);
     if (!element) throw new Error(`Missing settings element: ${selector}`);

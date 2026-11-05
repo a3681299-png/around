@@ -1,5 +1,7 @@
 import { createYouTubeAdapter } from '../../src/sites/youtube';
 import { createPageController } from '../../src/host/page-controller';
+import { extensionAssets } from '../../src/browser/asset-client';
+import { createTakeStorage } from '../../src/browser/take-storage';
 import { DEFAULT_SETTINGS } from '../../src/storage/settings';
 import { emptyDesign } from '../../src/design/schema';
 import type { DesignDocument } from '../../src/design/types';
@@ -14,7 +16,12 @@ export function mount() {
     if (name.startsWith('--ww-')) counts.variables++;
     nativeSet(name, value, priority);
   };
-  const controller = createPageController(document, createYouTubeAdapter(document, window), () => counts.surfaces++);
+  const controller = createPageController(
+    document,
+    createYouTubeAdapter(document, window),
+    { assets: extensionAssets, takes: createTakeStorage('youtube') },
+    () => counts.surfaces++,
+  );
   const design: DesignDocument = {
     ...emptyDesign('youtube', null),
     rules: [{ kind: 'surface-style', target: 'video-card', style: { backgroundColor: '#c9d4e8', borderRadiusPx: 8 } }],

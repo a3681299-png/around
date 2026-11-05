@@ -1,6 +1,6 @@
 import { getSiteAdapter } from '../sites';
 import { oneOf } from '../validation';
-import { watchSettings } from '../storage/settings';
+import { watchSettings } from '../browser/settings-store';
 import { createPageController } from '../host/page-controller';
 import { createSettingsPanel } from '../settings/panel';
 import { createCreatorEditor, type CreatorEditor } from '../editor/controller';
@@ -12,8 +12,10 @@ import { installAssetRuntimeHost } from '../diagnostics/asset-runtime-host';
 import { createAssetReadHost } from '../browser/asset-read-host';
 import { requestStudioSurface } from '../browser/side-panel';
 import { OPEN_SIDE_PANEL, OPEN_STUDIO_WINDOW } from '../editor/messages';
-import { watchEmergencyOff } from '../storage/safety';
+import { watchEmergencyOff } from '../browser/safety-store';
 import { skinAssetPort } from '../browser/skin-assets';
+import { extensionAssets } from '../browser/asset-client';
+import { createTakeStorage } from '../browser/take-storage';
 
 if (ASSET_PROFILE) installAssetRuntimeHost(document);
 
@@ -27,7 +29,12 @@ if (site) {
   lifetime.__webWorldThemesCleanup?.();
   const assetReader = createAssetReadHost(document);
   let creator: CreatorEditor | undefined;
-  const controller = createPageController(document, site, () => creator?.refreshSelection(), skinAssetPort);
+  const controller = createPageController(
+    document,
+    site,
+    { assets: extensionAssets, takes: createTakeStorage(site.id), skinAssets: skinAssetPort },
+    () => creator?.refreshSelection(),
+  );
   // Panel previews share the renderer's loader; each preview URL lives until the page unloads.
   const previewUrls = new Map<string, Promise<string | undefined>>();
   controller.suspend(true);

@@ -1,4 +1,4 @@
-import { loadAsset } from '../assets/client';
+import { loadAsset } from './asset-client';
 import { SKIN_LIMITS } from '../design/types';
 import type { SkinAssetPort } from '../design/renderer';
 import type { ArtPixels } from '../design/contrast';

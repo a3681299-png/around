@@ -7,6 +7,13 @@ import {
   type OpenEditorResponse,
 } from '../editor/messages';
 
+/** Ending an edit from the side panel closes Chrome's panel too (page side). */
+export function closeSidePanel(): void {
+  void chrome.runtime.sendMessage({ type: CLOSE_SIDE_PANEL }).catch(() => undefined);
+}
+/** The URL of one of the extension's own pages (e.g. the backup page). */
+export const extensionPageUrl = (path: string): string => chrome.runtime.getURL(path);
+
 /** Chrome-only composition. Configure before a gesture: awaiting setOptions can lose it. */
 export function installSidePanelHost() {
   chrome.runtime.onMessage.addListener((raw: unknown, sender, respond) => {

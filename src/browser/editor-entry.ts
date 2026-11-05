@@ -1,6 +1,7 @@
-import { watchSettings } from '../storage/settings';
+import { watchSettings } from './settings-store';
 import { PROBE_EDITOR_TARGET, PREPARE_SIDE_PANEL } from '../editor/messages';
-import { EMERGENCY_COMMAND, SAFETY_SHORTCUT, safetyShortcut, setEmergencyOff } from '../storage/safety';
+import { EMERGENCY_COMMAND, SAFETY_SHORTCUT } from '../storage/safety';
+import { safetyShortcut, setEmergencyOff } from './safety-store';
 
 export const EDITOR_COMMAND = 'open-editor';
 /** action/commands callbacks retain their user gesture: no storage read precedes open(). */

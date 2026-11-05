@@ -7,7 +7,7 @@ import {
   verifiedModelBytes,
   type VerifiedModelSource,
 } from '../src/assets/verified-source';
-import { assetSourceBytes, type LoadedAsset } from '../src/assets/client';
+import { assetSourceBytes, type LoadedAsset } from '../src/assets/port';
 import { inspectAsset } from '../src/assets/inspect';
 import { vrmFixture } from './helpers/vrm-fixture';
 import { BACKUP_LIBRARY_LEASE, keepAssetLease, type AssetLease } from '../src/assets/repository';

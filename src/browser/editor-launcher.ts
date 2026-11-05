@@ -1,5 +1,5 @@
-import { requestStudioSurface } from '../browser/side-panel';
-import { OPEN_SIDE_PANEL, OPEN_STUDIO_WINDOW, PREPARE_SIDE_PANEL, type OpenEditorResponse } from './messages';
+import { requestStudioSurface } from './side-panel';
+import { OPEN_SIDE_PANEL, OPEN_STUDIO_WINDOW, PREPARE_SIDE_PANEL, type OpenEditorResponse } from '../editor/messages';
 
 /** The popup's two ways into the editor: the side panel (S) and the editor's own window (W).
  * Only the active tab ID is needed, so no tabs/activeTab permission is added. */
