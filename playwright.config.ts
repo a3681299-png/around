@@ -12,6 +12,7 @@ const unitSpecs = [
   'mannequin',
   'body-motion',
   'character-v15',
+  'behaviour-motions',
   'autonomy',
   'two-bone-ik',
   'asset-import-validation',

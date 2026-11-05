@@ -34,6 +34,17 @@ test('the editor shows and saves the computed motion and autonomy switches and t
   await expect(shyness).toBeEnabled();
   await shyness.fill('80');
   await shyness.dispatchEvent('change');
+  // The behaviour → motion table: off until a motion is picked, then its part and speed.
+  const doze = panel.getByLabel('居眠りの動作'),
+    dozeSpeed = panel.getByLabel('居眠りの速さ');
+  await expect(doze).toBeEnabled();
+  await expect(dozeSpeed).toBeDisabled();
+  await doze.selectOption('sit');
+  await expect(dozeSpeed).toBeEnabled();
+  await expect(dozeSpeed).toHaveValue('1');
+  await dozeSpeed.fill('0.5');
+  await dozeSpeed.dispatchEvent('change');
+  await expect(dozeSpeed).toHaveValue('0.5');
   await computed.uncheck();
   await panel.locator('.save').click();
   await expect(panel.locator('.dirty')).toHaveText('保存済み');
@@ -46,5 +57,7 @@ test('the editor shows and saves the computed motion and autonomy switches and t
     computedMotion: false,
     autonomy: true,
     personality: { shyness: 0.8, curiosity: 0.5, sleepiness: 0.5 },
+    // The pose is held (length 0): its part is 0…0.
+    behaviourMotions: { doze: { motion: 'sit', from: 0, to: 0, speed: 0.5 } },
   });
 });

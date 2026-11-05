@@ -180,7 +180,7 @@ export function migrateV14ToV15(value: unknown): Data {
     const layer = record(value);
     if (layer['kind'] !== 'model3d' || layer['character'] === undefined) continue;
     const character = record(layer['character']);
-    for (const key of ['personality', 'computedMotion', 'autonomy'])
+    for (const key of ['personality', 'computedMotion', 'autonomy', 'behaviourMotions'])
       if (Object.hasOwn(character, key)) throw new Error('キャラの性格と自律の設定にはDesignDocument v15が必要です。');
   }
   return next(data, 15);

@@ -134,10 +134,34 @@ export function evaluateModels(
               : (l.walk ?? model.clip);
     // A standard motion the body measure (or the user) rules out holds the rest pose instead;
     // the character's own motions always play (docs/r3-plan.md, R3-1b).
-    const clip =
+    const authorClip =
       chosen !== null && layer.character && !motionUsable(layer.character, chosen, layer.source.vrm?.body)
         ? null
         : chosen;
+    // The author's own motion (a path, a timed clip that is not a held pose) comes first; it is
+    // judged on the author's clip, never on a behaviour's motion chosen below.
+    const authorRole = authorClip === null ? undefined : layer.character?.motions[authorClip]?.role,
+      authorSeconds = authorClip === null ? 0 : (modelClips(layer)[authorClip]?.duration ?? 0);
+    const authorActive =
+      Boolean(layer.motion?.enabled) ||
+      (model.playing && authorSeconds > 0 && authorRole !== 'idle' && authorRole !== 'sit');
+    // v15: while the autonomy drives, the behaviour it picked (last frame's, in the state) plays
+    // its assigned motion: a part of it, looped from when the behaviour began, at its speed.
+    const autonomyState = restart ? undefined : before?.body?.autonomy;
+    const assigned =
+      layer.character?.autonomy &&
+      layer.character.computedMotion !== false &&
+      !authorActive &&
+      !paused &&
+      !input.environment.reducedMotion
+        ? layer.character.behaviourMotions?.[autonomyState?.behaviour ?? 'rest']
+        : undefined;
+    const assignedIndex = assigned ? layer.character!.motions.findIndex((m) => m.id === assigned.motion) : -1;
+    const behaviourClip =
+      assigned && assignedIndex >= 0 && motionUsable(layer.character!, assignedIndex, layer.source.vrm?.body)
+        ? { index: assignedIndex, entry: assigned, since: autonomyState?.since ?? 0 }
+        : undefined;
+    const clip = behaviourClip ? behaviourClip.index : authorClip;
     let next: ModelState =
       before && !restart
         ? { ...before }
@@ -168,6 +192,14 @@ export function evaluateModels(
       next.timeMs = advance(layer, clip, next.timeMs, delta);
       next.previousTimeMs = advance(layer, next.previousClip, next.previousTimeMs, delta);
       next.fadeElapsedMs = Math.min(next.fadeDurationMs, next.fadeElapsedMs + (model.playing ? dt : 0));
+    }
+    if (behaviourClip) {
+      // Its own clock: the part's start plus the time since the behaviour began, at its speed,
+      // looped within the part. The same inputs give the same time (no accumulated drift).
+      const { from, to, speed } = behaviourClip.entry,
+        length = (to - from) * 1000,
+        elapsed = Math.max(0, input.timeMs - behaviourClip.since) * speed;
+      next.timeMs = from * 1000 + (length > 0 ? elapsed % length : 0);
     }
     const blend = next.fadeDurationMs === 0 ? 1 : Math.min(1, next.fadeElapsedMs / next.fadeDurationMs);
     if (blend >= 1) {
@@ -220,11 +252,7 @@ export function evaluateModels(
     let pose: BodyPose | undefined;
     // v15: the author may stop the computed motion altogether (absent: on, as in v14).
     if (layer.character && layer.source.vrm && layer.character.computedMotion !== false) {
-      const role = clip === null ? undefined : layer.character.motions[clip]?.role,
-        clipSeconds = clip === null ? 0 : (modelClips(layer)[clip]?.duration ?? 0);
-      // The author's own motion (a path, a timed clip that is not a held pose) comes first.
-      const authorActive =
-        Boolean(layer.motion?.enabled) || (model.playing && clipSeconds > 0 && role !== 'idle' && role !== 'sit');
+      const role = clip === null ? undefined : layer.character.motions[clip]?.role;
       const idle = input.signals.samples?.['user.idle.duration'];
       const body = evaluateBodyMotion(restart ? undefined : before?.body, {
         timeMs: input.timeMs,

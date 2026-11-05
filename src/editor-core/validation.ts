@@ -2,7 +2,7 @@ import { isDesignId, parseDecoration, parsePlacement, parseSurfaceStyle } from '
 import { IMAGE_LIMITS, type ImagePatch } from '../design/types';
 import { ANIMATION_LIMITS } from '../assets/motion-types';
 import { MODEL_LIMITS } from '../models/types';
-import { CHARACTER_LIMITS, parsePersonality } from '../characters/settings';
+import { BEHAVIOUR_NAMES, CHARACTER_LIMITS, parsePersonality } from '../characters/settings';
 import { parseSignalRules } from '../signals/keyframe-schema';
 import type { PlacementChange } from '../world/geometry';
 import type { SignalRule } from '../signals/keyframes';
@@ -193,7 +193,28 @@ export function parseImagePatch(value: unknown): ImagePatch {
   if (Object.hasOwn(input, 'renderMode')) result['renderMode'] = renderMode;
   if (Object.hasOwn(input, 'character')) {
     // Membership of the kept IDs is checked against the layer by applyCharacterPatch.
-    const c = commandObject(character, ['standardMotions', 'keep', 'personality', 'computedMotion', 'autonomy']);
+    const c = commandObject(character, [
+      'standardMotions',
+      'keep',
+      'personality',
+      'computedMotion',
+      'autonomy',
+      'behaviourMotions',
+    ]);
+    // v15: the shape here (known behaviours, a motion id, three numbers); that the motion exists
+    // and the part lies inside it is checked against the layer by the document parser.
+    if (Object.hasOwn(c, 'behaviourMotions')) {
+      const assignment = commandObject(c['behaviourMotions'], [...BEHAVIOUR_NAMES]);
+      for (const entry of Object.values(assignment)) {
+        const e = commandObject(entry, ['motion', 'from', 'to', 'speed']);
+        if (
+          typeof e['motion'] !== 'string' ||
+          !/^[a-z][a-z0-9-]{0,63}$/.test(e['motion']) ||
+          !['from', 'to', 'speed'].every((k) => typeof e[k] === 'number' && Number.isFinite(e[k]))
+        )
+          throw new Error('自律の動作の割り当てが不正です。');
+      }
+    }
     if (Object.hasOwn(c, 'standardMotions') && !['auto', 'on', 'off'].includes(c['standardMotions'] as string))
       throw new Error('標準の動作の設定が不正です。');
     // v15: three numbers in 0…1 and two booleans; the document parser checks them again.
