@@ -103,7 +103,7 @@ export function youtubeOperations(doc: Document) {
     return { parent, r };
   };
   /**
-   * Chunk 4 prototype (LAYERING, docs/layering-plan.md). The player is its own stacking context
+   * Chunk 4 (LAYERING, docs/layering-plan.md). The player is its own stacking context
    * (position:relative; z-index:0) and paints its media at one level (z-index 10) with everything
    * it shows over the picture above it (bars 58/59, menus 73–2300, end screen 36…). A plane
    * inserted directly after the media at the media's level is then under all of that by the
@@ -251,7 +251,7 @@ export function youtubeOperations(doc: Document) {
         !active.closest('[id^="web-world-themes"]')
       )
         rows.push({ id: 'native.focus', kind: 'gesture', element: active });
-      // Chunk 4 prototype: which surfaces the beneath plane cannot cover. The plane is clipped to the
+      // Chunk 4: which surfaces the beneath plane cannot cover. The plane is clipped to the
       // player's box and sits next to the media in paint order, so a surface outside the player
       // either paints over the media (and so over the plane) or under the whole player, where the
       // player already covers it and takes its clicks: only the player's own surfaces need a proof.

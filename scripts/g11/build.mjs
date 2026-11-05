@@ -26,10 +26,10 @@ if (!existsSync(hooks))
 const version = /G11_HOOKS_VERSION = (\d+);/.exec(await readFile(hooks, 'utf8'))?.[1];
 if (Number(version) !== HOOKS_VERSION)
   throw new Error(`Measurement hooks version ${version} in ${source}; this harness expects ${HOOKS_VERSION}.`);
-// WW_LAYERING=1: the chunk 4 prototype (docs/layering-plan.md), in its own folder so the two builds
-// can be measured alternately.
-const layering = process.env.WW_LAYERING === '1';
-const out = path.join(source, layering ? '.work/g11-layering-dist' : '.work/g11-measurement-dist');
+// WW_LAYERING=0: the earlier cut-out way (docs/layering-plan.md, chunk 4), in its own folder so the
+// two ways can be measured alternately. The tree's own default otherwise (layering from chunk 4).
+const layering = process.env.WW_LAYERING !== '0';
+const out = path.join(source, layering ? '.work/g11-measurement-dist' : '.work/g11-cutout-dist');
 workPath(out);
 
 const work = path.join(root, '.work/g11-handoff');

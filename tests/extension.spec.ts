@@ -404,7 +404,8 @@ test('switching the artwork on and off never filters, replaces, or rewrites nati
     })),
     video: document.querySelector('video')!,
     stream: document.querySelector('video')!.srcObject,
-    player: document.querySelector('#movie_player'),
+    // Where the page put it (YouTube's media container, as the fixture's): never moved.
+    player: document.querySelector('video')!.parentElement,
   }));
   const assertMedia = async () => {
     expect(

@@ -256,8 +256,9 @@ export function createImageRenderer(
           const anchor = roots.get(id)!.layer.placement.anchor;
           return anchor.kind === 'surface' && anchor.target === 'video-player';
         });
-      // Chunk 4 prototype (LAYERING, docs/layering-plan.md): outside editing, the player's plane goes
-      // under its controls by stacking order instead of over them with the bands cut out.
+      // Chunk 4 (LAYERING, docs/layering-plan.md): outside editing, the player's plane goes under its
+      // controls by stacking order instead of over them with the bands cut out. While editing, the
+      // cut-out way stays: its handles take input with the editor's own checks (claims, the centre).
       // Locked editing takes no input on the artwork, so it is drawn as outside editing.
       const offered =
         LAYERING && needsVideoSlot && !(editing && !editing.locked) ? safety.source.beneathSlot?.() : undefined;

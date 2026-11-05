@@ -21,10 +21,12 @@ if (guardTrace && !outputName.startsWith('.work/')) throw new Error('Development
 const noIdleRecheck = process.env.WW_NO_IDLE_RECHECK === '1';
 if (noIdleRecheck && !outputName.startsWith('.work/'))
   throw new Error('Builds without the idle recheck must stay inside .work.');
-// Chunk 4 prototype (docs/layering-plan.md): the character sits inside the player's own stacking,
-// under its controls, instead of over the page with cut-outs. Development builds only.
-const layering = process.env.WW_LAYERING === '1';
-if (layering && !outputName.startsWith('.work/')) throw new Error('Layering prototype builds must stay inside .work.');
+// Chunk 4 (docs/layering-plan.md): the player's character sits inside the player's own stacking,
+// under its controls. WW_LAYERING=0 is the earlier way (over the controls with the bands cut out),
+// for development builds only: to compare, and to run the G1 specs that way too.
+const layering = process.env.WW_LAYERING !== '0';
+if (!layering && !outputName.startsWith('.work/'))
+  throw new Error('Builds without layering (WW_LAYERING=0) must stay inside .work.');
 // Breaks the layering guard on purpose: no stacking proof (every player part taken as over the
 // character), to see its tests fail (docs/layering-plan.md).
 const noStackingProof = process.env.WW_NO_STACKING_PROOF === '1';

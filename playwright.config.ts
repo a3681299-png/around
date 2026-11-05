@@ -115,15 +115,16 @@ export default defineConfig<object, { layering: boolean | undefined }>({
       use: { trace: 'retain-on-failure', screenshot: 'only-on-failure' },
     },
     // The G1 specs again, with the player's character kept clear of the controls the other way
-    // (docs/layering-plan.md): a development build with WW_LAYERING set (tests/helpers/layering-build.ts).
-    // Both ways must keep every control visible and reachable; a failure here is the product's.
+    // (docs/layering-plan.md): the earlier cut-out way, a WW_LAYERING=0 development build
+    // (tests/helpers/layering-build.ts). It stays as the way out where a part cannot be proven, so
+    // both ways must keep every control visible and reachable; a failure here is the product's.
     {
       name: 'g1-other-way',
       testMatch: g1Specs,
       fullyParallel: false,
       workers: 1,
       outputDir: './.work/test-results/g1-other-way',
-      use: { trace: 'retain-on-failure', screenshot: 'only-on-failure', layering: true },
+      use: { trace: 'retain-on-failure', screenshot: 'only-on-failure', layering: false },
     },
   ],
 });

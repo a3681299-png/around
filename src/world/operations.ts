@@ -26,7 +26,7 @@ export interface OperationSurface {
    * can move anywhere inside it without the page moving, so a page-following plane
    * excludes the whole box instead of the current rectangle. */
   scrollBox?: PlacementFrame;
-  /** Chunk 4 prototype: the browser paints this surface over the beneath plane (stacking order,
+  /** Chunk 4: the browser paints this surface over the beneath plane (stacking order,
    * proven at the read), wherever either is on screen. */
   aboveBeneath?: boolean;
 }
@@ -69,7 +69,7 @@ export interface PaintFootprint {
   outset: number;
   /** overlay: screen-fixed plane. page: plane that scrolls with the document. atmosphere:
    * translucent plane under ATMOSPHERE_ALPHA_CAP. native-underlay: player-local plane.
-   * native-beneath (chunk 4 prototype): player-local plane at the media's level, under every
+   * native-beneath (chunk 4): player-local plane at the media's level, under every
    * surface proven to paint over it; clip is the player's box. */
   composition: 'overlay' | 'page' | 'atmosphere' | 'native-underlay' | 'native-beneath' | 'unsupported';
   /** native-beneath only: every change pending since the read is covered by stacking order, so
@@ -161,7 +161,7 @@ export function guardPaint(snapshot: OperationSnapshot, paints: readonly PaintFo
     if (paint.composition === 'native-beneath') {
       // The browser paints every proven surface over this plane, so only the others are checked,
       // as the local plane checks them: a forbidden one under the paint stops it. Input is never
-      // taken here (the prototype is not used while editing).
+      // taken here (the way is not used while editing).
       const clip = paint.clip;
       if (!clip || !Object.values(clip).every(Number.isFinite) || paint.pointerEvents) {
         issues.push({
@@ -677,7 +677,7 @@ export function stepApproach(
   if (!near.size) return { near, held };
   const targets = [...near].filter(([, entry]) => entry.rect.width > 0 && entry.rect.height > 0);
   for (const paint of paints) {
-    // Under the controls by stacking order (chunk 4 prototype): moving there cannot hide or take
+    // Under the controls by stacking order (chunk 4): moving there cannot hide or take
     // what the pointer is aiming at, so it is never held for an approach.
     if (!paint.dynamic || paint.composition === 'native-beneath') continue;
     const root = paint.root ?? paint.id,

@@ -7,7 +7,7 @@ import { showArtwork } from './helpers/artwork';
 import { layeringBuild } from './helpers/layering-build';
 
 /**
- * Chunk 4 prototype (docs/layering-plan.md): the player's character inside the player's own
+ * Chunk 4 (docs/layering-plan.md): the player's character inside the player's own
  * stacking, directly after its media at the media's level. What the player paints over its picture
  * is then painted over the character by the browser; the guard checks only what it cannot prove.
  */

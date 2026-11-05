@@ -10,13 +10,15 @@ import { storeDesign } from './helpers/skin-verification';
 import { writeContent } from '../scripts/playground/content';
 
 /**
- * Chunk 4 on real YouTube (docs/layering-plan.md): the scenes not seen in the prototype, with the
- * test mannequin under the player's controls. Captions (they are read: they must stay over the
- * character), fullscreen, the miniplayer and the end screen, and an advert when one comes. In each,
- * the character is not stopped, YouTube's parts are over it and the point of a button is never the
- * extension's. Headless, also for fullscreen: an off-screen headed window would go fullscreen on
- * the nearest monitor, over the person's work. Explicit: WW_LIVE_LAYERING=1 with
- * WW_TEST_EXTENSION_PATH set to a layering build. Pictures go to .work/layering-scenes.
+ * Chunk 4 on real YouTube (docs/layering-plan.md): the scenes not seen in the first prototype,
+ * with the test mannequin under the player's controls. Captions (they are read: they must stay
+ * over the character), fullscreen, the miniplayer and the end screen, and an advert when one comes.
+ * In each, the character is not stopped (or takes the cut-out way where a part is not proven),
+ * YouTube's parts are over it and the point of a button is never the extension's. Fullscreen is
+ * headless only: an off-screen headed window would go fullscreen on the nearest monitor, over the
+ * person's work. WW_LIVE_HEADED=1 opens the other scenes in an off-screen window. Explicit:
+ * WW_LIVE_LAYERING=1 (the normal build; a WW_GUARD_TRACE build also records why). Pictures go to
+ * .work/layering-scenes.
  */
 const shots = path.resolve('.work/layering-scenes');
 

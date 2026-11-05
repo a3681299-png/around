@@ -54,7 +54,7 @@ export interface OperationCandidate {
   scrolls?: boolean;
   unsupported?: boolean;
   nativeAbove?: boolean;
-  /** Proven to paint over the beneath plane by stacking order (chunk 4 prototype, LAYERING). */
+  /** Proven to paint over the beneath plane by stacking order (chunk 4, LAYERING). */
   aboveBeneath?: boolean;
   /** Optional readings from the adapter's same synchronous discovery pass. */
   rect?: PlacementFrame;
@@ -112,7 +112,7 @@ export interface OperationSource {
       }
     | undefined;
   overlaySlot(): { parent: HTMLElement; zIndex: number } | undefined;
-  /** Chunk 4 prototype (LAYERING, docs/layering-plan.md): a place inside the player's own stacking
+  /** Chunk 4 (LAYERING, docs/layering-plan.md): a place inside the player's own stacking
    * context, directly after its media and at the media's level, so that whatever the player paints
    * over its picture is painted over this plane too, by the browser's stacking order. */
   beneathSlot?(): BeneathSlot | undefined;
@@ -155,7 +155,7 @@ export function createOperationSource(
    * discovery uses). Without it, every element added or removed is a layout change. */
   holdsCandidate?: (root: Element, deep?: boolean) => boolean,
   underlaySlot: OperationSource['underlaySlot'] = () => undefined,
-  /** Chunk 4 prototype: given the elements changed since the last read (undefined: not known,
+  /** Chunk 4: given the elements changed since the last read (undefined: not known,
    * a whole scan is due), the adapter's beneath place. */
   beneathSlot: (pending: readonly Element[] | undefined, kind: PendingChange) => BeneathSlot | undefined = () =>
     undefined,

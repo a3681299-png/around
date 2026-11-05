@@ -630,7 +630,7 @@ export function createOperationGuardHost(
         }
       }
       // A beneath paint whose pending changes the stacking order covers by itself needs none of
-      // the guard's stops for a stale or moving read (chunk 4 prototype, docs/layering-plan.md):
+      // the guard's stops for a stale or moving read (chunk 4, docs/layering-plan.md):
       // whatever the player paints over its picture stays painted over it, wherever it moves.
       const structural = (p: PaintFootprint) => p.composition === 'native-beneath' && p.settled === true;
       const pausedIssues: SafetyIssue[] = stopped

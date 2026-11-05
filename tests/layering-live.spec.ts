@@ -10,13 +10,13 @@ import { storeDesign } from './helpers/skin-verification';
 import { writeContent } from '../scripts/playground/content';
 
 /**
- * Chunk 4 prototype on real YouTube (docs/layering-plan.md): the test mannequin sits at the
- * player's bottom-right corner, inside the player's own stacking under its controls. While the
- * pointer comes and goes, k pauses and plays, the settings menu and the context menu open, the
- * character is never stopped, the bars' own pixels stay on top of it and the real buttons work.
- * Explicit: WW_LIVE_LAYERING=1 with WW_TEST_EXTENSION_PATH=.work/layering-dist (a WW_LAYERING=1
- * build). WW_LIVE_LAYERING_BASELINE=1 runs the same steps on a normal build and only records
- * (the stops it shows are the guard's, as in chunk 3). Pictures go to .work/layering-live.
+ * Chunk 4 on real YouTube (docs/layering-plan.md): the test mannequin sits at the player's
+ * bottom-right corner, inside the player's own stacking under its controls. While the pointer
+ * comes and goes, k pauses and plays, the settings menu and the context menu open, the character
+ * is never stopped, the bars' own pixels stay on top of it and the real buttons work.
+ * Explicit: WW_LIVE_LAYERING=1 (the normal build). WW_LIVE_LAYERING_BASELINE=1 with
+ * WW_TEST_EXTENSION_PATH set to a WW_LAYERING=0 build runs the same steps the earlier cut-out way
+ * and only records (the stops it shows are the guard's, as in chunk 3). Pictures go to .work/layering-live.
  */
 const shots = path.resolve('.work/layering-live');
 const baseline = process.env.WW_LIVE_LAYERING_BASELINE === '1';

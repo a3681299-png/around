@@ -6,7 +6,7 @@ const built = new Map<string, Promise<string>>();
 
 /** The way the normal build (dist) keeps the player's character clear: the WW_LAYERING default of
  * scripts/build.mjs. Changed together with it. */
-export const DEFAULT_LAYERING = false;
+export const DEFAULT_LAYERING = true;
 
 /** A development build with the player's character kept clear of the controls one way
  * (docs/layering-plan.md): layering true puts it under them by stacking order, false cuts the
