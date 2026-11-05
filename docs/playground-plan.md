@@ -52,6 +52,7 @@
 - `scripts/browser-boundary.mjs` は ESLint の設定（`browserBoundaryConfig`）を返す形にし、`eslint.config.mjs` に入れた。`scripts/lint.mjs` の文字列の検査は外した
 - 許すのは `src/browser/`・`src/background/`・`src/popup/`・`src/backup/page.ts`・`src/content/index.ts`・`src/assets/read-frame.ts`・`src/diagnostics/`。型だけの参照（`chrome.runtime.MessageSender`）・コメント・文字列・`chrome` という名前の引数は使用に数えない
 - わざと書いて確かめた：`src/host/` に `chrome['storage']`・`const c = chrome`・`chrome?.storage` を置くと `eslint` が3件のエラー（`no-restricted-globals`）。unit（`tests/browser-boundary.spec.ts`）でも、この3つと `globalThis.chrome`・`window.chrome`・`self["chrome"]` を、3か所のパスで全部拒否することを確かめる
+- 限界：`window` の別名（`const w = window; w.chrome`）や動的なプロパティ名（`globalThis[name]`）は見逃す。うっかりを防ぐための検査で、Playground の出力に `chrome` の参照が0件であることの検査と合わせて使う
 
 ### テストと CI
 
