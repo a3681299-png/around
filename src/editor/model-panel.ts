@@ -1,6 +1,6 @@
 import type { EditorLayer, ImagePatch, ModelDecoration } from '../design/types';
 import type { ModelSettings } from '../models/types';
-import { modelClips, motionUsable } from '../characters/settings';
+import { DEFAULT_CHARACTER_PERSONALITY, modelClips, motionUsable } from '../characters/settings';
 import { classifyBody, type BodyReason } from '../characters/humanoid';
 import { parseMotionManifest, type MotionLabel } from '../characters/manifest';
 
@@ -69,6 +69,9 @@ export function createModelPanel(
     <details class="character-options" open><summary>キャラの動作</summary>
       <p class="character-body model-help" role="status"></p>
       <div class="property"><label>標準の動作 <select class="character-standard" aria-label="標準の動作"><option value="auto">体型に合わせる</option><option value="on">使う</option><option value="off">使わない</option></select></label></div>
+      <div class="property"><label><input type="checkbox" class="character-computed" aria-label="計算の動き"> 計算の動き（呼吸・まばたき・見回すなど）</label></div>
+      <div class="property"><label><input type="checkbox" class="character-autonomy" aria-label="自律"> 自律（カーソルから逃げる・寄ってくる・うとうとする）</label></div>
+      <div class="property character-personality"><label>臆病さ <input type="range" class="character-trait" data-trait="shyness" aria-label="臆病さ" min="0" max="100" step="1"></label><label>好奇心 <input type="range" class="character-trait" data-trait="curiosity" aria-label="好奇心" min="0" max="100" step="1"></label><label>眠りやすさ <input type="range" class="character-trait" data-trait="sleepiness" aria-label="眠りやすさ" min="0" max="100" step="1"></label></div>
       <ul class="character-motions" aria-label="キャラの動作"></ul>
       <div class="property row character-import"><label>種類 <select class="character-origin" aria-label="追加する動作の種類"><option value="character">このキャラ専用</option><option value="standard">どのモデルにも当てられる版</option></select></label><button type="button" class="character-add">動作を追加</button></div>
       <input class="character-file" type="file" accept=".vrma,.json,application/json" multiple hidden aria-label="動作（.vrma）とmanifest.jsonを追加">
@@ -107,6 +110,25 @@ export function createModelPanel(
     const value = (event.target as HTMLSelectElement).value as 'auto' | 'on' | 'off';
     if (current?.character) change({ character: { standardMotions: value } });
   });
+  for (const [selector, key] of [
+    ['.character-computed', 'computedMotion'],
+    ['.character-autonomy', 'autonomy'],
+  ] as const)
+    fieldset.querySelector(selector)!.addEventListener('change', (event) => {
+      event.stopPropagation();
+      if (current?.character) change({ character: { [key]: (event.target as HTMLInputElement).checked } });
+    });
+  fieldset.querySelector('.character-personality')!.addEventListener('change', (event) => {
+    event.stopPropagation();
+    if (!current?.character) return;
+    const value = (trait: string) =>
+      Number(fieldset.querySelector<HTMLInputElement>(`.character-trait[data-trait="${trait}"]`)!.value) / 100;
+    change({
+      character: {
+        personality: { shyness: value('shyness'), curiosity: value('curiosity'), sleepiness: value('sleepiness') },
+      },
+    });
+  });
   fieldset.querySelector('.character-motions')!.addEventListener('click', (event) => {
     const button = (event.target as Element).closest<HTMLButtonElement>('button[data-remove]');
     if (!button || !current?.character) return;
@@ -129,6 +151,17 @@ export function createModelPanel(
     const select = fieldset.querySelector<HTMLSelectElement>('.character-standard')!;
     select.value = layer.character?.standardMotions ?? 'auto';
     select.disabled = !layer.character;
+    // v15: absent means computed motion on and autonomy off (older artwork keeps its behaviour).
+    const computed = fieldset.querySelector<HTMLInputElement>('.character-computed')!,
+      autonomy = fieldset.querySelector<HTMLInputElement>('.character-autonomy')!;
+    computed.checked = layer.character?.computedMotion !== false;
+    autonomy.checked = Boolean(layer.character?.autonomy);
+    computed.disabled = autonomy.disabled = !layer.character;
+    const personality = layer.character?.personality ?? DEFAULT_CHARACTER_PERSONALITY;
+    for (const input of fieldset.querySelectorAll<HTMLInputElement>('.character-trait')) {
+      input.value = String(Math.round(personality[input.dataset['trait'] as keyof typeof personality] * 100));
+      input.disabled = !layer.character || !layer.character.autonomy;
+    }
     const list = fieldset.querySelector<HTMLUListElement>('.character-motions')!;
     list.replaceChildren(
       ...(layer.character?.motions ?? []).map((motion, index) => {
