@@ -176,7 +176,12 @@ test('real YouTube: the character under the player controls is never stopped and
         if (!b) return { s, hit: false };
         const r = b.getBoundingClientRect();
         const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
-        return { s, hit: Boolean(hit && (b === hit || b.contains(hit))) };
+        return {
+          s,
+          hit: Boolean(hit && (b === hit || b.contains(hit))),
+          // What took the point instead (YouTube's own, or ours), for the report.
+          at: hit ? `${hit.tagName.toLowerCase()}#${hit.id}.${[...hit.classList].join('.')}` : null,
+        };
       }),
     );
     await phase('k-play');
@@ -211,7 +216,11 @@ test('real YouTube: the character under the player controls is never stopped and
     // A WW_GUARD_TRACE build also says why a pending read was not covered by the stacking order.
     const trace = await page.evaluate(() => {
       const host = document.querySelector<HTMLElement>('#web-world-themes-video-decorations');
-      return { unsettled: host?.dataset['wwBeneathUnsettled'], unproven: host?.dataset['wwBeneathUnproven'] };
+      return {
+        unsettled: host?.dataset['wwBeneathUnsettled'],
+        why: document.documentElement.dataset['wwBeneathWhy'],
+        ways: document.documentElement.dataset['wwLayeringWays'],
+      };
     });
     const report = { baseline, plane, hosts, stops, why, trace, bars, reach, pausedByClick, ad };
     await writeFile(
@@ -220,7 +229,14 @@ test('real YouTube: the character under the player controls is never stopped and
     );
     console.log('LAYERING LIVE ' + JSON.stringify(report));
     // G1 holds in both builds: the buttons are reached, a click works, the glyphs are on top.
-    for (const r of reach) expect(r.hit, r.s).toBe(true);
+    // The point is the button's, or YouTube's own part laid over it (an advert's badge over the
+    // play button): never the extension's. Which it was is in the report.
+    for (const r of reach) {
+      expect(r.at, r.s).not.toBeNull();
+      expect(r.at, `${r.s}: the extension takes the point`).not.toMatch(/web-world-themes/);
+      if (!r.hit) test.info().annotations.push({ type: 'covered by YouTube', description: `${r.s}: ${r.at}` });
+    }
+    expect(reach.some((r) => r.hit)).toBe(true);
     expect(pausedByClick).toBe(true);
     expect(bars.compared).toBeGreaterThan(50);
     expect(bars.covered).toBe(0);

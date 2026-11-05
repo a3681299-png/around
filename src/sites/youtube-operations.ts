@@ -281,6 +281,24 @@ export function youtubeOperations(doc: Document) {
               id: `${row.id} ${row.element.tagName.toLowerCase()}.${row.element.classList[0] ?? ''}`,
               box: { left: r.left, top: r.top, width: r.width, height: r.height },
             });
+            // Why it was not proven: the element and its ancestors up to the player as read now,
+            // and the media's own level (the trace build only; first 8 kept).
+            WW_GUARD_TRACE: {
+              // On the document: the plane may not exist yet at the first read.
+              const host = doc.documentElement;
+              const chain: string[] = [];
+              for (let e: Element | null = row.element; e && e !== place.parent; e = e.parentElement) {
+                const s = composition.style(e as HTMLElement);
+                chain.push(
+                  `${e.tagName.toLowerCase()}.${e.classList[0] ?? ''}:${s.position}/${s.zIndex}/${s.opacity}/${s.display}`,
+                );
+              }
+              const media = composition.style(place.media);
+              const note = `${performance.now().toFixed(0)}ms ${row.id} [${chain.join(' < ')}] media ${media.position}/${media.zIndex} player ${composition.style(place.parent).zIndex}`;
+              const kept = (host.dataset['wwBeneathWhy'] ?? '').split('\n').filter(Boolean);
+              if (kept.length < 8 && !kept.some((k) => k.includes(row.id)))
+                host.dataset['wwBeneathWhy'] = [...kept, note].join('\n');
+            }
           }
         }
         beneathRead = { unproven };
