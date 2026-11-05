@@ -1,0 +1,94 @@
+{
+  "note": "Short check (2 pairs, alternated), real YouTube, headless, corner variant, pointer crossing the player every second (WW_PERF_R32_WIGGLE=1). Extension rAF CPU per frame (ms). Not the pass/fail measurement.",
+  "runs": [
+    {
+      "pair": 1,
+      "build": "normal",
+      "rows": [
+        {
+          "round": 0,
+          "variant": "corner",
+          "median": 0.8000000007450581,
+          "p95": 2.100000001490116,
+          "mean": 1.0175182480781981,
+          "frames": 822
+        },
+        {
+          "round": 1,
+          "variant": "corner",
+          "median": 0.8000000007450581,
+          "p95": 2,
+          "mean": 0.9800970874618269,
+          "frames": 824
+        }
+      ]
+    },
+    {
+      "pair": 1,
+      "build": "layering",
+      "rows": [
+        {
+          "round": 0,
+          "variant": "corner",
+          "median": 0.7000000029802322,
+          "p95": 2.100000001490116,
+          "mean": 0.980858895758544,
+          "frames": 815
+        },
+        {
+          "round": 1,
+          "variant": "corner",
+          "median": 0.6999999992549419,
+          "p95": 2.199999999254942,
+          "mean": 0.9170940171549681,
+          "frames": 819
+        }
+      ]
+    },
+    {
+      "pair": 2,
+      "build": "normal",
+      "rows": [
+        {
+          "round": 0,
+          "variant": "corner",
+          "median": 0.8000000007450581,
+          "p95": 2.100000001490116,
+          "mean": 1.0253349573881196,
+          "frames": 821
+        },
+        {
+          "round": 1,
+          "variant": "corner",
+          "median": 0.7999999970197678,
+          "p95": 2.100000001490116,
+          "mean": 0.9572649573058946,
+          "frames": 819
+        }
+      ]
+    },
+    {
+      "pair": 2,
+      "build": "layering",
+      "rows": [
+        {
+          "round": 0,
+          "variant": "corner",
+          "median": 0.7999999970197678,
+          "p95": 2.199999999254942,
+          "mean": 0.9733415233698978,
+          "frames": 814
+        },
+        {
+          "round": 1,
+          "variant": "corner",
+          "median": 0.6999999992549419,
+          "p95": 2.199999999254942,
+          "mean": 0.9394348894339741,
+          "frames": 814
+        }
+      ]
+    }
+  ],
+  "browser": "153.0.8010.12"
+}
