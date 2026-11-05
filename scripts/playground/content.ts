@@ -1,12 +1,15 @@
-// Builds the Playground's content folder from material made in this repository only: the test
-// rig VRM (tests/helpers/vrm-fixture.ts), synthetic videos (scripts/generate-media-fixtures.mjs)
-// and a background drawn here. No third-party avatar, Mixamo motion or private model.
+// Builds the Playground's content folder from material made in this repository only: the
+// mannequin VRM and its one-frame poses (tests/helpers/mannequin.ts), synthetic videos
+// (scripts/generate-media-fixtures.mjs) and a background drawn here. No third-party avatar,
+// Mixamo motion or private model. Shota's own VRM and Blender poses replace them later: the
+// character's motions keep the same roles (sit, idle).
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { deflateSync } from 'node:zlib';
-import { vrmFixture } from '../../tests/helpers/vrm-fixture';
+import { MANNEQUIN_POSES, mannequinPoseVrma, mannequinVrm } from '../../tests/helpers/mannequin';
 import { inspectAsset } from '../../src/assets/inspect';
+import { inspectVrma } from '../../src/assets/vrma';
 import { parseDesign } from '../../src/design/schema';
 import { defaultModelSettings } from '../../src/models/types';
 
@@ -66,15 +69,20 @@ export function writeContent(root: string, out: string): { models: string[] } {
     assets[id] = { file, name };
     return id;
   };
-  const vrm = new Uint8Array(vrmFixture());
-  const vrmId = add(vrm, 'vrm', 'WW test rig.vrm');
+  const vrm = new Uint8Array(mannequinVrm());
+  const vrmId = add(vrm, 'vrm', 'WW mannequin.vrm');
+  // One-frame poses as the character's motions: index 0 sits on the edge, 1 stands.
+  const poses = (['sit', 'stand'] as const).map((name) => {
+    const bytes = new Uint8Array(mannequinPoseVrma(name, MANNEQUIN_POSES[name]));
+    return { name, bytes, id: add(bytes, 'vrma', `${name}.vrma`), info: inspectVrma(bytes).info };
+  });
   const background = new Uint8Array(backgroundPng(480, 270));
   const backgroundId = add(background, 'png', 'room.png');
   // Videos are the site's own media, not engine assets.
   for (const [from, to] of [
     ['long.webm', 'video-a.webm'],
     ['alpha1080.webm', 'video-b.webm'],
-  ])
+  ] as const)
     writeFileSync(join(out, to), readFileSync(join(root, 'tests/fixtures/motion', from)));
   const model = inspectAsset(vrm).model!;
   const design = parseDesign({
@@ -108,7 +116,7 @@ export function writeContent(root: string, out: string): { models: string[] } {
         kind: 'model3d',
         id: 'resident',
         assetId: vrmId,
-        name: '試験用のキャラ',
+        name: '試験用のマネキン',
         // The same anchor as on YouTube: the player's top edge, near its right end.
         placement: {
           anchor: { kind: 'surface', target: 'video-player' },
@@ -123,11 +131,22 @@ export function writeContent(root: string, out: string): { models: string[] } {
         visible: true,
         locked: false,
         source: model,
-        model: defaultModelSettings(model),
+        model: { ...defaultModelSettings(model), clip: 0, playing: true, loop: true },
+        character: {
+          standardMotions: 'auto',
+          motions: poses.map((pose) => ({
+            id: pose.name,
+            assetId: pose.id,
+            role: pose.name === 'sit' ? 'sit' : 'idle',
+            origin: 'character',
+            loop: true,
+            source: pose.info,
+          })),
+        },
       },
     ],
   });
   writeFileSync(join(out, 'design.json'), JSON.stringify(design, null, 2));
   writeFileSync(join(out, 'manifest.json'), JSON.stringify({ design: 'design.json', assets }, null, 2));
-  return { models: [assets[vrmId]!.file] };
+  return { models: [assets[vrmId]!.file, ...poses.map((pose) => assets[pose.id]!.file)] };
 }

@@ -123,6 +123,44 @@ test('Alt+Shift+Q takes every effect off, and pressing it again brings them back
   await expect.poll(() => page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(styled);
 });
 
+test('G1 while the character moves: it takes no input and the controls stay the hit target mid-hop', async ({
+  page,
+}) => {
+  await open(page);
+  await page.locator('#apply').click();
+  await expect(model(page)).toHaveAttribute('data-renderer', 'three', { timeout: 20000 });
+  const character = (await page.locator('[data-image-id="resident"]').first().boundingBox())!;
+  const hit = (x: number, y: number, selector: string) =>
+    page.evaluate(
+      ([x, y, selector]) => Boolean(document.elementFromPoint(x as number, y as number)?.closest(selector as string)),
+      [x, y, selector] as const,
+    );
+  // The character's own middle is not a target: whatever is under it is.
+  const under = await page.evaluate(
+    ([x, y]) => document.elementFromPoint(x!, y!)?.closest('[id^="web-world-themes"]') ?? null,
+    [character.x + character.width / 2, character.y + character.height / 2] as const,
+  );
+  expect(under).toBeNull();
+  // Starting the video makes it hop; through the hop every control stays reachable and the
+  // body's pose keeps changing (it really is moving while we check).
+  const controls = await Promise.all(
+    ['#apply', '#play', '#seek', '#volume'].map(async (selector) => {
+      const box = (await page.locator(selector).boundingBox())!;
+      return { selector, x: box.x + box.width / 2, y: box.y + box.height / 2 };
+    }),
+  );
+  const hips = () => model(page).evaluate((e: HTMLElement) => JSON.parse(e.dataset.modelFrame!).pose?.hips?.[1] ?? 0);
+  await page.locator('#play').click();
+  const heights = new Set<number>();
+  for (let i = 0; i < 12; i++) {
+    heights.add(await hips());
+    for (const control of controls)
+      expect(await hit(control.x, control.y, control.selector), control.selector).toBe(true);
+    await page.waitForTimeout(40);
+  }
+  expect(heights.size).toBeGreaterThan(3);
+});
+
 /** Every button, link and input on the page, by its id or text, for a readable failure. */
 const interactive = (page: Page) =>
   page.evaluate(() => {

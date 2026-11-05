@@ -557,8 +557,9 @@ export function createModelRenderer(
           if (hips) {
             i.visual.updateWorldMatrix(true, true);
             const at = hips.getWorldPosition(new Vector3());
-            // The seat is a little under the hips joint: the thickness of the thighs.
-            i.visual.position.y = -(at.y - 0.04 * i.seatScale);
+            // The seat is a little under the hips joint: the thickness of the thighs. The computed
+            // hips lift (a hop) is taken out first, or the contact would cancel it.
+            i.visual.position.y = -(at.y - (pose.hips[1] + 0.04) * i.seatScale);
           }
         }
         // Moving without walking: the drawn layer follows the hop arc or blinks out and in. The
