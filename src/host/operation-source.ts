@@ -103,6 +103,10 @@ export interface OperationSource {
          * the moment the class goes (the bars appear), the band clip is back in the same style
          * recalculation, so no frame can show artwork over a shown bar. Absent: always clipped. */
         barsHiddenClass?: string;
+        /** Classes under which the bands stay clipped even with barsHiddenClass: the player
+         * shows something of its own there then (an advert's parts while its bars are hidden,
+         * docs/chunk3-verification.md). Decided by the same style recalculation. */
+        barsKeptClasses?: readonly string[];
       }
     | undefined;
   overlaySlot(): { parent: HTMLElement; zIndex: number } | undefined;

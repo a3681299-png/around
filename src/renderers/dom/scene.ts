@@ -135,7 +135,7 @@ export function createImageRenderer(
         host: HTMLElement;
         content: HTMLElement;
         shadow: ShadowRoot;
-        /** the class written into its rule */ barsHidden?: string;
+        /** the selector written into its rule */ barsHidden?: string;
         /** the overlay cut-outs last written on its content */ contentClip?: string;
       }
     | undefined;
@@ -430,17 +430,21 @@ export function createImageRenderer(
         // "bars hidden" class does the plane drop it, and that is decided by the browser's own
         // style recalculation, not by this draw: when the class goes, the clip is back for the
         // very frame the bars start to appear, whatever the timing of our rAF or observers.
-        const hidden =
-          slot.barsHiddenClass && /^[A-Za-z][\w-]*$/.test(slot.barsHiddenClass) ? slot.barsHiddenClass : '';
-        if (videoSlot.barsHidden !== hidden) {
-          videoSlot.barsHidden = hidden;
+        // Class names only (the adapter's, checked here): never a selector of anyone else's. Under
+        // any "kept" class (an advert showing its own parts in the bands) the clip stays.
+        const name = /^[A-Za-z][\w-]*$/;
+        const hidden = slot.barsHiddenClass && name.test(slot.barsHiddenClass) ? slot.barsHiddenClass : '';
+        const kept = (slot.barsKeptClasses ?? []).filter((c) => name.test(c));
+        const selector = hidden ? `.${hidden}${kept.map((c) => `:not(.${c})`).join('')}` : '';
+        if (videoSlot.barsHidden !== selector) {
+          videoSlot.barsHidden = selector;
           let rule = videoSlot.shadow.querySelector<HTMLStyleElement>('style[data-bars]');
           if (!rule) {
             rule = doc.createElement('style');
             rule.dataset['bars'] = '';
             videoSlot.shadow.append(rule);
           }
-          rule.textContent = hidden ? `:host-context(.${hidden}){clip-path:none!important}` : '';
+          rule.textContent = selector ? `:host-context(${selector}){clip-path:none!important}` : '';
         }
       }
       // One presentation container preserves scoped z-index/tie ordering and

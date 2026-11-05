@@ -175,6 +175,30 @@ test('G1 bands: the bars brought back by a pointer move or a key are clipped fro
   }
 });
 
+/**
+ * Chunk 3 verification (docs/chunk3-verification.md): during an advert YouTube can hide its bars
+ * (ytp-autohide) while the advert's own parts stay in the bands. While the player shows an advert,
+ * the bands stay clipped whatever the bars do, from the very style recalculation the advert starts.
+ */
+test('G1 bands: an advert keeps the bands clipped while the bars are hidden', async ({ popup, youtube }) => {
+  await redArtworkInTheCorner(popup, youtube);
+  await hideBars(youtube, true);
+  await expect.poll(() => redInBottomBand(youtube)).toBeGreaterThan(1000);
+  // The advert starts with the bars hidden (as on YouTube, where ytp-autohide stays): the plane's
+  // computed clip at that very moment, then the pixels.
+  const clip = await youtube.evaluate((plane) => {
+    document.querySelector('#movie_player')!.classList.add('ad-showing', 'ad-interrupting');
+    return getComputedStyle(document.querySelector(plane) as HTMLElement).clipPath;
+  }, PLANE);
+  expect(clip).toBe(`inset(${TOP_BAND}px 0px ${BOTTOM_BAND}px)`);
+  await expect.poll(() => redInBottomBand(youtube)).toBe(0);
+  // The advert over: hidden bars open the bands again.
+  await youtube.evaluate(() =>
+    document.querySelector('#movie_player')!.classList.remove('ad-showing', 'ad-interrupting'),
+  );
+  await expect.poll(() => redInBottomBand(youtube)).toBeGreaterThan(1000);
+});
+
 test('G1 bands: without the "only while shown" rule the same check fails (the check is real)', async ({
   popup,
   youtube,

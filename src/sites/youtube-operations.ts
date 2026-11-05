@@ -217,6 +217,9 @@ export function youtubeOperations(doc: Document) {
         // pointer or key for a while). It is removed before the bars fade in: on pointer moves,
         // keys, pause, ads and end screens. The bands are then clipped again (see videoSlot).
         barsHiddenClass: 'ytp-autohide',
+        // During an advert the player can carry ytp-autohide while the advert's own parts (its
+        // badge, links, skip) stay in the bands: they stay clipped then (chunk 3 verification).
+        barsKeptClasses: ['ad-showing', 'ad-interrupting'],
       };
     },
     overlaySlot,
