@@ -8,6 +8,7 @@ const unitSpecs = [
   'backup-data',
   'browser-boundary',
   'playground-output',
+  'g11-hooks',
   'asset-import-validation',
   'asset-profile',
   'asset-read-data',

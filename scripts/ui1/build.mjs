@@ -42,7 +42,12 @@ await build({
   legalComments: 'none',
   loader: { '.css': 'text' },
   dropLabels: ['WW_TEST_PAGE_CHANGE', 'WW_GUARD_TRACE'],
-  define: { __WW_WORLD_MODE__: '"runtime"', __WW_WORLD_DEVTOOLS__: 'false', __WW_ASSET_PROFILE__: 'false' },
+  define: {
+    __WW_WORLD_MODE__: '"runtime"',
+    __WW_WORLD_DEVTOOLS__: 'false',
+    __WW_ASSET_PROFILE__: 'false',
+    __WW_G11__: 'false',
+  },
   ...instrumentation,
   plugins: disableInk ? [disableInkPlugin(source)] : [],
 });

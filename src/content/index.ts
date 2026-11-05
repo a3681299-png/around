@@ -16,6 +16,8 @@ import { watchEmergencyOff } from '../browser/safety-store';
 import { skinAssetPort } from '../browser/skin-assets';
 import { extensionAssets } from '../browser/asset-client';
 import { createTakeStorage } from '../browser/take-storage';
+import { G11_ENABLED, g11ExposeController } from '../diagnostics/g11-hooks';
+import { pagePaintRegions, safePaintRegions } from '../world/operations';
 
 if (ASSET_PROFILE) installAssetRuntimeHost(document);
 
@@ -64,6 +66,22 @@ if (site) {
       },
     },
   );
+  // G1 measurement build only (folded away elsewhere): the harness's area and state checks.
+  if (G11_ENABLED)
+    g11ExposeController(controller, () => {
+      const source = controller.safety?.source,
+        snapshot = source?.capture();
+      if (!source || !snapshot) return null;
+      const pageSlot = source.pageSlot();
+      return {
+        snapshot,
+        regions: safePaintRegions(snapshot, false),
+        pageRegions: pageSlot ? pagePaintRegions(snapshot, false, { left: 0, top: 0, ...snapshot.viewport }) : [],
+        pageSlot: Boolean(pageSlot),
+        videoSlot: Boolean(source.videoSlot()),
+        status: controller.safety!.snapshot().stopped,
+      };
+    });
   const disconnectStudio = connectStudioHost(document, site, creator, controller.safety);
   const unwatchEmergency = watchEmergencyOff((value) => {
     controller.suspend(value);

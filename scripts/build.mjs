@@ -106,6 +106,8 @@ const shared = {
     __WW_WORLD_MODE__: JSON.stringify(worldMode),
     __WW_WORLD_DEVTOOLS__: String(process.env.WW_WORLD_DEVTOOLS === '1'),
     __WW_ASSET_PROFILE__: String(profiling),
+    // G1 measurement hooks (src/diagnostics/g11-hooks.ts): only scripts/g11/build.mjs turns them on.
+    __WW_G11__: 'false',
   },
 };
 

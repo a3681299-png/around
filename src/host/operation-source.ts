@@ -1,6 +1,7 @@
 import type { OperationSnapshot, OperationSurface } from '../world/operations';
 import type { PlacementFrame } from '../world/geometry';
 import { scrollsWithPage } from './operation-composition';
+import { g11CaptureEnd, g11CaptureStart } from '../diagnostics/g11-hooks';
 import { ANSWER_CHECK_MS, COALESCE_MS, SWEEP_GROUPS, TRUST_MS, createAnswerCheck } from './answer-check';
 import {
   traceGeometryCause,
@@ -604,6 +605,7 @@ export function createOperationSource(
         touched: [...touched].filter((element) => readRows.has(element) !== holdsCandidate?.(element, false)).length,
         pending,
       });
+    const g11Start = g11CaptureStart();
     stateDirty = false;
     forced = false;
     geometryDirty = false;
@@ -720,6 +722,7 @@ export function createOperationSource(
     });
     cached = seal(surfaces, scroll, { width: doc.defaultView!.innerWidth, height: doc.defaultView!.innerHeight });
     WW_GUARD_TRACE: traceGeometryRead(doc, cached, rows);
+    g11CaptureEnd(g11Start, surfaces.length);
     return cached;
   }
   /** Signs, numbers and freezes a read (a whole one, or one with replaced boxes): the geometry
