@@ -4,6 +4,7 @@ import type { MotionState } from './motion';
 import { object, numeric } from '../models/types';
 import { oneOf } from '../validation';
 import { modelClips, motionUsable } from '../characters/settings';
+import { evaluateBodyMotion, layerSeed, parseBodyState, type BodyMotionState, type BodyPose } from './body-motion';
 
 export interface ModelState {
   clip: number | null;
@@ -17,12 +18,17 @@ export interface ModelState {
   lookPitch: number;
   suspended: boolean;
   phase: 'manual' | 'idle' | 'walk' | 'run';
+  /** A character's computed motion (R3-2). Absent for layers without a character, and in takes
+   * recorded before it existed. */
+  body?: BodyMotionState;
 }
 export interface ModelEvaluation extends ModelState {
   resetDynamics?: boolean;
   id: string;
   blend: number;
   speedPx: number;
+  /** The computed motion to add on top of the clip pose (characters only). */
+  pose?: BodyPose;
 }
 export function parseModelStates(value: unknown, ids?: ReadonlySet<string>): Record<string, ModelState> {
   if (!value || typeof value !== 'object' || Array.isArray(value) || Object.keys(value).length > 8)
@@ -42,6 +48,7 @@ export function parseModelStates(value: unknown, ids?: ReadonlySet<string>): Rec
         'lookPitch',
         'suspended',
         'phase',
+        'body',
       ]);
       const clip = (n: unknown) => {
         if (n === null) return null;
@@ -66,6 +73,7 @@ export function parseModelStates(value: unknown, ids?: ReadonlySet<string>): Rec
           lookPitch: numeric(v['lookPitch'], -80, 80),
           suspended: v['suspended'],
           phase: phase as ModelState['phase'],
+          ...(v['body'] === undefined ? {} : { body: parseBodyState(v['body']) }),
         },
       ];
     }),
@@ -207,6 +215,36 @@ export function evaluateModels(
     }
     next.phase = phase;
     next.suspended = !running;
+    // A character's computed motion on top of its clip (R3-2). Layers without a character, and
+    // every artwork made before characters existed, are evaluated exactly as before.
+    let pose: BodyPose | undefined;
+    if (layer.character && layer.source.vrm) {
+      const role = clip === null ? undefined : layer.character.motions[clip]?.role,
+        clipSeconds = clip === null ? 0 : (modelClips(layer)[clip]?.duration ?? 0);
+      // The author's own motion (a path, a timed clip that is not a held pose) comes first.
+      const authorActive =
+        Boolean(layer.motion?.enabled) || (model.playing && clipSeconds > 0 && role !== 'idle' && role !== 'sit');
+      const idle = input.signals.samples?.['user.idle.duration'];
+      const body = evaluateBodyMotion(restart ? undefined : before?.body, {
+        timeMs: input.timeMs,
+        deltaMs: input.deltaMs,
+        seed: layerSeed(layer.id, input.seed),
+        posture: role === 'sit' ? 'sit' : 'stand',
+        authorActive,
+        running,
+        reducedMotion: input.environment.reducedMotion,
+        position: entry.position,
+        heightPx: layer.placement.heightPx,
+        pointer: input.signals.pointer,
+        idleSeconds: typeof idle === 'number' ? idle : undefined,
+        scrollY: input.signals.scroll?.y,
+        events: input.events,
+      });
+      next.body = body.state;
+      pose = body.pose;
+      // Breathing never stops while the character is shown.
+      needsFrame ||= running;
+    }
     state[layer.id] = next;
     evaluations.push({
       ...next,
@@ -214,6 +252,7 @@ export function evaluateModels(
       blend,
       speedPx,
       ...(restart || paused ? { resetDynamics: true } : {}),
+      ...(pose ? { pose } : {}),
     });
     const duration = clip === null ? 0 : (modelClips(layer)[clip]?.duration ?? 0) * 1000;
     needsFrame ||=
