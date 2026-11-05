@@ -47,5 +47,12 @@
     "file": "tests/vrm-data.spec.ts",
     "test": "VRM1 preserves humanoid, expression, spring and MToon capabilities with v11 roundtrip",
     "extraction": "first explicit parseDesign input accepted by the historical parser; expected result captured with 133f88b"
+  },
+  {
+    "version": 14,
+    "commit": "800373875d9a933b101e4e1cfdbfe7cfa40412e8",
+    "file": "tests/character-data.spec.ts",
+    "test": "v14 character roundtrips; clip indices then address its motions",
+    "extraction": "first explicit parseDesign input accepted by the historical parser; expected result captured with 3a41aa2"
   }
 ]

@@ -24,6 +24,18 @@ export interface CharacterSettings {
   /** auto follows the body measure; on/off is the user's override shown next to it. */
   standardMotions: 'auto' | 'on' | 'off';
   motions: CharacterMotion[];
+  /** v15: who the character is. Each 0…1; absent means 0.5 each. Only numbers, never formulas. */
+  personality?: CharacterPersonality;
+  /** v15: the author can stop the computed motion (breathing, sway…); absent means on (v14). */
+  computedMotion?: boolean;
+  /** v15: the author can turn the autonomy on; absent means off, so older artwork keeps the
+   * behaviour it had (docs/spatial-design.md: no silent switch to a new state machine). */
+  autonomy?: boolean;
+}
+export interface CharacterPersonality {
+  shyness: number;
+  curiosity: number;
+  sleepiness: number;
 }
 export const CHARACTER_LIMITS = Object.freeze({ motions: 64, durationSeconds: 600, metres: 100 });
 
@@ -64,7 +76,7 @@ export function parseVrmAnimationInfo(value: unknown): VrmAnimationInfo {
 
 export function parseCharacter(value: unknown, source: ModelInfo): CharacterSettings {
   if (source.format !== 'vrm' || !source.vrm) throw new Error('キャラ設定にはVRMモデルが必要です。');
-  const v = object(value, ['standardMotions', 'motions']);
+  const v = object(value, ['standardMotions', 'motions', 'personality', 'computedMotion', 'autonomy']);
   if (!oneOf(v['standardMotions'], ['auto', 'on', 'off']) || !Array.isArray(v['motions']))
     throw new Error('キャラ設定が不正です。');
   if (v['motions'].length > CHARACTER_LIMITS.motions)
@@ -91,8 +103,26 @@ export function parseCharacter(value: unknown, source: ModelInfo): CharacterSett
   });
   if (new Set(motions.map((m) => m.id)).size !== motions.length)
     throw new Error('キャラの動作の名前が重複しています。');
-  return { standardMotions: v['standardMotions'] as CharacterSettings['standardMotions'], motions };
+  return {
+    standardMotions: v['standardMotions'] as CharacterSettings['standardMotions'],
+    motions,
+    ...(v['personality'] === undefined ? {} : { personality: parsePersonality(v['personality']) }),
+    ...(v['computedMotion'] === undefined ? {} : { computedMotion: bool(v['computedMotion']) }),
+    ...(v['autonomy'] === undefined ? {} : { autonomy: bool(v['autonomy']) }),
+  };
 }
+
+/** Three numbers in 0…1 (rounded to 0.01 so equal values serialise equally); nothing else. */
+export function parsePersonality(value: unknown): CharacterPersonality {
+  const v = object(value, ['shyness', 'curiosity', 'sleepiness']);
+  const unit = (n: unknown) => Math.round(numeric(n, 0, 1) * 100) / 100;
+  return { shyness: unit(v['shyness']), curiosity: unit(v['curiosity']), sleepiness: unit(v['sleepiness']) };
+}
+export const DEFAULT_CHARACTER_PERSONALITY: CharacterPersonality = Object.freeze({
+  shyness: 0.5,
+  curiosity: 0.5,
+  sleepiness: 0.5,
+});
 
 /** The clip list a layer's indices address: its character motions, or the model's own clips. */
 export const modelClips = (layer: {
@@ -105,6 +135,9 @@ export const modelClips = (layer: {
 
 export interface CharacterPatch {
   standardMotions?: CharacterSettings['standardMotions'];
+  personality?: CharacterPersonality;
+  computedMotion?: boolean;
+  autonomy?: boolean;
   /** Motion IDs to keep, in order: a subset of the current motions (removal and reordering). */
   keep?: string[];
 }
@@ -131,7 +164,15 @@ export function applyCharacterPatch(
   };
   const model = layer.model;
   return {
-    character: { standardMotions: patch.standardMotions ?? layer.character.standardMotions, motions },
+    // The v15 behaviour settings ride along unless the patch sets them.
+    character: {
+      ...layer.character,
+      standardMotions: patch.standardMotions ?? layer.character.standardMotions,
+      motions,
+      ...(patch.personality ? { personality: patch.personality } : {}),
+      ...(patch.computedMotion === undefined ? {} : { computedMotion: patch.computedMotion }),
+      ...(patch.autonomy === undefined ? {} : { autonomy: patch.autonomy }),
+    },
     model: {
       ...model,
       clip: remap(model.clip),

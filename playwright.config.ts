@@ -11,6 +11,8 @@ const unitSpecs = [
   'g11-hooks',
   'mannequin',
   'body-motion',
+  'character-v15',
+  'autonomy',
   'two-bone-ik',
   'asset-import-validation',
   'asset-profile',

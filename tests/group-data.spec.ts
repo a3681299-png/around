@@ -71,7 +71,7 @@ test('v1–v5 migrate without inventing groups; v6 references existing assets an
     if (version < 3) legacy.decorations.forEach((layer: Partial<ImageDecoration>) => delete layer.locked);
     const before = JSON.stringify(legacy),
       parsed = parseDesign(legacy);
-    expect(parsed.schemaVersion).toBe(14);
+    expect(parsed.schemaVersion).toBe(15);
     expect(parsed.groups).toBeUndefined();
     expect(JSON.stringify(legacy)).toBe(before);
     expect(parsed.decorations.map((item) => item.assetId)).toEqual(input.decorations.map((item) => item.assetId));

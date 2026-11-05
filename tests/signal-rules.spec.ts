@@ -72,7 +72,7 @@ test('validated rules roundtrip and reject unknown fields, targets, duplicates, 
   const { scene } = scenario(),
     design = { ...emptyDesign('youtube', null), ...scene },
     parsed = parseDesign(design);
-  expect(parsed.schemaVersion).toBe(14);
+  expect(parsed.schemaVersion).toBe(15);
   expect(parseDesign(JSON.parse(JSON.stringify(parsed)))).toEqual(parsed);
   const rule = scene.signalRules[0]!;
   const malformed = [

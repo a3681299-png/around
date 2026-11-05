@@ -24,6 +24,7 @@ const layer10 = [...layer9, 'model', 'source'];
 const group6 = ['kind', 'id', 'name', 'opacity', 'zIndex', 'visible', 'locked', 'effects', 'children'];
 const group9 = [...group6, 'motion'];
 const layer12 = [...layer10, 'renderMode'];
+const layer14 = [...layer12, 'character'];
 const group12 = [...group9, 'renderMode'];
 const rule1 = ['kind', 'target', 'style'];
 const rule13 = [...rule1, 'skin'];
@@ -169,6 +170,22 @@ export function migrateV13ToV14(value: unknown): Data {
   return next(data, 14);
 }
 
+/** v14 → v15 (chunk 3): a character may carry its personality and the author's switches for the
+ * computed motion and the autonomy. Nothing changes shape; absent keys keep v14's behaviour
+ * (computed motion on, autonomy off). Everything else passes unchanged through every earlier
+ * step, so checking the characters here covers v1–v14 (a character itself is v14). */
+export function migrateV14ToV15(value: unknown): Data {
+  const data = stage(value, 14, { root: root8, layer: layer14, kinds: models, group: group12, rule: rule13 });
+  for (const value of list(data['decorations'])) {
+    const layer = record(value);
+    if (layer['kind'] !== 'model3d' || layer['character'] === undefined) continue;
+    const character = record(layer['character']);
+    for (const key of ['personality', 'computedMotion', 'autonomy'])
+      if (Object.hasOwn(character, key)) throw new Error('キャラの性格と自律の設定にはDesignDocument v15が必要です。');
+  }
+  return next(data, 15);
+}
+
 export const DESIGN_MIGRATIONS = Object.freeze([
   migrateV1ToV2,
   migrateV2ToV3,
@@ -183,14 +200,15 @@ export const DESIGN_MIGRATIONS = Object.freeze([
   migrateV11ToV12,
   migrateV12ToV13,
   migrateV13ToV14,
+  migrateV14ToV15,
 ]);
 
-/** Pure chain; a returned v14 object is still unvalidated external input. */
+/** Pure chain; a returned v15 object is still unvalidated external input. */
 export function migrateDesign(value: unknown): Data {
   let data = record(value);
   const version = data['schemaVersion'];
-  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 14)
+  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 15)
     throw new Error('このデザインのバージョンには対応していません。');
-  for (let from = version; from < 14; from++) data = DESIGN_MIGRATIONS[from - 1]!(data);
+  for (let from = version; from < 15; from++) data = DESIGN_MIGRATIONS[from - 1]!(data);
   return data;
 }

@@ -2,7 +2,7 @@
   "baseline": "d1a552e3641ac9141844afeff911fe7bfc46109f",
   "documents": {
     "history-v10.json": {
-      "schemaVersion": 14,
+      "schemaVersion": 15,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": "retro",
@@ -89,7 +89,7 @@
       ]
     },
     "history-v11.json": {
-      "schemaVersion": 14,
+      "schemaVersion": 15,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": "retro",
@@ -322,7 +322,7 @@
       ]
     },
     "history-v12.json": {
-      "schemaVersion": 14,
+      "schemaVersion": 15,
       "id": "modes",
       "siteId": "youtube",
       "baseThemeId": null,
@@ -389,7 +389,7 @@
       ]
     },
     "history-v7.json": {
-      "schemaVersion": 14,
+      "schemaVersion": 15,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": null,
@@ -456,7 +456,7 @@
       ]
     },
     "history-v8.json": {
-      "schemaVersion": 14,
+      "schemaVersion": 15,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": null,
@@ -662,7 +662,7 @@
       ]
     },
     "history-v9.json": {
-      "schemaVersion": 14,
+      "schemaVersion": 15,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": null,
@@ -885,7 +885,7 @@
       ]
     },
     "v1.json": {
-      "schemaVersion": 14,
+      "schemaVersion": 15,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": "retro",
@@ -906,7 +906,7 @@
       "decorations": []
     },
     "v2.json": {
-      "schemaVersion": 14,
+      "schemaVersion": 15,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": null,
@@ -935,7 +935,7 @@
       ]
     },
     "v3.json": {
-      "schemaVersion": 14,
+      "schemaVersion": 15,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": null,
@@ -964,7 +964,7 @@
       ]
     },
     "v4.json": {
-      "schemaVersion": 14,
+      "schemaVersion": 15,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": "retro",
@@ -999,7 +999,7 @@
       ]
     },
     "v5.json": {
-      "schemaVersion": 14,
+      "schemaVersion": 15,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": null,
@@ -1060,7 +1060,7 @@
       ]
     },
     "v6.json": {
-      "schemaVersion": 14,
+      "schemaVersion": 15,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": "retro",
@@ -1145,7 +1145,7 @@
       ]
     },
     "v7.json": {
-      "schemaVersion": 14,
+      "schemaVersion": 15,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": "retro",
@@ -1237,7 +1237,7 @@
       ]
     },
     "v8.json": {
-      "schemaVersion": 14,
+      "schemaVersion": 15,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": "retro",
@@ -1378,7 +1378,7 @@
       ]
     },
     "v9.json": {
-      "schemaVersion": 14,
+      "schemaVersion": 15,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": "retro",
@@ -1531,7 +1531,7 @@
       ]
     },
     "history-v13.json": {
-      "schemaVersion": 14,
+      "schemaVersion": 15,
       "id": "youtube-custom",
       "siteId": "youtube",
       "baseThemeId": "retro",
@@ -1759,6 +1759,310 @@
               "springBone": true,
               "expressions": {}
             }
+          }
+        }
+      ]
+    },
+    "history-v14.json": {
+      "schemaVersion": 15,
+      "id": "youtube-custom",
+      "siteId": "youtube",
+      "baseThemeId": null,
+      "rules": [],
+      "decorations": [
+        {
+          "id": "trusie",
+          "assetId": "asset-0000000000000000000000000000000000000000000000000000000000000001",
+          "name": "Trusie",
+          "placement": {
+            "anchor": {
+              "kind": "viewport"
+            },
+            "x": 0.5,
+            "y": 0.5,
+            "widthPx": 120,
+            "heightPx": 160,
+            "rotationDeg": 0
+          },
+          "opacity": 1,
+          "zIndex": 0,
+          "visible": true,
+          "locked": false,
+          "kind": "model3d",
+          "source": {
+            "format": "vrm",
+            "vrm": {
+              "version": "1.0",
+              "humanoid": [
+                {
+                  "bone": "hips",
+                  "node": 2
+                },
+                {
+                  "bone": "head",
+                  "node": 3
+                },
+                {
+                  "bone": "spine",
+                  "node": 4
+                },
+                {
+                  "bone": "leftUpperArm",
+                  "node": 5
+                },
+                {
+                  "bone": "leftLowerArm",
+                  "node": 6
+                },
+                {
+                  "bone": "leftHand",
+                  "node": 7
+                },
+                {
+                  "bone": "leftUpperLeg",
+                  "node": 8
+                },
+                {
+                  "bone": "leftLowerLeg",
+                  "node": 9
+                },
+                {
+                  "bone": "leftFoot",
+                  "node": 10
+                },
+                {
+                  "bone": "leftEye",
+                  "node": 11
+                },
+                {
+                  "bone": "rightUpperArm",
+                  "node": 12
+                },
+                {
+                  "bone": "rightLowerArm",
+                  "node": 13
+                },
+                {
+                  "bone": "rightHand",
+                  "node": 14
+                },
+                {
+                  "bone": "rightUpperLeg",
+                  "node": 15
+                },
+                {
+                  "bone": "rightLowerLeg",
+                  "node": 16
+                },
+                {
+                  "bone": "rightFoot",
+                  "node": 17
+                },
+                {
+                  "bone": "rightEye",
+                  "node": 18
+                }
+              ],
+              "expressions": [
+                "happy",
+                "blink"
+              ],
+              "lookAt": true,
+              "springBone": true,
+              "mtoon": true,
+              "body": {
+                "height": 1.1,
+                "headLength": 0.25,
+                "headsTall": 4.4,
+                "legLength": 0.2618033988749895,
+                "legRatio": 0.23800308988635407,
+                "armLength": 0.29999999999999993,
+                "armRatio": 0.27272727272727265,
+                "hipsHeight": 0.5,
+                "hipsRatio": 0.45454545454545453,
+                "shoulderWidth": 0.3
+              }
+            },
+            "clips": [
+              {
+                "name": "Rest / 待機",
+                "duration": 2
+              },
+              {
+                "name": "Stride",
+                "duration": 2
+              },
+              {
+                "name": "Sprint",
+                "duration": 2
+              }
+            ],
+            "bones": [
+              {
+                "node": 2,
+                "name": "Hips"
+              },
+              {
+                "node": 3,
+                "name": "Head"
+              },
+              {
+                "node": 4,
+                "name": "spine"
+              },
+              {
+                "node": 5,
+                "name": "leftUpperArm"
+              },
+              {
+                "node": 6,
+                "name": "leftLowerArm"
+              },
+              {
+                "node": 7,
+                "name": "leftHand"
+              },
+              {
+                "node": 8,
+                "name": "leftUpperLeg"
+              },
+              {
+                "node": 9,
+                "name": "leftLowerLeg"
+              },
+              {
+                "node": 10,
+                "name": "leftFoot"
+              },
+              {
+                "node": 11,
+                "name": "leftEye"
+              },
+              {
+                "node": 12,
+                "name": "rightUpperArm"
+              },
+              {
+                "node": 13,
+                "name": "rightLowerArm"
+              },
+              {
+                "node": 14,
+                "name": "rightHand"
+              },
+              {
+                "node": 15,
+                "name": "rightUpperLeg"
+              },
+              {
+                "node": 16,
+                "name": "rightLowerLeg"
+              },
+              {
+                "node": 17,
+                "name": "rightFoot"
+              },
+              {
+                "node": 18,
+                "name": "rightEye"
+              }
+            ],
+            "vertices": 8,
+            "triangles": 12,
+            "textureBytes": 4
+          },
+          "model": {
+            "rotationX": 0,
+            "rotationY": 0,
+            "rotationZ": 0,
+            "clip": 1,
+            "playing": true,
+            "loop": true,
+            "speed": 1,
+            "crossFadeMs": 250,
+            "inPlace": true,
+            "locomotion": {
+              "enabled": false,
+              "idle": null,
+              "walk": null,
+              "run": null,
+              "walkSpeed": 10,
+              "runSpeed": 220,
+              "faceMovement": true,
+              "forwardDeg": 0
+            },
+            "look": {
+              "enabled": true,
+              "bone": 3,
+              "yawLimit": 50,
+              "pitchLimit": 30,
+              "lagMs": 160
+            },
+            "vrm": {
+              "lookAt": true,
+              "headFollow": true,
+              "springBone": true,
+              "expressions": {}
+            }
+          },
+          "character": {
+            "standardMotions": "auto",
+            "motions": [
+              {
+                "id": "idle",
+                "assetId": "asset-0000000000000000000000000000000000000000000000000000000000000002",
+                "role": "idle",
+                "origin": "character",
+                "loop": true,
+                "source": {
+                  "format": "vrma",
+                  "name": "sit",
+                  "duration": 1,
+                  "bones": [
+                    "hips",
+                    "spine",
+                    "head",
+                    "leftUpperLeg",
+                    "leftLowerLeg",
+                    "rightUpperLeg"
+                  ],
+                  "hipsTranslation": true,
+                  "restHipsHeight": 0.9,
+                  "hipsTravel": [
+                    0,
+                    -0.3999999761581421,
+                    0.10000000149011612
+                  ]
+                }
+              },
+              {
+                "id": "sit",
+                "assetId": "asset-0000000000000000000000000000000000000000000000000000000000000003",
+                "role": "sit",
+                "origin": "standard",
+                "loop": true,
+                "source": {
+                  "format": "vrma",
+                  "name": "sit",
+                  "duration": 1,
+                  "bones": [
+                    "hips",
+                    "spine",
+                    "head",
+                    "leftUpperLeg",
+                    "leftLowerLeg",
+                    "rightUpperLeg"
+                  ],
+                  "hipsTranslation": true,
+                  "restHipsHeight": 0.9,
+                  "hipsTravel": [
+                    0,
+                    -0.3999999761581421,
+                    0.10000000149011612
+                  ]
+                }
+              }
+            ]
           }
         }
       ]
