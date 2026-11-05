@@ -25,6 +25,11 @@ if (noIdleRecheck && !outputName.startsWith('.work/'))
 // under its controls, instead of over the page with cut-outs. Development builds only.
 const layering = process.env.WW_LAYERING === '1';
 if (layering && !outputName.startsWith('.work/')) throw new Error('Layering prototype builds must stay inside .work.');
+// Breaks the layering guard on purpose: no stacking proof (every player part taken as over the
+// character), to see its tests fail (docs/layering-plan.md).
+const noStackingProof = process.env.WW_NO_STACKING_PROOF === '1';
+if (noStackingProof && !outputName.startsWith('.work/'))
+  throw new Error('Builds without the stacking proof must stay inside .work.');
 const watching = process.argv.includes('--watch');
 const worldMode = process.env.WW_WORLD_MODE ?? 'runtime';
 if (!['legacy', 'compare', 'runtime'].includes(worldMode))
@@ -104,6 +109,7 @@ const shared = {
     ...(pageChangeProbe ? [] : ['WW_TEST_PAGE_CHANGE']),
     ...(guardTrace ? [] : ['WW_GUARD_TRACE']),
     ...(noIdleRecheck ? ['WW_IDLE_RECHECK'] : []),
+    ...(noStackingProof ? ['WW_STACKING_PROOF'] : []),
   ],
   define: {
     __WW_PAGE_CHANGE_LEGACY__: String(pageChangeProbe && process.env.WW_PAGE_CHANGE_LEGACY === '1'),

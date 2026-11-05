@@ -126,7 +126,154 @@ const hideBars = (youtube: Page, hidden: boolean) =>
     hidden,
   );
 
-test('G1 bands: artwork may paint in the bands only while the bars are hidden', async ({ popup, youtube }) => {
+/**
+ * The bar's own glyphs (the fixture's buttons draw white text) in the bottom band, with the
+ * artwork and with its plane made transparent: where a glyph is white without the artwork, it is
+ * the same with it. Also how much of the band the artwork paints (under the bars, by stacking).
+ */
+async function barGlyphs(youtube: Page) {
+  const player = (await youtube.locator('#movie_player').boundingBox())!;
+  const clip = { x: player.x, y: player.y + player.height - BOTTOM_BAND, width: player.width, height: BOTTOM_BAND };
+  const canvases = (opacity: string) =>
+    youtube.evaluate(
+      ([plane, value]) => {
+        for (const c of (document.querySelector(plane!) as HTMLElement).shadowRoot!.querySelectorAll<HTMLElement>(
+          '.image, canvas, img',
+        ))
+          c.style.opacity = value!;
+      },
+      [PLANE, opacity],
+    );
+  const withIt = pngPixels(await youtube.screenshot({ clip }));
+  await canvases('0');
+  const without = pngPixels(await youtube.screenshot({ clip }));
+  await canvases('');
+  let glyph = 0,
+    covered = 0,
+    artwork = 0;
+  for (let i = 0; i < without.rgba.length; i += 4) {
+    const a = withIt.rgba,
+      b = without.rgba;
+    if (a[i]! > 200 && a[i + 1]! < 60 && a[i + 2]! > 200) artwork++;
+    // A glyph's own (opaque) pixels: pure white. Its anti-aliased rim is partly see-through and
+    // shows whatever is behind the bar, the artwork included, so it is not counted.
+    if (!(b[i]! >= 250 && b[i + 1]! >= 250 && b[i + 2]! >= 250)) continue;
+    glyph++;
+    if (Math.max(...[0, 1, 2].map((c) => Math.abs(a[i + c]! - b[i + c]!))) > 24) covered++;
+  }
+  return { glyph, covered, artwork };
+}
+
+/** Layering (docs/layering-plan.md): every frame from the class change on, the plane sits directly
+ * after the media at its level; the frames where it did not. */
+async function watchOrder(youtube: Page) {
+  await youtube.evaluate((plane) => {
+    const player = document.querySelector('#movie_player')!;
+    const host = document.querySelector(plane) as HTMLElement;
+    const w = window as unknown as { orderProblems: string[]; orderChecks: number; stopOrder: () => void };
+    w.orderProblems = [];
+    w.orderChecks = 0;
+    const check = (when: string) => {
+      w.orderChecks++;
+      const media = host.previousElementSibling as HTMLElement | null;
+      if (
+        !media?.classList.contains('html5-video-container') ||
+        getComputedStyle(host).zIndex !== getComputedStyle(media).zIndex
+      )
+        w.orderProblems.push(`${when}: after ${media?.className}, z ${getComputedStyle(host).zIndex}`);
+    };
+    const observer = new MutationObserver(() => check('class change'));
+    observer.observe(player, { attributes: true, attributeFilter: ['class'] });
+    let running = true;
+    const frame = () => {
+      if (!running) return;
+      check('frame');
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+    w.stopOrder = () => {
+      running = false;
+      observer.disconnect();
+    };
+  }, PLANE);
+  return async () =>
+    youtube.evaluate(() => {
+      const w = window as unknown as { orderProblems: string[]; orderChecks: number; stopOrder: () => void };
+      w.stopOrder();
+      return { problems: w.orderProblems, checks: w.orderChecks };
+    });
+}
+
+test('G1 bands (layering): the bars are drawn over the artwork in the band, shown or hidden, and stay pressable', async ({
+  popup,
+  youtube,
+  layeringOn,
+}) => {
+  test.skip(!layeringOn, 'The cut-out way is checked by the tests below.');
+  await redArtworkInTheCorner(popup, youtube);
+  await youtube.evaluate(() => {
+    const player = document.querySelector('#movie_player')!;
+    const show = () => player.classList.remove('ytp-autohide');
+    player.addEventListener('pointermove', show);
+    document.addEventListener('keydown', show, true);
+  });
+  const player = (await youtube.locator('#movie_player').boundingBox())!;
+  for (const action of [
+    async () => youtube.mouse.move(player.x + player.width / 2, player.y + player.height / 2, { steps: 3 }),
+    async () => youtube.keyboard.press('k'),
+    async () => youtube.keyboard.press('Tab'),
+  ]) {
+    await youtube.mouse.move(2, 2);
+    await hideBars(youtube, true);
+    await expect.poll(() => redInBottomBand(youtube)).toBeGreaterThan(1000);
+    const stop = await watchOrder(youtube);
+    await action();
+    await youtube.waitForTimeout(300);
+    const watched = await stop();
+    expect(watched.problems).toEqual([]);
+    expect(watched.checks).toBeGreaterThan(3);
+    // Bars shown: the artwork is still in the band (under the bars), and no glyph of theirs changed.
+    const bars = await barGlyphs(youtube);
+    expect(bars.artwork).toBeGreaterThan(1000);
+    expect(bars.glyph).toBeGreaterThan(50);
+    expect(bars.covered).toBe(0);
+  }
+  // The real button under the artwork takes the click.
+  const button = youtube.getByRole('button', { name: 'Fullscreen', exact: true });
+  const box = (await button.boundingBox())!;
+  expect(
+    await youtube.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.getAttribute('aria-label'), {
+      x: box.x + box.width / 2,
+      y: box.y + box.height / 2,
+    }),
+  ).toBe('Fullscreen');
+});
+
+test('G1 bands (layering): with the plane put over the bars, the same check fails (the check is real)', async ({
+  popup,
+  youtube,
+  layeringOn,
+}) => {
+  test.skip(!layeringOn, 'The cut-out way is checked by the tests below.');
+  await redArtworkInTheCorner(popup, youtube);
+  // Deliberately broken, in this page only: the plane above every part of the player.
+  await youtube.evaluate((plane) => {
+    const shadow = (document.querySelector(plane) as HTMLElement).shadowRoot!;
+    const broken = document.createElement('style');
+    broken.textContent = ':host{z-index:5000!important}';
+    shadow.append(broken);
+  }, PLANE);
+  await expect.poll(() => redInBottomBand(youtube)).toBeGreaterThan(1000);
+  // The fullscreen and settings glyphs under the artwork (a few dozen opaque pixels each).
+  expect((await barGlyphs(youtube)).covered).toBeGreaterThan(5);
+});
+
+test('G1 bands: artwork may paint in the bands only while the bars are hidden', async ({
+  popup,
+  youtube,
+  layeringOn,
+}) => {
+  test.skip(layeringOn, 'Cut-out way only: layering paints under the bars (checked above).');
   await redArtworkInTheCorner(popup, youtube);
   // Bars shown (the fixture starts without ytp-autohide): the band is clipped.
   await expect.poll(() => redInBottomBand(youtube)).toBe(0);
@@ -146,7 +293,9 @@ test('G1 bands: artwork may paint in the bands only while the bars are hidden', 
 test('G1 bands: the bars brought back by a pointer move or a key are clipped from their first frame', async ({
   popup,
   youtube,
+  layeringOn,
 }) => {
+  test.skip(layeringOn, 'Cut-out way only: layering paints under the bars (checked above).');
   await redArtworkInTheCorner(popup, youtube);
   // Like YouTube: a pointer move over the player or a key (k, arrows, Tab) shows the bars.
   await youtube.evaluate(() => {
@@ -202,7 +351,9 @@ test('G1 bands: an advert keeps the bands clipped while the bars are hidden', as
 test('G1 bands: without the "only while shown" rule the same check fails (the check is real)', async ({
   popup,
   youtube,
+  layeringOn,
 }) => {
+  test.skip(layeringOn, 'Cut-out way only: layering has no band clip to break (its check is above).');
   await redArtworkInTheCorner(popup, youtube);
   // Deliberately broken, in this page only: the plane drops its band clip whatever the bars do.
   await youtube.evaluate((plane) => {

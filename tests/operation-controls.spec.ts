@@ -6,10 +6,12 @@ import { openEditor } from './helpers/editor';
 import type { DesignDocument } from '../src/design/types';
 import { parseDesign } from '../src/design/schema';
 import { defaultFollowMotion } from '../src/signals/motion';
+import { pngPixels } from './helpers/png-pixels';
 
 test('native drag, text, keyboard and fullscreen controls remain usable with opaque artwork', async ({
   popup,
   youtube,
+  layeringOn,
 }, info) => {
   await youtube.goto('https://www.youtube.com/watch?v=fixture');
   await showArtwork(popup);
@@ -77,15 +79,46 @@ test('native drag, text, keyboard and fullscreen controls remain usable with opa
   const baseline = await run();
   const protectedBefore = await youtube.locator('#g1-seek').screenshot();
   await info.attach('native-seek-before', { body: protectedBefore, contentType: 'image/png' });
+  // Layering (docs/layering-plan.md): the artwork may show through where the slider itself is
+  // transparent (around its track and thumb), as under YouTube's bars. What must not change is the
+  // slider's own paint: the pixels it changes over what is behind it, found before any artwork.
+  const slider = (await youtube.locator('#g1-seek').boundingBox())!;
+  let ownPaint: { mask: number[]; pixels: Uint8Array } | undefined;
+  if (layeringOn) {
+    const shot = pngPixels(await youtube.screenshot({ clip: slider })),
+      pixels = shot.rgba;
+    await youtube.locator('#g1-seek').evaluate((e) => (e.style.visibility = 'hidden'));
+    const without = pngPixels(await youtube.screenshot({ clip: slider })).rgba;
+    await youtube.locator('#g1-seek').evaluate((e) => (e.style.visibility = ''));
+    const mine = (x: number, y: number) => {
+      if (x < 0 || y < 0 || x >= shot.width || y >= shot.height) return false;
+      const i = (y * shot.width + x) * 4;
+      return Math.max(...[0, 1, 2].map((c) => Math.abs(pixels[i + c]! - without[i + c]!))) > 60;
+    };
+    // Only the inside of what it paints: its anti-aliased rim is partly see-through.
+    const mask: number[] = [];
+    for (let y = 0; y < shot.height; y++)
+      for (let x = 0; x < shot.width; x++)
+        if (mine(x, y) && mine(x - 1, y) && mine(x + 1, y) && mine(x, y - 1) && mine(x, y + 1))
+          mask.push((y * shot.width + x) * 4);
+    ownPaint = { mask, pixels };
+    expect(mask.length).toBeGreaterThan(200);
+  }
   const preserved = async (name: string) => {
     let picture = protectedBefore;
     try {
       await expect
         .poll(async () => {
-          picture = await youtube.locator('#g1-seek').screenshot();
-          return picture.equals(protectedBefore);
+          if (!ownPaint) {
+            picture = await youtube.locator('#g1-seek').screenshot();
+            return picture.equals(protectedBefore);
+          }
+          picture = await youtube.screenshot({ clip: slider });
+          const now = pngPixels(picture).rgba,
+            before = ownPaint.pixels;
+          return ownPaint.mask.filter((i) => [0, 1, 2].some((c) => Math.abs(now[i + c]! - before[i + c]!) > 24)).length;
         })
-        .toBe(true);
+        .toBe(ownPaint ? 0 : true);
     } finally {
       await info.attach(name, { body: picture, contentType: 'image/png' });
     }
@@ -143,7 +176,13 @@ test('native drag, text, keyboard and fullscreen controls remain usable with opa
   await editor.getByRole('button', { name: '編集を終了', exact: true }).first().click();
   const playerPaint = youtube.locator('#web-world-themes-video-decorations');
   await expect(playerPaint.locator('[data-image-id]')).toBeVisible();
-  await expect(playerPaint).toHaveCSS('clip-path', 'inset(64px 0px 112px)');
+  // How the bands stay clear depends on the way (docs/layering-plan.md); that they do is checked
+  // by `preserved` below in both. Cut out: the plane clips the bands. Layering: the plane is whole
+  // and sits directly after the media, under the bars by stacking order.
+  if (layeringOn) {
+    await expect(playerPaint).toHaveCSS('clip-path', 'inset(0px)');
+    expect(await playerPaint.evaluate((host) => host.previousElementSibling?.className)).toBe('html5-video-container');
+  } else await expect(playerPaint).toHaveCSS('clip-path', 'inset(64px 0px 112px)');
   await preserved('native-seek-player');
   expect(await run()).toEqual(baseline);
   // G1.2: the same opaque layer, now moving (it follows the pointer). Only the roots over a near
@@ -164,7 +203,8 @@ test('native drag, text, keyboard and fullscreen controls remain usable with opa
     )
     .toBe('');
   await expect(playerPaint.locator('[data-image-id]')).toBeVisible();
-  // It is held at the seek bar: the run below meets a moving layer that the approach holds.
+  // At the seek bar: cut out, the run below meets a moving layer that the approach holds. Under
+  // the bars by stacking order, it needs no hold (it cannot cover what the pointer aims at).
   const seekBox = (await youtube.locator('#g1-seek').boundingBox())!;
   await youtube.mouse.move(seekBox.x + 20, seekBox.y + seekBox.height / 2, { steps: 4 });
   await expect
@@ -174,7 +214,7 @@ test('native drag, text, keyboard and fullscreen controls remain usable with opa
           (await youtube.locator('#web-world-themes-decorations').getAttribute('data-ww-safety')) ?? '{}',
         ).issues?.filter((i: any) => i.surfaceId === 'native.approach').length,
     )
-    .toBe(1);
+    .toBe(layeringOn ? 0 : 1);
   // Off the seek bar again (its own hover colour is not part of the comparison), as before.
   const fullscreen = (await youtube.getByRole('button', { name: 'Fullscreen', exact: true }).boundingBox())!;
   await youtube.mouse.move(fullscreen.x + fullscreen.width / 2, fullscreen.y + fullscreen.height / 2, { steps: 4 });

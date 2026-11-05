@@ -135,10 +135,10 @@ export interface BeneathSlot {
   after: HTMLElement;
   zIndex: number;
   rect: PlacementFrame;
-  /** Whether every change pending since the last read is one the stacking order covers by
-   * itself (outside the player's box, or inside a part proven to paint over the plane), so the
-   * plane needs no hold while the read is pending. False when the changes are not known. */
-  settled: boolean;
+  /** While a read is pending: where a control not proven to paint over the plane is, or may have
+   * been brought out by the pending changes ('everywhere' when that cannot be told). A paint near
+   * none of these needs no hold while the read is pending; the stacking order covers the rest. */
+  unproven: readonly PlacementFrame[] | 'everywhere';
 }
 /** DOM identities stay here; the site adapter alone supplies discovery/selectors. */
 export function createOperationSource(

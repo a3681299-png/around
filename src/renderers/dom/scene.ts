@@ -46,6 +46,26 @@ export interface ImageEditing {
 // handles. They use Gesso's values whatever the colour scheme, since they sit over any picture.
 // Handles keep a 14px hit area around their 12px square; rotation is a square with its glyph,
 // because a circle means 保存済み.
+/**
+ * A beneath paint needs no hold for a pending read when no control that is not proven to paint
+ * over it is near (docs/layering-plan.md, chunk 4): within 40 px, the distance at which the G1.2
+ * approach takes a control as near. Unknown places hold every paint, as before.
+ */
+const BENEATH_NEAR_PX = 40;
+function beneathSettled(
+  unproven: readonly { left: number; top: number; width: number; height: number }[] | 'everywhere',
+  bounds: { left: number; top: number; right: number; bottom: number } | undefined,
+) {
+  if (unproven === 'everywhere' || !bounds) return false;
+  return !unproven.some(
+    (r) =>
+      r.left < bounds.right + BENEATH_NEAR_PX &&
+      r.left + r.width > bounds.left - BENEATH_NEAR_PX &&
+      r.top < bounds.bottom + BENEATH_NEAR_PX &&
+      r.top + r.height > bounds.top - BENEATH_NEAR_PX,
+  );
+}
+
 const CSS = `
 :host { --cobalt:#2b51b8; --ink-muted:#53575f; --edge:rgba(255,255,255,.85); --rotate:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 6 6'%3E%3Cpath d='M5 3A2 2 0 1 1 3 1' fill='none' stroke='black' stroke-width='1' stroke-linecap='round'/%3E%3Cpath d='M2.6 0L4.2 1L2.6 2Z'/%3E%3C/svg%3E"); }
 :host { all:initial !important; position:fixed !important; inset:0 !important; width:100vw !important; height:100vh !important; margin:0 !important; padding:0 !important; border:0 !important; background:transparent !important; overflow:hidden !important; pointer-events:none !important; z-index:var(--ww-decoration-z,2147482000) !important; clip-path:var(--ww-decoration-clip,none) !important; }
@@ -238,12 +258,20 @@ export function createImageRenderer(
         });
       // Chunk 4 prototype (LAYERING, docs/layering-plan.md): outside editing, the player's plane goes
       // under its controls by stacking order instead of over them with the bands cut out.
-      const beneath = LAYERING && needsVideoSlot && !editing ? safety.source.beneathSlot?.() : undefined;
+      // Locked editing takes no input on the artwork, so it is drawn as outside editing.
+      const beneath =
+        LAYERING && needsVideoSlot && !(editing && !editing.locked) ? safety.source.beneathSlot?.() : undefined;
       const slot = beneath
         ? { parent: beneath.parent, rect: beneath.rect, top: 0, bottom: 0, zIndex: beneath.zIndex }
         : needsVideoSlot
           ? safety.source.videoSlot()
           : undefined;
+      // Which way each protected draw took, on the document (the trace build only).
+      WW_GUARD_TRACE: if (LAYERING && needsVideoSlot) {
+        const way = `${beneath ? 'beneath' : slot ? 'cutout' : 'none'}${editing ? (editing.locked ? '/locked' : '/editing') : ''}`;
+        const seen = (doc.documentElement.dataset['wwLayeringWays'] ?? '').split('|').filter(Boolean);
+        if (seen[seen.length - 1] !== way) doc.documentElement.dataset['wwLayeringWays'] = [...seen, way].join('|');
+      }
       // Explicit editing only: the verified video centre (no menu, error or advert over it), where
       // screen- and page-plane handles may take input over the video. The bands and any native
       // control in the centre stay native: they are cut from the clip and refused at input time.
@@ -577,7 +605,9 @@ export function createImageRenderer(
               animated:
                 layer.layer.kind === 'animation' ||
                 Boolean(layer.layer.effects?.some((e) => e.enabled && e.bindings.length)),
-              ...(localIds.has(layer.layer.id) && beneath ? { settled: beneath.settled } : {}),
+              ...(localIds.has(layer.layer.id) && beneath
+                ? { settled: beneathSettled(beneath.unproven, layer.bounds) }
+                : {}),
               ...(localIds.has(layer.layer.id) && slot
                 ? {
                     clip: {

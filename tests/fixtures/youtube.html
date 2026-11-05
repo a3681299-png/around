@@ -95,10 +95,18 @@
       ytd-comment-thread-renderer b { display: block; font-size: 12px; }
       ytd-comment-thread-renderer p { margin: 3px 0; font-size: 13px; }
       .comment-replies { color: #065fd4; font-size: 12px; }
-      .html5-video-player { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #101519; color: white; overflow: hidden; }
+      /* The player's stacking as on real YouTube (read 2026-11-06, docs/layering-plan.md 2.1): the
+         player is its own stacking context (relative, z-index 0, overflow hidden), the media sits in
+         a container at level 10, the bars at 58/59, and some parts are containers without a
+         z-index (captions, interactive content, adverts). YouTube's container is relative with no
+         height and an absolute video; here it is absolute and full size, which paints the same. */
+      .html5-video-player { position: relative; z-index: 0; width: 100%; aspect-ratio: 16 / 9; background: #101519; color: white; overflow: hidden; }
       .html5-video-player:fullscreen { height: 100%; width: 100%; aspect-ratio: auto; }
+      .html5-video-container { position: absolute; inset: 0; z-index: 10; }
       .html5-main-video { display: block; width: 100%; height: 100%; object-fit: contain; }
-      .ytp-chrome-bottom { position: absolute; left: 12px; right: 12px; bottom: 0; height: 48px; }
+      .ytp-caption-window-container, .ytp-player-content { position: absolute; inset: 0; pointer-events: none; }
+      .ytp-chrome-top { position: absolute; left: 12px; right: 12px; top: 0; z-index: 58; }
+      .ytp-chrome-bottom { position: absolute; left: 12px; right: 12px; bottom: 0; height: 48px; z-index: 59; }
       .ytp-progress-bar { position: absolute; top: -5px; width: 100%; height: 3px; background: #777 !important; }
       .ytp-progress-bar::before { content: ''; display: block; width: 24%; height: 3px; background: #f03; }
       .ytp-left-controls { display: flex; height: 48px; float: left; align-items: center; font-size: 11px; gap: 4px; }
@@ -196,7 +204,7 @@
         const player = document.createElement('div');
         player.id = 'movie_player';
         player.className = 'html5-video-player';
-        player.innerHTML = `<video class="html5-main-video" muted playsinline poster="${artwork(currentVideo)}"></video><a class="ytp-title-link" hidden>${currentVideo[0]}</a><div class="ytp-chrome-bottom"><div class="ytp-progress-bar"></div><div class="ytp-left-controls"><button class="ytp-button" aria-label="Play">▶</button><button class="ytp-button" aria-label="Mute">◖</button><span>0:00 / LIVE</span></div><div class="ytp-right-controls"><button class="ytp-button" aria-label="Subtitles">CC</button><button class="ytp-button" aria-label="YouTube settings">⚙</button><button class="ytp-button" aria-label="Fullscreen">⛶</button></div></div>`;
+        player.innerHTML = `<div class="html5-video-container"><video class="html5-main-video" muted playsinline poster="${artwork(currentVideo)}"></video></div><div class="ytp-chrome-top"><a class="ytp-title-link" hidden>${currentVideo[0]}</a></div><div class="video-ads ytp-ad-module"></div><div class="ytp-player-content ytp-iv-player-content"></div><div class="ytp-caption-window-container"></div><div class="ytp-chrome-bottom"><div class="ytp-progress-bar"></div><div class="ytp-left-controls"><button class="ytp-button" aria-label="Play">▶</button><button class="ytp-button" aria-label="Mute">◖</button><span>0:00 / LIVE</span></div><div class="ytp-right-controls"><button class="ytp-button" aria-label="Subtitles">CC</button><button class="ytp-button" aria-label="YouTube settings">⚙</button><button class="ytp-button" aria-label="Fullscreen">⛶</button></div></div>`;
         const video = player.querySelector('video');
         // A local canvas stream exercises the browser's actual video playback API without downloading media.
         const canvas = document.createElement('canvas');

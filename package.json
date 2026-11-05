@@ -16,7 +16,7 @@
     "test:setup": "node scripts/test.mjs --install",
     "test": "node scripts/test.mjs",
     "test:unit": "node scripts/test.mjs --project=unit",
-    "test:e2e": "node scripts/test.mjs --project=e2e",
+    "test:e2e": "node scripts/test.mjs --project=e2e --project=g1-other-way",
     "check": "npm run lint && npm run build && npm test",
     "lint": "npm run format:check && node scripts/lint.mjs && eslint src tests playwright.config.ts --max-warnings=0",
     "format": "prettier . --write",

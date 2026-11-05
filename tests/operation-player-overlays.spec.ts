@@ -60,8 +60,11 @@ async function place(youtube: Page, html: string) {
     document.querySelector('#ww-test-overlay')?.remove();
     const host = document.createElement('div');
     host.id = 'ww-test-overlay';
-    // z-index 0: under the player-local plane (z 1 here), the case stacking order cannot save.
-    host.style.cssText = 'position:absolute;right:40px;top:38%;z-index:0';
+    // At the media's level (z-index 10, like YouTube's seek and speed overlays), after it: over the
+    // picture, under the cut-out way's plane (media + 1 = 11), the case only the cut-out saves. The
+    // layering way's plane sits directly after the media at 10, so this overlay is over it by tree
+    // order, and the check is that it stays so. (z-index 0 would be under the media itself, hidden.)
+    host.style.cssText = 'position:absolute;right:40px;top:38%;z-index:10';
     host.innerHTML = html;
     const target = host.querySelector<HTMLElement>('#target')!;
     target.style.cssText = 'display:block;width:120px;height:40px;background:#2a7;color:#fff;font:14px sans-serif';
@@ -92,7 +95,15 @@ async function covered(youtube: Page) {
         if (!(rgba[at]! > 200 && rgba[at + 1]! < 60 && rgba[at + 2]! > 200)) continue;
         const px = player.x + x,
           py = player.y + y;
-        if (px >= target.x && px < target.x + target.width && py >= target.y && py < target.y + target.height) over++;
+        // Inside the box by a pixel: its edge rows fall between device pixels and mix with what is
+        // around (the cut-out way's hole is 4 px wider, so it never met them).
+        if (
+          px >= target.x + 1 &&
+          px < target.x + target.width - 1 &&
+          py >= target.y + 1 &&
+          py < target.y + target.height - 1
+        )
+          over++;
         else elsewhere++;
       }
     worst = Math.max(worst, over);
@@ -128,9 +139,33 @@ test('G1: the player overlays at the bottom right stay visible and pressable und
 test('G1: an overlay link the adapter does not recognise is covered (the check is real)', async ({
   popup,
   youtube,
+  layeringOn,
 }) => {
+  test.skip(layeringOn, 'Cut-out way only: under the controls by stacking, it is not covered (next test).');
   await magentaArtwork(popup, youtube);
   // Deliberately unmarked: the same box, but neither a link nor focusable nor a known part.
   await place(youtube, '<div class="ww-unknown" id="target">Next video</div>');
+  expect((await covered(youtube)).over).toBeGreaterThan(1000);
+});
+
+test('G1 (layering): an overlay the adapter does not recognise is still over the artwork, by stacking order', async ({
+  popup,
+  youtube,
+  layeringOn,
+}) => {
+  test.skip(!layeringOn, 'The layering way only.');
+  await magentaArtwork(popup, youtube);
+  // The adapter knows nothing of it; the browser paints it over the plane all the same.
+  await place(youtube, '<div class="ww-unknown" id="target">Next video</div>');
+  const result = await covered(youtube);
+  expect(result.drawn).toBe(true);
+  expect(result.over).toBe(0);
+  // The check is real: with the plane deliberately put over the player's parts, it is covered.
+  await youtube.evaluate(() => {
+    const shadow = document.querySelector<HTMLElement>('#web-world-themes-video-decorations')!.shadowRoot!;
+    const broken = document.createElement('style');
+    broken.textContent = ':host{z-index:5000!important}';
+    shadow.append(broken);
+  });
   expect((await covered(youtube)).over).toBeGreaterThan(1000);
 });

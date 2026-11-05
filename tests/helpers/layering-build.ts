@@ -2,15 +2,26 @@ import { execFile } from 'node:child_process';
 import path from 'node:path';
 import { promisify } from 'node:util';
 
-const output = '.work/layering-test-dist';
-let built: Promise<string> | undefined;
+const built = new Map<string, Promise<string>>();
 
-/** The chunk 4 prototype build (WW_LAYERING=1 in scripts/build.mjs, docs/layering-plan.md): the
- * player's character goes under its controls by stacking order. Built once per worker, inside
- * .work only (the build refuses any other output). */
-export function layeringBuild(): Promise<string> {
-  built ??= promisify(execFile)(process.execPath, ['scripts/build.mjs'], {
-    env: { ...process.env, WW_LAYERING: '1', WW_BUILD_OUT: output },
-  }).then(() => path.resolve(output));
-  return built;
+/** The way the normal build (dist) keeps the player's character clear: the WW_LAYERING default of
+ * scripts/build.mjs. Changed together with it. */
+export const DEFAULT_LAYERING = false;
+
+/** A development build with the player's character kept clear of the controls one way
+ * (docs/layering-plan.md): layering true puts it under them by stacking order, false cuts the
+ * bands out as before. Built once per worker and setting, inside .work only (the build refuses any
+ * other output). `variant` adds another development switch of scripts/build.mjs (as
+ * WW_NO_IDLE_RECHECK=1) to the same build. */
+export function layeringBuild(layering: boolean, variant: Record<string, string> = {}): Promise<string> {
+  const suffix = Object.keys(variant).length ? `-${Object.keys(variant).join('-').toLowerCase()}` : '';
+  const output = `.work/test-dist-${layering ? 'layering' : 'cutout'}${suffix.replaceAll('_', '-')}`;
+  let build = built.get(output);
+  if (!build) {
+    build = promisify(execFile)(process.execPath, ['scripts/build.mjs'], {
+      env: { ...process.env, ...variant, WW_LAYERING: layering ? '1' : '0', WW_BUILD_OUT: output },
+    }).then(() => path.resolve(output));
+    built.set(output, build);
+  }
+  return build;
 }

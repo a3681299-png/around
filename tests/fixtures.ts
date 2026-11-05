@@ -3,6 +3,7 @@ import { execFile } from 'node:child_process';
 import { mkdir, mkdtemp, readFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { renderDiagnostics } from './helpers/render-diagnostics';
+import { DEFAULT_LAYERING, layeringBuild } from './helpers/layering-build';
 
 const defaultExtensionPath = path.resolve(process.env.WW_TEST_EXTENSION_PATH ?? 'dist');
 const fixturePath = path.resolve('tests/fixtures/youtube.html');
@@ -102,7 +103,29 @@ export async function launchExtension(
   return context;
 }
 
-export const test = base.extend<{ profile: string; extensionId: string; popup: Page; youtube: Page }>({
+export const test = base.extend<
+  {
+    profile: string;
+    extensionId: string;
+    popup: Page;
+    youtube: Page;
+    /** Whether the extension under test puts the player's character under its controls. */
+    layeringOn: boolean;
+  },
+  {
+    /** Which way the player's character is kept clear of the controls (docs/layering-plan.md):
+     * undefined is the build under test (dist, or WW_TEST_EXTENSION_PATH); true or false is a
+     * development build with WW_LAYERING set so, for a project that runs the G1 specs the other way. */
+    layering: boolean | undefined;
+    extensionPath: string;
+  }
+>({
+  layering: [undefined, { scope: 'worker', option: true }],
+  extensionPath: [
+    async ({ layering }, use) => use(layering === undefined ? defaultExtensionPath : await layeringBuild(layering)),
+    { scope: 'worker' },
+  ],
+  layeringOn: async ({ layering }, use) => use(layering ?? DEFAULT_LAYERING),
   profile: async ({}, use, info) => {
     const work = path.resolve(process.env.WW_TEST_PROFILE_ROOT ?? '.work');
     await mkdir(work, { recursive: true });
@@ -124,8 +147,8 @@ export const test = base.extend<{ profile: string; extensionId: string; popup: P
       }
     }
   },
-  context: async ({ profile }, use, info) => {
-    const context = await launchExtension(profile);
+  context: async ({ profile, extensionPath }, use, info) => {
+    const context = await launchExtension(profile, true, { extensionPath });
     try {
       await use(context);
     } finally {

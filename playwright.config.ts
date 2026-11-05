@@ -79,8 +79,20 @@ const unitSpecs = [
   'world-timeline-host',
   'youtube-details',
 ].map((name) => `**/${name}.spec.ts`);
+// The operation safety (G1) specs: what must hold whichever way the character is kept clear.
+const g1Specs = [
+  'operation-safety',
+  'operation-bands',
+  'operation-controls',
+  'operation-player-overlays',
+  'operation-editing-input',
+  'g13-fix-bound',
+  'g13-look-regression',
+  'g13-sparse-visual',
+  'g14-idle-recheck',
+].map((name) => `**/${name}.spec.ts`);
 
-export default defineConfig({
+export default defineConfig<object, { layering: boolean | undefined }>({
   testDir: './tests',
   outputDir: './.work/test-results',
   // Removes `%TEMP%\ww-*` profiles left by tests that ended without closing their browser.
@@ -101,6 +113,17 @@ export default defineConfig({
       workers: 1,
       outputDir: './.work/test-results/e2e',
       use: { trace: 'retain-on-failure', screenshot: 'only-on-failure' },
+    },
+    // The G1 specs again, with the player's character kept clear of the controls the other way
+    // (docs/layering-plan.md): a development build with WW_LAYERING set (tests/helpers/layering-build.ts).
+    // Both ways must keep every control visible and reachable; a failure here is the product's.
+    {
+      name: 'g1-other-way',
+      testMatch: g1Specs,
+      fullyParallel: false,
+      workers: 1,
+      outputDir: './.work/test-results/g1-other-way',
+      use: { trace: 'retain-on-failure', screenshot: 'only-on-failure', layering: true },
     },
   ],
 });

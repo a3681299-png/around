@@ -2,6 +2,7 @@ import { build } from 'esbuild';
 import type { Page } from '@playwright/test';
 import { test, expect, launchExtension } from './fixtures';
 import { noIdleRecheckBuild } from './helpers/no-idle-recheck-build';
+import { layeringBuild } from './helpers/layering-build';
 import { openEditor } from './helpers/editor';
 import path from 'node:path';
 import { exposeEditorControls, withCanvas } from './helpers/editor-workspace';
@@ -145,15 +146,13 @@ test('editing owns the center of a real-style player whose media sits on its own
   youtube,
 }) => {
   await youtube.goto('https://www.youtube.com/watch?v=fixture');
-  // YouTube puts the media in a positioned container with z-index 10.
-  await youtube.evaluate(() => {
-    const video = document.querySelector('#movie_player video')!;
-    const container = document.createElement('div');
-    container.className = 'html5-video-container';
-    container.style.cssText = 'position:absolute;inset:0;z-index:10';
-    video.replaceWith(container);
-    container.append(video);
-  });
+  // YouTube puts the media in a positioned container with z-index 10 (the fixture's player does).
+  expect(
+    await youtube.evaluate(() => {
+      const container = document.querySelector<HTMLElement>('#movie_player video')!.parentElement!;
+      return container.classList.contains('html5-video-container') && getComputedStyle(container).zIndex;
+    }),
+  ).toBe('10');
   const editor = await opaqueArtwork(popup, youtube);
   await editor.getByLabel('配置の基準').selectOption('video-player');
   await editor.getByLabel('画像の幅').fill('120');
@@ -243,8 +242,11 @@ test('editing lets viewport artwork own the verified video centre, never the ban
  * below, on CI between the move and the stale-handle check (run 41772161277), so the input-time
  * defence would not be what is tested. The input must still be refused and reach the player. */
 const withoutIdleRecheck = test.extend({
-  context: async ({ profile }, use) => {
-    const context = await launchExtension(profile, true, { extensionPath: await noIdleRecheckBuild() });
+  context: async ({ profile, layering }, use) => {
+    // The same way as the project (docs/layering-plan.md): the build under test, or the other one.
+    const extensionPath =
+      layering === undefined ? await noIdleRecheckBuild() : await layeringBuild(layering, { WW_NO_IDLE_RECHECK: '1' });
+    const context = await launchExtension(profile, true, { extensionPath });
     try {
       await use(context);
     } finally {

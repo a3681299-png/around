@@ -1,6 +1,7 @@
 import { createOperationSource, type DiscoveryScan, type OperationCandidate } from '../host/operation-source';
 import { createCompositionReader, fixedContainingBlock, scrollsWithPage } from '../host/operation-composition';
 import { LAYERING } from '../host/world-options';
+import type { PlacementFrame } from '../world/geometry';
 
 const selectors: [string, OperationCandidate['kind'], string][] = [
   ['player.seek', 'drag', '.ytp-progress-bar-container, .ytp-progress-bar'],
@@ -133,7 +134,19 @@ export function youtubeOperations(doc: Document) {
    * changed), never the document. Styles that hide or show a part are what such changes do; the
    * order of the player's parts is proven per control, so an opacity fade changes nothing here.
    */
-  const unprovenControl = (
+  /** The stacking proof, the one place it is asked. A development build without it on purpose
+   * (WW_NO_STACKING_PROOF=1, scripts/build.mjs) drops the labelled line and takes everything as
+   * proven, to see the layering tests fail; every other build keeps the line. */
+  const provenOver = (
+    composition: ReturnType<typeof createCompositionReader>,
+    element: Element,
+    media: HTMLElement,
+  ) => {
+    let proven = true;
+    WW_STACKING_PROOF: proven = composition.paintsAbove(element, media);
+    return proven;
+  };
+  const unprovenControls = (
     root: HTMLElement,
     media: HTMLElement,
     composition: ReturnType<typeof createCompositionReader>,
@@ -141,17 +154,17 @@ export function youtubeOperations(doc: Document) {
     const candidates = root.matches(candidateSelector)
       ? [root, ...root.querySelectorAll(candidateSelector)]
       : [...root.querySelectorAll(candidateSelector)];
-    return candidates.find((element) => {
+    return candidates.filter((element) => {
       if (element.closest('[id^="web-world-themes"]') || media.contains(element)) return false;
       const r = element.getBoundingClientRect();
       if (r.width <= 0 || r.height <= 0 || composition.style(element as HTMLElement).visibility === 'hidden')
         return false;
-      return !composition.paintsAbove(element, media);
+      return !provenOver(composition, element, media);
     });
   };
-  /** The last read's outcome for the plane: an unproven control over the player's box keeps it
-   * held whenever a read is pending (its id, for the trace). */
-  let beneathRead: { unproven?: string } | undefined;
+  /** The last read's controls over the player's box not proven to paint over the plane: a paint
+   * near one of them is held while a read is pending (the ids are for the trace). */
+  let beneathRead: { unproven: { id: string; box: PlacementFrame }[] } | undefined;
   return createOperationSource(
     doc,
     (scan) => {
@@ -238,7 +251,7 @@ export function youtubeOperations(doc: Document) {
       const place = LAYERING ? beneathPlace() : undefined;
       if (place) {
         const p = place.r;
-        let unproven: string | undefined;
+        const unproven: { id: string; box: PlacementFrame }[] = [];
         for (const row of rows) {
           if (row.occlusion === 'allow') continue;
           if (row.element === place.parent) {
@@ -246,7 +259,7 @@ export function youtubeOperations(doc: Document) {
             const bar = [...place.parent.children].find((c) =>
               c.classList.contains(row.id === 'player.controls.top' ? 'ytp-chrome-top' : 'ytp-chrome-bottom'),
             );
-            row.aboveBeneath = Boolean(bar && composition.paintsAbove(bar, place.media));
+            row.aboveBeneath = Boolean(bar && provenOver(composition, bar, place.media));
           } else if (!place.parent.contains(row.element)) {
             row.aboveBeneath = true;
             continue;
@@ -260,12 +273,17 @@ export function youtubeOperations(doc: Document) {
               box.top + box.height <= p.top
             )
               continue;
-            row.aboveBeneath = composition.paintsAbove(row.element, place.media);
+            row.aboveBeneath = provenOver(composition, row.element, place.media);
           }
-          if (!row.aboveBeneath)
-            unproven ??= `${row.id} ${row.element.tagName.toLowerCase()}.${row.element.classList[0] ?? ''}${row.element.closest('#movie_player') ? ' (player)' : ''}`;
+          if (!row.aboveBeneath) {
+            const r = row.envelope ?? row.rect ?? row.element.getBoundingClientRect();
+            unproven.push({
+              id: `${row.id} ${row.element.tagName.toLowerCase()}.${row.element.classList[0] ?? ''}`,
+              box: { left: r.left, top: r.top, width: r.width, height: r.height },
+            });
+          }
         }
-        beneathRead = unproven ? { unproven } : {};
+        beneathRead = { unproven };
       } else beneathRead = undefined;
       return overlay
         ? rows
@@ -333,42 +351,50 @@ export function youtubeOperations(doc: Document) {
         zIndex,
         rect: { left: r.left, top: r.top, width: r.width, height: r.height },
       };
-      // Settled: every change since the read is one the stacking order covers by itself. Only a
-      // control of the player's shown unproven can be covered (see the discovery above); a plain
-      // geometry change moves nothing over or under the plane unless one already was.
-      // The reason it is not, for the guard trace ('' when settled).
-      const unsettled = (() => {
-        if (kind === 'none') return '';
-        if (!beneathRead) return 'no read';
-        if (beneathRead.unproven) return `unproven ${beneathRead.unproven}`;
+      // While a read is pending, where a control not proven to paint over the plane is or may be
+      // now: the last read's ones, and the ones the pending changes brought out (only a shown
+      // unproven control can be covered; the stacking order covers every other change). Each
+      // comes with why, for the guard trace.
+      const found: { why: string; box: PlacementFrame }[] = [];
+      const everywhere = (() => {
+        if (kind === 'none') return false;
+        if (!beneathRead) return true;
+        for (const { id, box } of beneathRead.unproven) found.push({ why: `unproven ${id}`, box });
         const composition = createCompositionReader(doc);
         const inPlayer = (root: HTMLElement, why: string) => {
-          const found = unprovenControl(root, media, composition);
-          return found ? `unproven ${found.tagName}.${found.classList[0] ?? ''} after ${why}` : '';
+          for (const control of unprovenControls(root, media, composition)) {
+            const b = control.getBoundingClientRect();
+            found.push({
+              why: `unproven ${control.tagName}.${control.classList[0] ?? ''} after ${why}`,
+              box: { left: b.left, top: b.top, width: b.width, height: b.height },
+            });
+          }
         };
         // Changes not known one by one (a whole scan is due), or many: the player's own controls.
-        if (!pending || pending.length > 64) return inPlayer(parent, 'unknown changes');
+        if (!pending || pending.length > 64) {
+          inPlayer(parent, 'unknown changes');
+          return false;
+        }
         for (const element of pending) {
           if (!element.isConnected || media.contains(element)) continue;
           // A change of an ancestor (theater, dark mode) re-styles the player's parts too.
           const root = element.contains(parent) ? parent : parent.contains(element) ? element : undefined;
-          if (!root || (root === element && composition.paintsAbove(element, media))) continue;
+          if (!root || (root === element && provenOver(composition, element, media))) continue;
           // The player's own class (bars shown or hidden, playing, ads…) or a part of it (the
-          // bezel's wrapper): settled while no control there is shown unproven.
-          const found = inPlayer(root as HTMLElement, `${element.tagName}.${element.classList[0] ?? ''}`);
-          if (found) return found;
+          // bezel's wrapper): what shows there unproven.
+          inPlayer(root as HTMLElement, `${element.tagName}.${element.classList[0] ?? ''}`);
           if (root === parent) break;
         }
-        return '';
+        return false;
       })();
       // On the extension's own host (its mutations are not the page's): every reason seen so far.
-      WW_GUARD_TRACE: if (unsettled) {
+      WW_GUARD_TRACE: if (everywhere || found.length) {
         const host = doc.getElementById('web-world-themes-video-decorations');
         const seen = new Set((host?.dataset['wwBeneathUnsettled'] ?? '').split('|').filter(Boolean));
-        seen.add(unsettled);
+        for (const why of everywhere ? ['no read'] : found.map((f) => f.why)) seen.add(why);
         host?.setAttribute('data-ww-beneath-unsettled', [...seen].join('|'));
       }
-      return { ...slot, settled: !unsettled };
+      return { ...slot, unproven: everywhere ? ('everywhere' as const) : found.map((f) => f.box) };
     },
   );
 }

@@ -1,10 +1,10 @@
 import { build } from 'esbuild';
 import type { Page } from '@playwright/test';
-import { test, expect, launchExtension } from './fixtures';
-import { layeringBuild } from './helpers/layering-build';
+import { test, expect } from './fixtures';
 import { openEditor, closeEditorPages } from './helpers/editor';
 import { exposeEditorControls } from './helpers/editor-workspace';
 import { showArtwork } from './helpers/artwork';
+import { layeringBuild } from './helpers/layering-build';
 
 /**
  * Chunk 4 prototype (docs/layering-plan.md): the player's character inside the player's own
@@ -89,37 +89,27 @@ test('paintsAbove proves paint order from stacking contexts alone, and nothing i
   });
 });
 
-const layered = test.extend({
-  context: async ({ profile }, use) => {
-    const context = await launchExtension(profile, true, { extensionPath: await layeringBuild() });
-    try {
-      await use(context);
-    } finally {
-      await context.close();
-    }
-  },
-});
+/** Always the layering build, whichever the project's (these tests are about it). */
+const layered = test.extend({ layering: [true, { scope: 'worker' }] });
 
 /** The fixture's player made like YouTube's: its own stacking context, the media in a container at
  * level 10, the bars at 58 and 59. */
 async function youtubeStacking(youtube: Page) {
   await youtube.goto('https://www.youtube.com/watch?v=fixture');
   await youtube.locator('#movie_player video').waitFor({ state: 'attached' });
-  await youtube.evaluate(() => {
-    const player = document.querySelector<HTMLElement>('#movie_player')!;
-    player.style.zIndex = '0';
-    const video = player.querySelector('video')!;
-    const container = document.createElement('div');
-    container.className = 'html5-video-container';
-    container.style.cssText = 'position:absolute;inset:0;z-index:10';
-    video.replaceWith(container);
-    container.append(video);
-    player.querySelector<HTMLElement>('.ytp-chrome-bottom')!.style.zIndex = '59';
-    const top = document.createElement('div');
-    top.className = 'ytp-chrome-top';
-    top.style.cssText = 'position:absolute;left:12px;right:12px;top:0;height:48px;z-index:58';
-    player.append(top);
-  });
+  // The fixture's player is built like YouTube's (tests/fixtures/youtube.html): check it is.
+  expect(
+    await youtube.evaluate(() => {
+      const player = document.querySelector<HTMLElement>('#movie_player')!;
+      const z = (selector: string) => getComputedStyle(player.querySelector(selector)!).zIndex;
+      return [
+        getComputedStyle(player).zIndex,
+        z('.html5-video-container'),
+        z('.ytp-chrome-top'),
+        z('.ytp-chrome-bottom'),
+      ];
+    }),
+  ).toEqual(['0', '10', '58', '59']);
 }
 
 async function characterOverBar(popup: Page, youtube: Page) {
@@ -266,5 +256,88 @@ layered(
     await expect.poll(limited).toBe(true);
     await youtube.evaluate(() => document.getElementById('unproven')!.remove());
     await expect.poll(limited, { timeout: 5000 }).toBe(false);
+  },
+);
+
+/** An unproven control (positioned without a z-index, so below the plane's level) put beside the
+ * character's box, `gap` px from its left edge (negative: overlapping), or in the player's
+ * top-left corner (`far`). */
+async function unprovenControl(youtube: Page, where: { gap: number } | 'far') {
+  const box = (await youtube.locator('#web-world-themes-video-decorations [data-image-id]').boundingBox())!;
+  const player = (await youtube.locator('#movie_player').boundingBox())!;
+  await youtube.evaluate(
+    ({ where, box, player }) => {
+      document.getElementById('unproven')?.remove();
+      const wrap = document.createElement('div');
+      wrap.id = 'unproven';
+      const left = where === 'far' ? 20 : box.x - player.x - where.gap - 30;
+      const top = where === 'far' ? 70 : box.y - player.y + 10;
+      wrap.innerHTML = `<button style="position:absolute;left:${left}px;top:${top}px;width:30px;height:24px">x</button>`;
+      document.querySelector('#movie_player')!.append(wrap);
+    },
+    { where, box, player },
+  );
+}
+/** Stopped frames while the player's own class changes (a read is pending each time). */
+async function stoppedWhileBarsToggle(youtube: Page) {
+  const stops = await countStops(youtube);
+  await youtube.waitForTimeout(600);
+  await stops();
+  // The bars change as YouTube's do (a button comes and goes in them): each change is a layout
+  // change, which keeps a read pending for a moment (the guard's HOLD in the cut-out way).
+  for (let i = 0; i < 6; i++) {
+    await youtube.evaluate(() => {
+      const player = document.querySelector('#movie_player')!;
+      player.classList.toggle('ytp-autohide');
+      const extra = player.querySelector('#bar-extra');
+      if (extra) extra.remove();
+      else
+        player
+          .querySelector('.ytp-right-controls')!
+          .insertAdjacentHTML('afterbegin', '<button class="ytp-button" id="bar-extra">+</button>');
+    });
+    await youtube.waitForTimeout(120);
+  }
+  await youtube.waitForTimeout(200);
+  return stops();
+}
+
+layered(
+  'an unproven control far from the character holds nothing; one beside it holds it while a read is pending',
+  async ({ popup, youtube }) => {
+    await youtubeStacking(youtube);
+    await characterOverBar(popup, youtube);
+    // Far (the player's other corner): the character is never stopped.
+    await unprovenControl(youtube, 'far');
+    const far = await stoppedWhileBarsToggle(youtube);
+    expect(far.frames).toBeGreaterThan(20);
+    expect(far.stopped).toBe(0);
+    // Beside it (20 px away, not overlapping): held while each change is being read, as a control
+    // near the pointer is in G1.2; drawn again in between.
+    await unprovenControl(youtube, { gap: 20 });
+    const near = await stoppedWhileBarsToggle(youtube);
+    expect(near.stopped).toBeGreaterThan(0);
+    expect(near.stopped).toBeLessThan(near.frames);
+  },
+);
+
+/** The layering build with its stacking proof removed on purpose (WW_NO_STACKING_PROOF=1). */
+const unproofed = test.extend({
+  extensionPath: [
+    async ({}, use) => use(await layeringBuild(true, { WW_NO_STACKING_PROOF: '1' })),
+    { scope: 'worker' },
+  ],
+});
+
+unproofed(
+  'without the stacking proof, an unproven control under the character is not stopped (the check is real)',
+  async ({ popup, youtube }) => {
+    await youtubeStacking(youtube);
+    await characterOverBar(popup, youtube);
+    await unprovenControl(youtube, { gap: -60 });
+    const result = await stoppedWhileBarsToggle(youtube);
+    expect(result.frames).toBeGreaterThan(20);
+    // The same placement stops it with the proof (the test above and the one before it).
+    expect(result.stopped).toBe(0);
   },
 );
