@@ -1,0 +1,567 @@
+{
+  "conclusion": "success",
+  "headSha": "063845318167ae3c37ccb9ed0e285870a95eefbe",
+  "jobs": [
+    {
+      "completedAt": "2026-11-05T02:09:55Z",
+      "conclusion": "success",
+      "databaseId": 127001570409,
+      "name": "unit",
+      "startedAt": "2026-11-05T02:07:53Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-05T02:07:56Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-05T02:07:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:08:07Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v6",
+          "number": 2,
+          "startedAt": "2026-11-05T02:07:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:08:10Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-node@v6",
+          "number": 3,
+          "startedAt": "2026-11-05T02:08:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:08:48Z",
+          "conclusion": "success",
+          "name": "Run npm ci",
+          "number": 4,
+          "startedAt": "2026-11-05T02:08:10Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:09:29Z",
+          "conclusion": "success",
+          "name": "Run npm run lint",
+          "number": 5,
+          "startedAt": "2026-11-05T02:08:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:09:32Z",
+          "conclusion": "success",
+          "name": "Run npm run typecheck",
+          "number": 6,
+          "startedAt": "2026-11-05T02:09:29Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:09:52Z",
+          "conclusion": "success",
+          "name": "Run npm run test:unit",
+          "number": 7,
+          "startedAt": "2026-11-05T02:09:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:09:53Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 8,
+          "startedAt": "2026-11-05T02:09:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:09:53Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-node@v6",
+          "number": 15,
+          "startedAt": "2026-11-05T02:09:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:09:54Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v6",
+          "number": 16,
+          "startedAt": "2026-11-05T02:09:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:09:54Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 17,
+          "startedAt": "2026-11-05T02:09:54Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/a3681299-png/web-world-themes/actions/runs/41953141736/job/127001570409"
+    },
+    {
+      "completedAt": "2026-11-05T02:20:20Z",
+      "conclusion": "success",
+      "databaseId": 127001570659,
+      "name": "e2e (2)",
+      "startedAt": "2026-11-05T02:07:53Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-05T02:07:55Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-05T02:07:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:08:06Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v6",
+          "number": 2,
+          "startedAt": "2026-11-05T02:07:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:08:09Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-node@v6",
+          "number": 3,
+          "startedAt": "2026-11-05T02:08:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:08:54Z",
+          "conclusion": "success",
+          "name": "Run npm ci",
+          "number": 4,
+          "startedAt": "2026-11-05T02:08:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:09:13Z",
+          "conclusion": "success",
+          "name": "Run npx playwright install --with-deps chromium --no-shell",
+          "number": 5,
+          "startedAt": "2026-11-05T02:08:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:09:16Z",
+          "conclusion": "success",
+          "name": "Run sudo apt-get install -y xdotool",
+          "number": 6,
+          "startedAt": "2026-11-05T02:09:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:09:21Z",
+          "conclusion": "success",
+          "name": "Run npm run build",
+          "number": 7,
+          "startedAt": "2026-11-05T02:09:16Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:09:21Z",
+          "conclusion": "skipped",
+          "name": "Run xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" npm run test:e2e -- tests/editor-entry.spec.ts tests/side-panel.spec.ts --grep \"OFF opens|ON action|hand off unsaved|timeline keeps layer controls\" --output=.work/native-entry-results",
+          "number": 8,
+          "startedAt": "2026-11-05T02:09:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:20:15Z",
+          "conclusion": "success",
+          "name": "Run xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" npm run test:e2e -- --shard=2/4",
+          "number": 9,
+          "startedAt": "2026-11-05T02:09:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:20:17Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 10,
+          "startedAt": "2026-11-05T02:20:15Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:20:17Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-node@v6",
+          "number": 19,
+          "startedAt": "2026-11-05T02:20:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:20:18Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v6",
+          "number": 20,
+          "startedAt": "2026-11-05T02:20:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:20:18Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 21,
+          "startedAt": "2026-11-05T02:20:18Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/a3681299-png/web-world-themes/actions/runs/41953141736/job/127001570659"
+    },
+    {
+      "completedAt": "2026-11-05T02:13:19Z",
+      "conclusion": "success",
+      "databaseId": 127001570695,
+      "name": "e2e (4)",
+      "startedAt": "2026-11-05T02:07:53Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-05T02:07:55Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-05T02:07:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:08:07Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v6",
+          "number": 2,
+          "startedAt": "2026-11-05T02:07:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:08:09Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-node@v6",
+          "number": 3,
+          "startedAt": "2026-11-05T02:08:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:08:45Z",
+          "conclusion": "success",
+          "name": "Run npm ci",
+          "number": 4,
+          "startedAt": "2026-11-05T02:08:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:09:03Z",
+          "conclusion": "success",
+          "name": "Run npx playwright install --with-deps chromium --no-shell",
+          "number": 5,
+          "startedAt": "2026-11-05T02:08:45Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:09:08Z",
+          "conclusion": "success",
+          "name": "Run sudo apt-get install -y xdotool",
+          "number": 6,
+          "startedAt": "2026-11-05T02:09:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:09:11Z",
+          "conclusion": "success",
+          "name": "Run npm run build",
+          "number": 7,
+          "startedAt": "2026-11-05T02:09:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:09:11Z",
+          "conclusion": "skipped",
+          "name": "Run xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" npm run test:e2e -- tests/editor-entry.spec.ts tests/side-panel.spec.ts --grep \"OFF opens|ON action|hand off unsaved|timeline keeps layer controls\" --output=.work/native-entry-results",
+          "number": 8,
+          "startedAt": "2026-11-05T02:09:11Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:13:14Z",
+          "conclusion": "success",
+          "name": "Run xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" npm run test:e2e -- --shard=4/4",
+          "number": 9,
+          "startedAt": "2026-11-05T02:09:11Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:13:16Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 10,
+          "startedAt": "2026-11-05T02:13:14Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:13:16Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-node@v6",
+          "number": 19,
+          "startedAt": "2026-11-05T02:13:16Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:13:17Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v6",
+          "number": 20,
+          "startedAt": "2026-11-05T02:13:16Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:13:17Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 21,
+          "startedAt": "2026-11-05T02:13:17Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/a3681299-png/web-world-themes/actions/runs/41953141736/job/127001570695"
+    },
+    {
+      "completedAt": "2026-11-05T02:12:17Z",
+      "conclusion": "success",
+      "databaseId": 127001570821,
+      "name": "e2e (3)",
+      "startedAt": "2026-11-05T02:07:53Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-05T02:07:55Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-05T02:07:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:08:05Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v6",
+          "number": 2,
+          "startedAt": "2026-11-05T02:07:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:08:07Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-node@v6",
+          "number": 3,
+          "startedAt": "2026-11-05T02:08:05Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:08:52Z",
+          "conclusion": "success",
+          "name": "Run npm ci",
+          "number": 4,
+          "startedAt": "2026-11-05T02:08:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:09:11Z",
+          "conclusion": "success",
+          "name": "Run npx playwright install --with-deps chromium --no-shell",
+          "number": 5,
+          "startedAt": "2026-11-05T02:08:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:09:14Z",
+          "conclusion": "success",
+          "name": "Run sudo apt-get install -y xdotool",
+          "number": 6,
+          "startedAt": "2026-11-05T02:09:11Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:09:18Z",
+          "conclusion": "success",
+          "name": "Run npm run build",
+          "number": 7,
+          "startedAt": "2026-11-05T02:09:14Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:09:18Z",
+          "conclusion": "skipped",
+          "name": "Run xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" npm run test:e2e -- tests/editor-entry.spec.ts tests/side-panel.spec.ts --grep \"OFF opens|ON action|hand off unsaved|timeline keeps layer controls\" --output=.work/native-entry-results",
+          "number": 8,
+          "startedAt": "2026-11-05T02:09:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:12:13Z",
+          "conclusion": "success",
+          "name": "Run xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" npm run test:e2e -- --shard=3/4",
+          "number": 9,
+          "startedAt": "2026-11-05T02:09:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:12:14Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 10,
+          "startedAt": "2026-11-05T02:12:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:12:14Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-node@v6",
+          "number": 19,
+          "startedAt": "2026-11-05T02:12:14Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:12:15Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v6",
+          "number": 20,
+          "startedAt": "2026-11-05T02:12:14Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:12:15Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 21,
+          "startedAt": "2026-11-05T02:12:15Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/a3681299-png/web-world-themes/actions/runs/41953141736/job/127001570821"
+    },
+    {
+      "completedAt": "2026-11-05T02:14:20Z",
+      "conclusion": "success",
+      "databaseId": 127001570822,
+      "name": "e2e (1)",
+      "startedAt": "2026-11-05T02:07:53Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-05T02:07:55Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-05T02:07:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:08:06Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v6",
+          "number": 2,
+          "startedAt": "2026-11-05T02:07:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:08:08Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-node@v6",
+          "number": 3,
+          "startedAt": "2026-11-05T02:08:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:08:53Z",
+          "conclusion": "success",
+          "name": "Run npm ci",
+          "number": 4,
+          "startedAt": "2026-11-05T02:08:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:09:12Z",
+          "conclusion": "success",
+          "name": "Run npx playwright install --with-deps chromium --no-shell",
+          "number": 5,
+          "startedAt": "2026-11-05T02:08:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:09:15Z",
+          "conclusion": "success",
+          "name": "Run sudo apt-get install -y xdotool",
+          "number": 6,
+          "startedAt": "2026-11-05T02:09:12Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:09:19Z",
+          "conclusion": "success",
+          "name": "Run npm run build",
+          "number": 7,
+          "startedAt": "2026-11-05T02:09:15Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:09:44Z",
+          "conclusion": "success",
+          "name": "Run xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" npm run test:e2e -- tests/editor-entry.spec.ts tests/side-panel.spec.ts --grep \"OFF opens|ON action|hand off unsaved|timeline keeps layer controls\" --output=.work/native-entry-results",
+          "number": 8,
+          "startedAt": "2026-11-05T02:09:19Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:14:16Z",
+          "conclusion": "success",
+          "name": "Run xvfb-run --auto-servernum --server-args=\"-screen 0 1920x1080x24\" npm run test:e2e -- --shard=1/4",
+          "number": 9,
+          "startedAt": "2026-11-05T02:09:44Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:14:17Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 10,
+          "startedAt": "2026-11-05T02:14:16Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:14:17Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-node@v6",
+          "number": 19,
+          "startedAt": "2026-11-05T02:14:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:14:18Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v6",
+          "number": 20,
+          "startedAt": "2026-11-05T02:14:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-05T02:14:18Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 21,
+          "startedAt": "2026-11-05T02:14:18Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/a3681299-png/web-world-themes/actions/runs/41953141736/job/127001570822"
+    }
+  ],
+  "status": "completed",
+  "url": "https://github.com/a3681299-png/web-world-themes/actions/runs/41953141736"
+}

@@ -1,0 +1,11 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> web-world-themes@0.1.0 build
+> npm run typecheck && node scripts/build.mjs
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> web-world-themes@0.1.0 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.world.json && tsc --noEmit -p tsconfig.editor-core.json
+
+.work/extension/ にChromeへ読み込める拡張機能を作成しました。

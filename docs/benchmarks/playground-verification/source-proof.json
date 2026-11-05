@@ -1,0 +1,100 @@
+{
+  "target": "063845318167ae3c37ccb9ed0e285870a95eefbe",
+  "before": "447b2bf31e319051e327f9ada2b83954276b8ff8",
+  "productStatus": "",
+  "bundles": [
+    {
+      "file": ".work/extension/content/index.js",
+      "sha256": "966faaaa6b57dd84f451a0baefe2d56df39254b03fea4bdd82f1548bd3f66bdb",
+      "probe": false
+    },
+    {
+      "file": ".work/perf/content/index.js",
+      "sha256": "fbee8557b77817d2dba5de6ce52924d2456cf91f8f060e30abfc492927ada8a7",
+      "probe": true
+    },
+    {
+      "file": ".work/perf-busy/content/index.js",
+      "sha256": "47b3a3b5aa5723aac7d8b0cdea46715c2f58a0e1546b3fe4277c937533c6c52e",
+      "probe": true
+    },
+    {
+      "file": "../playground-v1-before/.work/extension/content/index.js",
+      "sha256": "40f2b1718cc766be74676d5e4a3b0d05a1ffa8a8db2b60d9fd6934794f53965a",
+      "probe": false
+    },
+    {
+      "file": "../playground-v1-before/.work/perf/content/index.js",
+      "sha256": "f914738fd1e2ca9fd664f147289e83d9b721fb6f82fef20d40f0dd55b44f7cd3",
+      "probe": true
+    }
+  ],
+  "playground": [
+    {
+      "file": ".work\\playground\\app.js",
+      "bytes": 1234950,
+      "sha256": "26e8b98c197407282fa8313eae3acd65e6b34a42362a7b6ce98b5b0f0f8b0710"
+    },
+    {
+      "file": ".work\\playground\\assets\\licenses\\lottie-web-MIT.txt",
+      "bytes": 1075,
+      "sha256": "9d8d4d8b4bb99572ee8b51025a30b8493d949798cac465c6c15b1b29420bcb06"
+    },
+    {
+      "file": ".work\\playground\\assets\\licenses\\three-MIT.txt",
+      "bytes": 1081,
+      "sha256": "8b378ebe60e2fe500158cb0ac71cb5e8b7d92953c2abcc63a0eb90499653b5bc"
+    },
+    {
+      "file": ".work\\playground\\assets\\licenses\\three-vrm-MIT.txt",
+      "bytes": 1072,
+      "sha256": "279ec82987aec7e72ecb9850bb704a87e352d577bc7581454c30f3551a88ea92"
+    },
+    {
+      "file": ".work\\playground\\content\\asset-50e23ecd97d7cc20cfa556bbc9c762cf8e9aad5a102e24ce8ba46e162794c900.vrm",
+      "bytes": 5708,
+      "sha256": "50e23ecd97d7cc20cfa556bbc9c762cf8e9aad5a102e24ce8ba46e162794c900"
+    },
+    {
+      "file": ".work\\playground\\content\\asset-6e002146617a1609ec64fcf607a332a442ce94ec109289d5675b00b3a6513290.png",
+      "bytes": 15209,
+      "sha256": "6e002146617a1609ec64fcf607a332a442ce94ec109289d5675b00b3a6513290"
+    },
+    {
+      "file": ".work\\playground\\content\\design.json",
+      "bytes": 6472,
+      "sha256": "48c24a745a5b550529258da64643ee1280b3e23bdf08b8364a6f90ca3b8be1f9"
+    },
+    {
+      "file": ".work\\playground\\content\\manifest.json",
+      "bytes": 462,
+      "sha256": "633bcc4eed8501336a6718ed21f4fca3e9702c0571de12b61f079b8a7dedb27d"
+    },
+    {
+      "file": ".work\\playground\\content\\video-a.webm",
+      "bytes": 39988,
+      "sha256": "9c5ac2e7b945f9063cbfdf91b4cc0fb13642fc435716c71d482040ead693dbba"
+    },
+    {
+      "file": ".work\\playground\\content\\video-b.webm",
+      "bytes": 160788,
+      "sha256": "3b8a674c8fcb27f4c251d91b773bcc0002d550b147e5b6aacfc56f414fe37089"
+    },
+    {
+      "file": ".work\\playground\\index.html",
+      "bytes": 3232,
+      "sha256": "486b56f1f5ba119d881a7c47d268e9734e64949745408caf4e402947c3c58f4a"
+    },
+    {
+      "file": ".work\\playground\\style.css",
+      "bytes": 2009,
+      "sha256": "970aee80a265ebc3951e249711fcb182fb8d6db83fb83db21414306e48773ca5"
+    },
+    {
+      "file": ".work\\playground\\THIRD_PARTY_NOTICES.md",
+      "bytes": 1710,
+      "sha256": "c9448499f666c655163ae938faa199e5acc2faf12dbc2ab7164fa7ed1e139f9a"
+    }
+  ],
+  "chromeInPlayground": 0
+}

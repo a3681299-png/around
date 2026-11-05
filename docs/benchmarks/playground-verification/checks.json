@@ -1,0 +1,750 @@
+{
+  "unit": {
+    "startTime": "2026-11-05T02:47:45.351Z",
+    "duration": 12779.781,
+    "expected": 523,
+    "skipped": 3,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "windows-all": {
+    "startTime": "2026-11-05T02:53:27.769Z",
+    "duration": 1197921.535,
+    "expected": 280,
+    "skipped": 61,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "pg-normal": {
+    "startTime": "2026-11-05T03:13:57.401Z",
+    "duration": 5409.382,
+    "expected": 4,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "pg-normal-record": {
+    "startTime": "2026-11-05T03:21:04.708Z",
+    "duration": 5832.301,
+    "expected": 4,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "pg-no-mark": {
+    "startTime": "2026-11-05T03:14:03.827Z",
+    "duration": 1753.9109999999998,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0,
+    "failures": [
+      {
+        "file": "playground-extra.spec.ts",
+        "line": 53,
+        "title": "G1 missing mark causes the coverage assertion to fail",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\playground-extra.spec.ts",
+              "column": 59,
+              "line": 58
+            },
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"play\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\n  56 |   await expect.poll(()=>page.evaluate(()=>Boolean((globalThis as any).__wwPlayground))).toBe(true);\n  57 |   const missing=await page.evaluate(()=>{const c=new Set((globalThis as any).__wwPlayground.controls());return [...document.querySelectorAll('button,a[href],input,video')].filter(e=>!e.closest('[id^=\"web-world-themes\"]')&&!c.has(e)).map(e=>e.id||e.textContent?.trim());});\n> 58 |   records.push({case:'controls',missing});expect(missing).toEqual([]);\n     |                                                           ^\n  59 | });\n  60 | test('G1 overlapping character preserves real button pixels and click delivery',async({page})=>{\n  61 |   const good=JSON.parse(await readFile(path.join(root,'content/design.json'),'utf8'));\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\playground-extra.spec.ts:58:59"
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "pg-no-parser": {
+    "startTime": "2026-11-05T03:14:06.579Z",
+    "duration": 11782.092,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0,
+    "failures": [
+      {
+        "file": "playground-extra.spec.ts",
+        "line": 24,
+        "title": "Playground refuses malformed artwork through parseDesign",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\playground-extra.spec.ts",
+              "column": 47,
+              "line": 30
+            },
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoBeEmpty\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('#status')\nExpected: not empty\nReceived: empty\nTimeout:  10000ms\n\nCall log:\n\u001b[2m  - Expect \"not toBeEmpty\" locator('#status') with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('#status')\u001b[22m\n\u001b[2m    24 × locator resolved to <p id=\"status\" role=\"status\"></p>\u001b[22m\n\u001b[2m       - unexpected value \"empty\"\u001b[22m\n\n\n  28 |     await page.route('**/content/design.json',r=>r.fulfill({json:doc}));\n  29 |     await page.goto(origin);\n> 30 |     await expect(page.locator('#status')).not.toBeEmpty();\n     |                                               ^\n  31 |     await page.locator('#apply').click();\n  32 |     await expect(model(page)).toHaveCount(0);\n  33 |     records.push({case:label,rejected:await page.locator('#status').textContent()});\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\playground-extra.spec.ts:30:47"
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "pg-no-clip": {
+    "startTime": "2026-11-05T03:14:19.120Z",
+    "duration": 3484.526,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0,
+    "failures": [
+      {
+        "file": "playground-extra.spec.ts",
+        "line": 60,
+        "title": "G1 overlapping character preserves real button pixels and click delivery",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\playground-extra.spec.ts",
+              "column": 77,
+              "line": 81
+            },
+            "message": "Error: native button pixels must remain identical\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\n  79 |   expect(green,'character must remain visibly drawn away from the protected control').toBeGreaterThan(500);\n  80 |   const after=await button.screenshot();\n> 81 |   expect(after.equals(before),'native button pixels must remain identical').toBe(true);\n     |                                                                             ^\n  82 |   await button.click();await expect.poll(()=>page.locator('video').evaluate((v:HTMLVideoElement)=>!v.paused)).toBe(true);\n  83 |   await button.click();await expect.poll(()=>page.locator('video').evaluate((v:HTMLVideoElement)=>v.paused)).toBe(true);\n  84 |   records.push({case:'overlap',box,bounds,green,pixelsEqual:after.equals(before),clicks:true});\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\playground-extra.spec.ts:81:77"
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "stability-after": {
+    "startTime": "2026-11-05T03:14:23.511Z",
+    "duration": 77729.342,
+    "expected": 20,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "stability-before": {
+    "startTime": "2026-11-05T03:15:42.398Z",
+    "duration": 73353.53099999999,
+    "expected": 20,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "no-hysteresis": {
+    "startTime": "2026-11-05T03:16:56.927Z",
+    "duration": 144582.409,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 10,
+    "flaky": 0,
+    "failures": [
+      {
+        "file": "timing.spec.ts",
+        "line": 858,
+        "title": "G1.2 ①②④: near a control, only the layer over it is held; a layer elsewhere keeps following the scroll",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\timing.spec.ts",
+              "column": 69,
+              "line": 914
+            },
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"over-account\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\nCall Log:\n- Timeout 10000ms exceeded while waiting on the predicate\n\n  912 |   const left = Date.now();\n  913 |   await youtube.mouse.move(away.x, away.y, { steps: 4 });\n> 914 |   await expect.poll(() => heldLayers(youtube), { intervals: [50] }).toEqual([]);\n      |                                                                     ^\n  915 |   console.log('VERIFICATION_RELEASE_MS', Date.now() - left);\n  916 |   expect(Date.now() - left).toBeGreaterThanOrEqual(300);\n  917 |   await expect.poll(() => alphaOf(youtube, 'over-account')).toBeCloseTo(0.9, 1);\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\timing.spec.ts:914:69"
+          }
+        ]
+      },
+      {
+        "file": "timing.spec.ts",
+        "line": 858,
+        "title": "G1.2 ①②④: near a control, only the layer over it is held; a layer elsewhere keeps following the scroll",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\timing.spec.ts",
+              "column": 69,
+              "line": 914
+            },
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"over-account\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\nCall Log:\n- Timeout 10000ms exceeded while waiting on the predicate\n\n  912 |   const left = Date.now();\n  913 |   await youtube.mouse.move(away.x, away.y, { steps: 4 });\n> 914 |   await expect.poll(() => heldLayers(youtube), { intervals: [50] }).toEqual([]);\n      |                                                                     ^\n  915 |   console.log('VERIFICATION_RELEASE_MS', Date.now() - left);\n  916 |   expect(Date.now() - left).toBeGreaterThanOrEqual(300);\n  917 |   await expect.poll(() => alphaOf(youtube, 'over-account')).toBeCloseTo(0.9, 1);\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\timing.spec.ts:914:69"
+          }
+        ]
+      },
+      {
+        "file": "timing.spec.ts",
+        "line": 858,
+        "title": "G1.2 ①②④: near a control, only the layer over it is held; a layer elsewhere keeps following the scroll",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\timing.spec.ts",
+              "column": 69,
+              "line": 914
+            },
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"over-account\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\nCall Log:\n- Timeout 10000ms exceeded while waiting on the predicate\n\n  912 |   const left = Date.now();\n  913 |   await youtube.mouse.move(away.x, away.y, { steps: 4 });\n> 914 |   await expect.poll(() => heldLayers(youtube), { intervals: [50] }).toEqual([]);\n      |                                                                     ^\n  915 |   console.log('VERIFICATION_RELEASE_MS', Date.now() - left);\n  916 |   expect(Date.now() - left).toBeGreaterThanOrEqual(300);\n  917 |   await expect.poll(() => alphaOf(youtube, 'over-account')).toBeCloseTo(0.9, 1);\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\timing.spec.ts:914:69"
+          }
+        ]
+      },
+      {
+        "file": "timing.spec.ts",
+        "line": 858,
+        "title": "G1.2 ①②④: near a control, only the layer over it is held; a layer elsewhere keeps following the scroll",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\timing.spec.ts",
+              "column": 29,
+              "line": 916
+            },
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: >= \u001b[32m300\u001b[39m\nReceived:    \u001b[31m116\u001b[39m\n\n  914 |   await expect.poll(() => heldLayers(youtube), { intervals: [50] }).toEqual([]);\n  915 |   console.log('VERIFICATION_RELEASE_MS', Date.now() - left);\n> 916 |   expect(Date.now() - left).toBeGreaterThanOrEqual(300);\n      |                             ^\n  917 |   await expect.poll(() => alphaOf(youtube, 'over-account')).toBeCloseTo(0.9, 1);\n  918 | });\n  919 |\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\timing.spec.ts:916:29"
+          }
+        ]
+      },
+      {
+        "file": "timing.spec.ts",
+        "line": 858,
+        "title": "G1.2 ①②④: near a control, only the layer over it is held; a layer elsewhere keeps following the scroll",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\timing.spec.ts",
+              "column": 69,
+              "line": 914
+            },
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"over-account\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\nCall Log:\n- Timeout 10000ms exceeded while waiting on the predicate\n\n  912 |   const left = Date.now();\n  913 |   await youtube.mouse.move(away.x, away.y, { steps: 4 });\n> 914 |   await expect.poll(() => heldLayers(youtube), { intervals: [50] }).toEqual([]);\n      |                                                                     ^\n  915 |   console.log('VERIFICATION_RELEASE_MS', Date.now() - left);\n  916 |   expect(Date.now() - left).toBeGreaterThanOrEqual(300);\n  917 |   await expect.poll(() => alphaOf(youtube, 'over-account')).toBeCloseTo(0.9, 1);\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\timing.spec.ts:914:69"
+          }
+        ]
+      },
+      {
+        "file": "timing.spec.ts",
+        "line": 858,
+        "title": "G1.2 ①②④: near a control, only the layer over it is held; a layer elsewhere keeps following the scroll",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\timing.spec.ts",
+              "column": 69,
+              "line": 914
+            },
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"over-account\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\nCall Log:\n- Timeout 10000ms exceeded while waiting on the predicate\n\n  912 |   const left = Date.now();\n  913 |   await youtube.mouse.move(away.x, away.y, { steps: 4 });\n> 914 |   await expect.poll(() => heldLayers(youtube), { intervals: [50] }).toEqual([]);\n      |                                                                     ^\n  915 |   console.log('VERIFICATION_RELEASE_MS', Date.now() - left);\n  916 |   expect(Date.now() - left).toBeGreaterThanOrEqual(300);\n  917 |   await expect.poll(() => alphaOf(youtube, 'over-account')).toBeCloseTo(0.9, 1);\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\timing.spec.ts:914:69"
+          }
+        ]
+      },
+      {
+        "file": "timing.spec.ts",
+        "line": 858,
+        "title": "G1.2 ①②④: near a control, only the layer over it is held; a layer elsewhere keeps following the scroll",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\timing.spec.ts",
+              "column": 69,
+              "line": 914
+            },
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"over-account\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\nCall Log:\n- Timeout 10000ms exceeded while waiting on the predicate\n\n  912 |   const left = Date.now();\n  913 |   await youtube.mouse.move(away.x, away.y, { steps: 4 });\n> 914 |   await expect.poll(() => heldLayers(youtube), { intervals: [50] }).toEqual([]);\n      |                                                                     ^\n  915 |   console.log('VERIFICATION_RELEASE_MS', Date.now() - left);\n  916 |   expect(Date.now() - left).toBeGreaterThanOrEqual(300);\n  917 |   await expect.poll(() => alphaOf(youtube, 'over-account')).toBeCloseTo(0.9, 1);\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\timing.spec.ts:914:69"
+          }
+        ]
+      },
+      {
+        "file": "timing.spec.ts",
+        "line": 858,
+        "title": "G1.2 ①②④: near a control, only the layer over it is held; a layer elsewhere keeps following the scroll",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\timing.spec.ts",
+              "column": 69,
+              "line": 914
+            },
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"over-account\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\nCall Log:\n- Timeout 10000ms exceeded while waiting on the predicate\n\n  912 |   const left = Date.now();\n  913 |   await youtube.mouse.move(away.x, away.y, { steps: 4 });\n> 914 |   await expect.poll(() => heldLayers(youtube), { intervals: [50] }).toEqual([]);\n      |                                                                     ^\n  915 |   console.log('VERIFICATION_RELEASE_MS', Date.now() - left);\n  916 |   expect(Date.now() - left).toBeGreaterThanOrEqual(300);\n  917 |   await expect.poll(() => alphaOf(youtube, 'over-account')).toBeCloseTo(0.9, 1);\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\timing.spec.ts:914:69"
+          }
+        ]
+      },
+      {
+        "file": "timing.spec.ts",
+        "line": 858,
+        "title": "G1.2 ①②④: near a control, only the layer over it is held; a layer elsewhere keeps following the scroll",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\timing.spec.ts",
+              "column": 69,
+              "line": 914
+            },
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"over-account\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\nCall Log:\n- Timeout 10000ms exceeded while waiting on the predicate\n\n  912 |   const left = Date.now();\n  913 |   await youtube.mouse.move(away.x, away.y, { steps: 4 });\n> 914 |   await expect.poll(() => heldLayers(youtube), { intervals: [50] }).toEqual([]);\n      |                                                                     ^\n  915 |   console.log('VERIFICATION_RELEASE_MS', Date.now() - left);\n  916 |   expect(Date.now() - left).toBeGreaterThanOrEqual(300);\n  917 |   await expect.poll(() => alphaOf(youtube, 'over-account')).toBeCloseTo(0.9, 1);\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\timing.spec.ts:914:69"
+          }
+        ]
+      },
+      {
+        "file": "timing.spec.ts",
+        "line": 858,
+        "title": "G1.2 ①②④: near a control, only the layer over it is held; a layer elsewhere keeps following the scroll",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\timing.spec.ts",
+              "column": 69,
+              "line": 914
+            },
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"over-account\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\nCall Log:\n- Timeout 10000ms exceeded while waiting on the predicate\n\n  912 |   const left = Date.now();\n  913 |   await youtube.mouse.move(away.x, away.y, { steps: 4 });\n> 914 |   await expect.poll(() => heldLayers(youtube), { intervals: [50] }).toEqual([]);\n      |                                                                     ^\n  915 |   console.log('VERIFICATION_RELEASE_MS', Date.now() - left);\n  916 |   expect(Date.now() - left).toBeGreaterThanOrEqual(300);\n  917 |   await expect.poll(() => alphaOf(youtube, 'over-account')).toBeCloseTo(0.9, 1);\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\timing.spec.ts:914:69"
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "fast-release": {
+    "startTime": "2026-11-05T03:21:11.559Z",
+    "duration": 5677.165,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0,
+    "failures": [
+      {
+        "file": "timing.spec.ts",
+        "line": 858,
+        "title": "G1.2 ①②④: near a control, only the layer over it is held; a layer elsewhere keeps following the scroll",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\timing.spec.ts",
+              "column": 29,
+              "line": 916
+            },
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: >= \u001b[32m300\u001b[39m\nReceived:    \u001b[31m133\u001b[39m\n\n  914 |   await expect.poll(() => heldLayers(youtube), { intervals: [50] }).toEqual([]);\n  915 |   console.log('VERIFICATION_RELEASE_MS', Date.now() - left);\n> 916 |   expect(Date.now() - left).toBeGreaterThanOrEqual(300);\n      |                             ^\n  917 |   await expect.poll(() => alphaOf(youtube, 'over-account')).toBeCloseTo(0.9, 1);\n  918 | });\n  919 |\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\timing.spec.ts:916:29"
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "live-after-final": {
+    "startTime": "2026-11-05T03:19:22.474Z",
+    "duration": 17271.906000000003,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0,
+    "failures": [
+      {
+        "file": "live.spec.ts",
+        "line": 8,
+        "title": "same Playground artwork on real YouTube",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\tests\\helpers\\editor.ts",
+              "column": 54,
+              "line": 26
+            },
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('.connection-status')\nExpected: \u001b[32m\"true\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('.connection-status') with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('.connection-status')\u001b[22m\n\u001b[2m    7 × locator resolved to <span role=\"status\" aria-live=\"polite\" class=\"connection-status\">接続先を選んでください。</span>\u001b[22m\n\u001b[2m      - unexpected value \"null\"\u001b[22m\n\u001b[2m    17 × locator resolved to <span role=\"status\" aria-live=\"polite\" class=\"connection-status\">対応する編集対象がありません。YouTubeを開いて一覧を更新してください。</span>\u001b[22m\n\u001b[2m       - unexpected value \"null\"\u001b[22m\n\n\n   at ..\\..\\tests\\helpers\\editor.ts:26\n\n  24 |   await studio.setViewportSize({ width, height });\n  25 |   await studio.goto(`${page}?target=${tab}`);\n> 26 |   await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');\n     |                                                      ^\n  27 |   const panel = studio.getByRole('dialog', { name: 'デザインエディター' });\n  28 |   await expect(panel).toBeVisible();\n  29 |   await youtube.bringToFront();\n    at openEditor (C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\tests\\helpers\\editor.ts:26:54)\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\live.spec.ts:28:20"
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "live-before": {
+    "failures": []
+  },
+  "anchor-after": {
+    "startTime": "2026-11-05T03:25:08.912Z",
+    "duration": 17350.281,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0,
+    "failures": [
+      {
+        "file": "live.spec.ts",
+        "line": 8,
+        "title": "same Playground artwork on real YouTube",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\live.spec.ts",
+              "column": 122,
+              "line": 27
+            },
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"https://www.youtube.com/watch?v=LC1a-DwUhls\"\u001b[39m\nReceived: \u001b[31mundefined\u001b[39m\n\nCall Log:\n- Timeout 10000ms exceeded while waiting on the predicate\n\n  25 |     await expect(page.locator('html')).toHaveAttribute('data-ww-site','youtube');\n  26 |     await page.bringToFront();\n> 27 |     await expect.poll(()=>popup.evaluate(async()=> (await chrome.tabs.query({active:true,currentWindow:true}))[0]?.url)).toBe(page.url());\n     |                                                                                                                          ^\n  28 |     const source = path.resolve('.work/playground/content');\n  29 |     const manifest = JSON.parse(await readFile(path.join(source, 'manifest.json'), 'utf8'));\n  30 |     const design = JSON.parse(await readFile(path.join(source, 'design.json'), 'utf8'));\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\live.spec.ts:27:122"
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "anchor-before": {
+    "startTime": "2026-11-05T03:25:27.280Z",
+    "duration": 16703.605,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0,
+    "failures": [
+      {
+        "file": "live.spec.ts",
+        "line": 8,
+        "title": "same Playground artwork on real YouTube",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\live.spec.ts",
+              "column": 122,
+              "line": 27
+            },
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"https://www.youtube.com/watch?v=LC1a-DwUhls\"\u001b[39m\nReceived: \u001b[31mundefined\u001b[39m\n\nCall Log:\n- Timeout 10000ms exceeded while waiting on the predicate\n\n  25 |     await expect(page.locator('html')).toHaveAttribute('data-ww-site','youtube');\n  26 |     await page.bringToFront();\n> 27 |     await expect.poll(()=>popup.evaluate(async()=> (await chrome.tabs.query({active:true,currentWindow:true}))[0]?.url)).toBe(page.url());\n     |                                                                                                                          ^\n  28 |     const source = path.resolve('.work/playground/content');\n  29 |     const manifest = JSON.parse(await readFile(path.join(source, 'manifest.json'), 'utf8'));\n  30 |     const design = JSON.parse(await readFile(path.join(source, 'design.json'), 'utf8'));\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\live.spec.ts:27:122"
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "anchor-final-after": {
+    "startTime": "2026-11-05T03:47:10.298Z",
+    "duration": 58652.774000000005,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "anchor-final-before": {
+    "startTime": "2026-11-05T03:48:10.028Z",
+    "duration": 48213.309,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "real-after": {
+    "startTime": "2026-11-05T03:21:18.156Z",
+    "duration": 80596.737,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0,
+    "failures": [
+      {
+        "file": "operation-live.spec.ts",
+        "line": 113,
+        "title": "optional real YouTube operation checks with and without authored paint",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\tests\\operation-live.spec.ts",
+              "column": 78,
+              "line": 89
+            },
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\nCall Log:\n- Timeout 5000ms exceeded while waiting on the predicate\n\n  87 |   const paused = await video.evaluate((v: HTMLVideoElement) => v.paused);\n  88 |   await page.keyboard.press('k');\n> 89 |   await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.paused)).toBe(!paused);\n     |                                                                              ^\n  90 |   await page.locator('.ytp-fullscreen-button').click();\n  91 |   await expect.poll(() => page.evaluate(() => Boolean(document.fullscreenElement))).toBe(true);\n  92 |   await page.locator('.ytp-fullscreen-button').click();\n    at nativeInputs (C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\tests\\operation-live.spec.ts:89:78)\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\tests\\operation-live.spec.ts:134:20"
+          }
+        ]
+      },
+      {
+        "file": "signal-timeline-live.spec.ts",
+        "line": 11,
+        "title": "real YouTube: GIF scroll rule, explicit take recording, ghost projection, replay isolation and reload",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\tests\\signal-timeline-live.spec.ts",
+              "column": 87,
+              "line": 368
+            },
+            "message": "Error: {\"events\":24,\"frames\":384,\"hidden\":51,\"unexplained\":51,\"explainedSpans\":[],\"traced\":false,\"stops\":[\"ページの操作部品が動いている間は、絵の表示を止めています。\",\"\"],\"near\":[[[16,354,52,43]],[[52,376,115,40],[16,432,36,39],[68,433,91,18],[60,480,32,32]],[[16,366,36,39],[68,366,55,20],[60,412,32,32],[52,456,115,40]],[[52,376,115,40],[16,432,36,39],[68,433,91,18],[60,480,32,32]],[[16,354,52,43]],[]],\"samples\":[{\"t\":15439.1,\"scrollY\":90,\"visible\":false,\"stopped\":\"ページの操作部品が動いている間は、絵の表示を止めています。\",\"rect\":[563,313,260,195]},{\"t\":15668.3,\"scrollY\":90,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":15980.6,\"scrollY\":180,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":16279.3,\"scrollY\":270,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":16515.3,\"scrollY\":360,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":16883.3,\"scrollY\":450,\"visible\":false,\"stopped\":\"ページの操作部品が動いている間は、絵の表示を止めています。\",\"rect\":[563,313,260,195]},{\"t\":17147.1,\"scrollY\":540,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":17376.3,\"scrollY\":540,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":17612.3,\"scrollY\":630,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":17855.4,\"scrollY\":720,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":18216.5,\"scrollY\":810,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":18410.8,\"scrollY\":900,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":18702.4,\"scrollY\":900,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":18904,\"scrollY\":990,\"visible\":false,\"stopped\":\"ページの操作部品が動いている間は、絵の表示を止めています。\",\"rect\":[563,313,260,195]},{\"t\":19125.9,\"scrollY\":1080,\"visible\":false,\"stopped\":\"ページの操作部品が動いている間は、絵の表示を止めています。\",\"rect\":[563,313,260,195]},{\"t\":19271.9,\"scrollY\":1080,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":19431.7,\"scrollY\":990,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":19521.9,\"scrollY\":990,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":19619.1,\"scrollY\":900,\"visible\":true,\"\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m51\u001b[39m\n\n  366 |     };\n  367 |     expect(during.length, 'frames sampled during the wheel').toBeGreaterThan(20);\n> 368 |     expect(unexplained.length, JSON.stringify(report.checks['wheel']).slice(0, 2000)).toBe(0);\n      |                                                                                       ^\n  369 |     stage('record');\n  370 |     await panel.click('.take-record');\n  371 |     await expect\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\tests\\signal-timeline-live.spec.ts:368:87"
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "real-before": {
+    "startTime": "2026-11-05T03:22:39.783Z",
+    "duration": 103384.81300000001,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0,
+    "failures": [
+      {
+        "file": "signal-timeline-live.spec.ts",
+        "line": 11,
+        "title": "real YouTube: GIF scroll rule, explicit take recording, ghost projection, replay isolation and reload",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\tests\\signal-timeline-live.spec.ts",
+              "column": 87,
+              "line": 368
+            },
+            "message": "Error: {\"events\":24,\"frames\":357,\"hidden\":25,\"unexplained\":25,\"explainedSpans\":[],\"traced\":false,\"stops\":[\"ページの操作部品が動いている間は、絵の表示を止めています。\",\"\"],\"near\":[[[16,354,52,43]],[[52,376,115,40],[16,432,36,39],[68,432,49,20],[60,478,32,32]],[[60,358,32,32],[52,402,115,40],[16,458,36,39],[68,458,40,20]],[[52,376,115,40],[16,432,36,39],[68,432,49,20],[60,478,32,32]],[[16,354,52,43]],[]],\"samples\":[{\"t\":16457.3,\"scrollY\":90,\"visible\":false,\"stopped\":\"ページの操作部品が動いている間は、絵の表示を止めています。\",\"rect\":[563,313,260,195]},{\"t\":16832.3,\"scrollY\":180,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":17200.4,\"scrollY\":270,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":17554.5,\"scrollY\":360,\"visible\":false,\"stopped\":\"ページの操作部品が動いている間は、絵の表示を止めています。\",\"rect\":[563,313,260,195]},{\"t\":17998.9,\"scrollY\":450,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":18311.3,\"scrollY\":540,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":18720.9,\"scrollY\":630,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":19290.3,\"scrollY\":720,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":19963.8,\"scrollY\":810,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":20199.9,\"scrollY\":900,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":20741.5,\"scrollY\":900,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":20942.8,\"scrollY\":990,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":21040,\"scrollY\":990,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":21199.8,\"scrollY\":1080,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":21317.8,\"scrollY\":1080,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":21505.3,\"scrollY\":1080,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":21713.6,\"scrollY\":990,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":21803.9,\"scrollY\":990,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":21963.6,\"scrollY\":900,\"visible\":true,\"stopped\":\"\",\"rect\":[563,313,260,195]},{\"t\":22033,\"scrollY\"\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m25\u001b[39m\n\n  366 |     };\n  367 |     expect(during.length, 'frames sampled during the wheel').toBeGreaterThan(20);\n> 368 |     expect(unexplained.length, JSON.stringify(report.checks['wheel']).slice(0, 2000)).toBe(0);\n      |                                                                                       ^\n  369 |     stage('record');\n  370 |     await panel.click('.take-record');\n  371 |     await expect\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\tests\\signal-timeline-live.spec.ts:368:87"
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "operations-repeat-after": {
+    "startTime": "2026-11-05T03:25:44.931Z",
+    "duration": 114585.869,
+    "expected": 2,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0,
+    "failures": [
+      {
+        "file": "operation-live.spec.ts",
+        "line": 113,
+        "title": "optional real YouTube operation checks with and without authored paint",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\tests\\operation-live.spec.ts",
+              "column": 78,
+              "line": 84
+            },
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0.4405548685786286\u001b[39m\nReceived:   \u001b[31m0.4405548685786286\u001b[39m\n\nCall Log:\n- Timeout 5000ms exceeded while waiting on the predicate\n\n  82 |       }),\n  83 |   );\n> 84 |   await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.volume)).toBeGreaterThan(quieter);\n     |                                                                              ^\n  85 |   await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.volume)).toBeLessThan(1);\n  86 |   await player.focus();\n  87 |   const paused = await video.evaluate((v: HTMLVideoElement) => v.paused);\n    at nativeInputs (C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\tests\\operation-live.spec.ts:84:78)\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\tests\\operation-live.spec.ts:134:20"
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "operations-resume-before": {
+    "startTime": "2026-11-05T03:48:59.871Z",
+    "duration": 158584.573,
+    "expected": 2,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0,
+    "failures": [
+      {
+        "file": "operation-live.spec.ts",
+        "line": 113,
+        "title": "optional real YouTube operation checks with and without authored paint",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\tests\\operation-live.spec.ts",
+              "column": 78,
+              "line": 89
+            },
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\nCall Log:\n- Timeout 5000ms exceeded while waiting on the predicate\n\n  87 |   const paused = await video.evaluate((v: HTMLVideoElement) => v.paused);\n  88 |   await page.keyboard.press('k');\n> 89 |   await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.paused)).toBe(!paused);\n     |                                                                              ^\n  90 |   await page.locator('.ytp-fullscreen-button').click();\n  91 |   await expect.poll(() => page.evaluate(() => Boolean(document.fullscreenElement))).toBe(true);\n  92 |   await page.locator('.ytp-fullscreen-button').click();\n    at nativeInputs (C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\tests\\operation-live.spec.ts:89:78)\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\tests\\operation-live.spec.ts:134:20"
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "perf-calibration-first-test": {
+    "startTime": "2026-11-05T03:52:53.731Z",
+    "duration": 192592.79499999998,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "perf-calibration-test": {
+    "startTime": "2026-11-05T04:23:27.329Z",
+    "duration": 168227.07200000001,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "model-debug-tests": {
+    "startTime": "2026-11-05T04:10:30.430Z",
+    "duration": 195534.979,
+    "expected": 4,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "model-full-after-tests": {
+    "startTime": "2026-11-05T04:15:41.255Z",
+    "duration": 154241.183,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "model-full-before-tests": {
+    "startTime": "2026-11-05T04:18:17.096Z",
+    "duration": 143018.47,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0,
+    "failures": [
+      {
+        "file": "perf.spec.ts",
+        "line": 425,
+        "title": "Playground ports real YouTube alternating performance",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\perf.spec.ts",
+              "column": 5,
+              "line": 412
+            },
+            "message": "Error: browserContext._wrapApiCall: file data stream has unexpected number of bytes\n\n  410 |     console.log('R31_INVALID_RUN', idLabel, String(error));\n  411 |   } finally {\n> 412 |     await context.close();\n      |     ^\n  413 |     result.hostAfter = await auditHost();\n  414 |     result.finished = new Date().toISOString();\n  415 |     await writeFile(path.join(work, idLabel + '.json'), JSON.stringify(result, null, 2));\n    at oneRun (C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\perf.spec.ts:412:5)\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\perf.spec.ts:439:17"
+          },
+          {
+            "message": "Error: End of central directory record signature not found. Either not a zip file, or file is truncated."
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "take-first-after-tests": {
+    "startTime": "2026-11-05T05:02:19.337Z",
+    "duration": 43634.362,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0,
+    "failures": [
+      {
+        "file": "take-live-extra.spec.ts",
+        "line": 11,
+        "title": "real YouTube: record, save and reload a take through the page port, then export its backup",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\take-live-extra.spec.ts",
+              "column": 141,
+              "line": 66
+            },
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeCloseTo\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m, \u001b[22mprecision\u001b[2m)\u001b[22m\n\nExpected: \u001b[32m0.999649982499125\u001b[39m\nReceived: \u001b[31m0\u001b[39m\n\nExpected precision:    5\nExpected difference: < \u001b[32m0.000005\u001b[39m\nReceived difference:   \u001b[31m0.999649982499125\u001b[39m\n\nCall Log:\n- Timeout 10000ms exceeded while waiting on the predicate\n\n  64 |     await panel.locator('.take-position').fill(String(time/1000));\n  65 |     await panel.locator('.take-position').press('Tab');\n> 66 |     await expect.poll(()=>page.locator(`[data-image-id=\"${design.decorations[0].id}\"]`).evaluate((e:HTMLElement)=>Number(e.style.opacity))).toBeCloseTo(expected,5);\n     |                                                                                                                                             ^\n  67 |     const backup=await context.newPage();await backup.goto(`chrome-extension://${id}/backup/index.html`);\n  68 |     await expect(backup.locator('#backup-export')).toBeEnabled();\n  69 |     const downloaded=backup.waitForEvent('download');await backup.locator('#backup-export').click();\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\take-live-extra.spec.ts:66:141"
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "take-first-before-tests": {
+    "startTime": "2026-11-05T05:03:03.918Z",
+    "duration": 40396.765,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0,
+    "failures": [
+      {
+        "file": "take-live-extra.spec.ts",
+        "line": 11,
+        "title": "real YouTube: record, save and reload a take through the page port, then export its backup",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\take-live-extra.spec.ts",
+              "column": 141,
+              "line": 66
+            },
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeCloseTo\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m, \u001b[22mprecision\u001b[2m)\u001b[22m\n\nExpected: \u001b[32m0.9994660971703151\u001b[39m\nReceived: \u001b[31m0\u001b[39m\n\nExpected precision:    5\nExpected difference: < \u001b[32m0.000005\u001b[39m\nReceived difference:   \u001b[31m0.9994660971703151\u001b[39m\n\nCall Log:\n- Timeout 10000ms exceeded while waiting on the predicate\n\n  64 |     await panel.locator('.take-position').fill(String(time/1000));\n  65 |     await panel.locator('.take-position').press('Tab');\n> 66 |     await expect.poll(()=>page.locator(`[data-image-id=\"${design.decorations[0].id}\"]`).evaluate((e:HTMLElement)=>Number(e.style.opacity))).toBeCloseTo(expected,5);\n     |                                                                                                                                             ^\n  67 |     const backup=await context.newPage();await backup.goto(`chrome-extension://${id}/backup/index.html`);\n  68 |     await expect(backup.locator('#backup-export')).toBeEnabled();\n  69 |     const downloaded=backup.waitForEvent('download');await backup.locator('#backup-export').click();\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\take-live-extra.spec.ts:66:141"
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "take-second-after-tests": {
+    "startTime": "2026-11-05T05:06:01.814Z",
+    "duration": 28308.37,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0,
+    "failures": [
+      {
+        "file": "take-live-extra.spec.ts",
+        "line": 11,
+        "title": "real YouTube: record, save and reload a take through the page port, then export its backup",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\src\\assets\\validate-bytes.ts",
+              "column": 20,
+              "line": 21
+            },
+            "message": "ReferenceError: createImageBitmap is not defined\n\n   at ..\\..\\src\\assets\\validate-bytes.ts:21\n\n  19 |   // Video playback probing remains at the existing content importer boundary.\n  20 |   if (!info.model && !info.vrmAnimation && info.animation?.format !== 'lottie' && info.animation?.format !== 'webm') {\n> 21 |     const bitmap = await createImageBitmap(blob);\n     |                    ^\n  22 |     try {\n  23 |       if (bitmap.width !== info.width || bitmap.height !== info.height)\n  24 |         throw new Error('画像を正しく読み込めませんでした。');\n    at validateAssetBytes (C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\src\\assets\\validate-bytes.ts:21:20)\n    at validateOriginals (C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\src\\backup\\archive.ts:25:34)\n    at decodeBackup (C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\src\\backup\\archive.ts:70:30)\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\take-live-extra.spec.ts:76:22"
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "take-second-before-tests": {
+    "startTime": "2026-11-05T05:06:31.072Z",
+    "duration": 28176.155,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0,
+    "failures": [
+      {
+        "file": "take-live-extra.spec.ts",
+        "line": 11,
+        "title": "real YouTube: record, save and reload a take through the page port, then export its backup",
+        "errors": [
+          {
+            "location": {
+              "file": "C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\src\\assets\\validate-bytes.ts",
+              "column": 20,
+              "line": 21
+            },
+            "message": "ReferenceError: createImageBitmap is not defined\n\n   at ..\\..\\src\\assets\\validate-bytes.ts:21\n\n  19 |   // Video playback probing remains at the existing content importer boundary.\n  20 |   if (!info.model && !info.vrmAnimation && info.animation?.format !== 'lottie' && info.animation?.format !== 'webm') {\n> 21 |     const bitmap = await createImageBitmap(blob);\n     |                    ^\n  22 |     try {\n  23 |       if (bitmap.width !== info.width || bitmap.height !== info.height)\n  24 |         throw new Error('画像を正しく読み込めませんでした。');\n    at validateAssetBytes (C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\src\\assets\\validate-bytes.ts:21:20)\n    at validateOriginals (C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\src\\backup\\archive.ts:25:34)\n    at decodeBackup (C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\src\\backup\\archive.ts:70:30)\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\verify-tools\\take-live-extra.spec.ts:76:22"
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "take-after-tests": {
+    "startTime": "2026-11-05T05:07:58.020Z",
+    "duration": 25179.809999999998,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "take-before-tests": {
+    "startTime": "2026-11-05T05:08:24.215Z",
+    "duration": 23972.09,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  },
+  "performance-test": {
+    "startTime": "2026-11-05T04:53:22.066Z",
+    "duration": 524217.577,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "failures": [],
+    "errors": []
+  }
+}

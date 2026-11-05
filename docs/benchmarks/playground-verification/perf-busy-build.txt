@@ -1,0 +1,2 @@
+.work/perf-busy/ にChromeへ読み込める拡張機能を作成しました。
+{"out":"C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\playground-v1-after\\.work\\perf-busy","revision":"063845318167ae3c37ccb9ed0e285870a95eefbe","dirtySource":false}
