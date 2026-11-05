@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures';
+import { showArtwork } from './helpers/artwork';
 import { readFile } from 'node:fs/promises';
 import { openEditor } from './helpers/editor';
 import { BACKUP_HEADER_BYTES } from '../src/backup/archive';
@@ -46,7 +47,7 @@ test('reimporting the same historical VRM measures its existing record and layer
     },
     { metadata, original: [...original], design: manifest.designs[0], lease: BACKUP_LIBRARY_LEASE },
   );
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await youtube.reload();
   const { panel, studio } = await openEditor(popup, youtube);
   await panel.locator('.layer').first().click();

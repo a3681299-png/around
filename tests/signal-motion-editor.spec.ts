@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { showArtwork } from './helpers/artwork';
 import { test, expect } from './fixtures';
 import { closeEditorPages, openEditor } from './helpers/editor';
 import type { DesignDocument } from '../src/design/types';
@@ -8,7 +9,7 @@ test('shared motion UI pursues, stops, rotates, keeps handles aligned and preser
   popup,
   youtube,
 }) => {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   let { panel } = await openEditor(popup, youtube);
   await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await panel.locator('.save').click();
@@ -133,7 +134,7 @@ test('shared motion UI pursues, stops, rotates, keeps handles aligned and preser
   expect((await stored()).decorations[0]!.placement.x).toBeCloseTo(before.x + 60 / scale, 3);
   await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
   await expect(youtube.locator('#web-world-themes-decorations')).toHaveCount(0);
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await expect(image).toBeVisible();
   await youtube.emulateMedia({ reducedMotion: 'reduce' });
   await youtube.waitForTimeout(50);

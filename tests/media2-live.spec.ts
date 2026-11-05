@@ -1,4 +1,5 @@
 import { exposeEditorControls } from './helpers/editor-workspace';
+import { showArtwork } from './helpers/artwork';
 import { test, expect } from '@playwright/test';
 import { mkdtemp, mkdir, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -41,7 +42,7 @@ test('optional real YouTube: saved group, mask, anchors, signals, theater, fulls
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto('https://www.youtube.com/watch?v=AS4q9yaWJkI', { waitUntil: 'domcontentloaded', timeout: 30_000 });
     await expect(page.locator('#movie_player video').first()).toBeAttached({ timeout: 20_000 });
-    await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    await showArtwork(popup);
     await page.bringToFront();
     await expect(page.locator('[data-ww-surface~="player-window"]')).toBeVisible();
     // UI0-d round 3: the editor window (as a tab); the checks stay on the YouTube page.

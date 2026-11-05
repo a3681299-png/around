@@ -1,4 +1,5 @@
 import { test, expect, type Page, type CDPSession } from '@playwright/test';
+import { showArtwork } from './helpers/artwork';
 import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -106,7 +107,7 @@ test('private local avatar: real YouTube A and controlled A-prime/B/C load perfo
       const page = await context.newPage();
       await page.goto('https://www.youtube.com/watch?v=LC1a-DwUhls', { waitUntil: 'domcontentloaded' });
       await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30000 });
-      await popup.getByRole('switch', { name: '作品を表示する' }).check();
+      await showArtwork(popup);
       await page.bringToFront();
       await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
       await page
@@ -402,7 +403,7 @@ test('opt-in real YouTube iframe origin, storage, transfer and fullscreen lifecy
     const page = await context.newPage();
     await page.goto('https://www.youtube.com/watch?v=LC1a-DwUhls', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30000 });
-    await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    await showArtwork(popup);
     await page.bringToFront();
     await page
       .locator('video')

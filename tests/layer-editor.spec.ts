@@ -1,4 +1,5 @@
 import { exposeEditorControls, withCanvas, clickCanvas, beginCanvasGesture } from './helpers/editor-workspace';
+import { showArtwork } from './helpers/artwork';
 import type { Page, Locator } from '@playwright/test';
 import { test, expect } from './fixtures';
 import { openEditor } from './helpers/editor';
@@ -11,7 +12,7 @@ const images =
 const rows = '[data-layer-id]';
 
 async function open(popup: Page, page: Page) {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   const dialog = (await openEditor(popup, page)).panel;
   await exposeEditorControls(dialog);

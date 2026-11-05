@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { showArtwork } from './helpers/artwork';
 import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -37,7 +38,7 @@ test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and 
     const page = await context.newPage();
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto('https://www.youtube.com/watch?v=AS4q9yaWJkI', { waitUntil: 'domcontentloaded' });
-    await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    await showArtwork(popup);
     await page.bringToFront();
     await expect(page.locator('[data-ww-surface~="player-window"]')).toBeVisible({ timeout: 20_000 });
     // UI0-d 3.1: the editor's window (as a tab); the artwork and its checks stay on the YouTube page.

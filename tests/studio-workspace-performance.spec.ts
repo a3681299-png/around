@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { showArtwork } from './helpers/artwork';
 import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { test, expect, type Page } from '@playwright/test';
@@ -74,7 +75,7 @@ test('32 layers remain editable with locked/hidden selection; measure the page w
     await popup.goto(`chrome-extension://${id}/popup/index.html`);
     const youtube = await context.newPage();
     await youtube.goto('https://www.youtube.com/watch?v=fixture');
-    await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    await showArtwork(popup);
     let { panel, studio } = await openEditor(popup, youtube);
     await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
     await expect(youtube.locator(overlay + ' [data-image-id]')).toHaveCount(1);

@@ -1,4 +1,5 @@
 import { modelPoseError } from './helpers/model-assertions';
+import { showArtwork } from './helpers/artwork';
 import { test, expect } from './fixtures';
 import { modelFixture } from './helpers/model-fixture';
 import type { ModelEvaluation } from '../src/world/models';
@@ -11,7 +12,7 @@ test('standalone Studio configures model pursuit and clips, records/seeks poses,
   youtube,
 }) => {
   test.setTimeout(60000);
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   await youtube.bringToFront();
   const opened = context.waitForEvent('page');

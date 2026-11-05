@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { showArtwork } from './helpers/artwork';
 import { mkdir, mkdtemp, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -46,7 +47,7 @@ test('real YouTube: the Playground artwork sits on the player edge and moves as 
     await page.goto('https://www.youtube.com/watch?v=LC1a-DwUhls', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 25000 });
     await declinePromotion(page);
-    await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    await showArtwork(popup);
     await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
     // The real import: the VRM, its two poses and the room picture, each checked and leased.
     const { panel } = await openEditor(popup, page);

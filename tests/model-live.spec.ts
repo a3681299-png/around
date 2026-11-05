@@ -1,4 +1,5 @@
 import { modelPoseError } from './helpers/model-assertions';
+import { showArtwork } from './helpers/artwork';
 import { declinePromotion } from './helpers/youtube-live';
 import { test, expect } from '@playwright/test';
 import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
@@ -42,7 +43,7 @@ test('real YouTube: official Studio places a rig, switches run/idle, replays mod
     const page = await context.newPage();
     await page.goto('https://www.youtube.com/watch?v=LC1a-DwUhls', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 25000 });
-    await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    await showArtwork(popup);
     await page.bringToFront();
     await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
     await openSidePanelFromIcon(popup, page);

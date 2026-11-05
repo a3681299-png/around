@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures';
+import { showArtwork } from './helpers/artwork';
 import { openEditor } from './helpers/editor';
 import { vrmFixture } from './helpers/vrm-fixture';
 import { vrmaFixture, overflowingHipsVrma } from './helpers/vrma-fixture';
@@ -20,7 +21,7 @@ for (const [name, buffer] of [
   ['hips', overflowingHipsVrma()],
 ] as const)
   test(`Studio refuses invalid motion ${name} before attaching or saving`, async ({ popup, youtube }) => {
-    await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    await showArtwork(popup);
     const { panel } = await openEditor(popup, youtube);
     await panel.locator('.model-file').setInputFiles({
       name: 'Original.vrm',

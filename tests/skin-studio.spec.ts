@@ -1,4 +1,5 @@
 import type { Locator, Page } from '@playwright/test';
+import { showArtwork } from './helpers/artwork';
 import { test, expect } from './fixtures';
 import { openEditor } from './helpers/editor';
 
@@ -11,7 +12,7 @@ const cards = '[data-ww-surface~="video-card"]';
 const key = 'webWorldThemes.design.youtube';
 
 async function enable(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await expect(youtube.locator(cards).first()).toBeVisible();
 }
 /** A 48×48 frame: corners, edges and centre in three colours, so slices show in pixels. */

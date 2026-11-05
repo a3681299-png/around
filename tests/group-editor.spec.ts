@@ -1,4 +1,5 @@
 import { exposeEditorControls, withCanvas, clickCanvas, beginCanvasGesture } from './helpers/editor-workspace';
+import { showArtwork } from './helpers/artwork';
 import type { CDPSession, Locator, Page } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -16,7 +17,7 @@ const presentation =
 const colors = ['#f04a50', '#3caf78', '#4276ed'],
   names = ['red.png', 'green.png', 'blue.png'];
 async function open(popup: Page, page: Page) {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await page.bringToFront();
   await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   const { panel } = await openEditor(popup, page);
@@ -456,7 +457,7 @@ test('mixed anchors and interleaved selection are refused; player groups follow 
     if (boundary === 'off') await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
     else await popup.getByRole('button', { name: '緊急OFF', exact: true }).click();
     await expect(youtube.locator(overlay)).toHaveCount(0);
-    if (boundary === 'off') await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    if (boundary === 'off') await showArtwork(popup);
     else await popup.getByRole('button', { name: '描画を再開', exact: true }).click();
     await youtube.bringToFront();
     await ready(youtube, 3);
@@ -714,7 +715,7 @@ test('16 groups / 32 media share effect sources and become idle or fully detache
     else await popup.getByRole('button', { name: '緊急OFF', exact: true }).click();
     await expect(youtube.locator(overlay)).toHaveCount(0);
     await expect.poll(stats).toMatchObject({ pointer: 0, video: 0 });
-    if (boundary === 'off') await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    if (boundary === 'off') await showArtwork(popup);
     else await popup.getByRole('button', { name: '描画を再開', exact: true }).click();
     await youtube.bringToFront();
     await ready(youtube, 32);

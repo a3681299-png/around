@@ -1,4 +1,5 @@
 import type { Page } from '@playwright/test';
+import { showArtwork } from './helpers/artwork';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { test, expect } from './fixtures';
@@ -121,7 +122,7 @@ test('storage with the strength at 0% is moved to OFF once: nothing is drawn, an
   expect(await stored(popup, 'webWorldThemes.showArtwork')).toBe(false);
   await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-site', 'youtube');
   // The same page draws as soon as 作品を表示する is ON: the storage itself was readable.
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await drawn(youtube);
 });
 

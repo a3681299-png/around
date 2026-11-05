@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures';
+import { showArtwork } from './helpers/artwork';
 import { closeEditorPages, openEditor } from './helpers/editor';
 import { vrmFixture } from './helpers/vrm-fixture';
 import type { DesignDocument } from '../src/design/types';
@@ -13,7 +14,7 @@ test('VRM1 renders MToon with alpha, follows the pointer, edits expressions and 
   const file = info.outputPath('original.vrm');
   await mkdir(path.dirname(file), { recursive: true });
   await writeFile(file, vrmFixture());
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
@@ -163,7 +164,7 @@ for (const large of [false, true])
       file = info.outputPath(large ? 'original-padded.vrm' : 'original-small.vrm');
     await mkdir(path.dirname(file), { recursive: true });
     await writeFile(file, bytes);
-    await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    await showArtwork(popup);
     await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
     await youtube.bringToFront();
     const opened = context.waitForEvent('page');

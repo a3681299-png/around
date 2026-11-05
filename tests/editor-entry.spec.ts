@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { showArtwork } from './helpers/artwork';
 import { cp, mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
@@ -29,7 +30,7 @@ async function setup() {
   await popup.goto('chrome-extension://' + id + '/popup/index.html');
   const page = await context.newPage();
   await page.goto('https://www.youtube.com/watch?v=fixture');
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   await expect(popup.locator('#creator-editor-direct')).toBeEnabled();
   await page.bringToFront();

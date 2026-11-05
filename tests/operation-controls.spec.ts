@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures';
+import { showArtwork } from './helpers/artwork';
 import path from 'node:path';
 import { exposeEditorControls } from './helpers/editor-workspace';
 import { openEditor } from './helpers/editor';
@@ -11,7 +12,7 @@ test('native drag, text, keyboard and fullscreen controls remain usable with opa
   youtube,
 }, info) => {
   await youtube.goto('https://www.youtube.com/watch?v=fixture');
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await youtube.evaluate(() => {
     const player = document.querySelector<HTMLElement>('#movie_player')!;
     for (const [id, name, bottom, width] of [
@@ -184,7 +185,7 @@ test('native drag, text, keyboard and fullscreen controls remain usable with opa
 
 test('fullscreen keeps authored painting order across viewport and player anchors', async ({ popup, youtube }) => {
   await youtube.goto('https://www.youtube.com/watch?v=fixture');
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   const { panel: editor } = await openEditor(popup, youtube);
   const files = await youtube.evaluate(() =>
     ['red', 'blue'].map((color) => {
@@ -255,7 +256,7 @@ test('an opened 操作チェック stays open while the guard releases its first
   context,
   extensionId,
 }) => {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   const studio = await context.newPage();
   // Every hidden/open change of the fold, from before the editor mounts it.
   await studio.addInitScript(() => {
@@ -303,7 +304,7 @@ test('Studio exposes protection overlays, per-layer restrictions and emergency O
   context,
   extensionId,
 }, info) => {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   const studio = await context.newPage();
   await studio.goto(`chrome-extension://${extensionId}/studio/index.html`);
   await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');

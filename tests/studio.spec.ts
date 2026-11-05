@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { showArtwork } from './helpers/artwork';
 import { readFile } from 'node:fs/promises';
 import type { Page, BrowserContext, Locator } from '@playwright/test';
 import { test, expect } from './fixtures';
@@ -16,7 +17,7 @@ const overlay = '#web-world-themes-decorations',
   images = `${presentation} [data-image-id]`,
   key = 'webWorldThemes.design.youtube';
 async function launch(context: BrowserContext, popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   await youtube.bringToFront();
   const opened = context.waitForEvent('page');
@@ -379,7 +380,7 @@ test('the authenticated Port rejects stale revisions and unrecognized commands w
   youtube,
   extensionId,
 }) => {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   // A Studio extension document supplies the real MV3 sender origin; no page-script bridge exists.
   const control = await context.newPage();

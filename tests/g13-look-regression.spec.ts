@@ -1,4 +1,5 @@
 // Copy to tests/ before running. This is a verification test, not a product change.
+import { showArtwork } from './helpers/artwork';
 import { test, expect } from './fixtures';
 import { openEditor } from './helpers/editor';
 import { exposeEditorControls } from './helpers/editor-workspace';
@@ -19,7 +20,7 @@ test('G1.3: a resized group must not expose a control outside the group', async 
       '<div id="below" style="display:flex;flex:none"><button id="g13-first" style="width:70px;height:40px">First</button></div><div id="secondary" style="flex:none"><button id="g13-second" style="width:70px;height:40px">Second</button></div>';
     document.querySelector('ytd-app')!.append(box);
   });
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
   const image = await youtube.evaluate(() => {

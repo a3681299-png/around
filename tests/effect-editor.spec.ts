@@ -1,4 +1,5 @@
 import { exposeEditorControls, withCanvas, beginCanvasGesture } from './helpers/editor-workspace';
+import { showArtwork } from './helpers/artwork';
 import type { Page, Locator, CDPSession } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -14,7 +15,7 @@ const layers =
     ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]',
   media = `${layers} .media`;
 async function open(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   await youtube.bringToFront();
   const { panel } = await openEditor(popup, youtube);
@@ -480,7 +481,7 @@ test('32 masks share sources, stay idle, detach on background/OFF/zero and remai
     else await popup.getByRole('button', { name: '緊急OFF', exact: true }).click();
     await expect(youtube.locator(overlay)).toHaveCount(0);
     await expect.poll(stats).toMatchObject({ pointer: 0, video: 0 });
-    if (boundary === 'off') await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    if (boundary === 'off') await showArtwork(popup);
     else await popup.getByRole('button', { name: '描画を再開', exact: true }).click();
     await youtube.bringToFront();
     await expect(youtube.locator(media)).toHaveCount(32);

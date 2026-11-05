@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { showArtwork } from './helpers/artwork';
 import { cp, mkdir, mkdtemp } from 'node:fs/promises';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
@@ -24,7 +25,7 @@ test('UI0-d header and real emergency accelerator stop skins, page marks and the
     await popup.goto(`chrome-extension://${id}/popup/index.html`);
     const page = await context.newPage();
     await page.goto('https://www.youtube.com/watch?v=fixture');
-    await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    await showArtwork(popup);
     await page.bringToFront();
     const tab = await popup.evaluate(
       async () => (await chrome.tabs.query({ active: true, currentWindow: true }))[0]!.id!,

@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { showArtwork } from './helpers/artwork';
 import type { Locator, Page } from '@playwright/test';
 import { test, expect } from './fixtures';
 import { clickCanvas, exposeEditorControls, withCanvas } from './helpers/editor-workspace';
@@ -9,7 +10,7 @@ const host = '#web-world-themes-page-marks';
 const COBALT = 'rgb(43, 81, 184)';
 
 async function enable(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await expect(youtube.locator(cards).first()).toBeVisible();
 }
 async function openEditor(popup: Page, youtube: Page) {
@@ -312,7 +313,7 @@ test('protection overlays are the vermilion 45° hatch with a mono label, and em
   context,
   extensionId,
 }) => {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   const studio = await context.newPage();
   await studio.goto(`chrome-extension://${extensionId}/studio/index.html`);
   await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
