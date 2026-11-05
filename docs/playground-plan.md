@@ -55,13 +55,13 @@
 
 ### テストと CI
 
-| 種類              | 結果                                                          |
-| ----------------- | ------------------------------------------------------------- |
-| 型チェック・lint  | 通った（新しい ESLint の規則を含む）                          |
-| unit              | 全件（下の CI）。`browser-boundary` 3件                       |
-| e2e（触った部分） | `operation-live`（`WW_LIVE_OPERATIONS=1`、実 YouTube）1件通過 |
-| 診断              | `startup-profile`（`WW_PROFILE_STARTUP=1`）2回・計8組         |
-| CI                | CI_RESULT                                                     |
+| 種類              | 結果                                                                                                                                                            |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 型チェック・lint  | 通った（新しい ESLint の規則を含む）                                                                                                                            |
+| unit              | 全件（下の CI）。`browser-boundary` 3件                                                                                                                         |
+| e2e（触った部分） | `operation-live`（`WW_LIVE_OPERATIONS=1`、実 YouTube）1件通過                                                                                                   |
+| 診断              | `startup-profile`（`WW_PROFILE_STARTUP=1`）2回・計8組                                                                                                           |
+| CI                | `7688942` 成功（unit と e2e 4台）。塊2（`codex/chunk2-r3-2`）はこの上に載せ直した（型チェック・lint・unit 546 通過、塊2で触った部分の e2e 37 通過・1 スキップ） |
 
 後回しにした2件（`operation-live` の `k`、`signal-timeline-live` の wheel）は [r3-plan.md の「後回し」](r3-plan.md)に1行ずつ書いた。
 
