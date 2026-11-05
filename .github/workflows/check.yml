@@ -2,8 +2,7 @@ name: Theme checks
 
 on:
   push:
-    branches:
-      [
+    branches: [
         feat/heisei-silver-blue,
         feat/heisei-silver-shell,
         fix/youtube-silver-native-surfaces,
