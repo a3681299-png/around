@@ -1,0 +1,88 @@
+{
+  "url": "https://wwt-deploy-probe.lolipop-now.app/",
+  "first": {
+    "ms": 4464,
+    "done": "true"
+  },
+  "again": "true",
+  "summary": "3 / 3 件が読めて中身も一致（2026/11/5 16:53:43、https://wwt-deploy-probe.lolipop-now.app）",
+  "firstTable": "files/dummy.vrm\t200 読めた・中身一致\tapplication/octet-stream / 期待: application/octet-stream or model/gltf-binary\t20971520 B（期待 20971520）\t1549 ms（12.9 MB/s）\t04b5b1d5e1e5df36…\tcontent-encoding: -\ncache-control: max-age=86400\ncontent-length: -\naccept-ranges: bytes\nserver: CloudFront\nfiles/dummy.glb\t200 読めた・中身一致\tmodel/gltf-binary / 期待: model/gltf-binary\t20971520 B（期待 20971520）\t1489 ms（13.4 MB/s）\te1da31975372e6d7…\tcontent-encoding: -\ncache-control: max-age=86400\ncontent-length: -\naccept-ranges: bytes\nserver: CloudFront\nfiles/dummy.json\t200 読めた・中身一致\tapplication/json / 期待: application/json\t48 B（期待 48）\t90 ms（0.0 MB/s）\t707f1fcd120511a8…\tcontent-encoding: -\ncache-control: max-age=3600\ncontent-length: -\naccept-ranges: bytes\nserver: CloudFront",
+  "againTable": "files/dummy.vrm\t200 読めた・中身一致\tapplication/octet-stream / 期待: application/octet-stream or model/gltf-binary\t20971520 B（期待 20971520）\t857 ms（23.3 MB/s）\t04b5b1d5e1e5df36…\tcontent-encoding: -\ncache-control: max-age=86400\ncontent-length: -\naccept-ranges: bytes\nserver: CloudFront\nfiles/dummy.glb\t200 読めた・中身一致\tmodel/gltf-binary / 期待: model/gltf-binary\t20971520 B（期待 20971520）\t894 ms（22.4 MB/s）\te1da31975372e6d7…\tcontent-encoding: -\ncache-control: max-age=86400\ncontent-length: -\naccept-ranges: bytes\nserver: CloudFront\nfiles/dummy.json\t200 読めた・中身一致\tapplication/json / 期待: application/json\t48 B（期待 48）\t31 ms（0.0 MB/s）\t707f1fcd120511a8…\tcontent-encoding: -\ncache-control: max-age=3600\ncontent-length: -\naccept-ranges: bytes\nserver: CloudFront",
+  "responses": [
+    {
+      "url": "/",
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "encoding": "br",
+      "cache": "max-age=86400",
+      "server": "CloudFront"
+    },
+    {
+      "url": "probe.js",
+      "status": 200,
+      "type": "text/javascript",
+      "encoding": "br",
+      "cache": "max-age=31536000",
+      "server": "CloudFront"
+    },
+    {
+      "url": "probe.json",
+      "status": 200,
+      "type": "application/json",
+      "encoding": "br",
+      "cache": "max-age=3600",
+      "server": "CloudFront"
+    },
+    {
+      "url": "files/dummy.vrm",
+      "status": 200,
+      "type": "application/octet-stream",
+      "cache": "max-age=86400",
+      "server": "CloudFront"
+    },
+    {
+      "url": "files/dummy.glb",
+      "status": 200,
+      "type": "model/gltf-binary",
+      "cache": "max-age=86400",
+      "server": "CloudFront"
+    },
+    {
+      "url": "files/dummy.json",
+      "status": 200,
+      "type": "application/json",
+      "cache": "max-age=3600",
+      "server": "CloudFront"
+    },
+    {
+      "url": "probe.json",
+      "status": 200,
+      "type": "application/json",
+      "encoding": "br",
+      "cache": "max-age=3600",
+      "server": "CloudFront"
+    },
+    {
+      "url": "files/dummy.vrm",
+      "status": 200,
+      "type": "application/octet-stream",
+      "cache": "max-age=86400",
+      "server": "CloudFront"
+    },
+    {
+      "url": "files/dummy.glb",
+      "status": 200,
+      "type": "model/gltf-binary",
+      "cache": "max-age=86400",
+      "server": "CloudFront"
+    },
+    {
+      "url": "files/dummy.json",
+      "status": 200,
+      "type": "application/json",
+      "cache": "max-age=3600",
+      "server": "CloudFront"
+    }
+  ],
+  "console": []
+}

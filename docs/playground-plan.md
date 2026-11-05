@@ -337,6 +337,42 @@ gantt
 
 結果で決めること：3件とも読めて中身一致なら、Playground（`npm run build:playground` の `dist-playground/`）をそのまま置ける。`.vrm` を断られたら、拡張子を `.glb` にして置く（中身は同じ。素材は SHA-256 で照合するので名前に依らない）。20MB が10秒を超えるなら、キャラの素材を小さくする（テクスチャを縮める）か、読み込み中の表示を足す
 
+#### 置いて確かめた結果（2026-11-05、Claude Code）
+
+**静的なファイルのまま置けて、20MB の `.vrm`・`.glb` も中身を変えずに読めた。** Next.js の入れ物は要らない（`deploy/` は作っていない）。公開の URL は `https://wwt-deploy-probe.lolipop-now.app/`（プロジェクト `wwt-deploy-probe`、Free プラン）。
+
+![公開した確かめのページ（headless で開いた表）](screenshots/playground/deploy-probe-live.png)
+
+| ファイル           | 結果          | Content-Type               | 時間（初回 → キャッシュなしの2回目） | 配信のヘッダー                                                               |
+| ------------------ | ------------- | -------------------------- | ------------------------------------ | ---------------------------------------------------------------------------- |
+| `files/dummy.vrm`  | 200・中身一致 | `application/octet-stream` | 1549 ms（12.9MB/s）→ 857 ms          | 圧縮なし・`cache-control: max-age=86400`・`accept-ranges: bytes`・CloudFront |
+| `files/dummy.glb`  | 200・中身一致 | `model/gltf-binary`        | 1489 ms（13.4MB/s）→ 894 ms          | 同上                                                                         |
+| `files/dummy.json` | 200・中身一致 | `application/json`         | 90 ms → 31 ms                        | `max-age=3600`                                                               |
+
+- ページ（`/`）は `text/html`、`probe.js` は `text/javascript`、どちらも brotli 圧縮。配信側は CSP のヘッダーを足さない（ページの `<meta>` の CSP だけが効く）。コンソールのエラー・CSP の違反は0件
+- 測った場所は翔太の PC の回線（headless の Chromium）。スマートフォン・遅い回線では測っていない
+- 記録：[probe-result.json](benchmarks/playground-deploy/probe-result.json)（応答ごとのヘッダー、2回分の表）
+
+分かった上限と注意（公式の案内と、置いてみて分かったこと）：
+
+| 項目                    | 中身                                                                                                                                                                                           |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1回のデプロイの大きさ   | Free 100MB・Personal 500MB（[プラン](https://deploy.lolipop.jp/docs/plans)）。CLI は送る前に tar.gz にまとめる（確かめの束 40MB → 42.0MB と表示）。単一ファイルの上限は記載なし。20MB は通った |
+| 静的なサイト            | `--framework static`。ルートは `index.html`。名前が `.` で始まるファイルは公開されない（[静的サイト](https://deploy.lolipop.jp/docs/frameworks/static)）                                       |
+| `index.html` を直接開く | `/index.html` は 404、`/` だけが返る。リンクは `./` かフォルダの名前にする                                                                                                                     |
+| `.gitignore`            | CLI はリポジトリの `.gitignore` を守る。`dist-deploy-probe/` は無視の対象なので、リポジトリの中からは「deploy 対象のファイルがありません」で失敗した。リポジトリの外に写してから置いた         |
+| 置いた直後              | READY になった直後の1回目は、ブラウザーで HTTP のエラー（数十秒後には 200）                                                                                                                    |
+| 名前                    | 最初の失敗でもプロジェクトとサブドメインは作られる。2回目は `--project <ID>` で同じ所へ置く                                                                                                    |
+| ログイン                | `npx -y lolipop@2.0.8 login`（ブラウザーで承認）。Windows では `%APPDATA%\lolipop\credentials.json` に入る（リポジトリの外）。ウェブのログインは CLI に引き継がれない                          |
+
+**Playground 本番を置くときの手順**
+
+1. `creator-editor`（または作業ブランチ）で `npm run build:playground`。出力の検査（トルーシェ・私用 VRM・Mixamo・一覧にないモデル）が通らないと出力を消して止まる
+2. `dist-playground/` を、リポジトリの外の空のフォルダに写す（`.gitignore` の対象なので、中からは置けない）
+3. そのフォルダで、初回は `npx -y lolipop@2.0.8 deploy --name <名前> --framework static --org <組織の ID>`。2回目からは `--project <ID>`（`npx -y lolipop@2.0.8 project list`）
+4. `npx -y lolipop@2.0.8 deployment show <デプロイの ID>` が READY になってから、1分ほど待って開く。Playground の e2e と同じ確かめ（適用・解除・Alt+Shift+Q・コンソールのエラー0件）を、公開の URL で headless に回す
+5. 応募には、この公開の URL を使う。審査が終わるまで消さない・非公開にしない（[コンテストの注意事項](https://lolipop.jp/deploy-now/contest/)）
+
 ## 11. 自律が「見せられる自然さ」に届かなかったときの逃げ道
 
 | 逃げ道                            | 中身                                                                                                               | 今のエンジンでできるか                                            | 手間                                                  |
