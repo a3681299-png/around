@@ -91,7 +91,20 @@ export interface OperationSource {
   /** While only looks changed: the envelopes of those controls, where they are now. */
   lookRegions(): readonly PlacementFrame[];
   /** zIndex: the local plane's order inside the player, just above its media and below its UI. */
-  videoSlot(): { parent: HTMLElement; rect: PlacementFrame; top: number; bottom: number; zIndex: number } | undefined;
+  videoSlot():
+    | {
+        parent: HTMLElement;
+        rect: PlacementFrame;
+        top: number;
+        bottom: number;
+        zIndex: number;
+        /** A class the player carries exactly while its control bars are hidden. While the
+         * player has it, the bands hold no visible control and the local plane may paint there;
+         * the moment the class goes (the bars appear), the band clip is back in the same style
+         * recalculation, so no frame can show artwork over a shown bar. Absent: always clipped. */
+        barsHiddenClass?: string;
+      }
+    | undefined;
   overlaySlot(): { parent: HTMLElement; zIndex: number } | undefined;
   /** A place under the page's content for atmosphere layers, when the adapter owns the page's
    * stacking (the Playground). Undefined on sites we only decorate (YouTube): there, atmosphere

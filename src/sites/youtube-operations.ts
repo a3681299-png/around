@@ -202,6 +202,10 @@ export function youtubeOperations(doc: Document) {
         top: 64,
         bottom: 112,
         zIndex: Number.isFinite(mediaZ) ? mediaZ + 1 : 1,
+        // YouTube puts ytp-autohide on the player while it hides both control bars (playing, no
+        // pointer or key for a while). It is removed before the bars fade in: on pointer moves,
+        // keys, pause, ads and end screens. The bands are then clipped again (see videoSlot).
+        barsHiddenClass: 'ytp-autohide',
       };
     },
     overlaySlot,

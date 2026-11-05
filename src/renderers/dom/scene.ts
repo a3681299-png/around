@@ -130,7 +130,14 @@ export function createImageRenderer(
     }
   >();
   const compositions = new Map<string, { node: HTMLDivElement; content: HTMLDivElement; controls: HTMLDivElement }>();
-  let videoSlot: { host: HTMLElement; content: HTMLElement; shadow: ShadowRoot } | undefined;
+  let videoSlot:
+    | {
+        host: HTMLElement;
+        content: HTMLElement;
+        shadow: ShadowRoot;
+        /** the class written into its rule */ barsHidden?: string;
+      }
+    | undefined;
   let pagePlane: Plane | undefined, atmospherePlane: Plane | undefined;
   const createPlane = (id: string, css: string, gestures: boolean): Plane => {
     const planeHost = doc.createElement('div');
@@ -388,6 +395,23 @@ export function createImageRenderer(
         if (videoSlot.host.parentElement !== slot.parent) slot.parent.append(videoSlot.host);
         videoSlot.host.style.setProperty('--ww-decoration-clip', `inset(${slot.top}px 0 ${slot.bottom}px 0)`);
         videoSlot.host.style.setProperty('--ww-local-z', String(slot.zIndex));
+        // G1, the control bands only while the bars are shown (chunk 3, docs/autonomy-plan.md):
+        // the band clip above stays the default. Only while the player carries the adapter's
+        // "bars hidden" class does the plane drop it, and that is decided by the browser's own
+        // style recalculation, not by this draw: when the class goes, the clip is back for the
+        // very frame the bars start to appear, whatever the timing of our rAF or observers.
+        const hidden =
+          slot.barsHiddenClass && /^[A-Za-z][\w-]*$/.test(slot.barsHiddenClass) ? slot.barsHiddenClass : '';
+        if (videoSlot.barsHidden !== hidden) {
+          videoSlot.barsHidden = hidden;
+          let rule = videoSlot.shadow.querySelector<HTMLStyleElement>('style[data-bars]');
+          if (!rule) {
+            rule = doc.createElement('style');
+            rule.dataset['bars'] = '';
+            videoSlot.shadow.append(rule);
+          }
+          rule.textContent = hidden ? `:host-context(.${hidden}){clip-path:none!important}` : '';
+        }
       }
       // One presentation container preserves scoped z-index/tie ordering and
       // keeps a group's masks/opacity on the original, un-cloned subtree.
