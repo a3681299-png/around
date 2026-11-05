@@ -86,7 +86,7 @@ export function writeContent(root: string, out: string): { models: string[] } {
     writeFileSync(join(out, to), readFileSync(join(root, 'tests/fixtures/motion', from)));
   const model = inspectAsset(vrm).model!;
   const design = parseDesign({
-    schemaVersion: 14,
+    schemaVersion: 15,
     id: 'playground-custom',
     siteId: 'playground',
     baseThemeId: null,
@@ -117,11 +117,15 @@ export function writeContent(root: string, out: string): { models: string[] } {
         id: 'resident',
         assetId: vrmId,
         name: '試験用のマネキン',
-        // The same anchor as on YouTube: the player's top edge, near its right end.
+        // Home is the player's bottom-right corner, over the fullscreen button's place (Shota's
+        // decision, chunk 3). The anchor is the player (a part kind, the same ID on YouTube), so
+        // it follows theater mode, fullscreen and any window size there as here.
         placement: {
           anchor: { kind: 'surface', target: 'video-player' },
-          x: 0.86,
-          y: 0,
+          x: 0.9,
+          // Low enough to sit in the corner, high enough that the box stays inside the player
+          // (the Playground's own controls are just below it).
+          y: 0.74,
           widthPx: 150,
           heightPx: 190,
           rotationDeg: 0,
@@ -134,6 +138,9 @@ export function writeContent(root: string, out: string): { models: string[] } {
         model: { ...defaultModelSettings(model), clip: 0, playing: true, loop: true },
         character: {
           standardMotions: 'auto',
+          // The autonomy on, with a middling personality (v15).
+          autonomy: true,
+          personality: { shyness: 0.6, curiosity: 0.6, sleepiness: 0.5 },
           motions: poses.map((pose) => ({
             id: pose.name,
             assetId: pose.id,

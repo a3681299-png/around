@@ -64,6 +64,8 @@ export interface AutonomyContext {
   /** Home: the authored anchor point (page px), and the character's drawn height (px). */
   home: Point;
   heightPx: number;
+  /** The part it lives on (its anchor's frame, the same space as home): it never leaves it. */
+  room?: { left: number; top: number; width: number; height: number };
   pointer: Point | undefined;
   idleSeconds: number;
   playing: boolean;
@@ -118,13 +120,18 @@ export function evaluateAutonomy(
   if (context.pointer) {
     const d = distance(context.pointer, body);
     near = d < AUTONOMY.nearHeights * h;
-    if (s.pointer && s.pointerTime !== null && t > s.pointerTime) {
-      const seconds = (t - s.pointerTime) / 1000;
-      speed = distance(context.pointer, s.pointer) / seconds;
-      closing = (distance(s.pointer, body) - d) / seconds;
+    // Speed over the time since the pointer last moved, not since the last frame: a mouse that
+    // reports every 80 ms would otherwise look five times faster than it is.
+    const moved = !s.pointer || s.pointer.x !== context.pointer.x || s.pointer.y !== context.pointer.y;
+    if (moved) {
+      if (s.pointer && s.pointerTime !== null && t > s.pointerTime) {
+        const seconds = Math.min(1, (t - s.pointerTime) / 1000);
+        speed = distance(context.pointer, s.pointer) / seconds;
+        closing = (distance(s.pointer, body) - d) / seconds;
+      }
+      s.pointer = { ...context.pointer };
+      s.pointerTime = t;
     }
-    s.pointer = { ...context.pointer };
-    s.pointerTime = t;
     if (near) s.nearAt = t;
   }
   // Internal states, fixed formulas: rises with what happens (or does not), decays otherwise.
@@ -152,16 +159,31 @@ export function evaluateAutonomy(
     doze: s.sleepy > 0.6 && s.alert < 0.2 ? s.sleepy : 0,
     return: offHome && away && s.alert < 0.45 ? 0.5 : 0,
   };
+  // Offsets that keep the body inside its room (a margin of its own half width/height).
+  const room = context.room;
+  const keepX = (x: number) =>
+    room
+      ? Math.max(room.left + 0.35 * h, Math.min(room.left + room.width - 0.35 * h, context.home.x + x)) - context.home.x
+      : x;
+  const keepY = (y: number) =>
+    room
+      ? Math.max(room.top + 0.5 * h, Math.min(room.top + room.height - 0.5 * h, context.home.y + y)) - context.home.y
+      : y;
   let best: Behaviour = 'rest';
   for (const b of BEHAVIOURS) if (scores[b] > scores[best]) best = b;
   if (best !== s.behaviour && (t - s.since >= AUTONOMY.dwellMs || best === 'flee')) {
     s.behaviour = best;
     s.since = t;
     if (best === 'flee' && context.pointer) {
-      // Away from the pointer, horizontally first (a seat's edge runs sideways).
+      // Away from the pointer, sideways first (a seat's edge runs sideways), inside its room;
+      // with no room that way (home at the room's edge), up and away instead.
       const dx = body.x - context.pointer.x,
         side = dx === 0 ? 1 : Math.sign(dx);
-      s.target = { x: s.offset.x + side * AUTONOMY.fleeHeights * h, y: s.offset.y };
+      const x = keepX(s.offset.x + side * AUTONOMY.fleeHeights * h);
+      s.target =
+        Math.abs(x - s.offset.x) >= 0.6 * h
+          ? { x, y: s.offset.y }
+          : { x: keepX(s.offset.x + side * 0.4 * h), y: keepY(s.offset.y - AUTONOMY.fleeHeights * h) };
     }
     if (best === 'return' || best === 'rest') s.target = best === 'return' ? { x: 0, y: 0 } : { ...s.offset };
   }
@@ -169,7 +191,7 @@ export function evaluateAutonomy(
     // A little toward the pointer, never onto it, and not far from home.
     const dx = context.pointer.x - body.x,
       reach = Math.max(-0.7 * h, Math.min(0.7 * h, s.offset.x + Math.sign(dx) * Math.max(0, Math.abs(dx) - 0.9 * h)));
-    s.target = { x: reach, y: s.offset.y };
+    s.target = { x: keepX(reach), y: s.offset.y };
   }
   // Move toward the target at the behaviour's speed; a quick move hops.
   const speedPx =

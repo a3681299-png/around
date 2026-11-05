@@ -244,6 +244,10 @@ export function evaluateModels(
         ...(layer.character.autonomy
           ? { personality: layer.character.personality ?? DEFAULT_CHARACTER_PERSONALITY }
           : {}),
+        // The part it lives on (its anchor): a flight or an approach stays inside it.
+        ...(layer.placement.anchor.kind === 'surface' && input.anchors[layer.placement.anchor.target]
+          ? { room: input.anchors[layer.placement.anchor.target] }
+          : {}),
         // G1.2 holds a root over an approached control: a move away from the pointer continues.
         ...(paused ? { yielding: true } : {}),
       });

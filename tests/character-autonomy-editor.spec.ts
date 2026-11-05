@@ -17,13 +17,11 @@ test('the editor shows and saves the computed motion and autonomy switches and t
     buffer: mannequinVrm(),
   });
   await expect(panel.locator('.layer')).toHaveCount(1, { timeout: 30000 });
-  await panel
-    .locator('.character-file')
-    .setInputFiles({
-      name: 'sit.vrma',
-      mimeType: 'model/gltf-binary',
-      buffer: mannequinPoseVrma('sit', MANNEQUIN_POSES.sit),
-    });
+  await panel.locator('.character-file').setInputFiles({
+    name: 'sit.vrma',
+    mimeType: 'model/gltf-binary',
+    buffer: mannequinPoseVrma('sit', MANNEQUIN_POSES.sit),
+  });
   await expect(panel.locator('.character-motions li')).toHaveCount(1, { timeout: 30000 });
   const computed = panel.getByLabel('計算の動き', { exact: true }),
     autonomy = panel.getByLabel('自律', { exact: true }),

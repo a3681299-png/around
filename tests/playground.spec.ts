@@ -73,12 +73,13 @@ test('without the extension, 適用 switches the site to the artwork and back', 
   await expect(model(page)).toHaveAttribute('data-renderer', 'three', { timeout: 20000 });
   await expect(model(page)).toHaveAttribute('data-format', 'vrm');
   await expect.poll(() => page.evaluate(() => getComputedStyle(document.body).backgroundColor)).not.toBe(plain);
-  // It sits on the player's top edge: its box crosses that edge, near the right end.
+  // Home is the player's bottom-right corner (chunk 3): the box's middle is in the corner's
+  // quarter, and the box stays inside the player (the site's own controls are just below it).
   const player = (await page.locator('.player').boundingBox())!,
     character = (await page.locator('[data-image-id="resident"]').first().boundingBox())!;
-  expect(character.y).toBeLessThan(player.y);
-  expect(character.y + character.height).toBeGreaterThan(player.y);
   expect(character.x + character.width / 2).toBeGreaterThan(player.x + player.width * 0.8);
+  expect(character.y + character.height / 2).toBeGreaterThan(player.y + player.height * 0.6);
+  expect(character.y + character.height).toBeLessThanOrEqual(player.y + player.height + 1);
   await page.waitForTimeout(500);
   await page.screenshot({ path: join(shots, 'after.png') });
   await page.locator('#apply').click();

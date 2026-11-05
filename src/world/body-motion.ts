@@ -112,6 +112,8 @@ export interface BodyContext {
   /** The layer's anchor point in page px, and its height in px (scales moves). */
   position: Point | undefined;
   heightPx: number;
+  /** The anchor's frame (same space as position): the autonomy keeps the body inside it. */
+  room?: { left: number; top: number; width: number; height: number };
   pointer: Point | undefined;
   idleSeconds: number | undefined;
   scrollY: number | undefined;
@@ -218,6 +220,7 @@ export function evaluateBodyMotion(
       deltaMs: context.deltaMs,
       home: context.position!,
       heightPx: context.heightPx,
+      ...(context.room ? { room: context.room } : {}),
       pointer: context.pointer,
       idleSeconds: idle,
       playing: context.events.some((e) => e.type === 'video.play'),
