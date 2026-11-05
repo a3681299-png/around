@@ -6,6 +6,7 @@ const unitSpecs = [
   'answer-check',
   'clean-work',
   'backup-data',
+  'browser-boundary',
   'asset-import-validation',
   'asset-profile',
   'asset-read-data',
