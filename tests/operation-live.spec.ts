@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { showArtwork } from './helpers/artwork';
 import { mkdir, mkdtemp } from 'node:fs/promises';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
@@ -138,12 +139,12 @@ test('optional real YouTube operation checks with and without authored paint', a
     const url = process.env.WW_LIVE_VIDEO_URL ?? 'https://www.youtube.com/watch?v=LC1a-DwUhls';
     await page.goto(url, { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30_000 });
-    await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    await showArtwork(popup);
     if (process.env.WW_LIVE_OPERATIONS_OFF === '1')
       await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
     await page.bringToFront();
     const before = await nativeInputs(page);
-    await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    await showArtwork(popup);
     // UI0-d round 3: the editor window (as a tab); the operation checks stay on the YouTube page.
     const { panel: editor } = await openEditor(popup, page);
     await exposeEditorControls(editor);

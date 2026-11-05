@@ -62,6 +62,9 @@ function playgroundPlayback(doc: Document): PlaybackSource {
 
 function playgroundOperations(doc: Document) {
   const overlaySlot = () => ({ parent: doc.body, zIndex: 1 });
+  // The page is ours: no element on it makes a stacking context of its own and its background is
+  // the canvas's, so a negative z-index puts atmosphere between the background and the content.
+  const underlaySlot = () => ({ parent: doc.body, zIndex: -1 });
   return createOperationSource(
     doc,
     () => {
@@ -91,6 +94,7 @@ function playgroundOperations(doc: Document) {
     overlaySlot,
     () => undefined,
     (root, deep) => root.matches(`[${CONTROL}]`) || Boolean(deep && root.querySelector(`[${CONTROL}]`)),
+    underlaySlot,
   );
 }
 

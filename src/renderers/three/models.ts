@@ -54,6 +54,9 @@ interface Resource {
   bytes: number;
   disposed: boolean;
   trace?: string;
+  /** The body height measured from the bytes at this load (re-inspected every time): artwork
+   * saved before body measures existed still gets a computed motion scaled to its body. */
+  bodyHeight?: number;
 }
 function dispose(gltf: GLTF, shared?: SharedModelLease) {
   const geometries = new Set<Mesh['geometry']>(),
@@ -254,6 +257,7 @@ export function createModelRenderer(
         if (trace) entry.trace = trace;
         profileEnd(trace, 'renderer.source-load', readStart);
         if (!metadata.model) throw new Error('GLB素材が見つかりません。');
+        if (metadata.model.vrm?.body) entry.bodyHeight = metadata.model.vrm.body.height;
         if (entry.disposed || closed) throw new Error('読み込みを中止しました。');
         const bytes = blob
           ? new Uint8Array(
@@ -383,6 +387,8 @@ export function createModelRenderer(
     scene: Scene;
     camera: OrthographicCamera;
     visual: Group;
+    /** The model's height in the scene's units (it is scaled to fit its box). */
+    seatScale: number;
     player?: ReturnType<typeof createRigPlayer>;
     vrmPlayer?: ReturnType<typeof createVrmPlayer>;
     inPlace?: boolean;
@@ -506,7 +512,10 @@ export function createModelRenderer(
         const m = i.layer.model;
         i.visual.rotation.set(
           (m.rotationX * Math.PI) / 180,
-          ((m.rotationY + (i.evaluation?.yawDeg ?? 0) + (m.locomotion.faceMovement ? m.locomotion.forwardDeg : 0)) *
+          ((m.rotationY +
+            (i.evaluation?.yawDeg ?? 0) +
+            (i.evaluation?.pose?.yawDeg ?? 0) +
+            (m.locomotion.faceMovement ? m.locomotion.forwardDeg : 0)) *
             Math.PI) /
             180,
           (m.rotationZ * Math.PI) / 180,
@@ -521,7 +530,14 @@ export function createModelRenderer(
         if (i.inPlace !== m.inPlace || (!i.player && !i.vrmPlayer) || i.playerMotions !== motions) {
           i.player?.destroy();
           i.vrmPlayer?.destroy();
-          if (avatar) i.vrmPlayer = createVrmPlayer(i.source!, avatar, m.inPlace, motions);
+          if (avatar)
+            i.vrmPlayer = createVrmPlayer(
+              i.source!,
+              avatar,
+              m.inPlace,
+              motions,
+              i.layer.source.vrm?.body?.height ?? i.entry?.bodyHeight ?? 1,
+            );
           else i.player = createRigPlayer(i.source!, i.root, m.inPlace);
           i.inPlace = m.inPlace;
           i.playerMotions = motions;
@@ -532,6 +548,26 @@ export function createModelRenderer(
             i.element.dataset.vrmPose = JSON.stringify(i.vrmPlayer.paint(i.evaluation, m, i.worldTime ?? 0));
           else i.player?.paint(i.evaluation, m);
         }
+        const pose = i.evaluation?.pose;
+        // Seat contact: a sitting character's hips go to the box centre, which the layout puts
+        // on the anchor point (the edge it sits on). Measured on the posed body every paint.
+        i.visual.position.set(0, 0, 0);
+        if (pose?.seat && avatar) {
+          const hips = avatar.humanoid.getRawBoneNode('hips');
+          if (hips) {
+            i.visual.updateWorldMatrix(true, true);
+            const at = hips.getWorldPosition(new Vector3());
+            // The seat is a little under the hips joint: the thickness of the thighs. The computed
+            // hips lift (a hop) is taken out first, or the contact would cancel it.
+            i.visual.position.y = -(at.y - (pose.hips[1] + 0.04) * i.seatScale);
+          }
+        }
+        // Moving without walking: the drawn layer follows the hop arc or blinks out and in. The
+        // engine's protected regions clip the plane whatever this offset is.
+        const offset = pose && (pose.offset.x || pose.offset.y) ? `${pose.offset.x}px ${pose.offset.y}px` : '';
+        if (i.element.style.translate !== offset) i.element.style.translate = offset;
+        const opacity = pose && pose.opacity < 1 ? String(pose.opacity) : '';
+        if (i.element.style.opacity !== opacity) i.element.style.opacity = opacity;
         if (options?.warmupPhase === 'after-pose' && options.warmup && options.warmup !== 'none' && !i.posePrepared) {
           i.preparing = true;
           const generation = i.generation;
@@ -724,6 +760,7 @@ export function createModelRenderer(
         scene,
         camera,
         visual,
+        seatScale: 1,
         assetId: '',
         visible: false,
         dirty: false,
@@ -799,6 +836,7 @@ export function createModelRenderer(
                 normal.position.copy(center).multiplyScalar(-1 / edge);
                 normal.add(root);
                 i.visual.add(normal);
+                i.seatScale = size.y / edge;
                 if (
                   options?.warmupPhase !== 'after-pose' &&
                   ((options?.warmup && options.warmup !== 'none') || options?.shared)

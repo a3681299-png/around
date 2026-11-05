@@ -39,6 +39,7 @@ await build({
     __WW_WORLD_MODE__: '"runtime"',
     __WW_WORLD_DEVTOOLS__: 'false',
     __WW_ASSET_PROFILE__: 'false',
+    __WW_G11__: 'false',
     __WW_PLAYGROUND_TEST__: String(test),
   },
 });

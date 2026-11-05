@@ -1,0 +1,7 @@
+{
+  "clip": "protectionClip returns viewport",
+  "underlay": "adapter omits underlay slot",
+  "author": "authorActive forced to false",
+  "volume": "move the actual slider 90px upward after computing its stable box",
+  "volumeTarget": "place a neutral hit target over the already stable native slider box"
+}

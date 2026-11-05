@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { showArtwork } from './helpers/artwork';
 import { test, expect } from './fixtures';
 import { closeEditorPages, openEditor } from './helpers/editor';
 
@@ -6,7 +7,7 @@ test('signal space keys edit with mouse/numbers, one-step drag history, key-only
   popup,
   youtube,
 }) => {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   let { panel } = await openEditor(popup, youtube);
   await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await panel.locator('.timeline-toggle').click();

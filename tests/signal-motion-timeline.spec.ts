@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { showArtwork } from './helpers/artwork';
 import { mkdir } from 'node:fs/promises';
 import { test, expect } from './fixtures';
 import { closeEditorPages, openEditor } from './helpers/editor';
@@ -9,7 +10,7 @@ test('mouse-driven X/rotation lanes edit offsets, custom ranges and curves with 
   popup,
   youtube,
 }) => {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   let { panel } = await openEditor(popup, youtube);
   await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await panel.locator('.timeline-toggle').click();
@@ -67,7 +68,7 @@ test('GIF/image group pursuit with a shared mask records full history, replays/s
   popup,
   youtube,
 }) => {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   let { panel } = await openEditor(popup, youtube);
   await panel
     .getByLabel('画像素材を追加')

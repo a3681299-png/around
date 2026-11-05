@@ -1,3 +1,4 @@
+import { showArtwork } from './helpers/artwork';
 // The sparse-read bound (docs/g13-fix-verification.md, 古い位置の上限) in real drawing: an opaque layer
 // that follows the pointer a little is drawn only when the pointer moves, so the source is read
 // only then. Codex's order with pointer moves: a caught-up read after a quiet spell, the first
@@ -31,7 +32,7 @@ test('G1.3: a control moved after its group was checked is not drawn over on spa
   );
   await youtube.reload();
   await expect(youtube.locator('#g13-second')).toBeVisible();
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
   const image = await youtube.evaluate(() => {

@@ -1,6 +1,7 @@
 import type { OperationSnapshot, OperationSurface } from '../world/operations';
 import type { PlacementFrame } from '../world/geometry';
 import { scrollsWithPage } from './operation-composition';
+import { g11CaptureEnd, g11CaptureStart } from '../diagnostics/g11-hooks';
 import { ANSWER_CHECK_MS, COALESCE_MS, SWEEP_GROUPS, TRUST_MS, createAnswerCheck } from './answer-check';
 import {
   traceGeometryCause,
@@ -92,6 +93,10 @@ export interface OperationSource {
   /** zIndex: the local plane's order inside the player, just above its media and below its UI. */
   videoSlot(): { parent: HTMLElement; rect: PlacementFrame; top: number; bottom: number; zIndex: number } | undefined;
   overlaySlot(): { parent: HTMLElement; zIndex: number } | undefined;
+  /** A place under the page's content for atmosphere layers, when the adapter owns the page's
+   * stacking (the Playground). Undefined on sites we only decorate (YouTube): there, atmosphere
+   * stays over the content with its opacity cap. Drawn under the content, it covers nothing. */
+  underlaySlot(): { parent: HTMLElement; zIndex: number } | undefined;
   /** Explicit editing only: the player's video centre (minus its control bands) while no menu,
    * error or advert covers it. Unlike videoSlot it stays available when native controls appear in
    * the centre; those are cut from the clip and refused at input time instead. */
@@ -110,6 +115,7 @@ export function createOperationSource(
   /** The adapter's candidate test for an inserted subtree (the same selectors its incremental
    * discovery uses). Without it, every element added or removed is a layout change. */
   holdsCandidate?: (root: Element, deep?: boolean) => boolean,
+  underlaySlot: OperationSource['underlaySlot'] = () => undefined,
 ): OperationSource {
   if (!documentIds.has(doc)) documentIds.set(doc, ++nextDocumentId);
   const documentId = documentIds.get(doc)!;
@@ -604,6 +610,7 @@ export function createOperationSource(
         touched: [...touched].filter((element) => readRows.has(element) !== holdsCandidate?.(element, false)).length,
         pending,
       });
+    const g11Start = g11CaptureStart();
     stateDirty = false;
     forced = false;
     geometryDirty = false;
@@ -720,6 +727,7 @@ export function createOperationSource(
     });
     cached = seal(surfaces, scroll, { width: doc.defaultView!.innerWidth, height: doc.defaultView!.innerHeight });
     WW_GUARD_TRACE: traceGeometryRead(doc, cached, rows);
+    g11CaptureEnd(g11Start, surfaces.length);
     return cached;
   }
   /** Signs, numbers and freezes a read (a whole one, or one with replaced boxes): the geometry
@@ -915,6 +923,7 @@ export function createOperationSource(
     videoSlot,
     editorCentre,
     overlaySlot: verifiedOverlaySlot,
+    underlaySlot,
     pageSlot() {
       const overlay = verifiedOverlaySlot();
       if (!overlay || doc.fullscreenElement) return undefined;

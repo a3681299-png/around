@@ -1,3 +1,4 @@
+import { showArtwork } from './helpers/artwork';
 // G1.4: artwork that is not redrawn is still rechecked (docs/g14-plan.md). Codex's long-wait repro
 // (docs/g13-bound2-verification.md, 長く入力しない条件), unchanged: an opaque layer that follows the
 // pointer a little is drawn only when the pointer moves. After the first group's check (300ms) its
@@ -33,7 +34,7 @@ test('G1.4: a silent move stays protected through a longer interval without a ne
   );
   await youtube.reload();
   await expect(youtube.locator('#g13-second')).toBeVisible();
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
   const image = await youtube.evaluate(() => {

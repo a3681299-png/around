@@ -10,6 +10,7 @@ import type { TakeStorage } from '../timeline/types';
 import type { AssetPort } from '../assets/port';
 import { createOperationGuardHost, guardWanted, type OperationGuardHost } from './operation-guard';
 import { legacyPageChange } from '../diagnostics/page-change-probe';
+import { g11GuardDisabled, g11RegisterRefresh } from '../diagnostics/g11-hooks';
 
 /** The only base an artwork may still name: artwork saved while the retro theme existed (until
  * retro-theme-final) names it, and draws exactly as artwork with no base. */
@@ -50,12 +51,14 @@ export function createPageController(
     onSurfacesChanged?.(),
   );
   const timeline = createTimelineHost(doc, site.id, ports.takes);
-  const safety = site.operationSurfaces
-    ? createOperationGuardHost(doc, site.operationSurfaces(), (stop) => {
-        if (stop) images.holdSafety(stop === true ? undefined : stop);
-        images.refresh();
-      })
-    : undefined;
+  // g11GuardDisabled is false outside the G1 measurement build (src/diagnostics/g11-hooks.ts).
+  const safety =
+    site.operationSurfaces && !g11GuardDisabled()
+      ? createOperationGuardHost(doc, site.operationSurfaces(), (stop) => {
+          if (stop) images.holdSafety(stop === true ? undefined : stop);
+          images.refresh();
+        })
+      : undefined;
   const images = createImageRenderer(
     doc,
     ports.assets,
@@ -64,6 +67,7 @@ export function createPageController(
     timeline,
     safety,
   );
+  g11RegisterRefresh(() => images.refresh());
   let suspended = false,
     editing = false;
   // Observation starts only once settings and artwork call for it.

@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { showArtwork } from './helpers/artwork';
 import { writeFile } from 'node:fs/promises';
 import { test, expect } from './fixtures';
 import { openEditor } from './helpers/editor';
@@ -15,7 +16,7 @@ for (const viewport of [
     youtube,
   }, info) => {
     await youtube.setViewportSize(viewport);
-    await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    await showArtwork(popup);
     // The popup changes optimistically; authoring is enabled after the page receives the save.
     await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
     // UI0-d round 3: the in-page Studio's workbench is the editor window's own, at the same sizes.

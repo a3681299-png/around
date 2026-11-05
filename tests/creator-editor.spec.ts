@@ -1,4 +1,5 @@
 import { exposeEditorControls } from './helpers/editor-workspace';
+import { showArtwork } from './helpers/artwork';
 import type { Page, Locator } from '@playwright/test';
 import { test, expect } from './fixtures';
 import { openEditor as openEditorPage } from './helpers/editor';
@@ -9,7 +10,7 @@ const key = 'webWorldThemes.design.youtube';
 let editor: Locator | undefined;
 
 async function enable(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await expect(youtube.locator(cards).first()).toBeVisible();
 }
 
@@ -177,7 +178,7 @@ test('OFF and 緊急OFF remove editing UI, selection, styles, variables and surf
     ).toEqual(nativeCard);
     await expect(youtube.locator('ytd-thumbnail #thumbnail').first()).toHaveCSS('border-radius', '16px');
     if (boundary === 'off') {
-      await popup.getByRole('switch', { name: '作品を表示する' }).check();
+      await showArtwork(popup);
       await expect(youtube.locator(cards).first()).toHaveCSS('background-color', 'rgb(238, 221, 255)');
       dialog = await openEditor(popup, youtube);
       await selectCard(youtube);

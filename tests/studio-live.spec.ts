@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { showArtwork } from './helpers/artwork';
 import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -41,7 +42,7 @@ test('optional real signed-out YouTube: independent Studio creation, bidirection
     const youtube = await context.newPage();
     await youtube.setViewportSize({ width: 1280, height: 900 });
     await youtube.goto('https://www.youtube.com/watch?v=AS4q9yaWJkI', { waitUntil: 'domcontentloaded' });
-    await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    await showArtwork(popup);
     await expect(youtube.locator('[data-ww-surface~="player-window"]')).toBeVisible({ timeout: 20_000 });
     await youtube.bringToFront();
     const opened = context.waitForEvent('page');

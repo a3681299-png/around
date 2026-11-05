@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures';
+import { showArtwork } from './helpers/artwork';
 import { mkdtemp } from 'node:fs/promises';
 import path from 'node:path';
 import { openEditor } from './helpers/editor';
@@ -34,7 +35,7 @@ test('UI0-d rejects forged skin channels, slots, bytes and another target sessio
   youtube,
   extensionId,
 }, info) => {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   const { studio, panel } = await openEditor(popup, youtube);
   await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await expect(youtube.locator('[data-image-id]')).toHaveCount(1);
@@ -151,7 +152,7 @@ test('UI0-d native panel Undo and Redo each act once across both focus locations
     await popup.goto(`chrome-extension://${id}/popup/index.html`);
     const page = await context.newPage();
     await page.goto('https://www.youtube.com/watch?v=fixture');
-    await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    await showArtwork(popup);
     await page.bringToFront();
     const tab = await popup.evaluate(
       async () => (await chrome.tabs.query({ active: true, currentWindow: true }))[0]!.id!,

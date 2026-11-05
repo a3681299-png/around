@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { showArtwork } from './helpers/artwork';
 import { cp, mkdir, mkdtemp } from 'node:fs/promises';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
@@ -186,7 +187,7 @@ test('optional real YouTube side panel: covered input, resume, OFF and native em
       }));
     await expect.poll(clean).toEqual({ marks: [], drawn: [] });
     records.off = await clean();
-    await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    await showArtwork(popup);
     await expect(host.locator('[data-image-id]')).toHaveCount(1);
     await page.bringToFront();
     await nativeShortcut(page, profile, extension, 'Q');

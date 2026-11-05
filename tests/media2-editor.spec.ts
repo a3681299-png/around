@@ -1,4 +1,5 @@
 import { exposeEditorControls } from './helpers/editor-workspace';
+import { showArtwork } from './helpers/artwork';
 import path from 'node:path';
 import { build } from 'esbuild';
 import { readFile } from 'node:fs/promises';
@@ -13,7 +14,7 @@ const overlay = '#web-world-themes-decorations',
   layers = `${presentation} [data-image-id]`;
 const file = (name: string) => path.resolve(`tests/fixtures/motion/${name}`);
 async function open(popup: Page, page: Page) {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await page.bringToFront();
   const { panel } = await openEditor(popup, page);
   await exposeEditorControls(panel);

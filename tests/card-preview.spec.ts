@@ -1,4 +1,5 @@
 import type { Page } from '@playwright/test';
+import { showArtwork } from './helpers/artwork';
 import { test, expect } from './fixtures';
 import { openEditor } from './helpers/editor';
 
@@ -39,7 +40,7 @@ async function overlay(youtube: Page, tag: 'ytd-video-preview' | 'tp-yt-iron-dro
 const clicks = (youtube: Page) => youtube.locator('#g111-layer').evaluate((node: HTMLElement) => node.dataset.clicks);
 
 async function start(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await expect(youtube.locator(cards).first()).toBeVisible();
   return openEditor(popup, youtube);
 }

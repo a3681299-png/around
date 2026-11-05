@@ -1,4 +1,5 @@
 import { exposeEditorControls } from './helpers/editor-workspace';
+import { showArtwork } from './helpers/artwork';
 import { openEditor } from './helpers/editor';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -19,7 +20,7 @@ const cases = [
 
 for (const [index, scenario] of cases.entries())
   test(`media benchmark: ${scenario.name}`, async ({ popup, youtube, context }, info) => {
-    await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    await showArtwork(popup);
     await youtube.bringToFront();
     await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
     const { panel } = await openEditor(popup, youtube);

@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { showArtwork } from './helpers/artwork';
 import type { Page } from '@playwright/test';
 import { test, expect } from './fixtures';
 import { openEditor } from './helpers/editor';
@@ -7,7 +8,7 @@ const overlay = '#web-world-themes-decorations',
   images =
     ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]';
 async function open(popup: Page, page: Page) {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   // UI0-d round 3: the in-page Studio's workbench is the editor page's own (its window).
   return (await openEditor(popup, page)).panel;

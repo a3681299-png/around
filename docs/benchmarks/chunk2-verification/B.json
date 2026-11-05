@@ -1,0 +1,270 @@
+{
+  "environment": {
+    "os": "10.0.26300",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13650HX",
+    "url": "https://www.youtube.com/watch?v=LC1a-DwUhls"
+  },
+  "accepted": [],
+  "blocks": {},
+  "attempts": [
+    {
+      "pair": 1,
+      "side": "left",
+      "build": "fix",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "models": {
+        "mannequin": {
+          "duration": 0,
+          "bytes": 42640,
+          "selected": {
+            "clip": 0,
+            "timeMs": 0,
+            "playback": "playing",
+            "posePresent": false
+          }
+        }
+      },
+      "background": 5.245,
+      "valid": false,
+      "error": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('.connection-status')\nExpected: \u001b[32m\"\u001b[7mtru\u001b[27me\"\u001b[39m\nReceived: \u001b[31m\"\u001b[7mfals\u001b[27me\"\u001b[39m\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('.connection-status') with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('.connection-status')\u001b[22m\n\u001b[2m    3 × locator resolved to <span role=\"status\" aria-live=\"polite\" data-connected=\"false\" class=\"connection-status\">接続しています…</span>\u001b[22m\n\u001b[2m      - unexpected value \"false\"\u001b[22m\n\u001b[2m    30 × locator resolved to <span role=\"status\" aria-live=\"polite\" data-connected=\"false\" slot=\"connection-status\" class=\"connection-status\">保存する素材が見つかりません。</span>\u001b[22m\n\u001b[2m       - unexpected value \"false\"\u001b[22m\n",
+      "attempts": {
+        "quiet:startup": [
+          {
+            "valid": false,
+            "frameCount": 458,
+            "ad": 31,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 112,
+              "dropped": 0
+            }
+          },
+          {
+            "valid": true,
+            "frameCount": 435,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 109,
+              "dropped": 0
+            }
+          }
+        ],
+        "quiet:steady": [
+          {
+            "valid": true,
+            "frameCount": 864,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 141,
+              "dropped": 0
+            }
+          }
+        ],
+        "quiet:spa": [
+          {
+            "valid": true,
+            "frameCount": 737,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": null
+          }
+        ],
+        "mannequin:startup": [
+          {
+            "valid": true,
+            "frameCount": 351,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 15,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 107,
+              "dropped": 0
+            }
+          }
+        ],
+        "mannequin:steady": [
+          {
+            "valid": true,
+            "frameCount": 864,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 144,
+              "dropped": 0
+            }
+          }
+        ],
+        "mannequin:spa": [
+          {
+            "valid": true,
+            "frameCount": 751,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": null
+          }
+        ]
+      }
+    },
+    {
+      "pair": 1,
+      "side": "right",
+      "build": "head",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "models": {
+        "mannequin": {
+          "duration": 0,
+          "bytes": 42640,
+          "selected": {
+            "clip": 0,
+            "timeMs": 0,
+            "playback": "playing",
+            "posePresent": true
+          }
+        }
+      },
+      "background": 5.377,
+      "valid": false,
+      "error": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('.connection-status')\nExpected: \u001b[32m\"\u001b[7mtru\u001b[27me\"\u001b[39m\nReceived: \u001b[31m\"\u001b[7mfals\u001b[27me\"\u001b[39m\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" locator('.connection-status') with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('.connection-status')\u001b[22m\n\u001b[2m    2 × locator resolved to <span role=\"status\" aria-live=\"polite\" data-connected=\"false\" class=\"connection-status\">接続しています…</span>\u001b[22m\n\u001b[2m      - unexpected value \"false\"\u001b[22m\n\u001b[2m    31 × locator resolved to <span role=\"status\" aria-live=\"polite\" data-connected=\"false\" slot=\"connection-status\" class=\"connection-status\">保存する素材が見つかりません。</span>\u001b[22m\n\u001b[2m       - unexpected value \"false\"\u001b[22m\n",
+      "attempts": {
+        "quiet:startup": [
+          {
+            "valid": false,
+            "frameCount": 474,
+            "ad": 32,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 110,
+              "dropped": 0
+            }
+          },
+          {
+            "valid": true,
+            "frameCount": 402,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 102,
+              "dropped": 0
+            }
+          }
+        ],
+        "quiet:steady": [
+          {
+            "valid": true,
+            "frameCount": 864,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 143,
+              "dropped": 0
+            }
+          }
+        ],
+        "quiet:spa": [
+          {
+            "valid": true,
+            "frameCount": 721,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": null
+          }
+        ],
+        "mannequin:startup": [
+          {
+            "valid": true,
+            "frameCount": 470,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 21,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 115,
+              "dropped": 0
+            }
+          }
+        ],
+        "mannequin:steady": [
+          {
+            "valid": true,
+            "frameCount": 863,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 143,
+              "dropped": 0
+            }
+          }
+        ],
+        "mannequin:spa": [
+          {
+            "valid": true,
+            "frameCount": 749,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 39,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": null
+          }
+        ]
+      }
+    },
+    {
+      "pair": 2,
+      "side": "right",
+      "build": "head",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "background": 7.83,
+      "valid": false,
+      "attempts": {
+        "quiet:startup": [
+          {
+            "valid": false,
+            "frameCount": 361,
+            "ad": 29,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 0,
+            "video": {
+              "total": 148,
+              "dropped": 1
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

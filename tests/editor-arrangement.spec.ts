@@ -1,4 +1,5 @@
 import type { Locator, Page } from '@playwright/test';
+import { showArtwork } from './helpers/artwork';
 import { test, expect } from './fixtures';
 import { openEditor } from './helpers/editor';
 
@@ -11,7 +12,7 @@ import { openEditor } from './helpers/editor';
 const cards = '[data-ww-surface~="video-card"]';
 
 async function enable(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await expect(youtube.locator(cards).first()).toBeVisible();
 }
 const shown = (panel: Locator, selector: string) =>

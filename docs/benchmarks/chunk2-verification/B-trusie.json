@@ -1,0 +1,2214 @@
+{
+  "environment": {
+    "os": "10.0.26300",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13650HX",
+    "url": "https://www.youtube.com/watch?v=LC1a-DwUhls"
+  },
+  "accepted": [1, 2, 3, 4],
+  "blocks": {
+    "trusie:startup": {
+      "pairs": [
+        {
+          "pair": 1,
+          "order": ["left", "right"],
+          "left": {
+            "cpu": {
+              "n": 368,
+              "median": 1.1000000005587935,
+              "p95": 8.100000000558794,
+              "max": 43.69999999925494,
+              "total": 839.5999999931082
+            },
+            "clock": {
+              "start": 0,
+              "end": 6000,
+              "origin": 1793868190046.7,
+              "actualRafFrames": 367
+            },
+            "call": {
+              "n": 4208,
+              "median": 0,
+              "p95": 0.900000000372529,
+              "max": 38.39999999944121,
+              "total": 839.5999999931082,
+              "atLeast2": 47,
+              "atLeast5": 22,
+              "atLeast10": 9,
+              "atLeast16": 6
+            },
+            "gpu": {
+              "n": 15,
+              "median": 2.162447,
+              "p95": 2.525676,
+              "max": 2.525676,
+              "total": 30.486964000000004
+            },
+            "modelSamples": 15,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 108,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "load": 1,
+              "MutationObserver": 1077,
+              "promise": 2002,
+              "microtask": 403,
+              "raf": 665,
+              "ResizeObserver": 13,
+              "event": 13,
+              "event-property": 6,
+              "chrome-event": 9,
+              "setTimeout": 23
+            },
+            "valid": true
+          },
+          "right": {
+            "cpu": {
+              "n": 494,
+              "median": 0.900000000372529,
+              "p95": 4.800000000745058,
+              "max": 35.00000000093132,
+              "total": 789.6000000145286
+            },
+            "clock": {
+              "start": 0,
+              "end": 6000,
+              "origin": 1793868247723.7,
+              "actualRafFrames": 493
+            },
+            "call": {
+              "n": 4533,
+              "median": 0,
+              "p95": 0.900000000372529,
+              "max": 34.80000000074506,
+              "total": 789.6000000145286,
+              "atLeast2": 36,
+              "atLeast5": 14,
+              "atLeast10": 4,
+              "atLeast16": 2
+            },
+            "gpu": {
+              "n": 20,
+              "median": 1.5051815,
+              "p95": 1.948072,
+              "max": 2.943436,
+              "total": 29.925811999999993
+            },
+            "modelSamples": 20,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 122,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "load": 1,
+              "promise": 2004,
+              "microtask": 508,
+              "MutationObserver": 1078,
+              "raf": 888,
+              "ResizeObserver": 14,
+              "event": 12,
+              "event-property": 6,
+              "chrome-event": 9,
+              "setTimeout": 23
+            },
+            "valid": true
+          },
+          "delta": {
+            "median": -0.20000000018626451,
+            "p95": -3.2999999998137355,
+            "frames": 126,
+            "cpuTotal": -49.99999997857958
+          }
+        },
+        {
+          "pair": 2,
+          "order": ["right", "left"],
+          "left": {
+            "cpu": {
+              "n": 461,
+              "median": 1,
+              "p95": 5.5,
+              "max": 32.700000000186265,
+              "total": 787.5000000018626
+            },
+            "clock": {
+              "start": 0,
+              "end": 6000,
+              "origin": 1793868364111.5,
+              "actualRafFrames": 460
+            },
+            "call": {
+              "n": 4543,
+              "median": 0,
+              "p95": 0.7999999998137355,
+              "max": 31.200000000186265,
+              "total": 787.5000000018626,
+              "atLeast2": 40,
+              "atLeast5": 14,
+              "atLeast10": 6,
+              "atLeast16": 1
+            },
+            "gpu": {
+              "n": 13,
+              "median": 1.114218,
+              "p95": 4.841197,
+              "max": 4.841197,
+              "total": 22.924726000000003
+            },
+            "modelSamples": 14,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 115,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "load": 1,
+              "promise": 2002,
+              "event": 11,
+              "microtask": 497,
+              "MutationObserver": 1143,
+              "raf": 837,
+              "ResizeObserver": 13,
+              "event-property": 6,
+              "chrome-event": 9,
+              "setTimeout": 27
+            },
+            "valid": true
+          },
+          "right": {
+            "cpu": {
+              "n": 415,
+              "median": 1.2000000001862645,
+              "p95": 8.299999999813735,
+              "max": 46.10000000055879,
+              "total": 973.2000000029802
+            },
+            "clock": {
+              "start": 0,
+              "end": 6000,
+              "origin": 1793868303876.9,
+              "actualRafFrames": 414
+            },
+            "call": {
+              "n": 4393,
+              "median": 0,
+              "p95": 1.099999999627471,
+              "max": 40.299999999813735,
+              "total": 973.2000000029802,
+              "atLeast2": 60,
+              "atLeast5": 21,
+              "atLeast10": 10,
+              "atLeast16": 4
+            },
+            "gpu": {
+              "n": 19,
+              "median": 2.325103,
+              "p95": 8.887655,
+              "max": 8.887655,
+              "total": 50.791122
+            },
+            "modelSamples": 20,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 114,
+              "dropped": 1
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "load": 1,
+              "promise": 2008,
+              "event": 9,
+              "microtask": 457,
+              "MutationObserver": 1087,
+              "raf": 778,
+              "ResizeObserver": 16,
+              "event-property": 6,
+              "chrome-event": 9,
+              "setTimeout": 25
+            },
+            "valid": true
+          },
+          "delta": {
+            "median": 0.20000000018626451,
+            "p95": 2.7999999998137355,
+            "frames": -46,
+            "cpuTotal": 185.7000000011176
+          }
+        },
+        {
+          "pair": 3,
+          "order": ["left", "right"],
+          "left": {
+            "cpu": {
+              "n": 397,
+              "median": 1.1000000005587935,
+              "p95": 8.200000000186265,
+              "max": 40.40000000130385,
+              "total": 804.5999999688938
+            },
+            "clock": {
+              "start": 0,
+              "end": 6000,
+              "origin": 1793868427254.2,
+              "actualRafFrames": 396
+            },
+            "call": {
+              "n": 4390,
+              "median": 0,
+              "p95": 0.7999999998137355,
+              "max": 37.700000000186265,
+              "total": 804.5999999688938,
+              "atLeast2": 41,
+              "atLeast5": 19,
+              "atLeast10": 7,
+              "atLeast16": 3
+            },
+            "gpu": {
+              "n": 17,
+              "median": 1.464113,
+              "p95": 7.158332,
+              "max": 7.158332,
+              "total": 41.632475
+            },
+            "modelSamples": 17,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 104,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "load": 1,
+              "promise": 2006,
+              "event": 9,
+              "microtask": 437,
+              "MutationObserver": 1167,
+              "raf": 721,
+              "ResizeObserver": 13,
+              "event-property": 6,
+              "chrome-event": 9,
+              "setTimeout": 24
+            },
+            "valid": true
+          },
+          "right": {
+            "cpu": {
+              "n": 367,
+              "median": 1,
+              "p95": 8.200000000186265,
+              "max": 54.49999999906868,
+              "total": 806.0000000055879
+            },
+            "clock": {
+              "start": 0,
+              "end": 6000,
+              "origin": 1793868484271.5,
+              "actualRafFrames": 366
+            },
+            "call": {
+              "n": 4279,
+              "median": 0,
+              "p95": 0.7999999998137355,
+              "max": 38.5,
+              "total": 806.0000000055879,
+              "atLeast2": 44,
+              "atLeast5": 20,
+              "atLeast10": 9,
+              "atLeast16": 5
+            },
+            "gpu": {
+              "n": 16,
+              "median": 1.535624,
+              "p95": 3.151874,
+              "max": 3.151874,
+              "total": 24.905343
+            },
+            "modelSamples": 17,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 106,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "load": 1,
+              "promise": 2006,
+              "event": 11,
+              "microtask": 409,
+              "MutationObserver": 1118,
+              "raf": 684,
+              "ResizeObserver": 15,
+              "event-property": 6,
+              "chrome-event": 9,
+              "setTimeout": 23
+            },
+            "valid": true
+          },
+          "delta": {
+            "median": -0.10000000055879354,
+            "p95": 0,
+            "frames": -30,
+            "cpuTotal": 1.4000000366941094
+          }
+        },
+        {
+          "pair": 4,
+          "order": ["right", "left"],
+          "left": {
+            "cpu": {
+              "n": 408,
+              "median": 1.3999999994412065,
+              "p95": 8.099999999627471,
+              "max": 37.39999999944121,
+              "total": 976.4999999813735
+            },
+            "clock": {
+              "start": 0,
+              "end": 6000,
+              "origin": 1793868601077.5,
+              "actualRafFrames": 407
+            },
+            "call": {
+              "n": 4403,
+              "median": 0,
+              "p95": 1.2000000001862645,
+              "max": 36,
+              "total": 976.4999999813735,
+              "atLeast2": 70,
+              "atLeast5": 16,
+              "atLeast10": 10,
+              "atLeast16": 4
+            },
+            "gpu": {
+              "n": 14,
+              "median": 1.9111704999999999,
+              "p95": 5.773175,
+              "max": 5.773175,
+              "total": 32.450345
+            },
+            "modelSamples": 20,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 115,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "load": 1,
+              "promise": 2004,
+              "event": 11,
+              "microtask": 444,
+              "MutationObserver": 1145,
+              "raf": 745,
+              "ResizeObserver": 14,
+              "event-property": 6,
+              "chrome-event": 9,
+              "setTimeout": 27
+            },
+            "valid": true
+          },
+          "right": {
+            "cpu": {
+              "n": 261,
+              "median": 1.7000000001862645,
+              "p95": 14.299999999813735,
+              "max": 69.3999999994412,
+              "total": 957.1999999955297
+            },
+            "clock": {
+              "start": 0,
+              "end": 6000,
+              "origin": 1793868539713.2,
+              "actualRafFrames": 260
+            },
+            "call": {
+              "n": 3911,
+              "median": 0,
+              "p95": 1.2999999998137355,
+              "max": 60.700000000186265,
+              "total": 957.1999999955297,
+              "atLeast2": 85,
+              "atLeast5": 25,
+              "atLeast10": 15,
+              "atLeast16": 5
+            },
+            "gpu": {
+              "n": 12,
+              "median": 5.895467,
+              "p95": 5.895467,
+              "max": 5.895467,
+              "total": 53.44503399999999
+            },
+            "modelSamples": 13,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 103,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "load": 1,
+              "promise": 2002,
+              "event": 11,
+              "microtask": 295,
+              "MutationObserver": 1074,
+              "raf": 477,
+              "ResizeObserver": 17,
+              "event-property": 6,
+              "setTimeout": 22,
+              "chrome-event": 9
+            },
+            "valid": true
+          },
+          "delta": {
+            "median": 0.30000000074505806,
+            "p95": 6.2000000001862645,
+            "frames": -147,
+            "cpuTotal": -19.299999985843897
+          }
+        }
+      ],
+      "left": {
+        "cpu": {
+          "n": 1634,
+          "min": 0,
+          "median": 1.1000000005587935,
+          "p95": 7.300000000745058,
+          "max": 43.69999999925494,
+          "sum": 3408.1999999452382
+        },
+        "calls": {
+          "n": 17544,
+          "min": 0,
+          "median": 0,
+          "p95": 0.900000000372529,
+          "max": 38.39999999944121,
+          "sum": 3408.1999999452382
+        },
+        "rafIntervalMs": {
+          "n": 1626,
+          "min": 5.400000000000546,
+          "median": 7,
+          "p95": 41.29999999999973,
+          "max": 534.7,
+          "sum": 20865.59999999999
+        },
+        "gpu": {
+          "n": 59,
+          "min": 0.811092,
+          "median": 1.749739,
+          "p95": 5.594009,
+          "max": 7.158332,
+          "sum": 127.49451000000005
+        },
+        "video": {
+          "n": 4,
+          "total": 442,
+          "dropped": 0
+        },
+        "realFrames": {
+          "n": 4,
+          "min": 367,
+          "median": 401.5,
+          "p95": 460,
+          "max": 460,
+          "sum": 1630
+        }
+      },
+      "right": {
+        "cpu": {
+          "n": 1537,
+          "min": 0,
+          "median": 1.1000000005587935,
+          "p95": 8.299999999813735,
+          "max": 69.3999999994412,
+          "sum": 3526.0000000186265
+        },
+        "calls": {
+          "n": 17116,
+          "min": 0,
+          "median": 0,
+          "p95": 1,
+          "max": 60.700000000186265,
+          "sum": 3526.0000000186265
+        },
+        "rafIntervalMs": {
+          "n": 1529,
+          "min": 6,
+          "median": 7,
+          "p95": 41.80000000000018,
+          "max": 604.0999999999999,
+          "sum": 21038.29999999999
+        },
+        "gpu": {
+          "n": 67,
+          "min": 0.446509,
+          "median": 1.674739,
+          "p95": 5.895467,
+          "max": 8.887655,
+          "sum": 159.06731100000002
+        },
+        "video": {
+          "n": 4,
+          "total": 445,
+          "dropped": 1
+        },
+        "realFrames": {
+          "n": 4,
+          "min": 260,
+          "median": 390,
+          "p95": 493,
+          "max": 493,
+          "sum": 1533
+        }
+      },
+      "delta": {
+        "median": 0,
+        "p95": 0.9999999990686774
+      },
+      "pairedP95": {
+        "n": 4,
+        "min": -3.2999999998137355,
+        "median": 1.3999999999068677,
+        "p95": 6.2000000001862645,
+        "max": 6.2000000001862645,
+        "sum": 5.7000000001862645
+      },
+      "absolutePairedP95": {
+        "n": 4,
+        "min": 0,
+        "median": 3.0499999998137355,
+        "p95": 6.2000000001862645,
+        "max": 6.2000000001862645,
+        "sum": 12.299999999813735
+      }
+    },
+    "trusie:steady": {
+      "pairs": [
+        {
+          "pair": 1,
+          "order": ["left", "right"],
+          "left": {
+            "cpu": {
+              "n": 865,
+              "median": 0.900000000372529,
+              "p95": 2.1000000005587935,
+              "max": 9.200000000186265,
+              "total": 933.900000021793
+            },
+            "clock": {
+              "start": 14204.099999999627,
+              "end": 20204.099999999627,
+              "origin": 1793868190046.7,
+              "actualRafFrames": 864
+            },
+            "call": {
+              "n": 2617,
+              "median": 0,
+              "p95": 1.2999999998137355,
+              "max": 9.100000000558794,
+              "total": 933.900000021793,
+              "atLeast2": 19,
+              "atLeast5": 1,
+              "atLeast10": 0,
+              "atLeast16": 0
+            },
+            "gpu": {
+              "n": 40,
+              "median": 1.2393995,
+              "p95": 2.563749,
+              "max": 3.167707,
+              "total": 59.404634
+            },
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 142,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "raf": 1734,
+              "microtask": 867,
+              "setTimeout": 25
+            },
+            "valid": true
+          },
+          "right": {
+            "cpu": {
+              "n": 864,
+              "median": 0.7999999998137355,
+              "p95": 1.8999999994412065,
+              "max": 3.7999999998137355,
+              "total": 829.6000000052154
+            },
+            "clock": {
+              "start": 14169.200000000186,
+              "end": 20169.200000000186,
+              "origin": 1793868247723.7,
+              "actualRafFrames": 863
+            },
+            "call": {
+              "n": 2614,
+              "median": 0,
+              "p95": 1,
+              "max": 3.7000000001862645,
+              "total": 829.6000000052154,
+              "atLeast2": 8,
+              "atLeast5": 0,
+              "atLeast10": 0,
+              "atLeast16": 0
+            },
+            "gpu": {
+              "n": 40,
+              "median": 1.2167949999999998,
+              "p95": 2.169218,
+              "max": 2.878541,
+              "total": 50.951669
+            },
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 143,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "raf": 1728,
+              "microtask": 864,
+              "setTimeout": 25
+            },
+            "valid": true
+          },
+          "delta": {
+            "median": -0.10000000055879354,
+            "p95": -0.2000000011175871,
+            "frames": -1,
+            "cpuTotal": -104.30000001657754
+          }
+        },
+        {
+          "pair": 2,
+          "order": ["right", "left"],
+          "left": {
+            "cpu": {
+              "n": 864,
+              "median": 0.7999999998137355,
+              "p95": 1.7000000001862645,
+              "max": 6,
+              "total": 764.5999999931082
+            },
+            "clock": {
+              "start": 14115.900000000373,
+              "end": 20115.900000000373,
+              "origin": 1793868364111.5,
+              "actualRafFrames": 863
+            },
+            "call": {
+              "n": 2614,
+              "median": 0,
+              "p95": 0.900000000372529,
+              "max": 4.8999999994412065,
+              "total": 764.5999999931082,
+              "atLeast2": 8,
+              "atLeast5": 0,
+              "atLeast10": 0,
+              "atLeast16": 0
+            },
+            "gpu": {
+              "n": 40,
+              "median": 1.1091395,
+              "p95": 1.675051,
+              "max": 2.302291,
+              "total": 45.54796899999999
+            },
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 144,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "raf": 1728,
+              "microtask": 864,
+              "setTimeout": 25
+            },
+            "valid": true
+          },
+          "right": {
+            "cpu": {
+              "n": 865,
+              "median": 0.8999999994412065,
+              "p95": 2.099999999627471,
+              "max": 5.3999999994412065,
+              "total": 890.7000000067055
+            },
+            "clock": {
+              "start": 14132.700000000186,
+              "end": 20132.700000000186,
+              "origin": 1793868303876.9,
+              "actualRafFrames": 864
+            },
+            "call": {
+              "n": 2617,
+              "median": 0,
+              "p95": 1.1000000005587935,
+              "max": 5,
+              "total": 890.7000000067055,
+              "atLeast2": 8,
+              "atLeast5": 1,
+              "atLeast10": 0,
+              "atLeast16": 0
+            },
+            "gpu": {
+              "n": 40,
+              "median": 1.2069,
+              "p95": 2.129374,
+              "max": 4.566041,
+              "total": 55.04213999999999
+            },
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 144,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "raf": 1730,
+              "microtask": 865,
+              "setTimeout": 25
+            },
+            "valid": true
+          },
+          "delta": {
+            "median": 0.09999999962747097,
+            "p95": 0.39999999944120646,
+            "frames": 1,
+            "cpuTotal": 126.10000001359731
+          }
+        },
+        {
+          "pair": 3,
+          "order": ["left", "right"],
+          "left": {
+            "cpu": {
+              "n": 866,
+              "median": 0.8000000007450581,
+              "p95": 1.900000000372529,
+              "max": 4.8999999994412065,
+              "total": 864.0000000074506
+            },
+            "clock": {
+              "start": 14132,
+              "end": 20132,
+              "origin": 1793868427254.2,
+              "actualRafFrames": 865
+            },
+            "call": {
+              "n": 2616,
+              "median": 0,
+              "p95": 1.1000000005587935,
+              "max": 4.8999999994412065,
+              "total": 864.0000000074506,
+              "atLeast2": 13,
+              "atLeast5": 0,
+              "atLeast10": 0,
+              "atLeast16": 0
+            },
+            "gpu": {
+              "n": 40,
+              "median": 1.2215095,
+              "p95": 2.284687,
+              "max": 3.32703,
+              "total": 52.518023
+            },
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 144,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "raf": 1730,
+              "microtask": 865,
+              "setTimeout": 24
+            },
+            "valid": true
+          },
+          "right": {
+            "cpu": {
+              "n": 865,
+              "median": 0.8000000007450581,
+              "p95": 2,
+              "max": 6,
+              "total": 883.8999999938533
+            },
+            "clock": {
+              "start": 14117,
+              "end": 20117,
+              "origin": 1793868484271.5,
+              "actualRafFrames": 864
+            },
+            "call": {
+              "n": 2617,
+              "median": 0,
+              "p95": 1.099999999627471,
+              "max": 6,
+              "total": 883.8999999938533,
+              "atLeast2": 7,
+              "atLeast5": 1,
+              "atLeast10": 0,
+              "atLeast16": 0
+            },
+            "gpu": {
+              "n": 40,
+              "median": 1.3621604999999999,
+              "p95": 1.61104,
+              "max": 1.894582,
+              "total": 52.33255799999999
+            },
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 142,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "raf": 1730,
+              "microtask": 865,
+              "setTimeout": 25
+            },
+            "valid": true
+          },
+          "delta": {
+            "median": 0,
+            "p95": 0.09999999962747097,
+            "frames": -1,
+            "cpuTotal": 19.89999998640269
+          }
+        },
+        {
+          "pair": 4,
+          "order": ["right", "left"],
+          "left": {
+            "cpu": {
+              "n": 865,
+              "median": 0.900000000372529,
+              "p95": 2.2000000001862645,
+              "max": 9.099999999627471,
+              "total": 937.2999999988824
+            },
+            "clock": {
+              "start": 14119.200000000186,
+              "end": 20119.200000000186,
+              "origin": 1793868601077.5,
+              "actualRafFrames": 864
+            },
+            "call": {
+              "n": 2619,
+              "median": 0,
+              "p95": 1.2999999998137355,
+              "max": 9.099999999627471,
+              "total": 937.2999999988824,
+              "atLeast2": 17,
+              "atLeast5": 1,
+              "atLeast10": 0,
+              "atLeast16": 0
+            },
+            "gpu": {
+              "n": 40,
+              "median": 1.2814830000000001,
+              "p95": 2.237811,
+              "max": 6.306666,
+              "total": 59.58948400000001
+            },
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 143,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "raf": 1730,
+              "microtask": 865,
+              "setTimeout": 25
+            },
+            "valid": true
+          },
+          "right": {
+            "cpu": {
+              "n": 865,
+              "median": 0.7999999998137355,
+              "p95": 1.8999999994412065,
+              "max": 4,
+              "total": 825.9999999953434
+            },
+            "clock": {
+              "start": 14119,
+              "end": 20119,
+              "origin": 1793868539713.2,
+              "actualRafFrames": 864
+            },
+            "call": {
+              "n": 2617,
+              "median": 0,
+              "p95": 1,
+              "max": 3.099999999627471,
+              "total": 825.9999999953434,
+              "atLeast2": 5,
+              "atLeast5": 0,
+              "atLeast10": 0,
+              "atLeast16": 0
+            },
+            "gpu": {
+              "n": 40,
+              "median": 1.253384,
+              "p95": 1.91828,
+              "max": 2.15177,
+              "total": 52.80109700000001
+            },
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 144,
+              "dropped": 0
+            },
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "raf": 1730,
+              "microtask": 865,
+              "setTimeout": 25
+            },
+            "valid": true
+          },
+          "delta": {
+            "median": -0.10000000055879354,
+            "p95": -0.30000000074505806,
+            "frames": 0,
+            "cpuTotal": -111.30000000353903
+          }
+        }
+      ],
+      "left": {
+        "cpu": {
+          "n": 3460,
+          "min": 0,
+          "median": 0.8000000007450581,
+          "p95": 2,
+          "max": 9.200000000186265,
+          "sum": 3499.800000021234
+        },
+        "calls": {
+          "n": 10466,
+          "min": 0,
+          "median": 0,
+          "p95": 1.1000000005587935,
+          "max": 9.100000000558794,
+          "sum": 3499.800000021234
+        },
+        "rafIntervalMs": {
+          "n": 3452,
+          "min": 5.799999999999272,
+          "median": 6.900000000001455,
+          "p95": 7.200000000000728,
+          "max": 13.399999999999636,
+          "sum": 23976.099999999817
+        },
+        "gpu": {
+          "n": 160,
+          "min": 0.428749,
+          "median": 1.2195559999999999,
+          "p95": 2.349634,
+          "max": 6.306666,
+          "sum": 217.06011000000004
+        },
+        "video": {
+          "n": 4,
+          "total": 573,
+          "dropped": 0
+        },
+        "realFrames": {
+          "n": 4,
+          "min": 863,
+          "median": 864,
+          "p95": 865,
+          "max": 865,
+          "sum": 3456
+        }
+      },
+      "right": {
+        "cpu": {
+          "n": 3459,
+          "min": 0,
+          "median": 0.7999999998137355,
+          "p95": 2,
+          "max": 6,
+          "sum": 3430.2000000011176
+        },
+        "calls": {
+          "n": 10465,
+          "min": 0,
+          "median": 0,
+          "p95": 1.099999999627471,
+          "max": 6,
+          "sum": 3430.2000000011176
+        },
+        "rafIntervalMs": {
+          "n": 3451,
+          "min": 5.399999999999636,
+          "median": 6.900000000001455,
+          "p95": 7.200000000000728,
+          "max": 13.799999999999272,
+          "sum": 23969.199999999793
+        },
+        "gpu": {
+          "n": 160,
+          "min": 0.42104,
+          "median": 1.2671085,
+          "p95": 2.029791,
+          "max": 4.566041,
+          "sum": 211.12746399999997
+        },
+        "video": {
+          "n": 4,
+          "total": 573,
+          "dropped": 0
+        },
+        "realFrames": {
+          "n": 4,
+          "min": 863,
+          "median": 864,
+          "p95": 864,
+          "max": 864,
+          "sum": 3455
+        }
+      },
+      "delta": {
+        "median": -9.313225746154785e-10,
+        "p95": 0
+      },
+      "pairedP95": {
+        "n": 4,
+        "min": -0.30000000074505806,
+        "median": -0.05000000074505806,
+        "p95": 0.39999999944120646,
+        "max": 0.39999999944120646,
+        "sum": -2.7939677238464355e-9
+      },
+      "absolutePairedP95": {
+        "n": 4,
+        "min": 0.09999999962747097,
+        "median": 0.2500000009313226,
+        "p95": 0.39999999944120646,
+        "max": 0.39999999944120646,
+        "sum": 1.0000000009313226
+      }
+    },
+    "trusie:spa": {
+      "pairs": [
+        {
+          "pair": 1,
+          "order": ["left", "right"],
+          "left": {
+            "cpu": {
+              "n": 633,
+              "median": 0,
+              "p95": 4.2000000001862645,
+              "max": 30.90000000130385,
+              "total": 598.0999999921769
+            },
+            "clock": {
+              "start": 20341.5,
+              "end": 26341.5,
+              "origin": 1793868190046.7,
+              "actualRafFrames": 632
+            },
+            "call": {
+              "n": 810,
+              "median": 0.09999999962747097,
+              "p95": 3.5,
+              "max": 17.600000000558794,
+              "total": 598.0999999921769,
+              "atLeast2": 98,
+              "atLeast5": 21,
+              "atLeast10": 11,
+              "atLeast16": 1
+            },
+            "gpu": {
+              "n": 39,
+              "median": 2.593228,
+              "p95": 2.593228,
+              "max": 2.593228,
+              "total": 101.1358919999999
+            },
+            "modelSamples": 39,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": null,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "raf": 215,
+              "microtask": 129,
+              "event": 16,
+              "MutationObserver": 417,
+              "ResizeObserver": 14,
+              "setTimeout": 19
+            },
+            "valid": true
+          },
+          "right": {
+            "cpu": {
+              "n": 746,
+              "median": 0,
+              "p95": 1.5,
+              "max": 21.500000000931323,
+              "total": 280.50000001117587
+            },
+            "clock": {
+              "start": 20265.5,
+              "end": 26265.5,
+              "origin": 1793868247723.7,
+              "actualRafFrames": 745
+            },
+            "call": {
+              "n": 600,
+              "median": 0.09999999962747097,
+              "p95": 1.6000000005587935,
+              "max": 17.299999999813735,
+              "total": 280.50000001117587,
+              "atLeast2": 24,
+              "atLeast5": 10,
+              "atLeast10": 2,
+              "atLeast16": 1
+            },
+            "gpu": {
+              "n": 40,
+              "median": 1.367707,
+              "p95": 1.367707,
+              "max": 1.367707,
+              "total": 54.70828000000004
+            },
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": null,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "raf": 156,
+              "microtask": 106,
+              "event": 16,
+              "MutationObserver": 300,
+              "ResizeObserver": 10,
+              "setTimeout": 12
+            },
+            "valid": true
+          },
+          "delta": {
+            "median": 0,
+            "p95": -2.7000000001862645,
+            "frames": 113,
+            "cpuTotal": -317.599999981001
+          }
+        },
+        {
+          "pair": 2,
+          "order": ["right", "left"],
+          "left": {
+            "cpu": {
+              "n": 742,
+              "median": 0,
+              "p95": 1.300000000745058,
+              "max": 22.399999998509884,
+              "total": 226.49999999720603
+            },
+            "clock": {
+              "start": 20250.200000000186,
+              "end": 26250.200000000186,
+              "origin": 1793868364111.5,
+              "actualRafFrames": 741
+            },
+            "call": {
+              "n": 520,
+              "median": 0,
+              "p95": 2.199999999254942,
+              "max": 12.100000000558794,
+              "total": 226.49999999720603,
+              "atLeast2": 32,
+              "atLeast5": 9,
+              "atLeast10": 1,
+              "atLeast16": 0
+            },
+            "gpu": {
+              "n": 39,
+              "median": 1.280624,
+              "p95": 1.280624,
+              "max": 1.280624,
+              "total": 49.944336000000035
+            },
+            "modelSamples": 39,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": null,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "raf": 110,
+              "microtask": 60,
+              "event": 16,
+              "MutationObserver": 312,
+              "ResizeObserver": 10,
+              "setTimeout": 12
+            },
+            "valid": true
+          },
+          "right": {
+            "cpu": {
+              "n": 806,
+              "median": 0,
+              "p95": 0.40000000037252903,
+              "max": 22.399999999441206,
+              "total": 166.5000000037253
+            },
+            "clock": {
+              "start": 20246.299999999814,
+              "end": 26246.299999999814,
+              "origin": 1793868303876.9,
+              "actualRafFrames": 805
+            },
+            "call": {
+              "n": 366,
+              "median": 0.09999999962747097,
+              "p95": 2,
+              "max": 21,
+              "total": 166.5000000037253,
+              "atLeast2": 20,
+              "atLeast5": 8,
+              "atLeast10": 3,
+              "atLeast16": 1
+            },
+            "gpu": {
+              "n": 40,
+              "median": 1.193436,
+              "p95": 1.193436,
+              "max": 1.193436,
+              "total": 47.73743999999996
+            },
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": null,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "raf": 62,
+              "microtask": 38,
+              "event": 15,
+              "MutationObserver": 234,
+              "ResizeObserver": 8,
+              "setTimeout": 9
+            },
+            "valid": true
+          },
+          "delta": {
+            "median": 0,
+            "p95": -0.900000000372529,
+            "frames": 64,
+            "cpuTotal": -59.99999999348074
+          }
+        },
+        {
+          "pair": 3,
+          "order": ["left", "right"],
+          "left": {
+            "cpu": {
+              "n": 746,
+              "median": 0,
+              "p95": 1.5,
+              "max": 21.59999999962747,
+              "total": 228.3999999947846
+            },
+            "clock": {
+              "start": 20251.400000000373,
+              "end": 26251.400000000373,
+              "origin": 1793868427254.2,
+              "actualRafFrames": 745
+            },
+            "call": {
+              "n": 489,
+              "median": 0.09999999962747097,
+              "p95": 2.1000000005587935,
+              "max": 16,
+              "total": 228.3999999947846,
+              "atLeast2": 30,
+              "atLeast5": 10,
+              "atLeast10": 1,
+              "atLeast16": 1
+            },
+            "gpu": {
+              "n": 40,
+              "median": 1.56302,
+              "p95": 1.56302,
+              "max": 1.56302,
+              "total": 62.520800000000044
+            },
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": null,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "raf": 94,
+              "microtask": 46,
+              "event": 16,
+              "MutationObserver": 310,
+              "ResizeObserver": 10,
+              "setTimeout": 13
+            },
+            "valid": true
+          },
+          "right": {
+            "cpu": {
+              "n": 744,
+              "median": 0,
+              "p95": 1.1000000005587935,
+              "max": 23.699999999254942,
+              "total": 238.4000000068918
+            },
+            "clock": {
+              "start": 20248.10000000056,
+              "end": 26248.10000000056,
+              "origin": 1793868484271.5,
+              "actualRafFrames": 743
+            },
+            "call": {
+              "n": 532,
+              "median": 0.09999999962747097,
+              "p95": 2,
+              "max": 11.599999999627471,
+              "total": 238.4000000068918,
+              "atLeast2": 27,
+              "atLeast5": 11,
+              "atLeast10": 3,
+              "atLeast16": 0
+            },
+            "gpu": {
+              "n": 39,
+              "median": 1.099478,
+              "p95": 1.099478,
+              "max": 1.099478,
+              "total": 42.87964199999999
+            },
+            "modelSamples": 39,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": null,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "MutationObserver": 328,
+              "raf": 109,
+              "microtask": 55,
+              "event": 16,
+              "ResizeObserver": 11,
+              "setTimeout": 13
+            },
+            "valid": true
+          },
+          "delta": {
+            "median": 0,
+            "p95": -0.39999999944120646,
+            "frames": -2,
+            "cpuTotal": 10.000000012107193
+          }
+        },
+        {
+          "pair": 4,
+          "order": ["right", "left"],
+          "left": {
+            "cpu": {
+              "n": 730,
+              "median": 0,
+              "p95": 1.6000000005587935,
+              "max": 23.799999999813735,
+              "total": 254.89999999571592
+            },
+            "clock": {
+              "start": 20217.599999999627,
+              "end": 26217.599999999627,
+              "origin": 1793868601077.5,
+              "actualRafFrames": 729
+            },
+            "call": {
+              "n": 512,
+              "median": 0,
+              "p95": 2.2000000001862645,
+              "max": 22.59999999962747,
+              "total": 254.89999999571592,
+              "atLeast2": 32,
+              "atLeast5": 11,
+              "atLeast10": 3,
+              "atLeast16": 1
+            },
+            "gpu": {
+              "n": 39,
+              "median": 1.171614,
+              "p95": 1.171614,
+              "max": 1.171614,
+              "total": 45.69294599999996
+            },
+            "modelSamples": 39,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": null,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "raf": 93,
+              "microtask": 43,
+              "event": 16,
+              "MutationObserver": 337,
+              "ResizeObserver": 11,
+              "setTimeout": 12
+            },
+            "valid": true
+          },
+          "right": {
+            "cpu": {
+              "n": 738,
+              "median": 0,
+              "p95": 1.7999999998137355,
+              "max": 22.300000000745058,
+              "total": 244.00000000651926
+            },
+            "clock": {
+              "start": 20231.400000000373,
+              "end": 26231.400000000373,
+              "origin": 1793868539713.2,
+              "actualRafFrames": 737
+            },
+            "call": {
+              "n": 548,
+              "median": 0.049999999813735485,
+              "p95": 2,
+              "max": 13.400000000372529,
+              "total": 244.00000000651926,
+              "atLeast2": 29,
+              "atLeast5": 12,
+              "atLeast10": 1,
+              "atLeast16": 0
+            },
+            "gpu": {
+              "n": 40,
+              "median": 0.969738,
+              "p95": 0.969738,
+              "max": 0.969738,
+              "total": 38.78951999999999
+            },
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": null,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "kinds": {
+              "raf": 107,
+              "microtask": 55,
+              "event": 16,
+              "MutationObserver": 346,
+              "ResizeObserver": 11,
+              "setTimeout": 13
+            },
+            "valid": true
+          },
+          "delta": {
+            "median": 0,
+            "p95": 0.19999999925494194,
+            "frames": 8,
+            "cpuTotal": -10.899999989196658
+          }
+        }
+      ],
+      "left": {
+        "cpu": {
+          "n": 2851,
+          "min": 0,
+          "median": 0,
+          "p95": 2.5,
+          "max": 30.90000000130385,
+          "sum": 1307.8999999798834
+        },
+        "calls": {
+          "n": 2331,
+          "min": 0,
+          "median": 0.09999999962747097,
+          "p95": 2.7999999998137355,
+          "max": 22.59999999962747,
+          "sum": 1307.8999999798834
+        },
+        "rafIntervalMs": {
+          "n": 2843,
+          "min": 5.700000000000728,
+          "median": 6.900000000001455,
+          "p95": 7.400000000001455,
+          "max": 305.5,
+          "sum": 23969
+        },
+        "gpu": {
+          "n": 157,
+          "min": 1.171614,
+          "median": 1.56302,
+          "p95": 2.593228,
+          "max": 2.593228,
+          "sum": 259.2939740000003
+        },
+        "video": {
+          "n": 0,
+          "total": 0,
+          "dropped": 0
+        },
+        "realFrames": {
+          "n": 4,
+          "min": 632,
+          "median": 735,
+          "p95": 745,
+          "max": 745,
+          "sum": 2847
+        }
+      },
+      "right": {
+        "cpu": {
+          "n": 3034,
+          "min": 0,
+          "median": 0,
+          "p95": 1.2999999998137355,
+          "max": 23.699999999254942,
+          "sum": 929.4000000283122
+        },
+        "calls": {
+          "n": 2046,
+          "min": 0,
+          "median": 0.09999999962747097,
+          "p95": 1.900000000372529,
+          "max": 21,
+          "sum": 929.4000000283122
+        },
+        "rafIntervalMs": {
+          "n": 3026,
+          "min": 5.80000000000291,
+          "median": 7,
+          "p95": 7.399999999997817,
+          "max": 188,
+          "sum": 23969.4
+        },
+        "gpu": {
+          "n": 159,
+          "min": 0.969738,
+          "median": 1.193436,
+          "p95": 1.367707,
+          "max": 1.367707,
+          "sum": 184.11488200000005
+        },
+        "video": {
+          "n": 0,
+          "total": 0,
+          "dropped": 0
+        },
+        "realFrames": {
+          "n": 4,
+          "min": 737,
+          "median": 744,
+          "p95": 805,
+          "max": 805,
+          "sum": 3030
+        }
+      },
+      "delta": {
+        "median": 0,
+        "p95": -1.2000000001862645
+      },
+      "pairedP95": {
+        "n": 4,
+        "min": -2.7000000001862645,
+        "median": -0.6499999999068677,
+        "p95": 0.19999999925494194,
+        "max": 0.19999999925494194,
+        "sum": -3.800000000745058
+      },
+      "absolutePairedP95": {
+        "n": 4,
+        "min": 0.19999999925494194,
+        "median": 0.6499999999068677,
+        "p95": 2.7000000001862645,
+        "max": 2.7000000001862645,
+        "sum": 4.199999999254942
+      }
+    }
+  },
+  "attempts": [
+    {
+      "pair": 1,
+      "side": "left",
+      "build": "fix",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "models": {
+        "trusie": {
+          "duration": 10.666666984558105,
+          "bytes": 1537484,
+          "selected": {
+            "clip": 0,
+            "timeMs": 1753.9330154426389,
+            "playback": "playing",
+            "posePresent": false
+          }
+        }
+      },
+      "background": 5.832,
+      "valid": true,
+      "attempts": {
+        "trusie:startup": [
+          {
+            "valid": true,
+            "frameCount": 367,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 15,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 108,
+              "dropped": 0
+            }
+          }
+        ],
+        "trusie:steady": [
+          {
+            "valid": true,
+            "frameCount": 864,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 142,
+              "dropped": 0
+            }
+          }
+        ],
+        "trusie:spa": [
+          {
+            "valid": true,
+            "frameCount": 632,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 39,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": null
+          }
+        ]
+      }
+    },
+    {
+      "pair": 1,
+      "side": "right",
+      "build": "head",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "models": {
+        "trusie": {
+          "duration": 10.666666984558105,
+          "bytes": 1537484,
+          "selected": {
+            "clip": 0,
+            "timeMs": 1951.9330154422678,
+            "playback": "playing",
+            "posePresent": true
+          }
+        }
+      },
+      "background": 4.56,
+      "valid": true,
+      "attempts": {
+        "trusie:startup": [
+          {
+            "valid": true,
+            "frameCount": 493,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 20,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 122,
+              "dropped": 0
+            }
+          }
+        ],
+        "trusie:steady": [
+          {
+            "valid": true,
+            "frameCount": 863,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 143,
+              "dropped": 0
+            }
+          }
+        ],
+        "trusie:spa": [
+          {
+            "valid": true,
+            "frameCount": 745,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": null
+          }
+        ]
+      }
+    },
+    {
+      "pair": 2,
+      "side": "left",
+      "build": "fix",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "models": {
+        "trusie": {
+          "duration": 10.666666984558105,
+          "bytes": 1537484,
+          "selected": {
+            "clip": 0,
+            "timeMs": 1988.1330154418938,
+            "playback": "playing",
+            "posePresent": false
+          }
+        }
+      },
+      "background": 5.676,
+      "valid": true,
+      "attempts": {
+        "trusie:startup": [
+          {
+            "valid": true,
+            "frameCount": 460,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 14,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 115,
+              "dropped": 0
+            }
+          }
+        ],
+        "trusie:steady": [
+          {
+            "valid": true,
+            "frameCount": 863,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 144,
+              "dropped": 0
+            }
+          }
+        ],
+        "trusie:spa": [
+          {
+            "valid": true,
+            "frameCount": 741,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 39,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": null
+          }
+        ]
+      }
+    },
+    {
+      "pair": 2,
+      "side": "right",
+      "build": "head",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "models": {
+        "trusie": {
+          "duration": 10.666666984558105,
+          "bytes": 1537484,
+          "selected": {
+            "clip": 0,
+            "timeMs": 1988.9330154420804,
+            "playback": "playing",
+            "posePresent": true
+          }
+        }
+      },
+      "background": 3.573,
+      "valid": true,
+      "attempts": {
+        "trusie:startup": [
+          {
+            "valid": true,
+            "frameCount": 414,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 20,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 114,
+              "dropped": 1
+            }
+          }
+        ],
+        "trusie:steady": [
+          {
+            "valid": true,
+            "frameCount": 864,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 144,
+              "dropped": 0
+            }
+          }
+        ],
+        "trusie:spa": [
+          {
+            "valid": true,
+            "frameCount": 805,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": null
+          }
+        ]
+      }
+    },
+    {
+      "pair": 3,
+      "side": "left",
+      "build": "fix",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "models": {
+        "trusie": {
+          "duration": 10.666666984558105,
+          "bytes": 1537484,
+          "selected": {
+            "clip": 0,
+            "timeMs": 1710.8330154418945,
+            "playback": "playing",
+            "posePresent": false
+          }
+        }
+      },
+      "background": 4.161,
+      "valid": true,
+      "attempts": {
+        "trusie:startup": [
+          {
+            "valid": true,
+            "frameCount": 396,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 17,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 104,
+              "dropped": 0
+            }
+          }
+        ],
+        "trusie:steady": [
+          {
+            "valid": true,
+            "frameCount": 865,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 144,
+              "dropped": 0
+            }
+          }
+        ],
+        "trusie:spa": [
+          {
+            "valid": true,
+            "frameCount": 745,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": null
+          }
+        ]
+      }
+    },
+    {
+      "pair": 3,
+      "side": "right",
+      "build": "head",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "models": {
+        "trusie": {
+          "duration": 10.666666984558105,
+          "bytes": 1537484,
+          "selected": {
+            "clip": 0,
+            "timeMs": 1601.6330154413354,
+            "playback": "playing",
+            "posePresent": true
+          }
+        }
+      },
+      "background": 4.638,
+      "valid": true,
+      "attempts": {
+        "trusie:startup": [
+          {
+            "valid": true,
+            "frameCount": 366,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 17,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 106,
+              "dropped": 0
+            }
+          }
+        ],
+        "trusie:steady": [
+          {
+            "valid": true,
+            "frameCount": 864,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 142,
+              "dropped": 0
+            }
+          }
+        ],
+        "trusie:spa": [
+          {
+            "valid": true,
+            "frameCount": 743,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 39,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": null
+          }
+        ]
+      }
+    },
+    {
+      "pair": 4,
+      "side": "left",
+      "build": "fix",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "models": {
+        "trusie": {
+          "duration": 10.666666984558105,
+          "bytes": 1537484,
+          "selected": {
+            "clip": 0,
+            "timeMs": 2009.2330154424526,
+            "playback": "playing",
+            "posePresent": false
+          }
+        }
+      },
+      "background": 9.862,
+      "valid": true,
+      "attempts": {
+        "trusie:startup": [
+          {
+            "valid": true,
+            "frameCount": 407,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 20,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 115,
+              "dropped": 0
+            }
+          }
+        ],
+        "trusie:steady": [
+          {
+            "valid": true,
+            "frameCount": 864,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 143,
+              "dropped": 0
+            }
+          }
+        ],
+        "trusie:spa": [
+          {
+            "valid": true,
+            "frameCount": 729,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 39,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": null
+          }
+        ]
+      }
+    },
+    {
+      "pair": 4,
+      "side": "right",
+      "build": "head",
+      "browser": "143.0.7499.4",
+      "viewport": [1920, 1080, 1],
+      "models": {
+        "trusie": {
+          "duration": 10.666666984558105,
+          "bytes": 1537484,
+          "selected": {
+            "clip": 0,
+            "timeMs": 1607.4330154420804,
+            "playback": "playing",
+            "posePresent": true
+          }
+        }
+      },
+      "background": 5.822,
+      "valid": true,
+      "attempts": {
+        "trusie:startup": [
+          {
+            "valid": true,
+            "frameCount": 260,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 13,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 103,
+              "dropped": 0
+            }
+          }
+        ],
+        "trusie:steady": [
+          {
+            "valid": true,
+            "frameCount": 864,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": {
+              "total": 144,
+              "dropped": 0
+            }
+          }
+        ],
+        "trusie:spa": [
+          {
+            "valid": true,
+            "frameCount": 737,
+            "ad": 0,
+            "promo": 0,
+            "hidden": 0,
+            "modelSamples": 40,
+            "backend": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "video": null
+          }
+        ]
+      }
+    }
+  ]
+}

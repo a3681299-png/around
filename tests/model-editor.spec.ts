@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures';
+import { showArtwork } from './helpers/artwork';
 import { closeEditorPages, openEditor } from './helpers/editor';
 import { exposeEditorControls, withCanvas, beginCanvasGesture } from './helpers/editor-workspace';
 import { modelFixture } from './helpers/model-fixture';
@@ -11,7 +12,7 @@ test('GLB renders alpha, shares resources, edits/drags/duplicates/undoes, saves 
   youtube,
   context,
 }) => {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
@@ -85,7 +86,7 @@ test('arbitrary clips animate pixels, pause, crossfade, change speed and preserv
   popup,
   youtube,
 }) => {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
@@ -134,7 +135,7 @@ test('selected head bone adds a bounded look to the paused animated pose and OFF
   popup,
   youtube,
 }) => {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
@@ -161,7 +162,7 @@ test('selected head bone adds a bounded look to the paused animated pose and OFF
 });
 
 test('optional glTF node names are not required for cloned rig animation', async ({ popup, youtube }) => {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await panel.locator('.model-file').setInputFiles({

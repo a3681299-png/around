@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { showArtwork } from './helpers/artwork';
 import { readFile } from 'node:fs/promises';
 import type { Locator, Page } from '@playwright/test';
 import { test, expect } from './fixtures';
@@ -13,7 +14,7 @@ const key = 'webWorldThemes.design.youtube',
   overlay = '#web-world-themes-decorations';
 const layers = `${overlay} [data-image-id]`;
 async function open(popup: Page, page: Page) {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   return (await openEditor(popup, page)).panel;
 }

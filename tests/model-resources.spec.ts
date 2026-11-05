@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures';
+import { showArtwork } from './helpers/artwork';
 import { openEditor } from './helpers/editor';
 import { modelFixture } from './helpers/model-fixture';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -11,7 +12,7 @@ test('8 rigged models share one context/assets, respect surface budgets and susp
   context,
 }) => {
   test.setTimeout(60000);
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await panel.locator('.file').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
@@ -89,7 +90,7 @@ test('real WebGL loss recreates a context, deletion releases resources and Undo 
   popup,
   youtube,
 }) => {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await panel.locator('.file').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));

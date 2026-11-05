@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { showArtwork } from './helpers/artwork';
 import type { Locator, Page } from '@playwright/test';
 import { test, expect } from './fixtures';
 import { openEditor } from './helpers/editor';
@@ -15,7 +16,7 @@ const stopped = (youtube: Page) =>
 
 /** One image layer keeps the guard watching from load, as on a page with artwork. */
 async function editWithLayer(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await expect(youtube.locator(cards).first()).toBeVisible();
   const { studio, panel } = await openEditor(popup, youtube);
   await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));

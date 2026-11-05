@@ -66,6 +66,18 @@ export function createWorldSession(
           (entry.layer.model.playing || entry.layer.model.look.enabled),
       ),
     );
+  /** A shown character's computed motion reads the common signals (src/world/body-motion.ts):
+   * the pointer (turning), the main video's play/pause (hop, look down) and scrolling (shiver). */
+  const bodyActive = () =>
+    Boolean(
+      prepared?.layers.some(
+        (entry) =>
+          entry.renderable &&
+          entry.layer.kind === 'model3d' &&
+          Boolean(entry.layer.character) &&
+          Boolean(entry.layer.source.vrm),
+      ),
+    );
   const lookActive = () =>
     Boolean(
       prepared?.layers.some(
@@ -126,9 +138,10 @@ export function createWorldSession(
               Boolean(devtools?.active || authoring) ||
               rules.pointer ||
               motionActive() ||
-              lookActive()),
-          video: !doc.hidden && (masks.video || rules.video || Boolean(devtools?.active || authoring)),
-          scroll: !doc.hidden && (rules.scroll || Boolean(devtools?.active) || Boolean(authoring)),
+              lookActive() ||
+              bodyActive()),
+          video: !doc.hidden && (masks.video || rules.video || Boolean(devtools?.active || authoring) || bodyActive()),
+          scroll: !doc.hidden && (rules.scroll || Boolean(devtools?.active) || Boolean(authoring) || bodyActive()),
         };
     sources.recordClicks(Boolean(timeline?.recording && !doc.hidden));
     if (

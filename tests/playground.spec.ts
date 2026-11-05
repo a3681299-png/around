@@ -88,6 +88,24 @@ test('without the extension, 適用 switches the site to the artwork and back', 
   expect(problems).toEqual([]);
 });
 
+test('the background layer is drawn under the content: the video picture is not veiled', async ({ page }) => {
+  await open(page);
+  const player = (await page.locator('.player').boundingBox())!;
+  // The left half of the paused picture, away from the character on the right.
+  const clip = { x: player.x + 20, y: player.y + 60, width: player.width / 2 - 40, height: player.height - 120 };
+  await expect.poll(() => page.evaluate(() => document.querySelector('video')!.readyState)).toBeGreaterThanOrEqual(2);
+  // An empty stretch of the page beside the player, where the room should show.
+  const margin = { x: 10, y: 80, width: 80, height: 80 };
+  const plain = await page.screenshot({ clip }),
+    plainMargin = await page.screenshot({ clip: margin });
+  await page.locator('#apply').click();
+  await expect(model(page)).toHaveAttribute('data-renderer', 'three', { timeout: 20000 });
+  // The room is visible beside the content ...
+  await expect.poll(async () => (await page.screenshot({ clip: margin })).equals(plainMargin)).toBe(false);
+  // ... but nothing is painted over the picture.
+  expect((await page.screenshot({ clip })).equals(plain)).toBe(true);
+});
+
 test('Alt+Shift+Q takes every effect off, and pressing it again brings them back', async ({ page }) => {
   await open(page);
   const plain = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
@@ -103,6 +121,44 @@ test('Alt+Shift+Q takes every effect off, and pressing it again brings them back
   await page.keyboard.press('Alt+Shift+KeyQ');
   await expect(model(page)).toHaveAttribute('data-renderer', 'three', { timeout: 20000 });
   await expect.poll(() => page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(styled);
+});
+
+test('G1 while the character moves: it takes no input and the controls stay the hit target mid-hop', async ({
+  page,
+}) => {
+  await open(page);
+  await page.locator('#apply').click();
+  await expect(model(page)).toHaveAttribute('data-renderer', 'three', { timeout: 20000 });
+  const character = (await page.locator('[data-image-id="resident"]').first().boundingBox())!;
+  const hit = (x: number, y: number, selector: string) =>
+    page.evaluate(
+      ([x, y, selector]) => Boolean(document.elementFromPoint(x as number, y as number)?.closest(selector as string)),
+      [x, y, selector] as const,
+    );
+  // The character's own middle is not a target: whatever is under it is.
+  const under = await page.evaluate(
+    ([x, y]) => document.elementFromPoint(x!, y!)?.closest('[id^="web-world-themes"]') ?? null,
+    [character.x + character.width / 2, character.y + character.height / 2] as const,
+  );
+  expect(under).toBeNull();
+  // Starting the video makes it hop; through the hop every control stays reachable and the
+  // body's pose keeps changing (it really is moving while we check).
+  const controls = await Promise.all(
+    ['#apply', '#play', '#seek', '#volume'].map(async (selector) => {
+      const box = (await page.locator(selector).boundingBox())!;
+      return { selector, x: box.x + box.width / 2, y: box.y + box.height / 2 };
+    }),
+  );
+  const hips = () => model(page).evaluate((e: HTMLElement) => JSON.parse(e.dataset.modelFrame!).pose?.hips?.[1] ?? 0);
+  await page.locator('#play').click();
+  const heights = new Set<number>();
+  for (let i = 0; i < 12; i++) {
+    heights.add(await hips());
+    for (const control of controls)
+      expect(await hit(control.x, control.y, control.selector), control.selector).toBe(true);
+    await page.waitForTimeout(40);
+  }
+  expect(heights.size).toBeGreaterThan(3);
 });
 
 /** Every button, link and input on the page, by its id or text, for a readable failure. */

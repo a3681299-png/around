@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { showArtwork } from './helpers/artwork';
 import { mkdir, mkdtemp, writeFile, access } from 'node:fs/promises';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
@@ -37,7 +38,7 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
       { waitUntil: 'domcontentloaded' },
     );
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 25_000 });
-    await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    await showArtwork(popup);
     await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
     await page.bringToFront();
     await openSidePanelFromIcon(popup, page);

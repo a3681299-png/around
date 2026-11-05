@@ -1,4 +1,5 @@
 import { exposeEditorControls, withCanvas, beginCanvasGesture } from './helpers/editor-workspace';
+import { showArtwork } from './helpers/artwork';
 import type { Page, Locator, BrowserContext } from '@playwright/test';
 import { test, expect, launchExtension } from './fixtures';
 import { closeEditorPages, openEditor } from './helpers/editor';
@@ -9,7 +10,7 @@ const overlay = '#web-world-themes-decorations';
 const layers = `${overlay} [data-image-id]`;
 
 async function open(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
   await youtube.bringToFront();
   const { panel: dialog } = await openEditor(popup, youtube);
@@ -267,7 +268,7 @@ test('normal decoration is click-through; OFF and zero remove images and ON rest
     if (boundary === 'off') await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
     else await popup.getByRole('button', { name: '緊急OFF', exact: true }).click();
     await expect(youtube.locator(overlay)).toHaveCount(0);
-    if (boundary === 'off') await popup.getByRole('switch', { name: '作品を表示する' }).check();
+    if (boundary === 'off') await showArtwork(popup);
     else await popup.getByRole('button', { name: '描画を再開', exact: true }).click();
     await expect(youtube.locator(layers).locator('img')).toBeVisible();
   }
@@ -420,7 +421,7 @@ test('turning the theme OFF while a save waits for asset retention still complet
     (globalThis as typeof globalThis & { resumeAssetPrune?: () => void }).resumeAssetPrune?.();
   });
   await expect.poll(async () => (await stored(popup)).decorations.length).toBe(1);
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await expect(youtube.locator(layers)).toHaveCount(1);
   await expect(youtube.locator(layers).locator('img')).toBeVisible();
 });

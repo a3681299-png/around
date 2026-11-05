@@ -1,4 +1,5 @@
 import { mkdir } from 'node:fs/promises';
+import { showArtwork } from './helpers/artwork';
 import type { Locator, Page } from '@playwright/test';
 import { test, expect } from './fixtures';
 import { openEditor as openEditorPage } from './helpers/editor';
@@ -7,7 +8,7 @@ const cards = '[data-ww-surface~="video-card"]';
 const shots = process.env.WW_SKIN_SHOTS;
 
 async function enable(popup: Page, youtube: Page) {
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   await expect(youtube.locator(cards).first()).toBeVisible();
 }
 async function openEditor(popup: Page, youtube: Page) {

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { showArtwork } from './helpers/artwork';
 import { openSidePanelFromIcon } from './helpers/editor';
 import path from 'node:path';
 import { mkdir, mkdtemp } from 'node:fs/promises';
@@ -22,7 +23,7 @@ async function setup() {
   await popup.goto(`chrome-extension://${id}/popup/index.html`);
   const page = await context.newPage();
   await page.goto('https://www.youtube.com/watch?v=fixture');
-  await popup.getByRole('switch', { name: '作品を表示する' }).check();
+  await showArtwork(popup);
   // UI0-d: `local` is where the retired in-page editors stood; nothing of the editor may appear there.
   return { context, page, popup, id, local: page.locator('#web-world-themes-creator') };
 }
