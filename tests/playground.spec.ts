@@ -88,6 +88,23 @@ test('without the extension, 適用 switches the site to the artwork and back', 
   expect(problems).toEqual([]);
 });
 
+test('Alt+Shift+Q takes every effect off, and pressing it again brings them back', async ({ page }) => {
+  await open(page);
+  const plain = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  await page.locator('#apply').click();
+  await expect(model(page)).toHaveAttribute('data-renderer', 'three', { timeout: 20000 });
+  const styled = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  expect(styled).not.toBe(plain);
+  await page.keyboard.press('Alt+Shift+KeyQ');
+  // Off: no character, no skin, no layer left on the page.
+  await expect(model(page)).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(plain);
+  await expect(page.locator('[data-image-id]')).toHaveCount(0);
+  await page.keyboard.press('Alt+Shift+KeyQ');
+  await expect(model(page)).toHaveAttribute('data-renderer', 'three', { timeout: 20000 });
+  await expect.poll(() => page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(styled);
+});
+
 /** Every button, link and input on the page, by its id or text, for a readable failure. */
 const interactive = (page: Page) =>
   page.evaluate(() => {
