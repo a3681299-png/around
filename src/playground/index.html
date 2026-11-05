@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Only this site's own files run. Styles inline: the engine draws inside shadow roots.
+         blob: in connect-src: the glTF loader reads textures it unpacked into blob URLs itself. -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; media-src 'self' blob:; connect-src 'self' blob:; font-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'"
+    />
+    <link rel="icon" href="data:," />
+    <title>Playground — Web World Themes</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body data-ww-surface="page">
+    <header class="bar">
+      <span class="brand">みるばこ</span>
+      <span class="hint">ふつうの動画サイト</span>
+      <button id="apply" type="button" data-ww-control="click" aria-pressed="false">WWT を適用</button>
+    </header>
+    <main class="layout">
+      <section class="watch">
+        <div class="player" data-ww-surface="player-window">
+          <video data-ww-video data-ww-control="gesture" src="content/video-a.webm" muted loop playsinline></video>
+        </div>
+        <div class="controls" aria-label="再生の操作">
+          <button id="play" type="button" data-ww-control="click">再生</button>
+          <input id="seek" type="range" min="0" max="1000" value="0" aria-label="再生位置" data-ww-control="drag" />
+          <label class="volume"
+            >音量 <input id="volume" type="range" min="0" max="100" value="60" data-ww-control="drag"
+          /></label>
+        </div>
+        <h1 id="video-title" data-ww-surface="primary-heading">四角が流れる動画</h1>
+        <p class="description">自作の試験用の動画です。プレーヤーもシークバーも、このサイトのものです。</p>
+        <p id="status" role="status"></p>
+      </section>
+      <aside class="list" data-ww-list aria-label="次の動画">
+        <a
+          href="#a"
+          class="card"
+          data-ww-surface="video-card"
+          data-ww-control="click"
+          data-video="content/video-a.webm"
+          data-title="四角が流れる動画"
+          ><span class="thumb a"></span><span class="name">四角が流れる動画</span></a
+        >
+        <a
+          href="#b"
+          class="card"
+          data-ww-surface="video-card"
+          data-ww-control="click"
+          data-video="content/video-b.webm"
+          data-title="透ける四角の動画"
+          ><span class="thumb b"></span><span class="name">透ける四角の動画</span></a
+        >
+        <a
+          href="#c"
+          class="card"
+          data-ww-surface="video-card"
+          data-ww-control="click"
+          data-video="content/video-a.webm"
+          data-title="もう一度、四角"
+          ><span class="thumb c"></span><span class="name">もう一度、四角</span></a
+        >
+      </aside>
+    </main>
+    <footer class="foot">試作。見た目は仮です。</footer>
+  </body>
+</html>

@@ -1,5 +1,7 @@
 node_modules/
 dist/
+dist-playground/
+dist-deploy-probe/
 test-results/
 playwright-report/
 .work/

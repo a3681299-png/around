@@ -7,6 +7,7 @@ const unitSpecs = [
   'clean-work',
   'backup-data',
   'browser-boundary',
+  'playground-output',
   'asset-import-validation',
   'asset-profile',
   'asset-read-data',

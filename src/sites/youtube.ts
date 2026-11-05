@@ -5,6 +5,7 @@ import { youtubePlaybackSource } from './youtube-signals';
 import { youtubeOperations } from './youtube-operations';
 import { YOUTUBE_DESIGN_TARGETS, YOUTUBE_SKIN_CONTROLS, YOUTUBE_SKIN_MARKS } from './youtube-targets';
 import { createSelectorIndex } from './surface-index';
+import { SHARED_DECORATION_ANCHORS } from './anchors';
 import { surfacesFor, YOUTUBE_BASE_INDEX, YOUTUBE_BASE_SELECTORS, YOUTUBE_SURFACE_TARGETS } from './youtube-surfaces';
 
 const SURFACE_ATTRIBUTE = 'data-ww-surface';
@@ -41,7 +42,7 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
       if (!overlay) return undefined;
       return doc.elementsFromPoint(x, y).find((element) => !overlay.contains(element) && !element.contains(overlay));
     },
-    decorationAnchors: [{ id: 'video-player', surface: 'player-window', label: '動画プレイヤー' }],
+    decorationAnchors: SHARED_DECORATION_ANCHORS,
     signals: { videoPlayback: youtubePlaybackSource(doc) },
     operationSurfaces: () => youtubeOperations(doc),
     mountSettings: (entry) => mountYouTubeSettings(doc, view, entry),
