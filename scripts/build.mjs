@@ -21,6 +21,10 @@ if (guardTrace && !outputName.startsWith('.work/')) throw new Error('Development
 const noIdleRecheck = process.env.WW_NO_IDLE_RECHECK === '1';
 if (noIdleRecheck && !outputName.startsWith('.work/'))
   throw new Error('Builds without the idle recheck must stay inside .work.');
+// Chunk 4 prototype (docs/layering-plan.md): the character sits inside the player's own stacking,
+// under its controls, instead of over the page with cut-outs. Development builds only.
+const layering = process.env.WW_LAYERING === '1';
+if (layering && !outputName.startsWith('.work/')) throw new Error('Layering prototype builds must stay inside .work.');
 const watching = process.argv.includes('--watch');
 const worldMode = process.env.WW_WORLD_MODE ?? 'runtime';
 if (!['legacy', 'compare', 'runtime'].includes(worldMode))
@@ -106,6 +110,7 @@ const shared = {
     __WW_WORLD_MODE__: JSON.stringify(worldMode),
     __WW_WORLD_DEVTOOLS__: String(process.env.WW_WORLD_DEVTOOLS === '1'),
     __WW_ASSET_PROFILE__: String(profiling),
+    __WW_LAYERING__: String(layering),
     // G1 measurement hooks (src/diagnostics/g11-hooks.ts): only scripts/g11/build.mjs turns them on.
     __WW_G11__: 'false',
   },

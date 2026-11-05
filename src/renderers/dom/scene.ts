@@ -1,5 +1,5 @@
 import { captureGeometry } from '../../host/anchors';
-import { WORLD_MODE } from '../../host/world-options';
+import { LAYERING, WORLD_MODE } from '../../host/world-options';
 import { evaluateLayout } from '../../world/layout';
 import { legacyLayout } from './legacy-evaluation';
 import { assertWorldParity } from './parity';
@@ -236,7 +236,14 @@ export function createImageRenderer(
           const anchor = roots.get(id)!.layer.placement.anchor;
           return anchor.kind === 'surface' && anchor.target === 'video-player';
         });
-      const slot = needsVideoSlot ? safety.source.videoSlot() : undefined;
+      // Chunk 4 prototype (LAYERING, docs/layering-plan.md): outside editing, the player's plane goes
+      // under its controls by stacking order instead of over them with the bands cut out.
+      const beneath = LAYERING && needsVideoSlot && !editing ? safety.source.beneathSlot?.() : undefined;
+      const slot = beneath
+        ? { parent: beneath.parent, rect: beneath.rect, top: 0, bottom: 0, zIndex: beneath.zIndex }
+        : needsVideoSlot
+          ? safety.source.videoSlot()
+          : undefined;
       // Explicit editing only: the verified video centre (no menu, error or advert over it), where
       // screen- and page-plane handles may take input over the video. The bands and any native
       // control in the centre stay native: they are cut from the clip and refused at input time.
@@ -393,7 +400,16 @@ export function createImageRenderer(
         videoSlot = { host: localHost, content, shadow: localShadow };
       }
       if (slot && videoSlot) {
-        if (videoSlot.host.parentElement !== slot.parent) slot.parent.append(videoSlot.host);
+        if (beneath) {
+          // Directly after the media, at its level: the proofs (paintsAbove) are made against the
+          // media and hold for this plane only while nothing of the player's sits in between.
+          // A rebuilt player or a moved media is followed here, from this draw's own read.
+          if (
+            videoSlot.host.parentElement !== beneath.parent ||
+            videoSlot.host.previousElementSibling !== beneath.after
+          )
+            beneath.parent.insertBefore(videoSlot.host, beneath.after.nextSibling);
+        } else if (videoSlot.host.parentElement !== slot.parent) slot.parent.append(videoSlot.host);
         videoSlot.host.style.setProperty('--ww-decoration-clip', `inset(${slot.top}px 0 ${slot.bottom}px 0)`);
         videoSlot.host.style.setProperty('--ww-local-z', String(slot.zIndex));
         // What can be pressed over the picture (end screen cards, the "next" card, the cards
@@ -407,6 +423,7 @@ export function createImageRenderer(
           .surfaces.filter(
             (surface) =>
               surface.id.startsWith('player.overlay.') &&
+              !(beneath && surface.aboveBeneath) &&
               surface.availability.visible &&
               surface.shape.width > 0 &&
               surface.shape.height > 0,
@@ -541,7 +558,9 @@ export function createImageRenderer(
               composition: !verified
                 ? ('unsupported' as const)
                 : local
-                  ? ('native-underlay' as const)
+                  ? beneath
+                    ? ('native-beneath' as const)
+                    : ('native-underlay' as const)
                   : atmosphere
                     ? ('atmosphere' as const)
                     : page
@@ -558,6 +577,7 @@ export function createImageRenderer(
               animated:
                 layer.layer.kind === 'animation' ||
                 Boolean(layer.layer.effects?.some((e) => e.enabled && e.bindings.length)),
+              ...(localIds.has(layer.layer.id) && beneath ? { settled: beneath.settled } : {}),
               ...(localIds.has(layer.layer.id) && slot
                 ? {
                     clip: {

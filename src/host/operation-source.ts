@@ -54,6 +54,8 @@ export interface OperationCandidate {
   scrolls?: boolean;
   unsupported?: boolean;
   nativeAbove?: boolean;
+  /** Proven to paint over the beneath plane by stacking order (chunk 4 prototype, LAYERING). */
+  aboveBeneath?: boolean;
   /** Optional readings from the adapter's same synchronous discovery pass. */
   rect?: PlacementFrame;
   visible?: boolean;
@@ -110,6 +112,10 @@ export interface OperationSource {
       }
     | undefined;
   overlaySlot(): { parent: HTMLElement; zIndex: number } | undefined;
+  /** Chunk 4 prototype (LAYERING, docs/layering-plan.md): a place inside the player's own stacking
+   * context, directly after its media and at the media's level, so that whatever the player paints
+   * over its picture is painted over this plane too, by the browser's stacking order. */
+  beneathSlot?(): BeneathSlot | undefined;
   /** A place under the page's content for atmosphere layers, when the adapter owns the page's
    * stacking (the Playground). Undefined on sites we only decorate (YouTube): there, atmosphere
    * stays over the content with its opacity cap. Drawn under the content, it covers nothing. */
@@ -122,6 +128,18 @@ export interface OperationSource {
   pageSlot(): { parent: HTMLElement; zIndex: number } | undefined;
   destroy(): void;
 }
+export interface BeneathSlot {
+  /** The stacking context (the player); the plane is its child. */
+  parent: HTMLElement;
+  /** The plane is inserted directly after this child (the media) and takes its level. */
+  after: HTMLElement;
+  zIndex: number;
+  rect: PlacementFrame;
+  /** Whether every change pending since the last read is one the stacking order covers by
+   * itself (outside the player's box, or inside a part proven to paint over the plane), so the
+   * plane needs no hold while the read is pending. False when the changes are not known. */
+  settled: boolean;
+}
 /** DOM identities stay here; the site adapter alone supplies discovery/selectors. */
 export function createOperationSource(
   doc: Document,
@@ -133,6 +151,10 @@ export function createOperationSource(
    * discovery uses). Without it, every element added or removed is a layout change. */
   holdsCandidate?: (root: Element, deep?: boolean) => boolean,
   underlaySlot: OperationSource['underlaySlot'] = () => undefined,
+  /** Chunk 4 prototype: given the elements changed since the last read (undefined: not known,
+   * a whole scan is due), the adapter's beneath place. */
+  beneathSlot: (pending: readonly Element[] | undefined, kind: PendingChange) => BeneathSlot | undefined = () =>
+    undefined,
 ): OperationSource {
   if (!documentIds.has(doc)) documentIds.set(doc, ++nextDocumentId);
   const documentId = documentIds.get(doc)!;
@@ -721,6 +743,7 @@ export function createOperationSource(
               : 'exclusion',
         scrolls: row.scrolls !== false,
         ...(row.scrollBox ? { scrollBox: Object.freeze({ ...row.scrollBox }) } : {}),
+        ...(row.aboveBeneath ? { aboveBeneath: true } : {}),
       };
     });
     readIdentity = identity;
@@ -938,6 +961,7 @@ export function createOperationSource(
       return !missed.length;
     },
     videoSlot,
+    beneathSlot: () => beneathSlot(fullScan ? undefined : [...added, ...touched], dirty ? pending : 'none'),
     editorCentre,
     overlaySlot: verifiedOverlaySlot,
     underlaySlot,

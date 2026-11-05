@@ -146,6 +146,11 @@ test('R3-2 short check: extension rAF CPU per frame, quiet / plain VRM / compute
           ? { ...resident(layer), character: { ...(layer.character as object), autonomy: true } }
           : layer,
       ),
+      // Chunk 4: at its own place, the player's bottom-right corner, where the bars come and go
+      // (measured with WW_PERF_R32_WIGGLE=1 so they do; compare a WW_LAYERING=1 measurement build).
+      corner: layers.map((layer) =>
+        layer.id === 'resident' ? { ...layer, character: { ...(layer.character as object), autonomy: false } } : layer,
+      ),
     };
     // WW_PERF_R32_VARIANTS=body,autonomy measures only those (the chunk 3 short check).
     const chosen = process.env.WW_PERF_R32_VARIANTS?.split(',').filter((v) => v in variants) ?? [
@@ -169,7 +174,16 @@ test('R3-2 short check: extension rAF CPU per frame, quiet / plain VRM / compute
         await page.waitForTimeout(6000);
         const contextId = await isolated();
         await evaluate(contextId, '__g11Probe.begin(false)');
-        await page.waitForTimeout(5000);
+        if (process.env.WW_PERF_R32_WIGGLE === '1') {
+          // The pointer crosses the picture and leaves every second: the bars fade in and out.
+          const box = (await page.locator('#movie_player').boundingBox())!;
+          for (let i = 0; i < 5; i++) {
+            await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.5, { steps: 3 });
+            await page.waitForTimeout(500);
+            await page.mouse.move(8, 8, { steps: 3 });
+            await page.waitForTimeout(500);
+          }
+        } else await page.waitForTimeout(5000);
         const { total: _total, ...stats } = perFrame(await evaluate(contextId, '__g11Probe.end()'));
         const row = { round, variant, ...stats };
         rows.push(row);

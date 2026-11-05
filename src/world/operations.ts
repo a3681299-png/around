@@ -26,6 +26,9 @@ export interface OperationSurface {
    * can move anywhere inside it without the page moving, so a page-following plane
    * excludes the whole box instead of the current rectangle. */
   scrollBox?: PlacementFrame;
+  /** Chunk 4 prototype: the browser paints this surface over the beneath plane (stacking order,
+   * proven at the read), wherever either is on screen. */
+  aboveBeneath?: boolean;
 }
 export interface OperationSnapshot {
   /** geometry: changes whenever a surface moves on screen. layout (G1.3): changes only when a
@@ -65,8 +68,13 @@ export interface PaintFootprint {
   /** Includes filter/blur/shadow spread. Unknown spread is unsupported. */
   outset: number;
   /** overlay: screen-fixed plane. page: plane that scrolls with the document. atmosphere:
-   * translucent plane under ATMOSPHERE_ALPHA_CAP. native-underlay: player-local plane. */
-  composition: 'overlay' | 'page' | 'atmosphere' | 'native-underlay' | 'unsupported';
+   * translucent plane under ATMOSPHERE_ALPHA_CAP. native-underlay: player-local plane.
+   * native-beneath (chunk 4 prototype): player-local plane at the media's level, under every
+   * surface proven to paint over it; clip is the player's box. */
+  composition: 'overlay' | 'page' | 'atmosphere' | 'native-underlay' | 'native-beneath' | 'unsupported';
+  /** native-beneath only: every change pending since the read is covered by stacking order, so
+   * the guard's holds for a pending read (and the approach hold) do not apply to this paint. */
+  settled?: boolean;
 }
 /** Engine-held, never stored in artwork. Worst-case uniform tint at this alpha keeps
  * YouTube primary text at >= 4.5:1 and secondary text at >= 3:1 in light and dark themes. */
@@ -150,6 +158,43 @@ export function guardPaint(snapshot: OperationSnapshot, paints: readonly PaintFo
       right: paint.bounds.right + paint.outset,
       bottom: paint.bounds.bottom + paint.outset,
     };
+    if (paint.composition === 'native-beneath') {
+      // The browser paints every proven surface over this plane, so only the others are checked,
+      // as the local plane checks them: a forbidden one under the paint stops it. Input is never
+      // taken here (the prototype is not used while editing).
+      const clip = paint.clip;
+      if (!clip || !Object.values(clip).every(Number.isFinite) || paint.pointerEvents) {
+        issues.push({
+          layerId: paint.id,
+          surfaceId: 'player',
+          severity: 'enforced',
+          action: 'stop',
+          reason: '映像上の描画にはネイティブと一緒に動くクリップが必要です。',
+          remedy: 'プレイヤー基準の単独レイヤーへ戻してください。',
+        });
+        continue;
+      }
+      const inside = {
+        left: Math.max(bounds.left, clip.left),
+        right: Math.min(bounds.right, clip.left + clip.width),
+        top: Math.max(bounds.top, clip.top),
+        bottom: Math.min(bounds.bottom, clip.top + clip.height),
+      };
+      if (inside.left >= inside.right || inside.top >= inside.bottom) continue;
+      for (const { surface, envelope } of visible) {
+        if (surface.aboveBeneath || surface.policy.occlusion === 'allow' || !intersects(inside, envelope)) continue;
+        issues.push({
+          layerId: paint.id,
+          surfaceId: surface.id,
+          severity: 'enforced',
+          action: 'stop',
+          reason: '描く順番でキャラより手前と確かめられない操作面に重なるため、絵の表示を止めました。',
+          remedy: '操作面から離れた位置へ動かすか、大きさを小さくしてください。',
+        });
+        break;
+      }
+      continue;
+    }
     if (paint.composition === 'native-underlay') {
       if (!paint.clip || !Object.values(paint.clip).every(Number.isFinite)) {
         issues.push({
@@ -632,7 +677,9 @@ export function stepApproach(
   if (!near.size) return { near, held };
   const targets = [...near].filter(([, entry]) => entry.rect.width > 0 && entry.rect.height > 0);
   for (const paint of paints) {
-    if (!paint.dynamic) continue;
+    // Under the controls by stacking order (chunk 4 prototype): moving there cannot hide or take
+    // what the pointer is aiming at, so it is never held for an approach.
+    if (!paint.dynamic || paint.composition === 'native-beneath') continue;
     const root = paint.root ?? paint.id,
       { bounds, outset } = paint;
     for (const [key, { rect }] of targets) {

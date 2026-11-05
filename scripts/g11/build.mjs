@@ -26,7 +26,10 @@ if (!existsSync(hooks))
 const version = /G11_HOOKS_VERSION = (\d+);/.exec(await readFile(hooks, 'utf8'))?.[1];
 if (Number(version) !== HOOKS_VERSION)
   throw new Error(`Measurement hooks version ${version} in ${source}; this harness expects ${HOOKS_VERSION}.`);
-const out = path.join(source, '.work/g11-measurement-dist');
+// WW_LAYERING=1: the chunk 4 prototype (docs/layering-plan.md), in its own folder so the two builds
+// can be measured alternately.
+const layering = process.env.WW_LAYERING === '1';
+const out = path.join(source, layering ? '.work/g11-layering-dist' : '.work/g11-measurement-dist');
 workPath(out);
 
 const work = path.join(root, '.work/g11-handoff');
@@ -130,6 +133,7 @@ await build({
     __WW_WORLD_DEVTOOLS__: 'false',
     __WW_ASSET_PROFILE__: 'false',
     __WW_G11__: 'true',
+    __WW_LAYERING__: String(layering),
   },
 });
 // The hooks must have survived bundling: the registration is what run.mjs reads first.

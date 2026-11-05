@@ -138,8 +138,64 @@ export function createCompositionReader(doc: Document) {
     scrollers.set(parent, value);
     return value;
   };
+  /** The stacking contexts from the document down to element (element's own included), each with
+   * the level it paints at in its parent context (CSS 2, appendix E). Cached for this read. */
+  const contexts = new WeakMap<Element, readonly { element: Element; z: number }[]>();
+  const contextChain = (element: Element): readonly { element: Element; z: number }[] => {
+    const cached = contexts.get(element);
+    if (cached) return cached;
+    const parent = element.parentElement;
+    const above = parent && parent !== doc.documentElement ? contextChain(parent) : [];
+    let value = above;
+    if (element instanceof HTMLElement && element !== doc.documentElement) {
+      const s = style(element);
+      const positioned = s.position !== 'static';
+      const found =
+        (positioned && s.zIndex !== 'auto') ||
+        s.position === 'fixed' ||
+        s.position === 'sticky' ||
+        fixedContainingBlock(s) ||
+        Number(s.opacity) < 1 ||
+        s.isolation === 'isolate' ||
+        s.mixBlendMode !== 'normal' ||
+        s.clipPath !== 'none' ||
+        s.maskImage !== 'none' ||
+        s.transformStyle === 'preserve-3d' ||
+        s.containerType !== 'normal' ||
+        s.willChange !== 'auto';
+      // A context without a numeric z-index (opacity, transform, fixed with auto…) paints at
+      // level 0, in tree order with the positioned elements of its parent context.
+      if (found)
+        value = [...above, { element, z: positioned && Number.isFinite(Number(s.zIndex)) ? Number(s.zIndex) : 0 }];
+    }
+    contexts.set(element, value);
+    return value;
+  };
   return {
     style,
+    /**
+     * Whether everything element paints is painted after (over) reference, by the browser's own
+     * stacking order alone, wherever either of them is on screen (chunk 4, docs/layering-plan.md).
+     * reference must be a stacking context with a numeric z-index. Proven only where both are in
+     * distinct contexts of one common context: a higher level, or the same level and later in tree
+     * order. Content that is not in a context of its own at that point (normal flow, positioned
+     * without z-index) paints below any positive level, so it is not proven: false.
+     */
+    paintsAbove(element: Element, reference: Element) {
+      if (element === reference || reference.contains(element) || element.contains(reference)) return false;
+      const a = contextChain(element),
+        b = contextChain(reference);
+      const last = b[b.length - 1];
+      if (!last || last.element !== reference) return false;
+      let i = 0;
+      while (i < a.length && i < b.length && a[i]!.element === b[i]!.element) i++;
+      const mine = a[i],
+        theirs = b[i];
+      if (!theirs) return false;
+      if (!mine) return theirs.z < 0;
+      if (mine.z !== theirs.z) return mine.z > theirs.z;
+      return Boolean(theirs.element.compareDocumentPosition(mine.element) & Node.DOCUMENT_POSITION_FOLLOWING);
+    },
     scrollBox(element: HTMLElement) {
       // A stuck element moves against the page along its whole column.
       const sticky = stickyAncestor(element);
