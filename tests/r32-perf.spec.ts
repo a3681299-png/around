@@ -81,8 +81,24 @@ test('R3-2 short check: extension rAF CPU per frame, quiet / plain VRM / compute
         const { character: _drop, ...plain } = resident(layer);
         return { ...plain, model: { ...layer.model, clip: null } };
       }),
-      body: layers.map((layer) => (layer.id === 'resident' ? resident(layer) : layer)),
+      // Chunk 3: the same character without and with its autonomy (v15 `autonomy`).
+      body: layers.map((layer) =>
+        layer.id === 'resident'
+          ? { ...resident(layer), character: { ...(layer.character as object), autonomy: false } }
+          : layer,
+      ),
+      autonomy: layers.map((layer) =>
+        layer.id === 'resident'
+          ? { ...resident(layer), character: { ...(layer.character as object), autonomy: true } }
+          : layer,
+      ),
     };
+    // WW_PERF_R32_VARIANTS=body,autonomy measures only those (the chunk 3 short check).
+    const chosen = process.env.WW_PERF_R32_VARIANTS?.split(',').filter((v) => v in variants) ?? [
+      'quiet',
+      'vrm',
+      'body',
+    ];
 
     const session: CDPSession = await context.newCDPSession(page);
     const contexts = new Set<number>();
@@ -111,7 +127,7 @@ test('R3-2 short check: extension rAF CPU per frame, quiet / plain VRM / compute
 
     const rows: { round: number; variant: string; median: number; p95: number; mean: number; frames: number }[] = [];
     for (let round = 0; round < 2; round++) {
-      const order = round % 2 ? ['body', 'vrm', 'quiet'] : ['quiet', 'vrm', 'body'];
+      const order = round % 2 ? [...chosen].reverse() : chosen;
       for (const variant of order) {
         // The page stays: the artwork changes in storage and the page follows it (no reload, which
         // repeated in a headless profile makes YouTube's player fail).

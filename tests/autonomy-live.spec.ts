@@ -24,6 +24,17 @@ const media = (page: Page) =>
 test('real YouTube: the resident sits at the player corner, flees a rush, comes home and edges closer', async () => {
   test.skip(process.env.WW_LIVE_AUTONOMY !== '1', 'Explicit real YouTube verification (WW_LIVE_AUTONOMY=1).');
   test.setTimeout(300000);
+  await residentOnYouTube('autonomy');
+});
+
+// Its own page: a headless player that has played for a minute can fail ("Something went wrong").
+test('real YouTube: the resident stays at the corner in theater mode and fullscreen', async () => {
+  test.skip(process.env.WW_LIVE_AUTONOMY !== '1', 'Explicit real YouTube verification (WW_LIVE_AUTONOMY=1).');
+  test.setTimeout(300000);
+  await residentOnYouTube('corners');
+});
+
+async function residentOnYouTube(mode: 'autonomy' | 'corners') {
   await mkdir(shots, { recursive: true });
   const content = path.resolve('.work/autonomy-live/content');
   const { models } = writeContent(path.resolve('.'), content);
@@ -111,7 +122,8 @@ test('real YouTube: the resident sits at the player corner, flees a rush, comes 
         .toBe(true)
         .catch(() => undefined);
       const waited = Date.now() - start;
-      await page.screenshot({ path: path.join(shots, `youtube-${name}.png`), clip: player });
+      const clip = (await page.locator('#movie_player').boundingBox())!;
+      await page.screenshot({ path: path.join(shots, `youtube-${name}.png`), clip });
       return waited;
     };
     const box = async () => (await page.locator('[data-image-id="resident"]').first().boundingBox())!;
@@ -121,6 +133,36 @@ test('real YouTube: the resident sits at the player corner, flees a rush, comes 
     report['home'] = { box: home, ...(await state()), shownAfterMs: await shoot('home') };
     expect(home.x + home.width / 2).toBeGreaterThan(player.x + player.width * 0.8);
     expect(home.y + home.height / 2).toBeGreaterThan(player.y + player.height * 0.6);
+    if (mode === 'corners') {
+      // The corner follows the player: theater mode, then fullscreen (pointer away, so it is home).
+      const corner = async (name: string, key: string) => {
+        await page.locator('#movie_player').focus();
+        await page.keyboard.press(key);
+        await page.mouse.move(away.x, away.y);
+        await page.waitForTimeout(4000);
+        const p = (await page.locator('#movie_player').boundingBox())!;
+        const b = await box();
+        const shown = await shoot(name);
+        report[name] = {
+          player: p,
+          box: b,
+          shownAfterMs: shown,
+          fullscreen: await page.evaluate(() => Boolean(document.fullscreenElement)),
+          ...(await state()),
+        };
+        expect(b.x + b.width / 2).toBeGreaterThan(p.x + p.width * 0.8);
+        expect(b.y + b.height / 2).toBeGreaterThan(p.y + p.height * 0.6);
+        expect(b.x + b.width / 2).toBeLessThan(p.x + p.width);
+        expect(b.y + b.height / 2).toBeLessThan(p.y + p.height);
+        return p;
+      };
+      const theater = await corner('theater', 't');
+      expect(theater.width).toBeGreaterThan(player.width + 50);
+      const full = await corner('fullscreen', 'f');
+      expect(full.width).toBeGreaterThan(theater.width - 1);
+      console.log('AUTONOMY CORNERS ' + JSON.stringify(report));
+      return;
+    }
     const at = { x: home.x + home.width / 2, y: home.y + home.height / 2 };
     // A rush from the left.
     await page.mouse.move(at.x - 700, at.y);
@@ -173,4 +215,4 @@ test('real YouTube: the resident sits at the player corner, flees a rush, comes 
   } finally {
     await context.close();
   }
-});
+}
