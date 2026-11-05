@@ -35,9 +35,13 @@ export function createVrmPlayer(
     previousTime: number | undefined,
     springOn = true;
   // The computed motion (R3-2) is added in each bone's rest frame. The rest frames are read from
-  // the raw rest pose once; the bones go back to the pose they had right after.
+  // the raw rest pose once, when the first computed pose arrives (a VRM without a character never
+  // pays for it); the bones go back to the pose they had right after.
   const bodyRest = new Map<HumanBone, { node: Object3D; rest: Quaternion; inverse: Quaternion }>();
-  {
+  let restRead = false;
+  const readRest = () => {
+    if (restRead) return;
+    restRead = true;
     const saved = HUMAN_BONES.map((name) => {
       const node = vrm.humanoid.getRawBoneNode(name);
       return node ? ([name, node, node.quaternion.clone(), node.position.clone()] as const) : undefined;
@@ -56,7 +60,7 @@ export function createVrmPlayer(
       item?.[1].position.copy(item[3]);
     }
     vrm.scene.updateWorldMatrix(true, true);
-  }
+  };
   /** Bones the computed motion changed this paint, to put back before the next one. */
   const touched = new Map<Object3D, { quaternion: Quaternion; position: Vector3 }>();
   const remember = (node: Object3D) => {
@@ -84,6 +88,7 @@ export function createVrmPlayer(
     foot: vrm.humanoid.getRawBoneNode(`${side}Foot`),
   }));
   const applyBody = (pose: BodyPose) => {
+    readRest();
     const feet = pose.plantFeet ? legs.map((leg) => leg.foot?.getWorldPosition(new Vector3())) : [];
     for (const [name, euler] of Object.entries(pose.bones) as [HumanBone, readonly number[]][]) {
       const bone = bodyRest.get(name);
