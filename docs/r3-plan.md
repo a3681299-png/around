@@ -1116,3 +1116,12 @@ GPUの定常参考値は、変更前 **1.14 / 2.16ms**、修正後 **1.18 / 2.13
 2. **テストの揺れ2件を直す**
    - `tests/operation-safety.spec.ts:850`：解除までの計時を、離れる `mouse.move` の後からではなく、離れる1歩目を送る前から始める（1歩目で出口の72pxを越えるため）。下限は「1歩目から350ms」
    - 「作品を表示する」の `check()` が popup の読み込みと競合する件：`tests/studio-transfer.spec.ts:18`・`tests/operation-safety.spec.ts:27`・`:54`・`tests/helpers/world-host.ts:60`・`tests/helpers/asset-runtime-lab.ts:64` の5か所で、`check()` の前に `await expect(switch).toBeEnabled()` を置く
+
+---
+
+# 後回し
+
+前からある残件（変更の前後の両方の版で起きる）。直さず、症状・起きる条件・見立てを1行ずつ書く。
+
+- `tests/operation-live.spec.ts:89` の `k` で一時停止が切り替わらない（実 YouTube、447b2bf と 0638453 の両方、作品を置く前の区間）：フォーカス・動画の準備状態・キーの宛先の記録が足りず原因は未確定。エンジンの退行ではない（Codex の検証、docs/playground-verification.md）
+- `tests/signal-timeline-live.spec.ts:368` の wheel で「説明できない非表示」のフレームが出る（比較版 25/357、対象 51/384、両方に HOLD と解除の通知あり）：不要な HOLD か、試験の判定が HOLD を扱えていないかは未確定。守りを弱めて通さない（同上）
