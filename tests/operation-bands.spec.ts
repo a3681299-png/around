@@ -329,7 +329,12 @@ test('G1 bands: the bars brought back by a pointer move or a key are clipped fro
  * (ytp-autohide) while the advert's own parts stay in the bands. While the player shows an advert,
  * the bands stay clipped whatever the bars do, from the very style recalculation the advert starts.
  */
-test('G1 bands: an advert keeps the bands clipped while the bars are hidden', async ({ popup, youtube }) => {
+test('G1 bands: an advert keeps the bands clipped while the bars are hidden', async ({
+  popup,
+  youtube,
+  layeringOn,
+}) => {
+  test.skip(layeringOn, 'Cut-out way only: layering has no band clip; the advert parts are over it by stacking.');
   await redArtworkInTheCorner(popup, youtube);
   await hideBars(youtube, true);
   await expect.poll(() => redInBottomBand(youtube)).toBeGreaterThan(1000);
