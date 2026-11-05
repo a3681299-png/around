@@ -259,8 +259,31 @@ export function createImageRenderer(
       // Chunk 4 prototype (LAYERING, docs/layering-plan.md): outside editing, the player's plane goes
       // under its controls by stacking order instead of over them with the bands cut out.
       // Locked editing takes no input on the artwork, so it is drawn as outside editing.
-      const beneath =
+      const offered =
         LAYERING && needsVideoSlot && !(editing && !editing.locked) ? safety.source.beneathSlot?.() : undefined;
+      // The cut-out way stays as the way out (chunk 4): while a shown player control that is not
+      // proven to paint over the plane meets the player's artwork (the autoplay card when a video
+      // ends), the stacking order cannot keep it clear, and that draw is cut out as before.
+      const beneath =
+        offered &&
+        !offered.unprovenShown.some((box) =>
+          layout.layers.some((l) => {
+            const root = l.parentId ?? l.layer.id,
+              anchor = roots.get(root)?.layer.placement.anchor,
+              b = l.bounds;
+            return (
+              anchor?.kind === 'surface' &&
+              anchor.target === 'video-player' &&
+              b !== undefined &&
+              b.left < box.left + box.width &&
+              b.right > box.left &&
+              b.top < box.top + box.height &&
+              b.bottom > box.top
+            );
+          }),
+        )
+          ? offered
+          : undefined;
       const slot = beneath
         ? { parent: beneath.parent, rect: beneath.rect, top: 0, bottom: 0, zIndex: beneath.zIndex }
         : needsVideoSlot
@@ -268,7 +291,7 @@ export function createImageRenderer(
           : undefined;
       // Which way each protected draw took, on the document (the trace build only).
       WW_GUARD_TRACE: if (LAYERING && needsVideoSlot) {
-        const way = `${beneath ? 'beneath' : slot ? 'cutout' : 'none'}${editing ? (editing.locked ? '/locked' : '/editing') : ''}`;
+        const way = `${beneath ? 'beneath' : offered ? 'way-out' : slot ? 'cutout' : 'none'}${editing ? (editing.locked ? '/locked' : '/editing') : ''}`;
         const seen = (doc.documentElement.dataset['wwLayeringWays'] ?? '').split('|').filter(Boolean);
         if (seen[seen.length - 1] !== way) doc.documentElement.dataset['wwLayeringWays'] = [...seen, way].join('|');
       }

@@ -231,33 +231,34 @@ layered(
 );
 
 layered(
-  'a player control that is not proven to paint over the character still stops it',
+  'a player control not proven to paint over the character sends it the cut-out way while they meet',
   async ({ popup, youtube }) => {
     await youtubeStacking(youtube);
     await characterOverBar(popup, youtube);
-    const limited = () =>
-      youtube.evaluate(() =>
-        Boolean(
-          document
-            .querySelector('#web-world-themes-video-decorations')
-            ?.shadowRoot?.querySelector('[data-image-id]')
-            ?.hasAttribute('data-safety-limited'),
-        ),
-      );
-    await expect.poll(limited).toBe(false);
-    // A button positioned without a z-index paints below the media's level: the character would
-    // cover it, so the guard stops the character as before (and resumes once it is gone).
-    await youtube.evaluate(() => {
-      const wrap = document.createElement('div');
-      wrap.id = 'unproven';
-      wrap.innerHTML = '<button style="position:absolute;right:40px;bottom:70px;width:40px;height:30px">x</button>';
-      document.querySelector('#movie_player')!.append(wrap);
-    });
-    await expect.poll(limited).toBe(true);
+    const way = () => planeWay(youtube);
+    await expect.poll(way).toBe('beneath');
+    // A button positioned without a z-index paints below the media's level: drawn under the
+    // controls, the character would cover it. While they meet, the character is cut out as before
+    // (the way out), and it goes back under the controls once the button is gone.
+    await unprovenControl(youtube, { gap: -60 });
+    await expect.poll(way).toBe('cut out');
     await youtube.evaluate(() => document.getElementById('unproven')!.remove());
-    await expect.poll(limited, { timeout: 5000 }).toBe(false);
+    await expect.poll(way, { timeout: 5000 }).toBe('beneath');
   },
 );
+
+/** Which way the character is drawn: under the controls (after the media, at its level) or cut
+ * out (the plane over the player's parts, its bands and overlays clipped). */
+const planeWay = (youtube: Page) =>
+  youtube.evaluate(() => {
+    const host = document.querySelector<HTMLElement>('#web-world-themes-video-decorations');
+    if (!host?.shadowRoot?.querySelector('[data-image-id]')) return 'none';
+    const before = host.previousElementSibling as HTMLElement | null;
+    return before?.classList.contains('html5-video-container') &&
+      getComputedStyle(host).zIndex === getComputedStyle(before).zIndex
+      ? 'beneath'
+      : 'cut out';
+  });
 
 /** An unproven control (positioned without a z-index, so below the plane's level) put beside the
  * character's box, `gap` px from its left edge (negative: overlapping), or in the player's
@@ -330,14 +331,17 @@ const unproofed = test.extend({
 });
 
 unproofed(
-  'without the stacking proof, an unproven control under the character is not stopped (the check is real)',
+  'without the stacking proof, an unproven control under the character is left covered (the check is real)',
   async ({ popup, youtube }) => {
     await youtubeStacking(youtube);
     await characterOverBar(popup, youtube);
     await unprovenControl(youtube, { gap: -60 });
+    // With the proof the character goes the cut-out way here (the test above); without it, it stays
+    // under the controls over the button, and nothing holds it.
+    await youtube.waitForTimeout(800);
+    expect(await planeWay(youtube)).toBe('beneath');
     const result = await stoppedWhileBarsToggle(youtube);
     expect(result.frames).toBeGreaterThan(20);
-    // The same placement stops it with the proof (the test above and the one before it).
     expect(result.stopped).toBe(0);
   },
 );

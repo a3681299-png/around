@@ -139,6 +139,10 @@ export interface BeneathSlot {
    * been brought out by the pending changes ('everywhere' when that cannot be told). A paint near
    * none of these needs no hold while the read is pending; the stacking order covers the rest. */
   unproven: readonly PlacementFrame[] | 'everywhere';
+  /** The last read's shown controls over the player's box that are not proven to paint over the
+   * plane (the autoplay card at the end, a thumbnail's play button while it fades). Artwork that
+   * meets one is drawn the cut-out way instead: the stacking order cannot keep that control clear. */
+  unprovenShown: readonly PlacementFrame[];
 }
 /** DOM identities stay here; the site adapter alone supplies discovery/selectors. */
 export function createOperationSource(

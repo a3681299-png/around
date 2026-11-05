@@ -110,21 +110,28 @@ export function youtubeOperations(doc: Document) {
    * browser's own paint order. Only that structure is required here: no menu, advert or central
    * button turns it off. What is not proven to paint over it is checked by the guard as before.
    */
-  const beneathPlace = () => {
-    if (!overlaySlot()) return undefined;
+  // `sized`: also a box to draw in. The proofs need only the structure: a read taken while YouTube
+  // moves the player (into fullscreen or the miniplayer, its box empty for a moment) still proves
+  // its parts, so the next draw is not held for want of a read.
+  const beneathPlace = (sized = true) => {
+    const why = (reason: string) => {
+      WW_GUARD_TRACE: doc.documentElement.setAttribute('data-ww-beneath-place', reason);
+      return undefined;
+    };
+    if (!overlaySlot()) return why('no overlay slot');
     const parent = player();
-    if (!parent) return undefined;
+    if (!parent) return why('no player');
     const style = doc.defaultView!.getComputedStyle(parent);
-    if (style.position === 'static' || !Number.isFinite(Number(style.zIndex))) return undefined;
+    if (style.position === 'static' || !Number.isFinite(Number(style.zIndex))) return why('player not a context');
     let media: HTMLElement | undefined;
     for (const child of parent.children)
       if (child instanceof HTMLElement && child.classList.contains('html5-video-container')) media = child;
-    if (!media) return undefined;
+    if (!media) return why('no media');
     const mediaStyle = doc.defaultView!.getComputedStyle(media);
     const zIndex = Number(mediaStyle.zIndex);
-    if (mediaStyle.position === 'static' || !Number.isFinite(zIndex)) return undefined;
+    if (mediaStyle.position === 'static' || !Number.isFinite(zIndex)) return why('media without a level');
     const r = parent.getBoundingClientRect();
-    if (r.height <= 0 || r.width <= 0) return undefined;
+    if (sized && (r.height <= 0 || r.width <= 0)) return why('empty player box');
     return { parent, media, zIndex, r };
   };
   /**
@@ -248,7 +255,7 @@ export function youtubeOperations(doc: Document) {
       // player's box and sits next to the media in paint order, so a surface outside the player
       // either paints over the media (and so over the plane) or under the whole player, where the
       // player already covers it and takes its clicks: only the player's own surfaces need a proof.
-      const place = LAYERING ? beneathPlace() : undefined;
+      const place = LAYERING ? beneathPlace(false) : undefined;
       if (place) {
         const p = place.r;
         const unproven: { id: string; box: PlacementFrame }[] = [];
@@ -264,6 +271,17 @@ export function youtubeOperations(doc: Document) {
             row.aboveBeneath = true;
             continue;
           } else {
+            // Every part of the player is proven, shown or not and wherever it is now: the
+            // player's box changes (fullscreen, theater, the miniplayer) before the next read, and
+            // a part left without a proof would then stop a paint it is drawn over.
+            row.aboveBeneath = provenOver(composition, row.element, place.media);
+            WW_GUARD_TRACE: {
+              const kept = (doc.documentElement.dataset['wwBeneathRows'] ?? '').split('\n').filter(Boolean);
+              const note = `${row.id} ${row.element.tagName.toLowerCase()}.${[...row.element.classList].slice(0, 3).join('.')} ${row.aboveBeneath ? 'proven' : 'NOT'}`;
+              if (!row.aboveBeneath && !kept.includes(note) && kept.length < 40)
+                doc.documentElement.dataset['wwBeneathRows'] = [...kept, note].join('\n');
+            }
+            // Only one shown over the player's box can be under a paint.
             if (row.visible === false) continue;
             const box = row.envelope ?? row.rect ?? row.element.getBoundingClientRect();
             if (
@@ -273,7 +291,6 @@ export function youtubeOperations(doc: Document) {
               box.top + box.height <= p.top
             )
               continue;
-            row.aboveBeneath = provenOver(composition, row.element, place.media);
           }
           if (!row.aboveBeneath) {
             const r = row.envelope ?? row.rect ?? row.element.getBoundingClientRect();
@@ -412,7 +429,11 @@ export function youtubeOperations(doc: Document) {
         for (const why of everywhere ? ['no read'] : found.map((f) => f.why)) seen.add(why);
         host?.setAttribute('data-ww-beneath-unsettled', [...seen].join('|'));
       }
-      return { ...slot, unproven: everywhere ? ('everywhere' as const) : found.map((f) => f.box) };
+      return {
+        ...slot,
+        unproven: everywhere ? ('everywhere' as const) : found.map((f) => f.box),
+        unprovenShown: beneathRead?.unproven.map((u) => u.box) ?? [],
+      };
     },
   );
 }
