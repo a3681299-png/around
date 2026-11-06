@@ -46,6 +46,10 @@ export interface ImageEditing {
 // handles. They use Gesso's values whatever the colour scheme, since they sit over any picture.
 // Handles keep a 14px hit area around their 12px square; rotation is a square with its glyph,
 // because a circle means 保存済み.
+/** The artwork's size after a gesture: its own size by the gesture's proportion (drawn reduced, the
+ * gesture started from the drawn size). Drawn as authored, exactly the gesture's size. */
+const authoredSize = (own: number, drawn: number, result: number) =>
+  own === drawn || drawn <= 0 ? result : Math.round(((own * result) / drawn) * 10) / 10;
 /**
  * A beneath paint needs no hold for a pending read when no control that is not proven to paint
  * over it is near (docs/layering-plan.md, chunk 4): within 40 px, the distance at which the G1.2
@@ -963,8 +967,11 @@ export function createImageRenderer(
                 0,
                 Math.min(1, base.placement.y + (-dx * Math.sin(angle) + dy * Math.cos(angle)) / base.frame.height),
               ),
-              widthPx: p.widthPx,
-              heightPx: p.heightPx,
+              // The gesture starts from the size as drawn, which a reduced part (a miniplayer,
+              // REGULAR_PART_HEIGHT_PX) makes smaller than the artwork's: the artwork keeps its own
+              // size, changed by the gesture's proportion. Drawn as authored, that is p itself.
+              widthPx: authoredSize(base.placement.widthPx, start.placement.widthPx, p.widthPx),
+              heightPx: authoredSize(base.placement.heightPx, start.placement.heightPx, p.heightPx),
               rotationDeg: rotation(base.placement.rotationDeg + rotation(p.rotationDeg - start.placement.rotationDeg)),
             },
           };

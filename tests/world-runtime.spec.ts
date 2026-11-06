@@ -1,6 +1,9 @@
 import { test, expect } from '@playwright/test';
 import { evaluatePreparedWorld, evaluateWorld, initialWorldState } from '../src/world/evaluate';
-import { evaluateLayout } from '../src/world/layout';
+import { evaluateLayout, REGULAR_PART_HEIGHT_PX } from '../src/world/layout';
+import type { Decoration } from '../src/design/types';
+import { takeInput } from '../src/world/takes';
+import type { WorldInput } from '../src/world/types';
 import { legacyLayout, legacyWorld } from '../src/renderers/dom/legacy-evaluation';
 import { assertWorldParity } from '../src/renderers/dom/parity';
 import { worldScenario } from './helpers/world-scenario';
@@ -28,6 +31,67 @@ test('32 media / 16 groups match legacy layout and masks across anchors, lifecyc
     current = actual.state;
     legacy = expected.state;
   }
+});
+
+test('a layer on a part shown reduced (a miniplayer) is drawn reduced with it; at regular sizes it is untouched', () => {
+  const image = (id: string, anchor: Decoration['placement']['anchor']): Decoration => ({
+    kind: 'image',
+    id,
+    name: `${id}.png`,
+    assetId: `asset-${'b'.repeat(64)}`,
+    placement: { anchor, x: 0.85, y: 0.7, widthPx: 150, heightPx: 190, rotationDeg: 0 },
+    visible: true,
+    locked: false,
+    opacity: 1,
+    zIndex: 0,
+    effects: [],
+  });
+  const scene = freeze({
+    decorations: [image('on-player', { kind: 'surface', target: 'video-player' }), image('free', { kind: 'viewport' })],
+  });
+  const at = (player: { width: number; height: number }, regularHeights?: Record<string, number>) =>
+    evaluateLayout(scene, {
+      viewport: { width: 1920, height: 1080 },
+      anchors: { 'video-player': { left: 1400, top: 760, ...player } },
+      ...(regularHeights ? { regularHeights } : {}),
+    });
+  // The watch page's player, theater and anything at least the part's regular height: as authored.
+  for (const height of [621, 360]) {
+    const regular = at({ width: (height * 16) / 9, height });
+    expect(regular.layers[0]!.layer).toBe(scene.decorations[0]);
+    expect(regular.layers[0]!.bounds!.right - regular.layers[0]!.bounds!.left).toBeCloseTo(150);
+  }
+  // The miniplayer (400×225): the same proportion of the part, from the same point of it.
+  const mini = at({ width: 400, height: 225 }).layers;
+  const s = 225 / REGULAR_PART_HEIGHT_PX['video-player']!;
+  expect(mini[0]!.layer.placement).toEqual({ ...scene.decorations[0]!.placement, widthPx: 150 * s, heightPx: 190 * s });
+  expect(mini[0]!.position).toEqual({ x: 1400 + 400 * 0.85, y: 760 + 225 * 0.7 });
+  expect(mini[0]!.bounds!.bottom - mini[0]!.bounds!.top).toBeCloseTo(190 * s);
+  // A layer on the viewport is not on that part: untouched.
+  expect(mini[1]!.layer).toBe(scene.decorations[1]);
+  // With the height the part had just before at its regular size (the Host's memory), the layer
+  // keeps its share of the part: 190 of a 621 px player is 190 × 225 / 621 of the miniplayer.
+  const kept = at({ width: 400, height: 225 }, { 'video-player': 621 }).layers[0]!.layer.placement;
+  expect(kept.heightPx / 225).toBeCloseTo(190 / 621);
+  expect(kept.widthPx / kept.heightPx).toBeCloseTo(150 / 190);
+  // Known regular heights never enlarge it, and do nothing at a regular size.
+  expect(at({ width: 400, height: 225 }, { 'video-player': 300 }).layers[0]!.layer.placement.heightPx).toBeCloseTo(
+    190 * s,
+  );
+  expect(at({ width: 1104, height: 621 }, { 'video-player': 900 }).layers[0]!.layer).toBe(scene.decorations[0]);
+  // A take does not record the Host's memory: its inputs keep their format.
+  const input: WorldInput = {
+    timeMs: 0,
+    deltaMs: 0,
+    viewport: { width: 1920, height: 1080 },
+    anchors: {},
+    regularHeights: { 'video-player': 621 },
+    signals: { pointer: undefined, playing: false },
+    events: [],
+    environment: { hidden: false, reducedMotion: false },
+    seed: 1,
+  };
+  expect('regularHeights' in takeInput(input)).toBe(false);
 });
 
 test('reused layout produces the same frames and recordings; geometry changes invalidate preparation', () => {

@@ -108,7 +108,10 @@ function between(
  * (the whole-page rule or the roots held over a control). Playback applies the live ones. */
 export function takeInput(input: WorldInput): WorldInput {
   const { safeInteraction, approach, ...environment } = input.environment;
-  return safeInteraction === undefined && approach === undefined ? input : { ...input, environment };
+  // The Host's memory of a part's regular height is not part of a take (its format is unchanged).
+  const { regularHeights, ...recorded } = input;
+  if (safeInteraction === undefined && approach === undefined) return regularHeights === undefined ? input : recorded;
+  return { ...recorded, environment };
 }
 /** Upper bound keeps simultaneous events in their original recorded order. */
 function inputEnd(take: SignalTake, timeMs: number): number {
