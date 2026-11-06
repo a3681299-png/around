@@ -13,10 +13,12 @@ export interface WorldGeometry {
   viewport: { width: number; height: number };
   /** Semantic IDs only; absence means the host cannot currently resolve an anchor. */
   anchors: Readonly<Record<string, PlacementFrame>>;
-  /** By anchor ID: the part's height the last time it was shown at least its regular size
-   * (layout.ts, REGULAR_PART_HEIGHT_PX). Host memory for a reduced part; never recorded in a take
-   * (takeInput drops it), so a take replays from its own anchors alone. */
-  regularHeights?: Readonly<Record<string, number>>;
+  /** By anchor ID: the parts the site adapter reports shown in their reduced form (a video player's
+   * miniplayer), each with the height it last had when not reduced, the base its layers are drawn
+   * reduced against (layout.ts). The adapter decides the form; the world never infers it from a
+   * size, so a small regular part is never reduced. Recorded in World recordings (the input as
+   * evaluated); not in a take (takeInput drops it: takes are artwork data with their own format). */
+  reducedParts?: Readonly<Record<string, number>>;
 }
 export type WorldEvent =
   { type: 'video.play' | 'video.pause' | 'video.ended' | 'host.lifecycle' } | { type: 'pointer.click'; point: Point };

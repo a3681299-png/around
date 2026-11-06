@@ -61,6 +61,92 @@ test('explicit isolated developer recording replays live fixture evaluations and
   await runtime.session.detach();
 });
 
+test('only a player the adapter reports reduced draws its layers reduced; the recording replays it', async ({
+  popup,
+  youtube,
+  extensionId,
+}) => {
+  test.setTimeout(60_000);
+  const panel = await open(popup, youtube);
+  await image(panel, youtube);
+  // The player anchor is chosen on the watch page, where the player is.
+  await watch(youtube);
+  await panel.getByLabel('配置の基準').selectOption('video-player');
+  await panel.getByLabel('画像の幅', { exact: true }).fill('200');
+  await panel.getByLabel('画像の高さ', { exact: true }).fill('120');
+  await save(panel);
+  const runtime = await isolate(youtube, extensionId);
+  await reinject(runtime, 'runtime', true);
+  await expect.poll(() => runtime.evaluate('Boolean(globalThis.__wwWorldRuntime?.frame())')).toBe(true);
+  const drawn = () =>
+    runtime.evaluate<{ height: number; player: number; box: number }>(`(() => {
+      const layer = __wwWorldRuntime.frame().layout.layers[0];
+      return {
+        height: layer.layer.placement.heightPx,
+        player: layer.frame?.height ?? 0,
+        box: layer.bounds ? layer.bounds.bottom - layer.bounds.top : 0,
+      };
+    })()`);
+  const box = async () => (await drawn()).box;
+  await runtime.evaluate('__wwWorldRuntime.startRecording()');
+  await expect.poll(async () => (await drawn()).height).toBe(120);
+  // The layer is on the player, not the viewport.
+  expect(await runtime.evaluate('__wwWorldRuntime.frame().layout.layers[0].layer.placement.anchor')).toEqual({
+    kind: 'surface',
+    target: 'video-player',
+  });
+  const regular = (await drawn()).player,
+    viewport = youtube.viewportSize()!,
+    drawnBox = await box();
+  // The window shrunk at once: the regular player gets small, never reduced (no step at any height).
+  await youtube.setViewportSize({ width: 520, height: 420 });
+  await expect.poll(async () => (await drawn()).player).toBeLessThan(regular);
+  expect((await drawn()).height).toBe(120);
+  await expect.poll(box).toBeCloseTo(drawnBox, 0);
+  await youtube.setViewportSize(viewport);
+  await expect.poll(async () => (await drawn()).player).toBeCloseTo(regular, 3);
+  // YouTube's miniplayer moves the player into its own element: reduced by its last regular height.
+  const home = await youtube.locator('#movie_player').evaluate((player: HTMLElement) => {
+    const mini = document.createElement('ytd-miniplayer');
+    Object.assign(mini.style, { position: 'fixed', right: '12px', bottom: '12px', width: '400px', height: '225px' });
+    document.body.append(mini);
+    const style = player.getAttribute('style');
+    (globalThis as typeof globalThis & { __home?: [Node, Node | null] }).__home = [
+      player.parentNode!,
+      player.nextSibling,
+    ];
+    mini.append(player);
+    Object.assign(player.style, { width: '400px', height: '225px' });
+    return style;
+  });
+  await expect(youtube.locator('#movie_player')).toHaveAttribute('data-ww-reduced', '');
+  await expect.poll(async () => (await drawn()).player).toBeCloseTo(225, 3);
+  await expect.poll(async () => (await drawn()).height).toBeCloseTo((120 * 225) / regular, 6);
+  await expect.poll(box).toBeCloseTo((drawnBox * 225) / regular, 0);
+  // Back on the page: as authored again.
+  await youtube.locator('#movie_player').evaluate((player: HTMLElement, style) => {
+    const [parent, next] = (globalThis as typeof globalThis & { __home?: [Node, Node | null] }).__home!;
+    parent.insertBefore(player, next);
+    if (style === null) player.removeAttribute('style');
+    else player.setAttribute('style', style);
+    document.querySelector('ytd-miniplayer')!.remove();
+  }, home);
+  await expect(youtube.locator('#movie_player')).not.toHaveAttribute('data-ww-reduced');
+  await expect.poll(async () => (await drawn()).height).toBe(120);
+  const value = await runtime.evaluate<{ recording: WorldRecording; expected: WorldFrame; replayed: WorldFrame[] }>(
+    `(() => {
+      const expected = __wwWorldRuntime.frame(), recording = __wwWorldRuntime.stopRecording();
+      return { recording, expected, replayed: __wwWorldRuntime.replay(JSON.stringify(recording)).frames };
+    })()`,
+  );
+  // Every frame was recorded (the reduced inputs did not stop it) and replays as evaluated.
+  expect(value.recording.inputs.some((input) => input.reducedParts?.['video-player'] === regular)).toBe(true);
+  expect(value.replayed.at(-1)).toEqual(value.expected);
+  const reducedFrames = value.replayed.filter((frame) => frame.layout.layers[0]!.layer.placement.heightPx < 120);
+  expect(reducedFrames.length).toBeGreaterThan(0);
+  await runtime.session.detach();
+});
+
 test('recording-only listeners stop after artwork changes and idle/OFF leaves no recording loop', async ({
   popup,
   youtube,

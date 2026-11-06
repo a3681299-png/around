@@ -1,4 +1,5 @@
 import type { SiteAdapter, SitePageChange } from './types';
+import { PART_REDUCED_ATTRIBUTE } from '../host/anchors';
 import { mountYouTubeSettings } from './youtube-player';
 import { videoCardContainer } from './youtube-cards';
 import { youtubePlaybackSource } from './youtube-signals';
@@ -11,6 +12,8 @@ import { surfacesFor, YOUTUBE_BASE_INDEX, YOUTUBE_BASE_SELECTORS, YOUTUBE_SURFAC
 const SURFACE_ATTRIBUTE = 'data-ww-surface';
 /** YouTube's hover preview player, drawn over a card's thumbnail outside the card. */
 const INLINE_PREVIEW = 'ytd-video-preview';
+/** YouTube's miniplayer, into which it moves the player: the player window's reduced form. */
+const MINIPLAYER = 'ytd-miniplayer';
 
 const navigationEvents = ['yt-navigate-finish', 'yt-page-data-updated'] as const;
 const durationSelector =
@@ -81,8 +84,21 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
         );
       };
 
+      // The player window's form (PART_REDUCED_ATTRIBUTE): YouTube's miniplayer moves the player
+      // into its own element. Only the marked player windows are checked, on each batch of page
+      // changes (the move is a childList change), never by a document query.
+      const players = new Set<Element>();
+      const setForm = (element: Element) => {
+        const reduced = element.closest(MINIPLAYER) !== null;
+        if (element.hasAttribute(PART_REDUCED_ATTRIBUTE) !== reduced)
+          element.toggleAttribute(PART_REDUCED_ATTRIBUTE, reduced);
+      };
       const mark = (element: Element) => {
         const surfaces = surfacesFor(element, index.candidates(element));
+        if (surfaces.has('player-window')) {
+          players.add(element);
+          setForm(element);
+        } else if (players.delete(element)) element.removeAttribute(PART_REDUCED_ATTRIBUTE);
         if (surfaces.size > 0) {
           const value = [...surfaces].join(' ');
           if (element.getAttribute(SURFACE_ATTRIBUTE) !== value) {
@@ -122,6 +138,13 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
           // Parts that left the design lose their marks; parts that joined are looked up on their own.
           if (partsRemoved) for (const element of marked) mark(element);
           if (partSelectors) doc.querySelectorAll(partSelectors).forEach(mark);
+        }
+        for (const element of players) {
+          if (element.isConnected) setForm(element);
+          else {
+            players.delete(element);
+            element.removeAttribute(PART_REDUCED_ATTRIBUTE);
+          }
         }
         partsRemoved = false;
         partSelectors = undefined;
@@ -234,6 +257,8 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
         pending.clear();
         marked.forEach((element) => element.removeAttribute(SURFACE_ATTRIBUTE));
         marked.clear();
+        players.forEach((element) => element.removeAttribute(PART_REDUCED_ATTRIBUTE));
+        players.clear();
         root.removeAttribute('data-ww-site');
         root.removeAttribute('data-ww-mode');
         root.removeAttribute('data-ww-fullscreen');

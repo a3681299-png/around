@@ -66,7 +66,17 @@ function events(value: unknown): WorldEvent[] {
   });
 }
 export function parseWorldInput(value: unknown, options?: { registry: SignalRegistry }): WorldInput {
-  const data = record(value, ['timeMs', 'deltaMs', 'viewport', 'anchors', 'signals', 'events', 'environment', 'seed']);
+  const data = record(value, [
+    'timeMs',
+    'deltaMs',
+    'viewport',
+    'anchors',
+    'reducedParts',
+    'signals',
+    'events',
+    'environment',
+    'seed',
+  ]);
   const viewport = record(data['viewport'], ['width', 'height']),
     signals = record(data['signals'], ['pointer', 'pointerTimeMs', 'playing', 'scroll', 'samples']);
   const environment = record(data['environment'], ['hidden', 'reducedMotion', 'holdTransforms', 'safeInteraction']);
@@ -93,6 +103,26 @@ export function parseWorldInput(value: unknown, options?: { registry: SignalRegi
       ];
     }),
   );
+  // Optional (recordings made before it read as before): the parts the adapter reported reduced,
+  // each with its base height, so playback evaluates the same layout as the live frame did.
+  const reduced = data['reducedParts'];
+  if (
+    reduced !== undefined &&
+    (!reduced ||
+      typeof reduced !== 'object' ||
+      Array.isArray(reduced) ||
+      Object.keys(reduced).length > RECORDING_LIMITS.anchors)
+  )
+    throw new Error('Invalid recording reduced parts.');
+  const reducedParts =
+    reduced === undefined
+      ? undefined
+      : Object.fromEntries(
+          Object.entries(reduced).map(([id, height]) => {
+            if (!isDesignId(id)) throw new Error('Invalid semantic anchor ID.');
+            return [id, number(height, 0.001, 1e6)];
+          }),
+        );
   const seed = data['seed'] === undefined ? undefined : number(data['seed'], 0, 0xffffffff);
   if (seed !== undefined && !Number.isInteger(seed)) throw new Error('Invalid World seed.');
   const scroll = signals['scroll'] === undefined ? undefined : record(signals['scroll'], ['x', 'y', 'maxX', 'maxY']);
@@ -101,6 +131,7 @@ export function parseWorldInput(value: unknown, options?: { registry: SignalRegi
     deltaMs: number(data['deltaMs']),
     viewport: { width: number(viewport['width'], 0.001, 1e6), height: number(viewport['height'], 0.001, 1e6) },
     anchors: frames,
+    ...(reducedParts ? { reducedParts } : {}),
     signals: {
       pointer: signals['pointer'] === undefined ? undefined : point(signals['pointer']),
       playing: boolean(signals['playing']),

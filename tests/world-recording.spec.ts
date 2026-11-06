@@ -74,6 +74,48 @@ test('capacity and artwork changes stop a recording without changing the scene o
   expect(recorder.active).toBe(false);
 });
 
+test('a part reported reduced partway is recorded and replays the same frames; recordings without it still read', () => {
+  const { scene: raw, inputs: plain } = worldScenario(6),
+    scene = parseWorldScene(raw),
+    recorder = createWorldRecorder();
+  // The adapter reports the player reduced from the middle on (a miniplayer), with its last
+  // regular height: the inputs change shape partway, as they do when a page enters the miniplayer.
+  const inputs = plain.map((input, index) => {
+    const player = input.anchors['video-player'];
+    return index < plain.length / 2 || !player
+      ? input
+      : { ...input, reducedParts: { 'video-player': player.height * 2 } };
+  });
+  expect(inputs.some((input) => input.reducedParts)).toBe(true);
+  let state = initialWorldState();
+  recorder.start(scene, state);
+  const frames = inputs.map((input) => {
+    expect(recorder.capture(scene, input)).toBe(true);
+    const result = evaluateWorld(scene, state, input);
+    state = result.state;
+    return result.frame;
+  });
+  expect(recorder.status()).toEqual({ active: true, frames: inputs.length });
+  const recording = recorder.stop()!,
+    text = JSON.stringify(recording);
+  expect(recording.inputs.map((input) => input.reducedParts)).toEqual(inputs.map((input) => input.reducedParts));
+  expect(replayWorld(text)).toEqual({ state, frames });
+  // A recording made before the field existed reads and replays as before.
+  const old = { ...recording, inputs: recording.inputs.map(({ reducedParts: _, ...input }) => input) };
+  expect(parseWorldRecording(JSON.stringify(old)).inputs.every((input) => !('reducedParts' in input))).toBe(true);
+  const input = recording.inputs.at(-1)!;
+  for (const reducedParts of [
+    { 'video-player': 0 },
+    { 'video-player': -1 },
+    { 'video-player': Infinity },
+    { 'video-player': '621' },
+    { 'not an id!': 621 },
+    JSON.parse('{"__proto__":621}'),
+    [621],
+  ])
+    expect(() => parseWorldInput({ ...input, reducedParts })).toThrow();
+});
+
 test('recordings reject private/executable fields, unknown events, bad seeds, geometry and versions', () => {
   const { scene, inputs } = worldScenario(4),
     recorder = createWorldRecorder();

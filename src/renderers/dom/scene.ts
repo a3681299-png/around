@@ -752,7 +752,9 @@ export function createImageRenderer(
     const geometry = captureGeometry(doc, anchors),
       scene = { decorations: images, groups, ...(signalRules.length ? { signalRules } : {}) };
     const layout = WORLD_MODE === 'legacy' ? legacyLayout(scene, geometry) : evaluateLayout(scene, geometry);
-    if (WORLD_MODE === 'compare') assertWorldParity(layout, legacyLayout(scene, geometry), 'layout');
+    // The legacy layout predates reduced parts (a miniplayer): it is compared only where they agree.
+    if (WORLD_MODE === 'compare' && !geometry.reducedParts)
+      assertWorldParity(layout, legacyLayout(scene, geometry), 'layout');
     const layouts = new Map(layout.groups.map((group) => [group.layer.id, group]));
     const layerLayouts = new Map(layout.layers.map((layer) => [layer.layer.id, layer]));
     // Composite parents are evaluated first; descendants share the same effect stage.
@@ -967,8 +969,8 @@ export function createImageRenderer(
                 0,
                 Math.min(1, base.placement.y + (-dx * Math.sin(angle) + dy * Math.cos(angle)) / base.frame.height),
               ),
-              // The gesture starts from the size as drawn, which a reduced part (a miniplayer,
-              // REGULAR_PART_HEIGHT_PX) makes smaller than the artwork's: the artwork keeps its own
+              // The gesture starts from the size as drawn, which a reduced part (a miniplayer, the
+              // adapter's PART_REDUCED_ATTRIBUTE) makes smaller than the artwork's: the artwork keeps its own
               // size, changed by the gesture's proportion. Drawn as authored, that is p itself.
               widthPx: authoredSize(base.placement.widthPx, start.placement.widthPx, p.widthPx),
               heightPx: authoredSize(base.placement.heightPx, start.placement.heightPx, p.heightPx),

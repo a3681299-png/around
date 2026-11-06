@@ -11,28 +11,24 @@ import {
 } from './types';
 
 /**
- * A part kind's smallest regular height (CSS px), by the anchor's semantic ID: a part kind every
- * adapter reports (src/sites/anchors.ts), never a site's element. Shown lower than this, the part
- * is a reduced form of itself (a video player's miniplayer, a small embed), and a layer placed on
- * it is drawn reduced with it: by the part's height against the height it last had at its regular
- * size (the Host's `regularHeights`; this height when none is known), so the layer keeps its share
- * of the part, from the same point of it. Its size in the artwork stays as authored: at the
- * regular size and above (the page's player, theater, fullscreen) nothing changes. 360: the
- * smallest regular video picture (360p); a miniplayer is about 225 (chunk 4 follow-up,
- * docs/layering-plan.md 「塊4の続き」).
+ * The placement as drawn on its frame: reduced with a part the adapter reports in its reduced form
+ * (`reducedParts`: a video player's miniplayer), otherwise the same object. The layer is drawn by
+ * the part's height against the height it last had when not reduced, so it keeps its share of the
+ * part, from the same point of it; its size in the artwork stays as authored. Only the adapter's
+ * report counts, never a size: a regular part is drawn as authored however small it is (a small
+ * player, a window shrunk at once), so there is no threshold to step over (chunk 4 fix,
+ * docs/layering-plan.md 9).
  */
-export const REGULAR_PART_HEIGHT_PX: Readonly<Record<string, number>> = Object.freeze({ 'video-player': 360 });
-/** The placement as drawn on its frame: reduced with a reduced part, otherwise the same object. */
 function placedOn<T extends { placement: LayerPlacement }>(
   layer: T,
   frame: PlacementFrame | undefined,
   geometry: WorldGeometry,
 ): T {
   const anchor = layer.placement.anchor;
-  const regular = anchor.kind === 'surface' ? REGULAR_PART_HEIGHT_PX[anchor.target] : undefined;
-  if (!frame || !regular || frame.height <= 0 || frame.height >= regular) return layer;
-  const known = anchor.kind === 'surface' ? geometry.regularHeights?.[anchor.target] : undefined;
-  const scale = frame.height / Math.max(regular, Number.isFinite(known) ? known! : regular);
+  const base = anchor.kind === 'surface' ? geometry.reducedParts?.[anchor.target] : undefined;
+  // A base no taller than the part would enlarge it: a reduced form never draws larger.
+  if (!frame || !base || !Number.isFinite(base) || frame.height <= 0 || frame.height >= base) return layer;
+  const scale = frame.height / base;
   return {
     ...layer,
     placement: {

@@ -153,6 +153,15 @@ const plane = (page: Page) =>
       sameLevel: Boolean(host && before && getComputedStyle(host).zIndex === getComputedStyle(before).zIndex),
     };
   });
+/** The character's drawn height as a share of the player's. */
+const share = (page: Page) =>
+  page.evaluate(() => {
+    const player = document.querySelector('#movie_player')!.getBoundingClientRect();
+    let node: Element | undefined;
+    for (const host of document.querySelectorAll('[id^="web-world-themes"]'))
+      node ??= host.shadowRoot?.querySelector('[data-image-id="resident"]') ?? undefined;
+    return (node?.getBoundingClientRect().height ?? 0) / player.height;
+  });
 /** The element at the centre of each given part: never the extension's. */
 const points = (page: Page, selectors: string[]) =>
   page.evaluate(
@@ -377,6 +386,7 @@ test('real YouTube: fullscreen and the miniplayer keep the character under the p
     // Miniplayer (i): YouTube moves the player into its fixed miniplayer.
     await phase(page, 'miniplayer');
     await page.mouse.move(8, 8);
+    const regularShare = await share(page);
     await page.locator('#movie_player').focus();
     await page.keyboard.press('i');
     await page.waitForTimeout(2500);
@@ -386,15 +396,28 @@ test('real YouTube: fullscreen and the miniplayer keep the character under the p
       inMiniplayer: await page.evaluate(() =>
         Boolean(document.querySelector('#movie_player')?.closest('ytd-miniplayer')),
       ),
+      // The adapter reports the reduced form on the part (chunk 4 fix, docs/layering-plan.md 9).
+      reduced: await page.locator('#movie_player').evaluate((player) => player.hasAttribute('data-ww-reduced')),
+      regularShare,
+      share: await share(page),
       plane: await plane(page),
       points: await points(page, ['.ytp-miniplayer-expand-watch-page-button', '.ytp-play-button']),
     };
     if (mini) await page.screenshot({ path: path.join(shots, 'miniplayer.png'), clip: mini });
     pointsOk('miniplayer', report['miniplayer'] as Parameters<typeof pointsOk>[1]);
+    // The character keeps its share of the player in the miniplayer (2% for the drawn box's rounding).
+    const reduced = report['miniplayer'] as { reduced: boolean; share: number };
+    expect(reduced.reduced).toBe(true);
+    expect(Math.abs(reduced.share - regularShare)).toBeLessThan(regularShare * 0.02);
     await phase(page, 'miniplayer-exit');
     await page.locator('#movie_player').focus();
     await page.keyboard.press('i');
     await page.waitForTimeout(2500);
+    report['miniplayer-exit'] = {
+      reduced: await page.locator('#movie_player').evaluate((player) => player.hasAttribute('data-ww-reduced')),
+      share: await share(page),
+    };
+    expect(report['miniplayer-exit']).toMatchObject({ reduced: false });
   });
 });
 
