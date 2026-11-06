@@ -4,6 +4,7 @@ import type { PlaybackSource } from '../signals/types';
 import { effectActive, maskOf, neededSignals, wantsPointerFrame, type WorldEffectTarget } from '../world/effects';
 import { evaluatePreparedWorld, evaluateWorld, initialWorldState, layoutEffectTargets } from '../world/evaluate';
 import { evaluateLayout } from '../world/layout';
+import { startPage } from '../world/models';
 import type {
   WorldEvent,
   WorldFrame,
@@ -47,6 +48,8 @@ export function createWorldSession(
   let state = initialWorldState();
   let wasPreview = false;
   let lifecyclePending = false;
+  /** The address the last frame was painted for (startPage). */
+  let page: string | undefined;
   let lastFrame: WorldFrame | undefined, devtools: ReturnType<typeof createWorldDevtools>;
   let raf: number | undefined,
     listening = false;
@@ -156,6 +159,15 @@ export function createWorldSession(
   };
   const paint = (time: number) => {
     if (!context || !prepared) return;
+    // The document's address (without its fragment) is the page, on every site: an SPA move
+    // changes it without a new document. A new page starts each character's autonomy again at
+    // home (startPage). One string comparison per frame; nothing in the page is searched.
+    // Document.location is null for a document without a browsing context: no address, no move.
+    const address = (doc.location?.href ?? '').split('#')[0]!;
+    if (address !== page) {
+      if (page !== undefined) state = startPage(state);
+      page = address;
+    }
     // Host restrictions are sampled first: a preview or take mixes in the live approach (G1.2).
     const safety = context.safety?.sample(time);
     const overridden = timeline?.preview(context.scene, safety?.approach);

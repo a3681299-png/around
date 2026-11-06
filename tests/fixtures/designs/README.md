@@ -31,3 +31,9 @@ R3-1b（v14）では `history-v13.json` を追加した。v13を導入した `3e
 取得には `scripts/capture-design-chain-fixtures.mjs` を1件だけに絞った使い捨ての写しを使った（そのテストが `three` を読むため、`three`・`@pixiv` を外部として扱う1行を足した。元のスクリプトは変えていない）。
 期待値（`chain-expected.json`・`css-expected.json` の `history-v13.json`）は、変更前の `133f88b` のパーサーと `compileDesign` で取った。
 v14への版上げで、`chain-expected.json` の全件の `schemaVersion` を14にした（ほかの値は変えていない）。
+
+塊3（v15）では `history-v14.json` を追加した。v14を導入した `8003738` の `tests/character-data.spec.ts` の
+「v14 character roundtrips; clip indices then address its motions」が、最初に `parseDesign` へ渡して受理された入力（キャラ付きの VRM の3Dレイヤー1枚。層の名前が "Trusie" だが、テストの中の名前の文字列だけで、モデルや素材は含まない）である。
+取得は `scripts/capture-design-chain-fixtures.mjs` を1件に絞った使い捨ての写し（出力先だけ `.work/capture` に変えた）で行った。元のスクリプトは変えていない。
+期待値（`chain-expected.json`・`css-expected.json` の `history-v14.json`）は、変更前の `3a41aa2` のパーサーと `compileDesign` で取った。
+v15への版上げで、`chain-expected.json` の全件の `schemaVersion` を15にした（ほかの値は変えていない）。

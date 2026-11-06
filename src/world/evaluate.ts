@@ -1,4 +1,4 @@
-import { evaluateModels } from './models';
+import { evaluateModels, type ModelEvaluation } from './models';
 import { emptyEffectState, evaluateEffects, type WorldEffectTarget } from './effects';
 import { evaluateLayout } from './layout';
 import {
@@ -68,6 +68,12 @@ export function evaluatePreparedWorld(
         transformed?.state,
       )
     : undefined;
+  // A character that moved (a hop between anchors, a flight, the way home) is moved in the layout
+  // itself, not only where it is drawn: the operation guard and the planes' clips then know where
+  // it really is (a CSS translate would leave its bounds, and its protection, at home). Root
+  // layers only; a layer inside a group keeps the drawn offset. The next frame's home is the
+  // unshifted layout, so home never drifts.
+  const moved = models ? shiftMovedModels(layout, models.evaluations) : undefined;
   const machine = {
     video: input.signals.playing ? ('playing' as const) : ('paused' as const),
     events: input.events.map((event) =>
@@ -85,12 +91,43 @@ export function evaluatePreparedWorld(
     },
     frame: {
       timeMs: input.timeMs,
-      layout,
+      layout: moved?.layout ?? layout,
       effects: evaluated.effects,
       machine,
       needsFrame: evaluated.needsFrame || Boolean(transformed?.needsFrame || models?.needsFrame),
       subscriptions: evaluated.subscriptions,
-      ...(models ? { models: models.evaluations } : {}),
+      ...(models ? { models: moved?.evaluations ?? models.evaluations } : {}),
     },
+  };
+}
+
+/** The layout with every moved root character shifted by its move, and those moves taken out of
+ * the drawn pose (it is now where it is drawn). Undefined when nothing moved. */
+function shiftMovedModels(layout: WorldLayout, evaluations: readonly ModelEvaluation[]) {
+  const offsets = new Map<string, { x: number; y: number }>();
+  for (const e of evaluations) if (e.pose && (e.pose.offset.x || e.pose.offset.y)) offsets.set(e.id, e.pose.offset);
+  if (!offsets.size) return undefined;
+  const shifted = new Set<string>();
+  const layers = layout.layers.map((entry) => {
+    const o = offsets.get(entry.layer.id);
+    if (!o || entry.parentId) return entry;
+    shifted.add(entry.layer.id);
+    const b = entry.bounds;
+    return {
+      ...entry,
+      ...(entry.frame ? { frame: { ...entry.frame, left: entry.frame.left + o.x, top: entry.frame.top + o.y } } : {}),
+      ...(b ? { bounds: { left: b.left + o.x, top: b.top + o.y, right: b.right + o.x, bottom: b.bottom + o.y } } : {}),
+      ...(entry.position ? { position: { x: entry.position.x + o.x, y: entry.position.y + o.y } } : {}),
+      ...(entry.localPosition
+        ? { localPosition: { x: entry.localPosition.x + o.x, y: entry.localPosition.y + o.y } }
+        : {}),
+    };
+  });
+  if (!shifted.size) return undefined;
+  return {
+    layout: { ...layout, layers },
+    evaluations: evaluations.map((e) =>
+      shifted.has(e.id) && e.pose ? { ...e, pose: { ...e.pose, offset: { x: 0, y: 0 } } } : e,
+    ),
   };
 }

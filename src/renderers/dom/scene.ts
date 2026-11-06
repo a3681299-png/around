@@ -130,7 +130,15 @@ export function createImageRenderer(
     }
   >();
   const compositions = new Map<string, { node: HTMLDivElement; content: HTMLDivElement; controls: HTMLDivElement }>();
-  let videoSlot: { host: HTMLElement; content: HTMLElement; shadow: ShadowRoot } | undefined;
+  let videoSlot:
+    | {
+        host: HTMLElement;
+        content: HTMLElement;
+        shadow: ShadowRoot;
+        /** the selector written into its rule */ barsHidden?: string;
+        /** the overlay cut-outs last written on its content */ contentClip?: string;
+      }
+    | undefined;
   let pagePlane: Plane | undefined, atmospherePlane: Plane | undefined;
   const createPlane = (id: string, css: string, gestures: boolean): Plane => {
     const planeHost = doc.createElement('div');
@@ -388,6 +396,56 @@ export function createImageRenderer(
         if (videoSlot.host.parentElement !== slot.parent) slot.parent.append(videoSlot.host);
         videoSlot.host.style.setProperty('--ww-decoration-clip', `inset(${slot.top}px 0 ${slot.bottom}px 0)`);
         videoSlot.host.style.setProperty('--ww-local-z', String(slot.zIndex));
+        // What can be pressed over the picture (end screen cards, the "next" card, the cards
+        // teaser, products, an advert's links) is normally above this plane by stacking order.
+        // So it stays clear even where an overlay's own z-index were lower: the plane's content
+        // is clipped around every visible pressable overlay too (an intersection with the band
+        // clip on the host, which keeps the bars' class switch exact). The player's own bars and
+        // its whole-player gesture surface are the bands' business, not holes here.
+        const holes = safety.source
+          .capture()
+          .surfaces.filter(
+            (surface) =>
+              surface.id.startsWith('player.overlay.') &&
+              surface.availability.visible &&
+              surface.shape.width > 0 &&
+              surface.shape.height > 0,
+          )
+          .map((surface) => {
+            const s = surface.protectedEnvelope;
+            const x = Math.round(s.left - slot.rect.left),
+              y = Math.round(s.top - slot.rect.top);
+            return `M${x} ${y}h${Math.round(s.width)}v${Math.round(s.height)}h${-Math.round(s.width)}Z`;
+          });
+        const w = Math.ceil(slot.rect.width),
+          h = Math.ceil(slot.rect.height);
+        const contentClip = holes.length ? `path(evenodd, "M0 0H${w}V${h}H0Z${holes.join('')}")` : '';
+        // Compared with what was written (the browser normalises the style's own text).
+        if (videoSlot.contentClip !== contentClip) {
+          videoSlot.contentClip = contentClip;
+          videoSlot.content.style.clipPath = contentClip;
+        }
+        // G1, the control bands only while the bars are shown (chunk 3, docs/autonomy-plan.md):
+        // the band clip above stays the default. Only while the player carries the adapter's
+        // "bars hidden" class does the plane drop it, and that is decided by the browser's own
+        // style recalculation, not by this draw: when the class goes, the clip is back for the
+        // very frame the bars start to appear, whatever the timing of our rAF or observers.
+        // Class names only (the adapter's, checked here): never a selector of anyone else's. Under
+        // any "kept" class (an advert showing its own parts in the bands) the clip stays.
+        const name = /^[A-Za-z][\w-]*$/;
+        const hidden = slot.barsHiddenClass && name.test(slot.barsHiddenClass) ? slot.barsHiddenClass : '';
+        const kept = (slot.barsKeptClasses ?? []).filter((c) => name.test(c));
+        const selector = hidden ? `.${hidden}${kept.map((c) => `:not(.${c})`).join('')}` : '';
+        if (videoSlot.barsHidden !== selector) {
+          videoSlot.barsHidden = selector;
+          let rule = videoSlot.shadow.querySelector<HTMLStyleElement>('style[data-bars]');
+          if (!rule) {
+            rule = doc.createElement('style');
+            rule.dataset['bars'] = '';
+            videoSlot.shadow.append(rule);
+          }
+          rule.textContent = selector ? `:host-context(${selector}){clip-path:none!important}` : '';
+        }
       }
       // One presentation container preserves scoped z-index/tie ordering and
       // keeps a group's masks/opacity on the original, un-cloned subtree.

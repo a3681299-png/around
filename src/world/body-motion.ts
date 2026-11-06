@@ -2,6 +2,13 @@ import type { HumanBone } from '../characters/humanoid';
 import type { Point } from './geometry';
 import type { WorldEvent } from './types';
 import { numeric, object } from '../models/types';
+import {
+  evaluateAutonomy,
+  parseAutonomyState,
+  type AutonomyOutput,
+  type AutonomyState,
+  type Personality,
+} from './autonomy';
 
 /**
  * Stage-1 computed motion of a character (docs/r3-plan.md R3-2, docs/autonomy-plan.md 3・7):
@@ -75,6 +82,8 @@ export interface BodyMotionState {
   moveStartMs: number | null;
   moveFrom: Point;
   moveKind: 'hop' | 'jump';
+  /** The autonomy's internal states and where it has gone (chunk 3); absent when it is off. */
+  autonomy?: AutonomyState;
 }
 export const BODY_TIMING = Object.freeze({
   /** Idle seconds after which the character starts looking around by itself. */
@@ -103,11 +112,19 @@ export interface BodyContext {
   /** The layer's anchor point in page px, and its height in px (scales moves). */
   position: Point | undefined;
   heightPx: number;
+  widthPx?: number;
+  /** The anchor's frame (same space as position): the autonomy keeps the body inside it. */
+  room?: { left: number; top: number; width: number; height: number };
   pointer: Point | undefined;
   idleSeconds: number | undefined;
   scrollY: number | undefined;
   events: readonly WorldEvent[];
   drive?: BodyDrive;
+  /** The autonomy (chunk 3): its personality, or undefined when the author turned it off. */
+  personality?: Personality;
+  /** Held by G1.2 (an approached control): the body rests, but a move away from the pointer and
+   * the way back home go on, so the character never freezes half-way. */
+  yielding?: boolean;
 }
 
 /** A small integer hash (deterministic noise): the same seed and key give the same 0…1. */
@@ -196,13 +213,42 @@ export function evaluateBodyMotion(
     state: BodyMotionState = previous ? { ...previous } : initialBodyState();
   const author = context.authorActive,
     sit = context.posture === 'sit';
+  const idle = context.idleSeconds ?? 0;
+  const autonomous = !author && context.personality && context.position;
+  const runAutonomy = () =>
+    evaluateAutonomy(state.autonomy, {
+      timeMs: t,
+      deltaMs: context.deltaMs,
+      home: context.position!,
+      heightPx: context.heightPx,
+      ...(context.widthPx ? { widthPx: context.widthPx } : {}),
+      ...(context.room ? { room: context.room } : {}),
+      pointer: context.pointer,
+      idleSeconds: idle,
+      playing: context.events.some((e) => e.type === 'video.play'),
+      personality: context.personality!,
+    });
+  // Held by G1.2 while it is away from home: rest the body, keep going where it was going.
+  if (!context.running && context.yielding && autonomous && state.autonomy) {
+    const { state: mind, output } = runAutonomy();
+    return {
+      state: { ...state, autonomy: mind },
+      pose: { ...REST_POSE, seat: sit, offset: { x: output.offset.x, y: output.offset.y - output.hop } },
+    };
+  }
   // Held (hidden page, approached control): the body rests; what it was doing is forgotten.
   if (!context.running) {
     const rest = initialBodyState();
     rest.position = context.position ? { ...context.position } : null;
     return { state: rest, pose: { ...REST_POSE, seat: sit } };
   }
-  const idle = context.idleSeconds ?? 0;
+  // The autonomy picks what the body does; the body draws it.
+  let mind: AutonomyOutput | undefined;
+  if (autonomous) {
+    const result = runAutonomy();
+    state.autonomy = result.state;
+    mind = result.output;
+  } else delete state.autonomy;
   // Signals → occurrences. Only common signals: idle time, pointer, scroll, the main video.
   if (!author) {
     if (state.idleSeconds >= BODY_TIMING.turnAfterS && idle < 0.5 && context.pointer && context.position) {
@@ -293,7 +339,8 @@ export function evaluateBodyMotion(
     if (sit) {
       // Legs swing from the knee, out of step, in slow bursts.
       const burst = 0.35 + 0.65 * smooth(0.5 + 0.5 * Math.sin((TAU * t) / 9000 + hash01(seed, 4) * TAU));
-      const swing = Math.sin((TAU * t) / 1700) * 11 * burst * drive.fidget;
+      // Boredom (the autonomy) makes the legs swing more.
+      const swing = Math.sin((TAU * t) / 1700) * 11 * burst * drive.fidget * (mind ? 0.6 + 0.8 * mind.fidget : 1);
       add(bones, 'leftLowerLeg', swing, 0, 0);
       add(bones, 'rightLowerLeg', -swing, 0, 0);
     }
@@ -322,6 +369,15 @@ export function evaluateBodyMotion(
       add(bones, 'chest', 0, shake * 0.5, -shake * 0.7);
     }
   }
+  if (mind) {
+    // Leaning toward (or away from) the pointer, dozing with the head down, and the place it has
+    // gone to (hopping on a quick move) on top of everything else.
+    add(bones, 'spine', 8 * mind.lean, 0, 0);
+    add(bones, 'chest', 6 * mind.lean, 0, 0);
+    add(bones, 'head', 22 * mind.doze, 0, 0);
+    add(bones, 'neck', 10 * mind.doze, 0, 0);
+    offset = { x: offset.x + mind.offset.x, y: offset.y + mind.offset.y - mind.hop };
+  }
   // Rounded: equal inputs serialize equally and tiny float noise never wakes a redraw.
   const round = (v: number) => Math.round(v * 1000) / 1000;
   const frozen = Object.fromEntries(
@@ -332,7 +388,8 @@ export function evaluateBodyMotion(
     pose: {
       bones: frozen,
       hips: [round(hips[0]), round(hips[1]), round(hips[2])],
-      blink: round(blinkAt(t, seed)),
+      // Dozing closes the eyes; otherwise the seeded blinks.
+      blink: round(Math.max(blinkAt(t, seed), mind ? mind.doze : 0)),
       yawDeg: round(yawDeg + (sit && !author ? 25 : 0)),
       offset: { x: round(offset.x), y: round(offset.y) },
       opacity: round(opacity),
@@ -378,6 +435,7 @@ export function parseBodyState(value: unknown): BodyMotionState {
     'moveStartMs',
     'moveFrom',
     'moveKind',
+    'autonomy',
   ]);
   const time = (n: unknown) => (n === null ? null : numeric(n, 0, 86400000 * 7));
   const coordinate = (n: unknown) => numeric(n, -1e7, 1e7);
@@ -401,5 +459,6 @@ export function parseBodyState(value: unknown): BodyMotionState {
     moveStartMs: time(v['moveStartMs']),
     moveFrom: point(v['moveFrom']),
     moveKind: v['moveKind'],
+    ...(v['autonomy'] === undefined ? {} : { autonomy: parseAutonomyState(v['autonomy']) }),
   };
 }

@@ -1,6 +1,13 @@
 import type { EditorLayer, ImagePatch, ModelDecoration } from '../design/types';
 import type { ModelSettings } from '../models/types';
-import { modelClips, motionUsable } from '../characters/settings';
+import {
+  BEHAVIOUR_NAMES,
+  DEFAULT_CHARACTER_PERSONALITY,
+  modelClips,
+  motionUsable,
+  type BehaviourMotions,
+  type BehaviourName,
+} from '../characters/settings';
 import { classifyBody, type BodyReason } from '../characters/humanoid';
 import { parseMotionManifest, type MotionLabel } from '../characters/manifest';
 
@@ -13,6 +20,19 @@ export interface MotionImportOptions {
   ): void;
 }
 const REASONS: Record<BodyReason, string> = { head: '頭が大きい', legs: '足が短い', hips: '腰が低い' };
+const BEHAVIOUR_LABELS: Record<BehaviourName, string> = {
+  rest: '何もないとき',
+  flee: '逃げる',
+  approach: '近づく',
+  doze: '居眠り',
+  return: '家に帰る',
+};
+const PART_LABELS = { from: '始まり（秒）', to: '終わり（秒）', speed: '速さ' } as const;
+const cell = (child: Node) => {
+  const td = child.ownerDocument!.createElement('td');
+  td.append(child);
+  return td;
+};
 const ROLES: Record<string, string> = {
   idle: '待機',
   gesture: '身ぶり',
@@ -69,6 +89,10 @@ export function createModelPanel(
     <details class="character-options" open><summary>キャラの動作</summary>
       <p class="character-body model-help" role="status"></p>
       <div class="property"><label>標準の動作 <select class="character-standard" aria-label="標準の動作"><option value="auto">体型に合わせる</option><option value="on">使う</option><option value="off">使わない</option></select></label></div>
+      <div class="property"><label><input type="checkbox" class="character-computed" aria-label="計算の動き"> 計算の動き（呼吸・まばたき・見回すなど）</label></div>
+      <div class="property"><label><input type="checkbox" class="character-autonomy" aria-label="自律"> 自律（カーソルから逃げる・寄ってくる・うとうとする）</label></div>
+      <div class="property character-personality"><label>臆病さ <input type="range" class="character-trait" data-trait="shyness" aria-label="臆病さ" min="0" max="100" step="1"></label><label>好奇心 <input type="range" class="character-trait" data-trait="curiosity" aria-label="好奇心" min="0" max="100" step="1"></label><label>眠りやすさ <input type="range" class="character-trait" data-trait="sleepiness" aria-label="眠りやすさ" min="0" max="100" step="1"></label></div>
+      <table class="character-behaviours" aria-label="自律の動作の割り当て"><thead><tr><th>行動</th><th>動作</th><th>から（秒）</th><th>まで（秒）</th><th>速さ</th></tr></thead><tbody></tbody></table>
       <ul class="character-motions" aria-label="キャラの動作"></ul>
       <div class="property row character-import"><label>種類 <select class="character-origin" aria-label="追加する動作の種類"><option value="character">このキャラ専用</option><option value="standard">どのモデルにも当てられる版</option></select></label><button type="button" class="character-add">動作を追加</button></div>
       <input class="character-file" type="file" accept=".vrma,.json,application/json" multiple hidden aria-label="動作（.vrma）とmanifest.jsonを追加">
@@ -107,6 +131,47 @@ export function createModelPanel(
     const value = (event.target as HTMLSelectElement).value as 'auto' | 'on' | 'off';
     if (current?.character) change({ character: { standardMotions: value } });
   });
+  for (const [selector, key] of [
+    ['.character-computed', 'computedMotion'],
+    ['.character-autonomy', 'autonomy'],
+  ] as const)
+    fieldset.querySelector(selector)!.addEventListener('change', (event) => {
+      event.stopPropagation();
+      if (current?.character) change({ character: { [key]: (event.target as HTMLInputElement).checked } });
+    });
+  fieldset.querySelector('.character-personality')!.addEventListener('change', (event) => {
+    event.stopPropagation();
+    if (!current?.character) return;
+    const value = (trait: string) =>
+      Number(fieldset.querySelector<HTMLInputElement>(`.character-trait[data-trait="${trait}"]`)!.value) / 100;
+    change({
+      character: {
+        personality: { shyness: value('shyness'), curiosity: value('curiosity'), sleepiness: value('sleepiness') },
+      },
+    });
+  });
+  // v15: which motion each autonomy behaviour plays. Any edit sends the whole table again; a row
+  // whose motion is "なし" is left out. Picking a motion starts from its whole length at speed 1.
+  const behaviourRows = fieldset.querySelector<HTMLTableSectionElement>('.character-behaviours tbody')!;
+  behaviourRows.addEventListener('change', (event) => {
+    event.stopPropagation();
+    if (!current?.character) return;
+    const picked = (event.target as Element).closest('select');
+    const assignment: BehaviourMotions = {};
+    for (const row of behaviourRows.querySelectorAll<HTMLTableRowElement>('tr[data-behaviour]')) {
+      const name = row.dataset['behaviour'] as BehaviourName,
+        motion = row.querySelector<HTMLSelectElement>('select')!.value;
+      if (!motion) continue;
+      const source = current.character.motions.find((m) => m.id === motion);
+      if (!source) continue;
+      const number = (key: string) => Number(row.querySelector<HTMLInputElement>(`input[data-part="${key}"]`)!.value);
+      assignment[name] =
+        picked && row.contains(picked)
+          ? { motion, from: 0, to: Math.round(source.source.duration * 100) / 100, speed: 1 }
+          : { motion, from: number('from'), to: number('to'), speed: number('speed') };
+    }
+    change({ character: { behaviourMotions: assignment } });
+  });
   fieldset.querySelector('.character-motions')!.addEventListener('click', (event) => {
     const button = (event.target as Element).closest<HTMLButtonElement>('button[data-remove]');
     if (!button || !current?.character) return;
@@ -129,6 +194,52 @@ export function createModelPanel(
     const select = fieldset.querySelector<HTMLSelectElement>('.character-standard')!;
     select.value = layer.character?.standardMotions ?? 'auto';
     select.disabled = !layer.character;
+    // v15: absent means computed motion on and autonomy off (older artwork keeps its behaviour).
+    const computed = fieldset.querySelector<HTMLInputElement>('.character-computed')!,
+      autonomy = fieldset.querySelector<HTMLInputElement>('.character-autonomy')!;
+    computed.checked = layer.character?.computedMotion !== false;
+    autonomy.checked = Boolean(layer.character?.autonomy);
+    computed.disabled = autonomy.disabled = !layer.character;
+    const personality = layer.character?.personality ?? DEFAULT_CHARACTER_PERSONALITY;
+    for (const input of fieldset.querySelectorAll<HTMLInputElement>('.character-trait')) {
+      input.value = String(Math.round(personality[input.dataset['trait'] as keyof typeof personality] * 100));
+      input.disabled = !layer.character || !layer.character.autonomy;
+    }
+    behaviourRows.replaceChildren(
+      ...BEHAVIOUR_NAMES.map((name) => {
+        const row = doc.createElement('tr'),
+          entry = layer.character?.behaviourMotions?.[name],
+          off = !layer.character || !layer.character.autonomy;
+        row.dataset['behaviour'] = name;
+        const label = doc.createElement('th');
+        label.textContent = BEHAVIOUR_LABELS[name];
+        const select = doc.createElement('select');
+        select.setAttribute('aria-label', `${BEHAVIOUR_LABELS[name]}の動作`);
+        select.append(new Option('なし（計算の動き）', ''));
+        for (const motion of layer.character?.motions ?? []) select.append(new Option(motion.id, motion.id));
+        select.value = entry?.motion ?? '';
+        select.disabled = off;
+        const cells = [label, cell(select)];
+        for (const [key, min, max, step] of [
+          ['from', 0, 600, 0.01],
+          ['to', 0, 600, 0.01],
+          ['speed', 0.25, 4, 0.05],
+        ] as const) {
+          const input = doc.createElement('input');
+          input.type = 'number';
+          input.dataset['part'] = key;
+          input.min = String(min);
+          input.max = String(max);
+          input.step = String(step);
+          input.setAttribute('aria-label', `${BEHAVIOUR_LABELS[name]}の${PART_LABELS[key]}`);
+          input.value = entry ? String(entry[key]) : '';
+          input.disabled = off || !entry;
+          cells.push(cell(input));
+        }
+        row.append(...cells);
+        return row;
+      }),
+    );
     const list = fieldset.querySelector<HTMLUListElement>('.character-motions')!;
     list.replaceChildren(
       ...(layer.character?.motions ?? []).map((motion, index) => {

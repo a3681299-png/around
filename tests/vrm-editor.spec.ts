@@ -63,7 +63,7 @@ test('VRM1 renders MToon with alpha, follows the pointer, edits expressions and 
         'webWorldThemes.design.youtube'
       ] as DesignDocument,
   );
-  expect(saved.schemaVersion).toBe(14);
+  expect(saved.schemaVersion).toBe(15);
   expect(saved.decorations[0]).toMatchObject({
     kind: 'model3d',
     source: { format: 'vrm', vrm: { version: '1.0' } },
