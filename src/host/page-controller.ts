@@ -66,6 +66,7 @@ export function createPageController(
     site.signals?.videoPlayback,
     timeline,
     safety,
+    site.signals?.page,
   );
   g11RegisterRefresh(() => images.refresh());
   let suspended = false,

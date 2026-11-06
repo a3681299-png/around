@@ -1,5 +1,6 @@
 import type { DesignTarget } from '../design/types';
 import type { PlaybackSource } from '../signals/types';
+import type { PageIdentity } from '../host/page-identity';
 
 /** Consumers see semantic surfaces; the adapter owns selectors and page lifecycle. */
 export type Surface =
@@ -66,8 +67,11 @@ export interface SiteAdapter {
    * video card, outside the card), the element at (x, y) beneath that layer; otherwise undefined.
    * A hit test at one point, never a document query: callers find the part with `closest`. */
   beneathOverlay?(node: Element, x: number, y: number): Element | undefined;
-  /** Native media discovery belongs to the site; consumers only receive signals. */
-  readonly signals?: { readonly videoPlayback?: PlaybackSource };
+  /** Native media discovery belongs to the site; consumers only receive signals. `page` is the
+   * site's page identity (the same string for addresses showing the same page; YouTube: the video,
+   * not `t=`): a new page starts each character's autonomy again. Without it, the address
+   * without its fragment is the page. */
+  readonly signals?: { readonly videoPlayback?: PlaybackSource; readonly page?: PageIdentity };
   readonly operationSurfaces?: () => import('../host/operation-source').OperationSource;
   /** `marked` lists elements whose semantic surfaces changed in this batch, so consumers
    * never need a whole-document query to find new parts. */

@@ -1,4 +1,5 @@
 import { captureGeometry } from '../../host/anchors';
+import type { PageIdentity } from '../../host/page-identity';
 import { LAYERING, WORLD_MODE } from '../../host/world-options';
 import { evaluateLayout } from '../../world/layout';
 import { legacyLayout } from './legacy-evaluation';
@@ -128,6 +129,8 @@ export function createImageRenderer(
   playback?: PlaybackSource,
   timeline?: TimelineHost,
   safety?: OperationGuardHost,
+  /** The site adapter's page identity: a new page starts each character's autonomy again. */
+  page?: PageIdentity,
 ) {
   const view = doc.defaultView!;
   let host: HTMLElement | undefined;
@@ -1104,6 +1107,7 @@ export function createImageRenderer(
       // The slot reads computed styles of the overlay's ancestors; read before this frame's style
       // writes, the read needs no style recalculation, and the layout below reuses it (same task).
       () => safety?.source.overlaySlot(),
+      page,
     );
     imageLayer = doc.createElement('div');
     imageLayer.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:0';

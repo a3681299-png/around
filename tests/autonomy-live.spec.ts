@@ -34,7 +34,14 @@ test('real YouTube: the resident stays at the corner in theater mode and fullscr
   await residentOnYouTube('corners');
 });
 
-async function residentOnYouTube(mode: 'autonomy' | 'corners') {
+// Chunk 4 fix (docs/layering-plan.md 9): the page is the adapter's, not the address.
+test('real YouTube: t= on the same video keeps a fled resident where it is; another video brings it home', async () => {
+  test.skip(process.env.WW_LIVE_AUTONOMY !== '1', 'Explicit real YouTube verification (WW_LIVE_AUTONOMY=1).');
+  test.setTimeout(300000);
+  await residentOnYouTube('address');
+});
+
+async function residentOnYouTube(mode: 'autonomy' | 'corners' | 'address') {
   await mkdir(shots, { recursive: true });
   const content = path.resolve('.work/autonomy-live/content');
   const { models } = writeContent(path.resolve('.'), content);
@@ -170,6 +177,59 @@ async function residentOnYouTube(mode: 'autonomy' | 'corners') {
     await page.mouse.move(at.x - 70, at.y, { steps: 4 });
     await page.waitForTimeout(500);
     const fled = await box();
+    if (mode === 'address') {
+      // The same video's address gains t= (and a query): the page is the same video's page (the
+      // adapter's identity), so it stays where it fled. Then another video's ID in the address:
+      // a new page, so it is home at once (the control that the record would see a jump).
+      const follow = async (name: string, address: string) => {
+        const clip = (await page.locator('#movie_player').boundingBox())!;
+        const recording = page.evaluate(async (next) => {
+          const node = () =>
+            [...document.querySelectorAll('[id^="web-world-themes"]')]
+              .map((host) => host.shadowRoot?.querySelector('[data-image-id="resident"]'))
+              .find(Boolean);
+          const rows: { t: number; x: number; y: number; address: string }[] = [];
+          const start = performance.now();
+          await new Promise<void>((resolve) => {
+            const tick = () => {
+              const r = node()?.getBoundingClientRect();
+              if (r) rows.push({ t: performance.now() - start, x: r.x, y: r.y, address: location.search });
+              if (rows.length === 10) history.replaceState(history.state, '', next);
+              if (performance.now() - start < 1200) requestAnimationFrame(tick);
+              else resolve();
+            };
+            requestAnimationFrame(tick);
+          });
+          return rows;
+        }, address);
+        // Continuous pictures while the address changes (about 10 frames in), kept for a person.
+        for (let i = 0; i < 4; i++)
+          await page.screenshot({ path: path.join(shots, `youtube-${name}-${i}.png`), clip }).catch(() => undefined);
+        const frames = await recording;
+        const shown = await shoot(name);
+        const after = frames.filter((row) => row.address.includes(new URL(address, 'https://x').search));
+        const distances = after.map((row) => Math.hypot(row.x - home.x, row.y - home.y));
+        report[name] = {
+          frames: frames.length,
+          framesAfter: after.length,
+          minFromHome: Math.min(...distances),
+          lastFromHome: distances.at(-1),
+          shownAfterMs: shown,
+        };
+        return distances;
+      };
+      // Continuous pictures around the change, kept for a person to look at.
+      const sameVideo = await follow('address-t', '/watch?v=LC1a-DwUhls&t=7s&pp=keep');
+      const anotherVideo = await follow('address-other-video', '/watch?v=jNQXAC9IVRw');
+      console.log('AUTONOMY ADDRESS ' + JSON.stringify(report));
+      expect(Math.hypot(fled.x - home.x, fled.y - home.y)).toBeGreaterThan(100);
+      // t=: no frame after the change is back home (it did not jump).
+      expect(sameVideo.length).toBeGreaterThan(20);
+      expect(Math.min(...sameVideo)).toBeGreaterThan(60);
+      // Another video: home at once.
+      expect(anotherVideo.at(-1)!).toBeLessThan(2);
+      return;
+    }
     // The player's size can still settle after the first read (the page's own layout).
     const room = (await page.locator('#movie_player').boundingBox())!;
     report['fled'] = { box: fled, ...(await state()), shownAfterMs: await shoot('fled') };

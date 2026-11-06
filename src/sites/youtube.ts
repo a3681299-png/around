@@ -3,6 +3,7 @@ import { PART_REDUCED_ATTRIBUTE } from '../host/anchors';
 import { mountYouTubeSettings } from './youtube-player';
 import { videoCardContainer } from './youtube-cards';
 import { youtubePlaybackSource } from './youtube-signals';
+import { youtubePage } from './youtube-page';
 import { youtubeOperations } from './youtube-operations';
 import { YOUTUBE_DESIGN_TARGETS, YOUTUBE_SKIN_CONTROLS, YOUTUBE_SKIN_MARKS } from './youtube-targets';
 import { createSelectorIndex } from './surface-index';
@@ -46,7 +47,7 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
       return doc.elementsFromPoint(x, y).find((element) => !overlay.contains(element) && !element.contains(overlay));
     },
     decorationAnchors: SHARED_DECORATION_ANCHORS,
-    signals: { videoPlayback: youtubePlaybackSource(doc) },
+    signals: { videoPlayback: youtubePlaybackSource(doc), page: youtubePage },
     operationSurfaces: () => youtubeOperations(doc),
     mountSettings: (entry) => mountYouTubeSettings(doc, view, entry),
     setDesignParts(ids) {

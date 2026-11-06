@@ -10,6 +10,8 @@ import {
 } from '../src/world/autonomy';
 import { evaluateBodyMotion, type BodyContext } from '../src/world/body-motion';
 import { startPage, type ModelState } from '../src/world/models';
+import { createPageTracker } from '../src/host/page-identity';
+import { youtubePage } from '../src/sites/youtube-page';
 import { initialWorldState } from '../src/world/evaluate';
 import type { WorldState } from '../src/world/types';
 
@@ -170,6 +172,62 @@ test('a new page: it is home at once, and what it remembered of the last page is
   // Nothing to forget: the same state object.
   const quiet = initialWorldState();
   expect(startPage(quiet)).toBe(quiet);
+});
+
+test("a new page is the adapter's page, not the address: YouTube keeps a video's page through t= and queries", () => {
+  const steps = (tracker: ReturnType<typeof createPageTracker>, addresses: string[]) =>
+    addresses.map((address) => tracker(address));
+  const yt = 'https://www.youtube.com';
+  // The first address is not a new page (nothing to forget); the same video's address changes
+  // (t=, a playlist, a fragment, the parameter order) are not either.
+  expect(
+    steps(createPageTracker(youtubePage), [
+      `${yt}/watch?v=AAAAAAAAAAA`,
+      `${yt}/watch?v=AAAAAAAAAAA&t=7s`,
+      `${yt}/watch?t=12&v=AAAAAAAAAAA&list=PL1`,
+      `${yt}/watch?v=AAAAAAAAAAA#comments`,
+    ]),
+  ).toEqual([false, false, false, false]);
+  // A search, another video, back and forward: each is a new page, as before.
+  expect(
+    steps(createPageTracker(youtubePage), [
+      `${yt}/watch?v=AAAAAAAAAAA`,
+      `${yt}/results?search_query=sea`,
+      `${yt}/results?search_query=sea&sp=EgIQAQ`,
+      `${yt}/results?search_query=mountain`,
+      `${yt}/watch?v=BBBBBBBBBBB`,
+      `${yt}/watch?v=AAAAAAAAAAA`,
+      `${yt}/results?search_query=mountain`,
+      `${yt}/watch?v=AAAAAAAAAAA&t=30`,
+      `${yt}/shorts/CCCCCCCCCCC`,
+      `${yt}/shorts/DDDDDDDDDDD`,
+      `${yt}/`,
+      `${yt}/@channel/videos`,
+      `${yt}/@channel/videos?view=0`,
+      `${yt}/playlist?list=PL1`,
+      `${yt}/playlist?list=PL2`,
+    ]),
+  ).toEqual([false, true, false, true, true, true, true, true, true, true, true, true, false, true, true]);
+  // A site without its own page identity: the address without its fragment, as before.
+  expect(
+    steps(createPageTracker(), [
+      'https://example.test/a?x=1',
+      'https://example.test/a?x=1#top',
+      'https://example.test/a?x=2',
+      '',
+      '',
+    ]),
+  ).toEqual([false, false, true, true, false]);
+  // The adapter's identity is asked only when the address changes.
+  let asked = 0;
+  const tracker = createPageTracker((url) => (asked++, url.pathname));
+  steps(tracker, [
+    'https://example.test/a',
+    'https://example.test/a',
+    'https://example.test/a',
+    'https://example.test/b',
+  ]);
+  expect(asked).toBe(2);
 });
 
 test("the author's motion and reduced motion leave it at home", () => {

@@ -18,6 +18,7 @@ import type { TimelineHost } from './timeline';
 import { rebaseWorldClock } from '../world/clock';
 import { SIGNAL_REGISTRY } from '../signals/registry';
 import type { OperationGuardHost } from './operation-guard';
+import { createPageTracker, type PageIdentity } from './page-identity';
 
 export interface WorldHostContext {
   scene: WorldScene;
@@ -38,6 +39,8 @@ export function createWorldSession(
     result: ReturnType<typeof evaluateWorld>,
   ) => void,
   timeline?: TimelineHost,
+  /** The site adapter's page identity (SiteAdapter.signals.page); the address otherwise. */
+  page?: PageIdentity,
 ) {
   const view = doc.defaultView!,
     reduced = view.matchMedia('(prefers-reduced-motion: reduce)');
@@ -48,8 +51,7 @@ export function createWorldSession(
   let state = initialWorldState();
   let wasPreview = false;
   let lifecyclePending = false;
-  /** The address the last frame was painted for (startPage). */
-  let page: string | undefined;
+  const newPage = createPageTracker(page);
   let lastFrame: WorldFrame | undefined, devtools: ReturnType<typeof createWorldDevtools>;
   let raf: number | undefined,
     listening = false;
@@ -159,15 +161,10 @@ export function createWorldSession(
   };
   const paint = (time: number) => {
     if (!context || !prepared) return;
-    // The document's address (without its fragment) is the page, on every site: an SPA move
-    // changes it without a new document. A new page starts each character's autonomy again at
-    // home (startPage). One string comparison per frame; nothing in the page is searched.
+    // A new page (the adapter's page identity, page-identity.ts) starts each character's autonomy
+    // again at home (startPage). One string comparison per frame; nothing in the page is searched.
     // Document.location is null for a document without a browsing context: no address, no move.
-    const address = (doc.location?.href ?? '').split('#')[0]!;
-    if (address !== page) {
-      if (page !== undefined) state = startPage(state);
-      page = address;
-    }
+    if (newPage(doc.location?.href ?? '')) state = startPage(state);
     // Host restrictions are sampled first: a preview or take mixes in the live approach (G1.2).
     const safety = context.safety?.sample(time);
     const overridden = timeline?.preview(context.scene, safety?.approach);
