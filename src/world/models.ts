@@ -1,5 +1,5 @@
 import type { ModelDecoration } from '../design/types';
-import { yields, type WorldInput, type WorldLayout } from './types';
+import { yields, type WorldInput, type WorldLayout, type WorldState } from './types';
 import type { MotionState } from './motion';
 import { object, numeric } from '../models/types';
 import { oneOf } from '../validation';
@@ -84,6 +84,29 @@ function advance(layer: ModelDecoration, clip: number | null, time: number, delt
   const duration = clip === null ? 0 : (modelClips(layer)[clip]?.duration ?? 0) * 1000;
   return duration <= 0 ? 0 : layer.model.loop ? (time + delta) % duration : Math.min(duration, time + delta);
 }
+/**
+ * A new page (the Host saw the document's address change, e.g. an SPA move): every character's
+ * autonomy starts again, at home. Its memory is for one page (autonomy.ts), and where it fled on
+ * the last page means nothing on the next one. Without this a character that fled before a move
+ * walked home across the page change, and every frame of that walk re-read a page that was being
+ * rebuilt (chunk 3 follow-up: the search SPA's extension CPU, docs/chunk3-verification.md). The
+ * clip, the body's own timing and models without an autonomy are kept as they are.
+ */
+export function startPage(state: WorldState): WorldState {
+  const models = state.models;
+  if (!models || !Object.values(models).some((model) => model.body?.autonomy)) return state;
+  const next: Record<string, ModelState> = {};
+  for (const [id, model] of Object.entries(models)) {
+    if (!model.body?.autonomy) {
+      next[id] = model;
+      continue;
+    }
+    const { autonomy: _forgotten, ...body } = model.body;
+    next[id] = { ...model, body };
+  }
+  return { ...state, models: next };
+}
+
 /** Explicit clock/state only. Renderer never owns clip time or transitions. */
 export function evaluateModels(
   layout: WorldLayout,

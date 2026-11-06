@@ -9,6 +9,9 @@ import {
   type AutonomyState,
 } from '../src/world/autonomy';
 import { evaluateBodyMotion, type BodyContext } from '../src/world/body-motion';
+import { startPage, type ModelState } from '../src/world/models';
+import { initialWorldState } from '../src/world/evaluate';
+import type { WorldState } from '../src/world/types';
 
 const H = 190;
 const home = { x: 1000, y: 500 };
@@ -126,6 +129,47 @@ test('held by G1.2 half-way through a flight, it keeps going (not frozen) and it
     expect(result.pose.bones).toEqual({});
   }
   expect(held.at(-1)!).toBeGreaterThan(before);
+});
+
+test('a new page: it is home at once, and what it remembered of the last page is gone', () => {
+  let state: ReturnType<typeof evaluateBodyMotion>['state'] | undefined;
+  let t = 0;
+  // Startled and away from home on the last page.
+  for (; t < 600; t += 16) state = evaluateBodyMotion(state, { ...body, timeMs: t, ...rush(100)(t) }).state;
+  expect(state!.autonomy!.offset.x).toBeGreaterThan(50);
+  expect(state!.autonomy!.startles).toBeGreaterThan(0);
+  const model: ModelState = {
+    clip: 0,
+    timeMs: 1200,
+    previousClip: null,
+    previousTimeMs: 0,
+    fadeElapsedMs: 0,
+    fadeDurationMs: 0,
+    yawDeg: 0,
+    lookYaw: 0,
+    lookPitch: 0,
+    suspended: false,
+    phase: 'idle',
+  };
+  const world: WorldState = {
+    ...initialWorldState(),
+    timeMs: t,
+    models: { resident: { ...model, body: state! }, plain: model },
+  };
+  const next = startPage(world);
+  // Only the autonomy goes: the clip, the body's own timing and every other model stay.
+  const { autonomy: _gone, ...kept } = state!;
+  expect(next.models!['resident']).toEqual({ ...model, body: kept });
+  expect(next.models!['plain']).toBe(model);
+  expect(next.timeMs).toBe(t);
+  expect(world.models!['resident']!.body!.autonomy).toBeDefined();
+  // The next frame draws it at home (no walk back across the new page), with no memory of startles.
+  const after = evaluateBodyMotion(next.models!['resident']!.body, { ...body, timeMs: t, pointer: { x: 0, y: 0 } });
+  expect(after.pose.offset).toEqual({ x: 0, y: 0 });
+  expect(after.state.autonomy!.startles).toBe(0);
+  // Nothing to forget: the same state object.
+  const quiet = initialWorldState();
+  expect(startPage(quiet)).toBe(quiet);
 });
 
 test("the author's motion and reduced motion leave it at home", () => {
