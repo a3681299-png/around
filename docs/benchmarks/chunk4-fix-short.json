@@ -1,24 +1,31 @@
 {
-  "note": "Claude Code short check (2 pairs, not the pass/fail measurement). Codex harness (verify-c4-06b2b99/.work/verification/perf.spec.ts) limited to c5cbb68 vs 3452198. Headed off-screen Chromium, 1920x1080, real GPU, public mannequin, real YouTube LC1a-DwUhls. Startup CDP windows with an advert were retried per the harness.",
-  "os": "Windows 11",
+  "note": "Claude Code short checks (2 pairs each, not the pass/fail measurement). Codex harness (perf.spec.ts) limited to c5cbb68 vs the fix. Notebook (i7-13650HX), Chromium 153.0.8010.12, 144 Hz, headed off-screen, real GPU, public mannequin, real YouTube LC1a-DwUhls. This file: c5cbb68 vs 6a23f82 (third try, docs/layering-plan.md 9.10). Earlier rounds (9f34ddf, 3452198) are in 9.4.",
   "rows": [
     {
       "pair": 1,
       "build": "c5cbb68",
       "phase": "startup",
       "chromium": "153.0.8010.12",
-      "background": 3.842,
+      "background": 4.575,
+      "video": {
+        "total": 101,
+        "dropped": 5
+      },
       "g11": {
-        "frames": 281,
-        "totalMs": 570.2,
-        "median": 1.199999999254942,
-        "p95": 6.700000002980232
+        "frames": 258,
+        "totalMs": 710.6,
+        "median": 1.3999999985098839,
+        "p95": 8.600000001490116,
+        "max": 78.89999999850988,
+        "longFrames50": 1
       },
       "cdp": {
-        "frames": 314,
-        "totalMs": 329,
-        "median": 0.98,
-        "p95": 3.89
+        "frames": 268,
+        "totalMs": 394.3,
+        "median": 1.01,
+        "p95": 5.35,
+        "max": 27.3,
+        "longFrames50": 0
       }
     },
     {
@@ -26,18 +33,26 @@
       "build": "c5cbb68",
       "phase": "steady",
       "chromium": "153.0.8010.12",
-      "background": 3.842,
+      "background": 4.575,
+      "video": {
+        "total": 142,
+        "dropped": 0
+      },
       "g11": {
-        "frames": 841,
-        "totalMs": 744.1,
-        "median": 0.7999999970197678,
-        "p95": 1.699999999254942
+        "frames": 833,
+        "totalMs": 894.9,
+        "median": 0.8999999985098839,
+        "p95": 2,
+        "max": 9.199999995529652,
+        "longFrames50": 0
       },
       "cdp": {
         "frames": 825,
-        "totalMs": 380.9,
+        "totalMs": 441.4,
         "median": 0,
-        "p95": 1.49
+        "p95": 1.93,
+        "max": 3.2,
+        "longFrames50": 0
       }
     },
     {
@@ -45,170 +60,233 @@
       "build": "c5cbb68",
       "phase": "spa",
       "chromium": "153.0.8010.12",
-      "background": 3.842,
+      "background": 4.575,
+      "video": null,
       "g11": {
-        "frames": 746,
-        "totalMs": 173.9,
+        "frames": 725,
+        "totalMs": 186.3,
         "median": 0,
-        "p95": 1.300000000745058
+        "p95": 1.3999999985098839,
+        "max": 19.19999999552965,
+        "longFrames50": 0
       },
       "cdp": {
-        "frames": 741,
-        "totalMs": 150.7,
+        "frames": 743,
+        "totalMs": 136.1,
         "median": 0,
-        "p95": 1.07
+        "p95": 1.07,
+        "max": 21.8,
+        "longFrames50": 0
       }
     },
     {
       "pair": 1,
-      "build": "3452198",
+      "build": "6a23f82",
       "phase": "startup",
       "chromium": "153.0.8010.12",
-      "background": 3.958,
-      "g11": {
-        "frames": 218,
-        "totalMs": 628.9,
-        "median": 1.3999999985098839,
-        "p95": 13.300000004470348
+      "background": 3.606,
+      "video": {
+        "total": 99,
+        "dropped": 2
       },
-      "cdp": {
-        "frames": 185,
-        "totalMs": 463.1,
-        "median": 1.16,
-        "p95": 9.18
-      }
-    },
-    {
-      "pair": 1,
-      "build": "3452198",
-      "phase": "steady",
-      "chromium": "153.0.8010.12",
-      "background": 3.958,
-      "g11": {
-        "frames": 830,
-        "totalMs": 613.3,
-        "median": 0.6000000014901161,
-        "p95": 1.699999999254942
-      },
-      "cdp": {
-        "frames": 836,
-        "totalMs": 368,
-        "median": 0,
-        "p95": 1.39
-      }
-    },
-    {
-      "pair": 1,
-      "build": "3452198",
-      "phase": "spa",
-      "chromium": "153.0.8010.12",
-      "background": 3.958,
-      "g11": {
-        "frames": 709,
-        "totalMs": 343.6,
-        "median": 0,
-        "p95": 2.199999999254942
-      },
-      "cdp": {
-        "frames": 713,
-        "totalMs": 276.6,
-        "median": 0,
-        "p95": 2.1
-      }
-    },
-    {
-      "pair": 2,
-      "build": "3452198",
-      "phase": "startup",
-      "chromium": "153.0.8010.12",
-      "background": 2.675,
-      "g11": {
-        "frames": 320,
-        "totalMs": 584.4,
-        "median": 1,
-        "p95": 6.299999997019768
-      },
-      "cdp": {
-        "frames": 151,
-        "totalMs": 349.5,
-        "median": 1.16,
-        "p95": 9.95
-      }
-    },
-    {
-      "pair": 2,
-      "build": "3452198",
-      "phase": "steady",
-      "chromium": "153.0.8010.12",
-      "background": 2.675,
-      "g11": {
-        "frames": 845,
-        "totalMs": 558.9,
-        "median": 0.5,
-        "p95": 1.3999999985098839
-      },
-      "cdp": {
-        "frames": 822,
-        "totalMs": 410.1,
-        "median": 0,
-        "p95": 1.49
-      }
-    },
-    {
-      "pair": 2,
-      "build": "3452198",
-      "phase": "spa",
-      "chromium": "153.0.8010.12",
-      "background": 2.675,
-      "g11": {
-        "frames": 712,
-        "totalMs": 317.6,
-        "median": 0,
-        "p95": 1.9000000022351742
-      },
-      "cdp": {
-        "frames": 702,
-        "totalMs": 308.5,
-        "median": 0,
-        "p95": 2.2
-      }
-    },
-    {
-      "pair": 2,
-      "build": "c5cbb68",
-      "phase": "startup",
-      "chromium": "153.0.8010.12",
-      "background": 2.302,
       "g11": {
         "frames": 322,
-        "totalMs": 539.5,
-        "median": 1.0999999977648258,
-        "p95": 4.400000002235174
+        "totalMs": 625.3,
+        "median": 1,
+        "p95": 6.799999997019768,
+        "max": 34.900000005960464,
+        "longFrames50": 0
       },
       "cdp": {
-        "frames": 319,
-        "totalMs": 369.3,
-        "median": 0.98,
-        "p95": 4.4
+        "frames": 144,
+        "totalMs": 395.5,
+        "median": 1.6,
+        "p95": 10.95,
+        "max": 26.9,
+        "longFrames50": 0
+      }
+    },
+    {
+      "pair": 1,
+      "build": "6a23f82",
+      "phase": "steady",
+      "chromium": "153.0.8010.12",
+      "background": 3.606,
+      "video": {
+        "total": 144,
+        "dropped": 0
+      },
+      "g11": {
+        "frames": 838,
+        "totalMs": 569.9,
+        "median": 0.6000000014901161,
+        "p95": 1.3999999985098839,
+        "max": 3,
+        "longFrames50": 0
+      },
+      "cdp": {
+        "frames": 814,
+        "totalMs": 425.9,
+        "median": 0,
+        "p95": 1.68,
+        "max": 3.5,
+        "longFrames50": 0
+      }
+    },
+    {
+      "pair": 1,
+      "build": "6a23f82",
+      "phase": "spa",
+      "chromium": "153.0.8010.12",
+      "background": 3.606,
+      "video": null,
+      "g11": {
+        "frames": 614,
+        "totalMs": 483.8,
+        "median": 0,
+        "p95": 3.5,
+        "max": 31.700000002980232,
+        "longFrames50": 0
+      },
+      "cdp": {
+        "frames": 674,
+        "totalMs": 293.9,
+        "median": 0,
+        "p95": 2.25,
+        "max": 36.1,
+        "longFrames50": 0
       }
     },
     {
       "pair": 2,
-      "build": "c5cbb68",
+      "build": "6a23f82",
+      "phase": "startup",
+      "chromium": "153.0.8010.12",
+      "background": 9.723,
+      "video": {
+        "total": 92,
+        "dropped": 4
+      },
+      "g11": {
+        "frames": 180,
+        "totalMs": 659.9,
+        "median": 1.7999999970197678,
+        "p95": 14.400000005960464,
+        "max": 43.5,
+        "longFrames50": 0
+      },
+      "cdp": {
+        "frames": 157,
+        "totalMs": 424.4,
+        "median": 1.18,
+        "p95": 10.96,
+        "max": 24.4,
+        "longFrames50": 0
+      }
+    },
+    {
+      "pair": 2,
+      "build": "6a23f82",
       "phase": "steady",
       "chromium": "153.0.8010.12",
-      "background": 2.302,
+      "background": 9.723,
+      "video": {
+        "total": 141,
+        "dropped": 0
+      },
       "g11": {
-        "frames": 842,
-        "totalMs": 742,
-        "median": 0.8000000007450581,
-        "p95": 1.6000000014901161
+        "frames": 803,
+        "totalMs": 587.3,
+        "median": 0.6000000014901161,
+        "p95": 1.5,
+        "max": 2.5,
+        "longFrames50": 0
       },
       "cdp": {
         "frames": 832,
-        "totalMs": 408.2,
+        "totalMs": 413.3,
         "median": 0,
-        "p95": 1.44
+        "p95": 1.31,
+        "max": 3.2,
+        "longFrames50": 0
+      }
+    },
+    {
+      "pair": 2,
+      "build": "6a23f82",
+      "phase": "spa",
+      "chromium": "153.0.8010.12",
+      "background": 9.723,
+      "video": null,
+      "g11": {
+        "frames": 667,
+        "totalMs": 379,
+        "median": 0,
+        "p95": 2.7000000029802322,
+        "max": 22.600000001490116,
+        "longFrames50": 0
+      },
+      "cdp": {
+        "frames": 713,
+        "totalMs": 250.8,
+        "median": 0,
+        "p95": 2.02,
+        "max": 35.7,
+        "longFrames50": 0
+      }
+    },
+    {
+      "pair": 2,
+      "build": "c5cbb68",
+      "phase": "startup",
+      "chromium": "153.0.8010.12",
+      "background": 5.129,
+      "video": {
+        "total": 99,
+        "dropped": 3
+      },
+      "g11": {
+        "frames": 346,
+        "totalMs": 609.9,
+        "median": 1.0999999940395355,
+        "p95": 4.100000001490116,
+        "max": 48.29999999701977,
+        "longFrames50": 0
+      },
+      "cdp": {
+        "frames": 151,
+        "totalMs": 292.3,
+        "median": 1.1,
+        "p95": 7.3,
+        "max": 15.7,
+        "longFrames50": 0
+      }
+    },
+    {
+      "pair": 2,
+      "build": "c5cbb68",
+      "phase": "steady",
+      "chromium": "153.0.8010.12",
+      "background": 5.129,
+      "video": {
+        "total": 144,
+        "dropped": 0
+      },
+      "g11": {
+        "frames": 844,
+        "totalMs": 802.2,
+        "median": 0.8000000044703484,
+        "p95": 1.7999999970197678,
+        "max": 3.399999998509884,
+        "longFrames50": 0
+      },
+      "cdp": {
+        "frames": 800,
+        "totalMs": 455.5,
+        "median": 0,
+        "p95": 2.06,
+        "max": 4.3,
+        "longFrames50": 0
       }
     },
     {
@@ -216,18 +294,23 @@
       "build": "c5cbb68",
       "phase": "spa",
       "chromium": "153.0.8010.12",
-      "background": 2.302,
+      "background": 5.129,
+      "video": null,
       "g11": {
-        "frames": 748,
-        "totalMs": 191.4,
+        "frames": 694,
+        "totalMs": 218.9,
         "median": 0,
-        "p95": 1.4000000022351742
+        "p95": 1.7000000029802322,
+        "max": 13.100000001490116,
+        "longFrames50": 0
       },
       "cdp": {
-        "frames": 712,
-        "totalMs": 122.4,
+        "frames": 677,
+        "totalMs": 175.1,
         "median": 0,
-        "p95": 1.07
+        "p95": 1.24,
+        "max": 37.9,
+        "longFrames50": 0
       }
     }
   ]
