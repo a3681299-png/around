@@ -162,7 +162,8 @@ export function createWorldSession(
     // The document's address (without its fragment) is the page, on every site: an SPA move
     // changes it without a new document. A new page starts each character's autonomy again at
     // home (startPage). One string comparison per frame; nothing in the page is searched.
-    const address = doc.location.href.split('#')[0]!;
+    // Document.location is null for a document without a browsing context: no address, no move.
+    const address = (doc.location?.href ?? '').split('#')[0]!;
     if (address !== page) {
       if (page !== undefined) state = startPage(state);
       page = address;
