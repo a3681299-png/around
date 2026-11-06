@@ -484,14 +484,9 @@ export function createImageRenderer(
           if (
             videoSlot.host.parentElement !== beneath.parent ||
             videoSlot.host.previousElementSibling !== beneath.after
-          ) {
+          )
             beneath.parent.insertBefore(videoSlot.host, beneath.after.nextSibling);
-            safety.source.wrote?.();
-          }
-        } else if (videoSlot.host.parentElement !== slot.parent) {
-          slot.parent.append(videoSlot.host);
-          safety.source.wrote?.();
-        }
+        } else if (videoSlot.host.parentElement !== slot.parent) slot.parent.append(videoSlot.host);
         videoSlot.host.style.setProperty('--ww-decoration-clip', `inset(${slot.top}px 0 ${slot.bottom}px 0)`);
         videoSlot.host.style.setProperty('--ww-local-z', String(slot.zIndex));
         // What can be pressed over the picture (end screen cards, the "next" card, the cards
@@ -771,11 +766,7 @@ export function createImageRenderer(
     const overlaySlot = safety?.source.overlaySlot();
     const parent = overlaySlot?.parent ?? doc.fullscreenElement ?? doc.body ?? doc.documentElement;
     if (overlaySlot) host.style.setProperty('--ww-decoration-z', String(overlaySlot.zIndex));
-    if (host.parentElement !== parent) {
-      parent.append(host);
-      // The page changed under this draw's shared reads (operation-source `wrote`).
-      safety?.source.wrote?.();
-    }
+    if (host.parentElement !== parent) parent.append(host);
     const nextObserved = new Set<Element>();
     const effectTargets: EffectTarget[] = [];
     const geometry = captureGeometry(doc, anchors),

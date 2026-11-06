@@ -118,10 +118,6 @@ export interface OperationSource {
    * context, directly after its media and at the media's level, so that whatever the player paints
    * over its picture is painted over this plane too, by the browser's stacking order. */
   beneathSlot?(near?: readonly PlacementFrame[]): BeneathSlot | undefined;
-  /** The extension changed the page's structure (inserted, moved or removed one of its hosts):
-   * the reads shared within this draw (the overlay slot, the adapter's composition reads) are
-   * dropped, so no later read in the same task decides on a page from before the write. */
-  wrote?(): void;
   /** A place under the page's content for atmosphere layers, when the adapter owns the page's
    * stacking (the Playground). Undefined on sites we only decorate (YouTube): there, atmosphere
    * stays over the content with its opacity cap. Drawn under the content, it covers nothing. */
@@ -170,8 +166,6 @@ export function createOperationSource(
     kind: PendingChange,
     near?: readonly PlacementFrame[],
   ) => BeneathSlot | undefined = () => undefined,
-  /** Drops the adapter's reads shared within one draw (createDrawReads) when the extension writes. */
-  dropReads?: () => void,
 ): OperationSource {
   if (!documentIds.has(doc)) documentIds.set(doc, ++nextDocumentId);
   const documentId = documentIds.get(doc)!;
@@ -980,10 +974,6 @@ export function createOperationSource(
     },
     videoSlot,
     beneathSlot: (near) => beneathSlot(fullScan ? undefined : [...added, ...touched], dirty ? pending : 'none', near),
-    wrote() {
-      slot = undefined;
-      dropReads?.();
-    },
     editorCentre,
     overlaySlot: verifiedOverlaySlot,
     underlaySlot,

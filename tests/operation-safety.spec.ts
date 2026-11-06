@@ -13,7 +13,7 @@ import { defaultScrollOpacityRule, defaultSignalRule, type SignalRule } from '..
 async function probeCode() {
   const result = await build({
     stdin: {
-      contents: `export {youtubeOperations} from './src/sites/youtube-operations'; export {createCompositionReader,nativeAbove,scrollsWithPage,fixedContainingBlock} from './src/host/operation-composition'; export {createOperationSource} from './src/host/operation-source'; export {createOperationGuardHost} from './src/host/operation-guard'; export {safePaintRegions} from './src/world/operations'; export {evaluatePreparedWorld,initialWorldState} from './src/world/evaluate'; export {evaluateLayout} from './src/world/layout'; export {worldScenario} from './tests/helpers/world-scenario';`,
+      contents: `export {youtubeOperations} from './src/sites/youtube-operations'; export {createCompositionReader,createDrawReads,nativeAbove,scrollsWithPage,fixedContainingBlock} from './src/host/operation-composition'; export {createOperationSource} from './src/host/operation-source'; export {createOperationGuardHost} from './src/host/operation-guard'; export {safePaintRegions} from './src/world/operations'; export {evaluatePreparedWorld,initialWorldState} from './src/world/evaluate'; export {evaluateLayout} from './src/world/layout'; export {worldScenario} from './tests/helpers/world-scenario';`,
       resolveDir: process.cwd(),
     },
     bundle: true,
@@ -1217,6 +1217,41 @@ test('the composition slot is shared within one task and read again by every lat
   expect(result.changed.value).toBe(false); // A transformed ancestor removes the verified slot.
   expect(result.restored.value).toBe(true);
   expect(result.nextMicrotask.reads).toBeGreaterThan(0);
+});
+
+test("one draw's shared composition reads never reach the next task or frame, nor past a change in the same task", async ({
+  youtube,
+}) => {
+  await youtube.addScriptTag({ content: await probeCode() });
+  const result = await youtube.evaluate(async () => {
+    const api = (window as any).G1Probe;
+    const reads = api.createDrawReads(document);
+    const app = document.querySelector<HTMLElement>('ytd-app')!;
+    const first = reads.reader();
+    const sameTask = reads.reader() === first;
+    const opaque = first.style(app).opacity;
+    // A change in the same task (the page's own script, or the extension's write): a new reader.
+    app.style.opacity = '0.5';
+    const afterWrite = reads.reader();
+    const droppedOnWrite = afterWrite !== first;
+    const seenAfterWrite = afterWrite.style(app).opacity;
+    // No record at all (a stylesheet-only change, as a fade): the next task and frame read again.
+    await Promise.resolve();
+    const nextTask = reads.reader() !== afterWrite;
+    const before = reads.reader();
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    const nextFrame = reads.reader() !== before;
+    app.style.removeProperty('opacity');
+    return { sameTask, opaque, droppedOnWrite, seenAfterWrite, nextTask, nextFrame };
+  });
+  expect(result).toEqual({
+    sameTask: true,
+    opaque: '1',
+    droppedOnWrite: true,
+    seenAfterWrite: '0.5',
+    nextTask: true,
+    nextFrame: true,
+  });
 });
 
 test('a stylesheet-only change to an overlay ancestor is seen by the next frame without any DOM mutation', async ({

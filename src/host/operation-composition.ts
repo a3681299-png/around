@@ -55,26 +55,33 @@ export type CompositionReader = ReturnType<typeof createCompositionReader>;
 
 /**
  * One draw's composition reads (chunk 4 fix, docs/layering-plan.md 9): the stacking chains and
- * computed styles read for one draw are shared by every read of it (the whole read, the overlay
- * and beneath places, the pending proofs), instead of each walking the same ancestors again. The
- * reader is dropped when the extension writes the page (`drop`, from the Host's `wrote`) and at
- * the end of the task, so it never outlives the draw: an opacity or transform transition changes
- * the stacking order with no record, and the next draw must see it (the cued thumbnail's fade).
+ * computed styles read for one draw are shared by every read of it (the whole read, the beneath
+ * place, the pending proofs), instead of each walking the same ancestors again. The reader is
+ * dropped at the end of the task, so it never outlives the draw (an opacity or transform
+ * transition changes the stacking order with no record, and the next draw must see it: the cued
+ * thumbnail's fade), and as soon as the document changed since it was made (the page's or the
+ * extension's own writes, within the same task too). The observer runs only while a reader lives.
  */
 export function createDrawReads(doc: Document) {
   let reader: CompositionReader | undefined;
+  let changed = false;
+  const observer = new MutationObserver(() => (changed = true));
+  const drop = () => {
+    reader = undefined;
+    observer.disconnect();
+  };
   return {
     reader(): CompositionReader {
+      if (reader && (changed || observer.takeRecords().length)) drop();
       if (!reader) {
+        changed = false;
         const created = (reader = createCompositionReader(doc));
+        observer.observe(doc.documentElement, { attributes: true, childList: true, subtree: true });
         queueMicrotask(() => {
-          if (reader === created) reader = undefined;
+          if (reader === created) drop();
         });
       }
       return reader;
-    },
-    drop() {
-      reader = undefined;
     },
   };
 }

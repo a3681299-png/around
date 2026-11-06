@@ -1,5 +1,5 @@
 import { createOperationSource, type DiscoveryScan, type OperationCandidate } from '../host/operation-source';
-import { createDrawReads, type CompositionReader } from '../host/operation-composition';
+import { createDrawReads, fixedContainingBlock, type CompositionReader } from '../host/operation-composition';
 import { LAYERING } from '../host/world-options';
 import type { PlacementFrame } from '../world/geometry';
 
@@ -75,9 +75,9 @@ function createCandidateIndex(doc: Document) {
 
 export function youtubeOperations(doc: Document) {
   const candidates = createCandidateIndex(doc);
-  // One draw's styles and stacking chains, shared by its reads (the whole read, the overlay and
-  // beneath places, the pending proofs; the overlay's ancestors were walked three to four times a
-  // draw). Dropped at the end of the task and when the extension writes the page (Host `wrote`).
+  // One draw's styles and stacking chains, shared by its reads (the whole read, the beneath place,
+  // the player checks, the pending proofs). Dropped at the end of the task and whenever the
+  // document changed since it was made (createDrawReads).
   const reads = createDrawReads(doc);
   // The player, looked up in the whole document only by a whole read (which every added or removed
   // element leads to) or when the one found has left the document. Every draw asks for it (the
@@ -95,9 +95,9 @@ export function youtubeOperations(doc: Document) {
     const parent =
       doc.fullscreenElement instanceof HTMLElement ? doc.fullscreenElement : doc.querySelector<HTMLElement>('ytd-app');
     if (!parent) return undefined;
-    const composition = reads.reader();
+    // Its own reads: the Host shares its answer within the task (verifiedOverlaySlot).
     for (let node: HTMLElement | null = parent; node; node = node.parentElement)
-      if (composition.containingBlock(node)) return undefined;
+      if (fixedContainingBlock(doc.defaultView!.getComputedStyle(node))) return undefined;
     return { parent, zIndex: 1 };
   };
   /** The player when its centre is the native video gesture: no menu, error or advert over it,
@@ -468,6 +468,5 @@ export function youtubeOperations(doc: Document) {
         unprovenShown: beneathRead?.unproven.map((u) => u.box) ?? [],
       };
     },
-    reads.drop,
   );
 }
