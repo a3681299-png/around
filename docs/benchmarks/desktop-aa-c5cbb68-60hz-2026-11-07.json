@@ -1,0 +1,5058 @@
+{
+  "date": "2026-11-07 JST",
+  "revision": "c5cbb68eaaa7f1da596bbc6b05292e4f7425b5a2",
+  "measurementBuildContentSha256": "6e94ece70fb2cf987538cbb4d9ab3eeab732a69e12b43f31235e154ff63c1fcd",
+  "machine": {
+    "cpu": "AMD Ryzen 5 5600X",
+    "gpu": "AMD Radeon RX 6800",
+    "ramGiB": 64,
+    "os": "Windows 11 Pro 26H2 (26300.9711)"
+  },
+  "url": "https://www.youtube.com/watch?v=LC1a-DwUhls",
+  "windowMs": 6000,
+  "intendedRefreshHz": 60,
+  "condition": "Offscreen headed, cloned signed-out seed, one public v15 autonomous seated mannequin, no room image",
+  "calibration": [
+    {
+      "key": "g11-1-A-1",
+      "calibration": [
+        {
+          "loadMs": 0,
+          "frames": 36,
+          "totalMs": 0.7,
+          "medianMs": 0,
+          "p95Ms": 0.1
+        },
+        {
+          "loadMs": 2,
+          "frames": 36,
+          "totalMs": 74.6,
+          "medianMs": 2,
+          "p95Ms": 2.8
+        }
+      ]
+    },
+    {
+      "key": "g11-1-B-1",
+      "calibration": [
+        {
+          "loadMs": 0,
+          "frames": 36,
+          "totalMs": 0.3,
+          "medianMs": 0,
+          "p95Ms": 0.1
+        },
+        {
+          "loadMs": 2,
+          "frames": 36,
+          "totalMs": 72.4,
+          "medianMs": 2,
+          "p95Ms": 2.1
+        }
+      ]
+    }
+  ],
+  "results": {
+    "g11": {
+      "environment": [
+        {
+          "key": "g11-1-A-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 16.6625
+        },
+        {
+          "key": "g11-1-B-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 17.3625
+        },
+        {
+          "key": "g11-2-A-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 17.358333333333334
+        },
+        {
+          "key": "g11-2-B-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 18.05
+        },
+        {
+          "key": "g11-3-A-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 16.666666666666668
+        },
+        {
+          "key": "g11-3-B-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 16.666666666666668
+        },
+        {
+          "key": "g11-4-A-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 16.758333333333336
+        },
+        {
+          "key": "g11-4-B-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 16.662499999999998
+        },
+        {
+          "key": "g11-5-A-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 17.354166666666668
+        },
+        {
+          "key": "g11-5-B-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 18.058333333333334
+        },
+        {
+          "key": "g11-6-A-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 16.666666666666668
+        },
+        {
+          "key": "g11-6-B-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 17.35833333333333
+        },
+        {
+          "key": "g11-7-A-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 17.3625
+        },
+        {
+          "key": "g11-7-B-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 16.670833333333334
+        },
+        {
+          "key": "g11-8-A-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 18.058333333333334
+        },
+        {
+          "key": "g11-8-B-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 17.366666666666667
+        }
+      ],
+      "scenes": {
+        "startup": {
+          "n": 8,
+          "bMinusABounds": {
+            "extensionCpuTotalMs": {
+              "min": -130.7,
+              "max": 25.7,
+              "median": 5.75
+            },
+            "extensionCpuMedianPerFrameMs": {
+              "min": -0.4,
+              "max": 0.7,
+              "median": -0.05
+            },
+            "extensionCpuP95PerFrameMs": {
+              "min": -5,
+              "max": 18.8,
+              "median": -0.25
+            },
+            "pageLongTasks": {
+              "min": -3,
+              "max": 5,
+              "median": 0.5
+            },
+            "extensionLongTaskIndicator": {
+              "min": 0,
+              "max": 0,
+              "median": 0
+            },
+            "videoDropped": {
+              "min": -2,
+              "max": 3,
+              "median": -1
+            },
+            "videoTotal": {
+              "min": -23,
+              "max": 6,
+              "median": 0.5
+            },
+            "videoDroppedPercentagePoints": {
+              "min": -1.961,
+              "max": 3.101,
+              "median": -0.893
+            }
+          },
+          "pairs": [
+            {
+              "pair": 1,
+              "trial": 1,
+              "order": ["A", "B"],
+              "A": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6014.6,
+                "actualReadMs": 6015.9,
+                "domInteractiveMs": 1966.5,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 116.8,
+                "g11": {
+                  "frames": 112,
+                  "totalMs": 530.1,
+                  "medianMs": 2.2,
+                  "p95Ms": 19.8,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 128,
+                    "totalMs": 530.1,
+                    "medianMs": 1.9,
+                    "p95Ms": 18.3
+                  },
+                  "firstFrameMs": 2205.7
+                },
+                "cdp": null,
+                "pageLongTasks": 18,
+                "video": {
+                  "total": 99,
+                  "dropped": 5,
+                  "observedMs": 4900.1,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6008.5,
+                "actualReadMs": 6009.5,
+                "domInteractiveMs": 1914.8,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 116.7,
+                "g11": {
+                  "frames": 120,
+                  "totalMs": 536.1,
+                  "medianMs": 2.1,
+                  "p95Ms": 19.9,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 138,
+                    "totalMs": 536.1,
+                    "medianMs": 1.6,
+                    "p95Ms": 19.4
+                  },
+                  "firstFrameMs": 2210.4
+                },
+                "cdp": null,
+                "pageLongTasks": 18,
+                "video": {
+                  "total": 101,
+                  "dropped": 5,
+                  "observedMs": 4916.7,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": 6,
+                "extensionCpuMedianPerFrameMs": -0.1,
+                "extensionCpuP95PerFrameMs": 0.1,
+                "pageLongTasks": 0,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": 0,
+                "videoTotal": 2,
+                "videoDroppedPercentagePoints": -0.1
+              }
+            },
+            {
+              "pair": 2,
+              "trial": 1,
+              "order": ["B", "A"],
+              "A": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6014.8,
+                "actualReadMs": 6015.7,
+                "domInteractiveMs": 2009.4,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 116.6,
+                "g11": {
+                  "frames": 114,
+                  "totalMs": 491.7,
+                  "medianMs": 2,
+                  "p95Ms": 16.3,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 130,
+                    "totalMs": 491.7,
+                    "medianMs": 1.8,
+                    "p95Ms": 15.9
+                  },
+                  "firstFrameMs": 2173
+                },
+                "cdp": null,
+                "pageLongTasks": 15,
+                "video": {
+                  "total": 102,
+                  "dropped": 5,
+                  "observedMs": 5033.3,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6011.9,
+                "actualReadMs": 6013.4,
+                "domInteractiveMs": 1875.5,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 83.4,
+                "g11": {
+                  "frames": 122,
+                  "totalMs": 497.2,
+                  "medianMs": 1.9,
+                  "p95Ms": 14.1,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 143,
+                    "totalMs": 497.2,
+                    "medianMs": 1.6,
+                    "p95Ms": 13.7
+                  },
+                  "firstFrameMs": 2159.1
+                },
+                "cdp": null,
+                "pageLongTasks": 17,
+                "video": {
+                  "total": 102,
+                  "dropped": 3,
+                  "observedMs": 4883.4,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": 5.5,
+                "extensionCpuMedianPerFrameMs": -0.1,
+                "extensionCpuP95PerFrameMs": -2.2,
+                "pageLongTasks": 2,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": -2,
+                "videoTotal": 0,
+                "videoDroppedPercentagePoints": -1.961
+              }
+            },
+            {
+              "pair": 3,
+              "trial": 1,
+              "order": ["A", "B"],
+              "A": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6013.5,
+                "actualReadMs": 6014.3,
+                "domInteractiveMs": 1867,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 97.2,
+                "g11": {
+                  "frames": 131,
+                  "totalMs": 494.9,
+                  "medianMs": 1.9,
+                  "p95Ms": 14.5,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 151,
+                    "totalMs": 494.9,
+                    "medianMs": 1.7,
+                    "p95Ms": 12.9
+                  },
+                  "firstFrameMs": 2137.9
+                },
+                "cdp": null,
+                "pageLongTasks": 13,
+                "video": {
+                  "total": 102,
+                  "dropped": 5,
+                  "observedMs": 4916.6,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6010.6,
+                "actualReadMs": 6011.6,
+                "domInteractiveMs": 1858,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 133.3,
+                "g11": {
+                  "frames": 126,
+                  "totalMs": 485.7,
+                  "medianMs": 1.9,
+                  "p95Ms": 13.9,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 141,
+                    "totalMs": 485.7,
+                    "medianMs": 1.6,
+                    "p95Ms": 13.1
+                  },
+                  "firstFrameMs": 2170.3
+                },
+                "cdp": null,
+                "pageLongTasks": 18,
+                "video": {
+                  "total": 102,
+                  "dropped": 4,
+                  "observedMs": 4950,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": -9.2,
+                "extensionCpuMedianPerFrameMs": 0,
+                "extensionCpuP95PerFrameMs": -0.6,
+                "pageLongTasks": 5,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": -1,
+                "videoTotal": 0,
+                "videoDroppedPercentagePoints": -0.98
+              }
+            },
+            {
+              "pair": 4,
+              "trial": 1,
+              "order": ["B", "A"],
+              "A": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6009.1,
+                "actualReadMs": 6011.3,
+                "domInteractiveMs": 2063.2,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 116.7,
+                "g11": {
+                  "frames": 112,
+                  "totalMs": 507.5,
+                  "medianMs": 2.6,
+                  "p95Ms": 17.8,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 130,
+                    "totalMs": 507.5,
+                    "medianMs": 2.1,
+                    "p95Ms": 15.8
+                  },
+                  "firstFrameMs": 2358.1
+                },
+                "cdp": null,
+                "pageLongTasks": 17,
+                "video": {
+                  "total": 98,
+                  "dropped": 5,
+                  "observedMs": 4866.7,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6014.8,
+                "actualReadMs": 6015.7,
+                "domInteractiveMs": 1787.8,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 100.1,
+                "g11": {
+                  "frames": 131,
+                  "totalMs": 517,
+                  "medianMs": 2.2,
+                  "p95Ms": 17.2,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 142,
+                    "totalMs": 517,
+                    "medianMs": 1.9,
+                    "p95Ms": 17
+                  },
+                  "firstFrameMs": 1909.5
+                },
+                "cdp": null,
+                "pageLongTasks": 16,
+                "video": {
+                  "total": 102,
+                  "dropped": 4,
+                  "observedMs": 5000,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": 9.5,
+                "extensionCpuMedianPerFrameMs": -0.4,
+                "extensionCpuP95PerFrameMs": -0.6,
+                "pageLongTasks": -1,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": -1,
+                "videoTotal": 4,
+                "videoDroppedPercentagePoints": -1.18
+              }
+            },
+            {
+              "pair": 5,
+              "trial": 1,
+              "order": ["A", "B"],
+              "A": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6009.7,
+                "actualReadMs": 6010.6,
+                "domInteractiveMs": 1856.3,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 100,
+                "g11": {
+                  "frames": 129,
+                  "totalMs": 500.3,
+                  "medianMs": 1.9,
+                  "p95Ms": 15.9,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 147,
+                    "totalMs": 500.3,
+                    "medianMs": 1.7,
+                    "p95Ms": 14.9
+                  },
+                  "firstFrameMs": 2160.8
+                },
+                "cdp": null,
+                "pageLongTasks": 17,
+                "video": {
+                  "total": 102,
+                  "dropped": 6,
+                  "observedMs": 5016.7,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6013.6,
+                "actualReadMs": 6014.6,
+                "domInteractiveMs": 1755.5,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 100,
+                "g11": {
+                  "frames": 135,
+                  "totalMs": 526,
+                  "medianMs": 1.9,
+                  "p95Ms": 16.8,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 152,
+                    "totalMs": 526,
+                    "medianMs": 1.7,
+                    "p95Ms": 16.5
+                  },
+                  "firstFrameMs": 2059.4
+                },
+                "cdp": null,
+                "pageLongTasks": 16,
+                "video": {
+                  "total": 103,
+                  "dropped": 5,
+                  "observedMs": 4919.3,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": 25.7,
+                "extensionCpuMedianPerFrameMs": 0,
+                "extensionCpuP95PerFrameMs": 0.9,
+                "pageLongTasks": -1,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": -1,
+                "videoTotal": 1,
+                "videoDroppedPercentagePoints": -1.028
+              }
+            },
+            {
+              "pair": 6,
+              "trial": 1,
+              "order": ["B", "A"],
+              "A": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6016.5,
+                "actualReadMs": 6017.2,
+                "domInteractiveMs": 1834.1,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 83.4,
+                "g11": {
+                  "frames": 143,
+                  "totalMs": 517.1,
+                  "medianMs": 1.9,
+                  "p95Ms": 14.5,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 158,
+                    "totalMs": 517.1,
+                    "medianMs": 1.7,
+                    "p95Ms": 14.5
+                  },
+                  "firstFrameMs": 2074.4
+                },
+                "cdp": null,
+                "pageLongTasks": 13,
+                "video": {
+                  "total": 102,
+                  "dropped": 1,
+                  "observedMs": 4950.1,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6004.9,
+                "actualReadMs": 6005.6,
+                "domInteractiveMs": 1968.8,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 133.3,
+                "g11": {
+                  "frames": 119,
+                  "totalMs": 528.3,
+                  "medianMs": 2.2,
+                  "p95Ms": 18,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 135,
+                    "totalMs": 528.3,
+                    "medianMs": 1.8,
+                    "p95Ms": 17.7
+                  },
+                  "firstFrameMs": 2223.9
+                },
+                "cdp": null,
+                "pageLongTasks": 14,
+                "video": {
+                  "total": 98,
+                  "dropped": 4,
+                  "observedMs": 4849.9,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": 11.2,
+                "extensionCpuMedianPerFrameMs": 0.3,
+                "extensionCpuP95PerFrameMs": 3.5,
+                "pageLongTasks": 1,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": 3,
+                "videoTotal": -4,
+                "videoDroppedPercentagePoints": 3.101
+              }
+            },
+            {
+              "pair": 7,
+              "trial": 1,
+              "order": ["A", "B"],
+              "A": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6004.4,
+                "actualReadMs": 6005.3,
+                "domInteractiveMs": 1951.9,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 100,
+                "g11": {
+                  "frames": 124,
+                  "totalMs": 547.8,
+                  "medianMs": 2.1,
+                  "p95Ms": 17.9,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 140,
+                    "totalMs": 547.8,
+                    "medianMs": 1.7,
+                    "p95Ms": 17.9
+                  },
+                  "firstFrameMs": 2222.6
+                },
+                "cdp": null,
+                "pageLongTasks": 17,
+                "video": {
+                  "total": 100,
+                  "dropped": 4,
+                  "observedMs": 4833.3,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6006.3,
+                "actualReadMs": 6007,
+                "domInteractiveMs": 1737.1,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 66.7,
+                "g11": {
+                  "frames": 146,
+                  "totalMs": 514.5,
+                  "medianMs": 2,
+                  "p95Ms": 12.9,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 162,
+                    "totalMs": 514.5,
+                    "medianMs": 1.7,
+                    "p95Ms": 12.3
+                  },
+                  "firstFrameMs": 2025.7
+                },
+                "cdp": null,
+                "pageLongTasks": 14,
+                "video": {
+                  "total": 106,
+                  "dropped": 4,
+                  "observedMs": 5050,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": -33.3,
+                "extensionCpuMedianPerFrameMs": -0.1,
+                "extensionCpuP95PerFrameMs": -5,
+                "pageLongTasks": -3,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": 0,
+                "videoTotal": 6,
+                "videoDroppedPercentagePoints": -0.226
+              }
+            },
+            {
+              "pair": 8,
+              "trial": 1,
+              "order": ["B", "A"],
+              "A": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6013.4,
+                "actualReadMs": 6014.3,
+                "domInteractiveMs": 1951.1,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 100,
+                "g11": {
+                  "frames": 129,
+                  "totalMs": 489.7,
+                  "medianMs": 2,
+                  "p95Ms": 14.2,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 146,
+                    "totalMs": 489.7,
+                    "medianMs": 1.8,
+                    "p95Ms": 12.5
+                  },
+                  "firstFrameMs": 2225.8
+                },
+                "cdp": null,
+                "pageLongTasks": 13,
+                "video": {
+                  "total": 100,
+                  "dropped": 6,
+                  "observedMs": 4899.9,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6036.9,
+                "actualReadMs": 6037.9,
+                "domInteractiveMs": 2832,
+                "rAFPeriodMedianMs": 33.3,
+                "rAFPeriodP95Ms": 199.8,
+                "g11": {
+                  "frames": 55,
+                  "totalMs": 359,
+                  "medianMs": 2.7,
+                  "p95Ms": 33,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 72,
+                    "totalMs": 359,
+                    "medianMs": 2.2,
+                    "p95Ms": 29
+                  },
+                  "firstFrameMs": 3079
+                },
+                "cdp": null,
+                "pageLongTasks": 17,
+                "video": {
+                  "total": 77,
+                  "dropped": 4,
+                  "observedMs": 4033.3,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": -130.7,
+                "extensionCpuMedianPerFrameMs": 0.7,
+                "extensionCpuP95PerFrameMs": 18.8,
+                "pageLongTasks": 4,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": -2,
+                "videoTotal": -23,
+                "videoDroppedPercentagePoints": -0.805
+              }
+            }
+          ]
+        },
+        "steady": {
+          "n": 8,
+          "bMinusABounds": {
+            "extensionCpuTotalMs": {
+              "min": -67,
+              "max": 52.9,
+              "median": 14.95
+            },
+            "extensionCpuMedianPerFrameMs": {
+              "min": -0.1,
+              "max": 0.1,
+              "median": 0
+            },
+            "extensionCpuP95PerFrameMs": {
+              "min": -0.4,
+              "max": 0.7,
+              "median": 0.1
+            },
+            "pageLongTasks": {
+              "min": 0,
+              "max": 0,
+              "median": 0
+            },
+            "extensionLongTaskIndicator": {
+              "min": 0,
+              "max": 0,
+              "median": 0
+            },
+            "videoDropped": {
+              "min": 0,
+              "max": 0,
+              "median": 0
+            },
+            "videoTotal": {
+              "min": -1,
+              "max": 2,
+              "median": -0.5
+            },
+            "videoDroppedPercentagePoints": {
+              "min": 0,
+              "max": 0,
+              "median": 0
+            }
+          },
+          "pairs": [
+            {
+              "pair": 1,
+              "trial": 1,
+              "order": ["A", "B"],
+              "A": {
+                "scene": "steady",
+                "startMs": 12134.2,
+                "windowCloseMs": 18146.7,
+                "actualReadMs": 18147.5,
+                "domInteractiveMs": 1966.5,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 16.8,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 546.1,
+                  "medianMs": 1.4,
+                  "p95Ms": 2.6,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 546.1,
+                    "medianMs": 1.4,
+                    "p95Ms": 2.6
+                  },
+                  "firstFrameMs": 12139
+                },
+                "cdp": null,
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 143,
+                  "dropped": 0,
+                  "observedMs": 5983.3,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "steady",
+                "startMs": 12120.8,
+                "windowCloseMs": 18135.4,
+                "actualReadMs": 18136.2,
+                "domInteractiveMs": 1914.8,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 18.2,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 559.8,
+                  "medianMs": 1.4,
+                  "p95Ms": 2.7,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 559.8,
+                    "medianMs": 1.4,
+                    "p95Ms": 2.7
+                  },
+                  "firstFrameMs": 12127
+                },
+                "cdp": null,
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 142,
+                  "dropped": 0,
+                  "observedMs": 5950,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": 13.7,
+                "extensionCpuMedianPerFrameMs": 0,
+                "extensionCpuP95PerFrameMs": 0.1,
+                "pageLongTasks": 0,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": 0,
+                "videoTotal": -1,
+                "videoDroppedPercentagePoints": 0
+              }
+            },
+            {
+              "pair": 2,
+              "trial": 1,
+              "order": ["B", "A"],
+              "A": {
+                "scene": "steady",
+                "startMs": 12133.7,
+                "windowCloseMs": 18137.5,
+                "actualReadMs": 18138.3,
+                "domInteractiveMs": 2009.4,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 17.5,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 560.9,
+                  "medianMs": 1.5,
+                  "p95Ms": 2.6,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 560.9,
+                    "medianMs": 1.5,
+                    "p95Ms": 2.6
+                  },
+                  "firstFrameMs": 12139.7
+                },
+                "cdp": null,
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 142,
+                  "dropped": 0,
+                  "observedMs": 5936.5,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "steady",
+                "startMs": 12120.3,
+                "windowCloseMs": 18126,
+                "actualReadMs": 18127.8,
+                "domInteractiveMs": 1875.5,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 16.8,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 580.2,
+                  "medianMs": 1.4,
+                  "p95Ms": 2.8,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 580.2,
+                    "medianMs": 1.4,
+                    "p95Ms": 2.8
+                  },
+                  "firstFrameMs": 12125.8
+                },
+                "cdp": null,
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 143,
+                  "dropped": 0,
+                  "observedMs": 5966.6,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": 19.3,
+                "extensionCpuMedianPerFrameMs": -0.1,
+                "extensionCpuP95PerFrameMs": 0.2,
+                "pageLongTasks": 0,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": 0,
+                "videoTotal": 1,
+                "videoDroppedPercentagePoints": 0
+              }
+            },
+            {
+              "pair": 3,
+              "trial": 1,
+              "order": ["A", "B"],
+              "A": {
+                "scene": "steady",
+                "startMs": 12138,
+                "windowCloseMs": 18150.3,
+                "actualReadMs": 18150.9,
+                "domInteractiveMs": 1867,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 21.3,
+                "g11": {
+                  "frames": 359,
+                  "totalMs": 542.9,
+                  "medianMs": 1.4,
+                  "p95Ms": 2.6,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 359,
+                    "totalMs": 542.9,
+                    "medianMs": 1.4,
+                    "p95Ms": 2.6
+                  },
+                  "firstFrameMs": 12154.7
+                },
+                "cdp": null,
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 143,
+                  "dropped": 0,
+                  "observedMs": 5937.7,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "steady",
+                "startMs": 12128.4,
+                "windowCloseMs": 18129.8,
+                "actualReadMs": 18130.3,
+                "domInteractiveMs": 1858,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 16.8,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 595.8,
+                  "medianMs": 1.4,
+                  "p95Ms": 3.2,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 595.8,
+                    "medianMs": 1.4,
+                    "p95Ms": 3.2
+                  },
+                  "firstFrameMs": 12136.7
+                },
+                "cdp": null,
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 142,
+                  "dropped": 0,
+                  "observedMs": 5949.9,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": 52.9,
+                "extensionCpuMedianPerFrameMs": 0,
+                "extensionCpuP95PerFrameMs": 0.6,
+                "pageLongTasks": 0,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": 0,
+                "videoTotal": -1,
+                "videoDroppedPercentagePoints": 0
+              }
+            },
+            {
+              "pair": 4,
+              "trial": 1,
+              "order": ["B", "A"],
+              "A": {
+                "scene": "steady",
+                "startMs": 12104.2,
+                "windowCloseMs": 18113.6,
+                "actualReadMs": 18114.3,
+                "domInteractiveMs": 2063.2,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 17.7,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 583.7,
+                  "medianMs": 1.5,
+                  "p95Ms": 3,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 583.7,
+                    "medianMs": 1.5,
+                    "p95Ms": 3
+                  },
+                  "firstFrameMs": 12108
+                },
+                "cdp": null,
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 143,
+                  "dropped": 0,
+                  "observedMs": 5950,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "steady",
+                "startMs": 12135.9,
+                "windowCloseMs": 18142.9,
+                "actualReadMs": 18144.8,
+                "domInteractiveMs": 1787.8,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 16.8,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 566.8,
+                  "medianMs": 1.4,
+                  "p95Ms": 2.7,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 566.8,
+                    "medianMs": 1.4,
+                    "p95Ms": 2.7
+                  },
+                  "firstFrameMs": 12142.7
+                },
+                "cdp": null,
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 142,
+                  "dropped": 0,
+                  "observedMs": 5933.3,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": -16.9,
+                "extensionCpuMedianPerFrameMs": -0.1,
+                "extensionCpuP95PerFrameMs": -0.3,
+                "pageLongTasks": 0,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": 0,
+                "videoTotal": -1,
+                "videoDroppedPercentagePoints": 0
+              }
+            },
+            {
+              "pair": 5,
+              "trial": 1,
+              "order": ["A", "B"],
+              "A": {
+                "scene": "steady",
+                "startMs": 12104.4,
+                "windowCloseMs": 18108.2,
+                "actualReadMs": 18109,
+                "domInteractiveMs": 1856.3,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 19.3,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 617,
+                  "medianMs": 1.5,
+                  "p95Ms": 3,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 617,
+                    "medianMs": 1.5,
+                    "p95Ms": 3
+                  },
+                  "firstFrameMs": 12110.6
+                },
+                "cdp": null,
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 142,
+                  "dropped": 0,
+                  "observedMs": 5950,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "steady",
+                "startMs": 12099.6,
+                "windowCloseMs": 18105.6,
+                "actualReadMs": 18106.3,
+                "domInteractiveMs": 1755.5,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 18.6,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 550,
+                  "medianMs": 1.4,
+                  "p95Ms": 2.6,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 550,
+                    "medianMs": 1.4,
+                    "p95Ms": 2.6
+                  },
+                  "firstFrameMs": 12110.6
+                },
+                "cdp": null,
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 143,
+                  "dropped": 0,
+                  "observedMs": 5949.9,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": -67,
+                "extensionCpuMedianPerFrameMs": -0.1,
+                "extensionCpuP95PerFrameMs": -0.4,
+                "pageLongTasks": 0,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": 0,
+                "videoTotal": 1,
+                "videoDroppedPercentagePoints": 0
+              }
+            },
+            {
+              "pair": 6,
+              "trial": 1,
+              "order": ["B", "A"],
+              "A": {
+                "scene": "steady",
+                "startMs": 12132.8,
+                "windowCloseMs": 18145.6,
+                "actualReadMs": 18146.3,
+                "domInteractiveMs": 1834.1,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 18,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 535.9,
+                  "medianMs": 1.4,
+                  "p95Ms": 2.4,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 535.9,
+                    "medianMs": 1.4,
+                    "p95Ms": 2.4
+                  },
+                  "firstFrameMs": 12141.2
+                },
+                "cdp": null,
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 143,
+                  "dropped": 0,
+                  "observedMs": 5966.6,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "steady",
+                "startMs": 12104.1,
+                "windowCloseMs": 18111.5,
+                "actualReadMs": 18112.1,
+                "domInteractiveMs": 1968.8,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 18.5,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 524.3,
+                  "medianMs": 1.4,
+                  "p95Ms": 2.5,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 524.3,
+                    "medianMs": 1.4,
+                    "p95Ms": 2.5
+                  },
+                  "firstFrameMs": 12107.2
+                },
+                "cdp": null,
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 142,
+                  "dropped": 0,
+                  "observedMs": 5951.7,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": -11.6,
+                "extensionCpuMedianPerFrameMs": 0,
+                "extensionCpuP95PerFrameMs": 0.1,
+                "pageLongTasks": 0,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": 0,
+                "videoTotal": -1,
+                "videoDroppedPercentagePoints": 0
+              }
+            },
+            {
+              "pair": 7,
+              "trial": 1,
+              "order": ["A", "B"],
+              "A": {
+                "scene": "steady",
+                "startMs": 12108.6,
+                "windowCloseMs": 18125.9,
+                "actualReadMs": 18126.5,
+                "domInteractiveMs": 1951.9,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 18.6,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 532,
+                  "medianMs": 1.4,
+                  "p95Ms": 2.5,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 532,
+                    "medianMs": 1.4,
+                    "p95Ms": 2.5
+                  },
+                  "firstFrameMs": 12123.6
+                },
+                "cdp": null,
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 142,
+                  "dropped": 0,
+                  "observedMs": 5933.3,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "steady",
+                "startMs": 12098.2,
+                "windowCloseMs": 18107.2,
+                "actualReadMs": 18107.7,
+                "domInteractiveMs": 1737.1,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 18.4,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 548.2,
+                  "medianMs": 1.4,
+                  "p95Ms": 2.6,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 548.2,
+                    "medianMs": 1.4,
+                    "p95Ms": 2.6
+                  },
+                  "firstFrameMs": 12109.1
+                },
+                "cdp": null,
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 142,
+                  "dropped": 0,
+                  "observedMs": 5950,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": 16.2,
+                "extensionCpuMedianPerFrameMs": 0,
+                "extensionCpuP95PerFrameMs": 0.1,
+                "pageLongTasks": 0,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": 0,
+                "videoTotal": 0,
+                "videoDroppedPercentagePoints": 0
+              }
+            },
+            {
+              "pair": 8,
+              "trial": 1,
+              "order": ["B", "A"],
+              "A": {
+                "scene": "steady",
+                "startMs": 12105.9,
+                "windowCloseMs": 18114.2,
+                "actualReadMs": 18115,
+                "domInteractiveMs": 1951.1,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 18.7,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 559.5,
+                  "medianMs": 1.4,
+                  "p95Ms": 2.5,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 559.5,
+                    "medianMs": 1.4,
+                    "p95Ms": 2.5
+                  },
+                  "firstFrameMs": 12109.2
+                },
+                "cdp": null,
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 142,
+                  "dropped": 0,
+                  "observedMs": 5933.3,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "steady",
+                "startMs": 12284.1,
+                "windowCloseMs": 18294.8,
+                "actualReadMs": 18295.3,
+                "domInteractiveMs": 2832,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 18.8,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 601.5,
+                  "medianMs": 1.5,
+                  "p95Ms": 3.2,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 601.5,
+                    "medianMs": 1.5,
+                    "p95Ms": 3.2
+                  },
+                  "firstFrameMs": 12293.2
+                },
+                "cdp": null,
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 144,
+                  "dropped": 0,
+                  "observedMs": 5966.6,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": 42,
+                "extensionCpuMedianPerFrameMs": 0.1,
+                "extensionCpuP95PerFrameMs": 0.7,
+                "pageLongTasks": 0,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": 0,
+                "videoTotal": 2,
+                "videoDroppedPercentagePoints": 0
+              }
+            }
+          ]
+        },
+        "spa": {
+          "n": 8,
+          "bMinusABounds": {
+            "extensionCpuTotalMs": {
+              "min": -59.1,
+              "max": 112.9,
+              "median": -4.85
+            },
+            "extensionCpuMedianPerFrameMs": {
+              "min": -0.6,
+              "max": 0.6,
+              "median": 0
+            },
+            "extensionCpuP95PerFrameMs": {
+              "min": -5.3,
+              "max": 5.6,
+              "median": -1.15
+            },
+            "pageLongTasks": {
+              "min": -2,
+              "max": 2,
+              "median": 0.5
+            },
+            "extensionLongTaskIndicator": {
+              "min": 0,
+              "max": 0,
+              "median": 0
+            },
+            "videoDropped": {
+              "min": -1,
+              "max": 1,
+              "median": 0
+            },
+            "videoTotal": {
+              "min": -5,
+              "max": 3,
+              "median": 0
+            },
+            "videoDroppedPercentagePoints": {
+              "min": -7.692,
+              "max": 6.667,
+              "median": -0.63
+            }
+          },
+          "pairs": [
+            {
+              "pair": 1,
+              "trial": 1,
+              "order": ["A", "B"],
+              "A": {
+                "scene": "spa",
+                "startMs": 19228.8,
+                "windowCloseMs": 25235.2,
+                "actualReadMs": 25236,
+                "domInteractiveMs": 1966.5,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 33.4,
+                "g11": {
+                  "frames": 45,
+                  "totalMs": 249.1,
+                  "medianMs": 2,
+                  "p95Ms": 19.1,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 300,
+                    "totalMs": 249.1,
+                    "medianMs": 0,
+                    "p95Ms": 3.9
+                  },
+                  "firstFrameMs": 19239
+                },
+                "cdp": null,
+                "pageLongTasks": 9,
+                "video": {
+                  "total": 13,
+                  "dropped": 1,
+                  "observedMs": 583.3,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "B": {
+                "scene": "spa",
+                "startMs": 19206.8,
+                "windowCloseMs": 25219.6,
+                "actualReadMs": 25220.3,
+                "domInteractiveMs": 1914.8,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 35.6,
+                "g11": {
+                  "frames": 57,
+                  "totalMs": 239.5,
+                  "medianMs": 2,
+                  "p95Ms": 15.6,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 300,
+                    "totalMs": 239.5,
+                    "medianMs": 0,
+                    "p95Ms": 4.6
+                  },
+                  "firstFrameMs": 19212.2
+                },
+                "cdp": null,
+                "pageLongTasks": 9,
+                "video": {
+                  "total": 15,
+                  "dropped": 0,
+                  "observedMs": 698.2,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": -9.6,
+                "extensionCpuMedianPerFrameMs": 0,
+                "extensionCpuP95PerFrameMs": -3.5,
+                "pageLongTasks": 0,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": -1,
+                "videoTotal": 2,
+                "videoDroppedPercentagePoints": -7.692
+              }
+            },
+            {
+              "pair": 2,
+              "trial": 1,
+              "order": ["B", "A"],
+              "A": {
+                "scene": "spa",
+                "startMs": 19221.8,
+                "windowCloseMs": 25225.6,
+                "actualReadMs": 25226.3,
+                "domInteractiveMs": 2009.4,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 50,
+                "g11": {
+                  "frames": 61,
+                  "totalMs": 262.8,
+                  "medianMs": 1.7,
+                  "p95Ms": 15.3,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 292,
+                    "totalMs": 262.8,
+                    "medianMs": 0,
+                    "p95Ms": 5.5
+                  },
+                  "firstFrameMs": 19223
+                },
+                "cdp": null,
+                "pageLongTasks": 10,
+                "video": {
+                  "total": 15,
+                  "dropped": 1,
+                  "observedMs": 600,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "B": {
+                "scene": "spa",
+                "startMs": 19217.2,
+                "windowCloseMs": 25234.9,
+                "actualReadMs": 25235.5,
+                "domInteractiveMs": 1875.5,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 33.4,
+                "g11": {
+                  "frames": 57,
+                  "totalMs": 262.7,
+                  "medianMs": 1.7,
+                  "p95Ms": 18.5,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 299,
+                    "totalMs": 262.7,
+                    "medianMs": 0,
+                    "p95Ms": 5.4
+                  },
+                  "firstFrameMs": 19225.7
+                },
+                "cdp": null,
+                "pageLongTasks": 8,
+                "video": {
+                  "total": 14,
+                  "dropped": 0,
+                  "observedMs": 683.5,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": -0.1,
+                "extensionCpuMedianPerFrameMs": 0,
+                "extensionCpuP95PerFrameMs": 3.2,
+                "pageLongTasks": -2,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": -1,
+                "videoTotal": -1,
+                "videoDroppedPercentagePoints": -6.667
+              }
+            },
+            {
+              "pair": 3,
+              "trial": 1,
+              "order": ["A", "B"],
+              "A": {
+                "scene": "spa",
+                "startMs": 19127.4,
+                "windowCloseMs": 25137.2,
+                "actualReadMs": 25138.1,
+                "domInteractiveMs": 1867,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 33.3,
+                "g11": {
+                  "frames": 57,
+                  "totalMs": 191.1,
+                  "medianMs": 1.8,
+                  "p95Ms": 12.9,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 308,
+                    "totalMs": 191.1,
+                    "medianMs": 0,
+                    "p95Ms": 4.4
+                  },
+                  "firstFrameMs": 19138
+                },
+                "cdp": null,
+                "pageLongTasks": 8,
+                "video": {
+                  "total": 12,
+                  "dropped": 0,
+                  "observedMs": 516.7,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "B": {
+                "scene": "spa",
+                "startMs": 19168.7,
+                "windowCloseMs": 25174.1,
+                "actualReadMs": 25174.8,
+                "domInteractiveMs": 1858,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 33.4,
+                "g11": {
+                  "frames": 60,
+                  "totalMs": 304,
+                  "medianMs": 2.4,
+                  "p95Ms": 18.5,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 293,
+                    "totalMs": 304,
+                    "medianMs": 0,
+                    "p95Ms": 5.6
+                  },
+                  "firstFrameMs": 19170
+                },
+                "cdp": null,
+                "pageLongTasks": 10,
+                "video": {
+                  "total": 13,
+                  "dropped": 0,
+                  "observedMs": 650,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": 112.9,
+                "extensionCpuMedianPerFrameMs": 0.6,
+                "extensionCpuP95PerFrameMs": 5.6,
+                "pageLongTasks": 2,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": 0,
+                "videoTotal": 1,
+                "videoDroppedPercentagePoints": 0
+              }
+            },
+            {
+              "pair": 4,
+              "trial": 1,
+              "order": ["B", "A"],
+              "A": {
+                "scene": "spa",
+                "startMs": 19215.8,
+                "windowCloseMs": 25230.5,
+                "actualReadMs": 25231.1,
+                "domInteractiveMs": 2063.2,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 33.4,
+                "g11": {
+                  "frames": 75,
+                  "totalMs": 306.1,
+                  "medianMs": 2,
+                  "p95Ms": 19.5,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 289,
+                    "totalMs": 306.1,
+                    "medianMs": 0,
+                    "p95Ms": 4.8
+                  },
+                  "firstFrameMs": 19224.7
+                },
+                "cdp": null,
+                "pageLongTasks": 11,
+                "video": {
+                  "total": 20,
+                  "dropped": 0,
+                  "observedMs": 883.3,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "B": {
+                "scene": "spa",
+                "startMs": 19217.1,
+                "windowCloseMs": 25229.9,
+                "actualReadMs": 25230.6,
+                "domInteractiveMs": 1787.8,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 50,
+                "g11": {
+                  "frames": 65,
+                  "totalMs": 282.9,
+                  "medianMs": 1.8,
+                  "p95Ms": 16.5,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 293,
+                    "totalMs": 282.9,
+                    "medianMs": 0,
+                    "p95Ms": 5.3
+                  },
+                  "firstFrameMs": 19226
+                },
+                "cdp": null,
+                "pageLongTasks": 11,
+                "video": {
+                  "total": 15,
+                  "dropped": 1,
+                  "observedMs": 633.3,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": -23.2,
+                "extensionCpuMedianPerFrameMs": -0.2,
+                "extensionCpuP95PerFrameMs": -3,
+                "pageLongTasks": 0,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": 1,
+                "videoTotal": -5,
+                "videoDroppedPercentagePoints": 6.667
+              }
+            },
+            {
+              "pair": 5,
+              "trial": 1,
+              "order": ["A", "B"],
+              "A": {
+                "scene": "spa",
+                "startMs": 19182.7,
+                "windowCloseMs": 25189,
+                "actualReadMs": 25189.6,
+                "domInteractiveMs": 1856.3,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 35.5,
+                "g11": {
+                  "frames": 56,
+                  "totalMs": 312.3,
+                  "medianMs": 2.2,
+                  "p95Ms": 24.6,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 292,
+                    "totalMs": 312.3,
+                    "medianMs": 0,
+                    "p95Ms": 5
+                  },
+                  "firstFrameMs": 19193.9
+                },
+                "cdp": null,
+                "pageLongTasks": 12,
+                "video": {
+                  "total": 14,
+                  "dropped": 1,
+                  "observedMs": 666.6,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "B": {
+                "scene": "spa",
+                "startMs": 19113.5,
+                "windowCloseMs": 25117.8,
+                "actualReadMs": 25118.4,
+                "domInteractiveMs": 1755.5,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 50,
+                "g11": {
+                  "frames": 69,
+                  "totalMs": 292.7,
+                  "medianMs": 1.6,
+                  "p95Ms": 19.3,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 289,
+                    "totalMs": 292.7,
+                    "medianMs": 0,
+                    "p95Ms": 5.2
+                  },
+                  "firstFrameMs": 19126
+                },
+                "cdp": null,
+                "pageLongTasks": 14,
+                "video": {
+                  "total": 17,
+                  "dropped": 1,
+                  "observedMs": 733.3,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": -19.6,
+                "extensionCpuMedianPerFrameMs": -0.6,
+                "extensionCpuP95PerFrameMs": -5.3,
+                "pageLongTasks": 2,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": 0,
+                "videoTotal": 3,
+                "videoDroppedPercentagePoints": -1.261
+              }
+            },
+            {
+              "pair": 6,
+              "trial": 1,
+              "order": ["B", "A"],
+              "A": {
+                "scene": "spa",
+                "startMs": 19187.1,
+                "windowCloseMs": 25196.3,
+                "actualReadMs": 25196.8,
+                "domInteractiveMs": 1834.1,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 33.4,
+                "g11": {
+                  "frames": 62,
+                  "totalMs": 253.4,
+                  "medianMs": 1.8,
+                  "p95Ms": 17,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 301,
+                    "totalMs": 253.4,
+                    "medianMs": 0,
+                    "p95Ms": 4.5
+                  },
+                  "firstFrameMs": 19191.1
+                },
+                "cdp": null,
+                "pageLongTasks": 9,
+                "video": {
+                  "total": 15,
+                  "dropped": 1,
+                  "observedMs": 650,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "B": {
+                "scene": "spa",
+                "startMs": 19152.5,
+                "windowCloseMs": 25164.8,
+                "actualReadMs": 25165.3,
+                "domInteractiveMs": 1968.8,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 35.7,
+                "g11": {
+                  "frames": 64,
+                  "totalMs": 267,
+                  "medianMs": 1.7,
+                  "p95Ms": 17.2,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 303,
+                    "totalMs": 267,
+                    "medianMs": 0,
+                    "p95Ms": 4.7
+                  },
+                  "firstFrameMs": 19159.5
+                },
+                "cdp": null,
+                "pageLongTasks": 9,
+                "video": {
+                  "total": 15,
+                  "dropped": 0,
+                  "observedMs": 747.7,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": 13.6,
+                "extensionCpuMedianPerFrameMs": -0.1,
+                "extensionCpuP95PerFrameMs": 0.2,
+                "pageLongTasks": 0,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": -1,
+                "videoTotal": 0,
+                "videoDroppedPercentagePoints": -6.667
+              }
+            },
+            {
+              "pair": 7,
+              "trial": 1,
+              "order": ["A", "B"],
+              "A": {
+                "scene": "spa",
+                "startMs": 19118.5,
+                "windowCloseMs": 25123.3,
+                "actualReadMs": 25123.9,
+                "domInteractiveMs": 1951.9,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 33.2,
+                "g11": {
+                  "frames": 55,
+                  "totalMs": 239.6,
+                  "medianMs": 1.8,
+                  "p95Ms": 15.8,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 307,
+                    "totalMs": 239.6,
+                    "medianMs": 0,
+                    "p95Ms": 3.5
+                  },
+                  "firstFrameMs": 19122.6
+                },
+                "cdp": null,
+                "pageLongTasks": 9,
+                "video": {
+                  "total": 14,
+                  "dropped": 1,
+                  "observedMs": 584.1,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "B": {
+                "scene": "spa",
+                "startMs": 19120,
+                "windowCloseMs": 25136.5,
+                "actualReadMs": 25137.1,
+                "domInteractiveMs": 1737.1,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 48.8,
+                "g11": {
+                  "frames": 60,
+                  "totalMs": 249,
+                  "medianMs": 1.9,
+                  "p95Ms": 15.3,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 294,
+                    "totalMs": 249,
+                    "medianMs": 0,
+                    "p95Ms": 5.5
+                  },
+                  "firstFrameMs": 19125.7
+                },
+                "cdp": null,
+                "pageLongTasks": 11,
+                "video": {
+                  "total": 14,
+                  "dropped": 1,
+                  "observedMs": 600,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": 9.4,
+                "extensionCpuMedianPerFrameMs": 0.1,
+                "extensionCpuP95PerFrameMs": -0.5,
+                "pageLongTasks": 2,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": 0,
+                "videoTotal": 0,
+                "videoDroppedPercentagePoints": 0
+              }
+            },
+            {
+              "pair": 8,
+              "trial": 1,
+              "order": ["B", "A"],
+              "A": {
+                "scene": "spa",
+                "startMs": 19175.6,
+                "windowCloseMs": 25190,
+                "actualReadMs": 25190.7,
+                "domInteractiveMs": 1951.1,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 49,
+                "g11": {
+                  "frames": 66,
+                  "totalMs": 308.5,
+                  "medianMs": 1.9,
+                  "p95Ms": 17.1,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 289,
+                    "totalMs": 308.5,
+                    "medianMs": 0,
+                    "p95Ms": 6.3
+                  },
+                  "firstFrameMs": 19175.9
+                },
+                "cdp": null,
+                "pageLongTasks": 10,
+                "video": {
+                  "total": 17,
+                  "dropped": 0,
+                  "observedMs": 750,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "B": {
+                "scene": "spa",
+                "startMs": 19339,
+                "windowCloseMs": 25362,
+                "actualReadMs": 25362.7,
+                "domInteractiveMs": 2832,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 50,
+                "g11": {
+                  "frames": 61,
+                  "totalMs": 249.4,
+                  "medianMs": 1.9,
+                  "p95Ms": 15.3,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 289,
+                    "totalMs": 249.4,
+                    "medianMs": 0,
+                    "p95Ms": 4.5
+                  },
+                  "firstFrameMs": 19343.2
+                },
+                "cdp": null,
+                "pageLongTasks": 11,
+                "video": {
+                  "total": 16,
+                  "dropped": 1,
+                  "observedMs": 734.4,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": -59.1,
+                "extensionCpuMedianPerFrameMs": 0,
+                "extensionCpuP95PerFrameMs": -1.8,
+                "pageLongTasks": 1,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": 1,
+                "videoTotal": -1,
+                "videoDroppedPercentagePoints": 6.25
+              }
+            }
+          ]
+        }
+      },
+      "exclusions": []
+    },
+    "cdp": {
+      "environment": [
+        {
+          "key": "cdp-1-A-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 16.733333333333334
+        },
+        {
+          "key": "cdp-1-A-2",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 18.05
+        },
+        {
+          "key": "cdp-1-B-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 17.358333333333334
+        },
+        {
+          "key": "cdp-1-B-2",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 17.358333333333334
+        },
+        {
+          "key": "cdp-2-A-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 16.666666666666668
+        },
+        {
+          "key": "cdp-2-B-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 17.35833333333333
+        },
+        {
+          "key": "cdp-3-A-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 18.058333333333334
+        },
+        {
+          "key": "cdp-3-B-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 17.383333333333333
+        },
+        {
+          "key": "cdp-4-A-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 16.666666666666668
+        },
+        {
+          "key": "cdp-4-B-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 16.666666666666668
+        },
+        {
+          "key": "cdp-5-A-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 16.708333333333332
+        },
+        {
+          "key": "cdp-5-B-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 17.354166666666668
+        },
+        {
+          "key": "cdp-6-A-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 17.35833333333333
+        },
+        {
+          "key": "cdp-6-B-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 17.3625
+        },
+        {
+          "key": "cdp-7-A-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 17.354166666666668
+        },
+        {
+          "key": "cdp-7-B-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 16.666666666666668
+        },
+        {
+          "key": "cdp-8-A-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 17.3625
+        },
+        {
+          "key": "cdp-8-B-1",
+          "browser": "153.0.8010.12",
+          "renderer": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "screenX": -4000,
+          "screenY": 0,
+          "dpr": 1,
+          "width": 1920,
+          "height": 1080,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "periodMs": 16.6625
+        }
+      ],
+      "scenes": {
+        "startup": {
+          "n": 8,
+          "bMinusABounds": {
+            "extensionCpuTotalMs": {
+              "min": -76.294,
+              "max": 198.375,
+              "median": 5.646
+            },
+            "extensionCpuMedianPerFrameMs": {
+              "min": -0.472,
+              "max": 1.039,
+              "median": 0.027
+            },
+            "extensionCpuP95PerFrameMs": {
+              "min": -11.697,
+              "max": 7.612,
+              "median": -1.072
+            },
+            "pageLongTasks": {
+              "min": -6,
+              "max": 5,
+              "median": -0.5
+            },
+            "extensionLongTaskIndicator": {
+              "min": -6,
+              "max": 6,
+              "median": -0.5
+            },
+            "videoDropped": {
+              "min": -3,
+              "max": 2,
+              "median": -1
+            },
+            "videoTotal": {
+              "min": -9,
+              "max": 39,
+              "median": 0.5
+            },
+            "videoDroppedPercentagePoints": {
+              "min": -3.473,
+              "max": 1.786,
+              "median": -0.655
+            }
+          },
+          "pairs": [
+            {
+              "pair": 1,
+              "trial": 2,
+              "order": ["A", "B"],
+              "A": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6234.8,
+                "actualReadMs": 6947.6,
+                "domInteractiveMs": 2993.3,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 150,
+                "g11": {
+                  "frames": 53,
+                  "totalMs": 294.5,
+                  "medianMs": 2.9,
+                  "p95Ms": 16.3,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 80,
+                    "totalMs": 294.5,
+                    "medianMs": 1.8,
+                    "p95Ms": 15.9
+                  },
+                  "firstFrameMs": 3299.9
+                },
+                "cdp": {
+                  "frames": 80,
+                  "totalMs": 296.593,
+                  "medianMs": 1.033,
+                  "p95Ms": 27.262,
+                  "longTasksWithExtensionSample": 8,
+                  "profileStartMs": 790.041,
+                  "profileEndMs": 6290.124,
+                  "extensionNodes": 487
+                },
+                "pageLongTasks": 11,
+                "video": {
+                  "total": 70,
+                  "dropped": 5,
+                  "observedMs": 3131.1,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6002.4,
+                "actualReadMs": 6642.2,
+                "domInteractiveMs": 1613.5,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 99.9,
+                "g11": {
+                  "frames": 120,
+                  "totalMs": 573.7,
+                  "medianMs": 2.3,
+                  "p95Ms": 20.1,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 137,
+                    "totalMs": 573.7,
+                    "medianMs": 1.9,
+                    "p95Ms": 18.5
+                  },
+                  "firstFrameMs": 1853
+                },
+                "cdp": {
+                  "frames": 137,
+                  "totalMs": 494.968,
+                  "medianMs": 1.485,
+                  "p95Ms": 15.565,
+                  "longTasksWithExtensionSample": 9,
+                  "profileStartMs": 132.197,
+                  "profileEndMs": 6004.219,
+                  "extensionNodes": 594
+                },
+                "pageLongTasks": 16,
+                "video": {
+                  "total": 109,
+                  "dropped": 4,
+                  "observedMs": 4866.4,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": 198.375,
+                "extensionCpuMedianPerFrameMs": 0.452,
+                "extensionCpuP95PerFrameMs": -11.697,
+                "pageLongTasks": 5,
+                "extensionLongTaskIndicator": 1,
+                "videoDropped": -1,
+                "videoTotal": 39,
+                "videoDroppedPercentagePoints": -3.473
+              }
+            },
+            {
+              "pair": 2,
+              "trial": 1,
+              "order": ["B", "A"],
+              "A": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6009,
+                "actualReadMs": 6594.7,
+                "domInteractiveMs": 1451.7,
+                "rAFPeriodMedianMs": 16.8,
+                "rAFPeriodP95Ms": 150,
+                "g11": {
+                  "frames": 102,
+                  "totalMs": 609.5,
+                  "medianMs": 3,
+                  "p95Ms": 19.9,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 1,
+                  "allFrames": {
+                    "frames": 122,
+                    "totalMs": 609.5,
+                    "medianMs": 2.2,
+                    "p95Ms": 19.4
+                  },
+                  "firstFrameMs": 1766.5
+                },
+                "cdp": {
+                  "frames": 122,
+                  "totalMs": 544.238,
+                  "medianMs": 2.039,
+                  "p95Ms": 16.206,
+                  "longTasksWithExtensionSample": 15,
+                  "profileStartMs": 159.391,
+                  "profileEndMs": 6010.229,
+                  "extensionNodes": 625
+                },
+                "pageLongTasks": 21,
+                "video": {
+                  "total": 112,
+                  "dropped": 5,
+                  "observedMs": 5050,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6051.1,
+                "actualReadMs": 6812.5,
+                "domInteractiveMs": 1460.5,
+                "rAFPeriodMedianMs": 33.2,
+                "rAFPeriodP95Ms": 166.8,
+                "g11": {
+                  "frames": 76,
+                  "totalMs": 572.3,
+                  "medianMs": 3.9,
+                  "p95Ms": 23.1,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 2,
+                  "allFrames": {
+                    "frames": 95,
+                    "totalMs": 572.3,
+                    "medianMs": 2.6,
+                    "p95Ms": 22.2
+                  },
+                  "firstFrameMs": 1850.3
+                },
+                "cdp": {
+                  "frames": 95,
+                  "totalMs": 567.367,
+                  "medianMs": 3.078,
+                  "p95Ms": 23.818,
+                  "longTasksWithExtensionSample": 15,
+                  "profileStartMs": 142.987,
+                  "profileEndMs": 6054.937,
+                  "extensionNodes": 621
+                },
+                "pageLongTasks": 21,
+                "video": {
+                  "total": 112,
+                  "dropped": 7,
+                  "observedMs": 4983.3,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": 23.129,
+                "extensionCpuMedianPerFrameMs": 1.039,
+                "extensionCpuP95PerFrameMs": 7.612,
+                "pageLongTasks": 0,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": 2,
+                "videoTotal": 0,
+                "videoDroppedPercentagePoints": 1.786
+              }
+            },
+            {
+              "pair": 3,
+              "trial": 1,
+              "order": ["A", "B"],
+              "A": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6006,
+                "actualReadMs": 6593,
+                "domInteractiveMs": 1383.5,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 100,
+                "g11": {
+                  "frames": 128,
+                  "totalMs": 580.1,
+                  "medianMs": 2.5,
+                  "p95Ms": 20,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 145,
+                    "totalMs": 580.1,
+                    "medianMs": 2.1,
+                    "p95Ms": 19.3
+                  },
+                  "firstFrameMs": 1716.6
+                },
+                "cdp": {
+                  "frames": 145,
+                  "totalMs": 509.908,
+                  "medianMs": 1.533,
+                  "p95Ms": 13.984,
+                  "longTasksWithExtensionSample": 16,
+                  "profileStartMs": 139.065,
+                  "profileEndMs": 6011.264,
+                  "extensionNodes": 609
+                },
+                "pageLongTasks": 21,
+                "video": {
+                  "total": 114,
+                  "dropped": 6,
+                  "observedMs": 5049.9,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6008.6,
+                "actualReadMs": 6533.6,
+                "domInteractiveMs": 1496.1,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 99.8,
+                "g11": {
+                  "frames": 145,
+                  "totalMs": 493.5,
+                  "medianMs": 1.7,
+                  "p95Ms": 11.6,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 158,
+                    "totalMs": 493.5,
+                    "medianMs": 1.6,
+                    "p95Ms": 11.6
+                  },
+                  "firstFrameMs": 1716.7
+                },
+                "cdp": {
+                  "frames": 158,
+                  "totalMs": 433.614,
+                  "medianMs": 1.061,
+                  "p95Ms": 10.24,
+                  "longTasksWithExtensionSample": 10,
+                  "profileStartMs": 388.206,
+                  "profileEndMs": 6009.718,
+                  "extensionNodes": 476
+                },
+                "pageLongTasks": 15,
+                "video": {
+                  "total": 109,
+                  "dropped": 5,
+                  "observedMs": 4913.9,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": -76.294,
+                "extensionCpuMedianPerFrameMs": -0.472,
+                "extensionCpuP95PerFrameMs": -3.744,
+                "pageLongTasks": -6,
+                "extensionLongTaskIndicator": -6,
+                "videoDropped": -1,
+                "videoTotal": -5,
+                "videoDroppedPercentagePoints": -0.676
+              }
+            },
+            {
+              "pair": 4,
+              "trial": 1,
+              "order": ["B", "A"],
+              "A": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6016,
+                "actualReadMs": 6487.6,
+                "domInteractiveMs": 1503.7,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 83.2,
+                "g11": {
+                  "frames": 143,
+                  "totalMs": 480.6,
+                  "medianMs": 1.8,
+                  "p95Ms": 13.2,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 163,
+                    "totalMs": 480.6,
+                    "medianMs": 1.6,
+                    "p95Ms": 11.8
+                  },
+                  "firstFrameMs": 1859.9
+                },
+                "cdp": {
+                  "frames": 163,
+                  "totalMs": 438.678,
+                  "medianMs": 1.031,
+                  "p95Ms": 11.037,
+                  "longTasksWithExtensionSample": 12,
+                  "profileStartMs": 152.559,
+                  "profileEndMs": 6017.716,
+                  "extensionNodes": 566
+                },
+                "pageLongTasks": 15,
+                "video": {
+                  "total": 111,
+                  "dropped": 6,
+                  "observedMs": 4835.7,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6014.4,
+                "actualReadMs": 6462.5,
+                "domInteractiveMs": 1368.9,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 66.7,
+                "g11": {
+                  "frames": 157,
+                  "totalMs": 545.9,
+                  "medianMs": 1.9,
+                  "p95Ms": 14.2,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 175,
+                    "totalMs": 545.9,
+                    "medianMs": 1.7,
+                    "p95Ms": 13.3
+                  },
+                  "firstFrameMs": 1667.2
+                },
+                "cdp": {
+                  "frames": 175,
+                  "totalMs": 483.162,
+                  "medianMs": 1.139,
+                  "p95Ms": 13.226,
+                  "longTasksWithExtensionSample": 10,
+                  "profileStartMs": 135.781,
+                  "profileEndMs": 6016.228,
+                  "extensionNodes": 575
+                },
+                "pageLongTasks": 14,
+                "video": {
+                  "total": 115,
+                  "dropped": 3,
+                  "observedMs": 5066.7,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": 44.484,
+                "extensionCpuMedianPerFrameMs": 0.108,
+                "extensionCpuP95PerFrameMs": 2.189,
+                "pageLongTasks": -1,
+                "extensionLongTaskIndicator": -2,
+                "videoDropped": -3,
+                "videoTotal": 4,
+                "videoDroppedPercentagePoints": -2.797
+              }
+            },
+            {
+              "pair": 5,
+              "trial": 1,
+              "order": ["A", "B"],
+              "A": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6010.9,
+                "actualReadMs": 6453.5,
+                "domInteractiveMs": 1307.2,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 100,
+                "g11": {
+                  "frames": 154,
+                  "totalMs": 533.4,
+                  "medianMs": 2,
+                  "p95Ms": 13.2,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 170,
+                    "totalMs": 533.4,
+                    "medianMs": 1.9,
+                    "p95Ms": 12.9
+                  },
+                  "firstFrameMs": 1633.8
+                },
+                "cdp": {
+                  "frames": 170,
+                  "totalMs": 463.092,
+                  "medianMs": 1.035,
+                  "p95Ms": 11.787,
+                  "longTasksWithExtensionSample": 11,
+                  "profileStartMs": 129.506,
+                  "profileEndMs": 6011.857,
+                  "extensionNodes": 471
+                },
+                "pageLongTasks": 14,
+                "video": {
+                  "total": 116,
+                  "dropped": 5,
+                  "observedMs": 5100,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6014.7,
+                "actualReadMs": 6300,
+                "domInteractiveMs": 1394,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 83.3,
+                "g11": {
+                  "frames": 173,
+                  "totalMs": 473.4,
+                  "medianMs": 1.4,
+                  "p95Ms": 12.9,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 190,
+                    "totalMs": 473.4,
+                    "medianMs": 1.2,
+                    "p95Ms": 12.3
+                  },
+                  "firstFrameMs": 1653.7
+                },
+                "cdp": {
+                  "frames": 190,
+                  "totalMs": 451.254,
+                  "medianMs": 1.033,
+                  "p95Ms": 10.378,
+                  "longTasksWithExtensionSample": 9,
+                  "profileStartMs": 148.517,
+                  "profileEndMs": 6015.881,
+                  "extensionNodes": 560
+                },
+                "pageLongTasks": 12,
+                "video": {
+                  "total": 113,
+                  "dropped": 3,
+                  "observedMs": 4933.4,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": -11.838,
+                "extensionCpuMedianPerFrameMs": -0.002,
+                "extensionCpuP95PerFrameMs": -1.409,
+                "pageLongTasks": -2,
+                "extensionLongTaskIndicator": -2,
+                "videoDropped": -2,
+                "videoTotal": -3,
+                "videoDroppedPercentagePoints": -1.655
+              }
+            },
+            {
+              "pair": 6,
+              "trial": 1,
+              "order": ["B", "A"],
+              "A": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6013,
+                "actualReadMs": 6379.2,
+                "domInteractiveMs": 1309.4,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 66.7,
+                "g11": {
+                  "frames": 175,
+                  "totalMs": 476.2,
+                  "medianMs": 1.3,
+                  "p95Ms": 11.4,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 190,
+                    "totalMs": 476.2,
+                    "medianMs": 1.3,
+                    "p95Ms": 10.2
+                  },
+                  "firstFrameMs": 1423.1
+                },
+                "cdp": {
+                  "frames": 190,
+                  "totalMs": 446.668,
+                  "medianMs": 1.029,
+                  "p95Ms": 10.3,
+                  "longTasksWithExtensionSample": 11,
+                  "profileStartMs": 120.556,
+                  "profileEndMs": 6013.684,
+                  "extensionNodes": 584
+                },
+                "pageLongTasks": 13,
+                "video": {
+                  "total": 115,
+                  "dropped": 3,
+                  "observedMs": 5016.6,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6002.6,
+                "actualReadMs": 6383.9,
+                "domInteractiveMs": 896.1,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 66.6,
+                "g11": {
+                  "frames": 168,
+                  "totalMs": 435.7,
+                  "medianMs": 1.5,
+                  "p95Ms": 10.4,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 189,
+                    "totalMs": 435.7,
+                    "medianMs": 1.3,
+                    "p95Ms": 9
+                  },
+                  "firstFrameMs": 1173.9
+                },
+                "cdp": {
+                  "frames": 189,
+                  "totalMs": 370.637,
+                  "medianMs": 1.027,
+                  "p95Ms": 7.809,
+                  "longTasksWithExtensionSample": 13,
+                  "profileStartMs": 117.525,
+                  "profileEndMs": 6004.235,
+                  "extensionNodes": 614
+                },
+                "pageLongTasks": 15,
+                "video": {
+                  "total": 123,
+                  "dropped": 4,
+                  "observedMs": 5266.7,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": -76.031,
+                "extensionCpuMedianPerFrameMs": -0.002,
+                "extensionCpuP95PerFrameMs": -2.491,
+                "pageLongTasks": 2,
+                "extensionLongTaskIndicator": 2,
+                "videoDropped": 1,
+                "videoTotal": 8,
+                "videoDroppedPercentagePoints": 0.643
+              }
+            },
+            {
+              "pair": 7,
+              "trial": 1,
+              "order": ["A", "B"],
+              "A": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6012.8,
+                "actualReadMs": 6346.1,
+                "domInteractiveMs": 1115.6,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 66.7,
+                "g11": {
+                  "frames": 188,
+                  "totalMs": 501.6,
+                  "medianMs": 1.4,
+                  "p95Ms": 12.2,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 206,
+                    "totalMs": 501.6,
+                    "medianMs": 1.4,
+                    "p95Ms": 11.6
+                  },
+                  "firstFrameMs": 1403.6
+                },
+                "cdp": {
+                  "frames": 206,
+                  "totalMs": 470.687,
+                  "medianMs": 1.035,
+                  "p95Ms": 9.859,
+                  "longTasksWithExtensionSample": 12,
+                  "profileStartMs": 126.946,
+                  "profileEndMs": 6014.512,
+                  "extensionNodes": 596
+                },
+                "pageLongTasks": 16,
+                "video": {
+                  "total": 119,
+                  "dropped": 4,
+                  "observedMs": 5166.6,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6010.7,
+                "actualReadMs": 6436.3,
+                "domInteractiveMs": 1507.8,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 66.7,
+                "g11": {
+                  "frames": 159,
+                  "totalMs": 492.5,
+                  "medianMs": 1.9,
+                  "p95Ms": 12.6,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 174,
+                    "totalMs": 492.5,
+                    "medianMs": 1.8,
+                    "p95Ms": 11.6
+                  },
+                  "firstFrameMs": 1673.5
+                },
+                "cdp": {
+                  "frames": 174,
+                  "totalMs": 457.288,
+                  "medianMs": 1.089,
+                  "p95Ms": 10.381,
+                  "longTasksWithExtensionSample": 11,
+                  "profileStartMs": 139.182,
+                  "profileEndMs": 6012.279,
+                  "extensionNodes": 603
+                },
+                "pageLongTasks": 13,
+                "video": {
+                  "total": 110,
+                  "dropped": 3,
+                  "observedMs": 4866.6,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": -13.399,
+                "extensionCpuMedianPerFrameMs": 0.054,
+                "extensionCpuP95PerFrameMs": 0.522,
+                "pageLongTasks": -3,
+                "extensionLongTaskIndicator": -1,
+                "videoDropped": -1,
+                "videoTotal": -9,
+                "videoDroppedPercentagePoints": -0.634
+              }
+            },
+            {
+              "pair": 8,
+              "trial": 1,
+              "order": ["B", "A"],
+              "A": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6004.2,
+                "actualReadMs": 6396.2,
+                "domInteractiveMs": 1298.3,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 66.7,
+                "g11": {
+                  "frames": 182,
+                  "totalMs": 487.4,
+                  "medianMs": 1.5,
+                  "p95Ms": 11.5,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 199,
+                    "totalMs": 487.4,
+                    "medianMs": 1.5,
+                    "p95Ms": 11.5
+                  },
+                  "firstFrameMs": 1571.4
+                },
+                "cdp": {
+                  "frames": 199,
+                  "totalMs": 429.993,
+                  "medianMs": 1.04,
+                  "p95Ms": 10.297,
+                  "longTasksWithExtensionSample": 4,
+                  "profileStartMs": 126.877,
+                  "profileEndMs": 6005.469,
+                  "extensionNodes": 592
+                },
+                "pageLongTasks": 9,
+                "video": {
+                  "total": 116,
+                  "dropped": 4,
+                  "observedMs": 5066.7,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "startup",
+                "startMs": 0,
+                "windowCloseMs": 6013.8,
+                "actualReadMs": 6371.5,
+                "domInteractiveMs": 1232.6,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 66.8,
+                "g11": {
+                  "frames": 176,
+                  "totalMs": 524,
+                  "medianMs": 1.7,
+                  "p95Ms": 12.3,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 192,
+                    "totalMs": 524,
+                    "medianMs": 1.5,
+                    "p95Ms": 11.6
+                  },
+                  "firstFrameMs": 1504.9
+                },
+                "cdp": {
+                  "frames": 192,
+                  "totalMs": 503.91,
+                  "medianMs": 1.04,
+                  "p95Ms": 9.561,
+                  "longTasksWithExtensionSample": 10,
+                  "profileStartMs": 128.447,
+                  "profileEndMs": 6014.973,
+                  "extensionNodes": 650
+                },
+                "pageLongTasks": 13,
+                "video": {
+                  "total": 117,
+                  "dropped": 4,
+                  "observedMs": 5116.6,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": 73.917,
+                "extensionCpuMedianPerFrameMs": 0,
+                "extensionCpuP95PerFrameMs": -0.736,
+                "pageLongTasks": 4,
+                "extensionLongTaskIndicator": 6,
+                "videoDropped": 0,
+                "videoTotal": 1,
+                "videoDroppedPercentagePoints": -0.029
+              }
+            }
+          ]
+        },
+        "steady": {
+          "n": 8,
+          "bMinusABounds": {
+            "extensionCpuTotalMs": {
+              "min": -126.067,
+              "max": 25.442,
+              "median": -23.25
+            },
+            "extensionCpuMedianPerFrameMs": {
+              "min": -0.239,
+              "max": 0.061,
+              "median": 0
+            },
+            "extensionCpuP95PerFrameMs": {
+              "min": -0.949,
+              "max": 0.659,
+              "median": -0.057
+            },
+            "pageLongTasks": {
+              "min": 0,
+              "max": 0,
+              "median": 0
+            },
+            "extensionLongTaskIndicator": {
+              "min": 0,
+              "max": 0,
+              "median": 0
+            },
+            "videoDropped": {
+              "min": 0,
+              "max": 0,
+              "median": 0
+            },
+            "videoTotal": {
+              "min": -1,
+              "max": 2,
+              "median": 0
+            },
+            "videoDroppedPercentagePoints": {
+              "min": 0,
+              "max": 0,
+              "median": 0
+            }
+          },
+          "pairs": [
+            {
+              "pair": 1,
+              "trial": 1,
+              "order": ["A", "B"],
+              "A": {
+                "scene": "steady",
+                "startMs": 14513.9,
+                "windowCloseMs": 20528.7,
+                "actualReadMs": 20560.9,
+                "domInteractiveMs": 5264.3,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 18.4,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 564,
+                  "medianMs": 1.5,
+                  "p95Ms": 2.6,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 564,
+                    "medianMs": 1.5,
+                    "p95Ms": 2.6
+                  },
+                  "firstFrameMs": 14518.7
+                },
+                "cdp": {
+                  "frames": 360,
+                  "totalMs": 302.754,
+                  "medianMs": 1.014,
+                  "p95Ms": 2.385,
+                  "longTasksWithExtensionSample": 0,
+                  "profileStartMs": 14162.143,
+                  "profileEndMs": 20530.172,
+                  "extensionNodes": 204
+                },
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 142,
+                  "dropped": 0,
+                  "observedMs": 5935.8,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "steady",
+                "startMs": 12967.9,
+                "windowCloseMs": 18986,
+                "actualReadMs": 19019,
+                "domInteractiveMs": 1017.9,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 19,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 645.5,
+                  "medianMs": 1.6,
+                  "p95Ms": 3,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 645.5,
+                    "medianMs": 1.6,
+                    "p95Ms": 3
+                  },
+                  "firstFrameMs": 12969.6
+                },
+                "cdp": {
+                  "frames": 360,
+                  "totalMs": 328.196,
+                  "medianMs": 1.021,
+                  "p95Ms": 3.044,
+                  "longTasksWithExtensionSample": 0,
+                  "profileStartMs": 12547.446,
+                  "profileEndMs": 18987.741,
+                  "extensionNodes": 181
+                },
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 142,
+                  "dropped": 0,
+                  "observedMs": 5916.7,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": 25.442,
+                "extensionCpuMedianPerFrameMs": 0.007,
+                "extensionCpuP95PerFrameMs": 0.659,
+                "pageLongTasks": 0,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": 0,
+                "videoTotal": 0,
+                "videoDroppedPercentagePoints": 0
+              }
+            },
+            {
+              "pair": 2,
+              "trial": 1,
+              "order": ["B", "A"],
+              "A": {
+                "scene": "steady",
+                "startMs": 13152.9,
+                "windowCloseMs": 19172.9,
+                "actualReadMs": 19203.3,
+                "domInteractiveMs": 1451.7,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 19.3,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 753.9,
+                  "medianMs": 2,
+                  "p95Ms": 3.9,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 753.9,
+                    "medianMs": 2,
+                    "p95Ms": 3.9
+                  },
+                  "firstFrameMs": 13166.4
+                },
+                "cdp": {
+                  "frames": 360,
+                  "totalMs": 430.354,
+                  "medianMs": 1.029,
+                  "p95Ms": 3.749,
+                  "longTasksWithExtensionSample": 0,
+                  "profileStartMs": 12735.819,
+                  "profileEndMs": 19173.781,
+                  "extensionNodes": 205
+                },
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 143,
+                  "dropped": 0,
+                  "observedMs": 5950.1,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "steady",
+                "startMs": 13348.6,
+                "windowCloseMs": 19357.4,
+                "actualReadMs": 19387.9,
+                "domInteractiveMs": 1460.5,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 17.2,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 675.2,
+                  "medianMs": 1.7,
+                  "p95Ms": 3.2,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 675.2,
+                    "medianMs": 1.7,
+                    "p95Ms": 3.2
+                  },
+                  "firstFrameMs": 13350.2
+                },
+                "cdp": {
+                  "frames": 360,
+                  "totalMs": 376.868,
+                  "medianMs": 1.031,
+                  "p95Ms": 2.851,
+                  "longTasksWithExtensionSample": 0,
+                  "profileStartMs": 12943.587,
+                  "profileEndMs": 19358.446,
+                  "extensionNodes": 185
+                },
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 142,
+                  "dropped": 0,
+                  "observedMs": 5916.7,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": -53.486,
+                "extensionCpuMedianPerFrameMs": 0.002,
+                "extensionCpuP95PerFrameMs": -0.898,
+                "pageLongTasks": 0,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": 0,
+                "videoTotal": -1,
+                "videoDroppedPercentagePoints": 0
+              }
+            },
+            {
+              "pair": 3,
+              "trial": 1,
+              "order": ["A", "B"],
+              "A": {
+                "scene": "steady",
+                "startMs": 13216.5,
+                "windowCloseMs": 19232.1,
+                "actualReadMs": 19270.9,
+                "domInteractiveMs": 1383.5,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 19.1,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 714,
+                  "medianMs": 1.8,
+                  "p95Ms": 3.5,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 714,
+                    "medianMs": 1.8,
+                    "p95Ms": 3.5
+                  },
+                  "firstFrameMs": 13216.6
+                },
+                "cdp": {
+                  "frames": 360,
+                  "totalMs": 382.539,
+                  "medianMs": 1.034,
+                  "p95Ms": 3.134,
+                  "longTasksWithExtensionSample": 0,
+                  "profileStartMs": 12729.136,
+                  "profileEndMs": 19233.488,
+                  "extensionNodes": 207
+                },
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 141,
+                  "dropped": 0,
+                  "observedMs": 5902.3,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "steady",
+                "startMs": 13012.2,
+                "windowCloseMs": 19023.3,
+                "actualReadMs": 19054,
+                "domInteractiveMs": 1496.1,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 17.9,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 549.9,
+                  "medianMs": 1.5,
+                  "p95Ms": 2.4,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 549.9,
+                    "medianMs": 1.5,
+                    "p95Ms": 2.4
+                  },
+                  "firstFrameMs": 13016.7
+                },
+                "cdp": {
+                  "frames": 360,
+                  "totalMs": 256.472,
+                  "medianMs": 0.795,
+                  "p95Ms": 2.185,
+                  "longTasksWithExtensionSample": 0,
+                  "profileStartMs": 12659.876,
+                  "profileEndMs": 19024.509,
+                  "extensionNodes": 151
+                },
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 143,
+                  "dropped": 0,
+                  "observedMs": 5916.4,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": -126.067,
+                "extensionCpuMedianPerFrameMs": -0.239,
+                "extensionCpuP95PerFrameMs": -0.949,
+                "pageLongTasks": 0,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": 0,
+                "videoTotal": 2,
+                "videoDroppedPercentagePoints": 0
+              }
+            },
+            {
+              "pair": 4,
+              "trial": 1,
+              "order": ["B", "A"],
+              "A": {
+                "scene": "steady",
+                "startMs": 12973,
+                "windowCloseMs": 18979.2,
+                "actualReadMs": 19003.8,
+                "domInteractiveMs": 1503.7,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 18,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 552,
+                  "medianMs": 1.5,
+                  "p95Ms": 2.5,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 552,
+                    "medianMs": 1.5,
+                    "p95Ms": 2.5
+                  },
+                  "firstFrameMs": 12979
+                },
+                "cdp": {
+                  "frames": 360,
+                  "totalMs": 287.455,
+                  "medianMs": 0.859,
+                  "p95Ms": 2.387,
+                  "longTasksWithExtensionSample": 0,
+                  "profileStartMs": 12632.787,
+                  "profileEndMs": 18980.864,
+                  "extensionNodes": 169
+                },
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 142,
+                  "dropped": 0,
+                  "observedMs": 5917.3,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "steady",
+                "startMs": 12925.5,
+                "windowCloseMs": 18933.1,
+                "actualReadMs": 18961,
+                "domInteractiveMs": 1368.9,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 18.6,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 549.2,
+                  "medianMs": 1.4,
+                  "p95Ms": 2.7,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 549.2,
+                    "medianMs": 1.4,
+                    "p95Ms": 2.7
+                  },
+                  "firstFrameMs": 12933.5
+                },
+                "cdp": {
+                  "frames": 360,
+                  "totalMs": 274.833,
+                  "medianMs": 0.92,
+                  "p95Ms": 2.142,
+                  "longTasksWithExtensionSample": 0,
+                  "profileStartMs": 12592.785,
+                  "profileEndMs": 18934.147,
+                  "extensionNodes": 146
+                },
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 142,
+                  "dropped": 0,
+                  "observedMs": 5948.1,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": -12.622,
+                "extensionCpuMedianPerFrameMs": 0.061,
+                "extensionCpuP95PerFrameMs": -0.245,
+                "pageLongTasks": 0,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": 0,
+                "videoTotal": 0,
+                "videoDroppedPercentagePoints": 0
+              }
+            },
+            {
+              "pair": 5,
+              "trial": 1,
+              "order": ["A", "B"],
+              "A": {
+                "scene": "steady",
+                "startMs": 12949.4,
+                "windowCloseMs": 18953.1,
+                "actualReadMs": 18976.7,
+                "domInteractiveMs": 1307.2,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 18.7,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 570.8,
+                  "medianMs": 1.5,
+                  "p95Ms": 2.5,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 570.8,
+                    "medianMs": 1.5,
+                    "p95Ms": 2.5
+                  },
+                  "firstFrameMs": 12950.4
+                },
+                "cdp": {
+                  "frames": 360,
+                  "totalMs": 314.226,
+                  "medianMs": 1.019,
+                  "p95Ms": 2.397,
+                  "longTasksWithExtensionSample": 0,
+                  "profileStartMs": 12576.751,
+                  "profileEndMs": 18953.888,
+                  "extensionNodes": 166
+                },
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 142,
+                  "dropped": 0,
+                  "observedMs": 5933.4,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "steady",
+                "startMs": 12785.2,
+                "windowCloseMs": 18790.3,
+                "actualReadMs": 18818.5,
+                "domInteractiveMs": 1394,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 19.1,
+                "g11": {
+                  "frames": 359,
+                  "totalMs": 560.9,
+                  "medianMs": 1.5,
+                  "p95Ms": 2.5,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 560.9,
+                    "medianMs": 1.5,
+                    "p95Ms": 2.5
+                  },
+                  "firstFrameMs": 12803.7
+                },
+                "cdp": {
+                  "frames": 360,
+                  "totalMs": 280.348,
+                  "medianMs": 0.858,
+                  "p95Ms": 2.294,
+                  "longTasksWithExtensionSample": 0,
+                  "profileStartMs": 12397.124,
+                  "profileEndMs": 18791.754,
+                  "extensionNodes": 200
+                },
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 143,
+                  "dropped": 0,
+                  "observedMs": 5951.5,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": -33.878,
+                "extensionCpuMedianPerFrameMs": -0.161,
+                "extensionCpuP95PerFrameMs": -0.103,
+                "pageLongTasks": 0,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": 0,
+                "videoTotal": 1,
+                "videoDroppedPercentagePoints": 0
+              }
+            },
+            {
+              "pair": 6,
+              "trial": 1,
+              "order": ["B", "A"],
+              "A": {
+                "scene": "steady",
+                "startMs": 12735,
+                "windowCloseMs": 18747,
+                "actualReadMs": 18770.3,
+                "domInteractiveMs": 1309.4,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 16.7,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 451,
+                  "medianMs": 1.2,
+                  "p95Ms": 2,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 451,
+                    "medianMs": 1.2,
+                    "p95Ms": 2
+                  },
+                  "firstFrameMs": 12739.8
+                },
+                "cdp": {
+                  "frames": 360,
+                  "totalMs": 263.198,
+                  "medianMs": 1.024,
+                  "p95Ms": 2.064,
+                  "longTasksWithExtensionSample": 0,
+                  "profileStartMs": 12465.627,
+                  "profileEndMs": 18747.718,
+                  "extensionNodes": 178
+                },
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 142,
+                  "dropped": 0,
+                  "observedMs": 5950,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "steady",
+                "startMs": 12764.1,
+                "windowCloseMs": 18765.6,
+                "actualReadMs": 18794.2,
+                "domInteractiveMs": 896.1,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 16.8,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 411.1,
+                  "medianMs": 1.1,
+                  "p95Ms": 1.7,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 411.1,
+                    "medianMs": 1.1,
+                    "p95Ms": 1.7
+                  },
+                  "firstFrameMs": 12773.9
+                },
+                "cdp": {
+                  "frames": 360,
+                  "totalMs": 228.712,
+                  "medianMs": 1.022,
+                  "p95Ms": 2.053,
+                  "longTasksWithExtensionSample": 0,
+                  "profileStartMs": 12484.055,
+                  "profileEndMs": 18766.789,
+                  "extensionNodes": 170
+                },
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 143,
+                  "dropped": 0,
+                  "observedMs": 5950,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": -34.486,
+                "extensionCpuMedianPerFrameMs": -0.002,
+                "extensionCpuP95PerFrameMs": -0.011,
+                "pageLongTasks": 0,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": 0,
+                "videoTotal": 1,
+                "videoDroppedPercentagePoints": 0
+              }
+            },
+            {
+              "pair": 7,
+              "trial": 1,
+              "order": ["A", "B"],
+              "A": {
+                "scene": "steady",
+                "startMs": 12722.6,
+                "windowCloseMs": 18738.7,
+                "actualReadMs": 18761,
+                "domInteractiveMs": 1115.6,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 16.8,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 477.9,
+                  "medianMs": 1.3,
+                  "p95Ms": 2.1,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 477.9,
+                    "medianMs": 1.3,
+                    "p95Ms": 2.1
+                  },
+                  "firstFrameMs": 12736.9
+                },
+                "cdp": {
+                  "frames": 360,
+                  "totalMs": 265.595,
+                  "medianMs": 1.025,
+                  "p95Ms": 2.079,
+                  "longTasksWithExtensionSample": 0,
+                  "profileStartMs": 12457.017,
+                  "profileEndMs": 18739.511,
+                  "extensionNodes": 191
+                },
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 143,
+                  "dropped": 0,
+                  "observedMs": 5950,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "steady",
+                "startMs": 12886.9,
+                "windowCloseMs": 18900,
+                "actualReadMs": 18923.6,
+                "domInteractiveMs": 1507.8,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 16.8,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 508.9,
+                  "medianMs": 1.4,
+                  "p95Ms": 2.2,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 508.9,
+                    "medianMs": 1.4,
+                    "p95Ms": 2.2
+                  },
+                  "firstFrameMs": 12890.2
+                },
+                "cdp": {
+                  "frames": 360,
+                  "totalMs": 268.811,
+                  "medianMs": 1.025,
+                  "p95Ms": 2.079,
+                  "longTasksWithExtensionSample": 0,
+                  "profileStartMs": 12556.307,
+                  "profileEndMs": 18900.792,
+                  "extensionNodes": 195
+                },
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 142,
+                  "dropped": 0,
+                  "observedMs": 5950,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": 3.216,
+                "extensionCpuMedianPerFrameMs": 0,
+                "extensionCpuP95PerFrameMs": 0,
+                "pageLongTasks": 0,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": 0,
+                "videoTotal": -1,
+                "videoDroppedPercentagePoints": 0
+              }
+            },
+            {
+              "pair": 8,
+              "trial": 1,
+              "order": ["B", "A"],
+              "A": {
+                "scene": "steady",
+                "startMs": 12797.9,
+                "windowCloseMs": 18809,
+                "actualReadMs": 18832.1,
+                "domInteractiveMs": 1298.3,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 16.8,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 480.1,
+                  "medianMs": 1.3,
+                  "p95Ms": 2.1,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 480.1,
+                    "medianMs": 1.3,
+                    "p95Ms": 2.1
+                  },
+                  "firstFrameMs": 12804.8
+                },
+                "cdp": {
+                  "frames": 360,
+                  "totalMs": 253.338,
+                  "medianMs": 1.024,
+                  "p95Ms": 2.066,
+                  "longTasksWithExtensionSample": 0,
+                  "profileStartMs": 12478.902,
+                  "profileEndMs": 18810.551,
+                  "extensionNodes": 205
+                },
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 143,
+                  "dropped": 0,
+                  "observedMs": 5950,
+                  "segments": 1
+                }
+              },
+              "B": {
+                "scene": "steady",
+                "startMs": 12786.6,
+                "windowCloseMs": 18801.9,
+                "actualReadMs": 18824.8,
+                "domInteractiveMs": 1232.6,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 16.8,
+                "g11": {
+                  "frames": 360,
+                  "totalMs": 462.5,
+                  "medianMs": 1.2,
+                  "p95Ms": 2.1,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 360,
+                    "totalMs": 462.5,
+                    "medianMs": 1.2,
+                    "p95Ms": 2.1
+                  },
+                  "firstFrameMs": 12788.2
+                },
+                "cdp": {
+                  "frames": 360,
+                  "totalMs": 265.205,
+                  "medianMs": 1.023,
+                  "p95Ms": 2.06,
+                  "longTasksWithExtensionSample": 0,
+                  "profileStartMs": 12450.831,
+                  "profileEndMs": 18802.794,
+                  "extensionNodes": 174
+                },
+                "pageLongTasks": 0,
+                "video": {
+                  "total": 142,
+                  "dropped": 0,
+                  "observedMs": 5949.9,
+                  "segments": 1
+                }
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": 11.867,
+                "extensionCpuMedianPerFrameMs": -0.001,
+                "extensionCpuP95PerFrameMs": -0.006,
+                "pageLongTasks": 0,
+                "extensionLongTaskIndicator": 0,
+                "videoDropped": 0,
+                "videoTotal": -1,
+                "videoDroppedPercentagePoints": 0
+              }
+            }
+          ]
+        },
+        "spa": {
+          "n": 8,
+          "bMinusABounds": {
+            "extensionCpuTotalMs": {
+              "min": -51.387,
+              "max": 64.706,
+              "median": -4.652
+            },
+            "extensionCpuMedianPerFrameMs": {
+              "min": 0,
+              "max": 0,
+              "median": 0
+            },
+            "extensionCpuP95PerFrameMs": {
+              "min": -1.615,
+              "max": 0.941,
+              "median": -0.559
+            },
+            "pageLongTasks": {
+              "min": -6,
+              "max": 4,
+              "median": -1
+            },
+            "extensionLongTaskIndicator": {
+              "min": -5,
+              "max": 3,
+              "median": -1
+            },
+            "videoDropped": {
+              "min": -2,
+              "max": 1,
+              "median": 0
+            },
+            "videoTotal": {
+              "min": -10,
+              "max": 0,
+              "median": -2
+            },
+            "videoDroppedPercentagePoints": {
+              "min": -14.286,
+              "max": 8.333,
+              "median": 0
+            }
+          },
+          "pairs": [
+            {
+              "pair": 1,
+              "trial": 1,
+              "order": ["A", "B"],
+              "A": {
+                "scene": "spa",
+                "startMs": 22042,
+                "windowCloseMs": 28054.9,
+                "actualReadMs": 28258.4,
+                "domInteractiveMs": 5264.3,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 33.3,
+                "g11": {
+                  "frames": 46,
+                  "totalMs": 250.2,
+                  "medianMs": 2.5,
+                  "p95Ms": 17.4,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 297,
+                    "totalMs": 250.2,
+                    "medianMs": 0,
+                    "p95Ms": 6
+                  },
+                  "firstFrameMs": 22102.1
+                },
+                "cdp": {
+                  "frames": 297,
+                  "totalMs": 191.183,
+                  "medianMs": 0,
+                  "p95Ms": 4.174,
+                  "longTasksWithExtensionSample": 9,
+                  "profileStartMs": 21634.101,
+                  "profileEndMs": 28056.167,
+                  "extensionNodes": 300
+                },
+                "pageLongTasks": 9,
+                "video": {
+                  "total": 15,
+                  "dropped": 0,
+                  "observedMs": 616.6,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "B": {
+                "scene": "spa",
+                "startMs": 20426.7,
+                "windowCloseMs": 26444.2,
+                "actualReadMs": 26737.9,
+                "domInteractiveMs": 1017.9,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 50,
+                "g11": {
+                  "frames": 61,
+                  "totalMs": 356.3,
+                  "medianMs": 2.8,
+                  "p95Ms": 19.5,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 276,
+                    "totalMs": 356.3,
+                    "medianMs": 0,
+                    "p95Ms": 6.7
+                  },
+                  "firstFrameMs": 20519.5
+                },
+                "cdp": {
+                  "frames": 276,
+                  "totalMs": 255.889,
+                  "medianMs": 0,
+                  "p95Ms": 5.115,
+                  "longTasksWithExtensionSample": 12,
+                  "profileStartMs": 20057.708,
+                  "profileEndMs": 26445.054,
+                  "extensionNodes": 257
+                },
+                "pageLongTasks": 13,
+                "video": {
+                  "total": 15,
+                  "dropped": 0,
+                  "observedMs": 650,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": 64.706,
+                "extensionCpuMedianPerFrameMs": 0,
+                "extensionCpuP95PerFrameMs": 0.941,
+                "pageLongTasks": 4,
+                "extensionLongTaskIndicator": 3,
+                "videoDropped": 0,
+                "videoTotal": 0,
+                "videoDroppedPercentagePoints": 0
+              }
+            },
+            {
+              "pair": 2,
+              "trial": 1,
+              "order": ["B", "A"],
+              "A": {
+                "scene": "spa",
+                "startMs": 20727.3,
+                "windowCloseMs": 26743.2,
+                "actualReadMs": 27051.1,
+                "domInteractiveMs": 1451.7,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 50,
+                "g11": {
+                  "frames": 58,
+                  "totalMs": 330.5,
+                  "medianMs": 2.7,
+                  "p95Ms": 20.1,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 278,
+                    "totalMs": 330.5,
+                    "medianMs": 0,
+                    "p95Ms": 7.8
+                  },
+                  "firstFrameMs": 20733.1
+                },
+                "cdp": {
+                  "frames": 278,
+                  "totalMs": 255.14,
+                  "medianMs": 0,
+                  "p95Ms": 5.559,
+                  "longTasksWithExtensionSample": 13,
+                  "profileStartMs": 20293.348,
+                  "profileEndMs": 26744.664,
+                  "extensionNodes": 336
+                },
+                "pageLongTasks": 15,
+                "video": {
+                  "total": 16,
+                  "dropped": 1,
+                  "observedMs": 699.9,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "B": {
+                "scene": "spa",
+                "startMs": 20909.3,
+                "windowCloseMs": 26923.5,
+                "actualReadMs": 27157.7,
+                "domInteractiveMs": 1460.5,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 33.4,
+                "g11": {
+                  "frames": 47,
+                  "totalMs": 400.6,
+                  "medianMs": 4,
+                  "p95Ms": 34.2,
+                  "longRafCallbacks": 1,
+                  "longRafSums": 1,
+                  "allFrames": {
+                    "frames": 267,
+                    "totalMs": 400.6,
+                    "medianMs": 0,
+                    "p95Ms": 7.3
+                  },
+                  "firstFrameMs": 21016.8
+                },
+                "cdp": {
+                  "frames": 267,
+                  "totalMs": 268.422,
+                  "medianMs": 0,
+                  "p95Ms": 4.276,
+                  "longTasksWithExtensionSample": 11,
+                  "profileStartMs": 20448.437,
+                  "profileEndMs": 26925.652,
+                  "extensionNodes": 293
+                },
+                "pageLongTasks": 11,
+                "video": {
+                  "total": 11,
+                  "dropped": 0,
+                  "observedMs": 504.1,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": 13.282,
+                "extensionCpuMedianPerFrameMs": 0,
+                "extensionCpuP95PerFrameMs": -1.283,
+                "pageLongTasks": -4,
+                "extensionLongTaskIndicator": -2,
+                "videoDropped": -1,
+                "videoTotal": -5,
+                "videoDroppedPercentagePoints": -6.25
+              }
+            },
+            {
+              "pair": 3,
+              "trial": 1,
+              "order": ["A", "B"],
+              "A": {
+                "scene": "spa",
+                "startMs": 20814.2,
+                "windowCloseMs": 26829.4,
+                "actualReadMs": 27091.3,
+                "domInteractiveMs": 1383.5,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 33.4,
+                "g11": {
+                  "frames": 69,
+                  "totalMs": 286.3,
+                  "medianMs": 2,
+                  "p95Ms": 17.1,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 292,
+                    "totalMs": 286.3,
+                    "medianMs": 0,
+                    "p95Ms": 5.1
+                  },
+                  "firstFrameMs": 20816.6
+                },
+                "cdp": {
+                  "frames": 292,
+                  "totalMs": 227.805,
+                  "medianMs": 0,
+                  "p95Ms": 5.108,
+                  "longTasksWithExtensionSample": 7,
+                  "profileStartMs": 20361.413,
+                  "profileEndMs": 26830.451,
+                  "extensionNodes": 336
+                },
+                "pageLongTasks": 8,
+                "video": {
+                  "total": 22,
+                  "dropped": 0,
+                  "observedMs": 950,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "B": {
+                "scene": "spa",
+                "startMs": 20392,
+                "windowCloseMs": 26408.4,
+                "actualReadMs": 26693.9,
+                "domInteractiveMs": 1496.1,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 33.4,
+                "g11": {
+                  "frames": 50,
+                  "totalMs": 246.2,
+                  "medianMs": 2.4,
+                  "p95Ms": 15.7,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 301,
+                    "totalMs": 246.2,
+                    "medianMs": 0,
+                    "p95Ms": 5.1
+                  },
+                  "firstFrameMs": 20400.2
+                },
+                "cdp": {
+                  "frames": 301,
+                  "totalMs": 176.418,
+                  "medianMs": 0,
+                  "p95Ms": 4.081,
+                  "longTasksWithExtensionSample": 9,
+                  "profileStartMs": 20048.638,
+                  "profileEndMs": 26409.664,
+                  "extensionNodes": 246
+                },
+                "pageLongTasks": 9,
+                "video": {
+                  "total": 12,
+                  "dropped": 1,
+                  "observedMs": 500,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": -51.387,
+                "extensionCpuMedianPerFrameMs": 0,
+                "extensionCpuP95PerFrameMs": -1.027,
+                "pageLongTasks": 1,
+                "extensionLongTaskIndicator": 2,
+                "videoDropped": 1,
+                "videoTotal": -10,
+                "videoDroppedPercentagePoints": 8.333
+              }
+            },
+            {
+              "pair": 4,
+              "trial": 1,
+              "order": ["B", "A"],
+              "A": {
+                "scene": "spa",
+                "startMs": 20405,
+                "windowCloseMs": 26407,
+                "actualReadMs": 26699.7,
+                "domInteractiveMs": 1503.7,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 49.1,
+                "g11": {
+                  "frames": 45,
+                  "totalMs": 237.5,
+                  "medianMs": 3.4,
+                  "p95Ms": 15.9,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 294,
+                    "totalMs": 237.5,
+                    "medianMs": 0,
+                    "p95Ms": 5.7
+                  },
+                  "firstFrameMs": 20409.9
+                },
+                "cdp": {
+                  "frames": 294,
+                  "totalMs": 186.227,
+                  "medianMs": 0,
+                  "p95Ms": 4.597,
+                  "longTasksWithExtensionSample": 10,
+                  "profileStartMs": 20064.933,
+                  "profileEndMs": 26408.612,
+                  "extensionNodes": 275
+                },
+                "pageLongTasks": 13,
+                "video": {
+                  "total": 15,
+                  "dropped": 0,
+                  "observedMs": 600,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "B": {
+                "scene": "spa",
+                "startMs": 20414.7,
+                "windowCloseMs": 26422.7,
+                "actualReadMs": 26689.4,
+                "domInteractiveMs": 1368.9,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 33.3,
+                "g11": {
+                  "frames": 42,
+                  "totalMs": 213.8,
+                  "medianMs": 2.3,
+                  "p95Ms": 17.7,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 303,
+                    "totalMs": 213.8,
+                    "medianMs": 0,
+                    "p95Ms": 4.3
+                  },
+                  "firstFrameMs": 20466.9
+                },
+                "cdp": {
+                  "frames": 303,
+                  "totalMs": 174,
+                  "medianMs": 0,
+                  "p95Ms": 2.982,
+                  "longTasksWithExtensionSample": 8,
+                  "profileStartMs": 20043.501,
+                  "profileEndMs": 26424.377,
+                  "extensionNodes": 261
+                },
+                "pageLongTasks": 8,
+                "video": {
+                  "total": 13,
+                  "dropped": 1,
+                  "observedMs": 550,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": -12.227,
+                "extensionCpuMedianPerFrameMs": 0,
+                "extensionCpuP95PerFrameMs": -1.615,
+                "pageLongTasks": -5,
+                "extensionLongTaskIndicator": -2,
+                "videoDropped": 1,
+                "videoTotal": -2,
+                "videoDroppedPercentagePoints": 7.692
+              }
+            },
+            {
+              "pair": 5,
+              "trial": 1,
+              "order": ["A", "B"],
+              "A": {
+                "scene": "spa",
+                "startMs": 20366,
+                "windowCloseMs": 26375.7,
+                "actualReadMs": 26662.1,
+                "domInteractiveMs": 1307.2,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 33.8,
+                "g11": {
+                  "frames": 48,
+                  "totalMs": 271.8,
+                  "medianMs": 2.7,
+                  "p95Ms": 20.1,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 291,
+                    "totalMs": 271.8,
+                    "medianMs": 0,
+                    "p95Ms": 6.5
+                  },
+                  "firstFrameMs": 20367.1
+                },
+                "cdp": {
+                  "frames": 291,
+                  "totalMs": 185.425,
+                  "medianMs": 0,
+                  "p95Ms": 2.513,
+                  "longTasksWithExtensionSample": 11,
+                  "profileStartMs": 19981.358,
+                  "profileEndMs": 26376.996,
+                  "extensionNodes": 299
+                },
+                "pageLongTasks": 12,
+                "video": {
+                  "total": 15,
+                  "dropped": 0,
+                  "observedMs": 651.4,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "B": {
+                "scene": "spa",
+                "startMs": 20213.5,
+                "windowCloseMs": 26229.2,
+                "actualReadMs": 26383,
+                "domInteractiveMs": 1394,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 16.8,
+                "g11": {
+                  "frames": 41,
+                  "totalMs": 153.4,
+                  "medianMs": 1.8,
+                  "p95Ms": 12,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 316,
+                    "totalMs": 153.4,
+                    "medianMs": 0,
+                    "p95Ms": 2.6
+                  },
+                  "firstFrameMs": 20220.4
+                },
+                "cdp": {
+                  "frames": 316,
+                  "totalMs": 148.305,
+                  "medianMs": 0,
+                  "p95Ms": 2.101,
+                  "longTasksWithExtensionSample": 6,
+                  "profileStartMs": 19835.545,
+                  "profileEndMs": 26230.946,
+                  "extensionNodes": 297
+                },
+                "pageLongTasks": 6,
+                "video": {
+                  "total": 14,
+                  "dropped": 0,
+                  "observedMs": 600,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": -37.12,
+                "extensionCpuMedianPerFrameMs": 0,
+                "extensionCpuP95PerFrameMs": -0.412,
+                "pageLongTasks": -6,
+                "extensionLongTaskIndicator": -5,
+                "videoDropped": 0,
+                "videoTotal": -1,
+                "videoDroppedPercentagePoints": 0
+              }
+            },
+            {
+              "pair": 6,
+              "trial": 1,
+              "order": ["B", "A"],
+              "A": {
+                "scene": "spa",
+                "startMs": 20088.2,
+                "windowCloseMs": 26089.7,
+                "actualReadMs": 26307.5,
+                "domInteractiveMs": 1309.4,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 16.8,
+                "g11": {
+                  "frames": 49,
+                  "totalMs": 163.9,
+                  "medianMs": 1.5,
+                  "p95Ms": 13.5,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 315,
+                    "totalMs": 163.9,
+                    "medianMs": 0,
+                    "p95Ms": 2.1
+                  },
+                  "firstFrameMs": 20089.8
+                },
+                "cdp": {
+                  "frames": 315,
+                  "totalMs": 146.121,
+                  "medianMs": 0,
+                  "p95Ms": 2.06,
+                  "longTasksWithExtensionSample": 7,
+                  "profileStartMs": 19774.266,
+                  "profileEndMs": 26090.98,
+                  "extensionNodes": 263
+                },
+                "pageLongTasks": 7,
+                "video": {
+                  "total": 14,
+                  "dropped": 2,
+                  "observedMs": 550,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "B": {
+                "scene": "spa",
+                "startMs": 20108,
+                "windowCloseMs": 26110.8,
+                "actualReadMs": 26284.5,
+                "domInteractiveMs": 896.1,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 16.8,
+                "g11": {
+                  "frames": 44,
+                  "totalMs": 153.8,
+                  "medianMs": 1.4,
+                  "p95Ms": 14,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 316,
+                    "totalMs": 153.8,
+                    "medianMs": 0,
+                    "p95Ms": 1.9
+                  },
+                  "firstFrameMs": 20190.6
+                },
+                "cdp": {
+                  "frames": 316,
+                  "totalMs": 132.926,
+                  "medianMs": 0,
+                  "p95Ms": 2.059,
+                  "longTasksWithExtensionSample": 6,
+                  "profileStartMs": 19790.711,
+                  "profileEndMs": 26111.741,
+                  "extensionNodes": 288
+                },
+                "pageLongTasks": 6,
+                "video": {
+                  "total": 13,
+                  "dropped": 0,
+                  "observedMs": 550,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": -13.195,
+                "extensionCpuMedianPerFrameMs": 0,
+                "extensionCpuP95PerFrameMs": -0.001,
+                "pageLongTasks": -1,
+                "extensionLongTaskIndicator": -1,
+                "videoDropped": -2,
+                "videoTotal": -1,
+                "videoDroppedPercentagePoints": -14.286
+              }
+            },
+            {
+              "pair": 7,
+              "trial": 1,
+              "order": ["A", "B"],
+              "A": {
+                "scene": "spa",
+                "startMs": 20034.1,
+                "windowCloseMs": 26039.6,
+                "actualReadMs": 26279.5,
+                "domInteractiveMs": 1115.6,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 33.3,
+                "g11": {
+                  "frames": 62,
+                  "totalMs": 206,
+                  "medianMs": 1.4,
+                  "p95Ms": 11.6,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 306,
+                    "totalMs": 206,
+                    "medianMs": 0,
+                    "p95Ms": 4.2
+                  },
+                  "firstFrameMs": 20037
+                },
+                "cdp": {
+                  "frames": 306,
+                  "totalMs": 152.614,
+                  "medianMs": 0,
+                  "p95Ms": 2.198,
+                  "longTasksWithExtensionSample": 9,
+                  "profileStartMs": 19736.435,
+                  "profileEndMs": 26041.195,
+                  "extensionNodes": 291
+                },
+                "pageLongTasks": 9,
+                "video": {
+                  "total": 15,
+                  "dropped": 0,
+                  "observedMs": 650.1,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "B": {
+                "scene": "spa",
+                "startMs": 20210.2,
+                "windowCloseMs": 26214.2,
+                "actualReadMs": 26444.1,
+                "domInteractiveMs": 1507.8,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 33.3,
+                "g11": {
+                  "frames": 49,
+                  "totalMs": 180.5,
+                  "medianMs": 1.9,
+                  "p95Ms": 13.2,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 314,
+                    "totalMs": 180.5,
+                    "medianMs": 0,
+                    "p95Ms": 3.5
+                  },
+                  "firstFrameMs": 20223.5
+                },
+                "cdp": {
+                  "frames": 314,
+                  "totalMs": 163.86,
+                  "medianMs": 0,
+                  "p95Ms": 3.069,
+                  "longTasksWithExtensionSample": 8,
+                  "profileStartMs": 19909.743,
+                  "profileEndMs": 26215.946,
+                  "extensionNodes": 277
+                },
+                "pageLongTasks": 8,
+                "video": {
+                  "total": 10,
+                  "dropped": 0,
+                  "observedMs": 450,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": 11.246,
+                "extensionCpuMedianPerFrameMs": 0,
+                "extensionCpuP95PerFrameMs": 0.871,
+                "pageLongTasks": -1,
+                "extensionLongTaskIndicator": -1,
+                "videoDropped": 0,
+                "videoTotal": -5,
+                "videoDroppedPercentagePoints": 0
+              }
+            },
+            {
+              "pair": 8,
+              "trial": 1,
+              "order": ["B", "A"],
+              "A": {
+                "scene": "spa",
+                "startMs": 20148.4,
+                "windowCloseMs": 26150.6,
+                "actualReadMs": 26409.2,
+                "domInteractiveMs": 1298.3,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 49.9,
+                "g11": {
+                  "frames": 55,
+                  "totalMs": 230.6,
+                  "medianMs": 2,
+                  "p95Ms": 16,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 299,
+                    "totalMs": 230.6,
+                    "medianMs": 0,
+                    "p95Ms": 4.4
+                  },
+                  "firstFrameMs": 20154.8
+                },
+                "cdp": {
+                  "frames": 299,
+                  "totalMs": 177.667,
+                  "medianMs": 0,
+                  "p95Ms": 3.78,
+                  "longTasksWithExtensionSample": 6,
+                  "profileStartMs": 19803.943,
+                  "profileEndMs": 26151.389,
+                  "extensionNodes": 305
+                },
+                "pageLongTasks": 6,
+                "video": {
+                  "total": 18,
+                  "dropped": 0,
+                  "observedMs": 749.9,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "B": {
+                "scene": "spa",
+                "startMs": 20076.3,
+                "windowCloseMs": 26081.6,
+                "actualReadMs": 26277.2,
+                "domInteractiveMs": 1232.6,
+                "rAFPeriodMedianMs": 16.7,
+                "rAFPeriodP95Ms": 33.3,
+                "g11": {
+                  "frames": 58,
+                  "totalMs": 227.2,
+                  "medianMs": 1.6,
+                  "p95Ms": 15.7,
+                  "longRafCallbacks": 0,
+                  "longRafSums": 0,
+                  "allFrames": {
+                    "frames": 304,
+                    "totalMs": 227.2,
+                    "medianMs": 0,
+                    "p95Ms": 3.9
+                  },
+                  "firstFrameMs": 20171.5
+                },
+                "cdp": {
+                  "frames": 304,
+                  "totalMs": 180.59,
+                  "medianMs": 0,
+                  "p95Ms": 3.073,
+                  "longTasksWithExtensionSample": 8,
+                  "profileStartMs": 19792.507,
+                  "profileEndMs": 26082.891,
+                  "extensionNodes": 311
+                },
+                "pageLongTasks": 8,
+                "video": {
+                  "total": 16,
+                  "dropped": 0,
+                  "observedMs": 700.1,
+                  "segments": 1
+                },
+                "fledPx": 272.404
+              },
+              "bMinusA": {
+                "extensionCpuTotalMs": 2.923,
+                "extensionCpuMedianPerFrameMs": 0,
+                "extensionCpuP95PerFrameMs": -0.707,
+                "pageLongTasks": 2,
+                "extensionLongTaskIndicator": 2,
+                "videoDropped": 0,
+                "videoTotal": -2,
+                "videoDroppedPercentagePoints": 0
+              }
+            }
+          ]
+        }
+      },
+      "exclusions": [
+        {
+          "key": "cdp-1-A-1",
+          "reasons": {
+            "startup": ["window/frame coverage", "no rendered model"]
+          }
+        }
+      ]
+    }
+  }
+}
