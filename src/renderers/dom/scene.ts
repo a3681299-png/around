@@ -269,7 +269,24 @@ export function createImageRenderer(
       // stacking order instead of over them with the bands cut out. Editing too (it flickered the
       // cut-out way, chunk 4 follow-up): its handles go with the artwork under the controls, which keep their clicks by
       // stacking order; a press on a handle is claimed after a fresh read (editorClaims).
-      const offered = LAYERING && needsVideoSlot ? safety.source.beneathSlot?.() : undefined;
+      // Where the paints that can go under the controls are (the player's; every root in
+      // fullscreen, one plane), widened by BENEATH_NEAR_PX: only a control there can hold a paint
+      // for a pending read (beneathSettled), so only those need a proof now.
+      const near = layout.layers.flatMap((l) => {
+        const anchor = roots.get(l.parentId ?? l.layer.id)?.layer.placement.anchor,
+          b = l.bounds;
+        return (doc.fullscreenElement || (anchor?.kind === 'surface' && anchor.target === 'video-player')) && b
+          ? [
+              {
+                left: b.left - BENEATH_NEAR_PX,
+                top: b.top - BENEATH_NEAR_PX,
+                width: b.right - b.left + 2 * BENEATH_NEAR_PX,
+                height: b.bottom - b.top + 2 * BENEATH_NEAR_PX,
+              },
+            ]
+          : [];
+      });
+      const offered = LAYERING && needsVideoSlot ? safety.source.beneathSlot?.(near) : undefined;
       // The cut-out way stays as the way out (chunk 4): while a shown player control that is not
       // proven to paint over the plane meets the player's artwork (the autoplay card when a video
       // ends), the stacking order cannot keep it clear, and that draw is cut out as before.
@@ -467,9 +484,14 @@ export function createImageRenderer(
           if (
             videoSlot.host.parentElement !== beneath.parent ||
             videoSlot.host.previousElementSibling !== beneath.after
-          )
+          ) {
             beneath.parent.insertBefore(videoSlot.host, beneath.after.nextSibling);
-        } else if (videoSlot.host.parentElement !== slot.parent) slot.parent.append(videoSlot.host);
+            safety.source.wrote?.();
+          }
+        } else if (videoSlot.host.parentElement !== slot.parent) {
+          slot.parent.append(videoSlot.host);
+          safety.source.wrote?.();
+        }
         videoSlot.host.style.setProperty('--ww-decoration-clip', `inset(${slot.top}px 0 ${slot.bottom}px 0)`);
         videoSlot.host.style.setProperty('--ww-local-z', String(slot.zIndex));
         // What can be pressed over the picture (end screen cards, the "next" card, the cards
@@ -749,7 +771,11 @@ export function createImageRenderer(
     const overlaySlot = safety?.source.overlaySlot();
     const parent = overlaySlot?.parent ?? doc.fullscreenElement ?? doc.body ?? doc.documentElement;
     if (overlaySlot) host.style.setProperty('--ww-decoration-z', String(overlaySlot.zIndex));
-    if (host.parentElement !== parent) parent.append(host);
+    if (host.parentElement !== parent) {
+      parent.append(host);
+      // The page changed under this draw's shared reads (operation-source `wrote`).
+      safety?.source.wrote?.();
+    }
     const nextObserved = new Set<Element>();
     const effectTargets: EffectTarget[] = [];
     const geometry = captureGeometry(doc, anchors),

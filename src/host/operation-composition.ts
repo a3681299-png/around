@@ -51,6 +51,34 @@ export function scrollsWithPage(element: HTMLElement): boolean {
   return true;
 }
 
+export type CompositionReader = ReturnType<typeof createCompositionReader>;
+
+/**
+ * One draw's composition reads (chunk 4 fix, docs/layering-plan.md 9): the stacking chains and
+ * computed styles read for one draw are shared by every read of it (the whole read, the overlay
+ * and beneath places, the pending proofs), instead of each walking the same ancestors again. The
+ * reader is dropped when the extension writes the page (`drop`, from the Host's `wrote`) and at
+ * the end of the task, so it never outlives the draw: an opacity or transform transition changes
+ * the stacking order with no record, and the next draw must see it (the cued thumbnail's fade).
+ */
+export function createDrawReads(doc: Document) {
+  let reader: CompositionReader | undefined;
+  return {
+    reader(): CompositionReader {
+      if (!reader) {
+        const created = (reader = createCompositionReader(doc));
+        queueMicrotask(() => {
+          if (reader === created) reader = undefined;
+        });
+      }
+      return reader;
+    },
+    drop() {
+      reader = undefined;
+    },
+  };
+}
+
 /** A single, synchronous DOM read. Never retain computed facts across updates. */
 export function createCompositionReader(doc: Document) {
   const styles = new WeakMap<HTMLElement, CSSStyleDeclaration>();
@@ -79,6 +107,14 @@ export function createCompositionReader(doc: Document) {
     }
     return value;
   };
+  // A computed style is live: each property read resolves again. The answer is kept per element
+  // for this read instead (it reads seven properties).
+  const blocks = new WeakMap<HTMLElement, boolean>();
+  const containingBlock = (element: HTMLElement) => {
+    let value = blocks.get(element);
+    if (value === undefined) blocks.set(element, (value = fixedContainingBlock(style(element))));
+    return value;
+  };
   const fixedAncestor = (element: HTMLElement): boolean => {
     const cached = fixed.get(element);
     if (cached !== undefined) return cached;
@@ -103,7 +139,7 @@ export function createCompositionReader(doc: Document) {
       s.zIndex !== 'auto' ||
       s.position === 'fixed' ||
       s.position === 'sticky' ||
-      fixedContainingBlock(s) ||
+      containingBlock(element) ||
       Number(s.opacity) < 1 ||
       s.isolation === 'isolate' ||
       s.mixBlendMode !== 'normal' ||
@@ -154,7 +190,7 @@ export function createCompositionReader(doc: Document) {
         (positioned && s.zIndex !== 'auto') ||
         s.position === 'fixed' ||
         s.position === 'sticky' ||
-        fixedContainingBlock(s) ||
+        containingBlock(element) ||
         Number(s.opacity) < 1 ||
         s.isolation === 'isolate' ||
         s.mixBlendMode !== 'normal' ||
@@ -173,6 +209,8 @@ export function createCompositionReader(doc: Document) {
   };
   return {
     style,
+    /** fixedContainingBlock of the element's computed style, once per element for this read. */
+    containingBlock,
     /**
      * Whether everything element paints is painted after (over) reference, by the browser's own
      * stacking order alone, wherever either of them is on screen (chunk 4, docs/layering-plan.md).

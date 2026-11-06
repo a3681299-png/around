@@ -1,5 +1,5 @@
 import { createOperationSource, type DiscoveryScan, type OperationCandidate } from '../host/operation-source';
-import { createCompositionReader, fixedContainingBlock, scrollsWithPage } from '../host/operation-composition';
+import { createDrawReads, type CompositionReader } from '../host/operation-composition';
 import { LAYERING } from '../host/world-options';
 import type { PlacementFrame } from '../world/geometry';
 
@@ -75,6 +75,10 @@ function createCandidateIndex(doc: Document) {
 
 export function youtubeOperations(doc: Document) {
   const candidates = createCandidateIndex(doc);
+  // One draw's styles and stacking chains, shared by its reads (the whole read, the overlay and
+  // beneath places, the pending proofs; the overlay's ancestors were walked three to four times a
+  // draw). Dropped at the end of the task and when the extension writes the page (Host `wrote`).
+  const reads = createDrawReads(doc);
   // The player, looked up in the whole document only by a whole read (which every added or removed
   // element leads to) or when the one found has left the document. Every draw asks for it (the
   // video slot, the beneath place); the lookup walked the whole page each time, about 1 ms on a
@@ -91,8 +95,9 @@ export function youtubeOperations(doc: Document) {
     const parent =
       doc.fullscreenElement instanceof HTMLElement ? doc.fullscreenElement : doc.querySelector<HTMLElement>('ytd-app');
     if (!parent) return undefined;
+    const composition = reads.reader();
     for (let node: HTMLElement | null = parent; node; node = node.parentElement)
-      if (fixedContainingBlock(doc.defaultView!.getComputedStyle(node))) return undefined;
+      if (composition.containingBlock(node)) return undefined;
     return { parent, zIndex: 1 };
   };
   /** The player when its centre is the native video gesture: no menu, error or advert over it,
@@ -103,12 +108,13 @@ export function youtubeOperations(doc: Document) {
     if (!parent) return undefined;
     // A non-fullscreen fixed player uses the single screen composition. A
     // separate local context could otherwise reorder overlapping anchors.
-    if (doc.fullscreenElement !== parent && !scrollsWithPage(parent)) return undefined;
+    // scrolls(): not in fullscreen and no fixed ancestor, the same test as scrollsWithPage.
+    if (doc.fullscreenElement !== parent && !reads.reader().scrolls(parent)) return undefined;
     const menu = [
       ...parent.querySelectorAll<HTMLElement>(
         '.ytp-error, .ytp-ad-player-overlay, .ytp-popup:not(button), .ytp-settings-menu',
       ),
-    ].some((e) => e.getBoundingClientRect().height > 0 && doc.defaultView!.getComputedStyle(e).visibility !== 'hidden');
+    ].some((e) => e.getBoundingClientRect().height > 0 && reads.reader().style(e).visibility !== 'hidden');
     const r = parent.getBoundingClientRect();
     if (menu || r.height <= 176 || r.width <= 0) return undefined;
     return { parent, r };
@@ -132,13 +138,14 @@ export function youtubeOperations(doc: Document) {
     if (!overlaySlot()) return why('no overlay slot');
     const parent = player();
     if (!parent) return why('no player');
-    const style = doc.defaultView!.getComputedStyle(parent);
+    const composition = reads.reader();
+    const style = composition.style(parent);
     if (style.position === 'static' || !Number.isFinite(Number(style.zIndex))) return why('player not a context');
     let media: HTMLElement | undefined;
     for (const child of parent.children)
       if (child instanceof HTMLElement && child.classList.contains('html5-video-container')) media = child;
     if (!media) return why('no media');
-    const mediaStyle = doc.defaultView!.getComputedStyle(media);
+    const mediaStyle = composition.style(media);
     const zIndex = Number(mediaStyle.zIndex);
     if (mediaStyle.position === 'static' || !Number.isFinite(zIndex)) return why('media without a level');
     const r = parent.getBoundingClientRect();
@@ -155,11 +162,7 @@ export function youtubeOperations(doc: Document) {
   /** The stacking proof, the one place it is asked. A development build without it on purpose
    * (WW_NO_STACKING_PROOF=1, scripts/build.mjs) drops the labelled line and takes everything as
    * proven, to see the layering tests fail; every other build keeps the line. */
-  const provenOver = (
-    composition: ReturnType<typeof createCompositionReader>,
-    element: Element,
-    media: HTMLElement,
-  ) => {
+  const provenOver = (composition: CompositionReader, element: Element, media: HTMLElement) => {
     let proven = true;
     WW_STACKING_PROOF: proven = composition.paintsAbove(element, media);
     return proven;
@@ -167,7 +170,8 @@ export function youtubeOperations(doc: Document) {
   const unprovenControls = (
     root: HTMLElement,
     media: HTMLElement,
-    composition: ReturnType<typeof createCompositionReader>,
+    composition: CompositionReader,
+    near: readonly PlacementFrame[] | undefined,
   ) => {
     const candidates = root.matches(candidateSelector)
       ? [root, ...root.querySelectorAll(candidateSelector)]
@@ -175,8 +179,16 @@ export function youtubeOperations(doc: Document) {
     return candidates.filter((element) => {
       if (element.closest('[id^="web-world-themes"]') || media.contains(element)) return false;
       const r = element.getBoundingClientRect();
-      if (r.width <= 0 || r.height <= 0 || composition.style(element as HTMLElement).visibility === 'hidden')
+      if (r.width <= 0 || r.height <= 0) return false;
+      // Only a control near a paint can hold it (the Host's 40 px): one elsewhere needs no proof
+      // now, and the next whole read reads it as before. Its box is read first, its styles and
+      // stacking chain only when it is near (chunk 4 fix, docs/layering-plan.md 9).
+      if (
+        near &&
+        !near.some((n) => r.left < n.left + n.width && r.right > n.left && r.top < n.top + n.height && r.bottom > n.top)
+      )
         return false;
+      if (composition.style(element as HTMLElement).visibility === 'hidden') return false;
       return !provenOver(composition, element, media);
     });
   };
@@ -188,7 +200,7 @@ export function youtubeOperations(doc: Document) {
     (scan) => {
       // Every whole read looks the player up again (a new player, or another one first).
       knownPlayer = findPlayer();
-      const composition = createCompositionReader(doc);
+      const composition = reads.reader();
       const rows: OperationCandidate[] = [];
       const root = player(),
         overlay = overlaySlot();
@@ -352,7 +364,7 @@ export function youtubeOperations(doc: Document) {
         return (
           box.width > 0 &&
           box.height > 0 &&
-          doc.defaultView!.getComputedStyle(element).visibility !== 'hidden' &&
+          reads.reader().style(element).visibility !== 'hidden' &&
           box.bottom > r.top + 64 &&
           box.top < r.bottom - 112
         );
@@ -362,7 +374,7 @@ export function youtubeOperations(doc: Document) {
       // goes directly above it, so artwork is over the video yet under every native overlay
       // and control layer; the bands above are clipped and central controls disable it.
       const media = parent.querySelector<HTMLElement>('.html5-video-container');
-      const mediaZ = media ? Number.parseInt(doc.defaultView!.getComputedStyle(media).zIndex, 10) : NaN;
+      const mediaZ = media ? Number.parseInt(reads.reader().style(media).zIndex, 10) : NaN;
       return {
         parent,
         rect: { left: r.left, top: r.top, width: r.width, height: r.height },
@@ -390,7 +402,7 @@ export function youtubeOperations(doc: Document) {
     // test as incremental discovery's, on the inserted subtree only.
     (root, deep = true) => root.matches(candidateSelector) || (deep && Boolean(root.querySelector(candidateSelector))),
     undefined,
-    (pending, kind) => {
+    (pending, kind, near) => {
       if (!LAYERING) return undefined;
       const place = beneathPlace();
       if (!place) return undefined;
@@ -410,15 +422,15 @@ export function youtubeOperations(doc: Document) {
         if (kind === 'none') return false;
         if (!beneathRead) return true;
         for (const { id, box } of beneathRead.unproven) found.push({ why: `unproven ${id}`, box });
-        // Searched and proved again on every call while a read is pending, on purpose: an opacity
+        // Searched and proved again on every draw while a read is pending, on purpose: an opacity
         // or transform transition changes the stacking order with no mutation record (the cued
         // thumbnail's fade, docs/layering-plan.md 7), so no record count can say "unchanged". A
         // cache keyed on the page's records was tried and measured: YouTube changes the bars
         // nearly every frame while they show, so it was rebuilt ~80 times in 5 s anyway (chunk 4
-        // follow-up, "塊4の続き").
-        const composition = createCompositionReader(doc);
+        // follow-up, "塊4の続き"). Within the draw, the chains are shared (reads).
+        const composition = reads.reader();
         const inPlayer = (root: HTMLElement, why: string) => {
-          for (const control of unprovenControls(root, media, composition)) {
+          for (const control of unprovenControls(root, media, composition, near)) {
             const b = control.getBoundingClientRect();
             found.push({
               why: `unproven ${control.tagName}.${control.classList[0] ?? ''} after ${why}`,
@@ -456,5 +468,6 @@ export function youtubeOperations(doc: Document) {
         unprovenShown: beneathRead?.unproven.map((u) => u.box) ?? [],
       };
     },
+    reads.drop,
   );
 }

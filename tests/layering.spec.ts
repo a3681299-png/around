@@ -322,6 +322,51 @@ layered(
   },
 );
 
+layered(
+  'a proven control beside the character holds nothing; while its container fades (no record) it holds it',
+  async ({ popup, youtube }) => {
+    await youtubeStacking(youtube);
+    await characterOverBar(popup, youtube);
+    // A button at level 20 (over the media's 10) in a positioned container without a z-index, as
+    // YouTube's large play button is: proven while the container is opaque. A fade (opacity below
+    // 1) makes the container a context at level 0, under the media: the button is then not proven,
+    // and nothing in the page's records says so (chunk 4: why proofs are not kept across draws).
+    const box = (await youtube.locator('#web-world-themes-video-decorations [data-image-id]').boundingBox())!;
+    const player = (await youtube.locator('#movie_player').boundingBox())!;
+    const place = (fade: boolean) =>
+      youtube.evaluate(
+        ({ box, player, fade }) => {
+          document.getElementById('fading')?.remove();
+          if (!document.getElementById('fading-keys')) {
+            const style = document.createElement('style');
+            style.id = 'fading-keys';
+            style.textContent =
+              '@keyframes ww-test-fade { from { opacity: 1 } 10% { opacity: .4 } to { opacity: .4 } }';
+            document.head.append(style);
+          }
+          const wrap = document.createElement('div');
+          wrap.id = 'fading';
+          // The fade starts after the read that the insertion brings (a delay, no record).
+          wrap.style.cssText = `position:absolute;inset:0;pointer-events:none${fade ? ';animation:ww-test-fade 6s linear 700ms both' : ''}`;
+          wrap.innerHTML = `<button style="position:absolute;z-index:20;pointer-events:auto;left:${box.x - player.x - 50}px;top:${box.y - player.y + 10}px;width:30px;height:24px">x</button>`;
+          document.querySelector('#movie_player')!.append(wrap);
+        },
+        { box, player, fade },
+      );
+    await place(false);
+    const steady = await stoppedWhileBarsToggle(youtube);
+    expect(steady.frames).toBeGreaterThan(20);
+    expect(steady.stopped).toBe(0);
+    await place(true);
+    // stoppedWhileBarsToggle waits 600 ms first: the container is fading by the time the bars change.
+    const fading = await stoppedWhileBarsToggle(youtube);
+    expect(
+      await youtube.evaluate(() => Number(getComputedStyle(document.getElementById('fading')!).opacity)),
+    ).toBeLessThan(1);
+    expect(fading.stopped).toBeGreaterThan(0);
+  },
+);
+
 /** The layering build with its stacking proof removed on purpose (WW_NO_STACKING_PROOF=1). */
 const unproofed = test.extend({
   extensionPath: [
