@@ -167,3 +167,52 @@ worktree は比べる基準の2つ（`g13-g12head`＝`4d3f39b`・`g13-before`＝
 | 空く          |                                                                                                                                           | **45.85 GB** |
 
 残すものの内訳：docs などが名前を出しているもの 93 個・4.39GB、各仲間の新しい3回分 278 個・1.84GB、最近書かれたもの 46 個・0.49GB、比べる基準の worktree 2 個・0.34GB。`main-base`（0.81GB）と `ui0d3-base`（0.19GB）は、テストのファイルに未コミットの変更があるので「使用中」として残った（上のとおり、パッチに残してから手で外した）。
+
+## 検証の PC（デスクトップ）
+
+2026-11-07 にセットアップ。デスクトップの Codex が検証し、実装はノート PC の Claude Code が担当する。今回の確認対象は `codex/chunk4-layering` の `9432b7868239d9710524249f548c7fef81608d73`。指定された `layering.spec.ts` と `flicker-live.spec.ts` がある版を、detached worktree に展開した。
+
+| 項目     | 構成                                                                       |
+| -------- | -------------------------------------------------------------------------- |
+| CPU      | AMD Ryzen 5 5600X（6 コア、12 スレッド）                                   |
+| GPU      | AMD Radeon RX 6800、ドライバー 32.0.21045.16010                            |
+| メモリ   | 64 GiB（4 枚）                                                             |
+| OS       | Windows 11 Pro 25H2、ビルド 26200.9711                                     |
+| 電源     | Windows の電源プラン「高パフォーマンス」                                   |
+| 画面     | DELL SE2425HG と Pixio PXC243。各 1920×1080、横並び。GPU の報告値は 165 Hz |
+| 開発環境 | Node.js 24.11.1、npm 11.6.2、Playwright Chromium 153.0.8010.12             |
+
+### セットアップと運用
+
+- `npm ci` と `npm run test:setup` を実行し、Chromium をデスクトップのチェックアウト直下の `.work/browsers` に用意した。検証用 worktree からは `PLAYWRIGHT_BROWSERS_PATH` にその絶対パスを指定する。検証ビルドは worktree 内の `WW_BUILD_OUT=.work/test-dist` に作り、テストには `WW_TEST_EXTENSION_PATH=.work/test-dist` を指定する。
+- 作業ブランチの `a8a4b5d` から `node scripts/install-skills.mjs` を実行し、Codex の `~/.agents/skills` と Claude Code の `~/.claude/skills` に WWT の6スキルをインストールした。`node scripts/install-skills.mjs --check` は成功。
+- FFmpeg 9.0.1 Essentials を WinGet の `Gyan.FFmpeg.Essentials` でユーザー単位に導入した。ユーザー PATH から `ffmpeg -version` が通り、短い合成映像を VP9/WebM でエンコードできた。[FFmpeg の配布案内](https://ffmpeg.org/download.html)
+- 私用素材は `C:\wwt-private\` 配下の原本をユーザー環境変数で参照する。`WW_VRM_FILE` と `WW_CHARACTER_VRM` は専用モーションと同じキャラクターの VRM、`WW_VRMA_DIR` は `manifest.json` と専用モーションのサブフォルダを含む親ディレクトリ、`WW_CHARACTER_MOTIONS` はそのサブフォルダ。4件とも参照先を確認した。設定前から開いているターミナルでは、新しいターミナルを開くか、Windows のユーザー環境変数をプロセスに読み込んでから実行する。
+- スクリーンショットと計測は headless を基本にする。表示が必要な Chrome は `WW_TEST_WINDOW_OFFSCREEN=1` で画面外に置く。e2e 全件を回す場合は、フォーカスを取る前に翔太に伝える。
+- 検証対象コミットは detached worktree で開く。報告は `codex/verify-reports` に docs の変更だけをコミットして push する。Claude Code はそこから報告コミットを取り込む。検証が終わったら要約と報告で参照する画像を残し、検証用 worktree と生データを片付ける。
+
+### 動作確認
+
+| 確認       | 結果                                                                                                                                                                                                                                                                                                     |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 型チェック | `npm run typecheck` 成功                                                                                                                                                                                                                                                                                 |
+| lint       | `npm run lint` 成功                                                                                                                                                                                                                                                                                      |
+| unit 全件  | 572 件通過、1 件スキップ。比較用の素体を使う任意の `WW_VRM_COMPARE_FILE` テストが対象。指定したキャラクターと VRMA の unit テストは通過                                                                                                                                                                  |
+| e2e        | `npm run test:e2e -- tests/layering.spec.ts` で 1 spec・9 件通過。1 ワーカー                                                                                                                                                                                                                             |
+| 実サイト   | G11 の `smoke` 1 回成功。未ログインの headless Chromium で YouTube の視聴ページを撮影し、動画・操作バー・タイトルが表示されることと、操作保護が有効なことを確認。画像1枚はデスクトップの `.work/verify-desktop-20261107/watch-top.png`。私用素材を使う実サイトテストと `flicker-live` は今回の確認範囲外 |
+| CI         | 対象 `9432b78` は `[skip ci]` の docs コミットで実行履歴なし。報告ブランチの基点 `a8a4b5d` のジョブは、請求または支出上限に関する GitHub 側の制約で開始前に失敗。[CI の実行結果](https://github.com/a3681299-png/web-world-themes/actions/runs/42245038538)                                              |
+
+### G11 同一版の振れ幅
+
+`scripts/g11/build.mjs` で作った同一の計測ビルドを、両条件で操作保護を有効にして使用した。未ログインの headless Chromium、1920×1080、DPR 1。[同じ YouTube 視聴ページ](https://www.youtube.com/watch?v=M7lc1UVf-VE)を区間ごとにリロードし、32 レイヤー・16 グループの G11 の作品を描画した。各区間は定常状態を 15 秒待ち、3 秒の強制描画の後に 6 秒採取。`steady` の `G11_PAIR_COUNT=4` は保護ありの4区間を意味する。測定順は A1 → B1 → B2 → A2 の2組。
+
+標準実行は、manifest が読み込んだ計測コードを再注入した際の `Identifier '__probe' has already been declared` で最初の採取前に終了した。再実行では `G11_CONTENT_FILE` に `void 0;` だけの一時ファイルを指定し、毎回 manifest が読み込んだ同じ計測コードで採取した。4区間とも G11 の保護状態・動画再生・フレーム記録の検査と `scripts/g11/analyze.mjs` が通った。
+
+| 組・実行順 | 拡張 rAF CPU/フレーム 中央値（ms） | 拡張 rAF CPU/フレーム p95（ms） | 参考：全体 p95（ms） |
+| ---------- | ---------------------------------: | ------------------------------: | -------------------: |
+| 1・A → B   |           1.80 → 2.20（B−A +0.40） |            2.40 → 3.20（+0.80） |      15.537 → 21.112 |
+| 2・B → A   |           1.90 → 2.60（B−A −0.70） |            2.70 → 4.80（−2.10） |      15.489 → 20.076 |
+
+同じ組の差の絶対値は、中央値で 0.40〜0.70 ms、p95 で 0.80〜2.10 ms。4区間の値の範囲はそれぞれ 1.80〜2.60 ms、2.40〜4.80 ms。2組の定常時サンプルであり、合否判定には使わない。起動直後・SPA 遷移直後は今回の採取範囲外。G11 が計る拡張 CPU は rAF コールバックの合計で、rAF 外の処理は含まない。試行全体でネットワークエラー48件を観測したが、採用した各区間は広告・停止・バッファ待ち・動画の差し替え・ドロップフレームなし。
+
+計測条件と組ごとの要約は [desktop-g11-aa-2026-11-07.json](benchmarks/desktop-g11-aa-2026-11-07.json) に保存した。
