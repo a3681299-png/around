@@ -27,6 +27,17 @@ const quantile = (values: number[], q: number) => {
   return sorted.length ? sorted[Math.min(sorted.length - 1, Math.floor(q * sorted.length))]! : 0;
 };
 
+/** Calls per named extension function, from a precise coverage taken with callCount. */
+const callCounts = (result: { url: string; functions: { functionName: string; ranges: { count: number }[] }[] }[]) => {
+  const counts: Record<string, number> = {};
+  for (const script of result.filter((s) => s.url.startsWith('chrome-extension://')))
+    for (const fn of script.functions) {
+      const calls = fn.ranges[0]?.count ?? 0;
+      if (calls && fn.functionName) counts[fn.functionName] = (counts[fn.functionName] ?? 0) + calls;
+    }
+  return counts;
+};
+
 type Layer = { id: string; character?: unknown; model?: Record<string, unknown>; placement: object };
 type Design = { decorations: Layer[] } & Record<string, unknown>;
 
@@ -122,11 +133,13 @@ test('R3-2 short check: extension rAF CPU per frame, quiet / plain VRM / compute
   test.skip(process.env.WW_PERF_R32 !== '1', 'Explicit short measurement on real YouTube (WW_PERF_R32=1).');
   test.setTimeout(1500000);
   await mkdir(out, { recursive: true });
+  // WW_PERF_R32_HEADED=1: a real GPU, off the screen (as WW_PERF_SPA_HEADED below).
   const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-r32-perf-')), false, {
     extensionPath: process.env.WW_TEST_EXTENSION_PATH ?? '.work/g11-measurement-dist',
+    ...(process.env.WW_PERF_R32_HEADED === '1' ? { headed: true, width: 1920, height: 1080 } : {}),
   });
   try {
-    const { design, popup, page, isolated, evaluate, perFrame, play } = await setUp(context);
+    const { design, popup, page, session, isolated, evaluate, perFrame, play } = await setUp(context);
     const layers = design.decorations;
     const variants: Record<string, Layer[]> = {
       quiet: layers.filter((layer) => layer.id !== 'resident'),
@@ -174,6 +187,17 @@ test('R3-2 short check: extension rAF CPU per frame, quiet / plain VRM / compute
         await page.waitForTimeout(6000);
         const contextId = await isolated();
         await evaluate(contextId, '__g11Probe.begin(false)');
+        // WW_PERF_R32_PROFILE=1: a CPU profile and each extension function's call count for the
+        // window (.work/r32-perf/r32-<label>-<variant>-<round>.*). They add their own cost: such a
+        // run tells where the time goes, not whether a change passes.
+        const profiling = process.env.WW_PERF_R32_PROFILE === '1';
+        if (profiling) {
+          await session.send('Profiler.enable');
+          await session.send('Profiler.setSamplingInterval', { interval: 200 });
+          await session.send('Profiler.startPreciseCoverage', { callCount: true, detailed: true });
+          await session.send('Profiler.takePreciseCoverage');
+          await session.send('Profiler.start');
+        }
         if (process.env.WW_PERF_R32_WIGGLE === '1') {
           // The pointer crosses the picture and leaves every second: the bars fade in and out.
           const box = (await page.locator('#movie_player').boundingBox())!;
@@ -184,6 +208,14 @@ test('R3-2 short check: extension rAF CPU per frame, quiet / plain VRM / compute
             await page.waitForTimeout(500);
           }
         } else await page.waitForTimeout(5000);
+        if (profiling) {
+          const name = `r32-${process.env.WW_PERF_R32_LABEL ?? 'run'}-${variant}-${round}`;
+          const { profile } = await session.send('Profiler.stop');
+          const { result } = await session.send('Profiler.takePreciseCoverage');
+          await session.send('Profiler.stopPreciseCoverage');
+          await writeFile(path.join(out, `${name}.cpuprofile`), JSON.stringify(profile));
+          await writeFile(path.join(out, `${name}.counts.json`), JSON.stringify(callCounts(result)));
+        }
         const { total: _total, ...stats } = perFrame(await evaluate(contextId, '__g11Probe.end()'));
         const row = { round, variant, ...stats };
         rows.push(row);

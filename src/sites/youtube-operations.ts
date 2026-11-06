@@ -75,7 +75,18 @@ function createCandidateIndex(doc: Document) {
 
 export function youtubeOperations(doc: Document) {
   const candidates = createCandidateIndex(doc);
-  const player = () => doc.querySelector<HTMLElement>('.html5-video-player, #movie_player');
+  // The player, looked up in the whole document only by a whole read (which every added or removed
+  // element leads to) or when the one found has left the document. Every draw asks for it (the
+  // video slot, the beneath place); the lookup walked the whole page each time, about 1 ms on a
+  // watch page (chunk 4 follow-up: CPU profile of the corner character with the bars coming and
+  // going, docs/layering-plan.md 「塊4の続き」). A player that appears before the next read is
+  // not used until that read: until then the draw has none, which only keeps the plane off.
+  const findPlayer = () => doc.querySelector<HTMLElement>('.html5-video-player, #movie_player');
+  let knownPlayer: HTMLElement | null | undefined;
+  const player = () => {
+    if (knownPlayer === undefined || (knownPlayer && !knownPlayer.isConnected)) knownPlayer = findPlayer();
+    return knownPlayer;
+  };
   const overlaySlot = () => {
     const parent =
       doc.fullscreenElement instanceof HTMLElement ? doc.fullscreenElement : doc.querySelector<HTMLElement>('ytd-app');
@@ -175,6 +186,8 @@ export function youtubeOperations(doc: Document) {
   return createOperationSource(
     doc,
     (scan) => {
+      // Every whole read looks the player up again (a new player, or another one first).
+      knownPlayer = findPlayer();
       const composition = createCompositionReader(doc);
       const rows: OperationCandidate[] = [];
       const root = player(),
@@ -397,6 +410,12 @@ export function youtubeOperations(doc: Document) {
         if (kind === 'none') return false;
         if (!beneathRead) return true;
         for (const { id, box } of beneathRead.unproven) found.push({ why: `unproven ${id}`, box });
+        // Searched and proved again on every call while a read is pending, on purpose: an opacity
+        // or transform transition changes the stacking order with no mutation record (the cued
+        // thumbnail's fade, docs/layering-plan.md 7), so no record count can say "unchanged". A
+        // cache keyed on the page's records was tried and measured: YouTube changes the bars
+        // nearly every frame while they show, so it was rebuilt ~80 times in 5 s anyway (chunk 4
+        // follow-up, "塊4の続き").
         const composition = createCompositionReader(doc);
         const inPlayer = (root: HTMLElement, why: string) => {
           for (const control of unprovenControls(root, media, composition)) {
