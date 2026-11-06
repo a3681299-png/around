@@ -216,3 +216,14 @@ worktree は比べる基準の2つ（`g13-g12head`＝`4d3f39b`・`g13-before`＝
 同じ組の差の絶対値は、中央値で 0.40〜0.70 ms、p95 で 0.80〜2.10 ms。4区間の値の範囲はそれぞれ 1.80〜2.60 ms、2.40〜4.80 ms。2組の定常時サンプルであり、合否判定には使わない。起動直後・SPA 遷移直後は今回の採取範囲外。G11 が計る拡張 CPU は rAF コールバックの合計で、rAF 外の処理は含まない。試行全体でネットワークエラー48件を観測したが、採用した各区間は広告・停止・バッファ待ち・動画の差し替え・ドロップフレームなし。
 
 計測条件と組ごとの要約は [desktop-g11-aa-2026-11-07.json](benchmarks/desktop-g11-aa-2026-11-07.json) に保存した。
+
+## 実装の PC（ノート PC）の Chromium（2026-11-07）
+
+| 項目       | 構成                                                                                                             |
+| ---------- | ---------------------------------------------------------------------------------------------------------------- |
+| CPU・GPU   | Intel Core i7-13650HX、Intel UHD Graphics（画面の出力）と NVIDIA GeForce RTX 3050 6GB Laptop GPU                 |
+| 画面       | 1920×1080、144 Hz                                                                                                |
+| Playwright | 1.63.0（`package.json`）。Chromium は revision 1243 = **153.0.8010.12**。メインの `.work/browsers/chromium-1243` |
+
+- `.work/browsers` は `package.json` の Playwright と合っていた（`npm run test:setup` は不要だった）。テスト（`scripts/test.mjs`）はここを使う。`.work` の worktree には自分の `.work/browsers` がないので、`PLAYWRIGHT_BROWSERS_PATH` にメインの `.work/browsers` の絶対パスを指定する
+- これまでのノート PC の G11 の数値の「Chromium 143.0.7499.4」は、`scripts/g11` が `PLAYWRIGHT_BROWSERS_PATH` なしで動き、ユーザー全体のキャッシュ（`%LOCALAPPDATA%\ms-playwright\chromium-1200`、古い Playwright のもの）を使っていたため。`scripts/g11/environment.mjs` は、`G11_BROWSER_PATH` がなければ、`PLAYWRIGHT_BROWSERS_PATH`、なければメインの `.work/browsers` の、この Playwright の revision の Chromium を使うようにした（塊4のブランチ）。143 と 153 の数値は並べて比べない
