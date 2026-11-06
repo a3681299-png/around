@@ -12,6 +12,8 @@ interface StudioPorts {
   /** 緊急OFF and 操作チェック for the editor's header; `header` is slotted into its menu bar. */
   mountSafety?(root: HTMLElement, connection: StudioConnection): { header: HTMLElement; destroy(): void };
   openSettings?(target?: number): void;
+  /** In the browser's side panel only: closes it (fullscreen hides the browser's own button). */
+  closePanel?(): void;
   hostName: string;
   sidePanel?: boolean;
   connect(
@@ -44,6 +46,20 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
   settingsButton.hidden = !ports.openSettings;
   settingsButton.addEventListener('click', () => ports.openSettings?.(connection.target));
   connectionBar.append(settingsButton);
+  // In Chrome's side panel: fullscreen hides the toolbar and its own close button, so the panel
+  // carries one (chunk 4 follow-up), first on the status line at its foot (the editor's
+  // `panel-close` slot: the narrow panel does not show the connection bar, and its menu bar is
+  // full). The draft stays, as when the toolbar closes the panel.
+  const closeButton = ports.closePanel ? doc.createElement('button') : undefined;
+  if (closeButton) {
+    closeButton.type = 'button';
+    closeButton.className = 'close-panel';
+    closeButton.slot = 'panel-close';
+    closeButton.textContent = '閉じる';
+    closeButton.title = 'サイドパネルを閉じます。編集中の内容は残ります。';
+    closeButton.setAttribute('aria-label', 'サイドパネルを閉じる');
+    closeButton.addEventListener('click', () => ports.closePanel?.());
+  }
   for (const [selector, name] of [
     ['refresh-targets', 'refresh'],
     ['connect-target', 'connect'],
@@ -186,6 +202,7 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
       connectionBar.slot = 'connection';
       message.slot = 'connection-status';
       panel.host.append(connectionBar, message);
+      if (closeButton) panel.host.append(closeButton);
       if (safety) panel.host.append(safety.header);
       if (!builtNarrow) {
         stage = doc.createElement('section');

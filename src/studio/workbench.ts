@@ -363,7 +363,11 @@ export function createStudioWorkbench(
   const statusTip = make('', 'help', () => undefined);
   statusTip.classList.add('status-tip');
   statusTip.hidden = true;
-  footer.replaceChildren(connectionStatus, dirty, status, statusTip);
+  // The side panel's own close button (fullscreen hides Chrome's with the toolbar), first on the
+  // line; the page supplies it only in the side panel.
+  const panelClose = doc.createElement('slot');
+  panelClose.name = 'panel-close';
+  footer.replaceChildren(panelClose, connectionStatus, dirty, status, statusTip);
   const fitStatus = () => {
     // The status message gives way first, so the connection line keeps its place when it fits.
     const lines = [status, ...connectionStatus.assignedElements()].filter(

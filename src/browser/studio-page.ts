@@ -4,6 +4,7 @@ import { createStudioRecovery } from './studio-recovery';
 import { browserStudioPreferences } from './preferences';
 import { mountEditorSafety } from '../settings/safety-controls';
 import { skinAssetPort } from './skin-assets';
+import { closeOwnSidePanel } from './side-panel';
 import tokens from '../editor/studio-tokens.css';
 
 // The page around the editor wears the same tokens as the editor's shadow root. They are declared
@@ -25,6 +26,7 @@ async function start() {
     hostName: 'YouTube',
     mountSafety: mountEditorSafety,
     sidePanel,
+    ...(sidePanel ? { closePanel: () => closeOwnSidePanel(tab.id!) } : {}),
     connect: (notify, checkpoint) => createStudioClient(notify, checkpoint, sidePanel ? document : undefined),
     recovery: createStudioRecovery(tab.id),
     preferences: browserStudioPreferences,

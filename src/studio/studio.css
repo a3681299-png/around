@@ -144,6 +144,12 @@ body[data-sidepanel] .connection-bar {
 body[data-sidepanel] .connection-status {
   max-width: 100%;
 }
+/* Fullscreen hides Chrome's own close button with its toolbar: the panel's stays in view, first on
+   the status line (chunk 4 follow-up). A status that no longer fits moves into the ⓘ tooltip. */
+body[data-sidepanel] .close-panel {
+  flex: none;
+  border: 1px solid var(--line-control);
+}
 
 /* The editor header's safety: 緊急OFF is one ruled word button; 操作チェック joins it only while
    something is restricted (the 45° diamond: 制限中), and opens a floating panel below. Vermilion is

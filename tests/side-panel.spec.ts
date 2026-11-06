@@ -294,6 +294,51 @@ test('tab-specific panels isolate drafts and recovery; a closed panel leaves no 
   }
 });
 
+test('in fullscreen the panel closes itself with its own button (the toolbar is hidden)', async () => {
+  test.setTimeout(120_000);
+  const { context, page, popup, id } = await setup();
+  try {
+    await page.bringToFront();
+    const target = await popup.evaluate(
+      async () => (await chrome.tabs.query({ active: true, currentWindow: true }))[0]!.id!,
+    );
+    await popup.evaluate(async (tabId) => {
+      const result = await chrome.runtime.sendMessage({ type: 'web-world-themes:open-side-panel', tabId });
+      if (!result?.ok) throw new Error(result?.error ?? 'Native panel did not open.');
+    }, target);
+    const panel = await sidePanelDriver(context, page, id, target);
+    await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
+    await expect(page.locator('[data-ww-editing]')).toHaveCount(1);
+    // The player goes fullscreen (its own button: a real gesture), and Chrome's toolbar with it.
+    await page.locator('#movie_player [aria-label="Fullscreen"]').click();
+    await expect.poll(() => page.evaluate(() => Boolean(document.fullscreenElement))).toBe(true);
+    // The button is in the panel's connection bar (slotted into the editor, not in its shadow root).
+    // Pressed a moment later: closing ends the panel's page, which could drop this call's reply.
+    // Shown inside the panel's width (a narrow panel once pushed it out of view).
+    const shown = await panel.evaluate<number[]>(
+      '(() => { const r = document.querySelector(".close-panel").getBoundingClientRect(); return [r.width, r.height, r.right, innerWidth]; })()',
+    );
+    expect(shown[0]).toBeGreaterThan(20);
+    expect(shown[1]).toBeGreaterThan(16);
+    expect(shown[2]).toBeLessThanOrEqual(shown[3]!);
+    await mkdir('.work/verification', { recursive: true });
+    await panel.screenshot('.work/verification/side-panel-close-button.png');
+    await panel.evaluate('setTimeout(() => document.querySelector(".close-panel").click(), 50); true');
+    // The panel is gone (its page and the page's editing with it); the draft is kept as with the toolbar.
+    await expect(page.locator('[data-ww-editing]')).toHaveCount(0);
+    const cdp = await context.newCDPSession(page);
+    await expect
+      .poll(async () =>
+        (await cdp.send('Target.getTargets')).targetInfos.some((t) =>
+          t.url.startsWith(`chrome-extension://${id}/studio/index.html?surface=sidepanel`),
+        ),
+      )
+      .toBe(false);
+  } finally {
+    await context.close();
+  }
+});
+
 test('the real action popup launches its active YouTube tab in the official panel', async () => {
   test.setTimeout(60_000);
   const { context, page, popup, id, local } = await setup();

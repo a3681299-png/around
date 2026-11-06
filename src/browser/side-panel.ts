@@ -11,6 +11,12 @@ import {
 export function closeSidePanel(): void {
   void chrome.runtime.sendMessage({ type: CLOSE_SIDE_PANEL }).catch(() => undefined);
 }
+/** From the side panel's own page: closes Chrome's panel for its tab (the same message as above,
+ * with the tab named; the host disables and re-enables the panel, which works in every Chrome
+ * this extension supports, without another permission). */
+export function closeOwnSidePanel(tabId: number): void {
+  void chrome.runtime.sendMessage({ type: CLOSE_SIDE_PANEL, tabId }).catch(() => undefined);
+}
 /** The URL of one of the extension's own pages (e.g. the backup page). */
 export const extensionPageUrl = (path: string): string => chrome.runtime.getURL(path);
 
