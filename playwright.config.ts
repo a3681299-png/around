@@ -118,6 +118,8 @@ export default defineConfig<object, { layering: boolean | undefined }>({
     // (docs/layering-plan.md): the earlier cut-out way, a WW_LAYERING=0 development build
     // (tests/helpers/layering-build.ts). It stays as the way out where a part cannot be proven, so
     // both ways must keep every control visible and reachable; a failure here is the product's.
+    // `npm run test:e2e` runs both projects with --workers=1: a project's own `workers` does not
+    // stop two projects running side by side, which starved timing-sensitive specs on CI (chunk 4).
     {
       name: 'g1-other-way',
       testMatch: g1Specs,

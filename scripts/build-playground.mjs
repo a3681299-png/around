@@ -41,6 +41,8 @@ await build({
     __WW_ASSET_PROFILE__: 'false',
     __WW_G11__: 'false',
     __WW_PLAYGROUND_TEST__: String(test),
+    // The same switch as the extension's (scripts/build.mjs): layering unless WW_LAYERING=0 (chunk 4).
+    __WW_LAYERING__: String(process.env.WW_LAYERING !== '0'),
   },
 });
 copyFileSync(join(root, 'src/playground/index.html'), join(output, 'index.html'));

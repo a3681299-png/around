@@ -52,6 +52,10 @@ async function open(page: Page) {
     if (message.type() === 'error') problems.push(message.text());
   });
   page.on('pageerror', (error) => problems.push(error.message));
+  // A slower machine on purpose (as a busy CI runner): WW_CPU_THROTTLE=4 runs the page 4× slower.
+  const throttle = Number(process.env.WW_CPU_THROTTLE ?? 1);
+  if (throttle > 1)
+    await (await page.context().newCDPSession(page)).send('Emulation.setCPUThrottlingRate', { rate: throttle });
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto(origin + '/');
   await expect(page.locator('#apply')).toHaveText('WWT を適用');
@@ -150,16 +154,48 @@ test('G1 while the character moves: it takes no input and the controls stay the 
       return { selector, x: box.x + box.width / 2, y: box.y + box.height / 2 };
     }),
   );
-  const hips = () => model(page).evaluate((e: HTMLElement) => JSON.parse(e.dataset.modelFrame!).pose?.hips?.[1] ?? 0);
+  // Every frame, in the page: the body's height, and whether each control is the hit target at its
+  // centre. Round trips from the test (four hit tests each) are slow on a busy machine (a CI runner)
+  // and saw too few frames of a short hop; here no frame of it is missed.
+  await page.evaluate((list) => {
+    const w = window as unknown as { wwHop: { height: number; missed: string[] }[] };
+    w.wwHop = [];
+    const frame = () => {
+      let media: HTMLElement | null = null;
+      for (const host of document.querySelectorAll('[id^="web-world-themes"]'))
+        media ??= host.shadowRoot?.querySelector<HTMLElement>('.model-media') ?? null;
+      const raw = media?.dataset.modelFrame;
+      w.wwHop.push({
+        height: raw ? (JSON.parse(raw).pose?.hips?.[1] ?? 0) : 0,
+        missed: list.filter((c) => !document.elementFromPoint(c.x, c.y)?.closest(c.selector)).map((c) => c.selector),
+      });
+      if (w.wwHop.length < 600) requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  }, controls);
+  const rest = await model(page).evaluate((e: HTMLElement) => JSON.parse(e.dataset.modelFrame!).pose?.hips?.[1] ?? 0);
   await page.locator('#play').click();
-  const heights = new Set<number>();
-  for (let i = 0; i < 12; i++) {
-    heights.add(await hips());
-    for (const control of controls)
-      expect(await hit(control.x, control.y, control.selector), control.selector).toBe(true);
-    await page.waitForTimeout(40);
-  }
-  expect(heights.size).toBeGreaterThan(3);
+  // The hop has happened: more than three heights from the frames since play, rest included.
+  await expect
+    .poll(
+      () =>
+        page.evaluate(
+          () => new Set((window as unknown as { wwHop: { height: number }[] }).wwHop.map((f) => f.height)).size,
+        ),
+      { message: 'the body hops', timeout: 15000 },
+    )
+    .toBeGreaterThan(3);
+  // Through every frame of it, each control stayed the hit target.
+  const frames = await page.evaluate(
+    () => (window as unknown as { wwHop: { height: number; missed: string[] }[] }).wwHop,
+  );
+  const moving = frames.filter((f) => f.height !== rest);
+  // Frames off the rest height: at least three heights besides it (as the check above).
+  expect(new Set(moving.map((f) => f.height)).size).toBeGreaterThanOrEqual(3);
+  expect(frames.flatMap((f) => f.missed)).toEqual([]);
+  // A spot check from the test as well, after the hop.
+  for (const control of controls)
+    expect(await hit(control.x, control.y, control.selector), control.selector).toBe(true);
 });
 
 /** Every button, link and input on the page, by its id or text, for a readable failure. */
