@@ -315,9 +315,14 @@ test('chunk 3 search SPA: extension CPU per frame and a CPU profile, after one c
       await query.press('Enter');
       await page.waitForURL(/\/results\?/, { timeout: 20000 });
       if (counting) {
-        // Calls from 1 s to 3 s after the move only (the player is hidden by then).
+        // Calls in the first second (the old page still shows), then from 1 s to 3 s after the
+        // move only (the player is hidden by then).
         await page.waitForTimeout(1000);
-        await session.send('Profiler.takePreciseCoverage');
+        const first = await session.send('Profiler.takePreciseCoverage');
+        await writeFile(
+          path.join(out, `spa-${label}-${round}.counts-0to1s.json`),
+          JSON.stringify(callCounts(first.result)),
+        );
         await page.waitForTimeout(2000);
         const { result } = await session.send('Profiler.takePreciseCoverage');
         const counts: Record<string, number> = {};

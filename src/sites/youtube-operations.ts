@@ -39,6 +39,8 @@ const selectors: [string, OperationCandidate['kind'], string][] = [
 // One document traversal finds every candidate; each element then belongs to the first
 // selector (in this order) that matches it, exactly as when each selector had its own query.
 const candidateSelector = selectors.map(([, , selector]) => selector).join(', ');
+/** YouTube's miniplayer, into which it moves the player (youtube.ts marks the reduced form). */
+const MINIPLAYER = 'ytd-miniplayer';
 
 /**
  * The elements any selector can match, kept in document order between reads. A whole-document
@@ -282,8 +284,20 @@ export function youtubeOperations(doc: Document) {
       // player's box and sits next to the media in paint order, so a surface outside the player
       // either paints over the media (and so over the plane) or under the whole player, where the
       // player already covers it and takes its clicks: only the player's own surfaces need a proof.
+      // A player that is not shown (its box empty, not going into fullscreen or the miniplayer:
+      // a search or other page over a hidden watch page) carries no paint, so its parts are not
+      // proven (chunk 4 fix, docs/layering-plan.md 9, candidate 1). The read after it is shown
+      // again (every added or shown part is a page change) proves them; until then a paint there
+      // waits for that read ('everywhere'), as at the first read of a page.
       const place = LAYERING ? beneathPlace(false) : undefined;
-      if (place) {
+      const hidden = Boolean(
+        place &&
+        place.r.width <= 0 &&
+        place.r.height <= 0 &&
+        !doc.fullscreenElement &&
+        !place.parent.closest(MINIPLAYER),
+      );
+      if (place && !hidden) {
         const p = place.r;
         const unproven: { id: string; box: PlacementFrame }[] = [];
         for (const row of rows) {

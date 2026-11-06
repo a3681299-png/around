@@ -260,6 +260,7 @@ export function createOperationSource(
    * shifted snapshot follows exactly. A scroll inside an element moves only its contents. */
   const scrolled = (event: Event) => {
     WW_GUARD_TRACE: traceGeometryCause('changed');
+    frameScroll = undefined;
     geometryDirty = true;
     change(event.target === doc ? 'scroll' : 'layout');
   };
@@ -524,14 +525,27 @@ export function createOperationSource(
   /** Milliseconds until the pending change of any kind is read again (the answer check). */
   const settlesIn = () =>
     dirty && geometryDirty && deferredUntil ? Math.max(0, deferredUntil - doc.defaultView!.performance.now()) : 0;
+  /**
+   * The page's scroll for the shifted read (chunk 4 fix, docs/layering-plan.md 9, candidate 2).
+   * Reading scrollX/scrollY lays the page out when it changed, and while YouTube builds a page
+   * (startup, a search) the world's paint paid that layout in every frame through its capture: the
+   * self time profiled as `shifted`. The page's scroll only changes with a scroll event (a person's
+   * scroll, a script's, or the page growing shorter clamps it), so it is read when one comes and
+   * kept until the next; a whole read reads the scroll itself, and input checks read the page
+   * fresh (validate). Unknown (before the first event after a read): read once.
+   */
+  let frameScroll: { x: number; y: number } | undefined;
+  const scrollOfFrame = () => {
+    if (frameScroll) return frameScroll;
+    const view = doc.defaultView!;
+    return (frameScroll = { x: view.scrollX, y: view.scrollY });
+  };
   /** The last read as it is after the page scrolled: every surface that scrolls with the page
    * moved by the same amount, the rest unchanged. The same layout generation, a new scroll. One
    * object per offset, so the frame's readers share it. */
   let shift: { base: OperationSnapshot; x: number; y: number; snapshot: OperationSnapshot } | undefined;
   const shifted = (base: OperationSnapshot): OperationSnapshot => {
-    const view = doc.defaultView!,
-      x = view.scrollX,
-      y = view.scrollY;
+    const { x, y } = scrollOfFrame();
     const dx = x - (base.scroll?.x ?? x),
       dy = y - (base.scroll?.y ?? y);
     if (!dx && !dy) return base;
@@ -760,6 +774,8 @@ export function createOperationSource(
     });
     readIdentity = identity;
     const scroll = { x: doc.defaultView!.scrollX, y: doc.defaultView!.scrollY };
+    // The shifted read's scroll is this read's until the next scroll event (scrollOfFrame).
+    frameScroll = { ...scroll };
     readRows = new Map();
     rootSize = root.getBoundingClientRect();
     rows.forEach((row, i) => {
