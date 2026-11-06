@@ -77,7 +77,11 @@ execFileSync(process.execPath, ['scripts/build.mjs'], {
 });
 // The frame probe: every extension rAF callback timed and grouped by its frame time. It wraps
 // requestAnimationFrame before the content script runs; it reads nothing of the extension's own.
-const banner = `
+// In a block: run.mjs evaluates this same file again in the isolated world the manifest already
+// ran it in (to start the content with or without the guard), and a top-level const would then be
+// declared twice ("Identifier '__probe' has already been declared"). The probe itself is installed
+// once (globalThis.__g11Probe.installed).
+const banner = `{
 const __probe = globalThis.__g11Probe ??= { recording: false, force: false, frames: [], captures: [], intervals: [] };
 if (!__probe.installed) {
   __probe.installed = true;
@@ -105,6 +109,7 @@ if (!__probe.installed) {
     if (__probe.pump !== undefined) cancel(__probe.pump);
     return { frames: __probe.frames, captures: __probe.captures, intervals: __probe.intervals };
   };
+}
 }
 `;
 await build({

@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { chromium } from '@playwright/test';
+import { existsSync, readFileSync } from 'node:fs';
 
 export const root = fileURLToPath(new URL('../../', import.meta.url));
 process.chdir(root);
@@ -12,8 +13,37 @@ export const workRoot = path.join(root, '.work');
 export const extensionPath = process.env.G11_EXTENSION_PATH
   ? workPath(process.env.G11_EXTENSION_PATH)
   : path.join(workRoot, 'g11-measurement-dist');
+// The Chromium of this checkout's Playwright, from the same folder scripts/test.mjs uses
+// (PLAYWRIGHT_BROWSERS_PATH, else the main checkout's .work/browsers), so measurements run on the
+// version the tests run on. Without it Playwright looked in the user-wide cache, which can hold an
+// older revision (the notebook's chromium-1200, 143.0.7499.4, while Playwright 1.63.0 is 1243,
+// 153.0.8010.12: docs/tooling.md).
+function checkoutChromium() {
+  // Not an exported subpath of playwright-core: read from this checkout's node_modules.
+  const list = path.join(root, 'node_modules/playwright-core/browsers.json');
+  if (!existsSync(list)) return undefined;
+  const { revision } = JSON.parse(readFileSync(list, 'utf8')).browsers.find((browser) => browser.name === 'chromium');
+  const folders = [process.env.PLAYWRIGHT_BROWSERS_PATH, path.join(mainRoot(), '.work/browsers')].filter(Boolean);
+  const inside =
+    process.platform === 'win32'
+      ? ['chrome-win64', 'chrome.exe']
+      : process.platform === 'darwin'
+        ? ['chrome-mac-arm64', 'Google Chrome for Testing.app', 'Contents', 'MacOS', 'Google Chrome for Testing']
+        : ['chrome-linux64', 'chrome'];
+  return folders.map((folder) => path.join(folder, `chromium-${revision}`, ...inside)).find((file) => existsSync(file));
+}
+/** The main checkout (the browsers live there; a .work worktree has none of its own). */
+function mainRoot() {
+  const common = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], {
+    encoding: 'utf8',
+  }).trim();
+  return path.dirname(common);
+}
 export const browserPath =
-  process.env.G11_BROWSER_PATH || process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || chromium.executablePath();
+  process.env.G11_BROWSER_PATH ||
+  process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH ||
+  checkoutChromium() ||
+  chromium.executablePath();
 export const revision = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
 export function workPath(value) {
   const absolute = path.resolve(value);
