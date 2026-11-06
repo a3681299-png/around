@@ -89,6 +89,6 @@ AGENTS.md の完了報告の形に、次を加える。
 
 1. **報告を出したら、すぐに消す**：試行ごとのブラウザーのプロファイル（`p-*`・`g-entry-profile-*`・`g-backup-profile-*` など）、検証用のビルド（`test-dist-*`・`g11-*-dist` など）、検証用の worktree の中の `node_modules`（ジャンクションならリンクだけ外す。中をたどらない）、録画の動画
 2. **残すのは要約だけ**：`summary.json`・`stacks.json` などの要約の json と、報告から参照している画像。合わせて **1回の検証で 200MB まで**。超えるなら、何を残したかと理由を報告に書く
-3. **`docs/benchmarks` に生データを入れない**：trace・CPU プロファイル・プロファイルのフォルダ・動画はコミットしない
+3. **`docs/benchmarks` に生データを入れない**：trace・CPU プロファイル・プロファイルのフォルダ・動画はコミットしない。`.gz` などに圧縮しても同じ。保管用の zip も作らない（残すのは、翔太が残してと言った物だけ）
 4. **段階が閉じたら、検証の worktree を外す**：`node scripts/clean-work.mjs --dry-run` で確かめてから `node scripts/clean-work.mjs`、または `git worktree remove`。フォルダを直接消さない（git の記録が残る）。ブランチを checkout している worktree は外さない
 5. 報告に、残したものの一覧と合計の大きさを書く

@@ -79,7 +79,8 @@ e2e は全件で約23分かかる。毎回すべて回さず、いつ・誰が�
 - **段階が閉じたら、その検証の worktree を外す**（`node scripts/clean-work.mjs`、または `git worktree remove`）。結果は docs に記録済みで、版はコミットで分かる。ブランチを checkout している worktree は外さない
 - **検証報告を出したら、要約だけ残す**：試行ごとのブラウザーのプロファイル（`p-*`・`g-entry-profile-*`・`g-backup-profile-*` など）、検証用のビルド（`test-dist-*`・`g11-*-dist` など）、worktree の中の `node_modules`、録画の動画は消す。`summary.json`・`stacks.json` などの要約の json と、報告から参照している画像だけを残す
 - 残すものは **1回の検証で 200MB まで**。超えるなら、何を残したかと理由を報告に書く
-- **`docs/benchmarks` に生データを入れない**（trace・CPU プロファイル・プロファイルのフォルダ・動画）。入れるのは要約の json と、報告が参照する画像だけ
+- **`docs/benchmarks` に生データを入れない**（trace・CPU プロファイル・プロファイルのフォルダ・動画。`.gz` などに圧縮しても同じ）。入れるのは要約の json と、報告が参照する画像だけ
+- **保管用の zip は作らない**。残すのは、翔太が残してと言った物だけ
 
 ## 計測
 
