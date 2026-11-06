@@ -2,7 +2,7 @@ import { build } from 'esbuild';
 import type { Page } from '@playwright/test';
 import { test, expect } from './fixtures';
 import { openEditor, closeEditorPages } from './helpers/editor';
-import { exposeEditorControls } from './helpers/editor-workspace';
+import { exposeEditorControls, withCanvas } from './helpers/editor-workspace';
 import { showArtwork } from './helpers/artwork';
 import { layeringBuild } from './helpers/layering-build';
 
@@ -343,5 +343,145 @@ unproofed(
     const result = await stoppedWhileBarsToggle(youtube);
     expect(result.frames).toBeGreaterThan(20);
     expect(result.stopped).toBe(0);
+  },
+);
+
+/**
+ * Editing under the controls (chunk 4 follow-up, docs/layering-plan.md): an opaque image at the
+ * player's bottom right, its top in the picture and its bottom under the bottom bar, the editor
+ * still open. Returns the image and where to press: in the picture, in the band off any button, on
+ * the fullscreen button.
+ */
+async function editingOverBar(popup: Page, youtube: Page) {
+  await showArtwork(popup);
+  const { panel: editor } = await openEditor(popup, youtube);
+  await exposeEditorControls(editor);
+  const data = await youtube.evaluate(() => {
+    const c = document.createElement('canvas');
+    c.width = 64;
+    c.height = 64;
+    c.getContext('2d')!.fillRect(0, 0, 64, 64);
+    return c.toDataURL();
+  });
+  await editor.getByLabel('画像素材を追加').setInputFiles({
+    name: 'opaque.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from(data.split(',')[1]!, 'base64'),
+  });
+  await expect(youtube.locator('[data-image-id]').first()).toBeAttached();
+  await editor.getByLabel('配置の基準').selectOption('video-player');
+  await editor.getByLabel('画像の幅').fill('160');
+  await editor.getByLabel('画像の高さ').fill('170');
+  await editor.getByLabel('画像のX位置').fill('86');
+  await editor.getByLabel('画像のY位置').fill('76');
+  const node = youtube.locator('#web-world-themes-video-decorations [data-image-id]');
+  await expect.poll(() => planeWay(youtube)).toBe('beneath');
+  return node;
+}
+/** The press points, read inside withCanvas (the collapsed editor resizes the player). */
+async function pressPoints(youtube: Page, node: import('@playwright/test').Locator) {
+  const player = (await youtube.locator('#movie_player').boundingBox())!,
+    box = (await node.boundingBox())!,
+    // The settings button (the fixture's fullscreen button really goes fullscreen).
+    button = (await youtube.locator('#movie_player [aria-label="YouTube settings"]').boundingBox())!;
+  const bandTop = player.y + player.height - 112;
+  expect(box.y).toBeLessThan(bandTop - 20);
+  expect(box.y + box.height).toBeGreaterThan(bandTop + 30);
+  return {
+    box,
+    picture: { x: box.x + box.width / 2, y: (box.y + bandTop) / 2 },
+    // In the bottom band, above the bar itself (no control drawn there).
+    band: { x: box.x + box.width / 2, y: bandTop + 20 },
+    button: { x: button.x + button.width / 2, y: button.y + button.height / 2 },
+  };
+}
+const drag = async (youtube: Page, from: { x: number; y: number }) => {
+  await youtube.mouse.move(from.x, from.y);
+  await youtube.mouse.down();
+  await youtube.mouse.move(from.x - 30, from.y - 10, { steps: 6 });
+  await youtube.mouse.up();
+};
+
+layered(
+  'editing under the controls: the image is grabbed in the picture, never in the band, and the bar keeps its clicks',
+  async ({ popup, youtube }) => {
+    await youtubeStacking(youtube);
+    const node = await editingOverBar(popup, youtube);
+    await withCanvas(youtube, async () => {
+      await expect.poll(() => planeWay(youtube)).toBe('beneath');
+      let p = await pressPoints(youtube, node);
+      // Grab, move and let go in the picture.
+      await drag(youtube, p.picture);
+      await expect.poll(async () => (await node.boundingBox())!.x).toBeCloseTo(p.box.x - 30, 0);
+      p = await pressPoints(youtube, node);
+      // The bar's button is over the image: it takes the click, the image does not move.
+      await youtube.evaluate(() => {
+        const b = document.querySelector('#movie_player [aria-label="YouTube settings"]')!;
+        b.addEventListener('click', () => b.setAttribute('data-clicked', ''), { once: true });
+      });
+      // Over the image's own box: the press point is the image's as well.
+      expect(p.button.x).toBeGreaterThan(p.box.x);
+      expect(p.button.x).toBeLessThan(p.box.x + p.box.width);
+      expect(
+        await youtube.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.getAttribute('aria-label'), p.button),
+      ).toBe('YouTube settings');
+      await youtube.mouse.click(p.button.x, p.button.y);
+      await expect(youtube.locator('#movie_player [aria-label="YouTube settings"]')).toHaveAttribute(
+        'data-clicked',
+        '',
+      );
+      expect((await node.boundingBox())!.x).toBeCloseTo(p.box.x, 0);
+      // In the band (kept for the bars, also where none is drawn): never grabbed.
+      await drag(youtube, p.band);
+      await youtube.waitForTimeout(300);
+      expect((await node.boundingBox())!.x).toBeCloseTo(p.box.x, 0);
+    });
+  },
+);
+
+/** A control positioned without a z-index (not proven) over the image's picture part. */
+const unprovenUnder = (youtube: Page, at: { x: number; y: number }) =>
+  youtube.evaluate((p) => {
+    const player = document.querySelector('#movie_player')!,
+      r = player.getBoundingClientRect();
+    const wrap = document.createElement('div');
+    wrap.id = 'unproven';
+    wrap.innerHTML = `<button style="position:absolute;left:${p.x - r.left - 15}px;top:${p.y - r.top - 12}px;width:30px;height:24px">x</button>`;
+    player.append(wrap);
+  }, at);
+
+layered(
+  'editing under the controls: an unproven control under the image is never grabbed through',
+  async ({ popup, youtube }) => {
+    await youtubeStacking(youtube);
+    const node = await editingOverBar(popup, youtube);
+    await withCanvas(youtube, async () => {
+      const p = await pressPoints(youtube, node);
+      await unprovenUnder(youtube, p.picture);
+      await youtube.waitForTimeout(500);
+      // While they meet, the image takes the way out (the cut-out way, here the page plane):
+      // wherever it is drawn, the press over the control does not move it.
+      const anywhere = youtube.locator('[data-image-id]').first();
+      const before = (await anywhere.boundingBox())!;
+      expect(before.x).toBeCloseTo(p.box.x, 0);
+      await drag(youtube, p.picture);
+      await youtube.waitForTimeout(300);
+      expect((await anywhere.boundingBox())!.x).toBeCloseTo(before.x, 0);
+    });
+  },
+);
+
+unproofed(
+  'without the stacking proof, an unproven control under the image is grabbed through (the check is real)',
+  async ({ popup, youtube }) => {
+    await youtubeStacking(youtube);
+    const node = await editingOverBar(popup, youtube);
+    await withCanvas(youtube, async () => {
+      const p = await pressPoints(youtube, node);
+      await unprovenUnder(youtube, p.picture);
+      await youtube.waitForTimeout(500);
+      await drag(youtube, p.picture);
+      await expect.poll(async () => (await node.boundingBox())!.x).toBeCloseTo(p.box.x - 30, 0);
+    });
   },
 );

@@ -74,7 +74,8 @@ export interface OperationGuardHost {
   resume(): void;
   /** Input-time check for an editor gesture: false (and drawing paused) when a fresh read finds
    * a protected surface under the point. */
-  claim(point: Point): boolean;
+  /** underStacking: the press reached a handle on the beneath plane (chunk 4, editorClaims). */
+  claim(point: Point, underStacking?: boolean): boolean;
   destroy(): void;
 }
 /** Inspection observes the whole page; it runs only while authored paint can exist. */
@@ -601,8 +602,8 @@ export function createOperationGuardHost(
         idleSeconds: doc.hidden ? 0 : Math.max(0, Math.min(1e9, (time - lastActivity) / 1000)),
       };
     },
-    claim(point) {
-      if (editorClaims(source.capture({ fresh: true }), point)) return true;
+    claim(point, underStacking = false) {
+      if (editorClaims(source.capture({ fresh: true }), point, underStacking)) return true;
       pause(CLAIMED, false, undefined, [], '操作部品から離れた場所で、絵をつかんでください。');
       return false;
     },

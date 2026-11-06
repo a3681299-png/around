@@ -56,6 +56,8 @@ export interface OperationCandidate {
   nativeAbove?: boolean;
   /** Proven to paint over the beneath plane by stacking order (chunk 4, LAYERING). */
   aboveBeneath?: boolean;
+  /** Kept for native controls whether or not one is shown (the player's bands). */
+  reserved?: boolean;
   /** Optional readings from the adapter's same synchronous discovery pass. */
   rect?: PlacementFrame;
   visible?: boolean;
@@ -748,6 +750,7 @@ export function createOperationSource(
         scrolls: row.scrolls !== false,
         ...(row.scrollBox ? { scrollBox: Object.freeze({ ...row.scrollBox }) } : {}),
         ...(row.aboveBeneath ? { aboveBeneath: true } : {}),
+        ...(row.reserved ? { reserved: true } : {}),
       };
     });
     readIdentity = identity;

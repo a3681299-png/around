@@ -11,13 +11,21 @@ const fixturePath = path.resolve('tests/fixtures/youtube.html');
 export async function launchExtension(
   profile: string,
   useFixture = true,
-  options: { headed?: boolean; width?: number; height?: number; extensionPath?: string } = {},
+  options: {
+    headed?: boolean;
+    width?: number;
+    height?: number;
+    extensionPath?: string;
+    /** Record every page of the context to a video in this folder (for a person to watch). */
+    videoDir?: string;
+  } = {},
 ): Promise<BrowserContext> {
   const extensionPath = path.resolve(options.extensionPath ?? defaultExtensionPath);
   const context = await chromium.launchPersistentContext(profile, {
     ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
       ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH }
       : { channel: 'chromium' }),
+    ...(options.videoDir ? { recordVideo: { dir: options.videoDir, size: { width: 1280, height: 800 } } } : {}),
     headless: !options.headed,
     viewport: options.headed ? null : { width: 1100, height: 760 },
     args: [

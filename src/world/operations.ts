@@ -29,6 +29,9 @@ export interface OperationSurface {
   /** Chunk 4: the browser paints this surface over the beneath plane (stacking order,
    * proven at the read), wherever either is on screen. */
   aboveBeneath?: boolean;
+  /** An area kept for native controls whether or not one is shown there now (the player's bands):
+   * an editor gesture never takes it. */
+  reserved?: boolean;
 }
 export interface OperationSnapshot {
   /** geometry: changes whenever a surface moves on screen. layout (G1.3): changes only when a
@@ -160,10 +163,12 @@ export function guardPaint(snapshot: OperationSnapshot, paints: readonly PaintFo
     };
     if (paint.composition === 'native-beneath') {
       // The browser paints every proven surface over this plane, so only the others are checked,
-      // as the local plane checks them: a forbidden one under the paint stops it. Input is never
-      // taken here (the way is not used while editing).
+      // as the local plane checks them: a forbidden one under the paint stops it. While editing,
+      // its handles take input (editor-owned): every proven surface is over them too, so it gets
+      // its own clicks first; a press is claimed only where a fresh read finds no unproven surface
+      // and no reserved band under it (editorClaims). Input any other way is refused.
       const clip = paint.clip;
-      if (!clip || !Object.values(clip).every(Number.isFinite) || paint.pointerEvents) {
+      if (!clip || !Object.values(clip).every(Number.isFinite) || (paint.pointerEvents && !paint.editorOwned)) {
         issues.push({
           layerId: paint.id,
           surfaceId: 'player',
@@ -311,14 +316,21 @@ export function safePaintRegions(
   const merged = [...cutRegions(regions, editorRegion), ...centre];
   return merged.length > 1024 ? regions : merged;
 }
-/** True when a fresh snapshot shows no protected surface under an editor gesture's point. */
-export function editorClaims(snapshot: OperationSnapshot, point: Point): boolean {
+/**
+ * True when a fresh snapshot shows no protected surface under an editor gesture's point.
+ * `underStacking` (chunk 4): the press reached a handle on the beneath plane. A surface proven to
+ * paint over that plane is over the handle too, so the press would have gone to it had it been
+ * there: it is not in the way. A reserved band (the player's bars, also while they are hidden)
+ * stays native all the same, and so does every surface not proven.
+ */
+export function editorClaims(snapshot: OperationSnapshot, point: Point, underStacking = false): boolean {
   return (
     snapshot.supported &&
     !snapshot.surfaces.some(
       (surface) =>
         surface.availability.visible &&
         surface.policy.occlusion !== 'allow' &&
+        !(underStacking && surface.aboveBeneath && !surface.reserved) &&
         point.x >= surface.protectedEnvelope.left &&
         point.x <= surface.protectedEnvelope.left + surface.protectedEnvelope.width &&
         point.y >= surface.protectedEnvelope.top &&

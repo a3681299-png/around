@@ -376,17 +376,21 @@ test('editing keeps the video centre while a central native button is visible, a
 test('player artwork moved to the page plane by a central button can still be edited over the video centre', async ({
   popup,
   youtube,
+  layeringOn,
 }) => {
   await youtube.goto('https://www.youtube.com/watch?v=fixture');
-  await centralPlayButton(youtube);
+  const button = await centralPlayButton(youtube);
   const editor = await opaqueArtwork(popup, youtube);
   await editor.getByLabel('配置の基準').selectOption('video-player');
   await editor.getByLabel('画像の幅').fill('120');
   await editor.getByLabel('画像の高さ').fill('80');
   await besideCentre(youtube, editor, 'player');
-  // A central native control keeps the player-local plane unavailable.
-  await expect.poll(() => planeOf(youtube)).toBe('#web-world-themes-page-decorations');
-  const node = youtube.locator('#web-world-themes-page-decorations [data-image-id]');
+  // Cut out: a central native control keeps the player-local plane unavailable, the artwork follows
+  // the page. Layering (chunk 4): it stays under the controls while editing, the button (z 20) over
+  // it by stacking order.
+  const plane = layeringOn ? '#web-world-themes-video-decorations' : '#web-world-themes-page-decorations';
+  await expect.poll(() => planeOf(youtube)).toBe(plane);
+  const node = youtube.locator(`${plane} [data-image-id]`);
   await withCanvas(youtube, async () => {
     await settled(youtube);
     const box = (await node.boundingBox())!;
@@ -397,13 +401,21 @@ test('player artwork moved to the page plane by a central button can still be ed
     await youtube.mouse.move(center.x - 30, center.y + 10, { steps: 6 });
     await youtube.mouse.up();
     await expect.poll(async () => (await node.boundingBox())!.x).toBeCloseTo(box.x - 30, 0);
+    // The real button keeps its clicks while editing, either way.
+    const at = await button();
+    await youtube.mouse.click(at.x, at.y);
+    expect(await youtube.evaluate(() => (window as unknown as { centralClicks: number }).centralClicks)).toBe(1);
   });
 });
 
 test('player artwork follows the page when the player-local plane is unavailable and avoids only current rectangles', async ({
   popup,
   youtube,
+  layeringOn,
 }) => {
+  // Layering needs no band in the player (it is under the controls, not cut out of them): a short
+  // player keeps it in the player. The cut-out way's page plane is checked in g1-other-way.
+  test.skip(layeringOn, 'Cut-out way only: layering keeps a short player local.');
   await youtube.goto('https://www.youtube.com/watch?v=fixture');
   const editor = await opaqueArtwork(popup, youtube);
   await editor.getByLabel('配置の基準').selectOption('video-player');

@@ -197,6 +197,7 @@ export function youtubeOperations(doc: Document) {
           element: root,
           kind: 'drag',
           scrolls: composition.scrolls(root),
+          reserved: true,
           envelope: { ...shape, top: r.top + Math.max(0, r.height - 112), height: Math.min(112, r.height) },
         });
         rows.push({
@@ -204,6 +205,7 @@ export function youtubeOperations(doc: Document) {
           element: root,
           kind: 'click',
           scrolls: composition.scrolls(root),
+          reserved: true,
           envelope: { ...shape, height: Math.min(64, r.height) },
         });
       }

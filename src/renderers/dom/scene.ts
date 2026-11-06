@@ -175,6 +175,8 @@ export function createImageRenderer(
   // Document-origin offset of the page plane, corrected from its measured position.
   let pageOffset = { left: 0, top: 0 };
   let lastLayout: WorldLayout | undefined;
+  /** The roots the last protected draw put on the beneath plane (chunk 4). */
+  let beneathRoots: ReadonlySet<string> = new Set();
   let gesture:
     | {
         pointerId: number;
@@ -256,12 +258,11 @@ export function createImageRenderer(
           const anchor = roots.get(id)!.layer.placement.anchor;
           return anchor.kind === 'surface' && anchor.target === 'video-player';
         });
-      // Chunk 4 (LAYERING, docs/layering-plan.md): outside editing, the player's plane goes under its
-      // controls by stacking order instead of over them with the bands cut out. While editing, the
-      // cut-out way stays: its handles take input with the editor's own checks (claims, the centre).
-      // Locked editing takes no input on the artwork, so it is drawn as outside editing.
-      const offered =
-        LAYERING && needsVideoSlot && !(editing && !editing.locked) ? safety.source.beneathSlot?.() : undefined;
+      // Chunk 4 (LAYERING, docs/layering-plan.md): the player's plane goes under its controls by
+      // stacking order instead of over them with the bands cut out. Editing too (it flickered the
+      // cut-out way, chunk 4 follow-up): its handles go with the artwork under the controls, which keep their clicks by
+      // stacking order; a press on a handle is claimed after a fresh read (editorClaims).
+      const offered = LAYERING && needsVideoSlot ? safety.source.beneathSlot?.() : undefined;
       // The cut-out way stays as the way out (chunk 4): while a shown player control that is not
       // proven to paint over the plane meets the player's artwork (the autoplay card when a video
       // ends), the stacking order cannot keep it clear, and that draw is cut out as before.
@@ -574,6 +575,8 @@ export function createImageRenderer(
         videoSlot?.host.remove();
         videoSlot = undefined;
       }
+      // Which roots this draw put under the controls: an editor press on them is claimed that way.
+      beneathRoots = beneath ? localRoots : new Set();
       const localIds = new Set<string>();
       for (const layer of layout.layers) {
         const entry = nodes.get(layer.layer.id);
@@ -889,7 +892,10 @@ export function createImageRenderer(
     // A handle can lag behind native geometry (an asynchronous scroll moves the page under the
     // screen plane). A fresh read must find no protected control under the point; otherwise the
     // guard hides the artwork and the next press reaches the native control.
-    if (safety && !safety.claim({ x: event.clientX, y: event.clientY })) return;
+    // On the beneath plane (chunk 4) the press reached the handle under every proven surface.
+    const root = (id && parentGroup(groups, id)?.id) || id;
+    if (safety && !safety.claim({ x: event.clientX, y: event.clientY }, Boolean(root && beneathRoots.has(root))))
+      return;
     event.preventDefault();
     event.stopPropagation();
     const mode = target?.getAttribute('data-handle') ?? 'move';
