@@ -1,38 +1,61 @@
 import { test, expect, type Page } from '@playwright/test';
-import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
 import { showArtwork } from './helpers/artwork';
 import { openEditor, closeEditorPages } from './helpers/editor';
-import { declinePromotion } from './helpers/youtube-live';
+import { declinePromotion, waitForAdvertToEnd } from './helpers/youtube-live';
 import { writeContent } from '../scripts/playground/content';
 
 /**
- * The character flickering on real YouTube (chunk 4, docs/layering-plan.md): the test mannequin at
- * the player's corner, autonomy on, the pointer sweeping over the player, once while only watching
- * and once while editing (the editor connected, the page narrowed by a side panel's width). Every
- * frame: which way it is drawn, whether the guard stops it, and why. A flicker is a frame where it
- * goes from drawn to hidden, or a change of way (the plane moves between places). Explicit:
+ * The character flickering on real YouTube (chunk 4, docs/layering-plan.md): put the cursor inside
+ * the default imported mannequin's box with autonomy on and off, and sweep the player with the
+ * original mannequin at its corner. Watch normally and edit in a connected editor.
+ * Every frame records the composition, guard, position and pose. Explicit:
  * WW_LIVE_FLICKER=1 (headless; WW_TEST_EXTENSION_PATH for another build). Records go to .work/flicker-live.
  */
 const out = path.resolve('.work/flicker-live');
+type Point = { x: number; y: number };
+type Row = {
+  at: number;
+  way: string;
+  stopped: boolean;
+  why: string;
+  error: boolean;
+  pointer: Point | null;
+  box: (Point & { width: number; height: number }) | null;
+  behaviour: string | null;
+  clip: number | null;
+  suspended: boolean;
+  pose: string | null;
+  issues: string;
+  guard: string;
+};
 
 /** Installed once: per frame, the way, the stop and its reasons, for the current phase. */
 async function sampler(page: Page) {
   await page.evaluate(() => {
-    type Row = { way: string; stopped: boolean; why: string; error: boolean };
     const w = window as unknown as { wwPhase: string; wwFrames: Record<string, Row[]> };
     w.wwPhase = 'start';
     w.wwFrames = {};
-    const tick = () => {
+    let pointer: Point | null = null;
+    let layerId: string | null = null;
+    let lastSafety = '';
+    let lastGeometry = '';
+    let geometry = '';
+    let issues: { layerId: string; action?: string; surfaceId: string; reason: string }[] = [];
+    window.addEventListener('pointermove', (e) => (pointer = { x: e.clientX, y: e.clientY }), true);
+    const tick = (at: number) => {
       let node: Element | undefined,
+        media: HTMLElement | null | undefined,
         hostId = '';
       for (const host of document.querySelectorAll('[id^="web-world-themes"]')) {
         // The layer drawing the 3D character (the editor's working copy has its own layer id).
-        const found = host.shadowRoot?.querySelector('.model-media')?.closest('[data-image-id]');
+        const model = host.shadowRoot?.querySelector<HTMLElement>('.model-media');
+        const found = model?.closest('[data-image-id]');
         if (found && !node) {
           node = found;
+          media = model;
           hostId = host.id;
         }
       }
@@ -47,25 +70,48 @@ async function sampler(page: Page) {
             ? 'beneath'
             : 'cut-out';
       const stopped = !node || node.hasAttribute('data-safety-limited');
-      let why = '';
-      if (stopped) {
-        const record = document.querySelector<HTMLElement>('[data-ww-safety]')?.dataset.wwSafety;
-        const issues = (JSON.parse(record ?? '{}').issues ?? []) as {
-          layerId: string;
-          action?: string;
-          surfaceId: string;
-          reason: string;
-        }[];
-        why = issues
-          .filter((i) => i.layerId === node?.getAttribute('data-image-id') && i.action === 'stop')
-          .map((i) => `${i.surfaceId}: ${i.reason}`)
-          .join(' / ');
+      layerId = node?.getAttribute('data-image-id') ?? layerId;
+      const safety = document.querySelector<HTMLElement>('[data-ww-safety]')?.dataset.wwSafety ?? '';
+      if (safety !== lastSafety) {
+        lastSafety = safety;
+        issues = JSON.parse(safety || '{}').issues ?? [];
       }
+      const layerIssues = issues
+        .filter((i) => i.layerId === layerId)
+        .map((i) => `${i.action ?? 'stop'} ${i.surfaceId}: ${i.reason}`)
+        .join(' / ');
+      const why = stopped ? layerIssues : '';
+      const trace = document.documentElement.dataset.wwGuardGeometry ?? '';
+      if (trace !== lastGeometry) {
+        lastGeometry = trace;
+        const entries = JSON.parse(trace || '[]') as { change: string }[];
+        geometry = JSON.stringify(entries.filter((e) => e.change !== 'sweep').slice(-1)[0] ?? null);
+      }
+      const frame = JSON.parse(media?.dataset.modelFrame ?? '{}');
+      const bounds = media?.getBoundingClientRect();
+      const box =
+        bounds?.width && bounds.height
+          ? { x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height }
+          : null;
       // The player's own error screen over everything: such a frame says nothing about the guard.
       const failed = [...document.querySelectorAll<HTMLElement>('#movie_player .ytp-error')].some(
         (e) => e.getBoundingClientRect().height > 0 && getComputedStyle(e).display !== 'none',
       );
-      (w.wwFrames[w.wwPhase] ??= []).push({ way, stopped, why, error: failed });
+      (w.wwFrames[w.wwPhase] ??= []).push({
+        at,
+        way,
+        stopped,
+        why,
+        error: failed,
+        pointer,
+        box,
+        behaviour: frame.body?.autonomy?.behaviour ?? null,
+        clip: frame.clip ?? null,
+        suspended: frame.suspended ?? false,
+        pose: frame.pose ? JSON.stringify(frame.pose) : null,
+        issues: layerIssues,
+        guard: geometry,
+      });
       requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
@@ -89,10 +135,61 @@ async function sweep(page: Page, rounds = 3) {
   await page.waitForTimeout(500);
 }
 
+const cursorModes = ['still', 'slow', 'cross'] as const;
+
+async function overCharacter(page: Page, scene: string, run: string) {
+  const shoot = (name: string, index: number) =>
+    // Hiding the caret changes native inputs' inline styles and itself triggers a guard read.
+    page.screenshot({ path: path.join(run, `${name}-${index}.png`), caret: 'initial' });
+  const model = page.locator('.model-media');
+  await expect(model).toBeVisible();
+  const start = (await model.boundingBox())!;
+  const startY = start.y + start.height / 2;
+  // Approach the model gradually; a teleport from the masthead legitimately makes it flee
+  // and leaves the following pointer path on an empty part of the player.
+  await page.mouse.move(start.x - start.width, startY);
+  for (let i = 0; i <= 12; i++) {
+    await page.mouse.move(start.x + start.width * (i / 8 - 1), startY);
+    await page.waitForTimeout(60);
+  }
+  for (const mode of cursorModes) {
+    await expect(model).toBeVisible();
+    const box = (await model.boundingBox())!;
+    const x = box.x + box.width / 2;
+    const y = box.y + box.height / 2;
+    const name = `${scene}-${mode}`;
+    await phase(page, name);
+    await page.mouse.move(x, y);
+    if (mode === 'still') {
+      for (let i = 0; i < 4; i++) {
+        await page.waitForTimeout(300);
+        if (process.env.WW_FLICKER_SHOTS === '1') await shoot(name, i);
+      }
+    } else {
+      const extent = mode === 'slow' ? box.width / 8 : box.width * 0.6;
+      for (let i = 0; i <= 24; i++) {
+        // Cross the inside edge twice without leaving the player at its outer edge.
+        const wave = Math.sin((i / 12) * Math.PI);
+        await page.mouse.move(x - extent * (mode === 'cross' ? wave * wave : wave), y);
+        await page.waitForTimeout(50);
+        if (process.env.WW_FLICKER_SHOTS === '1' && [3, 9, 15, 21].includes(i)) await shoot(name, i);
+      }
+    }
+  }
+  await phase(page, 'between-cursor-modes');
+  await page.mouse.move(4, 4);
+}
+
 /** Flickers in one phase's frames: drawn → hidden, and changes of way. */
-function count(rows: { way: string; stopped: boolean; why: string; error: boolean }[]) {
+function count(rows: Row[]) {
   let hides = 0,
-    switches = 0;
+    switches = 0,
+    behaviourChanges = 0,
+    clipChanges = 0,
+    suspensionChanges = 0,
+    poseChanges = 0,
+    positionChanges = 0,
+    positionJumps = 0;
   const reasons: Record<string, number> = {},
     ways: Record<string, number> = {};
   rows.forEach((row, i) => {
@@ -102,21 +199,56 @@ function count(rows: { way: string; stopped: boolean; why: string; error: boolea
     if (!prev) return;
     if (!prev.stopped && row.stopped) hides++;
     if (prev.way !== row.way) switches++;
+    if (prev.behaviour !== row.behaviour) behaviourChanges++;
+    if (prev.clip !== row.clip) clipChanges++;
+    if (prev.suspended !== row.suspended) suspensionChanges++;
+    if (prev.pose !== row.pose) poseChanges++;
+    if (row.box && prev.box) {
+      const distance = Math.hypot(row.box.x - prev.box.x, row.box.y - prev.box.y);
+      if (distance >= 1) positionChanges++;
+      if (distance >= 40) positionJumps++;
+    }
   });
   return {
     frames: rows.length,
     stopped: rows.filter((r) => r.stopped).length,
     hides,
     switches,
+    behaviourChanges,
+    clipChanges,
+    suspensionChanges,
+    poseChanges,
+    positionChanges,
+    positionJumps,
+    pointerInside: rows.filter(
+      ({ pointer, box }) =>
+        pointer &&
+        box &&
+        pointer.x >= box.x &&
+        pointer.x < box.x + box.width &&
+        pointer.y >= box.y &&
+        pointer.y < box.y + box.height,
+    ).length,
     ways,
     reasons,
     playerError: rows.filter((r) => r.error).length,
   };
 }
 
-test('real YouTube: the character does not flicker while watching or while editing', async () => {
+for (const autonomy of [true, false])
+  test(`real YouTube: the character does not flicker while watching or editing (autonomy ${autonomy ? 'on' : 'off'})`, async () => {
+    test.skip(process.env.WW_LIVE_FLICKER !== '1', 'Explicit real YouTube check (WW_LIVE_FLICKER=1).');
+    test.setTimeout(300000);
+    await cursorFlicker(autonomy, false);
+  });
+
+test('real YouTube: the character at the player corner does not flicker while watching or editing', async () => {
   test.skip(process.env.WW_LIVE_FLICKER !== '1', 'Explicit real YouTube check (WW_LIVE_FLICKER=1).');
   test.setTimeout(300000);
+  await cursorFlicker(true, true);
+});
+
+async function cursorFlicker(autonomy: boolean, playerCorner: boolean) {
   await mkdir(out, { recursive: true });
   const content = path.join(out, 'content');
   const { models } = writeContent(path.resolve('.'), content);
@@ -125,8 +257,12 @@ test('real YouTube: the character does not flicker while watching or while editi
   // WW_FLICKER_VIDEO=1: a headed window kept off screen (scripts/test.mjs sets WW_TEST_WINDOW_OFFSCREEN=1),
   // recorded to .work/flicker-live/video for a person to watch.
   const video = process.env.WW_FLICKER_VIDEO === '1' && process.env.WW_TEST_WINDOW_OFFSCREEN === '1';
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-flicker-')), false, {
-    headed: video,
+  const headed = video || (process.env.WW_FLICKER_HEADED === '1' && process.env.WW_TEST_WINDOW_OFFSCREEN === '1');
+  const run = path.join(out, playerCorner ? 'player-corner' : autonomy ? 'on' : 'off');
+  await mkdir(run, { recursive: true });
+  const profile = await mkdtemp(path.resolve('.work/p-'));
+  const context = await launchExtension(profile, false, {
+    headed,
     width: 1280,
     height: 860,
     ...(video ? { videoDir: path.join(out, 'video') } : {}),
@@ -146,28 +282,36 @@ test('real YouTube: the character does not flicker while watching or while editi
     await page.goto('https://www.youtube.com/watch?v=LC1a-DwUhls', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30000 });
     await declinePromotion(page);
-    for (let i = 0; i < 60 && (await page.locator('#movie_player.ad-showing').count()); i++)
-      await page.waitForTimeout(500);
+    await waitForAdvertToEnd(page);
     await showArtwork(popup);
     const { panel } = await openEditor(popup, page);
-    await panel.locator('.model-file').setInputFiles(file(models.find((name) => name.endsWith('.vrm'))!));
+    const model =
+      process.env.WW_FLICKER_PRIVATE === '1'
+        ? process.env.WW_VRM_FILE
+        : file(models.find((name) => name.endsWith('.vrm'))!);
+    expect(model, 'Set WW_VRM_FILE for a private-model run').toBeTruthy();
+    await panel.locator('.model-file').setInputFiles(model!);
     await expect(panel.locator('.layer')).toHaveCount(1, { timeout: 30000 });
     await panel.locator('.character-file').setInputFiles(models.filter((name) => name.endsWith('.vrma')).map(file));
     await expect(panel.locator('.character-motions li')).toHaveCount(2, { timeout: 30000 });
-    // Placed as a person would in the editor: the player's bottom-right corner, autonomy on.
+    // Keep the import defaults for the reported case. The original sweep uses the player corner.
     const resident = design.decorations.find((layer: { id: string }) => layer.id === 'resident');
-    await panel.getByLabel('配置の基準').selectOption('video-player');
-    await panel.getByLabel('画像の幅').fill(String(resident.placement.widthPx));
-    await panel.getByLabel('画像の高さ').fill(String(resident.placement.heightPx));
-    await panel.getByLabel('画像のX位置').fill(String(resident.placement.x * 100));
-    await panel.getByLabel('画像のY位置').fill(String(resident.placement.y * 100));
-    await panel.getByLabel('自律', { exact: true }).check();
+    const placeAtCorner = async (editor: typeof panel) => {
+      await editor.getByLabel('配置の基準').selectOption('video-player');
+      await editor.getByLabel('画像の幅').fill(String(resident.placement.widthPx));
+      await editor.getByLabel('画像の高さ').fill(String(resident.placement.heightPx));
+      await editor.getByLabel('画像のX位置').fill(String(resident.placement.x * 100));
+      await editor.getByLabel('画像のY位置').fill(String(resident.placement.y * 100));
+    };
+    if (playerCorner) await placeAtCorner(panel);
+    await panel.getByLabel('自律', { exact: true }).setChecked(autonomy);
     await panel.locator('.save').click();
     await expect(panel.locator('.dirty')).toHaveText('保存済み');
     await closeEditorPages(page);
     await page.reload({ waitUntil: 'domcontentloaded' });
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30000 });
     await declinePromotion(page);
+    await waitForAdvertToEnd(page);
     await expect(page.locator('.model-media')).toHaveAttribute('data-renderer', 'three', { timeout: 60000 });
     // Paused: the flicker comes from the guard and the pointer, and an automated player that plays
     // for a minute fails ("Something went wrong", its error screen then covers the character).
@@ -177,8 +321,10 @@ test('real YouTube: the character does not flicker while watching or while editi
     await page.mouse.move(4, 4);
     await page.waitForTimeout(2000);
     // Watching.
-    await phase(page, 'watching');
-    await sweep(page);
+    if (playerCorner) {
+      await phase(page, 'watching');
+      await sweep(page);
+    } else await overCharacter(page, 'watching', run);
     // Editing: the editor connected (its own tab here), the page as wide as beside a side panel.
     await phase(page, 'opening-editor');
     const { panel: editing } = await openEditor(popup, page);
@@ -195,13 +341,8 @@ test('real YouTube: the character does not flicker while watching or while editi
     });
     // The reopened editor restores its own earlier working copy (anchored to the viewport, as just
     // imported), not the saved artwork: placed again at the player's corner, as the person had it.
-    if (report['editorAnchor'] !== 'video-player') {
-      await editing.getByLabel('配置の基準').selectOption('video-player');
-      await editing.getByLabel('画像の幅').fill(String(resident.placement.widthPx));
-      await editing.getByLabel('画像の高さ').fill(String(resident.placement.heightPx));
-      await editing.getByLabel('画像のX位置').fill(String(resident.placement.x * 100));
-      await editing.getByLabel('画像のY位置').fill(String(resident.placement.y * 100));
-    }
+    if (playerCorner && report['editorAnchor'] !== 'video-player') await placeAtCorner(editing);
+    await editing.getByLabel('自律', { exact: true }).setChecked(autonomy);
     await page.bringToFront();
     await page.setViewportSize({ width: 880, height: 800 });
     await page.waitForTimeout(2500);
@@ -217,31 +358,65 @@ test('real YouTube: the character does not flicker while watching or while editi
         editing: document.documentElement.getAttribute('data-ww-editing'),
       })),
     );
-    await phase(page, 'editing');
-    await sweep(page);
+    if (playerCorner) {
+      await phase(page, 'editing');
+      await sweep(page);
+    } else await overCharacter(page, 'editing', run);
     await phase(page, 'end');
     const frames = await page.evaluate(
       () =>
         (
           window as unknown as {
-            wwFrames: Record<string, { way: string; stopped: boolean; why: string; error: boolean }[]>;
+            wwFrames: Record<string, Row[]>;
           }
         ).wwFrames,
     );
     for (const [name, rows] of Object.entries(frames)) report[name] = count(rows);
     report['ways'] = await page.evaluate(() => document.documentElement.dataset['wwLayeringWays'] ?? null);
-    await writeFile(path.join(out, 'frames.json'), JSON.stringify(frames));
+    report['unprovenControls'] = await page.evaluate(() => ({
+      rows: document.documentElement.dataset.wwBeneathRows,
+      why: document.documentElement.dataset.wwBeneathWhy,
+      pending: document.getElementById('web-world-themes-video-decorations')?.dataset.wwBeneathUnsettled,
+    }));
+    await writeFile(path.join(run, 'frames.json'), JSON.stringify(frames));
     console.log('FLICKER ' + JSON.stringify(report));
+    if (!playerCorner && !autonomy) {
+      // A model that leaves hover to the player must still be draggable in the editor.
+      const model = page.locator('.model-media');
+      const box = (await model.boundingBox())!;
+      const x = box.x + box.width / 2;
+      const y = box.y + box.height / 2;
+      await page.mouse.move(x, y);
+      await page.mouse.down();
+      await page.mouse.move(x - 32, y, { steps: 4 });
+      await page.mouse.up();
+      await expect.poll(async () => (await model.boundingBox())!.x).toBeLessThan(box.x - 20);
+    }
     for (const name of ['watching', 'editing']) {
-      const r = report[name] as ReturnType<typeof count>;
-      expect(r.frames, name).toBeGreaterThan(100);
-      // A record taken over YouTube's error screen is not a record of the character.
-      expect(r.playerError, `${name}: frames over the player's error screen`).toBe(0);
-      expect.soft(r.hides, `${name}: drawn → hidden`).toBe(0);
-      expect.soft(r.switches, `${name}: changes of way`).toBe(0);
+      if (playerCorner) {
+        const r = report[name] as ReturnType<typeof count>;
+        expect(r.frames, name).toBeGreaterThan(100);
+        // A record taken over YouTube's error screen is not a record of the character.
+        expect(r.playerError, `${name}: frames over the player's error screen`).toBe(0);
+        expect.soft(r.hides, `${name}: drawn → hidden`).toBe(0);
+        expect.soft(r.switches, `${name}: changes of way`).toBe(0);
+        continue;
+      }
+      for (const mode of cursorModes) {
+        const scene = `${name}-${mode}`;
+        const cursor = report[scene] as ReturnType<typeof count>;
+        expect(cursor.pointerInside, `${scene}: pointer over the character`).toBeGreaterThan(5);
+        if (mode === 'cross')
+          expect(cursor.frames - cursor.pointerInside, `${scene}: pointer outside the character`).toBeGreaterThan(5);
+        expect.soft(cursor.playerError, `${scene}: frames over the player's error screen`).toBe(0);
+        expect.soft(cursor.stopped, `${scene}: stopped frames`).toBe(0);
+        expect.soft(cursor.hides, `${scene}: drawn → hidden`).toBe(0);
+        expect.soft(cursor.switches, `${scene}: changes of way`).toBe(0);
+      }
     }
   } finally {
-    await writeFile(path.join(out, 'report.json'), JSON.stringify(report, null, 1));
+    await writeFile(path.join(run, 'report.json'), JSON.stringify(report, null, 1));
     await context.close();
+    await rm(profile, { recursive: true, force: true, maxRetries: 3, retryDelay: 200 });
   }
-});
+}

@@ -16,6 +16,7 @@ import {
   moveGroup,
   resizePlacement,
   rotatePlacement,
+  type Bounds,
   type PlacementChange,
   type PlacementSample,
   type Point,
@@ -87,6 +88,7 @@ const CSS = `
 [data-group-edge="left"] { left:-4px; } [data-group-edge="right"] { right:-4px; }
 [hidden] { display:none !important; }
 .image[data-editable] { pointer-events:auto; cursor:move; }
+:host(:not([data-ww-model-press])) .image[data-video-hover] { pointer-events:none; }
 .selection-frame { z-index:1000; border:1px solid var(--cobalt); box-shadow:0 0 0 1px var(--edge), inset 0 0 0 1px var(--edge); }
 .selection-frame[data-locked] { border-color:var(--ink-muted); border-style:dashed; box-shadow:none; outline:1px dashed var(--edge); }
 .group-frame { position:absolute; border:1px dashed var(--cobalt); box-shadow:0 0 0 1px var(--edge); pointer-events:none; z-index:1001; }
@@ -184,6 +186,7 @@ export function createImageRenderer(
   let lastLayout: WorldLayout | undefined;
   /** The roots the last protected draw put on the beneath plane (chunk 4). */
   let beneathRoots: ReadonlySet<string> = new Set();
+  let videoHoverBounds: Bounds[] = [];
   let gesture:
     | {
         pointerId: number;
@@ -602,12 +605,32 @@ export function createImageRenderer(
       // Which roots this draw put under the controls: an editor press on them is claimed that way.
       beneathRoots = beneath ? localRoots : new Set();
       const localIds = new Set<string>();
+      videoHoverBounds = [];
       for (const layer of layout.layers) {
         const entry = nodes.get(layer.layer.id);
         if (!entry) continue;
-        if (localRoots.has(layer.parentId ?? layer.layer.id)) {
+        const root = layer.parentId ?? layer.layer.id;
+        if (localRoots.has(root)) {
           localIds.add(layer.layer.id);
         }
+        // A screen-plane model over the video would take hover away from the player. When the
+        // resulting native changes hold the model, hover returns and can restart the same loop.
+        // Let the player keep hover here. An explicit press still uses the real editor hit test.
+        const b = layer.bounds;
+        const passHover =
+          editorRegion &&
+          layer.layer.kind === 'model3d' &&
+          layer.layer.placement.anchor.kind === 'viewport' &&
+          inPlane(root, SCREEN) &&
+          !layer.locked &&
+          layer.visible &&
+          b &&
+          b.right > editorRegion.left &&
+          b.bottom > editorRegion.top &&
+          b.left < editorRegion.left + editorRegion.width &&
+          b.top < editorRegion.top + editorRegion.height;
+        entry.node.toggleAttribute('data-video-hover', Boolean(passHover));
+        if (passHover) videoHoverBounds.push(b);
       }
       const blocked = safety.commit(
         layout.layers
@@ -903,9 +926,8 @@ export function createImageRenderer(
       });
   };
 
-  const onPointerDown = (event: PointerEvent) => {
+  const beginPointerGesture = (event: PointerEvent, target: Element | undefined) => {
     if (!editing || editing.locked || event.button !== 0) return;
-    const target = event.target instanceof Element ? event.target : undefined;
     const wrapper = target?.closest<HTMLDivElement>('[data-image-id], [data-frame-id]');
     const originalId = wrapper?.dataset.imageId ?? wrapper?.dataset.frameId;
     const parent = originalId && parentGroup(groups, originalId),
@@ -955,6 +977,25 @@ export function createImageRenderer(
     };
     draw();
     node.setPointerCapture(event.pointerId);
+  };
+  const onPointerDown = (event: PointerEvent) =>
+    beginPointerGesture(event, event.target instanceof Element ? event.target : undefined);
+  const onVideoModelPress = (event: PointerEvent) => {
+    if (!host || !shadow || !editing || editing.locked || !event.isTrusted || event.button !== 0) return;
+    const { clientX: x, clientY: y } = event;
+    if (!videoHoverBounds.some((b) => x >= b.left && x < b.right && y >= b.top && y < b.bottom)) return;
+    if (event.composedPath().includes(host)) return;
+    // Restore hit testing only for this synchronous lookup. This honours the native clip,
+    // rotation and paint order without dispatching a hover transition or probing on mousemove.
+    host.toggleAttribute('data-ww-model-press', true);
+    const target = doc.elementFromPoint(x, y) === host ? shadow.elementFromPoint(x, y) : null;
+    host.removeAttribute('data-ww-model-press');
+    const node = target?.closest<HTMLElement>('.image[data-video-hover]');
+    if (!node) return;
+    beginPointerGesture(event, node);
+    // An additive press can deselect without starting a drag. The click still belongs to the
+    // editor, so keep its release and click from reaching the video in that case too.
+    if (event.defaultPrevented && !gesture) node.setPointerCapture(event.pointerId);
   };
   const onPointerMove = (event: PointerEvent) => {
     if (!gesture || !editing || editing.locked || event.pointerId !== gesture.pointerId) return;
@@ -1141,6 +1182,7 @@ export function createImageRenderer(
       return node;
     });
     wireGestures(shadow);
+    view.addEventListener('pointerdown', onVideoModelPress, true);
     observer = new ResizeObserver(refresh);
     view.addEventListener('resize', onViewChange);
     view.addEventListener('blur', onBlur);
@@ -1171,6 +1213,7 @@ export function createImageRenderer(
     view.removeEventListener('blur', onBlur);
     doc.removeEventListener('scroll', onViewChange, true);
     doc.removeEventListener('fullscreenchange', onViewChange);
+    view.removeEventListener('pointerdown', onVideoModelPress, true);
     host?.remove();
     videoSlot?.host.remove();
     videoSlot = undefined;
@@ -1187,6 +1230,7 @@ export function createImageRenderer(
     images = [];
     groups = [];
     lastLayout = undefined;
+    videoHoverBounds = [];
   };
   return {
     update(next: readonly Decoration[], nextGroups: readonly GroupLayer[] = [], nextRules: readonly SignalRule[] = []) {
