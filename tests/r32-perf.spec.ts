@@ -67,7 +67,11 @@ async function setUp(context: BrowserContext) {
   await showArtwork(popup);
   await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
   const { panel } = await openEditor(popup, page);
-  await panel.locator('.model-file').setInputFiles(file(models.find((name) => name.endsWith('.vrm'))!));
+  // WW_PERF_R32_MODEL: another character's VRM in place of the mannequin (outside the repository,
+  // e.g. a converted purchased model; docs/characters/mirdo.md), to compare it with the mannequin.
+  await panel
+    .locator('.model-file')
+    .setInputFiles(process.env.WW_PERF_R32_MODEL ?? file(models.find((name) => name.endsWith('.vrm'))!));
   await expect(panel.locator('.layer')).toHaveCount(1, { timeout: 30000 });
   await panel.locator('.character-file').setInputFiles(models.filter((name) => name.endsWith('.vrma')).map(file));
   await expect(panel.locator('.character-motions li')).toHaveCount(2, { timeout: 30000 });
@@ -76,6 +80,19 @@ async function setUp(context: BrowserContext) {
   await expect(panel.locator('.layer')).toHaveCount(2, { timeout: 30000 });
   await panel.locator('.save').click();
   await expect(panel.locator('.dirty')).toHaveText('保存済み');
+  if (process.env.WW_PERF_R32_MODEL) {
+    // The measured designs are built from the playground's design.json, whose resident points at
+    // the mannequin's asset and bones: point it at the imported model instead.
+    const saved = (await popup.evaluate(
+      async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
+    )) as Design;
+    const imported = saved.decorations.find((layer) => (layer as { kind?: string }).kind === 'model3d') as
+      (Layer & { assetId: string; source: unknown }) | undefined;
+    expect(imported, 'the imported model in the saved design').toBeTruthy();
+    design.decorations = design.decorations.map((layer) =>
+      layer.id === 'resident' ? { ...layer, assetId: imported!.assetId, source: imported!.source } : layer,
+    );
+  }
   await closeEditorPages(page);
 
   const session: CDPSession = await context.newCDPSession(page);
@@ -172,16 +189,27 @@ test('R3-2 short check: extension rAF CPU per frame, quiet / plain VRM / compute
       'body',
     ];
 
-    const rows: { round: number; variant: string; median: number; p95: number; mean: number; frames: number }[] = [];
+    const rows: {
+      round: number;
+      variant: string;
+      loadMs: number;
+      median: number;
+      p95: number;
+      mean: number;
+      frames: number;
+    }[] = [];
     for (let round = 0; round < 2; round++) {
       const order = round % 2 ? [...chosen].reverse() : chosen;
       for (const variant of order) {
         // The page stays: the artwork changes in storage and the page follows it (no reload, which
         // repeated in a headless profile makes YouTube's player fail).
+        const stored = Date.now();
         await storeDesign(popup, { ...design, siteId: 'youtube', rules: [], decorations: variants[variant] });
         await declinePromotion(page);
         if (variant === 'quiet') await expect(media(page)).toHaveCount(0, { timeout: 30000 });
         else await expect(media(page)).toHaveAttribute('data-renderer', 'three', { timeout: 60000 });
+        // From storing the artwork to the character's first paint (the model loaded and drawn).
+        const loadMs = Date.now() - stored;
         await play();
         // Past start-up: the steady state of each variant.
         await page.waitForTimeout(6000);
@@ -217,7 +245,7 @@ test('R3-2 short check: extension rAF CPU per frame, quiet / plain VRM / compute
           await writeFile(path.join(out, `${name}.counts.json`), JSON.stringify(callCounts(result)));
         }
         const { total: _total, ...stats } = perFrame(await evaluate(contextId, '__g11Probe.end()'));
-        const row = { round, variant, ...stats };
+        const row = { round, variant, loadMs, ...stats };
         rows.push(row);
         console.log('R32 perf ' + JSON.stringify(row));
       }
