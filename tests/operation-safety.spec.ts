@@ -2500,9 +2500,15 @@ test('G1.3 (D14②): while the page scrolls, the answer check reads one group of
       (JSON.parse(document.documentElement.getAttribute('data-ww-guard-geometry') ?? '[]') as any[]).filter(
         (entry) => entry.at >= since,
       );
+    // The phases last as long as 40 and 60 frames at 60Hz, whatever the display's rate: the answer
+    // check waits and goes round by time (src/host/answer-check.ts), so 40 frames on a 165Hz screen
+    // (about 240ms) ended before one round followed the 200ms window and failed every time (chunk 4
+    // fix verification on the desktop). The assertions below are unchanged.
+    const QUIET_MS = (40 * 1000) / 60,
+      MOVED_MS = (60 * 1000) / 60;
     // 1. Quiet scrolling: the checks go round group by group, one per frame, with no whole read.
     let since = Math.floor(performance.now());
-    for (let i = 0; i < 40; i++) {
+    for (const start = performance.now(); performance.now() - start < QUIET_MS;) {
       scrollBy(0, 4);
       host.sample(await frame());
     }
@@ -2519,7 +2525,7 @@ test('G1.3 (D14②): while the page scrolls, the answer check reads one group of
     let found = -1,
       last = moved,
       longest = 0;
-    for (let i = 0; i < 60 && found < 0; i++) {
+    while (found < 0 && performance.now() - moved < MOVED_MS) {
       scrollBy(0, 4);
       const time = await frame();
       longest = Math.max(longest, time - last);
