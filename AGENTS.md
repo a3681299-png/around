@@ -72,6 +72,15 @@ e2e は全件で約23分かかる。毎回すべて回さず、いつ・誰が�
 - 画面の外でも、`bringToFront` やネイティブのキー操作（`tests/editor-entry.spec.ts`・`tests/side-panel.spec.ts`）は、キーボードのフォーカスを一瞬取る。これらは e2e 全件を回すときだけにし、回す前に「1〜2分、キーボードのフォーカスを取ります」と翔太に一言伝える
 - 窓を目で見たいときだけ `WW_TEST_WINDOW_OFFSCREEN=0` を付ける。画面の外でだけ落ちるテストがあれば、`0` と比べて報告する
 
+### 検証の後始末（2026-11-07、翔太の決定）
+
+ノート PC の空きが少ない。終わった検証の生データは残さない。
+
+- **段階が閉じたら、その検証の worktree を外す**（`node scripts/clean-work.mjs`、または `git worktree remove`）。結果は docs に記録済みで、版はコミットで分かる。ブランチを checkout している worktree は外さない
+- **検証報告を出したら、要約だけ残す**：試行ごとのブラウザーのプロファイル（`p-*`・`g-entry-profile-*`・`g-backup-profile-*` など）、検証用のビルド（`test-dist-*`・`g11-*-dist` など）、worktree の中の `node_modules`、録画の動画は消す。`summary.json`・`stacks.json` などの要約の json と、報告から参照している画像だけを残す
+- 残すものは **1回の検証で 200MB まで**。超えるなら、何を残したかと理由を報告に書く
+- **`docs/benchmarks` に生データを入れない**（trace・CPU プロファイル・プロファイルのフォルダ・動画）。入れるのは要約の json と、報告が参照する画像だけ
+
 ## 計測
 
 - **性能を測るのは、ページの上で動く処理を変えたときだけ**（content script・`src/sites/`・`src/world/`・`src/host/`・描画）。エディターやサイドパネルの見た目だけの変更では、交互計測をしない
