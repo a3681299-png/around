@@ -90,6 +90,10 @@ const RETRY_MS = 1000;
 const LIST_LIMIT = 36;
 /** Nodes walked for one part's text bounds (a long comment has a few dozen). */
 const TIGHT_NODES = 160;
+/** Parts whose text bounds are measured in one read (the others wait for a later read). */
+const TIGHT_PER_READ = 4;
+/** A part's measured text bounds are trusted this long, then measured again. */
+const TIGHT_TTL_MS = 1000;
 
 export function youtubeBackdrop(doc: Document): SiteBackdrop {
   const view = doc.defaultView!;
@@ -174,6 +178,39 @@ export function youtubeBackdrop(doc: Document): SiteBackdrop {
     }
     return left < right ? new DOMRect(left, top, right - left, bottom - top) : e.getBoundingClientRect();
   };
+  /**
+   * How far a part's text stops short of its box's right edge, kept between reads: walking the
+   * text every frame of a scroll cost about a second in six (CPU profile). Only the right side is
+   * trimmed (text starts at the box's left and fills it top to bottom), so a stale value can only
+   * matter where a line grew longer. Re-measured when the box changes size, after TIGHT_TTL_MS,
+   * and after every page change; a few parts a read, the rest use their whole box meanwhile (a
+   * larger plate, never a smaller one).
+   */
+  const insets = new WeakMap<
+    Element,
+    { width: number; height: number; right: number; at: number; generation: number }
+  >();
+  let measures = 0,
+    budget = TIGHT_PER_READ,
+    lastRead = -Infinity,
+    generation = 0;
+  const tightRect = (e: Element, now: number) => {
+    const whole = e.getBoundingClientRect();
+    const known = insets.get(e);
+    if (
+      known &&
+      known.width === whole.width &&
+      known.height === whole.height &&
+      ((now - known.at < TIGHT_TTL_MS && known.generation === generation) || measures >= budget)
+    )
+      return new DOMRect(whole.left, whole.top, whole.width - known.right, whole.height);
+    if (measures >= budget || whole.width <= 0 || whole.height <= 0) return whole;
+    measures++;
+    const t = tightBox(e);
+    const right = Math.max(0, whole.right - t.right);
+    insets.set(e, { width: whole.width, height: whole.height, right, at: now, generation });
+    return new DOMRect(whole.left, whole.top, whole.width - right, whole.height);
+  };
   const box = (
     e: Element,
     importance: RegionImportance,
@@ -181,7 +218,7 @@ export function youtubeBackdrop(doc: Document): SiteBackdrop {
     tight?: boolean,
     pad?: number,
   ): UiRegion | undefined => {
-    const r = tight ? tightBox(e) : e.getBoundingClientRect();
+    const r = tight ? tightRect(e, view.performance.now()) : e.getBoundingClientRect();
     // A hidden page (YouTube keeps the last ones) or a closed miniplayer has no box.
     if (r.width <= 0 || r.height <= 0) return undefined;
     return {
@@ -220,12 +257,19 @@ export function youtubeBackdrop(doc: Document): SiteBackdrop {
       };
     },
     refresh() {
-      // The page changed (the adapter's notice): look for parts and list items again next read.
+      // The page changed (the adapter's notice): look for parts and list items again next read,
+      // and measure the text bounds again (the old ones serve until then).
       listsAt = -Infinity;
+      generation++;
       for (const [source, cached] of found) if (!cached.element) found.delete(source);
     },
     regions() {
       const now = view.performance.now();
+      measures = 0;
+      // While the page moves (reads every frame) a few parts are measured a read; a read after a
+      // pause (the once-a-second read of a still page) measures every part that is due.
+      budget = now - lastRead > 200 ? Infinity : TIGHT_PER_READ;
+      lastRead = now;
       if (now - listsAt >= RETRY_MS) readLists(now);
       const out: UiRegion[] = [];
       for (const source of SINGLES) {
@@ -239,12 +283,15 @@ export function youtubeBackdrop(doc: Document): SiteBackdrop {
           if (now - cached.at >= RETRY_MS) found.set(source, { at: now });
         }
       }
+      // Only the parts on screen count toward the limit (the observer's margin brings a few more
+      // in early, so their plates are ready as they scroll in).
       let listed = 0;
+      const height = view.innerHeight;
       for (const item of inView) {
         if (listed >= LIST_LIMIT) break;
         const kind = items.get(item);
         const region = box(item, kind?.importance ?? 'read', false, kind?.tight);
-        if (region) (out.push(region), listed++);
+        if (region && region.top < height && region.top + region.height > 0) (out.push(region), listed++);
       }
       return out;
     },

@@ -107,6 +107,51 @@ export function createSpaceHost(
     reduced[m]('change', wake);
   };
 
+  /**
+   * The video's mean colour (linear RGB), into `sample` when ready. The browser shrinks the frame
+   * to 8 × 5 off the page's thread (createImageBitmap with a resize), and only those 40 pixels are
+   * read here. Reading the full frame on the page — a canvas getImageData of the video, or a WebGL
+   * upload of it — stalled the page 4–16 ms a read in the CPU profiles. A frame that cannot be
+   * read (protected, an advert switching) fades the light out instead (`undefined`).
+   */
+  let sampling = false;
+  let shrunk: OffscreenCanvasRenderingContext2D | null | undefined;
+  const sampleVideo = (video: HTMLVideoElement | undefined) => {
+    if (sampling) return;
+    if (!video || video.readyState < 2 || video.videoWidth === 0) {
+      sample = undefined;
+      return;
+    }
+    sampling = true;
+    view
+      .createImageBitmap(video, { resizeWidth: 8, resizeHeight: 5, resizeQuality: 'low' })
+      .then((bitmap) => {
+        shrunk ??= new OffscreenCanvas(8, 5).getContext('2d', { willReadFrequently: true });
+        if (!shrunk) throw new Error('no 2d');
+        shrunk.drawImage(bitmap, 0, 0);
+        bitmap.close();
+        const data = shrunk.getImageData(0, 0, 8, 5).data;
+        const linear = (v: number) => {
+          const s = v / 255;
+          return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+        };
+        let r = 0,
+          g = 0,
+          b = 0;
+        for (let i = 0; i < data.length; i += 4) {
+          r += linear(data[i]!);
+          g += linear(data[i + 1]!);
+          b += linear(data[i + 2]!);
+        }
+        sample = { r: r / 40, g: g / 40, b: b / 40 };
+      })
+      .catch(() => (sample = undefined))
+      .finally(() => {
+        sampling = false;
+        schedule();
+      });
+  };
+
   const schedule = () => {
     if (frame === undefined && session?.renderer && !doc.hidden) frame = view.requestAnimationFrame(tick);
   };
@@ -138,8 +183,8 @@ export function createSpaceHost(
     }
     if (now - videoAt >= VIDEO_SAMPLE_MS) {
       videoAt = now;
-      // Read on the GPU, a few frames late (src/renderers/three/room.ts sampleVideo).
-      sample = space.videoLight > 0 ? renderer.sampleVideo(backdrop.video()) : undefined;
+      if (space.videoLight > 0) sampleVideo(backdrop.video());
+      else sample = undefined;
     }
     light = stepVideoLight(light, sample, dt, reduced.matches);
     const scrollProgress = view.scrollY / Math.max(1, view.innerHeight);
@@ -185,6 +230,7 @@ export function createSpaceHost(
         }
         doc.documentElement.dataset['wwRoomFrame'] = JSON.stringify({
           plates: plates.length,
+          boxes: plates.map((p) => [p.left, p.top, p.right, p.bottom].map(Math.round)),
           camera: [camera.x, camera.y, camera.dolly].map((n) => Math.round(n * 1000) / 1000),
           light: Math.round((0.2126 * light.r + 0.7152 * light.g + 0.0722 * light.b) * 1000) / 1000,
           sample: sample ? Math.round((0.2126 * sample.r + 0.7152 * sample.g + 0.0722 * sample.b) * 1000) / 1000 : null,

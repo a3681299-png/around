@@ -30,8 +30,6 @@ import {
   WebGLRenderTarget,
   WebGLRenderer,
   LinearSRGBColorSpace,
-  UnsignedByteType,
-  VideoTexture,
   type Object3D,
   type Material,
 } from 'three';
@@ -70,9 +68,6 @@ export interface RoomRenderer {
   /** The room's base view: camera_main's vertical field of view. */
   readonly baseFovDeg: number;
   resize(width: number, height: number): void;
-  /** Starts a read of the video's mean colour (linear RGB) and returns the last finished one:
-   * the result is a few frames late and never makes the page wait. Undefined when unreadable. */
-  sampleVideo(video: HTMLVideoElement | undefined): VideoLight | undefined;
   draw(frame: RoomFrame, look: RoomLook): void;
   /** For tests: the drawn colour (sRGB bytes) at canvas pixels, read right after a draw. */
   readPixels: ((points: readonly { x: number; y: number }[]) => number[][]) | undefined;
@@ -318,87 +313,6 @@ export async function createRoomRenderer(
   const quadScene = new Scene().add(quad);
   const quadCamera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
-  // --- The video's colour, read on the GPU (docs/depth-foundation.md): the frame is uploaded as
-  // a texture (a GPU copy), averaged into 8 × 5 cells, and read back through a pixel buffer a few
-  // frames later, so the page never waits for the GPU (a canvas getImageData did, ~4 ms a read).
-  const gl = renderer.getContext() as WebGL2RenderingContext;
-  // A VideoTexture per video element: a plain Texture holding a video is sized from the element's
-  // width attribute (0) and uploads nothing. Raw bytes (no sRGB format): the average of the encoded
-  // values is decoded on the CPU, close enough for a light.
-  let videoTexture: VideoTexture | undefined;
-  const textureFor = (video: HTMLVideoElement) => {
-    if (videoTexture?.image === video) return videoTexture;
-    videoTexture?.dispose();
-    videoTexture = new VideoTexture(video);
-    videoTexture.colorSpace = '';
-    videoTexture.generateMipmaps = false;
-    videoTexture.minFilter = LinearFilter;
-    return videoTexture;
-  };
-  const probeTarget = new WebGLRenderTarget(8, 5, { type: UnsignedByteType, depthBuffer: false });
-  const probeMaterial = new ShaderMaterial({
-    uniforms: { tVideo: { value: null } },
-    vertexShader: QUAD_VERTEX,
-    // Sixteen taps across each cell, still encoded (decoded on the CPU).
-    fragmentShader: `varying vec2 vUv; uniform sampler2D tVideo;
-      void main(){ vec3 c = vec3(0.); vec2 cell = floor(gl_FragCoord.xy);
-      for (int i = 0; i < 4; i++) for (int j = 0; j < 4; j++)
-        c += texture2D(tVideo, (cell + (vec2(float(i), float(j)) + 0.5) / 4.0) / vec2(8.0, 5.0)).rgb;
-      gl_FragColor = vec4(c / 16.0, 1.); }`,
-    depthTest: false,
-    depthWrite: false,
-  });
-  const probeScene = new Scene().add(new Mesh(new PlaneGeometry(2, 2), probeMaterial));
-  const probeBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.PIXEL_PACK_BUFFER, probeBuffer);
-  gl.bufferData(gl.PIXEL_PACK_BUFFER, 8 * 5 * 4, gl.STREAM_READ);
-  gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
-  let probeSync: WebGLSync | null = null,
-    probed: VideoLight | undefined,
-    unreadable = false;
-  const sampleVideo = (video: HTMLVideoElement | undefined): VideoLight | undefined => {
-    if (destroyed) return undefined;
-    if (probeSync) {
-      const state = gl.clientWaitSync(probeSync, 0, 0);
-      if (state !== gl.ALREADY_SIGNALED && state !== gl.CONDITION_SATISFIED) return probed;
-      gl.deleteSync(probeSync);
-      probeSync = null;
-      const data = new Uint8Array(8 * 5 * 4);
-      gl.bindBuffer(gl.PIXEL_PACK_BUFFER, probeBuffer);
-      gl.getBufferSubData(gl.PIXEL_PACK_BUFFER, 0, data);
-      gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
-      let r = 0,
-        g = 0,
-        b = 0;
-      for (let i = 0; i < data.length; i += 4) {
-        r += (data[i]! / 255) ** 2.2;
-        g += (data[i + 1]! / 255) ** 2.2;
-        b += (data[i + 2]! / 255) ** 2.2;
-      }
-      probed = { r: r / 40, g: g / 40, b: b / 40 };
-    }
-    if (!video || unreadable || video.readyState < 2 || video.videoWidth === 0) return (probed = undefined);
-    try {
-      const texture = textureFor(video);
-      texture.needsUpdate = true;
-      probeMaterial.uniforms['tVideo']!.value = texture;
-      renderer.setRenderTarget(probeTarget);
-      renderer.render(probeScene, quadCamera);
-      gl.bindBuffer(gl.PIXEL_PACK_BUFFER, probeBuffer);
-      gl.readPixels(0, 0, 8, 5, gl.RGBA, gl.UNSIGNED_BYTE, 0);
-      gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
-      probeSync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
-      gl.flush();
-    } catch {
-      // A protected or cross-origin frame cannot be uploaded: the light fades out instead.
-      unreadable = true;
-      probed = undefined;
-    } finally {
-      renderer.setRenderTarget(null);
-    }
-    return probed;
-  };
-
   const scene = new Scene();
   scene.background = new Color(0x050508);
   scene.add(gltf.scene);
@@ -501,7 +415,6 @@ export async function createRoomRenderer(
     canvas,
     baseFovDeg: cameraNode.fov,
     resize,
-    sampleVideo,
     draw(frame, look) {
       if (destroyed || !roomTarget) return;
       remix(look, frame.video);
@@ -571,11 +484,6 @@ export async function createRoomRenderer(
       roomTarget?.dispose();
       mix.dispose();
       composite.dispose();
-      if (probeSync) gl.deleteSync(probeSync);
-      gl.deleteBuffer(probeBuffer);
-      probeTarget.dispose();
-      probeMaterial.dispose();
-      videoTexture?.dispose();
       quad.geometry.dispose();
       renderer.dispose();
       renderer.forceContextLoss();

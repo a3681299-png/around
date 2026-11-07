@@ -228,17 +228,20 @@ test('real YouTube: the room behind the UI, glass plates that keep text readable
         'ytd-watch-flexy ytd-comment-view-model #main, ytd-watch-flexy yt-lockup-metadata-view-model, ytd-watch-metadata #title',
       )) {
         const walker = document.createTreeWalker(e, NodeFilter.SHOW_TEXT);
+        // Text clipped by its part (an ellipsis past the column) or the page (under the scrollbar)
+        // is not shown: only the text inside the part's own box counts.
+        const part = e.getBoundingClientRect();
+        const right = Math.min(part.right, document.documentElement.clientWidth);
         for (let node = walker.nextNode(); node; node = walker.nextNode()) {
           if (!node.nodeValue?.trim()) continue;
           range.selectNodeContents(node);
           for (const r of range.getClientRects())
-            for (let y = Math.max(r.top, 64) + 2; y < Math.min(r.bottom, innerHeight) - 2; y += 6)
-              // Text clipped by the page (an ellipsis past the column, under the scrollbar) is not shown.
-              for (
-                let x = Math.max(r.left, 0) + 1;
-                x < Math.min(r.right, document.documentElement.clientWidth) - 1;
-                x += 12
-              )
+            for (
+              let y = Math.max(r.top, part.top, 64) + 2;
+              y < Math.min(r.bottom, part.bottom, innerHeight) - 2;
+              y += 6
+            )
+              for (let x = Math.max(r.left, part.left, 0) + 1; x < Math.min(r.right, right) - 1; x += 12)
                 pts.push([x, y]);
         }
       }
@@ -253,6 +256,13 @@ test('real YouTube: the room behind the UI, glass plates that keep text readable
       const e = document.elementFromPoint(x, y);
       return `${e?.localName}#${e?.id}.${e?.className}`.slice(0, 80);
     }, at);
+    if (worst < READABLE_CONTRAST) {
+      // Which plates are near the worst point (for the failure's record).
+      const boxes = ((await frame()).boxes as number[][]).filter(
+        ([l, t, r, b]) => at[0] > l! - 60 && at[0] < r! + 60 && at[1] > t! - 60 && at[1] < b! + 60,
+      );
+      console.log(`[space-live] plates near the worst point: ${JSON.stringify(boxes)}`);
+    }
     console.log(
       `[space-live] ${scheme}${bright ? ' bright' : ''}: plate samples ${pixels.length}, worst contrast ${worst.toFixed(2)} at ${at.map(Math.round).join(',')} (${where}) rgb ${pixels[ratios.indexOf(worst)]}`,
     );
