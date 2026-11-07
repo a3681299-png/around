@@ -25,7 +25,7 @@ const key = 'webWorldThemes.design.youtube';
 
 /** The room and a magenta image, imported through the editor; the stored artwork puts the image
  * at room depth over the player's Play button. */
-async function roomArtwork(popup: Page, youtube: Page) {
+async function roomArtwork(popup: Page, youtube: Page, mixed = false) {
   await youtube.goto('https://www.youtube.com/watch?v=fixture');
   await youtube.locator('#movie_player video').waitFor({ state: 'attached' });
   await showArtwork(popup);
@@ -63,6 +63,23 @@ async function roomArtwork(popup: Page, youtube: Page) {
             rotationDeg: 0,
           },
         },
+        // Mixed artwork: one more image in front of the UI (the guard's), in the page's corner.
+        ...(mixed
+          ? [
+              {
+                ...image,
+                id: 'front-image',
+                placement: {
+                  anchor: { kind: 'viewport' },
+                  x: 0.97,
+                  y: 0.95,
+                  widthPx: 30,
+                  heightPx: 30,
+                  rotationDeg: 0,
+                },
+              },
+            ]
+          : []),
       ],
       space: { ...DEFAULT_SPACE_LOOK, room: { assetId: room.assetId } },
     },
@@ -113,9 +130,36 @@ test('the room is under the content and room-depth artwork stays behind every co
     guardVerdict: null,
   });
   // What a person sees: the Play button's own pixels are drawn over the magenta artwork.
+  expect(await magentaOverPlay(youtube)).toBeLessThan(0.5);
+});
+
+test('mixed artwork: the room-depth part stays behind the UI unguarded, the front part keeps the guard', async ({
+  popup,
+  youtube,
+}) => {
+  await roomArtwork(popup, youtube, true);
+  // Something is in front: the guard observes the page.
+  await expect(youtube.locator('html')).toHaveAttribute('data-ww-guard', 'on');
+  await expect(youtube.locator('#web-world-themes-room-decorations')).toBeAttached();
+  const placed = await youtube.evaluate(() => {
+    const canvas = document.querySelector('canvas[data-ww-room]')!;
+    const plane = document.getElementById('web-world-themes-room-decorations')!;
+    return {
+      planeZ: getComputedStyle(plane).zIndex,
+      planeAfterCanvas: plane.previousElementSibling === canvas,
+      // The room-depth image is on the room plane, the front one is not.
+      roomImages: plane.shadowRoot!.querySelectorAll('[data-image-id]').length,
+    };
+  });
+  expect.soft(placed).toEqual({ planeZ: '-1', planeAfterCanvas: true, roomImages: 1 });
+  expect(await magentaOverPlay(youtube)).toBeLessThan(0.5);
+});
+
+/** The share of magenta pixels inside the player's Play button, as drawn on screen. */
+async function magentaOverPlay(youtube: Page) {
   const play = (await youtube.locator('#movie_player button[aria-label="Play"]').boundingBox())!;
   const shot = await youtube.screenshot({ clip: play, caret: 'initial' });
-  const pixels = await youtube.evaluate(async (data) => {
+  return youtube.evaluate(async (data) => {
     const image = new Image();
     image.src = 'data:image/png;base64,' + data;
     await image.decode();
@@ -129,8 +173,7 @@ test('the room is under the content and room-depth artwork stays behind every co
     for (let i = 0; i < d.length; i += 4) if (d[i]! > 200 && d[i + 1]! < 60 && d[i + 2]! > 200) magenta++;
     return magenta / (d.length / 4);
   }, shot.toString('base64'));
-  expect(pixels).toBeLessThan(0.5);
-});
+}
 
 test('the room follows the pointer and stops drawing in fullscreen', async ({ popup, youtube }) => {
   await roomArtwork(popup, youtube);

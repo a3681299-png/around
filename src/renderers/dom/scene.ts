@@ -173,6 +173,11 @@ export function createImageRenderer(
       }
     | undefined;
   let pagePlane: Plane | undefined, atmospherePlane: Plane | undefined;
+  /** Mixed artwork's room-depth roots, behind the UI (docs/depth-foundation.md). */
+  let roomPlane: Plane | undefined;
+  /** This draw's place behind the UI: the room's, 'pending' while it loads or hides, undefined
+   * without a room (room-depth roots are then drawn in front, guarded, as before v16). */
+  let behind: ReturnType<NonNullable<typeof backdrop>> | undefined;
   const createPlane = (id: string, css: string, gestures: boolean): Plane => {
     const planeHost = doc.createElement('div');
     planeHost.id = id;
@@ -278,9 +283,15 @@ export function createImageRenderer(
     // Room-only artwork (draw's `room`) is behind the UI: no reads, no clip, no stop.
     if (safety && protect && !room) {
       const roots = new Map([...layout.groups, ...layout.layers].map((entry) => [entry.layer.id, entry]));
+      // Mixed artwork (docs/depth-foundation.md): while the artwork has a room, its room-depth roots
+      // go behind the UI on their own plane, outside every guard step below (no slot, no clip, no
+      // commit); the guard sees only what is in front.
+      const roomRoot = (id: string) => behind !== undefined && depthOf(roots.get(id)!.layer) === 'room';
+      const frontRoots = layout.roots.filter((id) => !roomRoot(id));
+      const frontLayers = layout.layers.filter((l) => !roomRoot(l.parentId ?? l.layer.id));
       const needsVideoSlot =
         Boolean(doc.fullscreenElement) ||
-        layout.roots.some((id) => {
+        frontRoots.some((id) => {
           const anchor = roots.get(id)!.layer.placement.anchor;
           return anchor.kind === 'surface' && anchor.target === 'video-player';
         });
@@ -291,7 +302,7 @@ export function createImageRenderer(
       // Where the paints that can go under the controls are (the player's; every root in
       // fullscreen, one plane), widened by BENEATH_NEAR_PX: only a control there can hold a paint
       // for a pending read (beneathSettled), so only those need a proof now.
-      const near = layout.layers.flatMap((l) => {
+      const near = frontLayers.flatMap((l) => {
         const anchor = roots.get(l.parentId ?? l.layer.id)?.layer.placement.anchor,
           b = l.bounds;
         return (doc.fullscreenElement || (anchor?.kind === 'surface' && anchor.target === 'video-player')) && b
@@ -312,7 +323,7 @@ export function createImageRenderer(
       const beneath =
         offered &&
         !offered.unprovenShown.some((box) =>
-          layout.layers.some((l) => {
+          frontLayers.some((l) => {
             const root = l.parentId ?? l.layer.id,
               anchor = roots.get(root)?.layer.placement.anchor,
               b = l.bounds;
@@ -368,7 +379,7 @@ export function createImageRenderer(
       const pageSlot =
         overlaySlot &&
         !doc.fullscreenElement &&
-        layout.roots.some((id) => pageAnchored(id) && !atmosphereRoot(id) && !(slot && videoAnchored(id)))
+        frontRoots.some((id) => pageAnchored(id) && !atmosphereRoot(id) && !(slot && videoAnchored(id)))
           ? safety.source.pageSlot()
           : undefined;
       const rootBounds = (id: string) =>
@@ -391,14 +402,15 @@ export function createImageRenderer(
         slot
           ? // The player-local plane keeps its native-underlay order; only when it is unavailable
             // does a player-anchored root follow the page instead of the screen plane.
-            layout.roots.filter((id) => fullscreenPlane || (videoAnchored(id) && !atmosphereRoot(id)))
+            frontRoots.filter((id) => fullscreenPlane || (videoAnchored(id) && !atmosphereRoot(id)))
           : [],
       );
       // Planes stack atmosphere < page < screen. A root never moves below an earlier root:
-      // one that would is drawn on the screen plane as normal, clipped artwork.
+      // one that would is drawn on the screen plane as normal, clipped artwork. Room roots are
+      // behind all of them, whatever their order.
       const planes = new Map<string, number>();
       let floor = ATMOSPHERE;
-      for (const id of layout.roots) {
+      for (const id of frontRoots) {
         if (localRoots.has(id)) continue;
         let plane = atmosphereRoot(id) && overlaySlot ? ATMOSPHERE : pageAnchored(id) && pageSlot ? PAGE : SCREEN;
         if (plane < floor) plane = SCREEN;
@@ -448,6 +460,31 @@ export function createImageRenderer(
       }
       if (!used.has(PAGE)) pagePlane = undefined;
       if (!used.has(ATMOSPHERE)) atmospherePlane = undefined;
+      // The room plane: right after the room's canvas at its level (under the page's content), or
+      // out of the page while the room is loading or hidden ('pending').
+      const roomRoots = new Set(layout.roots.filter(roomRoot));
+      if (roomRoots.size) {
+        roomPlane ??= createPlane('web-world-themes-room-decorations', UNDERLAY_CSS, false);
+        if (behind && behind !== 'pending') {
+          const after = behind.after?.parentElement === behind.parent ? behind.after : undefined;
+          if (SPACE_BREAK === 'stacking') {
+            // A broken build (WW_SPACE_BREAK=stacking): over the UI, unguarded, to see the tests fail.
+            if (roomPlane.host.parentElement !== behind.parent || roomPlane.host.nextSibling)
+              behind.parent.append(roomPlane.host);
+            roomPlane.host.style.setProperty('--ww-decoration-z', '2147482000');
+          } else {
+            if (
+              roomPlane.host.parentElement !== behind.parent ||
+              (after ? roomPlane.host.previousElementSibling !== after : roomPlane.host !== behind.parent.firstChild)
+            )
+              behind.parent.insertBefore(roomPlane.host, after ? after.nextSibling : behind.parent.firstChild);
+            roomPlane.host.style.setProperty('--ww-decoration-z', String(behind.zIndex));
+          }
+        } else roomPlane.host.remove();
+      } else if (roomPlane) {
+        roomPlane.host.remove();
+        roomPlane = undefined;
+      }
       // Reading scroll offsets forces layout after this draw's writes; only the page plane needs them.
       const scroll = pagePlane ? { x: view.scrollX, y: view.scrollY } : { x: 0, y: 0 };
       let pageRegions: ReturnType<typeof pagePaintRegions> = [];
@@ -565,9 +602,17 @@ export function createImageRenderer(
       let localIndex = 0,
         globalIndex = 0;
       let pageIndex = 0,
-        atmosphereIndex = 0;
+        atmosphereIndex = 0,
+        roomIndex = 0;
       for (const id of layout.roots) {
         const node = nodes.get(id)?.node ?? compositions.get(id)!.node;
+        if (roomRoots.has(id)) {
+          // Viewport coordinates, like the screen plane: the room plane is fixed to the viewport.
+          if (roomPlane!.content.children[roomIndex] !== node)
+            roomPlane!.content.insertBefore(node, roomPlane!.content.children[roomIndex] ?? null);
+          roomIndex++;
+          continue;
+        }
         const local = localRoots.has(id),
           page = inPlane(id, PAGE),
           atmosphere = inPlane(id, ATMOSPHERE),
@@ -648,8 +693,9 @@ export function createImageRenderer(
         entry.node.toggleAttribute('data-video-hover', Boolean(passHover));
         if (passHover) videoHoverBounds.push(b);
       }
+      // Room-depth paints are not the guard's: the stacking order keeps the UI over them.
       const blocked = safety.commit(
-        layout.layers
+        frontLayers
           .filter((l) => l.layer.visible && (!l.frame || l.visible))
           .map((layer) => {
             const root = layer.parentId ?? layer.layer.id,
@@ -802,6 +848,9 @@ export function createImageRenderer(
   const draw = () => {
     if (!host) return;
     const place = (room = roomPlace());
+    behind = backdrop?.();
+    // Nothing behind the UI shows in fullscreen: room-depth roots wait there, like the room.
+    if (behind && doc.fullscreenElement) behind = 'pending';
     guard = place ? undefined : safety;
     guard?.sample(view.performance.now());
     const overlaySlot = guard?.source.overlaySlot();
@@ -834,8 +883,8 @@ export function createImageRenderer(
         writtenSafety = '';
         recordedIssues = recordedStopped = undefined;
       }
-      for (const plane of [pagePlane, atmospherePlane]) plane?.host.remove();
-      pagePlane = atmospherePlane = undefined;
+      for (const plane of [pagePlane, atmospherePlane, roomPlane]) plane?.host.remove();
+      pagePlane = atmospherePlane = roomPlane = undefined;
       videoSlot?.host.remove();
       videoSlot = undefined;
       beneathRoots = new Set();
@@ -1283,7 +1332,8 @@ export function createImageRenderer(
     videoSlot = undefined;
     pagePlane?.host.remove();
     atmospherePlane?.host.remove();
-    pagePlane = atmospherePlane = undefined;
+    roomPlane?.host.remove();
+    pagePlane = atmospherePlane = roomPlane = undefined;
     host = undefined;
     shadow = undefined;
     groupFrame = undefined;
