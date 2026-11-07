@@ -372,9 +372,9 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       await writeFile(path.join(out, base + '.png'), Buffer.from(sheet.split(',')[1], 'base64'));
       console.log(`${verdict.pass ? 'PASS' : 'FAIL'} ${base} ${verdict.reasons.join(',')}`);
     }
+    await writeFile(path.join(out, 'report.json'), JSON.stringify(report, null, 1));
   } finally {
     await browser.close();
   }
-  await writeFile(path.join(out, 'report.json'), JSON.stringify(report, null, 1));
   console.log('CHECK_MOTIONS ' + path.join(out, 'report.json'));
 }
