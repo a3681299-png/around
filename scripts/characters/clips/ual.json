@@ -1,0 +1,25 @@
+{
+  "source": "UAL1_Standard_RM.glb",
+  "note": "Root motion version: the hips' travel gives a walk's or run's speed; inPlace removes it again so the engine moves the character at that speed. Names stay the library's own, so WWT recognizes them as any import would.",
+  "clips": [
+    { "source": "Idle_Loop" },
+    { "source": "Idle_Talking_Loop" },
+    { "source": "Walk_Loop", "inPlace": true },
+    { "source": "Walk_Formal_Loop", "inPlace": true },
+    { "source": "Jog_Fwd_Loop", "inPlace": true },
+    { "source": "Sprint_Loop", "inPlace": true },
+    { "source": "Crouch_Idle_Loop" },
+    { "source": "Sitting_Enter" },
+    { "source": "Sitting_Idle_Loop" },
+    { "source": "Sitting_Talking_Loop" },
+    { "source": "Sitting_Exit" },
+    { "source": "Jump_Start" },
+    { "source": "Jump_Loop" },
+    { "source": "Jump_Land" },
+    { "source": "Hit_Head" },
+    { "source": "Hit_Chest" },
+    { "source": "Dance_Loop" },
+    { "source": "Interact" },
+    { "source": "Spell_Simple_Idle_Loop" }
+  ]
+}

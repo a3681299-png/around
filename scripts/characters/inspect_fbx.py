@@ -6,7 +6,10 @@ import bpy, json, sys
 argv = sys.argv[sys.argv.index("--") + 1 :]
 src = argv[0]
 bpy.ops.wm.read_factory_settings(use_empty=True)
-bpy.ops.import_scene.fbx(filepath=src)
+if src.lower().endswith((".glb", ".gltf")):
+    bpy.ops.import_scene.gltf(filepath=src)
+else:
+    bpy.ops.import_scene.fbx(filepath=src)
 
 report = {"armatures": [], "meshes": [], "images": [], "actions": [a.name for a in bpy.data.actions]}
 for ob in bpy.data.objects:
