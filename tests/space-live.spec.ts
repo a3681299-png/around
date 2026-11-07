@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
-import { mkdir, mkdtemp } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile } from 'node:fs/promises';
+import { writeContent } from '../scripts/playground/content';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { launchExtension } from './fixtures';
@@ -65,7 +66,14 @@ test('real YouTube: the room behind the UI, glass plates that keep text readable
     await declinePromotion(page);
     await showArtwork(popup);
     // The room goes in through the real import and validation (it is one GLB model asset).
-    const { panel } = await openEditor(popup, page);
+    // The editor sometimes finds no target right after YouTube's first load (its page is still
+    // settling); a person reloads and opens it again, and so does the test, once.
+    const { panel } = await openEditor(popup, page).catch(async () => {
+      await page.reload({ waitUntil: 'domcontentloaded' });
+      await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30000 });
+      await page.waitForTimeout(3000);
+      return openEditor(popup, page);
+    });
     // On real YouTube the editor sometimes restores its session right after it opens and drops a
     // file chosen in that moment (no error is shown); choose it again once if no layer came.
     for (let attempt = 0; attempt < 2; attempt++) {
@@ -81,23 +89,59 @@ test('real YouTube: the room behind the UI, glass plates that keep text readable
         break;
     }
     await expect(panel.locator('.layer')).toHaveCount(1);
+    // Mixed artwork (the contest's demo): the room behind, and the Playground's resident in front
+    // at the player's bottom edge, under the guard.
+    const mixed = process.env.WW_SPACE_MIXED === '1';
+    const content = path.resolve('.work/space-live/content');
+    const { models } = mixed ? writeContent(path.resolve('.'), content) : { models: [] as string[] };
+    if (mixed) {
+      await panel.locator('.model-file').setInputFiles(
+        path.join(
+          content,
+          models.find((n) => n.endsWith('.vrm'))!,
+        ),
+      );
+      await expect(panel.locator('.layer')).toHaveCount(2, { timeout: 60000 });
+      await panel
+        .locator('.character-file')
+        .setInputFiles(models.filter((n) => n.endsWith('.vrma')).map((n) => path.join(content, n)));
+      await expect(panel.locator('.character-motions li')).toHaveCount(2, { timeout: 30000 });
+    }
     await panel.locator('.save').click();
     await expect(panel.locator('.dirty')).toHaveText('保存済み');
     await closeEditorPages(page);
     const saved = (await popup.evaluate(
       async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
-    )) as { decorations: { assetId: string }[] } & Record<string, unknown>;
-    const assetId = saved.decorations[0]!.assetId;
+    )) as { decorations: { assetId: string; source?: { format?: string } }[] } & Record<string, unknown>;
+    const assetId = saved.decorations.find((l) => l.source?.format !== 'vrm')!.assetId;
+    const residentLayer = saved.decorations.find((l) => l.source?.format === 'vrm');
+    const design = JSON.parse(await readFile(path.join(content, 'design.json'), 'utf8').catch(() => '{}'));
+    const resident = design.decorations?.find((l: { id: string }) => l.id === 'resident');
     const bright = process.env.WW_SPACE_BRIGHT === '1';
+    // The room lit so its shape reads (the test room's daylight layer); the night look otherwise.
+    const noon = Number(process.env.WW_SPACE_NOON ?? 0.12);
     await storeDesign(popup, {
       ...saved,
-      decorations: [],
+      decorations:
+        mixed && residentLayer && resident
+          ? [
+              {
+                ...residentLayer,
+                placement: { ...resident.placement, x: 0.9, y: 0.86, widthPx: 300, heightPx: 380 },
+                character: { ...resident.character, autonomy: false },
+              },
+            ]
+          : [],
       space: {
         ...DEFAULT_SPACE_LOOK,
         room: { assetId },
+        lights: { ...DEFAULT_SPACE_LOOK.lights, ...(noon > 0 ? { sun_noon: noon } : {}) },
         // The brightest the artwork can make the room: the readability check's worst case.
         ...(bright
-          ? { lights: { sun_night: 4, room_desk: 4, room_pendant: 4, screen: 4, screen_monitor: 4 }, videoLight: 2 }
+          ? {
+              lights: { sun_noon: 4, sun_night: 4, room_desk: 4, room_pendant: 4, screen: 4, screen_monitor: 4 },
+              videoLight: 2,
+            }
           : {}),
       },
     });
@@ -150,26 +194,67 @@ test('real YouTube: the room behind the UI, glass plates that keep text readable
     const left = await frame();
     expect(right.camera[0]).toBeGreaterThan(0.05);
     expect(left.camera[0]).toBeLessThan(-0.05);
+    if (mixed) {
+      // The front character is drawn (guarded), the room-depth part has none here.
+      await expect(page.locator('html')).toHaveAttribute('data-ww-guard', 'on');
+      await expect(page.locator('.model-media').first()).toHaveAttribute('data-renderer', 'three', { timeout: 60000 });
+    }
+    // Down to the comments: the left column's gaps between comments show the room.
     await page.mouse.wheel(0, 700);
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(1200);
+    await page
+      .locator('ytd-comments#comments')
+      .scrollIntoViewIfNeeded()
+      .catch(() => undefined);
+    await page.mouse.wheel(0, 300);
+    await expect.poll(() => page.locator('ytd-comment-view-model').count(), { timeout: 20000 }).toBeGreaterThan(2);
+    await page.waitForTimeout(2500);
     const scrolled = await frame();
     expect(scrolled.camera[2]).toBeGreaterThan(0.3);
-    await page.screenshot({ path: path.join(shots, `${scheme}-3-scrolled.png`), caret: 'initial' });
+    await page.screenshot({ path: path.join(shots, `${scheme}-3-comments.png`), caret: 'initial' });
+    await page.screenshot({
+      path: path.join(shots, `${scheme}-3-comments-gaps.png`),
+      caret: 'initial',
+      clip: { x: 0, y: 200, width: 760, height: 420 },
+    });
 
-    // Readability: inside the reading column's plate, the drawn background behind the text keeps
-    // the scheme's protected text at 4.5:1 (sampled on a grid over the whole column in view).
+    // Readability: inside every visible text part (each comment, each recommendation's text), the
+    // drawn background keeps the scheme's protected text at 4.5:1 (an 16 px grid).
+    // The points are behind the text itself: a grid over each run of text in view.
     const grid = await page.evaluate(() => {
-      const r = document.querySelector('ytd-watch-flexy #secondary-inner')!.getBoundingClientRect();
       const pts: [number, number][] = [];
-      for (let y = Math.max(r.top, 70) + 4; y < Math.min(r.bottom, innerHeight) - 4; y += 24)
-        for (let x = r.left + 4; x < r.right - 4; x += 24) pts.push([x, y]);
-      return pts;
+      const range = document.createRange();
+      for (const e of document.querySelectorAll(
+        'ytd-watch-flexy ytd-comment-view-model #main, ytd-watch-flexy yt-lockup-metadata-view-model, ytd-watch-metadata #title',
+      )) {
+        const walker = document.createTreeWalker(e, NodeFilter.SHOW_TEXT);
+        for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+          if (!node.nodeValue?.trim()) continue;
+          range.selectNodeContents(node);
+          for (const r of range.getClientRects())
+            for (let y = Math.max(r.top, 64) + 2; y < Math.min(r.bottom, innerHeight) - 2; y += 6)
+              // Text clipped by the page (an ellipsis past the column, under the scrollbar) is not shown.
+              for (
+                let x = Math.max(r.left, 0) + 1;
+                x < Math.min(r.right, document.documentElement.clientWidth) - 1;
+                x += 12
+              )
+                pts.push([x, y]);
+        }
+      }
+      return pts.slice(0, 4000);
     });
     const pixels = await roomPixels(page, grid);
     const text = PLATE_TEXT[scheme].text;
-    const worst = Math.min(...pixels.map(([r, g, b]) => contrast(text, luminance(r!, g!, b!))));
+    const ratios = pixels.map(([r, g, b]) => contrast(text, luminance(r!, g!, b!)));
+    const worst = Math.min(...ratios);
+    const at = grid[ratios.indexOf(worst)]!;
+    const where = await page.evaluate(([x, y]) => {
+      const e = document.elementFromPoint(x, y);
+      return `${e?.localName}#${e?.id}.${e?.className}`.slice(0, 80);
+    }, at);
     console.log(
-      `[space-live] ${scheme}${bright ? ' bright' : ''}: plate samples ${pixels.length}, worst contrast ${worst.toFixed(2)}`,
+      `[space-live] ${scheme}${bright ? ' bright' : ''}: plate samples ${pixels.length}, worst contrast ${worst.toFixed(2)} at ${at.map(Math.round).join(',')} (${where}) rgb ${pixels[ratios.indexOf(worst)]}`,
     );
     expect(worst).toBeGreaterThanOrEqual(READABLE_CONTRAST);
 
@@ -184,8 +269,24 @@ test('real YouTube: the room behind the UI, glass plates that keep text readable
     await page.locator('#movie_player .ytp-play-button').click();
     await expect.poll(paused).toBe(!before);
     await page.keyboard.press('t');
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(2500);
     await page.screenshot({ path: path.join(shots, `${scheme}-4-theater.png`), caret: 'initial' });
+    // The theater's sides: the room on both sides of the picture.
+    const sides = await page.evaluate(() => {
+      const v = document.querySelector('#movie_player video')!.getBoundingClientRect();
+      return { left: v.left, right: v.right, top: v.top, bottom: v.bottom };
+    });
+    if (sides.left > 40)
+      await page.screenshot({
+        path: path.join(shots, `${scheme}-4-theater-side.png`),
+        caret: 'initial',
+        clip: {
+          x: 0,
+          y: Math.max(0, sides.top),
+          width: Math.min(sides.left, 500),
+          height: Math.min(420, sides.bottom - sides.top),
+        },
+      });
     await page.keyboard.press('t');
     await page.setViewportSize({ width: 1100, height: 760 }).catch(() => undefined);
     await page.waitForTimeout(1500);

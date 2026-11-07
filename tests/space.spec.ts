@@ -111,7 +111,12 @@ test.describe('space: glass plates', () => {
       viewport,
     );
     expect(plates.map((p) => p.importance)).toEqual(['operate', 'read']);
-    expect(plates[0]).toMatchObject({ left: 4, top: 56, right: 1128 + PLATE_PAD_PX, bottom: 694 + PLATE_PAD_PX });
+    expect(plates[0]).toMatchObject({
+      left: 16 - PLATE_PAD_PX,
+      top: 68 - PLATE_PAD_PX,
+      right: 1128 + PLATE_PAD_PX,
+      bottom: 694 + PLATE_PAD_PX,
+    });
     expect(plates[1]!.bottom).toBe(viewport.height + PLATE_PAD_PX);
     expect(plates[1]!.right).toBe(viewport.width + PLATE_PAD_PX);
   });

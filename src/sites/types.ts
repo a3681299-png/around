@@ -99,6 +99,8 @@ export interface SiteBackdrop {
    * and kept while connected; reading them is a few box reads, never a document-wide query.
    */
   regions(): readonly import('../world/space').UiRegion[];
+  /** The page changed (the adapter's own page-change notice): parts may be looked for again. */
+  refresh?(): void;
   scheme(): import('../world/space').ColorScheme;
   /** The page's main video, whose colour lights the room; kept while connected. */
   video(): HTMLVideoElement | undefined;

@@ -53,8 +53,8 @@ import { SPACE_BREAK } from '../../host/world-options';
 const LAYER_LIMIT = 8;
 /** The least plate opacity by importance: a plate is seen as glass even over a dark room. */
 const PLATE_FLOOR = { operate: 0.32, read: 0.2 } as const;
-/** The room is drawn at this share of the canvas: it is mostly seen blurred through the plates. */
-const ROOM_SCALE = 0.75;
+/** The room is drawn at the canvas's own size: between the small plates it is seen sharp. */
+const ROOM_SCALE = 1;
 /** camera_main's distance to the room's middle (the dolly zoom's subject), docs/room-bake-plan.md. */
 export const ROOM_SUBJECT_M = 3.2;
 
@@ -172,7 +172,7 @@ function compositeShader() {
       uniform vec3 baseColor, videoColor, lampColor;
       uniform vec4 glass; // blur, refraction, highlight, tint
       uniform vec2 lightDir;
-      const float RADIUS = 12.0;
+      const float RADIUS = 10.0;
       float box(vec2 p, vec4 r) {
         vec2 c = (r.xy + r.zw) * 0.5, h = (r.zw - r.xy) * 0.5 - RADIUS;
         vec2 q = abs(p - c) - h;
@@ -197,11 +197,14 @@ function compositeShader() {
         vec2 shadowOffset = -lightDir * vec2(18.0, 26.0);
         for (int i = 0; i < PLATES; i++) {
           if (i >= plateCount) break;
-          float d = box(p, plates[i]);
+          vec4 r = plates[i];
+          if (plateInfo[i].y > 0.5) glow = max(glow, exp(-max(box(p, r), 0.0) / 260.0));
+          // Many small plates: one far from this pixel (beyond its shadow's reach) costs four compares.
+          if (p.x < r.x - 72.0 || p.x > r.z + 72.0 || p.y < r.y - 72.0 || p.y > r.w + 72.0) continue;
+          float d = box(p, r);
           if (d < inside) { inside = d; at = i; }
           // The plate's shadow on the room: the plate seen from the light, offset and softened.
-          shade = max(shade, 1.0 - smoothstep(-24.0, 36.0, box(p - shadowOffset, plates[i])));
-          if (plateInfo[i].y > 0.5) glow = max(glow, exp(-max(d, 0.0) / 260.0));
+          shade = max(shade, 1.0 - smoothstep(-16.0, 28.0, box(p - shadowOffset, r)));
         }
         vec3 back = room(uv, 0.0);
         // The plates darken the room behind them, and the video lights the room around itself.
@@ -216,10 +219,10 @@ function compositeShader() {
         // The outward normal from the box's gradient.
         vec2 n = normalize(vec2(box(p + vec2(1., 0.), plates[at]) - box(p - vec2(1., 0.), plates[at]),
                                 box(p + vec2(0., 1.), plates[at]) - box(p - vec2(0., 1.), plates[at])) + 1e-6);
-        // Refraction at the edge only: the room behind bends within 20 px of the edge; the middle,
-        // where the text is, is still.
-        float band = 1.0 - clamp(e / 20.0, 0.0, 1.0);
-        vec2 bend = n * glass.y * 16.0 * band * band;
+        // Refraction at the edge only: the room behind bends within 10 px of the edge (inside the
+        // plate's 8 px margin around the text, mostly); the middle, where the text is, is still.
+        float band = 1.0 - clamp(e / 10.0, 0.0, 1.0);
+        vec2 bend = n * glass.y * 12.0 * band * band;
         vec2 suv = (p - bend) / resolution;
         suv.y = 1.0 - suv.y;
         float lod = mix(1.0, 5.0, glass.x);
@@ -483,6 +486,9 @@ export async function createRoomRenderer(
         minFilter: LinearMipmapLinearFilter,
         magFilter: LinearFilter,
         depthBuffer: true,
+        // Seen sharp between the plates now: the furniture's edges are smoothed (resolved before
+        // the mip chain the frosted glass reads).
+        samples: 4,
       },
     );
     composite.uniforms['tRoom']!.value = roomTarget.texture;

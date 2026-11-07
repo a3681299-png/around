@@ -274,7 +274,10 @@ export function createSpaceHost(
       if (!renderer || renderer.canvas.hidden || !renderer.canvas.isConnected) return 'pending';
       return { parent: session!.slot.parent, zIndex: session!.slot.zIndex, after: renderer.canvas };
     },
-    changed: wake,
+    changed() {
+      backdrop.refresh?.();
+      wake();
+    },
     destroy: stop,
   };
 }

@@ -113,6 +113,9 @@ export interface UiRegion {
   importance: RegionImportance;
   /** The video's own box: it lights the room, and its plate is the video's colour. */
   video?: boolean;
+  /** The plate's margin around the region (default PLATE_PAD_PX). A bar that meets an opaque part
+   * of the page (the masthead) takes none, or the margin shows as a strip. */
+  pad?: number;
 }
 export interface GlassPlate {
   left: number;
@@ -122,20 +125,22 @@ export interface GlassPlate {
   importance: Exclude<RegionImportance, 'free'>;
   video: boolean;
 }
-export const PLATE_LIMIT = 12;
+/** One plate per part with text or controls (a comment, a recommendation's text, a button row). */
+export const PLATE_LIMIT = 48;
 /** The plate reaches this far past its region: scrolling can move the page a frame before the plate. */
-export const PLATE_PAD_PX = 12;
+export const PLATE_PAD_PX = 8;
 
 /** Plates for the regions that need one, in the viewport, at most PLATE_LIMIT (operate first). */
 export function glassPlates(regions: readonly UiRegion[], viewport: { width: number; height: number }): GlassPlate[] {
   const plates: GlassPlate[] = [];
   for (const r of regions) {
     if (r.importance === 'free' || !(r.width > 0) || !(r.height > 0)) continue;
+    const pad = Math.min(PLATE_PAD_PX, Math.max(0, r.pad ?? PLATE_PAD_PX));
     const plate = {
-      left: Math.max(-PLATE_PAD_PX, r.left - PLATE_PAD_PX),
-      top: Math.max(-PLATE_PAD_PX, r.top - PLATE_PAD_PX),
-      right: Math.min(viewport.width + PLATE_PAD_PX, r.left + r.width + PLATE_PAD_PX),
-      bottom: Math.min(viewport.height + PLATE_PAD_PX, r.top + r.height + PLATE_PAD_PX),
+      left: Math.max(-PLATE_PAD_PX, r.left - pad),
+      top: Math.max(-PLATE_PAD_PX, r.top - pad),
+      right: Math.min(viewport.width + PLATE_PAD_PX, r.left + r.width + pad),
+      bottom: Math.min(viewport.height + PLATE_PAD_PX, r.top + r.height + pad),
       importance: r.importance,
       video: Boolean(r.video),
     };

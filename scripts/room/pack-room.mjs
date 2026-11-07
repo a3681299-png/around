@@ -14,7 +14,16 @@ import { zlibSync } from 'fflate';
 import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
 import { FloatType } from 'three';
 
-export const ROOM_LAYERS = ['sun_night', 'room_desk', 'room_pendant', 'screen', 'screen_monitor'];
+export const ROOM_LAYERS = [
+  'sun_morning',
+  'sun_noon',
+  'sun_evening',
+  'sun_night',
+  'room_desk',
+  'room_pendant',
+  'screen',
+  'screen_monitor',
+];
 
 const crcTable = new Uint32Array(256).map((_, n) => {
   let c = n;
@@ -144,7 +153,8 @@ if (
     process.exit(2);
   }
   const loader = new EXRLoader().setDataType(FloatType);
-  const layers = ROOM_LAYERS.map((name) => {
+  // The contract's layers that were baked at this size (a room need not have every one).
+  const layers = ROOM_LAYERS.filter((name) => fs.existsSync(path.join(dir, `${name}-${size}.exr`))).map((name) => {
     const file = fs.readFileSync(path.join(dir, `${name}-${size}.exr`));
     const exr = loader.parse(file.buffer.slice(file.byteOffset, file.byteOffset + file.byteLength));
     const { png, scale } = encodeLayer(exr.width, exr.height, exr.data);
