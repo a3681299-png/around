@@ -128,17 +128,21 @@ test('real YouTube: a character read with its motions is seen, sits at home and 
       };
       requestAnimationFrame(tick);
     });
-    await page.waitForTimeout(6000);
     const frame = () =>
-      media(page).evaluate((e: HTMLElement) => {
-        const f = JSON.parse(e.dataset.modelFrame!);
-        return {
-          clip: f.clip as number | null,
-          behaviour: f.body?.autonomy?.behaviour as string | undefined,
-          seatEdge: f.body?.autonomy?.seat as string | undefined,
-          limited: Boolean(e.closest('[data-image-id]')?.hasAttribute('data-safety-limited')),
-        };
-      });
+      media(page).evaluate(
+        (e: HTMLElement) => {
+          const f = JSON.parse(e.dataset.modelFrame ?? '{}');
+          return {
+            clip: f.clip as number | null,
+            behaviour: f.body?.autonomy?.behaviour as string | undefined,
+            seatEdge: f.body?.autonomy?.seat as string | undefined,
+            seatWeight: f.body?.seatWeight as number | undefined,
+            limited: Boolean(e.closest('[data-image-id]')?.hasAttribute('data-safety-limited')),
+          };
+        },
+        undefined,
+        { timeout: 1000 },
+      );
     // A sequence of pictures of the player (for a person: no pose switched at once).
     let shot = 0;
     const sequence = async (ms: number) => {
@@ -168,8 +172,30 @@ test('real YouTube: a character read with its motions is seen, sits at home and 
       }
       return f;
     };
+    const seatedAtHome = async () => {
+      // A visible model can still be returning as the player settles. Wait for the completed
+      // transition and the actual resting clip before taking the picture or moving the pointer.
+      const expected = {
+        behaviour: 'rest',
+        seatEdge: 'bottom',
+        seatWeight: 1,
+        clip: ids.indexOf(assigned.rest!.motion),
+        limited: false,
+      };
+      let settled: Awaited<ReturnType<typeof frame>> | undefined;
+      await expect
+        .poll(
+          async () => {
+            settled = await frame().catch(() => undefined);
+            return settled;
+          },
+          { message: 'the character finishes returning and sits at home', timeout: 20000 },
+        )
+        .toEqual(expected);
+      return settled!;
+    };
     // Rest at home: seen, sitting on the lower edge, playing the rest motion.
-    const rest = await during('rest', 4000);
+    const rest = await seatedAtHome();
     report['rest'] = rest;
     report['restSeen'] = await seen('rest');
     await page.screenshot({ path: path.join(out, 'watching.png') });
@@ -195,7 +221,7 @@ test('real YouTube: a character read with its motions is seen, sits at home and 
     report['return'] = back;
     await sequence(2500);
     await page.screenshot({ path: path.join(out, 'return.png') });
-    await during('rest', 10000);
+    report['seatedAfterReturn'] = await seatedAtHome();
     await sequence(1500);
     // The pointer on the character: no frame held, nothing hidden (the flicker).
     const home = await box();
