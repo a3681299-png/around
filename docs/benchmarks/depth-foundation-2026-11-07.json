@@ -1,0 +1,307 @@
+{
+  "measuredAt": "2026-11-07",
+  "pc": "notebook i7-13650HX, Intel UHD (Chromium chooses it), 144Hz, offscreen headed 1920x1080",
+  "chromium": "153.0.8010.12",
+  "harness": "scripts/g11/run.mjs (G11_DEPTH), 2 pairs each, guarded vs unguarded in the same build",
+  "runs": {
+    "startup-front": {
+      "revision": "0764fff057bdc609de3dd38456558c0278eda01a",
+      "label": "depth front",
+      "videoUrl": "https://www.youtube.com/watch?v=M7lc1UVf-VE",
+      "pairs": [
+        {
+          "pair": 0,
+          "order": ["unguarded", "guarded"],
+          "guarded": {
+            "sum": 960.4,
+            "median": 1.200000001117587,
+            "p95": 2.300000000745058,
+            "max": 20.700000001117587,
+            "recaptures": 14,
+            "dropped": 2
+          },
+          "unguarded": {
+            "sum": 816,
+            "median": 1,
+            "p95": 2,
+            "max": 16.90000000037253,
+            "recaptures": 1,
+            "dropped": 0
+          },
+          "guardShareMs": 144.4
+        },
+        {
+          "pair": 1,
+          "order": ["guarded", "unguarded"],
+          "guarded": {
+            "sum": 897.7,
+            "median": 1.1000000014901161,
+            "p95": 2.300000000745058,
+            "max": 26.200000001117587,
+            "recaptures": 12,
+            "dropped": 8
+          },
+          "unguarded": {
+            "sum": 862.1,
+            "median": 1.099999999627471,
+            "p95": 2,
+            "max": 12.599999999627471,
+            "recaptures": 1,
+            "dropped": 0
+          },
+          "guardShareMs": 35.6
+        }
+      ]
+    },
+    "startup-room": {
+      "revision": "0764fff057bdc609de3dd38456558c0278eda01a",
+      "label": "depth room",
+      "videoUrl": "https://www.youtube.com/watch?v=M7lc1UVf-VE",
+      "pairs": [
+        {
+          "pair": 0,
+          "order": ["unguarded", "guarded"],
+          "guarded": {
+            "sum": 1192.2,
+            "median": 1.200000001117587,
+            "p95": 3.199999999254942,
+            "max": 86.80000000074506,
+            "recaptures": 4,
+            "dropped": 2
+          },
+          "unguarded": {
+            "sum": 1154.1,
+            "median": 1.1000000014901161,
+            "p95": 3.599999999627471,
+            "max": 65.80000000074506,
+            "recaptures": 1,
+            "dropped": 1
+          },
+          "guardShareMs": 38.1
+        },
+        {
+          "pair": 1,
+          "order": ["guarded", "unguarded"],
+          "guarded": {
+            "sum": 1125.4,
+            "median": 1.200000001117587,
+            "p95": 3.099999999627471,
+            "max": 62.5,
+            "recaptures": 6,
+            "dropped": 0
+          },
+          "unguarded": {
+            "sum": 1032.5,
+            "median": 1.1000000014901161,
+            "p95": 3.200000001117587,
+            "max": 78.19999999925494,
+            "recaptures": 0,
+            "dropped": 0
+          },
+          "guardShareMs": 92.9
+        }
+      ]
+    },
+    "startup-room2": {
+      "revision": "0764fff057bdc609de3dd38456558c0278eda01a",
+      "label": "depth room v2",
+      "videoUrl": "https://www.youtube.com/watch?v=M7lc1UVf-VE",
+      "pairs": [
+        {
+          "pair": 0,
+          "order": ["unguarded", "guarded"],
+          "guarded": {
+            "sum": 1092.5,
+            "median": 1.200000001117587,
+            "p95": 3.199999999254942,
+            "max": 75.30000000074506,
+            "recaptures": 1,
+            "dropped": 0
+          },
+          "unguarded": {
+            "sum": 1177.7,
+            "median": 1.199999999254942,
+            "p95": 3.100000001490116,
+            "max": 134.60000000149012,
+            "recaptures": 0,
+            "dropped": 0
+          },
+          "guardShareMs": -85.2
+        },
+        {
+          "pair": 1,
+          "order": ["guarded", "unguarded"],
+          "guarded": {
+            "sum": 1017,
+            "median": 1.199999999254942,
+            "p95": 2.5,
+            "max": 68.09999999962747,
+            "recaptures": 1,
+            "dropped": 0
+          },
+          "unguarded": {
+            "sum": 1068.6,
+            "median": 1.199999999254942,
+            "p95": 2.699999999254942,
+            "max": 75,
+            "recaptures": 0,
+            "dropped": 0
+          },
+          "guardShareMs": -51.6
+        }
+      ]
+    },
+    "spa-front": {
+      "revision": "0764fff057bdc609de3dd38456558c0278eda01a",
+      "label": "depth front",
+      "videoUrl": "https://www.youtube.com/watch?v=M7lc1UVf-VE",
+      "pairs": [
+        {
+          "pair": 0,
+          "order": ["unguarded", "guarded"],
+          "guarded": {
+            "sum": 1131.1,
+            "median": 1.299999998882413,
+            "p95": 2.599999999627471,
+            "max": 16.300000000745058,
+            "recaptures": 14,
+            "dropped": 3
+          },
+          "unguarded": {
+            "sum": 882.1,
+            "median": 1.099999999627471,
+            "p95": 1.900000000372529,
+            "max": 9.399999998509884,
+            "recaptures": 0,
+            "dropped": 0
+          },
+          "guardShareMs": 249
+        },
+        {
+          "pair": 1,
+          "order": ["guarded", "unguarded"],
+          "guarded": {
+            "sum": 1079.8,
+            "median": 1.1000000014901161,
+            "p95": 2.5,
+            "max": 20.5,
+            "recaptures": 15,
+            "dropped": 0
+          },
+          "unguarded": {
+            "sum": 895.4,
+            "median": 1,
+            "p95": 2.200000001117587,
+            "max": 11.099999999627471,
+            "recaptures": 0,
+            "dropped": 0
+          },
+          "guardShareMs": 184.4
+        }
+      ]
+    },
+    "spa-room": {
+      "revision": "0764fff057bdc609de3dd38456558c0278eda01a",
+      "label": "depth room",
+      "videoUrl": "https://www.youtube.com/watch?v=M7lc1UVf-VE",
+      "pairs": [
+        {
+          "pair": 0,
+          "order": ["unguarded", "guarded"],
+          "guarded": {
+            "sum": 1412.2,
+            "median": 1.699999999254942,
+            "p95": 4,
+            "max": 103.10000000149012,
+            "recaptures": 0,
+            "dropped": 1
+          },
+          "unguarded": {
+            "sum": 967.8,
+            "median": 1.099999999627471,
+            "p95": 2.800000000745058,
+            "max": 78.59999999962747,
+            "recaptures": 0,
+            "dropped": 5
+          },
+          "guardShareMs": 444.4
+        },
+        {
+          "pair": 1,
+          "order": ["guarded", "unguarded"],
+          "guarded": {
+            "sum": 1005.9,
+            "median": 1.099999999627471,
+            "p95": 2.700000001117587,
+            "max": 52.29999999888241,
+            "recaptures": 0,
+            "dropped": 0
+          },
+          "unguarded": {
+            "sum": 1039.8,
+            "median": 1.099999999627471,
+            "p95": 2.599999999627471,
+            "max": 59.5,
+            "recaptures": 0,
+            "dropped": -1
+          },
+          "guardShareMs": -33.9
+        }
+      ]
+    },
+    "spa-room2": {
+      "revision": "7cb2cadc3fbf6ac8ee3e3fc4c43406ef8b9667dd",
+      "label": "depth room v2",
+      "videoUrl": "https://www.youtube.com/watch?v=M7lc1UVf-VE",
+      "pairs": [
+        {
+          "pair": 0,
+          "order": ["unguarded", "guarded"],
+          "guarded": {
+            "sum": 1020.8,
+            "median": 1.099999999627471,
+            "p95": 2.5,
+            "max": 52.100000001490116,
+            "recaptures": 0,
+            "dropped": 6
+          },
+          "unguarded": {
+            "sum": 992.5,
+            "median": 1,
+            "p95": 2.699999999254942,
+            "max": 102.40000000037253,
+            "recaptures": 0,
+            "dropped": 1
+          },
+          "guardShareMs": 28.3
+        },
+        {
+          "pair": 1,
+          "order": ["guarded", "unguarded"],
+          "guarded": {
+            "sum": 1062,
+            "median": 1.199999999254942,
+            "p95": 2.5,
+            "max": 48.5,
+            "recaptures": 0,
+            "dropped": 2
+          },
+          "unguarded": {
+            "sum": 1079.4,
+            "median": 1.1000000005587935,
+            "p95": 2.400000000372529,
+            "max": 57.5,
+            "recaptures": 0,
+            "dropped": 3
+          },
+          "guardShareMs": -17.4
+        }
+      ]
+    }
+  },
+  "notes": {
+    "startup-room": "before the fix: room-depth artwork was drawn in front under the guard while the room loaded",
+    "startup-room2/spa-room2": "room-depth artwork waits for the room (pending); the guard never runs",
+    "frontVsRoomRender": "unguarded sums differ by the room rendering (both arms draw the room in the room runs)"
+  }
+}
