@@ -1,0 +1,21 @@
+{
+  "vrm": "0689d7cd51616474bc2f2fa7045df07cf3ecbea1ae7d884d29266031c0929bc8",
+  "motions": {
+    "Crouch_Idle_Loop": "3e5dabc4fd687b77da63df9083122d75ab896a14a766e1344c0c669027569c5b",
+    "Dance_Loop": "48659c9cf203b46c2da2c1af2797dd234e0967a0d9ae877bab80cd21002c79a3",
+    "Hit_Chest": "321d7cf3c0fb09568c388c6e3b1b8b7689e5bcd4d8813bdad3682f12e39504b2",
+    "Hit_Head": "01026f7283bc9c7d3e0190d54f4336dac21deb7ca32a789122a3f45e69e2e4a4",
+    "Idle_Loop": "228b33b24ffde192ea86e666e4baca21cc1fc5e2f308b800df6023da42869941",
+    "Idle_Talking_Loop": "d637af2fc8efccd7deed4e90487b96fb5f5ac4f93bd4a8d3d77752992f67a369",
+    "Interact": "073e8f137fda7841dbf859870fee7ebf6d8ca3d37e12a06dd9f5139a01e758ee",
+    "Jog_Fwd_Loop": "7ac3e23d1b619d88c4d32e566a1196db2044bbfdb0ce138179886057b2b8c8bb",
+    "Jump_Land": "d417150b5ebff26e8fc3eb7a164a2555f38c4e5277de167c3f84fdd155c8ded9",
+    "Sitting_Enter": "2f2aac7af8ff466f136222cd1eeead14087ed71d1376106859a609322e63eb2f",
+    "Sitting_Exit": "e5860c5beac064b8ee9c86ad0787ff66af67ddf2e065a3d2aa2e02fa1556f2c8",
+    "Sitting_Idle_Loop": "00a62fa8e2b74e0e05fb8f3a06d780ab4f59741246f5b4eb3fe740e84db6c409",
+    "Sitting_Talking_Loop": "519f0cdfdf252ea23611e117b6d9d246c7f1a3d57df475971db767d4db83c7a7",
+    "Spell_Simple_Idle_Loop": "61e072bb01ecec5021b5b4f6914352d29fe9330ba639f0e749e4f5d6791a5a48",
+    "Walk_Formal_Loop": "142e0298acab989df450fd93329cf1fab21fa93246e1b6aa318e3630e7595464",
+    "Walk_Loop": "2bc58e1694416a3c1c5b26a680d52661fe65c9a2335402eb6c93c97b073edd55"
+  }
+}

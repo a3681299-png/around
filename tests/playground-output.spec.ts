@@ -65,3 +65,13 @@ test('the forbidden names are found in text files too (a copied notice or path)'
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('a substituted model is refused even under an allowed hashed filename', () => {
+  const file = `content/asset-${'a'.repeat(64)}.vrm`;
+  const root = folder({ [file]: 'different bytes' });
+  try {
+    expect(check(root, ['content/a1.vrm', file])).toEqual([`${file}: contents do not match the asset hash`]);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});

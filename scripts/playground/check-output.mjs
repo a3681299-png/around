@@ -1,5 +1,6 @@
 // The Playground is public: its output must never carry the private character (トルーシェ),
 // a private model (PochibyKT_Pochi*) or Mixamo-derived motion (docs/playground-plan.md).
+import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
@@ -23,8 +24,12 @@ export function playgroundOutputProblems(root, allowedModels) {
     if (MODEL_FILE.test(label) && !allowedModels.includes(label))
       problems.push(`${label}: a model or motion the Playground build did not make`);
     // Text and glTF JSON chunks are readable as latin1; this finds bone names, metadata and paths.
-    const text = readFileSync(path).toString('latin1');
-    const utf8 = readFileSync(path).toString('utf8');
+    const bytes = readFileSync(path);
+    const hash = /^content\/asset-([a-f0-9]{64})\.(?:vrm|vrma)$/.exec(label)?.[1];
+    if (hash && createHash('sha256').update(bytes).digest('hex') !== hash)
+      problems.push(`${label}: contents do not match the asset hash`);
+    const text = bytes.toString('latin1');
+    const utf8 = bytes.toString('utf8');
     for (const pattern of FORBIDDEN)
       if (pattern.test(text) || pattern.test(utf8)) {
         problems.push(`${label}: contains ${pattern}`);
