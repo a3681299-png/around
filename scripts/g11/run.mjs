@@ -181,7 +181,8 @@ async function area(name) {
     regions,
   };
   result.areas.push(row);
-  await page.screenshot({ path: path.join(work, name + '.png') });
+  // caret 'initial': hiding the caret restyles inputs, which the guard answers by holding the art.
+  await page.screenshot({ path: path.join(work, name + '.png'), caret: 'initial' });
   await save();
   console.log(
     'AREA ' +
@@ -684,7 +685,7 @@ try {
           ).slice(0, 1800),
         }),
     );
-    await page.screenshot({ path: path.join(work, 'failure.png') }).catch(() => {});
+    await page.screenshot({ path: path.join(work, 'failure.png'), caret: 'initial' }).catch(() => {});
   }
   console.error(error.stack);
   process.exitCode = 1;

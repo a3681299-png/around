@@ -16,6 +16,7 @@ import { defaultFollowMotion } from '../src/signals/motion';
 import { commitDesign, editDesign, freezeTree, readDesign, shareDesign } from '../src/design/immutable';
 import { inspectAsset } from '../src/assets/inspect';
 import { vrmFixture } from './helpers/vrm-fixture';
+import { CHARACTER_HOME } from '../src/characters/home';
 
 function harness(validateAssets: () => Promise<void> = async () => undefined) {
   let value: DesignDocument | undefined,
@@ -853,6 +854,55 @@ test('geometry snapshots during asset preflight preserve selection until import 
   await h.editor.execute({ type: 'undo' });
   expect(h.editor.snapshot().document).toEqual(old.document);
   h.editor.destroy();
+});
+
+test('a model is imported at the character home on the player, under its bars; an image keeps the viewport default', async () => {
+  const h = harness(),
+    model = inspectAsset(vrmFixture()).model!;
+  await Promise.resolve();
+  h.editor.setEnabled(true);
+  h.editor.open();
+  try {
+    await h.editor.import([{ id: `asset-${'d'.repeat(64)}`, name: 'Character.vrm', width: 256, height: 256, model }]);
+    await h.editor.import([assets[0]!]);
+    const [character, image] = h.editor.snapshot().document.decorations;
+    // Watching shows it right away: a model on the screen plane over the video is cut out where
+    // the player's bars are, so a fresh import there was invisible until it was moved.
+    expect(character).toMatchObject({ kind: 'model3d', placement: CHARACTER_HOME });
+    expect(image!.placement.anchor).toEqual({ kind: 'viewport' });
+  } finally {
+    h.editor.destroy();
+  }
+});
+
+test('without a player on the page, or dropped at a point, a model is imported on the viewport as before', async () => {
+  const h = harness(),
+    model = inspectAsset(vrmFixture()).model!;
+  const frame = h.ports.geometry.frameFor;
+  h.ports.geometry.frameFor = (placement) => (placement.anchor.kind === 'viewport' ? frame(placement) : undefined);
+  await Promise.resolve();
+  h.editor.setEnabled(true);
+  h.editor.open();
+  try {
+    await h.editor.import([{ id: `asset-${'e'.repeat(64)}`, name: 'Character.vrm', width: 256, height: 256, model }]);
+    expect(h.editor.snapshot().document.decorations[0]!.placement).toMatchObject({
+      anchor: { kind: 'viewport' },
+      x: 0.45,
+      y: 0.45,
+    });
+    h.ports.geometry.frameFor = frame;
+    await h.editor.import([{ id: `asset-${'f'.repeat(64)}`, name: 'Dropped.vrm', width: 256, height: 256, model }], {
+      x: 100,
+      y: 80,
+    });
+    expect(h.editor.snapshot().document.decorations[1]!.placement).toMatchObject({
+      anchor: { kind: 'viewport' },
+      x: 0.1,
+      y: 0.1,
+    });
+  } finally {
+    h.editor.destroy();
+  }
 });
 
 test('reimporting a VRM refreshes its body without adding a layer or losing edits and history', async () => {

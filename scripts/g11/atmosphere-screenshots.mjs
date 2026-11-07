@@ -64,7 +64,9 @@ for (const scheme of ['light', 'dark']) {
   await page.evaluate(() => document.querySelector('video')?.pause());
   await page.mouse.wheel(0, 500);
   await page.waitForTimeout(2500);
-  await page.screenshot({ path: `${out}/real-${scheme}-none.png` });
+  // caret 'initial': the default hides the caret by restyling inputs, which the guard answers by
+  // holding the artwork for a moment (tests/fixtures.ts keepCaretInScreenshots).
+  await page.screenshot({ path: `${out}/real-${scheme}-none.png`, caret: 'initial' });
   // Import through the validated editor path, then make it a full-viewport atmosphere layer.
   const kinds = scheme === 'light' ? ['#ffffff', 'gradient'] : ['#000000', 'gradient'];
   await popup.locator('#creator-editor-open').evaluate((b) => b.click());
@@ -157,7 +159,7 @@ for (const scheme of ['light', 'dark']) {
       };
     });
     const name = `real-${scheme}-${kind === 'gradient' ? 'gradient' : kind === '#ffffff' ? 'white' : 'black'}-33`;
-    await page.screenshot({ path: `${out}/${name}.png` });
+    await page.screenshot({ path: `${out}/${name}.png`, caret: 'initial' });
     results.push({ scheme, name, ...state });
   }
   await context.close();

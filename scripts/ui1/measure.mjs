@@ -460,7 +460,7 @@ try {
 } catch (error) {
   result.failure = error.stack;
   await save();
-  await shared?.page.screenshot({ path: path.join(work, 'failure.png') }).catch(() => {});
+  await shared?.page.screenshot({ path: path.join(work, 'failure.png'), caret: 'initial' }).catch(() => {});
   console.error(error.stack);
   process.exitCode = 1;
 } finally {
