@@ -87,7 +87,7 @@ export function writeContent(root: string, out: string): { models: string[] } {
     writeFileSync(join(out, to), readFileSync(join(root, 'tests/fixtures/motion', from)));
   const model = inspectAsset(vrm).model!;
   const design = parseDesign({
-    schemaVersion: 15,
+    schemaVersion: 16,
     id: 'playground-custom',
     siteId: 'playground',
     baseThemeId: null,
