@@ -2,13 +2,14 @@ import { test, expect, type Page } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import { createServer, type Server } from 'node:http';
 import { mkdirSync, readFileSync, statSync } from 'node:fs';
-import { extname, join, normalize, resolve } from 'node:path';
+import { extname, join, normalize, resolve, sep } from 'node:path';
 
 /**
  * The Playground without the extension (docs/playground-plan.md): our own static site, the WWT
  * page runtime, plain headless Chromium. The build carries a read-only test hook (WW_PLAYGROUND_TEST).
  */
 const out = resolve('.work/playground-e2e');
+const mirdoOut = resolve('.work/playground-mirdo-e2e');
 const shots = resolve('.work/playground-shots');
 const types: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
@@ -27,14 +28,22 @@ test.use({ channel: 'chromium', headless: true });
 
 test.beforeAll(async () => {
   execFileSync(process.execPath, ['scripts/build-playground.mjs'], {
-    env: { ...process.env, WW_PLAYGROUND_OUT: '.work/playground-e2e', WW_PLAYGROUND_TEST: '1' },
+    env: {
+      ...process.env,
+      WW_PLAYGROUND_MIRDO_ROOT: undefined,
+      WW_PLAYGROUND_OUT: '.work/playground-e2e',
+      WW_PLAYGROUND_TEST: '1',
+    },
     stdio: 'pipe',
   });
   mkdirSync(shots, { recursive: true });
   server = createServer((request, response) => {
-    const path = normalize(join(out, decodeURIComponent(new URL(request.url!, 'http://x').pathname)));
+    const pathname = decodeURIComponent(new URL(request.url!, 'http://x').pathname);
+    const mirdo = pathname.startsWith('/mirdo/');
+    const folder = mirdo ? mirdoOut : out;
+    const path = normalize(join(folder, mirdo ? pathname.slice('/mirdo'.length) : pathname));
     const file = path.endsWith('\\') || path.endsWith('/') ? join(path, 'index.html') : path;
-    if (!file.startsWith(out) || !statSync(file, { throwIfNoEntry: false })?.isFile()) {
+    if (!file.startsWith(folder + sep) || !statSync(file, { throwIfNoEntry: false })?.isFile()) {
       response.writeHead(404).end();
       return;
     }
@@ -65,6 +74,73 @@ const model = (page: Page) =>
   page.locator(
     ':is(#web-world-themes-decorations, #web-world-themes-page-decorations, #web-world-themes-video-decorations) .model-media',
   );
+
+test('Mirdo starts on the lower edge and moves to the upper edge with the imported motions', async ({ page }) => {
+  test.skip(!process.env.WW_PLAYGROUND_MIRDO_ROOT, 'Requires the approved external asset checkout.');
+  test.setTimeout(60000);
+  execFileSync(process.execPath, ['scripts/build-playground.mjs'], {
+    env: { ...process.env, WW_PLAYGROUND_OUT: '.work/playground-mirdo-e2e' },
+    stdio: 'pipe',
+  });
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto(origin + '/mirdo/');
+  await expect(page.locator('#apply')).toHaveText('元に戻す');
+  await expect(page.getByRole('link', { name: /ミルド／ragooou/ })).toHaveAttribute(
+    'href',
+    'https://booth.pm/ja/items/6614116',
+  );
+  await expect(page.getByRole('link', { name: /Quaternius Universal Animation Library/ })).toBeVisible();
+  await expect(model(page)).toHaveAttribute('data-renderer', 'three', { timeout: 20000 });
+  const ids = await page.evaluate(async () => {
+    const design = await (await fetch('content/design.json')).json();
+    return design.decorations
+      .find((layer: { id: string }) => layer.id === 'resident')
+      .character.motions.map((m: { id: string }) => m.id) as string[];
+  });
+  const state = () =>
+    model(page).evaluate((e: HTMLElement, ids: string[]) => {
+      const f = JSON.parse(e.dataset.modelFrame ?? '{}');
+      const box = e.closest('[data-image-id]')!.getBoundingClientRect();
+      const player = document.querySelector('.player')!.getBoundingClientRect();
+      const seat = f.body?.autonomy?.seat;
+      return {
+        motion: ids[f.clip],
+        behaviour: f.body?.autonomy?.behaviour,
+        seat,
+        weight: f.body?.seatWeight,
+        onEdge: Math.abs(box.y + box.height / 2 - (seat === 'top' ? player.top : player.bottom)) < 1,
+      };
+    }, ids);
+  await expect.poll(state, { timeout: 10000 }).toMatchObject({
+    motion: 'sitting-idle-loop',
+    behaviour: 'rest',
+    seat: 'bottom',
+    weight: 1,
+    onEdge: true,
+  });
+  const box = (await model(page).boundingBox())!;
+  const player = (await page.locator('.player').boundingBox())!;
+  const x = box.x + box.width / 2,
+    y = player.y + player.height - 88;
+  await page.mouse.move(player.x + 35, y);
+  await page.waitForTimeout(200);
+  await page.mouse.move(x - 56, y, { steps: 4 });
+  await expect.poll(state).toMatchObject({ behaviour: 'flee', motion: 'jog-fwd-loop' });
+  // Leave the character, keeping the pointer on the lower side of the player.
+  await page.mouse.move(6, y);
+  await expect.poll(state, { timeout: 10000 }).toMatchObject({ behaviour: 'return', motion: 'walk-loop', seat: 'top' });
+  await expect.poll(state, { timeout: 15000 }).toMatchObject({
+    motion: 'sitting-idle-loop',
+    behaviour: 'rest',
+    seat: 'top',
+    weight: 1,
+    onEdge: true,
+  });
+  const volume = page.getByRole('slider', { name: '音量' });
+  await volume.focus();
+  await volume.press('ArrowLeft');
+  await expect(volume).toHaveValue('59');
+});
 
 test('without the extension, 適用 switches the site to the artwork and back', async ({ page }) => {
   const problems = await open(page);

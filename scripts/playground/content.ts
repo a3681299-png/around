@@ -1,8 +1,5 @@
-// Builds the Playground's content folder from material made in this repository only: the
-// mannequin VRM and its one-frame poses (tests/helpers/mannequin.ts), synthetic videos
-// (scripts/generate-media-fixtures.mjs) and a background drawn here. No third-party avatar,
-// Mixamo motion or private model. Shota's own VRM and Blender poses replace them later: the
-// character's motions keep the same roles (sit, idle).
+// The public build imports only the approved Mirdo files from the external asset checkout.
+// Tests without that checkout use the generated mannequin and its poses.
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -13,8 +10,20 @@ import { inspectVrma } from '../../src/assets/vrma';
 import { parseDesign } from '../../src/design/schema';
 import { defaultModelSettings } from '../../src/models/types';
 import { CHARACTER_HOME } from '../../src/characters/home';
+import { assignBehaviours, classifyMotion } from '../../src/characters/auto-motions';
+import type { CharacterMotion } from '../../src/characters/settings';
+import mirdoAssets from './mirdo-assets.json' with { type: 'json' };
 
 const sha = (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('hex');
+
+function readApproved(root: string, file: string, hash: string): Uint8Array {
+  const bytes = readFileSync(join(root, 'mirdo', file));
+  if (sha(bytes) !== hash)
+    throw new Error(
+      `Playground asset differs from the approved version: ${file}. Check the asset checkout and Git LFS.`,
+    );
+  return bytes;
+}
 
 /** A small PNG: a light green room-like gradient with a lighter band, drawn pixel by pixel. */
 function backgroundPng(width: number, height: number): Buffer {
@@ -60,7 +69,7 @@ function backgroundPng(width: number, height: number): Buffer {
   ]);
 }
 
-export function writeContent(root: string, out: string): { models: string[] } {
+export function writeContent(root: string, out: string, mirdoRoot?: string): { models: string[] } {
   mkdirSync(out, { recursive: true });
   const assets: Record<string, { file: string; name: string }> = {};
   const add = (bytes: Uint8Array, ext: string, name: string) => {
@@ -70,12 +79,32 @@ export function writeContent(root: string, out: string): { models: string[] } {
     assets[id] = { file, name };
     return id;
   };
-  const vrm = new Uint8Array(mannequinVrm());
-  const vrmId = add(vrm, 'vrm', 'WW mannequin.vrm');
-  // One-frame poses as the character's motions: index 0 sits on the edge, 1 stands.
-  const poses = (['sit', 'stand'] as const).map((name) => {
-    const bytes = new Uint8Array(mannequinPoseVrma(name, MANNEQUIN_POSES[name]));
-    return { name, bytes, id: add(bytes, 'vrma', `${name}.vrma`), info: inspectVrma(bytes).info };
+  const vrm = mirdoRoot
+    ? readApproved(mirdoRoot, 'work/mirdo-1024.vrm', mirdoAssets.vrm)
+    : new Uint8Array(mannequinVrm());
+  const motionFiles = mirdoRoot
+    ? Object.entries(mirdoAssets.motions).map(([name, hash]) => ({
+        name,
+        bytes: readApproved(mirdoRoot, `motions-pass/${name}.vrma`, hash),
+      }))
+    : (['sit', 'stand'] as const).map((name) => ({
+        name,
+        bytes: new Uint8Array(mannequinPoseVrma(name, MANNEQUIN_POSES[name])),
+      }));
+  const vrmId = add(vrm, 'vrm', mirdoRoot ? 'ミルド.vrm' : 'WW mannequin.vrm');
+  const motions = motionFiles.map(({ name, bytes }): CharacterMotion => {
+    const source = inspectVrma(bytes).info;
+    const guess = mirdoRoot
+      ? classifyMotion(name, source)
+      : ({ role: name === 'sit' ? 'sit' : 'idle', loop: true } as const);
+    return {
+      id: name.toLowerCase().replaceAll('_', '-'),
+      assetId: add(bytes, 'vrma', `${name}.vrma`),
+      role: guess.role,
+      origin: 'character',
+      loop: guess.loop,
+      source,
+    };
   });
   const background = new Uint8Array(backgroundPng(480, 270));
   const backgroundId = add(background, 'png', 'room.png');
@@ -117,7 +146,7 @@ export function writeContent(root: string, out: string): { models: string[] } {
         kind: 'model3d',
         id: 'resident',
         assetId: vrmId,
-        name: '試験用のマネキン',
+        name: mirdoRoot ? 'ミルド' : '試験用のマネキン',
         // Home is the player's bottom-right corner, over the fullscreen button's place (Shota's
         // decision, chunk 3). The anchor is the player (a part kind, the same ID on YouTube), so
         // it follows theater mode, fullscreen and any window size there as here.
@@ -128,25 +157,19 @@ export function writeContent(root: string, out: string): { models: string[] } {
         visible: true,
         locked: false,
         source: model,
-        model: { ...defaultModelSettings(model), clip: 0, playing: true, loop: true },
+        model: { ...defaultModelSettings(model), clip: mirdoRoot ? null : 0, playing: true, loop: true },
         character: {
           standardMotions: 'auto',
           // The autonomy on, with a middling personality (v15).
           autonomy: true,
           personality: { shyness: 0.6, curiosity: 0.6, sleepiness: 0.5 },
-          motions: poses.map((pose) => ({
-            id: pose.name,
-            assetId: pose.id,
-            role: pose.name === 'sit' ? 'sit' : 'idle',
-            origin: 'character',
-            loop: true,
-            source: pose.info,
-          })),
+          motions,
+          ...(mirdoRoot ? { behaviourMotions: assignBehaviours(motions, undefined) } : {}),
         },
       },
     ],
   });
   writeFileSync(join(out, 'design.json'), JSON.stringify(design, null, 2));
   writeFileSync(join(out, 'manifest.json'), JSON.stringify({ design: 'design.json', assets }, null, 2));
-  return { models: [assets[vrmId]!.file, ...poses.map((pose) => assets[pose.id]!.file)] };
+  return { models: [assets[vrmId]!.file, ...motions.map((motion) => assets[motion.assetId]!.file)] };
 }

@@ -8,6 +8,7 @@ import { createEditorSession } from '../editor-core/session';
 import type { EditCommand, EditorCheckpoint, EditorSnapshot } from '../editor-core/types';
 import { shortcutCommand } from '../editor-core/shortcuts';
 import { createBrowserEditorStorage, type BrowserImportSource } from '../browser/storage-adapter';
+import { readSavedThrough } from '../browser/design-store';
 import type { TimelineHost } from '../host/timeline';
 import type { TimelineCommand, TimelineUpdate } from '../timeline/types';
 import type { SkinAssetStatus } from '../design/renderer';
@@ -176,7 +177,7 @@ export function createCreatorEditor(
     },
   });
   let state = core.snapshot();
-  const editing = () => state.active && Boolean(remoteOwner);
+  const editing = () => state.active && !state.recoveryPending && Boolean(remoteOwner);
   const fullscreen = () => Boolean(doc.fullscreenElement);
   const dispatch = (command: EditCommand) => {
     void core.execute(command).catch((error: unknown) => {
@@ -524,13 +525,15 @@ export function createCreatorEditor(
         throw new Error('このYouTubeは別のエディターで編集中です。そちらの接続を解除してください。');
       if (handoff && state.view.saving) throw new Error('保存処理の完了後に切り替えてください。');
       if (handoff && core.gestureActive) await core.execute({ type: 'end', cancel: true });
-      const existed = state.active,
-        opened = core.open();
+      const existed = state.active;
+      if (existed && !remoteOwner && !state.view.saving) core.checkDetachedRecovery();
+      const savedThrough = !existed && resume ? await readSavedThrough(site.id) : undefined;
+      const opened = core.open();
       if (!opened.ok) throw new Error(opened.error);
       remoteOwner = owner;
       remoteSurface = surface;
       try {
-        if (!existed && resume) await core.restore(resume);
+        if (!existed && resume && !state.recoveryPending) await core.restore(resume, savedThrough);
         refresh();
         return core.snapshot();
       } catch (error) {
@@ -564,16 +567,19 @@ export function createCreatorEditor(
     },
     async import(owner, session, revision, files) {
       authorize(owner, session, revision);
+      if (state.recoveryPending) throw new Error('先に作業中のコピーを復元するか選んでください。');
       await core.import(files);
       return core.snapshot();
     },
     async importSkin(owner, session, revision, files, slot) {
       authorize(owner, session, revision);
+      if (state.recoveryPending) throw new Error('先に作業中のコピーを復元するか選んでください。');
       await core.importSkin(files, slot);
       return core.snapshot();
     },
     async importMotions(owner, session, revision, files, layer, labels, origin) {
       authorize(owner, session, revision);
+      if (state.recoveryPending) throw new Error('先に作業中のコピーを復元するか選んでください。');
       await core.importMotions(layer, files, labels, origin);
       return core.snapshot();
     },

@@ -220,8 +220,9 @@ export function createStudioStateDecoder() {
     sequence = 0;
   return {
     accept(payload: StudioStatePayload): { state: EditorSnapshot; checkpoint: EditorCheckpoint } | undefined {
+      const full = payload.checkpoint ? unpackCheckpoint(payload.checkpoint) : undefined;
       let next = payload.state,
-        history = payload.checkpoint ? unpackCheckpoint(payload.checkpoint)?.history : undefined;
+        history = full?.history;
       let nextSequence = payload.sequence;
       if (payload.delta) {
         const delta = payload.delta;
@@ -234,11 +235,14 @@ export function createStudioStateDecoder() {
       }
       if (!next) return;
       if (!history || nextSequence === undefined) throw new Error('エディターの初期状態がありません。');
-      const nextCheckpoint: EditorCheckpoint = {
+      const saved = next.draftBase ? next.draftBase.saved : next.saved;
+      const pending = next.recoveryPending ? (full ?? checkpoint) : undefined;
+      const nextCheckpoint: EditorCheckpoint = pending ?? {
         version: 1,
         siteId: next.document.siteId,
+        origin: { sessionId: next.sessionId, revision: next.checkpointRevision ?? next.revision },
         draft: next.document,
-        ...(next.saved ? { saved: next.saved } : {}),
+        ...(saved ? { saved } : {}),
         selectedIds: [...next.view.selectedIds],
         ...(next.selectedTarget ? { selectedTarget: next.selectedTarget } : {}),
         tool: next.view.tool ?? 'select',

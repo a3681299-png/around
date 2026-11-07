@@ -410,7 +410,10 @@ async function handle(
     }
     validateDocumentAssets(design, assets);
     if (message['action'] === 'validate') return undefined;
-    await saveDesign(design);
+    const revision = message['revision'];
+    if (revision !== undefined && (typeof revision !== 'number' || !Number.isSafeInteger(revision) || revision < 0))
+      throw new Error('保存する編集の版が不正です。');
+    await saveDesign(design, typeof revision === 'number' ? { sessionId: lease.session, revision } : undefined);
   } else throw new Error('未対応の素材操作です。');
   // Cleanup is secondary to a successful save; a failed cleanup retains assets.
   await profileAsync(trace, 'store.prune-after-command', () => prune(lease)).catch(() => undefined);

@@ -25,6 +25,8 @@ export function parseEditCommand(value: unknown): EditCommand {
     undo: [],
     redo: [],
     discard: [],
+    'restore-draft': [],
+    'keep-saved': [],
     save: [],
     close: [],
     begin: [],

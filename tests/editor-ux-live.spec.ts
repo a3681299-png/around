@@ -8,6 +8,52 @@ import { openEditor } from './helpers/editor';
 import { beginCanvasGesture, visiblePart } from './helpers/editor-workspace';
 import { errorSummary, waitForAdvertToEnd } from './helpers/youtube-live';
 
+test('optional signed-out YouTube: save and reopen Studio three times', async ({}, info) => {
+  test.skip(process.env.WW_LIVE_STUDIO_RECOVERY !== '1', 'Explicit real YouTube Studio recovery validation.');
+  test.setTimeout(120_000);
+  const profileRoot = process.env.WW_TEST_PROFILE_ROOT ?? tmpdir();
+  const context = await launchExtension(await mkdtemp(path.join(profileRoot, 'ww-recovery-')), false, {
+    headed: true,
+    width: 1440,
+    height: 950,
+  });
+  try {
+    const worker = context.serviceWorkers()[0] ?? (await context.waitForEvent('serviceworker'));
+    const popup = await context.newPage();
+    await popup.goto(`chrome-extension://${new URL(worker.url()).host}/popup/index.html`);
+    const page = await context.newPage();
+    await page.goto(process.env.WW_LIVE_VIDEO_URL ?? 'https://www.youtube.com/watch?v=LC1a-DwUhls', {
+      waitUntil: 'domcontentloaded',
+    });
+    await showArtwork(popup);
+    await expect(page.locator('[data-ww-surface~="player-window"]')).toBeVisible({ timeout: 20_000 });
+    let editor = await openEditor(popup, page);
+    await editor.panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
+    for (const round of [1, 2, 3]) {
+      const name = `保存した花 ${round}`;
+      const input = editor.panel.getByLabel('レイヤー名', { exact: true });
+      await input.fill(name);
+      await input.press('Tab');
+      await editor.panel.getByRole('button', { name: '保存', exact: true }).click();
+      await expect(editor.panel.locator('.status')).toHaveText('保存しました。');
+      await editor.studio.close();
+      // The second round keeps the original page alive. The first and third
+      // exercise recovery after its editing session is gone.
+      if (round !== 2) await page.reload({ waitUntil: 'domcontentloaded' });
+      editor = await openEditor(popup, page);
+      const layer = editor.panel.getByRole('button', { name, exact: true });
+      await expect(layer).toBeVisible();
+      await expect(editor.panel.locator('.dirty')).toHaveText('保存済み');
+      await expect(editor.studio.getByRole('region', { name: '作業中のコピーの復旧' })).toBeHidden();
+      await layer.click();
+    }
+    await editor.studio.screenshot({ path: info.outputPath('studio-reopened.png') });
+    await page.screenshot({ path: info.outputPath('youtube-reopened.png') });
+  } finally {
+    await context.close();
+  }
+});
+
 test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and cleanup', async () => {
   test.skip(process.env.WW_LIVE_EDITOR_UX !== '1', 'Explicit real YouTube UI validation.');
   test.setTimeout(120_000);

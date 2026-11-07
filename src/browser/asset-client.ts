@@ -222,7 +222,8 @@ export const loadAssetMetadata = (id: string) => request<AssetMetadata>('get-met
 
 export const retainAssets = (session: string, ids: readonly string[]) => request<void>('lease', { session, ids });
 export const releaseAssets = (session: string) => request<void>('release', { session });
-export const commitDesign = (design: DesignDocument, session: string) => request<void>('save', { design, session });
+export const commitDesign = (design: DesignDocument, session: string, revision: number) =>
+  request<void>('save', { design, session, revision });
 export const checkDesignAssets = (design: DesignDocument, session: string) =>
   request<void>('validate', { design, session });
 

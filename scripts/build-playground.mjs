@@ -3,6 +3,7 @@
 //   node scripts/build-playground.mjs                   → dist-playground/
 //   WW_PLAYGROUND_OUT=.work/x node scripts/build-playground.mjs
 //   WW_PLAYGROUND_TEST=1 adds the read-only test hook (window.__wwPlayground) for e2e only.
+//   WW_PLAYGROUND_MIRDO_ROOT points at the external wwt-private-assets checkout.
 import { build } from 'esbuild';
 import { copyFileSync, mkdirSync, rmSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
@@ -18,6 +19,8 @@ if (
 )
   throw new Error('WW_PLAYGROUND_OUT must be dist-playground or a direct .work child.');
 const test = process.env.WW_PLAYGROUND_TEST === '1';
+const mirdoRoot = process.env.WW_PLAYGROUND_MIRDO_ROOT;
+if (!test && !mirdoRoot) throw new Error('Set WW_PLAYGROUND_MIRDO_ROOT to the wwt-private-assets checkout.');
 
 rmSync(output, { recursive: true, force: true });
 mkdirSync(join(output, 'content'), { recursive: true });
@@ -41,6 +44,7 @@ await build({
     __WW_ASSET_PROFILE__: 'false',
     __WW_G11__: 'false',
     __WW_PLAYGROUND_TEST__: String(test),
+    __WW_PLAYGROUND_MIRDO__: String(Boolean(mirdoRoot)),
     // The same switch as the extension's (scripts/build.mjs): layering unless WW_LAYERING=0 (chunk 4).
     __WW_LAYERING__: String(process.env.WW_LAYERING !== '0'),
   },
@@ -67,14 +71,15 @@ await build({
   logLevel: 'warning',
 });
 const { writeContent } = await import(pathToFileURL(generator).href + `?${Date.now()}`);
-const { models } = writeContent(root, join(output, 'content'));
-
-const problems = playgroundOutputProblems(
-  output,
-  models.map((file) => `content/${file}`),
-);
-if (problems.length) {
+try {
+  const { models } = writeContent(root, join(output, 'content'), mirdoRoot);
+  const problems = playgroundOutputProblems(
+    output,
+    models.map((file) => `content/${file}`),
+  );
+  if (problems.length) throw new Error('Playground output refused:\n' + problems.join('\n'));
+} catch (error) {
   rmSync(output, { recursive: true, force: true });
-  throw new Error('Playground output refused:\n' + problems.join('\n'));
+  throw error;
 }
 console.log(`Playground: ${relative(root, output) || '.'} (static files only${test ? ', test hook' : ''})`);

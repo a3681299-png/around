@@ -7,7 +7,7 @@ import {
   type StudioRequest,
   type StudioTarget,
 } from '../studio/protocol';
-import type { EditCommand, EditorCheckpoint, EditorSnapshot } from '../editor-core/types';
+import type { EditCommand, EditorCheckpoint, EditorRevision, EditorSnapshot } from '../editor-core/types';
 import { ASSET_LIMITS } from '../assets/validation';
 import { ASSET_MESSAGES } from '../assets/limits';
 import { releaseAssets } from './asset-client';
@@ -23,7 +23,7 @@ import { OPEN_SIDE_PANEL, OPEN_STUDIO_WINDOW } from '../editor/messages';
 import type { TimelinePort, TimelineCommand, TimelineUpdate } from '../timeline/types';
 export function createStudioClient(
   notify: (value: StudioConnectionState) => void,
-  checkpointChanged: (target: number, checkpoint: EditorCheckpoint | undefined) => void,
+  checkpointChanged: (target: number, checkpoint: EditorCheckpoint | undefined, origin: EditorRevision) => void,
   visibilityDocument?: Document,
 ): StudioConnection {
   const owner = `studio-${crypto.randomUUID()}`;
@@ -114,28 +114,25 @@ export function createStudioClient(
     if (state && next.sessionId === state.sessionId && next.revision < state.revision) return;
     state = next;
     if (!connected) return;
+    const origin = { sessionId: next.sessionId, revision: next.revision };
+    // During a choice the checkpoint is the offered draft, while the
+    // snapshot shows the saved artwork.
+    if (next.recoveryPending) {
+      if (next.active && checkpoint && checkpoint !== backup) {
+        backup = checkpoint;
+        if (tabId !== undefined) checkpointChanged(tabId, backup, backup.origin ?? origin);
+      }
+      return;
+    }
     if (!next.active) {
       // The edit ended on the page (OFF, 緊急OFF or 編集を終了): an import still being read
       // here can no longer land, so its reading stops and its decoded frames close now.
       cancelImport();
       backup = undefined;
-      if (tabId !== undefined) checkpointChanged(tabId, undefined);
-    } else {
-      if (checkpoint) backup = checkpoint;
-      if (backup) {
-        backup = {
-          ...backup,
-          draft: next.document,
-          ...(next.saved ? { saved: next.saved } : {}),
-          selectedIds: [...next.view.selectedIds],
-          tool: next.view.tool ?? 'select',
-          snapping: next.view.snapping,
-        };
-        if (!next.saved) delete backup.saved;
-        if (next.selectedTarget) backup.selectedTarget = next.selectedTarget;
-        else delete backup.selectedTarget;
-        if (tabId !== undefined) checkpointChanged(tabId, backup);
-      }
+      if (tabId !== undefined) checkpointChanged(tabId, undefined, origin);
+    } else if (checkpoint && !next.view.saving) {
+      backup = checkpoint;
+      if (tabId !== undefined) checkpointChanged(tabId, backup, backup.origin ?? origin);
     }
   };
   const request = (value: Omit<StudioRequest, 'id'>): Promise<Extract<StudioMessage, { type: 'reply' }>> => {

@@ -9,6 +9,7 @@ import { createFetchAssets, type PlaygroundManifest } from './assets';
 import { mountPlayer } from './player';
 
 declare const __WW_PLAYGROUND_TEST__: boolean;
+declare const __WW_PLAYGROUND_MIRDO__: boolean;
 
 async function start() {
   mountPlayer(document);
@@ -26,7 +27,7 @@ async function start() {
   });
   controller.updateDesign(design);
   const apply = document.querySelector<HTMLButtonElement>('#apply')!;
-  let applied = false,
+  let applied = __WW_PLAYGROUND_MIRDO__,
     stopped = false;
   const render = () => {
     controller.update({ enabled: applied, creatorMode: false });
@@ -45,7 +46,9 @@ async function start() {
       controller.suspend(stopped);
     }
   });
+  document.querySelector<HTMLElement>('#mirdo-credits')!.hidden = !__WW_PLAYGROUND_MIRDO__;
   render();
+  apply.disabled = false;
   if (__WW_PLAYGROUND_TEST__)
     Object.assign(globalThis, {
       __wwPlayground: { controls: () => playgroundControls(document) },
