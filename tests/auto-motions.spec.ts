@@ -102,7 +102,9 @@ test("the autonomy's behaviours get the best motion of each kind; the author's c
   // author changed stay (they differ from what the earlier set would have given).
   const first = motions.filter((m) => ['idle-loop', 'jog-fwd-loop'].includes(m.id));
   const early = assignBehaviours(first, undefined);
-  expect(early).toMatchObject({ rest: { motion: 'idle-loop' }, approach: { motion: 'jog-fwd-loop' } });
+  // (No walk yet: going home runs, but approaching is left to the computed motion.)
+  expect(early).toMatchObject({ rest: { motion: 'idle-loop' }, return: { motion: 'jog-fwd-loop' } });
+  expect(early.approach).toBeUndefined();
   expect(reassignBehaviours(first, motions, early)).toMatchObject({
     rest: { motion: 'sitting-idle-loop' },
     approach: { motion: 'walk-loop' },

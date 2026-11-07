@@ -3,7 +3,8 @@ import { test, expect } from '@playwright/test';
 import { parseDesign } from '../src/design/schema';
 import { migrateV14ToV15 } from '../src/design/migrations';
 import { applyCharacterPatch, BEHAVIOUR_NAMES } from '../src/characters/settings';
-import { BEHAVIOURS } from '../src/world/autonomy';
+import { AUTONOMY, BEHAVIOURS } from '../src/world/autonomy';
+import { gaitSpeedPx, matchGait } from '../src/world/gait';
 import { evaluateWorld, initialWorldState } from '../src/world/evaluate';
 import type { DesignDocument, ModelDecoration } from '../src/design/types';
 
@@ -18,6 +19,8 @@ const motion = (id: string, duration: number) => {
   base.id = id;
   base.role = 'move';
   base.source.duration = duration;
+  // In place: these motions test the assignment; a travelling walk's gait is tested below.
+  base.source.hipsTravel = [0, 0, 0];
   return base;
 };
 const document = (behaviourMotions?: unknown, version = 15, extra: Record<string, unknown> = {}) => {
@@ -170,6 +173,102 @@ test('without an assignment, or with the autonomy off, the author’s clip plays
   );
   for (const f of plain) expect(assignedClips).not.toContain(f.clip);
   expect(off.map((f) => [f.clip, f.timeMs])).toEqual(plain.map((f) => [f.clip, f.timeMs]));
+});
+
+test('a walk that travels: going home it walks at the speed its feet keep, playing at the matching rate, never hopping', () => {
+  const doc = parseDesign(document({ ...assignment, return: { motion: 'walk', from: 0, to: 1, speed: 1 } }));
+  const character = characterOf(doc),
+    walk = character.motions.find((m) => m.id === 'walk')!;
+  // The walk's hips go 0.4 m forward in its 1 s (its rest hips 0.9 m high).
+  walk.source = { ...walk.source, hipsTravel: [0, 0, 0.4] };
+  const layer = doc.decorations[0] as ModelDecoration;
+  const natural = gaitSpeedPx(walk, layer.source.vrm?.body, layer.placement.heightPx)!;
+  const { rate, speedPx } = matchGait(AUTONOMY.returnSpeed, natural);
+  // Frightened away, then the pointer leaves: it goes home with the walk.
+  let state = initialWorldState();
+  const frames: {
+    behaviour: string | undefined;
+    clip: number | null;
+    timeMs: number;
+    hop: number;
+    x: number;
+    yaw: number;
+  }[] = [];
+  // (This walk is slow, 32 px/s at its fastest: home takes a while.)
+  for (let i = 0; i < 1600; i++) {
+    const t = i * 16;
+    const result = evaluateWorld(doc, state, {
+      timeMs: t,
+      deltaMs: i ? 16 : 0,
+      viewport: { width: 1100, height: 760 },
+      anchors: {},
+      signals: { playing: true, pointer: t < 1500 ? rush(t) : { x: 10, y: 10 } },
+      events: [],
+      environment: { hidden: false, reducedMotion: false },
+    });
+    state = result.state;
+    const m = result.frame.models![0]!;
+    const body = state.models?.['trusie']?.body as { autonomy?: { behaviour: string; offset: { x: number } } };
+    frames.push({
+      behaviour: body?.autonomy?.behaviour,
+      clip: m.clip,
+      timeMs: m.timeMs,
+      hop: m.pose?.offset.y ?? 0,
+      x: body?.autonomy?.offset.x ?? 0,
+      yaw: m.yawDeg,
+    });
+  }
+  const going = frames.filter((f, i) => f.behaviour === 'return' && frames[i + 1]?.behaviour === 'return');
+  expect(going.length).toBeGreaterThan(10);
+  const walkIndex = character.motions.findIndex((m) => m.id === 'walk');
+  const [a, b] = [going[3]!, going[4]!];
+  expect(b.clip).toBe(walkIndex);
+  // The walk plays at the rate that keeps up, and the body moves at the walk's speed.
+  expect((b.timeMs - a.timeMs + 1000) % 1000).toBeCloseTo(16 * rate, 3);
+  expect(Math.abs(b.x - a.x)).toBeCloseTo(speedPx * 0.016, 1);
+  // Walking, not hopping, and turned the way it goes (it fled right, so home is to the left).
+  for (const f of going) expect(f.hop).toBe(0);
+  expect(going.at(-2)!.x).toBeLessThan(going[0]!.x);
+  expect(going.at(-2)!.yaw).toBeCloseTo(-90, 0);
+  // Home again, it turns back to the viewer.
+  expect(frames.at(-1), JSON.stringify(frames.slice(-3))).toMatchObject({ behaviour: 'rest', yaw: 0 });
+});
+
+test('between sitting and standing, the motion that sits down or stands up plays once first', () => {
+  const doc = parseDesign(document());
+  const character = characterOf(doc);
+  // A sitting loop, a once-through motion that lowers the hips and one that raises them.
+  const sitLoop = { ...motion('perch', 2), role: 'sit' };
+  const down = { ...motion('perch-down', 0.5), role: 'sit', loop: false };
+  down.source = { ...down.source, hipsTravel: [0, -0.3, 0] };
+  const up = { ...motion('perch-up', 0.4), role: 'sit', loop: false };
+  up.source = { ...up.source, hipsTravel: [0, 0.3, 0] };
+  character.motions.push(sitLoop, down, up);
+  character.behaviourMotions = {
+    rest: { motion: 'perch', from: 0, to: 2, speed: 1 },
+    flee: { motion: 'hop', from: 0, to: 2.6, speed: 1 },
+    approach: { motion: 'walk', from: 0, to: 1, speed: 1 },
+    return: { motion: 'walk', from: 0, to: 1, speed: 1 },
+  };
+  const parsed = parseDesign(doc);
+  const ids = characterOf(parsed).motions.map((m) => m.id);
+  const frames = run(parsed, 700, (t) => (t < 1500 ? rush(t) : { x: 10, y: 10 }));
+  // Sitting at rest; frightened, it springs away at once (no getting up first).
+  expect(frames[3]!.clip).toBe(ids.indexOf('perch'));
+  const fled = frames.findIndex((f) => f.clip === ids.indexOf('hop'));
+  expect(fled).toBeGreaterThan(3);
+  expect(frames.slice(0, fled).some((f) => f.clip === ids.indexOf('perch-up'))).toBe(false);
+  // Home again, it sits down with the motion that lowers the hips (once, from its start), then sits.
+  const lowering = frames.findIndex((f, i) => i > fled && f.clip === ids.indexOf('perch-down'));
+  expect(lowering).toBeGreaterThan(fled);
+  expect(frames[lowering]!.timeMs).toBeLessThan(40);
+  const sat = frames.findIndex((f, i) => i > lowering && f.clip === ids.indexOf('perch'));
+  expect((sat - lowering) * 16).toBeGreaterThanOrEqual(500 - 32);
+  // A slow, curious pointer: it gets up with the motion that raises the hips, then walks.
+  const curious = run(parsed, 300, (t) => ({ x: 550 - 260 + Math.min(t, 1500) * 0.1, y: 380 }));
+  const rising = curious.findIndex((f) => f.clip === ids.indexOf('perch-up'));
+  expect(rising).toBeGreaterThan(0);
+  expect(curious.slice(rising).some((f) => f.clip === ids.indexOf('walk'))).toBe(true);
 });
 
 test('the author’s own timed motion comes first: no behaviour motion replaces it', () => {

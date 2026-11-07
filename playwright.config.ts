@@ -7,6 +7,7 @@ const unitSpecs = [
   'unitypackage',
   'auto-motions',
   'check-motions',
+  'gait',
   'clean-work',
   'backup-data',
   'browser-boundary',

@@ -19,6 +19,9 @@ export interface WorldGeometry {
    * size, so a small regular part is never reduced. Recorded in World recordings (the input as
    * evaluated); not in a take (takeInput drops it: takes are artwork data with their own format). */
   reducedParts?: Readonly<Record<string, number>>;
+  /** By anchor ID: the part's edges a character may sit on, as the site adapter reports them (a
+   * kind of edge, never a site's name). Absent: none, and a character rests at its home point. */
+  seats?: Readonly<Record<string, readonly ('top' | 'bottom')[]>>;
 }
 export type WorldEvent =
   { type: 'video.play' | 'video.pause' | 'video.ended' | 'host.lifecycle' } | { type: 'pointer.click'; point: Point };

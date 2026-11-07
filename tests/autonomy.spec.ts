@@ -250,6 +250,80 @@ test("the author's motion and reduced motion leave it at home", () => {
   expect(state!.autonomy).toBeUndefined();
 });
 
+test('with seats on its part it rests sitting on an edge, never in the air, and picks the edge itself', () => {
+  // The player's frame and its two edges (the adapter names them; the world sees only the edges).
+  const room = { left: 400, top: 200, width: 900, height: 500 };
+  const seats = [
+    { edge: 'bottom' as const, y: 700 },
+    { edge: 'top' as const, y: 200 },
+  ];
+  const seated = (t: number) => ({ room, seats, timeMs: t });
+  // At rest it goes to the lower edge and sits there: its anchor point on the edge itself (the box
+  // overhangs the edge; that is what sitting on it means), sideways where it was.
+  const settled = run(0, 3000, (t) => ({ ...seated(t), pointer: { x: 100, y: 100 } }));
+  expect(settled.state.seat).toBe('bottom');
+  expect(home.y + settled.last.offset.y).toBeCloseTo(700, 0);
+  expect(settled.last.offset.x).toBeCloseTo(0, 0);
+  // Left alone for long, bored of the place: it changes edges (before it dozes off).
+  const bored = run(3016, 45000, (t) => ({ ...seated(t), idleSeconds: 3 + t / 1000 }), settled.state);
+  expect(bored.state.seat).toBe('top');
+  expect(home.y + bored.last.offset.y).toBeCloseTo(200, 0);
+  expect(bored.frames.some((f) => f.state.behaviour === 'doze')).toBe(false);
+  // Frightened up off its edge with the pointer staying near: it never rests in the air; once
+  // calm it goes to the edge farther from the pointer and rests there.
+  const corner = { ...room, left: 400, width: 700 }; // home at the room's right side: it flees up
+  const stay = run(
+    3016,
+    12000,
+    (t) => ({ room: corner, seats, timeMs: t, ...rush(3200)(t), idleSeconds: 0 }),
+    settled.state,
+  );
+  expect(stay.frames.some((f) => f.state.behaviour === 'flee')).toBe(true);
+  const onEdge = (f: (typeof stay.frames)[number]) => seats.some((q) => Math.abs(home.y + f.offset.y - q.y) < 1);
+  for (const f of stay.frames.filter((g) => g.state.behaviour === 'rest')) expect(onEdge(f)).toBe(true);
+  // (With the pointer near and slow afterwards, it may well come closer: curiosity.)
+  expect(stay.frames.some((f) => f.state.behaviour === 'return')).toBe(true);
+  // Dozing off away from its edge (here, half way up the part): it goes to its edge to doze.
+  const drowsy = run(
+    0,
+    90000,
+    (t) => ({
+      room,
+      seats,
+      timeMs: t,
+      idleSeconds: 30 + t / 1000,
+      personality: { ...DEFAULT_PERSONALITY, sleepiness: 1 },
+    }),
+    { ...initialAutonomy(), seat: 'bottom', offset: { x: 0, y: -100 }, target: { x: 0, y: -100 } },
+  );
+  const dozing = drowsy.frames.filter((f) => f.state.behaviour === 'doze');
+  expect(dozing.length).toBeGreaterThan(0);
+  // (Bored first, it may have changed edges: either edge, never in between.)
+  expect(seats.some((q) => Math.abs(home.y + dozing.at(-1)!.offset.y - q.y) < 1)).toBe(true);
+  // A fright along an edge sends it sideways on that edge (it stays seated there).
+  const scared = run(45016, 46500, (t) => ({ ...seated(t), ...rush(45200)(t), idleSeconds: 0 }), bored.state);
+  expect(scared.frames.some((f) => f.state.behaviour === 'flee')).toBe(true);
+  expect(home.y + scared.last.offset.y).toBeCloseTo(200, 0);
+  // Off its edge (it fled up from the lower one) with the pointer lately by the lower edge: going
+  // home, it takes the edge farther from the pointer, the upper one.
+  const off = {
+    ...initialAutonomy(),
+    seat: 'bottom' as const,
+    behaviour: 'flee' as const,
+    offset: { x: 150, y: -50 },
+    target: { x: 150, y: -50 },
+    pointer: { x: home.x - 300, y: 690 },
+    pointerTime: 0,
+    nearAt: 0,
+  };
+  const back = run(2000, 8000, (t) => ({ ...seated(t), pointer: { x: home.x - 300, y: 690 } }), off);
+  expect(back.frames.some((f) => f.state.behaviour === 'return')).toBe(true);
+  expect(back.state.seat).toBe('top');
+  expect(home.y + back.last.offset.y).toBeCloseTo(200, 0);
+  // Without seats nothing changes: it rests at its home point.
+  expect(run(0, 3000, () => ({ pointer: { x: 100, y: 100 } })).last.offset).toEqual({ x: 0, y: 0 });
+});
+
 test('recorded autonomy states read back exactly; malformed ones are refused', () => {
   const { state } = run(0, 2000, rush(100));
   expect(parseAutonomyState(JSON.parse(JSON.stringify(state)))).toEqual(state);

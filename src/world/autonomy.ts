@@ -41,7 +41,12 @@ export interface AutonomyState {
   pointerTime: number | null;
   /** When the pointer was last near (for the return). */
   nearAt: number | null;
+  /** The edge of its part it sits on at rest, when the part has seats (absent: its home point). */
+  seat?: SeatEdge;
 }
+/** An edge of the part a character lives on that it can sit on (the adapter says which). */
+export type SeatEdge = 'top' | 'bottom';
+export const SEAT_EDGES: readonly SeatEdge[] = ['bottom', 'top'];
 export function initialAutonomy(): AutonomyState {
   return {
     boredom: 0,
@@ -72,6 +77,12 @@ export interface AutonomyContext {
   idleSeconds: number;
   playing: boolean;
   personality: Personality;
+  /** The edges of its part it may sit on (page px of each edge line), from the site adapter
+   * through the host. With seats, home at rest is a point on an edge, not the authored point. */
+  seats?: readonly { edge: SeatEdge; y: number }[];
+  /** By behaviour: the speed (px/s) its walk or run keeps the feet still at (src/world/gait.ts).
+   * Such a move walks there at that speed instead of hopping. */
+  gaits?: Partial<Record<Behaviour, number>>;
 }
 export interface AutonomyOutput {
   offset: Point;
@@ -98,8 +109,16 @@ export const AUTONOMY = Object.freeze({
   returnAfterMs: 1400,
   /** A behaviour lasts at least this long before another can take over (ms). */
   dwellMs: 600,
+  /** Bored this much while sitting, it moves to its part's other edge. */
+  seatBoredom: 0.8,
+  /** Going home within this long of the pointer being near, it takes the edge away from it (ms). */
+  seatAvoidMs: 10000,
 });
 
+declare const __WW_AUTONOMY_PACE__: number | undefined;
+/** 1 in every product build. A development build (WW_AUTONOMY_PACE, scripts/build.mjs, inside .work
+ * only) speeds the inner states up to see a doze or a change of seat without waiting minutes. */
+const PACE = typeof __WW_AUTONOMY_PACE__ === 'number' ? __WW_AUTONOMY_PACE__ : 1;
 const clamp = (v: number, low = 0, high = 1) => Math.max(low, Math.min(high, v));
 const distance = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
 
@@ -137,9 +156,9 @@ export function evaluateAutonomy(
     if (near) s.nearAt = t;
   }
   // Internal states, fixed formulas: rises with what happens (or does not), decays otherwise.
-  const quiet = context.idleSeconds >= 3;
-  s.boredom = clamp(s.boredom + (quiet ? dt / 40 : -dt / 4));
-  s.sleepy = clamp(s.sleepy + (context.idleSeconds >= 10 ? (dt / 90) * (0.5 + p.sleepiness) : -dt / 2));
+  const quiet = context.idleSeconds * PACE >= 3;
+  s.boredom = clamp(s.boredom + (quiet ? (dt / 40) * PACE : -dt / 4));
+  s.sleepy = clamp(s.sleepy + (context.idleSeconds * PACE >= 10 ? (dt / 90) * (0.5 + p.sleepiness) * PACE : -dt / 2));
   s.startles = Math.max(0, s.startles - dt / 120);
   s.alert = clamp(s.alert - dt / 6);
   if (near && closing > AUTONOMY.fastApproach) {
@@ -148,10 +167,32 @@ export function evaluateAutonomy(
     s.startles = Math.min(20, s.startles + 1);
     s.sleepy = 0;
   }
+  // Seats (the edges of its part): at rest it sits on one, its anchor point on the edge line, the
+  // box overhanging it (so it never rests in the air). It takes the lower edge first; back from a
+  // fright, the edge farther from the pointer; bored of a place, the other edge.
+  const seats = context.seats?.length ? context.seats : undefined;
+  const seatAt = (edge: SeatEdge | undefined) => seats?.find((q) => q.edge === edge) ?? seats?.[0];
+  /** Only called with seats. */
+  const pickSeat = (avoid: Point | null): SeatEdge => {
+    const all = seats!;
+    if (!avoid || all.length < 2) return (seatAt(s.seat) ?? all[0]!).edge;
+    return [...all].sort((a, b) => Math.abs(b.y - avoid.y) - Math.abs(a.y - avoid.y))[0]!.edge;
+  };
+  if (seats && !seats.some((q) => q.edge === s.seat)) s.seat = pickSeat(null);
   // Utility AI: each behaviour scores from the states and the situation; the best one wins,
   // after the current one has had its minimum time.
   const away = s.nearAt === null || t - s.nearAt > AUTONOMY.returnAfterMs;
-  const offHome = Math.hypot(s.offset.x, s.offset.y) > 2;
+  const homeOffset = (): Point => {
+    const seat = seatAt(s.seat);
+    return seat ? { x: s.offset.x, y: seat.y - context.home.y } : { x: 0, y: 0 };
+  };
+  const offHome = distance(s.offset, homeOffset()) > 2;
+  if (seats && seats.length > 1 && s.behaviour === 'rest' && !offHome && s.boredom >= AUTONOMY.seatBoredom) {
+    // A change of place: to the other edge, a little less bored for it.
+    s.seat = seats.find((q) => q.edge !== s.seat)!.edge;
+    s.boredom = AUTONOMY.seatBoredom / 2;
+    s.target = homeOffset();
+  }
   const scores: Record<Behaviour, number> = {
     rest: 0.2,
     flee: near && s.alert > 0.45 ? s.alert : 0,
@@ -159,7 +200,9 @@ export function evaluateAutonomy(
     approach:
       near && speed < AUTONOMY.slowApproach && s.alert < 0.25 ? (0.1 + 0.6 * p.curiosity) * (1 - 0.4 * p.shyness) : 0,
     doze: s.sleepy > 0.6 && s.alert < 0.2 ? s.sleepy : 0,
-    return: offHome && away && s.alert < 0.45 ? 0.5 : 0,
+    // With seats it sits only on an edge: off its edge, it goes back once calm even with the
+    // pointer near (to the edge farther from the pointer), rather than rest in the air.
+    return: offHome && (away || seats) && s.alert < 0.45 ? 0.5 : 0,
   };
   // Offsets that keep the whole drawn box inside its room (a margin of its half width/height).
   // Where the room is narrower than the box, the box's middle stays at the room's middle.
@@ -188,23 +231,37 @@ export function evaluateAutonomy(
           ? { x, y: s.offset.y }
           : { x: keepX(s.offset.x + side * 0.4 * h), y: keepY(s.offset.y - AUTONOMY.fleeHeights * h) };
     }
-    if (best === 'return' || best === 'rest') s.target = best === 'return' ? { x: 0, y: 0 } : { ...s.offset };
+    if (best === 'return') {
+      // Away from the pointer only if it was near lately (a fright); else the edge it had.
+      const recent = s.nearAt !== null && t - s.nearAt < AUTONOMY.seatAvoidMs ? s.pointer : null;
+      if (seats) s.seat = pickSeat(recent);
+      s.target = seats ? { x: 0, y: homeOffset().y } : { x: 0, y: 0 };
+    }
+    // Resting off its edge with the pointer still near, it stays put; going back is the return's
+    // (once the pointer is away), not a rest's.
+    if (best === 'rest') s.target = seats && away ? homeOffset() : { ...s.offset };
   }
+  if (seats && s.behaviour === 'rest' && !offHome) s.target = homeOffset();
+  // It dozes off only where it sits: on its edge (going there first if it is elsewhere).
+  if (seats && s.behaviour === 'doze') s.target = homeOffset();
   if (s.behaviour === 'approach' && context.pointer) {
     // A little toward the pointer, never onto it, and not far from home.
     const dx = context.pointer.x - body.x,
       reach = Math.max(-0.7 * h, Math.min(0.7 * h, s.offset.x + Math.sign(dx) * Math.max(0, Math.abs(dx) - 0.9 * h)));
     s.target = { x: keepX(reach), y: s.offset.y };
   }
-  // Move toward the target at the behaviour's speed; a quick move hops.
+  // Move toward the target at the behaviour's speed; a quick move hops, a walk or a run walks.
+  const gait = context.gaits?.[s.behaviour];
   const speedPx =
-    s.behaviour === 'flee'
-      ? AUTONOMY.fleeSpeed
-      : s.behaviour === 'approach'
-        ? AUTONOMY.approachSpeed
-        : s.behaviour === 'return'
-          ? AUTONOMY.returnSpeed
-          : 0;
+    gait !== undefined
+      ? gait
+      : s.behaviour === 'flee'
+        ? AUTONOMY.fleeSpeed
+        : s.behaviour === 'approach'
+          ? AUTONOMY.approachSpeed
+          : s.behaviour === 'return' || (seats && (s.behaviour === 'rest' || s.behaviour === 'doze'))
+            ? AUTONOMY.returnSpeed
+            : 0;
   const gap = distance(s.target, s.offset),
     step = Math.min(gap, speedPx * dt);
   if (gap > 0.01 && step > 0) {
@@ -213,7 +270,7 @@ export function evaluateAutonomy(
       y: s.offset.y + ((s.target.y - s.offset.y) / gap) * step,
     };
   }
-  const moving = gap > 1 && speedPx > 200;
+  const moving = gap > 1 && speedPx > 200 && gait === undefined;
   const round = (v: number) => Math.round(v * 100) / 100;
   s.offset = { x: round(s.offset.x), y: round(s.offset.y) };
   const travelled = moving ? 1 - gap / Math.max(1, AUTONOMY.fleeHeights * h) : 0;
@@ -243,7 +300,11 @@ export function parseAutonomyState(value: unknown): AutonomyState {
     'pointer',
     'pointerTime',
     'nearAt',
+    'seat',
   ]);
+  // Optional: states recorded before seats existed have none.
+  if (v['seat'] !== undefined && !SEAT_EDGES.includes(v['seat'] as SeatEdge))
+    throw new Error('Invalid autonomy state.');
   const coordinate = (n: unknown) => numeric(n, -1e7, 1e7);
   const point = (q: unknown): Point => {
     const o = object(q, ['x', 'y']);
@@ -263,5 +324,6 @@ export function parseAutonomyState(value: unknown): AutonomyState {
     pointer: v['pointer'] === null ? null : point(v['pointer']),
     pointerTime: time(v['pointerTime']),
     nearAt: time(v['nearAt']),
+    ...(v['seat'] !== undefined ? { seat: v['seat'] as SeatEdge } : {}),
   };
 }

@@ -99,6 +99,8 @@ function fit(behaviour: (typeof BEHAVIOUR_NAMES)[number], m: CharacterMotion, gu
     case 'flee':
       return m.role === 'move' ? (guess.kind === 'run' ? 2 : 1) + plain : 0;
     case 'approach':
+      // A curious creep: a walk only (a run toward the pointer reads as a charge).
+      return m.role === 'move' && guess.kind === 'walk' ? 2 + plain : 0;
     case 'return':
       return m.role === 'move' ? (guess.kind === 'walk' ? 2 : 1) + plain : 0;
     case 'doze':

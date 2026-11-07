@@ -8,6 +8,8 @@ import {
   type AutonomyOutput,
   type AutonomyState,
   type Personality,
+  type SeatEdge,
+  type Behaviour,
 } from './autonomy';
 
 /**
@@ -34,6 +36,8 @@ export interface BodyPose {
   opacity: number;
   /** Align the seat with the anchor point (a sitting pose on an edge). */
   seat: boolean;
+  /** While sitting down or standing up: how far the seat is aligned (0…1); absent: all of it. */
+  seatWeight?: number;
   /** Keep the feet where the pose put them while the hips dip (two-bone IK). */
   plantFeet: boolean;
 }
@@ -84,6 +88,8 @@ export interface BodyMotionState {
   moveKind: 'hop' | 'jump';
   /** The autonomy's internal states and where it has gone (chunk 3); absent when it is off. */
   autonomy?: AutonomyState;
+  /** 0 standing … 1 seated on its anchor point, moving between the two; absent: 0. */
+  seatWeight?: number;
 }
 export const BODY_TIMING = Object.freeze({
   /** Idle seconds after which the character starts looking around by itself. */
@@ -98,6 +104,8 @@ export const BODY_TIMING = Object.freeze({
   shiverScroll: 2500,
   hopMoveMs: 460,
   jumpMoveMs: 380,
+  /** Sitting down or standing up without a motion for it: the hips lower or rise over this. */
+  seatBlendMs: 320,
 });
 
 export interface BodyContext {
@@ -125,6 +133,10 @@ export interface BodyContext {
   /** Held by G1.2 (an approached control): the body rests, but a move away from the pointer and
    * the way back home go on, so the character never freezes half-way. */
   yielding?: boolean;
+  /** The edges of its part it may sit on at rest (page px), for the autonomy. */
+  seats?: readonly { edge: SeatEdge; y: number }[];
+  /** By behaviour: the speed its walk or run keeps the feet still at (px/s), for the autonomy. */
+  gaits?: Partial<Record<Behaviour, number>>;
 }
 
 /** A small integer hash (deterministic noise): the same seed and key give the same 0…1. */
@@ -223,6 +235,8 @@ export function evaluateBodyMotion(
       heightPx: context.heightPx,
       ...(context.widthPx ? { widthPx: context.widthPx } : {}),
       ...(context.room ? { room: context.room } : {}),
+      ...(context.seats?.length ? { seats: context.seats } : {}),
+      ...(context.gaits ? { gaits: context.gaits } : {}),
       pointer: context.pointer,
       idleSeconds: idle,
       playing: context.events.some((e) => e.type === 'video.play'),
@@ -383,6 +397,17 @@ export function evaluateBodyMotion(
   const frozen = Object.fromEntries(
     Object.entries(bones).map(([bone, v]) => [bone, [round(v[0]), round(v[1]), round(v[2])] as const]),
   ) as BodyBoneOffsets;
+  // Sitting down and standing up take a moment (no motion shows it: the hips lower onto the seat
+  // or rise from it as the seat's weight moves), never a jump between the two.
+  // A state without it stands (0); a first frame takes the posture at once.
+  const seatTarget = sit ? 1 : 0,
+    seatWas = previous ? (previous.seatWeight ?? 0) : seatTarget,
+    seatStep = Math.max(0, context.deltaMs) / BODY_TIMING.seatBlendMs;
+  const seatWeight = round(
+    seatWas < seatTarget ? Math.min(seatTarget, seatWas + seatStep) : Math.max(seatTarget, seatWas - seatStep),
+  );
+  if (seatWeight > 0) state.seatWeight = seatWeight;
+  else delete state.seatWeight;
   return {
     state,
     pose: {
@@ -390,10 +415,11 @@ export function evaluateBodyMotion(
       hips: [round(hips[0]), round(hips[1]), round(hips[2])],
       // Dozing closes the eyes; otherwise the seeded blinks.
       blink: round(Math.max(blinkAt(t, seed), mind ? mind.doze : 0)),
-      yawDeg: round(yawDeg + (sit && !author ? 25 : 0)),
+      yawDeg: round(yawDeg + (!author ? 25 * seatWeight : 0)),
       offset: { x: round(offset.x), y: round(offset.y) },
       opacity: round(opacity),
-      seat: sit,
+      seat: seatWeight > 0,
+      ...(seatWeight > 0 && seatWeight < 1 ? { seatWeight } : {}),
       plantFeet,
     },
   };
@@ -436,6 +462,7 @@ export function parseBodyState(value: unknown): BodyMotionState {
     'moveFrom',
     'moveKind',
     'autonomy',
+    'seatWeight',
   ]);
   const time = (n: unknown) => (n === null ? null : numeric(n, 0, 86400000 * 7));
   const coordinate = (n: unknown) => numeric(n, -1e7, 1e7);
@@ -460,5 +487,6 @@ export function parseBodyState(value: unknown): BodyMotionState {
     moveFrom: point(v['moveFrom']),
     moveKind: v['moveKind'],
     ...(v['autonomy'] === undefined ? {} : { autonomy: parseAutonomyState(v['autonomy']) }),
+    ...(v['seatWeight'] === undefined ? {} : { seatWeight: numeric(v['seatWeight'], 0, 1) }),
   };
 }

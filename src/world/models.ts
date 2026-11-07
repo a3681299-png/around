@@ -5,6 +5,8 @@ import { object, numeric } from '../models/types';
 import { oneOf } from '../validation';
 import { DEFAULT_CHARACTER_PERSONALITY, modelClips, motionUsable } from '../characters/settings';
 import { evaluateBodyMotion, layerSeed, parseBodyState, type BodyMotionState, type BodyPose } from './body-motion';
+import { AUTONOMY, type Behaviour } from './autonomy';
+import { gaitSpeedPx, matchGait } from './gait';
 
 export interface ModelState {
   clip: number | null;
@@ -21,6 +23,9 @@ export interface ModelState {
   /** A character's computed motion (R3-2). Absent for layers without a character, and in takes
    * recorded before it existed. */
   body?: BodyMotionState;
+  /** Sitting down or standing up with a motion for it: that motion plays once from `sinceMs`,
+   * then the behaviour's motion `to`. Absent otherwise. */
+  transition?: { clip: number; to: number; sinceMs: number };
 }
 export interface ModelEvaluation extends ModelState {
   resetDynamics?: boolean;
@@ -49,6 +54,7 @@ export function parseModelStates(value: unknown, ids?: ReadonlySet<string>): Rec
         'suspended',
         'phase',
         'body',
+        'transition',
       ]);
       const clip = (n: unknown) => {
         if (n === null) return null;
@@ -74,6 +80,15 @@ export function parseModelStates(value: unknown, ids?: ReadonlySet<string>): Rec
           suspended: v['suspended'],
           phase: phase as ModelState['phase'],
           ...(v['body'] === undefined ? {} : { body: parseBodyState(v['body']) }),
+          ...(v['transition'] === undefined
+            ? {}
+            : (() => {
+                const t = object(v['transition'], ['clip', 'to', 'sinceMs']);
+                const from = clip(t['clip']),
+                  to = clip(t['to']);
+                if (from === null || to === null) throw new Error('Invalid clip state.');
+                return { transition: { clip: from, to, sinceMs: numeric(t['sinceMs'], 0, 86400000 * 7) } };
+              })()),
         },
       ];
     }),
@@ -171,20 +186,123 @@ export function evaluateModels(
     // v15: while the autonomy drives, the behaviour it picked (last frame's, in the state) plays
     // its assigned motion: a part of it, looped from when the behaviour began, at its speed.
     const autonomyState = restart ? undefined : before?.body?.autonomy;
+    // Gaits (src/world/gait.ts): a behaviour that moves with a walk or a run goes at the speed the
+    // motion's feet keep, and the motion plays at the rate that matches the character's speed.
+    const gaits: Partial<Record<Behaviour, { rate: number; speedPx: number }>> = {};
+    if (layer.character?.autonomy)
+      for (const [name, requested] of [
+        ['flee', AUTONOMY.fleeSpeed],
+        ['approach', AUTONOMY.approachSpeed],
+        ['return', AUTONOMY.returnSpeed],
+      ] as const) {
+        const entry = layer.character.behaviourMotions?.[name],
+          natural = gaitSpeedPx(
+            layer.character.motions.find((m) => m.id === entry?.motion),
+            layer.source.vrm?.body,
+            layer.placement.heightPx,
+          );
+        if (natural) gaits[name] = matchGait(requested * (entry?.speed ?? 1), natural * (entry?.speed ?? 1));
+      }
+    // Seats: the edges of its part the adapter reports, in page px. Only for a character that
+    // sits at rest (a standing idle on an edge line would hang its feet in the air).
+    const anchorId = layer.placement.anchor.kind === 'surface' ? layer.placement.anchor.target : undefined,
+      room = anchorId ? input.anchors[anchorId] : undefined,
+      restMotion = layer.character?.behaviourMotions?.rest?.motion,
+      sitsAtRest = layer.character?.motions.find((m) => m.id === restMotion)?.role === 'sit';
+    const seats =
+      room && sitsAtRest && anchorId && layer.character?.autonomy
+        ? (input.seats?.[anchorId] ?? []).map((edge) => ({
+            edge,
+            y: edge === 'top' ? room.top : room.top + room.height,
+          }))
+        : [];
+    const doing = autonomyState?.behaviour ?? 'rest';
+    // Arrived while still fleeing (or going home): a walk would tread on the spot. It stands as at rest.
+    const arrived =
+      gaits[doing] !== undefined &&
+      autonomyState !== undefined &&
+      Math.hypot(autonomyState.target.x - autonomyState.offset.x, autonomyState.target.y - autonomyState.offset.y) <= 1;
+    // It sits only on an edge: off every edge, a rest (or an arrival) stands in the character's
+    // own idle loop (its motion of that role), never a sitting pose in the air.
+    const offSeat =
+      seats.length > 0 &&
+      (!autonomyState ||
+        !entry.position ||
+        !seats.some((q) => Math.abs(entry.position!.y + autonomyState.offset.y - q.y) < 1));
+    const standIndex =
+      offSeat && (arrived || doing === 'rest' || doing === 'doze')
+        ? (layer.character?.motions.findIndex(
+            (m, i) =>
+              m.role === 'idle' &&
+              m.loop &&
+              m.source.duration > 0 &&
+              motionUsable(layer.character!, i, layer.source.vrm?.body),
+          ) ?? -1)
+        : -1;
+    const standing =
+      standIndex >= 0
+        ? {
+            motion: layer.character!.motions[standIndex]!.id,
+            from: 0,
+            to: Math.floor(layer.character!.motions[standIndex]!.source.duration * 100 + 1e-6) / 100,
+            speed: 1,
+          }
+        : undefined;
     const assigned =
       layer.character?.autonomy &&
       layer.character.computedMotion !== false &&
       !authorActive &&
       !paused &&
       !input.environment.reducedMotion
-        ? layer.character.behaviourMotions?.[autonomyState?.behaviour ?? 'rest']
+        ? (standing ?? layer.character.behaviourMotions?.[arrived ? 'rest' : doing])
         : undefined;
     const assignedIndex = assigned ? layer.character!.motions.findIndex((m) => m.id === assigned.motion) : -1;
     const behaviourClip =
       assigned && assignedIndex >= 0 && motionUsable(layer.character!, assignedIndex, layer.source.vrm?.body)
-        ? { index: assignedIndex, entry: assigned, since: autonomyState?.since ?? 0 }
+        ? {
+            index: assignedIndex,
+            entry: assigned,
+            since: autonomyState?.since ?? 0,
+            rate: arrived ? 1 : (gaits[doing]?.rate ?? 1),
+          }
         : undefined;
-    const clip = behaviourClip ? behaviourClip.index : authorClip;
+    // Sitting down and standing up (the autonomy's motions only): between a standing motion and a
+    // sitting one, a sitting motion that plays once and lowers the hips (or raises them) plays
+    // first, once. Told apart by what the files measure (role, loop, the hips' rise), not names.
+    // Without one, the seat's weight lowers or raises the hips (body-motion.ts).
+    let transition: ModelState['transition'];
+    if (behaviourClip && layer.character) {
+      const motions = layer.character.motions,
+        sits = (i: number | null | undefined) => i !== null && i !== undefined && motions[i]?.role === 'sit';
+      const goingTo = behaviourClip.index,
+        was = before?.transition ? before.transition.to : before?.clip;
+      const ongoing =
+        before?.transition &&
+        before.transition.to === goingTo &&
+        input.timeMs - before.transition.sinceMs < (motions[before.transition.clip]?.source.duration ?? 0) * 1000;
+      if (ongoing) transition = before!.transition;
+      else if (
+        !restart &&
+        // A fright is at once: it springs up and away, no getting up first.
+        doing !== 'flee' &&
+        was !== undefined &&
+        was !== null &&
+        was !== goingTo &&
+        sits(was) !== sits(goingTo)
+      ) {
+        const down = sits(goingTo);
+        const found = motions.findIndex(
+          (m, i) =>
+            m.role === 'sit' &&
+            !m.loop &&
+            m.source.duration > 0 &&
+            (down ? -1 : 1) * m.source.hipsTravel[1] > 0.1 * m.source.restHipsHeight &&
+            motionUsable(layer.character!, i, layer.source.vrm?.body),
+        );
+        if (found >= 0) transition = { clip: found, to: goingTo, sinceMs: input.timeMs };
+      }
+    }
+    const clip = transition ? transition.clip : behaviourClip ? behaviourClip.index : authorClip;
     let next: ModelState =
       before && !restart
         ? { ...before }
@@ -216,12 +334,19 @@ export function evaluateModels(
       next.previousTimeMs = advance(layer, next.previousClip, next.previousTimeMs, delta);
       next.fadeElapsedMs = Math.min(next.fadeDurationMs, next.fadeElapsedMs + (model.playing ? dt : 0));
     }
-    if (behaviourClip) {
+    if (transition) {
+      // Once through, from its start.
+      next.timeMs = Math.max(0, input.timeMs - transition.sinceMs);
+      next.transition = transition;
+    } else {
+      delete next.transition;
+    }
+    if (behaviourClip && !transition) {
       // Its own clock: the part's start plus the time since the behaviour began, at its speed,
       // looped within the part. The same inputs give the same time (no accumulated drift).
       const { from, to, speed } = behaviourClip.entry,
         length = (to - from) * 1000,
-        elapsed = Math.max(0, input.timeMs - behaviourClip.since) * speed;
+        elapsed = Math.max(0, input.timeMs - behaviourClip.since) * speed * behaviourClip.rate;
       next.timeMs = from * 1000 + (length > 0 ? elapsed % length : 0);
     }
     const blend = next.fadeDurationMs === 0 ? 1 : Math.min(1, next.fadeElapsedMs / next.fadeDurationMs);
@@ -229,12 +354,30 @@ export function evaluateModels(
       next.previousClip = null;
       next.previousTimeMs = 0;
     }
-    const facing = layer.motion?.enabled && layer.motion.orientToMovement && l.faceMovement;
-    const targetYaw = facing && body ? (speedPx > 0.001 || before?.yawDeg ? wrap(90 - body.heading) : next.yawDeg) : 0;
+    const authorFacing = layer.motion?.enabled && layer.motion.orientToMovement && l.faceMovement;
+    // Walking or running with the autonomy, it turns the way it goes (a walk facing the viewer
+    // while it moves sideways would slide whatever its speed), and back to the viewer after.
+    const walking =
+      !authorFacing && autonomyState && gaits[doing] !== undefined && !arrived
+        ? Math.atan2(autonomyState.target.y - autonomyState.offset.y, autonomyState.target.x - autonomyState.offset.x) *
+          (180 / Math.PI)
+        : undefined;
+    const facing = Boolean(authorFacing) || walking !== undefined;
+    const easesHome = !facing && Boolean(layer.character?.autonomy) && next.yawDeg !== 0;
+    const targetYaw =
+      walking !== undefined
+        ? wrap(90 - walking)
+        : authorFacing && body
+          ? speedPx > 0.001 || before?.yawDeg
+            ? wrap(90 - body.heading)
+            : next.yawDeg
+          : 0;
     const turn = wrap(targetYaw - next.yawDeg);
-    if (facing && running) next.yawDeg = wrap(next.yawDeg + turn * (1 - Math.exp(-dt / 120)));
-    else if (!facing) next.yawDeg = 0;
-    needsFrame ||= running && Boolean(facing) && Math.abs(turn) > 0.01;
+    if ((facing || easesHome) && running) {
+      next.yawDeg = wrap(next.yawDeg + turn * (1 - Math.exp(-dt / 120)));
+      if (easesHome && Math.abs(next.yawDeg) < 0.5) next.yawDeg = 0;
+    } else if (!facing) next.yawDeg = 0;
+    needsFrame ||= running && (facing || easesHome) && Math.abs(turn) > 0.01;
     const look = model.look,
       pointer = input.signals.pointer;
     let lookYaw = 0,
@@ -275,13 +418,16 @@ export function evaluateModels(
     let pose: BodyPose | undefined;
     // v15: the author may stop the computed motion altogether (absent: on, as in v14).
     if (layer.character && layer.source.vrm && layer.character.computedMotion !== false) {
-      const role = clip === null ? undefined : layer.character.motions[clip]?.role;
+      const motionRole = (index: number | null) => (index === null ? undefined : layer.character!.motions[index]?.role);
+      const role = motionRole(clip);
       const idle = input.signals.samples?.['user.idle.duration'];
       const body = evaluateBodyMotion(restart ? undefined : before?.body, {
         timeMs: input.timeMs,
         deltaMs: input.deltaMs,
         seed: layerSeed(layer.id, input.seed),
-        posture: role === 'sit' ? 'sit' : 'stand',
+        // Getting up is standing already (the seat lets go while the motion raises the hips);
+        // sitting down is sitting.
+        posture: (transition ? motionRole(transition.to) : role) === 'sit' ? 'sit' : 'stand',
         authorActive,
         running,
         reducedMotion: input.environment.reducedMotion,
@@ -295,6 +441,14 @@ export function evaluateModels(
         // v15: the autonomy only when the author turned it on (absent: off, older artwork).
         ...(layer.character.autonomy
           ? { personality: layer.character.personality ?? DEFAULT_CHARACTER_PERSONALITY }
+          : {}),
+        ...(seats.length ? { seats } : {}),
+        ...(Object.keys(gaits).length
+          ? {
+              gaits: Object.fromEntries(Object.entries(gaits).map(([b, g]) => [b, g!.speedPx])) as Partial<
+                Record<Behaviour, number>
+              >,
+            }
           : {}),
         // The part it lives on (its anchor): a flight or an approach stays inside it.
         ...(layer.placement.anchor.kind === 'surface' && input.anchors[layer.placement.anchor.target]
