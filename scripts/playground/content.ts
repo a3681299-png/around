@@ -12,7 +12,7 @@ import { defaultModelSettings } from '../../src/models/types';
 import { CHARACTER_HOME } from '../../src/characters/home';
 import { assignBehaviours, classifyMotion } from '../../src/characters/auto-motions';
 import type { CharacterMotion } from '../../src/characters/settings';
-import mirdoAssets from './mirdo-assets.json';
+import mirdoAssets from './mirdo-assets.json' with { type: 'json' };
 
 const sha = (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('hex');
 
