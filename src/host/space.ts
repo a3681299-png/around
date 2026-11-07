@@ -28,8 +28,10 @@ import { SPACE_PROBE } from './world-options';
 const ACTIVE_MS = 600;
 /** Regions are read at least this often while still: YouTube moves parts without telling us. */
 const IDLE_REGION_MS = 1000;
-/** The video's colour is sampled this often (a tiny canvas); the world smooths between samples. */
-const VIDEO_SAMPLE_MS = 200;
+/** The video's colour is sampled this often (on the GPU); the world smooths between samples. */
+// Twice a second: each read still costs a round trip to the GPU process (~0.6 ms on the notebook,
+// measured), and the light moves at most 0.5 a second anyway.
+const VIDEO_SAMPLE_MS = 500;
 /** Only the light changing (a playing video): the room is redrawn at most this often. */
 const LIGHT_ONLY_MS = 33;
 
@@ -76,10 +78,6 @@ export function createSpaceHost(
     drawnScheme = '',
     sized = '';
   let pointer: { x: number; y: number } | undefined;
-  const probe = doc.createElement('canvas');
-  probe.width = 8;
-  probe.height = 5;
-  let probeContext: CanvasRenderingContext2D | null | undefined;
 
   const wake = () => {
     activeUntil = view.performance.now() + ACTIVE_MS;
@@ -107,35 +105,6 @@ export function createSpaceHost(
     doc[m]('visibilitychange', wake);
     doc[m]('fullscreenchange', wake);
     reduced[m]('change', wake);
-  };
-
-  /** The video's mean colour, linear RGB; undefined when it cannot be read (DRM, no frame). */
-  const readVideo = (): VideoLight | undefined => {
-    const video = backdrop.video();
-    if (!video || video.readyState < 2 || video.videoWidth === 0) return undefined;
-    try {
-      probeContext ??= probe.getContext('2d', { willReadFrequently: false });
-      if (!probeContext) return undefined;
-      probeContext.drawImage(video, 0, 0, probe.width, probe.height);
-      const data = probeContext.getImageData(0, 0, probe.width, probe.height).data;
-      const linear = (v: number) => {
-        const s = v / 255;
-        return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
-      };
-      let r = 0,
-        g = 0,
-        b = 0;
-      for (let i = 0; i < data.length; i += 4) {
-        r += linear(data[i]!);
-        g += linear(data[i + 1]!);
-        b += linear(data[i + 2]!);
-      }
-      const n = data.length / 4;
-      return { r: r / n, g: g / n, b: b / n };
-    } catch {
-      // A protected or cross-origin frame cannot be read: the light fades instead.
-      return undefined;
-    }
   };
 
   const schedule = () => {
@@ -169,7 +138,8 @@ export function createSpaceHost(
     }
     if (now - videoAt >= VIDEO_SAMPLE_MS) {
       videoAt = now;
-      sample = space.videoLight > 0 ? readVideo() : undefined;
+      // Read on the GPU, a few frames late (src/renderers/three/room.ts sampleVideo).
+      sample = space.videoLight > 0 ? renderer.sampleVideo(backdrop.video()) : undefined;
     }
     light = stepVideoLight(light, sample, dt, reduced.matches);
     const scrollProgress = view.scrollY / Math.max(1, view.innerHeight);
@@ -217,6 +187,11 @@ export function createSpaceHost(
           plates: plates.length,
           camera: [camera.x, camera.y, camera.dolly].map((n) => Math.round(n * 1000) / 1000),
           light: Math.round((0.2126 * light.r + 0.7152 * light.g + 0.0722 * light.b) * 1000) / 1000,
+          sample: sample ? Math.round((0.2126 * sample.r + 0.7152 * sample.g + 0.0722 * sample.b) * 1000) / 1000 : null,
+          video: (() => {
+            const v = backdrop.video();
+            return v ? [v.readyState, v.videoWidth, v.paused] : null;
+          })(),
           scheme,
         });
       }

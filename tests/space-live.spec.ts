@@ -66,8 +66,21 @@ test('real YouTube: the room behind the UI, glass plates that keep text readable
     await showArtwork(popup);
     // The room goes in through the real import and validation (it is one GLB model asset).
     const { panel } = await openEditor(popup, page);
-    await panel.locator('.model-file').setInputFiles(path.resolve(process.env.WW_ROOM_FILE!));
-    await expect(panel.locator('.layer')).toHaveCount(1, { timeout: 60000 });
+    // On real YouTube the editor sometimes restores its session right after it opens and drops a
+    // file chosen in that moment (no error is shown); choose it again once if no layer came.
+    for (let attempt = 0; attempt < 2; attempt++) {
+      await panel.locator('.model-file').setInputFiles(path.resolve(process.env.WW_ROOM_FILE!));
+      if (
+        await expect(panel.locator('.layer'))
+          .toHaveCount(1, { timeout: 30000 })
+          .then(
+            () => true,
+            () => false,
+          )
+      )
+        break;
+    }
+    await expect(panel.locator('.layer')).toHaveCount(1);
     await panel.locator('.save').click();
     await expect(panel.locator('.dirty')).toHaveText('保存済み');
     await closeEditorPages(page);
@@ -123,6 +136,10 @@ test('real YouTube: the room behind the UI, glass plates that keep text readable
 
     // The pointer and the scroll move the room only.
     const frame = async () => JSON.parse((await page.locator('html').getAttribute('data-ww-room-frame'))!);
+    // The playing video lights the room (its colour read on the GPU).
+    await expect
+      .poll(async () => (await frame()).light, { timeout: 15000, message: JSON.stringify(await frame()) })
+      .toBeGreaterThan(0.005);
     await page.mouse.move(1550, 120, { steps: 8 });
     await page.waitForTimeout(1500);
     const right = await frame();
