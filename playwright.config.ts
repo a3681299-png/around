@@ -5,6 +5,8 @@ import { defineConfig } from '@playwright/test';
 const unitSpecs = [
   'answer-check',
   'unitypackage',
+  'auto-motions',
+  'check-motions',
   'clean-work',
   'backup-data',
   'browser-boundary',

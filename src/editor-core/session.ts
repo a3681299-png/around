@@ -21,6 +21,7 @@ import { alignSamples, distributeSamples, type Alignment, type Distribution } fr
 import { createHistory } from '../editor/history';
 import { selectLayer } from '../editor/layers';
 import { CHARACTER_HOME } from '../characters/home';
+import { reassignBehaviours } from '../characters/auto-motions';
 import {
   deleteDocumentLayers,
   duplicateDocumentLayers,
@@ -694,7 +695,10 @@ export function createEditorSession<Source extends { readonly length: number }>(
       before = draft;
       const current = draft.decorations.find((item) => item.id === layerId);
       if (current?.kind !== 'model3d') throw new Error('動作を追加するレイヤーが見つかりません。');
-      const character = current.character ?? { standardMotions: 'auto' as const, motions: [] };
+      // A character made by this import moves on its own at once (reading motions is enough,
+      // docs/product-design-snapshot.md); an existing one keeps its autonomy switch as it was.
+      const character = current.character ?? { standardMotions: 'auto' as const, motions: [], autonomy: true };
+      const all = [...character.motions, ...draftMotions(character.motions, motions, labels, origin)];
       const next = editDesign(draft);
       next.decorations = next.decorations.map((item) =>
         item.id === layerId && item.kind === 'model3d'
@@ -702,7 +706,9 @@ export function createEditorSession<Source extends { readonly length: number }>(
               ...item,
               character: {
                 ...character,
-                motions: [...character.motions, ...draftMotions(character.motions, motions, labels, origin)],
+                motions: all,
+                // Behaviours the author has not set get the best motion of their kind.
+                behaviourMotions: reassignBehaviours(character.motions, all, character.behaviourMotions),
               },
               // The clip list changes from the model's own clips to the motions on first use.
               ...(current.character

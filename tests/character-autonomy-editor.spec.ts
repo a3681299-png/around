@@ -26,9 +26,13 @@ test('the editor shows and saves the computed motion and autonomy switches and t
   const computed = panel.getByLabel('計算の動き', { exact: true }),
     autonomy = panel.getByLabel('自律', { exact: true }),
     shyness = panel.getByLabel('臆病さ');
-  // A new character: computed motion on, autonomy off (as older artwork), personality greyed out.
+  // A character made by reading motions moves by itself at once (2026-11-07, "reading is enough"):
+  // computed motion and autonomy on. Older artwork without the key keeps the autonomy off.
   await expect(computed).toBeChecked();
-  await expect(autonomy).not.toBeChecked();
+  await expect(autonomy).toBeChecked();
+  await expect(shyness).toBeEnabled();
+  // Off and on again: the personality greys out with it.
+  await autonomy.uncheck();
   await expect(shyness).toBeDisabled();
   await autonomy.check();
   await expect(shyness).toBeEnabled();
