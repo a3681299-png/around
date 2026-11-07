@@ -1,11 +1,8 @@
-// Builds the Playground's content folder from material made in this repository only: the
-// mannequin VRM and its one-frame poses (tests/helpers/mannequin.ts), synthetic videos
-// (scripts/generate-media-fixtures.mjs) and a background drawn here. No third-party avatar,
-// Mixamo motion or private model. Shota's own VRM and Blender poses replace them later: the
-// character's motions keep the same roles (sit, idle).
+// The portable build uses generated fixtures. A local review build can opt in to the
+// fixed Mirdo and Quaternius files in the wwt-private-assets checkout.
 import { createHash } from 'node:crypto';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
+import { isAbsolute, join, relative } from 'node:path';
 import { deflateSync } from 'node:zlib';
 import { MANNEQUIN_POSES, mannequinPoseVrma, mannequinVrm } from '../../tests/helpers/mannequin';
 import { inspectAsset } from '../../src/assets/inspect';
@@ -70,12 +67,25 @@ export function writeContent(root: string, out: string): { models: string[] } {
     assets[id] = { file, name };
     return id;
   };
-  const vrm = new Uint8Array(mannequinVrm());
-  const vrmId = add(vrm, 'vrm', 'WW mannequin.vrm');
-  // One-frame poses as the character's motions: index 0 sits on the edge, 1 stands.
+  const privateRoot = process.env.WW_PLAYGROUND_PRIVATE_ASSETS;
+  const privateAsset = (file: string) => {
+    const source = realpathSync(privateRoot!);
+    const path = realpathSync(join(source, file));
+    const inside = relative(source, path);
+    if (!inside || inside.startsWith('..') || isAbsolute(inside))
+      throw new Error('Invalid Playground resident asset path.');
+    return new Uint8Array(readFileSync(path));
+  };
+  const vrm = privateRoot ? privateAsset('mirdo/work/mirdo-1024.vrm') : new Uint8Array(mannequinVrm());
+  const model = inspectAsset(vrm).model!;
+  const vrmId = add(vrm, 'vrm', privateRoot ? 'Mirdo.vrm' : 'WW mannequin.vrm');
+  // These two clips also drive the spatial resident. The basic player uses the same validated IDs.
   const poses = (['sit', 'stand'] as const).map((name) => {
-    const bytes = new Uint8Array(mannequinPoseVrma(name, MANNEQUIN_POSES[name]));
-    return { name, bytes, id: add(bytes, 'vrma', `${name}.vrma`), info: inspectVrma(bytes).info };
+    const bytes = privateRoot
+      ? privateAsset(`mirdo/motions-pass/${name === 'sit' ? 'Sitting_Idle_Loop' : 'Walk_Loop'}.vrma`)
+      : new Uint8Array(mannequinPoseVrma(name, MANNEQUIN_POSES[name]));
+    const info = inspectVrma(bytes).info;
+    return { name, id: add(bytes, 'vrma', `${name}.vrma`), info };
   });
   const background = new Uint8Array(backgroundPng(480, 270));
   const backgroundId = add(background, 'png', 'room.png');
@@ -85,7 +95,6 @@ export function writeContent(root: string, out: string): { models: string[] } {
     ['alpha1080.webm', 'video-b.webm'],
   ] as const)
     writeFileSync(join(out, to), readFileSync(join(root, 'tests/fixtures/motion', from)));
-  const model = inspectAsset(vrm).model!;
   const design = parseDesign({
     schemaVersion: 16,
     id: 'playground-custom',
@@ -117,7 +126,7 @@ export function writeContent(root: string, out: string): { models: string[] } {
         kind: 'model3d',
         id: 'resident',
         assetId: vrmId,
-        name: '試験用のマネキン',
+        name: privateRoot ? 'ミルド' : '試験用のマネキン',
         // Home is the player's bottom-right corner, over the fullscreen button's place (Shota's
         // decision, chunk 3). The anchor is the player (a part kind, the same ID on YouTube), so
         // it follows theater mode, fullscreen and any window size there as here.
@@ -147,6 +156,7 @@ export function writeContent(root: string, out: string): { models: string[] } {
     ],
   });
   writeFileSync(join(out, 'design.json'), JSON.stringify(design, null, 2));
-  writeFileSync(join(out, 'manifest.json'), JSON.stringify({ design: 'design.json', assets }, null, 2));
+  const resident = { model: vrmId, sit: poses[0]!.id, walk: poses[1]!.id, mannequin: !privateRoot };
+  writeFileSync(join(out, 'manifest.json'), JSON.stringify({ design: 'design.json', assets, resident }, null, 2));
   return { models: [assets[vrmId]!.file, ...poses.map((pose) => assets[pose.id]!.file)] };
 }

@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { chromium, test, expect, type Page } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import { createServer, type Server } from 'node:http';
 import { mkdirSync, readFileSync, statSync } from 'node:fs';
@@ -38,15 +38,30 @@ test.beforeAll(async () => {
       response.writeHead(404).end();
       return;
     }
-    response.writeHead(200, { 'content-type': types[extname(file)] ?? 'application/octet-stream' });
-    response.end(readFileSync(file));
+    const bytes = readFileSync(file);
+    const contentType = types[extname(file)] ?? 'application/octet-stream';
+    const range = extname(file) === '.webm' ? /^bytes=(\d+)-(\d*)$/.exec(request.headers.range ?? '') : null;
+    if (range) {
+      const start = Number(range[1]);
+      const end = Math.min(range[2] ? Number(range[2]) : bytes.length - 1, bytes.length - 1);
+      response.writeHead(206, {
+        'content-type': contentType,
+        'accept-ranges': 'bytes',
+        'content-range': `bytes ${start}-${end}/${bytes.length}`,
+        'content-length': end - start + 1,
+      });
+      response.end(bytes.subarray(start, end + 1));
+      return;
+    }
+    response.writeHead(200, { 'content-type': contentType, 'content-length': bytes.length });
+    response.end(bytes);
   });
   await new Promise<void>((done) => server.listen(0, '127.0.0.1', done));
   origin = `http://127.0.0.1:${(server.address() as { port: number }).port}`;
 });
 test.afterAll(() => new Promise<void>((done) => server.close(() => done())));
 
-async function open(page: Page) {
+async function open(page: Page, basic = true, viewport = { width: 1280, height: 800 }) {
   const problems: string[] = [];
   page.on('console', (message) => {
     if (message.type() === 'error') problems.push(message.text());
@@ -56,8 +71,8 @@ async function open(page: Page) {
   const throttle = Number(process.env.WW_CPU_THROTTLE ?? 1);
   if (throttle > 1)
     await (await page.context().newCDPSession(page)).send('Emulation.setCPUThrottlingRate', { rate: throttle });
-  await page.setViewportSize({ width: 1280, height: 800 });
-  await page.goto(origin + '/');
+  await page.setViewportSize(viewport);
+  await page.goto(origin + (basic ? '/?basic' : '/'));
   await expect(page.locator('#apply')).toHaveText('WWT を適用');
   return problems;
 }
@@ -243,4 +258,116 @@ test('G1: with the artwork on, the real controls are still the hit target and wo
   await expect.poll(() => page.evaluate(() => !document.querySelector('video')!.paused)).toBe(true);
   await page.locator('#play').click();
   await expect.poll(() => page.evaluate(() => document.querySelector('video')!.paused)).toBe(true);
+});
+
+async function exerciseSpatialControls(page: Page, mode: 'canvas' | 'css') {
+  const problems = await open(page, false);
+  const apply = page.locator('#apply');
+  const flat = (await apply.boundingBox())!;
+  // Check inert synchronously with Apply so even a slow test runner cannot miss the lock.
+  await expect(apply).toBeEnabled();
+  expect(
+    await apply.evaluate((element) => {
+      (element as HTMLButtonElement).click();
+      return element.closest<HTMLElement>('#watch-page')!.inert;
+    }),
+  ).toBe(true);
+  const stage = page.locator('.playground-stage');
+  await expect(stage).toHaveAttribute('data-mode', mode);
+  await expect(page.locator('#watch-page')).not.toHaveAttribute('inert', '');
+  await expect(page.locator('.playground-handoff')).toHaveCount(0);
+  const tilted = (await apply.boundingBox())!;
+  expect(flat.x - tilted.x).toBeGreaterThan(70);
+  expect(tilted.y - flat.y).toBeGreaterThan(30);
+
+  const search = page.getByRole('searchbox');
+  await search.click();
+  await page.keyboard.type('透ける');
+  await expect(search).toHaveValue('透ける');
+  await expect(page.getByRole('link', { name: '透ける四角の動画' })).toBeVisible();
+  await expect(page.getByRole('link', { name: '四角が流れる動画' })).toBeHidden();
+  await page.keyboard.press('Tab');
+  await expect(apply).toBeFocused();
+
+  const play = page.locator('#play');
+  const video = page.locator('video');
+  await play.click();
+  await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.paused)).toBe(false);
+  await play.click();
+  await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.paused)).toBe(true);
+  const seek = page.getByRole('slider', { name: '再生位置' });
+  const [start, end] = await seek.evaluate((element) => {
+    const box = element.getBoundingClientRect();
+    return [0.28, 0.78].map((fraction) => {
+      const x = box.left + box.width * fraction;
+      for (let y = Math.ceil(box.top); y < box.bottom; y++)
+        if (document.elementFromPoint(x, y) === element) return { x, y: y + 2 };
+      throw new Error('The projected seek bar was not a hit target.');
+    });
+  });
+  await page.mouse.move(start!.x, start!.y);
+  await page.mouse.down();
+  await page.mouse.move(end!.x, end!.y, { steps: 12 });
+  await page.mouse.up();
+  await expect.poll(async () => Number(await seek.inputValue())).toBeGreaterThan(650);
+  await expect
+    .poll(() => video.evaluate((element: HTMLVideoElement) => element.currentTime / element.duration))
+    .toBeGreaterThan(0.65);
+  await seek.press('Home');
+  await expect(seek).toHaveValue('0');
+
+  await page.keyboard.press('Alt+Shift+KeyQ');
+  await expect(stage).toHaveCount(0);
+  await expect(search).toHaveValue('透ける');
+  await page.keyboard.press('Alt+Shift+KeyQ');
+  await expect(stage).toHaveAttribute('data-mode', mode);
+  await expect(page.locator('#watch-page')).not.toHaveAttribute('inert', '');
+  await apply.click();
+  await expect(stage).toHaveCount(0);
+  await expect(apply).toHaveText('WWT を適用');
+  expect(problems).toEqual([]);
+}
+
+test('CSS3D keeps the tilted native controls operable without HTML-in-Canvas', async ({ page }) => {
+  await exerciseSpatialControls(page, 'css');
+});
+
+test('the narrow window retains the basic Playground', async ({ page }) => {
+  await open(page, false, { width: 880, height: 800 });
+  await page.locator('#apply').click();
+  await expect(model(page)).toHaveAttribute('data-renderer', 'three', { timeout: 20000 });
+  await expect(page.locator('.playground-stage')).toHaveCount(0);
+});
+
+test('reduced motion keeps the camera still after applying', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await open(page, false);
+  await page.locator('#apply').click();
+  const stage = page.locator('.playground-stage');
+  await expect(stage).toHaveAttribute('data-mode', 'css');
+  await expect(stage).not.toHaveAttribute('data-transition', '');
+  const apply = page.locator('#apply');
+  const before = await apply.boundingBox();
+  await page.mouse.move(20, 350);
+  await page.waitForTimeout(320);
+  expect(await apply.boundingBox()).toEqual(before);
+});
+
+test('HTML-in-Canvas in Chromium 153 syncs pointer drag, focus and keyboard', async () => {
+  const browser = await chromium.launch({ channel: 'chromium', args: ['--enable-blink-features=CanvasDrawElement'] });
+  try {
+    await exerciseSpatialControls(await browser.newPage(), 'canvas');
+  } finally {
+    await browser.close();
+  }
+});
+
+test('HTML-in-Canvas in stable Chrome syncs pointer drag, focus and keyboard', async () => {
+  test.skip(process.env.WW_PLAYGROUND_STABLE !== '1', 'Requires installed Chrome with HTML-in-Canvas.');
+  const browser = await chromium.launch({ channel: 'chrome' });
+  try {
+    await exerciseSpatialControls(await browser.newPage(), 'canvas');
+  } finally {
+    await browser.close();
+  }
 });

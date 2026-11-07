@@ -1,6 +1,6 @@
 // Builds the Playground (docs/playground-plan.md) as static files only. Separate from the
 // extension: scripts/build.mjs and dist/ are not touched.
-//   node scripts/build-playground.mjs                   → dist-playground/
+//   WW_PLAYGROUND_PRIVATE_ASSETS=<checkout> node scripts/build-playground.mjs → dist-playground/
 //   WW_PLAYGROUND_OUT=.work/x node scripts/build-playground.mjs
 //   WW_PLAYGROUND_TEST=1 adds the read-only test hook (window.__wwPlayground) for e2e only.
 import { build } from 'esbuild';
@@ -18,6 +18,8 @@ if (
 )
   throw new Error('WW_PLAYGROUND_OUT must be dist-playground or a direct .work child.');
 const test = process.env.WW_PLAYGROUND_TEST === '1';
+if (!test && !process.env.WW_PLAYGROUND_PRIVATE_ASSETS)
+  throw new Error('Set WW_PLAYGROUND_PRIVATE_ASSETS to the local wwt-private-assets checkout.');
 
 rmSync(output, { recursive: true, force: true });
 mkdirSync(join(output, 'content'), { recursive: true });

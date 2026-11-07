@@ -377,6 +377,8 @@ gantt
 
 **Playground 本番を置くときの手順**
 
+3D 版のローカルビルドには、[Playground の3Dの板](playground-3d.md) の素材設定を使う。公開に進む場合は、ビルドに含まれる素材の配布条件を確認する。
+
 1. `creator-editor`（または作業ブランチ）で `npm run build:playground`。出力の検査（トルーシェ・私用 VRM・Mixamo・一覧にないモデル）が通らないと出力を消して止まる
 2. `dist-playground/` を、リポジトリの外の空のフォルダに写す（`.gitignore` の対象なので、中からは置けない）
 3. そのフォルダで、初回は `npx -y lolipop@2.0.8 deploy --name <名前> --framework static --org <組織の ID>`。2回目からは `--project <ID>`（`npx -y lolipop@2.0.8 project list`）
