@@ -14,6 +14,7 @@
 // and only when .work is over 20 GB, it deletes by the same rules (never a worktree).
 import { execFileSync } from 'node:child_process';
 import { lstatSync, readdirSync, readFileSync, rmdirSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -64,6 +65,39 @@ export function decide(entries, { now, keep = KEEP_PER_FAMILY, recentMs = RECENT
     );
   }
   return entries.map((e) => decisions.get(e.name));
+}
+
+/**
+ * The system temp folder (os.tmpdir()): the tests and measurements make a browser profile there
+ * for every real-site run (mkdtemp(tmpdir(), 'ww-…')), 20–200 MB each, and nothing removed them,
+ * so they filled the disk while .work stayed small (2026-11-07: 33 GB). Only folders with our
+ * prefixes are touched, and only once nothing has written to them for `recentMs` (a run in
+ * progress writes all the time). Other programs' temp folders are never touched.
+ */
+export const TEMP_PREFIX = /^(ww-|wwt-|c3-|c34-|c4-|g11-|g13-|ui1-|playwright_chromiumdev_profile-)/;
+export const TEMP_RECENT_MS = 6 * HOUR;
+export function decideTemp(entries, { now, recentMs = TEMP_RECENT_MS }) {
+  return entries
+    .filter((e) => TEMP_PREFIX.test(e.name))
+    .map((e) => ({
+      ...e,
+      action: now - e.newestMs < recentMs ? 'keep' : 'delete',
+      reason: now - e.newestMs < recentMs ? 'recent' : 'temp profile',
+    }));
+}
+/** The plan for the system temp folder (see decideTemp). */
+export function planTemp({ tmp = tmpdir(), now = Date.now() } = {}) {
+  let names = [];
+  try {
+    names = readdirSync(tmp);
+  } catch {
+    return [];
+  }
+  const entries = names
+    .filter((name) => TEMP_PREFIX.test(name))
+    .map((name) => ({ name, path: path.join(tmp, name), kind: 'dir', ...measure(path.join(tmp, name)) }));
+  // Named TEMP/… in the report, apart from .work's own entries.
+  return decideTemp(entries, { now }).map((d) => ({ ...d, name: `TEMP/${d.name}` }));
 }
 
 /** Size and newest write time of a path, never following a link (a worktree's node_modules is a
@@ -265,6 +299,14 @@ export function report(decisions) {
 /** Called by scripts/test.mjs and the measurement scripts when they finish. */
 export function autoClean(root) {
   if (process.env.CI || process.env.WW_CLEAN_WORK === '0') return;
+  // The temp folder's old profiles go on every run (throwaway, and a day of runs fills gigabytes):
+  // only our prefixes, only untouched for TEMP_RECENT_MS, so a run in progress is never hit.
+  try {
+    const freed = apply(planTemp(), { root });
+    if (freed > 0) console.log(`clean-work: freed ${gb(freed)} of old browser profiles in the temp folder`);
+  } catch (error) {
+    console.warn(`clean-work: temp folder skipped (${error.message})`);
+  }
   const stamp = path.join(root, '.work', STAMP);
   try {
     if (Date.now() - statSync(stamp).mtimeMs < AUTO_EVERY_MS) return;
@@ -286,7 +328,7 @@ export function autoClean(root) {
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
   const dry = process.argv.includes('--dry-run');
-  const decisions = plan({ root });
+  const decisions = [...plan({ root }), ...planTemp()];
   const text = report(decisions);
   console.log(text);
   writeFileSync(

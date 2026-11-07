@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 // @ts-expect-error A plain ESM script without types; only its rules are tested here.
-import { decide, familyOf } from '../scripts/clean-work.mjs';
+import { decide, decideTemp, familyOf } from '../scripts/clean-work.mjs';
 
 const hour = 3600e3;
 const now = Date.UTC(2026, 10, 3, 12);
@@ -113,5 +113,35 @@ test('only the comparison bases are kept among unused worktrees, even when docs 
     'g13-before': 'keep:comparison base',
     'main-base': 'remove-worktree:unused',
     'g12-recent': 'remove-worktree:unused',
+  });
+});
+
+test('browser profiles the tests and measurements left in the system temp folder go after a few hours; nothing else there is touched', () => {
+  const result = Object.fromEntries(
+    (
+      decideTemp(
+        [
+          entry('ww-space-live-AbC123', 30),
+          entry('wwt-chunk3-perf-profiles', 50),
+          entry('c34-run-xY9z', 7),
+          entry('playwright_chromiumdev_profile-Qw12', 10),
+          // A run in progress (written in the last hours) stays.
+          entry('ww-r32-perf-Zz99', 1),
+          // Not ours: other programs' temp folders and the session's own.
+          entry('hd2lgjud.abc', 400),
+          entry('claude', 400),
+          entry('codex-artifact-session-1', 400),
+          entry('ScreenToGif', 400),
+        ],
+        { now, recentMs: 6 * hour },
+      ) as any[]
+    ).map((d) => [d.name, d.action]),
+  );
+  expect(result).toEqual({
+    'ww-space-live-AbC123': 'delete',
+    'wwt-chunk3-perf-profiles': 'delete',
+    'c34-run-xY9z': 'delete',
+    'playwright_chromiumdev_profile-Qw12': 'delete',
+    'ww-r32-perf-Zz99': 'keep',
   });
 });
