@@ -189,6 +189,7 @@ worktree は比べる基準の2つ（`g13-g12head`＝`4d3f39b`・`g13-before`＝
 - FFmpeg 9.0.1 Essentials を WinGet の `Gyan.FFmpeg.Essentials` でユーザー単位に導入した。ユーザー PATH から `ffmpeg -version` が通り、短い合成映像を VP9/WebM でエンコードできた。[FFmpeg の配布案内](https://ffmpeg.org/download.html)
 - 私用素材は `C:\wwt-private\` 配下の原本をユーザー環境変数で参照する。`WW_VRM_FILE` と `WW_CHARACTER_VRM` は専用モーションと同じキャラクターの VRM、`WW_VRMA_DIR` は `manifest.json` と専用モーションのサブフォルダを含む親ディレクトリ、`WW_CHARACTER_MOTIONS` はそのサブフォルダ。4件とも参照先を確認した。設定前から開いているターミナルでは、新しいターミナルを開くか、Windows のユーザー環境変数をプロセスに読み込んでから実行する。
 - スクリーンショットと計測は headless を基本にする。表示が必要な Chrome は `WW_TEST_WINDOW_OFFSCREEN=1` で画面外に置く。e2e 全件を回す場合は、フォーカスを取る前に翔太に伝える。
+- ネイティブのキー送信と画面の検出に頼る5件（`editor-entry.spec.ts` の3件・`skin-verification.spec.ts` の緊急 OFF・`ui0d-emergency.spec.ts`）は、デスクトップでは `c5cbb68` でも `c69d9bb` でも落ちる。ノート PC（1画面）では同じ版で5件とも通る（2026-11-07、Claude Code。1度だけフォーカスの取り合いでキー送信が失敗し、単独で回し直すと通った）。デスクトップの2画面・画面外の窓へのキー送信の環境の問題で、製品の不具合ではない。デスクトップで落ちても、ノート PC で通れば合格として扱い、報告にそう書く
 - 検証対象コミットは detached worktree で開く。報告は `codex/verify-reports` に docs の変更だけをコミットして push する。Claude Code はそこから報告コミットを取り込む。検証が終わったら要約と報告で参照する画像を残し、検証用 worktree と生データを片付ける。
 
 ### 動作確認
