@@ -79,7 +79,7 @@ export function writeContent(root: string, out: string): { models: string[] } {
   const vrm = privateRoot ? privateAsset('mirdo/work/mirdo-1024.vrm') : new Uint8Array(mannequinVrm());
   const model = inspectAsset(vrm).model!;
   const vrmId = add(vrm, 'vrm', privateRoot ? 'Mirdo.vrm' : 'WW mannequin.vrm');
-  // These two clips also drive the spatial resident. The basic player uses the same validated IDs.
+  // The spatial resident shares the basic player's validated seated clip.
   const poses = (['sit', 'stand'] as const).map((name) => {
     const bytes = privateRoot
       ? privateAsset(`mirdo/motions-pass/${name === 'sit' ? 'Sitting_Idle_Loop' : 'Walk_Loop'}.vrma`)
@@ -156,7 +156,7 @@ export function writeContent(root: string, out: string): { models: string[] } {
     ],
   });
   writeFileSync(join(out, 'design.json'), JSON.stringify(design, null, 2));
-  const resident = { model: vrmId, sit: poses[0]!.id, walk: poses[1]!.id, mannequin: !privateRoot };
+  const resident = { model: vrmId, sit: poses[0]!.id, mannequin: !privateRoot };
   writeFileSync(join(out, 'manifest.json'), JSON.stringify({ design: 'design.json', assets, resident }, null, 2));
   return { models: [assets[vrmId]!.file, ...poses.map((pose) => assets[pose.id]!.file)] };
 }

@@ -129,7 +129,9 @@ export function openSpatial(
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   page.inert = true;
 
-  renderer.setPixelRatio(1);
+  const pixelRatio = drawable ? window.devicePixelRatio : 1;
+  const maxBuffer = gl.getParameter(gl.MAX_VIEWPORT_DIMS) as Int32Array;
+  renderer.setPixelRatio(Math.min(pixelRatio, maxBuffer[0]! / width, maxBuffer[1]! / height));
   renderer.setSize(width, height, false);
   renderer.autoClear = false;
   const room = new Scene();
@@ -150,7 +152,7 @@ export function openSpatial(
   if (glass) {
     const slab = new Mesh(boardGeometry, glass);
     slab.position.z = -0.3;
-    glass.uniforms.resolution!.value.set(width, height);
+    renderer.getDrawingBufferSize(glass.uniforms.resolution!.value);
     glass.uniforms.aspect!.value = width / height;
     board.add(slab);
   }

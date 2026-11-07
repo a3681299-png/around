@@ -276,6 +276,11 @@ async function exerciseSpatialControls(page: Page, mode: 'canvas' | 'css') {
   await expect(stage).toHaveAttribute('data-mode', mode);
   await expect(page.locator('#watch-page')).not.toHaveAttribute('inert', '');
   await expect(page.locator('.playground-handoff')).toHaveCount(0);
+  if (mode === 'canvas') {
+    expect(
+      await stage.locator('canvas').evaluate((canvas: HTMLCanvasElement) => [canvas.width, canvas.height]),
+    ).toEqual([1920, 1200]);
+  }
   const tilted = (await apply.boundingBox())!;
   expect(flat.x - tilted.x).toBeGreaterThan(70);
   expect(tilted.y - flat.y).toBeGreaterThan(30);
@@ -356,7 +361,7 @@ test('reduced motion keeps the camera still after applying', async ({ page }) =>
 test('HTML-in-Canvas in Chromium 153 syncs pointer drag, focus and keyboard', async () => {
   const browser = await chromium.launch({ channel: 'chromium', args: ['--enable-blink-features=CanvasDrawElement'] });
   try {
-    await exerciseSpatialControls(await browser.newPage(), 'canvas');
+    await exerciseSpatialControls(await browser.newPage({ deviceScaleFactor: 1.5 }), 'canvas');
   } finally {
     await browser.close();
   }
@@ -366,7 +371,7 @@ test('HTML-in-Canvas in stable Chrome syncs pointer drag, focus and keyboard', a
   test.skip(process.env.WW_PLAYGROUND_STABLE !== '1', 'Requires installed Chrome with HTML-in-Canvas.');
   const browser = await chromium.launch({ channel: 'chrome' });
   try {
-    await exerciseSpatialControls(await browser.newPage(), 'canvas');
+    await exerciseSpatialControls(await browser.newPage({ deviceScaleFactor: 1.5 }), 'canvas');
   } finally {
     await browser.close();
   }

@@ -28,20 +28,25 @@ export function glassMaterial(room: Texture) {
         vec2 corner = abs(local) - (vec2(aspect, 1.0) * 0.5 - 0.026);
         float distanceToEdge = length(max(corner, 0.0)) + min(max(corner.x, corner.y), 0.0) - 0.026;
         if (reveal > 0.1 && distanceToEdge > 0.0) discard;
-        float bevel = smoothstep(-0.032, -0.002, distanceToEdge);
+        float bevel = smoothstep(-0.035, -0.004, distanceToEdge);
         vec2 screen = gl_FragCoord.xy / resolution;
-        vec2 bend = -normalize(local + vec2(0.00001)) * bevel * 0.024;
-        vec2 blur = vec2(0.005, 0.008);
-        vec3 behind = texture2D(room, screen + bend).rgb * 0.28;
-        behind += texture2D(room, screen + bend + blur).rgb * 0.18;
-        behind += texture2D(room, screen + bend - blur).rgb * 0.18;
-        behind += texture2D(room, screen + bend + vec2(blur.x, -blur.y)).rgb * 0.18;
-        behind += texture2D(room, screen + bend + vec2(-blur.x, blur.y)).rgb * 0.18;
-        vec3 paper = vec3(0.86, 0.89, 0.93);
-        vec3 glass = mix(behind, paper, mix(0.77, 0.26, bevel));
-        float rim = smoothstep(-0.006, -0.001, distanceToEdge);
-        float highlight = clamp(0.32 + panel.y * 0.40 + panel.x * 0.15, 0.0, 1.0);
-        glass = mix(glass, mix(vec3(1.0), tint, 0.56), rim * highlight);
+        vec2 bend = -normalize(local + vec2(0.00001)) * bevel * 0.028;
+        vec2 blur = vec2(0.0025, 0.004) * (1.0 + bevel);
+        vec2 center = screen + bend;
+        vec3 behind = texture2D(room, center).rgb * 4.0;
+        behind += (texture2D(room, center + vec2(blur.x, 0.0)).rgb +
+                   texture2D(room, center - vec2(blur.x, 0.0)).rgb +
+                   texture2D(room, center + vec2(0.0, blur.y)).rgb +
+                   texture2D(room, center - vec2(0.0, blur.y)).rgb) * 2.0;
+        behind += texture2D(room, center + blur).rgb +
+                  texture2D(room, center - blur).rgb +
+                  texture2D(room, center + vec2(blur.x, -blur.y)).rgb +
+                  texture2D(room, center + vec2(-blur.x, blur.y)).rgb;
+        vec3 frost = vec3(0.57, 0.73, 0.87);
+        vec3 glass = mix(behind / 16.0, frost, 0.16 + 0.16 * bevel);
+        float rim = smoothstep(-0.0045, -0.001, distanceToEdge);
+        float highlight = 0.30 + panel.y * 0.45 + panel.x * 0.18;
+        glass = mix(glass, mix(vec3(1.0), tint, 0.48), rim * highlight);
         gl_FragColor = vec4(mix(vec3(0.896, 0.880, 0.839), glass, reveal), 1.0);
         #include <colorspace_fragment>
       }

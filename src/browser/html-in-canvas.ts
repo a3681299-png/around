@@ -47,7 +47,14 @@ export function attachDrawable(canvas: DrawableCanvas, gl: DrawableGL, element: 
       if (modern) {
         canvas.updateElementGeometry!(element, { canvasTransform: transform });
       } else {
-        const css = canvas.getElementTransform!(element, transform).toString();
+        // The old API accepts a grid-to-grid transform. The new API takes CSS pixels.
+        const sx = canvas.width / canvas.clientWidth;
+        const sy = canvas.height / canvas.clientHeight;
+        const grid = new DOMMatrix()
+          .scale(sx, sy)
+          .multiply(transform)
+          .scale(1 / sx, 1 / sy);
+        const css = canvas.getElementTransform!(element, grid).toString();
         if (element.style.transform !== css) element.style.transform = css;
       }
     },
