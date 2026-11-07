@@ -11,6 +11,7 @@
 // to be moved at; a planted foot should then go backwards at that speed, not stand still.
 import { build } from 'esbuild';
 import { chromium } from '@playwright/test';
+import { createHash } from 'node:crypto';
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -38,6 +39,35 @@ export const LINES = Object.freeze({
 });
 
 const root = path.dirname(path.dirname(path.dirname(fileURLToPath(import.meta.url))));
+const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
+
+/** Only an absent sidecar means a plain VRMA. A broken sidecar changes the test conditions. */
+export async function readMotionMetadata(file) {
+  let bytes;
+  try {
+    bytes = await readFile(file);
+  } catch (error) {
+    if (error.code === 'ENOENT') return { info: {}, sha256: null };
+    throw error;
+  }
+  let info;
+  try {
+    info = JSON.parse(bytes.toString('utf8'));
+  } catch (cause) {
+    throw new Error(`Invalid motion measurements in ${file}`, { cause });
+  }
+  if (
+    !info ||
+    typeof info !== 'object' ||
+    Array.isArray(info) ||
+    (info.seconds !== undefined && !(Number.isFinite(info.seconds) && info.seconds >= 0)) ||
+    (info.speedMps !== undefined && !(Number.isFinite(info.speedMps) && info.speedMps >= 0)) ||
+    (info.rootTravelM !== undefined &&
+      (!Array.isArray(info.rootTravelM) || info.rootTravelM.length !== 3 || !info.rootTravelM.every(Number.isFinite)))
+  )
+    throw new Error(`Invalid motion measurements in ${file}`);
+  return { info, sha256: sha256(bytes) };
+}
 
 const viewer = `
 import * as THREE from 'three';
@@ -268,7 +298,9 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   }
   const only = new Set((opt('only', '') || '').split(',').filter(Boolean));
   await mkdir(out, { recursive: true });
-  const names = (await readdir(dir)).filter((f) => f.endsWith('.vrma') && (!only.size || only.has(f.slice(0, -5))));
+  const names = (await readdir(dir))
+    .filter((f) => f.endsWith('.vrma') && (!only.size || only.has(f.slice(0, -5))))
+    .sort();
   const bundle = await build({
     stdin: { contents: viewer, resolveDir: root, loader: 'js' },
     bundle: true,
@@ -277,15 +309,22 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     logLevel: 'silent',
   });
   const browser = await chromium.launch({ channel: 'chromium', headless: true, args: ['--use-angle=swiftshader'] });
-  const report = { model: path.basename(vrm), lines: LINES, clips: {} };
   try {
     const page = await browser.newPage({ viewport: { width: 400, height: 400 } });
     const model = await readFile(vrm);
+    const report = {
+      model: path.basename(vrm),
+      lines: LINES,
+      inputs: { modelSha256: sha256(model), chromium: browser.version(), motions: {} },
+      clips: {},
+    };
+    let activeClip;
     await page.route('http://vrm.local/**', async (route) => {
       const url = new URL(route.request().url());
       if (url.pathname === '/model.vrm') return route.fulfill({ body: model, contentType: 'model/gltf-binary' });
       const clip = decodeURIComponent(url.pathname.replace(/^\/clip\//, ''));
-      return route.fulfill({ body: await readFile(path.join(dir, clip)), contentType: 'model/gltf-binary' });
+      if (clip !== activeClip?.name) return route.abort();
+      return route.fulfill({ body: activeClip.bytes, contentType: 'model/gltf-binary' });
     });
     await page.route('http://viewer.local/', (route) =>
       route.fulfill({ body: '<!doctype html><body style="margin:0"></body>', contentType: 'text/html' }),
@@ -295,10 +334,10 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     report.setup = await page.evaluate((size) => window.setup(size), 240);
     for (const name of names) {
       const base = name.slice(0, -5);
-      let info = {};
-      try {
-        info = JSON.parse(await readFile(path.join(dir, base + '.json'), 'utf8'));
-      } catch {}
+      const { info, sha256: metadataSha256 } = await readMotionMetadata(path.join(dir, base + '.json'));
+      const bytes = await readFile(path.join(dir, name));
+      activeClip = { name, bytes };
+      report.inputs.motions[base] = { vrmaSha256: sha256(bytes), metadataSha256 };
       const frames = Math.max(12, Math.min(180, Math.round((info.seconds ?? 2) * 30) + 1));
       const result = await page.evaluate(([n, f]) => window.measureClip(n, f, 5, 'three-quarter'), [name, frames]);
       const travel =

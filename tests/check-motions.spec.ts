@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { dirname } from 'node:path';
 // @ts-expect-error The script is plain ESM without types.
-import { judge, LINES } from '../scripts/characters/check-motions.mjs';
+import { judge, LINES, readMotionMetadata } from '../scripts/characters/check-motions.mjs';
 
 type Row = {
   t: number;
@@ -75,4 +77,17 @@ test('an in-place run may leave the floor and its planted foot goes back at the 
     ).reasons,
   ).toContain('floating');
   expect(LINES.slideShare).toBeGreaterThan(0);
+});
+
+test('motion measurements distinguish a missing sidecar from a corrupt one', async ({}, testInfo) => {
+  const file = testInfo.outputPath('motion.json');
+  expect(await readMotionMetadata(file)).toEqual({ info: {}, sha256: null });
+  await mkdir(dirname(file), { recursive: true });
+  await writeFile(file, 'bad JSON');
+  await expect(readMotionMetadata(file)).rejects.toThrow('Invalid motion measurements');
+  await writeFile(file, JSON.stringify({ seconds: '1.33' }));
+  await expect(readMotionMetadata(file)).rejects.toThrow('Invalid motion measurements');
+  const info = { seconds: 1.33, speedMps: 0, rootTravelM: [0, 0, 0.5] };
+  await writeFile(file, JSON.stringify(info));
+  expect(await readMotionMetadata(file)).toEqual({ info, sha256: expect.stringMatching(/^[a-f0-9]{64}$/) });
 });
