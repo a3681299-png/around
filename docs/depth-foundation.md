@@ -2,7 +2,7 @@
 
 2026-11-07、Claude Code。ブランチ `codex/depth-foundation`（`codex/creator-editor-spike` の `263579c` から）。設計は [設計書のスナップショット](product-design-snapshot.md)（rev 99）の「空間の設計思想」「部屋の素材の約束」「描画と性能」「エンジンの順番」の 1・2。部屋の測定は `codex/room-bake` の `docs/room-bake-plan.md`。
 
-**中核を触った**：`src/design/schema.ts`・`src/design/migrations.ts`・`src/world/`・`src/host/`（`page-controller.ts` を含む）・`src/sites/`・`scripts/build.mjs`・`playwright.config.ts`。**作品データを v16 に上げた**。Codex の検証では e2e 全件（Windows）が要る。
+**中核を触った**：`src/design/schema.ts`・`src/design/migrations.ts`・`src/world/`・`src/host/`（`page-controller.ts` を含む）・`src/sites/`・`scripts/build.mjs`・`playwright.config.ts`。**作品データを v17 に上げた**（ミルドの v16 の上に1段。初めは v16 で作り、ミルドを作業ブランチに取り込んだあと載せ直した）。Codex の検証では e2e 全件（Windows）が要る。
 
 ## 0. 見せられる成果
 
@@ -18,7 +18,7 @@
 | ページを読む         | `src/host/space.ts`                                       | ポインター・スクロール・reduced-motion・タブの可視・全画面・UI の領域・動画の色を読み、world の関数に通して描画に渡す。動いた時だけ描く                                                                                       |
 | 描く                 | `src/renderers/three/room.ts`                             | 1枚の canvas（ページの中身の下）。部屋を光の層を混ぜたライトマップで描き、1回のパスで板（ぼかし・縁の屈折・縁のハイライト・色味・読みやすさの濃さ）と、板の影・動画の光を部屋に足す                                           |
 | サイトの事情         | `src/sites/youtube-backdrop.ts`（`SiteAdapter.backdrop`） | YouTube 自身の背景（`html`・`body`・`ytd-app`）だけを透明にし、部屋の置き場所（`body` の子、`z-index:-1`）を渡す。UI の領域（いくつかの決まった入れ物と重要度）と動画の要素を渡す                                             |
-| 作品データ           | `src/design/space.ts`・v16                                | 部屋の素材・光の層の重み・カメラ・板の見た目・動画の光の数値だけ。シェーダー・選択子・CSS は入れない                                                                                                                          |
+| 作品データ           | `src/design/space.ts`・v17                                | 部屋の素材・光の層の重み・カメラ・板の見た目・動画の光の数値だけ。シェーダー・選択子・CSS は入れない                                                                                                                          |
 
 ### 重なり順（奥から）
 
@@ -61,7 +61,7 @@
 - **夜の映り込み**（余裕があれば）は入れていない
 - **キャラが板に触れた跡**は、キャラが部屋を歩く次の塊に回した（今回のキャラはプレーヤーの縁のまま）
 
-## 3. 作品データ（DesignDocument v16）
+## 3. 作品データ（DesignDocument v17）
 
 | 項目                         | 形                                                                                                               | 上限                                                 |
 | ---------------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
@@ -72,8 +72,9 @@
 | `space.videoLight`           | 動画の光の強さ                                                                                                   | 0〜2                                                 |
 | レイヤー・グループの `depth` | `'room'` だけ（省略は手前）                                                                                      | グループと中のレイヤーは同じ奥行き                   |
 
-- 移行：`migrateV15ToV16` を1段。形は変わらず、v15 以前に `space`・`depth` があれば拒否する（全段を素通りするので、最後の1段の検査で v1〜v15 を覆う）
-- 期待値：`history-v15.json`（`83601bb` の `tests/character-v15.spec.ts`）を足し、変更前の `263579c` のパーサーと `compileDesign` で取った（`tests/fixtures/designs/README.md`）
+- 移行：`migrateV16ToV17` を1段。形は変わらず、v16 以前に `space`・`depth` があれば拒否する（全段を素通りするので、最後の1段の検査で v1〜v16 を覆う）
+- 期待値：`history-v16.json`（ミルドの v16 を入れた `e6e958d` の `tests/character-data.spec.ts`）を足し、変更前の `43ec318`（ミルドを取り込んだ作業ブランチ）のパーサーと `compileDesign` で取った（`tests/fixtures/designs/README.md`）
+- 版の経緯：この塊は初め v16 で作った（`history-v15.json` と `263579c` の期待値）。同じ日にミルドが v16（動作の腰の高さ）で作業ブランチに先に入ったので、載せ直して v17 にした。v16 で保存した奥行きの土台の作品は外に出していない
 - 部屋の素材は作品データにもリポジトリにも入らない。作品は素材 ID だけを持つ。テスト用の部屋は環境変数 `WW_ROOM_FILE` で渡す。e2e は自前の小さな部屋（`tests/helpers/room-fixture.ts`、ここで作った箱）を使う
 - 利用者が実際に保存した過去の JSON での確認は、まだしていない
 
