@@ -1,6 +1,6 @@
 import { createCreatorPanel } from '../editor/panel';
 import { shortcutCommand } from '../editor-core/shortcuts';
-import type { EditorCheckpoint, EditCommand } from '../editor-core/types';
+import type { EditorCheckpoint, EditorRevision, EditCommand } from '../editor-core/types';
 import type { StudioConnection, StudioConnectionState, StudioRecovery } from './connection';
 import type { StudioPreferences } from './preferences';
 import type { StudioTarget } from './protocol';
@@ -18,7 +18,7 @@ interface StudioPorts {
   sidePanel?: boolean;
   connect(
     notify: (value: StudioConnectionState) => void,
-    checkpoint: (target: number, value: EditorCheckpoint | undefined) => void,
+    checkpoint: (target: number, value: EditorCheckpoint | undefined, origin: EditorRevision) => void,
   ): StudioConnection;
   recovery: StudioRecovery;
   preferences: StudioPreferences;
@@ -39,6 +39,13 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
     message = get('.connection-status'),
     recoveryStatus = get('.recovery-status');
   const connectionBar = get('.connection-bar');
+  const recoveryChoice = doc.createElement('section');
+  recoveryChoice.className = 'recovery-choice';
+  recoveryChoice.setAttribute('aria-label', '作業中のコピーの復旧');
+  recoveryChoice.innerHTML = `<p>保存済みの作品と作業中のコピーが異なります。保存済みの作品を使うと、作業中のコピーは破棄されます。</p><button type="button">保存済みの作品を使う</button><button type="button">作業中のコピーを復元</button>`;
+  recoveryChoice.hidden = true;
+  mount.before(recoveryChoice);
+  const [keepSaved, restoreDraft] = recoveryChoice.querySelectorAll('button');
   const settingsButton = doc.createElement('button');
   settingsButton.type = 'button';
   settingsButton.className = 'studio-display-settings';
@@ -78,12 +85,12 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
   let pendingCommands = 0,
     latest: StudioConnectionState | undefined;
   let recoveryTimer: ReturnType<typeof setTimeout> | undefined;
-  const backups = new Map<number, EditorCheckpoint | undefined>();
+  const backups = new Map<number, { value: EditorCheckpoint | undefined; origin: EditorRevision }>();
   const persist = () => {
     clearTimeout(recoveryTimer);
-    for (const [target, value] of backups) {
+    for (const [target, { value, origin }] of backups) {
       backups.delete(target);
-      void ports.recovery.write(target, value).then(
+      void ports.recovery.write(target, value, origin).then(
         () => {
           if (alive) recoveryStatus.textContent = '';
         },
@@ -94,10 +101,12 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
       );
     }
   };
-  const connection = ports.connect(render, (target, value) => {
-    backups.set(target, value);
+  const connection = ports.connect(render, (target, value, origin) => {
+    backups.set(target, { value, origin });
     clearTimeout(recoveryTimer);
-    recoveryTimer = setTimeout(persist, 180);
+    const previous = latest?.target === target ? latest.state : undefined;
+    if (!value || previous?.recoveryPending || (previous?.view.dirty && value.draft === value.saved)) persist();
+    else recoveryTimer = setTimeout(persist, 180);
   });
   const safety = ports.mountSafety?.(root, connection);
   const dispatch = (command: EditCommand) => {
@@ -111,6 +120,8 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
       if (!pendingCommands && latest) render(latest);
     });
   };
+  keepSaved!.addEventListener('click', () => dispatch({ type: 'keep-saved' }));
+  restoreDraft!.addEventListener('click', () => dispatch({ type: 'restore-draft' }));
   // A side panel's width (320–480, up to half a window) gets the one-column arrangement with tabs.
   const narrow = () => (doc.defaultView?.innerWidth ?? 0) < 720;
   let builtNarrow = narrow();
@@ -138,6 +149,8 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
       (ports.sidePanel && value.target !== undefined ? ports.hostName + ' #' + value.target + ' · ' : '') +
       value.message;
     message.dataset.connected = String(value.connected);
+    recoveryChoice.hidden = !value.state?.recoveryPending || !value.state.active;
+    keepSaved!.disabled = restoreDraft!.disabled = !value.connected || pendingCommands > 0;
     get<HTMLButtonElement>('.disconnect-target').disabled = !value.connected;
     get<HTMLButtonElement>('.focus-target').disabled = value.target === undefined;
     if (!value.state || (pendingCommands && value.connected && value.target === paneTarget)) return;
@@ -223,7 +236,7 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
     panel.host.toggleAttribute('data-disconnected', !ready);
     panel.render({
       ...value.state.view,
-      saving: value.state.view.saving || !ready,
+      saving: value.state.view.saving || !ready || Boolean(value.state.recoveryPending),
       ...(importError ? { status: importError, error: true } : {}),
     });
   }
@@ -292,6 +305,7 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
     if (
       !connection.isConnected ||
       !connection.state?.active ||
+      connection.state.recoveryPending ||
       panel?.host.hasAttribute('data-ww-scrubbing') ||
       event.isComposing ||
       event

@@ -129,6 +129,19 @@ select:focus-visible {
   color: var(--ink);
   background: var(--surface-sunk);
 }
+.recovery-choice {
+  padding: var(--space-8);
+  color: var(--ink);
+  background: var(--surface-sunk);
+  border-bottom: 1px solid var(--line);
+}
+.recovery-choice p {
+  margin: 0 0 var(--space-8);
+}
+.recovery-choice button {
+  margin: 0 var(--space-8) var(--space-4) 0;
+  border: 1px solid var(--line-control);
+}
 
 body[data-sidepanel] .connection-bar label,
 body[data-sidepanel] .refresh-targets,

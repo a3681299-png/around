@@ -390,6 +390,8 @@ test('Studio deltas preserve gestures, Undo/Redo, save/discard and the bounded h
   expect(restored.history.past[0]!.decorations[1]).toBe(restored.history.past[1]!.decorations[1]);
   const recovered = harness();
   await Promise.resolve();
+  // A reload reads the same persisted artwork before adopting its checkpoint.
+  recovered.set(restored.saved!);
   recovered.editor.setEnabled(true);
   recovered.editor.open();
   await recovered.editor.restore(restored);
@@ -603,6 +605,7 @@ test('signal key edits share gesture history, locks, save/discard and session re
   const checkpoint = editor.checkpoint(),
     recovered = harness();
   await Promise.resolve();
+  recovered.set(checkpoint.saved!);
   recovered.editor.setEnabled(true);
   recovered.editor.open();
   await recovered.editor.restore(checkpoint);
@@ -682,6 +685,23 @@ test('checkpoint reload preserves draft, selection, asset references and Undo; a
   expect(b.editor.snapshot().view.dirty).toBe(true);
   await b.editor.execute({ type: 'discard' });
   expect(b.editor.snapshot().document).toEqual(incoming);
+  a.editor.destroy();
+  b.editor.destroy();
+});
+test('a legacy dirty checkpoint without a proven base waits for the author', async () => {
+  const a = await opened();
+  const { origin: _origin, ...legacy } = a.editor.checkpoint();
+  const b = harness();
+  await Promise.resolve();
+  b.editor.setEnabled(true);
+  b.editor.open();
+  await b.editor.restore(legacy);
+  expect(b.editor.snapshot().recoveryPending).toBe(true);
+  expect(b.editor.snapshot().document.decorations).toEqual([]);
+  await b.editor.execute({ type: 'restore-draft' });
+  expect(b.editor.snapshot().recoveryPending).toBeUndefined();
+  expect(b.editor.snapshot().document).toEqual(legacy.draft);
+  expect(b.editor.snapshot().saved).toBeUndefined();
   a.editor.destroy();
   b.editor.destroy();
 });

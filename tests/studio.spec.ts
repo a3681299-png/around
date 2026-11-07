@@ -8,7 +8,7 @@ import { observeImports, uploadLeases, type StudioImportProbe } from './helpers/
 import { unpackCheckpoint } from '../src/studio/checkpoint-codec';
 import { createStudioStateDecoder } from '../src/studio/state-sync';
 import type { StudioMessage } from '../src/studio/protocol';
-import type { EditorSnapshot } from '../src/editor-core/types';
+import type { EditorRevision, EditorSnapshot } from '../src/editor-core/types';
 import { beginCanvasGesture } from './helpers/editor-workspace';
 
 const overlay = '#web-world-themes-decorations',
@@ -43,6 +43,104 @@ async function save(panel: Locator) {
 async function stored(popup: Page) {
   return popup.evaluate(async (key) => (await chrome.storage.local.get(key))[key] as DesignDocument, key);
 }
+
+test('reopening Studio after save ignores a checkpoint from before that save', async ({ context, popup, youtube }) => {
+  const { studio, panel } = await launch(context, popup, youtube);
+  await importImages(panel, youtube, 1);
+  const recoveryKey = 'webWorldThemes.studio.session.' + new URL(studio.url()).searchParams.get('target');
+  const readRecovery = () => popup.evaluate(async (key) => (await chrome.storage.session.get(key))[key], recoveryKey);
+  await expect.poll(async () => unpackCheckpoint(await readRecovery())?.draft.decorations[0]?.name).toBe('petal.png');
+  const beforeSave = await readRecovery();
+  const name = panel.getByLabel('レイヤー名', { exact: true });
+  await name.fill('保存した花');
+  await name.press('Tab');
+  await save(panel);
+  const origin = unpackCheckpoint(beforeSave)?.origin;
+  const savedThrough = await popup.evaluate(async () => {
+    const key = 'webWorldThemes.studio.savedThrough.youtube';
+    return (await chrome.storage.local.get(key))[key] as EditorRevision;
+  });
+  expect(savedThrough).toMatchObject({ sessionId: origin?.sessionId, revision: expect.any(Number) });
+  expect(savedThrough.revision).toBeGreaterThan(origin!.revision);
+  await studio.close();
+  // Reproduce the checkpoint left behind when the Studio page disappears before
+  // the debounced write, even though the artwork save has completed.
+  await popup.evaluate(({ key, value }) => chrome.storage.session.set({ [key]: value }), {
+    key: recoveryKey,
+    value: beforeSave,
+  });
+  await youtube.reload();
+  const reopened = await launch(context, popup, youtube);
+  await expect(reopened.panel.getByRole('button', { name: '保存した花', exact: true })).toBeVisible();
+  await expect(reopened.panel.locator('.dirty')).toHaveText('保存済み');
+  expect((await stored(popup)).decorations[0]?.name).toBe('保存した花');
+});
+
+for (const decision of ['restore', 'keep saved'] as const)
+  test(`a draft and a different saved artwork require an explicit recovery choice: ${decision}`, async ({
+    context,
+    popup,
+    youtube,
+  }, info) => {
+    const { studio, panel } = await launch(context, popup, youtube);
+    await importImages(panel, youtube, 1);
+    await save(panel);
+    const name = panel.getByLabel('レイヤー名', { exact: true });
+    await name.fill('未保存の花');
+    await name.press('Tab');
+    const target = Number(new URL(studio.url()).searchParams.get('target'));
+    const recoveryKey = 'webWorldThemes.studio.session.' + target;
+    const readRecovery = () => popup.evaluate(async (key) => (await chrome.storage.session.get(key))[key], recoveryKey);
+    await expect
+      .poll(async () => unpackCheckpoint(await readRecovery())?.draft.decorations[0]?.name)
+      .toBe('未保存の花');
+    await studio.close();
+
+    const other = await context.newPage();
+    await other.goto('https://www.youtube.com/watch?v=other-recovery-target');
+    const second = await launch(context, popup, other);
+    await second.panel.getByRole('button', { name: 'petal.png', exact: true }).click();
+    const secondName = second.panel.getByLabel('レイヤー名', { exact: true });
+    await secondName.fill('別タブで保存した花');
+    await secondName.press('Tab');
+    await save(second.panel);
+    await second.studio.close();
+    // One choice uses the detached live session, the other a checkpoint
+    // after the YouTube document and its in-memory editor have gone away.
+    if (decision === 'keep saved') await youtube.reload();
+
+    const reopened = await launch(context, popup, youtube);
+    const choice = reopened.studio.getByRole('region', { name: '作業中のコピーの復旧' });
+    await expect(choice).toBeVisible();
+    await expect(reopened.panel.getByRole('button', { name: '別タブで保存した花', exact: true })).toBeVisible();
+    expect(unpackCheckpoint(await readRecovery())?.draft.decorations[0]?.name).toBe('未保存の花');
+    await expect(reopened.panel.getByRole('button', { name: '保存', exact: true })).toBeDisabled();
+    if (decision === 'keep saved') {
+      await reopened.studio.screenshot({ path: info.outputPath('recovery-choice.png') });
+      await reopened.studio.close();
+      await youtube.reload();
+      const again = await launch(context, popup, youtube);
+      const options = again.studio.getByRole('region', { name: '作業中のコピーの復旧' });
+      await expect(options).toBeVisible();
+      await options.getByRole('button', { name: '保存済みの作品を使う' }).click();
+      await expect(options).toBeHidden();
+      await expect
+        .poll(async () => unpackCheckpoint(await readRecovery())?.draft.decorations[0]?.name)
+        .toBe('別タブで保存した花');
+      await again.studio.close();
+      await youtube.reload();
+      const final = await launch(context, popup, youtube);
+      await expect(final.studio.getByRole('region', { name: '作業中のコピーの復旧' })).toBeHidden();
+      await expect(final.panel.locator('.dirty')).toHaveText('保存済み');
+      expect((await stored(popup)).decorations[0]?.name).toBe('別タブで保存した花');
+      return;
+    }
+    await choice.getByRole('button', { name: '作業中のコピーを復元' }).click();
+    await expect(choice).toBeHidden();
+    await expect(reopened.panel.getByRole('button', { name: '未保存の花', exact: true })).toBeVisible();
+    expect((await stored(popup)).decorations[0]?.name).toBe('別タブで保存した花');
+    await expect(reopened.panel.locator('.dirty')).toHaveText('未保存');
+  });
 
 test('Studio uploads small files directly, sends only asset IDs and preserves saved history', async ({
   context,

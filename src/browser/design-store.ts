@@ -1,7 +1,10 @@
 // The extension's storage of artworks (chrome.storage.local), one per site.
 import { parseDesign } from '../design/schema';
 import type { DesignDocument } from '../design/types';
+import type { EditorRevision } from '../editor-core/types';
 import { designKey } from '../storage/designs';
+
+const savedThroughKey = (siteId: string) => `webWorldThemes.studio.savedThrough.${siteId}`;
 
 export async function readDesign(siteId: string): Promise<DesignDocument | undefined> {
   const key = designKey(siteId);
@@ -12,9 +15,19 @@ export async function readDesign(siteId: string): Promise<DesignDocument | undef
   return design;
 }
 
-export async function saveDesign(input: DesignDocument): Promise<void> {
+export async function readSavedThrough(siteId: string): Promise<EditorRevision | undefined> {
+  const key = savedThroughKey(siteId);
+  return (await chrome.storage.local.get(key))[key] as EditorRevision | undefined;
+}
+
+export async function saveDesign(input: DesignDocument, savedThrough?: EditorRevision): Promise<void> {
   const design = parseDesign(input);
-  await chrome.storage.local.set({ [designKey(design.siteId)]: design });
+  // Record the checkpoint boundary with the artwork, even if Studio disconnects
+  // before the save acknowledgement reaches it.
+  await chrome.storage.local.set({
+    [designKey(design.siteId)]: design,
+    ...(savedThrough ? { [savedThroughKey(design.siteId)]: savedThrough } : {}),
+  });
 }
 
 /** Like settings, subscribe before reading so a slow read cannot undo an update. */

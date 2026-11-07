@@ -76,6 +76,8 @@ export type EditCommand =
         | 'undo'
         | 'redo'
         | 'discard'
+        | 'restore-draft'
+        | 'keep-saved'
         | 'save'
         | 'close'
         | 'begin';
@@ -109,7 +111,7 @@ export interface EditorStorage<Source> {
   watch(accept: (doc: DesignDocument | undefined) => void, error: (error: unknown) => void): () => void;
   retain(session: string, ids: readonly string[]): Promise<void>;
   release(session: string): Promise<void>;
-  save(doc: DesignDocument, session: string): Promise<void>;
+  save(doc: DesignDocument, session: string, revision: number): Promise<void>;
   validate(doc: DesignDocument, session: string): Promise<void>;
   import(source: Source, session: string): Promise<readonly EditorAsset[]>;
   cancelImport(): void;
@@ -132,7 +134,9 @@ export interface EditorPorts<Source> {
 export interface EditorCheckpoint {
   version: 1;
   siteId: string;
+  origin?: EditorRevision;
   draft: DesignDocument;
+  /** Saved artwork the draft was based on, even if another tab has since saved. */
   saved?: DesignDocument;
   selectedIds: string[];
   selectedTarget?: string;
@@ -140,13 +144,21 @@ export interface EditorCheckpoint {
   snapping: boolean;
   history: HistoryCheckpoint<DesignDocument>;
 }
-export interface EditorSnapshot {
+export interface EditorRevision {
   sessionId: string;
   revision: number;
+}
+
+export interface EditorSnapshot extends EditorRevision {
+  /** Present when a view-only update advanced the command revision. */
+  checkpointRevision?: number;
   active: boolean;
   enabled: boolean;
   view: EditorView;
   document: DesignDocument;
   saved?: DesignDocument;
+  /** Present when a dirty draft is based on a different saved artwork. */
+  draftBase?: { saved?: DesignDocument };
+  recoveryPending?: true;
   selectedTarget?: string;
 }

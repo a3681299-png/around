@@ -53,8 +53,10 @@ export function createEditorSession<Source extends { readonly length: number }>(
   const checkDesignAssets = storage.validate,
     saveDesign = storage.save;
   let saved: DesignDocument | undefined,
+    draftBase: DesignDocument | undefined,
     draft = readDesign(emptyDesign(ports.siteId, ports.baseThemeId)),
-    pendingSave: DesignDocument | undefined;
+    pendingSave: DesignDocument | undefined,
+    recovery: EditorCheckpoint | undefined;
   let active = false,
     enabled = false,
     settingsReceived = false,
@@ -78,7 +80,8 @@ export function createEditorSession<Source extends { readonly length: number }>(
     assetSession: string | undefined,
     leased = '';
   let sessionId = '',
-    revision = 0;
+    revision = 0,
+    checkpointRevision = 0;
   let leaseQueue: Promise<void> = Promise.resolve();
   const deferredReleases = new Set<string>(),
     listeners = new Set<(state: EditorSnapshot) => void>();
@@ -132,23 +135,32 @@ export function createEditorSession<Source extends { readonly length: number }>(
     return {
       sessionId,
       revision,
+      ...(checkpointRevision !== revision ? { checkpointRevision } : {}),
       active,
       enabled,
       view: freezeTree(view()),
       document: draft,
       ...(saved ? { saved } : {}),
+      ...(draftBase !== saved ? { draftBase: draftBase ? { saved: draftBase } : {} } : {}),
+      ...(recovery ? { recoveryPending: true } : {}),
       ...(selectedTarget ? { selectedTarget } : {}),
     };
   }
-  const render = () => {
+  const render = (checkpointChanged = true) => {
     revision++;
+    if (checkpointChanged) checkpointRevision = revision;
     const state = snapshot();
     listeners.forEach((listener) => listener(state));
   };
   const syncAssets = (): Promise<void> => {
     const session = assetSession;
     if (!session) return Promise.resolve();
-    const ids = [...new Set([draft, ...history.values()].flatMap(designAssetIds))];
+    const documents = [draft, ...history.values()];
+    if (recovery) {
+      documents.push(recovery.draft, ...recovery.history.past, ...recovery.history.future);
+      if (recovery.history.transaction) documents.push(recovery.history.transaction);
+    }
+    const ids = [...new Set(documents.flatMap(designAssetIds))];
     const key = ids.sort().join(',');
     leaseQueue = leaseQueue
       .catch(() => undefined)
@@ -173,6 +185,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     if (record) history.record(draft, parsed);
     draft = parsed;
     dirty = draft !== initial();
+    if (!dirty) draftBase = saved;
     status = dirty ? 'このタブでプレビュー中です。保存すると各タブに反映します。' : '保存済みの見た目です。';
     error = false;
     render();
@@ -208,6 +221,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     clearSelection();
     active = false;
     draft = initial();
+    draftBase = saved;
     dirty = false;
     render();
   };
@@ -567,6 +581,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     history.reset();
     interactionEpoch++;
     draft = initial();
+    draftBase = saved;
     dirty = false;
     status = '変更を破棄しました。';
     error = false;
@@ -764,6 +779,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     loadError = undefined;
     if (pendingSave && sameDesign(incoming, pendingSave)) {
       draft = initial();
+      draftBase = saved;
       dirty = false;
     } else if (!dirty) {
       if (!sameDesign(previous, incoming)) {
@@ -771,6 +787,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
         interactionEpoch++;
       }
       draft = initial();
+      draftBase = saved;
       if (active) {
         status = '保存済みのデザインを読み込みました。';
         error = false;
@@ -794,6 +811,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     if (!dirty || saving || importing || !assetSession) return;
     const saveSession = assetSession;
     const snapshot = draft;
+    const savedRevision = revision;
     pendingSave = snapshot;
     saving = true;
     status = '保存しています…';
@@ -803,7 +821,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
       // Renew the session's complete draft/history lease before crossing the save boundary.
       leased = '';
       await syncAssets();
-      await saveDesign(snapshot, saveSession);
+      await saveDesign(snapshot, saveSession, savedRevision);
       const epoch = storageEpoch;
       const latest = await storage.read();
       if (!alive) return;
@@ -833,6 +851,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
     if (loadError) return { ok: false, error: loadError };
     if (active) return { ok: true };
     draft = initial();
+    draftBase = saved;
     history.reset();
     interactionEpoch++;
     selectedImageIds = [];
@@ -853,6 +872,18 @@ export function createEditorSession<Source extends { readonly length: number }>(
   async function execute(command: EditCommand): Promise<void> {
     command = parseEditCommand(command);
     if (!active) throw new Error('編集セッションが開かれていません。');
+    if (command.type === 'restore-draft') {
+      if (recovery) await restore(recovery, undefined, true);
+      return;
+    }
+    if (command.type === 'keep-saved') {
+      if (recovery) {
+        recovery = undefined;
+        discard();
+      }
+      return;
+    }
+    if (recovery && command.type !== 'close') throw new Error('先に作業中のコピーを復元するか選んでください。');
     if ((saving || importing) && command.type !== 'close' && command.type !== 'tool')
       throw new Error('処理中です。完了を待ってください。');
     switch (command.type) {
@@ -913,7 +944,7 @@ export function createEditorSession<Source extends { readonly length: number }>(
           ...(command.state ? { state: command.state } : {}),
           ...(command.compact ? { compact: true } : {}),
         };
-        render();
+        render(false);
         break;
       case 'placements':
         changePlacements(command.changes);
@@ -971,19 +1002,36 @@ export function createEditorSession<Source extends { readonly length: number }>(
     }
   }
   function checkpoint(): EditorCheckpoint {
-    return {
-      version: 1,
-      siteId: ports.siteId,
-      draft,
-      ...(saved ? { saved } : {}),
-      selectedIds: [...selectedImageIds],
-      tool,
-      ...(selectedTarget ? { selectedTarget } : {}),
-      snapping,
-      history: history.checkpoint(),
-    };
+    return (
+      recovery ?? {
+        version: 1,
+        siteId: ports.siteId,
+        origin: { sessionId, revision: checkpointRevision },
+        draft,
+        ...(draftBase ? { saved: draftBase } : {}),
+        selectedIds: [...selectedImageIds],
+        tool,
+        ...(selectedTarget ? { selectedTarget } : {}),
+        snapping,
+        history: history.checkpoint(),
+      }
+    );
   }
-  async function restore(value: EditorCheckpoint) {
+  function offerRecovery(value: EditorCheckpoint) {
+    recovery = value;
+    draft = initial();
+    draftBase = saved;
+    dirty = false;
+    history.reset();
+    interactionEpoch++;
+    selectedImageIds = [];
+    clearSelection();
+    status = '保存済みの作品を表示しています。';
+    error = false;
+    render();
+    settleAssets();
+  }
+  async function restore(value: EditorCheckpoint, savedThrough?: EditorCheckpoint['origin'], confirmed = false) {
     if (!active || saving || importing || value.version !== 1 || value.siteId !== ports.siteId)
       throw new Error('この編集セッションに復元できません。');
     const restoringSession = sessionId;
@@ -1007,23 +1055,60 @@ export function createEditorSession<Source extends { readonly length: number }>(
     restored.restore(value.history);
     if (restored.values().some((doc) => doc.siteId !== ports.siteId))
       throw new Error('復旧データの対象が一致しません。');
+    const restoreSelection = () => {
+      selectedImageIds = normalizeSelection(value.selectedIds, draft.decorations, draft.groups ?? []);
+      selectedTarget = value.selectedTarget;
+      snapping = value.snapping;
+      tool = value.tool ?? 'select';
+    };
+    const origin = value.origin;
+    const hasOrigin =
+      origin &&
+      typeof origin.sessionId === 'string' &&
+      origin.sessionId.length > 0 &&
+      Number.isSafeInteger(origin.revision) &&
+      origin.revision >= 0;
+    if (
+      !confirmed &&
+      hasOrigin &&
+      savedThrough &&
+      origin.sessionId === savedThrough.sessionId &&
+      origin.revision <= savedThrough.revision
+    ) {
+      // Preserve editor context for IDs that still exist, without applying
+      // the superseded artwork or its Undo history.
+      restoreSelection();
+      render();
+      return;
+    }
+    const offerChoice = () => {
+      if (confirmed) return false;
+      const sameBase = sameDesign(restoredSaved, saved);
+      // Older checkpoints recorded the latest saved artwork, which could
+      // already have changed while their draft still had a different base.
+      if (sameBase && (hasOrigin || sameDesign(next, initial()))) return false;
+      // A clean old checkpoint, or a draft identical to the saved artwork,
+      // has no unsaved work. Its history belongs to a different baseline.
+      if (!sameDesign(next, restoredSaved ?? empty) && !sameDesign(next, initial())) offerRecovery(value);
+      return true;
+    };
+    if (offerChoice()) return;
     const ids = [...new Set([next, ...restored.values()].flatMap(designAssetIds))];
     await retainAssets(assetSession!, ids);
     await checkDesignAssets(next, assetSession!);
     if (!active || restoringSession !== sessionId) return;
+    // Another tab can save while validation is in flight.
+    if (offerChoice()) return;
+    recovery = undefined;
     history.restore(restored.checkpoint());
     if (history.active) history.commit(next);
     draft = shareDesign(initial(), next);
-    selectedImageIds = normalizeSelection(value.selectedIds, draft.decorations, draft.groups ?? []);
-    selectedTarget = value.selectedTarget;
-    snapping = value.snapping;
-    tool = value.tool ?? 'select';
+    draftBase = saved;
+    restoreSelection();
     dirty = draft !== initial();
     interactionEpoch++;
-    error = !sameDesign(restoredSaved, saved);
-    status = error
-      ? '復旧中に保存済みデザインが変わりました。プレビューを保持しています。保存すると上書きし、破棄すると最新の保存値に戻ります。'
-      : '編集セッションとUndo履歴を復元しました。';
+    error = false;
+    status = '編集セッションとUndo履歴を復元しました。';
     render();
     settleAssets();
   }
@@ -1034,6 +1119,9 @@ export function createEditorSession<Source extends { readonly length: number }>(
     snapshot,
     checkpoint,
     restore,
+    checkDetachedRecovery() {
+      if (!recovery && dirty && !sameDesign(draftBase, saved)) offerRecovery(checkpoint());
+    },
     import: addImages,
     importSkin: addSkinImage,
     importMotions: addMotions,

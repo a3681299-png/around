@@ -1,4 +1,4 @@
-import type { EditCommand, EditorCheckpoint, EditorSnapshot } from '../editor-core/types';
+import type { EditCommand, EditorCheckpoint, EditorRevision, EditorSnapshot } from '../editor-core/types';
 import type { StudioTarget } from './protocol';
 import type { TimelinePort } from '../timeline/types';
 import type { SkinPageInfo } from '../editor/skin-status';
@@ -47,5 +47,5 @@ export interface StudioConnection {
 }
 export interface StudioRecovery {
   read(target: number): Promise<EditorCheckpoint | undefined>;
-  write(target: number, checkpoint: EditorCheckpoint | undefined): Promise<void>;
+  write(target: number, checkpoint: EditorCheckpoint | undefined, origin: EditorRevision): Promise<void>;
 }
