@@ -116,6 +116,9 @@ export interface UiRegion {
   /** The plate's margin around the region (default PLATE_PAD_PX). A bar that meets an opaque part
    * of the page (the masthead) takes none, or the margin shows as a strip. */
   pad?: number;
+  /** A whole column the adapter found text in that none of its known parts covers (YouTube
+   * renamed a part): the readability's way out. It is kept first, past every limit. */
+  fallback?: boolean;
 }
 export interface GlassPlate {
   left: number;
@@ -124,6 +127,7 @@ export interface GlassPlate {
   bottom: number;
   importance: Exclude<RegionImportance, 'free'>;
   video: boolean;
+  fallback?: boolean;
 }
 /** One plate per part with text or controls (a comment, a recommendation's text, a button row). */
 export const PLATE_LIMIT = 48;
@@ -143,11 +147,14 @@ export function glassPlates(regions: readonly UiRegion[], viewport: { width: num
       bottom: Math.min(viewport.height + PLATE_PAD_PX, r.top + r.height + pad),
       importance: r.importance,
       video: Boolean(r.video),
+      ...(r.fallback ? { fallback: true } : {}),
     };
     if (plate.right <= plate.left || plate.bottom <= plate.top) continue;
     plates.push(plate);
   }
-  plates.sort((a, b) => (a.importance === b.importance ? 0 : a.importance === 'operate' ? -1 : 1));
+  // The fallback first (it is what keeps unrecognised text readable), then the controls.
+  const rank = (p: GlassPlate) => (p.fallback ? 0 : p.importance === 'operate' ? 1 : 2);
+  plates.sort((a, b) => rank(a) - rank(b));
   return plates.slice(0, PLATE_LIMIT);
 }
 export const samePlates = (a: readonly GlassPlate[], b: readonly GlassPlate[]) =>

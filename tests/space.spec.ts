@@ -136,6 +136,15 @@ test.describe('space: glass plates', () => {
     const many = Array.from({ length: PLATE_LIMIT + 5 }, (_, i) => region('read', i * 10, 0));
     expect(glassPlates(many, viewport)).toHaveLength(PLATE_LIMIT);
   });
+
+  test('a fallback plate (a column with text the adapter did not recognise) is never dropped by the limit', () => {
+    const many = Array.from({ length: PLATE_LIMIT + 5 }, (_, i) => region(i % 2 ? 'operate' : 'read', i * 10, 0));
+    const column: UiRegion = { ...region('read', 1144, 56, 456, 800), fallback: true };
+    const plates = glassPlates([...many, column], viewport);
+    expect(plates).toHaveLength(PLATE_LIMIT);
+    expect(plates[0]).toMatchObject({ left: 1144 - PLATE_PAD_PX, importance: 'read', fallback: true });
+    expect(plates.slice(1).every((p) => !p.fallback)).toBe(true);
+  });
 });
 
 test.describe('space: readability', () => {

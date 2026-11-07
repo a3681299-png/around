@@ -41,10 +41,12 @@ if (autonomyPace !== 1 && !outputName.startsWith('.work/'))
 // The depth foundation (docs/depth-foundation.md): a probe for tests (the room's state on the
 // document and its drawn pixels), and builds that break its protections on purpose, to see their
 // tests fail: `stacking` draws room-depth artwork over the UI instead of under it, `density`
-// draws the glass plates without the readability density.
+// draws the glass plates without the readability density. `names` stands in for YouTube renaming
+// its parts: the adapter knows none of its text parts, so only the fallback plates are left.
 const spaceProbe = process.env.WW_SPACE_PROBE === '1';
 const spaceBreak = process.env.WW_SPACE_BREAK ?? '';
-if (!['', 'stacking', 'density'].includes(spaceBreak)) throw new Error('WW_SPACE_BREAK must be stacking or density.');
+if (!['', 'stacking', 'density', 'names'].includes(spaceBreak))
+  throw new Error('WW_SPACE_BREAK must be stacking, density or names.');
 if ((spaceProbe || spaceBreak) && !outputName.startsWith('.work/'))
   throw new Error('Space probes and broken space builds must stay inside .work.');
 const watching = process.argv.includes('--watch');

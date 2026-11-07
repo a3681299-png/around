@@ -43,6 +43,8 @@ test('real YouTube: the room behind the UI, glass plates that keep text readable
   if (process.env.WW_SPACE_BREAK) variant['WW_SPACE_BREAK'] = process.env.WW_SPACE_BREAK;
   const extensionPath = await layeringBuild(DEFAULT_LAYERING, variant);
   const scheme = process.env.WW_SPACE_SCHEME === 'light' ? 'light' : 'dark';
+  const names = process.env.WW_SPACE_BREAK === 'names';
+  const tag = names ? `${scheme}-names` : scheme;
   const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-space-live-')), false, {
     headed: true,
     width: 1600,
@@ -160,7 +162,7 @@ test('real YouTube: the room behind the UI, glass plates that keep text readable
     await declinePromotion(page);
     await page.mouse.move(800, 470);
     await page.waitForTimeout(2500);
-    await page.screenshot({ path: path.join(shots, `${scheme}-1-rest.png`), caret: 'initial' });
+    await page.screenshot({ path: path.join(shots, `${tag}-1-rest.png`), caret: 'initial' });
 
     // The room is under the content: the canvas is never what a point on the page hits (a grid
     // over the whole viewport), and the page background is transparent.
@@ -187,7 +189,7 @@ test('real YouTube: the room behind the UI, glass plates that keep text readable
     await page.mouse.move(1550, 120, { steps: 8 });
     await page.waitForTimeout(1500);
     const right = await frame();
-    await page.screenshot({ path: path.join(shots, `${scheme}-2-pointer-right.png`), caret: 'initial' });
+    await page.screenshot({ path: path.join(shots, `${tag}-2-pointer-right.png`), caret: 'initial' });
     // Inside the viewport (the window is taller than the page's view by its own frame).
     await page.mouse.move(60, 780, { steps: 8 });
     await page.waitForTimeout(1500);
@@ -211,41 +213,80 @@ test('real YouTube: the room behind the UI, glass plates that keep text readable
     await page.waitForTimeout(2500);
     const scrolled = await frame();
     expect(scrolled.camera[2]).toBeGreaterThan(0.3);
-    await page.screenshot({ path: path.join(shots, `${scheme}-3-comments.png`), caret: 'initial' });
+    await page.screenshot({ path: path.join(shots, `${tag}-3-comments.png`), caret: 'initial' });
     await page.screenshot({
-      path: path.join(shots, `${scheme}-3-comments-gaps.png`),
+      path: path.join(shots, `${tag}-3-comments-gaps.png`),
       caret: 'initial',
       clip: { x: 0, y: 200, width: 760, height: 420 },
     });
 
-    // Readability: inside every visible text part (each comment, each recommendation's text), the
-    // drawn background keeps the scheme's protected text at 4.5:1 (an 16 px grid).
-    // The points are behind the text itself: a grid over each run of text in view.
+    // The readability's way out stays out of sight on today's YouTube: every text part is known, so
+    // no column plate. A build without the part names (WW_SPACE_BREAK=names) plates the columns.
+    const fallback = (await frame()).fallback as number[][];
+    console.log(`[space-live] fallback column plates: ${JSON.stringify(fallback)}`);
+    if (names) expect(fallback.length).toBeGreaterThan(0);
+    else expect(fallback).toEqual([]);
+
+    // Readability: behind every visible run of text in the page's columns (each comment, each
+    // recommendation's text, the title, the masthead; known to the adapter or not), the drawn
+    // background keeps the scheme's protected text at 4.5:1. Text on a picture (the player, a
+    // thumbnail) or on a part YouTube paints opaque is read against that, not the room.
     const grid = await page.evaluate(() => {
       const pts: [number, number][] = [];
       const range = document.createRange();
+      const picture = '#movie_player, ytd-thumbnail, yt-thumbnail-view-model, yt-collection-thumbnail-view-model, img';
+      const opaque = (e: Element | null) => {
+        for (let n = e; n && n.localName !== 'ytd-app'; n = n.parentElement) {
+          const c =
+            getComputedStyle(n)
+              .backgroundColor.match(/[\d.]+/g)
+              ?.map(Number) ?? [];
+          if (c.length === 3 || (c.length === 4 && c[3]! >= 0.95)) return true;
+        }
+        return false;
+      };
       for (const e of document.querySelectorAll(
-        'ytd-watch-flexy ytd-comment-view-model #main, ytd-watch-flexy yt-lockup-metadata-view-model, ytd-watch-metadata #title',
+        'ytd-watch-flexy:not([hidden]) #below, ytd-watch-flexy:not([hidden]) #secondary, #masthead-container',
       )) {
-        const walker = document.createTreeWalker(e, NodeFilter.SHOW_TEXT);
-        // Text clipped by its part (an ellipsis past the column) or the page (under the scrollbar)
-        // is not shown: only the text inside the part's own box counts.
-        const part = e.getBoundingClientRect();
-        const right = Math.min(part.right, document.documentElement.clientWidth);
+        const walker = document.createTreeWalker(e, NodeFilter.SHOW_TEXT, {
+          // Text not shown (a tooltip waiting, opacity 0) is not read.
+          acceptNode: (n) =>
+            n.parentElement?.closest(picture) ||
+            !n.parentElement?.checkVisibility({ opacityProperty: true, visibilityProperty: true }) ||
+            opaque(n.parentElement)
+              ? NodeFilter.FILTER_REJECT
+              : NodeFilter.FILTER_ACCEPT,
+        });
+        // Text clipped by a box it is in (an ellipsis past a recommendation's text) or by the page
+        // (under the scrollbar, under the masthead) is not shown: only the shown part counts.
+        const clipOf = (n: Element) => {
+          let l = 0,
+            t = 64,
+            r = document.documentElement.clientWidth,
+            b = innerHeight;
+          for (let p: Element | null = n; p && p !== e.parentElement; p = p.parentElement) {
+            const s = getComputedStyle(p);
+            if (s.overflowX === 'visible' && s.overflowY === 'visible') continue;
+            const box = p.getBoundingClientRect();
+            l = Math.max(l, box.left);
+            t = Math.max(t, box.top);
+            r = Math.min(r, box.right);
+            b = Math.min(b, box.bottom);
+          }
+          return { l, t, r, b };
+        };
         for (let node = walker.nextNode(); node; node = walker.nextNode()) {
           if (!node.nodeValue?.trim()) continue;
+          const clip = clipOf(node.parentElement!);
           range.selectNodeContents(node);
           for (const r of range.getClientRects())
-            for (
-              let y = Math.max(r.top, part.top, 64) + 2;
-              y < Math.min(r.bottom, part.bottom, innerHeight) - 2;
-              y += 6
-            )
-              for (let x = Math.max(r.left, part.left, 0) + 1; x < Math.min(r.right, right) - 1; x += 12)
-                pts.push([x, y]);
+            for (let y = Math.max(r.top, clip.t) + 2; y < Math.min(r.bottom, clip.b) - 2; y += 6)
+              for (let x = Math.max(r.left, clip.l) + 1; x < Math.min(r.right, clip.r) - 1; x += 12) pts.push([x, y]);
         }
       }
-      return pts.slice(0, 4000);
+      // An even share of every part when there are more points than one readback takes.
+      const step = Math.max(1, Math.ceil(pts.length / 4000));
+      return pts.filter((_, i) => i % step === 0);
     });
     const pixels = await roomPixels(page, grid);
     const text = PLATE_TEXT[scheme].text;
@@ -280,7 +321,7 @@ test('real YouTube: the room behind the UI, glass plates that keep text readable
     await expect.poll(paused).toBe(!before);
     await page.keyboard.press('t');
     await page.waitForTimeout(2500);
-    await page.screenshot({ path: path.join(shots, `${scheme}-4-theater.png`), caret: 'initial' });
+    await page.screenshot({ path: path.join(shots, `${tag}-4-theater.png`), caret: 'initial' });
     // The theater's sides: the room on both sides of the picture.
     const sides = await page.evaluate(() => {
       const v = document.querySelector('#movie_player video')!.getBoundingClientRect();
@@ -288,7 +329,7 @@ test('real YouTube: the room behind the UI, glass plates that keep text readable
     });
     if (sides.left > 40)
       await page.screenshot({
-        path: path.join(shots, `${scheme}-4-theater-side.png`),
+        path: path.join(shots, `${tag}-4-theater-side.png`),
         caret: 'initial',
         clip: {
           x: 0,
@@ -300,7 +341,7 @@ test('real YouTube: the room behind the UI, glass plates that keep text readable
     await page.keyboard.press('t');
     await page.setViewportSize({ width: 1100, height: 760 }).catch(() => undefined);
     await page.waitForTimeout(1500);
-    await page.screenshot({ path: path.join(shots, `${scheme}-5-narrow.png`), caret: 'initial' });
+    await page.screenshot({ path: path.join(shots, `${tag}-5-narrow.png`), caret: 'initial' });
   } finally {
     await context.close();
   }

@@ -239,6 +239,8 @@ export function createSpaceHost(
         }
         doc.documentElement.dataset['wwRoomFrame'] = JSON.stringify({
           plates: plates.length,
+          // Column plates from the readability's way out (text no known part covers).
+          fallback: plates.filter((p) => p.fallback).map((p) => [p.left, p.top, p.right, p.bottom].map(Math.round)),
           boxes: plates.map((p) => [p.left, p.top, p.right, p.bottom].map(Math.round)),
           camera: [camera.x, camera.y, camera.dolly].map((n) => Math.round(n * 1000) / 1000),
           light: Math.round((0.2126 * light.r + 0.7152 * light.g + 0.0722 * light.b) * 1000) / 1000,

@@ -6,6 +6,7 @@
  */
 import type { SiteBackdrop } from './types';
 import type { RegionImportance, UiRegion } from '../world/space';
+import { SPACE_BREAK } from '../host/world-options';
 
 /** The page background YouTube paints (the app shell, and html/body in some themes), and its
  * ambient mode: a blurred copy of the video drawn around the player (a decoration, not a control).
@@ -86,6 +87,30 @@ const LISTS: readonly { list: string; item: string; importance: RegionImportance
   },
 ];
 const VIDEO: RegionSource = { selector: '#movie_player video.html5-main-video', importance: 'free' };
+/**
+ * The readability's way out (docs/depth-foundation.md): when YouTube renames a part, its text no
+ * longer gets a small plate and would sit bare on the room. The page is walked now and then for
+ * visible text that no known part covers; the column it is in gets one large plate, the way the
+ * first version plated whole columns (the room shows less there, the text always reads).
+ */
+const COLUMNS =
+  'ytd-watch-flexy #below, ytd-watch-flexy #secondary-inner, ytd-watch-flexy #secondary, ' +
+  'ytd-browse #primary, ytd-search #primary, #masthead-container, ytd-mini-guide-renderer';
+/** Text on a picture is read against the picture, not the room: the player, thumbnails, images. */
+const OVER_PICTURE =
+  '#movie_player, #player, ytd-thumbnail, yt-thumbnail-view-model, ytd-playlist-thumbnail, ' +
+  'yt-collection-thumbnail-view-model, yt-image, img, video, canvas';
+const NOT_TEXT = new Set(['script', 'style', 'template', 'noscript', 'svg', 'iron-iconset-svg', 'dom-module']);
+/** Nodes the walk takes in one read: a few while the page moves, a whole pass in a still read. */
+const WALK_ACTIVE = 400;
+const WALK_IDLE = 6000;
+/** Smaller than this is not readable text (screen-reader-only text is clipped to a pixel). */
+const TEXT_MIN_W = 4;
+const TEXT_MIN_H = 6;
+/** Where no named column holds the text, the plate is its nearest box at least this wide. */
+const BLOCK_MIN_W = 240;
+/** A part painted at least this opaque hides the room behind its text by itself. */
+const OPAQUE_ALPHA = 0.95;
 /** A part not found is looked for again only this often; lists are re-read as often. */
 const RETRY_MS = 1000;
 /** Repeated parts read at most this many at once (the ones in view). */
@@ -96,6 +121,11 @@ const TIGHT_NODES = 160;
 const TIGHT_PER_READ = 4;
 /** A part's measured text bounds are trusted this long, then measured again. */
 const TIGHT_TTL_MS = 1000;
+
+/** The known parts, or none in a build that stands in for YouTube renaming them (WW_SPACE_BREAK=names):
+ * the picture stays (it lights the room), the text parts go. */
+const singles = SPACE_BREAK === 'names' ? SINGLES.filter((s) => s.video) : SINGLES;
+const lists = SPACE_BREAK === 'names' ? [] : LISTS;
 
 export function youtubeBackdrop(doc: Document): SiteBackdrop {
   const view = doc.defaultView!;
@@ -125,7 +155,7 @@ export function youtubeBackdrop(doc: Document): SiteBackdrop {
       { rootMargin: '200px 0px' },
     );
     const next = new Map<Element, { importance: RegionImportance; tight: boolean }>();
-    for (const source of LISTS) {
+    for (const source of lists) {
       const list = doc.querySelector(source.list);
       if (!list) continue;
       // Text parts hug their text; buttons and boxes keep their own box.
@@ -233,6 +263,127 @@ export function youtubeBackdrop(doc: Document): SiteBackdrop {
       ...(pad === undefined ? {} : { pad }),
     };
   };
+  // --- The fallback: visible text no known part covers -----------------------------------------
+  // The known parts now: the single parts found in the last read and every list item found (live,
+  // so items scrolled in after a walk started still count as known).
+  const knownSingles = new Set<Element>();
+  interface Pass {
+    root: Element;
+    walker: TreeWalker;
+    /** Columns this walk found bare text in (plated at once, before the walk ends). */
+    plated: Set<Element>;
+    opaque: Map<Element, boolean>;
+    visited: number;
+  }
+  let pass: Pass | undefined;
+  /** The last finished walk's columns: kept until the next walk finishes (never a gap between). */
+  let plated: Element[] = [];
+  let passAt = -Infinity;
+  const textRange = doc.createRange();
+  /** Whether a part between the text and the page root paints an opaque background of its own. */
+  const overOpaque = (e: Element, state: Pass) => {
+    const seen: Element[] = [];
+    let result = false;
+    for (let n: Element | null = e; n && n !== state.root; n = n.parentElement) {
+      const known = state.opaque.get(n);
+      if (known !== undefined) {
+        result = known;
+        break;
+      }
+      seen.push(n);
+      // rgb() is opaque, rgba() by its alpha; anything else (a newer colour syntax) counts as
+      // see-through, which plates more, never less.
+      const m = /^rgba?\(([^)]*)\)$/.exec(view.getComputedStyle(n).backgroundColor);
+      const parts = m ? m[1]!.split(/[\s,/]+/).filter(Boolean) : [];
+      const alpha = parts.length === 3 ? 1 : parts.length === 4 ? Number(parts[3]) : 0;
+      if (alpha >= OPAQUE_ALPHA) {
+        result = true;
+        break;
+      }
+    }
+    for (const n of seen) state.opaque.set(n, result);
+    return result;
+  };
+  const columnOf = (e: Element, root: Element) => {
+    const named = e.closest(COLUMNS);
+    if (named && root.contains(named)) return named;
+    // Not in a column YouTube still names: the nearest box wide enough to read as a column.
+    for (let n: Element | null = e; n && n !== root; n = n.parentElement)
+      if (n.getBoundingClientRect().width >= BLOCK_MIN_W) return n;
+    return e;
+  };
+  const startPass = (): Pass | undefined => {
+    const root = doc.querySelector('ytd-app') ?? doc.body;
+    if (!root) return undefined;
+    const state: Pass = { root, plated: new Set(), opaque: new Map(), visited: 0, walker: undefined! };
+    state.walker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        state.visited++;
+        if (node.nodeType === Node.TEXT_NODE)
+          return node.nodeValue && node.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+        const e = node as Element;
+        // A known part has its own plate; hidden pages, pictures and non-text are not walked.
+        if (
+          items.has(e) ||
+          knownSingles.has(e) ||
+          NOT_TEXT.has(e.localName) ||
+          e.hasAttribute('hidden') ||
+          e.matches(OVER_PICTURE)
+        )
+          return NodeFilter.FILTER_REJECT;
+        // A column already plated needs no more looking in.
+        for (const c of state.plated) if (c.contains(e)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_SKIP;
+      },
+    });
+    return state;
+  };
+  /**
+   * A part of the walk: `limit` nodes, then on in the next read. A walk starts at most once a
+   * RETRY_MS and after every page change. Text counts when it has a readable size and is on
+   * screen or within a screen of it (so a column is plated before its text scrolls in).
+   */
+  const walk = (now: number, limit: number) => {
+    if (!pass) {
+      if (now - passAt < RETRY_MS) return;
+      pass = startPass();
+      if (!pass) return;
+    }
+    // The page removed the node the walk stood on: walk again from the top next read.
+    if (!pass.walker.currentNode.isConnected) {
+      pass = undefined;
+      passAt = -Infinity;
+      return;
+    }
+    const w = view.innerWidth,
+      h = view.innerHeight;
+    pass.visited = 0;
+    while (pass.visited < limit) {
+      const node = pass.walker.nextNode();
+      if (!node) {
+        plated = [...pass.plated];
+        pass = undefined;
+        passAt = now;
+        return;
+      }
+      const parent = node.parentElement;
+      if (!parent) continue;
+      textRange.selectNodeContents(node);
+      const r = textRange.getBoundingClientRect();
+      if (r.width < TEXT_MIN_W || r.height < TEXT_MIN_H) continue;
+      if (r.bottom < -h || r.top > 2 * h || r.right < 0 || r.left > w) continue;
+      // Text not shown (a tooltip waiting, opacity 0) needs no plate.
+      if (!parent.checkVisibility({ opacityProperty: true, visibilityProperty: true })) continue;
+      if (overOpaque(parent, pass)) continue;
+      pass.plated.add(columnOf(parent, pass.root));
+    }
+  };
+  const fallbackColumns = () => {
+    const out = new Set<Element>();
+    for (const e of plated) if (e.isConnected) out.add(e);
+    if (pass) for (const e of pass.plated) out.add(e);
+    return out;
+  };
   return {
     open() {
       let style: HTMLStyleElement | null = null;
@@ -257,6 +408,9 @@ export function youtubeBackdrop(doc: Document): SiteBackdrop {
           items.clear();
           inView.clear();
           listsAt = -Infinity;
+          pass = undefined;
+          plated = [];
+          passAt = -Infinity;
         },
       };
     },
@@ -266,6 +420,8 @@ export function youtubeBackdrop(doc: Document): SiteBackdrop {
       listsAt = -Infinity;
       generation++;
       for (const [source, cached] of found) if (!cached.element) found.delete(source);
+      // A new walk over the changed page; the columns plated now stay until it finishes.
+      passAt = -Infinity;
     },
     regions() {
       const now = view.performance.now();
@@ -276,9 +432,11 @@ export function youtubeBackdrop(doc: Document): SiteBackdrop {
       lastRead = now;
       if (now - listsAt >= RETRY_MS) readLists(now);
       const out: UiRegion[] = [];
-      for (const source of SINGLES) {
+      knownSingles.clear();
+      for (const source of singles) {
         const e = element(source);
         if (!e) continue;
+        knownSingles.add(e);
         const region = box(e, source.importance, source.video, source.tight, source.pad);
         if (region) out.push(region);
         else {
@@ -296,6 +454,13 @@ export function youtubeBackdrop(doc: Document): SiteBackdrop {
         const kind = items.get(item);
         const region = box(item, kind?.importance ?? 'read', false, kind?.tight);
         if (region && region.top < height && region.top + region.height > 0) (out.push(region), listed++);
+      }
+      // After the known parts are looked up, so the walk sees this read's parts as known.
+      walk(now, budget === Infinity ? WALK_IDLE : WALK_ACTIVE);
+      for (const column of fallbackColumns()) {
+        const r = column.getBoundingClientRect();
+        if (r.width > 0 && r.height > 0)
+          out.push({ left: r.left, top: r.top, width: r.width, height: r.height, importance: 'read', fallback: true });
       }
       return out;
     },
