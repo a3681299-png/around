@@ -35,8 +35,9 @@ const LIGHT_ONLY_MS = 33;
 
 export interface SpaceHost {
   update(space: DesignSpace | undefined): void;
-  /** The place behind the UI for room-depth artwork, while the room is shown. */
-  place(): { parent: HTMLElement; zIndex: number; after: Element } | undefined;
+  /** The place behind the UI for room-depth artwork while the room is shown; 'pending' while the
+   * artwork has a room that is loading or hidden (fullscreen); undefined without a room. */
+  place(): { parent: HTMLElement; zIndex: number; after: Element } | 'pending' | undefined;
   /** Tell the room the page changed (the adapter's page-change notice). */
   changed(): void;
   destroy(): void;
@@ -147,6 +148,9 @@ export function createSpaceHost(
     const shown = !doc.fullscreenElement;
     if (renderer.canvas.hidden !== !shown) {
       renderer.canvas.hidden = !shown;
+      // The canvas's own style holds display with !important (pages cannot restyle it), so the
+      // hidden attribute alone would not hide it.
+      renderer.canvas.style.setProperty('display', shown ? 'block' : 'none', 'important');
       onPlace?.();
     }
     if (!shown) return;
@@ -288,8 +292,11 @@ export function createSpaceHost(
       wake();
     },
     place() {
-      const renderer = session?.renderer;
-      if (!renderer || renderer.canvas.hidden || !renderer.canvas.isConnected) return undefined;
+      if (!session) return undefined;
+      const renderer = session.renderer;
+      // Room-depth artwork waits for the room (and is not drawn in fullscreen, where nothing
+      // behind the player shows) rather than being drawn in front under the guard meanwhile.
+      if (!renderer || renderer.canvas.hidden || !renderer.canvas.isConnected) return 'pending';
       return { parent: session!.slot.parent, zIndex: session!.slot.zIndex, after: renderer.canvas };
     },
     changed: wake,

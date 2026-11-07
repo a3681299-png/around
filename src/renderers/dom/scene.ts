@@ -136,7 +136,7 @@ export function createImageRenderer(
   /** The depth foundation (docs/depth-foundation.md): the room's place under the page's content,
    * while the backdrop is open. Artwork whose every root is `depth: 'room'` is drawn there, over
    * the room and under the UI, without the guard: the browser's stacking keeps the UI over it. */
-  backdrop?: () => { parent: HTMLElement; zIndex: number; after?: Element } | undefined,
+  backdrop?: () => { parent: HTMLElement; zIndex: number; after?: Element } | 'pending' | undefined,
 ) {
   const view = doc.defaultView!;
   let host: HTMLElement | undefined;
@@ -206,10 +206,12 @@ export function createImageRenderer(
   let room: ReturnType<NonNullable<typeof backdrop>> | undefined,
     guard: OperationGuardHost | undefined = safety;
   const roomPlace = () => {
-    if (!backdrop || editing || doc.fullscreenElement || !images.length) return undefined;
+    if (!backdrop || editing || !images.length) return undefined;
     if (images.some((layer) => depthOf(layer) !== 'room') || groups.some((group) => depthOf(group) !== 'room'))
       return undefined;
-    return backdrop();
+    const place = backdrop();
+    // Nothing behind the UI shows in fullscreen: room-depth artwork waits, like the room.
+    return place && doc.fullscreenElement ? 'pending' : place;
   };
   // The last values written to the host; identical frames skip the attribute writes.
   let writtenClip = '',
@@ -799,27 +801,38 @@ export function createImageRenderer(
 
   const draw = () => {
     if (!host) return;
-    room = roomPlace();
-    guard = room ? undefined : safety;
+    const place = (room = roomPlace());
+    guard = place ? undefined : safety;
     guard?.sample(view.performance.now());
     const overlaySlot = guard?.source.overlaySlot();
-    if (room) {
+    if (place === 'pending') {
+      // The room is loading or hidden: room-only artwork is not drawn (never in front, unguarded).
+      host.remove();
+      return;
+    }
+    if (place) {
       // Behind the UI: right after the room's canvas, at its level, so the room is under the
       // artwork and the page's content is over both. No clip: there is nothing it could cover.
-      const after = room.after?.parentElement === room.parent ? room.after : undefined;
+      const after = place.after?.parentElement === place.parent ? place.after : undefined;
       if (SPACE_BREAK === 'stacking') {
         // A broken build (WW_SPACE_BREAK=stacking): over the UI, unguarded, to see the tests fail.
-        if (host.parentElement !== room.parent || host.nextSibling) room.parent.append(host);
+        if (host.parentElement !== place.parent || host.nextSibling) place.parent.append(host);
         host.style.setProperty('--ww-decoration-z', '2147482000');
       } else if (
-        host.parentElement !== room.parent ||
-        (after ? host.previousElementSibling !== after : host !== room.parent.firstChild)
+        host.parentElement !== place.parent ||
+        (after ? host.previousElementSibling !== after : host !== place.parent.firstChild)
       )
-        room.parent.insertBefore(host, after ? after.nextSibling : room.parent.firstChild);
-      if (SPACE_BREAK !== 'stacking') host.style.setProperty('--ww-decoration-z', String(room.zIndex));
+        place.parent.insertBefore(host, after ? after.nextSibling : place.parent.firstChild);
+      if (SPACE_BREAK !== 'stacking') host.style.setProperty('--ww-decoration-z', String(place.zIndex));
       if (host.style.getPropertyValue('--ww-decoration-clip') !== 'none') {
         host.style.setProperty('--ww-decoration-clip', 'none');
         writtenClip = 'none';
+      }
+      // A verdict from a guarded draw before the room appeared no longer applies.
+      if (host.dataset.wwSafety !== undefined) {
+        delete host.dataset.wwSafety;
+        writtenSafety = '';
+        recordedIssues = recordedStopped = undefined;
       }
       for (const plane of [pagePlane, atmospherePlane]) plane?.host.remove();
       pagePlane = atmospherePlane = undefined;

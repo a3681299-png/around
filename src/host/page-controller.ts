@@ -91,20 +91,19 @@ export function createPageController(
   // drawn in front as before, guarded.
   const guarded = () => {
     const layers = design?.decorations ?? [];
+    // While the room loads, room-only artwork waits for it ('pending'): it is never drawn in front.
     if (!space?.place()) return layers.length;
     const front = layers.filter((layer) => depthOf(layer) !== 'room').length;
     // Room-only drawing needs every root behind (src/renderers/dom/scene.ts roomPlace).
     return front || (design?.groups ?? []).some((group) => depthOf(group) !== 'room') ? layers.length : 0;
   };
-  const inspect = () =>
-    safety?.setActive(
-      guardWanted({
-        suspended,
-        enabled: Boolean(current?.enabled),
-        layers: guarded(),
-        editing,
-      }),
-    );
+  const inspect = () => {
+    const active = guardWanted({ suspended, enabled: Boolean(current?.enabled), layers: guarded(), editing });
+    safety?.setActive(active);
+    // The depth foundation's test probe (a .work build): whether the guard observes the page.
+    // (Unit tests run the source unbuilt, with stand-in documents: the label is not dropped there.)
+    WW_SPACE_PROBE: if (doc.documentElement?.dataset) doc.documentElement.dataset['wwGuard'] = active ? 'on' : 'off';
+  };
   let disconnect: (() => void) | undefined;
   let current: UserSettings | undefined;
   let design: DesignDocument | undefined;
