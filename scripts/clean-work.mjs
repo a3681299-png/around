@@ -148,6 +148,40 @@ function remove(target) {
   } else unlinkSync(target);
 }
 
+/**
+ * Cuts every link (symlink or Windows junction) inside a folder, at any depth, without entering
+ * one; returns how many. `git worktree remove --force` follows a junction and deletes what it
+ * points at: not only node_modules but a nested .work/browsers/chromium-1243 → the user-wide
+ * Playwright Chromium was emptied that way (2026-11-07).
+ */
+export function unlinkLinksInside(dir) {
+  let count = 0;
+  const stack = [dir];
+  while (stack.length) {
+    const at = stack.pop();
+    let names = [];
+    try {
+      names = readdirSync(at);
+    } catch {
+      continue;
+    }
+    for (const name of names) {
+      const child = path.join(at, name);
+      let info;
+      try {
+        info = lstatSync(child);
+      } catch {
+        continue;
+      }
+      if (info.isSymbolicLink()) {
+        remove(child);
+        count++;
+      } else if (info.isDirectory()) stack.push(child);
+    }
+  }
+  return count;
+}
+
 const git = (cwd, args) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
 
 /** Worktrees directly inside .work, with whether each is in use. */
@@ -248,11 +282,8 @@ export function apply(decisions, { root }) {
   }
   for (const d of decisions.filter((x) => x.action === 'remove-worktree')) {
     try {
-      // A junction (node_modules → this checkout's) must go before git deletes the folder.
-      for (const name of readdirSync(d.path)) {
-        const at = path.join(d.path, name);
-        if (lstatSync(at).isSymbolicLink()) remove(at);
-      }
+      // Every junction inside (node_modules, .work/browsers/…) must go before git deletes the folder.
+      unlinkLinksInside(d.path);
       // --force: only untracked outputs remain (tracked changes made it "in use").
       git(root, ['worktree', 'remove', '--force', d.path]);
       freed += d.bytes;

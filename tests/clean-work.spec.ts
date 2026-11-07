@@ -1,6 +1,9 @@
 import { test, expect } from '@playwright/test';
 // @ts-expect-error A plain ESM script without types; only its rules are tested here.
-import { decide, decideTemp, familyOf } from '../scripts/clean-work.mjs';
+import { decide, decideTemp, familyOf, unlinkLinksInside } from '../scripts/clean-work.mjs';
+import { existsSync, mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
 
 const hour = 3600e3;
 const now = Date.UTC(2026, 10, 3, 12);
@@ -114,6 +117,28 @@ test('only the comparison bases are kept among unused worktrees, even when docs 
     'main-base': 'remove-worktree:unused',
     'g12-recent': 'remove-worktree:unused',
   });
+});
+
+test('before a worktree is removed, every link inside it is cut, however deep, and what they point at stays', () => {
+  // git worktree remove --force follows a Windows junction and empties its target: a worktree's
+  // .work/browsers/chromium-1243 → the user-wide Playwright Chromium was lost that way (2026-11-07).
+  const root = mkdtempSync(path.join(tmpdir(), 'ww-clean-links-'));
+  try {
+    const target = path.join(root, 'shared');
+    mkdirSync(target);
+    writeFileSync(path.join(target, 'chrome.exe'), 'x');
+    const tree = path.join(root, 'tree');
+    mkdirSync(path.join(tree, '.work', 'browsers'), { recursive: true });
+    symlinkSync(target, path.join(tree, 'node_modules'), 'junction');
+    symlinkSync(target, path.join(tree, '.work', 'browsers', 'chromium-1243'), 'junction');
+    expect(unlinkLinksInside(tree)).toBe(2);
+    expect(existsSync(path.join(tree, '.work', 'browsers', 'chromium-1243'))).toBe(false);
+    expect(existsSync(path.join(tree, 'node_modules'))).toBe(false);
+    rmSync(tree, { recursive: true, force: true });
+    expect(existsSync(path.join(target, 'chrome.exe'))).toBe(true);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test('browser profiles the tests and measurements left in the system temp folder go after a few hours; nothing else there is touched', () => {
