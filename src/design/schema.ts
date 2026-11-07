@@ -378,7 +378,7 @@ export function parseDesign(value: unknown): DesignDocument {
     ? parseSignalRules(data['signalRules'], new Set([...decorations, ...groups].map((layer) => layer.id)))
     : [];
   return {
-    schemaVersion: 15,
+    schemaVersion: 16,
     id: data['id'],
     siteId: data['siteId'],
     baseThemeId: data['baseThemeId'],
@@ -390,7 +390,7 @@ export function parseDesign(value: unknown): DesignDocument {
 }
 
 export function emptyDesign(siteId: string, baseThemeId: string | null): DesignDocument {
-  return parseDesign({ schemaVersion: 15, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
+  return parseDesign({ schemaVersion: 16, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
 }
 
 export function sameDesign(a: DesignDocument | undefined, b: DesignDocument | undefined): boolean {

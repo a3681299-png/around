@@ -65,7 +65,7 @@ test('GLB renders alpha, shares resources, edits/drags/duplicates/undoes, saves 
         'webWorldThemes.design.youtube'
       ] as DesignDocument,
   );
-  expect(saved.schemaVersion).toBe(15);
+  expect(saved.schemaVersion).toBe(16);
   expect(saved.decorations[0]).toMatchObject({ kind: 'model3d', model: { rotationY: 35 } });
   expect(saved.decorations[0]!.assetId).toBe(saved.decorations[1]!.assetId);
   await closeEditorPages(youtube);

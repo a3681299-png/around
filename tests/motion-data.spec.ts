@@ -114,7 +114,7 @@ test('v4 playback settings coexist with old locked image layers and reject inval
   const old = legacy.decorations[0]!;
   delete (old as Partial<AnimationDecoration>).format;
   delete (old as Partial<AnimationDecoration>).playback;
-  expect(parseDesign(legacy)).toMatchObject({ schemaVersion: 15, decorations: [{ kind: 'image', locked: false }] });
+  expect(parseDesign(legacy)).toMatchObject({ schemaVersion: 16, decorations: [{ kind: 'image', locked: false }] });
   const doc = { ...emptyDesign('youtube', 'retro'), decorations: [layer()] };
   expect(parseDesign(doc)).toEqual(doc);
   for (const decoration of [

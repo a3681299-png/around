@@ -248,7 +248,8 @@ export function inspectVrma(bytes: Uint8Array): { info: VrmAnimationInfo; json: 
   let duration = 0,
     keys = 0,
     hipsTranslation = false,
-    hipsTravel: Vec3 = [0, 0, 0];
+    hipsTravel: Vec3 = [0, 0, 0],
+    measuredHipsHeight: number | undefined;
   const targets = new Set<string>();
   for (const channel of channels) {
     const target = record(channel['target']),
@@ -285,6 +286,14 @@ export function inspectVrma(bytes: Uint8Array): { info: VrmAnimationInfo; json: 
       const value = (i: number, c: number) => output.at(i * factor + (factor === 3 ? 1 : 0), c);
       const end = input.count - 1;
       hipsTravel = [0, 1, 2].map((c) => value(end, c) - value(0, c)) as unknown as Vec3;
+      // Time-weighted mean of the hips' height (trapezoids between keys), so the engine can tell a
+      // standing idle from a crouching one by what the file does, not by its name. Keys need not be
+      // evenly spaced, so a plain mean of the keys would over-count densely keyed moments.
+      let area = 0;
+      for (let i = 1; i < input.count; i++)
+        area += ((value(i - 1, 1) + value(i, 1)) / 2) * (input.at(i, 0) - input.at(i - 1, 0));
+      const span = input.at(end, 0) - input.at(0, 0);
+      measuredHipsHeight = span > 0 ? area / span : value(0, 1);
     }
   }
 
@@ -294,6 +303,9 @@ export function inspectVrma(bytes: Uint8Array): { info: VrmAnimationInfo; json: 
   // Finite local transforms can overflow when multiplied along the parent chain.
   if (!restHipsPosition.every(Number.isFinite)) throw bad('腰の位置が有限の数値ではありません。');
   if (!(restHipsHeight > 1e-3)) throw bad('腰の高さが0です。');
+  // Hips that are never moved stay at the rest height.
+  const hipsHeight = measuredHipsHeight ?? restHipsHeight;
+  if (!Number.isFinite(hipsHeight)) throw bad('腰の位置が有限の数値ではありません。');
   const name =
     typeof animation['name'] === 'string' ? animation['name'].replace(/[\u0000-\u001f]/g, '').slice(0, 120) : '';
   return {
@@ -305,6 +317,7 @@ export function inspectVrma(bytes: Uint8Array): { info: VrmAnimationInfo; json: 
       hipsTranslation,
       restHipsHeight,
       hipsTravel,
+      hipsHeight,
     },
     json,
     bin,

@@ -1,5 +1,25 @@
 import type { BodyMeasure } from '../characters/humanoid';
-import type { CharacterMotion } from '../characters/settings';
+import { motionUsable, type CharacterMotion, type CharacterSettings } from '../characters/settings';
+
+/**
+ * The idle loop a character stands in off its seat: of its usable idle loops, the one whose hips,
+ * measured from the file at import (v16 `hipsHeight`), stay closest to its own rest height, i.e.
+ * the most upright. A library's idles include crouching ones (a crouch listed first was picked
+ * before); the measure tells them apart without reading a name. Motions saved before v16 have no
+ * measure and rank after measured ones, in list order (so an old document stands as it did).
+ * -1 when there is no idle loop.
+ */
+export function standingIdle(character: CharacterSettings, body: BodyMeasure | undefined): number {
+  let best = -1,
+    bestScore = Infinity;
+  character.motions.forEach((m, i) => {
+    if (m.role !== 'idle' || !m.loop || !(m.source.duration > 0) || !motionUsable(character, i, body)) return;
+    const h = m.source.hipsHeight;
+    const score = h === undefined ? Number.MAX_VALUE : Math.abs(h / m.source.restHipsHeight - 1);
+    if (score < bestScore) [best, bestScore] = [i, score];
+  });
+  return best;
+}
 
 /**
  * Feet that do not slide (docs/characters/mirdo.md): a walk or a run moves its hips forward at

@@ -35,7 +35,7 @@ test('legacy documents migrate without adding effects or changing assets; shared
     const legacy = { ...document(), schemaVersion: version, decorations: [layer] };
     const before = JSON.stringify(legacy),
       parsed = parseDesign(legacy);
-    expect(parsed.schemaVersion).toBe(15);
+    expect(parsed.schemaVersion).toBe(16);
     expect(parsed.decorations[0]).not.toHaveProperty('effects');
     expect(parsed.decorations[0]?.assetId).toBe(layer.assetId);
     expect(JSON.stringify(legacy)).toBe(before);

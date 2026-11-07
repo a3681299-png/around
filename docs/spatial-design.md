@@ -750,12 +750,13 @@ Rendererの変更や解析共有だけならDesignDocumentの版を上げる必�
 
 実際に入った版（G0の案とは順番が違う）：
 
-| 版  | 段階                   | 足した項目                                                                                                                          |
-| --- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| v12 | G1.1                   | レイヤー・グループの `renderMode`（雰囲気の層）                                                                                     |
-| v13 | UI1                    | ルールの `skin`（UIの着せ替え）                                                                                                     |
-| v14 | R3-1b                  | 3Dの層の `character`（キャラの動作の一覧）、VRMの `source.vrm.body`（体型の測定）。[r3-plan.md](r3-plan.md)                         |
-| v15 | 塊3（R4 の最小の自律） | キャラの `personality`（臆病さ・好奇心・眠りやすさ）、`computedMotion`・`autonomy` のスイッチ。[autonomy-plan.md](autonomy-plan.md) |
+| 版  | 段階                   | 足した項目                                                                                                                                           |
+| --- | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| v12 | G1.1                   | レイヤー・グループの `renderMode`（雰囲気の層）                                                                                                      |
+| v13 | UI1                    | ルールの `skin`（UIの着せ替え）                                                                                                                      |
+| v14 | R3-1b                  | 3Dの層の `character`（キャラの動作の一覧）、VRMの `source.vrm.body`（体型の測定）。[r3-plan.md](r3-plan.md)                                          |
+| v15 | 塊3（R4 の最小の自律） | キャラの `personality`（臆病さ・好奇心・眠りやすさ）、`computedMotion`・`autonomy` のスイッチ。[autonomy-plan.md](autonomy-plan.md)                  |
+| v16 | ミルドの動き（続き）   | 動作の `source.hipsHeight`（取り込み時にファイルから測った腰の高さ。立ち待機を名前でなく測った値で選ぶ）。[characters/mirdo.md](characters/mirdo.md) |
 
 互換試験は `tests/fixtures/designs/chain-expected.json` 等の既存14件と導入コミット由来のデータを使う。
 これは利用者の実保存JSON一式ではないという由来も維持する。[既存の移行チェーンとfixtureの記録](signal-registry-schema-chain.md)

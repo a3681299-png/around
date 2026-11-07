@@ -13,4 +13,9 @@ export interface VrmAnimationInfo {
   restHipsHeight: number;
   /** Last minus first hips position in the file's own units (x, up, forward). */
   hipsTravel: Vec3;
+  /**
+   * Time-weighted mean hips height over the motion, in the same units as `restHipsHeight` (DesignDocument
+   * v16). Tells a standing idle from a crouching one by the file itself. Absent on motions saved before v16.
+   */
+  hipsHeight?: number;
 }

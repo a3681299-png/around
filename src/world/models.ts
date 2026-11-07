@@ -6,7 +6,7 @@ import { oneOf } from '../validation';
 import { DEFAULT_CHARACTER_PERSONALITY, modelClips, motionUsable } from '../characters/settings';
 import { evaluateBodyMotion, layerSeed, parseBodyState, type BodyMotionState, type BodyPose } from './body-motion';
 import { AUTONOMY, type Behaviour } from './autonomy';
-import { gaitSpeedPx, matchGait } from './gait';
+import { gaitSpeedPx, matchGait, standingIdle } from './gait';
 
 export interface ModelState {
   clip: number | null;
@@ -230,14 +230,8 @@ export function evaluateModels(
         !entry.position ||
         !seats.some((q) => Math.abs(entry.position!.y + autonomyState.offset.y - q.y) < 1));
     const standIndex =
-      offSeat && (arrived || doing === 'rest' || doing === 'doze')
-        ? (layer.character?.motions.findIndex(
-            (m, i) =>
-              m.role === 'idle' &&
-              m.loop &&
-              m.source.duration > 0 &&
-              motionUsable(layer.character!, i, layer.source.vrm?.body),
-          ) ?? -1)
+      offSeat && (arrived || doing === 'rest' || doing === 'doze') && layer.character
+        ? standingIdle(layer.character, layer.source.vrm?.body)
         : -1;
     const standing =
       standIndex >= 0

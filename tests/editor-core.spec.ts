@@ -704,7 +704,7 @@ test('legacy v7 saved checkpoints migrate before conflict comparison and failed 
   const a = await opened();
   await a.editor.execute({ type: 'save' });
   const legacy = JSON.parse(
-      JSON.stringify(a.editor.checkpoint()).replaceAll('"schemaVersion":15', '"schemaVersion":7'),
+      JSON.stringify(a.editor.checkpoint()).replaceAll('"schemaVersion":16', '"schemaVersion":7'),
     ) as EditorCheckpoint,
     before = JSON.stringify(legacy);
   expect(legacy.saved!.schemaVersion).toBe(7);
@@ -714,12 +714,12 @@ test('legacy v7 saved checkpoints migrate before conflict comparison and failed 
   b.editor.setEnabled(true);
   b.editor.open();
   await b.editor.restore(legacy);
-  expect(b.editor.snapshot().document.schemaVersion).toBe(15);
+  expect(b.editor.snapshot().document.schemaVersion).toBe(16);
   expect(b.editor.snapshot().view.dirty).toBe(false);
   expect(b.editor.snapshot().view.error).toBe(false);
   expect(JSON.stringify(legacy)).toBe(before);
   const invalid = structuredClone(legacy);
-  Object.assign(invalid.saved!, { schemaVersion: 16 });
+  Object.assign(invalid.saved!, { schemaVersion: 17 });
   const current = b.editor.snapshot().document;
   await expect(b.editor.restore(invalid)).rejects.toThrow();
   expect(b.editor.snapshot().document).toEqual(current);

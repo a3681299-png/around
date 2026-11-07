@@ -185,6 +185,22 @@ export function migrateV14ToV15(value: unknown): Data {
   }
   return next(data, 15);
 }
+/** v16: a motion's measured `hipsHeight`. Everything else passes through unchanged. */
+export function migrateV15ToV16(value: unknown): Data {
+  const data = stage(value, 15, { root: root8, layer: layer14, kinds: models, group: group12, rule: rule13 });
+  for (const value of list(data['decorations'])) {
+    const layer = record(value);
+    if (layer['kind'] !== 'model3d' || layer['character'] === undefined) continue;
+    const motions = record(layer['character'])['motions'];
+    if (!Array.isArray(motions)) continue; // the final schema rejects it
+    for (const motion of motions) {
+      const source = record(motion)['source'];
+      if (source !== undefined && Object.hasOwn(record(source), 'hipsHeight'))
+        throw new Error('動作の腰の高さにはDesignDocument v16が必要です。');
+    }
+  }
+  return next(data, 16);
+}
 
 export const DESIGN_MIGRATIONS = Object.freeze([
   migrateV1ToV2,
@@ -201,14 +217,15 @@ export const DESIGN_MIGRATIONS = Object.freeze([
   migrateV12ToV13,
   migrateV13ToV14,
   migrateV14ToV15,
+  migrateV15ToV16,
 ]);
 
-/** Pure chain; a returned v15 object is still unvalidated external input. */
+/** Pure chain; a returned v16 object is still unvalidated external input. */
 export function migrateDesign(value: unknown): Data {
   let data = record(value);
   const version = data['schemaVersion'];
-  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 15)
+  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 16)
     throw new Error('このデザインのバージョンには対応していません。');
-  for (let from = version; from < 15; from++) data = DESIGN_MIGRATIONS[from - 1]!(data);
+  for (let from = version; from < 16; from++) data = DESIGN_MIGRATIONS[from - 1]!(data);
   return data;
 }

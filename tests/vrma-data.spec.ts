@@ -19,13 +19,45 @@ test('a VRM Animation gives its duration, bones, rest hips height and hips trave
     hipsTranslation: true,
     restHipsHeight: expect.closeTo(0.9, 6),
     hipsTravel: [expect.closeTo(0, 6), expect.closeTo(-0.4, 6), expect.closeTo(0.1, 6)],
+    // Time-weighted over the keys: (0.9+0.7)/2·0.5 + (0.7+0.5)/2·0.5.
+    hipsHeight: expect.closeTo(0.7, 6),
   });
+});
+
+test('the hips height is weighted by time, so a crouch held long reads lower than a dip', () => {
+  const held = inspectVrma(
+    bytes(
+      vrmaFixture({
+        times: [0, 0.1, 1],
+        hips: [
+          [0, 0.9, 0],
+          [0, 0.5, 0],
+          [0, 0.5, 0],
+        ],
+      }),
+    ),
+  ).info;
+  const dip = inspectVrma(
+    bytes(
+      vrmaFixture({
+        times: [0, 0.9, 1],
+        hips: [
+          [0, 0.9, 0],
+          [0, 0.9, 0],
+          [0, 0.5, 0],
+        ],
+      }),
+    ),
+  ).info;
+  expect(held.hipsHeight).toBeCloseTo(0.52, 6);
+  expect(dip.hipsHeight).toBeCloseTo(0.88, 6);
 });
 
 test('a one-frame pose is a valid motion of length 0 (engine layers breathing on top)', () => {
   const { info } = inspectVrma(bytes(vrmaFixture({ times: [0], hips: [[0, 0.5, 0.1]], rotations: [[0, 0, 0, 1]] })));
   expect(info.duration).toBe(0);
   expect(info.hipsTravel).toEqual([0, 0, 0]);
+  expect(info.hipsHeight).toBeCloseTo(0.5, 6);
 });
 
 test('a motion without hips translation reports none', () => {
@@ -39,6 +71,8 @@ test('a motion without hips translation reports none', () => {
   );
   expect(info.hipsTranslation).toBe(false);
   expect(info.hipsTravel).toEqual([0, 0, 0]);
+  // Hips that never move stay at the rest height.
+  expect(info.hipsHeight).toBeCloseTo(info.restHipsHeight, 6);
 });
 
 const rejects: [string, (j: Record<string, any>) => void][] = [
@@ -105,7 +139,7 @@ test('valid nonzero scene and last-node references retain the same measured moti
         }),
       ),
     ).info,
-  ).toEqual({ ...expected, hipsTranslation: false, hipsTravel: [0, 0, 0] });
+  ).toEqual({ ...expected, hipsTranslation: false, hipsTravel: [0, 0, 0], hipsHeight: expected.restHipsHeight });
 });
 
 test('finite inputs that overflow the derived hips height are refused at the import boundary', () => {

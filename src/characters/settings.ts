@@ -67,7 +67,16 @@ const assetPattern = /^asset-[0-9a-f]{64}$/;
 const idPattern = /^[a-z][a-z0-9-]{0,63}$/;
 
 export function parseVrmAnimationInfo(value: unknown): VrmAnimationInfo {
-  const v = object(value, ['format', 'name', 'duration', 'bones', 'hipsTranslation', 'restHipsHeight', 'hipsTravel']);
+  const v = object(value, [
+    'format',
+    'name',
+    'duration',
+    'bones',
+    'hipsTranslation',
+    'restHipsHeight',
+    'hipsTravel',
+    'hipsHeight',
+  ]);
   if (v['format'] !== 'vrma' || !Array.isArray(v['bones']) || v['bones'].length > HUMAN_BONES.length)
     throw new Error('動作の情報が不正です。');
   const bones = v['bones'].map((b) => {
@@ -87,6 +96,8 @@ export function parseVrmAnimationInfo(value: unknown): VrmAnimationInfo {
     hipsTranslation: bool(v['hipsTranslation']),
     restHipsHeight: numeric(v['restHipsHeight'], 0.001, m),
     hipsTravel: [numeric(travel[0], -m, m), numeric(travel[1], -m, m), numeric(travel[2], -m, m)],
+    // v16; absent on motions saved earlier (the engine then falls back to the list order).
+    ...(v['hipsHeight'] === undefined ? {} : { hipsHeight: numeric(v['hipsHeight'], -m, m) }),
   };
 }
 
