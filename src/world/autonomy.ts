@@ -242,6 +242,10 @@ export function evaluateAutonomy(
     if (best === 'rest') s.target = seats && away ? homeOffset() : { ...s.offset };
   }
   if (seats && s.behaviour === 'rest' && !offHome) s.target = homeOffset();
+  // Going back, it aims at the edge where it is now: the part may move or resize after the return
+  // began (a page settling), and the target fixed then would leave it standing beside the edge for
+  // good (still "off home", so still returning, but already at its target).
+  if (seats && s.behaviour === 'return') s.target = { x: s.target.x, y: homeOffset().y };
   // It dozes off only where it sits: on its edge (going there first if it is elsewhere).
   if (seats && s.behaviour === 'doze') s.target = homeOffset();
   if (s.behaviour === 'approach' && context.pointer) {

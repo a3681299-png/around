@@ -324,6 +324,24 @@ test('with seats on its part it rests sitting on an edge, never in the air, and 
   expect(run(0, 3000, () => ({ pointer: { x: 100, y: 100 } })).last.offset).toEqual({ x: 0, y: 0 });
 });
 
+test('going back to its edge, it follows the edge when the part moves, and sits on it', () => {
+  // The player's lower edge, then the page settles and the edge is 6 px lower (the live import saw
+  // this: it stood 6 px above the edge for good, "going back" to where the edge had been).
+  const room = { left: 400, top: 200, width: 900, height: 500 };
+  const at = (bottom: number) => [{ edge: 'bottom' as const, y: bottom }];
+  const going = run(0, 100, (t) => ({ room, seats: at(700), timeMs: t }), {
+    ...initialAutonomy(),
+    seat: 'bottom',
+    behaviour: 'return',
+    offset: { x: 0, y: -60 },
+    target: { x: 0, y: 200 },
+  });
+  expect(going.state.behaviour).toBe('return');
+  const settled = run(116, 6000, (t) => ({ room: { ...room, height: 506 }, seats: at(706), timeMs: t }), going.state);
+  expect(home.y + settled.last.offset.y).toBeCloseTo(706, 0);
+  expect(settled.state.behaviour).toBe('rest');
+});
+
 test('recorded autonomy states read back exactly; malformed ones are refused', () => {
   const { state } = run(0, 2000, rush(100));
   expect(parseAutonomyState(JSON.parse(JSON.stringify(state)))).toEqual(state);
