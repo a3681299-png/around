@@ -112,6 +112,22 @@ for h, (t, s) in pairs.items():
 src_ref = {s: swing[t] @ rot(src_rest[s]) for t, s in pairs.values()}
 hips_t, hips_s = pairs["hips"]
 k = tgt_rest[hips_t].translation.z / src_rest[hips_s].translation.z
+
+
+def leg_length(rest, chain):
+    pts = [rest[b].translation for b in chain]
+    return sum((pts[i + 1] - pts[i]).length for i in range(len(pts) - 1))
+
+
+# A step is as long as the leg, not as the hips are high: the hips' travel along the floor is
+# scaled by the legs' length (a short-legged body's hips may sit relatively high), up and down by
+# the hips' height. Otherwise the planted feet slide by the difference.
+legs = [h for h in ("leftUpperLeg", "leftLowerLeg", "leftFoot") if h in pairs]
+k_step = (
+    leg_length(tgt_rest, [pairs[h][0] for h in legs]) / leg_length(src_rest, [pairs[h][1] for h in legs])
+    if len(legs) == 3
+    else k
+)
 feet = [pairs[h] for h in ("leftFoot", "rightFoot") if h in pairs]
 print("RETARGET hips scale", round(k, 4))
 
@@ -154,6 +170,20 @@ def sole_height(parts_list):
     return lowest
 
 
+def sole_points(parts_list):
+    """Every sole vertex in the deformed mesh (world), in a fixed order."""
+    dg = bpy.context.evaluated_depsgraph_get()
+    dg.update()
+    out = []
+    for mesh, idx in parts_list:
+        ev = mesh.evaluated_get(dg)
+        me = ev.to_mesh()
+        mw = ev.matrix_world
+        out.extend((mw @ me.vertices[i].co).copy() for i in idx)
+        ev.to_mesh_clear()
+    return out
+
+
 src_soles = sole_vertices(src, [s for _, s in feet])
 tgt_soles = sole_vertices(tgt, [t for t, _ in feet])
 src_sole_rest = sole_height(src_soles)
@@ -191,7 +221,7 @@ def world(bone, matrix):
     return (src.matrix_world @ src.pose.bones[bone].matrix).translation if matrix is None else matrix
 
 
-def solve(spread, travel, f0, f1, ground, lift=0.0):
+def solve(spread, travel, f0, f1, ground, lift=0.0, step=None):
     """The target's matrix_basis per bone for the current source frame.
     spread = {"left": deg, "right": deg}; lift moves the hips up (m)."""
     spread_q = {}
@@ -224,7 +254,9 @@ def solve(spread, travel, f0, f1, ground, lift=0.0):
                 moved = (src.matrix_world @ spb.matrix).translation - src_rest[s].translation - ground
                 if travel is not None:
                     moved = moved - travel * ((scn.frame_current - f0) / max(1, f1 - f0))
-                want_loc = tgt_world_inv @ (tgt_rest[b.name].translation + moved * k + Vector((0, 0, lift)))
+                s = k_step if step is None else step
+                scaled = Vector((moved.x * s, moved.y * s, moved.z * k + lift))
+                want_loc = tgt_world_inv @ (tgt_rest[b.name].translation + scaled)
                 basis.translation = base.inverted() @ want_loc
             out[b.name] = basis
         pose_arm[b.name] = base @ basis
@@ -262,20 +294,44 @@ def run(clip):
     # relative to it only if the library says so; UAL clips start on the floor).
     scn.frame_set(f0)
     ground = Vector((0, 0, 0))
-    travel_all = (hips_at(f1) - hips_at(f0)) * k
+    travel_raw = hips_at(f1) - hips_at(f0)
     n = f1 - f0 + 1
     tr = travel if in_place else None
 
     # Feet: per frame, the hips' lift that puts the target's lower sole as far above its floor as
     # the source's lower sole is above its own (scaled).
     lifts = []
+    # A motion that travels: the speed this body's planted feet keep, measured on the motion done
+    # in place (a touching sole vertex goes back at it). The hips then travel at that speed, so the
+    # feet hold still; the legs' length ratio is only the first guess.
+    travels = not in_place and travel.length > 0.05 * src_rest[hips_s].translation.z
+    soles_in_place = []
     for f in range(f0, f1 + 1):
         scn.frame_set(f)
         want = tgt_sole_rest + (sole_height(src_soles) - ground.z - src_sole_rest) * k
         pose_target(solve({}, tr, f0, f1, ground))
         lifts.append(want - sole_height(tgt_soles))
+        if travels:
+            pose_target(solve({}, travel, f0, f1, ground))
+            soles_in_place.append(sole_points(tgt_soles))
     for pb in tgt.pose.bones:
         pb.matrix_basis = Matrix()
+    step = k_step
+    travel_all = travel_raw * k_step
+    if travels and len(soles_in_place) > 2:
+        forward = travel.normalized()
+        speeds = []
+        for a, b in zip(soles_in_place, soles_in_place[1:]):
+            floor = min(p.z for p in a)
+            touch = [i for i, p in enumerate(a) if p.z < floor + 0.01 * height and b[i].z < floor + 0.01 * height]
+            if touch:
+                v = sorted(-(b[i] - a[i]).dot(forward) * scn.render.fps for i in touch)
+                speeds.append(v[len(v) // 2])
+        speeds.sort()
+        feet_speed = speeds[len(speeds) // 2] if speeds else 0
+        if feet_speed > 0:
+            step = feet_speed * sec / travel.length
+            travel_all = Vector((travel_raw.x * step, travel_raw.y * step, travel_raw.z * k))
     # Smoothed a little: the hips must not jitter by a frame's rounding.
     period = n - 1 if looping else n
     win = lambda arr, i: (
@@ -291,7 +347,7 @@ def run(clip):
             scn.frame_set(f)
             found = {}
             for a in steps:
-                pose_target(solve({"left": a, "right": a}, tr, f0, f1, ground, lifts[f - f0]))
+                pose_target(solve({"left": a, "right": a}, tr, f0, f1, ground, lifts[f - f0], step))
                 dg.update()
                 hits = meshcheck.inside(parts, dg, height)
                 for side in ("left", "right"):
@@ -322,7 +378,9 @@ def run(clip):
     prev = {}
     for f in range(f0, f1 + 1):
         scn.frame_set(f)
-        pose = solve({"left": need["left"][f - f0], "right": need["right"][f - f0]}, tr, f0, f1, ground, lifts[f - f0])
+        pose = solve(
+            {"left": need["left"][f - f0], "right": need["right"][f - f0]}, tr, f0, f1, ground, lifts[f - f0], step
+        )
         for bone, basis in pose.items():
             q = basis.to_quaternion()
             if bone in prev and prev[bone].dot(q) < 0:
@@ -346,7 +404,8 @@ def run(clip):
         "loop": looping,
         "inPlace": in_place,
         "hipsScale": round(k, 4),
-        "speedMps": round(travel.length * k / sec, 3) if in_place and sec else 0.0,
+        "stepScale": round(step, 4),
+        "speedMps": round(travel.length * k_step / sec, 3) if in_place and sec else 0.0,
         # VRM space (Y up, +Z forward): the hips' travel left in the clip.
         "rootTravelM": [round(v, 3) for v in ((0, 0, 0) if in_place else (travel_all.x, travel_all.z, -travel_all.y))],
         "feetLiftM": {"min": round(min(lifts), 4), "max": round(max(lifts), 4)},

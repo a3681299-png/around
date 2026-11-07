@@ -181,6 +181,23 @@ test('R3-2 short check: extension rAF CPU per frame, quiet / plain VRM / compute
       corner: layers.map((layer) =>
         layer.id === 'resident' ? { ...layer, character: { ...(layer.character as object), autonomy: false } } : layer,
       ),
+      // At home with the autonomy, resting and dozing in its sitting motion: it sits on the
+      // player's lower edge (seats, gaits and the seat's weight run every frame).
+      seated: layers.map((layer) =>
+        layer.id === 'resident'
+          ? {
+              ...layer,
+              character: {
+                ...(layer.character as object),
+                autonomy: true,
+                behaviourMotions: {
+                  rest: { motion: 'sit', from: 0, to: 0, speed: 1 },
+                  doze: { motion: 'sit', from: 0, to: 0, speed: 1 },
+                },
+              },
+            }
+          : layer,
+      ),
     };
     // WW_PERF_R32_VARIANTS=body,autonomy measures only those (the chunk 3 short check).
     const chosen = process.env.WW_PERF_R32_VARIANTS?.split(',').filter((v) => v in variants) ?? [

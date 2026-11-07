@@ -31,6 +31,8 @@ export const LINES = Object.freeze({
   planted: 0.015,
   slide: 0.08,
   slideShare: 0.15,
+  // A motion whose hips travel faster than this (heights per second) walks or runs.
+  travels: 0.15,
   // A clip whose hips rise this much above their lowest is a jump: floating is its point.
   jump: 0.12,
 });
@@ -122,7 +124,9 @@ window.measureClip = async (name, frames, sheetFrames, view) => {
   };
   const n = frames, rows = [], shots = [];
   const duration = clip.duration || 0;
-  const dt = duration && n > 1 ? duration / (n - 1) : 0;
+  // Up to the motion's end, not onto it: at its full length a loop is back at its start, and a
+  // motion that travels would jump back by its whole travel in that last frame.
+  const dt = duration && n > 1 ? duration / n : 0;
   const shotAt = new Set(Array.from({ length: sheetFrames }, (_, i) => Math.round((i * (n - 1)) / Math.max(1, sheetFrames - 1))));
   const hipsNode = vrm.humanoid.getNormalizedBoneNode('hips');
   for (let i = 0; i < n; i++) {
@@ -176,7 +180,7 @@ window.measureClip = async (name, frames, sheetFrames, view) => {
 `;
 
 /** The verdict from the rows (exported for the unit test). */
-export function judge(rows, height, speedMps = 0, lines = LINES) {
+export function judge(rows, height, speedMps = 0, lines = LINES, travelMps = 0) {
   const n = rows.length;
   const lowest = rows.map((r) => Math.min(r.sole.left, r.sole.right));
   // The floor is where the model's soles rest in its own rest pose: y = 0 for a VRM on the floor.
@@ -200,7 +204,10 @@ export function judge(rows, height, speedMps = 0, lines = LINES) {
       dt = b.t - a.t;
     if (!(dt > 0)) continue;
     const frame = [];
-    for (const side of ['left', 'right'])
+    // The foot the body stands on is the lower one; the other may skim the floor as it swings
+    // through (fast, and not a slide).
+    const stance = Math.max(a.sole.left, b.sole.left) <= Math.max(a.sole.right, b.sole.right) ? 'left' : 'right';
+    for (const side of [stance])
       a.foot[side].forEach((p, v) => {
         const q = b.foot[side][v];
         if (q && p[1] < lines.planted * height && q[1] < lines.planted * height)
@@ -220,13 +227,16 @@ export function judge(rows, height, speedMps = 0, lines = LINES) {
   const slips = touching.map(([vx, vz]) => Math.hypot(vx, vz + keep));
   const slide = slips.length ? slips.reduce((a, b) => a + b, 0) / slips.length : 0;
   const reasons = [];
-  // A run or a jump leaves the floor on purpose: it floats only if it never comes down.
-  const airborne = jump || speedMps > 0;
+  // A run or a jump leaves the floor on purpose: it floats only if it never comes down. A motion
+  // that travels (travelMps: its hips' own travel, the file keeps it) moves; its feet should not.
+  // (A hit or a landing drifts a few centimetres: that is no walk, the plain line judges it.)
+  const pace = keep > 0 ? keep : travelMps > lines.travels * height ? travelMps : 0;
+  const airborne = jump || pace > 0 || speedMps > 0;
   if (insideFrames > lines.insideFrames * n) reasons.push('hand-in-body');
   if (airborne ? Math.min(...lowest) > lines.float * height : floatFrames > lines.floatFrames * n)
     reasons.push('floating');
   if (sinkFrames > lines.sinkFrames * n) reasons.push('sinking');
-  if (keep > 0 ? slide > lines.slideShare * keep : slide > lines.slide * height) reasons.push('sliding');
+  if (pace > 0 ? slide > lines.slideShare * pace : slide > lines.slide * height) reasons.push('sliding');
   return {
     pass: reasons.length === 0,
     reasons,
@@ -291,7 +301,9 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       } catch {}
       const frames = Math.max(12, Math.min(180, Math.round((info.seconds ?? 2) * 30) + 1));
       const result = await page.evaluate(([n, f]) => window.measureClip(n, f, 5, 'three-quarter'), [name, frames]);
-      const verdict = judge(result.rows, result.height, info.speedMps ?? 0);
+      const travel =
+        info.rootTravelM && info.seconds ? Math.hypot(info.rootTravelM[0], info.rootTravelM[2]) / info.seconds : 0;
+      const verdict = judge(result.rows, result.height, info.speedMps ?? 0, LINES, travel);
       report.clips[base] = {
         seconds: +result.duration.toFixed(3),
         loop: info.loop ?? null,

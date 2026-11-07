@@ -1,13 +1,13 @@
 {
   "source": "UAL1_Standard_RM.glb",
-  "note": "Root motion version: the hips' travel gives a walk's or run's speed; inPlace removes it again so the engine moves the character at that speed. Names stay the library's own, so WWT recognizes them as any import would.",
+  "note": "Root motion version: walks and runs keep their hips' travel in the .vrma. WWT measures it at import (hipsTravel), draws the motion in place (the model's In-place setting) and moves the character at the speed the feet keep (src/world/gait.ts). Names stay the library's own, so WWT recognizes them as any import would.",
   "clips": [
     { "source": "Idle_Loop" },
     { "source": "Idle_Talking_Loop" },
-    { "source": "Walk_Loop", "inPlace": true },
-    { "source": "Walk_Formal_Loop", "inPlace": true },
-    { "source": "Jog_Fwd_Loop", "inPlace": true },
-    { "source": "Sprint_Loop", "inPlace": true },
+    { "source": "Walk_Loop" },
+    { "source": "Walk_Formal_Loop" },
+    { "source": "Jog_Fwd_Loop" },
+    { "source": "Sprint_Loop" },
     { "source": "Crouch_Idle_Loop" },
     { "source": "Sitting_Enter" },
     { "source": "Sitting_Idle_Loop" },
