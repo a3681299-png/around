@@ -186,6 +186,9 @@ def sole_points(parts_list):
 
 src_soles = sole_vertices(src, [s for _, s in feet])
 tgt_soles = sole_vertices(tgt, [t for t, _ in feet])
+tgt_soles_side = {
+    side: sole_vertices(tgt, [pairs[f"{side}Foot"][0]]) for side in ("left", "right") if f"{side}Foot" in pairs
+}
 src_sole_rest = sole_height(src_soles)
 tgt_sole_rest = sole_height(tgt_soles)
 print("RETARGET sole vertices", sum(len(i) for _, i in src_soles), sum(len(i) for _, i in tgt_soles))
@@ -266,6 +269,109 @@ def solve(spread, travel, f0, f1, ground, lift=0.0, step=None):
 def pose_target(pose):
     for bone, basis in pose.items():
         tgt.pose.bones[bone].matrix_basis = basis
+
+
+# Planted feet (walks and runs): a source's stance foot drifts a little on its own (UAL's walks by
+# 16-19% of their pace), and no single hips speed can cancel a drift that changes within a step.
+# While a foot touches the floor, its leg is bent (two-bone IK on this body's own thigh and shin) so
+# that the touching sole vertices stay where they were; once it lifts off, the correction eases back
+# to none over the swing, so the swing stays the source's. "Touching" is a sole vertex within
+# CONTACT of the body's rest sole height, in two neighbouring frames (the same test check-motions
+# uses for a planted foot), both measured on this body. The foot keeps its own turn (a heel strike,
+# a toe-off), only its place changes.
+CONTACT = 0.015
+LEG = ("UpperLeg", "LowerLeg", "Foot")
+
+
+def ik_leg(side, offset):
+    """Moves the foot by `offset` (world) with the thigh and shin, keeping the knee's bend plane and
+    the foot's turn. Returns the three bones' new matrix_basis."""
+    up, lo, ft = (tgt.pose.bones[pairs[side + b][0]] for b in LEG)
+    vl = bpy.context.view_layer
+    vl.update()
+    off = tgt_world_inv.to_3x3() @ offset
+    H, K, A = (pb.matrix.translation.copy() for pb in (up, lo, ft))
+    foot_rot = ft.matrix.to_quaternion()
+    L1, L2 = (K - H).length, (A - K).length
+    u = A + off - H
+    # A straight leg cannot reach farther; a fully folded one not nearer.
+    d = min(max(u.length, abs(L1 - L2) + 1e-4), (L1 + L2) * 0.9995)
+    u.normalize()
+    n = (K - H).cross(A - H)
+    if n.length < 1e-6:
+        n = up.matrix.to_3x3().col[0]
+    w = n.normalized().cross(u)
+    if w.dot((K - H) - u * (K - H).dot(u)) < 0:
+        w = -w
+    a = (L1 * L1 - L2 * L2 + d * d) / (2 * d)
+    knee = H + u * a + w * math.sqrt(max(0.0, L1 * L1 - a * a))
+    target = H + u * d
+    about = lambda p, q: Matrix.Translation(p) @ q.to_matrix().to_4x4() @ Matrix.Translation(-p)
+    up.matrix = about(H, (K - H).rotation_difference(knee - H)) @ up.matrix
+    vl.update()
+    K2, A2 = lo.matrix.translation.copy(), ft.matrix.translation.copy()
+    lo.matrix = about(K2, (A2 - K2).rotation_difference(target - K2)) @ lo.matrix
+    vl.update()
+    ft.matrix = Matrix.LocRotScale(ft.matrix.translation, foot_rot, None)
+    vl.update()
+    return {pb.name: pb.matrix_basis.copy() for pb in (up, lo, ft)}
+
+
+def pin_feet(pose_at, f0, f1, looping):
+    """Per frame and foot, the world offset that keeps a touching foot's sole still (see above)."""
+    n = f1 - f0 + 1
+    P = n - 1 if looping else n
+    sides = [s for s in ("left", "right") if s in tgt_soles_side and all(s + b in pairs for b in LEG)]
+    pins = {s: [Vector((0, 0, 0)) for _ in range(n)] for s in sides}
+    floor = tgt_sole_rest + CONTACT * height
+    # Twice: the second pass cancels what the first left (skinning bends the sole a little).
+    for _ in range(2):
+        soles = {s: [] for s in sides}
+        for f in range(f0, f1 + 1):
+            scn.frame_set(f)
+            pose_target(pose_at(f))
+            for s in sides:
+                if pins[s][f - f0].length > 0:
+                    ik_leg(s, pins[s][f - f0])
+            for s in sides:
+                soles[s].append(sole_points(tgt_soles_side[s]))
+        for s in sides:
+            # drift[t]: the touching sole's median move from frame t-1 to t (None: not touching).
+            drift = [None] * n
+            for t in range(1, n):
+                a, b = soles[s][t - 1], soles[s][t]
+                moves = [b[i] - a[i] for i, p in enumerate(a) if p.z < floor and b[i].z < floor]
+                if moves:
+                    moves.sort(key=lambda v: v.x * v.x + v.y * v.y)
+                    m = moves[len(moves) // 2]
+                    drift[t] = Vector((m.x, m.y, 0))
+            # A loop runs twice from its start so the first step's state is the steady one; the
+            # transitions are into frames 1..P (frame P of a loop is its frame 0 one cycle on).
+            span = 2 * P if looping else n
+            into = lambda m: ((m - 1) % P) + 1 if looping else m
+            acc, out = [Vector((0, 0, 0))] * span, Vector((0, 0, 0))
+            m = 1
+            while m < span:
+                d = drift[into(m)]
+                if d is not None:
+                    out = out - d
+                    acc[m] = out.copy()
+                    m += 1
+                    continue
+                # A swing: from the correction it lifted off with back to none, by its next contact.
+                end = m
+                while end < span and drift[into(end)] is None:
+                    end += 1
+                for j in range(m, end):
+                    acc[j] = out * (1 - (j - m + 1) / (end - m + 1))
+                out = Vector((0, 0, 0)) if end < span else acc[end - 1].copy()
+                m = end
+            for i in range(n):
+                j = (i % P) + P if looping else i
+                pins[s][i] = pins[s][i] + acc[j if j < span else span - 1]
+            if looping:
+                pins[s][n - 1] = pins[s][0].copy()
+    return pins
 
 
 def run(clip):
@@ -372,15 +478,26 @@ def run(clip):
         for pb in tgt.pose.bones:
             pb.matrix_basis = Matrix()
 
+    pose_at = lambda f: solve(
+        {"left": need["left"][f - f0], "right": need["right"][f - f0]}, tr, f0, f1, ground, lifts[f - f0], step
+    )
+    # Walks and runs (a motion whose hips travel): planted feet held still.
+    pins = pin_feet(pose_at, f0, f1, looping) if travels else {}
+    for pb in tgt.pose.bones:
+        pb.matrix_basis = Matrix()
+
     tgt.animation_data_create()
     action = bpy.data.actions.new(name + "_vrma")
     tgt.animation_data.action = action
     prev = {}
     for f in range(f0, f1 + 1):
         scn.frame_set(f)
-        pose = solve(
-            {"left": need["left"][f - f0], "right": need["right"][f - f0]}, tr, f0, f1, ground, lifts[f - f0], step
-        )
+        pose = pose_at(f)
+        if pins:
+            pose_target(pose)
+            for side, offsets in pins.items():
+                if offsets[f - f0].length > 0:
+                    pose.update(ik_leg(side, offsets[f - f0]))
         for bone, basis in pose.items():
             q = basis.to_quaternion()
             if bone in prev and prev[bone].dot(q) < 0:
@@ -410,6 +527,8 @@ def run(clip):
         "rootTravelM": [round(v, 3) for v in ((0, 0, 0) if in_place else (travel_all.x, travel_all.z, -travel_all.y))],
         "feetLiftM": {"min": round(min(lifts), 4), "max": round(max(lifts), 4)},
         "armSpreadDeg": {s: round(max(need[s]), 1) for s in need},
+        # The farthest a planted foot was held from where the motion put it (cm).
+        "feetPinCm": {s: round(max(v.length for v in pins[s]) * 100, 2) for s in pins},
         "export": list(res),
     }
     with open(os.path.join(out_dir, name + ".json"), "w", encoding="utf-8") as fp:
