@@ -1,7 +1,8 @@
 import { compileDesign, createDesignRenderer, type SkinAssetPort, type SkinAssetStatus } from '../design/renderer';
 import type { InkDecision } from '../design/contrast';
 import { readDesign } from '../design/immutable';
-import type { DesignDocument } from '../design/types';
+import { depthOf, type DesignDocument } from '../design/types';
+import { createSpaceHost } from './space';
 import { createImageRenderer, type ImageEditing } from '../design/image-renderer';
 import type { SiteAdapter, SitePageChange } from '../sites/types';
 import type { UserSettings } from '../storage/settings';
@@ -59,6 +60,17 @@ export function createPageController(
           images.refresh();
         })
       : undefined;
+  // The room behind the UI (docs/depth-foundation.md), on sites whose adapter has a backdrop.
+  const space = site.backdrop
+    ? createSpaceHost(doc, site.backdrop, ports.assets, () => {
+        // The room appearing or going changes where room-depth artwork goes and whether it
+        // needs the guard.
+        if (shown()) {
+          inspect();
+          images.refresh();
+        }
+      })
+    : undefined;
   const images = createImageRenderer(
     doc,
     ports.assets,
@@ -67,18 +79,29 @@ export function createPageController(
     timeline,
     safety,
     site.signals?.page,
+    space ? () => space.place() : undefined,
   );
   g11RegisterRefresh(() => images.refresh());
   let suspended = false,
     editing = false;
   // Observation starts only once settings and artwork call for it.
   safety?.setActive(false);
+  // Only what is in front of the UI needs the guard (ガードは手前の物だけ): while the room is
+  // shown, room-depth layers are under the content by stacking order. Without the room they are
+  // drawn in front as before, guarded.
+  const guarded = () => {
+    const layers = design?.decorations ?? [];
+    if (!space?.place()) return layers.length;
+    const front = layers.filter((layer) => depthOf(layer) !== 'room').length;
+    // Room-only drawing needs every root behind (src/renderers/dom/scene.ts roomPlace).
+    return front || (design?.groups ?? []).some((group) => depthOf(group) !== 'room') ? layers.length : 0;
+  };
   const inspect = () =>
     safety?.setActive(
       guardWanted({
         suspended,
         enabled: Boolean(current?.enabled),
-        layers: design?.decorations.length ?? 0,
+        layers: guarded(),
         editing,
       }),
     );
@@ -90,6 +113,7 @@ export function createPageController(
 
   const deactivate = () => {
     safety?.setActive(false);
+    space?.update(undefined);
     images.destroy();
     designRenderer.destroy();
     disconnect?.();
@@ -100,6 +124,7 @@ export function createPageController(
     WW_TEST_PAGE_CHANGE: if (legacyPageChange()) return render();
     if (!shown()) return;
     designRenderer.refresh(change, marked);
+    space?.changed();
     images.refresh();
     // Text can alter geometry too; active editors compare their anchor snapshot.
     onSurfacesChanged?.();
@@ -110,6 +135,7 @@ export function createPageController(
     inspect();
     syncParts();
     designRenderer.update(design);
+    space?.update(design?.space);
     images.update(design?.decorations ?? [], design?.groups ?? [], design?.signalRules ?? []);
     onSurfacesChanged?.();
   };
@@ -195,6 +221,7 @@ export function createPageController(
     destroy() {
       current = undefined;
       deactivate();
+      space?.destroy();
       safety?.destroy();
       designRenderer.dispose();
     },

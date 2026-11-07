@@ -38,6 +38,15 @@ const autonomyPace = Number(process.env.WW_AUTONOMY_PACE ?? '1');
 if (!(autonomyPace >= 1 && autonomyPace <= 100)) throw new Error('WW_AUTONOMY_PACE must be 1…100.');
 if (autonomyPace !== 1 && !outputName.startsWith('.work/'))
   throw new Error('Builds with a faster autonomy must stay inside .work.');
+// The depth foundation (docs/depth-foundation.md): a probe for tests (the room's state on the
+// document and its drawn pixels), and builds that break its protections on purpose, to see their
+// tests fail: `stacking` draws room-depth artwork over the UI instead of under it, `density`
+// draws the glass plates without the readability density.
+const spaceProbe = process.env.WW_SPACE_PROBE === '1';
+const spaceBreak = process.env.WW_SPACE_BREAK ?? '';
+if (!['', 'stacking', 'density'].includes(spaceBreak)) throw new Error('WW_SPACE_BREAK must be stacking or density.');
+if ((spaceProbe || spaceBreak) && !outputName.startsWith('.work/'))
+  throw new Error('Space probes and broken space builds must stay inside .work.');
 const watching = process.argv.includes('--watch');
 const worldMode = process.env.WW_WORLD_MODE ?? 'runtime';
 if (!['legacy', 'compare', 'runtime'].includes(worldMode))
@@ -118,6 +127,7 @@ const shared = {
     ...(guardTrace ? [] : ['WW_GUARD_TRACE']),
     ...(noIdleRecheck ? ['WW_IDLE_RECHECK'] : []),
     ...(noStackingProof ? ['WW_STACKING_PROOF'] : []),
+    ...(spaceProbe ? [] : ['WW_SPACE_PROBE']),
   ],
   define: {
     __WW_PAGE_CHANGE_LEGACY__: String(pageChangeProbe && process.env.WW_PAGE_CHANGE_LEGACY === '1'),
@@ -126,6 +136,8 @@ const shared = {
     __WW_ASSET_PROFILE__: String(profiling),
     __WW_LAYERING__: String(layering),
     __WW_AUTONOMY_PACE__: String(autonomyPace),
+    __WW_SPACE_PROBE__: String(spaceProbe),
+    __WW_SPACE_BREAK__: JSON.stringify(spaceBreak),
     // G1 measurement hooks (src/diagnostics/g11-hooks.ts): only scripts/g11/build.mjs turns them on.
     __WW_G11__: 'false',
   },

@@ -80,4 +80,26 @@ export interface SiteAdapter {
    * the editor picks parts. Unused parts cost nothing during scans. */
   setDesignParts?(ids: ReadonlySet<string>): void;
   mountSettings(entry: SettingsEntry): () => void;
+  /** The depth foundation (docs/depth-foundation.md): where the room goes and what is in front of it. */
+  readonly backdrop?: SiteBackdrop;
+}
+
+/**
+ * The page's side of the room behind the UI. The adapter owns which of its own backgrounds turn
+ * transparent (never the parts' looks) and which containers are read, operated or free; the
+ * engine only receives the rectangles.
+ */
+export interface SiteBackdrop {
+  /** Makes the page's own background transparent and gives the place for the room under the
+   * content (a fixed child at a negative level). `close` puts the page back as it was. */
+  open(): { parent: HTMLElement; zIndex: number; close(): void };
+  /**
+   * The UI regions now, with their importance: the G1 operation list widened to containers
+   * (docs/product-design-snapshot.md, UI の領域情報). A handful of known containers, found once
+   * and kept while connected; reading them is a few box reads, never a document-wide query.
+   */
+  regions(): readonly import('../world/space').UiRegion[];
+  scheme(): import('../world/space').ColorScheme;
+  /** The page's main video, whose colour lights the room; kept while connected. */
+  video(): HTMLVideoElement | undefined;
 }

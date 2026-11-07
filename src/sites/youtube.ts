@@ -5,6 +5,7 @@ import { videoCardContainer } from './youtube-cards';
 import { youtubePlaybackSource } from './youtube-signals';
 import { youtubePage } from './youtube-page';
 import { youtubeOperations } from './youtube-operations';
+import { youtubeBackdrop } from './youtube-backdrop';
 import { YOUTUBE_DESIGN_TARGETS, YOUTUBE_SKIN_CONTROLS, YOUTUBE_SKIN_MARKS } from './youtube-targets';
 import { createSelectorIndex } from './surface-index';
 import { LOWER_SEAT_ANCHORS } from './anchors';
@@ -51,6 +52,7 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
     signals: { videoPlayback: youtubePlaybackSource(doc), page: youtubePage },
     operationSurfaces: () => youtubeOperations(doc),
     mountSettings: (entry) => mountYouTubeSettings(doc, view, entry),
+    backdrop: youtubeBackdrop(doc),
     setDesignParts(ids) {
       const next = YOUTUBE_SKIN_MARKS.filter((mark) => ids.has(mark.part));
       if (next.length === partMarks.length && next.every((mark, position) => mark === partMarks[position])) return;
