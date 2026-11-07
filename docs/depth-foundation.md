@@ -194,3 +194,9 @@
 - YouTube の部品の名前（`yt-lockup-metadata-view-model`・`ytd-comment-view-model #main` など）に頼っている。変わると板が付かない部品が出る（文字は部屋の上に出る）。実サイトのテストで気づける
 - シアターで黒い余白を透明にしたので、縦長の動画では映像の左右に部屋が見える（意図どおり）。操作バーのグラデーションは YouTube のまま
 - 昼の光の層はテスト用の部屋で焼いただけで、光の強さは目で決めた値
+
+### ミルドの取り込みのあとの載せ直し（v17）
+
+- ミルド（`codex/mirdo-motion-2`・`codex/mirdo-spa-fix`）と検証の報告を作業ブランチに取り込んだ（`9cff6c7`〜`43ec318`）。この塊はその上に載せ直し、版を v17 にした（3節）
+- 載せ直したあとの確認：型・lint・unit 618件通過。触った所と版を見る e2e（`room-layer`・`layering`・`operation-*`・`page-change`・`playground`・`world-host`・`extension`・`g14-idle-recheck`・エディターの版を見る spec）は 200 通過・10 skip・1 失敗
+- 失敗の1件 `world-host`「only a player the adapter reports reduced…」（ミニプレーヤーで縮んだ高さにならない）は、この塊とミルドの前の `263579c` でも4回中4回落ちた。ミルドを取り込んだ `43ec318` では4回中1回。前からある揺れ（または前からある時間の取り合い）として、原因は調べていない。1回目の塊の終わり（ミルドの前）の e2e では通っていた
