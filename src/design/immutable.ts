@@ -1,4 +1,6 @@
+import { parseSpace } from './space';
 import {
+  checkGroupDepth,
   checkGroupRenderMode,
   checkStyleRules,
   isDesignId,
@@ -104,7 +106,7 @@ export function commitDesign(input: DesignDocument, previous?: DesignDocument): 
   if (documents.has(input)) return input;
   if (previous) previous = readDesign(previous);
   if (
-    input.schemaVersion !== 16 ||
+    input.schemaVersion !== 17 ||
     !isDesignId(input.id) ||
     !isDesignId(input.siteId) ||
     (input.baseThemeId !== null && !isDesignId(input.baseThemeId))
@@ -132,6 +134,7 @@ export function commitDesign(input: DesignDocument, previous?: DesignDocument): 
     if (children.some((child) => !sameAnchor(child!.placement.anchor, children[0]!.placement.anchor)))
       throw new Error('同じ配置基準のレイヤーだけをグループ化できます。');
     checkGroupRenderMode(group, children as Decoration[]);
+    checkGroupDepth(group, children as Decoration[]);
     group.children.forEach((id) => assigned.add(id));
   }
   if ((input.signalRules?.length ?? 0) > SIGNAL_RULE_LIMITS.rules) throw new Error('シグナルルールが多すぎます。');
@@ -152,9 +155,11 @@ export function commitDesign(input: DesignDocument, previous?: DesignDocument): 
     decorations,
     ...(groups.length ? { groups } : {}),
     ...(signalRules.length ? { signalRules } : {}),
+    ...(input.space ? { space: parseSpace(input.space) } : {}),
   };
   if (!groups.length) delete next.groups;
   if (!signalRules.length) delete next.signalRules;
+  if (!input.space) delete next.space;
   return adoptValidatedDesign(previous ? share(previous, next) : next);
 }
 

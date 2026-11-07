@@ -14,8 +14,11 @@ import {
   type GroupLayer,
   type LayerPlacement,
   type RenderMode,
+  type LayerDepth,
   renderModeOf,
+  depthOf,
 } from './types';
+import { parseSpace } from './space';
 import { MODEL_LIMITS, parseModelInfo, parseModelSettings } from '../models/types';
 import { modelClips, parseCharacter } from '../characters/settings';
 import { ASSET_MESSAGES } from '../assets/limits';
@@ -78,6 +81,17 @@ export function checkGroupRenderMode(group: GroupLayer, children: readonly { ren
   if (children.some((child) => renderModeOf(child) !== renderModeOf(group)))
     throw new Error('グループと中のレイヤーは同じ描画モードにしてください。');
 }
+/** v17. In front is stored by omission, so equal artwork has one canonical form. */
+function depth(input: Record<string, unknown>): { depth?: LayerDepth } {
+  if (!Object.hasOwn(input, 'depth')) return {};
+  if (input['depth'] !== 'room') throw new Error('奥行きが不正です。');
+  return { depth: 'room' };
+}
+/** A group is drawn as one subtree on one plane, so its members share its depth. */
+export function checkGroupDepth(group: GroupLayer, children: readonly { depth?: LayerDepth }[]): void {
+  if (children.some((child) => depthOf(child) !== depthOf(group)))
+    throw new Error('グループと中のレイヤーは同じ奥行きにしてください。');
+}
 
 export function parseGroupLayer(value: unknown): GroupLayer {
   const input = record(value, [
@@ -92,6 +106,7 @@ export function parseGroupLayer(value: unknown): GroupLayer {
     'children',
     'motion',
     'renderMode',
+    'depth',
   ]);
   if (
     input['kind'] !== 'group' ||
@@ -121,6 +136,7 @@ export function parseGroupLayer(value: unknown): GroupLayer {
     locked: input['locked'],
     children: [...input['children']],
     ...renderMode(input),
+    ...depth(input),
     ...(Object.hasOwn(input, 'motion') ? { motion: parseMotion(input['motion']) } : {}),
     ...(Object.hasOwn(input, 'effects') ? { effects: parseEffects(input['effects']) } : {}),
   };
@@ -257,6 +273,7 @@ const DECORATION_FIELDS = [
   'source',
   'renderMode',
   'character',
+  'depth',
 ] as const;
 const DECORATION_KINDS = ['image', 'animation', 'model3d'] as const;
 export function parseDecoration(value: unknown): Decoration {
@@ -285,6 +302,7 @@ export function parseDecoration(value: unknown): Decoration {
     visible: item['visible'],
     locked: item['locked'] as boolean,
     ...renderMode(item),
+    ...depth(item),
     ...(Object.hasOwn(item, 'motion') ? { motion: parseMotion(item['motion']) } : {}),
     ...(Object.hasOwn(item, 'effects') ? { effects: parseEffects(item['effects']) } : {}),
   };
@@ -334,6 +352,7 @@ export function parseDesign(value: unknown): DesignDocument {
     'decorations',
     'groups',
     'signalRules',
+    'space',
   ]);
   if (
     !isDesignId(data['id']) ||
@@ -371,6 +390,7 @@ export function parseDesign(value: unknown): DesignDocument {
       if (children.some((child) => !sameAnchor(child!.placement.anchor, children[0]!.placement.anchor)))
         throw new Error('同じ配置基準のレイヤーだけをグループ化できます。');
       checkGroupRenderMode(group, children as Decoration[]);
+      checkGroupDepth(group, children as Decoration[]);
       group.children.forEach((id) => assigned.add(id));
     }
   }
@@ -378,7 +398,7 @@ export function parseDesign(value: unknown): DesignDocument {
     ? parseSignalRules(data['signalRules'], new Set([...decorations, ...groups].map((layer) => layer.id)))
     : [];
   return {
-    schemaVersion: 16,
+    schemaVersion: 17,
     id: data['id'],
     siteId: data['siteId'],
     baseThemeId: data['baseThemeId'],
@@ -386,11 +406,12 @@ export function parseDesign(value: unknown): DesignDocument {
     decorations,
     ...(groups.length ? { groups } : {}),
     ...(signalRules.length ? { signalRules } : {}),
+    ...(Object.hasOwn(data, 'space') ? { space: parseSpace(data['space']) } : {}),
   };
 }
 
 export function emptyDesign(siteId: string, baseThemeId: string | null): DesignDocument {
-  return parseDesign({ schemaVersion: 16, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
+  return parseDesign({ schemaVersion: 17, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
 }
 
 export function sameDesign(a: DesignDocument | undefined, b: DesignDocument | undefined): boolean {

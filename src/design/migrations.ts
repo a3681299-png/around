@@ -202,6 +202,15 @@ export function migrateV15ToV16(value: unknown): Data {
   return next(data, 16);
 }
 
+/** v16 → v17 (the depth foundation): the artwork may name a room behind the UI (`space`) and a
+ * layer or group may be drawn there (`depth: 'room'`). Nothing changes shape; every earlier
+ * layer stays in front by omission. Layers, groups and the root pass unchanged through every
+ * earlier step, so this gate (the v16 shape: no `space`, no `depth`) covers v1–v16. */
+export function migrateV16ToV17(value: unknown): Data {
+  const data = stage(value, 16, { root: root8, layer: layer14, kinds: models, group: group12, rule: rule13 });
+  return next(data, 17);
+}
+
 export const DESIGN_MIGRATIONS = Object.freeze([
   migrateV1ToV2,
   migrateV2ToV3,
@@ -218,14 +227,15 @@ export const DESIGN_MIGRATIONS = Object.freeze([
   migrateV13ToV14,
   migrateV14ToV15,
   migrateV15ToV16,
+  migrateV16ToV17,
 ]);
 
-/** Pure chain; a returned v16 object is still unvalidated external input. */
+/** Pure chain; a returned v17 object is still unvalidated external input. */
 export function migrateDesign(value: unknown): Data {
   let data = record(value);
   const version = data['schemaVersion'];
-  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 16)
+  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 17)
     throw new Error('このデザインのバージョンには対応していません。');
-  for (let from = version; from < 16; from++) data = DESIGN_MIGRATIONS[from - 1]!(data);
+  for (let from = version; from < 17; from++) data = DESIGN_MIGRATIONS[from - 1]!(data);
   return data;
 }

@@ -122,7 +122,7 @@ test('every pure adjacent step advances one version without granting validation 
     let data = freezeTree(JSON.parse(readFileSync(fixtures + file, 'utf8')));
     const original = JSON.stringify(data);
     const version = data.schemaVersion as number;
-    for (let from = version; from < 16; from++) {
+    for (let from = version; from < 17; from++) {
       const migration = DESIGN_MIGRATIONS[from - 1]!;
       const before = JSON.stringify(data);
       const migrated = migration(data);
@@ -143,7 +143,7 @@ test('every pure adjacent step advances one version without granting validation 
     rules: [],
     decorations: [{ kind: 'image', opacity: Infinity }],
   });
-  expect(unvalidated['schemaVersion']).toBe(16);
+  expect(unvalidated['schemaVersion']).toBe(17);
   expect(() => parseDesign(unvalidated)).toThrow();
   expect(() => readDesign(freezeTree(unvalidated))).toThrow();
   expect(() => commitDesign(unvalidated as unknown as DesignDocument)).toThrow();
@@ -180,7 +180,7 @@ test('v12 renderMode keeps normal by omission, stores atmosphere, and keeps a gr
     b = { ...image, id: 'image-b' };
   // Every v11 document migrates with normal rendering and no new field.
   const migrated = parseDesign({ ...doc([a]), schemaVersion: 11 });
-  expect(migrated.schemaVersion).toBe(16);
+  expect(migrated.schemaVersion).toBe(17);
   expect(Object.hasOwn(migrated.decorations[0]!, 'renderMode')).toBe(false);
   expect(Object.hasOwn(parseDesign(doc([{ ...a, renderMode: 'normal' }])).decorations[0]!, 'renderMode')).toBe(false);
   const atmosphere = parseDesign(doc([{ ...a, renderMode: 'atmosphere' }]));

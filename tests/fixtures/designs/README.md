@@ -43,3 +43,9 @@ v15への版上げで、`chain-expected.json` の全件の `schemaVersion` を15
 取得は `scripts/capture-design-chain-fixtures.mjs` を1件に絞った使い捨ての写し（出力先を `.work/capture` に、`three`・`@pixiv` を外部に）で行った。元のスクリプトは変えていない。
 期待値（`chain-expected.json`・`css-expected.json` の `history-v15.json`）は、変更前の `e0b14ca` のパーサーと `compileDesign` で取った。
 v16への版上げで、`chain-expected.json` の全件の `schemaVersion` を16にした（ほかの値は変えていない）。
+
+奥行きの土台（v17）では `history-v16.json` を追加した。v16を導入した `e6e958d` の `tests/character-data.spec.ts` の
+「a motion hips height roundtrips at its limit and stays absent when not given」が、最初に `parseDesign` へ渡して受理された入力（キャラ付きの VRM の3Dレイヤー1枚。名前の文字列だけで、モデルや素材は含まない）である。
+取得は `scripts/capture-design-chain-fixtures.mjs` を1件に絞った使い捨ての写し（出力先だけ `.work/capture` に変えた）で行った。元のスクリプトは変えていない。
+期待値（`chain-expected.json`・`css-expected.json` の `history-v16.json`）は、変更前の `43ec318` のパーサーと `compileDesign` で取った。
+v17への版上げで、`chain-expected.json` の全件の `schemaVersion` を17にした（ほかの値は変えていない）。

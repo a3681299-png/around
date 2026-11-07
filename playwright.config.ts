@@ -8,6 +8,8 @@ const unitSpecs = [
   'auto-motions',
   'check-motions',
   'gait',
+  'space',
+  'space-data',
   'clean-work',
   'backup-data',
   'browser-boundary',

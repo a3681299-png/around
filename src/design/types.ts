@@ -38,7 +38,7 @@ export interface SurfaceStyleRule {
 }
 
 export interface DesignDocument {
-  schemaVersion: 16;
+  schemaVersion: 17;
   id: string;
   siteId: string;
   /** null uses native site styling; a built-in theme is an optional starting point. */
@@ -48,7 +48,14 @@ export interface DesignDocument {
   /** Composition nodes reference existing media; assets are never duplicated here. */
   groups?: GroupLayer[];
   signalRules?: import('../signals/keyframes').SignalRule[];
+  /** v17: the room behind the UI and the numbers of its fixed effects (docs/depth-foundation.md). */
+  space?: import('./space').DesignSpace;
 }
+
+/** v17: 'room' draws the layer behind the UI, under the page's content (no guard is needed
+ * there). Omitted is in front of the UI, as every earlier layer (docs/depth-foundation.md). */
+export type LayerDepth = 'room';
+export const depthOf = (layer: { depth?: LayerDepth }): 'room' | 'front' => layer.depth ?? 'front';
 
 export type RenderMode = 'normal' | 'atmosphere';
 export const renderModeOf = (layer: { renderMode?: RenderMode }): RenderMode => layer.renderMode ?? 'normal';
@@ -78,6 +85,7 @@ export interface LayerAppearance {
   /** Omitted means normal. Atmosphere paints over protected areas under an engine-held
    * alpha cap, without filters, shadows or input; the cap is never stored in artwork. */
   renderMode?: RenderMode;
+  depth?: LayerDepth;
   motion?: import('../signals/motion').FollowMotion;
 }
 
