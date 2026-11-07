@@ -187,7 +187,7 @@ worktree は比べる基準の2つ（`g13-g12head`＝`4d3f39b`・`g13-before`＝
 - `npm ci` と `npm run test:setup` を実行し、Chromium をデスクトップのチェックアウト直下の `.work/browsers` に用意した。検証用 worktree からは `PLAYWRIGHT_BROWSERS_PATH` にその絶対パスを指定する。検証ビルドは worktree 内の `WW_BUILD_OUT=.work/test-dist` に作り、テストには `WW_TEST_EXTENSION_PATH=.work/test-dist` を指定する。
 - 作業ブランチの `a8a4b5d` から `node scripts/install-skills.mjs` を実行し、Codex の `~/.agents/skills` と Claude Code の `~/.claude/skills` に WWT の6スキルをインストールした。`node scripts/install-skills.mjs --check` は成功。
 - FFmpeg 9.0.1 Essentials を WinGet の `Gyan.FFmpeg.Essentials` でユーザー単位に導入した。ユーザー PATH から `ffmpeg -version` が通り、短い合成映像を VP9/WebM でエンコードできた。[FFmpeg の配布案内](https://ffmpeg.org/download.html)
-- 私用素材は `C:\wwt-private\` 配下の原本をユーザー環境変数で参照する。`WW_VRM_FILE` と `WW_CHARACTER_VRM` は専用モーションと同じキャラクターの VRM、`WW_VRMA_DIR` は `manifest.json` と専用モーションのサブフォルダを含む親ディレクトリ、`WW_CHARACTER_MOTIONS` はそのサブフォルダ。4件とも参照先を確認した。設定前から開いているターミナルでは、新しいターミナルを開くか、Windows のユーザー環境変数をプロセスに読み込んでから実行する。
+- 私用素材は次の手順で取得し、ユーザー環境変数で参照する。
 - スクリーンショットと計測は headless を基本にする。表示が必要な Chrome は `WW_TEST_WINDOW_OFFSCREEN=1` で画面外に置く。e2e 全件を回す場合は、フォーカスを取る前に翔太に伝える。
 - ネイティブのキー送信と画面の検出に頼る5件（`editor-entry.spec.ts` の3件・`skin-verification.spec.ts` の緊急 OFF・`ui0d-emergency.spec.ts`）は、デスクトップでは `c5cbb68` でも `c69d9bb` でも落ちる。ノート PC（1画面）では同じ版で5件とも通る（2026-11-07、Claude Code。1度だけフォーカスの取り合いでキー送信が失敗し、単独で回し直すと通った）。デスクトップの2画面・画面外の窓へのキー送信の環境の問題で、製品の不具合ではない。デスクトップで落ちても、ノート PC で通れば合格として扱い、報告にそう書く
 - 私用素材の共有は、WWT とは別の非公開リポジトリ `a3681299-png/wwt-private-assets`（人は招待しない。大きいファイルは Git LFS）で行う。中身はミルド（元の unitypackage・取り出した中身・変換した VRM・ミルドに当てた .vrma と判定の結果）と Quaternius の Universal Animation Library。トルーシェ・pokke・LP_BaseBody・Mixamo 由来の物は入れていない。ノート PC の `C:\wwt-private\` がこのリポジトリそのもの。WWT 本体のリポジトリには、今までどおり素材を入れない（2026-11-07、翔太の決定）
@@ -199,6 +199,33 @@ worktree は比べる基準の2つ（`g13-g12head`＝`4d3f39b`・`g13-before`＝
   5. 退避したフォルダにしかない物（トルーシェなど）は、必要なら `C:\wwt-private\ローポリモデル用\` へ戻す（`.gitignore` で、このリポジトリには入らない）
   6. 新しい物を足したら、そのリポジトリで `git add`・`git commit`・`git push`（相手の PC では `git pull`）
 - 検証対象コミットは detached worktree で開く。報告は `codex/verify-reports` に docs の変更だけをコミットして push する。Claude Code はそこから報告コミットを取り込む。検証が終わったら要約と報告で参照する画像を残し、検証用 worktree と生データを片付ける。
+
+### 非公開素材のセットアップ（Windows）
+
+WWT と別の非公開リポジトリ `a3681299-png/wwt-private-assets` を使う。Git と Git LFS をインストールし、この非公開リポジトリを読める GitHub アカウントで認証する。旧フォルダーの中身を確認し、退避先がすでにある場合は作業を止めて別の退避先を選ぶ。既存の内容を保持したまま切り替えられるよう、別フォルダーで LFS の確認まで済ませる。
+
+```powershell
+git lfs install
+git clone https://github.com/a3681299-png/wwt-private-assets.git C:\wwt-private-new
+git -C C:\wwt-private-new lfs pull
+git -C C:\wwt-private-new lfs fsck
+git -C C:\wwt-private-new lfs ls-files
+```
+
+全件取得できたら、既存の `C:\wwt-private` がある場合は `C:\wwt-private-old` に移し、`C:\wwt-private-new` を `C:\wwt-private` に移す。ミルドを使う場合の Windows ユーザー環境変数は次のとおり。
+
+```powershell
+$vrm = 'C:\wwt-private\mirdo\work\mirdo-1024.vrm'
+$motions = 'C:\wwt-private\mirdo\motions-pass'
+[Environment]::SetEnvironmentVariable('WW_VRM_FILE', $vrm, 'User')
+[Environment]::SetEnvironmentVariable('WW_CHARACTER_VRM', $vrm, 'User')
+[Environment]::SetEnvironmentVariable('WW_VRMA_DIR', $motions, 'User')
+[Environment]::SetEnvironmentVariable('WW_CHARACTER_MOTIONS', $motions, 'User')
+```
+
+新しいターミナルで `Get-ChildItem Env:WW*` と `Get-Item -LiteralPath $env:WW_CHARACTER_VRM` を実行する。VRM は約1.85 MB。数百バイトしかない場合は LFS のポインターを見ているため、`git lfs pull` を確認する。`Get-ChildItem -LiteralPath $env:WW_CHARACTER_MOTIONS -Filter *.vrma` でミルド用の合格クリップを確認する。判定を再実行するときは対応する JSON がそろった `mirdo/motions` を使う。トルーシェの旧 `character-live` は `manifest.json` と専用サブフォルダーを含む別の動作ディレクトリが必要なので、その実行時だけトルーシェ用の変数を指定する。
+
+退避先だけにある素材はその場で保管し、必要なときは環境変数で参照する。WWT 本体のリポジトリには素材を入れない。
 
 ### 動作確認
 
