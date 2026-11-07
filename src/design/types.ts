@@ -38,7 +38,7 @@ export interface SurfaceStyleRule {
 }
 
 export interface DesignDocument {
-  schemaVersion: 15;
+  schemaVersion: 16;
   id: string;
   siteId: string;
   /** null uses native site styling; a built-in theme is an optional starting point. */
@@ -155,6 +155,8 @@ export interface DesignTarget {
   readonly surface: string;
   readonly label: string;
   readonly skin?: SkinTargetSpec;
+  /** The part's edges a character living on it can sit on (the adapter decides; never artwork). */
+  readonly seats?: readonly ('top' | 'bottom')[];
 }
 
 export const STYLE_LIMITS = Object.freeze({ borderWidth: 12, borderRadius: 48 });

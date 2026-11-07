@@ -110,7 +110,7 @@ test('pick a card, preview all properties locally, save across tabs, discard, re
   await expect(second.locator(cards).first()).toHaveCSS('border-radius', '14px');
   const stored = await popup.evaluate(async (designKey) => (await chrome.storage.local.get(designKey))[designKey], key);
   expect(stored).toMatchObject({
-    schemaVersion: 15,
+    schemaVersion: 16,
     siteId: 'youtube',
     // New artwork names no base theme since the retro theme was removed.
     baseThemeId: null,

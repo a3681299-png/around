@@ -25,13 +25,15 @@ const frameOf = (element: Element | null | undefined): PlacementFrame | undefine
 /** One plain numeric snapshot; page elements and selectors stay in the Host. */
 export function captureGeometry(doc: Document, anchors: readonly DesignTarget[]): WorldGeometry {
   const frames: Record<string, PlacementFrame> = {},
-    reduced: Record<string, number> = {};
+    reduced: Record<string, number> = {},
+    seats: Record<string, readonly ('top' | 'bottom')[]> = {};
   let seen = regularSeen.get(doc);
   for (const anchor of anchors) {
     const element = partElement(doc, anchor),
       frame = frameOf(element);
     if (!frame) continue;
     frames[anchor.id] = frame;
+    if (anchor.seats?.length) seats[anchor.id] = anchor.seats;
     // The adapter reports a part's reduced form (a miniplayer) on the part itself; the world gets
     // the form and the base it is drawn against: the part's last height when not reduced,
     // remembered here, the only place that sees the part over time. A part never seen regular has
@@ -48,6 +50,7 @@ export function captureGeometry(doc: Document, anchors: readonly DesignTarget[])
     viewport: { width: doc.defaultView!.innerWidth, height: doc.defaultView!.innerHeight },
     anchors: frames,
     ...(Object.keys(reduced).length ? { reducedParts: reduced } : {}),
+    ...(Object.keys(seats).length ? { seats } : {}),
   };
 }
 

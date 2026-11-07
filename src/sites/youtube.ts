@@ -7,7 +7,7 @@ import { youtubePage } from './youtube-page';
 import { youtubeOperations } from './youtube-operations';
 import { YOUTUBE_DESIGN_TARGETS, YOUTUBE_SKIN_CONTROLS, YOUTUBE_SKIN_MARKS } from './youtube-targets';
 import { createSelectorIndex } from './surface-index';
-import { SHARED_DECORATION_ANCHORS } from './anchors';
+import { LOWER_SEAT_ANCHORS } from './anchors';
 import { surfacesFor, YOUTUBE_BASE_INDEX, YOUTUBE_BASE_SELECTORS, YOUTUBE_SURFACE_TARGETS } from './youtube-surfaces';
 
 const SURFACE_ATTRIBUTE = 'data-ww-surface';
@@ -46,7 +46,8 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
       if (!overlay) return undefined;
       return doc.elementsFromPoint(x, y).find((element) => !overlay.contains(element) && !element.contains(overlay));
     },
-    decorationAnchors: SHARED_DECORATION_ANCHORS,
+    // The masthead sits right on top of the player: only its lower edge is a seat.
+    decorationAnchors: LOWER_SEAT_ANCHORS,
     signals: { videoPlayback: youtubePlaybackSource(doc), page: youtubePage },
     operationSurfaces: () => youtubeOperations(doc),
     mountSettings: (entry) => mountYouTubeSettings(doc, view, entry),

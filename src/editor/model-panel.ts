@@ -167,7 +167,8 @@ export function createModelPanel(
       const number = (key: string) => Number(row.querySelector<HTMLInputElement>(`input[data-part="${key}"]`)!.value);
       assignment[name] =
         picked && row.contains(picked)
-          ? { motion, from: 0, to: Math.round(source.source.duration * 100) / 100, speed: 1 }
+          ? // Rounded down: rounding 1.6667 s up to 1.67 ends past the motion and is refused.
+            { motion, from: 0, to: Math.floor(source.source.duration * 100 + 1e-6) / 100, speed: 1 }
           : { motion, from: number('from'), to: number('to'), speed: number('speed') };
     }
     change({ character: { behaviourMotions: assignment } });

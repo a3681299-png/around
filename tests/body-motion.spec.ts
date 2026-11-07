@@ -193,3 +193,22 @@ test('recorded body states read back exactly, and malformed ones are refused', (
   expect(() => parseBodyState({ ...copy, lookYaw: 1e9 })).toThrow();
   expect(() => parseBodyState({ ...copy, moveKind: 'walk' })).toThrow();
 });
+
+test('sitting down and standing up take a moment: the seat weight moves, never jumps', () => {
+  // Standing, then sitting from 1 s, standing again from 2 s.
+  const frames = run(3000, (t) => ({ posture: t >= 1000 && t < 2000 ? 'sit' : 'stand' })).poses;
+  const weight = (p: BodyPose) => (p.seat ? (p.seatWeight ?? 1) : 0);
+  const steps = frames.slice(1).map((f, i) => Math.abs(weight(f.pose) - weight(frames[i]!.pose)));
+  // At most one frame's share of the blend per frame.
+  for (const step of steps) expect(step).toBeLessThanOrEqual(16 / BODY_TIMING.seatBlendMs + 1e-3);
+  expect(weight(frames.find((f) => f.t === 1008 + 16 * 22)!.pose)).toBe(1);
+  expect(weight(frames.find((f) => f.t === 2000 + 16 * 22)!.pose)).toBe(0);
+  // Half way down, the pose says how far (the renderer lowers the hips by that much).
+  const half = frames.find((f) => f.t === 1008 + 16 * 10)!;
+  expect(half.pose.seatWeight).toBeGreaterThan(0.3);
+  expect(half.pose.seatWeight).toBeLessThan(1);
+  // Standing again, nothing is kept: the state is as before.
+  expect(frames.at(-1)!.state.seatWeight).toBeUndefined();
+  // Recorded with the weight, read back exactly.
+  expect(parseBodyState(JSON.parse(JSON.stringify(half.state)))).toEqual(half.state);
+});

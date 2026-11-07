@@ -6,6 +6,23 @@ import { renderDiagnostics } from './helpers/render-diagnostics';
 import { DEFAULT_LAYERING, layeringBuild } from './helpers/layering-build';
 
 const defaultExtensionPath = path.resolve(process.env.WW_TEST_EXTENSION_PATH ?? 'dist');
+
+/**
+ * Screenshots keep the text caret as it is. Playwright's default (`caret: 'hide'`) restyles the
+ * page's inputs for the shot, a native look change the operation guard answers by holding the
+ * artwork for a moment, so the shot missed what a person sees (Codex's investigation, 2026-11-07).
+ * Set once on the shared Page and Locator prototypes; an explicit `caret` still wins.
+ */
+function keepCaretInScreenshots(page: Page) {
+  for (const proto of [Object.getPrototypeOf(page), Object.getPrototypeOf(page.locator('html'))]) {
+    if (proto.wwKeepCaret) continue;
+    const screenshot = proto.screenshot as (options?: object) => Promise<Buffer>;
+    proto.screenshot = function (this: unknown, options?: object) {
+      return screenshot.call(this, { caret: 'initial', ...options });
+    };
+    proto.wwKeepCaret = true;
+  }
+}
 const fixturePath = path.resolve('tests/fixtures/youtube.html');
 
 export async function launchExtension(
@@ -48,6 +65,9 @@ export async function launchExtension(
         : []),
     ],
   });
+  const first = context.pages()[0];
+  if (first) keepCaretInScreenshots(first);
+  else context.once('page', keepCaretInScreenshots);
   // Bound Windows Chromium shutdown; only the test's headless profile and
   // extension path may be terminated when normal close stops responding.
   if (process.platform === 'win32' && !options.headed) {

@@ -134,7 +134,7 @@ test('native Chrome panel uses the same draft, group masks, selection, history, 
     const stored = await popup.evaluate(
       async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
     );
-    expect((stored as { schemaVersion: number }).schemaVersion).toBe(15);
+    expect((stored as { schemaVersion: number }).schemaVersion).toBe(16);
     await page.reload();
     await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
     await expect(page.locator('#web-world-themes-decorations [data-image-id]')).toHaveCount(3);

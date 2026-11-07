@@ -19,7 +19,11 @@ import { modelFixture } from './helpers/model-fixture';
 
 const asset = (n: number) => `asset-${n.toString(16).padStart(64, '0')}`;
 const vrmSource = () => inspectAsset(new Uint8Array(vrmFixture())).model!;
-const motionSource = () => inspectVrma(new Uint8Array(vrmaFixture())).info;
+// As the importer measured a motion before v16 (these documents are v14/v15): no hips height.
+const motionSource = () => {
+  const { hipsHeight: _, ...info } = inspectVrma(new Uint8Array(vrmaFixture())).info;
+  return info;
+};
 function character(patch: Partial<CharacterSettings> = {}): CharacterSettings {
   return {
     standardMotions: 'auto',
@@ -125,6 +129,30 @@ for (const [name, mutate] of bad)
     expect(() => parseDesign(doc([layer(vrmSource(), { character: c })]))).toThrow();
   });
 
+// v16 documents, so the value itself (not the version gate) is what is refused.
+const badHips: [string, unknown][] = [
+  ['non-finite', Number.POSITIVE_INFINITY],
+  ['past the limit', CHARACTER_LIMITS.metres + 1],
+  ['below the limit', -CHARACTER_LIMITS.metres - 1],
+  ['text', '0.9'],
+];
+for (const [name, value] of badHips)
+  test(`character rejects a hips height that is ${name}`, () => {
+    const c = JSON.parse(JSON.stringify(character()));
+    c.motions[0].source.hipsHeight = value;
+    expect(() => parseDesign(doc([layer(vrmSource(), { character: c })], 16))).toThrow('範囲外');
+  });
+
+test('a motion hips height roundtrips at its limit and stays absent when not given', () => {
+  const c = character();
+  c.motions[0]!.source = { ...c.motions[0]!.source, hipsHeight: CHARACTER_LIMITS.metres };
+  const parsed = parseDesign(doc([layer(vrmSource(), { character: c })], 16));
+  const motions = (parsed.decorations[0] as ModelDecoration).character!.motions;
+  expect(motions[0]!.source.hipsHeight).toBe(CHARACTER_LIMITS.metres);
+  expect(Object.hasOwn(motions[1]!.source, 'hipsHeight')).toBe(false);
+  expect(parseDesign(JSON.parse(JSON.stringify(parsed)))).toStrictEqual(parsed);
+});
+
 test('the motion count limit is inclusive', () => {
   const c = character();
   c.motions = Array.from({ length: CHARACTER_LIMITS.motions }, (_, i) => ({ ...c.motions[0]!, id: `m${i}` }));
@@ -180,6 +208,6 @@ test('v13 documents cannot carry a character or a body measure, and migrate to v
   expect(() => migrateV13ToV14(doc([layer(source)], 13))).toThrow();
   const v13 = doc([layer(plain)], 13);
   const migrated = parseDesign(v13);
-  expect(migrated.schemaVersion).toBe(15);
+  expect(migrated.schemaVersion).toBe(16);
   expect((migrated.decorations[0] as ModelDecoration).character).toBeUndefined();
 });

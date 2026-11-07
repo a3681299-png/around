@@ -108,9 +108,11 @@ function between(
  * (the whole-page rule or the roots held over a control). Playback applies the live ones. */
 export function takeInput(input: WorldInput): WorldInput {
   const { safeInteraction, approach, ...environment } = input.environment;
-  // A part's reduced form is not part of a take (artwork data; its format is unchanged).
-  const { reducedParts, ...recorded } = input;
-  if (safeInteraction === undefined && approach === undefined) return reducedParts === undefined ? input : recorded;
+  // A part's reduced form and its seats are not part of a take (artwork data; its format is
+  // unchanged). Both are the adapter's facts about the page, given again on playback.
+  const { reducedParts, seats, ...recorded } = input;
+  if (safeInteraction === undefined && approach === undefined)
+    return reducedParts === undefined && seats === undefined ? input : recorded;
   return { ...recorded, environment };
 }
 /** Upper bound keeps simultaneous events in their original recorded order. */

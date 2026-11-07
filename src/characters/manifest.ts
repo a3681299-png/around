@@ -1,5 +1,6 @@
 import { CHARACTER_LIMITS, MOTION_ROLES, type CharacterMotion, type MotionRole } from './settings';
 import { oneOf } from '../validation';
+import { classifyMotion } from './auto-motions';
 
 /**
  * A motion folder's manifest.json is an authoring aid only: it names and sorts the files.
@@ -91,8 +92,10 @@ export function draftMotions(
     const label = labels.get(basename(asset.name));
     const id = motionId(label?.name ?? asset.name, taken);
     taken.add(id);
-    // Without a manifest a one-frame file is a pose to sit or stand in; anything else idles.
-    const role: MotionRole = label?.role ?? (asset.vrmAnimation.duration === 0 ? 'sit' : 'idle');
-    return { id, assetId: asset.id, role, origin, loop: label?.loop ?? true, source: asset.vrmAnimation };
+    // Without a manifest the name and the file's own measures decide (a one-frame file is a pose
+    // to sit or stand in; an unknown name is a gesture), src/characters/auto-motions.ts.
+    const guess = label ? undefined : classifyMotion(asset.name, asset.vrmAnimation);
+    const role: MotionRole = label?.role ?? guess!.role;
+    return { id, assetId: asset.id, role, origin, loop: label?.loop ?? guess!.loop, source: asset.vrmAnimation };
   });
 }

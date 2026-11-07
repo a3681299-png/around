@@ -4,6 +4,10 @@ import { defineConfig } from '@playwright/test';
 // fullyParallel gives each test a worker-isolated module/global environment.
 const unitSpecs = [
   'answer-check',
+  'unitypackage',
+  'auto-motions',
+  'check-motions',
+  'gait',
   'clean-work',
   'backup-data',
   'browser-boundary',

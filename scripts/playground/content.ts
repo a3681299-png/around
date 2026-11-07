@@ -12,6 +12,7 @@ import { inspectAsset } from '../../src/assets/inspect';
 import { inspectVrma } from '../../src/assets/vrma';
 import { parseDesign } from '../../src/design/schema';
 import { defaultModelSettings } from '../../src/models/types';
+import { CHARACTER_HOME } from '../../src/characters/home';
 
 const sha = (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('hex');
 
@@ -86,7 +87,7 @@ export function writeContent(root: string, out: string): { models: string[] } {
     writeFileSync(join(out, to), readFileSync(join(root, 'tests/fixtures/motion', from)));
   const model = inspectAsset(vrm).model!;
   const design = parseDesign({
-    schemaVersion: 15,
+    schemaVersion: 16,
     id: 'playground-custom',
     siteId: 'playground',
     baseThemeId: null,
@@ -120,16 +121,8 @@ export function writeContent(root: string, out: string): { models: string[] } {
         // Home is the player's bottom-right corner, over the fullscreen button's place (Shota's
         // decision, chunk 3). The anchor is the player (a part kind, the same ID on YouTube), so
         // it follows theater mode, fullscreen and any window size there as here.
-        placement: {
-          anchor: { kind: 'surface', target: 'video-player' },
-          x: 0.9,
-          // Low enough to sit in the corner, high enough that the box stays inside the player
-          // (the Playground's own controls are just below it).
-          y: 0.74,
-          widthPx: 150,
-          heightPx: 190,
-          rotationDeg: 0,
-        },
+        // The Playground's own controls are just below the box.
+        placement: CHARACTER_HOME,
         opacity: 1,
         zIndex: 2,
         visible: true,

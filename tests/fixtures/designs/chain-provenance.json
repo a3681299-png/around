@@ -54,5 +54,12 @@
     "file": "tests/character-data.spec.ts",
     "test": "v14 character roundtrips; clip indices then address its motions",
     "extraction": "first explicit parseDesign input accepted by the historical parser; expected result captured with 3a41aa2"
+  },
+  {
+    "version": 15,
+    "commit": "83601bb8f61add3d92a5016c1f0a3d5693f9f7eb",
+    "file": "tests/character-v15.spec.ts",
+    "test": "v15 roundtrips personality and the switches; absent keys keep v14 behaviour",
+    "extraction": "first explicit parseDesign input accepted by the historical parser; expected result captured with e0b14ca"
   }
 ]

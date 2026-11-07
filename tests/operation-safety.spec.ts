@@ -10,7 +10,7 @@ import type { DesignDocument } from '../src/design/types';
 import { parseDesign } from '../src/design/schema';
 import { defaultScrollOpacityRule, defaultSignalRule, type SignalRule } from '../src/signals/keyframes';
 
-async function probeCode() {
+async function probeCode(trace = true) {
   const result = await build({
     stdin: {
       contents: `export {youtubeOperations} from './src/sites/youtube-operations'; export {createCompositionReader,createDrawReads,nativeAbove,scrollsWithPage,fixedContainingBlock} from './src/host/operation-composition'; export {createOperationSource} from './src/host/operation-source'; export {createOperationGuardHost} from './src/host/operation-guard'; export {safePaintRegions} from './src/world/operations'; export {evaluatePreparedWorld,initialWorldState} from './src/world/evaluate'; export {evaluateLayout} from './src/world/layout'; export {worldScenario} from './tests/helpers/world-scenario';`,
@@ -20,6 +20,7 @@ async function probeCode() {
     write: false,
     format: 'iife',
     globalName: 'G1Probe',
+    ...(trace ? {} : { dropLabels: ['WW_GUARD_TRACE'] }),
   });
   return result.outputFiles[0]!.text;
 }
@@ -1179,8 +1180,11 @@ test('incremental discovery matches a fresh full scan after inserts, removals, m
   }
 });
 
-test('the composition slot is shared within one task and read again by every later task', async ({ youtube }) => {
-  await youtube.addScriptTag({ content: await probeCode() });
+test('the composition slot shares the capture read, then reads again on change or in a later task', async ({
+  youtube,
+}) => {
+  // Trace markers write the document and deliberately invalidate the reader.
+  await youtube.addScriptTag({ content: await probeCode(false) });
   const result = await youtube.evaluate(async () => {
     const api = (window as any).G1Probe;
     const original = window.getComputedStyle;
@@ -1200,6 +1204,7 @@ test('the composition slot is shared within one task and read again by every lat
     const repeated = count(() => Boolean(source.overlaySlot()));
     const app = document.querySelector<HTMLElement>('ytd-app')!;
     app.style.transform = 'translateX(0)';
+    const changedCapture = source.capture({ fresh: true }).supported;
     await new Promise((resolve) => setTimeout(resolve, 0));
     const changed = count(() => Boolean(source.overlaySlot()));
     app.style.removeProperty('transform');
@@ -1209,11 +1214,11 @@ test('the composition slot is shared within one task and read again by every lat
     const nextMicrotask = count(() => Boolean(source.overlaySlot()));
     window.getComputedStyle = original;
     source.destroy();
-    return { first, repeated, changed, restored, nextMicrotask };
+    return { first, repeated, changedCapture, changed, restored, nextMicrotask };
   });
-  expect(result.first).toMatchObject({ value: true });
-  expect(result.first.reads).toBeGreaterThan(0);
+  expect(result.first).toEqual({ reads: 0, value: true });
   expect(result.repeated).toEqual({ reads: 0, value: true });
+  expect(result.changedCapture).toBe(false);
   expect(result.changed.value).toBe(false); // A transformed ancestor removes the verified slot.
   expect(result.restored.value).toBe(true);
   expect(result.nextMicrotask.reads).toBeGreaterThan(0);

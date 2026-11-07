@@ -37,3 +37,9 @@ v14への版上げで、`chain-expected.json` の全件の `schemaVersion` を14
 取得は `scripts/capture-design-chain-fixtures.mjs` を1件に絞った使い捨ての写し（出力先だけ `.work/capture` に変えた）で行った。元のスクリプトは変えていない。
 期待値（`chain-expected.json`・`css-expected.json` の `history-v14.json`）は、変更前の `3a41aa2` のパーサーと `compileDesign` で取った。
 v15への版上げで、`chain-expected.json` の全件の `schemaVersion` を15にした（ほかの値は変えていない）。
+
+ミルドの動きの続き（v16）では `history-v15.json` を追加した。v15を導入した `83601bb` の `tests/character-v15.spec.ts` の
+「v15 roundtrips personality and the switches; absent keys keep v14 behaviour」が、最初に `parseDesign` へ渡して受理された入力（キャラ付きの VRM の3Dレイヤー1枚。層の名前 "Trusie" はテストの中の文字列だけで、モデルや素材は含まない）である。
+取得は `scripts/capture-design-chain-fixtures.mjs` を1件に絞った使い捨ての写し（出力先を `.work/capture` に、`three`・`@pixiv` を外部に）で行った。元のスクリプトは変えていない。
+期待値（`chain-expected.json`・`css-expected.json` の `history-v15.json`）は、変更前の `e0b14ca` のパーサーと `compileDesign` で取った。
+v16への版上げで、`chain-expected.json` の全件の `schemaVersion` を16にした（ほかの値は変えていない）。

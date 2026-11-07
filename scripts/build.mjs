@@ -32,6 +32,12 @@ if (!layering && !outputName.startsWith('.work/'))
 const noStackingProof = process.env.WW_NO_STACKING_PROOF === '1';
 if (noStackingProof && !outputName.startsWith('.work/'))
   throw new Error('Builds without the stacking proof must stay inside .work.');
+// Development only: the autonomy's inner states (boredom, sleepiness) move this many times as
+// fast, to see a doze or a change of seat without waiting minutes (docs/characters/mirdo.md).
+const autonomyPace = Number(process.env.WW_AUTONOMY_PACE ?? '1');
+if (!(autonomyPace >= 1 && autonomyPace <= 100)) throw new Error('WW_AUTONOMY_PACE must be 1…100.');
+if (autonomyPace !== 1 && !outputName.startsWith('.work/'))
+  throw new Error('Builds with a faster autonomy must stay inside .work.');
 const watching = process.argv.includes('--watch');
 const worldMode = process.env.WW_WORLD_MODE ?? 'runtime';
 if (!['legacy', 'compare', 'runtime'].includes(worldMode))
@@ -119,6 +125,7 @@ const shared = {
     __WW_WORLD_DEVTOOLS__: String(process.env.WW_WORLD_DEVTOOLS === '1'),
     __WW_ASSET_PROFILE__: String(profiling),
     __WW_LAYERING__: String(layering),
+    __WW_AUTONOMY_PACE__: String(autonomyPace),
     // G1 measurement hooks (src/diagnostics/g11-hooks.ts): only scripts/g11/build.mjs turns them on.
     __WW_G11__: 'false',
   },

@@ -72,6 +72,7 @@ export function parseWorldInput(value: unknown, options?: { registry: SignalRegi
     'viewport',
     'anchors',
     'reducedParts',
+    'seats',
     'signals',
     'events',
     'environment',
@@ -123,6 +124,31 @@ export function parseWorldInput(value: unknown, options?: { registry: SignalRegi
             return [id, number(height, 0.001, 1e6)];
           }),
         );
+  // Optional (older recordings have none): the edges each part's characters may sit on.
+  const seatData = data['seats'];
+  if (
+    seatData !== undefined &&
+    (!seatData ||
+      typeof seatData !== 'object' ||
+      Array.isArray(seatData) ||
+      Object.keys(seatData).length > RECORDING_LIMITS.anchors)
+  )
+    throw new Error('Invalid recording seats.');
+  const seats =
+    seatData === undefined
+      ? undefined
+      : Object.fromEntries(
+          Object.entries(seatData).map(([id, edges]) => {
+            if (
+              !isDesignId(id) ||
+              !Array.isArray(edges) ||
+              edges.length > 2 ||
+              edges.some((e) => e !== 'top' && e !== 'bottom')
+            )
+              throw new Error('Invalid recording seats.');
+            return [id, [...edges] as ('top' | 'bottom')[]];
+          }),
+        );
   const seed = data['seed'] === undefined ? undefined : number(data['seed'], 0, 0xffffffff);
   if (seed !== undefined && !Number.isInteger(seed)) throw new Error('Invalid World seed.');
   const scroll = signals['scroll'] === undefined ? undefined : record(signals['scroll'], ['x', 'y', 'maxX', 'maxY']);
@@ -132,6 +158,7 @@ export function parseWorldInput(value: unknown, options?: { registry: SignalRegi
     viewport: { width: number(viewport['width'], 0.001, 1e6), height: number(viewport['height'], 0.001, 1e6) },
     anchors: frames,
     ...(reducedParts ? { reducedParts } : {}),
+    ...(seats ? { seats } : {}),
     signals: {
       pointer: signals['pointer'] === undefined ? undefined : point(signals['pointer']),
       playing: boolean(signals['playing']),

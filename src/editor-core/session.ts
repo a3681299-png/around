@@ -20,6 +20,8 @@ import {
 import { alignSamples, distributeSamples, type Alignment, type Distribution } from '../design/layout';
 import { createHistory } from '../editor/history';
 import { selectLayer } from '../editor/layers';
+import { CHARACTER_HOME } from '../characters/home';
+import { reassignBehaviours } from '../characters/auto-motions';
 import {
   deleteDocumentLayers,
   duplicateDocumentLayers,
@@ -488,11 +490,17 @@ export function createEditorSession<Source extends { readonly length: number }>(
           Math.min(260 / asset.width, 200 / asset.height, (width * 0.28) / asset.width, (height * 0.3) / asset.height),
         );
         const id = ports.makeId('image');
+        // A character nobody dropped anywhere goes home: the player's corner under its bars, where
+        // it is seen while watching (CHARACTER_HOME). Without a player on the page, the viewport.
+        const home =
+          asset.model && !point && ports.geometry.frameFor(CHARACTER_HOME)
+            ? { ...CHARACTER_HOME, x: Math.max(0.05, CHARACTER_HOME.x - index * 0.12) }
+            : undefined;
         const common = {
           id,
           assetId: asset.id,
           name: asset.name,
-          placement: {
+          placement: home ?? {
             anchor: { kind: 'viewport' as const },
             x: Math.min(0.95, Math.max(0.05, origin.x / width + (index * 24) / width)),
             y: Math.min(0.95, Math.max(0.05, origin.y / height + (index * 24) / height)),
@@ -687,7 +695,10 @@ export function createEditorSession<Source extends { readonly length: number }>(
       before = draft;
       const current = draft.decorations.find((item) => item.id === layerId);
       if (current?.kind !== 'model3d') throw new Error('動作を追加するレイヤーが見つかりません。');
-      const character = current.character ?? { standardMotions: 'auto' as const, motions: [] };
+      // A character made by this import moves on its own at once (reading motions is enough,
+      // docs/product-design-snapshot.md); an existing one keeps its autonomy switch as it was.
+      const character = current.character ?? { standardMotions: 'auto' as const, motions: [], autonomy: true };
+      const all = [...character.motions, ...draftMotions(character.motions, motions, labels, origin)];
       const next = editDesign(draft);
       next.decorations = next.decorations.map((item) =>
         item.id === layerId && item.kind === 'model3d'
@@ -695,7 +706,9 @@ export function createEditorSession<Source extends { readonly length: number }>(
               ...item,
               character: {
                 ...character,
-                motions: [...character.motions, ...draftMotions(character.motions, motions, labels, origin)],
+                motions: all,
+                // Behaviours the author has not set get the best motion of their kind.
+                behaviourMotions: reassignBehaviours(character.motions, all, character.behaviourMotions),
               },
               // The clip list changes from the model's own clips to the motions on first use.
               ...(current.character

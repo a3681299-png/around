@@ -99,7 +99,8 @@ for (const [url, parts] of Object.entries(pages)) {
       const [x, y, w, h] = row.box;
       const pad = 10;
       const clip = { x: Math.max(0, x - pad), y: Math.max(0, y - pad), width: w + pad * 2, height: h + pad * 2 };
-      const shot = await page.screenshot({ clip, path: path.join(out, `${part}-${method}.png`) });
+      // caret 'initial': hiding the caret restyles inputs, which the guard answers by holding the art.
+      const shot = await page.screenshot({ clip, path: path.join(out, `${part}-${method}.png`), caret: 'initial' });
       const inside = method === 'outset' ? -3 : 3;
       const ox = x - clip.x,
         oy = y - clip.y;

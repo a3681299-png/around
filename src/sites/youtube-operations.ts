@@ -1,5 +1,5 @@
 import { createOperationSource, type DiscoveryScan, type OperationCandidate } from '../host/operation-source';
-import { createDrawReads, fixedContainingBlock, type CompositionReader } from '../host/operation-composition';
+import { createDrawReads, type CompositionReader } from '../host/operation-composition';
 import { LAYERING } from '../host/world-options';
 import type { PlacementFrame } from '../world/geometry';
 
@@ -97,9 +97,11 @@ export function youtubeOperations(doc: Document) {
     const parent =
       doc.fullscreenElement instanceof HTMLElement ? doc.fullscreenElement : doc.querySelector<HTMLElement>('ytd-app');
     if (!parent) return undefined;
-    // Its own reads: the Host shares its answer within the task (verifiedOverlaySlot).
+    // Discovery, the beneath plane and the Host's slot can all ask in the same draw.
+    // Share their style answers, with the same invalidation as the stacking proofs.
+    const composition = reads.reader();
     for (let node: HTMLElement | null = parent; node; node = node.parentElement)
-      if (fixedContainingBlock(doc.defaultView!.getComputedStyle(node))) return undefined;
+      if (composition.containingBlock(node)) return undefined;
     return { parent, zIndex: 1 };
   };
   /** The player when its centre is the native video gesture: no menu, error or advert over it,
