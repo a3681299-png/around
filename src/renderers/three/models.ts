@@ -469,6 +469,16 @@ export function createModelRenderer(
     for (const i of instances) {
       if (!i.alive || !i.visible || !i.root || !i.dirty || i.failed || i.preparing || !i.layer) continue;
       try {
+        const avatar = isVrm(i.source!);
+        const motionKey = avatar && i.layer.character ? i.layer.character.motions.map((x) => x.assetId).join() : '';
+        if (motionKey && i.motionKey !== motionKey) loadMotions(i, i.layer, avatar!, motionKey);
+        const motions = motionKey ? i.motionClips : undefined;
+        if (motionKey && (!motions || !i.evaluation)) {
+          // The first canvas stays empty until it can paint the authored pose. A motion-list
+          // replacement can leave the last posed frame in place while its clips load.
+          i.dirty = false;
+          continue;
+        }
         const trace = ASSET_PROFILE && !i.profiled ? i.entry?.trace : undefined;
         const firstStart = trace ? performance.now() : 0;
         const r = ensure(trace),
@@ -520,13 +530,7 @@ export function createModelRenderer(
             180,
           (m.rotationZ * Math.PI) / 180,
         );
-        const avatar = isVrm(i.source!);
         const playerStart = trace ? performance.now() : 0;
-        // A character plays its .vrma motions; they load once per motion list, then the player
-        // is rebuilt on them. Until they arrive the model holds its rest pose.
-        const motionKey = avatar && i.layer.character ? i.layer.character.motions.map((x) => x.assetId).join() : '';
-        if (motionKey && i.motionKey !== motionKey) loadMotions(i, i.layer, avatar!, motionKey);
-        const motions = motionKey && i.motionKey === motionKey ? i.motionClips : undefined;
         if (i.inPlace !== m.inPlace || (!i.player && !i.vrmPlayer) || i.playerMotions !== motions) {
           i.player?.destroy();
           i.vrmPlayer?.destroy();

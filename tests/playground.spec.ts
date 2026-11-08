@@ -126,6 +126,31 @@ test('the background layer is drawn under the content: the video picture is not 
   expect((await page.screenshot({ clip })).equals(plain)).toBe(true);
 });
 
+test('the basic resident has no visible frame while its motion is still loading', async ({ page }) => {
+  const problems = await open(page);
+  let requested!: () => void;
+  let ready!: () => void;
+  const motionRequested = new Promise<void>((resolve) => (requested = resolve));
+  const motionReady = new Promise<void>((resolve) => (ready = resolve));
+  await page.route('**/*.vrma', async (route) => {
+    requested();
+    await motionReady;
+    await route.continue();
+  });
+  await page.locator('#apply').click();
+  try {
+    await motionRequested;
+    // The loader asks for the clip during the same paint that used to draw the rest pose.
+    expect(await model(page).evaluate((element) => getComputedStyle(element).visibility)).toBe('hidden');
+    expect(await model(page).locator('canvas').evaluate((canvas: HTMLCanvasElement) => canvas.width)).toBe(1);
+  } finally {
+    ready();
+  }
+  await expect(model(page)).toHaveAttribute('data-renderer', 'three', { timeout: 20000 });
+  await expect(model(page)).toBeVisible();
+  expect(problems).toEqual([]);
+});
+
 test('Alt+Shift+Q takes every effect off, and pressing it again brings them back', async ({ page }) => {
   await open(page);
   const plain = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
