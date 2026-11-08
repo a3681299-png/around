@@ -1,0 +1,4 @@
+interface:
+  display_name: 'WWT City Director'
+  short_description: 'Playground の街を自分でループして仕上げる'
+  default_prompt: 'Use $wwt-city-director to build and polish the WWT Playground city, looping on screenshots until the scorecard bar is met.'

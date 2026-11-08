@@ -1,0 +1,4 @@
+interface:
+  display_name: 'WWT Page to City'
+  short_description: 'ページの部品から街を作り、UI と G1 をつなぐ'
+  default_prompt: 'Use $wwt-page-to-city to generate the WWT Playground city from the page layout and keep real UI operation working (G1).'

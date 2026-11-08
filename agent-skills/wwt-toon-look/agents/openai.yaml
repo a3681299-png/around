@@ -1,0 +1,4 @@
+interface:
+  display_name: 'WWT Toon Look'
+  short_description: 'トゥーン・輪郭線・パステルの街の絵'
+  default_prompt: 'Use $wwt-toon-look to build or improve the toon, outline, palette, and low-poly look of the WWT Playground city, then score it.'

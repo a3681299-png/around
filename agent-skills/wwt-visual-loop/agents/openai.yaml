@@ -1,0 +1,4 @@
+interface:
+  display_name: 'WWT Visual Loop'
+  short_description: '見本の視点で撮って採点し、弱い所を直す'
+  default_prompt: 'Use $wwt-visual-loop to capture the preset views, score them, fix the three weakest areas, and repeat.'

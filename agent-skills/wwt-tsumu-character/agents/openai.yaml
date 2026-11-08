@@ -1,0 +1,4 @@
+interface:
+  display_name: 'WWT Tsumu Character'
+  short_description: 'つむの取り込み・見た目・自律'
+  default_prompt: 'Use $wwt-tsumu-character to import Tsumu, match the toon look, and make her live autonomously in the WWT Playground city.'

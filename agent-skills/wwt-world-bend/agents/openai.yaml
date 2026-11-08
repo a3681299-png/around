@@ -1,0 +1,4 @@
+interface:
+  display_name: 'WWT World Bend'
+  short_description: '平らな街を惑星に見せる投影とカメラ'
+  default_prompt: 'Use $wwt-world-bend to implement or fix the bent-world projection, camera controls, picking, and illusions for the WWT Playground city.'
