@@ -220,6 +220,10 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
           }
           if (record.removedNodes.length > 0) needsPrune = true;
         }
+        // The player's form is set here, in the mutation's microtask, not in the next frame's flush:
+        // a Host frame that ran before the flush would read the miniplayer's box without the mark
+        // and remember it as the regular height (host/anchors.ts). Only the marked players are checked.
+        for (const element of players) if (element.isConnected) setForm(element);
         schedule();
       });
       observer.observe(root, {

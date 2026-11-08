@@ -147,6 +147,34 @@ test('only a player the adapter reports reduced draws its layers reduced; the re
   await runtime.session.detach();
 });
 
+test('the player is marked reduced before any frame can read its miniplayer height as regular', async ({
+  popup,
+  youtube,
+}) => {
+  // The Host remembers a part's last height while it is not marked reduced (host/anchors.ts). If the
+  // mark only came with the adapter's next animation frame, a Host frame that ran first would store
+  // the miniplayer's 225px as the regular height and the layers would never be drawn reduced.
+  const showArtwork = popup.getByRole('switch', { name: '作品を表示する' });
+  await expect(showArtwork).toBeEnabled();
+  await showArtwork.check();
+  await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
+  await watch(youtube);
+  const marks = await youtube.locator('#movie_player').evaluate(async (player: HTMLElement) => {
+    const home: [Node, Node | null] = [player.parentNode!, player.nextSibling];
+    const mini = document.createElement('ytd-miniplayer');
+    document.body.append(mini);
+    mini.append(player);
+    // Mutation observers run in the microtask checkpoint; no animation frame can run in between.
+    await Promise.resolve();
+    const inMini = player.hasAttribute('data-ww-reduced');
+    home[0].insertBefore(player, home[1]);
+    mini.remove();
+    await Promise.resolve();
+    return { inMini, back: player.hasAttribute('data-ww-reduced') };
+  });
+  expect(marks).toEqual({ inMini: true, back: false });
+});
+
 test('recording-only listeners stop after artwork changes and idle/OFF leaves no recording loop', async ({
   popup,
   youtube,
