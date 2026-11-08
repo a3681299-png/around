@@ -47,7 +47,7 @@ type Entry = {
   heightM: number;
   status: string;
 };
-type View = 'far' | 'mid' | 'near' | 'sil' | 'night' | 'props';
+type View = 'far' | 'mid' | 'near' | 'sil' | 'night' | 'props' | 'hero';
 
 const ink = '#2b3a5a';
 const palette = { grass: '#8fd6b8', green: '#2e9e8c', pavement: '#eaf8f6', water: '#5aa9de', sky: '#bdeff5' };
@@ -86,24 +86,38 @@ function glow(color: string) {
   lights.add(material);
   return material;
 }
-/** Inverted hull pushed out a fixed number of screen pixels, like the world's ink pass. */
-function inkMaterial(px = 1.6) {
+/** The world's ink width (src/playground/city/projection.ts on codex/playground-city): `cityInk`
+ * drawing-buffer pixels, 2.1 close up to 1.25 at the planet view, times the material's lineScale.
+ * The world draws residents at lineScale 0.72; the lineup uses 1.0 for everything, the value
+ * proposed to the world side, because 0.72 left residents nearly unlined at mid range. */
+const cityInk = { value: 1.8 };
+const INK_BY_VIEW: Record<string, number> = {
+  near: 2.1,
+  props: 2.1,
+  hero: 2.1,
+  mid: 1.8,
+  sil: 1.8,
+  night: 1.8,
+  far: 1.25,
+};
+function inkMaterial(lineScale = 1) {
   const material = new MeshToonMaterial({ color: '#000000', emissive: ink, side: BackSide, toneMapped: false });
   material.onBeforeCompile = (shader) => {
     shader.uniforms.inkPixels = { value: pixels };
-    shader.vertexShader = 'uniform vec2 inkPixels;\n' + shader.vertexShader;
+    shader.uniforms.cityInk = cityInk;
+    shader.vertexShader = 'uniform vec2 inkPixels;\nuniform float cityInk;\n' + shader.vertexShader;
     shader.vertexShader = shader.vertexShader.replace(
       '#include <project_vertex>',
       `#include <project_vertex>
       // BackSide defines FLIP_SIDED, which already negated transformedNormal: undo it to push outward.
       vec2 inkDir = (projectionMatrix * vec4(-normalize(transformedNormal), 0.0)).xy * inkPixels;
-      gl_Position.xy += inkDir / max(length(inkDir), 0.0001) * ${(2 * px).toFixed(2)} / inkPixels * gl_Position.w;`,
+      gl_Position.xy += inkDir / max(length(inkDir), 0.0001) * cityInk * ${(2 * lineScale).toFixed(2)} / inkPixels * gl_Position.w;`,
     );
   };
-  material.customProgramCacheKey = () => `ink-${px}`;
+  material.customProgramCacheKey = () => `ink-${lineScale}`;
   return material;
 }
-const inkThin = inkMaterial(1.3);
+const inkThin = inkMaterial(Number(params.get('lineScale') ?? 1));
 
 // --- colours ---------------------------------------------------------------------------------
 type Colorway = Record<string, string>;
@@ -320,7 +334,9 @@ async function buildViews() {
     if (entry.kind === 'ship') object.rotation.y = -Math.PI / 2;
     return object;
   };
-  const waterSide = (entry: Entry) => entry.kind === 'ship' || entry.id === 'harbor-pier';
+  // Ships, the pier and the tall harbour landmarks stand by the water, behind the row.
+  const waterSide = (entry: Entry) =>
+    entry.kind === 'ship' || ['harbor-pier', 'harbor-crane', 'harbor-lighthouse'].includes(entry.id);
 
   // Every view is built fresh: skinned meshes cannot be shared by a plain clone.
   // Row: Tsumu first (height reference), then each resident standing, then those holding a prop.
@@ -350,6 +366,21 @@ async function buildViews() {
       g.add(await placeAt(entry, -3.5 + i * 3.8, entry.kind === 'ship' ? -4.4 : -3.2));
     return g;
   };
+
+  // Hero: Tsumu beside one resident of each role, at Tsumu's eye level (same work, same people?).
+  const hero = new Group();
+  hero.add(ground());
+  const firstOfRole = [...new Map(residents.map((entry) => [entry.roles[0], entry])).values()];
+  const pair = [
+    await tsumu(),
+    ...(await Promise.all(firstOfRole.map((entry, i) => resident(entry, i + 2, false, props)))),
+  ];
+  pair.forEach((object, i) => {
+    if (!object) return;
+    object.position.x = (i - (pair.length - 1) / 2) * 0.72;
+    hero.add(object);
+  });
+  views.set('hero', hero);
 
   views.set('mid', await rowView());
   views.set('near', await rowView());
@@ -413,6 +444,7 @@ const cameras: Record<View, { at: [number, number, number]; look: [number, numbe
   night: { at: [0, 9, 20], look: [0, 0.4, 0], fov: 30 },
   near: { at: [0, 0.75, 6.4], look: [0, 0.55, 0], fov: 30 },
   props: { at: [0, 4.2, 13.5], look: [0, 0.9, -1.2], fov: 34 },
+  hero: { at: [0, 0.62, 4.6], look: [0, 0.5, 0], fov: 30 },
 };
 
 const pointLights: PointLight[] = [];
@@ -422,6 +454,7 @@ function show(view: View) {
   for (const light of pointLights.splice(0)) scene.remove(light);
   const group = views.get(view)!;
   scene.add(group);
+  cityInk.value = INK_BY_VIEW[view] ?? 1.8;
   const night = view === 'night';
   const sil = view === 'sil';
   scene.background = new Color(sil ? '#ffffff' : night ? '#1d2747' : palette.sky);

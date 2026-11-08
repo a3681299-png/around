@@ -13,7 +13,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const [outArg] = process.argv.slice(2).filter((arg) => !arg.startsWith('--'));
 if (!outArg) throw new Error('capture-lineup.mjs <out-folder> [--views far,mid,...]');
 const viewsArg = process.argv.find((arg) => arg.startsWith('--views='))?.slice(8);
-const views = (viewsArg ?? 'far,mid,near,sil,night,props').split(',');
+const views = (viewsArg ?? 'far,mid,near,hero,sil,night,props').split(',');
 const out = resolve(outArg);
 mkdirSync(out, { recursive: true });
 
@@ -76,7 +76,8 @@ try {
   const errors = [];
   tab.on('pageerror', (error) => errors.push(String(error)));
   tab.on('console', (message) => message.type() === 'error' && errors.push(message.text()));
-  await tab.goto(url + '?w=1600&h=900');
+  const lineScale = process.argv.find((arg) => arg.startsWith('--line-scale='))?.slice(13) ?? '1';
+  await tab.goto(url + `?w=1600&h=900&lineScale=${lineScale}`);
   await tab.waitForFunction(() => window.lineup?.ready, null, { timeout: 30_000 });
   await tab.evaluate(() => window.lineup.ready);
   for (const view of views) {
