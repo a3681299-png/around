@@ -156,3 +156,17 @@ test('places the viewer sees are chosen more often', () => {
   const counts = visits((id) => (id === 'window' ? 1 : 0));
   expect(counts['window']!).toBeGreaterThan((counts['desk'] ?? 0) * 1.5);
 });
+
+test('arriving at a standing place behind the glass, it touches the glass first; never with reduced motion', () => {
+  const touched = run(startResident(layout, 3), 240, { glassNear: true }).trace;
+  const touches = touched.filter((s, i) => s.activity === 'touch' && touched[i - 1]?.activity === 'walk');
+  expect(touches.length).toBeGreaterThan(0);
+  for (const t of touches) expect(layout.spots.find((s) => s.id === t.spot)!.kind).toBe('stand');
+  expect(residentPose(touches[0]!, layout).clip).toBe('touch');
+  expect(
+    run(startResident(layout, 3), 240, { glassNear: true, reducedMotion: true }).trace.some(
+      (s) => s.activity === 'touch',
+    ),
+  ).toBe(false);
+  expect(run(startResident(layout, 3), 240).trace.some((s) => s.activity === 'touch')).toBe(false);
+});

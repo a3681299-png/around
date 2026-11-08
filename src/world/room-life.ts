@@ -27,7 +27,8 @@ export interface RoomLayout {
   spots: readonly RoomSpot[];
 }
 
-export type ResidentActivity = 'idle' | 'walk' | 'sitDown' | 'sit' | 'standUp' | 'hide' | 'leave' | 'front' | 'arrive';
+export type ResidentActivity =
+  'idle' | 'walk' | 'sitDown' | 'sit' | 'standUp' | 'hide' | 'touch' | 'leave' | 'front' | 'arrive';
 export interface ResidentState {
   /** Seconds since the life started. */
   t: number;
@@ -69,9 +70,15 @@ export interface ResidentInput {
   /** The character's place in the room is near its place in front (screen distance, the Host). */
   nearFront: boolean;
   reducedMotion: boolean;
+  /** The glass is right in front of the character (the Host: a plate's edge near its hand on
+   * screen): arriving at a standing place, it touches the glass from behind. Absent: never. */
+  glassNear?: boolean;
 }
 
 export const WALK_SPEED = 0.85; // metres a second
+/** How long a touch of the glass lasts; the mark is left `TOUCH_MARK_S` into it. */
+export const TOUCH_S = 2.4;
+export const TOUCH_MARK_S = 0.7;
 export const SIT_DOWN_S = 0.7;
 export const STAND_UP_S = 0.6;
 export const LEAVE_S = 0.45;
@@ -451,10 +458,15 @@ export function stepResident(state: ResidentState, input: ResidentInput, seed: n
       s = { ...s, x, z, heading, path };
       if (!path.length) {
         const spot = s.spot ? spots.get(s.spot) : undefined;
-        begin(settle(spot), spot?.kind === 'sit' ? SIT_DOWN_S : 4 + rand() * 5);
+        // At a standing place right behind the glass, it touches the glass first.
+        if (spot?.kind === 'stand' && input.glassNear && !input.reducedMotion) begin('touch', TOUCH_S);
+        else begin(settle(spot), spot?.kind === 'sit' ? SIT_DOWN_S : 4 + rand() * 5);
       }
       break;
     }
+    case 'touch':
+      if (elapsed >= s.dwell) begin('idle', 3 + rand() * 4);
+      break;
   }
   // Settling into a place turns the character to the place's way (seats and corners face out).
   if (s.activity !== 'walk' && s.activity !== 'front') {
@@ -469,7 +481,7 @@ export interface ResidentPose {
   visible: boolean;
   /** 0–1: the room character's opacity (fades out leaving, in arriving). */
   opacity: number;
-  clip: 'idle' | 'walk' | 'sitDown' | 'sit' | 'standUp' | 'hide' | 'hop';
+  clip: 'idle' | 'walk' | 'sitDown' | 'sit' | 'standUp' | 'hide' | 'hop' | 'touch';
   /** Seconds into the clip. */
   time: number;
   x: number;
@@ -542,6 +554,9 @@ export function residentPose(s: ResidentState, layout: RoomLayout): ResidentPose
       return { ...base, clip: 'sit', seat: 1, ...(spot ? { x: spot.x, z: spot.z } : {}) };
     case 'hide':
       return { ...base, clip: 'hide' };
+    case 'touch':
+      // Facing the glass (the viewer's side) with a hand on it.
+      return { ...base, clip: 'touch', heading: 0 };
     case 'walk':
       return { ...base, clip: 'walk' };
     case 'idle':

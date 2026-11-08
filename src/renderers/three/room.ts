@@ -116,7 +116,10 @@ export interface RoomFrame {
   scheme: ColorScheme;
   /** Linear RGB of the video's light (already slew-limited by the world). */
   video: VideoLight;
+  /** The resident's palm marks on the glass (canvas px, 0–1 strength), at most MARK_LIMIT. */
+  marks?: readonly { x: number; y: number; strength: number }[];
 }
+const MARK_LIMIT = 4;
 export interface RoomRenderer {
   readonly canvas: HTMLCanvasElement;
   /** The room's base view: camera_main's vertical field of view. */
@@ -216,6 +219,8 @@ function compositeShader() {
       lampColor: { value: new Color(1, 0.62, 0.34) },
       lightDir: { value: new Vector2(-0.45, -0.9) },
       toneMappingExposure: { value: 1 },
+      marks: { value: Array.from({ length: MARK_LIMIT }, () => new Vector4()) },
+      markCount: { value: 0 },
     },
     vertexShader: QUAD_VERTEX,
     fragmentShader: `
@@ -232,6 +237,20 @@ function compositeShader() {
       uniform vec3 baseColor, videoColor, lampColor;
       uniform vec4 glass; // blur, refraction, highlight, tint
       uniform vec2 lightDir;
+      #define MARKS ${MARK_LIMIT}
+      uniform vec4 marks[MARKS]; // x, y (canvas px, top-left), -, strength
+      uniform int markCount;
+      // A palm pressed on the glass from behind: the palm and four fingertips, misted.
+      float palm(vec2 p, vec2 c) {
+        vec2 q = p - c;
+        float m = exp(-dot(q / vec2(15.0, 18.0), q / vec2(15.0, 18.0)));
+        for (int k = 0; k < 4; k++) {
+          vec2 f = q - vec2(-13.5 + 9.0 * float(k), -22.0 - (k == 1 || k == 2 ? 6.0 : 0.0));
+          m = max(m, exp(-dot(f / vec2(3.6, 8.0), f / vec2(3.6, 8.0))));
+        }
+        // The breath's mist around it, fainter and wider.
+        return max(m, 0.35 * exp(-dot(q / 34.0, q / 34.0)));
+      }
       const float RADIUS = 10.0;
       float box(vec2 p, vec4 r) {
         vec2 c = (r.xy + r.zw) * 0.5, h = (r.zw - r.xy) * 0.5 - RADIUS;
@@ -253,7 +272,7 @@ function compositeShader() {
         vec2 p = vec2(gl_FragCoord.x, resolution.y - gl_FragCoord.y);
         vec2 uv = gl_FragCoord.xy / resolution;
         float inside = 1e9; int at = -1;
-        float shade = 0.0; float glow = 0.0;
+        float shade = 0.0; float glow = 0.0; float glint = 0.0;
         vec2 shadowOffset = -lightDir * vec2(18.0, 26.0);
         for (int i = 0; i < PLATES; i++) {
           if (i >= plateCount) break;
@@ -265,10 +284,14 @@ function compositeShader() {
           if (d < inside) { inside = d; at = i; }
           // The plate's shadow on the room: the plate seen from the light, offset and softened.
           shade = max(shade, 1.0 - smoothstep(-16.0, 28.0, box(p - shadowOffset, r)));
+          // The light the glass bends at its edge falls just past the shadow's far side: a thin,
+          // warm line (a caustic), the plate's light on the room.
+          glint = max(glint, exp(-abs(box(p - shadowOffset * 1.25, r) - 4.0) / 3.0));
         }
         vec3 back = room(uv, 0.0);
         // The plates darken the room behind them, and the video lights the room around itself.
         back *= 1.0 - shade * shadowAmount;
+        back += lampColor * glint * (1.0 - shade) * shadowAmount * 0.35;
         back += videoColor * glow * 0.45 * (1.0 - shade * shadowAmount * 0.5);
         if (at < 0 || inside >= 0.0 || plateInfo[at].y > 0.5) {
           // Outside every plate, or under the video (the player covers it).
@@ -287,6 +310,15 @@ function compositeShader() {
         suv.y = 1.0 - suv.y;
         float lod = mix(1.0, 5.0, glass.x);
         vec3 c = frosted(suv, lod) * (1.0 - shade * shadowAmount * 0.6);
+        // The resident's palm marks: misted glass, only in the sheet's margin band (the text's
+        // middle never), before the density rule below, which then keeps the text at 4.5:1.
+        float mist = 0.0;
+        for (int k = 0; k < MARKS; k++) {
+          if (k >= markCount) break;
+          mist = max(mist, palm(p, marks[k].xy) * marks[k].w);
+        }
+        mist *= 1.0 - smoothstep(14.0, 26.0, e);
+        c = mix(c, vec3(0.85, 0.87, 0.9), mist * 0.55);
         // A thin rim catches the lamp and the video's light from the light's side (3 px).
         float rim = pow(1.0 - clamp(e / 3.0, 0.0, 1.0), 2.0) * glass.z;
         float facing = 0.35 + 0.65 * max(0.0, dot(n, -normalize(lightDir)));
@@ -667,6 +699,9 @@ export async function createRoomRenderer(
         info[i]!.set(SPACE_BREAK === 'density' ? 0 : PLATE_FLOOR[p.importance], p.video ? 1 : 0, 0, 0);
       });
       u['plateCount']!.value = Math.min(PLATE_LIMIT, frame.plates.length);
+      const marks = (frame.marks ?? []).slice(0, MARK_LIMIT);
+      marks.forEach((m, i) => (u['marks']!.value as Vector4[])[i]!.set(m.x, m.y, 0, m.strength));
+      u['markCount']!.value = marks.length;
       u['dark']!.value = frame.scheme === 'dark' ? 1 : 0;
       // A broken build (WW_SPACE_BREAK=density) drops the readability density, to see its tests fail.
       // The limit keeps a margin for the 8-bit output: rounding a pixel to the nearest byte can move

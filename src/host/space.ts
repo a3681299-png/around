@@ -13,6 +13,7 @@ import {
   cameraSettled,
   cameraTarget,
   glassPlates,
+  glassSheets,
   projectCamera,
   samePlates,
   stepCamera,
@@ -29,6 +30,7 @@ import {
   startResident,
   stepResident,
   withFloorPlaces,
+  TOUCH_MARK_S,
   type ResidentState,
   type RoomLayout,
   type RoomSpot,
@@ -75,6 +77,7 @@ export function residentClips(motions: ResidentSource['motions']): Map<ResidentC
   set('standUp', find(/sit.*(exit|up)/, /stand.*up/));
   set('hide', find(/crouch/, /hide/));
   set('hop', find(/jump|hop/));
+  set('touch', find(/interact|touch|wave/));
   // Names that say nothing (a file renamed): the roles measured at import (characters/settings.ts).
   const byRole = (role: string) => motions.find((m) => m.role === role)?.assetId;
   if (!out.has('idle')) set('idle', byRole('idle'));
@@ -190,6 +193,14 @@ export function createSpaceHost(
   let spotSeen = new Map<string, number>();
   let nearFront = false;
   let roomSeen = 1;
+  /** Where a touch now would leave its mark (viewport px), from measureView. */
+  let touchAt: { x: number; y: number; d: number } | undefined;
+  /** The touch marks on the glass: page position (they move with the page) and when made. */
+  let marks: { x: number; y: number; at: number }[] = [];
+  let markedSince: number | undefined;
+  /** A mark rises, holds, and fades (ms). */
+  const MARK_HOLD_MS = 1800,
+    MARK_FADE_MS = 5200;
 
   const stopLife = () => {
     if (!life) return;
@@ -328,7 +339,8 @@ export function createSpaceHost(
         if (!p || !feet || !head || p.x < 0 || p.x > w || feet.y > h || head.y < 0 || feet.y - head.y > h * 0.6)
           return [s.id, 0];
         const over = plates.filter((r) => inside(p, r));
-        return [s.id, over.some((r) => r.video) ? 0 : over.length ? 0.4 : 1];
+        // Behind a sheet it is seen only as a blur (the design's 板の後ろで薄く見える).
+        return [s.id, over.some((r) => r.video) ? 0 : over.length ? 0.15 : 1];
       }),
     );
     let covered = 0;
@@ -343,6 +355,31 @@ export function createSpaceHost(
     // with camera shapes, the top's far shot is where the page covers the room most, so it counts
     // at less than half (the character then keeps the viewer company in front).
     if (shots && shotName === 'top') roomSeen *= 0.4;
+    // The glass in front of the character: the nearest sheet edge to its hand (on screen), within
+    // reach. A touch leaves its mark there (on the sheet's margin, never over the text's middle).
+    touchAt = undefined;
+    if (life) {
+      const hand = renderer.project([{ x: life.state.x, y: layout.floorY + 1.05, z: life.state.z }])[0];
+      if (hand)
+        for (const r of plates) {
+          if (r.video) continue;
+          // The nearest point of the sheet's outline, 6 px inside it.
+          const x = Math.min(r.right - 6, Math.max(r.left + 6, hand.x)),
+            y = Math.min(r.bottom - 6, Math.max(r.top + 6, hand.y));
+          const edge =
+            hand.x < r.left || hand.x > r.right || hand.y < r.top || hand.y > r.bottom
+              ? { x, y }
+              : // Behind the sheet: the nearest side.
+                [
+                  { x: r.left + 6, y: hand.y, d: hand.x - r.left },
+                  { x: r.right - 6, y: hand.y, d: r.right - hand.x },
+                  { x: hand.x, y: r.top + 6, d: hand.y - r.top },
+                  { x: hand.x, y: r.bottom - 6, d: r.bottom - hand.y },
+                ].sort((a, b) => a.d - b.d)[0]!;
+          const d = Math.hypot(edge.x - hand.x, edge.y - hand.y);
+          if (d < 140 && (!touchAt || d < touchAt.d)) touchAt = { x: edge.x, y: edge.y, d };
+        }
+    }
     // Near the front place: the player's lower right corner (the character's home in front).
     const player = plates.find((r) => r.video);
     const me = life ? renderer.project([{ x: life.state.x, y: layout.floorY + 0.8, z: life.state.z }])[0] : null;
@@ -376,7 +413,7 @@ export function createSpaceHost(
     // Plates follow the UI: every frame while the page moves, once a second otherwise.
     if (now < activeUntil || now - regionsAt >= IDLE_REGION_MS) {
       regionsAt = now;
-      plates = glassPlates(backdrop.regions(), { width: view.innerWidth, height: view.innerHeight });
+      plates = glassSheets(glassPlates(backdrop.regions(), { width: view.innerWidth, height: view.innerHeight }));
     }
     if (now - videoAt >= VIDEO_SAMPLE_MS) {
       videoAt = now;
@@ -438,9 +475,20 @@ export function createSpaceHost(
           front: space.resident?.front ?? 0,
           nearFront,
           reducedMotion: reduced.matches,
+          glassNear: Boolean(touchAt),
         },
         life.seed,
       );
+      // The palm on the glass: one mark per touch, where the hand meets the sheet.
+      if (
+        life.state.activity === 'touch' &&
+        life.state.t - life.state.since >= TOUCH_MARK_S &&
+        markedSince !== life.state.since &&
+        touchAt
+      ) {
+        markedSince = life.state.since;
+        marks = [...marks.slice(-3), { x: touchAt.x + view.scrollX, y: touchAt.y + view.scrollY, at: now }];
+      }
       const away = life.body && life.state.activity !== 'front' ? space.resident?.layerId : undefined;
       if (away !== awayId) {
         awayId = away;
@@ -458,14 +506,22 @@ export function createSpaceHost(
         if (residentDue || !pose.visible) life.body.update(pose, (now - life.drawnAt) / 1000);
       }
     }
-    const moved = !drawnCamera || !cameraSettled(camera, drawnCamera) || shotsMoving;
+    // The marks now: rising for a moment, held, then fading; gone ones are dropped.
+    marks = marks.filter((m) => now - m.at < MARK_HOLD_MS + MARK_FADE_MS);
+    const glassMarks = marks.map((m) => {
+      const age = now - m.at;
+      const strength = Math.min(1, age / 250) * (age < MARK_HOLD_MS ? 1 : 1 - (age - MARK_HOLD_MS) / MARK_FADE_MS);
+      return { x: m.x - view.scrollX, y: m.y - view.scrollY, strength: Math.max(0, strength) };
+    });
+    const fading = marks.length > 0 && now - drawnAt >= RESIDENT_RESTING_MS;
+    const moved = !drawnCamera || !cameraSettled(camera, drawnCamera) || shotsMoving || fading;
     const platesMoved = !drawnPlates || !samePlates(plates, drawnPlates) || scheme !== drawnScheme;
     const lit =
       !drawnLight ||
       Math.abs(light.r - drawnLight.r) + Math.abs(light.g - drawnLight.g) + Math.abs(light.b - drawnLight.b) > 1 / 512;
     if (moved || platesMoved || residentDue || (lit && now - drawnAt >= LIGHT_ONLY_MS)) {
       if (life) life.drawnAt = now;
-      renderer.draw({ camera: projection, plates, scheme, video: light }, space);
+      renderer.draw({ camera: projection, plates, scheme, video: light, marks: glassMarks }, space);
       if (!revealing) {
         const current = session;
         revealing = true;
@@ -505,6 +561,7 @@ export function createSpaceHost(
           })(),
           scheme,
           shot: shots ? shotName : null,
+          marks: glassMarks.map((m) => [Math.round(m.x), Math.round(m.y), Math.round(m.strength * 100) / 100]),
           resident: life
             ? {
                 activity: life.state.activity,
@@ -523,7 +580,8 @@ export function createSpaceHost(
     const video = backdrop.video();
     const playing = Boolean(video && !video.paused && space.videoLight > 0);
     const living = Boolean(life?.body) && life!.state.activity !== 'front';
-    if (!cameraSettled(camera, target) || shotsMoving || now < activeUntil || playing || lit || living) schedule();
+    if (!cameraSettled(camera, target) || shotsMoving || now < activeUntil || playing || lit || living || marks.length)
+      schedule();
     // In front, the life still keeps time (to come back when the room opens), four times a second.
     else view.setTimeout(schedule, life ? 250 : IDLE_REGION_MS);
   };
