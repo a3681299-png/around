@@ -38,7 +38,7 @@
       "base": "B",
       "source": {
         "type": "booth-base-modified",
-        "author": "シロタカブ（readme.txt の表記。依頼文では「おなかにやさしい」。翔太が確認）",
+        "author": "シロタカブ（おなかにやさしい）※要確認",
         "url": "https://booth.pm/ja/items/8801178",
         "license": "BOOTH 3D素体モデル（デフォルメ）ver1.0 の規約：改変して作ったキャラクターの配布は可。素体のまま・僅かな改変の配布と自作発言は禁止",
         "record": "wwt-private-assets/city-assets/base-body/LICENSE-notes.md"
@@ -59,7 +59,49 @@
       "base": "A",
       "source": {
         "type": "booth-base-modified",
-        "author": "シロタカブ（readme.txt の表記。依頼文では「おなかにやさしい」。翔太が確認）",
+        "author": "シロタカブ（おなかにやさしい）※要確認",
+        "url": "https://booth.pm/ja/items/8801178",
+        "license": "BOOTH 3D素体モデル（デフォルメ）ver1.0 の規約：改変して作ったキャラクターの配布は可。素体のまま・僅かな改変の配布と自作発言は禁止",
+        "record": "wwt-private-assets/city-assets/base-body/LICENSE-notes.md"
+      }
+    },
+    {
+      "id": "resident-fisher-a",
+      "kind": "resident",
+      "file": "residents/fisher-a.glb",
+      "status": "draft",
+      "heightM": 1.024,
+      "tris": 2608,
+      "slots": ["slot_accent", "slot_bottom", "slot_hair", "slot_shoes", "slot_skin", "slot_top"],
+      "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
+      "roles": ["fisher"],
+      "cultures": ["sea"],
+      "rig": "resident",
+      "base": "B",
+      "source": {
+        "type": "booth-base-modified",
+        "author": "シロタカブ（おなかにやさしい）※要確認",
+        "url": "https://booth.pm/ja/items/8801178",
+        "license": "BOOTH 3D素体モデル（デフォルメ）ver1.0 の規約：改変して作ったキャラクターの配布は可。素体のまま・僅かな改変の配布と自作発言は禁止",
+        "record": "wwt-private-assets/city-assets/base-body/LICENSE-notes.md"
+      }
+    },
+    {
+      "id": "resident-gardener-a",
+      "kind": "resident",
+      "file": "residents/gardener-a.glb",
+      "status": "draft",
+      "heightM": 1.005,
+      "tris": 2564,
+      "slots": ["slot_accent", "slot_bottom", "slot_cloth", "slot_hair", "slot_shoes", "slot_skin", "slot_top"],
+      "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
+      "roles": ["gardener"],
+      "cultures": ["nature"],
+      "rig": "resident",
+      "base": "A",
+      "source": {
+        "type": "booth-base-modified",
+        "author": "シロタカブ（おなかにやさしい）※要確認",
         "url": "https://booth.pm/ja/items/8801178",
         "license": "BOOTH 3D素体モデル（デフォルメ）ver1.0 の規約：改変して作ったキャラクターの配布は可。素体のまま・僅かな改変の配布と自作発言は禁止",
         "record": "wwt-private-assets/city-assets/base-body/LICENSE-notes.md"
@@ -80,7 +122,28 @@
       "base": "A",
       "source": {
         "type": "booth-base-modified",
-        "author": "シロタカブ（readme.txt の表記。依頼文では「おなかにやさしい」。翔太が確認）",
+        "author": "シロタカブ（おなかにやさしい）※要確認",
+        "url": "https://booth.pm/ja/items/8801178",
+        "license": "BOOTH 3D素体モデル（デフォルメ）ver1.0 の規約：改変して作ったキャラクターの配布は可。素体のまま・僅かな改変の配布と自作発言は禁止",
+        "record": "wwt-private-assets/city-assets/base-body/LICENSE-notes.md"
+      }
+    },
+    {
+      "id": "resident-musician-a",
+      "kind": "resident",
+      "file": "residents/musician-a.glb",
+      "status": "draft",
+      "heightM": 1.035,
+      "tris": 2560,
+      "slots": ["slot_accent", "slot_bottom", "slot_hair", "slot_shoes", "slot_skin", "slot_top"],
+      "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
+      "roles": ["musician", "listener"],
+      "cultures": ["music"],
+      "rig": "resident",
+      "base": "A",
+      "source": {
+        "type": "booth-base-modified",
+        "author": "シロタカブ（おなかにやさしい）※要確認",
         "url": "https://booth.pm/ja/items/8801178",
         "license": "BOOTH 3D素体モデル（デフォルメ）ver1.0 の規約：改変して作ったキャラクターの配布は可。素体のまま・僅かな改変の配布と自作発言は禁止",
         "record": "wwt-private-assets/city-assets/base-body/LICENSE-notes.md"
@@ -101,7 +164,7 @@
       "base": "B",
       "source": {
         "type": "booth-base-modified",
-        "author": "シロタカブ（readme.txt の表記。依頼文では「おなかにやさしい」。翔太が確認）",
+        "author": "シロタカブ（おなかにやさしい）※要確認",
         "url": "https://booth.pm/ja/items/8801178",
         "license": "BOOTH 3D素体モデル（デフォルメ）ver1.0 の規約：改変して作ったキャラクターの配布は可。素体のまま・僅かな改変の配布と自作発言は禁止",
         "record": "wwt-private-assets/city-assets/base-body/LICENSE-notes.md"
@@ -122,7 +185,49 @@
       "base": "A",
       "source": {
         "type": "booth-base-modified",
-        "author": "シロタカブ（readme.txt の表記。依頼文では「おなかにやさしい」。翔太が確認）",
+        "author": "シロタカブ（おなかにやさしい）※要確認",
+        "url": "https://booth.pm/ja/items/8801178",
+        "license": "BOOTH 3D素体モデル（デフォルメ）ver1.0 の規約：改変して作ったキャラクターの配布は可。素体のまま・僅かな改変の配布と自作発言は禁止",
+        "record": "wwt-private-assets/city-assets/base-body/LICENSE-notes.md"
+      }
+    },
+    {
+      "id": "resident-stargazer-a",
+      "kind": "resident",
+      "file": "residents/stargazer-a.glb",
+      "status": "draft",
+      "heightM": 1.084,
+      "tris": 2544,
+      "slots": ["slot_accent", "slot_bottom", "slot_cloth", "slot_hair", "slot_shoes", "slot_skin", "slot_top"],
+      "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
+      "roles": ["stargazer"],
+      "cultures": ["sky"],
+      "rig": "resident",
+      "base": "B",
+      "source": {
+        "type": "booth-base-modified",
+        "author": "シロタカブ（おなかにやさしい）※要確認",
+        "url": "https://booth.pm/ja/items/8801178",
+        "license": "BOOTH 3D素体モデル（デフォルメ）ver1.0 の規約：改変して作ったキャラクターの配布は可。素体のまま・僅かな改変の配布と自作発言は禁止",
+        "record": "wwt-private-assets/city-assets/base-body/LICENSE-notes.md"
+      }
+    },
+    {
+      "id": "resident-vendor-a",
+      "kind": "resident",
+      "file": "residents/vendor-a.glb",
+      "status": "draft",
+      "heightM": 0.977,
+      "tris": 2388,
+      "slots": ["slot_accent", "slot_bottom", "slot_hair", "slot_shoes", "slot_skin", "slot_top"],
+      "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
+      "roles": ["vendor"],
+      "cultures": ["food"],
+      "rig": "resident",
+      "base": "B",
+      "source": {
+        "type": "booth-base-modified",
+        "author": "シロタカブ（おなかにやさしい）※要確認",
         "url": "https://booth.pm/ja/items/8801178",
         "license": "BOOTH 3D素体モデル（デフォルメ）ver1.0 の規約：改変して作ったキャラクターの配布は可。素体のまま・僅かな改変の配布と自作発言は禁止",
         "record": "wwt-private-assets/city-assets/base-body/LICENSE-notes.md"
@@ -143,7 +248,7 @@
       "base": "A",
       "source": {
         "type": "booth-base-modified",
-        "author": "シロタカブ（readme.txt の表記。依頼文では「おなかにやさしい」。翔太が確認）",
+        "author": "シロタカブ（おなかにやさしい）※要確認",
         "url": "https://booth.pm/ja/items/8801178",
         "license": "BOOTH 3D素体モデル（デフォルメ）ver1.0 の規約：改変して作ったキャラクターの配布は可。素体のまま・僅かな改変の配布と自作発言は禁止",
         "record": "wwt-private-assets/city-assets/base-body/LICENSE-notes.md"
@@ -164,7 +269,7 @@
       "base": "B",
       "source": {
         "type": "booth-base-modified",
-        "author": "シロタカブ（readme.txt の表記。依頼文では「おなかにやさしい」。翔太が確認）",
+        "author": "シロタカブ（おなかにやさしい）※要確認",
         "url": "https://booth.pm/ja/items/8801178",
         "license": "BOOTH 3D素体モデル（デフォルメ）ver1.0 の規約：改変して作ったキャラクターの配布は可。素体のまま・僅かな改変の配布と自作発言は禁止",
         "record": "wwt-private-assets/city-assets/base-body/LICENSE-notes.md"
@@ -185,56 +290,11 @@
       "base": "A",
       "source": {
         "type": "booth-base-modified",
-        "author": "シロタカブ（readme.txt の表記。依頼文では「おなかにやさしい」。翔太が確認）",
+        "author": "シロタカブ（おなかにやさしい）※要確認",
         "url": "https://booth.pm/ja/items/8801178",
         "license": "BOOTH 3D素体モデル（デフォルメ）ver1.0 の規約：改変して作ったキャラクターの配布は可。素体のまま・僅かな改変の配布と自作発言は禁止",
         "record": "wwt-private-assets/city-assets/base-body/LICENSE-notes.md"
       }
-    },
-    {
-      "id": "resident-fisher-a",
-      "kind": "resident",
-      "file": null,
-      "status": "placeholder",
-      "roles": ["fisher"],
-      "cultures": ["sea"],
-      "source": null
-    },
-    {
-      "id": "resident-gardener-a",
-      "kind": "resident",
-      "file": null,
-      "status": "placeholder",
-      "roles": ["gardener"],
-      "cultures": ["nature"],
-      "source": null
-    },
-    {
-      "id": "resident-musician-a",
-      "kind": "resident",
-      "file": null,
-      "status": "placeholder",
-      "roles": ["musician"],
-      "cultures": ["music"],
-      "source": null
-    },
-    {
-      "id": "resident-stargazer-a",
-      "kind": "resident",
-      "file": null,
-      "status": "placeholder",
-      "roles": ["stargazer"],
-      "cultures": ["sky"],
-      "source": null
-    },
-    {
-      "id": "resident-vendor-a",
-      "kind": "resident",
-      "file": null,
-      "status": "placeholder",
-      "roles": ["vendor"],
-      "cultures": ["food"],
-      "source": null
     },
     {
       "id": "prop-broom",
@@ -265,6 +325,42 @@
       "attach": [],
       "roles": ["dockworker"],
       "cultures": [],
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
+    },
+    {
+      "id": "prop-fishing-rod",
+      "kind": "prop",
+      "file": "props/fishing-rod.glb",
+      "status": "draft",
+      "heightM": 1.5,
+      "tris": 116,
+      "slots": ["slot_accent", "slot_cloth", "slot_metal", "slot_wood"],
+      "attach": [],
+      "roles": ["fisher"],
+      "cultures": ["sea"],
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
+    },
+    {
+      "id": "prop-instrument",
+      "kind": "prop",
+      "file": "props/instrument.glb",
+      "status": "draft",
+      "heightM": 0.792,
+      "tris": 212,
+      "slots": ["slot_accent", "slot_bottom", "slot_cloth", "slot_wood"],
+      "attach": [],
+      "roles": ["musician"],
+      "cultures": ["music"],
       "source": {
         "type": "own",
         "author": "WWT（Claude Code がスクリプトで作成）",
@@ -327,49 +423,58 @@
       }
     },
     {
-      "id": "prop-fishing-rod",
-      "kind": "prop",
-      "file": null,
-      "status": "placeholder",
-      "roles": ["fisher"],
-      "cultures": ["sea"],
-      "source": null
-    },
-    {
-      "id": "prop-instrument",
-      "kind": "prop",
-      "file": null,
-      "status": "placeholder",
-      "roles": ["musician"],
-      "cultures": ["music"],
-      "source": null
-    },
-    {
       "id": "prop-stall-goods",
       "kind": "prop",
-      "file": null,
-      "status": "placeholder",
+      "file": "props/stall-goods.glb",
+      "status": "draft",
+      "heightM": 0.109,
+      "tris": 476,
+      "slots": ["slot_accent", "slot_cloth", "slot_wood"],
+      "attach": [],
       "roles": ["vendor"],
       "cultures": ["food"],
-      "source": null
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
     },
     {
       "id": "prop-telescope",
       "kind": "prop",
-      "file": null,
-      "status": "placeholder",
+      "file": "props/telescope.glb",
+      "status": "draft",
+      "heightM": 0.638,
+      "tris": 112,
+      "slots": ["slot_accent", "slot_glass", "slot_metal"],
+      "attach": [],
       "roles": ["stargazer"],
       "cultures": ["sky"],
-      "source": null
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
     },
     {
       "id": "prop-watering-can",
       "kind": "prop",
-      "file": null,
-      "status": "placeholder",
+      "file": "props/watering-can.glb",
+      "status": "draft",
+      "heightM": 0.306,
+      "tris": 160,
+      "slots": ["slot_accent", "slot_metal"],
+      "attach": [],
       "roles": ["gardener"],
       "cultures": ["nature"],
-      "source": null
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
     },
     {
       "id": "ship-cargo-a",
@@ -516,6 +621,24 @@
       }
     },
     {
+      "id": "street-bicycle",
+      "kind": "street",
+      "file": "street/bicycle.glb",
+      "status": "draft",
+      "heightM": 0.81,
+      "tris": 276,
+      "slots": ["slot_accent", "slot_bottom", "slot_cloth", "slot_metal", "slot_wood"],
+      "attach": [],
+      "roles": ["walker"],
+      "cultures": [],
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
+    },
+    {
       "id": "street-hedge",
       "kind": "street",
       "file": "street/hedge.glb",
@@ -543,6 +666,24 @@
       "slots": ["slot_accent", "slot_light", "slot_metal"],
       "attach": [],
       "roles": ["lamplighter"],
+      "cultures": [],
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
+    },
+    {
+      "id": "street-postbox",
+      "kind": "street",
+      "file": "street/postbox.glb",
+      "status": "draft",
+      "heightM": 1.31,
+      "tris": 172,
+      "slots": ["slot_accent", "slot_bottom", "slot_cloth", "slot_metal"],
+      "attach": [],
+      "roles": [],
       "cultures": [],
       "source": {
         "type": "own",
@@ -588,67 +729,103 @@
       }
     },
     {
-      "id": "street-bicycle",
-      "kind": "street",
-      "file": null,
-      "status": "placeholder",
-      "roles": ["walker"],
-      "cultures": [],
-      "source": null
-    },
-    {
-      "id": "street-postbox",
-      "kind": "street",
-      "file": null,
-      "status": "placeholder",
-      "roles": [],
-      "cultures": [],
-      "source": null
-    },
-    {
       "id": "culture-fisher-hut",
       "kind": "culture",
-      "file": null,
-      "status": "placeholder",
+      "file": "culture/fisher-hut.glb",
+      "status": "draft",
+      "heightM": 3.2,
+      "tris": 792,
+      "slots": ["slot_accent", "slot_bottom", "slot_cloth", "slot_light", "slot_metal", "slot_wood"],
+      "attach": [],
       "roles": ["fisher"],
       "cultures": ["sea"],
-      "source": null
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
     },
     {
       "id": "culture-garden",
       "kind": "culture",
-      "file": null,
-      "status": "placeholder",
+      "file": "culture/garden.glb",
+      "status": "draft",
+      "heightM": 2.64,
+      "tris": 784,
+      "slots": [
+        "slot_accent",
+        "slot_bottom",
+        "slot_cloth",
+        "slot_glass",
+        "slot_metal",
+        "slot_plant",
+        "slot_stone",
+        "slot_wood"
+      ],
+      "attach": [],
       "roles": ["gardener"],
       "cultures": ["nature"],
-      "source": null
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
     },
     {
       "id": "culture-observatory",
       "kind": "culture",
-      "file": null,
-      "status": "placeholder",
+      "file": "culture/observatory.glb",
+      "status": "draft",
+      "heightM": 4.44,
+      "tris": 764,
+      "slots": ["slot_accent", "slot_cloth", "slot_light", "slot_metal", "slot_stone", "slot_wood"],
+      "attach": [],
       "roles": ["stargazer"],
       "cultures": ["sky"],
-      "source": null
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
     },
     {
       "id": "culture-stage",
       "kind": "culture",
-      "file": null,
-      "status": "placeholder",
+      "file": "culture/stage.glb",
+      "status": "draft",
+      "heightM": 3.575,
+      "tris": 760,
+      "slots": ["slot_accent", "slot_cloth", "slot_light", "slot_metal", "slot_wood"],
+      "attach": [],
       "roles": ["musician", "listener"],
       "cultures": ["music"],
-      "source": null
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
     },
     {
       "id": "culture-stall",
       "kind": "culture",
-      "file": null,
-      "status": "placeholder",
+      "file": "culture/stall.glb",
+      "status": "draft",
+      "heightM": 2.64,
+      "tris": 710,
+      "slots": ["slot_accent", "slot_cloth", "slot_light", "slot_metal", "slot_wood"],
+      "attach": [],
       "roles": ["vendor"],
       "cultures": ["food"],
-      "source": null
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
     }
   ]
 }

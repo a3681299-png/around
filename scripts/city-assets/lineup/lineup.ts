@@ -44,10 +44,11 @@ type Entry = {
   kind: string;
   file: string | null;
   roles: string[];
+  cultures?: string[];
   heightM: number;
   status: string;
 };
-type View = 'far' | 'mid' | 'near' | 'sil' | 'night' | 'props' | 'hero';
+type View = 'far' | 'mid' | 'near' | 'sil' | 'night' | 'props' | 'hero' | 'culture';
 
 const ink = '#2b3a5a';
 const palette = { grass: '#8fd6b8', green: '#2e9e8c', pavement: '#eaf8f6', water: '#5aa9de', sky: '#bdeff5' };
@@ -230,6 +231,11 @@ const held: Record<string, { prop: string; pose: Pose }> = {
   dockworker: { prop: 'prop-crate', pose: 'carry' },
   shopkeeper: { prop: 'prop-broom', pose: 'hang' },
   lamplighter: { prop: 'prop-lantern', pose: 'hang' },
+  musician: { prop: 'prop-instrument', pose: 'hang' },
+  stargazer: { prop: 'prop-telescope', pose: 'hang' },
+  gardener: { prop: 'prop-watering-can', pose: 'hang' },
+  vendor: { prop: 'prop-stall-goods', pose: 'carry' },
+  fisher: { prop: 'prop-fishing-rod', pose: 'hang' },
 };
 
 async function resident(entry: Entry, seed: number, withProp: boolean, props: Map<string, Entry>) {
@@ -382,6 +388,27 @@ async function buildViews() {
   });
   views.set('hero', hero);
 
+  // Culture: each culture building with its own person in front, holding the culture's prop.
+  const culture = new Group();
+  culture.add(ground());
+  const buildings = things.filter((t) => t.kind === 'culture');
+  for (const [i, entry] of buildings.entries()) {
+    const x = (i - (buildings.length - 1) / 2) * 5.2;
+    culture.add(await placeAt(entry, x, -0.6, i + 1));
+    const person = residents.find((r) => r.cultures?.some((c) => entry.cultures?.includes(c)));
+    if (person) {
+      const figure = await resident(person, i + 4, true, props);
+      figure.position.set(x + 1.2, 0, 1.4);
+      culture.add(figure);
+    }
+  }
+  const cultureHero = await tsumu();
+  if (cultureHero) {
+    cultureHero.position.set(-1.4, 0, 1.6);
+    culture.add(cultureHero);
+  }
+  views.set('culture', culture);
+
   views.set('mid', await rowView());
   views.set('near', await rowView());
   views.set('sil', await rowView());
@@ -404,7 +431,8 @@ async function buildViews() {
     farHero.position.set(1, 0, 1.2);
     far.add(farHero);
   }
-  const land = things.filter((t) => t.kind !== 'prop' && !waterSide(t));
+  // Culture buildings have their own view; scattered here they would bury the crowd being judged.
+  const land = things.filter((t) => t.kind !== 'prop' && t.kind !== 'culture' && !waterSide(t));
   for (let i = 0; i < land.length * 3; i++)
     far.add(await placeAt(land[i % land.length], (random() - 0.5) * 28, random() < 0.5 ? -1.9 : 4.4, i));
   for (const [i, entry] of things.filter(waterSide).entries())
@@ -445,6 +473,7 @@ const cameras: Record<View, { at: [number, number, number]; look: [number, numbe
   near: { at: [0, 0.75, 6.4], look: [0, 0.55, 0], fov: 30 },
   props: { at: [0, 4.2, 13.5], look: [0, 0.9, -1.2], fov: 34 },
   hero: { at: [0, 0.62, 4.6], look: [0, 0.5, 0], fov: 30 },
+  culture: { at: [0, 7.5, 21], look: [0, 1.4, 0], fov: 34 },
 };
 
 const pointLights: PointLight[] = [];
