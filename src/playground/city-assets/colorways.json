@@ -1,0 +1,24 @@
+{
+  "note": "Resident colour sets proposed by the asset side. Every colour is from wwt-toon-look's table except the skin and hair rows, which the table did not have yet (proposed additions). The world may pick any set for any resident; slot names follow wwt-asset-contract.",
+  "skin": ["#f7dcc8", "#eec3a1", "#d9a37f", "#b9805f"],
+  "hair": ["#4a3b48", "#6e4f3f", "#2f4a6e", "#a8744f", "#d8c3a5"],
+  "sets": [
+    { "top": "#5aa9de", "bottom": "#2f6fa8", "shoes": "#2b3a5a", "accent": "#f2d06b" },
+    { "top": "#f6fbff", "bottom": "#2e9e8c", "shoes": "#2b3a5a", "accent": "#d46a72" },
+    { "top": "#8fd6b8", "bottom": "#f6fbff", "shoes": "#6e4f3f", "accent": "#5aa9de" },
+    { "top": "#d46a72", "bottom": "#2b3a5a", "shoes": "#2b3a5a", "accent": "#f6fbff" },
+    { "top": "#f2d06b", "bottom": "#5aa9de", "shoes": "#2b3a5a", "accent": "#2e9e8c" },
+    { "top": "#2f6fa8", "bottom": "#fff1c9", "shoes": "#6e4f3f", "accent": "#f28ab2" },
+    { "top": "#fff1c9", "bottom": "#d46a72", "shoes": "#2b3a5a", "accent": "#2f6fa8" },
+    { "top": "#2e9e8c", "bottom": "#2b3a5a", "shoes": "#6e4f3f", "accent": "#f2d06b" }
+  ],
+  "materials": {
+    "wood": "#c98f5c",
+    "metal": "#7d8ea3",
+    "stone": "#dfe7e6",
+    "cloth": "#fff1c9",
+    "glass": "#bdeff5",
+    "plant": "#2e9e8c",
+    "light": "#ffe7a3"
+  }
+}

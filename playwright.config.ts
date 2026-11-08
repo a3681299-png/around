@@ -13,6 +13,7 @@ const unitSpecs = [
   'room-life',
   'camera-shots',
   'clean-work',
+  'city-assets-check',
   'backup-data',
   'browser-boundary',
   'playground-output',

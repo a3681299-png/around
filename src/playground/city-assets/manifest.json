@@ -1,0 +1,549 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "id": "hero-tsumu",
+      "kind": "hero",
+      "file": null,
+      "privateFile": "wwt-private-assets/tsumu/work/tsumu-city.glb",
+      "status": "final",
+      "heightM": 1.006,
+      "tris": 1766,
+      "slots": ["slot_tex"],
+      "attach": [],
+      "roles": ["hero"],
+      "cultures": [],
+      "rig": "tsumu",
+      "note": "Converted by Codex (scripts/characters/tsumu_glb.py + retarget_vrma.py); the asset side rebuilds it with city-assets/tools/build_tsumu.py and checks the approved SHA-256. Height is the world's 0.72 display scale.",
+      "source": {
+        "type": "booth-hero",
+        "author": "兎賀さんね（©とがさん）",
+        "url": "https://booth.pm/ja/items/6970838",
+        "license": "VN3 利用規約 v1.0（個別条件 A・I・J・N を確認済み、docs/playground-city.md）",
+        "record": "wwt-private-assets/tsumu/source/License"
+      }
+    },
+    {
+      "id": "resident-dockworker-a",
+      "kind": "resident",
+      "file": "residents/dockworker-a.glb",
+      "status": "draft",
+      "heightM": 1.134,
+      "tris": 2254,
+      "slots": ["slot_accent", "slot_bottom", "slot_hair", "slot_shoes", "slot_skin", "slot_top"],
+      "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
+      "roles": ["dockworker"],
+      "cultures": [],
+      "rig": "resident",
+      "base": "B",
+      "source": {
+        "type": "booth-base-modified",
+        "author": "シロタカブ（readme.txt の表記。依頼文では「おなかにやさしい」。翔太が確認）",
+        "url": "https://booth.pm/ja/items/8801178",
+        "license": "BOOTH 3D素体モデル（デフォルメ）ver1.0 の規約：改変して作ったキャラクターの配布は可。素体のまま・僅かな改変の配布と自作発言は禁止",
+        "record": "wwt-private-assets/city-assets/base-body/LICENSE-notes.md"
+      }
+    },
+    {
+      "id": "resident-dockworker-b",
+      "kind": "resident",
+      "file": "residents/dockworker-b.glb",
+      "status": "draft",
+      "heightM": 1.138,
+      "tris": 2044,
+      "slots": ["slot_accent", "slot_bottom", "slot_hair", "slot_shoes", "slot_skin", "slot_top"],
+      "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
+      "roles": ["dockworker"],
+      "cultures": [],
+      "rig": "resident",
+      "base": "A",
+      "source": {
+        "type": "booth-base-modified",
+        "author": "シロタカブ（readme.txt の表記。依頼文では「おなかにやさしい」。翔太が確認）",
+        "url": "https://booth.pm/ja/items/8801178",
+        "license": "BOOTH 3D素体モデル（デフォルメ）ver1.0 の規約：改変して作ったキャラクターの配布は可。素体のまま・僅かな改変の配布と自作発言は禁止",
+        "record": "wwt-private-assets/city-assets/base-body/LICENSE-notes.md"
+      }
+    },
+    {
+      "id": "resident-lamplighter-a",
+      "kind": "resident",
+      "file": "residents/lamplighter-a.glb",
+      "status": "draft",
+      "heightM": 1.398,
+      "tris": 2344,
+      "slots": ["slot_accent", "slot_bottom", "slot_hair", "slot_light", "slot_shoes", "slot_skin", "slot_top"],
+      "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
+      "roles": ["lamplighter"],
+      "cultures": [],
+      "rig": "resident",
+      "base": "A",
+      "source": {
+        "type": "booth-base-modified",
+        "author": "シロタカブ（readme.txt の表記。依頼文では「おなかにやさしい」。翔太が確認）",
+        "url": "https://booth.pm/ja/items/8801178",
+        "license": "BOOTH 3D素体モデル（デフォルメ）ver1.0 の規約：改変して作ったキャラクターの配布は可。素体のまま・僅かな改変の配布と自作発言は禁止",
+        "record": "wwt-private-assets/city-assets/base-body/LICENSE-notes.md"
+      }
+    },
+    {
+      "id": "resident-shopkeeper-a",
+      "kind": "resident",
+      "file": "residents/shopkeeper-a.glb",
+      "status": "draft",
+      "heightM": 1.105,
+      "tris": 2372,
+      "slots": ["slot_accent", "slot_bottom", "slot_hair", "slot_shoes", "slot_skin", "slot_top"],
+      "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
+      "roles": ["shopkeeper"],
+      "cultures": [],
+      "rig": "resident",
+      "base": "A",
+      "source": {
+        "type": "booth-base-modified",
+        "author": "シロタカブ（readme.txt の表記。依頼文では「おなかにやさしい」。翔太が確認）",
+        "url": "https://booth.pm/ja/items/8801178",
+        "license": "BOOTH 3D素体モデル（デフォルメ）ver1.0 の規約：改変して作ったキャラクターの配布は可。素体のまま・僅かな改変の配布と自作発言は禁止",
+        "record": "wwt-private-assets/city-assets/base-body/LICENSE-notes.md"
+      }
+    },
+    {
+      "id": "resident-walker-a",
+      "kind": "resident",
+      "file": "residents/walker-a.glb",
+      "status": "draft",
+      "heightM": 1.162,
+      "tris": 2324,
+      "slots": ["slot_accent", "slot_bottom", "slot_hair", "slot_shoes", "slot_skin", "slot_top"],
+      "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
+      "roles": ["walker"],
+      "cultures": [],
+      "rig": "resident",
+      "base": "A",
+      "source": {
+        "type": "booth-base-modified",
+        "author": "シロタカブ（readme.txt の表記。依頼文では「おなかにやさしい」。翔太が確認）",
+        "url": "https://booth.pm/ja/items/8801178",
+        "license": "BOOTH 3D素体モデル（デフォルメ）ver1.0 の規約：改変して作ったキャラクターの配布は可。素体のまま・僅かな改変の配布と自作発言は禁止",
+        "record": "wwt-private-assets/city-assets/base-body/LICENSE-notes.md"
+      }
+    },
+    {
+      "id": "resident-walker-b",
+      "kind": "resident",
+      "file": "residents/walker-b.glb",
+      "status": "draft",
+      "heightM": 1.113,
+      "tris": 2330,
+      "slots": ["slot_accent", "slot_bottom", "slot_hair", "slot_shoes", "slot_skin", "slot_top"],
+      "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
+      "roles": ["walker"],
+      "cultures": [],
+      "rig": "resident",
+      "base": "B",
+      "source": {
+        "type": "booth-base-modified",
+        "author": "シロタカブ（readme.txt の表記。依頼文では「おなかにやさしい」。翔太が確認）",
+        "url": "https://booth.pm/ja/items/8801178",
+        "license": "BOOTH 3D素体モデル（デフォルメ）ver1.0 の規約：改変して作ったキャラクターの配布は可。素体のまま・僅かな改変の配布と自作発言は禁止",
+        "record": "wwt-private-assets/city-assets/base-body/LICENSE-notes.md"
+      }
+    },
+    {
+      "id": "resident-fisher-a",
+      "kind": "resident",
+      "file": null,
+      "status": "placeholder",
+      "roles": ["fisher"],
+      "cultures": ["sea"],
+      "source": null
+    },
+    {
+      "id": "resident-gardener-a",
+      "kind": "resident",
+      "file": null,
+      "status": "placeholder",
+      "roles": ["gardener"],
+      "cultures": ["nature"],
+      "source": null
+    },
+    {
+      "id": "resident-musician-a",
+      "kind": "resident",
+      "file": null,
+      "status": "placeholder",
+      "roles": ["musician"],
+      "cultures": ["music"],
+      "source": null
+    },
+    {
+      "id": "resident-stargazer-a",
+      "kind": "resident",
+      "file": null,
+      "status": "placeholder",
+      "roles": ["stargazer"],
+      "cultures": ["sky"],
+      "source": null
+    },
+    {
+      "id": "resident-vendor-a",
+      "kind": "resident",
+      "file": null,
+      "status": "placeholder",
+      "roles": ["vendor"],
+      "cultures": ["food"],
+      "source": null
+    },
+    {
+      "id": "prop-broom",
+      "kind": "prop",
+      "file": "props/broom.glb",
+      "status": "draft",
+      "heightM": 1.01,
+      "tris": 120,
+      "slots": ["slot_accent", "slot_cloth", "slot_wood"],
+      "attach": [],
+      "roles": ["shopkeeper"],
+      "cultures": [],
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
+    },
+    {
+      "id": "prop-crate",
+      "kind": "prop",
+      "file": "props/crate.glb",
+      "status": "draft",
+      "heightM": 0.195,
+      "tris": 80,
+      "slots": ["slot_accent", "slot_cloth", "slot_wood"],
+      "attach": [],
+      "roles": ["dockworker"],
+      "cultures": [],
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
+    },
+    {
+      "id": "prop-lantern",
+      "kind": "prop",
+      "file": "props/lantern.glb",
+      "status": "draft",
+      "heightM": 0.232,
+      "tris": 220,
+      "slots": ["slot_light", "slot_metal"],
+      "attach": [],
+      "roles": ["lamplighter"],
+      "cultures": [],
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
+    },
+    {
+      "id": "prop-fishing-rod",
+      "kind": "prop",
+      "file": null,
+      "status": "placeholder",
+      "roles": ["fisher"],
+      "cultures": ["sea"],
+      "source": null
+    },
+    {
+      "id": "prop-instrument",
+      "kind": "prop",
+      "file": null,
+      "status": "placeholder",
+      "roles": ["musician"],
+      "cultures": ["music"],
+      "source": null
+    },
+    {
+      "id": "prop-lighter-pole",
+      "kind": "prop",
+      "file": null,
+      "status": "placeholder",
+      "roles": ["lamplighter"],
+      "cultures": [],
+      "source": null
+    },
+    {
+      "id": "prop-paper-bag",
+      "kind": "prop",
+      "file": null,
+      "status": "placeholder",
+      "roles": ["shopkeeper"],
+      "cultures": [],
+      "source": null
+    },
+    {
+      "id": "prop-stall-goods",
+      "kind": "prop",
+      "file": null,
+      "status": "placeholder",
+      "roles": ["vendor"],
+      "cultures": ["food"],
+      "source": null
+    },
+    {
+      "id": "prop-telescope",
+      "kind": "prop",
+      "file": null,
+      "status": "placeholder",
+      "roles": ["stargazer"],
+      "cultures": ["sky"],
+      "source": null
+    },
+    {
+      "id": "prop-watering-can",
+      "kind": "prop",
+      "file": null,
+      "status": "placeholder",
+      "roles": ["gardener"],
+      "cultures": ["nature"],
+      "source": null
+    },
+    {
+      "id": "ship-cargo-a",
+      "kind": "ship",
+      "file": "ships/cargo-a.glb",
+      "status": "draft",
+      "heightM": 1.51,
+      "tris": 712,
+      "slots": ["slot_accent", "slot_cloth", "slot_light", "slot_metal", "slot_wood"],
+      "attach": [],
+      "roles": ["dockworker"],
+      "cultures": [],
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
+    },
+    {
+      "id": "ship-sail-a",
+      "kind": "ship",
+      "file": null,
+      "status": "placeholder",
+      "roles": ["fisher"],
+      "cultures": [],
+      "source": null
+    },
+    {
+      "id": "harbor-bollard",
+      "kind": "harbor",
+      "file": "harbor/bollard.glb",
+      "status": "draft",
+      "heightM": 0.325,
+      "tris": 212,
+      "slots": ["slot_accent", "slot_metal"],
+      "attach": [],
+      "roles": ["dockworker"],
+      "cultures": [],
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
+    },
+    {
+      "id": "harbor-cargo-pile",
+      "kind": "harbor",
+      "file": "harbor/cargo-pile.glb",
+      "status": "draft",
+      "heightM": 0.84,
+      "tris": 424,
+      "slots": ["slot_accent", "slot_cloth", "slot_wood"],
+      "attach": [],
+      "roles": ["dockworker"],
+      "cultures": [],
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
+    },
+    {
+      "id": "harbor-pier",
+      "kind": "harbor",
+      "file": "harbor/pier.glb",
+      "status": "draft",
+      "heightM": 0.97,
+      "tris": 696,
+      "slots": ["slot_accent", "slot_wood"],
+      "attach": [],
+      "roles": ["dockworker"],
+      "cultures": [],
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
+    },
+    {
+      "id": "harbor-crane",
+      "kind": "harbor",
+      "file": null,
+      "status": "placeholder",
+      "roles": ["dockworker"],
+      "cultures": [],
+      "source": null
+    },
+    {
+      "id": "street-bench",
+      "kind": "street",
+      "file": "street/bench.glb",
+      "status": "draft",
+      "heightM": 0.751,
+      "tris": 200,
+      "slots": ["slot_metal", "slot_wood"],
+      "attach": [],
+      "roles": ["walker"],
+      "cultures": [],
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
+    },
+    {
+      "id": "street-hedge",
+      "kind": "street",
+      "file": "street/hedge.glb",
+      "status": "draft",
+      "heightM": 0.56,
+      "tris": 104,
+      "slots": ["slot_plant", "slot_stone"],
+      "attach": [],
+      "roles": [],
+      "cultures": [],
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
+    },
+    {
+      "id": "street-lamp",
+      "kind": "street",
+      "file": "street/lamp.glb",
+      "status": "draft",
+      "heightM": 2.17,
+      "tris": 212,
+      "slots": ["slot_accent", "slot_light", "slot_metal"],
+      "attach": [],
+      "roles": ["lamplighter"],
+      "cultures": [],
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
+    },
+    {
+      "id": "street-tree",
+      "kind": "street",
+      "file": "street/tree.glb",
+      "status": "draft",
+      "heightM": 2.279,
+      "tris": 140,
+      "slots": ["slot_plant", "slot_wood"],
+      "attach": [],
+      "roles": [],
+      "cultures": [],
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
+    },
+    {
+      "id": "street-bicycle",
+      "kind": "street",
+      "file": null,
+      "status": "placeholder",
+      "roles": ["walker"],
+      "cultures": [],
+      "source": null
+    },
+    {
+      "id": "street-postbox",
+      "kind": "street",
+      "file": null,
+      "status": "placeholder",
+      "roles": [],
+      "cultures": [],
+      "source": null
+    },
+    {
+      "id": "street-sign",
+      "kind": "street",
+      "file": null,
+      "status": "placeholder",
+      "roles": [],
+      "cultures": [],
+      "source": null
+    },
+    {
+      "id": "culture-fisher-hut",
+      "kind": "culture",
+      "file": null,
+      "status": "placeholder",
+      "roles": ["fisher"],
+      "cultures": ["sea"],
+      "source": null
+    },
+    {
+      "id": "culture-garden",
+      "kind": "culture",
+      "file": null,
+      "status": "placeholder",
+      "roles": ["gardener"],
+      "cultures": ["nature"],
+      "source": null
+    },
+    {
+      "id": "culture-observatory",
+      "kind": "culture",
+      "file": null,
+      "status": "placeholder",
+      "roles": ["stargazer"],
+      "cultures": ["sky"],
+      "source": null
+    },
+    {
+      "id": "culture-stage",
+      "kind": "culture",
+      "file": null,
+      "status": "placeholder",
+      "roles": ["musician", "listener"],
+      "cultures": ["music"],
+      "source": null
+    },
+    {
+      "id": "culture-stall",
+      "kind": "culture",
+      "file": null,
+      "status": "placeholder",
+      "roles": ["vendor"],
+      "cultures": ["food"],
+      "source": null
+    }
+  ]
+}
