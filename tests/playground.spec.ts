@@ -1,8 +1,9 @@
-import { chromium, test, expect, type Page } from '@playwright/test';
+import { chromium, test, expect, type Locator, type Page } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
-import { createServer, type Server } from 'node:http';
-import { mkdirSync, readFileSync, statSync } from 'node:fs';
-import { extname, join, normalize, resolve, sep } from 'node:path';
+import type { Server } from 'node:http';
+import { mkdirSync } from 'node:fs';
+import { join, resolve } from 'node:path';
+import { createPlaygroundServer } from '../scripts/playground/serve.mjs';
 
 /**
  * The Playground without the extension (docs/playground-plan.md): our own static site, the WWT
@@ -11,17 +12,6 @@ import { extname, join, normalize, resolve, sep } from 'node:path';
 const out = resolve('.work/playground-e2e');
 const mirdoOut = resolve('.work/playground-mirdo-e2e');
 const shots = resolve('.work/playground-shots');
-const types: Record<string, string> = {
-  '.html': 'text/html; charset=utf-8',
-  '.js': 'text/javascript; charset=utf-8',
-  '.css': 'text/css; charset=utf-8',
-  '.json': 'application/json',
-  '.png': 'image/png',
-  '.webm': 'video/webm',
-  '.vrm': 'application/octet-stream',
-  '.md': 'text/plain; charset=utf-8',
-  '.txt': 'text/plain; charset=utf-8',
-};
 let server: Server, origin: string;
 // The same Chromium build as the extension tests (tests/fixtures.ts), headless, no extension.
 test.use({ channel: 'chromium', headless: true });
@@ -37,34 +27,7 @@ test.beforeAll(async () => {
     stdio: 'pipe',
   });
   mkdirSync(shots, { recursive: true });
-  server = createServer((request, response) => {
-    const pathname = decodeURIComponent(new URL(request.url!, 'http://x').pathname);
-    const mirdo = pathname.startsWith('/mirdo/');
-    const folder = mirdo ? mirdoOut : out;
-    const path = normalize(join(folder, mirdo ? pathname.slice('/mirdo'.length) : pathname));
-    const file = path.endsWith('\\') || path.endsWith('/') ? join(path, 'index.html') : path;
-    if (!file.startsWith(folder + sep) || !statSync(file, { throwIfNoEntry: false })?.isFile()) {
-      response.writeHead(404).end();
-      return;
-    }
-    const bytes = readFileSync(file);
-    const contentType = types[extname(file)] ?? 'application/octet-stream';
-    const range = extname(file) === '.webm' ? /^bytes=(\d+)-(\d*)$/.exec(request.headers.range ?? '') : null;
-    if (range) {
-      const start = Number(range[1]);
-      const end = Math.min(range[2] ? Number(range[2]) : bytes.length - 1, bytes.length - 1);
-      response.writeHead(206, {
-        'content-type': contentType,
-        'accept-ranges': 'bytes',
-        'content-range': `bytes ${start}-${end}/${bytes.length}`,
-        'content-length': end - start + 1,
-      });
-      response.end(bytes.subarray(start, end + 1));
-      return;
-    }
-    response.writeHead(200, { 'content-type': contentType, 'content-length': bytes.length });
-    response.end(bytes);
-  });
+  server = createPlaygroundServer(out);
   await new Promise<void>((done) => server.listen(0, '127.0.0.1', done));
   origin = `http://127.0.0.1:${(server.address() as { port: number }).port}`;
 });
@@ -97,64 +60,77 @@ test('Mirdo starts on the lower edge and moves to the upper edge with the import
     env: { ...process.env, WW_PLAYGROUND_OUT: '.work/playground-mirdo-e2e' },
     stdio: 'pipe',
   });
-  await page.setViewportSize({ width: 1280, height: 800 });
-  await page.goto(origin + '/mirdo/');
-  await expect(page.locator('#apply')).toHaveText('元に戻す');
-  await expect(page.getByRole('link', { name: /ミルド／ragooou/ })).toHaveAttribute(
-    'href',
-    'https://booth.pm/ja/items/6614116',
-  );
-  await expect(page.getByRole('link', { name: /Quaternius Universal Animation Library/ })).toBeVisible();
-  await expect(model(page)).toHaveAttribute('data-renderer', 'three', { timeout: 20000 });
-  const ids = await page.evaluate(async () => {
-    const design = await (await fetch('content/design.json')).json();
-    return design.decorations
-      .find((layer: { id: string }) => layer.id === 'resident')
-      .character.motions.map((m: { id: string }) => m.id) as string[];
-  });
-  const state = () =>
-    model(page).evaluate((e: HTMLElement, ids: string[]) => {
-      const f = JSON.parse(e.dataset.modelFrame ?? '{}');
-      const box = e.closest('[data-image-id]')!.getBoundingClientRect();
-      const player = document.querySelector('.player')!.getBoundingClientRect();
-      const seat = f.body?.autonomy?.seat;
-      return {
-        motion: ids[f.clip],
-        behaviour: f.body?.autonomy?.behaviour,
-        seat,
-        weight: f.body?.seatWeight,
-        onEdge: Math.abs(box.y + box.height / 2 - (seat === 'top' ? player.top : player.bottom)) < 1,
-      };
-    }, ids);
-  await expect.poll(state, { timeout: 10000 }).toMatchObject({
-    motion: 'sitting-idle-loop',
-    behaviour: 'rest',
-    seat: 'bottom',
-    weight: 1,
-    onEdge: true,
-  });
-  const box = (await model(page).boundingBox())!;
-  const player = (await page.locator('.player').boundingBox())!;
-  const x = box.x + box.width / 2,
-    y = player.y + player.height - 88;
-  await page.mouse.move(player.x + 35, y);
-  await page.waitForTimeout(200);
-  await page.mouse.move(x - 56, y, { steps: 4 });
-  await expect.poll(state).toMatchObject({ behaviour: 'flee', motion: 'jog-fwd-loop' });
-  // Leave the character, keeping the pointer on the lower side of the player.
-  await page.mouse.move(6, y);
-  await expect.poll(state, { timeout: 10000 }).toMatchObject({ behaviour: 'return', motion: 'walk-loop', seat: 'top' });
-  await expect.poll(state, { timeout: 15000 }).toMatchObject({
-    motion: 'sitting-idle-loop',
-    behaviour: 'rest',
-    seat: 'top',
-    weight: 1,
-    onEdge: true,
-  });
-  const volume = page.getByRole('slider', { name: '音量' });
-  await volume.focus();
-  await volume.press('ArrowLeft');
-  await expect(volume).toHaveValue('59');
+  // Its own server: the shared one serves a single folder (scripts/playground/serve.mjs).
+  const mirdoServer = createPlaygroundServer(mirdoOut);
+  await new Promise<void>((done) => mirdoServer.listen(0, '127.0.0.1', done));
+  const mirdoOrigin = `http://127.0.0.1:${(mirdoServer.address() as { port: number }).port}`;
+  try {
+    // Narrower than the 3D board's minimum (spatial.ts): this checks the basic Playground's
+    // resident. The demo opens on the plain site (design, demo scene 1).
+    await page.setViewportSize({ width: 940, height: 800 });
+    await page.goto(mirdoOrigin + '/');
+    await page.locator('#apply').click();
+    await expect(page.locator('#apply')).toHaveText('元に戻す');
+    await expect(page.getByRole('link', { name: /ミルド／ragooou/ })).toHaveAttribute(
+      'href',
+      'https://booth.pm/ja/items/6614116',
+    );
+    await expect(page.getByRole('link', { name: /Quaternius Universal Animation Library/ })).toBeVisible();
+    await expect(model(page)).toHaveAttribute('data-renderer', 'three', { timeout: 20000 });
+    const ids = await page.evaluate(async () => {
+      const design = await (await fetch('content/design.json')).json();
+      return design.decorations
+        .find((layer: { id: string }) => layer.id === 'resident')
+        .character.motions.map((m: { id: string }) => m.id) as string[];
+    });
+    const state = () =>
+      model(page).evaluate((e: HTMLElement, ids: string[]) => {
+        const f = JSON.parse(e.dataset.modelFrame ?? '{}');
+        const box = e.closest('[data-image-id]')!.getBoundingClientRect();
+        const player = document.querySelector('.player')!.getBoundingClientRect();
+        const seat = f.body?.autonomy?.seat;
+        return {
+          motion: ids[f.clip],
+          behaviour: f.body?.autonomy?.behaviour,
+          seat,
+          weight: f.body?.seatWeight,
+          onEdge: Math.abs(box.y + box.height / 2 - (seat === 'top' ? player.top : player.bottom)) < 1,
+        };
+      }, ids);
+    await expect.poll(state, { timeout: 10000 }).toMatchObject({
+      motion: 'sitting-idle-loop',
+      behaviour: 'rest',
+      seat: 'bottom',
+      weight: 1,
+      onEdge: true,
+    });
+    const box = (await model(page).boundingBox())!;
+    const player = (await page.locator('.player').boundingBox())!;
+    const x = box.x + box.width / 2,
+      y = player.y + player.height - 88;
+    await page.mouse.move(player.x + 35, y);
+    await page.waitForTimeout(200);
+    await page.mouse.move(x - 56, y, { steps: 4 });
+    await expect.poll(state).toMatchObject({ behaviour: 'flee', motion: 'jog-fwd-loop' });
+    // Leave the character, keeping the pointer on the lower side of the player.
+    await page.mouse.move(6, y);
+    await expect
+      .poll(state, { timeout: 10000 })
+      .toMatchObject({ behaviour: 'return', motion: 'walk-loop', seat: 'top' });
+    await expect.poll(state, { timeout: 15000 }).toMatchObject({
+      motion: 'sitting-idle-loop',
+      behaviour: 'rest',
+      seat: 'top',
+      weight: 1,
+      onEdge: true,
+    });
+    const volume = page.getByRole('slider', { name: '音量' });
+    await volume.focus();
+    await volume.press('ArrowLeft');
+    await expect(volume).toHaveValue('59');
+  } finally {
+    await new Promise<void>((done) => mirdoServer.close(() => done()));
+  }
 });
 
 test('without the extension, 適用 switches the site to the artwork and back', async ({ page }) => {
@@ -200,6 +176,35 @@ test('the background layer is drawn under the content: the video picture is not 
   await expect.poll(async () => (await page.screenshot({ clip: margin })).equals(plainMargin)).toBe(false);
   // ... but nothing is painted over the picture.
   expect((await page.screenshot({ clip })).equals(plain)).toBe(true);
+});
+
+test('the basic resident has no visible frame while its motion is still loading', async ({ page }) => {
+  const problems = await open(page);
+  let requested!: () => void;
+  let ready!: () => void;
+  const motionRequested = new Promise<void>((resolve) => (requested = resolve));
+  const motionReady = new Promise<void>((resolve) => (ready = resolve));
+  await page.route('**/*.vrma', async (route) => {
+    requested();
+    await motionReady;
+    await route.continue();
+  });
+  await page.locator('#apply').click();
+  try {
+    await motionRequested;
+    // The loader asks for the clip during the same paint that used to draw the rest pose.
+    expect(await model(page).evaluate((element) => getComputedStyle(element).visibility)).toBe('hidden');
+    expect(
+      await model(page)
+        .locator('canvas')
+        .evaluate((canvas: HTMLCanvasElement) => canvas.width),
+    ).toBe(1);
+  } finally {
+    ready();
+  }
+  await expect(model(page)).toHaveAttribute('data-renderer', 'three', { timeout: 20000 });
+  await expect(model(page)).toBeVisible();
+  expect(problems).toEqual([]);
 });
 
 test('Alt+Shift+Q takes every effect off, and pressing it again brings them back', async ({ page }) => {
@@ -336,6 +341,24 @@ test('G1: with the artwork on, the real controls are still the hit target and wo
   await expect.poll(() => page.evaluate(() => document.querySelector('video')!.paused)).toBe(true);
 });
 
+async function dragProjectedRange(page: Page, slider: Locator, fractions: [number, number]) {
+  const [start, end] = await slider.evaluate((element, ratios) => {
+    const box = element.getBoundingClientRect();
+    return ratios.map((fraction) => {
+      const x = box.left + box.width * fraction;
+      const rows = [];
+      for (let y = Math.ceil(box.top); y < box.bottom; y++)
+        if (document.elementFromPoint(x, y) === element) rows.push(y);
+      if (rows.length === 0) throw new Error(`The projected range ${element.id} was not a hit target.`);
+      return { x, y: rows[Math.floor(rows.length / 2)]! };
+    });
+  }, fractions);
+  await page.mouse.move(start!.x, start!.y);
+  await page.mouse.down();
+  await page.mouse.move(end!.x, end!.y, { steps: 12 });
+  await page.mouse.up();
+}
+
 async function exerciseSpatialControls(page: Page, mode: 'canvas' | 'css') {
   const problems = await open(page, false);
   const apply = page.locator('#apply');
@@ -377,25 +400,54 @@ async function exerciseSpatialControls(page: Page, mode: 'canvas' | 'css') {
   await play.click();
   await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.paused)).toBe(true);
   const seek = page.getByRole('slider', { name: '再生位置' });
-  const [start, end] = await seek.evaluate((element) => {
-    const box = element.getBoundingClientRect();
-    return [0.28, 0.78].map((fraction) => {
-      const x = box.left + box.width * fraction;
-      for (let y = Math.ceil(box.top); y < box.bottom; y++)
-        if (document.elementFromPoint(x, y) === element) return { x, y: y + 2 };
-      throw new Error('The projected seek bar was not a hit target.');
-    });
-  });
-  await page.mouse.move(start!.x, start!.y);
-  await page.mouse.down();
-  await page.mouse.move(end!.x, end!.y, { steps: 12 });
-  await page.mouse.up();
+  await dragProjectedRange(page, seek, [0.28, 0.78]);
   await expect.poll(async () => Number(await seek.inputValue())).toBeGreaterThan(650);
   await expect
     .poll(() => video.evaluate((element: HTMLVideoElement) => element.currentTime / element.duration))
     .toBeGreaterThan(0.65);
   await seek.press('Home');
   await expect(seek).toHaveValue('0');
+
+  await page.locator('#play').click();
+  await expect.poll(() => video.evaluate((element: HTMLVideoElement) => !element.paused)).toBe(true);
+  const original = await video.elementHandle();
+  const watchPage = page.locator('#watch-page');
+  await page.locator('#open-desktop').click();
+  await expect(page).toHaveURL(/#desktop$/);
+  await expect(stage).not.toHaveAttribute('data-transition', '');
+  await expect(page.locator('#close-desktop')).toBeVisible();
+  const docked = (await watchPage.boundingBox())!;
+  expect(docked.width).toBeLessThan(page.viewportSize()!.width * 0.62);
+  expect(
+    await video.evaluate((element: HTMLVideoElement, first) => first === element && !element.paused, original),
+  ).toBe(true);
+
+  await play.click();
+  await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.paused)).toBe(true);
+  await dragProjectedRange(page, seek, [0.24, 0.74]);
+  await expect
+    .poll(() => video.evaluate((element: HTMLVideoElement) => element.currentTime / element.duration))
+    .toBeGreaterThan(0.65);
+  await dragProjectedRange(page, page.locator('#volume'), [0.54, 0.3]);
+  await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.volume)).toBeLessThan(0.42);
+  await search.click();
+  await search.press('ControlOrMeta+A');
+  await search.press('Backspace');
+  await page.keyboard.insertText('もう一度');
+  await expect(page.getByRole('link', { name: 'もう一度、四角' })).toBeVisible();
+  await expect(page.getByRole('link', { name: '透ける四角の動画' })).toBeHidden();
+  const playback = () =>
+    video.evaluate((element: HTMLVideoElement) => [element.currentTime, element.paused, element.volume]);
+  const beforeBack = await playback();
+  await page.goBack();
+  await expect(page).not.toHaveURL(/#desktop$/);
+  await expect(stage).not.toHaveAttribute('data-transition', '');
+  await expect(watchPage).not.toHaveAttribute('inert', '');
+  expect((await watchPage.boundingBox())!.width).toBeGreaterThan(docked.width);
+  expect(await playback()).toEqual(beforeBack);
+  expect(await video.evaluate((element, first) => first === element, original)).toBe(true);
+  await expect(search).toHaveValue('もう一度');
+  await search.fill('透ける');
 
   await page.keyboard.press('Alt+Shift+KeyQ');
   await expect(stage).toHaveCount(0);
@@ -432,6 +484,35 @@ test('reduced motion keeps the camera still after applying', async ({ page }) =>
   await page.mouse.move(20, 350);
   await page.waitForTimeout(320);
   expect(await apply.boundingBox()).toEqual(before);
+  await page.locator('#open-desktop').click();
+  await expect(stage).not.toHaveAttribute('data-transition', '');
+  const docked = await apply.boundingBox();
+  expect(docked).not.toEqual(before);
+  await page.mouse.move(20, 350);
+  await page.waitForTimeout(320);
+  expect(await apply.boundingBox()).toEqual(docked);
+  await page.locator('#close-desktop').click();
+  await expect(page).not.toHaveURL(/#desktop$/);
+});
+
+test('a direct desktop visit has a working video-only fallback and a way back', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.setViewportSize({ width: 880, height: 800 });
+  await page.goto(origin + '/?basic#desktop');
+  await expect(page.locator('body')).toHaveAttribute('data-desktop', 'basic');
+  const monitor = page.locator('.desktop-lite canvas');
+  const pixels = () => monitor.evaluate((canvas: HTMLCanvasElement) => canvas.toDataURL());
+  const before = await pixels();
+  await page.locator('#play').click();
+  await expect.poll(pixels).not.toBe(before);
+  const video = page.locator('video');
+  const original = await video.elementHandle();
+  await page.locator('#close-desktop').click();
+  await expect(page).not.toHaveURL(/#desktop$/);
+  await expect(monitor).toBeHidden();
+  expect(
+    await video.evaluate((element: HTMLVideoElement, first) => first === element && !element.paused, original),
+  ).toBe(true);
 });
 
 test('HTML-in-Canvas in Chromium 153 syncs pointer drag, focus and keyboard', async () => {

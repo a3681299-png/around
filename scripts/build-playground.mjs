@@ -23,6 +23,9 @@ const test = process.env.WW_PLAYGROUND_TEST === '1';
 // Playground 3D branch the second. The files are hash-checked either way (playground/content.ts).
 const mirdoRoot = process.env.WW_PLAYGROUND_MIRDO_ROOT ?? process.env.WW_PLAYGROUND_PRIVATE_ASSETS;
 if (!test && !mirdoRoot) throw new Error('Set WW_PLAYGROUND_MIRDO_ROOT to the wwt-private-assets checkout.');
+const localRoom = process.env.WW_PLAYGROUND_LOCAL_ROOM;
+if ((localRoom || process.env.WW_PLAYGROUND_LOCAL_LAYOUT) && output === join(root, 'dist-playground'))
+  throw new Error('A local room or layout requires an explicit WW_PLAYGROUND_OUT under .work.');
 
 rmSync(output, { recursive: true, force: true });
 mkdirSync(join(output, 'content'), { recursive: true });

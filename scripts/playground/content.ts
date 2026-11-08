@@ -12,6 +12,7 @@ import { defaultModelSettings } from '../../src/models/types';
 import { CHARACTER_HOME } from '../../src/characters/home';
 import { assignBehaviours, classifyMotion } from '../../src/characters/auto-motions';
 import type { CharacterMotion } from '../../src/characters/settings';
+import { parseDesktopLayout } from '../../src/playground/desktop-layout';
 import mirdoAssets from './mirdo-assets.json' with { type: 'json' };
 
 const sha = (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('hex');
@@ -108,7 +109,12 @@ export function writeContent(root: string, out: string, mirdoRoot?: string): { m
   });
   const model = inspectAsset(vrm).model!;
   // The spatial resident (src/playground/resident.ts) shares the validated seated clip.
-  const sit = motions.find((motion) => motion.role === 'sit') ?? motions[0]!;
+  // Mirdo's clips are picked by their approved file names; the mannequin has only sit and stand.
+  const clip = (mirdoName: string, mannequinName: 'sit' | 'stand') =>
+    motions.find((motion) => motion.id === (mirdoRoot ? mirdoName : mannequinName).toLowerCase().replaceAll('_', '-'))!
+      .assetId;
+  const sit = clip('Sitting_Idle_Loop', 'sit');
+  const stand = clip('Idle_Loop', 'stand');
   const background = new Uint8Array(backgroundPng(480, 270));
   const backgroundId = add(background, 'png', 'room.png');
   // Videos are the site's own media, not engine assets.
@@ -172,7 +178,30 @@ export function writeContent(root: string, out: string, mirdoRoot?: string): { m
     ],
   });
   writeFileSync(join(out, 'design.json'), JSON.stringify(design, null, 2));
-  const resident = { model: vrmId, sit: sit.assetId, mannequin: !mirdoRoot };
-  writeFileSync(join(out, 'manifest.json'), JSON.stringify({ design: 'design.json', assets, resident }, null, 2));
-  return { models: [assets[vrmId]!.file, ...motions.map((motion) => assets[motion.assetId]!.file)] };
+  const extras = mirdoRoot
+    ? { sitDown: clip('Sitting_Enter', 'sit'), walk: clip('Walk_Loop', 'stand'), hop: clip('Jump_Land', 'stand') }
+    : {};
+  const resident = { model: vrmId, sit, stand, ...extras, mannequin: !mirdoRoot };
+  const localRoom = process.env.WW_PLAYGROUND_LOCAL_ROOM;
+  const layout = JSON.parse(
+    readFileSync(
+      process.env.WW_PLAYGROUND_LOCAL_LAYOUT ?? join(root, 'scripts/playground/desktop-layout.json'),
+      'utf8',
+    ),
+  );
+  const models = [vrmId, ...motions.map((motion) => motion.assetId)];
+  let room;
+  if (localRoom) {
+    const bytes = readFileSync(localRoom);
+    if (inspectAsset(bytes).model?.format !== 'glb') throw new Error('The local room must be a self-contained GLB.');
+    const asset = add(bytes, 'glb', 'Local room.glb');
+    room = { position: [0, -508, -600], rotationDeg: [0, 0, 0], scale: 410, ...layout.room, asset };
+    models.push(asset);
+  }
+  const desktop = parseDesktopLayout({ ...layout, room });
+  writeFileSync(
+    join(out, 'manifest.json'),
+    JSON.stringify({ design: 'design.json', assets, resident, desktop }, null, 2),
+  );
+  return { models: models.map((id) => assets[id]!.file) };
 }

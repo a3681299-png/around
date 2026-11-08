@@ -1,0 +1,19 @@
+{
+  "monitor": {
+    "position": [464, 53.6, -577.5],
+    "rotationDeg": [0, 0, 0],
+    "size": [300, 176]
+  },
+  "floorY": -508,
+  "viewer": [518, 313],
+  "via": [
+    [-64, 59],
+    [162, 303]
+  ],
+  "camera": { "truckX": -630, "lensY": -0.32 },
+  "room": {
+    "position": [-30, -508, 1360],
+    "rotationDeg": [0, 0, 0],
+    "scale": 520
+  }
+}

@@ -51,6 +51,22 @@ body {
   font: inherit;
   cursor: pointer;
 }
+#open-desktop {
+  flex: none;
+  margin-left: 10px;
+  /* Match the Apply button's outer height so adding this action keeps the player in place. */
+  padding: 7px 12px;
+  border: 1px solid #a5b7b9;
+  border-radius: 6px;
+  background: #edf4f3;
+  color: #213e46;
+  font: inherit;
+  cursor: pointer;
+}
+#open-desktop:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
 .layout {
   display: grid;
   grid-template-columns: minmax(0, 720px) 280px;
@@ -170,27 +186,28 @@ h1 {
 .playground-css3d {
   pointer-events: none;
 }
+#watch-page[data-spatial='css'] {
+  position: absolute;
+  inset: 0 auto auto 0;
+  pointer-events: auto;
+}
 #watch-page[data-spatial] {
   color: #132033;
   transform-origin: 0 0;
 }
-#watch-page[data-spatial='css'] .card,
-#watch-page[data-spatial='css'] .bar {
-  background: rgb(245 249 255 / 42%);
-}
-#watch-page[data-spatial='canvas'] {
+#watch-page[data-spatial] {
   --text-backing: #f3f5f8;
 }
-#watch-page[data-spatial='canvas'] :is(.brand, .hint, .name, .foot span, h1, .description, #status:not(:empty)) {
+#watch-page[data-spatial] :is(.brand, .hint, .name, .foot span, h1, .description, #status:not(:empty)) {
   width: fit-content;
   background: var(--text-backing);
   border-radius: 3px;
   box-shadow: 0 0 0 4px var(--text-backing);
 }
-#watch-page[data-spatial='canvas'] .name {
+#watch-page[data-spatial] .name {
   align-self: start;
 }
-#watch-page[data-spatial='canvas'] .controls {
+#watch-page[data-spatial] .controls {
   background: var(--text-backing);
   border-radius: 6px;
   box-shadow: 0 0 0 4px var(--text-backing);
@@ -205,9 +222,123 @@ h1 {
 #watch-page[data-spatial='canvas'] video {
   opacity: 0;
 }
-#watch-page[data-spatial='css'] {
-  background: color-mix(in srgb, #e3ecf4 var(--room-reveal, 0%), var(--bg));
+.desktop-bar {
+  position: fixed;
+  z-index: 4;
+  inset: auto 20px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 960px;
+  min-height: 55px;
+  margin: auto;
+  padding: 7px 9px 7px 17px;
+  border: 1px solid #5a666b;
+  border-radius: 13px;
+  background: #192930;
+  color: #f0f4ee;
+  box-shadow: 0 8px 25px #0006;
+}
+body[data-desktop='spatial']:not(:has(.playground-stage[data-taskbar-ready])) .desktop-bar {
+  visibility: hidden;
+}
+.desktop-bar[hidden] {
+  display: none;
+}
+.desktop-wordmark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 0.06em;
+}
+.desktop-wordmark span {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #c6ded1;
+  border-radius: 4px 4px 7px 4px;
+  background: linear-gradient(135deg, #b2d3d7 47%, #37616c 48%);
+}
+.desktop-wordmark small {
+  color: #bacbd0;
+}
+#close-desktop {
+  min-height: 36px;
+  padding: 5px 13px;
+  border: 1px solid #8aa9aa;
+  border-radius: 7px;
+  background: #d8e8e0;
+  color: #162c35;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+.desktop-lite {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 84% 30%, #6a6258 0, transparent 44%), linear-gradient(168deg, #264049 61%, #453c38 61%);
+}
+.desktop-lite-monitor {
+  position: absolute;
+  inset: 21% 4vw auto auto;
+  width: min(30vw, 470px);
+  padding: 9px;
+  border: 1px solid #6c777a;
+  border-radius: 9px;
+  background: #17272d;
+  box-shadow: 12px 20px 35px #10202a88;
+}
+.desktop-lite-monitor canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #07111b;
+}
+body[data-desktop='basic'] #watch-page {
+  position: relative;
+  width: min(62vw, 1000px);
+  margin: 4vh 0 88px 3vw;
+  overflow: hidden;
+  border: 1px solid #8dabad;
   border-radius: 12px;
-  box-shadow: 0 22px 65px #04071394;
-  transform-origin: center;
+  background: var(--bg);
+  box-shadow: 0 16px 50px #15283199;
+}
+body[data-desktop='basic'] .layout {
+  grid-template-columns: minmax(0, 1fr) minmax(140px, 27%);
+  gap: 16px;
+  padding-top: 26px;
+}
+body[data-desktop='basic'] .seek {
+  min-width: 36px;
+}
+@media (max-width: 920px) {
+  body[data-desktop='basic'] #watch-page {
+    width: calc(100% - 6vw);
+    margin-top: clamp(132px, 33vw, 220px);
+  }
+  .desktop-lite-monitor {
+    inset: 15px auto auto 50%;
+    width: clamp(186px, 44vw, 335px);
+    transform: translateX(-50%);
+  }
+}
+@media (max-width: 660px) {
+  body[data-desktop='basic'] .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body[data-desktop='basic'] .controls {
+    flex-wrap: wrap;
+  }
+  .bar {
+    flex-wrap: wrap;
+  }
+  .desktop-wordmark small {
+    display: none;
+  }
+  .desktop-bar {
+    inset: auto 9px 9px;
+  }
 }
