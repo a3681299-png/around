@@ -300,7 +300,9 @@ function compositeShader() {
           if (k >= markCount) break;
           mist = max(mist, palm((p - marks[k].xy) / marks[k].z + marks[k].xy, marks[k].xy) * marks[k].w);
         }
-        back = mix(back, vec3(0.62, 0.66, 0.72), mist * 0.45);
+        // Breath on glass whitens it; over a light room the palm's own outline stays a little
+        // clearer than the mist around it (the fingertips' print).
+        back = mix(back, vec3(0.93, 0.95, 0.98), mist * 0.6);
         back += videoColor * glow * 0.45 * (1.0 - shade * shadowAmount * 0.5);
         if (at < 0 || inside >= 0.0 || plateInfo[at].y > 0.5) {
           // Outside every plate, or under the video (the player covers it).

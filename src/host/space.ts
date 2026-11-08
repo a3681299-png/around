@@ -355,6 +355,14 @@ export function createSpaceHost(
     // with camera shapes, the top's far shot is where the page covers the room most, so it counts
     // at less than half (the character then keeps the viewer company in front).
     if (shots && shotName === 'top') roomSeen *= 0.4;
+    // In the theater the room is the two sides of the picture: wide sides open it (the character
+    // comes into them), however much the text below covers further down.
+    const picture = plates.find((r) => r.video);
+    if (shots && shotName === 'theater' && picture)
+      roomSeen = Math.max(
+        roomSeen,
+        Math.min(1, ((Math.max(0, picture.left) + Math.max(0, w - picture.right)) / w) * 2),
+      );
     // The glass in front of the character: the nearest sheet edge to its hand (on screen), within
     // reach. A touch leaves its mark there (on the sheet's margin, never over the text's middle).
     // The glass between the character and the viewer: where its hand is on screen, if that is in

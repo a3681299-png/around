@@ -62,7 +62,9 @@ export const DEFAULT_SHOTS: CameraShots = Object.freeze({
     orbitDeg: 0,
     sway: 0.6,
   }),
-  theater: Object.freeze({ x: 0, y: 0, z: -0.2, fovDeg: 52, shiftX: 0, shiftY: 0.04, orbitDeg: 4, sway: 0.4 }),
+  // Opened, moved left and shifted so the room's right side (the desk, the chair) falls beside the
+  // picture on the right, with the room's middle on the left.
+  theater: Object.freeze({ x: -0.3, y: 0, z: -0.2, fovDeg: 52, shiftX: -0.7, shiftY: 0.04, orbitDeg: 3, sway: 0.4 }),
   transition: 1.6,
 });
 

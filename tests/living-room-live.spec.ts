@@ -21,7 +21,39 @@ import { DEFAULT_SHOTS } from '../src/world/camera-shots';
  * recording go to .work/living-live (not committed). WW_SPACE_SCHEME=light, WW_SPACE_BRIGHT=1.
  */
 const shots = path.resolve('.work/living-live');
-const WATCH = 'https://www.youtube.com/watch?v=LC1a-DwUhls';
+// WW_LIVING_VIDEO picks another video (a 4:3 one leaves wide sides in the theater).
+const WATCH = `https://www.youtube.com/watch?v=${process.env.WW_LIVING_VIDEO ?? 'LC1a-DwUhls'}`;
+
+/** The extension's own CPU over a few seconds (a CDP profile's self time in chrome-extension:
+ * scripts): a short look, not the verdict (Codex's alternate measurement is). */
+async function extensionCpu(page: Page, ms: number) {
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Profiler.enable');
+  await cdp.send('Profiler.setSamplingInterval', { interval: 200 });
+  await cdp.send('Profiler.start');
+  await page.waitForTimeout(ms);
+  const { profile } = (await cdp.send('Profiler.stop')) as {
+    profile: {
+      nodes: { id: number; callFrame: { url: string; functionName: string } }[];
+      samples: number[];
+      timeDeltas: number[];
+    };
+  };
+  await cdp.detach();
+  const byId = new Map(profile.nodes.map((n) => [n.id, n]));
+  let total = 0;
+  const by = new Map<string, number>();
+  profile.samples.forEach((id, i) => {
+    const node = byId.get(id)!;
+    if (!node.callFrame.url.startsWith('chrome-extension://')) return;
+    const t = (profile.timeDeltas[i] ?? 0) / 1000;
+    total += t;
+    const name = node.callFrame.functionName || '(anonymous)';
+    by.set(name, (by.get(name) ?? 0) + t);
+  });
+  const top = [...by].sort((a, b) => b[1] - a[1]).slice(0, 6);
+  return { totalMs: Math.round(total), top: top.map(([n, t]) => `${n} ${t.toFixed(1)}`) };
+}
 
 const frame = async (page: Page) =>
   JSON.parse((await page.locator('html').getAttribute('data-ww-room-frame')) ?? '{}') as {
@@ -243,6 +275,8 @@ test('real YouTube: Mirdo lives in the room, the room opens from flat at the com
     }
     const living = (await frame(page)).resident!;
     expect(living.away).toBe(resident.id);
+    const cpu = await extensionCpu(page, 6000);
+    log.push(`cpu at the comments, 6 s: ${JSON.stringify(cpu)}`);
 
     // 4. Back to the top for a while: the room hides behind the player and the list.
     await page.mouse.wheel(0, -3000);
@@ -253,9 +287,12 @@ test('real YouTube: Mirdo lives in the room, the room opens from flat at the com
     }
 
     // 5. The theater: the room opens on both sides.
+    await waitForAdvertToEnd(page).catch(() => undefined);
+    await declinePromotion(page);
     await page.locator('#movie_player').hover();
     await page.keyboard.press('t');
-    for (let i = 0; i < 6; i++) {
+    await page.mouse.move(800, 300);
+    for (let i = 0; i < 8; i++) {
       await page.waitForTimeout(3000);
       await note(page, `theater ${i}`);
       await shoot(page, `5-theater-${i}`);
