@@ -356,7 +356,15 @@ export function youtubeBackdrop(doc: Document): SiteBackdrop {
     if (!app) return undefined;
     // The columns found (a column inside another is walked with it), or the whole app.
     const found = COLUMN_SOURCES.map(element).filter((e): e is Element => Boolean(e?.isConnected));
-    const columns = found.filter((e) => !found.some((other) => other !== e && other.contains(e)));
+    // A walker never filters its own root: a column that is itself a known part (the masthead bar
+    // has its own plate) is left out here, as the filter would leave it out of a wider walk.
+    const skipped = (e: Element) =>
+      knownSingles.has(e) || items.has(e) || e.hasAttribute('hidden') || e.matches(OVER_PICTURE);
+    const columns = found.filter(
+      (e) => !skipped(e) && !found.some((other) => other !== e && other.contains(e) && !skipped(other)),
+    );
+    // Every column skipped (all known): nothing of them to walk. None found at all: the whole app.
+    if (found.length && !columns.length) return undefined;
     const [root, ...rest] = columns.length ? columns : [app];
     const state: Pass = { root: root!, rest, plated: new Set(), opaque: new Map(), visited: 0, walker: undefined! };
     state.walker = walkerFor(state, root!);
@@ -371,7 +379,12 @@ export function youtubeBackdrop(doc: Document): SiteBackdrop {
     if (!pass) {
       if (now - passAt < RETRY_MS) return;
       pass = startPass();
-      if (!pass) return;
+      if (!pass) {
+        // Nothing to walk now (every column is a known part): no column plates until the next try.
+        passAt = now;
+        plated = [];
+        return;
+      }
     }
     // The page removed the node the walk stood on: walk again from the top next read.
     if (!pass.walker.currentNode.isConnected) {
