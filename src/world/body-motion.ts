@@ -250,11 +250,16 @@ export function evaluateBodyMotion(
       pose: { ...REST_POSE, seat: sit, offset: { x: output.offset.x, y: output.offset.y - output.hop } },
     };
   }
-  // Held (hidden page, approached control): the body rests; what it was doing is forgotten.
+  // Held (hidden page, approached control, a frame its part is missing): the body rests and its
+  // momentary motions are forgotten, but not where the autonomy had it go or what it remembers:
+  // one frame without its part used to send it home at once (docs/characters/mirdo.md 10.). A new
+  // page still starts the autonomy again (models.ts startPage).
   if (!context.running) {
     const rest = initialBodyState();
     rest.position = context.position ? { ...context.position } : null;
-    return { state: rest, pose: { ...REST_POSE, seat: sit } };
+    if (state.autonomy && autonomous) rest.autonomy = state.autonomy;
+    const offset = rest.autonomy ? { offset: { ...rest.autonomy.offset } } : {};
+    return { state: rest, pose: { ...REST_POSE, seat: sit, ...offset } };
   }
   // The autonomy picks what the body does; the body draws it.
   let mind: AutonomyOutput | undefined;
