@@ -8,7 +8,11 @@
 
 ```powershell
 $env:WW_PLAYGROUND_PRIVATE_ASSETS = 'C:/wwt-private'
-$env:WW_PLAYGROUND_LOCAL_ROOM = 'C:/wwt-private/room/packed/room-packed-noon.glb'
+$roomFile = 'C:/wwt-private/room/packed/room-packed-noon.glb'
+if ((Get-Item -LiteralPath $roomFile -ErrorAction SilentlyContinue).Length -ne 5810192) {
+  $roomFile = 'C:/wwt-private/.git/lfs/objects/fe/e7/fee76579a89478499486c08b5ce75d71cb0c5bda55861e67f5274f10ee8ebfb0'
+}
+$env:WW_PLAYGROUND_LOCAL_ROOM = $roomFile
 $env:WW_PLAYGROUND_LOCAL_LAYOUT = 'scripts/playground/desktop-layout-noon.json'
 $env:WW_PLAYGROUND_OUT = '.work/desktop-preview'
 npm run build:playground
