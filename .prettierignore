@@ -9,3 +9,5 @@ test-results/
 src/vendor/
 /assets/
 tests/fixtures/
+# A skill's design sample (the flat site's hakoniwa mock-up), kept as the designer wrote it.
+agent-skills/**/*.dc.html
