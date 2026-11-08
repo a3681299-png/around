@@ -1,14 +1,17 @@
 import { test, expect } from '@playwright/test';
+import { BufferGeometry, Float32BufferAttribute, Group, Mesh } from 'three';
 import {
   floorPath,
   onFloor,
   residentPose,
   startResident,
   stepResident,
+  withFloorPlaces,
   type ResidentInput,
   type ResidentState,
   type RoomLayout,
 } from '../src/world/room-life';
+import { readRoomLayout } from '../src/renderers/three/room';
 
 /**
  * The character's life in the room (docs/living-room.md): pure and deterministic. A 4 × 4 m floor
@@ -71,6 +74,42 @@ test('the floor test and a path around the hole, every point of it on the floor'
   expect(at).toEqual([0, -3]);
   // A straight line when nothing is in the way.
   expect(floorPath(layout, [-1.5, -0.5], [1.5, -0.5])).toEqual([[1.5, -0.5]]);
+});
+
+test('the room floor uses only bounded world positions and non-degenerate triangles', () => {
+  const root = new Group();
+  const far = new Group();
+  far.scale.set(1e18, 1, 1);
+  root.add(far);
+  const geometry = new BufferGeometry();
+  geometry.setAttribute(
+    'position',
+    new Float32BufferAttribute([1, 0, 0, 2, 0, 0, 1, 0, 0.5, 1, 0, 0, 1, 1, 0, 1, 2, 0], 3),
+  );
+  for (const parent of [root, far]) {
+    const floor = new Mesh(geometry);
+    floor.name = 'navmesh_floor';
+    parent.add(floor);
+    const marker = new Group();
+    marker.name = 'marker_stand_here';
+    marker.position.set(1.1, 0, 0.2);
+    parent.add(marker);
+  }
+  const room = readRoomLayout(root);
+  expect(room.floor).toEqual([[1, 0, 2, 0, 1, 0.5]]);
+  expect(room.floorY).toBe(0);
+  expect(room.spots).toHaveLength(1);
+});
+
+test('floor sampling has a finite work budget even when a floating point coordinate cannot advance', () => {
+  const floor = square(1e18, 0, 2e18, 0.5);
+  const room = withFloorPlaces({ floorY: 0, floor, spots: [] });
+  expect(room.spots).toEqual([]);
+});
+
+test('a distant disconnected floor is left unreachable without an exhaustive search', () => {
+  const floor = [...square(0, 0, 48, 49.6), ...square(49, 49, 49.6, 49.6)];
+  expect(floorPath({ floorY: 0, floor, spots: [] }, [0.6, 0.6], [49.3, 49.3])).toEqual([]);
 });
 
 test('the same seed and inputs give the same life; another seed another', () => {

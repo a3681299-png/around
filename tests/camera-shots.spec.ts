@@ -35,6 +35,17 @@ test('blending: distance and view on a log scale, so the width seen at the subje
   expect(blendShots(a, b, 1).fovDeg).toBeCloseTo(b.fovDeg, 6);
 });
 
+test('allowed shots at or past the subject have finite, continuous positions', () => {
+  const past = { ...DEFAULT_SHOTS.top, z: -4 };
+  const near = { ...DEFAULT_SHOTS.comments, z: -SUBJECT_M };
+  for (const [from, to] of [
+    [past, near],
+    [near, DEFAULT_SHOTS.comments],
+  ] as const) {
+    for (const t of [0, 0.5, 1]) expect(blendShots(from, to, t).z).toBeCloseTo(from.z + (to.z - from.z) * t, 6);
+  }
+});
+
 test('a change takes the transition on a smooth curve and is settled after it; interrupted, it does not jump', () => {
   let s = startShots(DEFAULT_SHOTS, 'top');
   expect(currentShot(s, DEFAULT_SHOTS, false).shot).toEqual(DEFAULT_SHOTS.top);

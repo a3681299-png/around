@@ -88,7 +88,11 @@ const loglerp = (a: number, b: number, t: number) => Math.exp(lerp(Math.log(a), 
 export function blendShots(a: CameraShot, b: CameraShot, t: number, subject = SUBJECT_M): CameraShot {
   // The distance to the subject and the tangent of the half view, on a log scale: the width seen
   // at the subject, their product, then also changes evenly.
-  const distance = loglerp(subject + a.z, subject + b.z, t);
+  const distanceA = subject + a.z;
+  const distanceB = subject + b.z;
+  // A shot may put the camera on the far side of the subject. There is no positive distance
+  // to preserve there, but its position can still interpolate through the subject normally.
+  const distance = distanceA > 0 && distanceB > 0 ? loglerp(distanceA, distanceB, t) : lerp(distanceA, distanceB, t);
   const tan = loglerp(Math.tan((a.fovDeg * Math.PI) / 360), Math.tan((b.fovDeg * Math.PI) / 360), t);
   return {
     x: lerp(a.x, b.x, t),
