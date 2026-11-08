@@ -72,7 +72,9 @@ rev 116 で、コンテストの Playground は「Web ページが街になる�
 
 - **e2e 全件は回していない**（Codex）。触った所の e2e は 51 通過・4 skip（`character-autonomy-editor`・`character-editor`・`g13-look-regression`・`layering`・`operation-controls`・`operation-player-overlays`・`page-change`・`playground`・`room-fallback`・`room-layer`・`world-host`）。unit 643 通過
 - 性能：部屋に住むキャラが見えている間、部屋を 15〜30fps で描く（止まっていれば描かない、から変わった）。拡張の CPU は短い目安だけ。GPU の時間・正式な交互計測はしていない
-- `space-live` は「今日の YouTube では逃げ道の板は0枚」を確かめるが、おすすめに「Auto-dubbed」の印が出た回は、逃げ道が正しく列に板を敷いて落ちた（ページの中身による）
+- **入力が止まる不具合は Codex の `78af911` で直した**（床の座標が 10¹⁸ になる GLB で、床の場所を探すループが進まなかった。経路の仕事に上限、カメラの補間を有限に。`docs/living-room-windows-verification.md`、`codex/verify-reports` の `2d4da61`）。作業ブランチに取り込んだ
+- **定常の約0.7秒の処理と動画落ち**（直した版の交互計測の3組。最長のコールバック 710・748・761 ms）：原因は未特定。条件を絞った CPU プロファイル2回では最長 19.0・20.8 ms で再現しなかった。通常の起動と定常での再現条件を探すのが次の手（同じ報告の「残り」）
+- `space-live` は、逃げ道が列に板を敷いても、見えている文字が 4.5:1 以上なら合格にした（おすすめに「Auto-dubbed」の印が出た回に、逃げ道が正しく働いて落ちていたため）
 - 手前のキャラから部屋への「跳ねる」は、部屋の側で跳ねて消えるだけで、手前の絵と位置はつながっていない（粗）
 - 歩く足の滑りは、撮った回がほとんど椅子の裏だったので、まだ目で確かめきっていない
 - 奥行きの土台の利用者の過去の作品での確認はしていない
