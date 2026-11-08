@@ -512,7 +512,7 @@ export function residentPose(s: ResidentState, layout: RoomLayout): ResidentPose
       return { ...base, clip: 'hide' };
     case 'walk':
       return { ...base, clip: 'walk' };
-    default:
+    case 'idle':
       return { ...base, clip: 'idle' };
   }
 }
