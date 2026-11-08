@@ -208,6 +208,6 @@ test('v13 documents cannot carry a character or a body measure, and migrate to v
   expect(() => migrateV13ToV14(doc([layer(source)], 13))).toThrow();
   const v13 = doc([layer(plain)], 13);
   const migrated = parseDesign(v13);
-  expect(migrated.schemaVersion).toBe(17);
+  expect(migrated.schemaVersion).toBe(18);
   expect((migrated.decorations[0] as ModelDecoration).character).toBeUndefined();
 });

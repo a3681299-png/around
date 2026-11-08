@@ -86,6 +86,11 @@ export interface CameraProjection {
   /** Offset from camera_main in its own axes (metres): right, up, back. */
   offset: { x: number; y: number; z: number };
   fovDeg: number;
+  /** v18 camera shapes (world/camera-shots.ts): the lens shift in fractions of the half frame's
+   * height (the renderer divides x by the aspect) and a turn about the room's middle. */
+  shiftX?: number;
+  shiftY?: number;
+  orbitDeg?: number;
 }
 /**
  * The dolly zoom keeps the plane `subject` metres in front of camera_main the same size on screen:
@@ -157,6 +162,62 @@ export function glassPlates(regions: readonly UiRegion[], viewport: { width: num
   plates.sort((a, b) => rank(a) - rank(b));
   return plates.slice(0, PLATE_LIMIT);
 }
+/** Reading plates closer than this (px, vertically) in the same column join one sheet. */
+export const SHEET_GAP_PX = 40;
+/**
+ * One sheet of glass per column of reading (docs/living-room.md): the plates of a column's parts
+ * (a comment, its buttons, the next comment…) join into one panel instead of reading as separate
+ * labels. Plates join when they overlap across (by half the narrower one's width) and are at most
+ * SHEET_GAP_PX apart down the page; a control plate wholly inside a sheet goes into it. The video's
+ * plate and the readability's way out stay as they are. The sheet covers every plate it took, so
+ * every text stays on glass, and the density rule (plateAlpha) holds over the whole sheet.
+ */
+export function glassSheets(plates: readonly GlassPlate[]): GlassPlate[] {
+  const out: GlassPlate[] = [];
+  const kept: GlassPlate[] = [];
+  for (const p of plates) (p.video || p.fallback ? kept : out).push({ ...p });
+  const across = (a: GlassPlate, b: GlassPlate) =>
+    Math.min(a.right, b.right) - Math.max(a.left, b.left) >= 0.5 * Math.min(a.right - a.left, b.right - b.left);
+  const near = (a: GlassPlate, b: GlassPlate) => Math.max(a.top, b.top) - Math.min(a.bottom, b.bottom) <= SHEET_GAP_PX;
+  const inside = (a: GlassPlate, b: GlassPlate) =>
+    a.left >= b.left && a.right <= b.right && a.top >= b.top && a.bottom <= b.bottom;
+  // Groups by joining pairs (union-find over at most PLATE_LIMIT plates).
+  const parent = out.map((_, i) => i);
+  const root = (i: number): number => (parent[i] === i ? i : (parent[i] = root(parent[i]!)));
+  for (let i = 0; i < out.length; i++)
+    for (let j = i + 1; j < out.length; j++) {
+      const a = out[i]!,
+        b = out[j]!;
+      const reading = a.importance === 'read' || b.importance === 'read';
+      if ((reading && across(a, b) && near(a, b)) || inside(a, b) || inside(b, a)) parent[root(j)] = root(i);
+    }
+  const groups = new Map<number, GlassPlate[]>();
+  out.forEach((p, i) => groups.set(root(i), [...(groups.get(root(i)) ?? []), p]));
+  const sheets: GlassPlate[] = [];
+  for (const members of groups.values()) {
+    if (members.length === 1) {
+      sheets.push(members[0]!);
+      continue;
+    }
+    // The sheet is as wide as most of its parts: one part much wider (a header row across the
+    // page) would otherwise frost the room beside the whole column. Such a part keeps its own plate.
+    const rights = members.map((p) => p.right).sort((a, b) => a - b);
+    const right = rights[Math.min(rights.length - 1, Math.floor(rights.length * 0.8))]!;
+    const sheet: GlassPlate = {
+      left: Math.min(...members.map((p) => p.left)),
+      top: Math.min(...members.map((p) => p.top)),
+      right,
+      bottom: Math.max(...members.map((p) => p.bottom)),
+      // A sheet with any text on it is a reading sheet (its floor is the lighter one).
+      importance: members.some((p) => p.importance === 'read') ? 'read' : 'operate',
+      video: false,
+    };
+    sheets.push(sheet);
+    for (const p of members) if (p.right > right + 24) sheets.push(p);
+  }
+  return [...kept, ...sheets];
+}
+
 export const samePlates = (a: readonly GlassPlate[], b: readonly GlassPlate[]) =>
   a.length === b.length &&
   a.every(

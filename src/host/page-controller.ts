@@ -2,7 +2,7 @@ import { compileDesign, createDesignRenderer, type SkinAssetPort, type SkinAsset
 import type { InkDecision } from '../design/contrast';
 import { readDesign } from '../design/immutable';
 import { depthOf, type DesignDocument } from '../design/types';
-import { createSpaceHost } from './space';
+import { createSpaceHost, type ResidentSource } from './space';
 import { createImageRenderer, type ImageEditing } from '../design/image-renderer';
 import type { SiteAdapter, SitePageChange } from '../sites/types';
 import type { UserSettings } from '../storage/settings';
@@ -30,6 +30,19 @@ export interface PageController {
   setSkinPreviews(enabled: boolean): void;
   validateDesign(design: DesignDocument | undefined): void;
   destroy(): void;
+}
+
+/** The space's resident (v18): its 3D layer with a character, as the room's Host needs it. A
+ * layer that is missing or has no character leaves the room without a resident. */
+function residentOf(design: DesignDocument | undefined): ResidentSource | undefined {
+  const id = design?.space?.resident?.layerId;
+  const layer = id ? design.decorations.find((item) => item.id === id) : undefined;
+  if (!layer || layer.kind !== 'model3d' || !layer.character) return undefined;
+  return {
+    layerId: layer.id,
+    assetId: layer.assetId,
+    motions: layer.character.motions.map((m) => ({ id: m.id, assetId: m.assetId, role: m.role })),
+  };
 }
 
 /** What the page runtime reads and keeps outside the page. The extension's implementations live
@@ -80,6 +93,8 @@ export function createPageController(
     safety,
     site.signals?.page,
     space ? () => space.place() : undefined,
+    // The resident's front drawing waits while the character lives in the room (v18).
+    space ? () => space.away() : undefined,
   );
   g11RegisterRefresh(() => images.refresh());
   let suspended = false,
@@ -90,7 +105,9 @@ export function createPageController(
   // shown, room-depth layers are under the content by stacking order. Without the room they are
   // drawn in front as before, guarded.
   const guarded = () => {
-    const layers = design?.decorations ?? [];
+    // The resident living in the room is not drawn in front meanwhile: nothing of it to guard.
+    const away = space?.away();
+    const layers = (design?.decorations ?? []).filter((layer) => layer.id !== away);
     // While the room loads, room-only artwork waits for it ('pending'): it is never drawn in front.
     if (!space?.place()) return layers.length;
     const front = layers.filter((layer) => depthOf(layer) !== 'room').length;
@@ -134,7 +151,7 @@ export function createPageController(
     inspect();
     syncParts();
     designRenderer.update(design);
-    space?.update(design?.space);
+    space?.update(design?.space, residentOf(design));
     images.update(design?.decorations ?? [], design?.groups ?? [], design?.signalRules ?? []);
     onSurfacesChanged?.();
   };

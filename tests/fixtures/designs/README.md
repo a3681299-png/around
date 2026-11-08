@@ -49,3 +49,9 @@ v16への版上げで、`chain-expected.json` の全件の `schemaVersion` を16
 取得は `scripts/capture-design-chain-fixtures.mjs` を1件に絞った使い捨ての写し（出力先だけ `.work/capture` に変えた）で行った。元のスクリプトは変えていない。
 期待値（`chain-expected.json`・`css-expected.json` の `history-v16.json`）は、変更前の `43ec318` のパーサーと `compileDesign` で取った。
 v17への版上げで、`chain-expected.json` の全件の `schemaVersion` を17にした（ほかの値は変えていない）。
+
+部屋に住む（v18）では `history-v17.json` を追加した。v17を導入した `18b8b6f` の `tests/space-data.spec.ts` の
+「v17 roundtrips the space and a room-depth layer; omission keeps every layer in front」が、最初に `parseDesign` へ渡して受理された入力（奥と手前の画像レイヤー2枚と `space`。部屋の素材は ID の文字列だけで、素材そのものは含まない）である。
+取得は `scripts/capture-design-chain-fixtures.mjs` を1件に絞った使い捨ての写し（出力先を `.work/capture` に、`three`・`@pixiv` を外部に）で行った。元のスクリプトは変えていない。
+期待値（`chain-expected.json`・`css-expected.json` の `history-v17.json`）は、変更前の `bd06c2a`（`src/design` は `eb43889` と同じ）のパーサーと `compileDesign` で取った。
+v18への版上げで、`chain-expected.json` の全件の `schemaVersion` を18にした（ほかの値は変えていない）。

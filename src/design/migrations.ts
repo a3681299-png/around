@@ -211,6 +211,28 @@ export function migrateV16ToV17(value: unknown): Data {
   return next(data, 17);
 }
 
+/** v17 → v18 (the living room): the space may name its resident, its own layout and the camera's
+ * shapes. Nothing else changes; a v17 space carrying any of them is refused here. Everything else
+ * passes unchanged to the final schema, which checks the v18 shape (the v17 one is a subset). */
+export function migrateV17ToV18(value: unknown): Data {
+  const data = record(value);
+  if (data['schemaVersion'] !== 17) throw new Error('このデザインのバージョンには対応していません。');
+  const space = data['space'];
+  if (space !== undefined && space !== null && typeof space === 'object' && !Array.isArray(space)) {
+    const s = space as Data;
+    const camera = s['camera'];
+    if (
+      Object.hasOwn(s, 'resident') ||
+      Object.hasOwn(s, 'layout') ||
+      (camera !== null &&
+        typeof camera === 'object' &&
+        (Object.hasOwn(camera, 'shots') || Object.hasOwn(camera, 'transition')))
+    )
+      throw new Error('部屋の住人・配置・カメラの形にはDesignDocument v18が必要です。');
+  }
+  return next(data, 18);
+}
+
 export const DESIGN_MIGRATIONS = Object.freeze([
   migrateV1ToV2,
   migrateV2ToV3,
@@ -228,14 +250,15 @@ export const DESIGN_MIGRATIONS = Object.freeze([
   migrateV14ToV15,
   migrateV15ToV16,
   migrateV16ToV17,
+  migrateV17ToV18,
 ]);
 
-/** Pure chain; a returned v17 object is still unvalidated external input. */
+/** Pure chain; a returned v18 object is still unvalidated external input. */
 export function migrateDesign(value: unknown): Data {
   let data = record(value);
   const version = data['schemaVersion'];
-  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 17)
+  if (typeof version !== 'number' || !Number.isInteger(version) || version < 1 || version > 18)
     throw new Error('このデザインのバージョンには対応していません。');
-  for (let from = version; from < 17; from++) data = DESIGN_MIGRATIONS[from - 1]!(data);
+  for (let from = version; from < 18; from++) data = DESIGN_MIGRATIONS[from - 1]!(data);
   return data;
 }

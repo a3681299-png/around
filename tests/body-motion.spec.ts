@@ -184,6 +184,21 @@ test('held (hidden page, approached control): the body rests but keeps the seat'
   expect(held.pose.yawDeg).toBe(0);
 });
 
+test('one frame not drawn (its part missing for a moment) keeps where the autonomy was: no jump home', () => {
+  // Startled on its part's top: the pointer rushes at it, it flees (docs/characters/mirdo.md 10.).
+  const personality = { shyness: 1, curiosity: 0, sleepiness: 0 };
+  const rush = (t: number) => (t < 400 ? { x: 1100, y: 300 } : { x: 1100 - (t - 400) * 4, y: 300 });
+  const fled = run(700, (t) => ({ personality, pointer: rush(t) }));
+  const before = fled.state.autonomy!;
+  expect(Math.hypot(before.offset.x, before.offset.y)).toBeGreaterThan(20);
+  // A frame where it is not drawn, then drawn again with the pointer gone.
+  const held = evaluateBodyMotion(fled.state, { ...base, timeMs: 716, personality, running: false });
+  const after = evaluateBodyMotion(held.state, { ...base, timeMs: 732, personality, pointer: undefined });
+  expect(after.state.autonomy!.offset.x).toBeCloseTo(before.offset.x, 0);
+  expect(after.state.autonomy!.offset.y).toBeCloseTo(before.offset.y, 0);
+  expect(after.state.autonomy!.startles).toBeGreaterThan(0);
+});
+
 test('recorded body states read back exactly, and malformed ones are refused', () => {
   const { state } = run(2000, (t) => ({ idleSeconds: 5, events: t === 160 ? [{ type: 'video.play' }] : [] }));
   const copy = JSON.parse(JSON.stringify(state));

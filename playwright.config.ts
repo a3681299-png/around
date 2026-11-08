@@ -10,6 +10,8 @@ const unitSpecs = [
   'gait',
   'space',
   'space-data',
+  'room-life',
+  'camera-shots',
   'clean-work',
   'backup-data',
   'browser-boundary',

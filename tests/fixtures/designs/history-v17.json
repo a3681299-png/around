@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 17,
+  "id": "youtube-custom",
+  "siteId": "youtube",
+  "baseThemeId": null,
+  "rules": [],
+  "decorations": [
+    {
+      "kind": "image",
+      "id": "back",
+      "assetId": "asset-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "name": "flower.png",
+      "placement": {
+        "anchor": {
+          "kind": "viewport"
+        },
+        "x": 0.5,
+        "y": 0.5,
+        "widthPx": 100,
+        "heightPx": 80,
+        "rotationDeg": 0
+      },
+      "opacity": 0.8,
+      "zIndex": 1,
+      "visible": true,
+      "locked": true,
+      "depth": "room"
+    },
+    {
+      "kind": "image",
+      "id": "front",
+      "assetId": "asset-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "name": "flower.png",
+      "placement": {
+        "anchor": {
+          "kind": "viewport"
+        },
+        "x": 0.5,
+        "y": 0.5,
+        "widthPx": 100,
+        "heightPx": 80,
+        "rotationDeg": 0
+      },
+      "opacity": 0.8,
+      "zIndex": 1,
+      "visible": true,
+      "locked": true
+    }
+  ],
+  "space": {
+    "lights": {
+      "sun_night": 1,
+      "room_desk": 1,
+      "room_pendant": 0.6,
+      "screen": 0.5,
+      "screen_monitor": 0.8
+    },
+    "camera": {
+      "sway": 1,
+      "dolly": 0.6,
+      "follow": 0.8
+    },
+    "glass": {
+      "blur": 0.7,
+      "refraction": 0.6,
+      "highlight": 0.6,
+      "tint": 0.5,
+      "shadow": 0.6
+    },
+    "videoLight": 1,
+    "room": {
+      "assetId": "asset-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  }
+}

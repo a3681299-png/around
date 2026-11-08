@@ -11,6 +11,8 @@ import {
   cameraTarget,
   contrast,
   glassPlates,
+  glassSheets,
+  SHEET_GAP_PX,
   luminance,
   plateAlpha,
   plateLimit,
@@ -210,4 +212,42 @@ test.describe('space: the video light', () => {
     const reduced = stepVideoLight({ r: 0, g: 0, b: 0 }, { r: 1, g: 1, b: 1 }, 0.2, true);
     expect(reduced.g).toBeCloseTo(0.025);
   });
+});
+
+test('one sheet per column: a column’s reading plates join, every plate stays covered, the video and the way out stay apart', () => {
+  const p = (left: number, top: number, right: number, bottom: number, extra: object = {}) => ({
+    left,
+    top,
+    right,
+    bottom,
+    importance: 'read' as const,
+    video: false,
+    ...extra,
+  });
+  const comments = [p(60, 100, 700, 180), p(60, 190, 400, 230, { importance: 'operate' }), p(60, 250, 520, 330)];
+  const video = p(0, 0, 1100, 620, { video: true, importance: 'operate' });
+  const way = p(1140, 60, 1580, 900, { fallback: true });
+  const far = p(60, 330 + SHEET_GAP_PX + 50, 600, 900);
+  const list = p(1140, 60, 1580, 900);
+  const sheets = glassSheets([video, ...comments, way, far, list]);
+  // The three comment plates are one sheet; the far one is its own; the video and the way out stay.
+  expect(sheets).toContainEqual(p(60, 100, 700, 330));
+  expect(sheets).toContainEqual(far);
+  expect(sheets).toContainEqual(video);
+  expect(sheets).toContainEqual(way);
+  // Every plate given is inside some sheet (no text loses its glass).
+  for (const plate of [...comments, far, list])
+    expect(
+      sheets.some(
+        (s) => s.left <= plate.left && s.top <= plate.top && s.right >= plate.right && s.bottom >= plate.bottom,
+      ),
+    ).toBe(true);
+  // One part much wider than the rest (a header across the page) does not widen the sheet: it keeps
+  // its own plate, and the room beside the column stays clear.
+  const header = p(0, 60, 1120, 95);
+  const withHeader = glassSheets([header, ...comments, p(60, 340, 640, 400), p(60, 410, 600, 470)]);
+  expect(Math.max(...withHeader.filter((s) => s !== header && s.right !== 1120).map((s) => s.right))).toBeLessThan(720);
+  expect(withHeader).toContainEqual(header);
+  // Plates beside each other in different columns do not join.
+  expect(glassSheets([p(0, 0, 500, 100), p(520, 0, 1000, 100)])).toHaveLength(2);
 });

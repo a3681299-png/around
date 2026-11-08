@@ -9,7 +9,7 @@ for (let version = 1; version <= 9; version++)
     const before = JSON.stringify(input),
       parsed = parseDesign(input);
     expect(input.schemaVersion).toBe(version);
-    expect(parsed.schemaVersion).toBe(17);
+    expect(parsed.schemaVersion).toBe(18);
     expect(JSON.stringify(input)).toBe(before);
     expect(parsed.rules).toEqual(
       input.rules.map((rule: { style: { backgroundColor?: string } }) =>
@@ -41,9 +41,9 @@ for (let version = 1; version <= 9; version++)
     );
   });
 
-test('unknown future DesignDocument remains unchanged and v18 remains unsupported', async () => {
+test('unknown future DesignDocument remains unchanged and v19 remains unsupported', async () => {
   const input = JSON.parse(await readFile('tests/fixtures/designs/v6.json', 'utf8'));
-  input.schemaVersion = 18;
+  input.schemaVersion = 19;
   const before = JSON.stringify(input);
   expect(() => parseDesign(input)).toThrow(/バージョン/);
   expect(JSON.stringify(input)).toBe(before);

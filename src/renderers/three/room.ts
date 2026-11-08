@@ -11,8 +11,11 @@
  * Nothing here reads the page: the Host passes the plates, the camera and the video's light.
  */
 import {
+  AmbientLight,
   Camera,
   Color,
+  DirectionalLight,
+  Quaternion,
   HalfFloatType,
   LinearFilter,
   LinearMipmapLinearFilter,
@@ -46,6 +49,57 @@ import {
 } from '../../world/space';
 import { ROOM_LIGHT_LAYER, type RoomLook } from '../../design/space';
 import { SPACE_BREAK } from '../../host/world-options';
+import type { RoomLayout, RoomSpot } from '../../world/room-life';
+import type { RoomResident } from './room-resident';
+
+/**
+ * The room's layout from the asset contract (部屋の素材の約束): marker_sit_/marker_hide_/
+ * marker_stand_ empties (position; the arrow, the empty's +Z, gives the way the character faces)
+ * and the navmesh_floor mesh (its triangles, flattened onto the floor). Numbers only leave here.
+ */
+function readLayout(root: Object3D): RoomLayout {
+  root.updateWorldMatrix(true, true);
+  const spots: RoomSpot[] = [];
+  const floor: number[][] = [];
+  let floorY = 0,
+    heights = 0;
+  const p = new Vector3(),
+    forward = new Vector3();
+  root.traverse((o) => {
+    const marker = /^marker_(sit|hide|stand)_([a-z0-9_]{1,32})$/.exec(o.name);
+    if (marker && spots.length < 32) {
+      o.getWorldPosition(p);
+      forward.set(0, 0, 1).transformDirection(o.matrixWorld);
+      const heading = Math.hypot(forward.x, forward.z) > 0.2 ? Math.atan2(forward.x, forward.z) : 0;
+      if ([p.x, p.y, p.z, heading].every(Number.isFinite))
+        spots.push({
+          id: `${marker[1]}_${marker[2]}`,
+          kind: marker[1] as RoomSpot['kind'],
+          x: p.x,
+          y: p.y,
+          z: p.z,
+          heading,
+        });
+      return;
+    }
+    const mesh = o as Mesh;
+    if (!mesh.isMesh || mesh.name !== 'navmesh_floor') return;
+    const position = mesh.geometry.getAttribute('position');
+    const index = mesh.geometry.getIndex();
+    const count = index ? index.count : position.count;
+    for (let i = 0; i + 2 < count && floor.length < 4096; i += 3) {
+      const tri: number[] = [];
+      for (let k = 0; k < 3; k++) {
+        p.fromBufferAttribute(position, index ? index.getX(i + k) : i + k).applyMatrix4(mesh.matrixWorld);
+        tri.push(p.x, p.z);
+        floorY += p.y;
+        heights++;
+      }
+      if (tri.every(Number.isFinite)) floor.push(tri);
+    }
+  });
+  return { floorY: heights ? floorY / heights : 0, floor, spots };
+}
 
 /** Light layers a room may carry (the asset contract, 部屋の素材の約束). More are ignored. */
 const LAYER_LIMIT = 8;
@@ -62,13 +116,25 @@ export interface RoomFrame {
   scheme: ColorScheme;
   /** Linear RGB of the video's light (already slew-limited by the world). */
   video: VideoLight;
+  /** The resident's palm marks on the glass (canvas px, 0–1 strength), at most MARK_LIMIT. */
+  marks?: readonly { x: number; y: number; size: number; strength: number }[];
 }
+const MARK_LIMIT = 4;
 export interface RoomRenderer {
   readonly canvas: HTMLCanvasElement;
   /** The room's base view: camera_main's vertical field of view. */
   readonly baseFovDeg: number;
+  /** The room's own layout (its markers and walkable floor, the asset contract), as numbers. */
+  readonly layout: RoomLayout;
   resize(width: number, height: number): void;
   draw(frame: RoomFrame, look: RoomLook): void;
+  /** Puts the living character into the room's scene once its programs are ready (undefined
+   * takes it out; it is not disposed here). */
+  setResident(resident: RoomResident | undefined): Promise<void>;
+  /** Room points (metres) to canvas pixels with the last drawn camera; null behind the camera. */
+  project(points: readonly { x: number; y: number; z: number }[]): ({ x: number; y: number } | null)[];
+  /** 0–1: dims the room (a reduced-motion cut between camera shapes). */
+  dim(amount: number): void;
   /** Fades the canvas in (after the first draw); resolves when it is fully shown. */
   reveal(): Promise<void>;
   /** For tests: the drawn colour (sRGB bytes) at canvas pixels, read right after a draw. */
@@ -153,6 +219,8 @@ function compositeShader() {
       lampColor: { value: new Color(1, 0.62, 0.34) },
       lightDir: { value: new Vector2(-0.45, -0.9) },
       toneMappingExposure: { value: 1 },
+      marks: { value: Array.from({ length: MARK_LIMIT }, () => new Vector4()) },
+      markCount: { value: 0 },
     },
     vertexShader: QUAD_VERTEX,
     fragmentShader: `
@@ -169,6 +237,20 @@ function compositeShader() {
       uniform vec3 baseColor, videoColor, lampColor;
       uniform vec4 glass; // blur, refraction, highlight, tint
       uniform vec2 lightDir;
+      #define MARKS ${MARK_LIMIT}
+      uniform vec4 marks[MARKS]; // x, y (canvas px, top-left), -, strength
+      uniform int markCount;
+      // A palm pressed on the glass from behind: the palm and four fingertips, misted.
+      float palm(vec2 p, vec2 c) {
+        vec2 q = p - c;
+        float m = exp(-dot(q / vec2(15.0, 18.0), q / vec2(15.0, 18.0)));
+        for (int k = 0; k < 4; k++) {
+          vec2 f = q - vec2(-13.5 + 9.0 * float(k), -22.0 - (k == 1 || k == 2 ? 6.0 : 0.0));
+          m = max(m, exp(-dot(f / vec2(3.6, 8.0), f / vec2(3.6, 8.0))));
+        }
+        // The breath's mist around it, fainter and wider.
+        return max(m, 0.35 * exp(-dot(q / 34.0, q / 34.0)));
+      }
       const float RADIUS = 10.0;
       float box(vec2 p, vec4 r) {
         vec2 c = (r.xy + r.zw) * 0.5, h = (r.zw - r.xy) * 0.5 - RADIUS;
@@ -190,7 +272,7 @@ function compositeShader() {
         vec2 p = vec2(gl_FragCoord.x, resolution.y - gl_FragCoord.y);
         vec2 uv = gl_FragCoord.xy / resolution;
         float inside = 1e9; int at = -1;
-        float shade = 0.0; float glow = 0.0;
+        float shade = 0.0; float glow = 0.0; float glint = 0.0;
         vec2 shadowOffset = -lightDir * vec2(18.0, 26.0);
         for (int i = 0; i < PLATES; i++) {
           if (i >= plateCount) break;
@@ -202,10 +284,25 @@ function compositeShader() {
           if (d < inside) { inside = d; at = i; }
           // The plate's shadow on the room: the plate seen from the light, offset and softened.
           shade = max(shade, 1.0 - smoothstep(-16.0, 28.0, box(p - shadowOffset, r)));
+          // The light the glass bends at its edge falls just past the shadow's far side: a thin,
+          // warm line (a caustic), the plate's light on the room.
+          glint = max(glint, exp(-abs(box(p - shadowOffset * 1.25, r) - 4.0) / 3.0));
         }
         vec3 back = room(uv, 0.0);
         // The plates darken the room behind them, and the video lights the room around itself.
         back *= 1.0 - shade * shadowAmount;
+        back += lampColor * glint * (1.0 - shade) * shadowAmount * 0.35;
+        // The resident's palm marks on the glass between it and the viewer: misted, only in the
+        // clear (outside every sheet: the Host places them away from text, and the sheets below
+        // draw over them), fading as the Host says.
+        float mist = 0.0;
+        for (int k = 0; k < MARKS; k++) {
+          if (k >= markCount) break;
+          mist = max(mist, palm((p - marks[k].xy) / marks[k].z + marks[k].xy, marks[k].xy) * marks[k].w);
+        }
+        // Breath on glass whitens it; over a light room the palm's own outline stays a little
+        // clearer than the mist around it (the fingertips' print).
+        back = mix(back, vec3(0.93, 0.95, 0.98), mist * 0.6);
         back += videoColor * glow * 0.45 * (1.0 - shade * shadowAmount * 0.5);
         if (at < 0 || inside >= 0.0 || plateInfo[at].y > 0.5) {
           // Outside every plate, or under the video (the player covers it).
@@ -267,6 +364,7 @@ const disposeObject = (root: Object3D) =>
 
 /** How long the room fades in once it is ready. */
 const REVEAL_MS = 700;
+const UP = new Vector3(0, 1, 0);
 
 /**
  * Waits for a quiet moment of the page (an idle callback; `timeoutMs` at the latest), so the
@@ -348,6 +446,14 @@ export async function createRoomRenderer(
   const scene = new Scene();
   scene.background = new Color(0x050508);
   scene.add(gltf.scene);
+  const layout = readLayout(gltf.scene);
+  // The room is baked (unlit materials); these lights reach only the living character. A soft
+  // fill and a warm key from above the camera, near the lamps' colour; the video's colour is added
+  // to the fill each draw (the screen's light on the character, as on the room).
+  const fill = new AmbientLight(0xffffff, 1.1);
+  const key = new DirectionalLight(0xffe2c4, 1.4);
+  key.position.set(0.6, 3, 2);
+  scene.add(fill, key, key.target);
   let monitor: MeshBasicMaterial | undefined;
   gltf.scene.traverse((o) => {
     const mesh = o as Mesh;
@@ -503,9 +609,44 @@ export async function createRoomRenderer(
   }
   slot.parent.prepend(canvas);
   let revealed: Promise<void> | undefined;
+  let resident: RoomResident | undefined;
+  let dimmed = 0;
+  const projected = new Vector3();
   return {
     canvas,
     baseFovDeg: cameraNode.fov,
+    layout,
+    async setResident(next) {
+      if (resident === next) return;
+      if (resident) scene.remove(resident.root);
+      resident = next;
+      if (!next) return;
+      // The character's programs link in parallel before it is first drawn (the startup's long
+      // first draw was the room's own link, 11節): it joins the scene only once they are ready.
+      const visible = next.root.visible;
+      next.root.visible = true;
+      const holder = new Scene().add(next.root);
+      holder.add(fill.clone(), key.clone());
+      renderer.setRenderTarget(roomTarget ?? null);
+      await renderer.compileAsync(holder, camera).catch(() => undefined);
+      renderer.setRenderTarget(null);
+      next.root.visible = visible;
+      if (resident === next && !destroyed) scene.add(next.root);
+    },
+    project(points) {
+      return points.map(({ x, y, z }) => {
+        projected.set(x, y, z).project(camera);
+        if (projected.z > 1 || projected.z < -1) return null;
+        return { x: ((projected.x + 1) / 2) * width, y: ((1 - projected.y) / 2) * height };
+      });
+    },
+    dim(amount) {
+      const next = Math.round(Math.min(1, Math.max(0, amount)) * 100) / 100;
+      if (next === dimmed) return;
+      dimmed = next;
+      // Over the reveal's own opacity (a style the page cannot change): a short dip, no transition.
+      canvas.style.setProperty('filter', next ? `brightness(${1 - next * 0.85})` : 'none', 'important');
+    },
     reveal() {
       revealed ??= new Promise<void>((resolve) => {
         // The canvas was connected at opacity 0 in an earlier frame, so this change transitions.
@@ -527,9 +668,27 @@ export async function createRoomRenderer(
         .addScaledVector(axes.up, frame.camera.offset.y)
         .addScaledVector(axes.back, frame.camera.offset.z);
       camera.quaternion.copy(base.quaternion);
+      const orbit = ((frame.camera.orbitDeg ?? 0) * Math.PI) / 180;
+      if (orbit) {
+        // A turn about the room's middle (the dolly zoom's subject in front of camera_main), about
+        // the room's vertical: vertical lines stay vertical.
+        const pivot = base.position.clone().addScaledVector(axes.back, -ROOM_SUBJECT_M);
+        const turn = new Quaternion().setFromAxisAngle(UP, orbit);
+        camera.position.sub(pivot).applyQuaternion(turn).add(pivot);
+        camera.quaternion.premultiply(turn);
+      }
       camera.fov = frame.camera.fovDeg;
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
+      if (frame.camera.shiftX || frame.camera.shiftY) {
+        // The lens shift: the frustum slides instead of the camera turning (an off-axis view).
+        const m = camera.projectionMatrix.elements;
+        m[8] = (frame.camera.shiftX ?? 0) / camera.aspect;
+        m[9] = frame.camera.shiftY ?? 0;
+        camera.projectionMatrixInverse.copy(camera.projectionMatrix).invert();
+      }
+      camera.updateMatrixWorld();
+      fill.color.setRGB(0.55 + frame.video.r * 0.6, 0.52 + frame.video.g * 0.6, 0.6 + frame.video.b * 0.6);
       if (monitor) monitor.color.setRGB(frame.video.r * 1.6, frame.video.g * 1.6, frame.video.b * 1.6);
       renderer.setRenderTarget(roomTarget);
       renderer.render(scene, camera);
@@ -542,6 +701,9 @@ export async function createRoomRenderer(
         info[i]!.set(SPACE_BREAK === 'density' ? 0 : PLATE_FLOOR[p.importance], p.video ? 1 : 0, 0, 0);
       });
       u['plateCount']!.value = Math.min(PLATE_LIMIT, frame.plates.length);
+      const marks = (frame.marks ?? []).slice(0, MARK_LIMIT);
+      marks.forEach((m, i) => (u['marks']!.value as Vector4[])[i]!.set(m.x, m.y, m.size, m.strength));
+      u['markCount']!.value = marks.length;
       u['dark']!.value = frame.scheme === 'dark' ? 1 : 0;
       // A broken build (WW_SPACE_BREAK=density) drops the readability density, to see its tests fail.
       // The limit keeps a margin for the 8-bit output: rounding a pixel to the nearest byte can move

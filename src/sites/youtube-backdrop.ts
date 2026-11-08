@@ -87,6 +87,8 @@ const LISTS: readonly { list: string; item: string; importance: RegionImportance
   },
 ];
 const VIDEO: RegionSource = { selector: '#movie_player video.html5-main-video', importance: 'free' };
+/** The watch page's own element: its `theater` attribute is YouTube's theater mode. */
+const WATCH: RegionSource = { selector: 'ytd-watch-flexy:not([hidden])', importance: 'free' };
 /**
  * The readability's way out (docs/depth-foundation.md): when YouTube renames a part, its text no
  * longer gets a small plate and would sit bare on the room. The page is walked now and then for
@@ -96,6 +98,20 @@ const VIDEO: RegionSource = { selector: '#movie_player video.html5-main-video', 
 const COLUMNS =
   'ytd-watch-flexy #below, ytd-watch-flexy #secondary-inner, ytd-watch-flexy #secondary, ' +
   'ytd-browse #primary, ytd-search #primary, #masthead-container, ytd-mini-guide-renderer';
+/**
+ * Where the walk looks (docs/living-room.md, 逃げ道の範囲): the columns above, each found by one
+ * cached query like any known part, never a document-wide scan per page change. Text outside them
+ * (menus, dialogs) paints its own background. If YouTube renames the columns themselves (none is
+ * found), the walk falls back to the whole app: the way out is never narrower than its need.
+ */
+const COLUMN_SOURCES: readonly RegionSource[] = [
+  'ytd-watch-flexy:not([hidden]) #below',
+  'ytd-watch-flexy:not([hidden]) #secondary',
+  'ytd-browse:not([hidden]) #primary',
+  'ytd-search:not([hidden]) #primary',
+  '#masthead-container',
+  'ytd-mini-guide-renderer',
+].map((selector) => ({ selector, importance: 'free' as const }));
 /** Text on a picture is read against the picture, not the room: the player, thumbnails, images. */
 const OVER_PICTURE =
   '#movie_player, #player, ytd-thumbnail, yt-thumbnail-view-model, ytd-playlist-thumbnail, ' +
@@ -269,6 +285,8 @@ export function youtubeBackdrop(doc: Document): SiteBackdrop {
   const knownSingles = new Set<Element>();
   interface Pass {
     root: Element;
+    /** The roots still to walk after this one (the columns), in order. */
+    rest: Element[];
     walker: TreeWalker;
     /** Columns this walk found bare text in (plated at once, before the walk ends). */
     plated: Set<Element>;
@@ -312,11 +330,8 @@ export function youtubeBackdrop(doc: Document): SiteBackdrop {
       if (n.getBoundingClientRect().width >= BLOCK_MIN_W) return n;
     return e;
   };
-  const startPass = (): Pass | undefined => {
-    const root = doc.querySelector('ytd-app') ?? doc.body;
-    if (!root) return undefined;
-    const state: Pass = { root, plated: new Set(), opaque: new Map(), visited: 0, walker: undefined! };
-    state.walker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
+  const walkerFor = (state: Pass, root: Element) =>
+    doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
       acceptNode(node) {
         state.visited++;
         if (node.nodeType === Node.TEXT_NODE)
@@ -336,6 +351,23 @@ export function youtubeBackdrop(doc: Document): SiteBackdrop {
         return NodeFilter.FILTER_SKIP;
       },
     });
+  const startPass = (): Pass | undefined => {
+    const app = doc.querySelector('ytd-app') ?? doc.body;
+    if (!app) return undefined;
+    // The columns found (a column inside another is walked with it), or the whole app.
+    const found = COLUMN_SOURCES.map(element).filter((e): e is Element => Boolean(e?.isConnected));
+    // A walker never filters its own root: a column that is itself a known part (the masthead bar
+    // has its own plate) is left out here, as the filter would leave it out of a wider walk.
+    const skipped = (e: Element) =>
+      knownSingles.has(e) || items.has(e) || e.hasAttribute('hidden') || e.matches(OVER_PICTURE);
+    const columns = found.filter(
+      (e) => !skipped(e) && !found.some((other) => other !== e && other.contains(e) && !skipped(other)),
+    );
+    // Every column skipped (all known): nothing of them to walk. None found at all: the whole app.
+    if (found.length && !columns.length) return undefined;
+    const [root, ...rest] = columns.length ? columns : [app];
+    const state: Pass = { root: root!, rest, plated: new Set(), opaque: new Map(), visited: 0, walker: undefined! };
+    state.walker = walkerFor(state, root!);
     return state;
   };
   /**
@@ -347,7 +379,12 @@ export function youtubeBackdrop(doc: Document): SiteBackdrop {
     if (!pass) {
       if (now - passAt < RETRY_MS) return;
       pass = startPass();
-      if (!pass) return;
+      if (!pass) {
+        // Nothing to walk now (every column is a known part): no column plates until the next try.
+        passAt = now;
+        plated = [];
+        return;
+      }
     }
     // The page removed the node the walk stood on: walk again from the top next read.
     if (!pass.walker.currentNode.isConnected) {
@@ -360,6 +397,12 @@ export function youtubeBackdrop(doc: Document): SiteBackdrop {
     pass.visited = 0;
     while (pass.visited < limit) {
       const node = pass.walker.nextNode();
+      if (!node && pass.rest.length) {
+        // The next column: same pass, same plated set.
+        pass.root = pass.rest.shift()!;
+        pass.walker = walkerFor(pass, pass.root);
+        continue;
+      }
       if (!node) {
         plated = [...pass.plated];
         pass = undefined;
@@ -482,5 +525,6 @@ export function youtubeBackdrop(doc: Document): SiteBackdrop {
     },
     scheme: () => (doc.documentElement.hasAttribute('dark') ? 'dark' : 'light'),
     video: () => element(VIDEO) as HTMLVideoElement | undefined,
+    theater: () => element(WATCH)?.hasAttribute('theater') ?? false,
   };
 }
