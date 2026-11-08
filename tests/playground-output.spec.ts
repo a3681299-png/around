@@ -66,6 +66,16 @@ test('the forbidden names are found in text files too (a copied notice or path)'
   }
 });
 
+test('an allowed model name still requires the approved contents', () => {
+  const model = `content/asset-${'0'.repeat(64)}.glb`;
+  const root = folder({ [model]: 'glTF' });
+  try {
+    expect(check(root, ['content/a1.vrm', model])).toEqual([`${model}: contents do not match the asset hash`]);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test('a substituted model is refused even under an allowed hashed filename', () => {
   const file = `content/asset-${'a'.repeat(64)}.vrm`;
   const root = folder({ [file]: 'different bytes' });

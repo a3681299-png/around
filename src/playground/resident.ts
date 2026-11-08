@@ -1,4 +1,4 @@
-import { AnimationMixer, Group, LoadingManager, MathUtils, Vector3, type AnimationAction, type Curve } from 'three';
+import { AnimationMixer, Group, LoadingManager, MathUtils, Vector3, type AnimationAction } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { VRMLoaderPlugin, VRMUtils, type VRM } from '@pixiv/three-vrm';
 import type { AssetPort } from '../assets/port';
@@ -10,12 +10,10 @@ export type ResidentAssets = {
   sit: string;
   stand: string;
   sitDown?: string;
-  walk?: string;
-  hop?: string;
   mannequin?: boolean;
 };
 
-const phases = ['sit', 'stand', 'sitDown', 'walk', 'hop'] as const;
+const phases = ['sit', 'stand', 'sitDown'] as const;
 type Pose = (typeof phases)[number];
 export type SeatEdge = 'lower' | 'upper';
 
@@ -52,12 +50,6 @@ export async function loadResident(assets: AssetPort, ids: ResidentAssets) {
     if (animation) actions.set(phases[i]!, mixer.clipAction(vrmAnimationClip(animation, vrm)));
   });
   const hips = vrm.humanoid.getRawBoneNode('hips');
-  const hipsTrack = `${vrm.humanoid.getNormalizedBoneNode('hips')?.name}.position`;
-  const walk = actions.get('walk')?.getClip();
-  const translations = walk?.tracks.find((track) => track.name === hipsTrack)?.values;
-  // The clip moves forward in its own metres. Use that distance for the ground path so the feet
-  // keep their pace when the display scale changes.
-  const stride = translations ? translations[translations.length - 1]! - translations[2]! : 0;
   const feet = [
     vrm.humanoid.getRawBoneNode('leftToes') ?? vrm.humanoid.getRawBoneNode('leftFoot'),
     vrm.humanoid.getRawBoneNode('rightToes') ?? vrm.humanoid.getRawBoneNode('rightFoot'),
@@ -71,9 +63,6 @@ export async function loadResident(assets: AssetPort, ids: ResidentAssets) {
   let teleportAt: number | undefined;
   let active: AnimationAction | undefined;
   const seat = new Vector3();
-  const pathPoint = new Vector3();
-  const heading = new Vector3();
-  let boardScale = ids.mannequin ? 88 : 147;
 
   function sample(pose: Pose, seconds: number, delta: number) {
     const action = actions.get(pose)!;
@@ -115,21 +104,20 @@ export async function loadResident(assets: AssetPort, ids: ResidentAssets) {
       width: number,
       height: number,
       lowerHeadroom: number,
-      { flee, show, reduced, leaving }: { flee: boolean; show: boolean; reduced: boolean; leaving: boolean },
+      { flee, show, reduced }: { flee: boolean; show: boolean; reduced: boolean },
     ) {
       // A crouched landing at the lower edge must still clear the player controls on short viewports.
-      boardScale = Math.min((ids.mannequin ? 88 : 147) * Math.min(1, height / 800), Math.max(68, lowerHeadroom));
+      const boardScale = Math.min((ids.mannequin ? 88 : 147) * Math.min(1, height / 800), Math.max(68, lowerHeadroom));
       avatar.scale.setScalar(boardScale);
       if (reduced) {
         teleportAt = undefined;
         arrivedAt = -Infinity;
       }
-      if (leaving && edge === 'lower') teleportAt = undefined;
       if (
         !reduced &&
         delta > 0 &&
         teleportAt === undefined &&
-        (edge === 'lower' ? flee : leaving || (!flee && time - arrivedAt >= 3.4))
+        (edge === 'lower' ? flee : !flee && time - arrivedAt >= 3.4)
       )
         teleportAt = time + 0.17;
       const landing = teleportAt !== undefined && time >= teleportAt;
@@ -157,49 +145,6 @@ export async function loadResident(assets: AssetPort, ids: ResidentAssets) {
         place(boardSeat(edge, width, height, seat), 0.1, 1);
       }
       if (landing) vrm.springBoneManager?.reset();
-    },
-    updateRoom(
-      time: number,
-      delta: number,
-      ledge: Vector3,
-      path: Curve<Vector3>,
-      windowScale: number,
-      viewer: Vector3,
-      monitor: Vector3,
-      reduced: boolean,
-    ) {
-      const hopTime = 0.49;
-      const pace = 1.63;
-      const worldStride = stride * boardScale;
-      const walkTime = walk && worldStride > 0 ? (path.getLength() * walk.duration) / (worldStride * pace) : 0;
-      avatar.scale.setScalar(boardScale);
-      root.visible = true;
-      if (reduced || !walk || walkTime === 0 || time >= hopTime + walkTime) {
-        sample('stand', 0, 0);
-        place(viewer, Math.atan2(monitor.x - viewer.x, monitor.z - viewer.z), 0);
-        return false;
-      }
-      if (time < hopTime) {
-        const t = time / hopTime;
-        const hop = actions.get('hop')?.getClip();
-        avatar.scale.setScalar(boardScale * MathUtils.lerp(windowScale, 1, t));
-        if (hop) sample('hop', hop.duration * (0.19 + 0.31 * t), delta);
-        else sample('stand', 0, delta);
-        path.getPointAt(0, pathPoint).lerp(ledge, 1 - t);
-        pathPoint.y += Math.sin(Math.PI * t) * 14;
-        path.getTangentAt(0, heading);
-        place(pathPoint, Math.atan2(heading.x, heading.z), 0);
-      } else {
-        const walking = time - hopTime;
-        const loop = (walking * pace) % walk.duration;
-        sample('walk', loop, delta);
-        const along = walking / walkTime;
-        path.getPointAt(along, pathPoint);
-        path.getTangentAt(along, heading);
-        place(pathPoint, Math.atan2(heading.x, heading.z), 0, (-worldStride * loop) / walk.duration);
-      }
-      if (time <= delta) vrm.springBoneManager?.reset();
-      return true;
     },
   };
 }

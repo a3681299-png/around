@@ -10,10 +10,16 @@ type DrawableGL = WebGL2RenderingContext & {
   texElementImage2D?: (target: number, format: number, element: HTMLElement) => void;
 };
 
+export function drawableMode(canvas: DrawableCanvas, gl: DrawableGL) {
+  if (gl.texElementSubImage2D && canvas.updateElementGeometry && canvas.getElementImageDefaultSize) return 'modern';
+  if (gl.texElementImage2D && canvas.getElementTransform) return 'legacy';
+  return null;
+}
+
 export function attachDrawable(canvas: DrawableCanvas, gl: DrawableGL, element: HTMLElement, repaint: () => void) {
-  const modern = gl.texElementSubImage2D && canvas.updateElementGeometry && canvas.getElementImageDefaultSize;
-  const legacy = gl.texElementImage2D && canvas.getElementTransform;
-  if (!modern && !legacy) return null;
+  const mode = drawableMode(canvas, gl);
+  if (!mode) return null;
+  const modern = mode === 'modern';
   if (modern) {
     canvas.setAttribute('content', 'drawable');
     element.setAttribute('drawable', '');

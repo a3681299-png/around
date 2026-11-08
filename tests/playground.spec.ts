@@ -33,7 +33,13 @@ test.beforeAll(async () => {
 });
 test.afterAll(() => new Promise<void>((done) => server.close(() => done())));
 
-async function open(page: Page, basic = true, viewport = { width: 1280, height: 800 }) {
+async function prepared(page: Page) {
+  await page.waitForFunction(() => performance.getEntriesByName('playground:prepared').length > 0, null, {
+    timeout: 20000,
+  });
+}
+
+async function open(page: Page, basic = true, viewport = { width: 1280, height: 800 }, waitForTheme = true) {
   const problems: string[] = [];
   page.on('console', (message) => {
     if (message.type() === 'error') problems.push(message.text());
@@ -46,6 +52,7 @@ async function open(page: Page, basic = true, viewport = { width: 1280, height: 
   await page.setViewportSize(viewport);
   await page.goto(origin + (basic ? '/?basic' : '/'));
   await expect(page.locator('#apply')).toHaveText('WWT を適用');
+  if (waitForTheme) await prepared(page);
   return problems;
 }
 const model = (page: Page) =>
@@ -69,6 +76,7 @@ test('Mirdo starts on the lower edge and moves to the upper edge with the import
     // resident. The demo opens on the plain site (design, demo scene 1).
     await page.setViewportSize({ width: 940, height: 800 });
     await page.goto(mirdoOrigin + '/');
+    await prepared(page);
     await page.locator('#apply').click();
     await expect(page.locator('#apply')).toHaveText('元に戻す');
     await expect(page.getByRole('link', { name: /ミルド／ragooou/ })).toHaveAttribute(
@@ -178,17 +186,69 @@ test('the background layer is drawn under the content: the video picture is not 
   expect((await page.screenshot({ clip })).equals(plain)).toBe(true);
 });
 
-test('the basic resident has no visible frame while its motion is still loading', async ({ page }) => {
-  const problems = await open(page);
+for (const basic of [true, false]) {
+  test(`early Apply waits for the first pose and leaves the player usable (${basic ? 'basic' : 'CSS3D'})`, async ({
+    page,
+  }) => {
+    let requested!: () => void;
+    let release!: () => void;
+    const motionRequested = new Promise<void>((resolve) => (requested = resolve));
+    const motionReady = new Promise<void>((resolve) => (release = resolve));
+    await page.route('**/*.vrma', async (route) => {
+      requested();
+      await motionReady;
+      await route.continue();
+    });
+    const problems = await open(page, basic, { width: 1280, height: 800 }, false);
+    const apply = page.locator('#apply');
+    const video = page.locator('video');
+    const original = await video.elementHandle();
+    try {
+      await motionRequested;
+      await expect(apply).toHaveText('WWT を適用');
+      await expect(model(page)).toHaveCount(0);
+      await expect(page.locator('.playground-stage')).toHaveCount(0);
+      await apply.click();
+      await expect(apply).toHaveAttribute('aria-busy', 'true');
+      await expect(model(page)).toHaveCount(0);
+      await expect(page.locator('.playground-stage')).toHaveCount(0);
+      await page.locator('#play').click();
+      await expect.poll(() => video.evaluate((element) => (element as HTMLVideoElement).paused)).toBe(false);
+    } finally {
+      release();
+    }
+    await expect(apply).toHaveText('元に戻す', { timeout: 20000 });
+    if (basic) await expect(model(page)).toHaveAttribute('data-renderer', 'three', { timeout: 20000 });
+    else {
+      await page.waitForFunction(() => performance.getEntriesByName('playground:resident-frame').length > 0);
+      await expect(page.locator('.playground-stage')).not.toHaveAttribute('data-transition', '');
+    }
+    expect(
+      await video.evaluate((element: HTMLVideoElement, first) => first === element && !element.paused, original),
+    ).toBe(true);
+    expect(problems).toEqual([]);
+  });
+}
+
+test('the basic resident still hides the unposed frame when a motion is retried after Apply', async ({ page }) => {
   let requested!: () => void;
   let ready!: () => void;
+  const warmed = new Set<string>();
   const motionRequested = new Promise<void>((resolve) => (requested = resolve));
   const motionReady = new Promise<void>((resolve) => (ready = resolve));
   await page.route('**/*.vrma', async (route) => {
+    const url = route.request().url();
+    if (!warmed.has(url)) {
+      warmed.add(url);
+      // A failed warmup must leave the same first-pose gate in place on retry.
+      await route.abort();
+      return;
+    }
     requested();
     await motionReady;
     await route.continue();
   });
+  await open(page);
   await page.locator('#apply').click();
   try {
     await motionRequested;
@@ -204,7 +264,6 @@ test('the basic resident has no visible frame while its motion is still loading'
   }
   await expect(model(page)).toHaveAttribute('data-renderer', 'three', { timeout: 20000 });
   await expect(model(page)).toBeVisible();
-  expect(problems).toEqual([]);
 });
 
 test('Alt+Shift+Q takes every effect off, and pressing it again brings them back', async ({ page }) => {
@@ -408,26 +467,6 @@ async function exerciseSpatialControls(page: Page, mode: 'canvas' | 'css') {
   await seek.press('Home');
   await expect(seek).toHaveValue('0');
 
-  await page.locator('#play').click();
-  await expect.poll(() => video.evaluate((element: HTMLVideoElement) => !element.paused)).toBe(true);
-  const original = await video.elementHandle();
-  const watchPage = page.locator('#watch-page');
-  await page.locator('#open-desktop').click();
-  await expect(page).toHaveURL(/#desktop$/);
-  await expect(stage).not.toHaveAttribute('data-transition', '');
-  await expect(page.locator('#close-desktop')).toBeVisible();
-  const docked = (await watchPage.boundingBox())!;
-  expect(docked.width).toBeLessThan(page.viewportSize()!.width * 0.62);
-  expect(
-    await video.evaluate((element: HTMLVideoElement, first) => first === element && !element.paused, original),
-  ).toBe(true);
-
-  await play.click();
-  await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.paused)).toBe(true);
-  await dragProjectedRange(page, seek, [0.24, 0.74]);
-  await expect
-    .poll(() => video.evaluate((element: HTMLVideoElement) => element.currentTime / element.duration))
-    .toBeGreaterThan(0.65);
   await dragProjectedRange(page, page.locator('#volume'), [0.54, 0.3]);
   await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.volume)).toBeLessThan(0.42);
   await search.click();
@@ -438,20 +477,14 @@ async function exerciseSpatialControls(page: Page, mode: 'canvas' | 'css') {
   await expect(page.getByRole('link', { name: '透ける四角の動画' })).toBeHidden();
   const playback = () =>
     video.evaluate((element: HTMLVideoElement) => [element.currentTime, element.paused, element.volume]);
-  const beforeBack = await playback();
-  await page.goBack();
-  await expect(page).not.toHaveURL(/#desktop$/);
-  await expect(stage).not.toHaveAttribute('data-transition', '');
-  await expect(watchPage).not.toHaveAttribute('inert', '');
-  expect((await watchPage.boundingBox())!.width).toBeGreaterThan(docked.width);
-  expect(await playback()).toEqual(beforeBack);
+  const beforeOff = await playback();
+  const original = await video.elementHandle();
+  await page.keyboard.press('Alt+Shift+KeyQ');
+  await expect(stage).toHaveCount(0);
+  expect(await playback()).toEqual(beforeOff);
   expect(await video.evaluate((element, first) => first === element, original)).toBe(true);
   await expect(search).toHaveValue('もう一度');
   await search.fill('透ける');
-
-  await page.keyboard.press('Alt+Shift+KeyQ');
-  await expect(stage).toHaveCount(0);
-  await expect(search).toHaveValue('透ける');
   await page.keyboard.press('Alt+Shift+KeyQ');
   await expect(stage).toHaveAttribute('data-mode', mode);
   await expect(page.locator('#watch-page')).not.toHaveAttribute('inert', '');
@@ -484,35 +517,6 @@ test('reduced motion keeps the camera still after applying', async ({ page }) =>
   await page.mouse.move(20, 350);
   await page.waitForTimeout(320);
   expect(await apply.boundingBox()).toEqual(before);
-  await page.locator('#open-desktop').click();
-  await expect(stage).not.toHaveAttribute('data-transition', '');
-  const docked = await apply.boundingBox();
-  expect(docked).not.toEqual(before);
-  await page.mouse.move(20, 350);
-  await page.waitForTimeout(320);
-  expect(await apply.boundingBox()).toEqual(docked);
-  await page.locator('#close-desktop').click();
-  await expect(page).not.toHaveURL(/#desktop$/);
-});
-
-test('a direct desktop visit has a working video-only fallback and a way back', async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.setViewportSize({ width: 880, height: 800 });
-  await page.goto(origin + '/?basic#desktop');
-  await expect(page.locator('body')).toHaveAttribute('data-desktop', 'basic');
-  const monitor = page.locator('.desktop-lite canvas');
-  const pixels = () => monitor.evaluate((canvas: HTMLCanvasElement) => canvas.toDataURL());
-  const before = await pixels();
-  await page.locator('#play').click();
-  await expect.poll(pixels).not.toBe(before);
-  const video = page.locator('video');
-  const original = await video.elementHandle();
-  await page.locator('#close-desktop').click();
-  await expect(page).not.toHaveURL(/#desktop$/);
-  await expect(monitor).toBeHidden();
-  expect(
-    await video.evaluate((element: HTMLVideoElement, first) => first === element && !element.paused, original),
-  ).toBe(true);
 });
 
 test('HTML-in-Canvas in Chromium 153 syncs pointer drag, focus and keyboard', async () => {
