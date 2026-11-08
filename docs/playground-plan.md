@@ -377,7 +377,9 @@ gantt
 
 **Playground 本番を置くときの手順**
 
-1. 作業ブランチで `WW_PLAYGROUND_MIRDO_ROOT` に `wwt-private-assets` のローカルチェックアウトを指定し、`npm run build:playground`。許可した素材とその内容を照合し、出力検査に失敗した場合は出力を消して止まる。[ミルドのビルドと確認結果](playground-mirdo.md)
+3D 版のローカルビルドには、[Playground の3Dの板](playground-3d.md) の素材設定を使う（`WW_PLAYGROUND_PRIVATE_ASSETS` は `WW_PLAYGROUND_MIRDO_ROOT` と同じ意味で、どちらも許可した素材のハッシュで照合する）。公開に進む場合は、ビルドに含まれる素材の配布条件を確認する。
+
+1. 作業ブランチで `WW_PLAYGROUND_MIRDO_ROOT` に `wwt-private-assets` のローカルチェックアウトを指定し、`npm run build:playground`。許可した素材とその内容を照合し、出力検査（トルーシェ・私用 VRM・Mixamo・一覧にないモデル）に失敗した場合は出力を消して止まる。[ミルドのビルドと確認結果](playground-mirdo.md)
 2. `dist-playground/` を、リポジトリの外の空のフォルダに写す（`.gitignore` の対象なので、中からは置けない）
 3. そのフォルダで、初回は `npx -y lolipop@2.0.8 deploy --name <名前> --framework static --org <組織の ID>`。2回目からは `--project <ID>`（`npx -y lolipop@2.0.8 project list`）
 4. `npx -y lolipop@2.0.8 deployment show <デプロイの ID>` が READY になってから、1分ほど待って開く。Playground の e2e と同じ確かめ（適用・解除・Alt+Shift+Q・コンソールのエラー0件）を、公開の URL で headless に回す

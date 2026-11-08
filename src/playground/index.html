@@ -15,66 +15,88 @@
     <script src="app.js" defer></script>
   </head>
   <body data-ww-surface="page">
-    <header class="bar">
-      <span class="brand">みるばこ</span>
-      <span class="hint">ふつうの動画サイト</span>
-      <button id="apply" type="button" data-ww-control="click" aria-pressed="false" disabled>WWT を適用</button>
-    </header>
-    <main class="layout">
-      <section class="watch">
-        <div class="player" data-ww-surface="player-window">
-          <video data-ww-video data-ww-control="gesture" src="content/video-a.webm" muted loop playsinline></video>
-        </div>
-        <div class="controls" aria-label="再生の操作">
-          <button id="play" type="button" data-ww-control="click">再生</button>
-          <input id="seek" type="range" min="0" max="1000" value="0" aria-label="再生位置" data-ww-control="drag" />
-          <label class="volume"
-            >音量 <input id="volume" type="range" min="0" max="100" value="60" data-ww-control="drag"
-          /></label>
-        </div>
-        <h1 id="video-title" data-ww-surface="primary-heading">四角が流れる動画</h1>
-        <p class="description">自作の試験用の動画です。プレーヤーもシークバーも、このサイトのものです。</p>
-        <p id="status" role="status"></p>
-      </section>
-      <aside class="list" data-ww-list aria-label="次の動画">
-        <a
-          href="#a"
-          class="card"
-          data-ww-surface="video-card"
+    <div id="watch-page">
+      <header class="bar">
+        <span class="brand">みるばこ</span>
+        <span class="hint">ふつうの動画サイト</span>
+        <input
+          id="search"
+          class="search"
+          type="search"
+          aria-label="動画を探す"
+          placeholder="動画を探す"
           data-ww-control="click"
-          data-video="content/video-a.webm"
-          data-title="四角が流れる動画"
-          ><span class="thumb a"></span><span class="name">四角が流れる動画</span></a
+        />
+        <button id="apply" class="apply" type="button" data-ww-control="click" aria-pressed="false" disabled
+          >WWT を適用</button
         >
-        <a
-          href="#b"
-          class="card"
-          data-ww-surface="video-card"
-          data-ww-control="click"
-          data-video="content/video-b.webm"
-          data-title="透ける四角の動画"
-          ><span class="thumb b"></span><span class="name">透ける四角の動画</span></a
-        >
-        <a
-          href="#c"
-          class="card"
-          data-ww-surface="video-card"
-          data-ww-control="click"
-          data-video="content/video-a.webm"
-          data-title="もう一度、四角"
-          ><span class="thumb c"></span><span class="name">もう一度、四角</span></a
-        >
-      </aside>
-    </main>
-    <footer class="foot">
-      <span id="mirdo-credits" hidden>
-        キャラクター
-        <a href="https://booth.pm/ja/items/6614116" data-ww-control="click">ミルド／ragooou（らぐー）</a>
-        ・動作
-        <a href="https://quaternius.com/packs/universalanimationlibrary.html" data-ww-control="click">
-          Quaternius Universal Animation Library（CC0）
-        </a>
-      </span>
-    </footer>
+      </header>
+      <main class="layout">
+        <section class="watch">
+          <div class="player" data-ww-surface="player-window">
+            <video data-ww-video data-ww-control="gesture" src="content/video-a.webm" muted loop playsinline></video>
+          </div>
+          <div class="controls" aria-label="再生の操作">
+            <button id="play" type="button" data-ww-control="click">再生</button>
+            <input
+              id="seek"
+              class="seek"
+              type="range"
+              min="0"
+              max="1000"
+              value="0"
+              aria-label="再生位置"
+              data-ww-control="drag"
+            />
+            <label class="volume"
+              >音量 <input id="volume" type="range" min="0" max="100" value="60" data-ww-control="drag"
+            /></label>
+          </div>
+          <h1 id="video-title" data-ww-surface="primary-heading">四角が流れる動画</h1>
+          <p class="description">自作の試験用の動画です。プレーヤーもシークバーも、このサイトのものです。</p>
+          <p id="status" role="status"></p>
+        </section>
+        <aside class="list" data-ww-list aria-label="次の動画">
+          <a
+            href="#a"
+            class="card"
+            data-ww-surface="video-card"
+            data-ww-control="click"
+            data-video="content/video-a.webm"
+            data-title="四角が流れる動画"
+            ><span class="thumb a"></span><span class="name">四角が流れる動画</span></a
+          >
+          <a
+            href="#b"
+            class="card"
+            data-ww-surface="video-card"
+            data-ww-control="click"
+            data-video="content/video-b.webm"
+            data-title="透ける四角の動画"
+            ><span class="thumb b"></span><span class="name">透ける四角の動画</span></a
+          >
+          <a
+            href="#c"
+            class="card"
+            data-ww-surface="video-card"
+            data-ww-control="click"
+            data-video="content/video-a.webm"
+            data-title="もう一度、四角"
+            ><span class="thumb c"></span><span class="name">もう一度、四角</span></a
+          >
+        </aside>
+      </main>
+      <footer class="foot">
+        <span>Web World Themes Playground</span>
+        <span id="mirdo-credits" hidden>
+          キャラクター
+          <a href="https://booth.pm/ja/items/6614116" data-ww-control="click">ミルド／ragooou（らぐー）</a>
+          ・動作
+          <a href="https://quaternius.com/packs/universalanimationlibrary.html" data-ww-control="click">
+            Quaternius Universal Animation Library（CC0）
+          </a>
+        </span>
+      </footer>
+    </div>
   </body>
 </html>

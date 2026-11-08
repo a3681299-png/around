@@ -7,6 +7,7 @@ import { createMemoryTakeStorage } from '../timeline/memory-takes';
 import { parseDesign } from '../design/schema';
 import { createFetchAssets, type PlaygroundManifest } from './assets';
 import { mountPlayer } from './player';
+import { openSpatial } from './spatial';
 
 declare const __WW_PLAYGROUND_TEST__: boolean;
 declare const __WW_PLAYGROUND_MIRDO__: boolean;
@@ -21,22 +22,51 @@ async function start() {
   const design = parseDesign(await (await fetch(new URL(manifest.design, base), { credentials: 'omit' })).json());
   const site = createPlaygroundAdapter(document);
   if (design.siteId !== site.id) throw new Error('作品の対象サイトが一致しません。');
+  const assets = createFetchAssets(base, manifest);
   const controller = createPageController(document, site, {
-    assets: createFetchAssets(base, manifest),
+    assets,
     takes: createMemoryTakeStorage(),
   });
   controller.updateDesign(design);
   const apply = document.querySelector<HTMLButtonElement>('#apply')!;
-  let applied = __WW_PLAYGROUND_MIRDO__,
+  const page = document.querySelector<HTMLElement>('#watch-page')!;
+  const video = document.querySelector<HTMLVideoElement>('video[data-ww-video]')!;
+  const basicOnly = __WW_PLAYGROUND_TEST__ && new URLSearchParams(location.search).has('basic');
+  // The demo opens on the plain site and the viewer presses「WWT を適用」(design, demo scene 1→2).
+  let applied = false,
     stopped = false;
+  let spatial: ReturnType<typeof openSpatial> = null;
   const render = () => {
-    controller.update({ enabled: applied, creatorMode: false });
+    controller.update({ enabled: applied && !spatial, creatorMode: false });
     apply.setAttribute('aria-pressed', String(applied));
     apply.textContent = applied ? '元に戻す' : 'WWT を適用';
     document.documentElement.toggleAttribute('data-ww-applied', applied);
+    // Set only after enter() had its chance: the 3D board measures the page without the
+    // basic layout's extra room for the seated feet (style.css).
+    document.documentElement.toggleAttribute('data-ww-basic', applied && !spatial && !stopped);
   };
+  function enter(preferCanvas = true) {
+    if (basicOnly || stopped || spatial || !applied) return;
+    spatial = openSpatial(
+      page,
+      video,
+      assets,
+      manifest.resident,
+      (reason) => {
+        spatial = null;
+        if (reason === 'resize') enter();
+        if (reason === 'graphics' && preferCanvas) enter(false);
+        render();
+      },
+      preferCanvas,
+    );
+  }
   apply.addEventListener('click', () => {
     applied = !applied;
+    if (applied) {
+      if (spatial) spatial.cancelExit();
+      else enter();
+    } else spatial?.exit();
     render();
   });
   // Emergency OFF, as in the extension: the same shortcut stops every effect until pressed again.
@@ -44,6 +74,9 @@ async function start() {
     if (event.altKey && event.shiftKey && event.code === 'KeyQ') {
       stopped = !stopped;
       controller.suspend(stopped);
+      if (stopped) spatial?.exit(true);
+      else enter();
+      render();
     }
   });
   document.querySelector<HTMLElement>('#mirdo-credits')!.hidden = !__WW_PLAYGROUND_MIRDO__;

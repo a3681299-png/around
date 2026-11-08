@@ -106,6 +106,9 @@ export function writeContent(root: string, out: string, mirdoRoot?: string): { m
       source,
     };
   });
+  const model = inspectAsset(vrm).model!;
+  // The spatial resident (src/playground/resident.ts) shares the validated seated clip.
+  const sit = motions.find((motion) => motion.role === 'sit') ?? motions[0]!;
   const background = new Uint8Array(backgroundPng(480, 270));
   const backgroundId = add(background, 'png', 'room.png');
   // Videos are the site's own media, not engine assets.
@@ -114,9 +117,8 @@ export function writeContent(root: string, out: string, mirdoRoot?: string): { m
     ['alpha1080.webm', 'video-b.webm'],
   ] as const)
     writeFileSync(join(out, to), readFileSync(join(root, 'tests/fixtures/motion', from)));
-  const model = inspectAsset(vrm).model!;
   const design = parseDesign({
-    schemaVersion: 16,
+    schemaVersion: 17,
     id: 'playground-custom',
     siteId: 'playground',
     baseThemeId: null,
@@ -170,6 +172,7 @@ export function writeContent(root: string, out: string, mirdoRoot?: string): { m
     ],
   });
   writeFileSync(join(out, 'design.json'), JSON.stringify(design, null, 2));
-  writeFileSync(join(out, 'manifest.json'), JSON.stringify({ design: 'design.json', assets }, null, 2));
+  const resident = { model: vrmId, sit: sit.assetId, mannequin: !mirdoRoot };
+  writeFileSync(join(out, 'manifest.json'), JSON.stringify({ design: 'design.json', assets, resident }, null, 2));
   return { models: [assets[vrmId]!.file, ...motions.map((motion) => assets[motion.assetId]!.file)] };
 }
