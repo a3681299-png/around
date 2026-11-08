@@ -9,10 +9,11 @@ description: 'WWT Playground の街の絵の決まり：明るくデフォルメ
 
 ## References
 
-| File                         | Read it when                               |
-| ---------------------------- | ------------------------------------------ |
-| `references/look-recipes.md` | 材質・陰・輪郭線・空・影・小物の作り方     |
-| `references/scorecard.md`    | 見た目を採点する・「良くなった」と言うとき |
+| File                             | Read it when                                           |
+| -------------------------------- | ------------------------------------------------------ |
+| `references/look-recipes.md`     | 材質・陰・輪郭線・空・影・小物の作り方                 |
+| `references/scorecard.md`        | 見た目を採点する・「良くなった」と言うとき             |
+| `references/time-and-weather.md` | 時刻で変わる空と光、動画が決める天気、時間を回すつまみ |
 
 ## Core rule
 
