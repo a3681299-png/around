@@ -105,4 +105,7 @@ export interface SiteBackdrop {
   scheme(): import('../world/space').ColorScheme;
   /** The page's main video, whose colour lights the room; kept while connected. */
   video(): HTMLVideoElement | undefined;
+  /** The page shows its video wide (YouTube's theater): the room opens on both sides. A known
+   * part's attribute, kept while connected; never a document-wide query. */
+  theater?(): boolean;
 }

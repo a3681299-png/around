@@ -86,6 +86,11 @@ export interface CameraProjection {
   /** Offset from camera_main in its own axes (metres): right, up, back. */
   offset: { x: number; y: number; z: number };
   fovDeg: number;
+  /** v18 camera shapes (world/camera-shots.ts): the lens shift in fractions of the half frame's
+   * height (the renderer divides x by the aspect) and a turn about the room's middle. */
+  shiftX?: number;
+  shiftY?: number;
+  orbitDeg?: number;
 }
 /**
  * The dolly zoom keeps the plane `subject` metres in front of camera_main the same size on screen:

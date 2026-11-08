@@ -137,6 +137,8 @@ export function createImageRenderer(
    * while the backdrop is open. Artwork whose every root is `depth: 'room'` is drawn there, over
    * the room and under the UI, without the guard: the browser's stacking keeps the UI over it. */
   backdrop?: () => { parent: HTMLElement; zIndex: number; after?: Element } | 'pending' | undefined,
+  /** v18: the layer whose character is living in the room now; its front drawing waits. */
+  away?: () => string | undefined,
 ) {
   const view = doc.defaultView!;
   let host: HTMLElement | undefined;
@@ -945,13 +947,15 @@ export function createImageRenderer(
       const renderable = layouts.get(group.id)!.renderable;
       effectTargets.push({ layer, element: entry.content, frame: rect, renderable, visibility() {} });
     }
+    const awayId = editing ? undefined : away?.();
     for (const item of images) {
       const entry = nodes.get(item.id);
       if (!entry) continue;
       const evaluated = layerLayouts.get(item.id)!,
         rect = evaluated.frame;
       const parent = parentGroup(groups, item.id);
-      const visible = evaluated.visible,
+      // The resident in the room is drawn there (by the room's renderer), not here.
+      const visible = evaluated.visible && item.id !== awayId,
         locked = evaluated.locked;
       entry.node.hidden = !visible || !rect;
       const selected = Boolean(editing?.selectedIds.includes(item.id));
@@ -965,7 +969,7 @@ export function createImageRenderer(
         const element = target && doc.querySelector(`[data-ww-surface~="${target.surface}"]`);
         if (element) nextObserved.add(element);
       }
-      if (!rect) {
+      if (!rect || item.id === awayId) {
         entry.media.update(item, false);
         continue;
       }

@@ -231,6 +231,31 @@ export function floorPath(
   return out;
 }
 
+/**
+ * The room's places plus free standing places on its open floor (a 0.9 m grid, at most 16, facing
+ * the camera's side): with only the furniture's places, a character whose furniture is out of
+ * sight would never be seen; with these, the life drifts toward the floor the viewer can see.
+ */
+export function withFloorPlaces(layout: RoomLayout): RoomLayout {
+  let minX = Infinity,
+    minZ = Infinity,
+    maxX = -Infinity,
+    maxZ = -Infinity;
+  for (const t of layout.floor)
+    for (let i = 0; i < 6; i += 2) {
+      minX = Math.min(minX, t[i]!);
+      maxX = Math.max(maxX, t[i]!);
+      minZ = Math.min(minZ, t[i + 1]!);
+      maxZ = Math.max(maxZ, t[i + 1]!);
+    }
+  const free: RoomSpot[] = [];
+  for (let z = minZ + 0.45; z < maxZ && free.length < 16; z += 0.9)
+    for (let x = minX + 0.45; x < maxX && free.length < 16; x += 0.9)
+      if (walkable(layout, x, z) && !layout.spots.some((s) => Math.hypot(s.x - x, s.z - z) < 0.6))
+        free.push({ id: `floor_${free.length}`, kind: 'stand', x, y: layout.floorY, z, heading: 0 });
+  return { ...layout, spots: [...layout.spots, ...free] };
+}
+
 // --- the life ----------------------------------------------------------------------------------
 
 /** Where the character stands to use a spot: the spot itself, or beside a seat on the floor. */
@@ -268,8 +293,12 @@ const settle = (spot: RoomSpot | undefined): ResidentActivity =>
 function choose(current: string | undefined, input: ResidentInput, rand: () => number): RoomSpot | undefined {
   const others = input.layout.spots.filter((spot) => spot.id !== current);
   if (!others.length) return undefined;
+  // The room's own places keep a little weight unseen (life goes on behind the list); free floor
+  // places almost none (there would be no reason to stand there out of sight).
   const weights = others.map(
-    (spot) => (0.15 + Math.max(0, Math.min(1, input.seen(spot)))) * (spot.kind === 'sit' ? 1.4 : 1),
+    (spot) =>
+      ((spot.id.startsWith('floor_') ? 0.02 : 0.15) + Math.max(0, Math.min(1, input.seen(spot)))) *
+      (spot.kind === 'sit' ? 1.4 : 1),
   );
   let r = rand() * weights.reduce((a, b) => a + b, 0);
   for (let i = 0; i < others.length; i++) if ((r -= weights[i]!) <= 0) return others[i];
@@ -450,6 +479,8 @@ export interface ResidentPose {
   /** 0 standing on the floor, 1 seated at the spot's height (the seat's marker is at the hips). */
   seat: number;
   seatY: number;
+  /** The floor's height (the shadow stays on it during a hop). */
+  floorY: number;
 }
 
 export function residentPose(s: ResidentState, layout: RoomLayout): ResidentPose {
@@ -465,6 +496,7 @@ export function residentPose(s: ResidentState, layout: RoomLayout): ResidentPose
     heading: s.heading,
     seat: 0,
     seatY: spot?.y ?? layout.floorY,
+    floorY: layout.floorY,
   };
   const k = (v: number) => Math.min(1, Math.max(0, v));
   const ease = (v: number) => v * v * (3 - 2 * v);

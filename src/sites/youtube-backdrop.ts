@@ -87,6 +87,8 @@ const LISTS: readonly { list: string; item: string; importance: RegionImportance
   },
 ];
 const VIDEO: RegionSource = { selector: '#movie_player video.html5-main-video', importance: 'free' };
+/** The watch page's own element: its `theater` attribute is YouTube's theater mode. */
+const WATCH: RegionSource = { selector: 'ytd-watch-flexy:not([hidden])', importance: 'free' };
 /**
  * The readability's way out (docs/depth-foundation.md): when YouTube renames a part, its text no
  * longer gets a small plate and would sit bare on the room. The page is walked now and then for
@@ -482,5 +484,6 @@ export function youtubeBackdrop(doc: Document): SiteBackdrop {
     },
     scheme: () => (doc.documentElement.hasAttribute('dark') ? 'dark' : 'light'),
     video: () => element(VIDEO) as HTMLVideoElement | undefined,
+    theater: () => element(WATCH)?.hasAttribute('theater') ?? false,
   };
 }

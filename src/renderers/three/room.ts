@@ -11,8 +11,11 @@
  * Nothing here reads the page: the Host passes the plates, the camera and the video's light.
  */
 import {
+  AmbientLight,
   Camera,
   Color,
+  DirectionalLight,
+  Quaternion,
   HalfFloatType,
   LinearFilter,
   LinearMipmapLinearFilter,
@@ -46,6 +49,57 @@ import {
 } from '../../world/space';
 import { ROOM_LIGHT_LAYER, type RoomLook } from '../../design/space';
 import { SPACE_BREAK } from '../../host/world-options';
+import type { RoomLayout, RoomSpot } from '../../world/room-life';
+import type { RoomResident } from './room-resident';
+
+/**
+ * The room's layout from the asset contract (部屋の素材の約束): marker_sit_/marker_hide_/
+ * marker_stand_ empties (position; the arrow, the empty's +Z, gives the way the character faces)
+ * and the navmesh_floor mesh (its triangles, flattened onto the floor). Numbers only leave here.
+ */
+function readLayout(root: Object3D): RoomLayout {
+  root.updateWorldMatrix(true, true);
+  const spots: RoomSpot[] = [];
+  const floor: number[][] = [];
+  let floorY = 0,
+    heights = 0;
+  const p = new Vector3(),
+    forward = new Vector3();
+  root.traverse((o) => {
+    const marker = /^marker_(sit|hide|stand)_([a-z0-9_]{1,32})$/.exec(o.name);
+    if (marker && spots.length < 32) {
+      o.getWorldPosition(p);
+      forward.set(0, 0, 1).transformDirection(o.matrixWorld);
+      const heading = Math.hypot(forward.x, forward.z) > 0.2 ? Math.atan2(forward.x, forward.z) : 0;
+      if ([p.x, p.y, p.z, heading].every(Number.isFinite))
+        spots.push({
+          id: `${marker[1]}_${marker[2]}`,
+          kind: marker[1] as RoomSpot['kind'],
+          x: p.x,
+          y: p.y,
+          z: p.z,
+          heading,
+        });
+      return;
+    }
+    const mesh = o as Mesh;
+    if (!mesh.isMesh || mesh.name !== 'navmesh_floor') return;
+    const position = mesh.geometry.getAttribute('position');
+    const index = mesh.geometry.getIndex();
+    const count = index ? index.count : position.count;
+    for (let i = 0; i + 2 < count && floor.length < 4096; i += 3) {
+      const tri: number[] = [];
+      for (let k = 0; k < 3; k++) {
+        p.fromBufferAttribute(position, index ? index.getX(i + k) : i + k).applyMatrix4(mesh.matrixWorld);
+        tri.push(p.x, p.z);
+        floorY += p.y;
+        heights++;
+      }
+      if (tri.every(Number.isFinite)) floor.push(tri);
+    }
+  });
+  return { floorY: heights ? floorY / heights : 0, floor, spots };
+}
 
 /** Light layers a room may carry (the asset contract, 部屋の素材の約束). More are ignored. */
 const LAYER_LIMIT = 8;
@@ -67,8 +121,17 @@ export interface RoomRenderer {
   readonly canvas: HTMLCanvasElement;
   /** The room's base view: camera_main's vertical field of view. */
   readonly baseFovDeg: number;
+  /** The room's own layout (its markers and walkable floor, the asset contract), as numbers. */
+  readonly layout: RoomLayout;
   resize(width: number, height: number): void;
   draw(frame: RoomFrame, look: RoomLook): void;
+  /** Puts the living character into the room's scene once its programs are ready (undefined
+   * takes it out; it is not disposed here). */
+  setResident(resident: RoomResident | undefined): Promise<void>;
+  /** Room points (metres) to canvas pixels with the last drawn camera; null behind the camera. */
+  project(points: readonly { x: number; y: number; z: number }[]): ({ x: number; y: number } | null)[];
+  /** 0–1: dims the room (a reduced-motion cut between camera shapes). */
+  dim(amount: number): void;
   /** Fades the canvas in (after the first draw); resolves when it is fully shown. */
   reveal(): Promise<void>;
   /** For tests: the drawn colour (sRGB bytes) at canvas pixels, read right after a draw. */
@@ -267,6 +330,7 @@ const disposeObject = (root: Object3D) =>
 
 /** How long the room fades in once it is ready. */
 const REVEAL_MS = 700;
+const UP = new Vector3(0, 1, 0);
 
 /**
  * Waits for a quiet moment of the page (an idle callback; `timeoutMs` at the latest), so the
@@ -348,6 +412,14 @@ export async function createRoomRenderer(
   const scene = new Scene();
   scene.background = new Color(0x050508);
   scene.add(gltf.scene);
+  const layout = readLayout(gltf.scene);
+  // The room is baked (unlit materials); these lights reach only the living character. A soft
+  // fill and a warm key from above the camera, near the lamps' colour; the video's colour is added
+  // to the fill each draw (the screen's light on the character, as on the room).
+  const fill = new AmbientLight(0xffffff, 1.1);
+  const key = new DirectionalLight(0xffe2c4, 1.4);
+  key.position.set(0.6, 3, 2);
+  scene.add(fill, key, key.target);
   let monitor: MeshBasicMaterial | undefined;
   gltf.scene.traverse((o) => {
     const mesh = o as Mesh;
@@ -503,9 +575,44 @@ export async function createRoomRenderer(
   }
   slot.parent.prepend(canvas);
   let revealed: Promise<void> | undefined;
+  let resident: RoomResident | undefined;
+  let dimmed = 0;
+  const projected = new Vector3();
   return {
     canvas,
     baseFovDeg: cameraNode.fov,
+    layout,
+    async setResident(next) {
+      if (resident === next) return;
+      if (resident) scene.remove(resident.root);
+      resident = next;
+      if (!next) return;
+      // The character's programs link in parallel before it is first drawn (the startup's long
+      // first draw was the room's own link, 11節): it joins the scene only once they are ready.
+      const visible = next.root.visible;
+      next.root.visible = true;
+      const holder = new Scene().add(next.root);
+      holder.add(fill.clone(), key.clone());
+      renderer.setRenderTarget(roomTarget ?? null);
+      await renderer.compileAsync(holder, camera).catch(() => undefined);
+      renderer.setRenderTarget(null);
+      next.root.visible = visible;
+      if (resident === next && !destroyed) scene.add(next.root);
+    },
+    project(points) {
+      return points.map(({ x, y, z }) => {
+        projected.set(x, y, z).project(camera);
+        if (projected.z > 1 || projected.z < -1) return null;
+        return { x: ((projected.x + 1) / 2) * width, y: ((1 - projected.y) / 2) * height };
+      });
+    },
+    dim(amount) {
+      const next = Math.round(Math.min(1, Math.max(0, amount)) * 100) / 100;
+      if (next === dimmed) return;
+      dimmed = next;
+      // Over the reveal's own opacity (a style the page cannot change): a short dip, no transition.
+      canvas.style.setProperty('filter', next ? `brightness(${1 - next * 0.85})` : 'none', 'important');
+    },
     reveal() {
       revealed ??= new Promise<void>((resolve) => {
         // The canvas was connected at opacity 0 in an earlier frame, so this change transitions.
@@ -527,9 +634,27 @@ export async function createRoomRenderer(
         .addScaledVector(axes.up, frame.camera.offset.y)
         .addScaledVector(axes.back, frame.camera.offset.z);
       camera.quaternion.copy(base.quaternion);
+      const orbit = ((frame.camera.orbitDeg ?? 0) * Math.PI) / 180;
+      if (orbit) {
+        // A turn about the room's middle (the dolly zoom's subject in front of camera_main), about
+        // the room's vertical: vertical lines stay vertical.
+        const pivot = base.position.clone().addScaledVector(axes.back, -ROOM_SUBJECT_M);
+        const turn = new Quaternion().setFromAxisAngle(UP, orbit);
+        camera.position.sub(pivot).applyQuaternion(turn).add(pivot);
+        camera.quaternion.premultiply(turn);
+      }
       camera.fov = frame.camera.fovDeg;
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
+      if (frame.camera.shiftX || frame.camera.shiftY) {
+        // The lens shift: the frustum slides instead of the camera turning (an off-axis view).
+        const m = camera.projectionMatrix.elements;
+        m[8] = (frame.camera.shiftX ?? 0) / camera.aspect;
+        m[9] = frame.camera.shiftY ?? 0;
+        camera.projectionMatrixInverse.copy(camera.projectionMatrix).invert();
+      }
+      camera.updateMatrixWorld();
+      fill.color.setRGB(0.55 + frame.video.r * 0.6, 0.52 + frame.video.g * 0.6, 0.6 + frame.video.b * 0.6);
       if (monitor) monitor.color.setRGB(frame.video.r * 1.6, frame.video.g * 1.6, frame.video.b * 1.6);
       renderer.setRenderTarget(roomTarget);
       renderer.render(scene, camera);

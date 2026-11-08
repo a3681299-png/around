@@ -50,12 +50,14 @@ export const dollyFov = (z: number, baseFovDeg = BASE_FOV_DEG, subject = SUBJECT
  */
 export const DEFAULT_SHOTS: CameraShots = Object.freeze({
   top: Object.freeze({ x: 0, y: 0.05, z: 1.5, fovDeg: 30, shiftX: 0, shiftY: 0, orbitDeg: 0, sway: 0.15 }),
+  // Moved right and shifted so the room's right side (the desk, the chair) comes into the gap
+  // between the comments and the list beside them.
   comments: Object.freeze({
-    x: -0.15,
+    x: 0.2,
     y: -0.05,
     z: -0.25,
     fovDeg: 50,
-    shiftX: -0.12,
+    shiftX: 0.3,
     shiftY: 0.06,
     orbitDeg: 0,
     sway: 0.6,

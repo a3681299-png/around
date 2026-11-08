@@ -17,12 +17,96 @@ import {
   samePlates,
   stepCamera,
   stepVideoLight,
+  type CameraProjection,
   type GlassPlate,
   type SpaceCameraState,
   type VideoLight,
 } from '../world/space';
 import { createRoomRenderer, ROOM_SUBJECT_M, type RoomRenderer } from '../renderers/three/room';
+import { loadRoomResident, type ResidentClipName, type RoomResident } from '../renderers/three/room-resident';
+import {
+  residentPose,
+  startResident,
+  stepResident,
+  withFloorPlaces,
+  type ResidentState,
+  type RoomLayout,
+  type RoomSpot,
+} from '../world/room-life';
+import {
+  DEFAULT_SHOTS,
+  currentShot,
+  flatness,
+  shotCamera,
+  shotSettled,
+  startShots,
+  stepShots,
+  wantedShot,
+  type CameraShots,
+  type ShotName,
+  type ShotState,
+} from '../world/camera-shots';
+import type { SpaceLayout } from '../design/space';
 import { SPACE_PROBE } from './world-options';
+
+/** The room's resident as the page controller found it in the artwork: its 3D layer's model and
+ * its character motions (asset IDs and the names they were imported with). */
+export interface ResidentSource {
+  layerId: string;
+  assetId: string;
+  motions: readonly { id: string; assetId: string; role?: string }[];
+}
+/** The body's clips from the character's own motions, by the names they were imported with
+ * (Quaternius-style names: Walk_Loop, Sitting_Enter…; the engine reads names, never the site). */
+export function residentClips(motions: ResidentSource['motions']): Map<ResidentClipName, string> {
+  const out = new Map<ResidentClipName, string>();
+  const find = (...patterns: RegExp[]) => {
+    for (const pattern of patterns) {
+      const hit = motions.find((m) => pattern.test(m.id));
+      if (hit) return hit.assetId;
+    }
+    return undefined;
+  };
+  const set = (name: ResidentClipName, id: string | undefined) => id && out.set(name, id);
+  set('idle', find(/^idle(-loop)?$/, /idle/));
+  set('walk', find(/^walk(-loop)?$/, /walk/));
+  set('sit', find(/^sit(ting)?(-idle)?(-loop)?$/, /sit.*idle/, /^sit/));
+  set('sitDown', find(/sit.*(enter|down)/));
+  set('standUp', find(/sit.*(exit|up)/, /stand.*up/));
+  set('hide', find(/crouch/, /hide/));
+  set('hop', find(/jump|hop/));
+  // Names that say nothing (a file renamed): the roles measured at import (characters/settings.ts).
+  const byRole = (role: string) => motions.find((m) => m.role === role)?.assetId;
+  if (!out.has('idle')) set('idle', byRole('idle'));
+  if (!out.has('walk')) set('walk', byRole('move'));
+  if (!out.has('sit')) set('sit', byRole('sit'));
+  return out;
+}
+/** The artwork's own layout as the world's numbers (rectangles become two triangles each). */
+const layoutFromArtwork = (l: SpaceLayout): RoomLayout => ({
+  floorY: l.floorY,
+  floor: l.floor.flatMap((r) => [
+    [r.x0, r.z0, r.x1, r.z0, r.x1, r.z1],
+    [r.x0, r.z0, r.x1, r.z1, r.x0, r.z1],
+  ]),
+  spots: l.spots.map((s, i) => ({
+    id: `${s.kind}_${i}`,
+    kind: s.kind,
+    x: s.x,
+    y: s.y,
+    z: s.z,
+    heading: (s.headingDeg * Math.PI) / 180,
+  })),
+});
+/** A fixed seed per resident layer: the same artwork lives the same life. */
+const seedOf = (text: string) => {
+  let h = 2166136261;
+  for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 16777619);
+  return h >>> 0;
+};
+/** The resident is drawn at most this often while it moves, and this often while it rests. */
+const RESIDENT_MOVING_MS = 33;
+const RESIDENT_RESTING_MS = 66;
 
 /** How long after a scroll, resize or page change the regions are read every frame. */
 const ACTIVE_MS = 600;
@@ -36,7 +120,10 @@ const VIDEO_SAMPLE_MS = 500;
 const LIGHT_ONLY_MS = 33;
 
 export interface SpaceHost {
-  update(space: DesignSpace | undefined): void;
+  update(space: DesignSpace | undefined, resident?: ResidentSource): void;
+  /** The resident layer's id while the character lives in the room (its front drawing is then
+   * hidden and needs no guard); undefined while it is in front, or without a resident. */
+  away(): string | undefined;
   /** The place behind the UI for room-depth artwork while the room is shown; 'pending' while the
    * artwork has a room that is loading or hidden (fullscreen); undefined without a room. */
   place(): { parent: HTMLElement; zIndex: number; after: Element } | 'pending' | undefined;
@@ -80,6 +167,72 @@ export function createSpaceHost(
   let pointer: { x: number; y: number } | undefined;
   /** The current room's canvas has started fading in (after its first draw). */
   let revealing = false;
+  // v18: the camera's shapes per page state (world/camera-shots.ts), when the artwork gives them.
+  let shots: CameraShots | undefined,
+    shotState: ShotState | undefined,
+    shotName: ShotName = 'top';
+  // v18: the character living in the room.
+  let residentSource: ResidentSource | undefined;
+  let life:
+    | {
+        key: string;
+        body?: RoomResident;
+        layout: RoomLayout;
+        seed: number;
+        state: ResidentState;
+        drawnAt: number;
+        drawnActivity?: string;
+        abort: AbortController;
+      }
+    | undefined;
+  let awayId: string | undefined;
+  let viewProjectedAt = -Infinity;
+  let spotSeen = new Map<string, number>();
+  let nearFront = false;
+  let roomSeen = 1;
+
+  const stopLife = () => {
+    if (!life) return;
+    life.abort.abort();
+    void session?.renderer?.setResident(undefined);
+    life.body?.dispose();
+    life = undefined;
+    if (awayId !== undefined) {
+      awayId = undefined;
+      onPlace?.();
+    }
+  };
+  /** Loads the resident's body into the room (its model and motions through the same asset port
+   * and checks as any layer); the life runs meanwhile, the body joins when ready. */
+  const startLife = (renderer: RoomRenderer, next: DesignSpace, source: ResidentSource) => {
+    const layout = withFloorPlaces(next.layout ? layoutFromArtwork(next.layout) : renderer.layout);
+    if (!layout.floor.length || !layout.spots.length) return;
+    const seed = seedOf(source.layerId);
+    const abort = new AbortController();
+    const key = `${source.assetId}|${source.motions.map((m) => m.assetId).join(',')}|${JSON.stringify(next.layout ?? null)}`;
+    life = { key, layout, seed, state: startResident(layout, seed), drawnAt: -Infinity, abort };
+    const current = life;
+    const clips = residentClips(source.motions);
+    void (async () => {
+      const model = await assets.load(source.assetId, abort.signal);
+      if (!model.modelBuffer) throw new Error('部屋の住人は3Dのモデル（VRM）にしてください。');
+      const motions = await Promise.all(
+        [...clips].map(async ([name, id]) => {
+          const asset = await assets.load(id, abort.signal);
+          return { name, bytes: new Uint8Array(await asset.blob!.arrayBuffer()) };
+        }),
+      );
+      const body = await loadRoomResident(model.modelBuffer, motions);
+      if (life !== current || abort.signal.aborted) return body.dispose();
+      current.body = body;
+      await renderer.setResident(body);
+      drawnCamera = undefined;
+      schedule();
+    })().catch((error: unknown) => {
+      if (abort.signal.aborted) return;
+      console.error('[Web World Themes] 部屋の住人を読み込めませんでした。', error);
+    });
+  };
 
   const wake = () => {
     activeUntil = view.performance.now() + ACTIVE_MS;
@@ -154,6 +307,48 @@ export function createSpaceHost(
       });
   };
 
+  /**
+   * What the viewer sees of the room now: each place's share (projected into the viewport, not
+   * under the player and only half under a reading plate) and the room's share overall (the
+   * viewport less the plates, the player's counted whole). Read four times a second.
+   */
+  const measureView = (renderer: RoomRenderer, layout: RoomLayout) => {
+    const w = view.innerWidth,
+      h = view.innerHeight;
+    const inside = (p: { x: number; y: number }, r: GlassPlate) =>
+      p.x >= r.left && p.x <= r.right && p.y >= r.top && p.y <= r.bottom;
+    // The body's middle, its feet and its head: a place counts only where the whole body is in
+    // view (near the camera the feet fall below the window and the body fills it).
+    const body = (s: RoomSpot) =>
+      s.kind === 'sit' ? [s.y - 0.4, s.y + 0.2, s.y + 0.9] : [layout.floorY, layout.floorY + 0.8, layout.floorY + 1.55];
+    const points = renderer.project(layout.spots.flatMap((s: RoomSpot) => body(s).map((y) => ({ x: s.x, y, z: s.z }))));
+    spotSeen = new Map(
+      layout.spots.map((s, i) => {
+        const [feet, p, head] = [points[i * 3], points[i * 3 + 1], points[i * 3 + 2]];
+        if (!p || !feet || !head || p.x < 0 || p.x > w || feet.y > h || head.y < 0 || feet.y - head.y > h * 0.6)
+          return [s.id, 0];
+        const over = plates.filter((r) => inside(p, r));
+        return [s.id, over.some((r) => r.video) ? 0 : over.length ? 0.4 : 1];
+      }),
+    );
+    let covered = 0;
+    for (const r of plates) {
+      const area =
+        Math.max(0, Math.min(w, r.right) - Math.max(0, r.left)) *
+        Math.max(0, Math.min(h, r.bottom) - Math.max(0, r.top));
+      covered += area * (r.video ? 1 : 0.6);
+    }
+    roomSeen = Math.max(0, Math.min(1, 1 - covered / Math.max(1, w * h)));
+    // The plates do not know the page's opaque pictures (the list of thumbnails beside the player):
+    // with camera shapes, the top's far shot is where the page covers the room most, so it counts
+    // at less than half (the character then keeps the viewer company in front).
+    if (shots && shotName === 'top') roomSeen *= 0.4;
+    // Near the front place: the player's lower right corner (the character's home in front).
+    const player = plates.find((r) => r.video);
+    const me = life ? renderer.project([{ x: life.state.x, y: layout.floorY + 0.8, z: life.state.z }])[0] : null;
+    nearFront = Boolean(player && me && Math.hypot(me.x - player.right, me.y - player.bottom) < w * 0.22);
+  };
+
   const schedule = () => {
     if (frame === undefined && session?.renderer && !doc.hidden) frame = view.requestAnimationFrame(tick);
   };
@@ -190,28 +385,87 @@ export function createSpaceHost(
     }
     light = stepVideoLight(light, sample, dt, reduced.matches);
     const scrollProgress = view.scrollY / Math.max(1, view.innerHeight);
-    const target = cameraTarget(space.camera, {
-      ...(pointer ? { pointer } : {}),
-      scroll: scrollProgress,
-      reducedMotion: reduced.matches,
-    });
-    camera = stepCamera(camera, target, dt, space.camera.follow);
+    let target: SpaceCameraState;
+    let projection: CameraProjection;
+    let shotsMoving = false,
+      flat = false;
+    if (shots) {
+      // v18: the shapes. The page's own state picks one (the viewer's scrolling and theater
+      // switch); the pointer only adds the small lens-shift parallax, followed smoothly.
+      shotName = wantedShot(shotName, backdrop.theater?.() ?? false, scrollProgress);
+      shotState = stepShots(shotState ?? startShots(shots, shotName), shots, shotName, dt, reduced.matches);
+      const { shot, dip } = currentShot(shotState, shots, reduced.matches);
+      renderer.dim(dip);
+      shotsMoving = !shotSettled(shotState, shots, reduced.matches);
+      flat = !shotsMoving && flatness(shot, shots.top) > 0.9;
+      const k = reduced.matches ? 0.25 : 1;
+      target = pointer ? { x: pointer.x * k, y: pointer.y * k, dolly: 0 } : CAMERA_REST;
+      camera = stepCamera(camera, target, dt, space.camera.follow);
+      const c = shotCamera(shot, { x: camera.x, y: camera.y }, ROOM_SUBJECT_M);
+      projection = {
+        offset: { x: c.x, y: c.y, z: c.z },
+        fovDeg: c.fovDeg,
+        shiftX: c.shiftX,
+        shiftY: c.shiftY,
+        orbitDeg: c.orbitDeg,
+      };
+    } else {
+      target = cameraTarget(space.camera, {
+        ...(pointer ? { pointer } : {}),
+        scroll: scrollProgress,
+        reducedMotion: reduced.matches,
+      });
+      camera = stepCamera(camera, target, dt, space.camera.follow);
+      projection = projectCamera({ fovDeg: renderer.baseFovDeg, subject: ROOM_SUBJECT_M }, camera);
+    }
     const scheme = backdrop.scheme();
-    const moved = !drawnCamera || !cameraSettled(camera, drawnCamera);
+    // The resident: its life steps every frame (cheap numbers); its body is drawn at most 30 times
+    // a second while it moves and 15 while it rests, and not at all while it is in front.
+    let residentDue = false;
+    if (life) {
+      if (now - viewProjectedAt >= 250) {
+        viewProjectedAt = now;
+        measureView(renderer, life.layout);
+      }
+      life.state = stepResident(
+        life.state,
+        {
+          dt,
+          layout: life.layout,
+          seen: (spot) => spotSeen.get(spot.id) ?? 0.5,
+          roomSeen,
+          flat,
+          front: space.resident?.front ?? 0,
+          nearFront,
+          reducedMotion: reduced.matches,
+        },
+        life.seed,
+      );
+      const away = life.body && life.state.activity !== 'front' ? space.resident?.layerId : undefined;
+      if (away !== awayId) {
+        awayId = away;
+        onPlace?.();
+      }
+      if (life.body) {
+        const pose = residentPose(life.state, life.layout);
+        const moving = !['idle', 'sit', 'hide', 'front'].includes(life.state.activity);
+        // A change of activity is always drawn: gone to the front, the room must not keep the
+        // last faint frame of the fade.
+        const changed = life.state.activity !== life.drawnActivity;
+        life.drawnActivity = life.state.activity;
+        residentDue =
+          changed || (pose.visible && now - life.drawnAt >= (moving ? RESIDENT_MOVING_MS : RESIDENT_RESTING_MS));
+        if (residentDue || !pose.visible) life.body.update(pose, (now - life.drawnAt) / 1000);
+      }
+    }
+    const moved = !drawnCamera || !cameraSettled(camera, drawnCamera) || shotsMoving;
     const platesMoved = !drawnPlates || !samePlates(plates, drawnPlates) || scheme !== drawnScheme;
     const lit =
       !drawnLight ||
       Math.abs(light.r - drawnLight.r) + Math.abs(light.g - drawnLight.g) + Math.abs(light.b - drawnLight.b) > 1 / 512;
-    if (moved || platesMoved || (lit && now - drawnAt >= LIGHT_ONLY_MS)) {
-      renderer.draw(
-        {
-          camera: projectCamera({ fovDeg: renderer.baseFovDeg, subject: ROOM_SUBJECT_M }, camera),
-          plates,
-          scheme,
-          video: light,
-        },
-        space,
-      );
+    if (moved || platesMoved || residentDue || (lit && now - drawnAt >= LIGHT_ONLY_MS)) {
+      if (life) life.drawnAt = now;
+      renderer.draw({ camera: projection, plates, scheme, video: light }, space);
       if (!revealing) {
         const current = session;
         revealing = true;
@@ -250,6 +504,17 @@ export function createSpaceHost(
             return v ? [v.readyState, v.videoWidth, v.paused] : null;
           })(),
           scheme,
+          shot: shots ? shotName : null,
+          resident: life
+            ? {
+                activity: life.state.activity,
+                spot: life.state.spot ?? null,
+                body: Boolean(life.body),
+                away: awayId ?? null,
+                screen: renderer.project([{ x: life.state.x, y: life.layout.floorY + 0.8, z: life.state.z }])[0],
+                roomSeen: Math.round(roomSeen * 100) / 100,
+              }
+            : null,
         });
       }
     }
@@ -257,13 +522,17 @@ export function createSpaceHost(
     // playing video's colour. Otherwise sleep until an event wakes the loop.
     const video = backdrop.video();
     const playing = Boolean(video && !video.paused && space.videoLight > 0);
-    if (!cameraSettled(camera, target) || now < activeUntil || playing || lit) schedule();
-    else view.setTimeout(schedule, IDLE_REGION_MS);
+    const living = Boolean(life?.body) && life!.state.activity !== 'front';
+    if (!cameraSettled(camera, target) || shotsMoving || now < activeUntil || playing || lit || living) schedule();
+    // In front, the life still keeps time (to come back when the room opens), four times a second.
+    else view.setTimeout(schedule, life ? 250 : IDLE_REGION_MS);
   };
 
   const stop = () => {
     if (frame !== undefined) view.cancelAnimationFrame(frame);
     frame = undefined;
+    stopLife();
+    shotState = undefined;
     if (!session) return;
     session.abort.abort();
     session.renderer?.destroy();
@@ -313,6 +582,7 @@ export function createSpaceHost(
           abort.signal.addEventListener('abort', () => watch.disconnect());
         }
         onPlace?.();
+        syncLife();
         wake();
       })
       .catch((error: unknown) => {
@@ -321,15 +591,35 @@ export function createSpaceHost(
         console.error('[Web World Themes] 部屋を読み込めませんでした。', error);
       });
   };
+  /** Starts, keeps or ends the resident's life for the artwork now (once the room is there). */
+  const syncLife = () => {
+    const renderer = session?.renderer;
+    const source = space?.resident && residentSource?.layerId === space.resident.layerId ? residentSource : undefined;
+    if (!renderer || !space || !source) return stopLife();
+    const key = `${source.assetId}|${source.motions.map((m) => m.assetId).join(',')}|${JSON.stringify(space.layout ?? null)}`;
+    if (life?.key === key) return;
+    stopLife();
+    startLife(renderer, space, source);
+  };
   return {
-    update(next) {
+    update(next, resident) {
       space = next;
+      residentSource = resident;
       if (!next) return stop();
       if (session && session.assetId !== next.room.assetId) stop();
       if (!session) start(next);
+      const nextShots = next.camera.shots
+        ? { ...next.camera.shots, transition: next.camera.transition ?? DEFAULT_SHOTS.transition }
+        : undefined;
+      if (JSON.stringify(nextShots) !== JSON.stringify(shots)) {
+        shots = nextShots;
+        shotState = undefined;
+      }
+      syncLife();
       drawnCamera = undefined;
       wake();
     },
+    away: () => awayId,
     place() {
       if (!session) return undefined;
       const renderer = session.renderer;
