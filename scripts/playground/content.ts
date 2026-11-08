@@ -10,6 +10,7 @@ import { inspectVrma } from '../../src/assets/vrma';
 import { parseDesign } from '../../src/design/schema';
 import { defaultModelSettings } from '../../src/models/types';
 import { CHARACTER_HOME } from '../../src/characters/home';
+import { parseDesktopLayout } from '../../src/playground/desktop-layout';
 
 const sha = (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('hex');
 
@@ -82,7 +83,7 @@ export function writeContent(root: string, out: string): { models: string[] } {
   // The spatial resident shares the basic player's validated seated clip.
   const poses = (['sit', 'stand'] as const).map((name) => {
     const bytes = privateRoot
-      ? privateAsset(`mirdo/motions-pass/${name === 'sit' ? 'Sitting_Idle_Loop' : 'Walk_Loop'}.vrma`)
+      ? privateAsset(`mirdo/motions-pass/${name === 'sit' ? 'Sitting_Idle_Loop' : 'Idle_Loop'}.vrma`)
       : new Uint8Array(mannequinPoseVrma(name, MANNEQUIN_POSES[name]));
     const info = inspectVrma(bytes).info;
     return { name, id: add(bytes, 'vrma', `${name}.vrma`), info };
@@ -156,7 +157,36 @@ export function writeContent(root: string, out: string): { models: string[] } {
     ],
   });
   writeFileSync(join(out, 'design.json'), JSON.stringify(design, null, 2));
-  const resident = { model: vrmId, sit: poses[0]!.id, mannequin: !privateRoot };
-  writeFileSync(join(out, 'manifest.json'), JSON.stringify({ design: 'design.json', assets, resident }, null, 2));
-  return { models: [assets[vrmId]!.file, ...poses.map((pose) => assets[pose.id]!.file)] };
+  const extras = privateRoot
+    ? Object.fromEntries(
+        Object.entries({ sitDown: 'Sitting_Enter', walk: 'Walk_Loop', hop: 'Jump_Land' }).map(([role, name]) => {
+          const bytes = privateAsset(`mirdo/motions-pass/${name}.vrma`);
+          inspectVrma(bytes);
+          return [role, add(bytes, 'vrma', `${name}.vrma`)];
+        }),
+      )
+    : {};
+  const resident = { model: vrmId, sit: poses[0]!.id, stand: poses[1]!.id, ...extras, mannequin: !privateRoot };
+  const localRoom = process.env.WW_PLAYGROUND_LOCAL_ROOM;
+  const layout = JSON.parse(
+    readFileSync(
+      process.env.WW_PLAYGROUND_LOCAL_LAYOUT ?? join(root, 'scripts/playground/desktop-layout.json'),
+      'utf8',
+    ),
+  );
+  const models = [vrmId, ...poses.map((pose) => pose.id), ...Object.values(extras)];
+  let room;
+  if (localRoom) {
+    const bytes = readFileSync(localRoom);
+    if (inspectAsset(bytes).model?.format !== 'glb') throw new Error('The local room must be a self-contained GLB.');
+    const asset = add(bytes, 'glb', 'Local room.glb');
+    room = { position: [0, -508, -600], rotationDeg: [0, 0, 0], scale: 410, ...layout.room, asset };
+    models.push(asset);
+  }
+  const desktop = parseDesktopLayout({ ...layout, room });
+  writeFileSync(
+    join(out, 'manifest.json'),
+    JSON.stringify({ design: 'design.json', assets, resident, desktop }, null, 2),
+  );
+  return { models: models.map((id) => assets[id]!.file) };
 }

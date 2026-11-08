@@ -8,6 +8,8 @@ import { parseDesign } from '../design/schema';
 import { createFetchAssets, type PlaygroundManifest } from './assets';
 import { mountPlayer } from './player';
 import { openSpatial } from './spatial';
+import { mountDesktopShell } from './desktop';
+import { parseDesktopLayout } from './desktop-layout';
 
 declare const __WW_PLAYGROUND_TEST__: boolean;
 
@@ -30,11 +32,21 @@ async function start() {
   const apply = document.querySelector<HTMLButtonElement>('#apply')!;
   const page = document.querySelector<HTMLElement>('#watch-page')!;
   const video = document.querySelector<HTMLVideoElement>('video[data-ww-video]')!;
+  const openDesktop = document.querySelector<HTMLButtonElement>('#open-desktop')!;
+  const closeDesktop = document.querySelector<HTMLButtonElement>('#close-desktop')!;
+  const shell = mountDesktopShell(video);
+  const layout = parseDesktopLayout(manifest.desktop);
+  if (layout.room) void assets.load(layout.room.asset).catch(() => undefined);
+  const desktopHash = () => location.hash === '#desktop';
   const basicOnly = __WW_PLAYGROUND_TEST__ && new URLSearchParams(location.search).has('basic');
-  let applied = false,
+  let applied = desktopHash(),
     stopped = false;
   let spatial: ReturnType<typeof openSpatial> = null;
   const render = () => {
+    const desktop = desktopHash() && applied && !stopped;
+    openDesktop.hidden = !applied || stopped || desktop;
+    shell.show(desktop ? (spatial ? 'spatial' : 'basic') : undefined);
+    spatial?.setDesktop(desktop);
     controller.update({ enabled: applied && !spatial, creatorMode: false });
     apply.setAttribute('aria-pressed', String(applied));
     apply.textContent = applied ? '元に戻す' : 'WWT を適用';
@@ -47,6 +59,7 @@ async function start() {
       video,
       assets,
       manifest.resident,
+      layout,
       (reason) => {
         spatial = null;
         if (reason === 'resize') enter();
@@ -56,12 +69,38 @@ async function start() {
       preferCanvas,
     );
   }
+  function route() {
+    if (desktopHash()) {
+      applied = true;
+      if (spatial) spatial.cancelExit();
+      else enter();
+    }
+    render();
+  }
+  function returnToBrowser() {
+    if (history.state?.fromPlaygroundBrowser) history.back();
+    else {
+      history.replaceState(null, '', location.pathname + location.search);
+      route();
+    }
+  }
+  openDesktop.addEventListener('click', () => {
+    if (desktopHash()) return;
+    history.pushState({ fromPlaygroundBrowser: true }, '', '#desktop');
+    route();
+    closeDesktop.focus({ preventScroll: true });
+  });
+  closeDesktop.addEventListener('click', returnToBrowser);
+  window.addEventListener('hashchange', route);
   apply.addEventListener('click', () => {
     applied = !applied;
     if (applied) {
       if (spatial) spatial.cancelExit();
       else enter();
-    } else spatial?.exit();
+    } else {
+      spatial?.exit();
+      if (desktopHash()) returnToBrowser();
+    }
     render();
   });
   // Emergency OFF, as in the extension: the same shortcut stops every effect until pressed again.
@@ -74,7 +113,7 @@ async function start() {
       render();
     }
   });
-  render();
+  route();
   apply.disabled = false;
   if (__WW_PLAYGROUND_TEST__)
     Object.assign(globalThis, {

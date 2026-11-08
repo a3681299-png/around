@@ -30,6 +30,7 @@
         <button id="apply" class="apply" type="button" data-ww-control="click" aria-pressed="false" disabled
           >WWT を適用</button
         >
+        <button id="open-desktop" type="button" data-ww-control="click" hidden>デスクトップへ</button>
       </header>
       <main class="layout">
         <section class="watch">
@@ -88,5 +89,14 @@
       </main>
       <footer class="foot"><span>Web World Themes Playground</span></footer>
     </div>
+    <div class="desktop-lite" aria-hidden="true" hidden>
+      <div class="desktop-lite-monitor"><canvas width="480" height="270"></canvas></div>
+    </div>
+    <footer id="desktop-bar" class="desktop-bar" aria-label="デスクトップ" hidden>
+      <div class="desktop-wordmark"
+        ><span aria-hidden="true"></span><strong>窓辺</strong><small>WWT Playground</small></div
+      >
+      <button id="close-desktop" type="button" data-ww-control="click">ブラウザーに戻る</button>
+    </footer>
   </body>
 </html>

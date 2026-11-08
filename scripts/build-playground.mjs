@@ -18,6 +18,9 @@ if (
 )
   throw new Error('WW_PLAYGROUND_OUT must be dist-playground or a direct .work child.');
 const test = process.env.WW_PLAYGROUND_TEST === '1';
+const localRoom = process.env.WW_PLAYGROUND_LOCAL_ROOM;
+if ((localRoom || process.env.WW_PLAYGROUND_LOCAL_LAYOUT) && output === join(root, 'dist-playground'))
+  throw new Error('A local room or layout requires an explicit WW_PLAYGROUND_OUT under .work.');
 if (!test && !process.env.WW_PLAYGROUND_PRIVATE_ASSETS)
   throw new Error('Set WW_PLAYGROUND_PRIVATE_ASSETS to the local wwt-private-assets checkout.');
 
