@@ -115,16 +115,6 @@ export const walkable = (layout: RoomLayout, x: number, z: number) =>
   onFloor(layout, x, z + BODY_M) &&
   onFloor(layout, x, z - BODY_M);
 
-/** Walkable all the way (sampled every 2 cm). */
-function clear(layout: RoomLayout, a: readonly [number, number], b: readonly [number, number]) {
-  const steps = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / 0.02));
-  for (let i = 0; i <= steps; i++) {
-    const t = i / steps;
-    if (!walkable(layout, a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t)) return false;
-  }
-  return true;
-}
-
 /** The nearest walkable point to (x, z) on a 5 cm search (a seat's marker is over the chair, off the floor). */
 export function nearestFloor(layout: RoomLayout, x: number, z: number): [number, number] {
   if (walkable(layout, x, z)) return [x, z];
@@ -139,6 +129,8 @@ export function nearestFloor(layout: RoomLayout, x: number, z: number): [number,
 }
 
 const CELL = 0.1;
+const MAX_VISITS = 4096;
+const MAX_FLOOR_CHECKS = 750000;
 /**
  * A walk over the floor from a to b: straight when nothing is in the way, otherwise the shortest
  * way over a 10 cm grid of the floor, pulled tight (each corner kept only where a straight line
@@ -149,7 +141,21 @@ export function floorPath(
   a: readonly [number, number],
   b: readonly [number, number],
 ): [number, number][] {
-  if (clear(layout, a, b)) return [[b[0], b[1]]];
+  // Navigation runs on the page's main thread. Charge each position conservatively for
+  // all its triangle checks, including the straight-line and path-shortening passes.
+  let remaining = Math.floor(MAX_FLOOR_CHECKS / (5 * Math.max(1, layout.floor.length)));
+  const supported = (x: number, z: number) => remaining-- > 0 && walkable(layout, x, z);
+  const clear = (from: readonly [number, number], to: readonly [number, number]) => {
+    const steps = Math.max(1, Math.ceil(Math.hypot(to[0] - from[0], to[1] - from[1]) / 0.02));
+    if (!(steps < remaining)) return false;
+    for (let i = 0; i <= steps; i++) {
+      const t = i / steps;
+      if (!supported(from[0] + (to[0] - from[0]) * t, from[1] + (to[1] - from[1]) * t)) return false;
+    }
+    return true;
+  };
+  if (!supported(...a) || !supported(...b)) return [];
+  if (clear(a, b)) return [[b[0], b[1]]];
   let minX = Infinity,
     minZ = Infinity,
     maxX = -Infinity,
@@ -175,9 +181,11 @@ export function floorPath(
     from = new Int32Array(w * h).fill(-1),
     done = new Uint8Array(w * h);
   cost[start] = 0;
-  // A small grid: a plain Dijkstra over an array (no heap) stays well under a millisecond.
+  // Stop before scanning a large disconnected floor can block the host. A partial path
+  // would leave the resident walking somewhere the solver didn't prove reachable.
   const open = new Set<number>([start]);
-  while (open.size) {
+  let arrived = false;
+  for (let visit = 0; open.size && visit < MAX_VISITS && remaining > 0; visit++) {
     let best = -1,
       bestCost = Infinity;
     for (const i of open) {
@@ -188,7 +196,10 @@ export function floorPath(
       }
     }
     open.delete(best);
-    if (best === goal) break;
+    if (best === goal) {
+      arrived = true;
+      break;
+    }
     done[best] = 1;
     const bx = best % w,
       bz = Math.floor(best / w);
@@ -199,13 +210,9 @@ export function floorPath(
           nz = bz + dz;
         if (nx < 0 || nz < 0 || nx >= w || nz >= h) continue;
         const n = nz * w + nx;
-        if (done[n] || (n !== goal && !walkable(layout, cx(n), cz(n)))) continue;
+        if (done[n] || (n !== goal && !supported(cx(n), cz(n)))) continue;
         // A diagonal step only where both sides are open (it would cut a furniture corner).
-        if (
-          dx &&
-          dz &&
-          (!walkable(layout, cx(bz * w + nx), cz(bz * w + nx)) || !walkable(layout, cx(nz * w + bx), cz(nz * w + bx)))
-        )
+        if (dx && dz && (!supported(cx(bz * w + nx), cz(bz * w + nx)) || !supported(cx(nz * w + bx), cz(nz * w + bx))))
           continue;
         const c = cost[best]! + (dx && dz ? Math.SQRT2 : 1) * CELL;
         if (c < cost[n]!) {
@@ -215,7 +222,7 @@ export function floorPath(
         }
       }
   }
-  if (from[goal] === -1 && goal !== start) return [];
+  if (!arrived || start === goal) return [];
   const cells: [number, number][] = [];
   for (let i = goal; i !== -1 && i !== start; i = from[i]!) cells.unshift([cx(i), cz(i)]);
   cells[cells.length - 1] = [b[0], b[1]];
@@ -224,7 +231,7 @@ export function floorPath(
   let at: readonly [number, number] = a;
   for (let i = 0; i < cells.length; i++) {
     const next = cells[i + 1];
-    if (next && clear(layout, at, next)) continue;
+    if (next && clear(at, next)) continue;
     out.push(cells[i]!);
     at = cells[i]!;
   }
@@ -249,10 +256,19 @@ export function withFloorPlaces(layout: RoomLayout): RoomLayout {
       maxZ = Math.max(maxZ, t[i + 1]!);
     }
   const free: RoomSpot[] = [];
-  for (let z = minZ + 0.45; z < maxZ && free.length < 16; z += 0.9)
-    for (let x = minX + 0.45; x < maxX && free.length < 16; x += 0.9)
+  // A sparse floor should still have a fixed sampling budget. Integer indices also advance
+  // when a very large coordinate cannot represent the addition of a small step.
+  const spacing = Math.max(0.9, (maxX - minX) / 16, (maxZ - minZ) / 16);
+  for (let row = 0; row < 16 && free.length < 16; row++) {
+    const z = minZ + (row + 0.5) * spacing;
+    if (!(z < maxZ)) break;
+    for (let col = 0; col < 16 && free.length < 16; col++) {
+      const x = minX + (col + 0.5) * spacing;
+      if (!(x < maxX)) break;
       if (walkable(layout, x, z) && !layout.spots.some((s) => Math.hypot(s.x - x, s.z - z) < 0.6))
         free.push({ id: `floor_${free.length}`, kind: 'stand', x, y: layout.floorY, z, heading: 0 });
+    }
+  }
   return { ...layout, spots: [...layout.spots, ...free] };
 }
 

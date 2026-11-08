@@ -47,7 +47,7 @@ import {
   type GlassPlate,
   type VideoLight,
 } from '../../world/space';
-import { ROOM_LIGHT_LAYER, type RoomLook } from '../../design/space';
+import { ROOM_LIGHT_LAYER, SPACE_LIMITS, type RoomLook } from '../../design/space';
 import { SPACE_BREAK } from '../../host/world-options';
 import type { RoomLayout, RoomSpot } from '../../world/room-life';
 import type { RoomResident } from './room-resident';
@@ -57,21 +57,24 @@ import type { RoomResident } from './room-resident';
  * marker_stand_ empties (position; the arrow, the empty's +Z, gives the way the character faces)
  * and the navmesh_floor mesh (its triangles, flattened onto the floor). Numbers only leave here.
  */
-function readLayout(root: Object3D): RoomLayout {
+export function readRoomLayout(root: Object3D): RoomLayout {
   root.updateWorldMatrix(true, true);
   const spots: RoomSpot[] = [];
   const floor: number[][] = [];
   let floorY = 0,
-    heights = 0;
+    heights = 0,
+    triangles = 0;
   const p = new Vector3(),
     forward = new Vector3();
+  const inRoom = (point: Vector3) =>
+    [point.x, point.y, point.z].every((n) => Number.isFinite(n) && Math.abs(n) <= SPACE_LIMITS.roomReach);
   root.traverse((o) => {
     const marker = /^marker_(sit|hide|stand)_([a-z0-9_]{1,32})$/.exec(o.name);
     if (marker && spots.length < 32) {
       o.getWorldPosition(p);
       forward.set(0, 0, 1).transformDirection(o.matrixWorld);
       const heading = Math.hypot(forward.x, forward.z) > 0.2 ? Math.atan2(forward.x, forward.z) : 0;
-      if ([p.x, p.y, p.z, heading].every(Number.isFinite))
+      if (inRoom(p) && Number.isFinite(heading))
         spots.push({
           id: `${marker[1]}_${marker[2]}`,
           kind: marker[1] as RoomSpot['kind'],
@@ -87,15 +90,23 @@ function readLayout(root: Object3D): RoomLayout {
     const position = mesh.geometry.getAttribute('position');
     const index = mesh.geometry.getIndex();
     const count = index ? index.count : position.count;
-    for (let i = 0; i + 2 < count && floor.length < 4096; i += 3) {
+    // A valid glTF can still acquire enormous coordinates through composed transforms. Only
+    // bounded room coordinates reach navigation, with a limit even for discarded triangles.
+    for (let i = 0; i + 2 < count && triangles < 4096; i += 3, triangles++) {
       const tri: number[] = [];
+      let sumY = 0;
       for (let k = 0; k < 3; k++) {
         p.fromBufferAttribute(position, index ? index.getX(i + k) : i + k).applyMatrix4(mesh.matrixWorld);
+        if (!inRoom(p)) break;
         tri.push(p.x, p.z);
-        floorY += p.y;
-        heights++;
+        sumY += p.y;
       }
-      if (tri.every(Number.isFinite)) floor.push(tri);
+      if (tri.length !== 6) continue;
+      const [ax, az, bx, bz, cx, cz] = tri as [number, number, number, number, number, number];
+      if (Math.abs((bx - ax) * (cz - az) - (bz - az) * (cx - ax)) < 1e-8) continue;
+      floor.push(tri);
+      floorY += sumY;
+      heights += 3;
     }
   });
   return { floorY: heights ? floorY / heights : 0, floor, spots };
@@ -412,7 +423,7 @@ export async function createRoomRenderer(
   const scene = new Scene();
   scene.background = new Color(0x050508);
   scene.add(gltf.scene);
-  const layout = readLayout(gltf.scene);
+  const layout = readRoomLayout(gltf.scene);
   // The room is baked (unlit materials); these lights reach only the living character. A soft
   // fill and a warm key from above the camera, near the lamps' colour; the video's colour is added
   // to the fill each draw (the screen's light on the character, as on the room).
