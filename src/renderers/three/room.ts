@@ -289,7 +289,7 @@ export async function createRoomRenderer(
 ): Promise<RoomRenderer> {
   const view = doc.defaultView!,
     signal = options.signal;
-  // The startup CPU profile (docs/depth-foundation.md, 10節) had the room's first draw as one
+  // The startup CPU profile (docs/depth-foundation.md, 11節) had the room's first draw as one
   // 50–70 ms task: the textures' upload and the shader programs' link, all at once, during the
   // page's own startup. The room now waits for the page to settle, then prepares one piece per
   // idle moment (parse, each texture, the programs in parallel), and fades in when ready.

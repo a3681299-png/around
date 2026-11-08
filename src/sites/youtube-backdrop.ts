@@ -378,6 +378,8 @@ export function youtubeBackdrop(doc: Document): SiteBackdrop {
       pass.plated.add(columnOf(parent, pass.root));
     }
   };
+  /** The columns last reported on the console (development builds only). */
+  let loggedColumns = '';
   const fallbackColumns = () => {
     const out = new Set<Element>();
     for (const e of plated) if (e.isConnected) out.add(e);
@@ -457,10 +459,24 @@ export function youtubeBackdrop(doc: Document): SiteBackdrop {
       }
       // After the known parts are looked up, so the walk sees this read's parts as known.
       walk(now, budget === Infinity ? WALK_IDLE : WALK_ACTIVE);
-      for (const column of fallbackColumns()) {
+      const columns = fallbackColumns();
+      for (const column of columns) {
         const r = column.getBoundingClientRect();
         if (r.width > 0 && r.height > 0)
           out.push({ left: r.left, top: r.top, width: r.width, height: r.height, importance: 'read', fallback: true });
+      }
+      WW_DEV_LOG: {
+        // The way out working means a known part's name no longer matches YouTube's page: the
+        // small plates were lost silently. Said once per change of the plated columns.
+        const names = [...columns].map((e) => `${e.localName}${e.id ? `#${e.id}` : ''}`);
+        const key = names.join(' ');
+        if (key !== loggedColumns) {
+          loggedColumns = key;
+          if (names.length)
+            console.info(
+              `[Web World Themes] 読みやすさの逃げ道：名前の分からない部品の文字に、列ごとの板を敷きました（列 ${names.length} 本: ${key}）`,
+            );
+        }
       }
       return out;
     },

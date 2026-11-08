@@ -126,7 +126,9 @@ await build({
   legalComments: 'none',
   loader: { '.css': 'text' },
   banner: { js: banner },
-  dropLabels: ['WW_TEST_PAGE_CHANGE', 'WW_GUARD_TRACE'],
+  // As the normal build: the test probe of the room (a JSON written to the page on every draw) and
+  // the development log are not measured.
+  dropLabels: ['WW_TEST_PAGE_CHANGE', 'WW_GUARD_TRACE', 'WW_SPACE_PROBE', 'WW_DEV_LOG'],
   define: {
     __WW_PAGE_CHANGE_LEGACY__: 'false',
     __WW_WORLD_MODE__: '"runtime"',

@@ -50,6 +50,10 @@ if (!['', 'stacking', 'density', 'names'].includes(spaceBreak))
 if ((spaceProbe || spaceBreak) && !outputName.startsWith('.work/'))
   throw new Error('Space probes and broken space builds must stay inside .work.');
 const watching = process.argv.includes('--watch');
+// A development build (`npm run dev`, or WW_DEV=1): it writes what only a developer needs to the
+// console, such as the readability's way out taking over (`WW_DEV_LOG:` blocks). The normal build
+// drops those blocks, strings and all; nothing is ever sent anywhere.
+const development = watching || process.env.WW_DEV === '1';
 const worldMode = process.env.WW_WORLD_MODE ?? 'runtime';
 if (!['legacy', 'compare', 'runtime'].includes(worldMode))
   throw new Error('WW_WORLD_MODE must be legacy, compare or runtime.');
@@ -130,6 +134,7 @@ const shared = {
     ...(noIdleRecheck ? ['WW_IDLE_RECHECK'] : []),
     ...(noStackingProof ? ['WW_STACKING_PROOF'] : []),
     ...(spaceProbe ? [] : ['WW_SPACE_PROBE']),
+    ...(development ? [] : ['WW_DEV_LOG']),
   ],
   define: {
     __WW_PAGE_CHANGE_LEGACY__: String(pageChangeProbe && process.env.WW_PAGE_CHANGE_LEGACY === '1'),

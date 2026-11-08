@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
 import type { Page } from '@playwright/test';
 import { test as base, expect } from './fixtures';
 import { openEditor, closeEditorPages } from './helpers/editor';
@@ -15,7 +17,7 @@ import { PLATE_TEXT, READABLE_CONTRAST, contrast, luminance } from '../src/world
  */
 const test = base.extend<object, { extensionPath: string }>({
   extensionPath: [
-    async ({}, use) => use(await layeringBuild(true, { WW_SPACE_PROBE: '1', WW_SPACE_BREAK: 'names' })),
+    async ({}, use) => use(await layeringBuild(true, { WW_SPACE_PROBE: '1', WW_SPACE_BREAK: 'names', WW_DEV: '1' })),
     { scope: 'worker' },
   ],
 });
@@ -102,6 +104,10 @@ test('without the part names, every visible text still has a plate under it and 
   popup,
   youtube,
 }) => {
+  const fallbackLogs: string[] = [];
+  youtube.on('console', (message) => {
+    if (message.text().includes('読みやすさの逃げ道')) fallbackLogs.push(message.text());
+  });
   await showRoom(popup, youtube);
   const frame = async () => JSON.parse((await youtube.locator('html').getAttribute('data-ww-room-frame'))!);
   // A still page reads its parts once a second: two reads, so a walk has finished.
@@ -136,4 +142,13 @@ test('without the part names, every visible text still has a plate under it and 
   }
   // It was the way out that did it (no known part is left in this build).
   expect((await frame()).fallback.length).toBeGreaterThan(0);
+  // A development build says so on the console (so a YouTube change that silently drops the
+  // small plates is noticed), naming the columns it plated; nothing is sent anywhere.
+  expect(fallbackLogs.length).toBeGreaterThan(0);
+  expect(fallbackLogs[0]).toMatch(/読みやすさの逃げ道.*列 [1-9]\d* 本: \S+/);
+});
+
+test('the normal build has no fallback log at all', async () => {
+  const bundle = await readFile(path.join(await layeringBuild(true), 'content/index.js'), 'utf8');
+  expect(bundle).not.toContain('読みやすさの逃げ道');
 });
