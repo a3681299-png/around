@@ -212,9 +212,32 @@ test('real YouTube: Mirdo lives in the room, the room opens from flat at the com
       await shoot(page, `2-opening-${i}`);
     }
     await expect.poll(async () => (await frame(page)).shot, { timeout: 10000 }).toBe('comments');
-    // 3. Living at the comments: a few moments over 40 s.
+    // 3. Living at the comments: a few moments over 40 s, and a filmstrip of a walk (the feet must
+    // not slide) and of a touch on the glass when they happen.
+    const strips = new Set<string>();
     for (let i = 0; i < 8; i++) {
-      await page.waitForTimeout(5000);
+      for (let k = 0; k < 10; k++) {
+        await page.waitForTimeout(500);
+        const now = await frame(page);
+        const r = now.resident as unknown as { activity: string; screen: { x: number; y: number } | null } | null;
+        // In the clear beside the comments' sheet (behind it the body is only a blur).
+        if (
+          r?.screen &&
+          r.screen.x > 760 &&
+          (r.activity === 'walk' || r.activity === 'touch') &&
+          !strips.has(r.activity)
+        ) {
+          strips.add(r.activity);
+          for (let n = 0; n < 8; n++) {
+            await page.screenshot({
+              path: path.join(shots, `${tag}-strip-${r.activity}-${n}.png`),
+              caret: 'initial',
+              clip: { x: Math.max(0, r.screen.x - 160), y: Math.max(0, r.screen.y - 260), width: 320, height: 420 },
+            });
+            await page.waitForTimeout(110);
+          }
+        }
+      }
       await note(page, `comments ${i}`);
       await shoot(page, `3-comments-${i}`);
     }

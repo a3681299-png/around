@@ -196,7 +196,7 @@ export function createSpaceHost(
   /** Where a touch now would leave its mark (viewport px), from measureView. */
   let touchAt: { x: number; y: number; d: number } | undefined;
   /** The touch marks on the glass: page position (they move with the page) and when made. */
-  let marks: { x: number; y: number; at: number }[] = [];
+  let marks: { x: number; y: number; at: number; size: number }[] = [];
   let markedSince: number | undefined;
   /** A mark rises, holds, and fades (ms). */
   const MARK_HOLD_MS = 1800,
@@ -340,7 +340,7 @@ export function createSpaceHost(
           return [s.id, 0];
         const over = plates.filter((r) => inside(p, r));
         // Behind a sheet it is seen only as a blur (the design's 板の後ろで薄く見える).
-        return [s.id, over.some((r) => r.video) ? 0 : over.length ? 0.15 : 1];
+        return [s.id, over.some((r) => r.video) ? 0 : over.length ? 0.05 : 1];
       }),
     );
     let covered = 0;
@@ -357,28 +357,22 @@ export function createSpaceHost(
     if (shots && shotName === 'top') roomSeen *= 0.4;
     // The glass in front of the character: the nearest sheet edge to its hand (on screen), within
     // reach. A touch leaves its mark there (on the sheet's margin, never over the text's middle).
+    // The glass between the character and the viewer: where its hand is on screen, if that is in
+    // the clear (outside every sheet by a margin, so a mark never lies over text), sized by how far
+    // away it stands (a palm is about 10 cm across).
     touchAt = undefined;
     if (life) {
-      const hand = renderer.project([{ x: life.state.x, y: layout.floorY + 1.05, z: life.state.z }])[0];
-      if (hand)
-        for (const r of plates) {
-          if (r.video) continue;
-          // The nearest point of the sheet's outline, 6 px inside it.
-          const x = Math.min(r.right - 6, Math.max(r.left + 6, hand.x)),
-            y = Math.min(r.bottom - 6, Math.max(r.top + 6, hand.y));
-          const edge =
-            hand.x < r.left || hand.x > r.right || hand.y < r.top || hand.y > r.bottom
-              ? { x, y }
-              : // Behind the sheet: the nearest side.
-                [
-                  { x: r.left + 6, y: hand.y, d: hand.x - r.left },
-                  { x: r.right - 6, y: hand.y, d: r.right - hand.x },
-                  { x: hand.x, y: r.top + 6, d: hand.y - r.top },
-                  { x: hand.x, y: r.bottom - 6, d: r.bottom - hand.y },
-                ].sort((a, b) => a.d - b.d)[0]!;
-          const d = Math.hypot(edge.x - hand.x, edge.y - hand.y);
-          if (d < 140 && (!touchAt || d < touchAt.d)) touchAt = { x: edge.x, y: edge.y, d };
-        }
+      const [hand, side] = renderer.project([
+        { x: life.state.x, y: layout.floorY + 1.05, z: life.state.z },
+        { x: life.state.x + 0.1, y: layout.floorY + 1.05, z: life.state.z },
+      ]);
+      const clear = (p: { x: number; y: number }) =>
+        p.x > 30 &&
+        p.x < w - 30 &&
+        p.y > 30 &&
+        p.y < h - 30 &&
+        !plates.some((r) => p.x > r.left - 40 && p.x < r.right + 40 && p.y > r.top - 40 && p.y < r.bottom + 40);
+      if (hand && side && clear(hand)) touchAt = { x: hand.x, y: hand.y, d: Math.abs(side.x - hand.x) };
     }
     // Near the front place: the player's lower right corner (the character's home in front).
     const player = plates.find((r) => r.video);
@@ -487,7 +481,10 @@ export function createSpaceHost(
         touchAt
       ) {
         markedSince = life.state.since;
-        marks = [...marks.slice(-3), { x: touchAt.x + view.scrollX, y: touchAt.y + view.scrollY, at: now }];
+        marks = [
+          ...marks.slice(-3),
+          { x: touchAt.x + view.scrollX, y: touchAt.y + view.scrollY, at: now, size: Math.max(0.4, touchAt.d / 30) },
+        ];
       }
       const away = life.body && life.state.activity !== 'front' ? space.resident?.layerId : undefined;
       if (away !== awayId) {
@@ -511,7 +508,7 @@ export function createSpaceHost(
     const glassMarks = marks.map((m) => {
       const age = now - m.at;
       const strength = Math.min(1, age / 250) * (age < MARK_HOLD_MS ? 1 : 1 - (age - MARK_HOLD_MS) / MARK_FADE_MS);
-      return { x: m.x - view.scrollX, y: m.y - view.scrollY, strength: Math.max(0, strength) };
+      return { x: m.x - view.scrollX, y: m.y - view.scrollY, size: m.size, strength: Math.max(0, strength) };
     });
     const fading = marks.length > 0 && now - drawnAt >= RESIDENT_RESTING_MS;
     const moved = !drawnCamera || !cameraSettled(camera, drawnCamera) || shotsMoving || fading;
@@ -570,6 +567,7 @@ export function createSpaceHost(
                 away: awayId ?? null,
                 screen: renderer.project([{ x: life.state.x, y: life.layout.floorY + 0.8, z: life.state.z }])[0],
                 roomSeen: Math.round(roomSeen * 100) / 100,
+                glass: touchAt ? [Math.round(touchAt.x), Math.round(touchAt.y)] : null,
               }
             : null,
         });
