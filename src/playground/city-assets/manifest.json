@@ -29,7 +29,7 @@
       "file": "residents/dockworker-a.glb",
       "status": "draft",
       "heightM": 1.134,
-      "tris": 2254,
+      "tris": 2448,
       "slots": ["slot_accent", "slot_bottom", "slot_hair", "slot_shoes", "slot_skin", "slot_top"],
       "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
       "roles": ["dockworker"],
@@ -50,7 +50,7 @@
       "file": "residents/dockworker-b.glb",
       "status": "draft",
       "heightM": 1.138,
-      "tris": 2044,
+      "tris": 2236,
       "slots": ["slot_accent", "slot_bottom", "slot_hair", "slot_shoes", "slot_skin", "slot_top"],
       "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
       "roles": ["dockworker"],
@@ -71,7 +71,7 @@
       "file": "residents/lamplighter-a.glb",
       "status": "draft",
       "heightM": 1.398,
-      "tris": 2344,
+      "tris": 2536,
       "slots": ["slot_accent", "slot_bottom", "slot_hair", "slot_light", "slot_shoes", "slot_skin", "slot_top"],
       "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
       "roles": ["lamplighter"],
@@ -92,7 +92,28 @@
       "file": "residents/shopkeeper-a.glb",
       "status": "draft",
       "heightM": 1.105,
-      "tris": 2372,
+      "tris": 2500,
+      "slots": ["slot_accent", "slot_bottom", "slot_hair", "slot_shoes", "slot_skin", "slot_top"],
+      "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
+      "roles": ["shopkeeper"],
+      "cultures": [],
+      "rig": "resident",
+      "base": "B",
+      "source": {
+        "type": "booth-base-modified",
+        "author": "シロタカブ（readme.txt の表記。依頼文では「おなかにやさしい」。翔太が確認）",
+        "url": "https://booth.pm/ja/items/8801178",
+        "license": "BOOTH 3D素体モデル（デフォルメ）ver1.0 の規約：改変して作ったキャラクターの配布は可。素体のまま・僅かな改変の配布と自作発言は禁止",
+        "record": "wwt-private-assets/city-assets/base-body/LICENSE-notes.md"
+      }
+    },
+    {
+      "id": "resident-shopkeeper-b",
+      "kind": "resident",
+      "file": "residents/shopkeeper-b.glb",
+      "status": "draft",
+      "heightM": 1.133,
+      "tris": 2268,
       "slots": ["slot_accent", "slot_bottom", "slot_hair", "slot_shoes", "slot_skin", "slot_top"],
       "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
       "roles": ["shopkeeper"],
@@ -113,7 +134,7 @@
       "file": "residents/walker-a.glb",
       "status": "draft",
       "heightM": 1.162,
-      "tris": 2324,
+      "tris": 2516,
       "slots": ["slot_accent", "slot_bottom", "slot_hair", "slot_shoes", "slot_skin", "slot_top"],
       "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
       "roles": ["walker"],
@@ -134,13 +155,34 @@
       "file": "residents/walker-b.glb",
       "status": "draft",
       "heightM": 1.113,
-      "tris": 2330,
+      "tris": 2524,
       "slots": ["slot_accent", "slot_bottom", "slot_hair", "slot_shoes", "slot_skin", "slot_top"],
       "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
       "roles": ["walker"],
       "cultures": [],
       "rig": "resident",
       "base": "B",
+      "source": {
+        "type": "booth-base-modified",
+        "author": "シロタカブ（readme.txt の表記。依頼文では「おなかにやさしい」。翔太が確認）",
+        "url": "https://booth.pm/ja/items/8801178",
+        "license": "BOOTH 3D素体モデル（デフォルメ）ver1.0 の規約：改変して作ったキャラクターの配布は可。素体のまま・僅かな改変の配布と自作発言は禁止",
+        "record": "wwt-private-assets/city-assets/base-body/LICENSE-notes.md"
+      }
+    },
+    {
+      "id": "resident-walker-c",
+      "kind": "resident",
+      "file": "residents/walker-c.glb",
+      "status": "draft",
+      "heightM": 1.113,
+      "tris": 2352,
+      "slots": ["slot_accent", "slot_bottom", "slot_hair", "slot_shoes", "slot_skin", "slot_top"],
+      "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
+      "roles": ["walker"],
+      "cultures": [],
+      "rig": "resident",
+      "base": "A",
       "source": {
         "type": "booth-base-modified",
         "author": "シロタカブ（readme.txt の表記。依頼文では「おなかにやさしい」。翔太が確認）",
@@ -235,11 +277,47 @@
       "kind": "prop",
       "file": "props/lantern.glb",
       "status": "draft",
-      "heightM": 0.232,
+      "heightM": 0.325,
       "tris": 220,
       "slots": ["slot_light", "slot_metal"],
       "attach": [],
       "roles": ["lamplighter"],
+      "cultures": [],
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
+    },
+    {
+      "id": "prop-lighter-pole",
+      "kind": "prop",
+      "file": "props/lighter-pole.glb",
+      "status": "draft",
+      "heightM": 1.42,
+      "tris": 96,
+      "slots": ["slot_accent", "slot_light", "slot_metal", "slot_wood"],
+      "attach": [],
+      "roles": ["lamplighter"],
+      "cultures": [],
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
+    },
+    {
+      "id": "prop-paper-bag",
+      "kind": "prop",
+      "file": "props/paper-bag.glb",
+      "status": "draft",
+      "heightM": 0.295,
+      "tris": 76,
+      "slots": ["slot_accent", "slot_cloth", "slot_wood"],
+      "attach": [],
+      "roles": ["shopkeeper"],
       "cultures": [],
       "source": {
         "type": "own",
@@ -264,24 +342,6 @@
       "status": "placeholder",
       "roles": ["musician"],
       "cultures": ["music"],
-      "source": null
-    },
-    {
-      "id": "prop-lighter-pole",
-      "kind": "prop",
-      "file": null,
-      "status": "placeholder",
-      "roles": ["lamplighter"],
-      "cultures": [],
-      "source": null
-    },
-    {
-      "id": "prop-paper-bag",
-      "kind": "prop",
-      "file": null,
-      "status": "placeholder",
-      "roles": ["shopkeeper"],
-      "cultures": [],
       "source": null
     },
     {
@@ -332,11 +392,20 @@
     {
       "id": "ship-sail-a",
       "kind": "ship",
-      "file": null,
-      "status": "placeholder",
+      "file": "ships/sail-a.glb",
+      "status": "draft",
+      "heightM": 2.09,
+      "tris": 192,
+      "slots": ["slot_accent", "slot_cloth", "slot_light", "slot_wood"],
+      "attach": [],
       "roles": ["fisher"],
       "cultures": [],
-      "source": null
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
     },
     {
       "id": "harbor-bollard",
@@ -375,6 +444,24 @@
       }
     },
     {
+      "id": "harbor-crane",
+      "kind": "harbor",
+      "file": "harbor/crane.glb",
+      "status": "draft",
+      "heightM": 2.94,
+      "tris": 328,
+      "slots": ["slot_accent", "slot_cloth", "slot_light", "slot_metal", "slot_stone", "slot_wood"],
+      "attach": [],
+      "roles": ["dockworker"],
+      "cultures": [],
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
+    },
+    {
       "id": "harbor-pier",
       "kind": "harbor",
       "file": "harbor/pier.glb",
@@ -391,15 +478,6 @@
         "license": "WWT と同じ",
         "record": "wwt-private-assets/city-assets/tools"
       }
-    },
-    {
-      "id": "harbor-crane",
-      "kind": "harbor",
-      "file": null,
-      "status": "placeholder",
-      "roles": ["dockworker"],
-      "cultures": [],
-      "source": null
     },
     {
       "id": "street-bench",
@@ -456,6 +534,24 @@
       }
     },
     {
+      "id": "street-sign",
+      "kind": "street",
+      "file": "street/sign.glb",
+      "status": "draft",
+      "heightM": 1.3,
+      "tris": 152,
+      "slots": ["slot_accent", "slot_cloth", "slot_metal"],
+      "attach": [],
+      "roles": [],
+      "cultures": [],
+      "source": {
+        "type": "own",
+        "author": "WWT（Claude Code がスクリプトで作成）",
+        "license": "WWT と同じ",
+        "record": "wwt-private-assets/city-assets/tools"
+      }
+    },
+    {
       "id": "street-tree",
       "kind": "street",
       "file": "street/tree.glb",
@@ -484,15 +580,6 @@
     },
     {
       "id": "street-postbox",
-      "kind": "street",
-      "file": null,
-      "status": "placeholder",
-      "roles": [],
-      "cultures": [],
-      "source": null
-    },
-    {
-      "id": "street-sign",
       "kind": "street",
       "file": null,
       "status": "placeholder",

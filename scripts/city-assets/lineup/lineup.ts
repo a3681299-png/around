@@ -316,6 +316,8 @@ async function buildViews() {
   const placeAt = async (entry: Entry, px: number, pz: number, seed = 1) => {
     const object = await prop(entry, seed);
     object.position.set(px, 0, pz);
+    // Ships pass along the quay, so they are judged side-on.
+    if (entry.kind === 'ship') object.rotation.y = -Math.PI / 2;
     return object;
   };
   const waterSide = (entry: Entry) => entry.kind === 'ship' || entry.id === 'harbor-pier';
@@ -344,8 +346,8 @@ async function buildViews() {
       g.add(await placeAt(entry, bx, -1.3));
       bx += 1.7;
     }
-    for (const entry of things.filter(waterSide))
-      g.add(await placeAt(entry, entry.kind === 'ship' ? 3.5 : -2, entry.kind === 'ship' ? -4.2 : -3.2));
+    for (const [i, entry] of things.filter(waterSide).entries())
+      g.add(await placeAt(entry, -3.5 + i * 3.8, entry.kind === 'ship' ? -4.4 : -3.2));
     return g;
   };
 
@@ -399,8 +401,8 @@ async function buildViews() {
     shelfHero.position.set(-sx / 2 - 0.5, 0, 0);
     shelf.add(shelfHero);
   }
-  for (const entry of things.filter(waterSide))
-    shelf.add(await placeAt(entry, entry.kind === 'ship' ? 2 : -2.5, entry.kind === 'ship' ? -4 : -3.2));
+  for (const [i, entry] of things.filter(waterSide).entries())
+    shelf.add(await placeAt(entry, -4 + i * 4, entry.kind === 'ship' ? -4.4 : -3.2));
   views.set('props', shelf);
 }
 
@@ -410,7 +412,7 @@ const cameras: Record<View, { at: [number, number, number]; look: [number, numbe
   sil: { at: [0, 9, 20], look: [0, 0.4, 0], fov: 30 },
   night: { at: [0, 9, 20], look: [0, 0.4, 0], fov: 30 },
   near: { at: [0, 0.75, 6.4], look: [0, 0.55, 0], fov: 30 },
-  props: { at: [0, 2.4, 7.5], look: [0, 0.5, -0.6], fov: 34 },
+  props: { at: [0, 4.2, 13.5], look: [0, 0.9, -1.2], fov: 34 },
 };
 
 const pointLights: PointLight[] = [];
