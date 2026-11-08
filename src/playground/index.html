@@ -12,13 +12,12 @@
     <link rel="icon" href="data:," />
     <title>Playground — Web World Themes</title>
     <link rel="stylesheet" href="style.css" />
-    <script src="app.js" defer></script>
+    <script src="app.js" type="module"></script>
   </head>
   <body data-ww-surface="page">
     <div id="watch-page">
       <header class="bar">
         <span class="brand">みるばこ</span>
-        <span class="hint">ふつうの動画サイト</span>
         <input
           id="search"
           class="search"
@@ -27,10 +26,7 @@
           placeholder="動画を探す"
           data-ww-control="click"
         />
-        <button id="apply" class="apply" type="button" data-ww-control="click" aria-pressed="false" disabled
-          >WWT を適用</button
-        >
-        <button id="open-desktop" type="button" data-ww-control="click" hidden>デスクトップへ</button>
+        <button id="apply" class="apply" type="button" data-ww-control="click" aria-pressed="false">WWT を適用</button>
       </header>
       <main class="layout">
         <section class="watch">
@@ -88,7 +84,6 @@
         </aside>
       </main>
       <footer class="foot">
-        <span>Web World Themes Playground</span>
         <span id="mirdo-credits" hidden>
           キャラクター
           <a href="https://booth.pm/ja/items/6614116" data-ww-control="click">ミルド／ragooou（らぐー）</a>
@@ -99,14 +94,5 @@
         </span>
       </footer>
     </div>
-    <div class="desktop-lite" aria-hidden="true" hidden>
-      <div class="desktop-lite-monitor"><canvas width="480" height="270"></canvas></div>
-    </div>
-    <footer id="desktop-bar" class="desktop-bar" aria-label="デスクトップ" hidden>
-      <div class="desktop-wordmark"
-        ><span aria-hidden="true"></span><strong>窓辺</strong><small>WWT Playground</small></div
-      >
-      <button id="close-desktop" type="button" data-ww-control="click">ブラウザーに戻る</button>
-    </footer>
   </body>
 </html>

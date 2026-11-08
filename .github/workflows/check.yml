@@ -9,6 +9,7 @@ on:
         codex/extension-completion,
         codex/creator-editor-spike,
         codex/playground-desktop,
+        codex/playground-startup,
         # The next chunk's branch while Codex verifies the previous one (AGENTS.md).
         'codex/chunk*',
       ]

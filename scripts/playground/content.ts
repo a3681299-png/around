@@ -178,9 +178,7 @@ export function writeContent(root: string, out: string, mirdoRoot?: string): { m
     ],
   });
   writeFileSync(join(out, 'design.json'), JSON.stringify(design, null, 2));
-  const extras = mirdoRoot
-    ? { sitDown: clip('Sitting_Enter', 'sit'), walk: clip('Walk_Loop', 'stand'), hop: clip('Jump_Land', 'stand') }
-    : {};
+  const extras = mirdoRoot ? { sitDown: clip('Sitting_Enter', 'sit') } : {};
   const resident = { model: vrmId, sit, stand, ...extras, mannequin: !mirdoRoot };
   const localRoom = process.env.WW_PLAYGROUND_LOCAL_ROOM;
   const layout = JSON.parse(

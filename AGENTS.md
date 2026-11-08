@@ -29,7 +29,7 @@ e2e は全件で約23分かかる。毎回すべて回さず、いつ・誰が�
 | ------------------------------ | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
 | 作業の途中（実装担当）         | 型チェック・lint・unit 全件、触った部分の e2e、対象の本物のページの画像を開いて確認  | Codex が実装担当の場合も同じ                                           |
 | push のたび                    | —                                                                                    | （CI が型チェック・lint・unit を回す）                                 |
-| 作業ブランチへの取り込み・手動 | —                                                                                    | （CI が e2e 全件を回す。docs だけの変更では回さない）                  |
+| 作業ブランチへの取り込み・手動 | —                                                                                    | 必要なときに Actions の手動実行で Linux の e2e 全件を選べる            |
 | 大きな塊の終わり               | Codex の中核以外の変更を、完成基準・実際の画面・触った所のテストを中心にレビューする | 中核の変更を Windows の e2e 全件・実サイト・性能まで含めてレビューする |
 
 - Codex が確かめている間、Claude Code は別のブランチで次の塊を進めてよい。Codex が確かめているコミットと、作業ブランチ（`codex/creator-editor-spike`）には触らない（作業ブランチに入れてよいのは docs のコミットだけ）
@@ -62,7 +62,7 @@ e2e は全件で約23分かかる。毎回すべて回さず、いつ・誰が�
 - Claude Code の「性能の調査」（仮説を確かめる短い計測・CPU プロファイル）は、作業の途中でしてよい。合否を決める交互計測は Codex がする
 - 中核：`src/design/renderer.ts`・`src/design/schema.ts`・`src/design/migrations.ts`・`src/validation.ts`・`src/sites/`・`src/world/`・`src/host/`（`src/host/page-controller.ts` を含む）・`src/content/`・`manifest.json`・`scripts/build.mjs`・`playwright.config.ts`・`tests/fixtures.ts`
 - 「触った部分の e2e」は、変えたモジュールの名前で `tests/` を検索して選ぶ（`git grep -l <モジュール名> tests/`）。選んだ spec を完了報告に書く
-- CI は push のたびに型チェック・lint・unit を回す。e2e の全件（4台に分けて並べる）は、手動で起動したとき（workflow_dispatch）と、`codex/creator-editor-spike` への push（取り込み）のときだけ回し、docs だけの変更では回さない。中核の塊の終わりには Codex が Windows で e2e 全件を回す
+- CI の自動実行は Linux の型チェック・lint・unit。CI で e2e の全件が必要なときは手動実行（workflow_dispatch）の `browser_suite` を選ぶ。中核の塊の終わりには Codex が Windows で e2e 全件を回す
 - CI が落ちたら、次の作業より先に直す。push のたびの CI（型チェック・lint・unit）も、e2e の全件の CI も同じ
 - GitHub の CI が動かない間（月の上限など）は、手元の型チェック・lint・unit・触った部分の e2e で確かめて進めてよい。e2e の全件は手元で回さない（キーボードのフォーカスを取るため。Codex が回す）
 - `workers: 1` は変えない。手元で e2e を並列にしない（ネイティブのウィンドウと計測が取り合うため）

@@ -2,7 +2,6 @@ import {
   AmbientLight,
   BoxGeometry,
   Color,
-  DepthTexture,
   Group,
   HalfFloatType,
   LoadingManager,
@@ -12,9 +11,7 @@ import {
   MeshStandardMaterial,
   PointLight,
   ShaderMaterial,
-  Vector2,
   WebGLRenderTarget,
-  type Camera,
   type Scene,
   type Texture,
   type WebGLRenderer,
@@ -26,7 +23,7 @@ import type { AssetPort } from '../assets/port';
 import { parseVerifiedModelSource } from '../assets/verified-source';
 import type { DesktopLayout } from './desktop-layout';
 
-export function positionMonitor(group: Group, monitor: DesktopLayout['monitor']) {
+function positionMonitor(group: Group, monitor: DesktopLayout['monitor']) {
   group.position.set(...monitor.position);
   group.rotation.set(...(monitor.rotationDeg.map(MathUtils.degToRad) as [number, number, number]));
 }
@@ -121,13 +118,7 @@ function mixRoomLight(renderer: WebGLRenderer, layers: Awaited<ReturnType<typeof
 }
 
 /** Geometry and practical lights can be swapped for the room asset at this boundary. */
-export function mountRoom(
-  scene: Scene,
-  layout: DesktopLayout,
-  assets: AssetPort,
-  renderer: WebGLRenderer,
-  invalidate: () => void,
-) {
+export function mountRoom(scene: Scene, layout: DesktopLayout, assets: AssetPort, renderer: WebGLRenderer) {
   const room = new Group();
   scene.add(room);
   scene.background = new Color(0x101728);
@@ -198,6 +189,7 @@ export function mountRoom(
   scene.add(lights);
   let disposed = false;
   let lightMap: WebGLRenderTarget | undefined;
+  let ready = Promise.resolve();
   if (layout.room) {
     const source = layout.room;
     const manager = new LoadingManager();
@@ -205,7 +197,7 @@ export function mountRoom(
       if (url.startsWith('blob:')) return url;
       throw new Error('Playground room references an external resource.');
     });
-    void assets
+    ready = assets
       .load(source.asset)
       .then((asset) => parseVerifiedModelSource(asset.modelBuffer!, new GLTFLoader(manager)))
       .then(async (gltf) => {
@@ -243,56 +235,16 @@ export function mountRoom(
           if (localRoom.parent !== scene) VRMUtils.deepDispose(localRoom);
         }
       })
-      .catch((error: unknown) => console.warn('[WWT Playground] Room', error))
-      .finally(() => {
-        if (!disposed) invalidate();
-      });
+      .catch((error: unknown) => console.warn('[WWT Playground] Room', error));
   }
   return {
     videoLight,
     lights,
+    ready,
     dispose() {
       disposed = true;
       VRMUtils.deepDispose(scene);
       lightMap?.dispose();
-    },
-  };
-}
-
-/** Preserve the wallpaper's depth as well as its colour so the moving resident can go behind furniture. */
-export function createRoomCache(renderer: WebGLRenderer) {
-  const size = renderer.getSize(new Vector2());
-  const target = new WebGLRenderTarget(size.x, size.y, {
-    depthTexture: new DepthTexture(size.x, size.y),
-    ...(renderer.extensions.has('EXT_color_buffer_float') ? { type: HalfFloatType } : {}),
-  });
-  const material = new ShaderMaterial({
-    uniforms: { wallpaper: { value: target.texture }, depth: { value: target.depthTexture } },
-    vertexShader: QUAD_VERTEX,
-    fragmentShader: `
-      uniform sampler2D wallpaper;
-      uniform sampler2D depth;
-      varying vec2 pixel;
-      void main() {
-        gl_FragColor = texture2D(wallpaper, pixel);
-        gl_FragDepth = texture2D(depth, pixel).r;
-        #include <colorspace_fragment>
-      }
-    `,
-  });
-  const composite = new FullScreenQuad(material);
-  return {
-    capture(room: Scene, camera: Camera) {
-      renderer.setRenderTarget(target);
-      renderer.clear();
-      renderer.render(room, camera);
-      renderer.setRenderTarget(null);
-    },
-    draw: () => composite.render(renderer),
-    dispose() {
-      composite.dispose();
-      material.dispose();
-      target.dispose();
     },
   };
 }
