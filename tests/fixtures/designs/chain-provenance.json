@@ -61,5 +61,12 @@
     "file": "tests/character-v15.spec.ts",
     "test": "v15 roundtrips personality and the switches; absent keys keep v14 behaviour",
     "extraction": "first explicit parseDesign input accepted by the historical parser; expected result captured with e0b14ca"
+  },
+  {
+    "version": 16,
+    "commit": "e6e958d46d6a92236df2e587ad14459f2938a15a",
+    "file": "tests/character-data.spec.ts",
+    "test": "a motion hips height roundtrips at its limit and stays absent when not given",
+    "extraction": "first explicit parseDesign input accepted by the historical parser"
   }
 ]

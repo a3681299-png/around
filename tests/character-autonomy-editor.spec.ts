@@ -55,7 +55,7 @@ test('the editor shows and saves the computed motion and autonomy switches and t
   const saved = (await popup.evaluate(
     async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
   )) as DesignDocument;
-  expect(saved.schemaVersion).toBe(16);
+  expect(saved.schemaVersion).toBe(17);
   const character = (saved.decorations[0] as ModelDecoration).character!;
   expect(character).toMatchObject({
     computedMotion: false,

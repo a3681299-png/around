@@ -14,7 +14,13 @@ export const DEFAULT_LAYERING = true;
  * other output). `variant` adds another development switch of scripts/build.mjs (as
  * WW_NO_IDLE_RECHECK=1) to the same build. */
 export function layeringBuild(layering: boolean, variant: Record<string, string> = {}): Promise<string> {
-  const suffix = Object.keys(variant).length ? `-${Object.keys(variant).join('-').toLowerCase()}` : '';
+  // Keys and values: WW_SPACE_BREAK=names and =density are different builds.
+  const suffix = Object.keys(variant).length
+    ? `-${Object.entries(variant)
+        .map(([k, v]) => (v === '1' ? k : `${k}-${v}`))
+        .join('-')
+        .toLowerCase()}`
+    : '';
   const output = `.work/test-dist-${layering ? 'layering' : 'cutout'}${suffix.replaceAll('_', '-')}`;
   let build = built.get(output);
   if (!build) {

@@ -102,7 +102,7 @@ test('mouse-only first creation: import, check selection, group, mask, behavior,
   await expect(panel.locator('.dirty')).toHaveText('未保存');
   await save(panel);
   const saved = await stored(popup);
-  expect(saved.schemaVersion).toBe(16);
+  expect(saved.schemaVersion).toBe(17);
   expect(saved.groups?.[0]?.effects?.[0]).toMatchObject({ enabled: true, radiusPx: 180 });
   await panel.page().screenshot({ path: info.outputPath('02-group-inspector.png') });
   await youtube.reload();

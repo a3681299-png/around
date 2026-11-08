@@ -5,6 +5,7 @@ import { videoCardContainer } from './youtube-cards';
 import { youtubePlaybackSource } from './youtube-signals';
 import { youtubePage } from './youtube-page';
 import { youtubeOperations } from './youtube-operations';
+import { youtubeBackdrop } from './youtube-backdrop';
 import { YOUTUBE_DESIGN_TARGETS, YOUTUBE_SKIN_CONTROLS, YOUTUBE_SKIN_MARKS } from './youtube-targets';
 import { createSelectorIndex } from './surface-index';
 import { LOWER_SEAT_ANCHORS } from './anchors';
@@ -51,6 +52,7 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
     signals: { videoPlayback: youtubePlaybackSource(doc), page: youtubePage },
     operationSurfaces: () => youtubeOperations(doc),
     mountSettings: (entry) => mountYouTubeSettings(doc, view, entry),
+    backdrop: youtubeBackdrop(doc),
     setDesignParts(ids) {
       const next = YOUTUBE_SKIN_MARKS.filter((mark) => ids.has(mark.part));
       if (next.length === partMarks.length && next.every((mark, position) => mark === partMarks[position])) return;
@@ -218,6 +220,10 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
           }
           if (record.removedNodes.length > 0) needsPrune = true;
         }
+        // The player's form is set here, in the mutation's microtask, not in the next frame's flush:
+        // a Host frame that ran before the flush would read the miniplayer's box without the mark
+        // and remember it as the regular height (host/anchors.ts). Only the marked players are checked.
+        for (const element of players) if (element.isConnected) setForm(element);
         schedule();
       });
       observer.observe(root, {

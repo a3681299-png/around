@@ -15,6 +15,12 @@ const scroll = mode === 'scroll';
 // steady (G1.2): one layer moves all the time (its X follows the idle time, which grows every frame
 // while the pointer rests), with no scroll and no input, so the extension draws every frame.
 const steady = mode === 'steady';
+// The depth foundation (docs/depth-foundation.md): G11_DEPTH=room puts every layer and group of
+// the scene behind the UI (depth 'room') with the room G11_ROOM_FILE (a packed room .glb) under the
+// page; the guard then has nothing in front to protect, and its share should vanish.
+const roomDepth = process.env.G11_DEPTH === 'room';
+if (roomDepth && !process.env.G11_ROOM_FILE)
+  throw new Error('G11_DEPTH=room needs G11_ROOM_FILE (a packed room .glb).');
 process.env.G11_STARTUP = mode === 'startup' ? '1' : '0';
 process.env.G11_FRAMES_ONLY = mode === 'minute' ? '0' : '1';
 process.env.G11_PERF_ONLY = mode === 'areas' ? '0' : '1';
@@ -339,6 +345,10 @@ try {
       const guide = editor.getByRole('button', { name: '操作ガイドを閉じる', exact: true });
       if (await guide.isVisible()) await guide.click();
       await editor.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
+      if (roomDepth) {
+        await editor.locator('.model-file').setInputFiles(path.resolve(process.env.G11_ROOM_FILE));
+        await editor.locator('.layer').nth(1).waitFor({ timeout: 60000 });
+      }
       await editor.locator('.save').click();
       await editor.locator('.dirty').filter({ hasText: '保存済み' }).waitFor();
       await editor.getByRole('button', { name: '編集を終了', exact: true }).click();
@@ -346,13 +356,27 @@ try {
       const imported = await popup.evaluate(
         async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
       );
-      const sample = imported.decorations[0];
+      const sample = imported.decorations.find((layer) => layer.kind === 'image');
       if (!sample?.assetId) throw new Error('Validated import was not saved');
+      const room = imported.decorations.find((layer) => layer.kind === 'model3d');
+      if (roomDepth && !room) throw new Error('The room was not imported.');
       const design = {
         ...imported,
         baseThemeId: null,
+        ...(roomDepth
+          ? {
+              space: {
+                room: { assetId: room.assetId },
+                lights: { sun_night: 1, room_desk: 1, room_pendant: 0.6, screen: 0.5, screen_monitor: 0.8 },
+                camera: { sway: 1, dolly: 0.6, follow: 0.8 },
+                glass: { blur: 0.7, refraction: 0.6, highlight: 0.6, tint: 0.5, shadow: 0.6 },
+                videoLight: 1,
+              },
+            }
+          : {}),
         decorations: Array.from({ length: 32 }, (_, i) => ({
           ...sample,
+          ...(roomDepth ? { depth: 'room' } : {}),
           id: `g11-layer-${i}`,
           name: `G1.1 measurement ${i}`,
           opacity: 0.8,
@@ -370,6 +394,7 @@ try {
         })),
         groups: Array.from({ length: 16 }, (_, i) => ({
           kind: 'group',
+          ...(roomDepth ? { depth: 'room' } : {}),
           id: `g11-group-${i}`,
           name: `G1.1 group ${i}`,
           opacity: 0.7,
