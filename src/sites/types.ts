@@ -90,9 +90,10 @@ export interface SiteAdapter {
  * engine only receives the rectangles.
  */
 export interface SiteBackdrop {
-  /** Makes the page's own background transparent and gives the place for the room under the
-   * content (a fixed child at a negative level). `close` puts the page back as it was. */
-  open(): { parent: HTMLElement; zIndex: number; close(): void };
+  /** Gives the place for the room under the content (a fixed child at a negative level). `show`
+   * makes the page's own background transparent once the room is there to be seen (the page keeps
+   * its looks while the room loads); `close` puts the page back as it was. */
+  open(): { parent: HTMLElement; zIndex: number; show(): void; close(): void };
   /**
    * The UI regions now, with their importance: the G1 operation list widened to containers
    * (docs/product-design-snapshot.md, UI の領域情報). A handful of known containers, found once

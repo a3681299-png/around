@@ -78,6 +78,8 @@ export function createSpaceHost(
     drawnScheme = '',
     sized = '';
   let pointer: { x: number; y: number } | undefined;
+  /** The current room's canvas has started fading in (after its first draw). */
+  let revealing = false;
 
   const wake = () => {
     activeUntil = view.performance.now() + ACTIVE_MS;
@@ -210,6 +212,13 @@ export function createSpaceHost(
         },
         space,
       );
+      if (!revealing) {
+        const current = session;
+        revealing = true;
+        void renderer.reveal().then(() => {
+          if (session === current) doc.documentElement.dataset['wwRoom'] = 'ready';
+        });
+      }
       drawnAt = now;
       drawnCamera = camera;
       drawnPlates = plates;
@@ -260,6 +269,7 @@ export function createSpaceHost(
     session = undefined;
     listen(false);
     last = 0;
+    revealing = false;
     drawnCamera = drawnPlates = drawnLight = undefined;
     sized = '';
     camera = CAMERA_REST;
@@ -276,13 +286,19 @@ export function createSpaceHost(
       .load(next.room.assetId, abort.signal)
       .then(async (asset) => {
         if (!asset.modelBuffer) throw new Error('部屋の素材は GLB で読み込んでください。');
-        const renderer = await createRoomRenderer(doc, slot, asset.modelBuffer, { readback: SPACE_PROBE });
+        const renderer = await createRoomRenderer(doc, slot, asset.modelBuffer, {
+          readback: SPACE_PROBE,
+          signal: abort.signal,
+        });
         if (session !== current || abort.signal.aborted) {
           renderer.destroy();
           return;
         }
         current.renderer = renderer;
-        doc.documentElement.dataset['wwRoom'] = 'ready';
+        // The page's background turns transparent only now; the canvas fades in after its first
+        // draw (tick), and 'ready' is set once it is fully shown.
+        slot.show();
+        doc.documentElement.dataset['wwRoom'] = 'loading';
         WW_SPACE_PROBE: {
           // A sample request forces the next draw (the page's own attribute change wakes nobody).
           const watch = new MutationObserver(() => {

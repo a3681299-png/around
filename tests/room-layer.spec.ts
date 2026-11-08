@@ -89,6 +89,46 @@ async function roomArtwork(popup: Page, youtube: Page, mixed = false) {
   await expect(youtube.locator('html')).toHaveAttribute('data-ww-room', 'ready', { timeout: 30000 });
 }
 
+test('the page keeps its background while the room prepares; the room then fades in over it', async ({
+  popup,
+  youtube,
+}) => {
+  // Recorded in each document from its start: the order in which the room's canvas and the
+  // backdrop style (the page's background made transparent) arrive.
+  await youtube.addInitScript(() => {
+    const order: unknown[] = [];
+    (globalThis as typeof globalThis & { __roomOrder?: unknown[] }).__roomOrder = order;
+    let canvasSeen = false,
+      styleSeen = false;
+    new MutationObserver(() => {
+      const canvas = document.querySelector('canvas[data-ww-room]'),
+        style = document.getElementById('web-world-themes-backdrop');
+      if (canvas && !canvasSeen) {
+        canvasSeen = true;
+        order.push(['canvas', Boolean(style), getComputedStyle(canvas).opacity]);
+      }
+      if (style && !styleSeen) {
+        styleSeen = true;
+        order.push(['style', Boolean(canvas)]);
+      }
+    }).observe(document, { childList: true, subtree: true });
+  });
+  await roomArtwork(popup, youtube);
+  const shown = await youtube.evaluate(() => ({
+    order: (globalThis as typeof globalThis & { __roomOrder?: unknown[] }).__roomOrder,
+    opacity: getComputedStyle(document.querySelector('canvas[data-ww-room]')!).opacity,
+  }));
+  // The canvas comes first, transparent; the page's background turns transparent after it; at
+  // 'ready' the room is fully shown.
+  expect(shown).toEqual({
+    order: [
+      ['canvas', false, '0'],
+      ['style', true],
+    ],
+    opacity: '1',
+  });
+});
+
 test('the room is under the content and room-depth artwork stays behind every control, unguarded', async ({
   popup,
   youtube,

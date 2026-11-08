@@ -69,6 +69,8 @@ export interface RoomRenderer {
   readonly baseFovDeg: number;
   resize(width: number, height: number): void;
   draw(frame: RoomFrame, look: RoomLook): void;
+  /** Fades the canvas in (after the first draw); resolves when it is fully shown. */
+  reveal(): Promise<void>;
   /** For tests: the drawn colour (sRGB bytes) at canvas pixels, read right after a draw. */
   readPixels: ((points: readonly { x: number; y: number }[]) => number[][]) | undefined;
   destroy(): void;
@@ -263,17 +265,43 @@ const disposeObject = (root: Object3D) =>
     }
   });
 
+/** How long the room fades in once it is ready. */
+const REVEAL_MS = 700;
+
+/**
+ * Waits for a quiet moment of the page (an idle callback; `timeoutMs` at the latest), so the
+ * room's preparation runs in small steps between the page's own work. The room only needs to be
+ * glimpsed: it never has to be ready for the page's first paint. Throws once `signal` aborts.
+ */
+function quiet(view: Window, timeoutMs: number, signal: AbortSignal | undefined): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const done = () => (signal?.aborted ? reject(new DOMException('aborted', 'AbortError')) : resolve());
+    if (typeof view.requestIdleCallback === 'function') view.requestIdleCallback(done, { timeout: timeoutMs });
+    else view.setTimeout(done, 16);
+  });
+}
+
 export async function createRoomRenderer(
   doc: Document,
   slot: { parent: HTMLElement; zIndex: number },
   source: VerifiedModelSource,
-  options: { readback?: boolean } = {},
+  options: { readback?: boolean; signal?: AbortSignal } = {},
 ): Promise<RoomRenderer> {
+  const view = doc.defaultView!,
+    signal = options.signal;
+  // The startup CPU profile (docs/depth-foundation.md, 10節) had the room's first draw as one
+  // 50–70 ms task: the textures' upload and the shader programs' link, all at once, during the
+  // page's own startup. The room now waits for the page to settle, then prepares one piece per
+  // idle moment (parse, each texture, the programs in parallel), and fades in when ready.
+  if (doc.readyState !== 'complete')
+    await new Promise<void>((resolve) => view.addEventListener('load', () => resolve(), { once: true }));
+  await quiet(view, 3000, signal);
   const canvas = doc.createElement('canvas');
   canvas.dataset['wwRoom'] = '';
   canvas.setAttribute('aria-hidden', 'true');
-  // Under the content (the adapter's backdrop slot): it takes no input and covers nothing.
-  canvas.style.cssText = `position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;pointer-events:none!important;z-index:${slot.zIndex}!important;display:block!important;margin:0!important;border:0!important;padding:0!important`;
+  // Under the content (the adapter's backdrop slot): it takes no input and covers nothing. It
+  // starts transparent and fades in (reveal) over the page's own background colour.
+  canvas.style.cssText = `position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;pointer-events:none!important;z-index:${slot.zIndex}!important;display:block!important;margin:0!important;border:0!important;padding:0!important;opacity:0!important;transition:opacity ${REVEAL_MS}ms ease-out!important`;
   const renderer = new WebGLRenderer({
     canvas,
     antialias: false,
@@ -289,16 +317,20 @@ export async function createRoomRenderer(
   const loader = new GLTFLoader();
   let gltf: GLTF;
   try {
+    // The context's creation alone took ~30 ms in the profile: the parse waits for the next quiet moment.
+    await quiet(view, 1000, signal);
     gltf = await parseVerifiedModelSource(source, loader);
   } catch (error) {
     renderer.dispose();
     throw error;
   }
-  const layers = await lightLayers(gltf).catch((error) => {
-    disposeObject(gltf.scene);
-    renderer.dispose();
-    throw error;
-  });
+  const layers = await quiet(view, 1000, signal)
+    .then(() => lightLayers(gltf))
+    .catch((error) => {
+      disposeObject(gltf.scene);
+      renderer.dispose();
+      throw error;
+    });
   const size = (layers[0]!.texture.image as { width?: number } | undefined)?.width ?? 1024;
   const mixTarget = new WebGLRenderTarget(size, size, {
     type: HalfFloatType,
@@ -410,10 +442,80 @@ export async function createRoomRenderer(
   };
   resize(doc.defaultView?.innerWidth ?? 1280, doc.defaultView?.innerHeight ?? 720);
   canvas.addEventListener('webglcontextlost', () => (destroyed = true));
+  const release = () => {
+    destroyed = true;
+    canvas.remove();
+    disposeObject(gltf.scene);
+    layers.forEach((l) => l.texture.dispose());
+    mixTarget.dispose();
+    roomTarget?.dispose();
+    mix.dispose();
+    composite.dispose();
+    quad.geometry.dispose();
+    renderer.dispose();
+    renderer.forceContextLoss();
+  };
+  try {
+    // One texture per quiet moment: each upload is a few ms on its own (a 1024 px layer), where
+    // the first draw uploaded them all in one task.
+    const textures = new Set<Texture>(layers.map((l) => l.texture));
+    scene.traverse((o) => {
+      const map = ((o as Mesh).material as MeshBasicMaterial | undefined)?.map;
+      if (map) textures.add(map);
+    });
+    for (const texture of textures) {
+      await quiet(view, 1000, signal);
+      renderer.initTexture(texture);
+    }
+    // The programs, linked in parallel by the GPU process (KHR_parallel_shader_compile) while the
+    // page runs; the first draw then finds them ready instead of waiting on the link. Each pass is
+    // compiled for the target it draws into (the program depends on it: colour space, tone mapping).
+    await quiet(view, 1000, signal);
+    const compile = (target: WebGLRenderTarget | null, s: Scene, c: Camera) => {
+      renderer.setRenderTarget(target);
+      const done = renderer.compileAsync(s, c);
+      renderer.setRenderTarget(null);
+      return done;
+    };
+    await Promise.all([
+      compile(mixTarget, quadScene, quadCamera),
+      compile(roomTarget!, scene, camera),
+      compile(null, compositeScene, quadCamera),
+    ]);
+    // Each pass's first draw still checks its programs (a synchronous round trip to the GPU
+    // process per program, ~13 ms for all in the profile) and uploads its buffers: one pass per
+    // quiet moment, into the canvas that is still transparent. The real first draw finds them done.
+    const warm: [WebGLRenderTarget | null, Scene, Camera][] = [
+      [mixTarget, quadScene, quadCamera],
+      [roomTarget!, scene, camera],
+      [null, compositeScene, quadCamera],
+    ];
+    for (const [target, s, c] of warm) {
+      await quiet(view, 1000, signal);
+      renderer.setRenderTarget(target);
+      renderer.render(s, c);
+      renderer.setRenderTarget(null);
+    }
+    await quiet(view, 1000, signal);
+  } catch (error) {
+    release();
+    throw error;
+  }
   slot.parent.prepend(canvas);
+  let revealed: Promise<void> | undefined;
   return {
     canvas,
     baseFovDeg: cameraNode.fov,
+    reveal() {
+      revealed ??= new Promise<void>((resolve) => {
+        // The canvas was connected at opacity 0 in an earlier frame, so this change transitions.
+        canvas.style.setProperty('opacity', '1', 'important');
+        const end = () => resolve();
+        canvas.addEventListener('transitionend', end, { once: true });
+        view.setTimeout(end, REVEAL_MS + 100);
+      });
+      return revealed;
+    },
     resize,
     draw(frame, look) {
       if (destroyed || !roomTarget) return;
@@ -475,18 +577,6 @@ export async function createRoomRenderer(
           });
         }
       : undefined,
-    destroy() {
-      destroyed = true;
-      canvas.remove();
-      disposeObject(gltf.scene);
-      layers.forEach((l) => l.texture.dispose());
-      mixTarget.dispose();
-      roomTarget?.dispose();
-      mix.dispose();
-      composite.dispose();
-      quad.geometry.dispose();
-      renderer.dispose();
-      renderer.forceContextLoss();
-    },
+    destroy: release,
   };
 }

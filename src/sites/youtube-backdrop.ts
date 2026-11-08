@@ -11,7 +11,9 @@ import type { RegionImportance, UiRegion } from '../world/space';
  * ambient mode: a blurred copy of the video drawn around the player (a decoration, not a control).
  * The masthead, chips bar and guide keep their own backgrounds: content scrolls under them. */
 const BACKDROP_CSS =
-  'html,body,ytd-app{background:transparent!important}' +
+  // html keeps YouTube's base colour (under the room's canvas): the room fades in over it, not over
+  // the browser's white.
+  'html{background:var(--yt-spec-base-background)!important}body,ytd-app{background:transparent!important}' +
   'ytd-watch-flexy #cinematics,ytd-watch-flexy #cinematics-container{display:none!important}' +
   // The theater's black beside the picture is the player's own background (letterboxing, not a
   // control): the room shows there instead. The picture, the bars and their gradients stay.
@@ -233,18 +235,20 @@ export function youtubeBackdrop(doc: Document): SiteBackdrop {
   };
   return {
     open() {
-      let style = doc.getElementById(STYLE_ID) as HTMLStyleElement | null;
-      if (!style) {
-        style = doc.createElement('style');
-        style.id = STYLE_ID;
-        style.textContent = BACKDROP_CSS;
-        (doc.head ?? doc.documentElement).append(style);
-      }
+      let style: HTMLStyleElement | null = null;
       const parent = doc.body ?? doc.documentElement;
       return {
         parent,
         // Under ytd-app (not positioned with a level of its own) and over the transparent html.
         zIndex: -1,
+        show() {
+          style = doc.getElementById(STYLE_ID) as HTMLStyleElement | null;
+          if (style) return;
+          style = doc.createElement('style');
+          style.id = STYLE_ID;
+          style.textContent = BACKDROP_CSS;
+          (doc.head ?? doc.documentElement).append(style);
+        },
         close() {
           style?.remove();
           found.clear();
