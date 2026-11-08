@@ -1,0 +1,4 @@
+interface:
+  display_name: 'WWT Asset Director'
+  short_description: '星の旅の 3D 素材を自分でループして作る'
+  default_prompt: 'Use $wwt-asset-director to build the 3D assets for the WWT star-journey work, looping on lineup renders until the scorecard bar is met.'

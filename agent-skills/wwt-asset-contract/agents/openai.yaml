@@ -1,0 +1,4 @@
+interface:
+  display_name: 'WWT Asset Contract'
+  short_description: '素材と世界の受け渡しの約束と検査'
+  default_prompt: 'Use $wwt-asset-contract to export assets that match the WWT world contract, update the manifest, and run the checks.'

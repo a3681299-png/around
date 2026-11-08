@@ -1,0 +1,4 @@
+interface:
+  display_name: 'WWT Asset Review Loop'
+  short_description: '素材を並べて撮り、採点して直す'
+  default_prompt: 'Use $wwt-asset-review-loop to render the asset lineup at the preset distances, score it, and fix the three weakest areas.'

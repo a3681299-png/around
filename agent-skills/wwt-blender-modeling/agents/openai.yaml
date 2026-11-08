@@ -1,0 +1,4 @@
+interface:
+  display_name: 'WWT Blender Modeling'
+  short_description: 'Blender スクリプトで住人と物を作る'
+  default_prompt: 'Use $wwt-blender-modeling to script low-poly residents and props for the WWT star-journey work.'
