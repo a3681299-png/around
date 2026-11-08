@@ -23,14 +23,14 @@
 | id                     | 種類     | ファイル                                     | 状態           | 三角形 | 高さ m | 役割        |
 | ---------------------- | -------- | -------------------------------------------- | -------------- | ------ | ------ | ----------- |
 | hero-tsumu             | hero     | wwt-private-assets/tsumu/work/tsumu-city.glb | final（Codex） | 1766   | 1.006  | hero        |
-| resident-dockworker-a  | resident | residents/dockworker-a.glb                   | draft          | 2448   | 1.134  | dockworker  |
-| resident-dockworker-b  | resident | residents/dockworker-b.glb                   | draft          | 2236   | 1.138  | dockworker  |
-| resident-lamplighter-a | resident | residents/lamplighter-a.glb                  | draft          | 2536   | 1.398  | lamplighter |
-| resident-shopkeeper-a  | resident | residents/shopkeeper-a.glb                   | draft          | 2500   | 1.105  | shopkeeper  |
-| resident-shopkeeper-b  | resident | residents/shopkeeper-b.glb                   | draft          | 2268   | 1.133  | shopkeeper  |
-| resident-walker-a      | resident | residents/walker-a.glb                       | draft          | 2516   | 1.162  | walker      |
-| resident-walker-b      | resident | residents/walker-b.glb                       | draft          | 2524   | 1.113  | walker      |
-| resident-walker-c      | resident | residents/walker-c.glb                       | draft          | 2352   | 1.113  | walker      |
+| resident-dockworker-a  | resident | residents/dockworker-a.glb                   | draft          | 2568   | 1.134  | dockworker  |
+| resident-dockworker-b  | resident | residents/dockworker-b.glb                   | draft          | 2352   | 1.138  | dockworker  |
+| resident-lamplighter-a | resident | residents/lamplighter-a.glb                  | draft          | 2634   | 1.398  | lamplighter |
+| resident-shopkeeper-a  | resident | residents/shopkeeper-a.glb                   | draft          | 2614   | 1.105  | shopkeeper  |
+| resident-shopkeeper-b  | resident | residents/shopkeeper-b.glb                   | draft          | 2388   | 1.133  | shopkeeper  |
+| resident-walker-a      | resident | residents/walker-a.glb                       | draft          | 2612   | 1.162  | walker      |
+| resident-walker-b      | resident | residents/walker-b.glb                       | draft          | 2626   | 1.113  | walker      |
+| resident-walker-c      | resident | residents/walker-c.glb                       | draft          | 2452   | 1.113  | walker      |
 | prop-crate             | prop     | props/crate.glb                              | draft          | 80     | 0.195  | dockworker  |
 | prop-lantern           | prop     | props/lantern.glb                            | draft          | 220    | 0.325  | lamplighter |
 | prop-broom             | prop     | props/broom.glb                              | draft          | 120    | 1.01   | shopkeeper  |
@@ -62,14 +62,14 @@ before は最初に並べた絵（素体の半分の鏡で帽子が二重、顔�
 | 4. 近くで気持ちいい | 0      | 2     | 顔は平らな卵形、袖・すそは太い。体の陰がまだらに出る所が残る                                                                                |
 | 5. 小物の説得力     | 1      | 2     | 箱は両手の間、ランタンとほうきは手から下がる。箱は少し浮いて見える                                                                          |
 | 6. 夜               | 1      | 2     | 窓・灯り・ボタン・ランタンが光る。住人の縁の光は弱い                                                                                        |
-| 7. 軽さ             | 1      | 3     | 住人 2,236〜2,536（上限 3,000）、物はすべて上限の半分以下                                                                                   |
+| 7. 軽さ             | 1      | 3     | 住人 2,352〜2,634（上限 3,000）、物はすべて上限の半分以下                                                                                   |
 | 8. 約束             | —      | 3     | `check.mjs` 0 件、unit 7 件                                                                                                                 |
 
 絵：[before](screenshots/city-assets/p1-before/)、[after](screenshots/city-assets/p1-after/)（far・mid・near・sil・night・props）。
 
 ## 残り
 
-- 前髪の下の縁がぎざぎざで、目のように見える住人がいる（球を面で切っているため。平面で切り直す）
+- 前髪の縁は平面で切ってまっすぐにした。髪の丸い面に出る明るい陰の段が、近くでは眉のようにも見える（髪の面を増やすか、陰の段のしきい値を世界と相談）
 - 体の陰のまだら（減らした面と滑らかな法線の組み合わせ）
 - ベレーの散歩する人とはちまきの港の作業員が、影絵で似る
 - 箱を持つ姿は並べるページの仮の姿勢。世界が動作を当てたときの手の位置で見直す

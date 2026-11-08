@@ -9,9 +9,13 @@
       "status": "final",
       "heightM": 1.006,
       "tris": 1766,
-      "slots": ["slot_tex"],
+      "slots": [
+        "slot_tex"
+      ],
       "attach": [],
-      "roles": ["hero"],
+      "roles": [
+        "hero"
+      ],
       "cultures": [],
       "rig": "tsumu",
       "note": "Converted by Codex (scripts/characters/tsumu_glb.py + retarget_vrma.py); the asset side rebuilds it with city-assets/tools/build_tsumu.py and checks the approved SHA-256. Height is the world's 0.72 display scale.",
@@ -29,10 +33,24 @@
       "file": "residents/dockworker-a.glb",
       "status": "draft",
       "heightM": 1.134,
-      "tris": 2448,
-      "slots": ["slot_accent", "slot_bottom", "slot_hair", "slot_shoes", "slot_skin", "slot_top"],
-      "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
-      "roles": ["dockworker"],
+      "tris": 2568,
+      "slots": [
+        "slot_accent",
+        "slot_bottom",
+        "slot_hair",
+        "slot_shoes",
+        "slot_skin",
+        "slot_top"
+      ],
+      "attach": [
+        "attach_head",
+        "attach_hand_l",
+        "attach_hand_r",
+        "attach_back"
+      ],
+      "roles": [
+        "dockworker"
+      ],
       "cultures": [],
       "rig": "resident",
       "base": "B",
@@ -50,10 +68,24 @@
       "file": "residents/dockworker-b.glb",
       "status": "draft",
       "heightM": 1.138,
-      "tris": 2236,
-      "slots": ["slot_accent", "slot_bottom", "slot_hair", "slot_shoes", "slot_skin", "slot_top"],
-      "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
-      "roles": ["dockworker"],
+      "tris": 2352,
+      "slots": [
+        "slot_accent",
+        "slot_bottom",
+        "slot_hair",
+        "slot_shoes",
+        "slot_skin",
+        "slot_top"
+      ],
+      "attach": [
+        "attach_head",
+        "attach_hand_l",
+        "attach_hand_r",
+        "attach_back"
+      ],
+      "roles": [
+        "dockworker"
+      ],
       "cultures": [],
       "rig": "resident",
       "base": "A",
@@ -71,10 +103,25 @@
       "file": "residents/lamplighter-a.glb",
       "status": "draft",
       "heightM": 1.398,
-      "tris": 2536,
-      "slots": ["slot_accent", "slot_bottom", "slot_hair", "slot_light", "slot_shoes", "slot_skin", "slot_top"],
-      "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
-      "roles": ["lamplighter"],
+      "tris": 2634,
+      "slots": [
+        "slot_accent",
+        "slot_bottom",
+        "slot_hair",
+        "slot_light",
+        "slot_shoes",
+        "slot_skin",
+        "slot_top"
+      ],
+      "attach": [
+        "attach_head",
+        "attach_hand_l",
+        "attach_hand_r",
+        "attach_back"
+      ],
+      "roles": [
+        "lamplighter"
+      ],
       "cultures": [],
       "rig": "resident",
       "base": "A",
@@ -92,10 +139,24 @@
       "file": "residents/shopkeeper-a.glb",
       "status": "draft",
       "heightM": 1.105,
-      "tris": 2500,
-      "slots": ["slot_accent", "slot_bottom", "slot_hair", "slot_shoes", "slot_skin", "slot_top"],
-      "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
-      "roles": ["shopkeeper"],
+      "tris": 2614,
+      "slots": [
+        "slot_accent",
+        "slot_bottom",
+        "slot_hair",
+        "slot_shoes",
+        "slot_skin",
+        "slot_top"
+      ],
+      "attach": [
+        "attach_head",
+        "attach_hand_l",
+        "attach_hand_r",
+        "attach_back"
+      ],
+      "roles": [
+        "shopkeeper"
+      ],
       "cultures": [],
       "rig": "resident",
       "base": "B",
@@ -113,10 +174,24 @@
       "file": "residents/shopkeeper-b.glb",
       "status": "draft",
       "heightM": 1.133,
-      "tris": 2268,
-      "slots": ["slot_accent", "slot_bottom", "slot_hair", "slot_shoes", "slot_skin", "slot_top"],
-      "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
-      "roles": ["shopkeeper"],
+      "tris": 2388,
+      "slots": [
+        "slot_accent",
+        "slot_bottom",
+        "slot_hair",
+        "slot_shoes",
+        "slot_skin",
+        "slot_top"
+      ],
+      "attach": [
+        "attach_head",
+        "attach_hand_l",
+        "attach_hand_r",
+        "attach_back"
+      ],
+      "roles": [
+        "shopkeeper"
+      ],
       "cultures": [],
       "rig": "resident",
       "base": "A",
@@ -134,10 +209,24 @@
       "file": "residents/walker-a.glb",
       "status": "draft",
       "heightM": 1.162,
-      "tris": 2516,
-      "slots": ["slot_accent", "slot_bottom", "slot_hair", "slot_shoes", "slot_skin", "slot_top"],
-      "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
-      "roles": ["walker"],
+      "tris": 2612,
+      "slots": [
+        "slot_accent",
+        "slot_bottom",
+        "slot_hair",
+        "slot_shoes",
+        "slot_skin",
+        "slot_top"
+      ],
+      "attach": [
+        "attach_head",
+        "attach_hand_l",
+        "attach_hand_r",
+        "attach_back"
+      ],
+      "roles": [
+        "walker"
+      ],
       "cultures": [],
       "rig": "resident",
       "base": "A",
@@ -155,10 +244,24 @@
       "file": "residents/walker-b.glb",
       "status": "draft",
       "heightM": 1.113,
-      "tris": 2524,
-      "slots": ["slot_accent", "slot_bottom", "slot_hair", "slot_shoes", "slot_skin", "slot_top"],
-      "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
-      "roles": ["walker"],
+      "tris": 2626,
+      "slots": [
+        "slot_accent",
+        "slot_bottom",
+        "slot_hair",
+        "slot_shoes",
+        "slot_skin",
+        "slot_top"
+      ],
+      "attach": [
+        "attach_head",
+        "attach_hand_l",
+        "attach_hand_r",
+        "attach_back"
+      ],
+      "roles": [
+        "walker"
+      ],
       "cultures": [],
       "rig": "resident",
       "base": "B",
@@ -176,10 +279,24 @@
       "file": "residents/walker-c.glb",
       "status": "draft",
       "heightM": 1.113,
-      "tris": 2352,
-      "slots": ["slot_accent", "slot_bottom", "slot_hair", "slot_shoes", "slot_skin", "slot_top"],
-      "attach": ["attach_head", "attach_hand_l", "attach_hand_r", "attach_back"],
-      "roles": ["walker"],
+      "tris": 2452,
+      "slots": [
+        "slot_accent",
+        "slot_bottom",
+        "slot_hair",
+        "slot_shoes",
+        "slot_skin",
+        "slot_top"
+      ],
+      "attach": [
+        "attach_head",
+        "attach_hand_l",
+        "attach_hand_r",
+        "attach_back"
+      ],
+      "roles": [
+        "walker"
+      ],
       "cultures": [],
       "rig": "resident",
       "base": "A",
@@ -196,8 +313,12 @@
       "kind": "resident",
       "file": null,
       "status": "placeholder",
-      "roles": ["fisher"],
-      "cultures": ["sea"],
+      "roles": [
+        "fisher"
+      ],
+      "cultures": [
+        "sea"
+      ],
       "source": null
     },
     {
@@ -205,8 +326,12 @@
       "kind": "resident",
       "file": null,
       "status": "placeholder",
-      "roles": ["gardener"],
-      "cultures": ["nature"],
+      "roles": [
+        "gardener"
+      ],
+      "cultures": [
+        "nature"
+      ],
       "source": null
     },
     {
@@ -214,8 +339,12 @@
       "kind": "resident",
       "file": null,
       "status": "placeholder",
-      "roles": ["musician"],
-      "cultures": ["music"],
+      "roles": [
+        "musician"
+      ],
+      "cultures": [
+        "music"
+      ],
       "source": null
     },
     {
@@ -223,8 +352,12 @@
       "kind": "resident",
       "file": null,
       "status": "placeholder",
-      "roles": ["stargazer"],
-      "cultures": ["sky"],
+      "roles": [
+        "stargazer"
+      ],
+      "cultures": [
+        "sky"
+      ],
       "source": null
     },
     {
@@ -232,8 +365,12 @@
       "kind": "resident",
       "file": null,
       "status": "placeholder",
-      "roles": ["vendor"],
-      "cultures": ["food"],
+      "roles": [
+        "vendor"
+      ],
+      "cultures": [
+        "food"
+      ],
       "source": null
     },
     {
@@ -243,9 +380,15 @@
       "status": "draft",
       "heightM": 1.01,
       "tris": 120,
-      "slots": ["slot_accent", "slot_cloth", "slot_wood"],
+      "slots": [
+        "slot_accent",
+        "slot_cloth",
+        "slot_wood"
+      ],
       "attach": [],
-      "roles": ["shopkeeper"],
+      "roles": [
+        "shopkeeper"
+      ],
       "cultures": [],
       "source": {
         "type": "own",
@@ -261,9 +404,15 @@
       "status": "draft",
       "heightM": 0.195,
       "tris": 80,
-      "slots": ["slot_accent", "slot_cloth", "slot_wood"],
+      "slots": [
+        "slot_accent",
+        "slot_cloth",
+        "slot_wood"
+      ],
       "attach": [],
-      "roles": ["dockworker"],
+      "roles": [
+        "dockworker"
+      ],
       "cultures": [],
       "source": {
         "type": "own",
@@ -279,9 +428,14 @@
       "status": "draft",
       "heightM": 0.325,
       "tris": 220,
-      "slots": ["slot_light", "slot_metal"],
+      "slots": [
+        "slot_light",
+        "slot_metal"
+      ],
       "attach": [],
-      "roles": ["lamplighter"],
+      "roles": [
+        "lamplighter"
+      ],
       "cultures": [],
       "source": {
         "type": "own",
@@ -297,9 +451,16 @@
       "status": "draft",
       "heightM": 1.42,
       "tris": 96,
-      "slots": ["slot_accent", "slot_light", "slot_metal", "slot_wood"],
+      "slots": [
+        "slot_accent",
+        "slot_light",
+        "slot_metal",
+        "slot_wood"
+      ],
       "attach": [],
-      "roles": ["lamplighter"],
+      "roles": [
+        "lamplighter"
+      ],
       "cultures": [],
       "source": {
         "type": "own",
@@ -315,9 +476,15 @@
       "status": "draft",
       "heightM": 0.295,
       "tris": 76,
-      "slots": ["slot_accent", "slot_cloth", "slot_wood"],
+      "slots": [
+        "slot_accent",
+        "slot_cloth",
+        "slot_wood"
+      ],
       "attach": [],
-      "roles": ["shopkeeper"],
+      "roles": [
+        "shopkeeper"
+      ],
       "cultures": [],
       "source": {
         "type": "own",
@@ -331,8 +498,12 @@
       "kind": "prop",
       "file": null,
       "status": "placeholder",
-      "roles": ["fisher"],
-      "cultures": ["sea"],
+      "roles": [
+        "fisher"
+      ],
+      "cultures": [
+        "sea"
+      ],
       "source": null
     },
     {
@@ -340,8 +511,12 @@
       "kind": "prop",
       "file": null,
       "status": "placeholder",
-      "roles": ["musician"],
-      "cultures": ["music"],
+      "roles": [
+        "musician"
+      ],
+      "cultures": [
+        "music"
+      ],
       "source": null
     },
     {
@@ -349,8 +524,12 @@
       "kind": "prop",
       "file": null,
       "status": "placeholder",
-      "roles": ["vendor"],
-      "cultures": ["food"],
+      "roles": [
+        "vendor"
+      ],
+      "cultures": [
+        "food"
+      ],
       "source": null
     },
     {
@@ -358,8 +537,12 @@
       "kind": "prop",
       "file": null,
       "status": "placeholder",
-      "roles": ["stargazer"],
-      "cultures": ["sky"],
+      "roles": [
+        "stargazer"
+      ],
+      "cultures": [
+        "sky"
+      ],
       "source": null
     },
     {
@@ -367,8 +550,12 @@
       "kind": "prop",
       "file": null,
       "status": "placeholder",
-      "roles": ["gardener"],
-      "cultures": ["nature"],
+      "roles": [
+        "gardener"
+      ],
+      "cultures": [
+        "nature"
+      ],
       "source": null
     },
     {
@@ -378,9 +565,17 @@
       "status": "draft",
       "heightM": 1.51,
       "tris": 712,
-      "slots": ["slot_accent", "slot_cloth", "slot_light", "slot_metal", "slot_wood"],
+      "slots": [
+        "slot_accent",
+        "slot_cloth",
+        "slot_light",
+        "slot_metal",
+        "slot_wood"
+      ],
       "attach": [],
-      "roles": ["dockworker"],
+      "roles": [
+        "dockworker"
+      ],
       "cultures": [],
       "source": {
         "type": "own",
@@ -396,9 +591,16 @@
       "status": "draft",
       "heightM": 2.09,
       "tris": 192,
-      "slots": ["slot_accent", "slot_cloth", "slot_light", "slot_wood"],
+      "slots": [
+        "slot_accent",
+        "slot_cloth",
+        "slot_light",
+        "slot_wood"
+      ],
       "attach": [],
-      "roles": ["fisher"],
+      "roles": [
+        "fisher"
+      ],
       "cultures": [],
       "source": {
         "type": "own",
@@ -414,9 +616,14 @@
       "status": "draft",
       "heightM": 0.325,
       "tris": 212,
-      "slots": ["slot_accent", "slot_metal"],
+      "slots": [
+        "slot_accent",
+        "slot_metal"
+      ],
       "attach": [],
-      "roles": ["dockworker"],
+      "roles": [
+        "dockworker"
+      ],
       "cultures": [],
       "source": {
         "type": "own",
@@ -432,9 +639,15 @@
       "status": "draft",
       "heightM": 0.84,
       "tris": 424,
-      "slots": ["slot_accent", "slot_cloth", "slot_wood"],
+      "slots": [
+        "slot_accent",
+        "slot_cloth",
+        "slot_wood"
+      ],
       "attach": [],
-      "roles": ["dockworker"],
+      "roles": [
+        "dockworker"
+      ],
       "cultures": [],
       "source": {
         "type": "own",
@@ -450,9 +663,18 @@
       "status": "draft",
       "heightM": 2.94,
       "tris": 328,
-      "slots": ["slot_accent", "slot_cloth", "slot_light", "slot_metal", "slot_stone", "slot_wood"],
+      "slots": [
+        "slot_accent",
+        "slot_cloth",
+        "slot_light",
+        "slot_metal",
+        "slot_stone",
+        "slot_wood"
+      ],
       "attach": [],
-      "roles": ["dockworker"],
+      "roles": [
+        "dockworker"
+      ],
       "cultures": [],
       "source": {
         "type": "own",
@@ -468,9 +690,14 @@
       "status": "draft",
       "heightM": 0.97,
       "tris": 696,
-      "slots": ["slot_accent", "slot_wood"],
+      "slots": [
+        "slot_accent",
+        "slot_wood"
+      ],
       "attach": [],
-      "roles": ["dockworker"],
+      "roles": [
+        "dockworker"
+      ],
       "cultures": [],
       "source": {
         "type": "own",
@@ -486,9 +713,14 @@
       "status": "draft",
       "heightM": 0.751,
       "tris": 200,
-      "slots": ["slot_metal", "slot_wood"],
+      "slots": [
+        "slot_metal",
+        "slot_wood"
+      ],
       "attach": [],
-      "roles": ["walker"],
+      "roles": [
+        "walker"
+      ],
       "cultures": [],
       "source": {
         "type": "own",
@@ -504,7 +736,10 @@
       "status": "draft",
       "heightM": 0.56,
       "tris": 104,
-      "slots": ["slot_plant", "slot_stone"],
+      "slots": [
+        "slot_plant",
+        "slot_stone"
+      ],
       "attach": [],
       "roles": [],
       "cultures": [],
@@ -522,9 +757,15 @@
       "status": "draft",
       "heightM": 2.17,
       "tris": 212,
-      "slots": ["slot_accent", "slot_light", "slot_metal"],
+      "slots": [
+        "slot_accent",
+        "slot_light",
+        "slot_metal"
+      ],
       "attach": [],
-      "roles": ["lamplighter"],
+      "roles": [
+        "lamplighter"
+      ],
       "cultures": [],
       "source": {
         "type": "own",
@@ -540,7 +781,11 @@
       "status": "draft",
       "heightM": 1.3,
       "tris": 152,
-      "slots": ["slot_accent", "slot_cloth", "slot_metal"],
+      "slots": [
+        "slot_accent",
+        "slot_cloth",
+        "slot_metal"
+      ],
       "attach": [],
       "roles": [],
       "cultures": [],
@@ -558,7 +803,10 @@
       "status": "draft",
       "heightM": 2.279,
       "tris": 140,
-      "slots": ["slot_plant", "slot_wood"],
+      "slots": [
+        "slot_plant",
+        "slot_wood"
+      ],
       "attach": [],
       "roles": [],
       "cultures": [],
@@ -574,7 +822,9 @@
       "kind": "street",
       "file": null,
       "status": "placeholder",
-      "roles": ["walker"],
+      "roles": [
+        "walker"
+      ],
       "cultures": [],
       "source": null
     },
@@ -592,8 +842,12 @@
       "kind": "culture",
       "file": null,
       "status": "placeholder",
-      "roles": ["fisher"],
-      "cultures": ["sea"],
+      "roles": [
+        "fisher"
+      ],
+      "cultures": [
+        "sea"
+      ],
       "source": null
     },
     {
@@ -601,8 +855,12 @@
       "kind": "culture",
       "file": null,
       "status": "placeholder",
-      "roles": ["gardener"],
-      "cultures": ["nature"],
+      "roles": [
+        "gardener"
+      ],
+      "cultures": [
+        "nature"
+      ],
       "source": null
     },
     {
@@ -610,8 +868,12 @@
       "kind": "culture",
       "file": null,
       "status": "placeholder",
-      "roles": ["stargazer"],
-      "cultures": ["sky"],
+      "roles": [
+        "stargazer"
+      ],
+      "cultures": [
+        "sky"
+      ],
       "source": null
     },
     {
@@ -619,8 +881,13 @@
       "kind": "culture",
       "file": null,
       "status": "placeholder",
-      "roles": ["musician", "listener"],
-      "cultures": ["music"],
+      "roles": [
+        "musician",
+        "listener"
+      ],
+      "cultures": [
+        "music"
+      ],
       "source": null
     },
     {
@@ -628,8 +895,12 @@
       "kind": "culture",
       "file": null,
       "status": "placeholder",
-      "roles": ["vendor"],
-      "cultures": ["food"],
+      "roles": [
+        "vendor"
+      ],
+      "cultures": [
+        "food"
+      ],
       "source": null
     }
   ]
