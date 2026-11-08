@@ -397,8 +397,11 @@ export function parseDesign(value: unknown): DesignDocument {
   const signalRules = Object.hasOwn(data, 'signalRules')
     ? parseSignalRules(data['signalRules'], new Set([...decorations, ...groups].map((layer) => layer.id)))
     : [];
+  // The space's resident names a layer by id only: a layer since removed leaves the room empty
+  // (the Host looks it up), so deleting the layer in the editor never makes the artwork invalid.
+  const space = Object.hasOwn(data, 'space') ? parseSpace(data['space']) : undefined;
   return {
-    schemaVersion: 17,
+    schemaVersion: 18,
     id: data['id'],
     siteId: data['siteId'],
     baseThemeId: data['baseThemeId'],
@@ -406,12 +409,12 @@ export function parseDesign(value: unknown): DesignDocument {
     decorations,
     ...(groups.length ? { groups } : {}),
     ...(signalRules.length ? { signalRules } : {}),
-    ...(Object.hasOwn(data, 'space') ? { space: parseSpace(data['space']) } : {}),
+    ...(space ? { space } : {}),
   };
 }
 
 export function emptyDesign(siteId: string, baseThemeId: string | null): DesignDocument {
-  return parseDesign({ schemaVersion: 17, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
+  return parseDesign({ schemaVersion: 18, id: `${siteId}-custom`, siteId, baseThemeId, rules: [], decorations: [] });
 }
 
 export function sameDesign(a: DesignDocument | undefined, b: DesignDocument | undefined): boolean {

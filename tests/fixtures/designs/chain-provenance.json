@@ -68,5 +68,12 @@
     "file": "tests/character-data.spec.ts",
     "test": "a motion hips height roundtrips at its limit and stays absent when not given",
     "extraction": "first explicit parseDesign input accepted by the historical parser"
+  },
+  {
+    "version": 17,
+    "commit": "18b8b6ff53163dc7a6b37c5b99b4fd4f669f297c",
+    "file": "tests/space-data.spec.ts",
+    "test": "v17 roundtrips the space and a room-depth layer; omission keeps every layer in front",
+    "extraction": "first explicit parseDesign input accepted by the historical parser"
   }
 ]

@@ -106,7 +106,7 @@ export function commitDesign(input: DesignDocument, previous?: DesignDocument): 
   if (documents.has(input)) return input;
   if (previous) previous = readDesign(previous);
   if (
-    input.schemaVersion !== 17 ||
+    input.schemaVersion !== 18 ||
     !isDesignId(input.id) ||
     !isDesignId(input.siteId) ||
     (input.baseThemeId !== null && !isDesignId(input.baseThemeId))

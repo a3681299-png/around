@@ -392,7 +392,7 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
           'webWorldThemes.design.youtube'
         ] as DesignDocument,
     );
-    expect(design.schemaVersion).toBe(17);
+    expect(design.schemaVersion).toBe(18);
     expect(design).not.toHaveProperty('takes');
     expect(JSON.stringify(take)).not.toMatch(/https?:|cookie|asset-|signalRules|decorations/);
     const middle = take.inputs.find(
