@@ -7,6 +7,8 @@
 // Scenes: start, notice, turns, stop, joy, bed (default: all). Each scene is a fresh page, a fixed
 // list of timed calls on the page's test hook, and a fixed length. Calls a build does not have are
 // skipped, so an older build records the same scene without the newer behaviour.
+// WW_COMPARE_CLOSE=0 records from the room's own camera (what a visitor sees) instead of each
+// scene's close-up; any other number is the close-up's distance for every scene.
 // The window is real (GPU) but off screen, as tests/fixtures.ts places it. The output shows a
 // local character: keep it out of the repository (docs/living-body.md).
 import { chromium } from '@playwright/test';
@@ -141,7 +143,10 @@ try {
         room.closeUp(close);
         if (mood) room.resident.setMood?.(mood);
       },
-      [scene.close, scene.mood ?? null],
+      [
+        process.env.WW_COMPARE_CLOSE === undefined ? scene.close : Number(process.env.WW_COMPARE_CLOSE),
+        scene.mood ?? null,
+      ],
     );
     await page.waitForTimeout(1500); // the canvas has faded in, the body has settled
     const began = Date.now();
