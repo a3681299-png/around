@@ -1,6 +1,6 @@
 # Living Onboarding 引き継ぎ（2026-11-11、ノート PC → デスクトップ PC）
 
-ブランチ `feat/living-onboarding`（`codex/living-room` の `eca7c0a` から）。ノート PC とデスクトップ PC のどちらで続けても同じ形で進められるように、いま分かっていることをまとめる。PC の運用の決まりは [dual-pc-workflow.md](dual-pc-workflow.md)、部屋の美術の記録は [living-room-art.md](living-room-art.md)。
+現行の部屋の美術は **`codex/living-room-realism`**（`feat/living-onboarding` の `2db67c9` から）。詳細は [living-room-realism.md](living-room-realism.md) と末尾の「14」。ノート PC とデスクトップ PC のどちらでも続けられるように記録する。PC の運用は [dual-pc-workflow.md](dual-pc-workflow.md)、初版の美術は [living-room-art.md](living-room-art.md)。
 
 ## 1. 作品の目的
 
@@ -15,24 +15,24 @@ WWT をもとにした、コンテスト用の**独立した Web 作品**。3D �
 
 ## 2. 完成済みの部屋
 
-夜の青紫の部屋。4.8m 四方で、奥と左が高い壁、右が腰の高さの壁（カメラが上から覗くジオラマ）、天井なし。詳しい美術の方針・残っている問題は [living-room-art.md](living-room-art.md)。
+6.0 × 5.4m の本体に奥行き 0.8m の三面の出窓。木と生成り、くすんだ緑を中心に、制作机と読書・睡眠の場所、植物、日用品を作り込んだ。奥と左が高い壁、右が腰の高さの切断面。詳しい美術・残りは [living-room-realism.md](living-room-realism.md)。
 
 | 物                 | 場所                                                | 備考                                                                                     |
 | ------------------ | --------------------------------------------------- | ---------------------------------------------------------------------------------------- |
 | Blender 原本       | `art/living-room/living-room.blend`（LFS）          | モディファイアは残してある。編集はこちら                                                 |
-| Web 用の部屋       | `art/living-room/web/room.glb`（LFS、14.7MB）       | 光を焼いた GLB。家具・小物・画面・目印・カメラ `camera_main` を含む                      |
+| Web 用の部屋       | `art/living-room/web/room.glb`（LFS、14.54MB）      | 色と光を焼いた GLB。家具・小物・画面・目印・カメラ `camera_main` を含む                  |
 | ライトマップ・設定 | `art/living-room/web/lightmap.png`、`room.json`     | 通常のファイル（LFS ではない）                                                           |
-| 同じ構図の比較画像 | `art/living-room/renders/`                          | `v01`〜`v05` が Blender（同じカメラ）、`web_v05`〜`web_v07` がブラウザー                 |
+| 検証画像           | `art/living-room/renders/`                          | 現行は `realism-room`・`realism-desk`・`realism-bed`・`realism-portrait`。ほかは旧版     |
 | 作り直すスクリプト | `scripts/living-room/`                              | `run_all.py` で一括。部品は番号順（`lib.py`、`10_shell.py`〜`70_meta.py`、`80_bake.py`） |
 | 表示ページ         | `src/living-room/`、`scripts/build-living-room.mjs` | three.js。`dist-living-room/` へ出力                                                     |
 
 キャラのための用意（`70_meta.py`）：
 
-- `navmesh_floor`：家具の足元を除いた歩ける床（長方形 21 枚）
+- `navmesh_floor`：家具の足元を除いた歩ける床（長方形 33 枚、66 三角形）
 - 座る：`marker_sit_chair`・`_bed`・`_beanbag`・`_cushion`。隠れる：`marker_hide_beanbag`・`_chair`・`_dresser`。立つ：`marker_stand_window`・`_shelf`・`_center`・`_front`・`_guitar`（合計 12 か所）
 - 目印の向きは glTF の +Z（Blender では物の -Y）。`readLayout`（`src/renderers/three/room-layout.ts`）がそのまま読む
 - 画面は `dyn_monitor_screen`・`dyn_monitor2_screen` の別メッシュ。あとで本物の UI を映せる
-- 12 か所すべてが歩ける床の上にあり、歩いて届くことを、ページのテスト用の入口 `__wwLivingRoom.reach()` で確かめた（`room-life.ts` の `standPoint`・`walkable`・`floorPath`）
+- 12 か所すべてが歩ける床の上にあり、中央から歩いて届くことを、ページのテスト用の入口 `__wwLivingRoom.reach()` で確かめた。席から次の席へ向かう経路の残りは [living-room-realism.md](living-room-realism.md) に記録した
 
 ## 3. キャラクターの設計
 
@@ -85,14 +85,14 @@ WWT をもとにした、コンテスト用の**独立した Web 作品**。3D �
 
 ## 5. 起動方法
 
-PC によってパスが違う（ノート PC は `C:\Users\sm787\...`、デスクトップは `C:\Users\kuros\...`）。下は worktree `.work/living-onboarding` の中で行う。
+PC によってパスが違う（ノート PC は `C:\Users\sm787\...`、デスクトップは `C:\Users\kuros\...`）。新しい美術は worktree `.work/living-room-realism` の中で行う。`feat/living-onboarding` の既存 worktree はそのまま残す。
 
 最初の1回：
 
 ```bash
 git fetch --all --prune
-GIT_LFS_SKIP_SMUDGE=1 git worktree add .work/living-onboarding feat/living-onboarding   # worktree がなければ
-cd .work/living-onboarding
+GIT_LFS_SKIP_SMUDGE=1 git worktree add .work/living-room-realism codex/living-room-realism   # worktree がなければ
+cd .work/living-room-realism
 git lfs pull          # room.glb と living-room.blend の実体を取る
 npm ci
 ```
@@ -116,8 +116,8 @@ node scripts/living-room/capture.mjs art/living-room/renders/web_new.png
 # 作るだけ（焼かない）
 WW_SKIP_BAKE=1 WW_SAVE=.work/room-test.blend WW_RENDER=.work/room-test.png \
   "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" -b --python scripts/living-room/run_all.py
-# 焼いて GLB まで（コミットした部屋と同じ画質。GPU で 10 分ほど）
-WW_LM_SIZE=2048 WW_SAMPLES=256 WW_VC_SAMPLES=128 WW_OUT=art/living-room/web \
+# 焼いて GLB まで（コミットした部屋と同じ画質）
+WW_LM_SIZE=4096 WW_SAMPLES=128 WW_VC_SAMPLES=128 WW_OUT=art/living-room/web \
   "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" -b --python scripts/living-room/run_all.py
 ```
 
@@ -125,26 +125,27 @@ WW_LM_SIZE=2048 WW_SAMPLES=256 WW_VC_SAMPLES=128 WW_OUT=art/living-room/web \
 
 ## 6. 重要な設計判断
 
-| 判断                                                                                                       | 理由                                                                                                   |
-| ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| 拡張・作品データ・Playground の描画に載せず、独立したページにした                                          | 今回の対象外が多く、WWT 本体を壊さないため。共有したのは部屋の読み取り（`readLayout`）だけ             |
-| 光は Cycles で焼く（大きな面はライトマップ、ほかは頂点の色）。Web の色＝材質の色 × 焼いた光 × `lightScale` | ふつうの GLB のまま（独自の拡張なし）。小物までライトマップに入れると解像度が足りない                  |
-| 光る物（名前が `dyn_`）は焼かず自分の色で描き、ブルームをかける                                            | 画面・電球・ネオンがにじむ。焼くときは小さな光源のメッシュを外し、代わりの光（`60_lights.py`）で照らす |
-| 部屋の既存の描画（`renderers/three/room.ts`）は使わなかった                                                | ライトマップを 1024 に縮め、作品データと結び付いている                                                 |
-| 止まっている間は描かない。ポインターで少し回り込む間だけ描く                                               | ノート PC の CPU と GPU の負荷を抑える                                                                 |
-| 目印の名前は `marker_sit_*`・`marker_hide_*`・`marker_stand_*`、床は `navmesh_floor`                       | 既存の部屋の素材の約束（`docs/depth-foundation.md`）と同じ。`room-life.ts` がそのまま使える            |
-| `.blend` と `.glb` だけ Git LFS（`.gitattributes` の `art/**`）                                            | 大きな 2 件のため。画像とライトマップは通常の Git                                                      |
+| 判断                                                                                                      | 理由                                                                                                   |
+| --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| 拡張・作品データ・Playground の描画に載せず、独立したページにした                                         | 今回の対象外が多く、WWT 本体を壊さないため。共有したのは部屋の読み取り（`readLayout`）だけ             |
+| 色と光は Cycles で別々に焼き、ノイズ除去後に合成。`bakedColor: true` の Web の色＝焼いた色 × `lightScale` | 木目を保って光の粒を除く。指定のない旧データは従来の材質の色 × 焼いた光のまま                          |
+| 光る物（名前が `dyn_`）は焼かず自分の色で描き、ブルームをかける                                           | 画面・電球・ネオンがにじむ。焼くときは小さな光源のメッシュを外し、代わりの光（`60_lights.py`）で照らす |
+| 部屋の既存の描画（`renderers/three/room.ts`）は使わなかった                                               | ライトマップを 1024 に縮め、作品データと結び付いている                                                 |
+| 止まっている間は描かない。ポインターで少し回り込む間だけ描く                                              | ノート PC の CPU と GPU の負荷を抑える                                                                 |
+| 目印の名前は `marker_sit_*`・`marker_hide_*`・`marker_stand_*`、床は `navmesh_floor`                      | 既存の部屋の素材の約束（`docs/depth-foundation.md`）と同じ。`room-life.ts` がそのまま使える            |
+| `.blend` と `.glb` だけ Git LFS（`.gitattributes` の `art/**`）                                           | 大きな 2 件のため。画像とライトマップは通常の Git                                                      |
 
 ## 7. 未実装・保留
 
 - UI カード（今は仮の目印）、クリックで喜ぶ、表情。体の残り（待機の腕・止まったあとの足幅・座りの脚など）は [living-body.md](living-body.md) の 7 節
-- 参考画像（gogh の 2 枚）との見比べ：画像が会話に届かず、依頼文の言葉でだけ見比べた。**美術的には「一旦完成」（翔太の判断）で、完成とは確認していない**
-- 美術の残り：窓の外の空（ブラウザーで黒く、Blender で白っぽい）、布のしわ、金属・ガラスの照り返し、右手前（チェストが切れる・ギターが黒い）、壁の上の密度、ブラウザーと Blender の彩度の差（[living-room-art.md](living-room-art.md) の 6 節）
-- `room.glb` は未圧縮で 14.7MB（meshopt などで縮める余地）。GPU の重さは未測定
-- 縦長・狭い画面の見え方（幅に合わせて部屋を収めるが、見ていない）。新しいページの e2e は未作成（ページを開いて目印と床を確かめる確認はテスト用の入口 `__wwLivingRoom` にある）
+- 現行の美術は、2026-11-11 に届いた窓際の制作机の参考画像をもとに作り直した。窓の外、布の輪郭、床や陶器の反射など、残りは [living-room-realism.md](living-room-realism.md) にまとめた
+- `room.glb` は未圧縮で 14.54MB。短い実 GPU の参考計測は記録済み。公開前の圧縮とノート PC での確認は残る
+- 縦長 430×900 の実画面は確認済み。部屋は収まるが細部は小さくなる。専用ページの身体 e2e は `tests/living-room-body-live.spec.ts` がある（ローカル素材が要る）
 - **フェリスの保存（保留）**：両 PC の `C:\wwt-private\Felis_v0.8.1\`（約 82MB、FBX 2・unitypackage・PSD・案内のリンク）は `wwt-private-assets` の `git status` で未追跡のまま。フォルダに**規約の文書がなく**（`.url` のリンクだけ）、`wwt-private-assets` は「入れるのはミルドと Quaternius だけ」という翔太の決定（`.gitignore` のコメント、2026-11-07）なので、**保存してよいと確認できないため入れていない**。進めるには、(1) 購入元の規約で、私用のリポジトリへの保存・変換・公開物への使い方を確認、(2) 翔太が `wwt-private-assets` に入れると決める、(3) `.gitignore` に例外を足して `git add`（LFS の指定は `.fbx`・`.unitypackage` にすでにある）、の順。デスクトップで続けるときは、まず (1) の確認を取る
 
 ## 8. 次の作業
+
+**2026-11-11 の最新指示：アニメーションはひとまず止め、部屋の見た目を優先する。** まず [living-room-realism.md](living-room-realism.md) の実画面と残りをレビューする。以下の動作・UI の作業は、その後の候補として残す。
 
 2026-11-11 に身体制御の基礎ができた（下の「11」）。その続き：
 
@@ -167,7 +168,7 @@ WW_LM_SIZE=2048 WW_SAMPLES=256 WW_VC_SAMPLES=128 WW_OUT=art/living-room/web \
 - **確かめ方**：`git lfs ls-files` の `*` は「ローカルに実体がある」だけを示す。**新しい場所に clone して `git lfs pull` が通り、SHA-256 が合うことを見る**（`room.glb` 8f8a3f20…、`living-room.blend` e3625b29…。2026-11-11 に確かめた）
 - **再発の防止（ノート PC は適用済み、2026-11-11、翔太の許可）**：`.git/hooks/pre-push` の先頭で、標準入力を一時ファイルに取り、`git lfs pre-push "$@" < 一時ファイル` を先に実行し（失敗したら push を止める）、そのあと既存の `node …/pre-push.mjs < 一時ファイル` を実行するようにした。この hook は追跡しない（ノート PC にだけある）。**デスクトップの hook が独自の hook だけの作りなら、同じ手当てが要る**。新しい LFS ファイルを実際に送る場面は、まだ試していない（次に `.blend`・`.glb` を push するとき、`Uploading LFS objects` の表示が出れば動いている）。それまでは、push のあとに `git lfs push --all origin <ブランチ>` を手で実行し、新しい clone で取得を確かめる
 
-## 10. 状態（この文書を書いた時点）
+## 10. 初期の状態（ノート PC からの過去の記録）
 
 - ノート PC の worktree：`feat/living-onboarding`、`origin` と同じ。`77f0653`（デスクトップの運用の文書）を fast-forward で取り込み済み
 - 未コミットで残してあるもの：`art/living-room/living-room.blend`（Blender が 14:18 に保存し直した。コミットした版と中身が同じかは未確認。コミットした版の控えが同じフォルダの `living-room.blend1`、未追跡）。消さない。コミットする前に、`git lfs` で取れる版（e3625b29…）と比べて決める
@@ -199,3 +200,14 @@ WW_LM_SIZE=2048 WW_SAMPLES=256 WW_VC_SAMPLES=128 WW_OUT=art/living-room/web \
 - e2e を足した：`WW_LIVE_LIVING_BODY=1 WW_LIVING_CHARACTER=<vrm> WW_LIVING_MOTIONS=<dir> npm run test:e2e -- tests/living-room-body-live.spec.ts`（素材が要るので、ふだんはスキップされる）
 - 動画は通して見ていない。参考の作品の動画も見ていない。**翔太が比較動画（`C:\wwt-private\Felis_v0.8.1\work\compare\side-by-side-3\`、通常視点は `after3-room\`）を見て判断してほしい**
 - 次：動画を見ての直し（走りの1歩の滑り、止まったあとの立ち姿、余韻）、驚き・不機嫌・眠気、暮らし（`room-life.ts`）から気分を決める、UI カードとの配線
+
+## 14. 出窓と生活感のある部屋（2026-11-11、デスクトップ PC）
+
+現行の美術は `codex/living-room-realism`。元の `feat/living-onboarding`（`2db67c9`）の worktree と作業は変更していない。作業場所は `C:\Users\kuros\GitHub-Projects\web-world-themes\.work\living-room-realism`。このブランチの原本・GLB・ライトマップ・生成スクリプト・実画面をまとめて使う。
+
+- 正方形の部屋を 6.0 × 5.4m＋三面の出窓に変更。制作机、植物、配線、マイク、MIDI キーボード、衣類、本、洗濯かごなどを追加し、木目・布目・光を作り直した。実画面と再現手順は [living-room-realism.md](living-room-realism.md)。
+- `room.json` の `bakedColor` は専用ページの素材の形式。旧ライトマップも読める。DesignDocument の版上げなし、中核の変更なし。
+- 部屋の制作スクリプト、`src/living-room/index.ts` の材質と検証用カメラ、`index.html` の favicon を変更。身体・行動・移動のコードは変更していない。
+- 型チェック・lint・unit と `tests/living-room-body-live.spec.ts` を確認。短い A/B 計測は要約だけ保存した。
+- **翔太の最新指示によりアニメーションの追加作業は止めた。** 連続着席で経路が取れない場合や低い席の姿勢は、再開するときの確認事項として美術の記録に残した。
+- 次は全景と机の近景を見て、美術の密度、色、さらに作り込みたい物を決める。初版の 4.8m 四方・青紫の夜という前提は使わない。

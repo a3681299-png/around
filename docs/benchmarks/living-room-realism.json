@@ -1,0 +1,431 @@
+{
+  "pc": "Desktop: Ryzen 5 5600X / Radeon RX 6800 / 165 Hz",
+  "browser": "153.0.8010.12",
+  "viewport": [1600, 1000],
+  "pairs": [
+    {
+      "label": "before",
+      "readyMs": 1461.5382,
+      "startup": {
+        "totalMs": 2312.893999999993,
+        "top": [
+          ["onFirstUse", 960.3049999999976],
+          ["update", 77.68800000000003],
+          ["updateWorldMatrix", 75.71100000000006],
+          ["setProgram", 60.419000000000004],
+          ["texSubImage2D", 54.97500000000002],
+          ["WebGLRenderer.renderBufferDirect", 46.58699999999999],
+          ["multiplyMatrices", 46.381],
+          ["projectObject", 45.863]
+        ]
+      },
+      "steady": {
+        "frames": 995,
+        "intervalMedian": 6.099999999999454,
+        "intervalP95": 6.199999999999818,
+        "bodyMedian": 0.40000000037252903,
+        "bodyP95": 0.6999999992549419,
+        "drawMedian": 1,
+        "drawP95": 1.599999999627471
+      },
+      "cpu": {
+        "totalMs": 1312.5999999999979,
+        "top": [
+          ["updateWorldMatrix", 104.15400000000005],
+          ["update", 90.97100000000012],
+          ["setProgram", 85.72400000000006],
+          ["projectObject", 81.58100000000005],
+          ["WebGLRenderer.renderBufferDirect", 72.15200000000004],
+          ["multiplyMatrices", 66.41800000000003],
+          ["updateMatrixWorld", 49.64900000000003],
+          ["copy", 49.448000000000015]
+        ]
+      },
+      "facts": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "reach": [
+          {
+            "id": "hide_beanbag",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "hide_chair",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "hide_dresser",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "sit_beanbag",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "sit_bed",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "sit_chair",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "sit_cushion",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "stand_center",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "stand_front",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "stand_guitar",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "stand_shelf",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "stand_window",
+            "walkable": true,
+            "reachable": true
+          }
+        ],
+        "visible": "visible"
+      },
+      "errors": []
+    },
+    {
+      "label": "after",
+      "readyMs": 2279.8810999999987,
+      "startup": {
+        "totalMs": 3222.364999999992,
+        "top": [
+          ["onFirstUse", 1635.5770000000016],
+          ["texSubImage2D", 175.07100000000008],
+          ["update", 100.66600000000007],
+          ["updateWorldMatrix", 73.72500000000007],
+          ["WebGLRenderer.renderBufferDirect", 63.195],
+          ["multiplyMatrices", 51.98899999999998],
+          ["setProgram", 51.687],
+          ["(anonymous)", 48.47500000000003]
+        ]
+      },
+      "steady": {
+        "frames": 993,
+        "intervalMedian": 6.099999999999454,
+        "intervalP95": 6.199999999999818,
+        "bodyMedian": 0.40000000037252903,
+        "bodyP95": 0.6000000014901161,
+        "drawMedian": 1,
+        "drawP95": 1.5
+      },
+      "cpu": {
+        "totalMs": 1281.1329999999966,
+        "top": [
+          ["updateWorldMatrix", 102.74600000000004],
+          ["WebGLRenderer.renderBufferDirect", 77.68600000000005],
+          ["update", 77.30799999999999],
+          ["projectObject", 71.683],
+          ["multiplyMatrices", 62.41700000000001],
+          ["setProgram", 56.909000000000006],
+          ["compose", 54.201000000000015],
+          ["setFromRotationMatrix", 42.61900000000001]
+        ]
+      },
+      "facts": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "reach": [
+          {
+            "id": "hide_beanbag",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "hide_chair",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "hide_dresser",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "sit_beanbag",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "sit_bed",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "sit_chair",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "sit_cushion",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "stand_center",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "stand_front",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "stand_guitar",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "stand_shelf",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "stand_window",
+            "walkable": true,
+            "reachable": true
+          }
+        ],
+        "visible": "visible"
+      },
+      "errors": []
+    },
+    {
+      "label": "before",
+      "readyMs": 791.227899999998,
+      "startup": {
+        "totalMs": 2051.6399999999944,
+        "top": [
+          ["onFirstUse", 241.88299999999992],
+          ["update", 125.21300000000005],
+          ["updateWorldMatrix", 95.57400000000004],
+          ["setProgram", 87.61700000000005],
+          ["texSubImage2D", 72.705],
+          ["projectObject", 65.64000000000001],
+          ["WebGLRenderer.renderBufferDirect", 62.531000000000006],
+          ["multiplyMatrices", 61.09599999999999]
+        ]
+      },
+      "steady": {
+        "frames": 995,
+        "intervalMedian": 6.099999999999454,
+        "intervalP95": 6.199999999998909,
+        "bodyMedian": 0.40000000037252903,
+        "bodyP95": 0.5,
+        "drawMedian": 0.7999999988824129,
+        "drawP95": 1.099999999627471
+      },
+      "cpu": {
+        "totalMs": 1060.0449999999983,
+        "top": [
+          ["updateWorldMatrix", 107.60300000000008],
+          ["multiplyMatrices", 64.66300000000004],
+          ["update", 63.277000000000015],
+          ["setProgram", 59.489],
+          ["WebGLRenderer.renderBufferDirect", 58.778999999999975],
+          ["projectObject", 57.345000000000006],
+          ["compose", 46.092],
+          ["updateMatrixWorld", 41.64]
+        ]
+      },
+      "facts": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "reach": [
+          {
+            "id": "hide_beanbag",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "hide_chair",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "hide_dresser",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "sit_beanbag",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "sit_bed",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "sit_chair",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "sit_cushion",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "stand_center",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "stand_front",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "stand_guitar",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "stand_shelf",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "stand_window",
+            "walkable": true,
+            "reachable": true
+          }
+        ],
+        "visible": "visible"
+      },
+      "errors": []
+    },
+    {
+      "label": "after",
+      "readyMs": 834.188900000001,
+      "startup": {
+        "totalMs": 1719.1229999999973,
+        "top": [
+          ["onFirstUse", 240.85599999999974],
+          ["texSubImage2D", 151.57399999999998],
+          ["updateWorldMatrix", 91.1050000000001],
+          ["update", 85.79800000000006],
+          ["WebGLRenderer.renderBufferDirect", 59.507999999999996],
+          ["(anonymous)", 55.782999999999994],
+          ["multiplyMatrices", 49.179],
+          ["projectObject", 45.542]
+        ]
+      },
+      "steady": {
+        "frames": 994,
+        "intervalMedian": 6.099999999998545,
+        "intervalP95": 6.200000000000728,
+        "bodyMedian": 0.40000000037252903,
+        "bodyP95": 0.599999999627471,
+        "drawMedian": 0.900000000372529,
+        "drawP95": 1.400000000372529
+      },
+      "cpu": {
+        "totalMs": 1242.1139999999978,
+        "top": [
+          ["updateWorldMatrix", 110.40000000000012],
+          ["setProgram", 78.187],
+          ["WebGLRenderer.renderBufferDirect", 77.67500000000001],
+          ["multiplyMatrices", 69.371],
+          ["update", 65.28299999999999],
+          ["projectObject", 61.75999999999999],
+          ["setFromRotationMatrix", 46.441999999999986],
+          ["compose", 44.547]
+        ]
+      },
+      "facts": {
+        "gpu": "ANGLE (AMD, AMD Radeon RX 6800 (0x000073BF) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "reach": [
+          {
+            "id": "hide_beanbag",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "hide_chair",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "hide_dresser",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "sit_beanbag",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "sit_bed",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "sit_chair",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "sit_cushion",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "stand_center",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "stand_front",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "stand_guitar",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "stand_shelf",
+            "walkable": true,
+            "reachable": true
+          },
+          {
+            "id": "stand_window",
+            "walkable": true,
+            "reachable": true
+          }
+        ],
+        "visible": "visible"
+      },
+      "errors": []
+    }
+  ]
+}

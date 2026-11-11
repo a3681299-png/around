@@ -1,5 +1,7 @@
 # 住む部屋の美術（2026-11-11、`feat/living-onboarding`）
 
+**この文書は初版の記録。出窓・広い間取り・生活感・材質を改めた現行版は [living-room-realism.md](living-room-realism.md)。**
+
 Claude Code。`codex/living-room`（`eca7c0a`）から。コンテスト用の独立した Web 作品の、最初の塊：キャラが暮らせる 3D の部屋そのもの。キャラとオンボーディング UI はこの塊に入れていない。
 
 **中核は触っていない**（`src/renderers/three/room.ts` から `readLayout` を `room-layout.ts` に移しただけ。挙動は同じ）。作品データの版は上げていない。

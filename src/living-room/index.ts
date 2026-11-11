@@ -7,6 +7,8 @@ import {
   Raycaster,
   LoadingManager,
   MeshBasicMaterial,
+  HemisphereLight,
+  PMREMGenerator,
   PerspectiveCamera,
   Scene,
   SRGBColorSpace,
@@ -32,6 +34,7 @@ declare const __WW_LIVING_TEST__: boolean;
 declare const __WW_LIVING_CHARACTER__: boolean;
 
 interface RoomManifest {
+  bakedColor?: boolean;
   lightScale: number;
   lightmap: string;
   lightmapMesh: string;
@@ -71,7 +74,8 @@ async function start() {
   scene.background = new Color(BACKGROUND);
   scene.add(gltf.scene);
 
-  // Base colour x baked light. Light sources keep their own colour (above 1, so they bloom).
+  // New rooms bake colour and light together; older manifests still multiply their base colour.
+  // Light sources keep their own colour (above 1, so they bloom).
   const made = new Map<string, MeshBasicMaterial>();
   const unlit = (source: MeshStandardMaterial, lit: boolean, baked: boolean, map: Texture | null) => {
     const key = `${source.uuid}:${lit}:${baked}:${map ? 1 : 0}`;
@@ -80,8 +84,11 @@ async function start() {
       const glow = source.emissive.r + source.emissive.g + source.emissive.b > 0 && source.emissiveIntensity > 0;
       const color = glow
         ? source.emissive.clone().multiplyScalar(source.emissiveIntensity)
-        : source.color.clone().multiplyScalar(baked ? manifest.lightScale : 1);
-      material = new MeshBasicMaterial({ color, map, vertexColors: lit });
+        : (baked && manifest.bakedColor ? new Color(0xffffff) : source.color.clone()).multiplyScalar(
+            baked ? manifest.lightScale : 1,
+          );
+      // Thin window panes and curtains keep the sidedness authored in the room file.
+      material = new MeshBasicMaterial({ color, map, vertexColors: lit, side: source.side });
       made.set(key, material);
     }
     return material;
@@ -94,6 +101,7 @@ async function start() {
     }
     const mesh = object as Mesh;
     if (!mesh.isMesh) return;
+    if (mesh.name.startsWith('pbr_')) return;
     // A multi-material mesh arrives as several meshes whose names start with the object's name.
     const map = mesh.name.startsWith(manifest.lightmapMesh) ? lightmap : null;
     const source = mesh.material as MeshStandardMaterial;
@@ -101,6 +109,23 @@ async function start() {
     if (/^(duvet|sheet|throw|beanbag|rug_|floor_shade)/.test(source.name)) soft.push(mesh);
     mesh.material = unlit(source, mesh.geometry.hasAttribute('color'), mesh.name.startsWith('static_'), map);
   });
+  // The actual baked room supplies reflections in the small glass and metal objects. This is
+  // captured once, so the room's still frame and its ordinary animation loop stay inexpensive.
+  const reflective: Mesh[] = [];
+  gltf.scene.traverse((object) => {
+    const mesh = object as Mesh;
+    if (mesh.isMesh && mesh.name.startsWith('pbr_')) {
+      reflective.push(mesh);
+      mesh.visible = false;
+    }
+  });
+  if (reflective.length) {
+    const pmrem = new PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(scene, 0.08, 0.1, 30, { size: 128, position: new Vector3(0, 1.5, 0) }).texture;
+    pmrem.dispose();
+    scene.add(new HemisphereLight(0xc5dce0, 0x7c6045, 0.8));
+    for (const mesh of reflective) mesh.visible = true;
+  }
   const layout = readLayout(gltf.scene);
   // A character only where the build was given one (a local folder, never a public build).
   let resident: LivingResident | undefined;
@@ -125,6 +150,8 @@ async function start() {
   const look = new Vector2();
   const offset = new Vector3();
   const subject = new Vector3();
+  const reviewSubject = SUBJECT.clone();
+  let reviewDistance = 1;
   let closeUp = 0;
   let frameRate = 0;
   let frame: number | undefined;
@@ -158,10 +185,11 @@ async function start() {
     look.lerp(reduce.matches ? aim.set(0, 0) : aim, 1 - Math.exp(-dt * 5));
     // A small orbit about the subject follows the pointer: depth without leaving the composition.
     offset.copy(home).sub(SUBJECT);
+    if (__WW_LIVING_TEST__) offset.multiplyScalar(reviewDistance);
     offset.applyAxisAngle(new Vector3(0, 1, 0), -look.x * 0.05);
     offset.y += look.y * 0.25;
-    camera.position.copy(SUBJECT).add(offset);
-    camera.lookAt(SUBJECT);
+    camera.position.copy(reviewSubject).add(offset);
+    camera.lookAt(reviewSubject);
     if (closeUp && resident) {
       // For the motion review only (the test hook): the same angle, near the character.
       const at = resident.state().mover;
@@ -269,11 +297,17 @@ async function start() {
           return out;
         },
         resident,
-        /** 0 = the room's own camera; 0.3–0.6 = that fraction of its distance, on the character. */
+        /** Fixed close views of the furniture for the browser art review. */
+        reviewCamera: (target: [number, number, number], scale: number) => {
+          reviewSubject.fromArray(target);
+          reviewDistance = Math.min(1, Math.max(0.2, scale));
+          wake();
+        },
         /** Draws at most this many frames a second (0: every frame the display gives). */
         frameRate: (rate: number) => {
           frameRate = Math.max(0, rate);
         },
+        /** 0 = the room's own camera; 0.3–0.6 = that fraction of its distance, on the character. */
         closeUp: (scale: number) => {
           closeUp = Math.min(1, Math.max(0, scale));
           wake();

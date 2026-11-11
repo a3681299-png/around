@@ -6,8 +6,13 @@ import bpy, bmesh, math, random
 from mathutils import Vector, Matrix, Euler
 
 ROOT = 'Room'
-HALF = 2.4  # the room is 4.8 m square
-WALL_H = 2.7
+HALF = 3.0
+BACK = 2.7
+FRONT = -2.7
+WALL_H = 2.9
+# The bay belongs to the walkable room, including its angled cheeks.
+FLOOR_PLAN = [(-3, -2.7), (3, -2.7), (3, 2.7), (0.1, 2.7),
+              (-0.2, 3.5), (-2.1, 3.5), (-2.4, 2.7), (-3, 2.7)]
 
 
 def srgb(h, a=1.0):

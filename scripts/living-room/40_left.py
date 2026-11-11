@@ -195,8 +195,8 @@ par(L, lathe('static_floorlamp_shade', [(0.02, 0.1), (0.07, 0.085), (0.13, 0.03)
 par(L, sphere('dyn_floorlamp_bulb', 0.04, (0.525, 0.652, 1.64), C, M_BULB))
 
 # --- plants ---
-plant('monstera', (0.33, HALF - 0.3, 0), 0.17, 0.3, M_POT2, 9, 0.85, 0.36, 0.3, 4, droop=0.9)
-plant('snake', (-2.12, -0.5, 0), 0.12, 0.22, M_POT, 9, 0.5, 0.62, 0.075, 7, upright=True)
+plant('monstera', (0.45, BACK - 0.35, 0), 0.17, 0.3, M_POT2, 12, 0.85, 0.36, 0.3, 4, droop=0.9)
+plant('snake', (-2.7, -0.5, 0), 0.12, 0.22, M_POT, 11, 0.5, 0.62, 0.075, 7, upright=True)
 
 # --- rug: cream with a lilac band and a pink inner line ---
 RX, RY = 0.15, -0.55

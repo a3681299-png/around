@@ -1,223 +1,171 @@
-# The room's shell: floor slab and planks, three walls with wainscot, the window with its night
-# view, curtains, and the fixed camera. Needs lib.py.
+# A wider rented room, with a deep, three-sided window bay and an open camera side.
 C = wipe('shell')
-rnd = random.Random(7)
+rnd = random.Random(101)
+M_WALL = mat('wall_plaster', '#aeafa2', 0.95)
+M_TRIM = mat('painted_trim', '#d5cfb9', 0.6)
+M_FRAME = mat('window_frame', '#7b8175', 0.45)
+M_BRASS = mat('brass', '#a08248', 0.3, metal=0.8)
+M_BASE = mat('foundation', '#342d28', 0.8)
+floor_mats = [mat('oak_' + str(i), color, 0.65) for i, color in enumerate(
+    ['#947454', '#a18360', '#8a7156', '#ad8b65', '#9c7b59', '#b19672'])]
+outline('static_foundation', FLOOR_PLAN, 0.16, (0, 0, -0.18), C, M_BASE, bevel=0.008)
 
-M_SLAB = mat('slab', '#2b2740', 0.8)
-M_WALL = mat('wall_upper', '#5a5a96', 0.85)
-M_WALL_B = mat('wall_back', '#4a4a86', 0.85)
-M_WAIN = mat('wainscot', '#b9b4d8', 0.7)
-M_TRIM = mat('trim', '#e9e4f2', 0.55)
-M_CAP = mat('wall_cap', '#8f8cc0', 0.7)
-WOODS = [mat(f'floor_wood_{i}', h, 0.5) for i, h in enumerate(['#a9795a', '#b58463', '#9c6e52', '#c08f6c', '#a37355'])]
 
-# --- floor ---
-box('static_slab', (HALF * 2 + 0.24, HALF * 2 + 0.12, 0.2), (0, -0.06 + 0.06, -0.112), C, M_SLAB, bevel=0.02, segs=3)['lm'] = 1
+def floor_limits(y):
+    if y <= BACK:
+        return -HALF, HALF
+    t = (y - BACK) / 0.8
+    return -2.4 + 0.3 * t, 0.1 - 0.3 * t
+
+
+# Individual staggered boards create seams and end grain at the real scale.
 bm = bmesh.new()
-PW = 0.16
-x = -HALF
-row = 0
-while x < HALF - 1e-6:
-    w = min(PW, HALF - x)
-    y = -HALF - rnd.uniform(0, 0.9)
-    while y < HALF:
-        ln = rnd.uniform(0.9, 1.7)
-        y0, y1 = max(y, -HALF), min(y + ln, HALF)
-        if y1 - y0 > 0.02:
-            bm_box(bm, (w - 0.003, y1 - y0 - 0.003, 0.012), (x + w / 2, (y0 + y1) / 2, -0.006), mi=rnd.randrange(len(WOODS)))
-        y += ln
-    x += w
-    row += 1
-o = bm_object('static_floor_planks', bm, WOODS, C, bevel=0.0015, segs=1)
-o['lm'] = 1
-
-# --- walls (one mesh each, the back one with the window's hole) ---
-T = 0.14
-WIN = (0.55, 1.95, 1.0, 2.2)  # x0, x1, z0, z1
+step = 0.16
+row_edges = sorted({FRONT + j * step for j in range(math.ceil((3.5 - FRONT) / step))} | {BACK, 3.5})
+for ya, yb in zip(row_edges, row_edges[1:]):
+    xmin, xmax = floor_limits(yb)
+    x = xmin
+    first = True
+    while x < xmax - 0.01:
+        length = rnd.uniform(0.65, 1.35) if first else rnd.uniform(0.95, 1.6)
+        end = min(xmax, x + length)
+        bm_box(bm, (end - x - 0.002, yb - ya - 0.002, 0.022),
+               ((x + end) / 2, (ya + yb) / 2, -0.011), mi=rnd.randrange(len(floor_mats)))
+        first = False
+        x = end
+bm_object('static_floor_boards', bm, floor_mats, C, bevel=0.0008, segs=1)['lm'] = 1
 
 
-def wall_grid(xs, zs, hole=None):
-    bm = bmesh.new()
-    vs = [[bm.verts.new((x, 0, z)) for z in zs] for x in xs]
-    for i in range(len(xs) - 1):
-        for j in range(len(zs) - 1):
-            if hole and (i, j) in hole:
-                continue
-            f = bm.faces.new((vs[i][j], vs[i + 1][j], vs[i + 1][j + 1], vs[i][j + 1]))
-            f.material_index = 0 if zs[j] >= 0.95 - 1e-6 else 1
-    return bm
-
-
-def wall(name, bm, loc, rot, mats):
-    r = bmesh.ops.extrude_face_region(bm, geom=bm.faces[:])
-    vs = [e for e in r['geom'] if isinstance(e, bmesh.types.BMVert)]
-    bmesh.ops.translate(bm, vec=(0, T, 0), verts=vs)
-    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-    # the top faces get the lighter cap colour (the cut of the diorama)
-    top = max(v.co.z for v in bm.verts)
-    for f in bm.faces:
-        if f.normal.z > 0.9 and f.calc_center_median().z > top - 0.01:
-            f.material_index = 2
-    o = bm_object(name, bm, mats, C, bevel=0.006, segs=2, loc=loc, rot=rot)
+def wall_segment(name, a, b, bottom, top, material=M_WALL, thickness=0.14):
+    delta = Vector((b[0] - a[0], b[1] - a[1]))
+    o = box(name, (delta.length, thickness, top - bottom),
+            ((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (bottom + top) / 2),
+            C, material, rot=(0, 0, math.atan2(delta.y, delta.x)), bevel=0.006)
     o['lm'] = 1
     return o
 
 
-zs = [0, 0.95, WIN[2], WIN[3], WALL_H]
-wall('static_wall_back', wall_grid([-HALF - T, WIN[0], WIN[1], HALF + T], zs, hole={(1, 2)}), (0, HALF, 0), (0, 0, 0), [M_WALL_B, M_WAIN, M_CAP])
-wall('static_wall_left', wall_grid([-HALF, HALF], [0, 0.95, WALL_H]), (-HALF, 0, 0), (0, 0, math.radians(90)), [M_WALL, M_WAIN, M_CAP])
-# the right wall is a low half wall: the camera looks in over it (the diorama's open corner)
-wall('static_wall_right', wall_grid([-HALF, HALF], [0, 0.95]),(HALF + T, 0, 0), (0, 0, math.radians(90)), [M_WALL, M_WAIN, M_CAP])
+# Back and left full walls; the right wall is a low cutaway for the room camera.
+wall_segment('static_wall_left', (-3.07, FRONT), (-3.07, BACK + .07), 0, WALL_H)
+wall_segment('static_wall_right', (3.07, FRONT), (3.07, BACK + .07), 0, .7)
+wall_segment('static_wall_back_right', (.1, BACK + .07), (3.14, BACK + .07), 0, WALL_H)
+wall_segment('static_wall_back_left', (-3.14, BACK + .07), (-2.4, BACK + .07), 0, WALL_H)
+bay = [((-2.4, 2.7), (-2.1, 3.5)), ((-2.1, 3.5), (-.2, 3.5)), ((-.2, 3.5), (.1, 2.7))]
+for i, (a, b) in enumerate(bay):
+    wall_segment('static_bay_apron', a, b, 0, 1.02)
+    wall_segment('static_bay_header', a, b, 2.63, WALL_H)
+    wall_segment('static_bay_sill', a, b, 1.01, 1.055, M_TRIM, .30)
+    for p in (a, b):
+        box('static_window_post', (.065, .08, 1.63), (p[0], p[1], 1.835), C, M_FRAME)
+    for z in (1.085, 2.585, 1.73):
+        wall_segment('static_window_rail', a, b, z, z + .035, M_FRAME, .065)
+    if i == 1:
+        box('static_window_mullion', (.044, .06, 1.5), (-1.15, 3.49, 1.84), C, M_FRAME)
+        for x in (-1.65, -.65):
+            box('static_sash_handle', (.055, .018, .012), (x, 3.45, 1.73), C, M_BRASS, bevel=.003)
 
-# --- baseboard, chair rail and wainscot panels ---
-def run(name, size_z, depth, z, m, bevel=0.004):
-    # along back, left and right walls (inside faces)
-    box(name + '_b', (HALF * 2, depth, size_z), (0, HALF - depth / 2, z), C, m, bevel=bevel)['lm'] = 1
-    box(name + '_l', (depth, HALF * 2 - depth, size_z), (-HALF + depth / 2, -depth / 2, z), C, m, bevel=bevel)['lm'] = 1
-    box(name + '_r', (depth, HALF * 2 - depth, size_z), (HALF - depth / 2, -depth / 2, z), C, m, bevel=bevel)['lm'] = 1
+for a, b in [((-3, FRONT), (-3, BACK)), ((.1, BACK), (3, BACK)),
+             ((3, FRONT), (3, BACK)), ((-3, BACK), (-2.4, BACK))] + bay:
+    wall_segment('static_skirting', a, b, .005, .13, M_TRIM, .035)
 
+# A door and building details make this a place somebody could enter.
+M_DOOR = mat('door_wood', '#777b69', .7)
+box('static_door', (.045, .84, 2.03), (-2.97, -1.9, 1.02), C, M_DOOR, bevel=.006)['lm'] = 1
+for y in (-2.35, -1.45):
+    box('static_door_casing', (.065, .055, 2.13), (-2.94, y, 1.065), C, M_TRIM)
+box('static_door_lintel', (.065, .95, .06), (-2.94, -1.9, 2.11), C, M_TRIM)
+for z in (.55, 1.42):
+    box('static_door_inset', (.018, .65, .68), (-2.937, -1.9, z), C, M_DOOR, bevel=.006)['lm'] = 1
+cyl('pbr_door_rose', .025, .018, (-2.91, -1.57, 1.0), C, M_BRASS, rot=(0, math.pi / 2, 0))
+box('pbr_door_handle', (.06, .11, .014), (-2.88, -1.62, 1.0), C, M_BRASS, bevel=.005)
+for y in (-1.25, .94, 2.1):
+    box('static_wall_socket', (.02, .075, .09), (-2.985, y, .24), C, M_TRIM, bevel=.005)
+    for z in (.225, .255):
+        box('static_socket_slot', (.023, .025, .004), (-2.97, y, z), C, M_BASE, bevel=0)
 
-run('static_baseboard', 0.1, 0.018, 0.05, M_TRIM)
-run('static_rail', 0.035, 0.028, 0.95, M_TRIM, bevel=0.008)
-# raised panels on the wainscot: thin frames
+# Hazy blue-hour silhouettes follow all three panes. A single distant card left a black gap
+# when looking through the side of the bay; the soft colour field also keeps the room in focus.
+M_SKY = mat('sky', '#ffffff', 1, emit='#ffffff', strength=.7)
 bm = bmesh.new()
-def panel(cx, cz, w, h, axis):
-    t, d = 0.022, 0.008
-    for dx, dz, sw, sh in ((0, h / 2 - t / 2, w, t), (0, -h / 2 + t / 2, w, t), (-w / 2 + t / 2, 0, t, h - 2 * t), (w / 2 - t / 2, 0, t, h - 2 * t)):
-        if axis == 'b':
-            bm_box(bm, (sw, d, sh), (cx + dx, HALF - d / 2, cz + dz))
-        else:
-            sgn = -1 if axis == 'l' else 1
-            bm_box(bm, (d, sw, sh), (sgn * (HALF - d / 2), cx + dx, cz + dz))
-n = 6
-for i in range(n):
-    cx = -HALF + (i + 0.5) * (HALF * 2 / n)
-    panel(cx, 0.52, HALF * 2 / n - 0.14, 0.62, 'b')
-    panel(cx, 0.52, HALF * 2 / n - 0.14, 0.62, 'l')
-    panel(cx, 0.52, HALF * 2 / n - 0.14, 0.62, 'r')
-bm_object('static_wainscot_panels', bm, M_WAIN, C, bevel=0.003, segs=1)['lm'] = 1
+for a,b in bay:
+    delta=Vector((b[0]-a[0],b[1]-a[1]))
+    # Shared corner positions close the bay without a seam between the angled panes.
+    outward=Vector((0,0))
+    rows=[]
+    for j in range(33):
+        rows.append([bm.verts.new((a[0]+delta.x*i/48+outward.x,
+                                  a[1]+delta.y*i/48+outward.y,1.055+1.58*j/32)) for i in range(49)])
+    for j in range(32):
+        for i in range(48):
+            bm.faces.new((rows[j][i],rows[j+1][i],rows[j+1][i+1],rows[j][i+1]))
+sky=bm_object('dyn_window_sky',bm,M_SKY,C,smooth=False)
+# The haze depicts the view through glass; it must not block the window's area light.
+sky.visible_shadow=False
+colors=sky.data.color_attributes.new('Color','FLOAT_COLOR','POINT')
+low,high,city,lit=[Vector(srgb(h)[:3]) for h in ('#bdd0cd','#718c9b','#627b88','#d4c2a4')]
+for vertex,item in zip(sky.data.vertices,colors.data):
+    x,z=vertex.co.x,vertex.co.z
+    t=max(0,min(1,(z-1.055)/1.58))
+    color=low.lerp(high,t)
+    for cx,width,roof in [(-2.2,.48,1.78),(-1.54,.62,1.57),(-.87,.50,1.90),(-.24,.55,1.68)]:
+        side=1/(1+math.exp(min(40,(abs(x-cx)-width/2)*35)))
+        below=1/(1+math.exp(min(40,(z-roof)*22)))
+        color=color.lerp(city,side*below*.58)
+        for rz in (1.22,1.43,1.64):
+            if rz>roof-.08: continue
+            for rx in (cx-.12,cx+.12):
+                glow=math.exp(-((x-rx)/.045)**2-((z-rz)/.065)**2)*side*.28
+                color=color.lerp(lit,glow)
+    item.color=(*color,1)
+sky.data.color_attributes.active_color=colors
+nt=M_SKY.node_tree
+attribute=nt.nodes.new('ShaderNodeVertexColor')
+attribute.layer_name='Color'
+p=nt.nodes.get('Principled BSDF')
+nt.links.new(attribute.outputs['Color'],p.inputs['Base Color'])
+nt.links.new(attribute.outputs['Color'],p.inputs['Emission Color'])
 
-# --- window ---
-M_FRAME = mat('window_frame', '#efeaf6', 0.45)
-x0, x1, z0, z1 = WIN
-cx, cz, ww, wh = (x0 + x1) / 2, (z0 + z1) / 2, x1 - x0, z1 - z0
-bm = bmesh.new()
-fw, fd = 0.07, T + 0.05
-ycen = HALF + T / 2 - 0.012
-for dx, dz, sw, sh in ((0, wh / 2 + fw / 2, ww + 2 * fw, fw), (-ww / 2 - fw / 2, 0, fw, wh), (ww / 2 + fw / 2, 0, fw, wh)):
-    bm_box(bm, (sw, fd, sh), (cx + dx, ycen, cz + dz))
-# inner sash and muntins
-sd = 0.04
-for dx, dz, sw, sh in ((0, wh / 2 - 0.02, ww, 0.04), (0, -wh / 2 + 0.02, ww, 0.04), (-ww / 2 + 0.02, 0, 0.04, wh), (ww / 2 - 0.02, 0, 0.04, wh),
-                       (0, 0, 0.045, wh), (0, 0.18, ww, 0.025), (-ww / 4, 0, 0.022, wh), (ww / 4, 0, 0.022, wh)):
-    bm_box(bm, (sw, sd, sh), (cx + dx, HALF + 0.07, cz + dz))
-bm_object('static_window_frame', bm, M_FRAME, C, bevel=0.006, segs=2)
-box('static_window_sill', (ww + 0.26, 0.26, 0.04), (cx, HALF - 0.05, z0 - 0.02), C, M_FRAME, bevel=0.012, segs=3)
-box('static_window_apron', (ww + 0.14, 0.02, 0.07), (cx, HALF - 0.01, z0 - 0.075), C, M_FRAME, bevel=0.006)
-
-# the night outside: a sky gradient (vertex colours), a moon, a skyline with lit windows
-M_SKY = mat('sky', '#ffffff', 1, emit='#ffffff', strength=1.0, vcol=True)
-bm = bmesh.new()
-lay = bm.loops.layers.color.new('Color')
-# kept below the wall's top and close behind it, so the camera never sees it over the wall
-sw, sh, sy = 5.0, 2.9, HALF + 1.0
-rows = 10
-grad = [srgb(h) for h in ('#1b1f5e', '#262a78', '#3a3496', '#5a3fa6', '#8a4fb0', '#c067b0')]
-def sky_col(t):
-    t = max(0, min(0.999, t)) * (len(grad) - 1)
-    i = int(t)
-    f = t - i
-    return tuple(grad[i][k] * (1 - f) + grad[i + 1][k] * f for k in range(3)) + (1,)
-vs = [[bm.verts.new(((cx - 2.3, cx, HALF + T - 0.02)[i], sy, cz + 0.9 - j * sh / rows)) for i in range(3)] for j in range(rows + 1)]
-for j in range(rows):
-    for i in range(2):
-        f = bm.faces.new((vs[j][i], vs[j + 1][i], vs[j + 1][i + 1], vs[j][i + 1]))
-        for l in f.loops:
-            t = (cz + 0.9 - l.vert.co.z) / sh
-            c4 = sky_col(t ** 1.25)
-            l[lay] = tuple(v * 0.5 for v in c4[:3]) + (1,)
-bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-o = bm_object('dyn_window_sky', bm, M_SKY, C, smooth=False)
-for f in o.data.polygons:
-    f.flip() if f.normal.y > 0 else None
-M_MOON = mat('moon', '#fff6d8', 1, emit='#fff1c9', strength=3)
-cyl('dyn_moon', 0.17, 0.01, (cx + 0.38, sy - 0.05, cz + 0.36), C, M_MOON, rot=(math.radians(90), 0, 0), bevel=0, verts=40)
-M_CITY = mat('city', '#0b0a22', 1)
-M_CITYWIN = mat('city_window', '#ffd9a0', 1, emit='#ffcf8a', strength=1.6)
-M_CITYWIN2 = mat('city_window_cool', '#bfe2ff', 1, emit='#a8d8ff', strength=1.3)
-bm = bmesh.new()
-bx = cx - 2.3
-while bx < HALF - 0.5:
-    bw = rnd.uniform(0.28, 0.6)
-    bh = rnd.uniform(0.5, 1.5)
-    by = HALF + rnd.uniform(0.5, 0.8)
-    bm_box(bm, (bw, 0.3, bh), (bx + bw / 2, by, z0 - 0.75 + bh / 2), mi=0)
-    nx, nz = int(bw / 0.085), int(bh / 0.11)
-    for i in range(nx):
-        for j in range(nz):
-            if rnd.random() < 0.3:
-                bm_box(bm, (0.04, 0.01, 0.05), (bx + 0.05 + i * 0.085, by - 0.155, z0 - 0.75 + 0.08 + j * 0.11), mi=1 if rnd.random() < 0.7 else 2)
-    bx += bw + rnd.uniform(0.0, 0.08)
-bm_object('dyn_city', bm, [M_CITY, M_CITYWIN, M_CITYWIN2], C, smooth=False)
-
-# --- curtains: folded cloth to just below the sill, a rod with rings ---
-M_CURT = mat('curtain', '#8a7fc9', 0.9)
-M_ROD = mat('brass', '#c9a063', 0.35, metal=0.9)
-def curtain(name, xa, xb, seed):
-    r2 = random.Random(seed)
+M_CURTAIN = mat('curtain_linen', '#c2c1a7', 1)
+for xcenter in (-2.32, 0.0):
     bm = bmesh.new()
-    nx, nz = 64, 14
-    ztop, zbot = 2.36, 0.72
-    waves = 6.5
-    grid = []
-    for j in range(nz + 1):
-        t = j / nz
-        z = ztop + (zbot - ztop) * t
-        rowv = []
-        for i in range(nx + 1):
-            u = i / nx
-            # gathered toward the outer side as it falls; deeper folds lower
-            xx = xa + (xb - xa) * u
-            amp = 0.022 + 0.03 * t
-            yy = HALF - 0.085 - amp * math.sin(u * waves * 2 * math.pi + 0.6 * math.sin(t * 3 + seed)) - 0.012 * math.sin(u * 23 + t * 5)
-            xx += 0.012 * math.sin(t * 6 + u * 9)
-            rowv.append(bm.verts.new((xx, yy, z + (0.012 * math.sin(u * waves * 2 * math.pi) if j == nz else 0))))
-        grid.append(rowv)
-    for j in range(nz):
-        for i in range(nx):
-            bm.faces.new((grid[j][i], grid[j][i + 1], grid[j + 1][i + 1], grid[j + 1][i]))
-    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-    o = bm_object(name, bm, M_CURT, C)
-    s = o.modifiers.new('solid', 'SOLIDIFY')
-    s.thickness = 0.008
-    s.offset = 0
-    return o
-curtain('static_curtain_l', x0 - 0.2, x0 + 0.3, 1)
-curtain('static_curtain_r', x1 - 0.3, x1 + 0.2, 2)
-cyl('static_curtain_rod', 0.012, ww + 0.7, (cx, HALF - 0.085, 2.4), C, M_ROD, rot=(0, math.radians(90), 0), bevel=0.002)
-for sx in (-1, 1):
-    sphere('static_rod_finial', 0.028, (cx + sx * (ww / 2 + 0.36), HALF - 0.085, 2.4), C, M_ROD)
-    box('static_rod_bracket', (0.02, 0.085, 0.02), (cx + sx * (ww / 2 + 0.28), HALF - 0.045, 2.4), C, M_ROD, bevel=0.004)
+    rows = []
+    for j in range(45):
+        t = j / 44
+        rows.append([bm.verts.new((xcenter + (u / 24 - .5) * (.42 + .14 * t),
+                    2.78 - .07 * math.sin(u / 24 * math.pi * 10) * (.5 + .5 * t),
+                    2.71 - t * 2.55 + .015 * math.sin(u * .8) * t)) for u in range(25)])
+    for j in range(44):
+        for u in range(24):
+            bm.faces.new((rows[j][u], rows[j][u+1], rows[j+1][u+1], rows[j+1][u]))
+    o = bm_object('static_linen_curtain', bm, M_CURTAIN, C)
+    o['lm'] = 1
+    solid = o.modifiers.new('cloth thickness', 'SOLIDIFY')
+    solid.thickness = .003
+cyl('pbr_curtain_rod', .012, 2.9, (-1.15, 2.8, 2.75), C, M_BRASS, rot=(0, math.pi / 2, 0), bevel=.002)
 
-# --- camera and world ---
-cam = bpy.data.objects.get('camera_main')
-if not cam:
-    cam = bpy.data.objects.new('camera_main', bpy.data.cameras.new('camera_main'))
-    coll('meta').objects.link(cam)
-cam.location = (2.2, -8.6, 4.1)
-look = Vector((-0.05, 0.35, 0.85))
-cam.rotation_euler = (look - cam.location).to_track_quat('-Z', 'Y').to_euler()
+cam = bpy.data.objects.new('camera_main', bpy.data.cameras.new('camera_main'))
+coll('meta').objects.link(cam)
+cam.location = (3.8, -10.5, 6.9)
+CAMERA_TARGET = (-.05, .35, .85)
+cam.rotation_euler = (Vector(CAMERA_TARGET) - cam.location).to_track_quat('-Z', 'Y').to_euler()
 cam.data.lens = 46
 cam.data.sensor_width = 36
-cam.data.clip_start = 0.1
-cam.data.clip_end = 60
+cam.data.clip_start, cam.data.clip_end = .1, 80
 sc = bpy.context.scene
 sc.camera = cam
-sc.render.resolution_x, sc.render.resolution_y = 1600, 900
+sc.render.resolution_x, sc.render.resolution_y = 1600, 1000
 w = sc.world or bpy.data.worlds.new('World')
 sc.world = w
 w.use_nodes = True
-bg = w.node_tree.nodes.get('Background')
-bg.inputs['Color'].default_value = srgb('#191a4a')
-bg.inputs['Strength'].default_value = 0.5
+bg = next(n for n in w.node_tree.nodes if n.type == 'BACKGROUND')
+bg.inputs['Color'].default_value = srgb('#b8ccda')
+bg.inputs['Strength'].default_value = .22
+# The camera sees a cutaway, but its baked illumination comes from a complete room.
+# These baffles stay out of the GLB and camera render while providing indirect light and shade.
+baffles = wipe('lighting_baffles')
+for name,size,loc in [('ceiling',(6.3,6.45,.12),(0,.4,2.98)),
+                      ('front',(6.25,.12,2.95),(0,FRONT-.1,1.46)),
+                      ('right',(.12,5.6,2.24),(3.14,0,1.82))]:
+    o=box('bounce_'+name,size,loc,baffles,M_TRIM,bevel=0)
+    o.visible_camera=False
 print('shell done', len(C.objects))

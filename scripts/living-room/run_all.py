@@ -5,7 +5,7 @@
 #   WW_RENDER=<path.png>   also render camera_main there (Cycles, WW_RENDER_SAMPLES, default 128)
 #   WW_SKIP_BAKE=1         stop before the bake (no GLB/lightmap written)
 #   WW_OUT=<dir>           where the bake writes room.glb, lightmap.png, room.json
-#   WW_LM_SIZE / WW_SAMPLES / WW_VC_SAMPLES   bake quality (2048 / 256 / 128 for the committed room)
+#   WW_LM_SIZE / WW_SAMPLES / WW_VC_SAMPLES   bake quality (4096 / 128 / 128 for the committed room)
 # The parts are the numbered scripts next to this file; each one wipes and rebuilds its collection.
 import bpy, os, builtins
 
@@ -47,7 +47,7 @@ try:
 except Exception as _error:
     print('no GPU setup:', _error)
 
-for _part in ('lib.py', '10_shell.py', '20_desk.py', '30_bed.py', '40_left.py', '50_decor.py', '55_right.py', '60_lights.py', '70_meta.py'):
+for _part in ('lib.py', '10_shell.py', '20_desk.py', '30_bed.py', '40_left.py', '50_decor.py', '55_right.py', '58_materials.py', '60_lights.py', '70_meta.py'):
     wwrun(_part)
 
 _sc = bpy.context.scene
@@ -70,5 +70,9 @@ if os.environ.get('WW_SKIP_BAKE') != '1':
         _NS['WW_OUT'] = os.environ['WW_OUT'].rstrip('/\\') + '/'
     wwrun('80_bake.py')
 
+# Rebuilds are reproducible from these scripts; Blender's backup would duplicate the large asset.
+for _o in bpy.data.collections['lighting_baffles'].objects:
+    _o.hide_set(True)
+bpy.context.preferences.filepaths.save_version = 0
 bpy.ops.wm.save_as_mainfile(filepath=_save)
 print('run_all done', _save)

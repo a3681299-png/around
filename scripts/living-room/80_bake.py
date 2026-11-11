@@ -2,14 +2,14 @@
 #   static_lm  : big surfaces, light in a texture (their only UV); written to <out>/lightmap.png
 #   static_vc  : everything else, light in vertex colours (COLOR_0)
 #   dyn_*      : light sources and screens, exported with their own colours, never baked
-# Web colour = base colour x light x LIGHT_SCALE (see room.json). The source objects keep their
+# Web colour = baked colour x LIGHT_SCALE (see room.json). The source objects keep their
 # modifiers; the baked copies live in the `bake` collection and are rebuilt every run.
 import numpy as np, json, os, time
 
 OUT = globals().get('WW_OUT') or (WWD + '../../art/living-room/web/')
-LM_SIZE = globals().get('WW_LM_SIZE', 2048)
+LM_SIZE = globals().get('WW_LM_SIZE', 4096)
 SAMPLES = globals().get('WW_SAMPLES', 128)
-VC_SAMPLES = globals().get('WW_VC_SAMPLES', 64)
+VC_SAMPLES = globals().get('WW_VC_SAMPLES', 128)
 LIGHT_SCALE = 4.0
 os.makedirs(OUT, exist_ok=True)
 sc = bpy.context.scene
@@ -19,7 +19,7 @@ SRC = ['shell', 'desk', 'bed', 'left', 'decor', 'right']
 for n in SRC:
     coll(n).hide_render = False
 dg = bpy.context.evaluated_depsgraph_get()
-groups = {'lm': [], 'vc': [], 'dyn': []}
+groups = {'lm': [], 'vc': [], 'dyn': [], 'pbr': []}
 for n in SRC:
     for o in coll(n).objects:
         if o.type not in ('MESH', 'CURVE'):
@@ -29,8 +29,11 @@ for n in SRC:
         if o.matrix_world.determinant() < 0:
             me.flip_normals()
         c = bpy.data.objects.new('b_' + o.name, me)
+        # Background views through glass must keep transmitting the authored window light.
+        # new_from_object copies geometry only, so it otherwise restores opaque bake shadows.
+        c.visible_shadow = o.visible_shadow
         BK.objects.link(c)
-        key = 'dyn' if o.name.startswith('dyn_') else 'lm' if o.get('lm') else 'vc'
+        key = 'pbr' if o.name.startswith('pbr_') else 'dyn' if o.name.startswith('dyn_') else 'lm' if o.get('lm') else 'vc'
         c['src'] = o.name
         groups[key].append(c)
 
@@ -66,6 +69,7 @@ for o in groups['dyn']:
 lm = join(groups['lm'], 'static_lm')
 vc = join(groups['vc'], 'static_vc')
 em = join(dyn_rest, 'dyn_emissive')
+reflective = join(groups['pbr'], 'pbr_reflective') if groups['pbr'] else None
 print('tris lm/vc/em', *[sum(len(p.vertices) - 2 for p in o.data.polygons) for o in (lm, vc, em)])
 
 # hide the sources while baking so nothing is doubled
@@ -138,19 +142,27 @@ print('lightmap baked s', round(time.time() - t, 1))
 for m, n in tmp_nodes:
     m.node_tree.nodes.remove(n)
 px = np.array(img.pixels[:], dtype=np.float32).reshape(LM_SIZE, LM_SIZE, 4)
-# what noise is left: a 3x3 median takes the single bright texels, a small blur the grain
-rgb = px[:, :, :3]
-for ch in range(3):
-    p = np.pad(rgb[:, :, ch], 1, mode='edge')
-    stack = np.stack([p[dy:dy + LM_SIZE, dx:dx + LM_SIZE] for dy in range(3) for dx in range(3)])
-    med = np.median(stack, axis=0)
-    p = np.pad(med, 2, mode='edge')
-    k = (1, 4, 6, 4, 1)
-    h = sum(k[i] * p[2:2 + LM_SIZE, i:i + LM_SIZE] for i in range(5)) / 16
-    p = np.pad(h, ((2, 2), (0, 0)), mode='edge')
-    rgb[:, :, ch] = sum(k[i] * p[i:i + LM_SIZE, :] for i in range(5)) / 16
+rgb = px[:, :, :3].copy()
+
+# Bake the material separately: denoising irradiance must not erase the wood grain and weave.
+tmp_nodes = []
+for m in lm.data.materials:
+    node = m.node_tree.nodes.new('ShaderNodeTexImage')
+    node.image = img
+    m.node_tree.nodes.active = node
+    tmp_nodes.append((m, node))
+bs.use_pass_direct = bs.use_pass_indirect = False
+bs.use_pass_color = True
+sc.cycles.samples = 1
+bpy.ops.object.bake(type='DIFFUSE')
+albedo = np.array(img.pixels[:], dtype=np.float32).reshape(LM_SIZE, LM_SIZE, 4)
+for m, node in tmp_nodes:
+    m.node_tree.nodes.remove(node)
+wwrun('denoise.py')
+guide = np.repeat((albedo[:, :, :3].max(axis=2) > 0)[:, :, None], 3, axis=2).astype(np.float32)
+rgb = denoise_atlas(rgb, guide, OUT) * albedo[:, :, :3]
 light = np.clip(rgb / LIGHT_SCALE, 0, 1)
-print('lightmap max', float(px[:, :, :3].max()), 'p99.9', float(np.percentile(px[:, :, :3], 99.9)))
+print('lightmap max', float(rgb.max()), 'p99.9', float(np.percentile(rgb, 99.9)))
 enc = np.where(light <= 0.0031308, light * 12.92, 1.055 * np.power(light, 1 / 2.4) - 0.055)
 out = bpy.data.images.new('ww_lightmap_png', LM_SIZE, LM_SIZE, alpha=False)
 rgba = np.ones((LM_SIZE, LM_SIZE, 4), dtype=np.float32)
@@ -170,6 +182,7 @@ ca = vc.data.color_attributes.new('Light', 'FLOAT_COLOR', 'POINT')
 vc.data.color_attributes.active_color = ca
 vc.data.color_attributes.render_color_index = 0
 sc.cycles.samples = VC_SAMPLES
+bs.use_pass_direct = bs.use_pass_indirect = bs.use_pass_color = True
 bs.target = 'VERTEX_COLORS'
 t = time.time()
 bpy.ops.object.bake(type='DIFFUSE')
@@ -205,7 +218,7 @@ for name, v in metal.items():
 # --- export ---
 for o in bpy.context.selected_objects:
     o.select_set(False)
-exp = [lm, vc, em] + dyn_keep + [o for o in coll('meta_marks').objects] + [bpy.data.objects['camera_main']]
+exp = [lm, vc, em] + ([reflective] if reflective else []) + dyn_keep + [o for o in coll('meta_marks').objects] + [bpy.data.objects['camera_main']]
 nav = bpy.data.objects['navmesh_floor']
 for o in exp:
     o.hide_set(False)
@@ -223,8 +236,12 @@ for n in SRC:
     coll(n).hide_render = False
 BK.hide_render = True
 cam = bpy.data.objects['camera_main']
-json.dump({'version': 1, 'lightScale': LIGHT_SCALE, 'lightmap': 'lightmap.png', 'lightmapMesh': 'static_lm',
-           'vertexLightMesh': 'static_vc', 'camera': 'camera_main',
-           'sensorWidth': cam.data.sensor_width, 'lens': cam.data.lens, 'aspect': sc.render.resolution_x / sc.render.resolution_y},
-          open(OUT + 'room.json', 'w'), indent=2)
+manifest = {'version': 1, 'bakedColor': True, 'lightScale': LIGHT_SCALE, 'lightmap': 'lightmap.png', 'lightmapMesh': 'static_lm',
+            'vertexLightMesh': 'static_vc', 'camera': 'camera_main',
+            'sensorWidth': cam.data.sensor_width, 'lens': cam.data.lens, 'aspect': sc.render.resolution_x / sc.render.resolution_y}
+# Keep generated JSON stable across Python, Prettier and Windows line endings.
+manifest = {key: int(value) if isinstance(value, float) and value.is_integer() else value for key, value in manifest.items()}
+with open(OUT + 'room.json', 'w', encoding='utf-8', newline='\n') as manifest_file:
+    json.dump(manifest, manifest_file, indent=2)
+    manifest_file.write('\n')
 print('exported', os.path.getsize(OUT + 'room.glb'), os.path.getsize(OUT + 'lightmap.png'))

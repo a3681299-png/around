@@ -57,7 +57,7 @@ M_YEL = mat('butter', '#f6d98a', 0.6)
 M_RUBBER = mat('rubber', '#1b1b28', 0.7)
 M_CHROME = mat('chrome', '#c8cad8', 0.2, metal=1.0)
 
-DX, DY, DZ = -1.15, 1.97, 0.74  # desk centre and top height
+DX, DY, DZ = -1.15, 2.65, 0.74  # workstation faces the deep bay window
 D = group('desk_root', (DX, DY, 0))
 # top with rounded corners
 par(D, outline('static_desk_top', rounded_rect(1.72, 0.76, 0.05), 0.034, (0, 0, DZ - 0.034), C, M_TOP, bevel=0.008, segs=3))

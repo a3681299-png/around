@@ -1,5 +1,6 @@
 {
   "version": 1,
+  "bakedColor": true,
   "lightScale": 4.0,
   "lightmap": "lightmap.png",
   "lightmapMesh": "static_lm",
@@ -7,5 +8,5 @@
   "camera": "camera_main",
   "sensorWidth": 36.0,
   "lens": 46.0,
-  "aspect": 1.7777777777777777
+  "aspect": 1.6
 }

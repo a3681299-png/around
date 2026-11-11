@@ -14,7 +14,7 @@ M_PLUSH = mat('plush', '#fbf2e4', 1.0)
 M_BRASS = bpy.data.materials['brass']
 
 BW, BL = 1.12, 2.06
-B = group('bed_root', (HALF - BW / 2 - 0.03, HALF - BL / 2 - 0.05, 0), c=C)
+B = group('bed_root', (HALF - BW / 2 - 0.12, BACK - BL / 2 - 0.10, 0), c=C)
 # frame: a low platform with rounded rails and short tapered legs
 par(B, box('static_bed_platform', (BW, BL, 0.1), (0, 0, 0.23), C, M_BEDWOOD, bevel=0.02, segs=4))
 bpy.data.objects['static_bed_platform']['lm'] = 1
@@ -85,7 +85,7 @@ def drape(name, y0, y1, m, thick, lift, quilt, over_foot, over_side, seed, amp0=
     ss = o.modifiers.new('sub', 'SUBSURF')
     ss.levels = ss.render_levels = 1
     return o
-par(B, drape('static_duvet', -BL / 2, 0.42, M_DUVET, 0.04, 0.03, True, 0.26, 0.3, 3))
+par(B, drape('static_duvet', -BL / 2, 0.28, M_DUVET, 0.04, 0.03, False, 0.26, 0.3, 3, amp0=0.035))
 # the folded-back top of the duvet, showing its lighter inside
 par(B, soft_box('static_duvet_fold', (BW + 0.02, 0.3, 0.075), (-0.02, 0.44, TOP + 0.085), C, M_DUVET_IN, rot=(math.radians(4), 0, math.radians(-2)), puff=0.5, pinch=0.2, noise=0.04, seed=4, levels=2))
 # pillows
@@ -107,7 +107,7 @@ for sx in (-1, 1):
 par(PC, sphere('static_plush_nose', 0.008, (0, -0.088, 0.208), C, M_PINK))
 
 # --- nightstand between the bed and the desk ---
-N = group('nightstand_root', (B.location.x - BW / 2 - 0.3, HALF - 0.24, 0), c=C)
+N = group('nightstand_root', (B.location.x - BW / 2 - 0.3, BACK - 0.30, 0), c=C)
 par(N, box('static_nightstand', (0.44, 0.38, 0.4), (0, 0, 0.36), C, M_WHITE, bevel=0.025, segs=4))
 par(N, box('static_nightstand_drawer', (0.38, 0.02, 0.15), (0, -0.19, 0.44), C, M_BEDWOOD, bevel=0.008))
 par(N, box('static_nightstand_drawer2', (0.38, 0.02, 0.15), (0, -0.19, 0.27), C, M_BEDWOOD, bevel=0.008))
