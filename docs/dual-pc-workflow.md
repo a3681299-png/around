@@ -43,12 +43,19 @@ git lfs pull
 | Blender             | ヘッドレスで起動し、`C:\wwt-private\room\source\room.blend`（別の古い部屋）を開けた（37 オブジェクト）。`Felis.fbx` も読み込めた（12 オブジェクト） |
 | 完成済みの部屋      | **未確認**（下の「既知の問題」）                                                                                                                    |
 
+## 引き継ぎ後の確認（`a159c3e`、2026-11-11）
+
+ノート PC が LFS の実体を送ったあと、デスクトップで `git pull --ff-only` と `git lfs pull` が通った。
+
+| 確認                           | 結果                                                                                                                                  |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| LFS の SHA-256                 | `room.glb` 8f8a3f20…、`living-room.blend` e3625b29…（ノート PC の記録と一致）                                                         |
+| 完成済みの部屋のブラウザー表示 | 再生成せず、取得した GLB・ライトマップで表示できた（`build-living-room.mjs` → `capture.mjs`、目印 12 か所・床 42 三角形、到達不能 0） |
+| `living-room.blend`            | Blender 5.2.2 のヘッドレスで開けた（496 オブジェクト、カメラ `camera_main`）                                                          |
+| 撮影時の 404                   | 1 件（`capture.mjs` の errors）。部屋の表示と目印には影響なし。原因は未調査（favicon の可能性）                                       |
+
 ## 既知の問題
 
-**更新（2026-11-11、ノート PC）**：1 と 2 は解決した。1 は `git lfs push --object-id` で実体を送り、新しい clone で `git lfs pull` が通って SHA-256 が合うことまで確かめた（原因と再発防止は [living-onboarding-handoff.md](living-onboarding-handoff.md) の 9 節）。2 は同じ文書を作った。3 は残っている。以下は報告時点の記録。
-
-1. **`art/living-room/web/room.glb` と `art/living-room/living-room.blend` の LFS 実体が GitHub にない**（404）。`feat/living-onboarding` の `0cd4079` はこの2つを LFS ポインターとして持つが、実体（`room.glb` sha256 `8f8a3f20…`・14.7MB、`living-room.blend` sha256 `e3625b29…`・11.6MB）がノート PC から push されていない。デスクトップの `C:\wwt-private` にあるのは別の古い部屋（`room-packed-*.glb`）で、代わりにならない。`lightmap.png` は LFS ではなく通常のファイルとして入っていて取得済み
-   - **ノート PC でやること**：`git lfs push origin feat/living-onboarding`（失敗するなら `git lfs push --all origin`）。そのあと `git lfs ls-files` で2つが `*` になっていることと、デスクトップで `git lfs pull` が通ることを確かめる。実体の場所は `.gitattributes` の LFS 指定（`origin` の `.gitattributes` を確認）
-   - 実体が届いたら、デスクトップで「部屋を再生成せず、取得した GLB・ライトマップでブラウザー表示」と「`living-room.blend` を開く」を確認する
-2. 指定された `docs/living-onboarding-handoff.md` は、`feat/living-onboarding`（`d9ac881`）にも他の remote ブランチにも存在しない。ノート PC で未コミットか未 push の可能性がある。代わりに `docs/living-room.md`・`docs/living-room-art.md`・`docs/tooling.md` を読んだ
-3. `feat/living-onboarding` は `codex/creator-editor-spike` の子孫ではなく、`codex/living-room`（`eca7c0a`）から伸びている。作業ブランチへの取り込み時に別途整理が要る
+1. 指定されていた引き継ぎ文書は `docs/living-onboarding-handoff.md` として届いた
+2. `feat/living-onboarding` は `codex/creator-editor-spike` の子孫ではなく、`codex/living-room`（`eca7c0a`）から伸びている。作業ブランチへの取り込み時に別途整理が要る
+3. Blender MCP は、デスクトップでは未設定。部屋の作り直しは `scripts/living-room/run_all.py`（MCP 不要）で足りる
