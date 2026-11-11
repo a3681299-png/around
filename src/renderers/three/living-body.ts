@@ -18,6 +18,7 @@
  * inspectVrma (parseVrmAnimation).
  */
 import {
+  AnimationClip,
   AnimationMixer,
   CanvasTexture,
   CircleGeometry,
@@ -29,7 +30,6 @@ import {
   Quaternion,
   Vector3,
   type AnimationAction,
-  type AnimationClip,
 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { VRMLoaderPlugin, VRMUtils, type VRM } from '@pixiv/three-vrm';
@@ -39,6 +39,7 @@ import type { HumanBone } from '../../characters/humanoid';
 import { solveTwoBone, type Vec3 } from '../../characters/two-bone-ik';
 import { footAtRest, footStrain, stepFoot, type FootState } from '../../characters/foot-plant';
 import type { BodyIntent, BodyReach } from '../../characters/approach';
+import { wrapAngle } from '../../characters/locomotion';
 import { draw } from '../../world/room-life';
 
 export interface LivingBodyMotions {
@@ -68,11 +69,22 @@ export interface LivingBodyFacts {
   /** How far the reaching hand's tip is from the target (metres; undefined when not reaching). */
   reachGap: number | undefined;
   walkWeight: number;
+  /** Each foot now (left, right): pinned or not, how far it is held from where the motion has
+   * it (metres), and how high the motion has its toes and ankle above their standing height. */
+  feet: { down: boolean; stepping: boolean; held: number; toeRise: number; ankleRise: number }[];
+  /**
+   * What a viewer sees of the feet, whatever holds them: how far toes that are on the floor (in
+   * this frame and the last) have moved over it, summed (metres).
+   */
+  groundSlide: number;
 }
 export interface LivingBody {
   readonly root: Group;
   readonly metrics: LivingBodyMetrics;
-  update(intent: BodyIntent, dt: number, floorY: number): void;
+  /** `viewer`: where whoever is watching is (the camera), for the looks that go to them. */
+  update(intent: BodyIntent, dt: number, floorY: number, viewer?: Vec3): void;
+  /** Where the main joints are now (the room's metres): for measuring the motion from outside. */
+  joints(): Record<'hips' | 'head' | 'leftHand' | 'rightHand' | 'leftFoot' | 'rightFoot', Vec3>;
   facts(): LivingBodyFacts;
   dispose(): void;
 }
@@ -82,6 +94,8 @@ const LOOK_PITCH = 0.55;
 /** A reach never straightens the arm fully (a locked elbow looks stiff). */
 const ARM_STRETCH = 0.97;
 const LEAN_MAX = 0.42;
+/** How long a foot takes to its spot in a hard stop. */
+const STOP_STEP_S = 0.17;
 
 function blobShadow() {
   const canvas = new OffscreenCanvas(64, 64);
@@ -183,16 +197,20 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
     lowerLeg: need(`${side}LowerLeg`),
     foot: need(`${side}Foot`),
     toes: bone(`${side}Toes`),
+    shoulder: bone(`${side}Shoulder`),
     upperArm: need(`${side}UpperArm`),
     lowerArm: need(`${side}LowerArm`),
     hand: need(`${side}Hand`),
     finger: bone(`${side}MiddleDistal`) ?? bone(`${side}MiddleProximal`),
     restAnkle: 0,
     restToe: 0,
+    restSide: 0,
+    freed: false,
     plant: footAtRest(),
     lastContact: undefined as Vector3 | undefined,
     lastRaw: undefined as Vector3 | undefined,
     lastKind: 'toe' as 'toe' | 'ankle',
+    lastGround: undefined as Vector3 | undefined,
   }));
 
   // The rest pose (before any motion): the heights the feet stand at, the arm's reach.
@@ -207,6 +225,7 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
   };
   for (const leg of sides) {
     leg.restAnkle = leg.foot.getWorldPosition(v).y;
+    leg.restSide = Math.abs(v.x);
     leg.restToe = toeOf(leg, v).y;
   }
   const left = sides[0]!,
@@ -222,8 +241,7 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
   const mixer = new AnimationMixer(vrm.scene);
   const idleClip = vrmAnimationClip(idleAnimation, vrm),
     walkClip = vrmAnimationClip(walkAnimation, vrm);
-  const stride = walkInPlace(walkClip, hips.name);
-  const walkSpeed = stride > 0.05 && walkClip.duration > 0 ? stride / walkClip.duration : 0.6;
+  const walkTravel = walkInPlace(walkClip, hips.name);
   const play = (clip: AnimationClip): AnimationAction => {
     const action = mixer.clipAction(clip);
     action.play();
@@ -235,31 +253,108 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
     walk = play(walkClip);
   // A run (optional) shares the walk's cycle: the two are blended by speed, on one phase.
   const runClip = runAnimation ? vrmAnimationClip(runAnimation, vrm) : undefined;
-  const runStride = runClip ? walkInPlace(runClip, hips.name) : 0;
-  const run = runClip && runStride > stride ? play(runClip) : undefined;
-  const runSpeed = run && runClip ? runStride / (runClip.duration || 1) : walkSpeed;
+  const runTravel = runClip ? walkInPlace(runClip, hips.name) : 0;
+  let run = runClip ? play(runClip) : undefined;
+  /**
+   * The speed a loop's feet keep: how fast a foot on the floor goes back under the body, played
+   * on the spot (the median over the loop's moments with a foot down). This, not how far the
+   * motion's hips travel, is the ground the body may cover without its feet sliding: a retargeted
+   * run's hips can travel much further in a loop than its legs take it.
+   */
+  const feetPace = (action: AnimationAction, clip: AnimationClip) => {
+    for (const other of [idle, walk, run]) other?.setEffectiveWeight(other === action ? 1 : 0);
+    const steps = 48;
+    const toes = sides.map(() => [] as Vector3[]);
+    for (let i = 0; i <= steps; i++) {
+      action.time = Math.min(clip.duration - 1e-4, (i / steps) * clip.duration);
+      mixer.update(0);
+      root.updateWorldMatrix(true, true);
+      sides.forEach((leg, k) => toes[k]!.push(toeOf(leg, new Vector3())));
+    }
+    const speeds: number[] = [];
+    sides.forEach((leg, k) => {
+      for (let i = 0; i < steps; i++) {
+        const a = toes[k]![i]!,
+          b = toes[k]![i + 1]!;
+        if (a.y - leg.restToe < 0.02 && b.y - leg.restToe < 0.02) speeds.push((a.z - b.z) / (clip.duration / steps));
+      }
+    });
+    speeds.sort((a, b) => a - b);
+    return speeds.length >= 4 ? Math.max(0, speeds[speeds.length >> 1]!) : 0;
+  };
+  const walkPace = feetPace(walk, walkClip);
+  const walkSpeed = walkPace > 0.05 ? walkPace : walkTravel > 0.05 ? walkTravel / (walkClip.duration || 1) : 0.6;
+  const stride = walkSpeed * (walkClip.duration || 1);
+  const runPace = run && runClip ? feetPace(run, runClip) || runTravel / (runClip.duration || 1) : 0;
+  // A "run" no faster than the walk is no use as one.
+  if (run && runPace < walkSpeed * 1.15) {
+    run.stop();
+    run = undefined;
+  }
+  const runSpeed = run ? runPace : walkSpeed;
+  const runStride = runSpeed * (runClip?.duration || 1);
   // Both loops are two steps long, but may begin on different feet: find the shift (none or half
   // a cycle) at which the run's feet go the same way as the walk's.
   let runShift = 0;
+  /** How far the left foot is ahead of the right through a loop, at eight moments of it. */
+  const gait = (action: AnimationAction, clip: AnimationClip, shift: number) => {
+    const out: number[] = [];
+    for (const other of [idle, walk, run]) other?.setEffectiveWeight(other === action ? 1 : 0);
+    for (let i = 0; i < 8; i++) {
+      action.time = ((i / 8 + shift) % 1) * clip.duration;
+      mixer.update(0);
+      root.updateWorldMatrix(true, true);
+      out.push(sides[0]!.foot.getWorldPosition(v).z - sides[1]!.foot.getWorldPosition(v2).z);
+    }
+    return out;
+  };
+  const walking = gait(walk, walkClip, 0);
+  // The moment of the walk at which the left foot is furthest behind: about to push off. A walk
+  // from standing begins there, so its first move is a step and not the middle of a stride.
+  const pushOff = walking.indexOf(Math.min(...walking)) / 8;
   if (run && runClip) {
-    const gait = (action: AnimationAction, clip: AnimationClip, shift: number) => {
-      const out: number[] = [];
-      for (const other of [idle, walk, run]) other.setEffectiveWeight(other === action ? 1 : 0);
-      for (let i = 0; i < 8; i++) {
-        action.time = ((i / 8 + shift) % 1) * clip.duration;
-        mixer.update(0);
-        root.updateWorldMatrix(true, true);
-        out.push(sides[0]!.foot.getWorldPosition(v).z - sides[1]!.foot.getWorldPosition(v2).z);
-      }
-      return out;
-    };
-    const walking = gait(walk, walkClip, 0);
     const match = (shift: number) => gait(run, runClip, shift).reduce((sum, value, i) => sum + value * walking[i]!, 0);
     runShift = match(0.5) > match(0) ? 0.5 : 0;
-    idle.setEffectiveWeight(1);
-    walk.setEffectiveWeight(0);
-    run.setEffectiveWeight(0);
   }
+  idle.setEffectiveWeight(1);
+  walk.setEffectiveWeight(0);
+  run?.setEffectiveWeight(0);
+  // The run's trunk and arms on their own (the same motion, the legs' tracks left out). At a dart
+  // the legs are a blend of walk and run that matches the ground, which leaves the arms hardly
+  // swinging; this puts the run's arm swing and trunk twist on top, on the same phase.
+  const upperNames = new Set(
+    (
+      [
+        'spine',
+        'chest',
+        'upperChest',
+        'neck',
+        'head',
+        'leftShoulder',
+        'leftUpperArm',
+        'leftLowerArm',
+        'leftHand',
+        'rightShoulder',
+        'rightUpperArm',
+        'rightLowerArm',
+        'rightHand',
+      ] as const
+    ).flatMap((name) => {
+      const node = bone(name);
+      return node ? [`${node.name}.quaternion`] : [];
+    }),
+  );
+  const runUpper =
+    run && runClip
+      ? play(
+          new AnimationClip(
+            'run-upper',
+            runClip.duration,
+            runClip.tracks.filter((track) => upperNames.has(track.name)),
+          ),
+        )
+      : undefined;
+  runUpper?.setEffectiveWeight(0);
   // Sitting: the three motions each with a weight of its own, eased toward what the behaviour asks.
   const seatClips = (
     [
@@ -312,6 +407,14 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
     cycle = 0,
     walkWeight = 0,
     runWeight = 0,
+    scurry = 0,
+    moving = false,
+    hopHeight = 0,
+    lastTap = 0,
+    armSwing = 0,
+    armSwingSpeed = 0,
+    arch = 0,
+    armsPose = 0,
     lastSpeed = 0,
     accel = 0,
     lean = 0,
@@ -328,6 +431,8 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
     tilt = 0,
     joy = 0,
     relax = 0,
+    dropNow = 0,
+    stop: { t: number; feet: { delay: number; from: [number, number]; to: [number, number] }[] } | undefined,
     reachLean = 0;
   /** A spring toward a goal that overshoots a little before it rests (the body's follow-through). */
   const spring = (value: number, speed: number, goal: number, stiff: number, damp: number, dt: number) => {
@@ -346,6 +451,8 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
     steps: 0,
     reachGap: undefined,
     walkWeight: 0,
+    feet: [],
+    groundSlide: 0,
   };
   const q = new Quaternion(),
     q2 = new Quaternion(),
@@ -361,6 +468,7 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
     neck,
     head,
     ...sides.flatMap((s) => [s.upperLeg, s.lowerLeg, s.foot, s.upperArm, s.lowerArm, s.hand]),
+    ...sides.flatMap((s) => (s.shoulder ? [s.shoulder] : [])),
   ].filter((node, i, all) => all.indexOf(node) === i);
   const given = posed.map((node) => ({ node, q: node.quaternion.clone(), p: node.position.clone() }));
 
@@ -381,7 +489,15 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
   return {
     root,
     metrics,
-    update(intent, rawDt, floorY) {
+    joints: () => ({
+      hips: tuple(hips.getWorldPosition(v)),
+      head: tuple(head.getWorldPosition(v)),
+      leftHand: tuple(left.hand.getWorldPosition(v)),
+      rightHand: tuple(right.hand.getWorldPosition(v)),
+      leftFoot: tuple(left.foot.getWorldPosition(v)),
+      rightFoot: tuple(right.foot.getWorldPosition(v)),
+    }),
+    update(intent, rawDt, floorY, viewer) {
       const dt = clamp(Number.isFinite(rawDt) ? rawDt : 0, 0, 0.1);
       time += dt;
       root.position.set(intent.x, floorY, intent.z);
@@ -391,15 +507,28 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
       // the feet keep the floor's pace whether the body is starting, cruising or stopping. A slow
       // walk takes shorter steps (the blend with idle shortens them), so its cycle turns faster
       // than speed alone would say.
+      // From standing, the walk begins at its push-off (never in the middle of a stride).
+      if (intent.speed > 0 && !moving && walkWeight < 0.05 && runWeight < 0.05) cycle = pushOff;
+      moving = intent.speed > 0;
       const wantWalk = smooth(clamp(intent.speed / (walkSpeed * 0.55), 0, 1));
-      // A dart comes on at once (the blend must not lag the burst of speed); a walk eases in.
-      walkWeight = approach(walkWeight, wantWalk, intent.mood === 'interest' ? 22 : 9, dt);
+      walkWeight = approach(walkWeight, wantWalk, 9, dt);
       if (walkWeight < 0.002 && wantWalk === 0) walkWeight = 0;
-      // Faster than the walk's own pace, the run is mixed in: longer strides, not hurried feet.
-      const wantRun = run ? clamp((intent.speed - walkSpeed) / Math.max(0.1, runSpeed - walkSpeed), 0, 1) : 0;
-      runWeight = approach(runWeight, wantRun, 14, dt);
-      const stepLength = stride * (0.55 + 0.45 * walkWeight) * (1 - runWeight) + runStride * runWeight;
-      if (stepLength > 0.01) cycle = (cycle + (intent.speed * dt) / stepLength) % 1;
+      // An eager body does not walk faster, it scurries: the run, mixed with standing still in
+      // the share speed ÷ the run's own speed. That shortens the run's stride to the ground
+      // covered while keeping the run's own timing of feet on and off the floor (a walk and a run
+      // mixed on one phase disagree about when a foot is down, and the foot then drags), and its
+      // quick cadence: small fast steps.
+      scurry = approach(scurry, run && intent.mood === 'interest' ? 1 : 0, 14, dt);
+      runWeight = approach(runWeight, run ? clamp(intent.speed / runSpeed, 0, 1) : 0, 26, dt);
+      if (runWeight < 0.002 && intent.speed === 0) runWeight = 0;
+      const walkPart = walkWeight * (1 - scurry),
+        runPart = runWeight * scurry;
+      const moveWeight = Math.min(1, walkPart + runPart);
+      const stepLength =
+        stride * (0.55 + 0.45 * walkWeight) * (1 - scurry) + runStride * Math.max(0.05, runWeight) * scurry;
+      // (Never faster than half again the run's own cadence, however the weights lag a burst.)
+      const fastest = 1.5 / (runClip?.duration || walkClip.duration || 1);
+      if (stepLength > 0.01) cycle = (cycle + Math.min(fastest * dt, (intent.speed * dt) / stepLength)) % 1;
       idle.time = time % (idleClip.duration || 1);
       walk.time = cycle * (walkClip.duration || 1);
       if (run && runClip) run.time = ((cycle + runShift) % 1) * (runClip.duration || 1);
@@ -420,9 +549,14 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
       const share = sitting > 1 ? 1 / sitting : 1;
       const standing = Math.max(0, 1 - sitting * share);
       for (const seat of seatClips) seat.action.setEffectiveWeight(seat.weight * share);
-      idle.setEffectiveWeight((1 - walkWeight) * standing);
-      walk.setEffectiveWeight(walkWeight * (1 - runWeight) * standing);
-      run?.setEffectiveWeight(walkWeight * runWeight * standing);
+      idle.setEffectiveWeight((1 - moveWeight) * standing);
+      walk.setEffectiveWeight(walkPart * standing);
+      run?.setEffectiveWeight(runPart * standing);
+      // The trunk and arms are mostly the run's while it scurries (see `runUpper`).
+      if (runUpper && runClip) {
+        runUpper.time = ((cycle + runShift) % 1) * (runClip.duration || 1);
+        runUpper.setEffectiveWeight(2.2 * scurry * clamp(runWeight / 0.3, 0, 1) * standing);
+      }
       for (const g of given) {
         g.node.quaternion.copy(g.q);
         g.node.position.copy(g.p);
@@ -435,7 +569,16 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
 
       // 2. Posture. Small, additive, on top of whatever the motions gave.
       const eager = intent.mood === 'interest';
-      const atEase = (1 - walkWeight) * standing;
+      const atEase = (1 - moveWeight) * standing;
+      const arm = intent.hand === 'left' ? left : right;
+      const reaching = Boolean(intent.reach) && intent.reachWeight !== 0;
+      // What is looked at: the thing, or whoever is watching (a glance to share it), or between.
+      const lookAt =
+        intent.look && viewer && intent.toViewer > 0
+          ? ([0, 1, 2].map(
+              (i) => intent.look![i]! + (viewer[i]! - intent.look![i]!) * intent.toViewer,
+            ) as unknown as Vec3)
+          : intent.look;
       accel = approach(accel, dt > 0 ? (intent.speed - lastSpeed) / dt : 0, 14, dt);
       lastSpeed = intent.speed;
       // The trunk's pitch is a spring: it leans into speed and into a wind-up, is thrown back by
@@ -452,39 +595,80 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
       // Squash and stretch, one spring: sunk by a wind-up and by braking, kicked down by a
       // landing; let go, it rebounds past its rest (the stretch of the launch) and settles.
       const hopping = intent.hop !== undefined;
-      if (wasHopping && !hopping) squashSpeed += 9;
+      // Leaving the floor throws the spring the other way (the body stretches upward); landing
+      // kicks it down, harder from higher; a touch gives it a small start.
+      if (!wasHopping && hopping) squashSpeed -= 7;
+      if (wasHopping && !hopping) squashSpeed += 6 + hopHeight * 32;
+      if (intent.tap > lastTap + 0.5) squashSpeed += 2.2;
+      lastTap = intent.tap;
       wasHopping = hopping;
+      if (hopping) hopHeight = intent.hopHeight;
       [squash, squashSpeed] = spring(squash, squashSpeed, intent.crouch + clamp(-accel * 0.07, 0, 0.5), 15, 0.38, dt);
-      squash = clamp(squash, -0.8, 1.4);
-      const tall = 1 - 0.035 * squash;
+      squash = clamp(squash, -1, 1.6);
+      const tall = 1 - 0.055 * squash;
       root.scale.set(1 / Math.sqrt(tall), tall, 1 / Math.sqrt(tall));
-      hips.position.y -= Math.max(0, squash) * 0.055;
+      hips.position.y -= Math.max(0, squash) * 0.07;
+      // Arms that hang swing with the body's changes of speed: back as it darts off, forward and
+      // back again as it stops (a spring, so they arrive after the trunk does).
+      [armSwing, armSwingSpeed] = spring(armSwing, armSwingSpeed, clamp(accel * 0.1, -0.75, 0.75), 10, 0.32, dt);
+      arch = approach(arch, intent.arch, 18, dt);
       const air = hopping ? Math.sin(Math.PI * intent.hop!) : 0;
       if (hopping) root.position.y += intent.hopHeight * 4 * intent.hop! * (1 - intent.hop!);
-      const breath = Math.sin((time * Math.PI * 2) / 3.7) * 0.012 * (1 - walkWeight * 0.6);
+      const breath = Math.sin((time * Math.PI * 2) / 3.7) * 0.012 * (1 - moveWeight * 0.6);
       // Standing, the weight drifts from one leg to the other: the hips go over and tip, the
       // shoulders tip the other way (slowly; not while walking).
       const sway = Math.sin((time * Math.PI * 2) / 7.3) * atEase;
       hips.position.x += sway * 0.012;
       hips.position.z -= lean * 0.05;
       hips.rotateZ(sway * 0.025);
-      spine.rotateX(lean * 0.55 - breath * 0.5).rotateZ(roll - sway * 0.04);
-      if (chest !== spine) chest.rotateX(trail * 0.45 + breath);
-      // The head keeps its eyes level through the trunk's lean, and lags its changes.
-      head.rotateX(-trail * 0.6 + (trail - lean) * 0.8).rotateZ(-roll * 0.5);
-      // Off the floor the legs tuck.
+      // The trunk's line: curled forward when it gathers itself, arched back at the top of a jump.
+      spine.rotateX(lean * 0.55 - breath * 0.5 - arch * 0.24).rotateZ(roll - sway * 0.04);
+      if (chest !== spine) chest.rotateX(trail * 0.45 + breath - arch * 0.2);
+      // The head keeps its eyes level through the trunk's lean, and lags its changes; a touch
+      // makes it nod.
+      head.rotateX(-trail * 0.6 + (trail - lean) * 0.8 - arch * 0.22 + intent.tap * 0.1).rotateZ(-roll * 0.5);
+      // Off the floor the legs tuck under; in a jump for joy the heels kick up behind instead
+      // (one more than the other: a symmetrical pose is a stiff one).
       if (air > 0)
-        for (const leg of sides) {
-          leg.upperLeg.rotateX(-0.45 * air);
-          leg.lowerLeg.rotateX(0.85 * air);
-        }
+        sides.forEach((leg, i) => {
+          const kick = intent.kick * (i ? 0.72 : 1);
+          leg.upperLeg.rotateX((-0.45 * (1 - intent.kick) + 0.3 * kick) * air);
+          leg.lowerLeg.rotateX((0.85 * (1 - intent.kick) + 1.7 * kick) * air);
+        });
       // The arms: the idle motion holds them wide and straight (it clears thick sleeves), so at
-      // ease they come in and bend a little; in gladness they go up, and flap with each hop.
+      // ease they come in and bend a little; and they swing with the body's starts and stops.
       joy = approach(joy, intent.joy, 12, dt);
-      relax = approach(relax, atEase * (1 - joy), 5, dt);
+      armsPose = approach(armsPose, intent.arms, 22, dt);
+      relax = approach(relax, atEase * (1 - Math.min(1, Math.abs(armsPose))), 5, dt);
       for (const side of sides) {
-        side.upperArm.rotateZ(side.sign * (-0.2 * relax + joy * (2.25 + 0.35 * air)));
-        side.lowerArm.rotateY(-side.sign * (0.3 * relax + 0.7 * joy));
+        side.upperArm.rotateZ(side.sign * -0.2 * relax).rotateX(armSwing * (side === arm && reaching ? 0.2 : 1));
+        side.lowerArm.rotateY(-side.sign * (0.3 * relax + Math.max(0, -armSwing) * 0.5));
+      }
+      // A pose for both arms (gladness): each arm is swung, by its world direction, from where
+      // the motion has it toward "up and out" or "down and back". Going by direction, not by a
+      // fixed turn of the joint, gives the same silhouette whatever the motion underneath, and
+      // the way from down to up passes out to the side, as an arm thrown up does.
+      if (Math.abs(armsPose) > 1e-3) {
+        root.updateWorldMatrix(true, true);
+        const amount = Math.min(1, Math.abs(armsPose));
+        for (const side of sides) {
+          const up = armsPose > 0;
+          const shoulder = side.upperArm.getWorldPosition(new Vector3()),
+            elbow = side.lowerArm.getWorldPosition(new Vector3());
+          const upper = (up ? v3.set(side.sign * 0.66, 0.74, 0.12) : v3.set(side.sign * 0.4, -0.7, -0.6))
+            .normalize()
+            .applyAxisAngle(UP, intent.heading);
+          const upperNow = elbow.clone().sub(shoulder).normalize().lerp(upper, amount).normalize();
+          aim(side.upperArm, tuple(elbow), tuple(shoulder.addScaledVector(upperNow, upperArmLength)));
+          const bend = side.lowerArm.getWorldPosition(new Vector3()),
+            wrist = side.hand.getWorldPosition(new Vector3());
+          // The forearm a little more upright than the upper arm (up), or trailing behind it (back).
+          const fore = (up ? v3.set(side.sign * 0.42, 0.9, 0.1) : v3.set(side.sign * 0.3, -0.5, -0.8))
+            .normalize()
+            .applyAxisAngle(UP, intent.heading);
+          const foreNow = wrist.clone().sub(bend).normalize().lerp(fore, amount).normalize();
+          aim(side.lowerArm, tuple(wrist), tuple(bend.addScaledVector(foreNow, lowerArmLength)));
+        }
       }
 
       // Looking: the eyes first (the VRM's own look-at), then the head, neck and chest share the
@@ -493,8 +677,8 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
       head.getWorldPosition(v);
       let wantYaw = 0,
         wantPitch = 0;
-      if (intent.look && intent.lookWeight > 0) {
-        v2.set(intent.look[0], intent.look[1], intent.look[2]);
+      if (lookAt && intent.lookWeight > 0) {
+        v2.set(lookAt[0], lookAt[1], lookAt[2]);
         const local = root.worldToLocal(v2.clone()).sub(root.worldToLocal(v3.copy(v)));
         const yaw = Math.atan2(local.x, local.z),
           pitch = Math.atan2(local.y, Math.hypot(local.x, local.z));
@@ -535,10 +719,10 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
         .rotateX(-lookPitch * (neck !== head ? 0.6 : 1))
         .rotateZ(tilt);
       // The eyes: ahead of the face, or where the glance goes, or on the target; they get there first.
-      eyes = approach(eyes, intent.look ? intent.lookWeight : 0, 30, dt);
+      eyes = approach(eyes, lookAt ? intent.lookWeight : 0, 30, dt);
       const glancing = time < glanceUntil && !(intent.lookWeight > 0);
       v3.set(glancing ? Math.sin(glanceYaw) * 2 : 0, v.y - floorY + (glancing ? glancePitch * 2 : 0), 2);
-      if (intent.look) v3.lerp(root.worldToLocal(v2.set(intent.look[0], intent.look[1], intent.look[2])), eyes);
+      if (lookAt) v3.lerp(root.worldToLocal(v2.set(lookAt[0], lookAt[1], lookAt[2])), eyes);
       gaze.position.lerp(v3, 1 - Math.exp(-25 * dt));
 
       // The face, ears and tail. A blink now and then; a start when something is noticed; a smile
@@ -557,7 +741,12 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
       if (time >= twitchAt) twitchAt = time + 3.5 + next() * 6;
       const twitch = twitchAt - time > 0.16 ? 0 : 1;
       // Ears up at a start and while eager or glad; a flick of them now and then at rest.
-      const earsUp = intent.alert * 2.4 + joy * 1 + (eager && intent.lookWeight > 0 ? 0.7 : 0) + twitch * atEase * 1.2;
+      const earsUp =
+        intent.alert * 2.4 +
+        intent.tap * 1.6 +
+        joy * 1 +
+        (eager && intent.lookWeight > 0 ? 0.7 : 0) +
+        twitch * atEase * 1.2;
       const tailUp = joy * 1.1 + (eager && intent.lookWeight > 0 ? 0.55 : 0);
       // The tail: a slow sway at rest, a quicker one when eager, a wag in gladness.
       const wag =
@@ -577,7 +766,6 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
 
       // 4a. A far reach leans the trunk toward the target before the arm is solved (applied here,
       // with the rest of the posture, so the legs below see the final hips).
-      const arm = intent.hand === 'left' ? left : right;
       let wantLean = 0;
       if (intent.reach && intent.reachWeight > 0) {
         root.updateWorldMatrix(true, true);
@@ -606,30 +794,129 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
         root.position.z += (intent.seat[2] - v.z) * intent.seated;
         root.updateWorldMatrix(true, true);
       }
+      // A calm turn about: the feet are asked where they will stand when the turn is done (the
+      // motion's feet, carried round the body by the turn still to come), so each foot takes one
+      // step to its final place while the body comes round, instead of many small ones after it.
+      const sunk = Math.max(0, squash) * 0.07 * tall + (1 - tall) * 0.1;
+      const lift = intent.hop === undefined ? clamp(moveWeight, 0.35, 1) : 1;
+      const ahead = intent.turnAhead;
+      const lead = (p: Vector3) => (ahead ? p.sub(root.position).applyAxisAngle(UP, ahead).add(root.position) : p);
       const samples = sides.map((leg) => {
-        const ankle = leg.foot.getWorldPosition(new Vector3()),
-          toe = toeOf(leg, new Vector3());
+        const ankle = lead(leg.foot.getWorldPosition(new Vector3())),
+          toe = lead(toeOf(leg, new Vector3()));
         return {
           ankle: tuple(ankle),
           toe: tuple(toe),
-          ankleRise: ankle.y - floorY - leg.restAnkle,
-          toeRise: toe.y - floorY - leg.restToe,
+          // "On the floor" is the motion's say. The body's own sinking (a wind-up, a braking, a
+          // landing) lowers the feet with it, and would otherwise read as both feet down for as
+          // long as it lasts: a foot pinned through a run is dragged. So the sinking is taken out.
+          // A gait mixed with standing still lifts its feet only by its share: a swinging foot
+          // an inch up would read as down. The heights are judged at the gait's full size.
+          ankleRise: (ankle.y - floorY - leg.restAnkle + sunk) / lift,
+          toeRise: (toe.y - floorY - leg.restToe + sunk) / lift,
           yaw: Math.atan2(toe.x - ankle.x, toe.z - ankle.z),
         };
       });
       const strain = sides.map((leg) => footStrain(leg.plant));
+      // Equally strained (a turn on the spot strains both alike): the foot on the side the body
+      // turns to goes first, as a person opens that foot out and brings the other round.
+      const first = ahead < 0 || (ahead === 0 && intent.turn < 0) ? 1 : 0;
+      // A hard stop is made with the feet: as the braking begins, the foot in the air is put down
+      // a little ahead of where the body will stop and the other is brought up beside it, and the
+      // body comes to rest over them. (Left to the gait, the feet would glide on under a body
+      // that is slowing: a run's motion has no stop in it.)
+      if (intent.stopAt && !stop && intent.speed > 0) {
+        const leadFoot = samples[0]!.toeRise >= samples[1]!.toeRise ? 0 : 1;
+        const fx = Math.sin(intent.stopHeading),
+          fz = Math.cos(intent.stopHeading);
+        stop = {
+          t: 0,
+          feet: sides.map((leg, i) => {
+            const along = i === leadFoot ? 0.13 : -0.05,
+              across = leg.sign * leg.restSide;
+            return {
+              delay: i === leadFoot ? 0 : 0.09,
+              from: [samples[i]!.ankle[0] + leg.plant.dx, samples[i]!.ankle[2] + leg.plant.dz] as [number, number],
+              to: [intent.stopAt![0] + fx * along + fz * across, intent.stopAt![1] + fz * along - fx * across] as [
+                number,
+                number,
+              ],
+            };
+          }),
+        };
+      }
+      if (!intent.stopAt) stop = undefined;
+      else if (stop) stop.t += dt;
+      const planted = [false, false];
       sides.forEach((leg, i) => {
         const other = sides[1 - i]!.plant;
         const before = leg.plant.step;
+        const spot = stop?.feet[i];
+        const through = spot ? (stop!.t - spot.delay) / STOP_STEP_S : 0;
+        if (spot && through > 0) {
+          const s = samples[i]!;
+          planted[i] = true;
+          if (through < 1) {
+            // On its way to its spot: a quick step with a small arc.
+            const k = smooth(through);
+            leg.plant = {
+              ...leg.plant,
+              down: true,
+              contact: 'ankle',
+              step: through,
+              dx: spot.from[0] + (spot.to[0] - spot.from[0]) * k - s.ankle[0],
+              dz: spot.from[1] + (spot.to[1] - spot.from[1]) * k - s.ankle[2],
+              dyaw: wrapAngle(intent.stopHeading - s.yaw) * k,
+              lift: Math.sin(Math.PI * through) * 0.045,
+            };
+          } else {
+            // Down on its spot: held there (no corrective steps) until the stop is over.
+            if (leg.plant.step !== undefined)
+              leg.plant = {
+                ...leg.plant,
+                step: undefined,
+                lift: 0,
+                contact: 'ankle',
+                pinX: spot.to[0],
+                pinZ: spot.to[1],
+                pinYaw: intent.stopHeading,
+                rested: 0,
+              };
+            leg.plant = stepFoot(leg.plant, { ...s, ankleRise: 0, toeRise: 0 }, dt, false);
+          }
+          return;
+        }
         // One foot at a time, the one left furthest behind first.
-        const mayStep = other.down && other.step === undefined && strain[i]! >= strain[1 - i]!;
-        leg.plant = stepFoot(leg.plant, samples[i]!, dt, mayStep);
+        const mayStep =
+          other.down &&
+          other.step === undefined &&
+          (strain[i]! > strain[1 - i]! + 1e-6 || (Math.abs(strain[i]! - strain[1 - i]!) <= 1e-6 && i === first));
+        // ("Under way" is the scurry: a walk's feet keep the floor and are pinned as when standing.
+        // And a foot is under way only once it has left the floor: at the start of a dart the
+        // feet that still stand stay planted, the body pushing off from them, until each lifts.)
+        const running = scurry > 0.5 && intent.speed > walkSpeed * 0.45;
+        const s = samples[i]!;
+        leg.freed = running && (leg.freed || (s.toeRise > 0.03 && s.ankleRise > 0.03));
+        leg.plant = stepFoot(leg.plant, s, dt, mayStep && !running, leg.freed);
         if (before === undefined && leg.plant.step !== undefined) facts.steps++;
       });
       let drop = 0;
-      const targets = sides.map((leg, i) => {
-        const p: FootState = leg.plant,
-          s = samples[i]!;
+      const targets = sides.map((leg, i): Vec3 => {
+        const s = samples[i]!;
+        // A pin the leg cannot keep (the body has run on, or been carried off): let it go, quickly
+        // but over a few frames, rather than drag the foot or pull the hips down after it.
+        leg.upperLeg.getWorldPosition(v);
+        const span = leg.lowerLeg.getWorldPosition(v2).distanceTo(v) + v2.distanceTo(leg.foot.getWorldPosition(v3));
+        const held = leg.plant;
+        if (held.down && Math.hypot(s.ankle[0] + held.dx - v.x, s.ankle[2] + held.dz - v.z) > span * 0.93)
+          leg.plant = {
+            ...held,
+            dx: held.dx * 0.7,
+            dz: held.dz * 0.7,
+            pinX: held.pinX - held.dx * 0.3,
+            pinZ: held.pinZ - held.dz * 0.3,
+          };
+        const p: FootState = leg.plant;
         // The pin holds the contact (the toes, mostly), and the foot is turned back about the ankle:
         // the ankle goes where that turn leaves the toes on their spot.
         const ox = p.contact === 'toe' ? s.toe[0] - s.ankle[0] : 0,
@@ -638,12 +925,18 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
           sin = Math.sin(p.dyaw);
         const target: Vec3 = [
           s.ankle[0] + p.dx + ox - (ox * cos + oz * sin),
-          // Never under the floor (a seat lower than the motion's own would push the feet in).
-          Math.max(floorY + leg.restAnkle * 0.85, s.ankle[1] + p.lift),
+          // The body's sinking is the knees' to take up, not the feet's: each foot goes where
+          // the motion has it, as high above the floor as before the hips came down (otherwise
+          // a foot swinging forward in a run would scrape along the floor). And never under the
+          // floor (a seat lower than the motion's own would push the feet in).
+          // A foot planted for a stop stands on the floor, whatever the gait under it is doing.
+          planted[i]
+            ? floorY + leg.restAnkle + p.lift
+            : Math.max(floorY + leg.restAnkle * 0.85, s.ankle[1] + p.lift + sunk),
           s.ankle[2] + p.dz + oz - (-ox * sin + oz * cos),
         ];
         leg.upperLeg.getWorldPosition(v);
-        const length = leg.lowerLeg.getWorldPosition(v2).distanceTo(v) + v2.distanceTo(v3.set(...s.ankle));
+        const length = leg.lowerLeg.getWorldPosition(v2).distanceTo(v) + v2.distanceTo(leg.foot.getWorldPosition(v3));
         const flat = Math.hypot(target[0] - v.x, target[2] - v.z),
           up = v.y - target[1];
         const reach = length * 0.995;
@@ -651,8 +944,11 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
           drop = Math.max(drop, up - Math.sqrt(reach * reach - flat * flat));
         return target;
       });
+      // (Eased: the hips never drop in one frame.)
+      dropNow = approach(dropNow, Math.min(0.1, drop), 30, dt);
+      drop = dropNow;
       if (drop > 1e-4) {
-        hips.position.y -= Math.min(0.12, drop) / (root.scale.y || 1);
+        hips.position.y -= drop / (root.scale.y || 1);
         root.updateWorldMatrix(true, true);
       }
       const forward: Vec3 = [Math.sin(intent.heading), 0, Math.cos(intent.heading)];
@@ -660,19 +956,25 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
         const p = leg.plant,
           s = samples[i]!;
         const corrected =
+          planted[i] ||
           Math.abs(p.dx) + Math.abs(p.dz) + Math.abs(p.lift) + Math.abs(p.dyaw) > 1e-5 ||
           drop > 1e-4 ||
           targets[i]![1] > s.ankle[1] + 1e-5;
         if (corrected) {
           const footWorld = leg.foot.getWorldQuaternion(new Quaternion());
-          const hip = tuple(leg.upperLeg.getWorldPosition(v)),
-            knee = tuple(leg.lowerLeg.getWorldPosition(v)),
-            ankle = tuple(leg.foot.getWorldPosition(v));
-          const solved = solveTwoBone(hip, knee, ankle, targets[i]!, forward);
-          aim(leg.upperLeg, knee, solved.mid);
-          aim(leg.lowerLeg, tuple(leg.foot.getWorldPosition(v)), solved.end);
+          // Solved twice: the body's squash and stretch scales it more one way than the other, so
+          // a bone's length in the room changes as it turns and one solve lands a little off (a
+          // planted foot would creep as the body sinks). The second starts from the first's result.
+          for (let pass = 0; pass < (Math.abs(tall - 1) > 1e-3 ? 3 : 1); pass++) {
+            const hip = tuple(leg.upperLeg.getWorldPosition(v)),
+              knee = tuple(leg.lowerLeg.getWorldPosition(v)),
+              ankle = tuple(leg.foot.getWorldPosition(v));
+            const solved = solveTwoBone(hip, knee, ankle, targets[i]!, forward);
+            aim(leg.upperLeg, knee, solved.mid);
+            aim(leg.lowerLeg, tuple(leg.foot.getWorldPosition(v)), solved.end);
+          }
           // The foot keeps the motion's own tilt, turned back by what the pin holds.
-          setWorldQuaternion(leg.foot, footWorld.premultiply(q.setFromAxisAngle(UP, p.dyaw)));
+          setWorldQuaternion(leg.foot, footWorld.premultiply(q.setFromAxisAngle(UP, p.dyaw + ahead)));
         }
         // What the viewer sees: how far the planted contact moved over the floor this frame.
         const contact = p.contact === 'toe' ? toeOf(leg, new Vector3()) : leg.foot.getWorldPosition(new Vector3());
@@ -695,6 +997,11 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
       // motion has it; the elbow bends down and out.
       facts.reachGap = undefined;
       if (intent.reach && intent.reachWeight !== 0) {
+        // The arm does not go alone: its shoulder comes forward and up with it and the chest
+        // turns a little to give it reach (and both draw back with the hand before it goes).
+        const out = clamp(intent.reachWeight, -0.3, 1);
+        arm.shoulder?.rotateY(-arm.sign * 0.3 * out).rotateZ(arm.sign * 0.14 * out);
+        if (chest !== spine) chest.rotateY(-arm.sign * 0.16 * out);
         root.updateWorldMatrix(true, true);
         const shoulder = arm.upperArm.getWorldPosition(new Vector3()),
           elbow = arm.lowerArm.getWorldPosition(new Vector3()),
@@ -737,6 +1044,9 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
         aim(arm.lowerArm, tuple(arm.hand.getWorldPosition(v)), solved.end);
         // The hand opens flat along the forearm as it arrives (its rest pose on normalized bones).
         arm.hand.quaternion.slerp(q.identity(), clamp(weight, 0, 1));
+        // …and bends back at the wrist so the palm, not the fingertips, meets the thing; a touch
+        // presses it a little further for a moment.
+        arm.hand.rotateZ(arm.sign * (0.5 * clamp(weight, 0, 1) + 0.25 * intent.tap));
         arm.hand.updateWorldMatrix(false, true);
         // The fingertips: a hand's length past the wrist, along the forearm (the hand lies flat).
         const from = arm.lowerArm.getWorldPosition(v2),
@@ -748,9 +1058,33 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
       // 5. The model: pose copied to its own bones, then hair, tail and clothes follow.
       hips.position.y = Math.max(restHipsY * 0.5, hips.position.y);
       vrm.update(dt);
-      shadow.position.set(0, 0.004, 0);
+      // The shadow stays on the floor under a body in the air, and thins with the height.
+      const height = Math.max(0, root.position.y - floorY);
+      shadow.position.set(0, (0.004 - height) / (root.scale.y || 1), 0);
+      shadow.scale.setScalar(Math.max(0.55, 1 - height * 1.3));
       root.updateWorldMatrix(true, true);
-      facts.walkWeight = walkWeight;
+      facts.walkWeight = moveWeight;
+      sides.forEach((leg) => {
+        const toe = toeOf(leg, new Vector3());
+        // On the floor: the whole foot down, toes and ankle both about where they are when
+        // standing. (A foot swinging through close over the floor has its ankle up; one coming
+        // in to land or rolling off is not yet, or no longer, standing on it.)
+        const ankleY = leg.foot.getWorldPosition(v).y;
+        const grounded =
+          toe.y - floorY - leg.restToe * tall < 0.006 &&
+          ankleY - floorY - leg.restAnkle * tall < 0.012 &&
+          leg.plant.step === undefined;
+        if (grounded && leg.lastGround)
+          facts.groundSlide += Math.hypot(toe.x - leg.lastGround.x, toe.z - leg.lastGround.z);
+        leg.lastGround = grounded ? toe : undefined;
+      });
+      facts.feet = sides.map((leg, i) => ({
+        down: leg.plant.down,
+        stepping: leg.plant.step !== undefined,
+        held: Math.hypot(leg.plant.dx, leg.plant.dz),
+        toeRise: samples[i]!.toeRise,
+        ankleRise: samples[i]!.ankleRise,
+      }));
     },
     facts: () => ({ ...facts }),
     dispose() {

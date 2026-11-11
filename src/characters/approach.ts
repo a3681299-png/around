@@ -86,6 +86,9 @@ export interface ApproachState {
   cheered: number;
   /** How far out the hand was when it began to come back (1 from a full touch). */
   reachFrom: number;
+  /** Braking at the end of a dart: the place it will stop on and the way it will face there. */
+  stopAt: readonly [number, number] | undefined;
+  stopHeading: number;
 }
 
 export interface ApproachInput {
@@ -107,24 +110,76 @@ export interface ApproachInput {
 export const RECOVER_S = 0.6;
 export const SIT_DOWN_S = 1.3;
 export const STAND_UP_S = 1.05;
-export const CHEER_S = 1.5;
-/** The two hops of a cheer, as shares of it. */
-export const CHEER_HOPS: readonly (readonly [number, number])[] = [
-  [0.08, 0.4],
-  [0.44, 0.76],
-];
-export const PIVOT_S = 0.36;
+/**
+ * A cheer, in seconds from its start: a gasp (it takes the good news in, still), a gathering (it
+ * sinks, arms drawn down and back), a big jump (arms flung up, back arched, heels up), the
+ * landing, a twirl in the air, and the afterglow in which it comes back to standing.
+ */
+export const CHEER = { gasp: 0.2, gather: 0.5, jump: 1.08, land: 1.28, twirl: 1.76, end: 2.45 } as const;
+export const CHEER_S = CHEER.end;
 /** The target moved this far from the plan: plan again. */
 const REPLAN_M = 0.08;
 const FACE_RAD = 0.06;
-/** Further round than this, an eager body hops round instead of stepping round. */
+/**
+ * Further round than this the body turns about in one move before it goes: an eager one hops
+ * round, a calm one steps round (one foot out to where it will stand, then the other).
+ */
 const PIVOT_RAD = 1.75;
 
-/** How each mood plays the same approach. Seconds, and shares of the body's own speeds. */
+/** How each mood plays the same approach. Seconds, metres, and shares of the body's own speeds. */
 export const ACTING = {
-  calm: { notice: 0.85, windup: 0.2, crouch: 0.35, settle: 0.25, reach: 0.8, hold: 0.9, retract: 0.7 },
-  interest: { notice: 0.5, windup: 0.24, crouch: 1, settle: 0.34, reach: 0.46, hold: 0.7, retract: 0.5 },
+  calm: {
+    notice: 0.85,
+    windup: 0.2,
+    crouch: 0.35,
+    pivot: 0.66,
+    pivotHop: 0,
+    settle: 0.25,
+    reach: 0.8,
+    hold: 1.1,
+    retract: 0.7,
+  },
+  interest: {
+    notice: 0.5,
+    windup: 0.24,
+    crouch: 1,
+    pivot: 0.36,
+    pivotHop: 0.09,
+    settle: 0.3,
+    reach: 0.46,
+    hold: 1.0,
+    retract: 0.42,
+  },
 } as const;
+
+/**
+ * An eager way to a place: not the straight line but a shallow curve that swings out to the side
+ * the body already faces, so it leaves in the way it is turned and comes round onto the thing.
+ * Only over open floor (each leg of it a clear straight walk), only when there is room to curve,
+ * and never when the place is straight ahead: otherwise the plain way.
+ */
+export function arcPath(
+  layout: RoomLayout,
+  from: readonly [number, number],
+  to: readonly [number, number],
+  heading: number,
+  plain: Path,
+): Path {
+  const dx = to[0] - from[0],
+    dz = to[1] - from[1],
+    far = Math.hypot(dx, dz);
+  if (plain.length !== 1 || far < 0.9) return plain;
+  const off = wrapAngle(Math.atan2(dx, dz) - heading);
+  if (Math.abs(off) < 0.45) return plain;
+  // The side the body faces: the curve begins by going its way, not by turning against it.
+  const side = off > 0 ? -1 : 1;
+  const bulge = Math.min(0.32, far * 0.17) * side;
+  // ((dz, -dx) / far is the left of the way; `side` picks left or right of it.)
+  const via: [number, number] = [from[0] + dx * 0.5 + (dz / far) * bulge, from[1] + dz * 0.5 - (dx / far) * bulge];
+  if (!walkable(layout, via[0], via[1])) return plain;
+  if (floorPath(layout, from, via).length !== 1 || floorPath(layout, via, to).length !== 1) return plain;
+  return [via, [to[0], to[1]]];
+}
 
 export function moodLimits(mood: Mood, body: BodyReach): MoveLimits {
   const walk = body.walkSpeed ?? DEFAULT_LIMITS.maxSpeed;
@@ -154,6 +209,8 @@ export const startApproach = (x: number, z: number, heading: number): ApproachSt
   pivotTo: 0,
   cheered: 0,
   reachFrom: 1,
+  stopAt: undefined,
+  stopHeading: 0,
 });
 
 const distance = (a: Vec3, b: Vec3) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
@@ -202,7 +259,8 @@ export function stepApproach(state: ApproachState, input: ApproachInput): Approa
   // A beat's length: its mood's, a fifth shorter to a quarter longer, by the next fixed number.
   const vary = (seconds: number) => seconds * (0.8 + 0.45 * draw(input.seed ?? 1, s.draws++));
   const begin = (phase: ApproachPhase, extra: Partial<ApproachState> = {}) => {
-    s = { ...s, phase, since: s.t, beat: 0, ...extra };
+    // (A braking belongs to the walk it ends and the settling after it, nothing else.)
+    s = { ...s, phase, since: s.t, beat: 0, stopAt: phase === 'settle' ? s.stopAt : undefined, ...extra };
   };
   const fresh = target && (!s.done || distance(s.done, target) > REPLAN_M);
   // Standing or walking with nothing to walk to: come to rest where it is.
@@ -217,7 +275,13 @@ export function stepApproach(state: ApproachState, input: ApproachInput): Approa
     (s.phase === 'idle' || s.phase === 'hold' || s.phase === 'retract' || s.phase === 'recover') &&
     s.mover.speed === 0
   ) {
-    begin('cheer', { cheered: input.cheer ?? 0, ...(target ? { done: target } : {}) });
+    begin('cheer', {
+      cheered: input.cheer ?? 0,
+      pivotFrom: s.mover.heading,
+      // The hand, if it was out, comes back as the cheer begins.
+      reachFrom: approachIntent(s, target).reachWeight,
+      ...(target ? { done: target } : {}),
+    });
     return s;
   }
 
@@ -245,7 +309,8 @@ export function stepApproach(state: ApproachState, input: ApproachInput): Approa
       if (elapsed < s.beat) break;
       const place = standPlace(input.layout, [s.mover.x, s.mover.z], target, input.body);
       const here: [number, number] = nearestFloor(input.layout, s.mover.x, s.mover.z);
-      const path = place ? floorPath(input.layout, here, place) : [];
+      const plain = place ? floorPath(input.layout, here, place) : [];
+      const path = place && s.mood === 'interest' ? arcPath(input.layout, here, place, s.mover.heading, plain) : plain;
       // No way there: keep looking at it (the look follows the live target), try again later.
       // (The clock goes back only a little: the head must not turn away meanwhile.)
       if (!place || !path.length) {
@@ -267,15 +332,14 @@ export function stepApproach(state: ApproachState, input: ApproachInput): Approa
       const first = s.path[0];
       const toward = first ? Math.atan2(first[0] - s.mover.x, first[1] - s.mover.z) : s.mover.heading;
       const off = wrapAngle(toward - s.mover.heading);
-      // Behind it: an eager body hops round in one go; a calm one steps round as it walks.
-      if (s.mood === 'interest' && Math.abs(off) > PIVOT_RAD)
-        begin('pivot', { pivotFrom: s.mover.heading, pivotTo: s.mover.heading + off });
+      // Behind it: the body turns about in one move (a hop when eager, a step round when calm).
+      if (Math.abs(off) > PIVOT_RAD) begin('pivot', { pivotFrom: s.mover.heading, pivotTo: s.mover.heading + off });
       else begin('walk');
       break;
     }
     case 'pivot': {
-      const p = Math.min(1, elapsed / PIVOT_S);
-      // Most of the turn in the middle of the hop, while the feet are off the floor.
+      const p = Math.min(1, elapsed / acting.pivot);
+      // Most of the turn in the middle of the move (for a hop: while the feet are off the floor).
       const k = p * p * (3 - 2 * p);
       const heading = s.pivotFrom + (s.pivotTo - s.pivotFrom) * k;
       s = { ...s, mover: { ...s.mover, heading, turn: dt > 0 ? wrapAngle(heading - s.mover.heading) / dt : 0 } };
@@ -300,6 +364,15 @@ export function stepApproach(state: ApproachState, input: ApproachInput): Approa
       }
       const moved = stepMover(s.mover, s.path, dt, limits);
       s = { ...s, mover: moved.mover, path: moved.path };
+      // A dart ends in a hard stop: from the moment the stopping distance is all that is left,
+      // the body is braking onto the place it will stand (the rig plants its feet there).
+      const end = s.path[s.path.length - 1];
+      if (end && s.path.length === 1 && s.mood === 'interest') {
+        const left = Math.hypot(end[0] - s.mover.x, end[1] - s.mover.z);
+        const stopping = (s.mover.speed * s.mover.speed) / (2 * limits.decel);
+        if (s.mover.speed > limits.maxSpeed * 0.6 && left <= stopping + 0.04)
+          s = { ...s, stopAt: [end[0], end[1]], stopHeading: Math.atan2(end[0] - s.mover.x, end[1] - s.mover.z) };
+      }
       if (moved.arrived) begin('settle', { beat: vary(acting.settle) });
       break;
     }
@@ -344,9 +417,14 @@ export function stepApproach(state: ApproachState, input: ApproachInput): Approa
       rest();
       if (elapsed >= RECOVER_S) begin('idle');
       break;
-    case 'cheer':
-      if (elapsed >= CHEER_S) begin('idle');
+    case 'cheer': {
+      // The twirl: once round in the air, back to the way it faced.
+      const q = Math.min(1, Math.max(0, (elapsed - CHEER.land) / (CHEER.twirl - CHEER.land)));
+      const heading = s.pivotFrom + Math.PI * 2 * (q * q * (3 - 2 * q));
+      s = { ...s, mover: { ...s.mover, heading, turn: dt > 0 ? wrapAngle(heading - s.mover.heading) / dt : 0 } };
+      if (elapsed >= CHEER_S) begin('idle', { mover: { ...s.mover, heading: s.pivotFrom, turn: 0 } });
       break;
+    }
     case 'toSeat': {
       const seat = s.seat;
       if (fresh || !input.seat || !seat) {
@@ -409,8 +487,24 @@ export interface BodyIntent {
   hopHeight: number;
   /** A start of attention (1 the moment a thing is noticed, gone within the notice): the ears. */
   alert: number;
-  /** Gladness (0–1): the face, the arms, the tail. */
+  /** Gladness (0–1): the face and the tail. */
   joy: number;
+  /** Both arms: −1 drawn down and back (gathering), +1 flung up and out. 0 leaves them be. */
+  arms: number;
+  /** The trunk: −1 curled forward, +1 arched back. */
+  arch: number;
+  /** In the air: 0 the legs tuck under, 1 the heels kick up behind. */
+  kick: number;
+  /** The moment of a touch (1 as the hand lands, gone in a moment): a small start through the body. */
+  tap: number;
+  /** How much the look goes to whoever is watching instead of the thing (0–1). */
+  toViewer: number;
+  /** A calm turn about: how far the body has still to turn (radians). The feet step straight to
+   * where they will stand at the end, instead of shuffling after the body. */
+  turnAhead: number;
+  /** Braking to a stop here (x, z), to face this way: the feet are to be planted for it. */
+  stopAt?: readonly [number, number];
+  stopHeading: number;
 }
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
@@ -436,8 +530,16 @@ export function approachIntent(s: ApproachState, target: Vec3 | undefined): Body
     crouch = 0,
     alert = 0,
     joy = 0,
+    arms = 0,
+    arch = 0,
+    kick = 0,
+    tap = 0,
+    toViewer = 0,
+    turnAhead = 0,
     hop: number | undefined,
     hopHeight = 0;
+  /** 0 → 1 over [from, to], eased. */
+  const over = (from: number, to: number) => ease(clamp01((elapsed - from) / (to - from)));
   switch (s.phase) {
     case 'idle':
     case 'toSeat':
@@ -456,8 +558,10 @@ export function approachIntent(s: ApproachState, target: Vec3 | undefined): Body
       break;
     case 'pivot':
       lookWeight = 1;
-      hop = clamp01(elapsed / PIVOT_S);
-      hopHeight = 0.09;
+      if (acting.pivotHop > 0) {
+        hop = clamp01(elapsed / acting.pivot);
+        hopHeight = acting.pivotHop;
+      } else turnAhead = wrapAngle(s.pivotTo - s.mover.heading);
       break;
     case 'walk':
     case 'settle':
@@ -467,10 +571,16 @@ export function approachIntent(s: ApproachState, target: Vec3 | undefined): Body
       lookWeight = 1;
       reachWeight = reachCurve(elapsed / s.beat, eager);
       break;
-    case 'hold':
+    case 'hold': {
+      // Not a held pose: the hand lands (a start), rests, lifts a little and pats once more, and
+      // meanwhile the look goes to whoever is watching ("see?") and back to the thing.
+      const p = clamp01(elapsed / Math.max(0.2, s.beat));
       lookWeight = 1;
-      reachWeight = 1;
+      reachWeight = 1 - 0.24 * Math.sin(Math.PI * clamp01((p - 0.34) / 0.3)) ** 2;
+      tap = Math.max(1 - clamp01(elapsed / 0.16), p > 0.62 ? 1 - clamp01((p - 0.62) / 0.14) : 0);
+      toViewer = ease(clamp01((p - 0.5) / 0.14)) * (1 - ease(clamp01((p - 0.86) / 0.14)));
       break;
+    }
     case 'retract':
       lookWeight = 1;
       reachWeight = s.reachFrom * (1 - ease(clamp01(elapsed / acting.retract)));
@@ -479,16 +589,40 @@ export function approachIntent(s: ApproachState, target: Vec3 | undefined): Body
       lookWeight = 1 - ease(clamp01(elapsed / RECOVER_S));
       break;
     case 'cheer': {
-      const p = clamp01(elapsed / CHEER_S);
+      const c = CHEER;
       lookWeight = 1;
-      joy = ease(clamp01(p / 0.1)) * (1 - ease(clamp01((p - 0.8) / 0.2)));
-      for (const [from, to] of CHEER_HOPS)
-        if (p >= from && p < to) {
-          hop = (p - from) / (to - from);
-          hopHeight = 0.17;
-        }
-      // Sinking before each hop.
-      for (const [from] of CHEER_HOPS) if (p < from && p > from - 0.08) crouch = ease((p - (from - 0.08)) / 0.08);
+      // To whoever is watching, from the gasp on (the gladness is shared), until it settles.
+      toViewer = over(0, 0.12) * (1 - over(c.twirl + 0.25, c.end));
+      // The hand that was on the thing comes away during the gasp.
+      reachWeight = s.reachFrom * (1 - over(0, c.gasp + 0.1));
+      // The gasp: a start, held still, leaning back a little.
+      alert = 1 - over(c.gasp, c.gasp + 0.15);
+      joy = over(c.gasp * 0.6, c.gather) * (1 - over(c.twirl + 0.3, c.end));
+      // Gathering: down, curled, arms drawn back. Then the release.
+      // (The release takes a tenth of a second: quick, but a slow display still sees it happen.)
+      crouch = 1.35 * over(c.gasp, c.gather - 0.05) * (1 - over(c.gather - 0.04, c.gather + 0.06));
+      arch =
+        0.35 * over(0, c.gasp) * (1 - over(c.gasp, c.gasp + 0.12)) -
+        0.9 * over(c.gasp, c.gather - 0.05) * (1 - over(c.gather - 0.03, c.gather + 0.07)) +
+        1 * over(c.gather, c.gather + 0.16) * (1 - over(c.jump - 0.22, c.jump + 0.02));
+      arms =
+        -1 * over(c.gasp + 0.03, c.gather - 0.06) * (1 - over(c.gather - 0.05, c.gather + 0.08)) +
+        // Up within a sixth of a second (fast, but an arm's swing, not a cut), held through the
+        // top, down through the landing and a little past (they swing on), half out again for
+        // the twirl.
+        1 * over(c.gather - 0.01, c.gather + 0.16) * (1 - over(c.jump - 0.1, c.land)) -
+        0.25 * over(c.jump + 0.04, c.land) * (1 - over(c.land, c.land + 0.14)) +
+        0.55 * over(c.land + 0.02, c.land + 0.16) * (1 - over(c.twirl - 0.08, c.twirl + 0.22));
+      if (elapsed >= c.gather && elapsed < c.jump) {
+        hop = (elapsed - c.gather) / (c.jump - c.gather);
+        hopHeight = 0.3;
+        kick = Math.sin(Math.PI * hop);
+      } else if (elapsed >= c.land && elapsed < c.twirl) {
+        hop = (elapsed - c.land) / (c.twirl - c.land);
+        hopHeight = 0.14;
+      }
+      // A second, smaller sinking before the twirl (on top of the landing's own).
+      crouch += 0.7 * over(c.jump + 0.04, c.land - 0.03) * (1 - over(c.land - 0.02, c.land + 0.04));
       break;
     }
   }
@@ -520,5 +654,13 @@ export function approachIntent(s: ApproachState, target: Vec3 | undefined): Body
     hopHeight,
     alert,
     joy,
+    arms,
+    arch,
+    kick,
+    tap,
+    toViewer,
+    turnAhead,
+    ...((s.phase === 'walk' || s.phase === 'settle') && s.stopAt ? { stopAt: s.stopAt } : {}),
+    stopHeading: s.stopHeading,
   };
 }

@@ -126,6 +126,7 @@ async function start() {
   const offset = new Vector3();
   const subject = new Vector3();
   let closeUp = 0;
+  let frameRate = 0;
   let frame: number | undefined;
   let last = 0;
   let draws = 0;
@@ -146,6 +147,12 @@ async function start() {
   const timing = { frames: 0, interval: 0, worstInterval: 0, body: 0, draw: 0 };
   function tick(now: number) {
     frame = undefined;
+    // For checking the motion at a slower display (the test hook): frames that come sooner than
+    // the asked rate are passed over, as a 30 or 60 Hz screen would not have shown them.
+    if (__WW_LIVING_TEST__ && frameRate && last && now - last < 1000 / frameRate - 1) {
+      wake();
+      return;
+    }
     const dt = last ? Math.min(0.1, (now - last) / 1000) : 0;
     last = now;
     look.lerp(reduce.matches ? aim.set(0, 0) : aim, 1 - Math.exp(-dt * 5));
@@ -223,6 +230,9 @@ async function start() {
     status.textContent = '描画が止まりました。ページを再読み込みしてください。';
   });
   resize();
+  // The first frame is drawn now; `resize` has already asked for one, and two requests would run
+  // two loops side by side for as long as the page draws (every frame done twice).
+  if (frame !== undefined) cancelAnimationFrame(frame);
   tick(performance.now());
   canvas.toggleAttribute('data-ready', true);
   status.textContent = '';
@@ -260,6 +270,10 @@ async function start() {
         },
         resident,
         /** 0 = the room's own camera; 0.3–0.6 = that fraction of its distance, on the character. */
+        /** Draws at most this many frames a second (0: every frame the display gives). */
+        frameRate: (rate: number) => {
+          frameRate = Math.max(0, rate);
+        },
         closeUp: (scale: number) => {
           closeUp = Math.min(1, Math.max(0, scale));
           wake();

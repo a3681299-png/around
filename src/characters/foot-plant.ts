@@ -88,9 +88,26 @@ export function footStrain(state: FootState): number {
 /**
  * One frame for one foot.
  * @param mayStep  the other foot is planted and not stepping (one foot at a time)
+ * @param moving   the body is running. A run's feet are not pinned at all: its motion is played
+ *                 at the pace of the ground it covers, so its feet keep the floor by themselves,
+ *                 while a pin made as a foot comes in to land (still moving forward) is outrun
+ *                 within a frame, the more so the slower the display, and the foot is seen to
+ *                 catch. Pins are for standing, turning on the spot, and a walk
  */
-export function stepFoot(state: FootState, sample: FootSample, dt: number, mayStep: boolean): FootState {
+export function stepFoot(
+  state: FootState,
+  sample: FootSample,
+  dt: number,
+  mayStep: boolean,
+  moving = false,
+): FootState {
   const s = { ...state, rested: state.rested + dt };
+  if (moving) {
+    // Under way no foot is pinned: whatever hold is left runs out (as it does in the air) and the
+    // feet are the motion's own. They are pinned afresh, where they stand, when the body stops.
+    const keep = Math.exp(-RELEASE * dt);
+    return { ...s, down: false, step: undefined, lift: 0, dx: s.dx * keep, dz: s.dz * keep, dyaw: s.dyaw * keep };
+  }
   const toeDown = sample.toeRise < (s.down && s.contact === 'toe' ? UP_M : DOWN_M);
   const ankleDown = sample.ankleRise < (s.down && s.contact === 'ankle' ? UP_M : DOWN_M);
   const contact: 'toe' | 'ankle' | undefined = toeDown ? 'toe' : ankleDown ? 'ankle' : undefined;

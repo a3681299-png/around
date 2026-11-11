@@ -3,6 +3,7 @@ import { DEFAULT_LIMITS, stepMover, wrapAngle, type Mover, type Path } from '../
 import { footAtRest, stepFoot, STEP_DRIFT_M, type FootSample, type FootState } from '../src/characters/foot-plant';
 import {
   approachIntent,
+  arcPath,
   reachCurve,
   standoff,
   startApproach,
@@ -177,8 +178,20 @@ test('a thing appears: it is noticed, walked up to, faced, touched, and the body
   const target: Vec3 = [1.2, 1.0, -0.8];
   const { state, phases } = live(() => target, 20);
   // (It notices in the first frame the thing is there.)
-  // (Since the acting was added, a walk begins with a small sinking, the wind-up.)
-  expect(phases).toEqual(['notice', 'windup', 'walk', 'settle', 'reach', 'hold', 'retract', 'recover', 'idle']);
+  // (Since the acting was added, a walk begins with a small sinking, the wind-up; and this
+  // thing is behind the body, so it turns about, the pivot, before it goes.)
+  expect(phases).toEqual([
+    'notice',
+    'windup',
+    'pivot',
+    'walk',
+    'settle',
+    'reach',
+    'hold',
+    'retract',
+    'recover',
+    'idle',
+  ]);
   // It stands where a hand reaches the thing, facing it.
   const flat = Math.hypot(target[0] - state.mover.x, target[2] - state.mover.z);
   expect(flat).toBeCloseTo(standoff(target, body, 0), 1);
@@ -274,7 +287,7 @@ test('with nothing to notice it goes and sits; a thing appearing gets it up, tou
   expect(phases.slice(0, 3)).toEqual(['toSeat', 'sitDown', 'sit']);
   // It sat down facing the way the seat faces, from the floor in front of it.
   expect(phases.join(' ')).toContain(
-    'sit standUp idle notice windup walk settle reach hold retract recover idle toSeat sitDown sit',
+    'sit standUp idle notice windup pivot walk settle reach hold retract recover idle toSeat sitDown sit',
   );
   expect(Math.hypot(state.mover.x - 1.5, state.mover.z + 1.2)).toBeLessThan(0.02);
   expect(Math.abs(wrapAngle(state.mover.heading - Math.PI / 2))).toBeLessThan(0.07);
@@ -316,9 +329,15 @@ test('interest meets a thing behind it with a start, a wind-up, a hop round, a d
     'recover',
     'idle',
   ]);
-  // A calm body steps round as it walks: it never leaves the floor.
-  expect(calm.phases).not.toContain('pivot');
+  // A calm body turns about too, but on its feet: it never leaves the floor, and it tells the
+  // feet how far round it still has to go (so each steps once, to where it will stand).
   expect(calm.frames.every((f) => f.intent.hop === undefined)).toBe(true);
+  const stepRound = calm.frames.filter((f) => f.phase === 'pivot').map((f) => Math.abs(f.intent.turnAhead));
+  expect(stepRound[0]!).toBeGreaterThan(1.7);
+  expect(stepRound[stepRound.length - 1]!).toBeLessThan(0.05);
+  for (let i = 1; i < stepRound.length; i++) expect(stepRound[i]!).toBeLessThanOrEqual(stepRound[i - 1]! + 1e-9);
+  // An eager one hops, and asks nothing of the feet meanwhile.
+  expect(eager.frames.filter((f) => f.phase === 'pivot').every((f) => f.intent.turnAhead === 0)).toBe(true);
   // The start: the ears' moment is at the notice and is over before the body moves.
   const notice = eager.frames.filter((f) => f.phase === 'notice');
   expect(notice[0]!.intent.alert).toBeGreaterThan(0.9);
@@ -412,4 +431,124 @@ test('an eager walk leaves in a curve where a calm one turns first', () => {
   };
   expect(moving(undefined)).toBeLessThan(Math.PI / 3);
   expect(moving(1.9)).toBeGreaterThan(moving(undefined) + 0.2);
+});
+
+// --- the acting, made into a performance -------------------------------------------------------
+
+test('a touch is not a held pose: the hand lands, pats once more, the look goes to the viewer and back', () => {
+  const run = play('interest', [0.9, 0.9, 0.9], 12);
+  const hold = run.frames.filter((f) => f.phase === 'hold');
+  expect(hold.length).toBeGreaterThan(30);
+  const hand = hold.map((f) => f.intent.reachWeight);
+  // On it at the start and at the end, lifted off a little in between (the second pat).
+  expect(hand[0]!).toBeCloseTo(1, 2);
+  expect(hand[hand.length - 1]!).toBeCloseTo(1, 2);
+  expect(Math.min(...hand)).toBeLessThan(0.85);
+  expect(Math.min(...hand)).toBeGreaterThan(0.6);
+  // Two starts through the body: as the hand lands, and at the second pat.
+  let starts = 0;
+  const taps = hold.map((f) => f.intent.tap);
+  for (let i = 1; i < taps.length; i++) if (taps[i]! > taps[i - 1]! + 0.5) starts++;
+  expect(taps[0]!).toBeGreaterThan(0.8);
+  expect(starts).toBe(1);
+  // The look leaves the thing for whoever watches, and is back on it before the hand comes away.
+  const share = hold.map((f) => f.intent.toViewer);
+  expect(share[0]).toBe(0);
+  expect(Math.max(...share)).toBe(1);
+  expect(share[share.length - 1]!).toBeLessThan(0.05);
+  // Nothing in it jumps.
+  for (let i = 1; i < hand.length; i++) expect(Math.abs(hand[i]! - hand[i - 1]!)).toBeLessThan(0.05);
+});
+
+test('a cheer is a gasp, a gathering, a big jump with arms up, a landing, a twirl and an afterglow', () => {
+  const target: Vec3 = [0.9, 0.9, 0.9];
+  const run = play('interest', target, 14, 1, 1.2);
+  const cheer = run.frames.filter((f) => f.phase === 'cheer');
+  const t0 = cheer[0]!.t;
+  const at = (seconds: number) => cheer.find((f) => f.t - t0 >= seconds)!.intent;
+  // The gasp: still on the floor, not yet sunk, ears' moment, the look already shared.
+  expect(at(0.1).hop).toBeUndefined();
+  expect(at(0.1).crouch).toBeLessThan(0.1);
+  expect(at(0.1).alert).toBeGreaterThan(0.9);
+  expect(at(0.15).toViewer).toBe(1);
+  // The gathering: deep, curled, arms back.
+  expect(at(0.42).crouch).toBeGreaterThan(1);
+  expect(at(0.42).arch).toBeLessThan(-0.6);
+  expect(at(0.42).arms).toBeLessThan(-0.8);
+  // The jump: far higher than a hop round, arms up before the top, back arched, heels up.
+  const jump = cheer.filter((f) => f.intent.hop !== undefined && f.intent.hopHeight > 0.25);
+  expect(jump.length).toBeGreaterThan(20);
+  const top = jump[Math.floor(jump.length / 2)]!.intent;
+  expect(top.arms).toBeGreaterThan(0.95);
+  expect(top.arch).toBeGreaterThan(0.8);
+  expect(top.kick).toBeGreaterThan(0.9);
+  expect(jump[Math.floor(jump.length / 4)]!.intent.arms).toBeGreaterThan(0.9);
+  // The twirl: a second, lower time in the air, once round, and it ends facing as it began.
+  const twirl = cheer.filter((f) => f.intent.hop !== undefined && f.intent.hopHeight < 0.25);
+  expect(twirl.length).toBeGreaterThan(15);
+  const before = cheer[0]!.intent.heading;
+  const turned = twirl[twirl.length - 1]!.intent.heading - before;
+  expect(turned).toBeGreaterThan(Math.PI * 1.9);
+  expect(Math.abs(wrapAngle(run.state.mover.heading - before))).toBeLessThan(1e-6);
+  // The afterglow: on the floor, the gladness fading, arms and trunk back to rest by the end.
+  const last = cheer[cheer.length - 1]!.intent;
+  expect(last.hop).toBeUndefined();
+  expect(Math.abs(last.arms)).toBeLessThan(0.05);
+  expect(Math.abs(last.arch)).toBeLessThan(0.05);
+  expect(last.joy).toBeLessThan(0.05);
+  // The pose values never jump (a sixtieth of a second moves them by a fraction).
+  for (const key of ['arms', 'arch', 'crouch', 'joy'] as const)
+    for (let i = 1; i < cheer.length; i++)
+      expect(Math.abs(cheer[i]!.intent[key] - cheer[i - 1]!.intent[key])).toBeLessThan(0.35);
+});
+
+test('an eager way curves out and comes round, over open floor only; straight ahead it stays straight', () => {
+  const from: [number, number] = [0, 0],
+    to: [number, number] = [1.2, 1.2];
+  const plain: Path = [[1.2, 1.2]];
+  // Facing well off the way: one point in between, to the side the body faces, on the floor.
+  const curved = arcPath(layout, from, to, -1.2, plain);
+  expect(curved).toHaveLength(2);
+  const [via] = curved;
+  const side = (via![0] - 0.6) * 1.2 - (via![1] - 0.6) * 1.2; // which side of the straight way
+  expect(Math.abs(side)).toBeGreaterThan(0.1);
+  const other = arcPath(layout, from, to, 2.8, plain);
+  const otherSide = (other[0]![0] - 0.6) * 1.2 - (other[0]![1] - 0.6) * 1.2;
+  expect(Math.sign(otherSide)).toBe(-Math.sign(side));
+  // Not much longer than the straight way (no wandering).
+  const length = Math.hypot(via![0], via![1]) + Math.hypot(to[0] - via![0], to[1] - via![1]);
+  expect(length).toBeLessThan(Math.hypot(to[0], to[1]) * 1.12);
+  // Straight ahead, near, or round a corner: the plain way, untouched.
+  expect(arcPath(layout, from, to, Math.PI / 4, plain)).toBe(plain);
+  expect(arcPath(layout, from, [0.4, 0.4], -1.2, [[0.4, 0.4]])).toHaveLength(1);
+  const corner: Path = [
+    [0.5, 1],
+    [1.2, 1.2],
+  ];
+  expect(arcPath(layout, from, to, -1.2, corner)).toBe(corner);
+  // Where the curve would leave the floor, the plain way.
+  const edge: [number, number] = [1.8, -1.8];
+  expect(arcPath(layout, [1.8, 1.8], edge, Math.PI / 2, [edge])).toHaveLength(1);
+});
+
+test('running, the feet are not pinned: a hold left over runs out, and they are pinned afresh at the stop', () => {
+  // Standing, then held 5 cm off by the body's move.
+  let foot = stepFoot(footAtRest(), sample(0, 0), 1 / 60, true);
+  foot = stepFoot(foot, sample(0.05, 0), 1 / 60, true);
+  expect(Math.hypot(foot.dx, foot.dz)).toBeCloseTo(0.05, 9);
+  // Running: no pin, no corrective step however far the motion's foot goes; the hold only shrinks.
+  let held = Math.hypot(foot.dx, foot.dz);
+  for (let i = 1; i <= 30; i++) {
+    foot = stepFoot(foot, sample(0.05 + i * 0.06, 0), 1 / 30, true, true);
+    expect(foot.down).toBe(false);
+    expect(foot.step).toBeUndefined();
+    expect(Math.hypot(foot.dx, foot.dz)).toBeLessThan(held);
+    held = Math.hypot(foot.dx, foot.dz);
+  }
+  expect(held).toBeLessThan(1e-3);
+  // Stopped: pinned where it stands, and held there again.
+  foot = stepFoot(foot, sample(2, 0), 1 / 60, true);
+  expect(foot.down).toBe(true);
+  foot = stepFoot(foot, sample(2.03, 0), 1 / 60, true);
+  expect(foot.dx).toBeCloseTo(-0.03, 3);
 });

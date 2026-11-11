@@ -13,7 +13,7 @@ import {
   type Scene,
 } from 'three';
 import { prepareVerifiedSource } from '../assets/verified-source';
-import { loadLivingBody, type LivingBodyFacts } from '../renderers/three/living-body';
+import { loadLivingBody, type LivingBody, type LivingBodyFacts } from '../renderers/three/living-body';
 import {
   approachIntent,
   startApproach,
@@ -49,6 +49,21 @@ export interface LivingResident {
   state(): ApproachState & { target: Vec3 | undefined };
   facts(): LivingBodyFacts;
   metrics(): { arm: number; shoulderHeight: number; walkSpeed: number; height: number };
+  /**
+   * For measuring the motion (the test hook): starts keeping, each frame, the time, the phase,
+   * where the main joints are and how far the planted feet have slid; returns what was kept since
+   * the last call.
+   */
+  trace(): TraceFrame[];
+}
+export interface TraceFrame {
+  t: number;
+  phase: string;
+  speed: number;
+  slide: number;
+  ground: number;
+  feet: LivingBodyFacts['feet'];
+  joints: ReturnType<LivingBody['joints']>;
 }
 
 const bytes = async (url: URL) => {
@@ -115,6 +130,8 @@ export async function loadLivingResident(
   let seat: Seat | undefined;
   let mood: Mood = 'calm';
   let cheers = 0;
+  let tracing = false;
+  const frames: TraceFrame[] = [];
   let seated = 0;
   // An eager dart is a share of the run, not the run itself: the room is a few steps across.
   const measures = { ...body.metrics, runSpeed: Math.min(body.metrics.runSpeed, body.metrics.walkSpeed * 2.9) };
@@ -138,7 +155,17 @@ export async function loadLivingResident(
       // body sits on the surface, not in it), less what the surface has given.
       if (intent.seat)
         intent.seat = [intent.seat[0], intent.seat[1] + body.metrics.height * 0.06 - sunk, intent.seat[2]];
-      body.update(intent, dt, layout.floorY);
+      body.update(intent, dt, layout.floorY, [camera.position.x, camera.position.y, camera.position.z]);
+      if (tracing && frames.length < 20000)
+        frames.push({
+          t: state.t,
+          phase: state.phase,
+          speed: state.mover.speed,
+          slide: body.facts().slide,
+          ground: body.facts().groundSlide,
+          feet: body.facts().feet,
+          joints: body.joints(),
+        });
       marker.visible = Boolean(target);
       if (target) {
         marker.position.set(target[0], target[1], target[2]);
@@ -164,6 +191,10 @@ export async function loadLivingResident(
     },
     state: () => ({ ...state, target }),
     facts: () => body.facts(),
+    trace() {
+      tracing = true;
+      return frames.splice(0);
+    },
     metrics: () => ({ ...body.metrics }),
   };
 }
