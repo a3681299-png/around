@@ -14,7 +14,7 @@ import {
 } from 'three';
 import { prepareVerifiedSource } from '../assets/verified-source';
 import { loadLivingBody, type LivingBodyFacts } from '../renderers/three/living-body';
-import { approachIntent, startApproach, stepApproach, type ApproachState } from '../characters/approach';
+import { approachIntent, startApproach, stepApproach, type ApproachState, type Seat } from '../characters/approach';
 import type { Vec3 } from '../characters/two-bone-ik';
 import { standPoint, type RoomLayout } from '../world/room-life';
 
@@ -22,12 +22,17 @@ interface CharacterManifest {
   vrm: string;
   idle: string;
   walk: string;
+  sitDown?: string;
+  sit?: string;
+  standUp?: string;
 }
 
 export interface LivingResident {
   update(dt: number, camera: Camera): void;
   /** A point in the room's metres to notice, walk to and touch; undefined takes it away. */
   setTarget(target: Vec3 | undefined): void;
+  /** A seat of the room by its id (sit_chair, sit_bed…) to go and sit on; undefined stands up. */
+  sit(spot: string | undefined): boolean;
   state(): ApproachState & { target: Vec3 | undefined };
   facts(): LivingBodyFacts;
   metrics(): { arm: number; shoulderHeight: number; walkSpeed: number; height: number };
@@ -48,14 +53,24 @@ export async function loadLivingResident(scene: Scene, base: URL, layout: RoomLa
     if (!/^[\w.-]{1,80}$/.test(name)) throw new Error('キャラクターの素材の名前が正しくありません。');
     return new URL(name, folder);
   };
-  const [vrm, idle, walk] = await Promise.all([
+  const maybe = (name: string | undefined) => (name ? bytes(file(name)) : undefined);
+  const [vrm, idle, walk, sitDown, sit, standUp] = await Promise.all([
     bytes(file(manifest.vrm)),
     bytes(file(manifest.idle)),
     bytes(file(manifest.walk)),
+    maybe(manifest.sitDown),
+    maybe(manifest.sit),
+    maybe(manifest.standUp),
   ]);
   const prepared = prepareVerifiedSource(vrm, 'model/gltf-binary');
   if (!prepared.modelBuffer) throw new Error('キャラクターのモデルを検証できませんでした。');
-  const body = await loadLivingBody(prepared.modelBuffer, { idle, walk });
+  const body = await loadLivingBody(prepared.modelBuffer, {
+    idle,
+    walk,
+    ...(sitDown ? { sitDown } : {}),
+    ...(sit ? { sit } : {}),
+    ...(standUp ? { standUp } : {}),
+  });
   scene.add(body.root);
   // The room's light is baked into unlit materials, so these reach only the character: a cool
   // night fill and a warmer key from the desk lamp's side.
@@ -77,6 +92,7 @@ export async function loadLivingResident(scene: Scene, base: URL, layout: RoomLa
   const [x, z] = center ? standPoint(layout, center) : [0, 0];
   let state = startApproach(x, z, center?.heading ?? 0);
   let target: Vec3 | undefined;
+  let seat: Seat | undefined;
   const limits = {
     maxSpeed: Math.min(0.9, body.metrics.walkSpeed),
     accel: body.metrics.walkSpeed * 1.5,
@@ -86,7 +102,14 @@ export async function loadLivingResident(scene: Scene, base: URL, layout: RoomLa
   };
   return {
     update(dt, camera) {
-      state = stepApproach(state, { dt, layout, body: body.metrics, limits, ...(target ? { target } : {}) });
+      state = stepApproach(state, {
+        dt,
+        layout,
+        body: body.metrics,
+        limits,
+        ...(target ? { target } : {}),
+        ...(seat ? { seat } : {}),
+      });
       body.update(approachIntent(state, target), dt, layout.floorY);
       marker.visible = Boolean(target);
       if (target) {
@@ -96,6 +119,14 @@ export async function loadLivingResident(scene: Scene, base: URL, layout: RoomLa
     },
     setTarget(next) {
       target = next && next.every(Number.isFinite) ? [next[0], next[1], next[2]] : undefined;
+    },
+    sit(id) {
+      const spot = id ? layout.spots.find((s) => s.id === id && s.kind === 'sit') : undefined;
+      seat =
+        spot && sit
+          ? { x: spot.x, y: spot.y, z: spot.z, heading: spot.heading, stand: standPoint(layout, spot) }
+          : undefined;
+      return Boolean(seat);
     },
     state: () => ({ ...state, target }),
     facts: () => body.facts(),

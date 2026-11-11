@@ -11,7 +11,29 @@ import { floorPath, nearestFloor, walkable, type RoomLayout } from '../world/roo
 import { DEFAULT_LIMITS, stepMover, turnToward, wrapAngle, type MoveLimits, type Mover, type Path } from './locomotion';
 import type { Vec3 } from './two-bone-ik';
 
-export type ApproachPhase = 'idle' | 'notice' | 'walk' | 'settle' | 'reach' | 'hold' | 'retract' | 'recover';
+export type ApproachPhase =
+  | 'idle'
+  | 'notice'
+  | 'walk'
+  | 'settle'
+  | 'reach'
+  | 'hold'
+  | 'retract'
+  | 'recover'
+  | 'toSeat'
+  | 'sitDown'
+  | 'sit'
+  | 'standUp';
+
+/** A seat to rest on: where the hips go (the room's marker), the way it faces, and the floor
+ * point in front of it where the feet stand before sitting down. */
+export interface Seat {
+  x: number;
+  y: number;
+  z: number;
+  heading: number;
+  stand: readonly [number, number];
+}
 
 /** The body's own measures the plan needs (the rig measures them from the model). */
 export interface BodyReach {
@@ -35,12 +57,16 @@ export interface ApproachState {
   hand: 'left' | 'right';
   /** The last target seen, kept while the hand comes back from a target that vanished. */
   last: Vec3 | undefined;
+  /** The seat being walked to or sat on (kept while standing up from one that was taken away). */
+  seat: Seat | undefined;
 }
 
 export interface ApproachInput {
   dt: number;
   layout: RoomLayout;
   target?: Vec3;
+  /** With nothing to notice, the body goes and sits here; a thing appearing gets it up again. */
+  seat?: Seat;
   body: BodyReach;
   limits?: MoveLimits;
 }
@@ -50,6 +76,8 @@ export const REACH_S = 0.8;
 export const HOLD_S = 0.9;
 export const RETRACT_S = 0.7;
 export const RECOVER_S = 0.6;
+export const SIT_DOWN_S = 1.3;
+export const STAND_UP_S = 1.05;
 /** The target moved this far from the plan: plan again. */
 const REPLAN_M = 0.08;
 const FACE_RAD = 0.06;
@@ -64,6 +92,7 @@ export const startApproach = (x: number, z: number, heading: number): ApproachSt
   done: undefined,
   hand: 'right',
   last: undefined,
+  seat: undefined,
 });
 
 const distance = (a: Vec3, b: Vec3) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
@@ -122,7 +151,41 @@ export function stepApproach(state: ApproachState, input: ApproachInput): Approa
     case 'idle':
       rest();
       if (fresh) begin('notice');
-      else if (!target && s.done) s = { ...s, done: undefined };
+      else {
+        if (!target && s.done) s = { ...s, done: undefined };
+        if (input.seat && s.mover.speed === 0) {
+          const path = floorPath(input.layout, nearestFloor(input.layout, s.mover.x, s.mover.z), input.seat.stand);
+          if (path.length) begin('toSeat', { path, seat: input.seat });
+        }
+      }
+      break;
+    case 'toSeat': {
+      const seat = s.seat;
+      if (fresh || !input.seat || !seat) {
+        // Something to see, or the seat is gone: stop walking there.
+        rest();
+        if (s.mover.speed === 0) begin('idle', { seat: undefined });
+        break;
+      }
+      if (s.path.length) {
+        const moved = stepMover(s.mover, s.path, dt, limits);
+        s = { ...s, mover: moved.mover, path: moved.path };
+        break;
+      }
+      // In front of the seat: turn the back to it (the way the seat faces), then sit.
+      s = { ...s, mover: { ...turnToward(s.mover, seat.heading, dt, limits.turnRate), speed: 0 } };
+      if (Math.abs(wrapAngle(seat.heading - s.mover.heading)) < FACE_RAD)
+        begin('sitDown', { mover: { ...s.mover, turn: 0 } });
+      break;
+    }
+    case 'sitDown':
+      if (elapsed >= SIT_DOWN_S) begin('sit');
+      break;
+    case 'sit':
+      if (fresh || !input.seat) begin('standUp');
+      break;
+    case 'standUp':
+      if (elapsed >= STAND_UP_S) begin('idle', { seat: undefined });
       break;
     case 'notice': {
       rest();
@@ -218,6 +281,12 @@ export interface BodyIntent {
   reach?: Vec3;
   reachWeight: number;
   hand: 'left' | 'right';
+  /** Sitting: which motion, how far into it (seconds), how seated the body is (0 standing, 1 on
+   * the seat) and where the hips go when seated. */
+  pose: 'stand' | 'sitDown' | 'sit' | 'standUp';
+  poseTime: number;
+  seated: number;
+  seat?: Vec3;
 }
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
@@ -230,6 +299,10 @@ export function approachIntent(s: ApproachState, target: Vec3 | undefined): Body
     reachWeight = 0;
   switch (s.phase) {
     case 'idle':
+    case 'toSeat':
+    case 'sitDown':
+    case 'sit':
+    case 'standUp':
       break;
     case 'notice':
       lookWeight = ease(clamp01(elapsed / (NOTICE_S * 0.6)));
@@ -265,5 +338,16 @@ export function approachIntent(s: ApproachState, target: Vec3 | undefined): Body
     lookWeight: at ? lookWeight : 0,
     reachWeight: at ? reachWeight : 0,
     hand: s.hand,
+    pose: s.phase === 'sitDown' || s.phase === 'sit' || s.phase === 'standUp' ? s.phase : 'stand',
+    poseTime: elapsed,
+    seated:
+      s.phase === 'sit'
+        ? 1
+        : s.phase === 'sitDown'
+          ? ease(clamp01(elapsed / SIT_DOWN_S))
+          : s.phase === 'standUp'
+            ? 1 - ease(clamp01(elapsed / STAND_UP_S))
+            : 0,
+    ...(s.seat ? { seat: [s.seat.x, s.seat.y, s.seat.z] as Vec3 } : {}),
   };
 }

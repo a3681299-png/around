@@ -36,7 +36,7 @@ WWT をもとにした、コンテスト用の**独立した Web 作品**。3D �
 
 ## 3. キャラクターの設計
 
-**キャラクターは未実装。** 部屋の中のキャラの暮らし（歩く・座る・隠れる）の仕組みは既存の物がそのまま使える。下の「提案」は、実装前の案で、翔太の確認を取っていない。
+**2026-11-11 追記：身体制御の基礎を実装した（下の「11」と [living-body.md](living-body.md)）。この節の「提案」は実装前の案で、実際は `room-life.ts` を変えず `src/characters/` に足した。** 以下は実装前の記録。部屋の中のキャラの暮らし（歩く・座る・隠れる）の仕組みは既存の物がそのまま使える。下の「提案」は、実装前の案で、翔太の確認を取っていない。
 
 ### 既存の部品（再利用する）
 
@@ -137,7 +137,7 @@ WW_LM_SIZE=2048 WW_SAMPLES=256 WW_VC_SAMPLES=128 WW_OUT=art/living-room/web \
 
 ## 7. 未実装・保留
 
-- キャラクター、UI カード、気づく・近づく・触れる・喜ぶ、表情（上の「3」）
+- UI カード（今は仮の目印）、クリックで喜ぶ、表情。体の残り（待機の腕・止まったあとの足幅・座りの脚など）は [living-body.md](living-body.md) の 7 節
 - 参考画像（gogh の 2 枚）との見比べ：画像が会話に届かず、依頼文の言葉でだけ見比べた。**美術的には「一旦完成」（翔太の判断）で、完成とは確認していない**
 - 美術の残り：窓の外の空（ブラウザーで黒く、Blender で白っぽい）、布のしわ、金属・ガラスの照り返し、右手前（チェストが切れる・ギターが黒い）、壁の上の密度、ブラウザーと Blender の彩度の差（[living-room-art.md](living-room-art.md) の 6 節）
 - `room.glb` は未圧縮で 14.7MB（meshopt などで縮める余地）。GPU の重さは未測定
@@ -146,12 +146,15 @@ WW_LM_SIZE=2048 WW_SAMPLES=256 WW_VC_SAMPLES=128 WW_OUT=art/living-room/web \
 
 ## 8. 次の作業
 
-1. フェリスの規約を確認する（上）。決まるまでは、ミルドで一連の動きを作る
-2. `room-life.ts` の `notice`・`joy` と UI の入力を、unit テストを先に書いて足す（3 の提案）
-3. 部屋のページにキャラ（`loadRoomResident`）を載せ、生活（歩く・座る・隠れる）を画像で見る。歩く足の滑りは `docs/living-room.md` で「目で確かめきっていない」とある
-4. UI カードの投影・出現・クリック・閉じるの配線。一連の動きを録画で見て直す
-5. フェリスに決まったら、VRM への変換と動作の割り当て（`docs/characters/mirdo.md` の道具）
-6. 部屋の残りの美術の問題を、キャラが入った画で見て優先を決める
+2026-11-11 に身体制御の基礎ができた（下の「11」）。その続き：
+
+1. フェリスの規約を確認する（上の「7」）。確認できるまで、モデル・テクスチャ・変換した VRM・フェリスが写った録画はリポジトリにも公開にも出さない
+2. 録画を通して見て、[living-body.md](living-body.md) 7 節の不自然な所を直す（待機の腕、止まったあとの足幅、歩き出しの1歩、座りの脚）
+3. 生活との接続：今の行動（`approach.ts`）は「目印に触れる」と「席に座る」だけ。`room-life.ts` の暮らし（歩く・座る・隠れるの選び方）から同じ体を動かす
+4. UI カードの投影・出現・クリック・閉じるの配線と、喜ぶ反応（表情は VRM に 13 入れてある）
+5. 椅子・ビーズクッション・座布団での座り方を見る。家具との干渉を見る
+6. 重さ（モデル 55,043 三角形、毎フレーム描く）を測り、必要なら軽くする
+7. 部屋の残りの美術の問題を、キャラが入った画で見て優先を決める
 
 危ないと思う所：`room-life.ts` は `src/world/` の中核。追加だけにして、既存の `tests/` の挙動を変えない。`main` と他の worktree には触れない。私用の素材をリポジトリに入れない。
 
@@ -168,3 +171,12 @@ WW_LM_SIZE=2048 WW_SAMPLES=256 WW_VC_SAMPLES=128 WW_OUT=art/living-room/web \
 
 - ノート PC の worktree：`feat/living-onboarding`、`origin` と同じ。`77f0653`（デスクトップの運用の文書）を fast-forward で取り込み済み
 - 未コミットで残してあるもの：`art/living-room/living-room.blend`（Blender が 14:18 に保存し直した。コミットした版と中身が同じかは未確認。コミットした版の控えが同じフォルダの `living-room.blend1`、未追跡）。消さない。コミットする前に、`git lfs` で取れる版（e3625b29…）と比べて決める
+
+## 11. 身体制御の基礎（2026-11-11、デスクトップ PC）
+
+フェリスが、部屋で待機 → 目印を見る → 向きを変えて歩く → 減速して止まる → 向きを合わせる → 目印の座標へ手を伸ばす → 戻る、を自分で行う。席に座る・立つもできる。設計・順番・再現手順・結果・残りは [living-body.md](living-body.md)。
+
+- 足したもの：`src/characters/locomotion.ts`・`approach.ts`・`foot-plant.ts`、`src/renderers/three/living-body.ts`、`src/living-room/resident.ts`、`scripts/living-room/record.mjs`、`scripts/characters/felis.json`、`tests/living-body.spec.ts`
+- 変えたもの：`src/living-room/index.ts`・`scripts/build-living-room.mjs`（キャラは環境変数で渡したときだけ、`.work` の出力にだけ入る）、`scripts/characters/fbx_to_vrm.py`（材質ごとのテクスチャ、後ろ向きの FBX）、`playwright.config.ts`（unit の一覧に1行。中核）
+- フェリスの素材と、フェリスが写った録画・画像は**リポジトリに入れていない**。手元の `C:\wwt-private\Felis_v0.8.1\` の下（`extracted`・`work`・`motions`）。ノート PC で続けるときは [living-body.md](living-body.md) 5 節の手順で作り直す（Blender に VRM Add-on が要る）
+- デスクトップの状態：`feat/living-onboarding`、未コミットの変更なし、`origin` と同じ。今回 LFS の物は足していない

@@ -249,3 +249,32 @@ test('a thing no floor is near is looked at, not walked into; a touched thing is
   const moved = live(() => [0.6, 1.0, 0.9], 14, 1 / 60, once.state);
   expect(moved.phases).toContain('hold');
 });
+
+test('with nothing to notice it goes and sits; a thing appearing gets it up, touched, and it sits again', () => {
+  const seat = { x: 1.2, y: 0.45, z: -1.2, heading: Math.PI / 2, stand: [1.5, -1.2] as const };
+  const target: Vec3 = [-0.8, 1.0, 0.6];
+  let state = startApproach(0, 0, 0);
+  const phases: ApproachPhase[] = [];
+  const seated: number[] = [];
+  const dt = 1 / 60;
+  for (let t = 0; t < 40; t += dt) {
+    // The thing shows up once the body has been seated a while.
+    const at =
+      phases.includes('sit') && state.phase !== 'toSeat' && phases.filter((p) => p === 'sit').length < 2 && t > 12
+        ? target
+        : undefined;
+    state = stepApproach(state, { dt, layout, body, seat, ...(at ? { target: at } : {}) });
+    if (phases[phases.length - 1] !== state.phase) phases.push(state.phase);
+    seated.push(approachIntent(state, at).seated);
+  }
+  expect(phases.slice(0, 3)).toEqual(['toSeat', 'sitDown', 'sit']);
+  // It sat down facing the way the seat faces, from the floor in front of it.
+  expect(phases.join(' ')).toContain(
+    'sit standUp idle notice walk settle reach hold retract recover idle toSeat sitDown sit',
+  );
+  expect(Math.hypot(state.mover.x - 1.5, state.mover.z + 1.2)).toBeLessThan(0.02);
+  expect(Math.abs(wrapAngle(state.mover.heading - Math.PI / 2))).toBeLessThan(0.07);
+  // Lowering and rising are gradual; it never walks while seated.
+  for (let i = 1; i < seated.length; i++) expect(Math.abs(seated[i]! - seated[i - 1]!)).toBeLessThan(0.03);
+  expect(approachIntent(state, undefined).pose).toBe('sit');
+});

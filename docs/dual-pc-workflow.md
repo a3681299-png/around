@@ -11,17 +11,18 @@
 
 ## デスクトップの構成（2026-11-11 確認）
 
-| 項目                 | 内容                                                                                                                  |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| 本体のチェックアウト | `C:\Users\kuros\GitHub-Projects\web-world-themes`（`codex/creator-editor-spike`、clean）                              |
-| 作業用 worktree      | `.work\living-onboarding`（`feat/living-onboarding`、`origin` を追跡）。既存の worktree には触らない                  |
-| 素材リポジトリ       | `C:\wwt-private`（`a3681299-png/wwt-private-assets`、`main`）。`git lfs fsck` OK、LFS 145 件すべて実体あり            |
-| Felis                | `C:\wwt-private\Felis_v0.8.1\FBX\Felis.fbx`・`Felis_Android.fbx`（未追跡のまま。リポジトリに入れない）                |
-| Node.js / npm        | 24.11.1 / 11.6.2。worktree で `npm ci`                                                                                |
-| Git LFS              | 3.8.1。`gh` は `a3681299-png` でログイン済み                                                                          |
-| Blender              | 5.2.2 LTS（`C:\Program Files\Blender Foundation\Blender 5.2\blender.exe`）                                            |
-| 環境変数             | `WW_VRM_FILE`・`WW_CHARACTER_VRM`・`WW_VRMA_DIR`・`WW_CHARACTER_MOTIONS` は `C:\wwt-private\mirdo\...` を指す設定済み |
-| Blender MCP          | **未設定**（Claude Code の MCP 一覧が空、`uvx` もない、Blender のユーザーアドオンもなし）。必要になったら別途入れる   |
+| 項目                 | 内容                                                                                                                                                                                           |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 本体のチェックアウト | `C:\Users\kuros\GitHub-Projects\web-world-themes`（`codex/creator-editor-spike`、clean）                                                                                                       |
+| 作業用 worktree      | `.work\living-onboarding`（`feat/living-onboarding`、`origin` を追跡）。既存の worktree には触らない                                                                                           |
+| 素材リポジトリ       | `C:\wwt-private`（`a3681299-png/wwt-private-assets`、`main`）。`git lfs fsck` OK、LFS 145 件すべて実体あり                                                                                     |
+| Felis                | `C:\wwt-private\Felis_v0.8.1\FBX\Felis.fbx`・`Felis_Android.fbx`（未追跡のまま。リポジトリに入れない）                                                                                         |
+| Node.js / npm        | 24.11.1 / 11.6.2。worktree で `npm ci`                                                                                                                                                         |
+| Git LFS              | 3.8.1。`gh` は `a3681299-png` でログイン済み                                                                                                                                                   |
+| Blender              | 5.2.2 LTS（`C:\Program Files\Blender Foundation\Blender 5.2\blender.exe`）                                                                                                                     |
+| 環境変数             | `WW_VRM_FILE`・`WW_CHARACTER_VRM`・`WW_VRMA_DIR`・`WW_CHARACTER_MOTIONS` は `C:\wwt-private\mirdo\...` を指す設定済み                                                                          |
+| Blender MCP          | 使える（2026-11-11、アドオン 1.8）。`read_factory_settings` を MCP から呼ぶとアドオンが止まり、Blender で「Start MCP Server」を押し直すことになる。まとまった処理はヘッドレスの Blender で行う |
+| VRM Add-on           | 2026-11-11 に Blender の公式リポジトリから入れた（`blender --online-mode --command extension install vrm --enable`）。`fbx_to_vrm.py`・`retarget_vrma.py` に要る                               |
 
 ## worktree の作り方（LFS の実体が GitHub にない間）
 
@@ -58,4 +59,4 @@ git lfs pull
 
 1. 指定されていた引き継ぎ文書は `docs/living-onboarding-handoff.md` として届いた
 2. `feat/living-onboarding` は `codex/creator-editor-spike` の子孫ではなく、`codex/living-room`（`eca7c0a`）から伸びている。作業ブランチへの取り込み時に別途整理が要る
-3. Blender MCP は、デスクトップでは未設定。部屋の作り直しは `scripts/living-room/run_all.py`（MCP 不要）で足りる
+3. フェリスの素材（取り出したテクスチャ・変換した VRM・当てた動作・録画）は各 PC の `C:\wwt-private\Felis_v0.8.1\` にだけあり、同期されない。もう一方の PC では [living-body.md](living-body.md) 5 節の手順で作り直す

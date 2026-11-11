@@ -8,7 +8,7 @@
 // the desk). The window is real (GPU) but off screen, as tests/fixtures.ts places it. The output
 // shows a local character: keep it out of the repository (docs/living-body.md).
 import { chromium } from '@playwright/test';
-import { mkdirSync, readdirSync, renameSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { createPlaygroundServer } from '../playground/serve.mjs';
 
@@ -20,6 +20,8 @@ if (!targets.length) targets.push([-0.9, 0.95, -0.55]);
 const width = Number(process.env.WW_RECORD_WIDTH ?? 1280);
 const height = Number(process.env.WW_RECORD_HEIGHT ?? 720);
 mkdirSync(out, { recursive: true });
+// The phase pictures of an earlier run would mix with this one's (they are numbered alike).
+for (const file of readdirSync(out)) if (/^\d\d-t\d+-\w+\.png$/.test(file)) rmSync(join(out, file));
 const server = createPlaygroundServer(resolve(process.env.WW_LIVING_OUT ?? '.work/living-room-preview'));
 await new Promise((done) => server.listen(0, '127.0.0.1', done));
 const { port } = server.address();

@@ -43,6 +43,10 @@ import type { BodyIntent, BodyReach } from '../../characters/approach';
 export interface LivingBodyMotions {
   idle: Uint8Array;
   walk: Uint8Array;
+  /** Sitting down, seated (a loop) and standing up. Without them the body does not sit. */
+  sitDown?: Uint8Array;
+  sit?: Uint8Array;
+  standUp?: Uint8Array;
 }
 export interface LivingBodyMetrics extends BodyReach {
   height: number;
@@ -136,9 +140,13 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
   if (!vrm) throw new Error('VRMのHumanoidを読み込めませんでした。');
   VRMUtils.removeUnnecessaryVertices(vrm.scene);
   VRMUtils.rotateVRM0(vrm);
-  const [idleAnimation, walkAnimation] = await Promise.all([
+  const optional = (bytes: Uint8Array | undefined) => (bytes ? parseVrmAnimation(bytes) : undefined);
+  const [idleAnimation, walkAnimation, sitDownAnimation, sitAnimation, standUpAnimation] = await Promise.all([
     parseVrmAnimation(motions.idle),
     parseVrmAnimation(motions.walk),
+    optional(motions.sitDown),
+    optional(motions.sit),
+    optional(motions.standUp),
   ]);
 
   const root = new Group();
@@ -218,6 +226,18 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
   };
   const idle = play(idleClip),
     walk = play(walkClip);
+  // Sitting: the three motions each with a weight of its own, eased toward what the behaviour asks.
+  const seatClips = (
+    [
+      ['sitDown', sitDownAnimation],
+      ['sit', sitAnimation],
+      ['standUp', standUpAnimation],
+    ] as const
+  ).flatMap(([pose, animation]) => {
+    if (!animation) return [];
+    const clip = vrmAnimationClip(animation, vrm);
+    return [{ pose, clip, action: play(clip), weight: 0 }];
+  });
 
   const metrics: LivingBodyMetrics = {
     arm: upperArmLength + lowerArmLength + handLength,
@@ -301,8 +321,25 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
       if (stepLength > 0.01) cycle = (cycle + (intent.speed * dt) / stepLength) % 1;
       idle.time = time % (idleClip.duration || 1);
       walk.time = cycle * (walkClip.duration || 1);
-      idle.setEffectiveWeight(1 - walkWeight);
-      walk.setEffectiveWeight(walkWeight);
+      // Sitting motions take over from standing ones by their own eased weights (never a cut).
+      let sitting = 0;
+      for (const seat of seatClips) {
+        // Seated is the fallback for a missing sit-down or stand-up motion.
+        const wanted =
+          intent.pose === seat.pose ||
+          (seat.pose === 'sit' && intent.pose !== 'stand' && !seatClips.some((c) => c.pose === intent.pose));
+        seat.weight = approach(seat.weight, wanted ? 1 : 0, 8, dt);
+        if (seat.weight < 0.002 && !wanted) seat.weight = 0;
+        sitting += seat.weight;
+        const length = seat.clip.duration || 1;
+        // One-shot motions follow the behaviour's own clock and hold their last frame.
+        seat.action.time = seat.pose === 'sit' ? time % length : Math.min(length - 1e-3, Math.max(0, intent.poseTime));
+      }
+      const share = sitting > 1 ? 1 / sitting : 1;
+      const standing = Math.max(0, 1 - sitting * share);
+      for (const seat of seatClips) seat.action.setEffectiveWeight(seat.weight * share);
+      idle.setEffectiveWeight((1 - walkWeight) * standing);
+      walk.setEffectiveWeight(walkWeight * standing);
       for (const g of given) {
         g.node.quaternion.copy(g.q);
         g.node.position.copy(g.p);
@@ -381,6 +418,15 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
       // 3. Legs. The feet the motion has on the floor stay on their spot; a foot left too far
       // behind steps. The hips come down when a pinned foot would be out of the leg's reach.
       root.updateWorldMatrix(true, true);
+      // Seated: the hips go to the seat (the room's marker is where the hips rest), by as much
+      // as the body is seated, so it lowers onto the seat instead of dropping there.
+      if (intent.seat && intent.seated > 0) {
+        hips.getWorldPosition(v);
+        root.position.x += (intent.seat[0] - v.x) * intent.seated;
+        root.position.y += (intent.seat[1] - v.y) * intent.seated;
+        root.position.z += (intent.seat[2] - v.z) * intent.seated;
+        root.updateWorldMatrix(true, true);
+      }
       const samples = sides.map((leg) => {
         const ankle = leg.foot.getWorldPosition(new Vector3()),
           toe = toeOf(leg, new Vector3());
@@ -413,7 +459,8 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
           sin = Math.sin(p.dyaw);
         const target: Vec3 = [
           s.ankle[0] + p.dx + ox - (ox * cos + oz * sin),
-          s.ankle[1] + p.lift,
+          // Never under the floor (a seat lower than the motion's own would push the feet in).
+          Math.max(floorY + leg.restAnkle * 0.85, s.ankle[1] + p.lift),
           s.ankle[2] + p.dz + oz - (-ox * sin + oz * cos),
         ];
         leg.upperLeg.getWorldPosition(v);
@@ -433,7 +480,10 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
       sides.forEach((leg, i) => {
         const p = leg.plant,
           s = samples[i]!;
-        const corrected = Math.abs(p.dx) + Math.abs(p.dz) + Math.abs(p.lift) + Math.abs(p.dyaw) > 1e-5 || drop > 1e-4;
+        const corrected =
+          Math.abs(p.dx) + Math.abs(p.dz) + Math.abs(p.lift) + Math.abs(p.dyaw) > 1e-5 ||
+          drop > 1e-4 ||
+          targets[i]![1] > s.ankle[1] + 1e-5;
         if (corrected) {
           const footWorld = leg.foot.getWorldQuaternion(new Quaternion());
           const hip = tuple(leg.upperLeg.getWorldPosition(v)),
