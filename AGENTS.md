@@ -10,6 +10,21 @@
 - 操作性の3段階：見た目が変わる＝自由／操作が少し不便＝作者の表現として許容／操作が破綻する（押せない・ずれる・ドラッグが狂う・操作面が隠れる）＝エンジンが起こさせない
 - テストを製品の今の挙動に合わせて緩めない。失敗したら、まず製品側の原因を疑う
 
+## 開発開始時の確認（ノート PC とデスクトップ PC）
+
+作業を始める前に、次を実行して結果を確かめる。別の PC の作業が先に進んでいることがある。
+
+```bash
+git fetch --all --prune
+git branch --show-current          # 今のブランチ
+git status --short                 # 未コミットの変更（捨てない）
+git log --oneline -5               # 最新のコミット
+git log --oneline HEAD..@{u}       # 相手の PC が先に進めた分。あれば git pull --ff-only で取り込む
+```
+
+- 続きの作業なら、そのブランチの**引き継ぎドキュメントを最初に読む**。`feat/living-onboarding` は [docs/living-onboarding-handoff.md](docs/living-onboarding-handoff.md)（PC の運用は [docs/dual-pc-workflow.md](docs/dual-pc-workflow.md)）。引き継ぎが古いと気づいたら、作業の前に直す
+- 作業終了時：引き継ぎドキュメントの「状態」と次の作業を更新し、コミット・push する。**Git LFS の物は、push の後に新しい clone で `git lfs pull` が通ることまで確かめる**（`git lfs ls-files` の `*` はローカルに実体があるだけの印）。`git push --force`、`git reset --hard`、確認していないローカル変更の破棄はしない
+
 ## 進め方
 
 - **自分で見た目を確かめて直す**（2026-11-07、翔太の決定）。塊ごとに、どの場面で何がどう見えたら完成かを先に決める。実装し、テストや計測より先に本物のページで撮り、自分で画像や動画を開いて基準と見比べ、必要な修正を繰り返す。YouTube 向けは本物の YouTube、Playground は実際の Playground を使う。数値のテストだけで終わらせない

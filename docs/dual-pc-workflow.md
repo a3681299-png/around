@@ -45,6 +45,8 @@ git lfs pull
 
 ## 既知の問題
 
+**更新（2026-11-11、ノート PC）**：1 と 2 は解決した。1 は `git lfs push --object-id` で実体を送り、新しい clone で `git lfs pull` が通って SHA-256 が合うことまで確かめた（原因と再発防止は [living-onboarding-handoff.md](living-onboarding-handoff.md) の 9 節）。2 は同じ文書を作った。3 は残っている。以下は報告時点の記録。
+
 1. **`art/living-room/web/room.glb` と `art/living-room/living-room.blend` の LFS 実体が GitHub にない**（404）。`feat/living-onboarding` の `0cd4079` はこの2つを LFS ポインターとして持つが、実体（`room.glb` sha256 `8f8a3f20…`・14.7MB、`living-room.blend` sha256 `e3625b29…`・11.6MB）がノート PC から push されていない。デスクトップの `C:\wwt-private` にあるのは別の古い部屋（`room-packed-*.glb`）で、代わりにならない。`lightmap.png` は LFS ではなく通常のファイルとして入っていて取得済み
    - **ノート PC でやること**：`git lfs push origin feat/living-onboarding`（失敗するなら `git lfs push --all origin`）。そのあと `git lfs ls-files` で2つが `*` になっていることと、デスクトップで `git lfs pull` が通ることを確かめる。実体の場所は `.gitattributes` の LFS 指定（`origin` の `.gitattributes` を確認）
    - 実体が届いたら、デスクトップで「部屋を再生成せず、取得した GLB・ライトマップでブラウザー表示」と「`living-room.blend` を開く」を確認する
