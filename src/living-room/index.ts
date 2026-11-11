@@ -4,6 +4,7 @@
 import {
   ACESFilmicToneMapping,
   Color,
+  Raycaster,
   LoadingManager,
   MeshBasicMaterial,
   PerspectiveCamera,
@@ -24,8 +25,10 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { readLayout } from '../renderers/three/room-layout';
 import { floorPath, standPoint, walkable } from '../world/room-life';
+import { loadLivingResident, type LivingResident } from './resident';
 
 declare const __WW_LIVING_TEST__: boolean;
+declare const __WW_LIVING_CHARACTER__: boolean;
 
 interface RoomManifest {
   lightScale: number;
@@ -95,6 +98,9 @@ async function start() {
     mesh.material = unlit(source, mesh.geometry.hasAttribute('color'), mesh.name.startsWith('static_'), map);
   });
   const layout = readLayout(gltf.scene);
+  // A character only where the build was given one (a local folder, never a public build).
+  let resident: LivingResident | undefined;
+  if (__WW_LIVING_CHARACTER__) resident = await loadLivingResident(scene, base, layout);
 
   const authored = gltf.cameras.find((c) => c.name === manifest.camera || c.parent?.name === manifest.camera) as
     PerspectiveCamera | undefined;
@@ -114,6 +120,8 @@ async function start() {
   const aim = new Vector2();
   const look = new Vector2();
   const offset = new Vector3();
+  const subject = new Vector3();
+  let closeUp = 0;
   let frame: number | undefined;
   let last = 0;
   let draws = 0;
@@ -142,9 +150,19 @@ async function start() {
     offset.y += look.y * 0.25;
     camera.position.copy(SUBJECT).add(offset);
     camera.lookAt(SUBJECT);
+    if (closeUp && resident) {
+      // For the motion review only (the test hook): the same angle, near the character.
+      const at = resident.state().mover;
+      subject.set(at.x, layout.floorY + 0.6, at.z);
+      camera.position.copy(subject).addScaledVector(offset, closeUp);
+      camera.lookAt(subject);
+    }
+    camera.updateMatrixWorld();
+    resident?.update(dt, camera);
     composer.render();
     draws++;
-    if (look.distanceToSquared(aim) > 1e-6) wake();
+    // A living character breathes and blinks: with one, every frame is drawn while the page shows.
+    if (resident ? !document.hidden : look.distanceToSquared(aim) > 1e-6) wake();
     else last = 0;
   }
   function wake() {
@@ -155,6 +173,28 @@ async function start() {
     aim.set((event.clientX / window.innerWidth) * 2 - 1, 1 - (event.clientY / window.innerHeight) * 2);
     wake();
   });
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) wake();
+  });
+  if (resident) {
+    // A click puts the thing to notice on the surface under the pointer; Escape takes it away.
+    const ray = new Raycaster();
+    const live = resident;
+    canvas.addEventListener('click', (event) => {
+      ray.setFromCamera(
+        new Vector2((event.clientX / window.innerWidth) * 2 - 1, 1 - (event.clientY / window.innerHeight) * 2),
+        camera,
+      );
+      const hit = ray.intersectObject(gltf.scene, true).find((h) => h.object.visible);
+      if (!hit) return;
+      // A little off the surface, toward the viewer, so the hand has something in front of it.
+      const p = hit.point.addScaledVector(ray.ray.direction, -0.04);
+      live.setTarget([p.x, p.y, p.z]);
+    });
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') live.setTarget(undefined);
+    });
+  }
   canvas.addEventListener('webglcontextlost', (event) => {
     event.preventDefault();
     status.textContent = '描画が止まりました。ページを再読み込みしてください。';
@@ -182,6 +222,12 @@ async function start() {
           });
         },
         draws: () => draws,
+        resident,
+        /** 0 = the room's own camera; 0.3–0.6 = that fraction of its distance, on the character. */
+        closeUp: (scale: number) => {
+          closeUp = Math.min(1, Math.max(0, scale));
+          wake();
+        },
         triangles: () => renderer.info.render.triangles,
         still: () => {
           aim.set(0, 0);

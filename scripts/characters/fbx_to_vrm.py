@@ -9,7 +9,7 @@
 # max-texture-px overrides the config's material.maxTextureSize (a lighter variant).
 # (Not --factory-startup: the VRM add-on must load.) Prints a JSON report (triangles, materials,
 # textures, expressions, springs) as the last line, prefixed with "FBX_TO_VRM ".
-import bpy, json, os, sys
+import bpy, json, math, os, sys
 
 argv = sys.argv[sys.argv.index("--") + 1 :]
 config_path, fbx_path, texture_dir, out_path = argv[:4]
@@ -22,6 +22,17 @@ armature = next(o for o in bpy.data.objects if o.type == "ARMATURE")
 meshes = [o for o in bpy.data.objects if o.type == "MESH" and o.name not in config.get("dropMeshes", [])]
 for o in [o for o in bpy.data.objects if o.type == "MESH" and o not in meshes]:
     bpy.data.objects.remove(o)
+# VRM faces +Z (Blender's -Y). Some FBX files arrive turned half round about the up axis (their
+# armature object carries the turn): the feet tell which way the body faces, so turn it back.
+foot_name, toes_name = config["humanoid"].get("left_foot"), config["humanoid"].get("left_toes")
+if foot_name in armature.data.bones:
+    foot = armature.data.bones[foot_name]
+    tip = armature.data.bones[toes_name].tail_local if toes_name in armature.data.bones else foot.tail_local
+    forward = armature.matrix_world.to_3x3() @ (tip - foot.head_local)
+    if forward.y > 0.01:
+        armature.rotation_mode = "XYZ"
+        armature.rotation_euler.z += math.pi
+        bpy.context.view_layer.update()
 ext = armature.data.vrm_addon_extension
 ext.spec_version = "1.0"
 vrm1 = ext.vrm1
@@ -55,13 +66,17 @@ def image(name):
     return img
 
 
-base = image(m["baseColor"])
+common = config["material"]
 materials = set()
 for ob in meshes:
     for slot in ob.material_slots:
         if slot.material:
             materials.add(slot.material)
 for mat in materials:
+    # A model with several materials (skin, clothes, hair) names each one's own texture and
+    # colours under material.byMaterial; anything not named there keeps the common values.
+    m = {**common, **common.get("byMaterial", {}).get(mat.name, {})}
+    base = image(m["baseColor"])
     mat.use_nodes = True
     mtoon = mat.vrm_addon_extension.mtoon1
     mtoon.enabled = True

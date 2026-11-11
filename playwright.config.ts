@@ -23,6 +23,7 @@ const unitSpecs = [
   'behaviour-motions',
   'autonomy',
   'two-bone-ik',
+  'living-body',
   'asset-import-validation',
   'asset-profile',
   'asset-read-data',

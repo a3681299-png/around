@@ -1,0 +1,203 @@
+{
+  "note": "Felis (RyukuLab) v0.8.1. Names and numbers only; the model, its textures and the converted VRM stay out of the repository (terms unconfirmed, docs/characters/felis.md).",
+  "fbxImport": {},
+  "dropMeshes": ["Cloth_MoeSleeveless"],
+  "humanoid": {
+    "hips": "Hips",
+    "spine": "Spine",
+    "chest": "Chest",
+    "neck": "Neck",
+    "head": "Head",
+    "left_eye": "Eye.L",
+    "right_eye": "Eye.R",
+    "left_shoulder": "Shoulder.L",
+    "left_upper_arm": "UpperArm.L",
+    "left_lower_arm": "LowerArm.L",
+    "left_hand": "Hand.L",
+    "left_upper_leg": "UpperLeg.L",
+    "left_lower_leg": "LowerLeg.L",
+    "left_foot": "Foot.L",
+    "left_toes": "Toes.L",
+    "left_index_proximal": "IndexProximal.L",
+    "left_index_intermediate": "IndexIntermediate.L",
+    "left_index_distal": "IndexDistal.L",
+    "left_middle_proximal": "MiddleProximal.L",
+    "left_middle_intermediate": "MiddleIntermediate.L",
+    "left_middle_distal": "MiddleDistal.L",
+    "left_ring_proximal": "RingProximal.L",
+    "left_ring_intermediate": "RingIntermediate.L",
+    "left_ring_distal": "RingDistal.L",
+    "left_little_proximal": "LittleProximal.L",
+    "left_little_intermediate": "LittleIntermediate.L",
+    "left_little_distal": "LittleDistal.L",
+    "left_thumb_metacarpal": "ThumbProximal.L",
+    "left_thumb_proximal": "ThumbIntermediate.L",
+    "left_thumb_distal": "ThumbDistal.L",
+    "right_shoulder": "Shoulder.R",
+    "right_upper_arm": "UpperArm.R",
+    "right_lower_arm": "LowerArm.R",
+    "right_hand": "Hand.R",
+    "right_upper_leg": "UpperLeg.R",
+    "right_lower_leg": "LowerLeg.R",
+    "right_foot": "Foot.R",
+    "right_toes": "Toes.R",
+    "right_index_proximal": "IndexProximal.R",
+    "right_index_intermediate": "IndexIntermediate.R",
+    "right_index_distal": "IndexDistal.R",
+    "right_middle_proximal": "MiddleProximal.R",
+    "right_middle_intermediate": "MiddleIntermediate.R",
+    "right_middle_distal": "MiddleDistal.R",
+    "right_ring_proximal": "RingProximal.R",
+    "right_ring_intermediate": "RingIntermediate.R",
+    "right_ring_distal": "RingDistal.R",
+    "right_little_proximal": "LittleProximal.R",
+    "right_little_intermediate": "LittleIntermediate.R",
+    "right_little_distal": "LittleDistal.R",
+    "right_thumb_metacarpal": "ThumbProximal.R",
+    "right_thumb_proximal": "ThumbIntermediate.R",
+    "right_thumb_distal": "ThumbDistal.R"
+  },
+  "material": {
+    "baseColor": "Body_Base.png",
+    "maxTextureSize": 2048,
+    "shadeColor": [0.88, 0.78, 0.82],
+    "shadingShift": -0.2,
+    "shadingToony": 0.9,
+    "outlineWidth": 0.0015,
+    "outlineColor": [0.356, 0.25, 0.223],
+    "outlineLightingMix": 1.0,
+    "byMaterial": {
+      "Cloth": {
+        "baseColor": "Cloth_Base.png",
+        "outlineColor": [0.6, 0.56, 0.73]
+      },
+      "Hair": {
+        "baseColor": "Hair_Base.png"
+      }
+    }
+  },
+  "expressions": {
+    "happy": [
+      ["Body", "にっこり"],
+      ["Body", "笑い"]
+    ],
+    "angry": [
+      ["Body", "不機嫌"],
+      ["Body", "Angry"]
+    ],
+    "sad": [
+      ["Body", "Sad"],
+      ["Body", "∧"]
+    ],
+    "relaxed": [
+      ["Body", "ω"],
+      ["Body", "じと目"]
+    ],
+    "surprised": [
+      ["Body", "○小"],
+      ["Body", "瞳小"],
+      ["Body", "Up"]
+    ],
+    "aa": [["Body", "あ"]],
+    "ih": [["Body", "い"]],
+    "ou": [["Body", "う"]],
+    "ee": [["Body", "え"]],
+    "oh": [["Body", "お"]],
+    "blink": [["Body", "まばたき"]],
+    "blink_left": [["Body", "ウィンク"]],
+    "blink_right": [["Body", "ウィンク右"]]
+  },
+  "override_blink": {
+    "happy": "block",
+    "angry": "block",
+    "sad": "block",
+    "relaxed": "block",
+    "surprised": "block"
+  },
+  "springs": {
+    "colliders": [
+      {
+        "name": "head",
+        "bone": "Head",
+        "offset": [0, 0.07, 0],
+        "radius": 0.1
+      },
+      {
+        "name": "chest",
+        "bone": "Chest",
+        "offset": [0, 0.06, 0],
+        "radius": 0.075
+      },
+      {
+        "name": "hips",
+        "bone": "Hips",
+        "offset": [0, 0.0, 0],
+        "radius": 0.085
+      },
+      {
+        "name": "thigh.L",
+        "bone": "UpperLeg.L",
+        "offset": [0, 0.12, 0],
+        "radius": 0.06
+      },
+      {
+        "name": "thigh.R",
+        "bone": "UpperLeg.R",
+        "offset": [0, 0.12, 0],
+        "radius": 0.06
+      }
+    ],
+    "colliderGroups": {
+      "head": ["head", "chest"],
+      "body": ["chest", "hips", "thigh.L", "thigh.R"]
+    },
+    "chains": [
+      {
+        "roots": [
+          "Ahoge_001",
+          "FrontHair_001",
+          "BackHair_001",
+          "Hair_01_001.L",
+          "Hair_01_001.R",
+          "Hair_02_001.L",
+          "Hair_02_001.R",
+          "Hair_03_001.L",
+          "Hair_03_001.R"
+        ],
+        "stiffness": 1.4,
+        "drag": 0.5,
+        "gravity": 0.05,
+        "hitRadius": 0.012,
+        "colliderGroups": ["head"]
+      },
+      {
+        "roots": ["Ear.L", "Ear.R"],
+        "stiffness": 3.0,
+        "drag": 0.6,
+        "gravity": 0,
+        "hitRadius": 0.01
+      },
+      {
+        "roots": ["Tail_001"],
+        "stiffness": 1.0,
+        "drag": 0.45,
+        "gravity": 0.03,
+        "hitRadius": 0.02,
+        "colliderGroups": ["body"]
+      },
+      {
+        "roots": ["Sleeve_001.L", "Sleeve_001.R", "String_001.L", "String_001.R"],
+        "stiffness": 1.0,
+        "drag": 0.5,
+        "gravity": 0.1,
+        "hitRadius": 0.012,
+        "colliderGroups": ["body"]
+      }
+    ]
+  },
+  "meta": {
+    "name": "Felis (WWT private conversion)",
+    "author": "RyukuLab (see the original package)",
+    "copyright": "Private conversion for local WWT development. Not for redistribution."
+  }
+}
