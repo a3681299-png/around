@@ -2,6 +2,7 @@ node_modules/
 dist/
 dist-playground/
 dist-deploy-probe/
+dist-living-room/
 test-results/
 playwright-report/
 .work/
