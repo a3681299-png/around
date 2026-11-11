@@ -162,7 +162,7 @@ WW_LM_SIZE=2048 WW_SAMPLES=256 WW_VC_SAMPLES=128 WW_OUT=art/living-room/web \
 - **原因**：ノート PC の `.git/hooks/pre-push` が、型チェック・lint・unit を回す独自の hook（`.claude/hooks/pre-push.mjs` を呼ぶ）で、`git lfs install` が入れる標準の hook を置き換えている。そのため push のたびの LFS の送信が動かない
 - **直し方（実施済み）**：`git lfs push --object-id origin <oid>…`（oid は `git lfs ls-files -l` の物）で実体を送った。`git lfs push origin <ブランチ>` は、リモートの追跡ブランチがポインターをすでに持っているため何も送らなかった。**必ず `--all` か `--object-id` を使う**
 - **確かめ方**：`git lfs ls-files` の `*` は「ローカルに実体がある」だけを示す。**新しい場所に clone して `git lfs pull` が通り、SHA-256 が合うことを見る**（`room.glb` 8f8a3f20…、`living-room.blend` e3625b29…。2026-11-11 に確かめた）
-- **再発を防ぐ案（未適用）**：`.git/hooks/pre-push` の先頭で、標準入力を一時ファイルに取り、`git lfs pre-push "$@" < 一時ファイル` を先に実行し、そのあと既存の `node …/pre-push.mjs < 一時ファイル` を実行する。`.git/hooks` の書き換えは自動の許可が下りなかったので、翔太が適用するか、許可を出してもらう。それまでは、push のあとに `git lfs push --all origin <ブランチ>` を手で実行する。デスクトップの hook も同じ作りなら同じ問題がある
+- **再発の防止（ノート PC は適用済み、2026-11-11、翔太の許可）**：`.git/hooks/pre-push` の先頭で、標準入力を一時ファイルに取り、`git lfs pre-push "$@" < 一時ファイル` を先に実行し（失敗したら push を止める）、そのあと既存の `node …/pre-push.mjs < 一時ファイル` を実行するようにした。この hook は追跡しない（ノート PC にだけある）。**デスクトップの hook が独自の hook だけの作りなら、同じ手当てが要る**。新しい LFS ファイルを実際に送る場面は、まだ試していない（次に `.blend`・`.glb` を push するとき、`Uploading LFS objects` の表示が出れば動いている）。それまでは、push のあとに `git lfs push --all origin <ブランチ>` を手で実行し、新しい clone で取得を確かめる
 
 ## 10. 状態（この文書を書いた時点）
 
