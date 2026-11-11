@@ -26,6 +26,7 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { readLayout } from '../renderers/three/room-layout';
 import { floorPath, standPoint, walkable } from '../world/room-life';
 import { loadLivingResident, type LivingResident } from './resident';
+import { softSurface } from './soft-surface';
 
 declare const __WW_LIVING_TEST__: boolean;
 declare const __WW_LIVING_CHARACTER__: boolean;
@@ -85,6 +86,7 @@ async function start() {
     }
     return material;
   };
+  const soft: Mesh[] = [];
   gltf.scene.traverse((object) => {
     if (/^(navmesh_|marker_|occluder_|shadow_)/.test(object.name)) {
       object.visible = false;
@@ -95,12 +97,14 @@ async function start() {
     // A multi-material mesh arrives as several meshes whose names start with the object's name.
     const map = mesh.name.startsWith(manifest.lightmapMesh) ? lightmap : null;
     const source = mesh.material as MeshStandardMaterial;
+    // The room's soft things (by the material's name in the room file) give under a body.
+    if (/^(duvet|sheet|throw|beanbag|rug_|floor_shade)/.test(source.name)) soft.push(mesh);
     mesh.material = unlit(source, mesh.geometry.hasAttribute('color'), mesh.name.startsWith('static_'), map);
   });
   const layout = readLayout(gltf.scene);
   // A character only where the build was given one (a local folder, never a public build).
   let resident: LivingResident | undefined;
-  if (__WW_LIVING_CHARACTER__) resident = await loadLivingResident(scene, base, layout);
+  if (__WW_LIVING_CHARACTER__) resident = await loadLivingResident(scene, base, layout, softSurface(soft));
 
   const authored = gltf.cameras.find((c) => c.name === manifest.camera || c.parent?.name === manifest.camera) as
     PerspectiveCamera | undefined;
@@ -139,6 +143,7 @@ async function start() {
     camera.updateProjectionMatrix();
     wake();
   }
+  const timing = { frames: 0, interval: 0, worstInterval: 0, body: 0, draw: 0 };
   function tick(now: number) {
     frame = undefined;
     const dt = last ? Math.min(0.1, (now - last) / 1000) : 0;
@@ -158,9 +163,20 @@ async function start() {
       camera.lookAt(subject);
     }
     camera.updateMatrixWorld();
+    const began = __WW_LIVING_TEST__ ? performance.now() : 0;
     resident?.update(dt, camera);
+    const posed = __WW_LIVING_TEST__ ? performance.now() : 0;
     composer.render();
     draws++;
+    if (__WW_LIVING_TEST__ && dt > 0) {
+      // For the load measurement (the test hook): the frame's interval, the body's and the draw's
+      // time on the main thread.
+      timing.frames++;
+      timing.interval += dt * 1000;
+      timing.worstInterval = Math.max(timing.worstInterval, dt * 1000);
+      timing.body += posed - began;
+      timing.draw += performance.now() - posed;
+    }
     // A living character breathes and blinks: with one, every frame is drawn while the page shows.
     if (resident ? !document.hidden : look.distanceToSquared(aim) > 1e-6) wake();
     else last = 0;
@@ -177,7 +193,8 @@ async function start() {
     if (!document.hidden) wake();
   });
   if (resident) {
-    // A click puts the thing to notice on the surface under the pointer; Escape takes it away.
+    // A click puts the thing to notice on the surface under the pointer (with Shift it is met
+    // eagerly); a click on the thing itself answers the character's touch; Escape takes it away.
     const ray = new Raycaster();
     const live = resident;
     canvas.addEventListener('click', (event) => {
@@ -189,6 +206,12 @@ async function start() {
       if (!hit) return;
       // A little off the surface, toward the viewer, so the hand has something in front of it.
       const p = hit.point.addScaledVector(ray.ray.direction, -0.04);
+      const now = live.state().target;
+      if (now && ray.ray.distanceToPoint(new Vector3(now[0], now[1], now[2])) < 0.12) {
+        live.cheer();
+        return;
+      }
+      live.setMood(event.shiftKey ? 'interest' : 'calm');
       live.setTarget([p.x, p.y, p.z]);
     });
     window.addEventListener('keydown', (event) => {
@@ -222,6 +245,19 @@ async function start() {
           });
         },
         draws: () => draws,
+        /** The load since the last call: frames, and milliseconds a frame (interval, body, draw). */
+        timing: () => {
+          const n = Math.max(1, timing.frames);
+          const out = {
+            frames: timing.frames,
+            intervalMs: timing.interval / n,
+            worstIntervalMs: timing.worstInterval,
+            bodyMs: timing.body / n,
+            drawMs: timing.draw / n,
+          };
+          timing.frames = timing.interval = timing.worstInterval = timing.body = timing.draw = 0;
+          return out;
+        },
         resident,
         /** 0 = the room's own camera; 0.3–0.6 = that fraction of its distance, on the character. */
         closeUp: (scale: number) => {

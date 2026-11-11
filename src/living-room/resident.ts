@@ -14,7 +14,15 @@ import {
 } from 'three';
 import { prepareVerifiedSource } from '../assets/verified-source';
 import { loadLivingBody, type LivingBodyFacts } from '../renderers/three/living-body';
-import { approachIntent, startApproach, stepApproach, type ApproachState, type Seat } from '../characters/approach';
+import {
+  approachIntent,
+  startApproach,
+  stepApproach,
+  type ApproachState,
+  type Mood,
+  type Seat,
+} from '../characters/approach';
+import type { SoftSurface } from './soft-surface';
 import type { Vec3 } from '../characters/two-bone-ik';
 import { standPoint, type RoomLayout } from '../world/room-life';
 
@@ -22,6 +30,7 @@ interface CharacterManifest {
   vrm: string;
   idle: string;
   walk: string;
+  run?: string;
   sitDown?: string;
   sit?: string;
   standUp?: string;
@@ -33,6 +42,10 @@ export interface LivingResident {
   setTarget(target: Vec3 | undefined): void;
   /** A seat of the room by its id (sit_chair, sit_bed…) to go and sit on; undefined stands up. */
   sit(spot: string | undefined): boolean;
+  /** How the next thing that appears is met: 'calm' walks over, 'interest' darts at it. */
+  setMood(mood: Mood): void;
+  /** The character's touch was answered (the thing was clicked): it is glad. */
+  cheer(): void;
   state(): ApproachState & { target: Vec3 | undefined };
   facts(): LivingBodyFacts;
   metrics(): { arm: number; shoulderHeight: number; walkSpeed: number; height: number };
@@ -44,7 +57,12 @@ const bytes = async (url: URL) => {
   return new Uint8Array(await response.arrayBuffer());
 };
 
-export async function loadLivingResident(scene: Scene, base: URL, layout: RoomLayout): Promise<LivingResident> {
+export async function loadLivingResident(
+  scene: Scene,
+  base: URL,
+  layout: RoomLayout,
+  soft: SoftSurface,
+): Promise<LivingResident> {
   const folder = new URL('character/', base);
   const manifest = (await (
     await fetch(new URL('character.json', folder), { credentials: 'omit' })
@@ -54,10 +72,11 @@ export async function loadLivingResident(scene: Scene, base: URL, layout: RoomLa
     return new URL(name, folder);
   };
   const maybe = (name: string | undefined) => (name ? bytes(file(name)) : undefined);
-  const [vrm, idle, walk, sitDown, sit, standUp] = await Promise.all([
+  const [vrm, idle, walk, run, sitDown, sit, standUp] = await Promise.all([
     bytes(file(manifest.vrm)),
     bytes(file(manifest.idle)),
     bytes(file(manifest.walk)),
+    maybe(manifest.run),
     maybe(manifest.sitDown),
     maybe(manifest.sit),
     maybe(manifest.standUp),
@@ -67,6 +86,7 @@ export async function loadLivingResident(scene: Scene, base: URL, layout: RoomLa
   const body = await loadLivingBody(prepared.modelBuffer, {
     idle,
     walk,
+    ...(run ? { run } : {}),
     ...(sitDown ? { sitDown } : {}),
     ...(sit ? { sit } : {}),
     ...(standUp ? { standUp } : {}),
@@ -93,24 +113,32 @@ export async function loadLivingResident(scene: Scene, base: URL, layout: RoomLa
   let state = startApproach(x, z, center?.heading ?? 0);
   let target: Vec3 | undefined;
   let seat: Seat | undefined;
-  const limits = {
-    maxSpeed: Math.min(0.9, body.metrics.walkSpeed),
-    accel: body.metrics.walkSpeed * 1.5,
-    decel: body.metrics.walkSpeed * 1.9,
-    // A turn on the spot is made of small steps (foot-plant): faster than this the feet cannot keep up.
-    turnRate: 2.1,
-  };
+  let mood: Mood = 'calm';
+  let cheers = 0;
+  let seated = 0;
+  // An eager dart is a share of the run, not the run itself: the room is a few steps across.
+  const measures = { ...body.metrics, runSpeed: Math.min(body.metrics.runSpeed, body.metrics.walkSpeed * 2.9) };
   return {
     update(dt, camera) {
       state = stepApproach(state, {
         dt,
         layout,
-        body: body.metrics,
-        limits,
+        body: measures,
+        mood,
+        cheer: cheers,
         ...(target ? { target } : {}),
         ...(seat ? { seat } : {}),
       });
-      body.update(approachIntent(state, target), dt, layout.floorY);
+      const intent = approachIntent(state, target);
+      // The seat gives under the body: dropping onto it kicks the surface, and the body rides it.
+      if (intent.seated > 0.55 && seated <= 0.55) soft.kick(2.2);
+      seated = intent.seated;
+      const sunk = soft.press(intent.seat, intent.seated, dt);
+      // The room's marker is on the seat's surface; the hip joints rest a little above it (the
+      // body sits on the surface, not in it), less what the surface has given.
+      if (intent.seat)
+        intent.seat = [intent.seat[0], intent.seat[1] + body.metrics.height * 0.06 - sunk, intent.seat[2]];
+      body.update(intent, dt, layout.floorY);
       marker.visible = Boolean(target);
       if (target) {
         marker.position.set(target[0], target[1], target[2]);
@@ -127,6 +155,12 @@ export async function loadLivingResident(scene: Scene, base: URL, layout: RoomLa
           ? { x: spot.x, y: spot.y, z: spot.z, heading: spot.heading, stand: standPoint(layout, spot) }
           : undefined;
       return Boolean(seat);
+    },
+    setMood(next) {
+      mood = next === 'interest' ? 'interest' : 'calm';
+    },
+    cheer() {
+      cheers++;
     },
     state: () => ({ ...state, target }),
     facts: () => body.facts(),

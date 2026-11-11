@@ -21,6 +21,11 @@ export interface MoveLimits {
   decel: number;
   /** Radians a second. */
   turnRate: number;
+  /**
+   * Facing further off than this (radians) the body turns on the spot before it moves. A calm walk
+   * keeps the default (60°); an eager one sets it wide and so leaves in a curve, turning as it goes.
+   */
+  turnFirst?: number;
 }
 export const DEFAULT_LIMITS: MoveLimits = { maxSpeed: 0.7, accel: 1.1, decel: 1.4, turnRate: 3.2 };
 
@@ -95,7 +100,8 @@ function slice(m: Mover, path: Path, dt: number, limits: MoveLimits): MoveResult
   const error = Math.abs(wrapAngle(toward - turned.heading));
   // Facing the way: full speed. Facing away: turn on the spot (a body does not walk sideways).
   // Close to the point the turn would be an orbit, so the last steps go straight at it.
-  const facing = d < 0.2 ? 1 : Math.max(0, Math.min(1, (TURN_FIRST - error) / (TURN_FIRST * 0.6)));
+  const turnFirst = limits.turnFirst ?? TURN_FIRST;
+  const facing = d < 0.2 ? 1 : Math.max(0, Math.min(1, (turnFirst - error) / (turnFirst * 0.6)));
   // Slow enough to stop on the last point; corners are taken at the pace the turn there allows.
   const left = remaining(turned, path);
   // (A creep at the very end, so the point is reached and the last of the speed is next to nothing.)

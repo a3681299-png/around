@@ -39,10 +39,13 @@ import type { HumanBone } from '../../characters/humanoid';
 import { solveTwoBone, type Vec3 } from '../../characters/two-bone-ik';
 import { footAtRest, footStrain, stepFoot, type FootState } from '../../characters/foot-plant';
 import type { BodyIntent, BodyReach } from '../../characters/approach';
+import { draw } from '../../world/room-life';
 
 export interface LivingBodyMotions {
   idle: Uint8Array;
   walk: Uint8Array;
+  /** A run or jog loop, blended in above the walk's own pace. Without it the body only walks. */
+  run?: Uint8Array;
   /** Sitting down, seated (a loop) and standing up. Without them the body does not sit. */
   sitDown?: Uint8Array;
   sit?: Uint8Array;
@@ -52,6 +55,8 @@ export interface LivingBodyMetrics extends BodyReach {
   height: number;
   /** The speed the walk clip's feet keep, metres a second. */
   walkSpeed: number;
+  /** The same for the run (the walk's when there is no run). */
+  runSpeed: number;
 }
 export interface LivingBodyFacts {
   /** How far a planted foot's contact moved over the floor, summed and the worst frame (metres). */
@@ -141,13 +146,15 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
   VRMUtils.removeUnnecessaryVertices(vrm.scene);
   VRMUtils.rotateVRM0(vrm);
   const optional = (bytes: Uint8Array | undefined) => (bytes ? parseVrmAnimation(bytes) : undefined);
-  const [idleAnimation, walkAnimation, sitDownAnimation, sitAnimation, standUpAnimation] = await Promise.all([
-    parseVrmAnimation(motions.idle),
-    parseVrmAnimation(motions.walk),
-    optional(motions.sitDown),
-    optional(motions.sit),
-    optional(motions.standUp),
-  ]);
+  const [idleAnimation, walkAnimation, runAnimation, sitDownAnimation, sitAnimation, standUpAnimation] =
+    await Promise.all([
+      parseVrmAnimation(motions.idle),
+      parseVrmAnimation(motions.walk),
+      optional(motions.run),
+      optional(motions.sitDown),
+      optional(motions.sit),
+      optional(motions.standUp),
+    ]);
 
   const root = new Group();
   root.add(vrm.scene);
@@ -226,6 +233,33 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
   };
   const idle = play(idleClip),
     walk = play(walkClip);
+  // A run (optional) shares the walk's cycle: the two are blended by speed, on one phase.
+  const runClip = runAnimation ? vrmAnimationClip(runAnimation, vrm) : undefined;
+  const runStride = runClip ? walkInPlace(runClip, hips.name) : 0;
+  const run = runClip && runStride > stride ? play(runClip) : undefined;
+  const runSpeed = run && runClip ? runStride / (runClip.duration || 1) : walkSpeed;
+  // Both loops are two steps long, but may begin on different feet: find the shift (none or half
+  // a cycle) at which the run's feet go the same way as the walk's.
+  let runShift = 0;
+  if (run && runClip) {
+    const gait = (action: AnimationAction, clip: AnimationClip, shift: number) => {
+      const out: number[] = [];
+      for (const other of [idle, walk, run]) other.setEffectiveWeight(other === action ? 1 : 0);
+      for (let i = 0; i < 8; i++) {
+        action.time = ((i / 8 + shift) % 1) * clip.duration;
+        mixer.update(0);
+        root.updateWorldMatrix(true, true);
+        out.push(sides[0]!.foot.getWorldPosition(v).z - sides[1]!.foot.getWorldPosition(v2).z);
+      }
+      return out;
+    };
+    const walking = gait(walk, walkClip, 0);
+    const match = (shift: number) => gait(run, runClip, shift).reduce((sum, value, i) => sum + value * walking[i]!, 0);
+    runShift = match(0.5) > match(0) ? 0.5 : 0;
+    idle.setEffectiveWeight(1);
+    walk.setEffectiveWeight(0);
+    run.setEffectiveWeight(0);
+  }
   // Sitting: the three motions each with a weight of its own, eased toward what the behaviour asks.
   const seatClips = (
     [
@@ -245,7 +279,29 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
     shoulderHalf: shoulderL.distanceTo(shoulderR) / 2,
     height: head.getWorldPosition(v).y + 0.12,
     walkSpeed,
+    runSpeed,
   };
+
+  // Ears and tail are spring chains (they swing by themselves). To act with them, the pull on
+  // their springs is turned: up for pricked ears and a raised tail, sideways for a wag. The
+  // chains then move there in their own time, which is the overlap an animator would draw.
+  const springs = [...(vrm.springBoneManager?.joints ?? [])].map((joint) => ({
+    joint,
+    kind: /ear/i.test(joint.bone.name) ? 'ear' : /tail/i.test(joint.bone.name) ? 'tail' : 'other',
+    power: joint.settings.gravityPower,
+    dir: joint.settings.gravityDir.clone(),
+  }));
+  const expressions = vrm.expressionManager;
+  // Blinks and idle glances come at times drawn from a fixed sequence (the same every run).
+  let drawn = 0;
+  const next = () => draw(0x51ed, drawn++);
+  let blinkAt = 1.5,
+    blink = 0,
+    glanceAt = 3,
+    glanceUntil = 0,
+    glanceYaw = 0,
+    glancePitch = 0,
+    twitchAt = 5;
 
   // The eyes follow a point of their own (the VRM's look-at), eased between "ahead" and the target.
   const gaze = new Object3D();
@@ -255,13 +311,34 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
   let time = 0,
     cycle = 0,
     walkWeight = 0,
+    runWeight = 0,
     lastSpeed = 0,
     accel = 0,
     lean = 0,
+    leanSpeed = 0,
+    trail = 0,
     roll = 0,
+    squash = 0,
+    squashSpeed = 0,
+    wasHopping = false,
+    eyes = 0,
     lookYaw = 0,
     lookPitch = 0,
+    chestYaw = 0,
+    tilt = 0,
+    joy = 0,
+    relax = 0,
     reachLean = 0;
+  /** A spring toward a goal that overshoots a little before it rests (the body's follow-through). */
+  const spring = (value: number, speed: number, goal: number, stiff: number, damp: number, dt: number) => {
+    // Small fixed slices: the same wobble at any frame rate, and never unstable.
+    for (let left = dt; left > 1e-6; left -= 1 / 240) {
+      const h = Math.min(1 / 240, left);
+      speed += (-stiff * stiff * (value - goal) - 2 * damp * stiff * speed) * h;
+      value += speed * h;
+    }
+    return [value, speed] as const;
+  };
   const facts: LivingBodyFacts = {
     slide: 0,
     worstSlide: 0,
@@ -315,12 +392,17 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
       // walk takes shorter steps (the blend with idle shortens them), so its cycle turns faster
       // than speed alone would say.
       const wantWalk = smooth(clamp(intent.speed / (walkSpeed * 0.55), 0, 1));
-      walkWeight = approach(walkWeight, wantWalk, 9, dt);
+      // A dart comes on at once (the blend must not lag the burst of speed); a walk eases in.
+      walkWeight = approach(walkWeight, wantWalk, intent.mood === 'interest' ? 22 : 9, dt);
       if (walkWeight < 0.002 && wantWalk === 0) walkWeight = 0;
-      const stepLength = stride * (0.55 + 0.45 * walkWeight);
+      // Faster than the walk's own pace, the run is mixed in: longer strides, not hurried feet.
+      const wantRun = run ? clamp((intent.speed - walkSpeed) / Math.max(0.1, runSpeed - walkSpeed), 0, 1) : 0;
+      runWeight = approach(runWeight, wantRun, 14, dt);
+      const stepLength = stride * (0.55 + 0.45 * walkWeight) * (1 - runWeight) + runStride * runWeight;
       if (stepLength > 0.01) cycle = (cycle + (intent.speed * dt) / stepLength) % 1;
       idle.time = time % (idleClip.duration || 1);
       walk.time = cycle * (walkClip.duration || 1);
+      if (run && runClip) run.time = ((cycle + runShift) % 1) * (runClip.duration || 1);
       // Sitting motions take over from standing ones by their own eased weights (never a cut).
       let sitting = 0;
       for (const seat of seatClips) {
@@ -339,7 +421,8 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
       const standing = Math.max(0, 1 - sitting * share);
       for (const seat of seatClips) seat.action.setEffectiveWeight(seat.weight * share);
       idle.setEffectiveWeight((1 - walkWeight) * standing);
-      walk.setEffectiveWeight(walkWeight * standing);
+      walk.setEffectiveWeight(walkWeight * (1 - runWeight) * standing);
+      run?.setEffectiveWeight(walkWeight * runWeight * standing);
       for (const g of given) {
         g.node.quaternion.copy(g.q);
         g.node.position.copy(g.p);
@@ -351,17 +434,58 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
       }
 
       // 2. Posture. Small, additive, on top of whatever the motions gave.
-      accel = approach(accel, dt > 0 ? (intent.speed - lastSpeed) / dt : 0, 6, dt);
+      const eager = intent.mood === 'interest';
+      const atEase = (1 - walkWeight) * standing;
+      accel = approach(accel, dt > 0 ? (intent.speed - lastSpeed) / dt : 0, 14, dt);
       lastSpeed = intent.speed;
-      // Into the walk the trunk tips forward, stopping it rocks back; into a turn it tilts.
-      lean = approach(lean, clamp(accel * 0.07 + intent.speed * 0.05, -0.08, 0.12), 6, dt);
-      roll = approach(roll, clamp(-intent.turn * (0.012 + intent.speed * 0.05), -0.07, 0.07), 6, dt);
+      // The trunk's pitch is a spring: it leans into speed and into a wind-up, is thrown back by
+      // braking, and when the body stops it swings forward past upright before it settles (the
+      // momentum left over). The chest and head follow a moment later (`trail`).
+      const leanGoal =
+        0.04 * clamp(intent.speed / walkSpeed, 0, 1) +
+        0.15 * runWeight +
+        clamp(accel * 0.035, -0.28, 0.2) +
+        intent.crouch * 0.24;
+      [lean, leanSpeed] = spring(lean, leanSpeed, leanGoal, 12, 0.4, dt);
+      trail = approach(trail, lean, 7, dt);
+      roll = approach(roll, clamp(-intent.turn * (0.012 + intent.speed * 0.06), -0.2, 0.2), 8, dt);
+      // Squash and stretch, one spring: sunk by a wind-up and by braking, kicked down by a
+      // landing; let go, it rebounds past its rest (the stretch of the launch) and settles.
+      const hopping = intent.hop !== undefined;
+      if (wasHopping && !hopping) squashSpeed += 9;
+      wasHopping = hopping;
+      [squash, squashSpeed] = spring(squash, squashSpeed, intent.crouch + clamp(-accel * 0.07, 0, 0.5), 15, 0.38, dt);
+      squash = clamp(squash, -0.8, 1.4);
+      const tall = 1 - 0.035 * squash;
+      root.scale.set(1 / Math.sqrt(tall), tall, 1 / Math.sqrt(tall));
+      hips.position.y -= Math.max(0, squash) * 0.055;
+      const air = hopping ? Math.sin(Math.PI * intent.hop!) : 0;
+      if (hopping) root.position.y += intent.hopHeight * 4 * intent.hop! * (1 - intent.hop!);
       const breath = Math.sin((time * Math.PI * 2) / 3.7) * 0.012 * (1 - walkWeight * 0.6);
-      // Standing, the weight drifts from one leg to the other (slowly; not while walking).
-      const sway = Math.sin((time * Math.PI * 2) / 9.1) * 0.006 * (1 - walkWeight);
-      hips.position.x += sway;
-      spine.rotateX(lean * 0.6 - breath * 0.5).rotateZ(roll);
-      if (chest !== spine) chest.rotateX(lean * 0.4 + breath);
+      // Standing, the weight drifts from one leg to the other: the hips go over and tip, the
+      // shoulders tip the other way (slowly; not while walking).
+      const sway = Math.sin((time * Math.PI * 2) / 7.3) * atEase;
+      hips.position.x += sway * 0.012;
+      hips.position.z -= lean * 0.05;
+      hips.rotateZ(sway * 0.025);
+      spine.rotateX(lean * 0.55 - breath * 0.5).rotateZ(roll - sway * 0.04);
+      if (chest !== spine) chest.rotateX(trail * 0.45 + breath);
+      // The head keeps its eyes level through the trunk's lean, and lags its changes.
+      head.rotateX(-trail * 0.6 + (trail - lean) * 0.8).rotateZ(-roll * 0.5);
+      // Off the floor the legs tuck.
+      if (air > 0)
+        for (const leg of sides) {
+          leg.upperLeg.rotateX(-0.45 * air);
+          leg.lowerLeg.rotateX(0.85 * air);
+        }
+      // The arms: the idle motion holds them wide and straight (it clears thick sleeves), so at
+      // ease they come in and bend a little; in gladness they go up, and flap with each hop.
+      joy = approach(joy, intent.joy, 12, dt);
+      relax = approach(relax, atEase * (1 - joy), 5, dt);
+      for (const side of sides) {
+        side.upperArm.rotateZ(side.sign * (-0.2 * relax + joy * (2.25 + 0.35 * air)));
+        side.lowerArm.rotateY(-side.sign * (0.3 * relax + 0.7 * joy));
+      }
 
       // Looking: the eyes first (the VRM's own look-at), then the head, neck and chest share the
       // turn, each within what a neck can do.
@@ -383,19 +507,73 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
         wantPitch = clamp(pitch, -LOOK_PITCH, LOOK_PITCH);
         wantYaw *= intent.lookWeight;
         wantPitch *= intent.lookWeight;
+      } else if (intent.phase === 'idle' || intent.phase === 'sit') {
+        // Nothing to look at: now and then a glance about the room (the times and the directions
+        // come from the fixed sequence).
+        if (time >= glanceAt) {
+          glanceYaw = (next() - 0.5) * 1.4;
+          glancePitch = (next() - 0.45) * 0.3;
+          glanceUntil = time + 1.1 + next() * 1.7;
+          glanceAt = glanceUntil + 2.2 + next() * 4.5;
+        }
+        if (time < glanceUntil) {
+          wantYaw = glanceYaw;
+          wantPitch = glancePitch;
+        }
       }
-      lookYaw = approach(lookYaw, wantYaw, 7, dt);
-      lookPitch = approach(lookPitch, wantPitch, 7, dt);
-      if (chest !== spine) chest.rotateY(lookYaw * 0.15);
+      // Each part in its own time: the eyes at once, the head quickly (a snap when eager), the
+      // chest well after. A thing that holds the attention also tips the head to one side.
+      const attending = intent.lookWeight > 0.5 && intent.speed < 0.05 && !hopping;
+      lookYaw = approach(lookYaw, wantYaw, eager ? 16 : 6, dt);
+      lookPitch = approach(lookPitch, wantPitch, eager ? 16 : 6, dt);
+      chestYaw = approach(chestYaw, wantYaw, 3.5, dt);
+      tilt = approach(tilt, attending ? (wantYaw >= 0 ? 1 : -1) * (eager ? 0.16 : 0.09) : 0, 7, dt);
+      if (chest !== spine) chest.rotateY(chestYaw * 0.2);
       if (neck !== head) neck.rotateY(lookYaw * 0.3).rotateX(-lookPitch * 0.4);
-      head.rotateY(lookYaw * (neck !== head ? 0.55 : 0.85)).rotateX(-lookPitch * (neck !== head ? 0.6 : 1));
-      // The eyes: ahead of the face when idle, on the target when looking.
-      gaze.position.set(0, v.y - floorY, 2);
-      if (intent.look && intent.lookWeight > 0)
-        gaze.position.lerp(
-          root.worldToLocal(v2.set(intent.look[0], intent.look[1], intent.look[2])),
-          intent.lookWeight,
-        );
+      head
+        .rotateY(lookYaw * (neck !== head ? 0.5 : 0.8))
+        .rotateX(-lookPitch * (neck !== head ? 0.6 : 1))
+        .rotateZ(tilt);
+      // The eyes: ahead of the face, or where the glance goes, or on the target; they get there first.
+      eyes = approach(eyes, intent.look ? intent.lookWeight : 0, 30, dt);
+      const glancing = time < glanceUntil && !(intent.lookWeight > 0);
+      v3.set(glancing ? Math.sin(glanceYaw) * 2 : 0, v.y - floorY + (glancing ? glancePitch * 2 : 0), 2);
+      if (intent.look) v3.lerp(root.worldToLocal(v2.set(intent.look[0], intent.look[1], intent.look[2])), eyes);
+      gaze.position.lerp(v3, 1 - Math.exp(-25 * dt));
+
+      // The face, ears and tail. A blink now and then; a start when something is noticed; a smile
+      // in gladness (the model's own expressions, where it has them).
+      if (time >= blinkAt) {
+        blink = 0.14;
+        // Sometimes twice in a row.
+        blinkAt = time + (next() < 0.2 ? 0.3 : 1.8 + next() * 3.6);
+      }
+      blink = Math.max(0, blink - dt);
+      if (expressions) {
+        expressions.setValue('blink', (1 - joy) * Math.sin(Math.PI * clamp(blink / 0.14, 0, 1)));
+        expressions.setValue('happy', joy);
+        expressions.setValue('surprised', eager ? intent.alert * 0.5 : 0);
+      }
+      if (time >= twitchAt) twitchAt = time + 3.5 + next() * 6;
+      const twitch = twitchAt - time > 0.16 ? 0 : 1;
+      // Ears up at a start and while eager or glad; a flick of them now and then at rest.
+      const earsUp = intent.alert * 2.4 + joy * 1 + (eager && intent.lookWeight > 0 ? 0.7 : 0) + twitch * atEase * 1.2;
+      const tailUp = joy * 1.1 + (eager && intent.lookWeight > 0 ? 0.55 : 0);
+      // The tail: a slow sway at rest, a quicker one when eager, a wag in gladness.
+      const wag =
+        Math.sin(time * Math.PI * 2 * (joy > 0.1 ? 3.1 : eager && intent.lookWeight > 0 ? 1.4 : 0.33)) *
+        (0.12 + 0.3 * (eager && intent.lookWeight > 0 ? 1 : 0) + 1.2 * joy);
+      for (const s of springs) {
+        if (s.kind === 'other') continue;
+        const { settings } = s.joint;
+        if (s.kind === 'ear') settings.gravityDir.set(0, earsUp, 0).addScaledVector(s.dir, s.power);
+        else
+          settings.gravityDir
+            .set(Math.cos(intent.heading) * wag, tailUp, -Math.sin(intent.heading) * wag)
+            .addScaledVector(s.dir, s.power);
+        settings.gravityPower = settings.gravityDir.length();
+        if (settings.gravityPower > 1e-6) settings.gravityDir.divideScalar(settings.gravityPower);
+      }
 
       // 4a. A far reach leans the trunk toward the target before the arm is solved (applied here,
       // with the rest of the posture, so the legs below see the final hips).
@@ -405,7 +583,8 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
         root.updateWorldMatrix(true, true);
         arm.upperArm.getWorldPosition(v);
         const far = v.distanceTo(v2.set(intent.reach[0], intent.reach[1], intent.reach[2])) - handLength;
-        wantLean = clamp((far - (upperArmLength + lowerArmLength) * 0.9) / torso, 0, LEAN_MAX) * intent.reachWeight;
+        wantLean =
+          clamp((far - (upperArmLength + lowerArmLength) * 0.9) / torso, 0, LEAN_MAX) * Math.min(1, intent.reachWeight);
       }
       reachLean = approach(reachLean, wantLean, 8, dt);
       if (reachLean > 1e-4) {
@@ -515,7 +694,7 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
       // 4b. Arm. The hand goes to the target (its fingertips on it), blended from wherever the
       // motion has it; the elbow bends down and out.
       facts.reachGap = undefined;
-      if (intent.reach && intent.reachWeight > 0) {
+      if (intent.reach && intent.reachWeight !== 0) {
         root.updateWorldMatrix(true, true);
         const shoulder = arm.upperArm.getWorldPosition(new Vector3()),
           elbow = arm.lowerArm.getWorldPosition(new Vector3()),
@@ -547,12 +726,17 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
               .add(shoulder);
           solved = solveTwoBone(tuple(shoulder), tuple(elbow), tuple(wrist), tuple(wristGoal), tuple(pole));
         }
-        const target = wrist.clone().lerp(wristGoal, intent.reachWeight);
+        // The weight runs a little below 0 (the hand draws back first) and a little past 1 (it
+        // presses in): the line from where the motion has the hand to the thing, carried on at
+        // both ends. On the way the hand rises over that line and comes down onto the thing.
+        const weight = clamp(intent.reachWeight, -0.3, 1.2);
+        const target = wrist.clone().addScaledVector(wristGoal.clone().sub(wrist), weight);
+        target.y += Math.sin(Math.PI * clamp(weight, 0, 1)) * 0.06;
         solved = solveTwoBone(tuple(shoulder), tuple(elbow), tuple(wrist), tuple(target), tuple(pole));
         aim(arm.upperArm, tuple(elbow), solved.mid);
         aim(arm.lowerArm, tuple(arm.hand.getWorldPosition(v)), solved.end);
         // The hand opens flat along the forearm as it arrives (its rest pose on normalized bones).
-        arm.hand.quaternion.slerp(q.identity(), intent.reachWeight);
+        arm.hand.quaternion.slerp(q.identity(), clamp(weight, 0, 1));
         arm.hand.updateWorldMatrix(false, true);
         // The fingertips: a hand's length past the wrist, along the forearm (the hand lies flat).
         const from = arm.lowerArm.getWorldPosition(v2),

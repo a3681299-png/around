@@ -180,3 +180,12 @@ WW_LM_SIZE=2048 WW_SAMPLES=256 WW_VC_SAMPLES=128 WW_OUT=art/living-room/web \
 - 変えたもの：`src/living-room/index.ts`・`scripts/build-living-room.mjs`（キャラは環境変数で渡したときだけ、`.work` の出力にだけ入る）、`scripts/characters/fbx_to_vrm.py`（材質ごとのテクスチャ、後ろ向きの FBX）、`playwright.config.ts`（unit の一覧に1行。中核）
 - フェリスの素材と、フェリスが写った録画・画像は**リポジトリに入れていない**。手元の `C:\wwt-private\Felis_v0.8.1\` の下（`extracted`・`work`・`motions`）。ノート PC で続けるときは [living-body.md](living-body.md) 5 節の手順で作り直す（Blender に VRM Add-on が要る）
 - デスクトップの状態：`feat/living-onboarding`、未コミットの変更なし、`origin` と同じ。今回 LFS の物は足していない
+
+## 12. アニメ的な演技と柔らかいベッド（2026-11-11、デスクトップ PC）
+
+動きに緩急・予備動作・時間差・誇張を足し、「普段」「興味」「喜び」で演じ分けるようにした。ベッドは座ると沈み、立つとゆっくり戻る。詳しくは [living-body.md](living-body.md) の 9 節（気分の表、12原則の当てはめ、比較の結果、負荷、残り、比較動画の作り方）。
+
+- 足したもの：`src/living-room/soft-surface.ts`、`scripts/living-room/compare.mjs`。変えたもの：`approach.ts`（気分・沈む・跳ねて向き直る・喜び・間の揺らぎ）、`locomotion.ts`（`turnFirst`）、`living-body.ts`（走りのブレンド・ばねの傾きと伸び縮み・視線の時間差・耳と尻尾・表情・待機の腕）、`resident.ts`・`index.ts`・`build-living-room.mjs`、`tests/living-body.spec.ts`（18 件）
+- 部屋のファイル（`room.glb`・ライトマップ）は変えていない。LFS の物は足していない
+- 参考の動画は見られなかった。動画は通して見ておらず、コマの並びと記録で確かめた。**翔太が比較動画（`C:\wwt-private\Felis_v0.8.1\work\compare\side-by-side\`）を見て、気持ちよさを判断してほしい**
+- 次：動画を見ての直し、普段の大きな方向転換、驚き・不機嫌・眠気、暮らし（`room-life.ts`）から気分を決める、UI カードとの配線

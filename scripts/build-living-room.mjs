@@ -58,7 +58,12 @@ if (character) {
   mkdirSync(folder, { recursive: true });
   const clips = { idle: 'Idle_Loop.vrma', walk: 'Walk_Loop.vrma' };
   // Sitting is optional: a character without these motions stays on its feet.
-  const seated = { sitDown: 'Sitting_Enter.vrma', sit: 'Sitting_Idle_Loop.vrma', standUp: 'Sitting_Exit.vrma' };
+  const seated = {
+    run: 'Jog_Fwd_Loop.vrma',
+    sitDown: 'Sitting_Enter.vrma',
+    sit: 'Sitting_Idle_Loop.vrma',
+    standUp: 'Sitting_Exit.vrma',
+  };
   for (const [key, file] of Object.entries(seated)) if (existsSync(join(motions, file))) clips[key] = file;
   copyFileSync(character, join(folder, 'character.vrm'));
   for (const file of Object.values(clips)) copyFileSync(join(motions, file), join(folder, file));
