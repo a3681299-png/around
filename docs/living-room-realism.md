@@ -93,4 +93,13 @@ Web の画像は `scripts/living-room/capture.mjs <out.png> 1600 1000`。`WW_LIV
 - 色は落ち着いた緑と木へ寄せた。参考画像のさらに密な植物や機材の重なり、生活感の量を、次に翔太・Claude Code が見て調整してほしい。
 - GLB は 14.54MB、ライトマップは 5.02MB、編集原本は 13.12MB。公開前の圧縮とノート PC の実 GPU の確認は残る。
 
-旧版は Git 履歴と `renders/v01`〜`web_v07` に残る。検証用ビルド・中間 Blender ファイル・ブラウザープロファイルを報告後に除去し、新しい原本、Web 用データ、選んだ画像と計測要約を残す。
+## 同期と後始末
+
+実装は `2e55cb1`、GitHub の `codex/living-room-realism` へ push 済み。標準の LFS hook で 2 件の実体が送信され、新しい sparse clone から `git lfs pull` して SHA-256 の一致まで確認した。
+
+- `living-room.blend`：`697a326d5e289475c8a634121143ad9f49a553dd404c899f4862f91f56389b42`
+- `room.glb`：`da99ee4b663a8a89361606c96218997ad89ac1491f1d20a7193e472cb5bce29b`
+
+このブランチ名は `.github/workflows/check.yml` の push 対象に含まれず、Actions の実行は 0 件。検証結果は上記の手元の実行による。
+
+旧版は Git 履歴と `renders/v01`〜`web_v07` に残る。今回の検証用ビルド・中間 Blender ファイル・途中の画像・ログなど約 159MB と、LFS 確認用の clone を削除した。新しい原本と Web 用データのほかに残した検証記録は、参照する画像 4 枚と計測要約だけ（合計 3.47MB）。依存物は本体の `node_modules` への junction を使い、複製していない。
