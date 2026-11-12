@@ -27,6 +27,7 @@ import {
   type MindEvent,
   type Mood,
 } from '../characters/mind';
+import { startLiveMood, stepLiveMood, type LiveMoodState, type LiveMove } from '../characters/live-mood';
 
 /** A thing of the desktop the body can come to: where a hand reaches it, where one sits on it. */
 export interface StageThing {
@@ -64,6 +65,18 @@ export interface Seen {
   events: readonly MindEvent[];
   /** Where it knocks on the screen from (a point in front of its place at the room's front). */
   knockAt: Vec3;
+  /**
+   * The room is in live mode (docs/living-live.md): where it stands before the screen, what it
+   * watches, and how lively the music is (0–1).
+   */
+  live?: { spot: Stand; look: Vec3; energy: number };
+}
+
+/** A place to stand: where, and which way to face (radians about y). */
+export interface Stand {
+  x: number;
+  z: number;
+  heading: number;
 }
 
 export interface Orders {
@@ -86,9 +99,16 @@ export interface Orders {
   acts: StageAct[];
   says: string;
   mood: Mood;
+  /** A place to go and stand (a live: before the screen). */
+  stand?: Stand;
+  /** Music to move to: what it does with it, and how much of the dance and of the beat is in the body. */
+  music?: { move: LiveMove; dance: number; groove: number };
+  /** A jump for joy, this frame (the song's big moment). */
+  cheer: boolean;
 }
 
 export interface DirectorState {
+  liveMood: LiveMoodState;
   mind: Mind;
   activity: Activity;
   /** Seconds in this activity, and since the body settled into it (0 until then). */
@@ -123,6 +143,7 @@ const GIVE_UP_S = 3.2;
 
 export const startDirector = (seed = 1, affinity = 0): DirectorState => {
   return {
+    liveMood: startLiveMood(),
     // The page opens on it lying with its phone: that is the room at rest.
     mind: { ...startMind(seed, affinity), did: ['bedPhone'] },
     activity: 'bedPhone',
@@ -164,6 +185,12 @@ const SAYS: Record<Activity, string> = {
   tug: '窓を引っぱっている',
   perch: '窓の上に座っている',
   knock: '画面をコンコン叩いている',
+  live: '音楽を聴いている',
+};
+const LIVE_SAYS: Record<LiveMove, string> = {
+  listen: '音楽を聴いている',
+  sway: '音楽に揺れている',
+  dance: '音楽に合わせて踊っている',
 };
 
 /** The wallpaper that suits how it feels (an index into the desktop's wallpapers). */
@@ -224,6 +251,9 @@ export function stepDirector(state: DirectorState, seen: Seen): { state: Directo
   let touch: Vec3 | undefined,
     perch: Orders['perch'],
     look: Vec3 | undefined,
+    stand: Stand | undefined,
+    music: Orders['music'],
+    cheer = false,
     tumble = false,
     done = false,
     asleep = false,
@@ -341,11 +371,47 @@ export function stepDirector(state: DirectorState, seen: Seen): { state: Directo
       if (s.landedFor >= 0) s = { ...s, landedFor: s.landedFor + dt };
       done = (s.count > 0 && s.landedFor > 1.2) || s.time > 20;
       break;
+    case 'live': {
+      const { live } = seen;
+      if (!live) {
+        done = true;
+        break;
+      }
+      // Before the screen, watching it; what the music does to it is its mood's affair too.
+      const moved = stepLiveMood(s.liveMood, {
+        dt,
+        energy: live.energy,
+        grump: mind.grump,
+        tired: Math.max(0, 1 - mind.energy / 0.3),
+        joy: mind.joy,
+      });
+      stand = live.spot;
+      look = live.look;
+      music = { move: moved.move, dance: moved.dance, groove: moved.groove };
+      if (moved.drop) {
+        mind = feel(mind, 'drop');
+        cheer = true;
+        flash('bang', 0.9);
+      }
+      // Dancing keeps it glad, and now and then it shows.
+      let count = s.count + (moved.move === 'dance' ? dt : 0);
+      if (moved.move === 'dance') mind = { ...mind, joy: Math.min(1, mind.joy + dt / 14) };
+      if (count > 7) {
+        flash('note', 1.6);
+        count = 0;
+      }
+      s = { ...s, liveMood: moved, count };
+      break;
+    }
   }
 
   // --- what next -------------------------------------------------------------------------------
   // (Thrown off, it finishes falling before it thinks of anything else.)
   const falling = seen.body === 'tumble' || seen.body === 'dazed';
+  // A live begins: whatever it was at, it comes (the mind is not asked; a sleeper is woken by the
+  // music, and not crossly).
+  if (seen.live && s.activity !== 'live' && s.next !== 'live' && !falling)
+    s = { ...s, next: 'live', liveMood: startLiveMood() };
   if ((done || interrupted) && !s.next && !falling) {
     const picked = choose(mind, {
       uiOpen: stage.open,
@@ -427,8 +493,17 @@ export function stepDirector(state: DirectorState, seen: Seen): { state: Directo
       },
       emote,
       acts,
-      says: falling ? 'ほうり出された！' : leaving && seen.phone !== 'away' ? 'スマホを置いている' : SAYS[s.activity],
+      says: falling
+        ? 'ほうり出された！'
+        : leaving && seen.phone !== 'away'
+          ? 'スマホを置いている'
+          : music
+            ? LIVE_SAYS[music.move]
+            : SAYS[s.activity],
       mood,
+      ...(stand && !leaving ? { stand } : {}),
+      ...(music && !leaving ? { music } : {}),
+      cheer: cheer && !leaving,
     },
   };
 }

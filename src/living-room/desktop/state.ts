@@ -6,8 +6,10 @@
  *
  * Positions are CSS pixels of the viewport the desktop was last laid out for.
  */
-export type AppId = 'ambience' | 'mirror' | 'resident' | 'ball';
+export type AppId = 'player' | 'ambience' | 'mirror' | 'resident' | 'ball';
 export const APPS: readonly { id: AppId; title: string; w: number; h: number }[] = [
+  // A YouTube video, and the way into live mode (docs/living-live.md).
+  { id: 'player', title: 'プレイヤー', w: 432, h: 392 },
   { id: 'ambience', title: '壁紙と光', w: 340, h: 300 },
   { id: 'mirror', title: 'ミラー', w: 400, h: 300 },
   { id: 'resident', title: '住人', w: 300, h: 250 },
@@ -42,9 +44,14 @@ export interface DesktopState {
   /** 0.4–1.4: how bright the desktop (and so the room's glow) is. */
   brightness: number;
   mirror: boolean;
+  /** The video in the player (a YouTube id), and whether the room is in live mode around it. */
+  video?: string;
+  live: boolean;
   viewport: readonly [number, number];
   nextZ: number;
 }
+
+const VIDEO_ID = /^[A-Za-z0-9_-]{11}$/;
 
 /** The bar at the top and the dock at the bottom keep clear of windows. */
 export const BAR_H = 38;
@@ -57,6 +64,7 @@ export const startDesktop = (viewport: readonly [number, number]): DesktopState 
   wallpaper: 0,
   brightness: 1,
   mirror: false,
+  live: false,
   viewport,
   nextZ: 1,
 });
@@ -88,6 +96,8 @@ function firstPlace(id: AppId, viewport: readonly [number, number]): { x: number
   if (id === 'ball') return { x: vw * 0.47, y: vh * 0.58 };
   // The wallpapers on the right; the mirror up beside the clock.
   if (id === 'ambience') return { x: vw, y: vh * 0.1 };
+  // The player up in the middle, over the desk: the floor under it stays the resident's.
+  if (id === 'player') return { x: vw * 0.5 - 216, y: 0 };
   // (Left of the wallpapers' card with room to spare, on a narrow screen too.)
   return { x: Math.min(vw * 0.27, vw - 770), y: 0 };
 }
@@ -95,6 +105,8 @@ function firstPlace(id: AppId, viewport: readonly [number, number]): { x: number
 export type DesktopAction =
   | { type: 'open' }
   | { type: 'close' }
+  | { type: 'video'; id: string }
+  | { type: 'live'; on: boolean }
   | { type: 'app'; id: AppId }
   | { type: 'closeApp'; id: AppId }
   | { type: 'focus'; id: AppId }
@@ -118,7 +130,18 @@ export function reduceDesktop(state: DesktopState, action: DesktopAction): Deskt
       return state.windows.length ? opened : reduceDesktop(opened, { type: 'app', id: 'resident' });
     }
     case 'close':
-      return state.open ? { ...state, open: false } : state;
+      // (Live mode is a state of the open desktop: it ends with it.)
+      return state.open ? { ...state, open: false, live: false } : state;
+    case 'video': {
+      if (!VIDEO_ID.test(action.id)) return state;
+      // A video to play: the player comes up with it (and the desktop, if it was shut).
+      const shown = reduceDesktop({ ...state, open: true, video: action.id }, { type: 'app', id: 'player' });
+      return state.windows.length ? shown : reduceDesktop(shown, { type: 'app', id: 'resident' });
+    }
+    case 'live':
+      if (!action.on) return state.live ? { ...state, live: false } : state;
+      if (state.live || !state.open || !state.video) return state;
+      return { ...reduceDesktop(state, { type: 'app', id: 'player' }), live: true };
     case 'app': {
       if (state.windows.some((w) => w.id === action.id)) return front(action.id);
       const app = APPS.find((a) => a.id === action.id);
@@ -130,7 +153,11 @@ export function reduceDesktop(state: DesktopState, action: DesktopAction): Deskt
       return { ...state, windows: [...state.windows, win], nextZ: state.nextZ + 1 };
     }
     case 'closeApp':
-      return { ...state, windows: state.windows.filter((w) => w.id !== action.id) };
+      return {
+        ...state,
+        windows: state.windows.filter((w) => w.id !== action.id),
+        live: state.live && action.id !== 'player',
+      };
     case 'focus':
       return focused(state)?.id === action.id || !state.windows.some((w) => w.id === action.id)
         ? state

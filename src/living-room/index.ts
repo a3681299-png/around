@@ -135,6 +135,7 @@ async function start() {
   };
   const soft: Mesh[] = [];
   const shell = new Box3();
+  const shellMeshes: Mesh[] = [];
   gltf.scene.updateMatrixWorld(true);
   const kinds = new Map<MeshBasicMaterial, GlowKind>();
   gltf.scene.traverse((object) => {
@@ -148,7 +149,10 @@ async function start() {
     // A multi-material mesh arrives as several meshes whose names start with the object's name.
     const map = mesh.name.startsWith(manifest.lightmapMesh) ? lightmap : null;
     // (The big baked surfaces are the room's walls and floor: their box is the room's shell.)
-    if (map) shell.expandByObject(mesh);
+    if (map) {
+      shell.expandByObject(mesh);
+      shellMeshes.push(mesh);
+    }
     const source = mesh.material as MeshStandardMaterial;
     // The room's soft things (by the material's name in the room file) give under a body.
     if (/^(duvet|sheet|throw|pillow|beanbag|rug_|floor_shade)/.test(source.name)) soft.push(mesh);
@@ -178,7 +182,8 @@ async function start() {
   }
   const layout = readLayout(gltf.scene);
   // Seen from inside, the cutaway room needs the wall and the ceiling it was made without.
-  if (!shell.isEmpty()) scene.add(...enclose(shell, layout.floorY));
+  const added = shell.isEmpty() ? [] : enclose(shell, layout.floorY);
+  if (added.length) scene.add(...added);
   // A character only where the build was given one (a local folder, never a public build).
   let resident: LivingResident | undefined;
   // Light that changes at run time: the baked layers (the desktop's glow, the monitor) and small
@@ -224,12 +229,19 @@ async function start() {
     front.width = canvas.width;
     front.height = canvas.height;
     camera.aspect = width / height;
+    fit();
+    wake();
+  }
+  function fit() {
     // Wider than authored: keep the height. Narrower: keep the width, so the room is never cut.
     const tan = camera.aspect >= VIEW.aspect ? authoredTan : (authoredTan * VIEW.aspect) / camera.aspect;
     camera.fov = (Math.atan(tan) * 360) / Math.PI;
     camera.updateProjectionMatrix();
-    wake();
   }
+  // Where the camera rests: the room's own view, or (the test hook) one being tried.
+  const rest = { position: VIEW.position.clone(), target: SUBJECT.clone(), fov: VIEW.fov };
+  let fov = VIEW.fov;
+  let reviewing = false;
   // The virtual desktop: glass windows over the room, the same desktop on the room's monitor, and
   // its colour in the room's light (docs/living-desktop.md).
   const desktop = startRoomDesktop({
@@ -240,6 +252,9 @@ async function start() {
     glow,
     floorY: layout.floorY,
     resident,
+    shell,
+    shellMeshes,
+    added,
     wake: () => wake(),
   });
   const timing = { frames: 0, interval: 0, worstInterval: 0, body: 0, draw: 0 };
@@ -261,12 +276,37 @@ async function start() {
     last = now;
     // (With the desktop open the room holds still: the pointer is working the windows, and the
     // resident comes to a place on a window that must not drift under its hand.)
-    look.lerp(reduce.matches || desktop.open ? aim.set(0, 0) : aim, 1 - Math.exp(-dt * 5));
+    // A live moves the camera to its own view of the room (near the screen, or back in the hall)
+    // and home again after: eased, never cut (docs/living-live.md).
+    const live = desktop.live;
+    const staged = live.amount;
+    const to = live.camera() ?? rest;
+    const ease = 1 - Math.exp(-dt * 2.2);
+    home.lerp(to.position, ease);
+    SUBJECT.lerp(to.target, ease);
+    if (!reviewing) reviewSubject.copy(SUBJECT);
+    if (Math.abs(to.fov - fov) > 0.01) {
+      fov += (to.fov - fov) * ease;
+      authoredTan = Math.tan((fov * Math.PI) / 360);
+      fit();
+    }
+    // At a live the view is never quite still: it drifts a little by itself and follows the
+    // pointer further than the room's own view does, so the screen, the room around it and the
+    // resident before it slide against each other (that is what gives the picture its place in
+    // the room). With the desktop open otherwise, the room holds still: the pointer is working
+    // the windows, and the resident comes to a place on a window that must not drift under its hand.
+    const drifting = staged > 0.5 && !reduce.matches;
+    look.lerp(reduce.matches || (desktop.open && !drifting) ? aim.set(0, 0) : aim, 1 - Math.exp(-dt * 5));
+    const driftX = drifting ? 0.4 * Math.sin(now * 0.00021) : 0,
+      driftY = drifting ? 0.3 * Math.sin(now * 0.00016 + 1.3) : 0;
     // A small orbit about the subject follows the pointer: depth without leaving the composition.
     offset.copy(home).sub(SUBJECT);
     if (__WW_LIVING_TEST__) offset.multiplyScalar(reviewDistance).applyAxisAngle(new Vector3(0, 1, 0), reviewTurn);
-    offset.applyAxisAngle(new Vector3(0, 1, 0), -look.x * 0.05);
-    offset.y += look.y * 0.25;
+    offset.applyAxisAngle(new Vector3(0, 1, 0), -(look.x + driftX) * (0.05 + 0.05 * staged));
+    offset.y += (look.y + driftY) * (0.25 - 0.1 * staged);
+    // (A beat leans the view in by a finger's width.)
+    if (drifting) offset.multiplyScalar(1 - 0.006 * live.pulse);
+    resident?.houseLights(1 - 0.72 * staged);
     camera.position.copy(reviewSubject).add(offset);
     camera.lookAt(reviewSubject);
     if (closeUp && resident) {
@@ -279,7 +319,7 @@ async function start() {
     camera.updateMatrixWorld();
     const began = __WW_LIVING_TEST__ ? performance.now() : 0;
     // The resident sees what the desktop offers, acts on it, and the desktop takes that in.
-    const acts = resident?.update(dt, camera, desktop.stage()) ?? [];
+    const acts = resident?.update(dt, camera, desktop.stage(), live.cue()) ?? [];
     desktop.update(dt, now, acts);
     const posed = __WW_LIVING_TEST__ ? performance.now() : 0;
     // Up on the desktop (riding a window, thrown off one) the resident is in front of the UI: it
@@ -431,6 +471,7 @@ async function start() {
         /** Fixed close views of the furniture for the browser art review. */
         reviewCamera: (target: [number, number, number], scale: number, turn = 0) => {
           reviewSubject.fromArray(target);
+          reviewing = true;
           reviewDistance = Math.min(1, Math.max(0.08, scale));
           // (Round the subject by this much, radians: a side view of what the room's camera sees.)
           reviewTurn = turn;
@@ -447,12 +488,17 @@ async function start() {
         },
         /** Tries another view of the room: where the camera is, what it looks at, its vertical angle. */
         view: (position: [number, number, number], target: [number, number, number], fov: number) => {
-          home.fromArray(position);
-          SUBJECT.fromArray(target);
-          reviewSubject.fromArray(target);
-          authoredTan = Math.tan((fov * Math.PI) / 360);
-          resize();
+          rest.position.fromArray(position);
+          rest.target.fromArray(target);
+          rest.fov = fov;
+          wake();
         },
+        /** Live mode (docs/living-live.md): what it reads and hears now; and, for the checks, a
+         * picture (16 × 9 cells of RGBA) and a sound (0–1 each) given by hand instead of the tab's. */
+        live: () => ({ ...desktop.live.readout(), amount: desktop.live.amount }),
+        liveFeed: (cells?: number[], bands?: { bass: number; mid: number; high: number }) =>
+          desktop.live.feed(cells ? Uint8ClampedArray.from(cells) : undefined, bands),
+        dispatch: (action: Parameters<typeof desktop.dispatch>[0]) => desktop.dispatch(action),
         triangles: () => renderer.info.render.triangles,
         still: () => {
           aim.set(0, 0);

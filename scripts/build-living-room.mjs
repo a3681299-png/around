@@ -70,6 +70,8 @@ if (character) {
     sitDown: 'Sitting_Enter.vrma',
     sit: 'Sitting_Idle_Loop.vrma',
     standUp: 'Sitting_Exit.vrma',
+    // A dance for live mode (docs/living-live.md); without it the body only moves to the beat.
+    dance: 'Dance_Loop.vrma',
   };
   for (const [key, file] of Object.entries(seated)) if (existsSync(join(motions, file))) clips[key] = file;
   copyFileSync(character, join(folder, 'character.vrm'));

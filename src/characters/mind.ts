@@ -14,7 +14,19 @@
 import { draw } from '../world/room-life';
 
 export type Activity =
-  'nap' | 'bedPhone' | 'computer' | 'floorSit' | 'sulk' | 'play' | 'inspect' | 'shove' | 'tug' | 'perch' | 'knock';
+  | 'nap'
+  | 'bedPhone'
+  | 'computer'
+  | 'floorSit'
+  | 'sulk'
+  | 'play'
+  | 'inspect'
+  | 'shove'
+  | 'tug'
+  | 'perch'
+  | 'knock'
+  // At a live (docs/living-live.md): never taken up by itself, only while the room is in live mode.
+  | 'live';
 
 export type MindEvent =
   | 'uiOpened'
@@ -27,7 +39,9 @@ export type MindEvent =
   | 'touched'
   | 'knocked'
   | 'woken'
-  | 'lost';
+  | 'lost'
+  // The music rose out of a quiet passage: the song's big moment.
+  | 'drop';
 
 export interface Mind {
   t: number;
@@ -92,6 +106,8 @@ const DRIFT: Record<Activity, { energy: number; boredom: number; curiosity: numb
   tug: { energy: -1 / 300, boredom: -1 / 30, curiosity: -1 / 40 },
   perch: { energy: -1 / 500, boredom: -1 / 45, curiosity: -1 / 80 },
   knock: { energy: -1 / 600, boredom: -1 / 60, curiosity: 0 },
+  // (A live tires it slowly and leaves no room for boredom.)
+  live: { energy: -1 / 420, boredom: -1 / 12, curiosity: -1 / 60 },
 };
 
 export function stepMind(mind: Mind, dt: number, doing: Activity, settled: boolean): Mind {
@@ -160,6 +176,8 @@ export function feel(mind: Mind, kind: MindEvent): Mind {
       return { ...m, surprise: 1, grump: clamp01(m.grump + (m.energy < 0.6 ? 0.5 : 0.1)) };
     case 'lost':
       return { ...m, confusion: clamp01(m.confusion + 0.8), curiosity: clamp01(m.curiosity - 0.25) };
+    case 'drop':
+      return { ...m, joy: clamp01(m.joy + 0.45), boredom: clamp01(m.boredom - 0.3), grump: clamp01(m.grump - 0.15) };
   }
 }
 
@@ -182,6 +200,7 @@ export function scores(mind: Mind, offer: Offer): Record<Activity, number> {
     tug: offer.window ? awake * (0.5 * m.curiosity + 0.3 * m.joy - 0.2 * m.grump) : 0,
     perch: offer.perch ? awake * (0.42 + 0.4 * m.joy + 0.25 * m.curiosity - 0.35 * thrown - 0.5 * m.grump) : 0,
     knock: awake * (m.social * (1 + 0.25 * m.affinity) - 0.6 * m.grump),
+    live: 0,
   };
   // What it has just done is less inviting (sleep and sulking aside: those end by themselves).
   m.did.slice(-4).forEach((activity, i, all) => {

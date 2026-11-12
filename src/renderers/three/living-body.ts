@@ -52,6 +52,8 @@ export interface LivingBodyMotions {
   sitDown?: Uint8Array;
   sit?: Uint8Array;
   standUp?: Uint8Array;
+  /** A dance loop (a live). Without it the body only moves to the beat. */
+  dance?: Uint8Array;
 }
 export interface LivingBodyMetrics extends BodyReach {
   height: number;
@@ -168,7 +170,7 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
   VRMUtils.removeUnnecessaryVertices(vrm.scene);
   VRMUtils.rotateVRM0(vrm);
   const optional = (bytes: Uint8Array | undefined) => (bytes ? parseVrmAnimation(bytes) : undefined);
-  const [idleAnimation, walkAnimation, runAnimation, sitDownAnimation, sitAnimation, standUpAnimation] =
+  const [idleAnimation, walkAnimation, runAnimation, sitDownAnimation, sitAnimation, standUpAnimation, danceAnimation] =
     await Promise.all([
       parseVrmAnimation(motions.idle),
       parseVrmAnimation(motions.walk),
@@ -176,6 +178,7 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
       optional(motions.sitDown),
       optional(motions.sit),
       optional(motions.standUp),
+      optional(motions.dance),
     ]);
 
   const root = new Group();
@@ -386,6 +389,14 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
     const clip = vrmAnimationClip(animation, vrm);
     return [{ pose, clip, action: play(clip), weight: 0 }];
   });
+  // A dance (docs/living-live.md): a loop of its own, mixed in over standing still by how much
+  // the music has it dancing, and played at the music's pace.
+  const danceClip = danceAnimation ? vrmAnimationClip(danceAnimation, vrm) : undefined;
+  const dance = danceClip ? play(danceClip) : undefined;
+  dance?.setEffectiveWeight(0);
+  let danceWeight = 0,
+    danceTime = 0,
+    groove = 0;
 
   const metrics: LivingBodyMetrics = {
     arm: upperArmLength + lowerArmLength + handLength,
@@ -603,6 +614,19 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
         runUpper.time = ((cycle + runShift) % 1) * (runClip.duration || 1);
         runUpper.setEffectiveWeight(2.2 * scurry * clamp(runWeight / 0.3, 0, 1) * standing);
       }
+      // Music: only on its feet and at rest (it stops dancing to walk, and takes it up again).
+      const music = intent.music;
+      const free = (1 - moveWeight) * standing;
+      danceWeight = approach(danceWeight, dance && music ? music.dance * free : 0, 5, dt);
+      groove = approach(groove, music ? music.groove * free : 0, 5, dt);
+      if (danceWeight < 0.002 && !music) danceWeight = 0;
+      if (dance && danceClip) {
+        // The loop keeps the music's pace (within what still looks like the same dance).
+        danceTime = (danceTime + dt * clamp((music?.bpm ?? 120) / 120, 0.8, 1.3)) % (danceClip.duration || 1);
+        dance.time = danceTime;
+        dance.setEffectiveWeight(danceWeight);
+        idle.setEffectiveWeight(free * (1 - danceWeight));
+      }
       for (const g of given) {
         g.node.quaternion.copy(g.q);
         g.node.position.copy(g.p);
@@ -673,6 +697,22 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
       // The head keeps its eyes level through the trunk's lean, and lags its changes; a touch
       // makes it nod.
       head.rotateX(-trail * 0.6 + (trail - lean) * 0.8 - arch * 0.22 + intent.tap * 0.1).rotateZ(-roll * 0.5);
+      // To the beat: the knees give on each beat and the body comes up between them; the weight
+      // goes to one side for a beat and to the other for the next; the head nods a little late.
+      // Under a dance this is only the pulse (the dance has its own shapes).
+      if (music && groove > 0.002) {
+        const phase = music.beat - Math.floor(music.beat);
+        const dip = (1 - phase) ** 2.2;
+        const late = (1 - ((((music.beat - 0.12) % 1) + 1) % 1)) ** 2.2;
+        const side = Math.sin(music.beat * Math.PI);
+        const g = groove * (1 - 0.6 * danceWeight);
+        hips.position.y -= dip * 0.028 * g;
+        hips.position.x += side * 0.022 * g;
+        hips.rotateZ(side * 0.05 * g);
+        spine.rotateZ(-side * 0.07 * g).rotateX(dip * 0.03 * g);
+        head.rotateX(late * 0.1 * g).rotateZ(side * 0.06 * g);
+        for (const leg of sides) leg.upperArm.rotateX(side * leg.sign * 0.09 * g);
+      }
       // Off the floor the legs tuck under; in a jump for joy the heels kick up behind instead
       // (one more than the other: a symmetrical pose is a stiff one).
       if (air > 0)

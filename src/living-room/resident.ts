@@ -48,10 +48,10 @@ import type { ScreenGlow } from './screen-glow';
 import { startChair, stepChair, type ChairState } from './chair-give';
 import { chairRig, type ChairRig } from './chair-rig';
 import { phoneProp, PHONE_SIZE } from './phone-prop';
-import { startDirector, stepDirector, type Orders, type StageAct, type StageView } from './director';
+import { startDirector, stepDirector, type Orders, type StageAct, type StageView, type Stand } from './director';
 import { emoteBubble } from './emote';
 import type { Vec3 } from '../characters/two-bone-ik';
-import { standPoint, walkable, type RoomLayout } from '../world/room-life';
+import { nearestFloor, standPoint, walkable, type RoomLayout } from '../world/room-life';
 
 interface CharacterManifest {
   vrm: string;
@@ -61,14 +61,26 @@ interface CharacterManifest {
   sitDown?: string;
   sit?: string;
   standUp?: string;
+  dance?: string;
+}
+
+/** A live going on in the room (docs/living-live.md): where it stands, what it watches, the music. */
+export interface LiveCue {
+  spot: Stand;
+  look: Vec3;
+  /** 0–1: how lively the music is; the beat clock (whole numbers on the beats) and the tempo. */
+  energy: number;
+  beat: number;
+  bpm: number;
 }
 
 export interface LivingResident {
   /**
    * One frame. `stage` is what the desktop offers it (windows to reach, to sit on, a ball);
-   * returns what it does to the desktop this frame (turns it on, bats the ball…).
+   * `live` is there while the room is in live mode. Returns what it does to the desktop this
+   * frame (turns it on, bats the ball…).
    */
-  update(dt: number, camera: Camera, stage?: StageView): StageAct[];
+  update(dt: number, camera: Camera, stage?: StageView, live?: LiveCue): StageAct[];
   /** A point in the room's metres to notice, walk to and touch; undefined takes it away. */
   setTarget(target: Vec3 | undefined): void;
   /** A seat of the room by its id (sit_chair, sit_bed…) to go and sit on; undefined stands up. */
@@ -77,6 +89,8 @@ export interface LivingResident {
   setMood(mood: Mood): void;
   /** The character's touch was answered (the thing was clicked): it is glad. */
   cheer(): void;
+  /** The room's own light on it (1 as it is, less at a live: the house lights go down). */
+  houseLights(amount: number): void;
   /** Its own life (the director) on or off. Off, it stays where `sit` puts it. */
   live(on: boolean): void;
   /** Something happened to it (petted, a window flew past…): the mind is told. */
@@ -193,7 +207,7 @@ export async function loadLivingResident(
     return new URL(name, folder);
   };
   const maybe = (name: string | undefined) => (name ? bytes(file(name)) : undefined);
-  const [vrm, idle, walk, run, sitDown, sit, standUp] = await Promise.all([
+  const [vrm, idle, walk, run, sitDown, sit, standUp, dance] = await Promise.all([
     bytes(file(manifest.vrm)),
     bytes(file(manifest.idle)),
     bytes(file(manifest.walk)),
@@ -201,6 +215,7 @@ export async function loadLivingResident(
     maybe(manifest.sitDown),
     maybe(manifest.sit),
     maybe(manifest.standUp),
+    maybe(manifest.dance),
   ]);
   const prepared = prepareVerifiedSource(vrm, 'model/gltf-binary');
   if (!prepared.modelBuffer) throw new Error('キャラクターのモデルを検証できませんでした。');
@@ -211,6 +226,7 @@ export async function loadLivingResident(
     ...(sitDown ? { sitDown } : {}),
     ...(sit ? { sit } : {}),
     ...(standUp ? { standUp } : {}),
+    ...(dance ? { dance } : {}),
   });
   scene.add(body.root);
   // The room's light is baked into unlit materials, so these reach only the character: a cool
@@ -428,7 +444,7 @@ export async function loadLivingResident(
   };
 
   return {
-    update(dt, camera, stage = NOTHING) {
+    update(dt, camera, stage = NOTHING, live) {
       clock += dt;
       // Its mind: what it is at, what it reaches for, what the phone is for, how it feels.
       const holding = state.phase === 'hold';
@@ -443,24 +459,43 @@ export async function loadLivingResident(
           landed: holding && !wasHolding && !target,
           events: pending.splice(0),
           knockAt: knockAt(camera),
+          ...(live ? { live: { spot: live.spot, look: live.look, energy: live.energy } } : {}),
         });
         director = stepped.state;
         orders = stepped.orders;
         acts = orders.acts;
         touch = orders.touch;
         if (orders.tumble) tumbles++;
+        if (orders.cheer) cheers++;
         const place = orders.seat;
+        // (A place to stand is the nearest floor to where it was asked to: the room has things on it.)
+        const asked = orders.stand;
+        const floor = asked && nearestFloor(layout, asked.x, asked.z);
+        const stand = asked && floor ? { ...asked, x: floor[0], z: floor[1] } : undefined;
         seat =
           target || touch || orders.perch
             ? undefined
-            : place === 'bed'
-              ? bedLie
-              : place === 'chair'
-                ? chairSeat
-                : place === 'floor' && floorSeat
-                  ? // Sulking, it sits with its back to the room's open side.
-                    { ...floorSeat, heading: floorSeat.heading + (orders.backTurned ? Math.PI : 0) }
-                  : undefined;
+            : stand
+              ? {
+                  x: stand.x,
+                  y: layout.floorY,
+                  z: stand.z,
+                  // It watches the screen; dancing, it turns to whoever is watching it.
+                  heading:
+                    orders.music?.move === 'dance'
+                      ? Math.atan2(camera.position.x - stand.x, camera.position.z - stand.z)
+                      : stand.heading,
+                  stand: [stand.x, stand.z],
+                  standing: true,
+                }
+              : place === 'bed'
+                ? bedLie
+                : place === 'chair'
+                  ? chairSeat
+                  : place === 'floor' && floorSeat
+                    ? // Sulking, it sits with its back to the room's open side.
+                      { ...floorSeat, heading: floorSeat.heading + (orders.backTurned ? Math.PI : 0) }
+                    : undefined;
         // How it was treated is kept for the next visit.
         if (Math.abs(director.mind.affinity - savedAffinity) > 0.02) {
           savedAffinity = director.mind.affinity;
@@ -492,9 +527,14 @@ export async function loadLivingResident(
         ...(!target && orders?.perch ? { perch: orders.perch } : {}),
       });
       const intent = approachIntent(state, goal);
-      // The eyes go to what has its attention before the body does.
-      if (orders?.look) lookAt = orders.look;
-      lookTo += ((orders?.look ? 1 : 0) - lookTo) * (1 - Math.exp(-5 * dt));
+      // Music in the body (a live): the dance, and the beat it moves on.
+      if (orders?.music && live)
+        intent.music = { dance: orders.music.dance, groove: orders.music.groove, beat: live.beat, bpm: live.bpm };
+      // The eyes go to what has its attention before the body does. (Dancing with its back to the
+      // screen, it does not crane round at it.)
+      const watching = orders?.look && orders.music?.move !== 'dance' ? orders.look : undefined;
+      if (watching) lookAt = watching;
+      lookTo += ((watching ? 1 : 0) - lookTo) * (1 - Math.exp(-5 * dt));
       if (lookAt && lookTo > intent.lookWeight) {
         intent.look = lookAt;
         intent.lookWeight = lookTo;
@@ -715,6 +755,10 @@ export async function loadLivingResident(
     },
     setMood(next) {
       mood = next === 'interest' ? 'interest' : 'calm';
+    },
+    houseLights(amount) {
+      fill.intensity = 1.5 * amount;
+      key.intensity = 1.6 * amount;
     },
     cheer() {
       cheers++;

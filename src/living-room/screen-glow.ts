@@ -32,6 +32,8 @@ export interface ScreenGlow {
   off(slot: number): void;
   /** Tints a baked layer: linear RGB times `power` (0 is dark). */
   layer(name: GlowLayer, r: number, g: number, b: number, power: number): void;
+  /** Turns the room's own baked light down (1 as baked, 0 dark): the house lights at a live. */
+  dim(amount: number): void;
   /** Whether any slot shines (the page draws while it does). */
   readonly lit: boolean;
 }
@@ -53,6 +55,7 @@ export function screenGlow(
     layerScreen: { value: tints.screen },
     layerUiMap: { value: layers.ui ?? null },
     layerScreenMap: { value: layers.screen ?? null },
+    roomDim: { value: 1 },
   };
   const layered = Boolean(layers.ui && layers.screen);
   for (const [material, kind] of materials) patch(material, layered ? kind : 'plain', uniforms);
@@ -71,6 +74,9 @@ export function screenGlow(
     layer(name, r, g, b, power) {
       // (The layers are stored divided by the room's light scale, like its own light.)
       tints[name].set(r, g, b).multiplyScalar(Math.max(0, power) * lightScale);
+    },
+    dim(amount) {
+      uniforms.roomDim.value = Math.min(1, Math.max(0, amount));
     },
     get lit() {
       return lit;
@@ -114,6 +120,7 @@ uniform vec3 glowFacing[${GLOW_SLOTS}];
 uniform vec3 glowColor[${GLOW_SLOTS}];
 uniform vec3 layerUi;
 uniform vec3 layerScreen;
+uniform float roomDim;
 ${kind === 'lightmap' ? 'uniform sampler2D layerUiMap;\nuniform sampler2D layerScreenMap;' : ''}
 ${perVertex ? 'varying vec3 vLayerUi;\nvarying vec3 vLayerScreen;' : ''}
 varying vec3 vGlowWorld;
@@ -122,6 +129,9 @@ varying vec3 vGlowNormal;`,
       .replace(
         '#include <opaque_fragment>',
         `{
+  // The house lights: the room's own baked light, turned down at a live. (Things that shine by
+  // themselves, lamps and screens, are turned down less.)
+  outgoingLight *= ${kind === 'plain' ? 'mix(0.45, 1.0, roomDim)' : 'roomDim'};
   ${layerTerm}
   // The surface's hue at a middle brightness: what a small light shows of it.
   vec3 base = diffuseColor.rgb;

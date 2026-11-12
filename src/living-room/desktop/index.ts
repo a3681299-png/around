@@ -12,6 +12,7 @@
  *                  frame or the ball, where it can sit on a window; and what it does to it
  */
 import {
+  type Box3,
   CanvasTexture,
   CircleGeometry,
   Color,
@@ -32,11 +33,21 @@ import {
 import { GLOW_SLOTS, type ScreenGlow } from '../screen-glow';
 import type { LivingResident } from '../resident';
 import type { StageAct, StageThing, StageView } from '../director';
-import { WALLPAPERS, desktopLight, focused, linear, type AppId, type DeskWindow, type DesktopState } from './state';
+import {
+  WALLPAPERS,
+  desktopLight,
+  focused,
+  linear,
+  type AppId,
+  type DeskWindow,
+  type DesktopAction,
+  type DesktopState,
+} from './state';
 import { desktopView } from './view';
 import { MONITOR_H, MONITOR_W, paintDesktop } from './paint';
 import { mirror as mirrorSource } from './mirror';
 import { edgeSamples } from './edge';
+import { startLive, type Live } from '../live';
 
 export interface DesktopEnv {
   host: HTMLElement;
@@ -46,6 +57,11 @@ export interface DesktopEnv {
   glow: ScreenGlow;
   floorY: number;
   resident: LivingResident | undefined;
+  /** The room's walls and floor (their box and their meshes), and the wall and ceiling the page
+   * added: live mode lights them and turns them down (docs/living-live.md). */
+  shell: Box3;
+  shellMeshes: readonly Object3D[];
+  added: readonly Object3D[];
   /** Asks the page for a frame (it draws only when something changes). */
   wake(): void;
 }
@@ -61,6 +77,9 @@ export interface Desktop {
   readonly mirroring: boolean;
   readonly open: boolean;
   state(): DesktopState;
+  /** Live mode (docs/living-live.md): the room around a video. */
+  readonly live: Live;
+  dispatch(action: DesktopAction): void;
 }
 
 /**
@@ -68,7 +87,16 @@ export interface Desktop {
  * the real page: the room keeps its dark blue night; an open desktop is a soft wash from the
  * front, never daylight.
  */
-const GAIN = { screen: 2.6, ui: 1.5, uiBody: 2.4, screenBody: 1.1, pool: 0.3, ball: 0.55, poolBody: 0.9 };
+const GAIN = {
+  screen: 2.6,
+  ui: 1.5,
+  uiBody: 2.4,
+  screenBody: 1.1,
+  pool: 0.3,
+  ball: 0.55,
+  poolBody: 0.9,
+  liveScreen: 1.6,
+};
 /** The monitor's face is brighter than white, so it blooms like the room's other screens. */
 const FACE = 1.5;
 /** How hard the resident sends a thing off (CSS pixels a second). */
@@ -98,15 +126,32 @@ export function startRoomDesktop(env: DesktopEnv): Desktop {
   const { resident, glow, camera } = env;
   let dirty = true;
   const view = desktopView(env.host, {
-    changed: () => {
+    changed: (state) => {
       dirty = true;
+      // (At once: entering live mode asks the browser for the tab, which needs the press itself.)
+      live.changed(state);
       env.wake();
     },
     mirror: (on) => {
       if (on) void source.start();
       else source.stop();
     },
+    liveView: (name) => live.setView(name),
+    light: (on) => live.setLight(on),
   });
+  const live: Live = startLive(
+    {
+      scene: env.scene,
+      glow,
+      shell: env.shell,
+      shellMeshes: env.shellMeshes,
+      added: env.added,
+      floorY: env.floorY,
+      resident: Boolean(resident),
+      wake: env.wake,
+    },
+    view,
+  );
   const source = mirrorSource(view.mirrorVideo, (state) => {
     view.setMirror(state);
     view.dispatch({ type: 'mirror', on: state === 'on' });
@@ -127,7 +172,7 @@ export function startRoomDesktop(env: DesktopEnv): Desktop {
     return texture;
   };
   const painted = tune(new CanvasTexture(canvas));
-  let live: VideoTexture | undefined;
+  let shared: VideoTexture | undefined;
   const face = env.room.getObjectByName('dyn_monitor_screen') as Mesh | undefined;
   const faceMaterial = new MeshBasicMaterial({ map: painted, color: new Color(FACE, FACE, FACE) });
   if (face?.isMesh) face.material = faceMaterial;
@@ -254,7 +299,8 @@ export function startRoomDesktop(env: DesktopEnv): Desktop {
   };
   const stage = (): StageView => {
     const state = view.state();
-    if (!resident || !state.open) return { open: state.open };
+    // (At a live the windows are away and the player is the screen: nothing of it to play with.)
+    if (!resident || !state.open || state.live) return { open: state.open };
     const front = focused(state);
     const ball = state.windows.find((w) => w.id === 'ball');
     return {
@@ -338,12 +384,25 @@ export function startRoomDesktop(env: DesktopEnv): Desktop {
       const target = state.open ? 1 : 0;
       amount += (target - amount) * (1 - Math.exp(-(state.open ? 4.5 : 3) * dt));
       if (Math.abs(target - amount) < 0.002) amount = target;
-      glow.layer('screen', screen.x, screen.y, screen.z, GAIN.screen);
-      glow.layer('ui', ui.x, ui.y, ui.z, GAIN.ui * amount);
+      // A live takes the room over: the desktop's own glow goes out, and the desk's baked light
+      // (the layer baked for the monitor, behind the live's screen) shows the picture's colour
+      // as the screen's bounce off what is behind it.
+      live.update(dt, now, state, camera);
+      const staged = live.amount,
+        plain = 1 - staged,
+        picture = live.light.all;
+      glow.layer(
+        'screen',
+        screen.x * plain + picture[0] * staged,
+        screen.y * plain + picture[1] * staged,
+        screen.z * plain + picture[2] * staged,
+        GAIN.screen * plain + GAIN.liveScreen * staged,
+      );
+      glow.layer('ui', ui.x, ui.y, ui.z, GAIN.ui * amount * plain);
       uiLamp.color.setRGB(ui.x, ui.y, ui.z);
-      uiLamp.intensity = GAIN.uiBody * amount;
+      uiLamp.intensity = GAIN.uiBody * amount * plain;
       screenLamp.color.setRGB(screen.x, screen.y, screen.z);
-      screenLamp.intensity = GAIN.screenBody;
+      screenLamp.intensity = GAIN.screenBody * plain;
       settled =
         amount === target &&
         screen.distanceToSquared(want.set(light.screen[0], light.screen[1], light.screen[2])) < 1e-6 &&
@@ -357,6 +416,11 @@ export function startRoomDesktop(env: DesktopEnv): Desktop {
       const front = focused(state)?.id;
       windowLamp.intensity = 0;
       for (let i = 0; i < GLOW_SLOTS - 1; i++) {
+        // (At a live these lamps are the picture's: live/stage.ts sets them.)
+        if (staged > 0.004) {
+          shadows[i]!.visible = false;
+          continue;
+        }
         const win = amount > 0.01 ? state.windows[i] : undefined;
         const shadow = shadows[i]!;
         const cx = win ? win.x + win.w / 2 : 0;
@@ -397,15 +461,15 @@ export function startRoomDesktop(env: DesktopEnv): Desktop {
 
       // The monitor: the mirrored picture, or the desktop painted when it changes (and on the minute).
       if (source.state === 'on') {
-        if (!live) {
-          live = tune(new VideoTexture(view.mirrorVideo));
-          faceMaterial.map = live;
+        if (!shared) {
+          shared = tune(new VideoTexture(view.mirrorVideo));
+          faceMaterial.map = shared;
           faceMaterial.needsUpdate = true;
         }
       } else {
-        if (live) {
-          live.dispose();
-          live = undefined;
+        if (shared) {
+          shared.dispose();
+          shared = undefined;
           faceMaterial.map = painted;
           faceMaterial.needsUpdate = true;
           dirty = true;
@@ -440,7 +504,7 @@ export function startRoomDesktop(env: DesktopEnv): Desktop {
       }
     },
     get busy() {
-      return !settled || sliding || source.state === 'on';
+      return !settled || sliding || source.state === 'on' || live.amount > 0;
     },
     get mirroring() {
       return source.state === 'on';
@@ -449,5 +513,7 @@ export function startRoomDesktop(env: DesktopEnv): Desktop {
       return view.state().open;
     },
     state: () => view.state(),
+    dispatch: (action) => view.dispatch(action),
+    live,
   };
 }

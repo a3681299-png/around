@@ -611,6 +611,211 @@ body {
   cursor: default;
 }
 
+/* The player (docs/living-live.md): YouTube's own player in a card, as it is. */
+.desk-player-body {
+  gap: 10px;
+}
+.desk-player {
+  position: relative;
+  flex: none;
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #000;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+}
+.desk-player iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+.desk-player-empty {
+  margin: 0;
+  padding: 0 26px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.desk-player-empty[hidden] {
+  display: none;
+}
+.desk-player-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.desk-player-form input {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  box-sizing: border-box;
+  padding: 0 13px;
+  border-radius: 999px;
+  border: 1px solid var(--hair);
+  background: rgb(6 8 24 / 0.45);
+  color: var(--ink);
+  font: inherit;
+  font-size: 12.5px;
+  user-select: text;
+  cursor: text;
+}
+.desk-player-form input::placeholder {
+  color: rgb(246 247 252 / 0.38);
+}
+.desk-player-form .desk-action {
+  align-self: center;
+}
+.desk-player-foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.desk-player-foot .desk-hint {
+  font-size: 10.5px;
+  line-height: 1.45;
+}
+.desk .desk-live-button {
+  flex: none;
+  align-self: center;
+  background: linear-gradient(135deg, #ff5c7a, #ff9a3c);
+  color: #fff;
+}
+
+/* Live mode: the desktop steps back; the player's card is the screen in the room (the page puts
+   it where the room's camera sees the screen); a few controls stay at the foot of the page. */
+.desk-window,
+.desk-ball {
+  transition:
+    opacity 0.4s,
+    border-color 0.25s,
+    box-shadow 0.25s;
+}
+.desk[data-live] .desk-bar,
+.desk[data-live] .desk-dock,
+.desk[data-live] .desk-face,
+.desk[data-live] .desk-veil {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.desk[data-live] .desk-window:not(.is-live),
+.desk[data-live] .desk-ball {
+  opacity: 0;
+  pointer-events: none;
+}
+.desk-window.is-live {
+  transform-origin: 0 0;
+  border: 0;
+  border-radius: 0;
+  background: #000;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+  cursor: default;
+  animation: none;
+  will-change: transform;
+}
+.desk-window.is-live .desk-title,
+.desk-window.is-live .desk-player-form,
+.desk-window.is-live .desk-player-foot,
+.desk-window.is-live .desk-sheen {
+  display: none;
+}
+.desk-window.is-live .desk-player-body {
+  padding: 0;
+}
+.desk-window.is-live .desk-player {
+  flex: 1;
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+.live-hud {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translate(-50%, 8px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100% - 24px);
+  box-sizing: border-box;
+  padding: 6px 7px 6px 15px;
+  border-radius: 999px;
+  background: rgb(8 10 24 / 0.64);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  border: 1px solid var(--hair);
+  font-size: 12.5px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.35s,
+    transform 0.35s;
+}
+.live-hud[hidden] {
+  display: none;
+}
+.live-hud.is-awake,
+.live-hud:focus-within {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  pointer-events: auto;
+}
+.live-badge {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: #ff6b81;
+}
+.live-title {
+  max-width: 28ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--ink-2);
+}
+.live-title:empty {
+  display: none;
+}
+.live-views {
+  display: flex;
+  padding: 2px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.08);
+}
+.desk .live-view,
+.desk .live-light,
+.desk .live-leave {
+  height: 28px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+}
+.desk .live-view[aria-pressed='true'] {
+  background: rgb(255 255 255 / 0.22);
+  font-weight: 650;
+}
+.desk .live-light {
+  background: rgb(255 255 255 / 0.1);
+}
+.desk .live-light[aria-pressed='true'] {
+  background: rgb(92 232 178 / 0.26);
+}
+.desk .live-light:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.desk .live-leave {
+  background: rgb(255 255 255 / 0.16);
+}
+
 /* The ball: a bead of glass lit from inside, to be thrown about. */
 .desk-ball {
   position: absolute;

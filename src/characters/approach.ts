@@ -58,6 +58,11 @@ export interface Seat {
    * chest here (on the surface) and its head the way `heading` points (docs/living-life.md).
    */
   lie?: { x: number; y: number; z: number; heading: number };
+  /**
+   * No seat at all but a place to stand (before the screen at a live): the body goes to `stand`,
+   * turns to face `heading` and stays on its feet.
+   */
+  standing?: boolean;
 }
 
 /** The body's own measures the plan needs (the rig measures them from the model). */
@@ -362,6 +367,13 @@ export function stepApproach(state: ApproachState, input: ApproachInput): Approa
           const near = Math.hypot(under[0] - here[0], under[1] - here[1]) < 0.05;
           const path = near ? [] : floorPath(input.layout, here, under);
           if (near || path.length) begin('toPerch', { path, mood: 'interest', last: input.perch.at });
+        } else if (input.seat?.standing && s.mover.speed === 0) {
+          // A place to stand: there and facing the right way, it stays; else it goes, or turns.
+          const { stand, heading } = input.seat;
+          const there = Math.hypot(stand[0] - s.mover.x, stand[1] - s.mover.z) < 0.12;
+          const path = there ? [] : floorPath(input.layout, nearestFloor(input.layout, s.mover.x, s.mover.z), stand);
+          if (path.length || (there && Math.abs(wrapAngle(heading - s.mover.heading)) > FACE_RAD))
+            begin('toSeat', { path, seat: input.seat, mood: 'calm' });
         } else if (input.seat && s.mover.speed === 0) {
           const path = floorPath(input.layout, nearestFloor(input.layout, s.mover.x, s.mover.z), input.seat.stand);
           if (path.length) begin('toSeat', { path, seat: input.seat, mood: 'calm' });
@@ -504,6 +516,15 @@ export function stepApproach(state: ApproachState, input: ApproachInput): Approa
       if (s.path.length) {
         const moved = stepMover(s.mover, s.path, dt, limits);
         s = { ...s, mover: moved.mover, path: moved.path };
+        break;
+      }
+      if (seat.standing) {
+        // A place to stand: face the way asked (the page may turn it about while it stands), and
+        // that is all.
+        const heading = input.seat.heading;
+        s = { ...s, mover: { ...turnToward(s.mover, heading, dt, limits.turnRate), speed: 0 } };
+        if (Math.abs(wrapAngle(heading - s.mover.heading)) < FACE_RAD)
+          begin('idle', { seat: undefined, mover: { ...s.mover, turn: 0 } });
         break;
       }
       if (seat.lie) {
@@ -758,6 +779,12 @@ export interface BodyIntent {
   /** Braking to a stop here (x, z), to face this way: the feet are to be planted for it. */
   stopAt?: readonly [number, number];
   stopHeading: number;
+  /**
+   * Music it moves to (set by the page at a live, not by the approach): how much of the dance is
+   * in the body (0–1), how much it moves to the beat at all (0–1), the beat clock (whole numbers
+   * fall on the beats) and the tempo.
+   */
+  music?: { dance: number; groove: number; beat: number; bpm: number };
 }
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));

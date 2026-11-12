@@ -21,6 +21,7 @@ import {
   type DesktopState,
 } from './state';
 import { bounce, moving, speedOf, stepMotion, still, throwVelocity, type Motion } from './physics';
+import { playerUi, type LiveViewName, type PlayerUi } from '../live/player';
 
 export interface ResidentReadout {
   says: string;
@@ -53,12 +54,26 @@ export interface DesktopView {
   /** The mirror's state, for its window. */
   setMirror(state: 'off' | 'asking' | 'on' | 'refused' | 'unsupported'): void;
   readonly mirrorVideo: HTMLVideoElement;
+  /** The video player's card (docs/living-live.md). */
+  readonly player: PlayerUi;
+  /**
+   * Live mode: where the player's card is seen as a screen in the room (a CSS matrix for a card
+   * of LIVE_W × LIVE_H; undefined leaves it where it last was).
+   */
+  setScreen(matrix: readonly number[] | undefined): void;
 }
+
+/** The player's card in live mode, before the room's perspective is put on it (CSS pixels). */
+export const LIVE_W = 1280;
+export const LIVE_H = 720;
 
 export interface DesktopHooks {
   changed(state: DesktopState, action: DesktopAction): void;
   /** The mirror's button: start (true) or stop. */
   mirror(on: boolean): void;
+  /** Live mode's controls: the view, and the light's link to the picture. */
+  liveView(view: LiveViewName): void;
+  light(on: boolean): void;
 }
 
 const el = <K extends keyof HTMLElementTagNameMap>(
@@ -80,6 +95,7 @@ const ICONS: Record<AppId | 'desk' | 'close' | 'mark' | 'power' | 'dim' | 'brigh
   dim: 'M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z',
   bright:
     'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8',
+  player: 'M4 6h16v12H4zM10.2 9.4v5.2l4.6-2.6z',
   ambience: 'M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z',
   mirror: 'M3 5h18v11H3zM8 20h8M12 16v4',
   resident: 'M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zM4 20a8 8 0 0 1 16 0',
@@ -238,7 +254,21 @@ export function desktopView(host: HTMLElement, hooks: DesktopHooks): DesktopView
     body.append(residentHint);
     return body;
   }
-  const builders: Record<Exclude<AppId, 'ball'>, () => HTMLElement> = { ambience, mirror, resident };
+  const player = playerUi({
+    video: (id) => dispatch({ type: 'video', id }),
+    live: (on) => dispatch({ type: 'live', on }),
+    view: (view) => hooks.liveView(view),
+    light: (on) => hooks.light(on),
+  });
+  root.append(player.hud);
+  let screen = '';
+  let wasLive = false;
+  const builders: Record<Exclude<AppId, 'ball'>, () => HTMLElement> = {
+    player: () => player.body,
+    ambience,
+    mirror,
+    resident,
+  };
 
   // --- windows -------------------------------------------------------------------------------
   const frames = new Map<AppId, HTMLElement>();
@@ -249,7 +279,8 @@ export function desktopView(host: HTMLElement, hooks: DesktopHooks): DesktopView
     handle.addEventListener('pointerdown', (event) => {
       if (event.button !== 0 || (event.target as Element).closest('button, input, label')) return;
       const win = state.windows.find((w) => w.id === id);
-      if (!win) return;
+      // (The screen of a live hangs in the room: it is not picked up.)
+      if (!win || (state.live && id === 'player')) return;
       grab = { id, dx: event.clientX - win.x, dy: event.clientY - win.y, pointer: event.pointerId, trail: [] };
       const m = motion(id);
       m.vx = m.vy = 0;
@@ -399,14 +430,26 @@ export function desktopView(host: HTMLElement, hooks: DesktopHooks): DesktopView
                 { duration: 620, easing: 'cubic-bezier(0.3, 0.6, 0.4, 1)' },
               );
         }
-        node.style.left = `${win.x}px`;
-        node.style.top = `${win.y}px`;
-        node.style.width = `${win.w}px`;
-        node.style.height = `${win.h}px`;
+        // In live mode the player's card is the screen in the room: a card of a fixed size at the
+        // page's corner, put where the room's camera sees the screen by `setScreen`.
+        const onStage = state.live && app.id === 'player';
+        node.style.left = onStage ? '0' : `${win.x}px`;
+        node.style.top = onStage ? '0' : `${win.y}px`;
+        node.style.width = `${onStage ? LIVE_W : win.w}px`;
+        node.style.height = `${onStage ? LIVE_H : win.h}px`;
         node.style.zIndex = String(win.z);
         node.classList.toggle('is-front', front === app.id);
+        node.classList.toggle('is-live', onStage);
+        if (onStage) node.style.transform = screen;
       }
       dockButtons.get(app.id)!.setAttribute('aria-pressed', String(Boolean(win)));
+    }
+    // The player holds a video only while its card is there (closing the card stops it).
+    player.video(state.windows.some((w) => w.id === 'player') ? state.video : undefined);
+    root.toggleAttribute('data-live', state.live);
+    if (state.live !== wasLive) {
+      wasLive = state.live;
+      player.live(state.live);
     }
     swatches.forEach((button, index) => button.setAttribute('aria-pressed', String(index === state.wallpaper)));
     brightness.value = String(state.brightness);
@@ -439,7 +482,10 @@ export function desktopView(host: HTMLElement, hooks: DesktopHooks): DesktopView
     launcher.focus();
   });
   window.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && state.open) {
+    if (event.key !== 'Escape' || !state.open) return;
+    // Out of live mode first; then, the desktop.
+    if (state.live) dispatch({ type: 'live', on: false });
+    else {
       dispatch({ type: 'close' });
       launcher.focus();
     }
@@ -460,6 +506,11 @@ export function desktopView(host: HTMLElement, hooks: DesktopHooks): DesktopView
       let busy = false;
       for (const win of state.windows) {
         const ball = win.id === 'ball';
+        // (The screen of a live does not slide or tip: it is where the room has it.)
+        if (state.live && win.id === 'player') {
+          motions.set(win.id, still());
+          continue;
+        }
         let m = motion(win.id);
         if (grab?.id === win.id) {
           // In hand: its speed is the hand's (it tips with it; a rider can be shaken off).
@@ -489,6 +540,13 @@ export function desktopView(host: HTMLElement, hooks: DesktopHooks): DesktopView
         if (moving(m) && grab?.id !== win.id) busy = true;
       }
       return busy || Boolean(grab);
+    },
+    player,
+    setScreen(matrix) {
+      if (!matrix) return;
+      screen = `matrix3d(${matrix.map((v) => +v.toFixed(7)).join(',')})`;
+      const node = frames.get('player');
+      if (node && state.live && node.style.transform !== screen) node.style.transform = screen;
     },
     speed: (id) => speedOf(motion(id)),
     held: (id) => grab?.id === id,

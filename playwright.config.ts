@@ -27,6 +27,7 @@ const unitSpecs = [
   'living-life',
   'living-desktop',
   'living-mind',
+  'living-live',
   'asset-import-validation',
   'asset-profile',
   'asset-read-data',
