@@ -1,18 +1,22 @@
 /**
- * The virtual desktop joined to the room (docs/living-desktop.md). One state (state.ts) drives
- * four things at once:
+ * The virtual desktop joined to the room (docs/living-desktop.md, docs/living-mind.md). One state
+ * (state.ts) drives everything at once:
  *
- *   the page       glass windows over the room (view.ts)
+ *   the page       glass windows and a ball over the room, things that can be thrown (view.ts)
  *   the monitor    the same desktop on the desk monitor's face (paint.ts), or the real screen
  *                  while it is mirrored (mirror.ts)
- *   the light      the monitor's light and the desktop's glow from the viewer's side, both baked
- *                  layers tinted with the colour of what is shown (screen-glow.ts)
- *   the resident   where on the front window's frame it can put a hand, as a point in the room
+ *   the light      the monitor's light and the desktop's glow from the viewer's side, baked
+ *                  layers tinted with what is shown; and under each window and the ball a pool
+ *                  of its light and a soft shadow on the floor, which go where it goes
+ *   the resident   what it can do with the desktop (the stage): where a hand reaches a window's
+ *                  frame or the ball, where it can sit on a window; and what it does to it
  */
 import {
   CanvasTexture,
+  CircleGeometry,
   Color,
   DirectionalLight,
+  Mesh,
   MeshBasicMaterial,
   PointLight,
   Raycaster,
@@ -20,15 +24,15 @@ import {
   Vector2,
   Vector3,
   VideoTexture,
-  type Mesh,
   type Object3D,
   type PerspectiveCamera,
   type Scene,
   type Texture,
 } from 'three';
-import type { ScreenGlow } from '../screen-glow';
+import { GLOW_SLOTS, type ScreenGlow } from '../screen-glow';
 import type { LivingResident } from '../resident';
-import { desktopLight, type DesktopState } from './state';
+import type { StageAct, StageThing, StageView } from '../director';
+import { WALLPAPERS, desktopLight, focused, linear, type AppId, type DeskWindow, type DesktopState } from './state';
 import { desktopView } from './view';
 import { MONITOR_H, MONITOR_W, paintDesktop } from './paint';
 import { mirror as mirrorSource } from './mirror';
@@ -47,7 +51,10 @@ export interface DesktopEnv {
 }
 
 export interface Desktop {
-  update(dt: number, now: number): void;
+  /** What the desktop offers the resident this frame. */
+  stage(): StageView;
+  /** One frame; `acts` is what the resident did to the desktop. */
+  update(dt: number, now: number, acts: readonly StageAct[]): void;
   /** Something of the desktop is still moving: the page keeps drawing. */
   readonly busy: boolean;
   /** The real screen is being mirrored (a picture of some fifteen frames a second). */
@@ -61,14 +68,29 @@ export interface Desktop {
  * the real page: the room keeps its dark blue night; an open desktop is a soft wash from the
  * front, never daylight.
  */
-const GAIN = { screen: 2.6, ui: 1.5, uiBody: 2.4, screenBody: 1.1 };
+const GAIN = { screen: 2.6, ui: 1.5, uiBody: 2.4, screenBody: 1.1, pool: 0.3, ball: 0.55, poolBody: 0.9 };
 /** The monitor's face is brighter than white, so it blooms like the room's other screens. */
 const FACE = 1.5;
+/** How hard the resident sends a thing off (CSS pixels a second). */
+const SHOVE = { nudge: 150, push: 980, pull: -560, bat: 1350 };
+/** A thing passing this fast over the resident startles it. */
+const WHOOSH = 900;
+
+function blob() {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 64;
+  const g = canvas.getContext('2d')!;
+  const gradient = g.createRadialGradient(32, 32, 2, 32, 32, 31);
+  gradient.addColorStop(0, 'rgba(0,0,0,1)');
+  gradient.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = gradient;
+  g.fillRect(0, 0, 64, 64);
+  return new CanvasTexture(canvas);
+}
 
 export function startRoomDesktop(env: DesktopEnv): Desktop {
   const { resident, glow, camera } = env;
   let dirty = true;
-  let pressedFront = false;
   const view = desktopView(env.host, {
     changed: () => {
       dirty = true;
@@ -77,9 +99,6 @@ export function startRoomDesktop(env: DesktopEnv): Desktop {
     mirror: (on) => {
       if (on) void source.start();
       else source.stop();
-    },
-    pressed: () => {
-      pressedFront = true;
     },
   });
   const source = mirrorSource(view.mirrorVideo, (state) => {
@@ -114,79 +133,168 @@ export function startRoomDesktop(env: DesktopEnv): Desktop {
   }
   let minute = -1;
 
-  // --- lamps for the resident (the room itself takes the baked layers) --------------------------
+  // --- lamps for the resident (the room itself takes the baked layers and the pools) ------------
   const uiLamp = new DirectionalLight(0xffffff, 0);
   // From the viewer's side, a little above: where the desktop hangs.
   uiLamp.position.set(0.5, 2.2, 6);
   const screenLamp = new PointLight(0xffffff, 0, 3.2, 2);
   screenLamp.position.copy(faceAt).add(new Vector3(0, 0, 0.25));
-  if (resident) env.scene.add(uiLamp, uiLamp.target, screenLamp);
+  // The window in front shines on it from where that window hangs.
+  const windowLamp = new PointLight(0xffffff, 0, 3, 2);
+  if (resident) env.scene.add(uiLamp, uiLamp.target, screenLamp, windowLamp);
+
+  // --- a soft shadow on the floor under each thing of the desktop --------------------------------
+  const shade = blob();
+  const shadows = Array.from({ length: GLOW_SLOTS - 1 }, () => {
+    const mesh = new Mesh(
+      new CircleGeometry(0.5, 20),
+      new MeshBasicMaterial({ map: shade, color: 0x000000, transparent: true, opacity: 0, depthWrite: false }),
+    );
+    mesh.rotation.x = -Math.PI / 2;
+    mesh.renderOrder = 1;
+    mesh.visible = false;
+    env.scene.add(mesh);
+    return mesh;
+  });
 
   const screen = new Vector3(),
     ui = new Vector3(),
-    want = new Vector3();
+    want = new Vector3(),
+    accent = new Color(),
+    into = new Vector3();
   let amount = 0,
     settled = false,
-    first = true;
+    first = true,
+    sliding = false,
+    whooshedAt = -Infinity,
+    bats = 0;
 
-  // --- the resident and the front window --------------------------------------------------------
+  // --- screen ↔ room ---------------------------------------------------------------------------
   const ray = new Raycaster();
   const ndc = new Vector2();
-  let rectKey = '',
-    chosen: Vector3 | undefined,
-    wasTouching = false;
-  /** Where a hand held at hand height is, under a point of the screen. */
+  /** Where a point of the screen is in the room at a height above the floor (along the view). */
   const under = (x: number, y: number, height: number) => {
     ndc.set((x / window.innerWidth) * 2 - 1, 1 - (y / window.innerHeight) * 2);
     ray.setFromCamera(ndc, camera);
     const { origin, direction } = ray.ray;
     if (direction.y > -1e-4) return undefined;
-    const t = (height - origin.y) / direction.y;
+    const t = (env.floorY + height - origin.y) / direction.y;
     return t > 0 ? origin.clone().addScaledVector(direction, t) : undefined;
   };
-  function attend(state: DesktopState) {
-    if (!resident) return;
-    const rect = state.open ? view.frontRect() : undefined;
-    if (!rect) {
-      rectKey = '';
-      chosen = undefined;
-      resident.setUi(undefined);
-      wasTouching = false;
-      return;
+  const inRoom = (p: Vector3 | undefined, margin = 0): p is Vector3 =>
+    Boolean(p) && Math.abs(p!.x) < 2.9 + margin && Math.abs(p!.z) < 2.6 + margin;
+  /** Where a point of the room is on the screen (CSS pixels). */
+  const onScreen = (p: readonly number[]): [number, number] => {
+    want.set(p[0]!, p[1]!, p[2]!).project(camera);
+    return [((want.x + 1) / 2) * window.innerWidth, ((1 - want.y) / 2) * window.innerHeight];
+  };
+  const thingOf = (win: DeskWindow): StageThing => {
+    const body = resident!.metrics();
+    const from = resident!.state().mover;
+    const thing: StageThing = { speed: view.speed(win.id), held: view.held(win.id) };
+    if (win.id === 'ball') {
+      const p = under(win.x + win.w / 2, win.y + win.h / 2, body.shoulderHeight * 0.8);
+      if (inRoom(p)) thing.hand = [p.x, p.y, p.z];
+      return thing;
     }
-    // The place is chosen when the window comes to rest somewhere new, not every frame: the
-    // resident walks to one place on the frame, it does not hover between two.
-    const key = `${Math.round(rect.left / 3)},${Math.round(rect.top / 3)},${Math.round(rect.width)},${window.innerWidth},${window.innerHeight}`;
-    if (key !== rectKey) {
-      rectKey = key;
-      const body = resident.metrics();
-      const handY = env.floorY + body.shoulderHeight * 0.86;
-      const from = resident.state().mover;
-      let best = Infinity;
-      chosen = undefined;
-      for (const [x, y] of edgeSamples(rect, 10)) {
-        const p = under(x, y, handY);
-        // In the room (the approach itself decides whether there is floor to stand on).
-        if (!p || Math.abs(p.x) > 2.9 || Math.abs(p.z) > 2.6) continue;
-        const far = Math.hypot(p.x - from.x, p.z - from.z);
-        if (far < best) {
-          best = far;
-          chosen = p;
-        }
+    // A hand comes to the nearest place just outside the frame (its bottom, the lower sides).
+    let best = Infinity;
+    for (const [x, y] of edgeSamples({ left: win.x, top: win.y, right: win.x + win.w, bottom: win.y + win.h }, 10)) {
+      const p = under(x, y, body.shoulderHeight * 0.86);
+      if (!inRoom(p)) continue;
+      const far = Math.hypot(p.x - from.x, p.z - from.z);
+      if (far < best) {
+        best = far;
+        thing.hand = [p.x, p.y, p.z];
       }
-      // Nowhere in the room: something to look at, all the same (under the window's middle).
-      chosen ??= under(rect.left + rect.width / 2, rect.bottom, handY);
     }
-    resident.setUi(chosen ? [chosen.x, chosen.y, chosen.z] : undefined);
-    // Its hand lands on the frame: the window gives. A press on the window it holds is answered.
-    const touching = resident.touching();
-    if (touching && !wasTouching) view.nudge();
-    if (touching && pressedFront) resident.cheer();
-    wasTouching = touching;
+    // It sits on the middle of the top edge, facing the viewer. Along the line of sight through
+    // that point the seat is taken as low as is still over the room's floor (higher is nearer the
+    // viewer): a window low on the screen is a hop up, one high on it a great leap.
+    for (let k = 0.62; k <= 2.4 && !thing.perch; k += 0.16) {
+      const seat = under(win.x + win.w / 2, win.y - 2, body.height * k);
+      if (inRoom(seat, -0.35))
+        thing.perch = {
+          at: [seat.x, seat.y, seat.z],
+          heading: Math.atan2(camera.position.x - seat.x, camera.position.z - seat.z),
+        };
+    }
+    return thing;
+  };
+  const stage = (): StageView => {
+    const state = view.state();
+    if (!resident || !state.open) return { open: state.open };
+    const front = focused(state);
+    const ball = state.windows.find((w) => w.id === 'ball');
+    return {
+      open: true,
+      ...(front ? { window: thingOf(front) } : {}),
+      ...(ball ? { ball: thingOf(ball) } : {}),
+    };
+  };
+
+  function act(a: StageAct, state: DesktopState) {
+    switch (a.type) {
+      case 'open':
+      case 'close':
+        view.dispatch({ type: a.type });
+        break;
+      case 'app':
+        view.dispatch({ type: 'app', id: a.id });
+        break;
+      case 'wallpaper':
+        view.dispatch({ type: 'wallpaper', index: a.index });
+        break;
+      case 'sit': {
+        const id = focused(state)?.id;
+        if (id) view.sit(id, a.on);
+        break;
+      }
+      case 'knock': {
+        // Its knuckles on the glass: a ring spreads on the screen from where they are.
+        const [x, y] = onScreen(resident!.chest());
+        view.ripple(x, y - window.innerHeight * 0.03);
+        break;
+      }
+      case 'impulse': {
+        const id: AppId | undefined = a.thing === 'ball' ? 'ball' : focused(state)?.id;
+        const win = id && state.windows.find((w) => w.id === id);
+        if (!id || !win) break;
+        // Away from where it stands on the screen (a pull is toward it); the ball is batted
+        // back over the room, a little to one side and the other in turn.
+        const [sx, sy] = onScreen(resident!.chest());
+        let dx = win.x + win.w / 2 - sx,
+          dy = win.y + win.h / 2 - sy;
+        const far = Math.hypot(dx, dy) || 1;
+        dx /= far;
+        dy /= far;
+        if (a.kind === 'bat') {
+          const cx = window.innerWidth * 0.46 - (win.x + win.w / 2),
+            cy = window.innerHeight * 0.55 - (win.y + win.h / 2);
+          const toMiddle = Math.hypot(cx, cy) || 1;
+          const turn = (bats++ % 2 ? 1 : -1) * 0.55;
+          const mx = dx * 0.5 + (cx / toMiddle) * 0.9,
+            my = dy * 0.5 + (cy / toMiddle) * 0.9;
+          dx = mx * Math.cos(turn) - my * Math.sin(turn);
+          dy = mx * Math.sin(turn) + my * Math.cos(turn);
+          const n = Math.hypot(dx, dy) || 1;
+          dx /= n;
+          dy /= n;
+        }
+        view.impulse(id, dx * SHOVE[a.kind], dy * SHOVE[a.kind]);
+        // (What it sent off itself does not startle it as it leaves.)
+        whooshedAt = performance.now();
+        break;
+      }
+    }
+    env.wake();
   }
 
   return {
-    update(dt, now) {
+    stage,
+    update(dt, now, acts) {
+      for (const a of acts) act(a, view.state());
+      sliding = view.step(dt, now);
       const state = view.state();
       const mirrored = source.color(now);
       const light = desktopLight(state, mirrored);
@@ -209,6 +317,50 @@ export function startRoomDesktop(env: DesktopEnv): Desktop {
         amount === target &&
         screen.distanceToSquared(want.set(light.screen[0], light.screen[1], light.screen[2])) < 1e-6 &&
         (!state.open || ui.distanceToSquared(want.set(light.ui[0], light.ui[1], light.ui[2])) < 1e-6);
+
+      // Under each window and the ball: its light on what is behind it, its shadow on the floor.
+      // They are where the thing is on the screen, so they go with it when it is dragged or thrown.
+      const paper = WALLPAPERS[state.wallpaper] ?? WALLPAPERS[0]!;
+      const [ar, ag, ab] = linear(paper.accent);
+      accent.setRGB(ar, ag, ab);
+      const front = focused(state)?.id;
+      windowLamp.intensity = 0;
+      for (let i = 0; i < GLOW_SLOTS - 1; i++) {
+        const win = amount > 0.01 ? state.windows[i] : undefined;
+        const shadow = shadows[i]!;
+        const cx = win ? win.x + win.w / 2 : 0;
+        const hang = win && under(cx, win.y + win.h / 2, 1.05);
+        if (!win || !inRoom(hang, 1.2)) {
+          glow.off(i + 1);
+          shadow.visible = false;
+          continue;
+        }
+        const ball = win.id === 'ball';
+        // It shines into the room: the way the viewer looks, levelled a little.
+        camera.getWorldDirection(into);
+        into.y *= 0.35;
+        glow.set(
+          i + 1,
+          hang,
+          into,
+          accent,
+          (ball ? GAIN.ball : GAIN.pool * Math.sqrt((win.w * win.h) / 90000)) * amount,
+        );
+        if (win.id === front || (ball && !front)) {
+          windowLamp.position.copy(hang);
+          windowLamp.color.copy(accent);
+          windowLamp.intensity = GAIN.poolBody * amount;
+        }
+        const foot = under(cx, win.y + win.h, 0);
+        const across = under(cx + 100, win.y + win.h, 0);
+        if (inRoom(foot) && across) {
+          const metres = (foot.distanceTo(across) / 100) * win.w;
+          shadow.visible = true;
+          shadow.position.set(foot.x, env.floorY + 0.045, foot.z);
+          shadow.scale.set(metres * 1.1, metres * (ball ? 1.1 : 0.5), 1);
+          (shadow.material as MeshBasicMaterial).opacity = (ball ? 0.5 : 0.36) * amount;
+        } else shadow.visible = false;
+      }
 
       // The monitor: the mirrored picture, or the desktop painted when it changes (and on the minute).
       if (source.state === 'on') {
@@ -233,12 +385,29 @@ export function startRoomDesktop(env: DesktopEnv): Desktop {
           painted.needsUpdate = true;
         }
       }
-      attend(state);
-      pressedFront = false;
-      if (resident) view.setResident(resident.says());
+
+      if (resident) {
+        // A window or the ball flying past where it stands gives it a start.
+        if (state.open && !resident.front && now - whooshedAt > 2500) {
+          const [sx, sy] = onScreen(resident.chest());
+          for (const win of state.windows)
+            if (
+              view.speed(win.id) > WHOOSH &&
+              sx > win.x - 30 &&
+              sx < win.x + win.w + 30 &&
+              sy > win.y - 30 &&
+              sy < win.y + win.h + 30
+            ) {
+              resident.notice('whoosh');
+              whooshedAt = now;
+              break;
+            }
+        }
+        view.setResident(resident.readout());
+      }
     },
     get busy() {
-      return !settled || source.state === 'on';
+      return !settled || sliding || source.state === 'on';
     },
     get mirroring() {
       return source.state === 'on';

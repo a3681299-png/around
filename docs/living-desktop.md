@@ -107,4 +107,6 @@ WW_LIVING_TEST=1 WW_LIVING_OUT=.work/living-room-preview \
 node scripts/playground/serve.mjs .work/living-room-preview 4183
 ```
 
+（2026-11-12 深夜の追記：`resident.setUi`・`says`・`touching` は、心と演出役への置き換えでなくなった。今の入口は [living-mind.md](living-mind.md) の 10。）
+
 テスト用の入口：`__wwLivingRoom.desktop()`（状態）、`resident.says()`・`resident.touching()`・`resident.setUi(point)`。unit は `tests/living-desktop.spec.ts`（8 件：窓の管理、はみ出さないこと、光の色、縁の点）。

@@ -16,7 +16,8 @@
 // textures change at run time.
 import { Color, Vector3, type Material, type MeshBasicMaterial, type Texture } from 'three';
 
-export const GLOW_SLOTS = 2;
+/** The resident's phone, and up to four things of the desktop (its windows, the ball). */
+export const GLOW_SLOTS = 5;
 export type GlowLayer = 'ui' | 'screen';
 /**
  * How a material carries its baked light, and so its layers: `lightmap` in textures on its UV,

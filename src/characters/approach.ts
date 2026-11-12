@@ -36,7 +36,13 @@ export type ApproachPhase =
   | 'standUp'
   | 'dive'
   | 'lie'
-  | 'rise';
+  | 'rise'
+  | 'toPerch'
+  | 'perchUp'
+  | 'perch'
+  | 'perchDown'
+  | 'tumble'
+  | 'dazed';
 export type Mood = 'calm' | 'interest';
 
 /** A seat to rest on: where the hips go (the room's marker), the way it faces, and the floor
@@ -100,6 +106,18 @@ export interface ApproachState {
   /** A dive onto a bed: where it took off from and the way it faced then. */
   diveFrom: readonly [number, number];
   diveHeading: number;
+  /** A perch (the top of a desktop window): where it sits, kept while it comes down; the floor it
+   * comes down to; tumbles answered so far. */
+  perchAt: Vec3 | undefined;
+  landAt: readonly [number, number];
+  tumbled: number;
+}
+
+/** Somewhere up off the floor to sit on, which may move (docs/living-mind.md): where the hips
+ * go, in the room's metres, and the way the body faces there. */
+export interface Perch {
+  at: Vec3;
+  heading: number;
 }
 
 export interface ApproachInput {
@@ -116,6 +134,10 @@ export interface ApproachInput {
   seed?: number;
   /** Overrides the mood's own pace (tests). */
   limits?: MoveLimits;
+  /** With nothing to notice, it walks under this, hops up and sits; taken away, it hops down. */
+  perch?: Perch;
+  /** A count that goes up each time it is thrown off its perch: it tumbles to the floor. */
+  tumble?: number;
 }
 
 export const RECOVER_S = 0.6;
@@ -140,6 +162,12 @@ const DIVE_HOP_M = 0.32;
 export const RISE_S = 1.6;
 /** Lying, seconds in: the roll from the front onto the back (after a moment of swinging feet). */
 export const LIE_ROLL = [1.9, 2.6] as const;
+/** Onto a perch: a quarter of a second gathering, then the hop. Down again; thrown off (a
+ * spinning fall); and the moment sitting dazed where it landed. Seconds. */
+export const PERCH_UP = { gather: 0.25, end: 0.8 } as const;
+export const PERCH_DOWN_S = 0.6;
+export const TUMBLE_S = 0.85;
+export const DAZED_S = 1.5;
 /** The target moved this far from the plan: plan again. */
 const REPLAN_M = 0.08;
 const FACE_RAD = 0.06;
@@ -236,6 +264,9 @@ export const startApproach = (x: number, z: number, heading: number): ApproachSt
   stopHeading: 0,
   diveFrom: [x, z],
   diveHeading: heading,
+  perchAt: undefined,
+  landAt: [x, z],
+  tumbled: 0,
 });
 
 const distance = (a: Vec3, b: Vec3) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
@@ -324,7 +355,14 @@ export function stepApproach(state: ApproachState, input: ApproachInput): Approa
         begin('notice', { beat: vary(ACTING[mood].notice) });
       } else {
         if (!target && s.done) s = { ...s, done: undefined };
-        if (input.seat && s.mover.speed === 0) {
+        if (input.perch && s.mover.speed === 0) {
+          // Under the perch (the nearest floor to it), then up.
+          const here = nearestFloor(input.layout, s.mover.x, s.mover.z);
+          const under = nearestFloor(input.layout, input.perch.at[0], input.perch.at[2]);
+          const near = Math.hypot(under[0] - here[0], under[1] - here[1]) < 0.05;
+          const path = near ? [] : floorPath(input.layout, here, under);
+          if (near || path.length) begin('toPerch', { path, mood: 'interest', last: input.perch.at });
+        } else if (input.seat && s.mover.speed === 0) {
           const path = floorPath(input.layout, nearestFloor(input.layout, s.mover.x, s.mover.z), input.seat.stand);
           if (path.length) begin('toSeat', { path, seat: input.seat, mood: 'calm' });
         }
@@ -548,6 +586,94 @@ export function stepApproach(state: ApproachState, input: ApproachInput): Approa
     case 'standUp':
       if (elapsed >= STAND_UP_S) begin('idle', { seat: undefined });
       break;
+    case 'toPerch': {
+      const perch = input.perch;
+      if (fresh || !perch) {
+        rest();
+        if (s.mover.speed === 0) begin('idle');
+        break;
+      }
+      s = { ...s, last: perch.at };
+      if (s.path.length) {
+        const moved = stepMover(s.mover, s.path, dt, limits);
+        s = { ...s, mover: moved.mover, path: moved.path };
+        break;
+      }
+      // Under it: turn the way it will sit, then up.
+      s = { ...s, mover: { ...turnToward(s.mover, perch.heading, dt, limits.turnRate), speed: 0 } };
+      if (Math.abs(wrapAngle(perch.heading - s.mover.heading)) < FACE_RAD)
+        begin('perchUp', { mover: { ...s.mover, turn: 0 }, diveFrom: [s.mover.x, s.mover.z], perchAt: perch.at });
+      break;
+    }
+    case 'perchUp': {
+      // (A perch that moves while it is in the air is landed on where it now is.)
+      const at = input.perch?.at ?? s.perchAt;
+      if (!at) {
+        begin('idle');
+        break;
+      }
+      const k = ease(clamp01((elapsed - PERCH_UP.gather) / (PERCH_UP.end - PERCH_UP.gather)));
+      s = {
+        ...s,
+        perchAt: at,
+        mover: {
+          ...s.mover,
+          x: s.diveFrom[0] + (at[0] - s.diveFrom[0]) * k,
+          z: s.diveFrom[1] + (at[2] - s.diveFrom[1]) * k,
+          speed: 0,
+          turn: 0,
+        },
+      };
+      if (elapsed >= PERCH_UP.end) begin('perch');
+      break;
+    }
+    case 'perch': {
+      const perch = input.perch;
+      const off = (input.tumble ?? 0) > s.tumbled;
+      if (perch && !off) {
+        // It rides: wherever the perch goes, it goes.
+        s = {
+          ...s,
+          perchAt: perch.at,
+          mover: { x: perch.at[0], z: perch.at[2], heading: perch.heading, speed: 0, turn: 0 },
+        };
+        break;
+      }
+      const landAt = nearestFloor(input.layout, s.mover.x, s.mover.z);
+      begin(off ? 'tumble' : 'perchDown', {
+        tumbled: input.tumble ?? s.tumbled,
+        diveFrom: [s.mover.x, s.mover.z],
+        diveHeading: s.mover.heading,
+        landAt,
+      });
+      break;
+    }
+    case 'perchDown':
+    case 'tumble': {
+      const length = s.phase === 'tumble' ? TUMBLE_S : PERCH_DOWN_S;
+      const k = clamp01(elapsed / length);
+      // Thrown off, it spins twice on the way down.
+      const heading = s.diveHeading + (s.phase === 'tumble' ? Math.PI * 4 * ease(k) : 0);
+      s = {
+        ...s,
+        mover: {
+          x: s.diveFrom[0] + (s.landAt[0] - s.diveFrom[0]) * ease(k),
+          z: s.diveFrom[1] + (s.landAt[1] - s.diveFrom[1]) * ease(k),
+          heading,
+          speed: 0,
+          turn: dt > 0 ? wrapAngle(heading - s.mover.heading) / dt : 0,
+        },
+      };
+      if (elapsed >= length)
+        begin(s.phase === 'tumble' ? 'dazed' : 'idle', {
+          perchAt: s.phase === 'tumble' ? s.perchAt : undefined,
+          mover: { x: s.landAt[0], z: s.landAt[1], heading: s.diveHeading, speed: 0, turn: 0 },
+        });
+      break;
+    }
+    case 'dazed':
+      if (elapsed >= DAZED_S) begin('idle', { perchAt: undefined });
+      break;
   }
   return s;
 }
@@ -601,6 +727,12 @@ export interface BodyIntent {
   lieAt?: Vec3;
   kickLegs: number;
   landed: number;
+  /** Seated up on a perch: how much the lower legs swing (0–1). */
+  dangle: number;
+  /** How it feels, shown in the face, the ears and tail and the carriage of the body (0–1 each;
+   * set by the page's director, not by the approach), and whether it is asleep. */
+  feel?: { sleepy: number; grumpy: number; confused: number; surprised: number };
+  sleep?: number;
   /** How far the body is sunk before a go (0–1): the wind-up. */
   crouch: number;
   /** Off the floor: how far through the hop (0–1), and how high it goes (metres). */
@@ -662,7 +794,9 @@ export function approachIntent(s: ApproachState, target: Vec3 | undefined): Body
     lie = 0,
     roll = 0,
     kickLegs = 0,
-    landed = 0;
+    landed = 0,
+    perched = 0,
+    dangle = 0;
   /** 0 → 1 over [from, to], eased. */
   const over = (from: number, to: number) => ease(clamp01((elapsed - from) / (to - from)));
   switch (s.phase) {
@@ -671,6 +805,45 @@ export function approachIntent(s: ApproachState, target: Vec3 | undefined): Body
     case 'sitDown':
     case 'sit':
     case 'standUp':
+      break;
+    case 'toPerch':
+      lookWeight = 1;
+      break;
+    case 'perchUp': {
+      // Gathers, springs up (arms thrown up), and is seated as it lands on the edge.
+      const g = PERCH_UP.gather;
+      crouch = 1.1 * over(0, g - 0.04) * (1 - over(g - 0.04, g + 0.05));
+      arms = 0.7 * over(g - 0.02, g + 0.12) * (1 - over(PERCH_UP.end - 0.2, PERCH_UP.end));
+      if (elapsed >= g) {
+        hop = clamp01((elapsed - g) / (PERCH_UP.end - g));
+        hopHeight = 0.22;
+      }
+      perched = over(g, PERCH_UP.end);
+      joy = over(g, PERCH_UP.end);
+      break;
+    }
+    case 'perch':
+      perched = 1;
+      // Settled, the legs swing.
+      dangle = over(0.3, 1.2);
+      break;
+    case 'perchDown':
+      perched = 1 - over(0, PERCH_DOWN_S * 0.8);
+      hop = clamp01(elapsed / PERCH_DOWN_S);
+      hopHeight = 0.1;
+      break;
+    case 'tumble':
+      // Flung off: arms and legs out, spinning (the mover turns it), down onto the floor.
+      perched = 1 - over(0, TUMBLE_S * 0.45);
+      hop = clamp01(elapsed / TUMBLE_S);
+      hopHeight = 0.18;
+      arms = 0.9;
+      kick = 1;
+      alert = 1;
+      break;
+    case 'dazed':
+      // Where it landed: sunk down, the head going round.
+      crouch = 0.9 * (1 - over(DAZED_S * 0.5, DAZED_S));
       break;
     case 'dive': {
       // Sink for the spring, arms back; launch with the arms flung ahead; flat before the bed.
@@ -800,7 +973,9 @@ export function approachIntent(s: ApproachState, target: Vec3 | undefined): Body
       s.phase === 'lie' ||
       s.phase === 'rise'
         ? s.phase
-        : 'stand',
+        : perched > 0.3
+          ? 'sit'
+          : 'stand',
     poseTime: elapsed,
     seated:
       s.phase === 'sit'
@@ -809,8 +984,13 @@ export function approachIntent(s: ApproachState, target: Vec3 | undefined): Body
           ? ease(clamp01(elapsed / SIT_DOWN_S))
           : s.phase === 'standUp'
             ? 1 - ease(clamp01(elapsed / STAND_UP_S))
-            : 0,
-    ...(s.seat && !s.seat.lie ? { seat: [s.seat.x, s.seat.y, s.seat.z] as Vec3 } : {}),
+            : perched,
+    ...(perched > 0 && s.perchAt
+      ? { seat: s.perchAt }
+      : s.seat && !s.seat.lie
+        ? { seat: [s.seat.x, s.seat.y, s.seat.z] as Vec3 }
+        : {}),
+    dangle,
     lie,
     roll,
     ...(s.seat?.lie && (s.phase === 'dive' || s.phase === 'lie' || s.phase === 'rise')

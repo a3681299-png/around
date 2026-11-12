@@ -19,6 +19,117 @@ body {
 #room[data-ready] {
   opacity: 1;
 }
+/* The resident in front of the desktop's windows: over everything, never in the pointer's way. */
+#front {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 6;
+  pointer-events: none;
+}
+/* The ball: a bead of glass lit from inside, to be thrown about. */
+.desk-ball {
+  position: absolute;
+  box-sizing: border-box;
+  border-radius: 50%;
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+  background:
+    radial-gradient(circle at 34% 30%, rgb(255 255 255 / 0.95), transparent 34%),
+    radial-gradient(circle at 60% 68%, var(--desk-accent), var(--desk-to) 62%, var(--desk-from));
+  border: 1px solid rgb(255 255 255 / 0.5);
+  box-shadow:
+    0 0 34px color-mix(in srgb, var(--desk-accent) 75%, transparent),
+    0 10px 24px rgb(3 6 24 / 0.5);
+  animation: desk-in 0.42s cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+.desk-ball.is-dragged {
+  cursor: grabbing;
+}
+/* A band across it, so that its rolling shows. */
+.desk-ball i {
+  position: absolute;
+  inset: 44% -1px;
+  background: rgb(255 255 255 / 0.4);
+  border-radius: 4px;
+}
+/* The resident knocked on the screen from inside: rings spread from its knuckles. */
+.desk-ripples {
+  position: fixed;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+  overflow: hidden;
+}
+.desk-ripple {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  border-radius: 50%;
+  border: 2px solid rgb(255 255 255 / 0.9);
+  box-shadow:
+    0 0 18px rgb(190 214 255 / 0.9),
+    inset 0 0 12px rgb(190 214 255 / 0.6);
+  opacity: 0;
+  animation: desk-ripple 0.9s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+@keyframes desk-ripple {
+  from {
+    opacity: 0.95;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 0;
+    transform: scale(7);
+  }
+}
+/* The resident's window: what it is at, how it is, and what it wants. */
+.desk-resident-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.desk-resident-mood {
+  margin-left: auto;
+  padding: 1px 10px;
+  border-radius: 10px;
+  background: rgb(255 255 255 / 0.16);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.desk-resident-mood:empty {
+  display: none;
+}
+.desk-meters {
+  display: grid;
+  gap: 5px;
+}
+.desk-meter {
+  display: grid;
+  grid-template-columns: 4.6em 1fr;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.desk-meter[hidden] {
+  display: none;
+}
+.desk-meter-track {
+  height: 6px;
+  border-radius: 3px;
+  background: rgb(255 255 255 / 0.16);
+  overflow: hidden;
+}
+.desk-meter-track i {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--desk-accent);
+  transition: width 0.4s ease-out;
+}
 #status {
   position: fixed;
   left: 50%;

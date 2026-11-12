@@ -64,6 +64,14 @@ export function paintDesktop(g: Pen, state: DesktopState, now: Date) {
       y = win.y * sy,
       w = win.w * sx,
       h = win.h * sy;
+    if (win.id === 'ball') {
+      // The toy: a bright bead.
+      g.fillStyle = paper.accent;
+      g.beginPath();
+      g.arc(x + w / 2, y + h / 2, Math.max(w, h) / 2, 0, Math.PI * 2);
+      g.fill();
+      continue;
+    }
     g.fillStyle = 'rgba(8,12,40,0.28)';
     pane(g, x + 2, y + 5, w, h, 9);
     g.fillStyle = win.id === front ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.26)';

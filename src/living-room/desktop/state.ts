@@ -6,11 +6,13 @@
  *
  * Positions are CSS pixels of the viewport the desktop was last laid out for.
  */
-export type AppId = 'ambience' | 'mirror' | 'resident';
+export type AppId = 'ambience' | 'mirror' | 'resident' | 'ball';
 export const APPS: readonly { id: AppId; title: string; w: number; h: number }[] = [
   { id: 'ambience', title: '壁紙と光', w: 340, h: 300 },
   { id: 'mirror', title: 'ミラー', w: 400, h: 300 },
-  { id: 'resident', title: '住人', w: 300, h: 210 },
+  { id: 'resident', title: '住人', w: 300, h: 250 },
+  // Not a window but a toy: a ball of glass to throw about, which the resident chases.
+  { id: 'ball', title: 'ボール', w: 72, h: 72 },
 ];
 
 /** Wallpapers: a two-colour sweep and an accent. The room's light takes their colour. */
@@ -80,7 +82,9 @@ function fit(win: DeskWindow, viewport: readonly [number, number]): DeskWindow {
  */
 function firstPlace(id: AppId, viewport: readonly [number, number]): { x: number; y: number } {
   const [vw, vh] = viewport;
-  if (id === 'resident') return { x: vw * 0.2, y: vh * 0.5 };
+  if (id === 'resident') return { x: vw * 0.2, y: vh * 0.48 };
+  // The ball drops in over the middle of the floor.
+  if (id === 'ball') return { x: vw * 0.47, y: vh * 0.56 };
   // The others open in the upper corners, clear of the middle of the room.
   if (id === 'ambience') return { x: vw, y: 0 };
   return { x: 0, y: 0 };
@@ -164,7 +168,11 @@ export function reduceDesktop(state: DesktopState, action: DesktopAction): Deskt
 
 /** The window in front (the one the resident comes to). */
 export const focused = (state: DesktopState): DeskWindow | undefined =>
-  state.windows.reduce<DeskWindow | undefined>((top, w) => (!top || w.z > top.z ? w : top), undefined);
+  state.windows.reduce<DeskWindow | undefined>(
+    // (The ball is a toy, never "the window in front".)
+    (top, w) => (w.id !== 'ball' && (!top || w.z > top.z) ? w : top),
+    undefined,
+  );
 
 export type Rgb = readonly [number, number, number];
 /** '#rrggbb' → linear RGB (what light is added in). */

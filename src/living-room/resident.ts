@@ -1,13 +1,13 @@
-// The character in the living room: loads a local VRM and its motions, and runs the behaviour
-// (src/characters/approach.ts) and the body (src/renderers/three/living-body.ts) on the page's
-// clock. The character's files are not part of the repository or of a public build: the build
-// copies them only when WW_LIVING_CHARACTER names a local folder (docs/living-body.md).
+// The character in the living room: loads a local VRM and its motions, and runs its mind (the
+// director, director.ts), the behaviour (src/characters/approach.ts) and the body (src/renderers/
+// three/living-body.ts) on the page's clock. The character's files are not part of the repository
+// or of a public build: the build copies them only when WW_LIVING_CHARACTER names a local folder
+// (docs/living-body.md).
 //
-// Its everyday life (docs/living-life.md): a day's script (life-script.ts) sends it between the
-// desk chair and the bed; the phone routine (src/characters/phone-routine.ts) has it pick up its
-// phone, put the earphones in, scroll and tap, carry the phone along and put it down. The chair
-// gives (chair-give.ts, chair-rig.ts), the bed gives (soft-surface.ts), the screen lights the
-// room and the face (screen-glow.ts, a point light), the cord hangs and swings (cord.ts).
+// Its life (docs/living-life.md, docs/living-mind.md): the director says where to be, what to
+// reach for, what the phone is for and how it feels; the chair gives (chair-give.ts), the bed
+// gives (soft-surface.ts), the phone's screen lights the room and the face (screen-glow.ts), the
+// cord hangs and swings (cord.ts), a bubble over its head says how it feels (emote.ts).
 import {
   AmbientLight,
   DirectionalLight,
@@ -25,7 +25,6 @@ import { prepareVerifiedSource } from '../assets/verified-source';
 import { loadLivingBody, type LivingBody, type LivingBodyFacts } from '../renderers/three/living-body';
 import {
   approachIntent,
-  standPlace,
   startApproach,
   stepApproach,
   type ApproachState,
@@ -43,12 +42,14 @@ import {
   type PhoneState,
 } from '../characters/phone-routine';
 import { makeCord, stepCord } from '../characters/cord';
+import type { MindEvent } from '../characters/mind';
 import type { SoftSurface, Press } from './soft-surface';
 import type { ScreenGlow } from './screen-glow';
 import { startChair, stepChair, type ChairState } from './chair-give';
 import { chairRig, type ChairRig } from './chair-rig';
 import { phoneProp, PHONE_SIZE } from './phone-prop';
-import { LIFE_STEPS, lifeOrders, startLife, stepLife, type LifeState, type Place } from './life-script';
+import { startDirector, stepDirector, type Orders, type StageAct, type StageView } from './director';
+import { emoteBubble } from './emote';
 import type { Vec3 } from '../characters/two-bone-ik';
 import { standPoint, type RoomLayout } from '../world/room-life';
 
@@ -63,7 +64,11 @@ interface CharacterManifest {
 }
 
 export interface LivingResident {
-  update(dt: number, camera: Camera): void;
+  /**
+   * One frame. `stage` is what the desktop offers it (windows to reach, to sit on, a ball);
+   * returns what it does to the desktop this frame (turns it on, bats the ball…).
+   */
+  update(dt: number, camera: Camera, stage?: StageView): StageAct[];
   /** A point in the room's metres to notice, walk to and touch; undefined takes it away. */
   setTarget(target: Vec3 | undefined): void;
   /** A seat of the room by its id (sit_chair, sit_bed…) to go and sit on; undefined stands up. */
@@ -72,20 +77,20 @@ export interface LivingResident {
   setMood(mood: Mood): void;
   /** The character's touch was answered (the thing was clicked): it is glad. */
   cheer(): void;
-  /** Its everyday life (the day's script) on or off. Off, it stays where `sit` puts it. */
+  /** Its own life (the director) on or off. Off, it stays where `sit` puts it. */
   live(on: boolean): void;
-  /**
-   * The virtual desktop's front window (docs/living-desktop.md): the place on its frame, in the
-   * room's metres, a hand could come to; undefined when the desktop is closed. Where there is
-   * floor to stand on, the resident puts its phone away and comes to it; otherwise it watches.
-   */
-  setUi(at: Vec3 | undefined): void;
-  /** Its hand is on the desktop's window now. */
-  touching(): boolean;
-  /** What it is doing, in a few words (shown in the desktop's own window). */
-  says(): string;
+  /** Something happened to it (petted, a window flew past…): the mind is told. */
+  notice(event: MindEvent): void;
+  /** It is up on the desktop (riding a window, or thrown off one): drawn in front of the UI. */
+  readonly front: boolean;
+  /** What of the scene is the resident (its body, its phone, its bubble). */
+  objects(): Object3D[];
+  /** Where its chest is (the room's metres): what a pointer or a flying window is near. */
+  chest(): Vec3;
+  /** What it is doing and how it is, in words and numbers (the desktop's own window shows it). */
+  readout(): { says: string; mood: string; energy: number; boredom: number; curiosity: number; social: number };
   state(): ApproachState & { target: Vec3 | undefined };
-  /** What the everyday life is doing (the test hook and the recordings). */
+  /** What the life is doing (the test hook and the recordings). */
   life(): {
     step: string;
     phone: PhoneState['phase'];
@@ -131,9 +136,37 @@ const bytes = async (url: URL) => {
 
 /** How bright the phone's screen lights the character (its spot) and the room (screen-glow). */
 const GLOW = { face: 1.0, room: 0.35 };
+const MOODS = {
+  sleepy: 'ねむい',
+  grumpy: 'ふきげん',
+  surprised: 'びっくり',
+  confused: 'こんらん',
+  happy: 'ごきげん',
+  calm: 'おだやか',
+};
+/** What the page remembers of the viewer between visits: numbers only. */
+const MEMORY_KEY = 'wwt-living-resident';
 
 const v = (p: readonly number[]) => new Vector3(p[0], p[1], p[2]);
 const tuple = (p: Vector3): Vec3 => [p.x, p.y, p.z];
+
+function remembered(): { affinity: number; visits: number } {
+  try {
+    const saved = JSON.parse(localStorage.getItem(MEMORY_KEY) ?? '{}') as { affinity?: unknown; visits?: unknown };
+    const affinity = typeof saved.affinity === 'number' && Number.isFinite(saved.affinity) ? saved.affinity : 0;
+    const visits = typeof saved.visits === 'number' && Number.isFinite(saved.visits) ? saved.visits : 0;
+    return { affinity: Math.min(1, Math.max(-1, affinity)), visits: Math.max(0, Math.trunc(visits)) };
+  } catch {
+    return { affinity: 0, visits: 0 };
+  }
+}
+function remember(affinity: number, visits: number) {
+  try {
+    localStorage.setItem(MEMORY_KEY, JSON.stringify({ affinity: Math.round(affinity * 100) / 100, visits }));
+  } catch {
+    // (Private browsing: it simply does not remember.)
+  }
+}
 
 export async function loadLivingResident(
   scene: Scene,
@@ -178,7 +211,7 @@ export async function loadLivingResident(
   key.position.set(-1.5, 3, 2.5);
   scene.add(fill, key, key.target);
 
-  // The thing to notice: a small lit panel (a stand-in for a UI card). It always faces the viewer.
+  // The thing to notice by hand (the test hook): a small lit panel. It always faces the viewer.
   const marker = new Mesh(
     new PlaneGeometry(0.14, 0.09),
     new MeshBasicMaterial({ color: 0x9fe8ff, side: DoubleSide, transparent: true, opacity: 0.9 }),
@@ -186,8 +219,10 @@ export async function loadLivingResident(
   marker.visible = false;
   marker.renderOrder = 2;
   scene.add(marker);
+  const bubble = emoteBubble();
+  scene.add(bubble.object);
 
-  // --- the everyday life's places -----------------------------------------------------------
+  // --- the places of its life -----------------------------------------------------------------
   const scale = body.metrics.height / 1.19;
   const pose = (name: string) => {
     const o = room.root.getObjectByName(name);
@@ -204,16 +239,15 @@ export async function loadLivingResident(
   const lieOn = pose('pose_lie_bed');
   const chairSeat = seatOf('sit_chair');
   const bedSeat = seatOf('sit_bed');
+  const floorSeat = seatOf('sit_floor');
   const bedLie: Seat | undefined =
     bedSeat && lieOn
       ? { ...bedSeat, lie: { x: lieOn.at.x, y: lieOn.at.y, z: lieOn.at.z, heading: lieOn.heading } }
       : undefined;
-  const rests: Record<Place, { at: Vector3; heading: number } | undefined> = {
-    chair: pose('pose_phone_desk'),
-    bed: pose('pose_phone_bed'),
-  };
-  const places: Record<Place, Seat | undefined> = { chair: chairSeat, bed: bedLie };
-  const lifeReady = Boolean(chairSeat && bedLie && rests.chair && rests.bed);
+  // The phone lives on the bed (the desk has the computer).
+  const rest = pose('pose_phone_bed');
+  const front = layout.spots.find((s) => s.id === 'stand_front') ?? layout.spots.find((s) => s.kind === 'stand');
+  const lifeReady = Boolean(chairSeat && bedLie && floorSeat && rest && front);
 
   // --- the chair --------------------------------------------------------------------------
   const chairMesh = room.root.getObjectByName('tex_chair') as Mesh | undefined;
@@ -231,20 +265,17 @@ export async function loadLivingResident(
   // and shines out through it, in a wide cone, so the hands and the face get about the same.
   const screenLight = new SpotLight(0xb8c8ff, 0, 2.4, 0.75, 1, 2);
   scene.add(screenLight, screenLight.target);
-  // The day begins on the way to the bed, where the phone is: lying there with it is what the
-  // room looks like when the page opens.
-  let lifeState: LifeState = startLife(LIFE_STEPS.indexOf('to bed again'), 'bed');
+
+  // --- its mind -----------------------------------------------------------------------------
+  // Each visit is another day (the seed), and it remembers how it was treated (the affinity).
+  const memory = remembered();
+  remember(memory.affinity, memory.visits + 1);
+  let director = startDirector(1 + memory.visits, memory.affinity);
+  let savedAffinity = memory.affinity;
   let living = lifeReady;
-  // The desktop's window: where a hand could come to it, whether there is floor to do so from,
-  // how long it is still worth watching from afar, how much the eyes are on it, and where the
-  // phone was put down to go to it.
-  let ui: Vec3 | undefined;
-  let watchLeft = 0,
-    lookUi = 0,
-    attendingUi = false,
-    waitingUi = false;
-  let restOverride: Place | undefined;
-  const restPlace = (): Place => restOverride ?? lifeOrders(lifeState).restAt;
+  let orders: Orders | undefined;
+  const pending: MindEvent[] = [];
+  const NOTHING: StageView = { open: false };
 
   const center = layout.spots.find((spot) => spot.id === 'stand_center') ?? layout.spots[0];
   const [x, z] = center ? standPoint(layout, center) : [0, 0];
@@ -252,11 +283,15 @@ export async function loadLivingResident(
   let target: Vec3 | undefined;
   let seat: Seat | undefined;
   let mood: Mood = 'calm';
-  let cheers = 0;
+  let cheers = 0,
+    tumbles = 0;
   let tracing = false;
   const frames: TraceFrame[] = [];
   let seated = 0,
     landed = 0,
+    wasHolding = false,
+    lookTo = 0,
+    lookAt: Vec3 | undefined,
     lastThumb = 0,
     smileUntil = 0,
     smileDraws = 0,
@@ -277,10 +312,9 @@ export async function loadLivingResident(
     const ahead = new Vector3(Math.sin(intent.heading), 0, Math.cos(intent.heading));
     const leftward = new Vector3(Math.cos(intent.heading), 0, -Math.sin(intent.heading));
     const lying = intent.lie > 0.5;
-    const restAt = rests[restPlace()];
     switch (place) {
       case 'rest': {
-        const at = (restAt?.at.clone() ?? headAt.clone()).add(p1.set(0, 0.03, 0));
+        const at = (rest?.at.clone() ?? headAt.clone()).add(p1.set(0, 0.03, 0));
         // Down onto it, the fingers the way from the body to it.
         const fingers = at.clone().sub(headAt).setY(0);
         if (fingers.lengthSq() < 1e-6) fingers.copy(ahead);
@@ -291,7 +325,7 @@ export async function loadLivingResident(
         // In front of the face, a little low: sitting, at the chest. Lying on the front, ahead of
         // the face near the bed. On the back, held up over the face, its top past the head.
         const onBack = lying ? intent.roll : 0;
-        const front = lying
+        const before = lying
           ? headAt
               .clone()
               .addScaledVector(ahead, 0.2 * scale)
@@ -305,7 +339,7 @@ export async function loadLivingResident(
           .clone()
           .addScaledVector(up, 0.17 * scale)
           .addScaledVector(ahead, -0.14 * scale);
-        const at = front.lerp(above, onBack);
+        const at = before.lerp(above, onBack);
         // The right hand a little right, the second hand beside it. (On the back, the body's
         // left is the other way round as seen from above: `leftward` is the standing body's.)
         at.addScaledVector(leftward, (place === 'grip' ? 0.035 : -0.012) * scale * (1 - 2 * onBack));
@@ -356,7 +390,7 @@ export async function loadLivingResident(
       grip: aim.grip,
     };
   };
-  /** Bed and desk tops and the floor: what the cord comes to rest on. */
+  /** The bed's top and the floor: what the cord comes to rest on. */
   const groundAt = (gx: number, gz: number) => {
     let y = layout.floorY;
     if (lieOn) {
@@ -366,83 +400,98 @@ export async function loadLivingResident(
         across = dx * Math.cos(lieOn.heading) - dz * Math.sin(lieOn.heading);
       if (Math.abs(across) < 0.68 && along > -1.45 && along < 0.95) y = Math.max(y, lieOn.at.y - 0.02);
     }
-    const desk = rests.chair;
-    if (desk && Math.hypot(gx - desk.at.x, gz - desk.at.z) < 0.4) y = Math.max(y, desk.at.y);
     return y;
+  };
+  /** Where it knocks on the screen from inside: out from the front of the room, toward the viewer. */
+  const knockAt = (camera: Camera): Vec3 => {
+    const stand = front ? standPoint(layout, front) : ([0, 0] as [number, number]);
+    const toward = p1.set(camera.position.x - stand[0], 0, camera.position.z - stand[1]).normalize();
+    return [
+      stand[0] + toward.x * 0.36 * scale,
+      layout.floorY + body.metrics.shoulderHeight * 1.04,
+      stand[1] + toward.z * 0.36 * scale,
+    ];
   };
 
   return {
-    update(dt, camera) {
+    update(dt, camera, stage = NOTHING) {
       clock += dt;
-      // The day's script: where to be, what the phone is for. A thing to notice comes first: the
-      // phone is kept in hand (not used) while it is seen to.
-      const orders = lifeOrders(lifeState);
-      // The desktop's window. With floor to reach it from: the phone is put away where the body
-      // rests (earphones out first) and it goes over, eager. Out of reach: it watches a while
-      // from where it is, the phone lowered, and then goes back to what it was doing.
-      const here: Place | undefined = state.phase === 'lie' ? 'bed' : state.phase === 'sit' ? 'chair' : undefined;
-      const reachable = Boolean(ui && standPlace(layout, [state.mover.x, state.mover.z], ui, measures));
-      watchLeft = Math.max(0, watchLeft - dt);
-      const watching = Boolean(ui) && !target && !reachable && watchLeft > 0;
-      const coming = Boolean(ui) && !target && reachable;
-      const putAway = coming && Boolean(here) && phoneState.phase !== 'carry' && phoneState.phone === 'hand';
-      if (putAway) restOverride = here;
-      const go = coming && !putAway && (phoneState.phase === 'away' || phoneState.phase === 'carry');
-      const goal = target ?? (go ? ui : undefined);
-      const attending = Boolean(target) || watching || coming;
-      attendingUi = watching || coming;
-      waitingUi = coming && !go;
-      if (living) seat = goal ? undefined : places[orders.seat ?? 'chair'];
-      // The phone is used only where the day has the body settled (lying on the bed, sitting at
-      // the desk): on the way back there from a window it is carried, or left lying, never
-      // reached for across the room.
-      const settled = here !== undefined && here === (orders.seat ?? 'chair');
-      const useNow = living && !attending && orders.use && settled;
+      // Its mind: what it is at, what it reaches for, what the phone is for, how it feels.
+      const holding = state.phase === 'hold';
+      let touch: Vec3 | undefined;
+      let acts: StageAct[] = [];
+      if (living) {
+        const stepped = stepDirector(director, {
+          dt,
+          body: state.phase,
+          phone: phoneState.phase,
+          stage,
+          landed: holding && !wasHolding && !target,
+          events: pending.splice(0),
+          knockAt: knockAt(camera),
+        });
+        director = stepped.state;
+        orders = stepped.orders;
+        acts = orders.acts;
+        touch = orders.touch;
+        if (orders.tumble) tumbles++;
+        const place = orders.seat;
+        seat =
+          target || touch || orders.perch
+            ? undefined
+            : place === 'bed'
+              ? bedLie
+              : place === 'chair'
+                ? chairSeat
+                : place === 'floor' && floorSeat
+                  ? // Sulking, it sits with its back to the room's open side.
+                    { ...floorSeat, heading: floorSeat.heading + (orders.backTurned ? Math.PI : 0) }
+                  : undefined;
+        // How it was treated is kept for the next visit.
+        if (Math.abs(director.mind.affinity - savedAffinity) > 0.02) {
+          savedAffinity = director.mind.affinity;
+          remember(savedAffinity, memory.visits + 1);
+        }
+      } else {
+        orders = undefined;
+        pending.length = 0;
+      }
+      wasHolding = holding;
+      const goal = target ?? touch;
       phoneState = stepPhone(phoneState, {
         dt,
-        use: useNow,
-        buds: orders.buds,
-        hold:
-          living &&
-          (target || watching
-            ? true
-            : coming
-              ? !putAway
-              : orders.hold || (orders.use && !settled && phoneState.phone === 'hand')),
+        use: !target && orders?.phone === 'use',
+        buds: true,
+        // (A thing put before it by hand comes first: the phone is lowered, not put away.)
+        hold: Boolean(target) || orders?.phone === 'hold',
       });
-      // Put down to go to the window: that is where the phone lies now.
-      if (restOverride && phoneState.phase === 'away') {
-        lifeState = { ...lifeState, phoneAt: restOverride };
-        restOverride = undefined;
-      }
       const held = phoneIntent(phoneState);
       state = stepApproach(state, {
         dt,
         layout,
         body: measures,
-        mood: goal && !target ? 'interest' : mood,
+        mood: target ? mood : orders?.eager ? 'interest' : 'calm',
         cheer: cheers,
+        tumble: tumbles,
         ...(goal ? { target: goal } : {}),
         ...(seat ? { seat } : {}),
+        ...(!target && orders?.perch ? { perch: orders.perch } : {}),
       });
-      // (The day waits while something has its attention.)
-      if (living && !attending)
-        lifeState = stepLife(
-          lifeState,
-          {
-            body: state.phase,
-            phone: phoneState.phase,
-            budsIn: phoneState.budL === 'ear' && phoneState.budR === 'ear',
-          },
-          dt,
-        );
       const intent = approachIntent(state, goal);
-      // The eyes go to the window before the body does, and stay on it between touches.
-      lookUi += ((attendingUi ? 1 : 0) - lookUi) * (1 - Math.exp(-5 * dt));
-      if (ui && lookUi > intent.lookWeight) {
-        intent.look = ui;
-        intent.lookWeight = lookUi;
-        intent.alert = Math.max(intent.alert, attendingUi ? 1 - Math.min(1, lookUi * 1.6) : 0);
+      // The eyes go to what has its attention before the body does.
+      if (orders?.look) lookAt = orders.look;
+      lookTo += ((orders?.look ? 1 : 0) - lookTo) * (1 - Math.exp(-5 * dt));
+      if (lookAt && lookTo > intent.lookWeight) {
+        intent.look = lookAt;
+        intent.lookWeight = lookTo;
+      }
+      // How it feels, and sleep (asleep, nothing swings and nothing is looked at).
+      const asleep = orders?.asleep ? 1 : 0;
+      if (orders) {
+        intent.feel = orders.feel;
+        intent.sleep = asleep;
+        intent.joy = Math.max(intent.joy, orders.feel.joy * 0.85);
+        if (asleep) intent.kickLegs = 0;
       }
       const onChair = Boolean(
         seat && chairSeat && !seat.lie && Math.hypot(seat.x - chairSeat.x, seat.z - chairSeat.z) < 0.05,
@@ -455,12 +504,13 @@ export async function loadLivingResident(
           dt,
           seated: onChair ? intent.seated : 0,
           ...(drop ? { impact: 1.4 } : {}),
-          lean: onChair && held.look > 0.5 ? 0.6 : 0.2,
+          lean: onChair ? 0.35 : 0.2,
         });
         chair.update(chairState);
       }
       // The bed under a body that sits on it or lies on it.
       let sunk = 0;
+      const perched = intent.seat !== undefined && !seat;
       if (intent.lieAt && intent.lie > 0.01) {
         if (intent.landed > 0.5 && landed <= 0.5) soft.kick(3.4);
         const at = intent.lieAt;
@@ -484,7 +534,7 @@ export async function loadLivingResident(
         ];
         sunk = soft.press(contacts, intent.lie, dt);
         intent.lieAt = [at[0], at[1] - sunk, at[2]];
-      } else if (!onChair) {
+      } else if (!onChair && !perched) {
         if (intent.seated > 0.55 && seated <= 0.55) soft.kick(2.2);
         sunk = soft.press(intent.seat, intent.seated, dt);
       } else soft.press(undefined, 0, dt);
@@ -493,8 +543,8 @@ export async function loadLivingResident(
       // The room's marker is on the seat's surface; the hip joints rest a little above it (the
       // body sits on the surface, not in it), less what the surface has given.
       if (intent.seat) {
-        const rest: Vec3 = [intent.seat[0], intent.seat[1] + body.metrics.height * 0.06 - sunk, intent.seat[2]];
-        intent.seat = onChair && chair ? chair.carry([rest[0], rest[1] - chairState.drop, rest[2]]) : rest;
+        const at: Vec3 = [intent.seat[0], intent.seat[1] + body.metrics.height * 0.06 - sunk, intent.seat[2]];
+        intent.seat = onChair && chair ? chair.carry([at[0], at[1] - chairState.drop, at[2]]) : at;
       }
 
       // The phone in the hands: where each hand goes, the thumb, the eyes on the screen.
@@ -506,7 +556,7 @@ export async function loadLivingResident(
       // (While a thing in the room is being touched, the arm is the touch's: the phone waits.)
       if (!(intent.reach && intent.reachWeight !== 0)) intent.hold = hold;
       intent.thumb = held.thumb;
-      if (held.look > intent.lookWeight && !attendingUi && phone.frame.at.lengthSq() > 0) {
+      if (held.look > intent.lookWeight && phone.frame.at.lengthSq() > 0) {
         intent.look = tuple(phone.frame.at);
         intent.lookWeight = held.look;
       }
@@ -517,6 +567,8 @@ export async function loadLivingResident(
       if (clock < smileUntil) intent.joy = Math.max(intent.joy, 0.75);
 
       body.update(intent, dt, layout.floorY, [camera.position.x, camera.position.y, camera.position.z]);
+      const head = body.head();
+      bubble.update(orders?.emote, p1.set(head.at[0], head.at[1], head.at[2]), body.metrics.height, dt);
 
       // The phone where it is: in the right hand, or on its rest.
       if (held.phone === 'hand') {
@@ -530,17 +582,13 @@ export async function loadLivingResident(
           fingers,
           palm,
         );
-      } else {
-        const rest = rests[restPlace()] ?? rests.chair;
-        if (rest)
-          phone.place(
-            p1.copy(rest.at).add(p2.set(0, PHONE_SIZE.depth / 2 + 0.002, 0)),
-            p3.set(Math.sin(rest.heading), 0, Math.cos(rest.heading)),
-            up,
-          );
-      }
+      } else if (rest)
+        phone.place(
+          p1.copy(rest.at).add(p2.set(0, PHONE_SIZE.depth / 2 + 0.002, 0)),
+          p3.set(Math.sin(rest.heading), 0, Math.cos(rest.heading)),
+          up,
+        );
       // The buds: on the phone, in the left hand's fingers, or in the ears.
-      const head = body.head();
       for (const [side, holder] of [
         [1, held.budL],
         [-1, held.budR],
@@ -606,6 +654,7 @@ export async function loadLivingResident(
         marker.position.set(target[0], target[1], target[2]);
         marker.quaternion.copy(camera.quaternion);
       }
+      return acts;
     },
     setTarget(next) {
       target = next && next.every(Number.isFinite) ? [next[0], next[1], next[2]] : undefined;
@@ -621,41 +670,33 @@ export async function loadLivingResident(
       return Boolean(seat);
     },
     live(on) {
-      // Stopped, it is left where it is, standing: not sent on to the place the day had chosen.
+      // Stopped, it is left where it is, standing: not sent on to the place its mind had chosen.
       if (living && !on) seat = undefined;
       living = on && lifeReady;
     },
-    setUi(at) {
-      const next: Vec3 | undefined = at && at.every(Number.isFinite) ? [at[0], at[1], at[2]] : undefined;
-      // A window that appears or moves is worth a new look, even from afar.
-      if (next && (!ui || Math.hypot(next[0] - ui[0], next[1] - ui[1], next[2] - ui[2]) > 0.08)) watchLeft = 7;
-      ui = next;
+    notice(event) {
+      if (living && pending.length < 8) pending.push(event);
     },
-    touching: () => Boolean(ui) && !target && state.phase === 'hold',
-    says() {
-      const phoning = phoneState.phase !== 'away' && phoneState.phase !== 'carry';
-      if (attendingUi) {
-        if (state.phase === 'reach' || state.phase === 'hold') return 'ウィンドウに触れている';
-        if (waitingUi)
-          return phoneState.budL !== 'phone' || phoneState.budR !== 'phone'
-            ? 'イヤホンを外している'
-            : 'スマホを置いている';
-        if (
-          state.phase === 'walk' ||
-          state.phase === 'windup' ||
-          state.phase === 'pivot' ||
-          state.phase === 'rise' ||
-          state.phase === 'standUp'
-        )
-          return 'こちらへ来ている';
-        return 'ウィンドウを眺めている';
-      }
-      if (state.phase === 'cheer') return 'よろこんでいる';
-      if (state.phase === 'lie' || state.phase === 'dive')
-        return phoning ? 'ベッドでスマホを見ている' : 'ベッドで寝転んでいる';
-      if (state.phase === 'sit') return phoning ? '机でスマホを見ている' : '机に座っている';
-      if (state.mover.speed > 0 || state.phase === 'toSeat') return '部屋を歩いている';
-      return 'ひと息ついている';
+    get front() {
+      return (
+        state.phase === 'perchUp' || state.phase === 'perch' || state.phase === 'perchDown' || state.phase === 'tumble'
+      );
+    },
+    objects: () => [body.root, phone.root, bubble.object],
+    chest() {
+      const head = body.head().at;
+      return [head[0], head[1] - body.metrics.height * 0.22, head[2]];
+    },
+    readout() {
+      const mind = director.mind;
+      return {
+        says: orders?.says ?? 'じっとしている',
+        mood: orders ? MOODS[orders.mood] : '',
+        energy: mind.energy,
+        boredom: mind.boredom,
+        curiosity: mind.curiosity,
+        social: mind.social,
+      };
     },
     setMood(next) {
       mood = next === 'interest' ? 'interest' : 'calm';
@@ -665,7 +706,7 @@ export async function loadLivingResident(
     },
     state: () => ({ ...state, target }),
     life: () => ({
-      step: lifeOrders(lifeState).step,
+      step: orders?.activity ?? 'manual',
       phone: phoneState.phase,
       body: state.phase,
       chair: { ...chairState },

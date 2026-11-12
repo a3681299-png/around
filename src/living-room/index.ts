@@ -16,6 +16,7 @@ import {
   Vector2,
   Vector3,
   WebGLRenderer,
+  type Light,
   type Mesh,
   type MeshStandardMaterial,
   type Texture,
@@ -83,7 +84,13 @@ async function start() {
     texture.flipY = false;
   }
 
-  const renderer = new WebGLRenderer({ canvas, antialias: true, powerPreference: 'low-power' });
+  // (With alpha: the resident alone is drawn clear behind it for the layer in front of the UI.
+  // The room itself always fills the canvas.)
+  const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'low-power' });
+  // The layer over the page's windows: the resident when it is in front of them.
+  const front = document.querySelector<HTMLCanvasElement>('#front')!;
+  const frontPen = front.getContext('2d');
+  let frontShown = false;
   renderer.toneMapping = ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.8;
   lightmap.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
@@ -203,6 +210,8 @@ async function start() {
     renderer.setSize(width, height, false);
     composer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     composer.setSize(width, height);
+    front.width = canvas.width;
+    front.height = canvas.height;
     camera.aspect = width / height;
     // Wider than authored: keep the height. Narrower: keep the width, so the room is never cut.
     const tan = camera.aspect >= manifest.aspect ? authoredTan : (authoredTan * manifest.aspect) / camera.aspect;
@@ -258,10 +267,40 @@ async function start() {
     }
     camera.updateMatrixWorld();
     const began = __WW_LIVING_TEST__ ? performance.now() : 0;
-    desktop.update(dt, now);
-    resident?.update(dt, camera);
+    // The resident sees what the desktop offers, acts on it, and the desktop takes that in.
+    const acts = resident?.update(dt, camera, desktop.stage()) ?? [];
+    desktop.update(dt, now, acts);
     const posed = __WW_LIVING_TEST__ ? performance.now() : 0;
-    composer.render();
+    // Up on the desktop (riding a window, thrown off one) the resident is in front of the UI: it
+    // is drawn on its own, clear behind it, and that picture is put on a canvas over the page's
+    // windows; the room is then drawn without it. One WebGL context, the body drawn once.
+    const inFront = Boolean(resident?.front);
+    if (inFront && resident && frontPen) {
+      const mine = new Set(resident.objects());
+      const shown = scene.children.map((child) => child.visible);
+      const background = scene.background;
+      for (const child of scene.children) if (!mine.has(child) && !(child as Light).isLight) child.visible = false;
+      scene.background = null;
+      renderer.setRenderTarget(null);
+      renderer.setClearColor(0x000000, 0);
+      renderer.clear();
+      renderer.render(scene, camera);
+      frontPen.clearRect(0, 0, front.width, front.height);
+      frontPen.drawImage(canvas, 0, 0);
+      scene.children.forEach((child, i) => {
+        child.visible = mine.has(child) ? false : shown[i]!;
+      });
+      scene.background = background;
+      composer.render();
+      scene.children.forEach((child, i) => {
+        child.visible = shown[i]!;
+      });
+      frontShown = true;
+    } else {
+      if (frontShown && frontPen) frontPen.clearRect(0, 0, front.width, front.height);
+      frontShown = false;
+      composer.render();
+    }
     draws++;
     if (__WW_LIVING_TEST__ && dt > 0) {
       // For the load measurement (the test hook): the frame's interval, the body's and the draw's
@@ -295,7 +334,16 @@ async function start() {
     const ray = new Raycaster();
     const live = resident;
     canvas.addEventListener('click', (event) => {
-      if (!event.altKey && !live.state().target) return;
+      if (!event.altKey && !live.state().target) {
+        // A plain click on the resident pets it.
+        const chest = new Vector3(...live.chest()).project(camera);
+        const near = Math.hypot(
+          ((chest.x + 1) / 2) * window.innerWidth - event.clientX,
+          ((1 - chest.y) / 2) * window.innerHeight - event.clientY,
+        );
+        if (near < Math.max(46, window.innerHeight * 0.07)) live.notice('petted');
+        return;
+      }
       ray.setFromCamera(
         new Vector2((event.clientX / window.innerWidth) * 2 - 1, 1 - (event.clientY / window.innerHeight) * 2),
         camera,
@@ -362,6 +410,13 @@ async function start() {
         resident,
         /** The virtual desktop's state (docs/living-desktop.md). */
         desktop: () => desktop.state(),
+        /** What the desktop offers the resident now (where a hand reaches, where it can sit). */
+        stage: () => desktop.stage(),
+        /** Where a point of the room is on the screen (CSS pixels). */
+        project: (point: [number, number, number]) => {
+          const p = new Vector3(...point).project(camera);
+          return [((p.x + 1) / 2) * window.innerWidth, ((1 - p.y) / 2) * window.innerHeight];
+        },
         /** Fixed close views of the furniture for the browser art review. */
         reviewCamera: (target: [number, number, number], scale: number, turn = 0) => {
           reviewSubject.fromArray(target);

@@ -1,7 +1,11 @@
 /**
- * The virtual desktop on the page (docs/living-desktop.md): glass windows over the room. Each
- * window blurs what is behind it (the room's canvas), so the UI lifts off a clouded background
- * while the room around it stays sharp: the resident can be seen coming up to a window.
+ * The virtual desktop on the page (docs/living-desktop.md, docs/living-mind.md): glass windows
+ * over the room. Each window blurs what is behind it (the room's canvas), so the UI lifts off a
+ * clouded background while the room around it stays sharp.
+ *
+ * The windows are things: dragged and let go they keep going, tip into their motion, bounce off
+ * the screen's edge (physics.ts); the ball is the same with hardly any friction. The resident
+ * pushes them, bats the ball, sits on a window (it sags) and is carried about on it.
  *
  * Everything is built with DOM calls from fixed strings (no markup from data). The state is
  * state.ts; this draws it and turns pointer and keyboard input into its actions.
@@ -16,16 +20,34 @@ import {
   type DesktopAction,
   type DesktopState,
 } from './state';
+import { bounce, moving, speedOf, stepMotion, still, throwVelocity, type Motion } from './physics';
+
+export interface ResidentReadout {
+  says: string;
+  mood: string;
+  /** 0–1 each. */
+  energy: number;
+  boredom: number;
+  curiosity: number;
+  social: number;
+}
 
 export interface DesktopView {
   state(): DesktopState;
   dispatch(action: DesktopAction): void;
-  /** The frame of the window in front, in CSS pixels (undefined: closed, or no window). */
-  frontRect(): DOMRect | undefined;
-  /** The resident's hand landed on the window in front: it gives a little. */
-  nudge(): void;
-  /** What the resident is doing, for its window (undefined: this build has no resident). */
-  setResident(text: string | undefined): void;
+  /** One frame of the windows' own motion; true while anything still moves. */
+  step(dt: number, now: number): boolean;
+  /** How fast a thing moves (CSS pixels a second), and whether the viewer has it in hand. */
+  speed(id: AppId): number;
+  held(id: AppId): boolean;
+  /** A shove: the thing is sent off at this velocity (CSS pixels a second). */
+  impulse(id: AppId, vx: number, vy: number): void;
+  /** The resident sits on a window (it sags under it) or gets off. */
+  sit(id: AppId, on: boolean): void;
+  /** A ring spreading from a point of the screen (the resident knocked on it from inside). */
+  ripple(x: number, y: number): void;
+  /** What the resident is doing and how it is, for its window (undefined: no resident here). */
+  setResident(readout: ResidentReadout | undefined): void;
   /** The mirror's state, for its window. */
   setMirror(state: 'off' | 'asking' | 'on' | 'refused' | 'unsupported'): void;
   readonly mirrorVideo: HTMLVideoElement;
@@ -35,8 +57,6 @@ export interface DesktopHooks {
   changed(state: DesktopState, action: DesktopAction): void;
   /** The mirror's button: start (true) or stop. */
   mirror(on: boolean): void;
-  /** A press on the window in front (the resident may be holding it). */
-  pressed(id: AppId): void;
 }
 
 const el = <K extends keyof HTMLElementTagNameMap>(
@@ -55,6 +75,7 @@ const ICONS: Record<AppId | 'desk' | 'close', string> = {
   ambience: 'M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z',
   mirror: 'M3 5h18v11H3zM8 20h8M12 16v4',
   resident: 'M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zM4 20a8 8 0 0 1 16 0',
+  ball: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM5.5 7.5c3 2 10 2 13 0M5.5 16.5c3-2 10-2 13 0',
   desk: 'M3 4h18v12H3zM9 20h6M12 16v4',
   close: 'M6 6l12 12M18 6L6 18',
 };
@@ -67,6 +88,13 @@ function icon(name: keyof typeof ICONS) {
   svg.append(path);
   return svg;
 }
+
+const METERS = [
+  ['energy', 'げんき'],
+  ['boredom', 'たいくつ'],
+  ['curiosity', 'きょうみ'],
+  ['social', 'かまって'],
+] as const;
 
 export function desktopView(host: HTMLElement, hooks: DesktopHooks): DesktopView {
   let state = startDesktop([window.innerWidth, window.innerHeight]);
@@ -89,7 +117,9 @@ export function desktopView(host: HTMLElement, hooks: DesktopHooks): DesktopView
   const launcher = el('button', 'desk-launcher desk-glass');
   launcher.type = 'button';
   launcher.append(icon('desk'), el('span', undefined, 'デスクトップを開く'));
-  host.append(root, launcher);
+  const ripples = el('div', 'desk-ripples');
+  ripples.setAttribute('aria-hidden', 'true');
+  host.append(root, launcher, ripples);
 
   const dispatch = (action: DesktopAction) => {
     const next = reduceDesktop(state, action);
@@ -97,6 +127,18 @@ export function desktopView(host: HTMLElement, hooks: DesktopHooks): DesktopView
     state = next;
     render();
     hooks.changed(state, action);
+  };
+
+  // --- the things' own motion ---------------------------------------------------------------------
+  const motions = new Map<AppId, Motion>();
+  const sat = new Set<AppId>();
+  /** The thing the viewer has in hand, where it was grabbed and where the pointer has been. */
+  let grab:
+    { id: AppId; dx: number; dy: number; pointer: number; trail: { t: number; x: number; y: number }[] } | undefined;
+  const motion = (id: AppId) => {
+    let m = motions.get(id);
+    if (!m) motions.set(id, (m = still()));
+    return m;
   };
 
   // --- the apps' insides ---------------------------------------------------------------------
@@ -146,18 +188,72 @@ export function desktopView(host: HTMLElement, hooks: DesktopHooks): DesktopView
   }
 
   const residentLine = el('p', 'desk-resident-line');
+  const residentMood = el('span', 'desk-resident-mood');
+  const meters = METERS.map(([, label]) => {
+    const row = el('div', 'desk-meter');
+    const fill = el('i');
+    const track = el('span', 'desk-meter-track');
+    track.append(fill);
+    row.append(el('span', undefined, label), track);
+    return { row, fill };
+  });
   function resident() {
     const body = el('div', 'desk-body');
-    body.append(el('p', 'desk-hint', 'いまの様子'), residentLine);
-    body.append(el('p', 'desk-hint', 'この窓を部屋の床の上あたりへ動かすと、縁に手をかけに来ます。'));
+    const head = el('div', 'desk-resident-head');
+    head.append(residentLine, residentMood);
+    const list = el('div', 'desk-meters');
+    list.append(...meters.map((m) => m.row));
+    body.append(head, list);
+    body.append(el('p', 'desk-hint', '窓やボールは掴んで投げられます。部屋のフェリスをクリックすると、なでられます。'));
     return body;
   }
-  const builders: Record<AppId, () => HTMLElement> = { ambience, mirror, resident };
+  const builders: Record<Exclude<AppId, 'ball'>, () => HTMLElement> = { ambience, mirror, resident };
 
   // --- windows -------------------------------------------------------------------------------
   const frames = new Map<AppId, HTMLElement>();
+  /** Dragging: by the title bar for a window, anywhere for the ball. Let go moving, it is thrown. */
+  function draggable(id: AppId, handle: HTMLElement, section: HTMLElement) {
+    handle.addEventListener('pointerdown', (event) => {
+      if (event.button !== 0 || (event.target as Element).closest('button')) return;
+      const win = state.windows.find((w) => w.id === id);
+      if (!win) return;
+      grab = { id, dx: event.clientX - win.x, dy: event.clientY - win.y, pointer: event.pointerId, trail: [] };
+      const m = motion(id);
+      m.vx = m.vy = 0;
+      handle.setPointerCapture(event.pointerId);
+      section.classList.add('is-dragged');
+    });
+    handle.addEventListener('pointermove', (event) => {
+      if (grab?.id !== id || grab.pointer !== event.pointerId) return;
+      grab.trail.push({ t: event.timeStamp, x: event.clientX, y: event.clientY });
+      if (grab.trail.length > 12) grab.trail.shift();
+      dispatch({ type: 'move', id, x: event.clientX - grab.dx, y: event.clientY - grab.dy });
+    });
+    const release = (event: PointerEvent) => {
+      if (grab?.id !== id || grab.pointer !== event.pointerId) return;
+      const [vx, vy] = throwVelocity(grab.trail, event.timeStamp);
+      const m = motion(id);
+      m.vx = vx;
+      m.vy = vy;
+      grab = undefined;
+      section.classList.remove('is-dragged');
+      hooks.changed(state, { type: 'focus', id });
+    };
+    handle.addEventListener('pointerup', release);
+    handle.addEventListener('pointercancel', release);
+  }
   function frame(id: AppId) {
     const app = APPS.find((a) => a.id === id)!;
+    if (id === 'ball') {
+      const ball = el('div', 'desk-ball');
+      ball.setAttribute('role', 'img');
+      ball.setAttribute('aria-label', 'ボール。掴んで投げられます');
+      ball.append(el('i'));
+      ball.addEventListener('pointerdown', () => dispatch({ type: 'focus', id }));
+      draggable(id, ball, ball);
+      stage.append(ball);
+      return ball;
+    }
     const section = el('section', 'desk-window desk-glass');
     section.setAttribute('role', 'dialog');
     section.setAttribute('aria-label', app.title);
@@ -169,31 +265,8 @@ export function desktopView(host: HTMLElement, hooks: DesktopHooks): DesktopView
     close.addEventListener('click', () => dispatch({ type: 'closeApp', id }));
     title.append(icon(id), el('span', undefined, app.title), close);
     section.append(title, builders[id]());
-    section.addEventListener('pointerdown', () => {
-      dispatch({ type: 'focus', id });
-      hooks.pressed(id);
-    });
-    // Dragged by its title bar (not by its close button).
-    let grab: { dx: number; dy: number; pointer: number } | undefined;
-    title.addEventListener('pointerdown', (event) => {
-      if (event.button !== 0 || (event.target as Element).closest('button')) return;
-      const win = state.windows.find((w) => w.id === id);
-      if (!win) return;
-      grab = { dx: event.clientX - win.x, dy: event.clientY - win.y, pointer: event.pointerId };
-      title.setPointerCapture(event.pointerId);
-      section.classList.add('is-dragged');
-    });
-    title.addEventListener('pointermove', (event) => {
-      if (grab?.pointer === event.pointerId)
-        dispatch({ type: 'move', id, x: event.clientX - grab.dx, y: event.clientY - grab.dy });
-    });
-    const release = (event: PointerEvent) => {
-      if (grab?.pointer !== event.pointerId) return;
-      grab = undefined;
-      section.classList.remove('is-dragged');
-    };
-    title.addEventListener('pointerup', release);
-    title.addEventListener('pointercancel', release);
+    section.addEventListener('pointerdown', () => dispatch({ type: 'focus', id }));
+    draggable(id, title, section);
     // The arrow keys move a focused title bar (dragging is not the only way).
     title.tabIndex = 0;
     title.setAttribute('aria-label', `${app.title}の窓。矢印キーで動かせます`);
@@ -217,7 +290,14 @@ export function desktopView(host: HTMLElement, hooks: DesktopHooks): DesktopView
     const button = el('button', 'desk-app');
     button.type = 'button';
     button.append(icon(app.id), el('span', undefined, app.title));
-    button.addEventListener('click', () => dispatch({ type: 'app', id: app.id }));
+    // The ball's button takes it out and puts it away; a window's brings it to the front.
+    button.addEventListener('click', () =>
+      dispatch(
+        app.id === 'ball' && state.windows.some((w) => w.id === 'ball')
+          ? { type: 'closeApp', id: 'ball' }
+          : { type: 'app', id: app.id },
+      ),
+    );
     dockButtons.set(app.id, button);
     dock.append(button);
   }
@@ -251,6 +331,8 @@ export function desktopView(host: HTMLElement, hooks: DesktopHooks): DesktopView
       if (!win) {
         node?.remove();
         frames.delete(app.id);
+        motions.delete(app.id);
+        sat.delete(app.id);
       } else {
         if (!node) frames.set(app.id, (node = frame(app.id)));
         node.style.left = `${win.x}px`;
@@ -304,26 +386,83 @@ export function desktopView(host: HTMLElement, hooks: DesktopHooks): DesktopView
   render();
   renderMirror();
   residentLine.textContent = 'この公開版には住人がいません。';
+  for (const m of meters) m.row.hidden = true;
 
+  let shown = '';
   return {
     state: () => state,
     dispatch,
-    frontRect() {
-      const id = state.open ? focused(state)?.id : undefined;
-      return id ? frames.get(id)?.getBoundingClientRect() : undefined;
+    step(dt, now) {
+      let busy = false;
+      for (const win of state.windows) {
+        const ball = win.id === 'ball';
+        let m = motion(win.id);
+        if (grab?.id === win.id) {
+          // In hand: its speed is the hand's (it tips with it; a rider can be shaken off).
+          const [vx, vy] = throwVelocity(grab.trail, now);
+          m = { ...m, vx, vy };
+          const next = stepMotion(m, dt, ball, sat.has(win.id));
+          m = { ...next, vx, vy };
+        } else {
+          if (m.vx || m.vy) {
+            const want: [number, number] = [win.x + m.vx * dt, win.y + m.vy * dt];
+            dispatch({ type: 'move', id: win.id, x: want[0], y: want[1] });
+            const got = state.windows.find((w) => w.id === win.id) ?? win;
+            m = bounce(m, want, [got.x, got.y], ball);
+          }
+          m = stepMotion(m, dt, ball, sat.has(win.id));
+        }
+        motions.set(win.id, m);
+        const node = frames.get(win.id);
+        if (node) {
+          const transform = ball
+            ? `rotate(${m.spin.toFixed(3)}rad)`
+            : m.tilt || m.sag
+              ? `translateY(${m.sag.toFixed(2)}px) rotate(${m.tilt.toFixed(4)}rad)`
+              : '';
+          if (node.style.transform !== transform) node.style.transform = transform;
+        }
+        if (moving(m) && grab?.id !== win.id) busy = true;
+      }
+      return busy || Boolean(grab);
     },
-    nudge() {
-      const id = focused(state)?.id;
-      const node = id && frames.get(id);
-      if (!node) return;
-      // Restart the little give even if it is still playing.
-      node.classList.remove('is-touched');
-      void node.offsetWidth;
-      node.classList.add('is-touched');
+    speed: (id) => speedOf(motion(id)),
+    held: (id) => grab?.id === id,
+    impulse(id, vx, vy) {
+      if (grab?.id === id) return;
+      const m = motion(id);
+      motions.set(id, { ...m, vx: m.vx + vx, vy: m.vy + vy });
     },
-    setResident(text) {
-      const line = text ?? 'この公開版には住人がいません。';
-      if (residentLine.textContent !== line) residentLine.textContent = line;
+    sit(id, on) {
+      if (on) {
+        sat.add(id);
+        // It lands on it: the window dips.
+        const m = motion(id);
+        motions.set(id, { ...m, sagV: m.sagV + 160 });
+      } else sat.delete(id);
+    },
+    ripple(x, y) {
+      for (const delay of [0, 0.16]) {
+        const ring = el('i', 'desk-ripple');
+        ring.style.left = `${x}px`;
+        ring.style.top = `${y}px`;
+        ring.style.animationDelay = `${delay}s`;
+        ring.addEventListener('animationend', () => ring.remove());
+        ripples.append(ring);
+      }
+    },
+    setResident(readout) {
+      const key = readout
+        ? `${readout.says}|${readout.mood}|${METERS.map(([k]) => Math.round(readout[k] * 25)).join()}`
+        : '';
+      if (key === shown) return;
+      shown = key;
+      residentLine.textContent = readout?.says ?? 'この公開版には住人がいません。';
+      residentMood.textContent = readout?.mood ?? '';
+      meters.forEach((m, i) => {
+        m.row.hidden = !readout;
+        if (readout) m.fill.style.width = `${Math.round(readout[METERS[i]![0]] * 100)}%`;
+      });
     },
     setMirror(next) {
       mirrorState = next;

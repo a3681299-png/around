@@ -450,6 +450,11 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
     tilt = 0,
     joy = 0,
     relax = 0,
+    sleepy = 0,
+    grumpy = 0,
+    confused = 0,
+    surprised = 0,
+    asleep = 0,
     dropNow = 0,
     stop: { t: number; feet: { delay: number; from: [number, number]; to: [number, number] }[] } | undefined,
     reachLean = 0;
@@ -732,7 +737,7 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
         wantPitch = clamp(pitch, -LOOK_PITCH, LOOK_PITCH);
         wantYaw *= intent.lookWeight;
         wantPitch *= intent.lookWeight;
-      } else if (intent.phase === 'idle' || intent.phase === 'sit') {
+      } else if ((intent.phase === 'idle' || intent.phase === 'sit' || intent.phase === 'perch') && !intent.sleep) {
         // Nothing to look at: now and then a glance about the room (the times and the directions
         // come from the fixed sequence).
         if (time >= glanceAt) {
@@ -774,25 +779,61 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
         blinkAt = time + (next() < 0.2 ? 0.3 : 1.8 + next() * 3.6);
       }
       blink = Math.max(0, blink - dt);
+      // How it feels (docs/living-mind.md), eased so no feeling snaps on: in the face, in the
+      // carriage of the head and shoulders, in the ears and the tail. A start is quick.
+      const feel = intent.feel;
+      sleepy = approach(sleepy, feel?.sleepy ?? 0, 2, dt);
+      grumpy = approach(grumpy, feel?.grumpy ?? 0, 3, dt);
+      confused = approach(confused, feel?.confused ?? 0, 5, dt);
+      const startled = feel?.surprised ?? 0;
+      // (The start itself: the body stretches up, once, as the surprise arrives.)
+      if (startled > 0.6 && surprised <= 0.6) squashSpeed -= 6;
+      surprised = approach(surprised, startled, 18, dt);
+      asleep = approach(asleep, intent.sleep ?? 0, 2.5, dt);
+      // Sleepy: the head sinks and nods. Cross: chin down, shoulders up. Puzzled: the head tips
+      // right over to one side, then the other.
+      const nod = sleepy * (0.2 + 0.1 * Math.sin(time * Math.PI * 2 * 0.22));
+      head.rotateX(nod + grumpy * 0.14).rotateZ(confused * 0.3 * Math.sin(time * Math.PI * 2 * 0.35));
+      if (neck !== head) neck.rotateX(nod * 0.5);
+      spine.rotateX(sleepy * 0.07 + grumpy * 0.05);
+      for (const side of sides) {
+        side.shoulder?.rotateZ(side.sign * 0.14 * grumpy);
+        // Startled, the arms fly out a little.
+        side.upperArm.rotateZ(side.sign * 0.35 * surprised);
+      }
       if (expressions) {
-        expressions.setValue('blink', (1 - joy) * Math.sin(Math.PI * clamp(blink / 0.14, 0, 1)));
-        expressions.setValue('happy', joy);
-        expressions.setValue('surprised', eager ? intent.alert * 0.5 : 0);
+        const closed = Math.max(asleep, sleepy * 0.45);
+        expressions.setValue(
+          'blink',
+          Math.max(closed, (1 - joy) * (1 - surprised) * Math.sin(Math.PI * clamp(blink / 0.14, 0, 1))),
+        );
+        expressions.setValue('happy', joy * (1 - grumpy));
+        expressions.setValue('angry', grumpy * (1 - asleep));
+        expressions.setValue('relaxed', Math.max(asleep * 0.8, sleepy * 0.5));
+        expressions.setValue('surprised', Math.max(eager ? intent.alert * 0.5 : 0, surprised, confused * 0.35));
       }
       if (time >= twitchAt) twitchAt = time + 3.5 + next() * 6;
       const twitch = twitchAt - time > 0.16 ? 0 : 1;
-      // Ears up at a start and while eager or glad; a flick of them now and then at rest.
+      // Ears up at a start and while eager or glad; a flick of them now and then at rest; back
+      // and down when it is cross or drowsy.
       const earsUp =
         intent.alert * 2.4 +
         intent.tap * 1.6 +
         joy * 1 +
+        surprised * 2.2 +
         (eager && intent.lookWeight > 0 ? 0.7 : 0) +
-        twitch * atEase * 1.2;
-      const tailUp = joy * 1.1 + (eager && intent.lookWeight > 0 ? 0.55 : 0);
-      // The tail: a slow sway at rest, a quicker one when eager, a wag in gladness.
+        twitch * atEase * 1.2 -
+        grumpy * 1.7 -
+        sleepy * 0.7 -
+        asleep * 0.9;
+      const tailUp = joy * 1.1 + (eager && intent.lookWeight > 0 ? 0.55 : 0) - grumpy * 0.5;
+      // The tail: a slow sway at rest, a quicker one when eager, a wag in gladness, a lashing
+      // from side to side when it is cross.
       const wag =
         Math.sin(time * Math.PI * 2 * (joy > 0.1 ? 3.1 : eager && intent.lookWeight > 0 ? 1.4 : 0.33)) *
-        (0.12 + 0.3 * (eager && intent.lookWeight > 0 ? 1 : 0) + 1.2 * joy);
+          (0.12 + 0.3 * (eager && intent.lookWeight > 0 ? 1 : 0) + 1.2 * joy) *
+          (1 - asleep) +
+        Math.sign(Math.sin(time * Math.PI * 2 * 1.1)) * 0.9 * grumpy;
       for (const s of springs) {
         if (s.kind === 'other') continue;
         const { settings } = s.joint;
@@ -822,6 +863,12 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
         // The hips go back a little as the trunk goes forward (the balance of a real lean).
         hips.position.z -= reachLean * 0.06;
       }
+
+      // Up on a perch (the top of a desktop window): the lower legs swing, one after the other.
+      if (intent.dangle > 0)
+        sides.forEach((leg, i) => {
+          leg.lowerLeg.rotateX(intent.dangle * (0.2 + 0.38 * Math.sin(time * Math.PI * 2 * 0.8 + i * Math.PI)));
+        });
 
       // 2b. Lying face down (a bed, docs/living-life.md). The standing pose, turned flat about the
       // feet and carried so the chest rests on the bed: the back arches to lift the head, the
