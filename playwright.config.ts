@@ -24,6 +24,7 @@ const unitSpecs = [
   'autonomy',
   'two-bone-ik',
   'living-body',
+  'living-life',
   'asset-import-validation',
   'asset-profile',
   'asset-read-data',

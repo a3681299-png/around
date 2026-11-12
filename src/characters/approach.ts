@@ -33,7 +33,10 @@ export type ApproachPhase =
   | 'toSeat'
   | 'sitDown'
   | 'sit'
-  | 'standUp';
+  | 'standUp'
+  | 'dive'
+  | 'lie'
+  | 'rise';
 export type Mood = 'calm' | 'interest';
 
 /** A seat to rest on: where the hips go (the room's marker), the way it faces, and the floor
@@ -44,6 +47,11 @@ export interface Seat {
   z: number;
   heading: number;
   stand: readonly [number, number];
+  /**
+   * A bed: instead of sitting, the body dives on from the stand point and lies face down, its
+   * chest here (on the surface) and its head the way `heading` points (docs/living-life.md).
+   */
+  lie?: { x: number; y: number; z: number; heading: number };
 }
 
 /** The body's own measures the plan needs (the rig measures them from the model). */
@@ -89,6 +97,9 @@ export interface ApproachState {
   /** Braking at the end of a dart: the place it will stop on and the way it will face there. */
   stopAt: readonly [number, number] | undefined;
   stopHeading: number;
+  /** A dive onto a bed: where it took off from and the way it faced then. */
+  diveFrom: readonly [number, number];
+  diveHeading: number;
 }
 
 export interface ApproachInput {
@@ -117,6 +128,18 @@ export const STAND_UP_S = 1.05;
  */
 export const CHEER = { gasp: 0.2, gather: 0.5, jump: 1.08, land: 1.28, twirl: 1.76, end: 2.45 } as const;
 export const CHEER_S = CHEER.end;
+/**
+ * A dive onto a bed, in seconds from its start: it sinks for the spring, launches, turns flat in
+ * the air and lands on its front (the bed throws it back up a little, the page's soft surface),
+ * then settles. A cartoon dive: committed, arms out ahead.
+ */
+export const DIVE = { launch: 0.3, land: 0.78, end: 1.35 } as const;
+const DIVE_HOP_M = 0.32;
+/** Getting up from lying: rolling back onto the front, pushing up, swinging the legs down off
+ * the bed, standing beside it. */
+export const RISE_S = 1.6;
+/** Lying, seconds in: the roll from the front onto the back (after a moment of swinging feet). */
+export const LIE_ROLL = [1.9, 2.6] as const;
 /** The target moved this far from the plan: plan again. */
 const REPLAN_M = 0.08;
 const FACE_RAD = 0.06;
@@ -211,9 +234,16 @@ export const startApproach = (x: number, z: number, heading: number): ApproachSt
   reachFrom: 1,
   stopAt: undefined,
   stopHeading: 0,
+  diveFrom: [x, z],
+  diveHeading: heading,
 });
 
 const distance = (a: Vec3, b: Vec3) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+/** Another seat than the one sat on (the page sends the body elsewhere). */
+const moved = (wanted: Seat, current: Seat | undefined) =>
+  !current ||
+  Math.hypot(wanted.x - current.x, wanted.z - current.z) > 0.05 ||
+  Boolean(wanted.lie) !== Boolean(current.lie);
 
 /**
  * How far from the target (on the floor) the body stands so the hand reaches it with the elbow
@@ -438,17 +468,82 @@ export function stepApproach(state: ApproachState, input: ApproachInput): Approa
         s = { ...s, mover: moved.mover, path: moved.path };
         break;
       }
+      if (seat.lie) {
+        // Beside a bed: face where it will land, then dive.
+        const face = Math.atan2(seat.lie.x - s.mover.x, seat.lie.z - s.mover.z);
+        s = { ...s, mover: { ...turnToward(s.mover, face, dt, limits.turnRate), speed: 0 } };
+        if (Math.abs(wrapAngle(face - s.mover.heading)) < FACE_RAD)
+          begin('dive', {
+            mover: { ...s.mover, turn: 0 },
+            diveFrom: [s.mover.x, s.mover.z],
+            diveHeading: s.mover.heading,
+          });
+        break;
+      }
       // In front of the seat: turn the back to it (the way the seat faces), then sit.
       s = { ...s, mover: { ...turnToward(s.mover, seat.heading, dt, limits.turnRate), speed: 0 } };
       if (Math.abs(wrapAngle(seat.heading - s.mover.heading)) < FACE_RAD)
         begin('sitDown', { mover: { ...s.mover, turn: 0 } });
       break;
     }
+    case 'dive': {
+      const lie = s.seat?.lie;
+      if (!lie) {
+        begin('idle', { seat: undefined });
+        break;
+      }
+      // Through the air from the take-off to the bed, turning to lie the bed's way.
+      const k = ease(clamp01((elapsed - DIVE.launch) / (DIVE.land - DIVE.launch)));
+      const heading = s.diveHeading + wrapAngle(lie.heading - s.diveHeading) * k;
+      s = {
+        ...s,
+        mover: {
+          x: s.diveFrom[0] + (lie.x - s.diveFrom[0]) * k,
+          z: s.diveFrom[1] + (lie.z - s.diveFrom[1]) * k,
+          heading,
+          speed: 0,
+          turn: dt > 0 ? wrapAngle(heading - s.mover.heading) / dt : 0,
+        },
+      };
+      if (elapsed >= DIVE.end) begin('lie', { mover: { ...s.mover, turn: 0 } });
+      break;
+    }
+    case 'lie':
+      if (fresh || !input.seat || moved(input.seat, s.seat))
+        begin('rise', { diveFrom: [s.mover.x, s.mover.z], diveHeading: s.mover.heading });
+      break;
+    case 'rise': {
+      const seat = s.seat;
+      if (!seat) {
+        begin('idle');
+        break;
+      }
+      // Push up, swing round and down off the bed's edge, stand beside it facing the room.
+      const k = ease(clamp01((elapsed - RISE_S * 0.2) / (RISE_S * 0.65)));
+      const heading = s.diveHeading + wrapAngle(seat.heading - s.diveHeading) * k;
+      s = {
+        ...s,
+        mover: {
+          x: s.diveFrom[0] + (seat.stand[0] - s.diveFrom[0]) * k,
+          z: s.diveFrom[1] + (seat.stand[1] - s.diveFrom[1]) * k,
+          heading,
+          speed: 0,
+          turn: dt > 0 ? wrapAngle(heading - s.mover.heading) / dt : 0,
+        },
+      };
+      if (elapsed >= RISE_S)
+        begin('idle', {
+          seat: undefined,
+          mover: { x: seat.stand[0], z: seat.stand[1], heading: seat.heading, speed: 0, turn: 0 },
+        });
+      break;
+    }
     case 'sitDown':
       if (elapsed >= SIT_DOWN_S) begin('sit');
       break;
     case 'sit':
-      if (fresh || !input.seat) begin('standUp');
+      // Up when something appears, the seat is taken away, or another place is wanted.
+      if (fresh || !input.seat || moved(input.seat, s.seat)) begin('standUp');
       break;
     case 'standUp':
       if (elapsed >= STAND_UP_S) begin('idle', { seat: undefined });
@@ -457,8 +552,25 @@ export function stepApproach(state: ApproachState, input: ApproachInput): Approa
   return s;
 }
 
+/**
+ * A hand sent somewhere to hold or handle a thing (the phone and its earphones, docs/living-life.md):
+ * the point the middle of the palm goes to, how much (0 the motion's own hand), which way the palm
+ * and the fingers point there, and how closed the fingers are.
+ */
+export interface HandGoal {
+  at: Vec3;
+  weight: number;
+  palm: Vec3;
+  fingers: Vec3;
+  grip: number;
+}
+
 /** What the rig is asked to do this frame. Weights are 0–1 unless said otherwise. */
 export interface BodyIntent {
+  /** Hands holding things (set by the page's phone routine, not by the approach). */
+  hold?: { left?: HandGoal; right?: HandGoal };
+  /** The right thumb on a screen (a tap: 0 → 1 → 0). */
+  thumb?: number;
   phase: ApproachPhase;
   mood: Mood;
   x: number;
@@ -476,10 +588,19 @@ export interface BodyIntent {
   hand: 'left' | 'right';
   /** Sitting: which motion, how far into it (seconds), how seated the body is (0 standing, 1 on
    * the seat) and where the hips go when seated. */
-  pose: 'stand' | 'sitDown' | 'sit' | 'standUp';
+  pose: 'stand' | 'sitDown' | 'sit' | 'standUp' | 'dive' | 'lie' | 'rise';
   poseTime: number;
   seated: number;
   seat?: Vec3;
+  /** Lying (0 upright, 1 flat on the front, head the way `heading` points), where the chest
+   * rests (the bed's surface), the legs' idle swing (0–1) and a landing's moment (1 as the
+   * body hits the bed, gone within a fifth of a second). */
+  lie: number;
+  /** Lying: 0 on its front, 1 rolled over onto its back. */
+  roll: number;
+  lieAt?: Vec3;
+  kickLegs: number;
+  landed: number;
   /** How far the body is sunk before a go (0–1): the wind-up. */
   crouch: number;
   /** Off the floor: how far through the hop (0–1), and how high it goes (metres). */
@@ -537,7 +658,11 @@ export function approachIntent(s: ApproachState, target: Vec3 | undefined): Body
     toViewer = 0,
     turnAhead = 0,
     hop: number | undefined,
-    hopHeight = 0;
+    hopHeight = 0,
+    lie = 0,
+    roll = 0,
+    kickLegs = 0,
+    landed = 0;
   /** 0 → 1 over [from, to], eased. */
   const over = (from: number, to: number) => ease(clamp01((elapsed - from) / (to - from)));
   switch (s.phase) {
@@ -546,6 +671,35 @@ export function approachIntent(s: ApproachState, target: Vec3 | undefined): Body
     case 'sitDown':
     case 'sit':
     case 'standUp':
+      break;
+    case 'dive': {
+      // Sink for the spring, arms back; launch with the arms flung ahead; flat before the bed.
+      const d = DIVE;
+      crouch = 1.1 * over(0, d.launch - 0.04) * (1 - over(d.launch - 0.04, d.launch + 0.04));
+      arms =
+        -0.8 * over(0.02, d.launch - 0.05) * (1 - over(d.launch - 0.06, d.launch)) +
+        over(d.launch - 0.04, d.launch + 0.1);
+      if (elapsed >= d.launch && elapsed < d.land) {
+        hop = (elapsed - d.launch) / (d.land - d.launch);
+        hopHeight = DIVE_HOP_M;
+      }
+      lie = ease(clamp01(((elapsed - d.launch) / (d.land - d.launch)) * 1.15));
+      landed = elapsed >= d.land ? 1 - clamp01((elapsed - d.land) / 0.2) : 0;
+      joy = over(d.launch, d.land) * (1 - over(d.land + 0.2, d.end + 0.6));
+      break;
+    }
+    case 'lie':
+      lie = 1;
+      // Landed on its front, the feet swing up behind; then it rolls over onto its back to
+      // settle in (the phone is held up over the face there), one leg crossed over the other.
+      kickLegs = over(0.6, 1.2);
+      roll = over(LIE_ROLL[0], LIE_ROLL[1]);
+      break;
+    case 'rise':
+      // Back onto its front first, then up and off the bed.
+      roll = 1 - over(0, RISE_S * 0.3);
+      lie = 1 - over(RISE_S * 0.25, RISE_S * 0.8);
+      kickLegs = 1 - over(0, 0.3);
       break;
     case 'notice':
       // An eager look snaps round; a calm one comes round.
@@ -638,7 +792,15 @@ export function approachIntent(s: ApproachState, target: Vec3 | undefined): Body
     lookWeight: at ? lookWeight : 0,
     reachWeight: at ? reachWeight : 0,
     hand: s.hand,
-    pose: s.phase === 'sitDown' || s.phase === 'sit' || s.phase === 'standUp' ? s.phase : 'stand',
+    pose:
+      s.phase === 'sitDown' ||
+      s.phase === 'sit' ||
+      s.phase === 'standUp' ||
+      s.phase === 'dive' ||
+      s.phase === 'lie' ||
+      s.phase === 'rise'
+        ? s.phase
+        : 'stand',
     poseTime: elapsed,
     seated:
       s.phase === 'sit'
@@ -648,7 +810,14 @@ export function approachIntent(s: ApproachState, target: Vec3 | undefined): Body
           : s.phase === 'standUp'
             ? 1 - ease(clamp01(elapsed / STAND_UP_S))
             : 0,
-    ...(s.seat ? { seat: [s.seat.x, s.seat.y, s.seat.z] as Vec3 } : {}),
+    ...(s.seat && !s.seat.lie ? { seat: [s.seat.x, s.seat.y, s.seat.z] as Vec3 } : {}),
+    lie,
+    roll,
+    ...(s.seat?.lie && (s.phase === 'dive' || s.phase === 'lie' || s.phase === 'rise')
+      ? { lieAt: [s.seat.lie.x, s.seat.lie.y, s.seat.lie.z] as Vec3 }
+      : {}),
+    kickLegs,
+    landed,
     crouch,
     ...(hop !== undefined ? { hop } : {}),
     hopHeight,

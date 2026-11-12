@@ -29,6 +29,7 @@ import { readLayout } from '../renderers/three/room-layout';
 import { floorPath, standPoint, walkable } from '../world/room-life';
 import { loadLivingResident, type LivingResident } from './resident';
 import { softSurface } from './soft-surface';
+import { screenGlow } from './screen-glow';
 
 declare const __WW_LIVING_TEST__: boolean;
 declare const __WW_LIVING_CHARACTER__: boolean;
@@ -115,7 +116,7 @@ async function start() {
     const map = mesh.name.startsWith(manifest.lightmapMesh) ? lightmap : null;
     const source = mesh.material as MeshStandardMaterial;
     // The room's soft things (by the material's name in the room file) give under a body.
-    if (/^(duvet|sheet|throw|beanbag|rug_|floor_shade)/.test(source.name)) soft.push(mesh);
+    if (/^(duvet|sheet|throw|pillow|beanbag|rug_|floor_shade)/.test(source.name)) soft.push(mesh);
     const textured = !!manifest.texturedMesh && mesh.name.startsWith(manifest.texturedMesh);
     mesh.material = unlit(source, mesh.geometry.hasAttribute('color'), mesh.name.startsWith('static_'), map, textured);
   });
@@ -139,7 +140,10 @@ async function start() {
   const layout = readLayout(gltf.scene);
   // A character only where the build was given one (a local folder, never a public build).
   let resident: LivingResident | undefined;
-  if (__WW_LIVING_CHARACTER__) resident = await loadLivingResident(scene, base, layout, softSurface(soft));
+  // Small screens (the resident's phone; later the UI panel) light the baked room.
+  const glow = screenGlow(made.values());
+  if (__WW_LIVING_CHARACTER__)
+    resident = await loadLivingResident(scene, base, layout, softSurface(soft), { root: gltf.scene, glow });
 
   const authored = gltf.cameras.find((c) => c.name === manifest.camera || c.parent?.name === manifest.camera) as
     PerspectiveCamera | undefined;
@@ -161,7 +165,8 @@ async function start() {
   const offset = new Vector3();
   const subject = new Vector3();
   const reviewSubject = SUBJECT.clone();
-  let reviewDistance = 1;
+  let reviewDistance = 1,
+    reviewTurn = 0;
   let closeUp = 0;
   let frameRate = 0;
   let frame: number | undefined;
@@ -195,7 +200,7 @@ async function start() {
     look.lerp(reduce.matches ? aim.set(0, 0) : aim, 1 - Math.exp(-dt * 5));
     // A small orbit about the subject follows the pointer: depth without leaving the composition.
     offset.copy(home).sub(SUBJECT);
-    if (__WW_LIVING_TEST__) offset.multiplyScalar(reviewDistance);
+    if (__WW_LIVING_TEST__) offset.multiplyScalar(reviewDistance).applyAxisAngle(new Vector3(0, 1, 0), reviewTurn);
     offset.applyAxisAngle(new Vector3(0, 1, 0), -look.x * 0.05);
     offset.y += look.y * 0.25;
     camera.position.copy(reviewSubject).add(offset);
@@ -308,9 +313,11 @@ async function start() {
         },
         resident,
         /** Fixed close views of the furniture for the browser art review. */
-        reviewCamera: (target: [number, number, number], scale: number) => {
+        reviewCamera: (target: [number, number, number], scale: number, turn = 0) => {
           reviewSubject.fromArray(target);
-          reviewDistance = Math.min(1, Math.max(0.2, scale));
+          reviewDistance = Math.min(1, Math.max(0.08, scale));
+          // (Round the subject by this much, radians: a side view of what the room's camera sees.)
+          reviewTurn = turn;
           wake();
         },
         /** Draws at most this many frames a second (0: every frame the display gives). */

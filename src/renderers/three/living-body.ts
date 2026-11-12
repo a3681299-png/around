@@ -24,6 +24,7 @@ import {
   CircleGeometry,
   Group,
   LoadingManager,
+  Matrix4,
   Mesh,
   MeshBasicMaterial,
   Object3D,
@@ -85,6 +86,13 @@ export interface LivingBody {
   update(intent: BodyIntent, dt: number, floorY: number, viewer?: Vec3): void;
   /** Where the main joints are now (the room's metres): for measuring the motion from outside. */
   joints(): Record<'hips' | 'head' | 'leftHand' | 'rightHand' | 'leftFoot' | 'rightFoot', Vec3>;
+  /**
+   * A hand as posed this frame (the room's metres): the wrist, the way the fingers point, the
+   * way the palm faces. Things held are placed from it (the phone, docs/living-life.md).
+   */
+  hand(side: 'left' | 'right'): { wrist: Vec3; fingers: Vec3; palm: Vec3 };
+  /** The head as posed: its middle, the way the face looks, its left and its up. */
+  head(): { at: Vec3; forward: Vec3; left: Vec3; up: Vec3 };
   facts(): LivingBodyFacts;
   dispose(): void;
 }
@@ -114,7 +122,7 @@ function blobShadow() {
       toneMapped: false,
     }),
   );
-  mesh.rotation.x = -Math.PI / 2;
+  // (Placed and turned flat every frame: on the floor, or on the bed under a body lying on it.)
   mesh.renderOrder = 1;
   return mesh;
 }
@@ -202,6 +210,17 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
     lowerArm: need(`${side}LowerArm`),
     hand: need(`${side}Hand`),
     finger: bone(`${side}MiddleDistal`) ?? bone(`${side}MiddleProximal`),
+    /** The finger joints that close round a held thing (proximal, intermediate, distal). */
+    curl: (['Index', 'Middle', 'Ring', 'Little'] as const).flatMap((f) =>
+      (['Proximal', 'Intermediate', 'Distal'] as const).flatMap((j, k) => {
+        const node = bone(`${side}${f}${j}` as HumanBone);
+        return node ? [{ node, share: [0.8, 1, 0.7][k]! }] : [];
+      }),
+    ),
+    thumb: (['ThumbProximal', 'ThumbDistal'] as const).flatMap((j) => {
+      const node = bone(`${side}${j}` as HumanBone);
+      return node ? [node] : [];
+    }),
     restAnkle: 0,
     restToe: 0,
     restSide: 0,
@@ -497,6 +516,26 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
       leftFoot: tuple(left.foot.getWorldPosition(v)),
       rightFoot: tuple(right.foot.getWorldPosition(v)),
     }),
+    hand(name) {
+      // Normalized bones rest with identity rotations: a left hand's fingers point along its +X,
+      // a right hand's along −X, and both palms face −Y (a T-pose's palms down).
+      const side = name === 'left' ? left : right;
+      side.hand.getWorldQuaternion(q);
+      return {
+        wrist: tuple(side.hand.getWorldPosition(new Vector3())),
+        fingers: tuple(new Vector3(side.sign, 0, 0).applyQuaternion(q)),
+        palm: tuple(new Vector3(0, -1, 0).applyQuaternion(q)),
+      };
+    },
+    head() {
+      head.getWorldQuaternion(q);
+      return {
+        at: tuple(head.getWorldPosition(new Vector3())),
+        forward: tuple(new Vector3(0, 0, 1).applyQuaternion(q)),
+        left: tuple(new Vector3(1, 0, 0).applyQuaternion(q)),
+        up: tuple(new Vector3(0, 1, 0).applyQuaternion(q)),
+      };
+    },
     update(intent, rawDt, floorY, viewer) {
       const dt = clamp(Number.isFinite(rawDt) ? rawDt : 0, 0, 0.1);
       time += dt;
@@ -534,11 +573,13 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
       if (run && runClip) run.time = ((cycle + runShift) % 1) * (runClip.duration || 1);
       // Sitting motions take over from standing ones by their own eased weights (never a cut).
       let sitting = 0;
+      const sitPose = intent.pose === 'sitDown' || intent.pose === 'sit' || intent.pose === 'standUp';
       for (const seat of seatClips) {
-        // Seated is the fallback for a missing sit-down or stand-up motion.
+        // Seated is the fallback for a missing sit-down or stand-up motion. (Lying is posed on
+        // the standing motions, not on a sitting one.)
         const wanted =
           intent.pose === seat.pose ||
-          (seat.pose === 'sit' && intent.pose !== 'stand' && !seatClips.some((c) => c.pose === intent.pose));
+          (seat.pose === 'sit' && sitPose && !seatClips.some((c) => c.pose === intent.pose));
         seat.weight = approach(seat.weight, wanted ? 1 : 0, 8, dt);
         if (seat.weight < 0.002 && !wanted) seat.weight = 0;
         sitting += seat.weight;
@@ -782,216 +823,280 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
         hips.position.z -= reachLean * 0.06;
       }
 
+      // 2b. Lying face down (a bed, docs/living-life.md). The standing pose, turned flat about the
+      // feet and carried so the chest rests on the bed: the back arches to lift the head, the
+      // head looks ahead, the lower legs come up behind and, settled in, swing one after the
+      // other. The body turns flat in the air of the dive (the approach eases `lie` in).
+      const lie = clamp(intent.lie ?? 0, 0, 1);
+      const overOnto = clamp(intent.roll ?? 0, 0, 1);
+      const lying = lie > 0.02;
+      if (lying) {
+        const front = lie * (1 - overOnto),
+          back = lie * overOnto;
+        // On the front, propped on the elbows: the back arches well up from the hips, the head
+        // comes up to look ahead, the feet swing up behind one after the other.
+        spine.rotateX(-0.42 * front + 0.08 * back);
+        if (chest !== spine) chest.rotateX(-0.34 * front + 0.06 * back);
+        if (neck !== head) neck.rotateX(-0.3 * front + 0.12 * back);
+        head.rotateX(-0.22 * front + 0.16 * back);
+        sides.forEach((leg, i) => {
+          const swing = intent.kickLegs * (0.55 + 0.5 * Math.sin(time * Math.PI * 2 * 0.85 + i * Math.PI));
+          leg.upperLeg.rotateX(0.06 * front).rotateZ(leg.sign * 0.06 * front);
+          leg.lowerLeg.rotateX(front * (0.45 + swing));
+          leg.foot.rotateX(0.55 * front);
+          // On the back: the left knee up with its foot on the bed, the right leg crossed over it
+          // and its foot idly swinging.
+          const dangle = 0.35 + 0.3 * intent.kickLegs * Math.sin(time * Math.PI * 2 * 0.55);
+          if (i === 0) {
+            leg.upperLeg.rotateX(-0.75 * back);
+            leg.lowerLeg.rotateX(1.6 * back);
+            leg.foot.rotateX(-0.25 * back);
+          } else {
+            // (+Z brings a right leg in across the body.)
+            leg.upperLeg.rotateX(-0.95 * back).rotateZ(0.3 * back);
+            leg.lowerLeg.rotateX(dangle * back);
+            leg.foot.rotateX(0.3 * back);
+          }
+        });
+        // Flat (about the feet), then over onto the back about the body's own length.
+        root.rotateX((Math.PI / 2) * lie);
+        if (back > 1e-4) root.rotateY(Math.PI * overOnto);
+        root.updateWorldMatrix(true, true);
+        if (intent.lieAt) {
+          // The hips on the surface (a body's depth above it), behind the chest's point by the
+          // trunk's length: the arch then lifts the chest off the bed onto the elbows.
+          hips.getWorldPosition(v);
+          const depth = metrics.height * 0.07,
+            back = torso * 0.85;
+          const hx = intent.lieAt[0] - Math.sin(intent.heading) * back,
+            hz = intent.lieAt[2] - Math.cos(intent.heading) * back;
+          root.position.x += (hx - v.x) * lie;
+          root.position.y += (intent.lieAt[1] + depth - v.y) * lie;
+          root.position.z += (hz - v.z) * lie;
+          root.updateWorldMatrix(true, true);
+        }
+        // The feet are off the floor: nothing holds them, and they start afresh on getting up.
+        for (const leg of sides) {
+          leg.plant = footAtRest();
+          leg.lastContact = leg.lastRaw = leg.lastGround = undefined;
+        }
+        stop = undefined;
+      }
+
       // 3. Legs. The feet the motion has on the floor stay on their spot; a foot left too far
       // behind steps. The hips come down when a pinned foot would be out of the leg's reach.
       root.updateWorldMatrix(true, true);
-      // Seated: the hips go to the seat (the room's marker is where the hips rest), by as much
-      // as the body is seated, so it lowers onto the seat instead of dropping there.
-      if (intent.seat && intent.seated > 0) {
-        hips.getWorldPosition(v);
-        root.position.x += (intent.seat[0] - v.x) * intent.seated;
-        root.position.y += (intent.seat[1] - v.y) * intent.seated;
-        root.position.z += (intent.seat[2] - v.z) * intent.seated;
-        root.updateWorldMatrix(true, true);
-      }
-      // A calm turn about: the feet are asked where they will stand when the turn is done (the
-      // motion's feet, carried round the body by the turn still to come), so each foot takes one
-      // step to its final place while the body comes round, instead of many small ones after it.
-      const sunk = Math.max(0, squash) * 0.07 * tall + (1 - tall) * 0.1;
-      const lift = intent.hop === undefined ? clamp(moveWeight, 0.35, 1) : 1;
-      const ahead = intent.turnAhead;
-      const lead = (p: Vector3) => (ahead ? p.sub(root.position).applyAxisAngle(UP, ahead).add(root.position) : p);
-      const samples = sides.map((leg) => {
-        const ankle = lead(leg.foot.getWorldPosition(new Vector3())),
-          toe = lead(toeOf(leg, new Vector3()));
-        return {
-          ankle: tuple(ankle),
-          toe: tuple(toe),
-          // "On the floor" is the motion's say. The body's own sinking (a wind-up, a braking, a
-          // landing) lowers the feet with it, and would otherwise read as both feet down for as
-          // long as it lasts: a foot pinned through a run is dragged. So the sinking is taken out.
-          // A gait mixed with standing still lifts its feet only by its share: a swinging foot
-          // an inch up would read as down. The heights are judged at the gait's full size.
-          ankleRise: (ankle.y - floorY - leg.restAnkle + sunk) / lift,
-          toeRise: (toe.y - floorY - leg.restToe + sunk) / lift,
-          yaw: Math.atan2(toe.x - ankle.x, toe.z - ankle.z),
-        };
-      });
-      const strain = sides.map((leg) => footStrain(leg.plant));
-      // Equally strained (a turn on the spot strains both alike): the foot on the side the body
-      // turns to goes first, as a person opens that foot out and brings the other round.
-      const first = ahead < 0 || (ahead === 0 && intent.turn < 0) ? 1 : 0;
-      // A hard stop is made with the feet: as the braking begins, the foot in the air is put down
-      // a little ahead of where the body will stop and the other is brought up beside it, and the
-      // body comes to rest over them. (Left to the gait, the feet would glide on under a body
-      // that is slowing: a run's motion has no stop in it.)
-      if (intent.stopAt && !stop && intent.speed > 0) {
-        const leadFoot = samples[0]!.toeRise >= samples[1]!.toeRise ? 0 : 1;
-        const fx = Math.sin(intent.stopHeading),
-          fz = Math.cos(intent.stopHeading);
-        stop = {
-          t: 0,
-          feet: sides.map((leg, i) => {
-            const along = i === leadFoot ? 0.13 : -0.05,
-              across = leg.sign * leg.restSide;
-            return {
-              delay: i === leadFoot ? 0 : 0.09,
-              from: [samples[i]!.ankle[0] + leg.plant.dx, samples[i]!.ankle[2] + leg.plant.dz] as [number, number],
-              to: [intent.stopAt![0] + fx * along + fz * across, intent.stopAt![1] + fz * along - fx * across] as [
-                number,
-                number,
-              ],
-            };
-          }),
-        };
-      }
-      if (!intent.stopAt) stop = undefined;
-      else if (stop) stop.t += dt;
-      const planted = [false, false];
-      sides.forEach((leg, i) => {
-        const other = sides[1 - i]!.plant;
-        const before = leg.plant.step;
-        const spot = stop?.feet[i];
-        const through = spot ? (stop!.t - spot.delay) / STOP_STEP_S : 0;
-        if (spot && through > 0) {
-          const s = samples[i]!;
-          planted[i] = true;
-          if (through < 1) {
-            // On its way to its spot: a quick step with a small arc.
-            const k = smooth(through);
-            leg.plant = {
-              ...leg.plant,
-              down: true,
-              contact: 'ankle',
-              step: through,
-              dx: spot.from[0] + (spot.to[0] - spot.from[0]) * k - s.ankle[0],
-              dz: spot.from[1] + (spot.to[1] - spot.from[1]) * k - s.ankle[2],
-              dyaw: wrapAngle(intent.stopHeading - s.yaw) * k,
-              lift: Math.sin(Math.PI * through) * 0.045,
-            };
-          } else {
-            // Down on its spot: held there (no corrective steps) until the stop is over.
-            if (leg.plant.step !== undefined)
+      let footSamples: { toeRise: number; ankleRise: number }[] = sides.map(() => ({ toeRise: 0, ankleRise: 0 }));
+      if (!lying) {
+        // Seated: the hips go to the seat (the room's marker is where the hips rest), by as much
+        // as the body is seated, so it lowers onto the seat instead of dropping there.
+        if (intent.seat && intent.seated > 0) {
+          hips.getWorldPosition(v);
+          root.position.x += (intent.seat[0] - v.x) * intent.seated;
+          root.position.y += (intent.seat[1] - v.y) * intent.seated;
+          root.position.z += (intent.seat[2] - v.z) * intent.seated;
+          root.updateWorldMatrix(true, true);
+        }
+        // A calm turn about: the feet are asked where they will stand when the turn is done (the
+        // motion's feet, carried round the body by the turn still to come), so each foot takes one
+        // step to its final place while the body comes round, instead of many small ones after it.
+        const sunk = Math.max(0, squash) * 0.07 * tall + (1 - tall) * 0.1;
+        const lift = intent.hop === undefined ? clamp(moveWeight, 0.35, 1) : 1;
+        const ahead = intent.turnAhead;
+        const lead = (p: Vector3) => (ahead ? p.sub(root.position).applyAxisAngle(UP, ahead).add(root.position) : p);
+        const samples = sides.map((leg) => {
+          const ankle = lead(leg.foot.getWorldPosition(new Vector3())),
+            toe = lead(toeOf(leg, new Vector3()));
+          return {
+            ankle: tuple(ankle),
+            toe: tuple(toe),
+            // "On the floor" is the motion's say. The body's own sinking (a wind-up, a braking, a
+            // landing) lowers the feet with it, and would otherwise read as both feet down for as
+            // long as it lasts: a foot pinned through a run is dragged. So the sinking is taken out.
+            // A gait mixed with standing still lifts its feet only by its share: a swinging foot
+            // an inch up would read as down. The heights are judged at the gait's full size.
+            ankleRise: (ankle.y - floorY - leg.restAnkle + sunk) / lift,
+            toeRise: (toe.y - floorY - leg.restToe + sunk) / lift,
+            yaw: Math.atan2(toe.x - ankle.x, toe.z - ankle.z),
+          };
+        });
+        const strain = sides.map((leg) => footStrain(leg.plant));
+        // Equally strained (a turn on the spot strains both alike): the foot on the side the body
+        // turns to goes first, as a person opens that foot out and brings the other round.
+        const first = ahead < 0 || (ahead === 0 && intent.turn < 0) ? 1 : 0;
+        // A hard stop is made with the feet: as the braking begins, the foot in the air is put down
+        // a little ahead of where the body will stop and the other is brought up beside it, and the
+        // body comes to rest over them. (Left to the gait, the feet would glide on under a body
+        // that is slowing: a run's motion has no stop in it.)
+        if (intent.stopAt && !stop && intent.speed > 0) {
+          const leadFoot = samples[0]!.toeRise >= samples[1]!.toeRise ? 0 : 1;
+          const fx = Math.sin(intent.stopHeading),
+            fz = Math.cos(intent.stopHeading);
+          stop = {
+            t: 0,
+            feet: sides.map((leg, i) => {
+              const along = i === leadFoot ? 0.13 : -0.05,
+                across = leg.sign * leg.restSide;
+              return {
+                delay: i === leadFoot ? 0 : 0.09,
+                from: [samples[i]!.ankle[0] + leg.plant.dx, samples[i]!.ankle[2] + leg.plant.dz] as [number, number],
+                to: [intent.stopAt![0] + fx * along + fz * across, intent.stopAt![1] + fz * along - fx * across] as [
+                  number,
+                  number,
+                ],
+              };
+            }),
+          };
+        }
+        if (!intent.stopAt) stop = undefined;
+        else if (stop) stop.t += dt;
+        const planted = [false, false];
+        sides.forEach((leg, i) => {
+          const other = sides[1 - i]!.plant;
+          const before = leg.plant.step;
+          const spot = stop?.feet[i];
+          const through = spot ? (stop!.t - spot.delay) / STOP_STEP_S : 0;
+          if (spot && through > 0) {
+            const s = samples[i]!;
+            planted[i] = true;
+            if (through < 1) {
+              // On its way to its spot: a quick step with a small arc.
+              const k = smooth(through);
               leg.plant = {
                 ...leg.plant,
-                step: undefined,
-                lift: 0,
+                down: true,
                 contact: 'ankle',
-                pinX: spot.to[0],
-                pinZ: spot.to[1],
-                pinYaw: intent.stopHeading,
-                rested: 0,
+                step: through,
+                dx: spot.from[0] + (spot.to[0] - spot.from[0]) * k - s.ankle[0],
+                dz: spot.from[1] + (spot.to[1] - spot.from[1]) * k - s.ankle[2],
+                dyaw: wrapAngle(intent.stopHeading - s.yaw) * k,
+                lift: Math.sin(Math.PI * through) * 0.045,
               };
-            leg.plant = stepFoot(leg.plant, { ...s, ankleRise: 0, toeRise: 0 }, dt, false);
+            } else {
+              // Down on its spot: held there (no corrective steps) until the stop is over.
+              if (leg.plant.step !== undefined)
+                leg.plant = {
+                  ...leg.plant,
+                  step: undefined,
+                  lift: 0,
+                  contact: 'ankle',
+                  pinX: spot.to[0],
+                  pinZ: spot.to[1],
+                  pinYaw: intent.stopHeading,
+                  rested: 0,
+                };
+              leg.plant = stepFoot(leg.plant, { ...s, ankleRise: 0, toeRise: 0 }, dt, false);
+            }
+            return;
           }
-          return;
+          // One foot at a time, the one left furthest behind first.
+          const mayStep =
+            other.down &&
+            other.step === undefined &&
+            (strain[i]! > strain[1 - i]! + 1e-6 || (Math.abs(strain[i]! - strain[1 - i]!) <= 1e-6 && i === first));
+          // ("Under way" is the scurry: a walk's feet keep the floor and are pinned as when standing.
+          // And a foot is under way only once it has left the floor: at the start of a dart the
+          // feet that still stand stay planted, the body pushing off from them, until each lifts.)
+          const running = scurry > 0.5 && intent.speed > walkSpeed * 0.45;
+          const s = samples[i]!;
+          leg.freed = running && (leg.freed || (s.toeRise > 0.03 && s.ankleRise > 0.03));
+          leg.plant = stepFoot(leg.plant, s, dt, mayStep && !running, leg.freed);
+          if (before === undefined && leg.plant.step !== undefined) facts.steps++;
+        });
+        let drop = 0;
+        const targets = sides.map((leg, i): Vec3 => {
+          const s = samples[i]!;
+          // A pin the leg cannot keep (the body has run on, or been carried off): let it go, quickly
+          // but over a few frames, rather than drag the foot or pull the hips down after it.
+          leg.upperLeg.getWorldPosition(v);
+          const span = leg.lowerLeg.getWorldPosition(v2).distanceTo(v) + v2.distanceTo(leg.foot.getWorldPosition(v3));
+          const held = leg.plant;
+          if (held.down && Math.hypot(s.ankle[0] + held.dx - v.x, s.ankle[2] + held.dz - v.z) > span * 0.93)
+            leg.plant = {
+              ...held,
+              dx: held.dx * 0.7,
+              dz: held.dz * 0.7,
+              pinX: held.pinX - held.dx * 0.3,
+              pinZ: held.pinZ - held.dz * 0.3,
+            };
+          const p: FootState = leg.plant;
+          // The pin holds the contact (the toes, mostly), and the foot is turned back about the ankle:
+          // the ankle goes where that turn leaves the toes on their spot.
+          const ox = p.contact === 'toe' ? s.toe[0] - s.ankle[0] : 0,
+            oz = p.contact === 'toe' ? s.toe[2] - s.ankle[2] : 0;
+          const cos = Math.cos(p.dyaw),
+            sin = Math.sin(p.dyaw);
+          const target: Vec3 = [
+            s.ankle[0] + p.dx + ox - (ox * cos + oz * sin),
+            // The body's sinking is the knees' to take up, not the feet's: each foot goes where
+            // the motion has it, as high above the floor as before the hips came down (otherwise
+            // a foot swinging forward in a run would scrape along the floor). And never under the
+            // floor (a seat lower than the motion's own would push the feet in).
+            // A foot planted for a stop stands on the floor, whatever the gait under it is doing.
+            planted[i]
+              ? floorY + leg.restAnkle + p.lift
+              : Math.max(floorY + leg.restAnkle * 0.85, s.ankle[1] + p.lift + sunk),
+            s.ankle[2] + p.dz + oz - (-ox * sin + oz * cos),
+          ];
+          leg.upperLeg.getWorldPosition(v);
+          const length = leg.lowerLeg.getWorldPosition(v2).distanceTo(v) + v2.distanceTo(leg.foot.getWorldPosition(v3));
+          const flat = Math.hypot(target[0] - v.x, target[2] - v.z),
+            up = v.y - target[1];
+          const reach = length * 0.995;
+          if (flat < reach && Math.hypot(flat, up) > reach)
+            drop = Math.max(drop, up - Math.sqrt(reach * reach - flat * flat));
+          return target;
+        });
+        // (Eased: the hips never drop in one frame.)
+        dropNow = approach(dropNow, Math.min(0.1, drop), 30, dt);
+        drop = dropNow;
+        if (drop > 1e-4) {
+          hips.position.y -= drop / (root.scale.y || 1);
+          root.updateWorldMatrix(true, true);
         }
-        // One foot at a time, the one left furthest behind first.
-        const mayStep =
-          other.down &&
-          other.step === undefined &&
-          (strain[i]! > strain[1 - i]! + 1e-6 || (Math.abs(strain[i]! - strain[1 - i]!) <= 1e-6 && i === first));
-        // ("Under way" is the scurry: a walk's feet keep the floor and are pinned as when standing.
-        // And a foot is under way only once it has left the floor: at the start of a dart the
-        // feet that still stand stay planted, the body pushing off from them, until each lifts.)
-        const running = scurry > 0.5 && intent.speed > walkSpeed * 0.45;
-        const s = samples[i]!;
-        leg.freed = running && (leg.freed || (s.toeRise > 0.03 && s.ankleRise > 0.03));
-        leg.plant = stepFoot(leg.plant, s, dt, mayStep && !running, leg.freed);
-        if (before === undefined && leg.plant.step !== undefined) facts.steps++;
-      });
-      let drop = 0;
-      const targets = sides.map((leg, i): Vec3 => {
-        const s = samples[i]!;
-        // A pin the leg cannot keep (the body has run on, or been carried off): let it go, quickly
-        // but over a few frames, rather than drag the foot or pull the hips down after it.
-        leg.upperLeg.getWorldPosition(v);
-        const span = leg.lowerLeg.getWorldPosition(v2).distanceTo(v) + v2.distanceTo(leg.foot.getWorldPosition(v3));
-        const held = leg.plant;
-        if (held.down && Math.hypot(s.ankle[0] + held.dx - v.x, s.ankle[2] + held.dz - v.z) > span * 0.93)
-          leg.plant = {
-            ...held,
-            dx: held.dx * 0.7,
-            dz: held.dz * 0.7,
-            pinX: held.pinX - held.dx * 0.3,
-            pinZ: held.pinZ - held.dz * 0.3,
-          };
-        const p: FootState = leg.plant;
-        // The pin holds the contact (the toes, mostly), and the foot is turned back about the ankle:
-        // the ankle goes where that turn leaves the toes on their spot.
-        const ox = p.contact === 'toe' ? s.toe[0] - s.ankle[0] : 0,
-          oz = p.contact === 'toe' ? s.toe[2] - s.ankle[2] : 0;
-        const cos = Math.cos(p.dyaw),
-          sin = Math.sin(p.dyaw);
-        const target: Vec3 = [
-          s.ankle[0] + p.dx + ox - (ox * cos + oz * sin),
-          // The body's sinking is the knees' to take up, not the feet's: each foot goes where
-          // the motion has it, as high above the floor as before the hips came down (otherwise
-          // a foot swinging forward in a run would scrape along the floor). And never under the
-          // floor (a seat lower than the motion's own would push the feet in).
-          // A foot planted for a stop stands on the floor, whatever the gait under it is doing.
-          planted[i]
-            ? floorY + leg.restAnkle + p.lift
-            : Math.max(floorY + leg.restAnkle * 0.85, s.ankle[1] + p.lift + sunk),
-          s.ankle[2] + p.dz + oz - (-ox * sin + oz * cos),
-        ];
-        leg.upperLeg.getWorldPosition(v);
-        const length = leg.lowerLeg.getWorldPosition(v2).distanceTo(v) + v2.distanceTo(leg.foot.getWorldPosition(v3));
-        const flat = Math.hypot(target[0] - v.x, target[2] - v.z),
-          up = v.y - target[1];
-        const reach = length * 0.995;
-        if (flat < reach && Math.hypot(flat, up) > reach)
-          drop = Math.max(drop, up - Math.sqrt(reach * reach - flat * flat));
-        return target;
-      });
-      // (Eased: the hips never drop in one frame.)
-      dropNow = approach(dropNow, Math.min(0.1, drop), 30, dt);
-      drop = dropNow;
-      if (drop > 1e-4) {
-        hips.position.y -= drop / (root.scale.y || 1);
-        root.updateWorldMatrix(true, true);
+        const forward: Vec3 = [Math.sin(intent.heading), 0, Math.cos(intent.heading)];
+        sides.forEach((leg, i) => {
+          const p = leg.plant,
+            s = samples[i]!;
+          const corrected =
+            planted[i] ||
+            Math.abs(p.dx) + Math.abs(p.dz) + Math.abs(p.lift) + Math.abs(p.dyaw) > 1e-5 ||
+            drop > 1e-4 ||
+            targets[i]![1] > s.ankle[1] + 1e-5;
+          if (corrected) {
+            const footWorld = leg.foot.getWorldQuaternion(new Quaternion());
+            // Solved twice: the body's squash and stretch scales it more one way than the other, so
+            // a bone's length in the room changes as it turns and one solve lands a little off (a
+            // planted foot would creep as the body sinks). The second starts from the first's result.
+            for (let pass = 0; pass < (Math.abs(tall - 1) > 1e-3 ? 3 : 1); pass++) {
+              const hip = tuple(leg.upperLeg.getWorldPosition(v)),
+                knee = tuple(leg.lowerLeg.getWorldPosition(v)),
+                ankle = tuple(leg.foot.getWorldPosition(v));
+              const solved = solveTwoBone(hip, knee, ankle, targets[i]!, forward);
+              aim(leg.upperLeg, knee, solved.mid);
+              aim(leg.lowerLeg, tuple(leg.foot.getWorldPosition(v)), solved.end);
+            }
+            // The foot keeps the motion's own tilt, turned back by what the pin holds.
+            setWorldQuaternion(leg.foot, footWorld.premultiply(q.setFromAxisAngle(UP, p.dyaw + ahead)));
+          }
+          // What the viewer sees: how far the planted contact moved over the floor this frame.
+          const contact = p.contact === 'toe' ? toeOf(leg, new Vector3()) : leg.foot.getWorldPosition(new Vector3());
+          const raw = new Vector3(...(p.contact === 'toe' ? s.toe : s.ankle));
+          const pinned = p.down && p.step === undefined;
+          // Heel to toe is another point of the foot, not a slide: measure from the new one on.
+          if (leg.lastKind !== p.contact) leg.lastContact = leg.lastRaw = undefined;
+          leg.lastKind = p.contact;
+          if (pinned && leg.lastContact && leg.lastRaw) {
+            const moved = Math.hypot(contact.x - leg.lastContact.x, contact.z - leg.lastContact.z);
+            facts.slide += moved;
+            facts.worstSlide = Math.max(facts.worstSlide, moved);
+            facts.rawSlide += Math.hypot(raw.x - leg.lastRaw.x, raw.z - leg.lastRaw.z);
+          }
+          leg.lastContact = pinned ? contact : undefined;
+          leg.lastRaw = pinned ? raw : undefined;
+        });
+        footSamples = samples;
       }
-      const forward: Vec3 = [Math.sin(intent.heading), 0, Math.cos(intent.heading)];
-      sides.forEach((leg, i) => {
-        const p = leg.plant,
-          s = samples[i]!;
-        const corrected =
-          planted[i] ||
-          Math.abs(p.dx) + Math.abs(p.dz) + Math.abs(p.lift) + Math.abs(p.dyaw) > 1e-5 ||
-          drop > 1e-4 ||
-          targets[i]![1] > s.ankle[1] + 1e-5;
-        if (corrected) {
-          const footWorld = leg.foot.getWorldQuaternion(new Quaternion());
-          // Solved twice: the body's squash and stretch scales it more one way than the other, so
-          // a bone's length in the room changes as it turns and one solve lands a little off (a
-          // planted foot would creep as the body sinks). The second starts from the first's result.
-          for (let pass = 0; pass < (Math.abs(tall - 1) > 1e-3 ? 3 : 1); pass++) {
-            const hip = tuple(leg.upperLeg.getWorldPosition(v)),
-              knee = tuple(leg.lowerLeg.getWorldPosition(v)),
-              ankle = tuple(leg.foot.getWorldPosition(v));
-            const solved = solveTwoBone(hip, knee, ankle, targets[i]!, forward);
-            aim(leg.upperLeg, knee, solved.mid);
-            aim(leg.lowerLeg, tuple(leg.foot.getWorldPosition(v)), solved.end);
-          }
-          // The foot keeps the motion's own tilt, turned back by what the pin holds.
-          setWorldQuaternion(leg.foot, footWorld.premultiply(q.setFromAxisAngle(UP, p.dyaw + ahead)));
-        }
-        // What the viewer sees: how far the planted contact moved over the floor this frame.
-        const contact = p.contact === 'toe' ? toeOf(leg, new Vector3()) : leg.foot.getWorldPosition(new Vector3());
-        const raw = new Vector3(...(p.contact === 'toe' ? s.toe : s.ankle));
-        const pinned = p.down && p.step === undefined;
-        // Heel to toe is another point of the foot, not a slide: measure from the new one on.
-        if (leg.lastKind !== p.contact) leg.lastContact = leg.lastRaw = undefined;
-        leg.lastKind = p.contact;
-        if (pinned && leg.lastContact && leg.lastRaw) {
-          const moved = Math.hypot(contact.x - leg.lastContact.x, contact.z - leg.lastContact.z);
-          facts.slide += moved;
-          facts.worstSlide = Math.max(facts.worstSlide, moved);
-          facts.rawSlide += Math.hypot(raw.x - leg.lastRaw.x, raw.z - leg.lastRaw.z);
-        }
-        leg.lastContact = pinned ? contact : undefined;
-        leg.lastRaw = pinned ? raw : undefined;
-      });
 
       // 4b. Arm. The hand goes to the target (its fingertips on it), blended from wherever the
       // motion has it; the elbow bends down and out.
@@ -1055,13 +1160,67 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
         facts.reachGap = tip.distanceTo(goal);
       }
 
+      // 4c. Hands that hold things (the phone and its earphones). Each hand goes, by its weight,
+      // from where the motion and the steps above left it to its goal; the palm and the fingers
+      // turn the way the goal says, and the fingers close round what is held. Solved after the
+      // reach, which never runs at the same time (the page lets the phone go first).
+      for (const side of sides) {
+        const goal = side.side === 'left' ? intent.hold?.left : intent.hold?.right;
+        const weight = goal ? clamp(goal.weight, 0, 1) : 0;
+        const grip = goal ? clamp(goal.grip, 0, 1) : 0;
+        if (weight > 1e-3 && goal) {
+          root.updateWorldMatrix(true, true);
+          const shoulder = side.upperArm.getWorldPosition(new Vector3()),
+            elbow = side.lowerArm.getWorldPosition(new Vector3()),
+            wrist = side.hand.getWorldPosition(new Vector3());
+          const fingers = new Vector3(...goal.fingers).normalize();
+          const palm = new Vector3(...goal.palm);
+          palm.addScaledVector(fingers, -palm.dot(fingers)).normalize();
+          // The palm's middle is half a hand past the wrist, a little off the palm's face.
+          const wristGoal = new Vector3(...goal.at)
+            .addScaledVector(fingers, -handLength * 0.45)
+            .addScaledVector(palm, -0.012);
+          const limit = (upperArmLength + lowerArmLength) * ARM_STRETCH;
+          if (wristGoal.distanceTo(shoulder) > limit) wristGoal.sub(shoulder).setLength(limit).add(shoulder);
+          const target = wrist.clone().lerp(wristGoal, weight);
+          // Elbows down and out (on a bed, they rest on it).
+          const pole = new Vector3(side.sign * 0.7, -1, -0.15).applyAxisAngle(UP, intent.heading);
+          const solved = solveTwoBone(tuple(shoulder), tuple(elbow), tuple(wrist), tuple(target), tuple(pole));
+          aim(side.upperArm, tuple(elbow), solved.mid);
+          aim(side.lowerArm, tuple(side.hand.getWorldPosition(v)), solved.end);
+          // The hand: its fingers along `fingers` (+X for a left hand, −X for a right), its palm
+          // (−Y) facing `palm`.
+          const x = fingers.clone().multiplyScalar(side.sign),
+            y = palm.clone().negate();
+          const z = new Vector3().crossVectors(x, y);
+          // (Its own quaternions: setWorldQuaternion works in q3.)
+          const want = new Quaternion().setFromRotationMatrix(new Matrix4().makeBasis(x, y, z));
+          setWorldQuaternion(side.hand, side.hand.getWorldQuaternion(new Quaternion()).slerp(want, weight));
+        }
+        // The fingers close toward the palm (about each joint's Z: down for a T-pose hand).
+        if (grip > 1e-3) for (const f of side.curl) f.node.rotateZ(-side.sign * grip * f.share * 1.05);
+        // The right thumb lies over the screen and taps it.
+        if (side.side === 'right' && grip > 1e-3)
+          side.thumb.forEach((t, k) => t.rotateY(side.sign * (0.35 * grip + (k ? 0.35 : 0.25) * (intent.thumb ?? 0))));
+      }
+
       // 5. The model: pose copied to its own bones, then hair, tail and clothes follow.
       hips.position.y = Math.max(restHipsY * 0.5, hips.position.y);
       vrm.update(dt);
-      // The shadow stays on the floor under a body in the air, and thins with the height.
-      const height = Math.max(0, root.position.y - floorY);
-      shadow.position.set(0, (0.004 - height) / (root.scale.y || 1), 0);
-      shadow.scale.setScalar(Math.max(0.55, 1 - height * 1.3));
+      // The shadow stays on the floor under a body in the air, and thins with the height. Lying,
+      // it is on the bed under the body, long the body's way.
+      root.updateWorldMatrix(true, true);
+      const height = lying && intent.lieAt ? 0 : Math.max(0, root.position.y - floorY);
+      hips.getWorldPosition(v);
+      const under = lying && intent.lieAt ? intent.lieAt[1] + 0.006 : floorY + 0.004;
+      v.y = under;
+      if (lying && intent.lieAt) v.set(v.x + (intent.lieAt[0] - v.x) * 0.5, under, v.z + (intent.lieAt[2] - v.z) * 0.5);
+      else v.set(root.position.x, under, root.position.z);
+      shadow.position.copy(root.worldToLocal(v));
+      q2.setFromAxisAngle(UP, intent.heading).multiply(q3.setFromAxisAngle(v2.set(1, 0, 0), -Math.PI / 2));
+      shadow.quaternion.copy(root.getWorldQuaternion(q).invert().multiply(q2));
+      const shrink = Math.max(0.55, 1 - height * 1.3);
+      shadow.scale.set(shrink / (root.scale.x || 1), (shrink * (1 + 1.1 * lie)) / (root.scale.y || 1), 1);
       root.updateWorldMatrix(true, true);
       facts.walkWeight = moveWeight;
       sides.forEach((leg) => {
@@ -1082,8 +1241,8 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
         down: leg.plant.down,
         stepping: leg.plant.step !== undefined,
         held: Math.hypot(leg.plant.dx, leg.plant.dz),
-        toeRise: samples[i]!.toeRise,
-        ankleRise: samples[i]!.ankleRise,
+        toeRise: footSamples[i]!.toeRise,
+        ankleRise: footSamples[i]!.ankleRise,
       }));
     },
     facts: () => ({ ...facts }),

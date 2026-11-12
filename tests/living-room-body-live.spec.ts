@@ -38,7 +38,9 @@ async function perform(page: Page, frameRate: number) {
   );
   await hook(
     page,
-    `room.still(); room.frameRate(${frameRate}); room.resident.setMood('interest'); room.resident.trace();`,
+    // (The everyday life, docs/living-life.md, is stopped: this measures the approach alone, from
+    // standing, as before it existed.)
+    `room.still(); room.frameRate(${frameRate}); room.resident.live(false); room.resident.setMood('interest'); room.resident.trace();`,
   );
   await page.waitForTimeout(800);
   await hook(page, 'room.resident.setTarget([-0.9, 0.95, -0.55]);');
