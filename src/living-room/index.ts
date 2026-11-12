@@ -29,7 +29,8 @@ import { readLayout } from '../renderers/three/room-layout';
 import { floorPath, standPoint, walkable } from '../world/room-life';
 import { loadLivingResident, type LivingResident } from './resident';
 import { softSurface } from './soft-surface';
-import { screenGlow } from './screen-glow';
+import { screenGlow, type GlowKind } from './screen-glow';
+import { startRoomDesktop } from './desktop';
 
 declare const __WW_LIVING_TEST__: boolean;
 declare const __WW_LIVING_CHARACTER__: boolean;
@@ -41,6 +42,8 @@ interface RoomManifest {
   lightmapMesh: string;
   /** Models that keep their own colour texture; their vertex colours hold baked light only. */
   texturedMesh?: string;
+  /** Lamps baked on their own, tinted at run time: a lightmap each (and vertex attributes). */
+  layers?: { ui?: string; screen?: string };
   camera: string;
   aspect: number;
 }
@@ -62,12 +65,23 @@ async function start() {
     if (url.startsWith('blob:') || url.startsWith('data:') || url.startsWith(base.href)) return url;
     throw new Error('部屋の素材が外部の資源を参照しています。');
   });
-  const [gltf, lightmap] = await Promise.all([
+  const image = (name: string | undefined) => {
+    if (!name) return undefined;
+    if (!/^[\w.-]{1,60}\.png$/.test(name)) throw new Error('部屋の光の画像の名前が正しくありません。');
+    return new TextureLoader(manager).loadAsync(new URL(name, base).href);
+  };
+  const [gltf, lightmap, layerUi, layerScreen] = await Promise.all([
     new GLTFLoader(manager).loadAsync(new URL('room.glb', base).href),
     new TextureLoader(manager).loadAsync(new URL(manifest.lightmap, base).href),
+    // Light baked on its own and tinted at run time (docs/living-desktop.md). Older rooms have none.
+    image(manifest.layers?.ui),
+    image(manifest.layers?.screen),
   ]);
-  lightmap.colorSpace = SRGBColorSpace;
-  lightmap.flipY = false;
+  for (const texture of [lightmap, layerUi, layerScreen]) {
+    if (!texture) continue;
+    texture.colorSpace = SRGBColorSpace;
+    texture.flipY = false;
+  }
 
   const renderer = new WebGLRenderer({ canvas, antialias: true, powerPreference: 'low-power' });
   renderer.toneMapping = ACESFilmicToneMapping;
@@ -104,6 +118,7 @@ async function start() {
     return material;
   };
   const soft: Mesh[] = [];
+  const kinds = new Map<MeshBasicMaterial, GlowKind>();
   gltf.scene.traverse((object) => {
     if (/^(navmesh_|marker_|occluder_|shadow_)/.test(object.name)) {
       object.visible = false;
@@ -118,7 +133,11 @@ async function start() {
     // The room's soft things (by the material's name in the room file) give under a body.
     if (/^(duvet|sheet|throw|pillow|beanbag|rug_|floor_shade)/.test(source.name)) soft.push(mesh);
     const textured = !!manifest.texturedMesh && mesh.name.startsWith(manifest.texturedMesh);
-    mesh.material = unlit(source, mesh.geometry.hasAttribute('color'), mesh.name.startsWith('static_'), map, textured);
+    const material = unlit(source, mesh.geometry.hasAttribute('color'), mesh.name.startsWith('static_'), map, textured);
+    mesh.material = material;
+    // How this material carries the room's baked light layers (screen-glow.ts).
+    const layered = mesh.geometry.hasAttribute('_ui') && mesh.geometry.hasAttribute('_screen');
+    kinds.set(material, map ? 'lightmap' : textured && layered ? 'textured' : layered ? 'vertex' : 'plain');
   });
   // The actual baked room supplies reflections in the small glass and metal objects. This is
   // captured once, so the room's still frame and its ordinary animation loop stay inexpensive.
@@ -140,8 +159,13 @@ async function start() {
   const layout = readLayout(gltf.scene);
   // A character only where the build was given one (a local folder, never a public build).
   let resident: LivingResident | undefined;
-  // Small screens (the resident's phone; later the UI panel) light the baked room.
-  const glow = screenGlow(made.values());
+  // Light that changes at run time: the baked layers (the desktop's glow, the monitor) and small
+  // screens (the resident's phone).
+  const glow = screenGlow(
+    kinds,
+    { ...(layerUi ? { ui: layerUi } : {}), ...(layerScreen ? { screen: layerScreen } : {}) },
+    manifest.lightScale,
+  );
   if (__WW_LIVING_CHARACTER__)
     resident = await loadLivingResident(scene, base, layout, softSurface(soft), { root: gltf.scene, glow });
 
@@ -186,6 +210,18 @@ async function start() {
     camera.updateProjectionMatrix();
     wake();
   }
+  // The virtual desktop: glass windows over the room, the same desktop on the room's monitor, and
+  // its colour in the room's light (docs/living-desktop.md).
+  const desktop = startRoomDesktop({
+    host: document.body,
+    scene,
+    room: gltf.scene,
+    camera,
+    glow,
+    floorY: layout.floorY,
+    resident,
+    wake: () => wake(),
+  });
   const timing = { frames: 0, interval: 0, worstInterval: 0, body: 0, draw: 0 };
   function tick(now: number) {
     frame = undefined;
@@ -195,9 +231,17 @@ async function start() {
       wake();
       return;
     }
+    // A mirrored screen is the only thing moving (no resident, the view at rest): thirty frames a
+    // second are plenty for a picture that comes at fifteen.
+    if (!resident && desktop.mirroring && last && now - last < 32 && look.distanceToSquared(aim) < 1e-6) {
+      wake();
+      return;
+    }
     const dt = last ? Math.min(0.1, (now - last) / 1000) : 0;
     last = now;
-    look.lerp(reduce.matches ? aim.set(0, 0) : aim, 1 - Math.exp(-dt * 5));
+    // (With the desktop open the room holds still: the pointer is working the windows, and the
+    // resident comes to a place on a window that must not drift under its hand.)
+    look.lerp(reduce.matches || desktop.open ? aim.set(0, 0) : aim, 1 - Math.exp(-dt * 5));
     // A small orbit about the subject follows the pointer: depth without leaving the composition.
     offset.copy(home).sub(SUBJECT);
     if (__WW_LIVING_TEST__) offset.multiplyScalar(reviewDistance).applyAxisAngle(new Vector3(0, 1, 0), reviewTurn);
@@ -214,6 +258,7 @@ async function start() {
     }
     camera.updateMatrixWorld();
     const began = __WW_LIVING_TEST__ ? performance.now() : 0;
+    desktop.update(dt, now);
     resident?.update(dt, camera);
     const posed = __WW_LIVING_TEST__ ? performance.now() : 0;
     composer.render();
@@ -228,7 +273,8 @@ async function start() {
       timing.draw += performance.now() - posed;
     }
     // A living character breathes and blinks: with one, every frame is drawn while the page shows.
-    if (resident ? !document.hidden : look.distanceToSquared(aim) > 1e-6) wake();
+    // Without one, only while the view or the desktop's light is still moving.
+    if (resident ? !document.hidden : look.distanceToSquared(aim) > 1e-6 || (desktop.busy && !document.hidden)) wake();
     else last = 0;
   }
   function wake() {
@@ -243,11 +289,13 @@ async function start() {
     if (!document.hidden) wake();
   });
   if (resident) {
-    // A click puts the thing to notice on the surface under the pointer (with Shift it is met
-    // eagerly); a click on the thing itself answers the character's touch; Escape takes it away.
+    // For trying the approach by hand: Alt and a click puts a thing to notice on the surface
+    // under the pointer (with Shift it is met eagerly); a click on the thing itself answers the
+    // character's touch; Escape takes it away. (The desktop's windows are what it comes to now.)
     const ray = new Raycaster();
     const live = resident;
     canvas.addEventListener('click', (event) => {
+      if (!event.altKey && !live.state().target) return;
       ray.setFromCamera(
         new Vector2((event.clientX / window.innerWidth) * 2 - 1, 1 - (event.clientY / window.innerHeight) * 2),
         camera,
@@ -312,6 +360,8 @@ async function start() {
           return out;
         },
         resident,
+        /** The virtual desktop's state (docs/living-desktop.md). */
+        desktop: () => desktop.state(),
         /** Fixed close views of the furniture for the browser art review. */
         reviewCamera: (target: [number, number, number], scale: number, turn = 0) => {
           reviewSubject.fromArray(target);

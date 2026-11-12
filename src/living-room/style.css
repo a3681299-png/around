@@ -36,3 +36,351 @@ body {
     transition: none;
   }
 }
+
+/* The virtual desktop (docs/living-desktop.md): glass over the room. Each pane blurs the room
+   behind it; the room around the panes stays sharp. */
+.desk {
+  --desk-from: #2b3f8f;
+  --desk-to: #9fb6ff;
+  --desk-accent: #dfe7ff;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #f4f5fb;
+}
+.desk-glass {
+  background: linear-gradient(160deg, rgb(255 255 255 / 0.16), rgb(255 255 255 / 0.06));
+  -webkit-backdrop-filter: blur(26px) saturate(1.5);
+  backdrop-filter: blur(26px) saturate(1.5);
+  border: 1px solid rgb(255 255 255 / 0.22);
+  box-shadow:
+    0 18px 50px rgb(3 6 24 / 0.45),
+    inset 0 1px 0 rgb(255 255 255 / 0.25);
+}
+.desk-veil {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 90% at 50% 45%, transparent 55%, rgb(4 6 26 / 0.5));
+  opacity: 0;
+  transition: opacity 0.5s ease-out;
+}
+.desk[data-open] .desk-veil {
+  opacity: 1;
+}
+.desk-bar,
+.desk-dock,
+.desk-stage {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.35s ease-out,
+    transform 0.45s cubic-bezier(0.2, 0.9, 0.25, 1),
+    visibility 0s 0.45s;
+}
+.desk[data-open] .desk-bar,
+.desk[data-open] .desk-dock,
+.desk[data-open] .desk-stage {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+.desk-bar {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  width: min(720px, calc(100% - 24px));
+  height: 34px;
+  box-sizing: border-box;
+  transform: translate(-50%, -14px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 6px 0 16px;
+  border-radius: 17px;
+  pointer-events: auto;
+}
+.desk[data-open] .desk-bar {
+  transform: translate(-50%, 0);
+}
+.desk-brand {
+  font-weight: 650;
+  letter-spacing: 0.02em;
+}
+.desk-live {
+  padding: 1px 10px;
+  border-radius: 10px;
+  background: rgb(255 92 122 / 0.85);
+  font-size: 12px;
+}
+.desk-live[hidden] {
+  display: none;
+}
+.desk-clock {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.9;
+}
+.desk-stage {
+  position: absolute;
+  inset: 0;
+}
+.desk-window {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px;
+  overflow: hidden;
+  pointer-events: auto;
+  animation: desk-in 0.42s cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+.desk-window.is-front {
+  border-color: color-mix(in srgb, var(--desk-accent) 55%, transparent);
+  box-shadow:
+    0 22px 60px rgb(3 6 24 / 0.55),
+    0 0 44px color-mix(in srgb, var(--desk-to) 30%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.3);
+}
+.desk-window.is-dragged .desk-title {
+  cursor: grabbing;
+}
+/* The resident's hand lands on the frame: it gives a little and settles. */
+.desk-window.is-touched {
+  animation: desk-touched 0.55s cubic-bezier(0.3, 1.6, 0.4, 1);
+}
+@keyframes desk-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+}
+@keyframes desk-touched {
+  30% {
+    transform: translate(3px, -7px) rotate(0.7deg);
+  }
+  60% {
+    transform: translate(-1px, 2px) rotate(-0.25deg);
+  }
+}
+.desk-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  flex: none;
+  padding: 0 8px 0 14px;
+  font-weight: 600;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  border-bottom: 1px solid rgb(255 255 255 / 0.12);
+}
+.desk-title > span {
+  flex: 1;
+}
+.desk svg,
+.desk-launcher svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.desk button {
+  font: inherit;
+  color: inherit;
+}
+.desk-close,
+.desk-shut {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 13px;
+  background: rgb(255 255 255 / 0.1);
+  cursor: pointer;
+}
+.desk-close:hover,
+.desk-shut:hover {
+  background: rgb(255 255 255 / 0.24);
+}
+.desk-close svg,
+.desk-shut svg {
+  width: 13px;
+  height: 13px;
+}
+.desk-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 12px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.desk-hint {
+  margin: 0;
+  font-size: 12.5px;
+  color: rgb(244 245 251 / 0.8);
+}
+.desk-swatches {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.desk-swatch {
+  height: 58px;
+  display: flex;
+  align-items: flex-end;
+  padding: 6px 8px;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  text-shadow: 0 1px 4px rgb(0 0 0 / 0.7);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.desk-swatch[aria-pressed='true'] {
+  border-color: #fff;
+  box-shadow: 0 0 18px color-mix(in srgb, var(--desk-to) 60%, transparent);
+}
+.desk-range {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+}
+.desk-range input {
+  flex: 1;
+  accent-color: var(--desk-accent);
+}
+.desk-mirror-frame {
+  position: relative;
+  flex: 1;
+  min-height: 90px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgb(4 6 26 / 0.55);
+  display: grid;
+  place-items: center;
+}
+.desk-mirror-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: none;
+}
+.desk-mirror-frame[data-live] .desk-mirror-video {
+  display: block;
+}
+.desk-mirror-frame[data-live] .desk-mirror-empty {
+  display: none;
+}
+.desk-mirror-empty {
+  font-size: 12.5px;
+  opacity: 0.75;
+}
+.desk .desk-action {
+  align-self: flex-start;
+  padding: 7px 16px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--desk-accent);
+  color: #10142c;
+  font-weight: 650;
+  cursor: pointer;
+}
+.desk-action:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.desk-resident-line {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+}
+.desk-dock {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translate(-50%, 16px);
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+  border-radius: 22px;
+  pointer-events: auto;
+}
+.desk[data-open] .desk-dock {
+  transform: translate(-50%, 0);
+}
+.desk .desk-app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  width: 76px;
+  padding: 7px 4px 5px;
+  border: 0;
+  border-radius: 15px;
+  background: transparent;
+  font-size: 11.5px;
+  cursor: pointer;
+}
+.desk-app svg {
+  width: 22px;
+  height: 22px;
+}
+.desk-app:hover {
+  background: rgb(255 255 255 / 0.14);
+}
+.desk-app[aria-pressed='true'] {
+  background: rgb(255 255 255 / 0.18);
+  box-shadow: inset 0 -2px 0 var(--desk-accent);
+}
+.desk-launcher {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 20px;
+  color: #f4f5fb;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.desk-launcher:hover {
+  background: linear-gradient(160deg, rgb(255 255 255 / 0.26), rgb(255 255 255 / 0.1));
+}
+.desk-launcher[hidden] {
+  display: none;
+}
+.desk :focus-visible,
+.desk-launcher:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .desk-bar,
+  .desk-dock,
+  .desk-stage,
+  .desk-veil {
+    transition: none;
+  }
+  .desk-window,
+  .desk-window.is-touched {
+    animation: none;
+  }
+}

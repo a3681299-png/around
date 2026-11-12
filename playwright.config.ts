@@ -25,6 +25,7 @@ const unitSpecs = [
   'two-bone-ik',
   'living-body',
   'living-life',
+  'living-desktop',
   'asset-import-validation',
   'asset-profile',
   'asset-read-data',

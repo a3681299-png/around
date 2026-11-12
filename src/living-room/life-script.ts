@@ -76,7 +76,12 @@ export interface LifeState {
   phoneAt: Place;
 }
 
-export const startLife = (): LifeState => ({ step: 0, held: 0, phoneAt: 'chair' });
+/** The day from one of its steps (the first by default), the phone lying at `phoneAt`. */
+export const startLife = (step = 0, phoneAt: Place = 'chair'): LifeState => ({
+  step: Math.min(DAY.length - 1, Math.max(0, Math.trunc(step))),
+  held: 0,
+  phoneAt,
+});
 
 export function stepLife(state: LifeState, seen: Seen, dt: number): LifeState {
   const step = DAY[state.step]!;
