@@ -11,6 +11,7 @@
     "dev": "node scripts/build.mjs --watch",
     "build": "npm run typecheck && node scripts/build.mjs",
     "build:playground": "node scripts/build-playground.mjs",
+    "living": "node scripts/serve-living-room.mjs",
     "build:deploy-probe": "node scripts/build-deploy-probe.mjs",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.world.json && tsc --noEmit -p tsconfig.editor-core.json",
     "test:setup": "node scripts/test.mjs --install",
