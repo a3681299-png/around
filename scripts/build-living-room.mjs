@@ -8,7 +8,7 @@
 //     adds a local character (docs/living-body.md). Only into a .work output: a character whose
 //     terms are not confirmed must never reach dist-living-room, which is what gets published.
 import { build } from 'esbuild';
-import { copyFileSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -53,6 +53,13 @@ await build({
 });
 for (const file of ['index.html', 'style.css']) copyFileSync(join(root, 'src/living-room', file), join(output, file));
 for (const file of files) copyFileSync(join(room, file), join(output, 'content', file));
+// The light layers the room file names (the desktop's glow, the monitor: docs/living-desktop.md).
+const { layers = {} } = JSON.parse(readFileSync(join(room, 'room.json'), 'utf8'));
+for (const file of Object.values(layers)) {
+  if (!/^[\w.-]{1,60}\.png$/.test(file))
+    throw new Error(`The room names a light layer that is not a plain .png: ${file}`);
+  copyFileSync(join(room, file), join(output, 'content', file));
+}
 if (character) {
   const folder = join(output, 'content/character');
   mkdirSync(folder, { recursive: true });

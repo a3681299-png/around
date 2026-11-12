@@ -149,6 +149,16 @@ def only(o):
     bpy.context.view_layer.objects.active = o
 
 
+# Light layers (docs/living-desktop.md): lamps marked with a `layer` are left out of the room's
+# own light and baked on their own further down; the page tints each layer at run time (the
+# virtual desktop's glow from the viewer's side, the desk monitor's light).
+for o in coll('lights').objects:
+    o.hide_render = bool(o.get('layer'))
+# The monitor's own face is drawn by the page (its picture changes): it must not light the bake.
+for o in dyn_keep:
+    o.visible_diffuse = False
+    o.visible_glossy = False
+
 # --- the lightmap ---
 only(lm)
 # Printed artwork samples its named ArtUV while irradiance is packed into LightUV.
@@ -312,6 +322,85 @@ for lit in ([textured] if textured else []) + groups['soft']:
     ta.data.foreach_set('color', tarr.ravel())
     lit.data.update()
 
+# --- light layers ---
+# Each layer: only its lamps, no world light. The big surfaces get a half-size lightmap on the
+# same UV (the light is soft; the albedo detail is multiplied in at full size first), the other
+# meshes a per-vertex attribute `_<LAYER>` next to their own light.
+LAYERS = sorted({o['layer'] for o in coll('lights').objects if o.get('layer')})
+LAYER_SIZE = LM_SIZE // 2
+world_bg = next(n for n in sc.world.node_tree.nodes if n.type == 'BACKGROUND')
+world_strength = world_bg.inputs['Strength'].default_value
+
+
+def bake_layer_vertices(o, with_color, passes):
+    only(o)
+    tmp = o.data.color_attributes.new('LayerBake', 'FLOAT_COLOR', 'POINT')
+    o.data.color_attributes.active_color = tmp
+    bs.use_pass_direct = bs.use_pass_indirect = True
+    bs.use_pass_color = with_color
+    bs.target = 'VERTEX_COLORS'
+    sc.cycles.samples = VC_SAMPLES
+    bpy.ops.object.bake(type='DIFFUSE')
+    tmp = o.data.color_attributes['LayerBake']
+    values = np.zeros(len(tmp.data) * 4, dtype=np.float32)
+    tmp.data.foreach_get('color', values)
+    values = values.reshape(-1, 4)
+    smooth_vertex_light(o, values, passes)
+    o.data.color_attributes.remove(tmp)
+    o.data.color_attributes.active_color = o.data.color_attributes['Light']
+    o.data.color_attributes.render_color_index = 0
+    return np.clip(values[:, :3] / LIGHT_SCALE, 0, None)
+
+
+layer_files = {}
+for layer in LAYERS:
+    for o in coll('lights').objects:
+        o.hide_render = o.get('layer') != layer
+    world_bg.inputs['Strength'].default_value = 0
+    only(lm)
+    tmp_nodes = []
+    for m in lm.data.materials:
+        node = m.node_tree.nodes.new('ShaderNodeTexImage')
+        node.image = img
+        m.node_tree.nodes.active = node
+        tmp_nodes.append((m, node))
+    bs.use_pass_direct = bs.use_pass_indirect = True
+    bs.use_pass_color = False
+    bs.target = 'IMAGE_TEXTURES'
+    sc.cycles.samples = SAMPLES
+    t = time.time()
+    bpy.ops.object.bake(type='DIFFUSE')
+    for m, node in tmp_nodes:
+        m.node_tree.nodes.remove(node)
+    layer_rgb = np.array(img.pixels[:], dtype=np.float32).reshape(LM_SIZE, LM_SIZE, 4)[:, :, :3].copy()
+    layer_rgb = denoise_atlas(layer_rgb, guide, OUT) * albedo[:, :, :3]
+    # Half size, averaging only the texels a surface covers (an island's edge must not darken).
+    step = LM_SIZE // LAYER_SIZE
+    covered = guide[:, :, 0]
+    weight = covered.reshape(LAYER_SIZE, step, LAYER_SIZE, step).sum(axis=(1, 3))
+    small = (layer_rgb * covered[:, :, None]).reshape(LAYER_SIZE, step, LAYER_SIZE, step, 3).sum(axis=(1, 3))
+    small /= np.maximum(weight, 1)[:, :, None]
+    print('layer', layer, 'baked s', round(time.time() - t, 1), 'max', float(small.max()), 'p99.9', float(np.percentile(small, 99.9)))
+    small = np.clip(small / LIGHT_SCALE, 0, 1)
+    encoded = np.where(small <= 0.0031308, small * 12.92, 1.055 * np.power(small, 1 / 2.4) - 0.055)
+    layer_png = bpy.data.images.new('ww_layer_png', LAYER_SIZE, LAYER_SIZE, alpha=False)
+    layer_rgba = np.ones((LAYER_SIZE, LAYER_SIZE, 4), dtype=np.float32)
+    layer_rgba[:, :, :3] = encoded
+    layer_png.pixels.foreach_set(layer_rgba.ravel())
+    layer_files[layer] = 'light-' + layer + '.png'
+    layer_png.filepath_raw = OUT + layer_files[layer]
+    layer_png.file_format = 'PNG'
+    layer_png.save()
+    bpy.data.images.remove(layer_png)
+    for o, with_color, passes in [(vc, True, 4)] + [(x, False, 2) for x in ([textured] if textured else []) + groups['soft']]:
+        values = bake_layer_vertices(o, with_color, passes)
+        attribute = o.data.attributes.new('_' + layer.upper(), 'FLOAT_VECTOR', 'POINT')
+        attribute.data.foreach_set('vector', values.ravel())
+world_bg.inputs['Strength'].default_value = world_strength
+# In the saved file the room renders as it stands with the desktop closed: the monitor on, no glow.
+for o in coll('lights').objects:
+    o.hide_render = o.get('layer') == 'ui'
+
 sc.cycles.sample_clamp_direct, sc.cycles.sample_clamp_indirect = clamps
 for name, v in metal.items():
     next(node for node in bpy.data.materials[name].node_tree.nodes if node.type == 'BSDF_PRINCIPLED').inputs['Metallic'].default_value = v
@@ -343,7 +432,9 @@ bpy.ops.export_scene.gltf(
     export_vertex_color='ACTIVE', export_all_vertex_colors=False, export_active_vertex_color_when_no_material=True,
     # Shape keys only on the moving models (the chair's give); positions only, no normals.
     export_animations=False, export_skins=False, export_morph=True, export_morph_normal=False,
-    export_morph_tangent=False)
+    export_morph_tangent=False,
+    # the light layers' per-vertex attributes (`_UI`, `_SCREEN`)
+    export_attributes=True)
 for src, name, copy in soft_renamed:
     copy.name = 'b_' + name
     src.name = name
@@ -357,6 +448,7 @@ BK.hide_viewport = True
 cam = bpy.data.objects['camera_main']
 manifest = {'version': 1, 'bakedColor': True, 'lightScale': LIGHT_SCALE, 'lightmap': 'lightmap.png', 'lightmapMesh': 'static_lm',
             'vertexLightMesh': 'static_vc', **({'texturedMesh': 'tex_'} if textured or groups['soft'] else {}), 'camera': 'camera_main',
+            **({'layers': layer_files} if layer_files else {}),
             'sensorWidth': cam.data.sensor_width, 'lens': cam.data.lens, 'aspect': sc.render.resolution_x / sc.render.resolution_y}
 # Keep generated JSON stable across Python, Prettier and Windows line endings.
 manifest = {key: int(value) if isinstance(value, float) and value.is_integer() else value for key, value in manifest.items()}

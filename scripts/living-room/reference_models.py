@@ -146,6 +146,35 @@ def chair_keys(o):
 
 chair_keys(MODEL_OBJECTS['chair'])
 PANELS = screen_panels(SCREEN_OBJECTS['workstation'])
+# The main monitor: the largest upright panel (the largest of all is the pen display, tilted).
+MONITOR_PANEL = next(i for i, p in enumerate(PANELS) if abs(p[3].z) < .3)
+
+
+def monitor_face(panel, c):
+    """A clean rectangle over the monitor's picture, with a 0-1 UV: the page draws the virtual
+    desktop (or the mirrored real screen) on it. Tripo's own picture stays behind it."""
+    centre, w, h, n, _ = panel
+    right = Vector((0, 0, 1)).cross(n).normalized()  # the viewer's right, facing the screen
+    up = n.cross(right).normalized()
+    w, h = w * .96, h * .93
+    at = centre + n * .006
+    corners = [at - right * w / 2 - up * h / 2, at + right * w / 2 - up * h / 2,
+               at + right * w / 2 + up * h / 2, at - right * w / 2 + up * h / 2]
+    me = bpy.data.meshes.new('dyn_monitor_screen')
+    me.from_pydata([tuple(p) for p in corners], [], [(0, 1, 2, 3)])
+    uv = me.uv_layers.new(name='UVMap')
+    for loop, co in zip(uv.data, [(0, 0), (1, 0), (1, 1), (0, 1)]):
+        loop.uv = co
+    me.materials.append(mat('monitor_face', '#ffffff', .3, emit='#ffffff', strength=2.2))
+    if 'dyn_monitor_screen' in bpy.data.objects:
+        bpy.data.objects.remove(bpy.data.objects['dyn_monitor_screen'], do_unlink=True)
+    o = bpy.data.objects.new('dyn_monitor_screen', me)
+    c.objects.link(o)
+    print('monitor face', tuple(round(v, 3) for v in at), round(w, 3), round(h, 3))
+    return o
+
+
+monitor_face(PANELS[MONITOR_PANEL], coll('desk'))
 for _p in PANELS:
     print('screen panel', tuple(round(v, 3) for v in _p[0]), 'w', round(_p[1], 3), 'h', round(_p[2], 3), 'n', tuple(round(v, 2) for v in _p[3]), 'area', round(_p[4], 4))
 print('reference models ready', len(MODEL_OBJECTS))

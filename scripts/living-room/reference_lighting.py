@@ -4,7 +4,15 @@ C=wipe('lights')
 # about the brightness per square metre the hand-built monitors had.
 for _i,(_c,_w,_h,_n,_a) in enumerate(PANELS[:4]):
     _q=_n.to_track_quat('-Z','Y').to_euler()
-    light('L_screen_'+str(_i),'AREA',tuple(_c+_n*.012),C,'#bed6ff',max(18,125*_a),size=_w*.9,size_y=_h*.9,rot=tuple(_q))
+    _o=light('L_screen_'+str(_i),'AREA',tuple(_c+_n*.012),C,'#bed6ff',max(18,125*_a),size=_w*.9,size_y=_h*.9,rot=tuple(_q))
+    # The main monitor shows the virtual desktop (docs/living-desktop.md): its light is a layer of
+    # its own, white here, tinted by the page with what the monitor shows.
+    if _i==MONITOR_PANEL:
+        _o['layer']='screen';_o.data.color=(1,1,1)
+# The virtual desktop opens in front of the room, on the viewer's side: its glow comes in through
+# the open front, a broad soft light, white here and tinted by the page. Just inside the front
+# bounce baffle (which would block it).
+light('L_ui','AREA',(0,-2.76,1.45),C,'#ffffff',150,size=5.2,size_y=2.3,rot=(R90,0,0))['layer']='ui'
 light('L_curtain_cove','AREA',(-.22,2.43,2.81),C,'#1255ff',27,size=2.30,size_y=.07,rot=(math.radians(28),0,0))
 for i,x in enumerate((-.95,-.37,.22,.78)):
     light('L_curtain_uplight_'+str(i),'AREA',(x,2.35,.89),C,'#0755ff',24,size=.18,size_y=.10,rot=(math.radians(142),0,0))
