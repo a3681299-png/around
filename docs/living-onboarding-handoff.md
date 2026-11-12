@@ -221,5 +221,5 @@ WW_LM_SIZE=4096 WW_SAMPLES=128 WW_VC_SAMPLES=128 WW_OUT=art/living-room/web \
 - 左の収納、中央奥の三画面の制作机、右の寝床、手前の格子ラグ・丸テーブル・カート・リュック・楽器を配置。画面と青い照り返しを主役に、枕元だけ暖色を入れた。
 - `art/living-room/living-room.blend` と `web/` が現行。実画面は `renders/reference-*.png`。新規作成した小さな絵柄用の画像は `textures/studio-art-atlas.png`。参考画像と絵柄・小物が完全に同じという意味ではない。
 - 型チェック・lint・unit 665 件通過（3 件スキップ）。10 か所へ到達可。前版と今回のミルドによる動作検査はいずれも足滑りで失敗した。Felis はこの PC に変換済みの物がなく未検証。身体・行動のコードと判定は変更していない。
-- 中核の変更・DesignDocument の版上げなし。原本は圧縮保存し、依存物を共有した。確認用の完成ビルド以外の検証用データは整理する。
+- 中核の変更・DesignDocument の版上げなし。原本は圧縮保存し、依存物を共有した。実装 `8e7508e` を push し、新しい clone の LFS 取得とハッシュ一致を確認した。検証用データ約130MBを削除し、参照画像・要約約5.09MBと確認用の完成ビルド一つを残した。
 - 次：全景と近景の美術レビュー。動作を再開するときは Felis のある環境で接地・席間の移動を確認する。詳細・同期状態は [living-room-night-reference.md](living-room-night-reference.md)。

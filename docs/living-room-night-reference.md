@@ -83,6 +83,13 @@ node scripts/playground/serve.mjs .work/living-room-preview 4181
 
 ## 保存・同期・後片付け
 
-原本 13.94MB、GLB 16.26MB、ライトマップ 3.53MB。Web 用の部屋データは約 19.80MB。依存物は既存 `living-onboarding/node_modules` への junction を使い、複製・追加インストールしなかった。検証用のビルドやプロファイル、途中の画像・ログ・動画は削除し、報告で参照する画像と計測要約だけ残す。確認用に最終の `dist-living-room` を一つ残す。
+原本 13.94MB、GLB 16.26MB、ライトマップ 3.53MB。Web 用の部屋データは約 19.80MB。依存物は既存 `living-onboarding/node_modules` への junction を使い、複製・追加インストールしなかった。今回の `.work` 内の検証ビルド、途中の画像・ログ・trace、LFS 確認 clone **129,815,282 bytes（約130MB）を削除した**。報告で参照する画像5枚と計測要約は約5.09MB。確認用に最終の `dist-living-room` 一つ（20.58MB）を残した。元の参考画像、他の worktree、既存の未コミットデータは変更していない。
 
-LFS 同期と最終の後片付けの結果は、push 後に追記する。
+実装は **`8e7508e`**、GitHub の `codex/living-room-reference` へ push 済み。標準の pre-push でも型チェック・lint・unit 665 件通過（3 件スキップ）。LFS 2件・約30MBをアップロードし、新規の sparse clone から `git lfs pull` して次の SHA-256 の一致を確認した。
+
+- `living-room.blend`：`491f7137c845d9eb18844a0d1a4d0f91427d5dd8df3fd2d43764c3d5184042fc`
+- `room.glb`：`68bd06818380bf3dfbdd5affc5442c33240aefa5deac69819c5f8e46f3f22232`
+
+この専用ブランチ名は `.github/workflows/check.yml` の push 対象外。上の検証結果は手元と pre-push の実行による。main や元の作業ブランチへの取り込みはしていない。
+
+作業終了時の確認用 URL は `http://127.0.0.1:4181/`。最終ビルドで `data-ready`、エラー0、テスト用フックなし、配信 GLB と原本の一致を確認した。プロセスが終了した場合は、この worktree で `node scripts/playground/serve.mjs dist-living-room 4181` から起動できる。
