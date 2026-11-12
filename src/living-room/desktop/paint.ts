@@ -3,7 +3,7 @@
  * page's windows are drawn from, painted small on a canvas that is the monitor's texture. Closed,
  * the monitor rests on its wallpaper and a clock; open, it shows the windows where they are.
  */
-import { APPS, BAR_H, WALLPAPERS, focused, type DesktopState } from './state';
+import { APPS, DOCK_H, WALLPAPERS, focused, type DesktopState } from './state';
 
 export const MONITOR_W = 640;
 export const MONITOR_H = 360;
@@ -48,15 +48,20 @@ export function paintDesktop(g: Pen, state: DesktopState, now: Date) {
   }
   const sx = W / state.viewport[0],
     sy = H / state.viewport[1];
-  // The bar.
-  g.fillStyle = 'rgba(255,255,255,0.22)';
-  pane(g, W * 0.22, 5, W * 0.56, 15, 7.5);
+  // The bar across the top, and the clock on the desktop itself.
+  const barH = Math.max(12, 32 * sy);
+  g.fillStyle = 'rgba(8,10,30,0.42)';
+  g.fillRect(0, 0, W, barH);
   g.fillStyle = 'rgba(255,255,255,0.95)';
-  g.font = '600 10px system-ui, sans-serif';
+  g.font = '700 9px system-ui, sans-serif';
   g.textAlign = 'left';
-  g.fillText('WWT Desktop', W * 0.22 + 10, 13);
-  g.textAlign = 'right';
-  g.fillText(time, W * 0.78 - 10, 13);
+  g.fillText('WWT', 8, barH / 2 + 0.5);
+  g.textAlign = 'center';
+  g.font = '600 9px system-ui, sans-serif';
+  g.fillText(time, W / 2, barH / 2 + 0.5);
+  g.textAlign = 'left';
+  g.font = '200 40px system-ui, sans-serif';
+  g.fillText(time, 30 * sx, barH + 34);
   // The windows, back to front.
   const front = focused(state)?.id;
   for (const win of [...state.windows].sort((a, b) => a.z - b.z)) {
@@ -73,15 +78,16 @@ export function paintDesktop(g: Pen, state: DesktopState, now: Date) {
       continue;
     }
     g.fillStyle = 'rgba(8,12,40,0.28)';
-    pane(g, x + 2, y + 5, w, h, 9);
-    g.fillStyle = win.id === front ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.26)';
-    pane(g, x, y, w, h, 9);
+    pane(g, x + 2, y + 5, w, h, 11);
+    g.fillStyle = win.id === front ? 'rgba(255,255,255,0.36)' : 'rgba(255,255,255,0.24)';
+    pane(g, x, y, w, h, 11);
+    // Its tile and its name.
+    g.fillStyle = paper.accent;
+    pane(g, x + 7, y + 6, 10, 10, 3);
     g.fillStyle = 'rgba(255,255,255,0.95)';
     g.font = '600 10px system-ui, sans-serif';
     g.textAlign = 'left';
-    g.fillText(APPS.find((a) => a.id === win.id)?.title ?? '', x + 9, y + 11);
-    g.fillStyle = 'rgba(255,255,255,0.3)';
-    g.fillRect(x, y + 20, w, 1);
+    g.fillText(APPS.find((a) => a.id === win.id)?.title ?? '', x + 22, y + 11.5);
     // Its insides, as a few soft bars (the monitor is across the room).
     g.fillStyle = 'rgba(255,255,255,0.45)';
     for (let i = 0; i < 3; i++) pane(g, x + 9, y + 30 + i * 13, w * (0.7 - i * 0.16), 6, 3);
@@ -91,11 +97,14 @@ export function paintDesktop(g: Pen, state: DesktopState, now: Date) {
     }
   }
   // The dock.
-  const dockW = APPS.length * 30 + 12;
-  g.fillStyle = 'rgba(255,255,255,0.24)';
-  pane(g, (W - dockW) / 2, H - (BAR_H * sy + 12), dockW, 26, 10);
+  const tile = 50 * sy,
+    gap = 10 * sx;
+  const dockW = APPS.length * (tile + gap) + gap,
+    dockY = H - (DOCK_H - 12) * sy;
+  g.fillStyle = 'rgba(255,255,255,0.22)';
+  pane(g, (W - dockW) / 2, dockY, dockW, tile + 20 * sy, 11);
   APPS.forEach((app, i) => {
-    g.fillStyle = state.windows.some((w) => w.id === app.id) ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.5)';
-    pane(g, (W - dockW) / 2 + 10 + i * 30, H - (BAR_H * sy + 12) + 6, 14, 14, 4);
+    g.fillStyle = state.windows.some((w) => w.id === app.id) ? paper.accent : 'rgba(255,255,255,0.5)';
+    pane(g, (W - dockW) / 2 + gap + i * (tile + gap), dockY + 8 * sy, tile, tile, tile * 0.3);
   });
 }

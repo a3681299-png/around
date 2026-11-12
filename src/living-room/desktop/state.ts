@@ -47,8 +47,8 @@ export interface DesktopState {
 }
 
 /** The bar at the top and the dock at the bottom keep clear of windows. */
-export const BAR_H = 44;
-export const DOCK_H = 84;
+export const BAR_H = 38;
+export const DOCK_H = 90;
 const MARGIN = 10;
 
 export const startDesktop = (viewport: readonly [number, number]): DesktopState => ({
@@ -77,17 +77,19 @@ function fit(win: DeskWindow, viewport: readonly [number, number]): DeskWindow {
 }
 
 /**
- * Where an app's window first opens. The resident's window opens low on the left, over the front
- * of the room's floor: a place the resident can walk up to and put a hand on.
+ * Where an app's window first opens: along the sides, as widgets sit on a desktop, so that the
+ * middle of the room (where the resident lives) stays clear. The resident's own card is low on
+ * the left, over the front of the floor: a place it can walk up to and put a hand on.
  */
 function firstPlace(id: AppId, viewport: readonly [number, number]): { x: number; y: number } {
   const [vw, vh] = viewport;
-  if (id === 'resident') return { x: vw * 0.2, y: vh * 0.48 };
+  if (id === 'resident') return { x: vw * 0.035, y: vh * 0.46 };
   // The ball drops in over the middle of the floor.
-  if (id === 'ball') return { x: vw * 0.47, y: vh * 0.56 };
-  // The others open in the upper corners, clear of the middle of the room.
-  if (id === 'ambience') return { x: vw, y: 0 };
-  return { x: 0, y: 0 };
+  if (id === 'ball') return { x: vw * 0.47, y: vh * 0.58 };
+  // The wallpapers on the right; the mirror up beside the clock.
+  if (id === 'ambience') return { x: vw, y: vh * 0.1 };
+  // (Left of the wallpapers' card with room to spare, on a narrow screen too.)
+  return { x: Math.min(vw * 0.27, vw - 770), y: 0 };
 }
 
 export type DesktopAction =

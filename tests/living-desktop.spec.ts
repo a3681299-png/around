@@ -42,6 +42,33 @@ test('an app opens once: asking again brings it to the front; focus follows the 
   expect(s.windows.map((w) => w.id).sort()).toEqual(['ambience', 'mirror']);
 });
 
+test('windows first open along the sides: the middle of the room, where the resident lives, stays clear', () => {
+  for (const viewport of [
+    [1280, 720],
+    [1920, 1080],
+    [1024, 768],
+  ] as const) {
+    const s = run(
+      startDesktop(viewport),
+      { type: 'open' },
+      { type: 'app', id: 'ambience' },
+      { type: 'app', id: 'mirror' },
+    );
+    // (The view's middle, a little below centre: the floor in front of the desk.)
+    const [mx, my] = [viewport[0] / 2, viewport[1] * 0.56];
+    for (const w of s.windows)
+      expect(mx > w.x && mx < w.x + w.w && my > w.y && my < w.y + w.h, `${w.id} at ${viewport.join('x')}`).toBe(false);
+    // And no two of them open on top of each other.
+    for (const a of s.windows)
+      for (const b of s.windows)
+        if (a.id < b.id)
+          expect(
+            a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h,
+            `${a.id} over ${b.id} at ${viewport.join('x')}`,
+          ).toBe(false);
+  }
+});
+
 test('a window can be dragged anywhere but never out of reach: its whole frame stays between the bar and the dock', () => {
   let s = run(start(), { type: 'open' });
   for (const [x, y] of [

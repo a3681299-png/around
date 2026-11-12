@@ -73,6 +73,12 @@ const GAIN = { screen: 2.6, ui: 1.5, uiBody: 2.4, screenBody: 1.1, pool: 0.3, ba
 const FACE = 1.5;
 /** How hard the resident sends a thing off (CSS pixels a second). */
 const SHOVE = { nudge: 150, push: 980, pull: -560, bat: 1350 };
+/** Where the desktop's panes hang in the room (metres toward the viewer from its middle). */
+const PANE_Z = 1.2;
+/** Heights a hand can meet a thing at, as shares of the shoulder's height: the easy ones first. */
+const REACH = [0.86, 1.08, 0.64, 1.26, 0.46];
+/** Depths of the room (metres from its middle toward the viewer) a seat on a window is tried at. */
+const PERCH_DEPTHS = [0.4, -0.3, 1.0, -0.9, 1.6, -1.5, 2.1, -2.1];
 /** A thing passing this fast over the resident startles it. */
 const WHOOSH = 900;
 
@@ -172,14 +178,27 @@ export function startRoomDesktop(env: DesktopEnv): Desktop {
   // --- screen ↔ room ---------------------------------------------------------------------------
   const ray = new Raycaster();
   const ndc = new Vector2();
-  /** Where a point of the screen is in the room at a height above the floor (along the view). */
-  const under = (x: number, y: number, height: number) => {
+  const sight = (x: number, y: number) => {
     ndc.set((x / window.innerWidth) * 2 - 1, 1 - (y / window.innerHeight) * 2);
     ray.setFromCamera(ndc, camera);
-    const { origin, direction } = ray.ray;
-    if (direction.y > -1e-4) return undefined;
+    return ray.ray;
+  };
+  /**
+   * Where a point of the screen is in the room at a height above the floor, along the line of
+   * sight. The view is level, from eye height: below the eye the line comes down to that height,
+   * above it the line climbs to it.
+   */
+  const under = (x: number, y: number, height: number) => {
+    const { origin, direction } = sight(x, y);
+    if (Math.abs(direction.y) < 1e-4) return undefined;
     const t = (env.floorY + height - origin.y) / direction.y;
     return t > 0 ? origin.clone().addScaledVector(direction, t) : undefined;
+  };
+  /** Where a point of the screen is on the upright plane the desktop's panes hang in. */
+  const onPane = (x: number, y: number) => {
+    const { origin, direction } = sight(x, y);
+    if (direction.z > -1e-4) return undefined;
+    return origin.clone().addScaledVector(direction, (PANE_Z - origin.z) / direction.z);
   };
   const inRoom = (p: Vector3 | undefined, margin = 0): p is Vector3 =>
     Boolean(p) && Math.abs(p!.x) < 2.9 + margin && Math.abs(p!.z) < 2.6 + margin;
@@ -192,33 +211,45 @@ export function startRoomDesktop(env: DesktopEnv): Desktop {
     const body = resident!.metrics();
     const from = resident!.state().mover;
     const thing: StageThing = { speed: view.speed(win.id), held: view.held(win.id) };
+    // A hand can be anywhere from the waist to a stretch above the head: the place on the floor
+    // from which it meets the thing is searched over those heights (the easy ones first).
     if (win.id === 'ball') {
-      const p = under(win.x + win.w / 2, win.y + win.h / 2, body.shoulderHeight * 0.8);
-      if (inRoom(p)) thing.hand = [p.x, p.y, p.z];
+      for (const k of REACH) {
+        const p = under(win.x + win.w / 2, win.y + win.h / 2, body.shoulderHeight * k);
+        if (!inRoom(p)) continue;
+        thing.hand = [p.x, p.y, p.z];
+        break;
+      }
       return thing;
     }
     // A hand comes to the nearest place just outside the frame (its bottom, the lower sides).
     let best = Infinity;
-    for (const [x, y] of edgeSamples({ left: win.x, top: win.y, right: win.x + win.w, bottom: win.y + win.h }, 10)) {
-      const p = under(x, y, body.shoulderHeight * 0.86);
-      if (!inRoom(p)) continue;
-      const far = Math.hypot(p.x - from.x, p.z - from.z);
-      if (far < best) {
-        best = far;
-        thing.hand = [p.x, p.y, p.z];
+    for (const [x, y] of edgeSamples({ left: win.x, top: win.y, right: win.x + win.w, bottom: win.y + win.h }, 10))
+      for (const k of REACH) {
+        const p = under(x, y, body.shoulderHeight * k);
+        if (!inRoom(p)) continue;
+        const far = Math.hypot(p.x - from.x, p.z - from.z);
+        if (far < best) {
+          best = far;
+          thing.hand = [p.x, p.y, p.z];
+        }
       }
-    }
-    // It sits on the middle of the top edge, facing the viewer. Along the line of sight through
-    // that point the seat is taken as low as is still over the room's floor (higher is nearer the
-    // viewer): a window low on the screen is a hop up, one high on it a great leap.
-    for (let k = 0.62; k <= 2.4 && !thing.perch; k += 0.16) {
-      const seat = under(win.x + win.w / 2, win.y - 2, body.height * k);
-      if (inRoom(seat, -0.35))
+    // It sits on the middle of the top edge, facing the viewer. The seat is somewhere on the line
+    // of sight through that point: the depths of the room are tried from its middle outward, and
+    // the first where the line is at a height it can jump to is taken (a window low on the screen
+    // is a hop up, one high on it a great leap).
+    const { origin, direction } = sight(win.x + win.w / 2, win.y - 2);
+    if (direction.z < -1e-4)
+      for (const z of PERCH_DEPTHS) {
+        const seat = origin.clone().addScaledVector(direction, (z - origin.z) / direction.z);
+        const up = (seat.y - env.floorY) / body.height;
+        if (up < 0.6 || up > 2.5 || !inRoom(seat, -0.35)) continue;
         thing.perch = {
           at: [seat.x, seat.y, seat.z],
           heading: Math.atan2(camera.position.x - seat.x, camera.position.z - seat.z),
         };
-    }
+        break;
+      }
     return thing;
   };
   const stage = (): StageView => {
@@ -329,8 +360,9 @@ export function startRoomDesktop(env: DesktopEnv): Desktop {
         const win = amount > 0.01 ? state.windows[i] : undefined;
         const shadow = shadows[i]!;
         const cx = win ? win.x + win.w / 2 : 0;
-        const hang = win && under(cx, win.y + win.h / 2, 1.05);
-        if (!win || !inRoom(hang, 1.2)) {
+        // The panes hang upright in the front of the room: that is where this one's light is.
+        const hang = win && onPane(cx, win.y + win.h / 2);
+        if (!win || !hang || Math.abs(hang.x) > 4.2 || hang.y > env.floorY + 3.4 || hang.y < env.floorY - 0.4) {
           glow.off(i + 1);
           shadow.visible = false;
           continue;
@@ -351,14 +383,15 @@ export function startRoomDesktop(env: DesktopEnv): Desktop {
           windowLamp.color.copy(accent);
           windowLamp.intensity = GAIN.poolBody * amount;
         }
-        const foot = under(cx, win.y + win.h, 0);
-        const across = under(cx + 100, win.y + win.h, 0);
-        if (inRoom(foot) && across) {
-          const metres = (foot.distanceTo(across) / 100) * win.w;
+        // Its shadow lies on the floor straight under it, fainter the higher it hangs.
+        const across = onPane(cx + 100, win.y + win.h / 2);
+        const high = (hang.y - env.floorY) / 3;
+        if (Math.abs(hang.x) < 2.9 && across && high < 1) {
+          const metres = (hang.distanceTo(across) / 100) * win.w;
           shadow.visible = true;
-          shadow.position.set(foot.x, env.floorY + 0.045, foot.z);
-          shadow.scale.set(metres * 1.1, metres * (ball ? 1.1 : 0.5), 1);
-          (shadow.material as MeshBasicMaterial).opacity = (ball ? 0.5 : 0.36) * amount;
+          shadow.position.set(hang.x, env.floorY + 0.045, hang.z);
+          shadow.scale.set(metres * 1.15, metres * (ball ? 1.15 : 0.42), 1);
+          (shadow.material as MeshBasicMaterial).opacity = (ball ? 0.5 : 0.38) * (1 - 0.7 * Math.max(0, high)) * amount;
         } else shadow.visible = false;
       }
 

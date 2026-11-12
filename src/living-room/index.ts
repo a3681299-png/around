@@ -3,6 +3,7 @@
 // vertex colours for the rest), so the page draws only when something changes.
 import {
   ACESFilmicToneMapping,
+  Box3,
   Color,
   Raycaster,
   LoadingManager,
@@ -32,6 +33,7 @@ import { loadLivingResident, type LivingResident } from './resident';
 import { softSurface } from './soft-surface';
 import { screenGlow, type GlowKind } from './screen-glow';
 import { startRoomDesktop } from './desktop';
+import { enclose } from './enclose';
 
 declare const __WW_LIVING_TEST__: boolean;
 declare const __WW_LIVING_CHARACTER__: boolean;
@@ -49,8 +51,15 @@ interface RoomManifest {
   aspect: number;
 }
 
-/** What the camera looks at (the middle of the room, a little above the floor), in the room's metres. */
-const SUBJECT = new Vector3(-0.05, 0.85, -0.35);
+/**
+ * The view (docs/living-shell.md): from the open front of the room at eye height, looking in, as
+ * someone standing in the doorway sees it. (The room file's own camera looks down on the room
+ * from a corner: a model on a table. This one puts the viewer in the room, behind the desktop's
+ * glass.) Metres in the room; the angle is the vertical one at 16:9 and wider.
+ */
+const VIEW = { position: new Vector3(0.1, 1.7, 5.6), fov: 42, aspect: 16 / 9 };
+/** What the camera looks at: the far half of the room, at about the resident's head. */
+const SUBJECT = new Vector3(-0.05, 0.95, -1);
 const BACKGROUND = 0x0b1835;
 
 async function start() {
@@ -125,6 +134,8 @@ async function start() {
     return material;
   };
   const soft: Mesh[] = [];
+  const shell = new Box3();
+  gltf.scene.updateMatrixWorld(true);
   const kinds = new Map<MeshBasicMaterial, GlowKind>();
   gltf.scene.traverse((object) => {
     if (/^(navmesh_|marker_|occluder_|shadow_)/.test(object.name)) {
@@ -136,6 +147,8 @@ async function start() {
     if (mesh.name.startsWith('pbr_')) return;
     // A multi-material mesh arrives as several meshes whose names start with the object's name.
     const map = mesh.name.startsWith(manifest.lightmapMesh) ? lightmap : null;
+    // (The big baked surfaces are the room's walls and floor: their box is the room's shell.)
+    if (map) shell.expandByObject(mesh);
     const source = mesh.material as MeshStandardMaterial;
     // The room's soft things (by the material's name in the room file) give under a body.
     if (/^(duvet|sheet|throw|pillow|beanbag|rug_|floor_shade)/.test(source.name)) soft.push(mesh);
@@ -164,6 +177,8 @@ async function start() {
     for (const mesh of reflective) mesh.visible = true;
   }
   const layout = readLayout(gltf.scene);
+  // Seen from inside, the cutaway room needs the wall and the ceiling it was made without.
+  if (!shell.isEmpty()) scene.add(...enclose(shell, layout.floorY));
   // A character only where the build was given one (a local folder, never a public build).
   let resident: LivingResident | undefined;
   // Light that changes at run time: the baked layers (the desktop's glow, the monitor) and small
@@ -176,13 +191,9 @@ async function start() {
   if (__WW_LIVING_CHARACTER__)
     resident = await loadLivingResident(scene, base, layout, softSurface(soft), { root: gltf.scene, glow });
 
-  const authored = gltf.cameras.find((c) => c.name === manifest.camera || c.parent?.name === manifest.camera) as
-    PerspectiveCamera | undefined;
-  if (!authored) throw new Error('部屋のカメラがありません。');
-  authored.updateWorldMatrix(true, false);
-  const home = authored.getWorldPosition(new Vector3());
-  const camera = new PerspectiveCamera(authored.fov, manifest.aspect, 0.1, 80);
-  const authoredTan = Math.tan((authored.fov * Math.PI) / 360);
+  const home = VIEW.position.clone();
+  const camera = new PerspectiveCamera(VIEW.fov, VIEW.aspect, 0.1, 80);
+  let authoredTan = Math.tan((VIEW.fov * Math.PI) / 360);
 
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
@@ -214,7 +225,7 @@ async function start() {
     front.height = canvas.height;
     camera.aspect = width / height;
     // Wider than authored: keep the height. Narrower: keep the width, so the room is never cut.
-    const tan = camera.aspect >= manifest.aspect ? authoredTan : (authoredTan * manifest.aspect) / camera.aspect;
+    const tan = camera.aspect >= VIEW.aspect ? authoredTan : (authoredTan * VIEW.aspect) / camera.aspect;
     camera.fov = (Math.atan(tan) * 360) / Math.PI;
     camera.updateProjectionMatrix();
     wake();
@@ -433,6 +444,14 @@ async function start() {
         closeUp: (scale: number) => {
           closeUp = Math.min(1, Math.max(0, scale));
           wake();
+        },
+        /** Tries another view of the room: where the camera is, what it looks at, its vertical angle. */
+        view: (position: [number, number, number], target: [number, number, number], fov: number) => {
+          home.fromArray(position);
+          SUBJECT.fromArray(target);
+          reviewSubject.fromArray(target);
+          authoredTan = Math.tan((fov * Math.PI) / 360);
+          resize();
         },
         triangles: () => renderer.info.render.triangles,
         still: () => {

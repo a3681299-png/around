@@ -51,7 +51,7 @@ import { phoneProp, PHONE_SIZE } from './phone-prop';
 import { startDirector, stepDirector, type Orders, type StageAct, type StageView } from './director';
 import { emoteBubble } from './emote';
 import type { Vec3 } from '../characters/two-bone-ik';
-import { standPoint, type RoomLayout } from '../world/room-life';
+import { standPoint, walkable, type RoomLayout } from '../world/room-life';
 
 interface CharacterManifest {
   vrm: string;
@@ -88,7 +88,16 @@ export interface LivingResident {
   /** Where its chest is (the room's metres): what a pointer or a flying window is near. */
   chest(): Vec3;
   /** What it is doing and how it is, in words and numbers (the desktop's own window shows it). */
-  readout(): { says: string; mood: string; energy: number; boredom: number; curiosity: number; social: number };
+  readout(): {
+    says: string;
+    mood: string;
+    /** The mood's name in the code (the desktop colours its signs of the resident by it). */
+    feeling: string;
+    energy: number;
+    boredom: number;
+    curiosity: number;
+    social: number;
+  };
   state(): ApproachState & { target: Vec3 | undefined };
   /** What the life is doing (the test hook and the recordings). */
   life(): {
@@ -403,14 +412,19 @@ export async function loadLivingResident(
     return y;
   };
   /** Where it knocks on the screen from inside: out from the front of the room, toward the viewer. */
+  let glass: Vec3 | undefined;
   const knockAt = (camera: Camera): Vec3 => {
+    if (glass) return glass;
     const stand = front ? standPoint(layout, front) : ([0, 0] as [number, number]);
     const toward = p1.set(camera.position.x - stand[0], 0, camera.position.z - stand[1]).normalize();
-    return [
-      stand[0] + toward.x * 0.36 * scale,
-      layout.floorY + body.metrics.shoulderHeight * 1.04,
-      stand[1] + toward.z * 0.36 * scale,
-    ];
+    // The glass is just past the last of the floor on the way to the viewer: the only places a
+    // hand reaches it from are on the room's side of it, so it knocks facing out.
+    let edge = 0;
+    while (edge < 4 && walkable(layout, stand[0] + toward.x * (edge + 0.1), stand[1] + toward.z * (edge + 0.1)))
+      edge += 0.1;
+    const out = edge + body.metrics.arm * 0.55;
+    glass = [stand[0] + toward.x * out, layout.floorY + body.metrics.shoulderHeight * 1.04, stand[1] + toward.z * out];
+    return glass;
   };
 
   return {
@@ -692,6 +706,7 @@ export async function loadLivingResident(
       return {
         says: orders?.says ?? 'じっとしている',
         mood: orders ? MOODS[orders.mood] : '',
+        feeling: orders?.mood ?? 'calm',
         energy: mind.energy,
         boredom: mind.boredom,
         curiosity: mind.curiosity,
