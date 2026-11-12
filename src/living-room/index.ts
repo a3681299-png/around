@@ -38,6 +38,8 @@ interface RoomManifest {
   lightScale: number;
   lightmap: string;
   lightmapMesh: string;
+  /** Models that keep their own colour texture; their vertex colours hold baked light only. */
+  texturedMesh?: string;
   camera: string;
   aspect: number;
 }
@@ -77,18 +79,24 @@ async function start() {
   // New rooms bake colour and light together; older manifests still multiply their base colour.
   // Light sources keep their own colour (above 1, so they bloom).
   const made = new Map<string, MeshBasicMaterial>();
-  const unlit = (source: MeshStandardMaterial, lit: boolean, baked: boolean, map: Texture | null) => {
-    const key = `${source.uuid}:${lit}:${baked}:${map ? 1 : 0}`;
+  const unlit = (source: MeshStandardMaterial, lit: boolean, baked: boolean, map: Texture | null, textured = false) => {
+    const key = `${source.uuid}:${lit}:${baked}:${map ? 1 : 0}:${textured}`;
     let material = made.get(key);
     if (!material) {
       const glow = source.emissive.r + source.emissive.g + source.emissive.b > 0 && source.emissiveIntensity > 0;
-      const color = glow
-        ? source.emissive.clone().multiplyScalar(source.emissiveIntensity * 0.55)
-        : (baked && manifest.bakedColor ? new Color(0xffffff) : source.color.clone()).multiplyScalar(
-            baked ? manifest.lightScale : 1,
-          );
+      // Textured models: their own colour texture times the baked light in the vertex colours,
+      // which is stored divided by lightScale like the rest of the room.
+      const color = textured
+        ? new Color(0xffffff).multiplyScalar(manifest.lightScale)
+        : glow
+          ? source.emissive.clone().multiplyScalar(source.emissiveIntensity * 0.55)
+          : (baked && manifest.bakedColor ? new Color(0xffffff) : source.color.clone()).multiplyScalar(
+              baked ? manifest.lightScale : 1,
+            );
       // Thin window panes and curtains keep the sidedness authored in the room file.
-      const artwork = map ?? (baked ? null : glow ? (source.emissiveMap ?? source.map) : source.map);
+      const artwork = textured
+        ? source.map
+        : (map ?? (baked ? null : glow ? (source.emissiveMap ?? source.map) : source.map));
       material = new MeshBasicMaterial({ color, map: artwork, vertexColors: lit, side: source.side });
       made.set(key, material);
     }
@@ -108,7 +116,8 @@ async function start() {
     const source = mesh.material as MeshStandardMaterial;
     // The room's soft things (by the material's name in the room file) give under a body.
     if (/^(duvet|sheet|throw|beanbag|rug_|floor_shade)/.test(source.name)) soft.push(mesh);
-    mesh.material = unlit(source, mesh.geometry.hasAttribute('color'), mesh.name.startsWith('static_'), map);
+    const textured = !!manifest.texturedMesh && mesh.name.startsWith(manifest.texturedMesh);
+    mesh.material = unlit(source, mesh.geometry.hasAttribute('color'), mesh.name.startsWith('static_'), map, textured);
   });
   // The actual baked room supplies reflections in the small glass and metal objects. This is
   // captured once, so the room's still frame and its ordinary animation loop stay inexpensive.

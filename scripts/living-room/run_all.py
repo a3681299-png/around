@@ -50,7 +50,7 @@ except Exception as _error:
     print('no GPU setup:', _error)
 
 for _part in ('lib.py', 'reference_common.py', 'reference_shell.py', 'reference_storage.py',
-              'reference_desk.py', 'reference_bed.py', 'reference_props.py',
+              'reference_desk.py', 'reference_bed.py', 'reference_props.py', 'reference_models.py',
               'reference_lighting.py', 'reference_meta.py'):
     wwrun(_part)
 

@@ -1,0 +1,63 @@
+{
+  "browser": "Playwright Chromium (.work/browsers)",
+  "displayRefreshHz": 144,
+  "viewport": [1440, 1080],
+  "device": "Windows laptop, Intel Core i7-13650HX, headed and off screen",
+  "scenario": "Same page code; room data before (8e7508e) and with the Tripo models. No resident. Ready time, 2 s idle (extra draws), then 2 s pointer orbit. Two alternating pairs: a short look, not a verdict.",
+  "files": {
+    "previous": {
+      "roomGlb": 16262724,
+      "lightmap": 3533765
+    },
+    "models": {
+      "roomGlb": 11214100,
+      "lightmap": 3434801
+    }
+  },
+  "results": [
+    {
+      "pair": 1,
+      "kind": "previous",
+      "readyMs": 1242,
+      "idleExtraDraws": 0,
+      "frames": 144,
+      "intervalMs": 13.86,
+      "worstIntervalMs": 100,
+      "drawMs": 2,
+      "errors": 0
+    },
+    {
+      "pair": 1,
+      "kind": "models",
+      "readyMs": 1262,
+      "idleExtraDraws": 0,
+      "frames": 150,
+      "intervalMs": 13.28,
+      "worstIntervalMs": 27.7,
+      "drawMs": 1.67,
+      "errors": 0
+    },
+    {
+      "pair": 2,
+      "kind": "models",
+      "readyMs": 1330,
+      "idleExtraDraws": 0,
+      "frames": 135,
+      "intervalMs": 14.81,
+      "worstIntervalMs": 27.8,
+      "drawMs": 2.03,
+      "errors": 0
+    },
+    {
+      "pair": 2,
+      "kind": "previous",
+      "readyMs": 1125,
+      "idleExtraDraws": 0,
+      "frames": 154,
+      "intervalMs": 13.08,
+      "worstIntervalMs": 20.9,
+      "drawMs": 1.99,
+      "errors": 0
+    }
+  ]
+}

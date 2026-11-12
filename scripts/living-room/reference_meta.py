@@ -3,23 +3,28 @@ C=wipe('meta_marks')
 def marker(name,loc,face):
     o=bpy.data.objects.new(name,None);o.empty_display_type='ARROWS';o.empty_display_size=.2
     o.location=loc;o.rotation_euler=(0,0,math.atan2(face[0],-face[1]));C.objects.link(o)
-marker('marker_sit_chair',(-.48,.66,.57),(0,1))
+marker('marker_sit_chair',(-.45,.72,.55),(0,1))
 marker('marker_sit_bed',(1.43,.83,.68),(-1,0))
-marker('marker_sit_floor',(-.75,-.70,.14),(.3,1))
+marker('marker_sit_floor',(-1.25,-.70,.14),(.3,1))
 marker('marker_hide_chair',(-1.04,.67,0),(0,-1))
-marker('marker_hide_trolley',(1.52,-1.30,0),(-1,-.2))
-marker('marker_stand_window',(-1.12,1.05,0),(0,1))
+# The body needs 0.14 m on every side of a spot (src/world/room-life.ts BODY_M): the trolley
+# and guitar spots sit in the 0.4 m lane between the trolley and the amplifier.
+marker('marker_hide_trolley',(1.80,-1.30,0),(-1,-.2))
+marker('marker_stand_window',(-1.10,.84,0),(0,1))
 marker('marker_stand_shelf',(-1.94,.10,0),(-1,0))
 # Keep the established demonstration's UI behind the initial resident, with clear floor ahead.
-marker('marker_stand_center',(.40,-.35,0),(1,-1))
+marker('marker_stand_center',(.62,-.30,0),(1,-1))
 marker('marker_stand_front',(-.25,-2.35,0),(0,-1))
-marker('marker_stand_guitar',(1.78,-1.07,0),(1,.2))
-OBST=[(-3,-1.55,-2.40,2.70),(-2.38,2.01,-1.52,2.70),
-      (-1.57,1.31,1.05,2.38),(-.85,.27,-.10,1.01),
+marker('marker_stand_guitar',(1.80,-.95,0),(1,.2))
+# Footprints (x0, y0, x1, y1) of the furniture, measured from the placed models
+# (reference_models.py) where they stand above the rug.
+OBST=[(-3,-1.55,-2.40,2.70),(-2.55,-1.25,-2.25,-.85),(-2.45,2.20,-1.40,2.70),
+      (-1.38,1.08,.78,2.70),(-.83,.30,-.07,1.13),
       (1.29,-.45,3,2.70),(.83,1.78,1.37,2.29),
-      (-1.61,-2.19,-.49,-1.07),(-.62,-.26,.18,.53),
-      (.68,-1.43,1.44,-.68),(.03,-2.54,.68,-1.94),
-      (2.30,-2.62,3,-1.65),(2.03,-1.52,2.90,-.45),
+      # the laptop only: the flat books and sketchbook on the rug can be stepped past
+      (-1.75,-2.65,-.45,-1.55),(-.35,-.95,.35,-.25),(-1.95,.33,-1.61,.67),
+      (.78,-1.70,1.60,-.90),(1.20,-2.70,3,-2.12),
+      (2.00,-1.45,2.90,-.45),
       (-2.96,-2.66,-2.35,-2.10)]
 CELL=.1;n=60;ny=54
 free=[[True]*n for _ in range(ny)]

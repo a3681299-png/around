@@ -20,7 +20,7 @@ SRC = ['shell', 'desk', 'bed', 'left', 'decor', 'right']
 for n in SRC:
     coll(n).hide_render = False
 dg = bpy.context.evaluated_depsgraph_get()
-groups = {'lm': [], 'vc': [], 'dyn': [], 'pbr': []}
+groups = {'lm': [], 'vc': [], 'dyn': [], 'pbr': [], 'tex': []}
 for n in SRC:
     for o in coll(n).objects:
         if o.type not in ('MESH', 'CURVE'):
@@ -43,7 +43,8 @@ for n in SRC:
         # new_from_object copies geometry only, so it otherwise restores opaque bake shadows.
         c.visible_shadow = o.visible_shadow
         BK.objects.link(c)
-        key = 'pbr' if o.name.startswith('pbr_') else 'dyn' if o.name.startswith('dyn_') else 'lm' if o.get('lm') else 'vc'
+        key = ('pbr' if o.name.startswith('pbr_') else 'dyn' if o.name.startswith('dyn_') else
+               'tex' if o.name.startswith('tex_') else 'lm' if o.get('lm') else 'vc')
         c['src'] = o.name
         groups[key].append(c)
 
@@ -81,7 +82,8 @@ lm = join(groups['lm'], 'static_lm')
 vc = join(groups['vc'], 'static_vc')
 em = join(dyn_rest, 'dyn_emissive')
 reflective = join(groups['pbr'], 'pbr_reflective') if groups['pbr'] else None
-print('tris lm/vc/em', *[sum(len(p.vertices) - 2 for p in o.data.polygons) for o in (lm, vc, em)])
+textured = join(groups['tex'], 'tex_models') if groups['tex'] else None
+print('tris lm/vc/em/tex', *[sum(len(p.vertices) - 2 for p in o.data.polygons) for o in (lm, vc, em, textured) if o])
 
 # hide the sources while baking so nothing is doubled
 for n in SRC:
@@ -247,6 +249,54 @@ arr[:, 3] = 1
 ca.data.foreach_set('color', arr.ravel())
 vc.data.update()
 
+
+def smooth_vertex_light(o, values, passes):
+    """Each vertex moves halfway to the mean of its neighbours, `passes` times."""
+    ev = np.zeros(len(o.data.edges) * 2, dtype=np.int32)
+    o.data.edges.foreach_get('vertices', ev)
+    ev = ev.reshape(-1, 2)
+    for _ in range(passes):
+        acc = np.zeros((len(values), 3), dtype=np.float64)
+        cnt = np.zeros(len(values), dtype=np.float64)
+        np.add.at(acc, ev[:, 0], values[ev[:, 1], :3])
+        np.add.at(acc, ev[:, 1], values[ev[:, 0], :3])
+        np.add.at(cnt, ev[:, 0], 1)
+        np.add.at(cnt, ev[:, 1], 1)
+        has = cnt > 0
+        values[has, :3] = (values[has, :3] + acc[has] / cnt[has, None]) / 2
+
+
+# --- light for the textured models ---
+# Light only (no colour pass): the web multiplies it by each model's own texture.
+if textured:
+    only(textured)
+    # Their glTF seams split vertices; weld so one corner is not lit twice.
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.select_all(action='SELECT')
+    bpy.ops.mesh.remove_doubles(threshold=1e-4)
+    bpy.ops.object.mode_set(mode='OBJECT')
+    for a in list(textured.data.color_attributes):
+        textured.data.color_attributes.remove(a)
+    ta = textured.data.color_attributes.new('Light', 'FLOAT_COLOR', 'POINT')
+    textured.data.color_attributes.active_color = ta
+    textured.data.color_attributes.render_color_index = 0
+    bs.use_pass_direct = bs.use_pass_indirect = True
+    bs.use_pass_color = False
+    bs.target = 'VERTEX_COLORS'
+    t = time.time()
+    bpy.ops.object.bake(type='DIFFUSE')
+    print('textured light baked s', round(time.time() - t, 1))
+    ta = textured.data.color_attributes['Light']
+    tarr = np.zeros(len(ta.data) * 4, dtype=np.float32)
+    ta.data.foreach_get('color', tarr)
+    tarr = tarr.reshape(-1, 4)
+    print('textured light max', float(tarr[:, :3].max()), 'mean', float(tarr[:, :3].mean()))
+    smooth_vertex_light(textured, tarr, 2)
+    tarr[:, :3] = np.clip(tarr[:, :3] / LIGHT_SCALE, 0, 1)
+    tarr[:, 3] = 1
+    ta.data.foreach_set('color', tarr.ravel())
+    textured.data.update()
+
 sc.cycles.sample_clamp_direct, sc.cycles.sample_clamp_indirect = clamps
 for name, v in metal.items():
     next(node for node in bpy.data.materials[name].node_tree.nodes if node.type == 'BSDF_PRINCIPLED').inputs['Metallic'].default_value = v
@@ -266,7 +316,7 @@ for obj in (lm, vc):
         obj.data.materials[i] = mat(original.name + '_baked', '#ffffff', 1.0)
 for o in bpy.context.selected_objects:
     o.select_set(False)
-exp = [lm, vc, em] + ([reflective] if reflective else []) + dyn_keep + [o for o in coll('meta_marks').objects] + [bpy.data.objects['camera_main']]
+exp = [lm, vc, em] + ([reflective] if reflective else []) + ([textured] if textured else []) + dyn_keep + [o for o in coll('meta_marks').objects] + [bpy.data.objects['camera_main']]
 nav = bpy.data.objects['navmesh_floor']
 for o in exp:
     o.hide_set(False)
@@ -286,7 +336,7 @@ BK.hide_render = True
 BK.hide_viewport = True
 cam = bpy.data.objects['camera_main']
 manifest = {'version': 1, 'bakedColor': True, 'lightScale': LIGHT_SCALE, 'lightmap': 'lightmap.png', 'lightmapMesh': 'static_lm',
-            'vertexLightMesh': 'static_vc', 'camera': 'camera_main',
+            'vertexLightMesh': 'static_vc', **({'texturedMesh': 'tex_models'} if textured else {}), 'camera': 'camera_main',
             'sensorWidth': cam.data.sensor_width, 'lens': cam.data.lens, 'aspect': sc.render.resolution_x / sc.render.resolution_y}
 # Keep generated JSON stable across Python, Prettier and Windows line endings.
 manifest = {key: int(value) if isinstance(value, float) and value.is_integer() else value for key, value in manifest.items()}
