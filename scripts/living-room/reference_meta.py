@@ -16,6 +16,42 @@ marker('marker_stand_shelf',(-1.94,.10,0),(-1,0))
 marker('marker_stand_center',(.62,-.30,0),(1,-1))
 marker('marker_stand_front',(-.25,-2.35,0),(0,-1))
 marker('marker_stand_guitar',(1.80,-.95,0),(1,.2))
+# Everyday life (docs/living-life.md). Not markers (the layout reader would take them for seats):
+# `pose_` empties the page reads by name. Where the resident lies on the bed (its chest; the
+# arrow is the way its head points), and where the phone is put down on the bed and on the desk.
+def clear_top(want, radius=.05, step=.02, search=.25, level=.01):
+    """A flat, clear spot on what is under `want` (x, y): the nearest point whose surface is level
+    for `radius` round it (the desk's clutter is not a place for a phone)."""
+    dg = bpy.context.evaluated_depsgraph_get()
+    sc = bpy.context.scene
+    def top(x, y):
+        # (From under the ceiling: the hidden light baffles sit just above the walls.)
+        hit, loc, *_ = sc.ray_cast(dg, Vector((x, y, 2.5)), Vector((0, 0, -1)))
+        return loc.z if hit else None
+    best = None
+    n = int(search / step)
+    for i in range(-n, n + 1):
+        for j in range(-n, n + 1):
+            x, y = want[0] + i * step, want[1] + j * step
+            z = top(x, y)
+            # On the furniture's top, not the floor beside it (want[2] is about how high it is).
+            if z is None or abs(z - want[2]) > .06:
+                continue
+            ring = [top(x + radius * math.cos(a), y + radius * math.sin(a)) for a in (0, 1.57, 3.14, 4.71)]
+            if any(r is None or abs(r - z) > level for r in ring):
+                continue
+            d = math.hypot(i, j)
+            if best is None or d < best[0]:
+                best = (d, (x, y, z))
+    return best[1] if best else (want[0], want[1], want[2])
+# Head to the pillows. The resident lands on its front and rolls onto its back: from the room's
+# camera (above the foot of the bed) the face then looks up into the phone's light. The phone is
+# put down by its right hand (on its back, toward +X).
+marker('pose_lie_bed',(1.95,1.42,on_duvet(1.95,1.42)),(0,1))
+marker('pose_phone_bed',(2.26,1.30,on_duvet(2.26,1.30)+.004),(0,1))
+# (The desk's flattest free top is its front right corner, by the right hand.)
+marker('pose_phone_desk',clear_top((.36,1.25,.70),level=.015),(0,-1))
+print('phone on the desk at', tuple(round(v,3) for v in bpy.data.objects['pose_phone_desk'].location))
 # Footprints (x0, y0, x1, y1) of the furniture, measured from the placed models
 # (reference_models.py) where they stand above the rug.
 OBST=[(-3,-1.55,-2.40,2.70),(-2.55,-1.25,-2.25,-.85),(-2.45,2.20,-1.40,2.70),

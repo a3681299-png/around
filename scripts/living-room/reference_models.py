@@ -116,6 +116,35 @@ def screen_panels(o):
     return sorted(out, key=lambda r: -r[4])
 
 
+def chair_keys(o):
+    """The chair's give as two shape keys, played by the page's springs (src/living-room/
+    chair-give.ts): `seat_sink` presses the cushion down where a body sits (deepest in the middle,
+    a slight swell at the rim), `back_recline` bends the backrest back about its hinge, more the
+    higher up (a flexing back, not a door). Coordinates are the chair model's own (front -Y)."""
+    me = o.data
+    if me.shape_keys:
+        o.shape_key_clear()
+    o.shape_key_add(name='Basis', from_mix=False)
+    sink = o.shape_key_add(name='seat_sink', from_mix=False)
+    back = o.shape_key_add(name='back_recline', from_mix=False)
+    hinge_y, hinge_z = .18, .58
+    tilt = math.radians(-13)
+    for i, v in enumerate(me.vertices):
+        x, y, z = v.co
+        # The cushion: inside the seat's outline, between the frame under it and the armrests.
+        if .40 < z < .62 and -.36 < y < .16 and abs(x) < .27:
+            r = min(1, math.hypot(x / .27, (y + .10) / .27))
+            depth = .040 * (1 - r * r) ** 1.5 - .004 * math.sin(math.pi * r) ** 2
+            sink.data[i].co = (x, y, z - depth * min(1, (z - .40) / .1))
+        if y > .08 and z > hinge_z + .03 and abs(x) < .29:
+            w = min(1, (z - hinge_z) / .35) ** 1.3
+            a = tilt * w
+            dy, dz = y - hinge_y, z - hinge_z
+            back.data[i].co = (x, hinge_y + dy * math.cos(a) - dz * math.sin(a), hinge_z + dy * math.sin(a) + dz * math.cos(a))
+    o['soft'] = 1
+
+
+chair_keys(MODEL_OBJECTS['chair'])
 PANELS = screen_panels(SCREEN_OBJECTS['workstation'])
 for _p in PANELS:
     print('screen panel', tuple(round(v, 3) for v in _p[0]), 'w', round(_p[1], 3), 'h', round(_p[2], 3), 'n', tuple(round(v, 2) for v in _p[3]), 'area', round(_p[4], 4))

@@ -70,5 +70,5 @@ def headphones(name,x,y,z,c):
 
 
 headphones('wall_headphones',1.93,2.60,1.82,C)
-headphones('bed_headphones',2.06,.49,.81,C)
+headphones('bed_headphones',2.47,.55,on_duvet(2.47,.55)+.14,C)
 print('reference props ready',len(C.objects),len(K.objects))

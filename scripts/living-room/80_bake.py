@@ -20,12 +20,17 @@ SRC = ['shell', 'desk', 'bed', 'left', 'decor', 'right']
 for n in SRC:
     coll(n).hide_render = False
 dg = bpy.context.evaluated_depsgraph_get()
-groups = {'lm': [], 'vc': [], 'dyn': [], 'pbr': [], 'tex': []}
+groups = {'lm': [], 'vc': [], 'dyn': [], 'pbr': [], 'tex': [], 'soft': []}
 for n in SRC:
     for o in coll(n).objects:
         if o.type not in ('MESH', 'CURVE'):
             continue
-        me = bpy.data.meshes.new_from_object(o.evaluated_get(dg), preserve_all_data_layers=True, depsgraph=dg)
+        if o.get('soft') and o.type == 'MESH' and o.data.shape_keys:
+            # A model that moves under the resident (the chair, docs/living-life.md) keeps its
+            # shape keys: copied as it is, not evaluated (that would bake the keys away).
+            me = o.data.copy()
+        else:
+            me = bpy.data.meshes.new_from_object(o.evaluated_get(dg), preserve_all_data_layers=True, depsgraph=dg)
         # Joining objects changes Blender's Generated coordinates to the combined room bounds.
         # Preserve each object's original coordinates so wood grain and woven grids keep scale.
         coordinates = np.empty(len(me.vertices) * 3, dtype=np.float32)
@@ -35,7 +40,7 @@ for n in SRC:
         generated = (coordinates - low) / np.maximum(high - low, 1e-8)
         attribute = me.attributes.new('BakeGenerated', 'FLOAT_VECTOR', 'POINT')
         attribute.data.foreach_set('vector', generated.ravel())
-        me.transform(o.matrix_world)
+        me.transform(o.matrix_world, shape_keys=True)
         if o.matrix_world.determinant() < 0:
             me.flip_normals()
         c = bpy.data.objects.new('b_' + o.name, me)
@@ -44,9 +49,19 @@ for n in SRC:
         c.visible_shadow = o.visible_shadow
         BK.objects.link(c)
         key = ('pbr' if o.name.startswith('pbr_') else 'dyn' if o.name.startswith('dyn_') else
+               'soft' if o.name.startswith('tex_') and o.get('soft') else
                'tex' if o.name.startswith('tex_') else 'lm' if o.get('lm') else 'vc')
         c['src'] = o.name
         groups[key].append(c)
+# Moving textured models are exported on their own, under their own names (tex_chair); the
+# source keeps its name under a `src_` prefix until the end (as the kept screens do below).
+soft_renamed = []
+for c in groups['soft']:
+    source = bpy.data.objects[c['src']]
+    source.name = 'src_' + c['src']
+    c.name = c['src']
+    c.data.name = c['src']
+    soft_renamed.append((source, c['src'], c))
 
 
 def join(objs, name):
@@ -268,34 +283,34 @@ def smooth_vertex_light(o, values, passes):
 
 # --- light for the textured models ---
 # Light only (no colour pass): the web multiplies it by each model's own texture.
-if textured:
-    only(textured)
+for lit in ([textured] if textured else []) + groups['soft']:
+    only(lit)
     # Their glTF seams split vertices; weld so one corner is not lit twice.
     bpy.ops.object.mode_set(mode='EDIT')
     bpy.ops.mesh.select_all(action='SELECT')
     bpy.ops.mesh.remove_doubles(threshold=1e-4)
     bpy.ops.object.mode_set(mode='OBJECT')
-    for a in list(textured.data.color_attributes):
-        textured.data.color_attributes.remove(a)
-    ta = textured.data.color_attributes.new('Light', 'FLOAT_COLOR', 'POINT')
-    textured.data.color_attributes.active_color = ta
-    textured.data.color_attributes.render_color_index = 0
+    for a in list(lit.data.color_attributes):
+        lit.data.color_attributes.remove(a)
+    ta = lit.data.color_attributes.new('Light', 'FLOAT_COLOR', 'POINT')
+    lit.data.color_attributes.active_color = ta
+    lit.data.color_attributes.render_color_index = 0
     bs.use_pass_direct = bs.use_pass_indirect = True
     bs.use_pass_color = False
     bs.target = 'VERTEX_COLORS'
     t = time.time()
     bpy.ops.object.bake(type='DIFFUSE')
-    print('textured light baked s', round(time.time() - t, 1))
-    ta = textured.data.color_attributes['Light']
+    print('textured light baked s', lit.name, round(time.time() - t, 1))
+    ta = lit.data.color_attributes['Light']
     tarr = np.zeros(len(ta.data) * 4, dtype=np.float32)
     ta.data.foreach_get('color', tarr)
     tarr = tarr.reshape(-1, 4)
     print('textured light max', float(tarr[:, :3].max()), 'mean', float(tarr[:, :3].mean()))
-    smooth_vertex_light(textured, tarr, 2)
+    smooth_vertex_light(lit, tarr, 2)
     tarr[:, :3] = np.clip(tarr[:, :3] / LIGHT_SCALE, 0, 1)
     tarr[:, 3] = 1
     ta.data.foreach_set('color', tarr.ravel())
-    textured.data.update()
+    lit.data.update()
 
 sc.cycles.sample_clamp_direct, sc.cycles.sample_clamp_indirect = clamps
 for name, v in metal.items():
@@ -316,7 +331,7 @@ for obj in (lm, vc):
         obj.data.materials[i] = mat(original.name + '_baked', '#ffffff', 1.0)
 for o in bpy.context.selected_objects:
     o.select_set(False)
-exp = [lm, vc, em] + ([reflective] if reflective else []) + ([textured] if textured else []) + dyn_keep + [o for o in coll('meta_marks').objects] + [bpy.data.objects['camera_main']]
+exp = [lm, vc, em] + ([reflective] if reflective else []) + ([textured] if textured else []) + groups['soft'] + dyn_keep +[o for o in coll('meta_marks').objects] + [bpy.data.objects['camera_main']]
 nav = bpy.data.objects['navmesh_floor']
 for o in exp:
     o.hide_set(False)
@@ -326,7 +341,12 @@ bpy.ops.export_scene.gltf(
     export_yup=True, export_cameras=True, export_extras=False, export_lights=False,
     export_texcoords=True, export_normals=True, export_materials='EXPORT', export_image_format='AUTO',
     export_vertex_color='ACTIVE', export_all_vertex_colors=False, export_active_vertex_color_when_no_material=True,
-    export_animations=False, export_skins=False, export_morph=False)
+    # Shape keys only on the moving models (the chair's give); positions only, no normals.
+    export_animations=False, export_skins=False, export_morph=True, export_morph_normal=False,
+    export_morph_tangent=False)
+for src, name, copy in soft_renamed:
+    copy.name = 'b_' + name
+    src.name = name
 for src, name, copy in renamed:
     copy.name = 'b_' + name
     src.name = name
@@ -336,7 +356,7 @@ BK.hide_render = True
 BK.hide_viewport = True
 cam = bpy.data.objects['camera_main']
 manifest = {'version': 1, 'bakedColor': True, 'lightScale': LIGHT_SCALE, 'lightmap': 'lightmap.png', 'lightmapMesh': 'static_lm',
-            'vertexLightMesh': 'static_vc', **({'texturedMesh': 'tex_models'} if textured else {}), 'camera': 'camera_main',
+            'vertexLightMesh': 'static_vc', **({'texturedMesh': 'tex_'} if textured or groups['soft'] else {}), 'camera': 'camera_main',
             'sensorWidth': cam.data.sensor_width, 'lens': cam.data.lens, 'aspect': sc.render.resolution_x / sc.render.resolution_y}
 # Keep generated JSON stable across Python, Prettier and Windows line endings.
 manifest = {key: int(value) if isinstance(value, float) and value.is_integer() else value for key, value in manifest.items()}

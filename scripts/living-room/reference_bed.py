@@ -54,8 +54,13 @@ for j in range(30):
     for i in range(50):bm.faces.new((grid[j][i],grid[j][i+1],grid[j+1][i+1],grid[j+1][i]))
 o=bm_object('checked_throw',bm,THROW,C);o['lm']=1
 plush('bed_cat',(2.49,1.75,.76),C,1.25)
-block('bed_closed_notebook',(.27,.20,.025),(1.9,.91,.754),C,INK,rot=(0,0,.2),bevel=.004)
-rod('bed_pen',(1.80,.84,.781),(2.02,.94,.781),.003,C,PALETTE[3])
+# The notebook on the far side of the duvet: the middle is where the resident lies
+# (pose_lie_bed, docs/living-life.md).
+def on_duvet(x,y):
+    return blanket_point((x-BX)/.88,(y+.41)/2.14)[2]
+NBX,NBY=2.47,1.78
+block('bed_closed_notebook',(.27,.20,.025),(NBX,NBY,on_duvet(NBX,NBY)+.016),C,INK,rot=(0,0,.2),bevel=.004)
+rod('bed_pen',(NBX-.1,NBY-.07,on_duvet(NBX,NBY)+.043),(NBX+.12,NBY+.03,on_duvet(NBX,NBY)+.043),.003,C,PALETTE[3])
 # Bedside chest and mushroom lamp: the one small warm pool in the blue room.
 NX,NY=1.10,2.03
 block('nightstand',(.49,.45,.49),(NX,NY,.29),C,PALETTE[0],bevel=.025)

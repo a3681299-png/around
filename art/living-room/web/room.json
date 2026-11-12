@@ -5,7 +5,7 @@
   "lightmap": "lightmap.png",
   "lightmapMesh": "static_lm",
   "vertexLightMesh": "static_vc",
-  "texturedMesh": "tex_models",
+  "texturedMesh": "tex_",
   "camera": "camera_main",
   "sensorWidth": 36,
   "lens": 65,
