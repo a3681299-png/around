@@ -1,6 +1,6 @@
-# Living Onboarding 引き継ぎ（2026-11-11、ノート PC → デスクトップ PC）
+# Living Onboarding 引き継ぎ（2026-11-12、ノート PC）
 
-現行の部屋の美術は **`codex/living-room-realism`**（`feat/living-onboarding` の `2db67c9` から）。詳細は [living-room-realism.md](living-room-realism.md) と末尾の「14」。ノート PC とデスクトップ PC のどちらでも続けられるように記録する。PC の運用は [dual-pc-workflow.md](dual-pc-workflow.md)、初版の美術は [living-room-art.md](living-room-art.md)。
+現行の部屋の美術は **`codex/living-room-reference`**（`codex/living-room-realism` の `1fa65a4` から）。翔太の新しい参考画像に合わせ、Blender MCP で夜の制作部屋を作成し、Web の表示を確認した。状態と再現手順は [living-room-night-reference.md](living-room-night-reference.md)。以前の出窓と植物の部屋は [living-room-realism.md](living-room-realism.md) と末尾の「14」に記録する。PC の運用は [dual-pc-workflow.md](dual-pc-workflow.md)、初版の美術は [living-room-art.md](living-room-art.md)。
 
 ## 1. 作品の目的
 
@@ -13,7 +13,7 @@ WWT をもとにした、コンテスト用の**独立した Web 作品**。3D �
 - **今回の対象外**：Chrome 拡張、YouTube 対応、汎用エディター。WWT 本体（拡張・`dist`・Playground）は壊さない
 - 過剰設計と新しい汎用基盤は避ける。美術の品質が機能の数より先（Parallax City の反省：簡素な物の大量の組み合わせでは目標の品質に届かなかった）
 
-## 2. 完成済みの部屋
+## 2. 前版の部屋（2026-11-11）
 
 6.0 × 5.4m の本体に奥行き 0.8m の三面の出窓。木と生成り、くすんだ緑を中心に、制作机と読書・睡眠の場所、植物、日用品を作り込んだ。奥と左が高い壁、右が腰の高さの切断面。詳しい美術・残りは [living-room-realism.md](living-room-realism.md)。
 
@@ -213,3 +213,13 @@ WW_LM_SIZE=4096 WW_SAMPLES=128 WW_VC_SAMPLES=128 WW_OUT=art/living-room/web \
 - 次は全景と机の近景を見て、美術の密度、色、さらに作り込みたい物を決める。初版の 4.8m 四方・青紫の夜という前提は使わない。
 - 実装 `2e55cb1` は GitHub へ push 済み。新しい sparse clone で LFS の 2 件を取得し、原本と SHA-256 が一致した。デスクトップの標準 LFS hook は送信を実行した。検証用 clone・ビルド・中間データは削除し、参照画像 4 枚と要約（計 3.47MB）を残した。
 - この専用ブランチは CI の push 対象外のため、Actions は起動していない。手元では型チェック・lint・unit 666 件（2 件スキップ）が通過。作業ブランチへの取り込みはまだ行っていない。
+
+## 15. モニターの光で照らされた制作部屋（2026-11-12、ノート PC）
+
+星の旅は止め、翔太の新しい画像の部屋へ変更。作業ブランチは `codex/living-room-reference`、作業場所は `.work/living-room-reference`。Blender MCP で造形・照明・焼き込み・原本保存を行った。`reference_*.py` が今回の部品で、`run_all.py` が一括再生成する。旧番号スクリプトは前版の記録。
+
+- 左の収納、中央奥の三画面の制作机、右の寝床、手前の格子ラグ・丸テーブル・カート・リュック・楽器を配置。画面と青い照り返しを主役に、枕元だけ暖色を入れた。
+- `art/living-room/living-room.blend` と `web/` が現行。実画面は `renders/reference-*.png`。新規作成した小さな絵柄用の画像は `textures/studio-art-atlas.png`。参考画像と絵柄・小物が完全に同じという意味ではない。
+- 型チェック・lint・unit 665 件通過（3 件スキップ）。10 か所へ到達可。前版と今回のミルドによる動作検査はいずれも足滑りで失敗した。Felis はこの PC に変換済みの物がなく未検証。身体・行動のコードと判定は変更していない。
+- 中核の変更・DesignDocument の版上げなし。原本は圧縮保存し、依存物を共有した。確認用の完成ビルド以外の検証用データは整理する。
+- 次：全景と近景の美術レビュー。動作を再開するときは Felis のある環境で接地・席間の移動を確認する。詳細・同期状態は [living-room-night-reference.md](living-room-night-reference.md)。

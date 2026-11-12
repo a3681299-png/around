@@ -36,14 +36,14 @@ try {
   const view = process.env.WW_LIVING_VIEW;
   if (view) {
     const views = {
-      desk: { at: [-1.15, 1.35, -2.55], scale: 0.36 },
+      desk: { at: [-0.3, 1.25, -1.65], scale: 0.36 },
       bed: { at: [2.05, 0.65, -1.3], scale: 0.32 },
     };
     if (!views[view]) throw new Error('WW_LIVING_VIEW must be desk or bed.');
     await page.evaluate(({ at, scale }) => globalThis.__wwLivingRoom.reviewCamera(at, scale), views[view]);
   }
   await page.waitForTimeout(1200); // the canvas fades in over 0.6 s
-  await page.screenshot({ path: out });
+  await page.screenshot({ path: out, caret: 'initial' });
   const facts = await page.evaluate(() => {
     const room = globalThis.__wwLivingRoom;
     return {

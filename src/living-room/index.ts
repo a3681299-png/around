@@ -44,7 +44,7 @@ interface RoomManifest {
 
 /** What the camera looks at (the middle of the room, a little above the floor), in the room's metres. */
 const SUBJECT = new Vector3(-0.05, 0.85, -0.35);
-const BACKGROUND = 0x07071a;
+const BACKGROUND = 0x0b1835;
 
 async function start() {
   const canvas = document.querySelector<HTMLCanvasElement>('#room')!;
@@ -68,7 +68,7 @@ async function start() {
 
   const renderer = new WebGLRenderer({ canvas, antialias: true, powerPreference: 'low-power' });
   renderer.toneMapping = ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.3;
+  renderer.toneMappingExposure = 1.8;
   lightmap.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
   const scene = new Scene();
   scene.background = new Color(BACKGROUND);
@@ -83,12 +83,13 @@ async function start() {
     if (!material) {
       const glow = source.emissive.r + source.emissive.g + source.emissive.b > 0 && source.emissiveIntensity > 0;
       const color = glow
-        ? source.emissive.clone().multiplyScalar(source.emissiveIntensity)
+        ? source.emissive.clone().multiplyScalar(source.emissiveIntensity * 0.55)
         : (baked && manifest.bakedColor ? new Color(0xffffff) : source.color.clone()).multiplyScalar(
             baked ? manifest.lightScale : 1,
           );
       // Thin window panes and curtains keep the sidedness authored in the room file.
-      material = new MeshBasicMaterial({ color, map, vertexColors: lit, side: source.side });
+      const artwork = map ?? (baked ? null : glow ? (source.emissiveMap ?? source.map) : source.map);
+      material = new MeshBasicMaterial({ color, map: artwork, vertexColors: lit, side: source.side });
       made.set(key, material);
     }
     return material;
@@ -141,7 +142,7 @@ async function start() {
 
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
-  const bloom = new UnrealBloomPass(new Vector2(1, 1), 0.2, 0.55, 1.3);
+  const bloom = new UnrealBloomPass(new Vector2(1, 1), 0.13, 0.55, 1.8);
   composer.addPass(bloom);
   composer.addPass(new OutputPass());
 

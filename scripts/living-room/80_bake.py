@@ -10,11 +10,12 @@ OUT = globals().get('WW_OUT') or (WWD + '../../art/living-room/web/')
 LM_SIZE = globals().get('WW_LM_SIZE', 4096)
 SAMPLES = globals().get('WW_SAMPLES', 128)
 VC_SAMPLES = globals().get('WW_VC_SAMPLES', 128)
-LIGHT_SCALE = 4.0
+LIGHT_SCALE = 2.0  # More precision in this room's deep shadows; bright screens stay separate.
 os.makedirs(OUT, exist_ok=True)
 sc = bpy.context.scene
 BK = wipe('bake')
 BK.hide_render = False  # the last run left the baked copies hidden from renders
+BK.hide_viewport = False
 SRC = ['shell', 'desk', 'bed', 'left', 'decor', 'right']
 for n in SRC:
     coll(n).hide_render = False
@@ -25,6 +26,15 @@ for n in SRC:
         if o.type not in ('MESH', 'CURVE'):
             continue
         me = bpy.data.meshes.new_from_object(o.evaluated_get(dg), preserve_all_data_layers=True, depsgraph=dg)
+        # Joining objects changes Blender's Generated coordinates to the combined room bounds.
+        # Preserve each object's original coordinates so wood grain and woven grids keep scale.
+        coordinates = np.empty(len(me.vertices) * 3, dtype=np.float32)
+        me.vertices.foreach_get('co', coordinates)
+        coordinates = coordinates.reshape(-1, 3)
+        low, high = coordinates.min(axis=0), coordinates.max(axis=0)
+        generated = (coordinates - low) / np.maximum(high - low, 1e-8)
+        attribute = me.attributes.new('BakeGenerated', 'FLOAT_VECTOR', 'POINT')
+        attribute.data.foreach_set('vector', generated.ravel())
         me.transform(o.matrix_world)
         if o.matrix_world.determinant() < 0:
             me.flip_normals()
@@ -44,7 +54,8 @@ def join(objs, name):
     for o in objs:
         o.select_set(True)
     bpy.context.view_layer.objects.active = objs[0]
-    bpy.ops.object.join()
+    if len(objs) > 1:
+        bpy.ops.object.join()
     j = bpy.context.view_layer.objects.active
     j.name = name
     j.data.name = name
@@ -78,9 +89,18 @@ for n in SRC:
 
 # metals have no diffuse light to bake: bake them as plain surfaces, then put the values back
 metal = {}
+generated_links = []
 for m in bpy.data.materials:
     if m.use_nodes:
-        p = m.node_tree.nodes.get('Principled BSDF')
+        for node in list(m.node_tree.nodes):
+            if node.type == 'TEX_COORD' and node.outputs['Generated'].is_linked:
+                targets = [link.to_socket for link in node.outputs['Generated'].links]
+                attribute = m.node_tree.nodes.new('ShaderNodeAttribute')
+                attribute.attribute_name = 'BakeGenerated'
+                for target in targets:
+                    m.node_tree.links.new(attribute.outputs['Vector'], target)
+                generated_links.append((m, node, attribute, targets))
+        p = next((node for node in m.node_tree.nodes if node.type == 'BSDF_PRINCIPLED'), None)
         if p and p.inputs['Metallic'].default_value > 0:
             metal[m.name] = p.inputs['Metallic'].default_value
             p.inputs['Metallic'].default_value = 0
@@ -114,12 +134,28 @@ def only(o):
 
 # --- the lightmap ---
 only(lm)
+# Printed artwork samples its named ArtUV while irradiance is packed into LightUV.
+# Removing the source UV before the albedo pass would smear posters into the atlas.
 for uv in list(lm.data.uv_layers):
-    lm.data.uv_layers.remove(uv)
-lm.data.uv_layers.new(name='UVMap')
+    if uv.name != 'ArtUV':
+        lm.data.uv_layers.remove(uv)
+lm.data.uv_layers.new(name='LightUV')
+lm.data.uv_layers.active_index = len(lm.data.uv_layers) - 1
+lm.data.uv_layers.active.active_render = True
 bpy.ops.object.mode_set(mode='EDIT')
 bpy.ops.mesh.select_all(action='SELECT')
 bpy.ops.uv.smart_project(angle_limit=math.radians(66), island_margin=0.0, area_weight=0.0, correct_aspect=True, scale_to_bounds=False)
+bpy.ops.object.mode_set(mode='OBJECT')
+# Close views need more texels on patterned fabric and prints than on the dark backs of boards.
+# Keep one 4096 atlas instead of growing every surface to an 8192 texture.
+uv_data = lm.data.uv_layers.active.data
+for polygon in lm.data.polygons:
+    material = lm.data.materials[polygon.material_index]
+    factor = 3.0 if material.name.startswith('throw_checked') else 2.0 if material.name.startswith('pillow_stripes') else 1.6 if material.name.endswith('_ink') else 1.0
+    if factor != 1:
+        for loop_index in polygon.loop_indices:
+            uv_data[loop_index].uv *= factor
+bpy.ops.object.mode_set(mode='EDIT')
 bpy.ops.uv.pack_islands(margin=0.004, rotate=True)
 bpy.ops.object.mode_set(mode='OBJECT')
 img = bpy.data.images.get('ww_lightmap')
@@ -213,9 +249,21 @@ vc.data.update()
 
 sc.cycles.sample_clamp_direct, sc.cycles.sample_clamp_indirect = clamps
 for name, v in metal.items():
-    bpy.data.materials[name].node_tree.nodes['Principled BSDF'].inputs['Metallic'].default_value = v
+    next(node for node in bpy.data.materials[name].node_tree.nodes if node.type == 'BSDF_PRINCIPLED').inputs['Metallic'].default_value = v
+for material, original, attribute, targets in generated_links:
+    for target in targets:
+        material.node_tree.links.new(original.outputs['Generated'], target)
+    material.node_tree.nodes.remove(attribute)
 
 # --- export ---
+# Baked surfaces contain their complete appearance. Keep material names for the soft-surface
+# contract, but do not export their source textures or the now-redundant artwork UV channel.
+for uv in list(lm.data.uv_layers):
+    if uv.name != 'LightUV':
+        lm.data.uv_layers.remove(uv)
+for obj in (lm, vc):
+    for i, original in enumerate(obj.data.materials):
+        obj.data.materials[i] = mat(original.name + '_baked', '#ffffff', 1.0)
 for o in bpy.context.selected_objects:
     o.select_set(False)
 exp = [lm, vc, em] + ([reflective] if reflective else []) + dyn_keep + [o for o in coll('meta_marks').objects] + [bpy.data.objects['camera_main']]
@@ -226,7 +274,7 @@ for o in exp:
 bpy.ops.export_scene.gltf(
     filepath=OUT + 'room.glb', export_format='GLB', use_selection=True, export_apply=False,
     export_yup=True, export_cameras=True, export_extras=False, export_lights=False,
-    export_texcoords=True, export_normals=True, export_materials='EXPORT', export_image_format='NONE',
+    export_texcoords=True, export_normals=True, export_materials='EXPORT', export_image_format='AUTO',
     export_vertex_color='ACTIVE', export_all_vertex_colors=False, export_active_vertex_color_when_no_material=True,
     export_animations=False, export_skins=False, export_morph=False)
 for src, name, copy in renamed:
@@ -235,6 +283,7 @@ for src, name, copy in renamed:
 for n in SRC:
     coll(n).hide_render = False
 BK.hide_render = True
+BK.hide_viewport = True
 cam = bpy.data.objects['camera_main']
 manifest = {'version': 1, 'bakedColor': True, 'lightScale': LIGHT_SCALE, 'lightmap': 'lightmap.png', 'lightmapMesh': 'static_lm',
             'vertexLightMesh': 'static_vc', 'camera': 'camera_main',
@@ -245,3 +294,8 @@ with open(OUT + 'room.json', 'w', encoding='utf-8', newline='\n') as manifest_fi
     json.dump(manifest, manifest_file, indent=2)
     manifest_file.write('\n')
 print('exported', os.path.getsize(OUT + 'room.glb'), os.path.getsize(OUT + 'lightmap.png'))
+# MCP keeps this Python namespace alive. The saved PNG is enough; release working float atlases.
+if img.users == 0:
+    bpy.data.images.remove(img)
+for temporary in ('px', 'rgb', 'albedo', 'guide', 'light', 'enc', 'rgba', 'arr', 'coordinates', 'generated'):
+    globals().pop(temporary, None)

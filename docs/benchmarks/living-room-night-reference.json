@@ -1,0 +1,90 @@
+{
+  "browser": "153.0.8010.12",
+  "displayRefreshHz": 144,
+  "triangleMetricNote": "triangles is the renderer's last postprocessing pass, not the room mesh count; do not use it as a geometry measurement.",
+  "viewport": [1440, 1080],
+  "device": "Windows laptop, Intel Core i7-13650HX; GPU as reported by WebGL",
+  "scenario": "No resident. Idle for 2 s, then pointer orbit for 2 s. Two A/B pairs. Reference measurements, not a sustained-motion or GPU-time certification.",
+  "results": [
+    {
+      "pair": 1,
+      "kind": "previous",
+      "readyMs": 2294.3565,
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "triangles": 1,
+      "idleExtraDraws": 0,
+      "timing": {
+        "frames": 162,
+        "intervalMs": 12.385802469135802,
+        "worstIntervalMs": 27.900000000000546,
+        "bodyMs": 0.000617283948317722,
+        "drawMs": 1.5222222222314206
+      },
+      "taskMs": 377.996,
+      "scriptMs": 301.67199999999997,
+      "intervalMedianMs": 13.800000000000182,
+      "intervalP95Ms": 14.199999999999818,
+      "errors": []
+    },
+    {
+      "pair": 1,
+      "kind": "reference",
+      "readyMs": 592.1884000000009,
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "triangles": 1,
+      "idleExtraDraws": 0,
+      "timing": {
+        "frames": 163,
+        "intervalMs": 12.265644171779142,
+        "worstIntervalMs": 21.100000000000364,
+        "bodyMs": 0.0012269938661734019,
+        "drawMs": 1.2803680981149428
+      },
+      "taskMs": 336.217,
+      "scriptMs": 259.52799999999996,
+      "intervalMedianMs": 13.800000000000182,
+      "intervalP95Ms": 14.199999999999818,
+      "errors": []
+    },
+    {
+      "pair": 2,
+      "kind": "previous",
+      "readyMs": 479.6940999999988,
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "triangles": 1,
+      "idleExtraDraws": 0,
+      "timing": {
+        "frames": 162,
+        "intervalMs": 12.344444444444445,
+        "worstIntervalMs": 27.90000000000009,
+        "bodyMs": 0.000617283948317722,
+        "drawMs": 1.3567901235131294
+      },
+      "taskMs": 346.508,
+      "scriptMs": 271.35900000000004,
+      "intervalMedianMs": 13.800000000000182,
+      "intervalP95Ms": 14.199999999999818,
+      "errors": []
+    },
+    {
+      "pair": 2,
+      "kind": "reference",
+      "readyMs": 511.7032999999974,
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A78B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "triangles": 1,
+      "idleExtraDraws": 0,
+      "timing": {
+        "frames": 160,
+        "intervalMs": 12.499374999999997,
+        "worstIntervalMs": 20.900000000000546,
+        "bodyMs": 0.001249999995343387,
+        "drawMs": 1.3187500000349246
+      },
+      "taskMs": 331.901,
+      "scriptMs": 256.347,
+      "intervalMedianMs": 13.800000000000182,
+      "intervalP95Ms": 14.100000000000364,
+      "errors": []
+    }
+  ]
+}

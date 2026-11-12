@@ -1,4 +1,4 @@
-# Rebuilds the whole living room without Blender MCP (the desktop has none):
+# Rebuilds the reference room in Blender MCP, or with the same script headlessly:
 #   blender -b --python scripts/living-room/run_all.py
 # Environment (all optional):
 #   WW_SAVE=<path.blend>   save the built room here (default: art/living-room/living-room.blend)
@@ -30,6 +30,8 @@ for _o in list(bpy.data.objects):
     bpy.data.objects.remove(_o, do_unlink=True)
 for _c in list(bpy.data.collections):
     bpy.data.collections.remove(_c)
+# A rebuild in a live MCP session must not accumulate orphan meshes and packed images.
+bpy.data.orphans_purge(do_recursive=True)
 
 # Cycles on whatever GPU there is (the bake and the render need it); the CPU otherwise
 try:
@@ -47,7 +49,9 @@ try:
 except Exception as _error:
     print('no GPU setup:', _error)
 
-for _part in ('lib.py', '10_shell.py', '20_desk.py', '30_bed.py', '40_left.py', '50_decor.py', '55_right.py', '58_materials.py', '60_lights.py', '70_meta.py'):
+for _part in ('lib.py', 'reference_common.py', 'reference_shell.py', 'reference_storage.py',
+              'reference_desk.py', 'reference_bed.py', 'reference_props.py',
+              'reference_lighting.py', 'reference_meta.py'):
     wwrun(_part)
 
 _sc = bpy.context.scene
@@ -74,5 +78,5 @@ if os.environ.get('WW_SKIP_BAKE') != '1':
 for _o in bpy.data.collections['lighting_baffles'].objects:
     _o.hide_set(True)
 bpy.context.preferences.filepaths.save_version = 0
-bpy.ops.wm.save_as_mainfile(filepath=_save)
+bpy.ops.wm.save_as_mainfile(filepath=_save, compress=True)
 print('run_all done', _save)
