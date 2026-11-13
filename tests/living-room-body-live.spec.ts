@@ -55,6 +55,124 @@ async function perform(page: Page, frameRate: number) {
   return { gap, frames: await hook<Frame[]>(page, 'return room.resident.trace();') };
 }
 
+/**
+ * A calm walk across the room, at cruising pace. What reads as a heavy, stomping walk ("どしっ
+ * どしっ"): long strides at a slow beat, the hips riding high and dropping at each landing. A small
+ * body walks with short, quick steps and a light bob.
+ */
+async function calmWalk(page: Page) {
+  await page.reload();
+  await page.waitForFunction(
+    'globalThis.__wwLivingRoom?.resident && document.querySelector("#room[data-ready]")',
+    null,
+    { timeout: 90000 },
+  );
+  await hook(page, `room.still(); room.resident.live(false);`);
+  await page.waitForTimeout(800);
+  const phase = () => hook<string>(page, 'return room.resident.state().phase;');
+  // (From the desk to the far side: a long straight way, so there is a cruise to measure.)
+  await hook(page, 'room.resident.setTarget([-0.9, 0.95, -0.55]);');
+  await expect.poll(phase, { timeout: 20000, intervals: [50] }).toBe('hold');
+  // (The first thing touched, it lets go and stands again before the next one.)
+  await expect.poll(phase, { timeout: 20000, intervals: [50] }).toBe('idle');
+  await hook(page, 'room.resident.trace();');
+  await hook(page, 'room.resident.setTarget([1.2, 0.9, 1.0]);');
+  await expect.poll(phase, { timeout: 20000, intervals: [50] }).toBe('walk');
+  await expect.poll(phase, { timeout: 20000, intervals: [50] }).toBe('hold');
+  const height = await hook<number>(page, 'return room.resident.metrics().height;');
+  return { height, frames: await hook<Frame[]>(page, 'return room.resident.trace();') };
+}
+
+test('the living room: a calm walk is light, short quick steps and a small bob, not a stomp', async () => {
+  test.skip(
+    process.env.WW_LIVE_LIVING_BODY !== '1' || !process.env.WW_LIVING_CHARACTER || !process.env.WW_LIVING_MOTIONS,
+    'Explicit: WW_LIVE_LIVING_BODY=1 with WW_LIVING_CHARACTER and WW_LIVING_MOTIONS.',
+  );
+  test.setTimeout(240000);
+  execFileSync(process.execPath, ['scripts/build-living-room.mjs'], {
+    env: { ...process.env, WW_LIVING_TEST: '1', WW_LIVING_OUT: '.work/living-body-e2e' },
+    stdio: 'inherit',
+  });
+  const server = createPlaygroundServer(built);
+  await new Promise<void>((done) => server.listen(0, '127.0.0.1', () => done()));
+  const browser = await chromium.launch({
+    channel: 'chromium',
+    headless: false,
+    args: [
+      '--window-position=-4000,0',
+      '--disable-backgrounding-occluded-windows',
+      '--disable-features=CalculateNativeWinOcclusion',
+    ],
+  });
+  try {
+    const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+    const errors: string[] = [];
+    page.on('pageerror', (error) => errors.push(String(error)));
+    await page.goto(`http://127.0.0.1:${(server.address() as AddressInfo).port}/`);
+    const { height, frames } = await calmWalk(page);
+    const order = frames.map((f) => f.phase).filter((phase, i, all) => phase !== all[i - 1]);
+    expect(order, 'it walked over').toContain('walk');
+    const top = Math.max(...frames.map((f) => f.speed));
+    const cruise = frames.filter((f) => f.phase === 'walk' && f.speed > top * 0.9);
+    const seconds = cruise[cruise.length - 1]!.t - cruise[0]!.t;
+    expect(seconds, 'a cruise long enough to measure').toBeGreaterThan(1.2);
+    // The beat: feet put down a second. A body about a metre tall walks at well over 100 steps a
+    // minute (a person's 110, quicker for shorter legs); it was 76.
+    // (Timed from one landing to the next, of either foot: a count over a short cruise is all edges.)
+    const landings: number[] = [];
+    for (let i = 1; i < cruise.length; i++)
+      if ([0, 1].some((k) => !cruise[i - 1]!.feet[k]!.down && cruise[i]!.feet[k]!.down)) landings.push(cruise[i]!.t);
+    const gaps = landings
+      .slice(1)
+      .map((t, i) => t - landings[i]!)
+      .sort((a, b) => a - b);
+    expect(gaps.length, 'steps in the cruise').toBeGreaterThanOrEqual(2);
+    expect(1 / gaps[gaps.length >> 1]!, 'steps a second').toBeGreaterThan(1.75);
+    // The bob: the hips rise and fall a little with each step (a person's 4–5 cm in 170 cm: under
+    // 3% of the height); it was 5.5 cm in 105 (over 5%).
+    const hips = cruise.map((f) => f.joints.hips[1]);
+    expect((Math.max(...hips) - Math.min(...hips)) / height, 'the bob, a share of the height').toBeLessThan(0.032);
+    // No thud: the hips' vertical speed does not turn sharply (a drop that stops dead at a landing).
+    // Judged every 25 ms (frame to frame, the display's own unevenness is louder than the body),
+    // on the sharpest twentieth: 5.8 m/s² when it stomped, 3.5 as a light walk.
+    const thinned: Frame[] = [];
+    for (const f of cruise) if (!thinned.length || f.t - thinned[thinned.length - 1]!.t >= 0.025) thinned.push(f);
+    const turns: number[] = [];
+    for (let i = 2; i < thinned.length; i++) {
+      const a = thinned[i - 2]!,
+        b = thinned[i - 1]!,
+        c = thinned[i]!;
+      const v1 = (b.joints.hips[1] - a.joints.hips[1]) / (b.t - a.t),
+        v2 = (c.joints.hips[1] - b.joints.hips[1]) / (c.t - b.t);
+      turns.push(Math.abs(v2 - v1) / ((c.t - a.t) / 2));
+    }
+    turns.sort((a, b) => a - b);
+    expect(turns[Math.floor(turns.length * 0.95)]!, 'the sharp turns of the hips up and down (m/s²)').toBeLessThan(4.5);
+    // The arms swing, low and loose: not thrown up in front like a march (the hands came 24 cm, 23%
+    // of the height, ahead of the hips), and not held still either.
+    const way = Math.atan2(
+      cruise[cruise.length - 1]!.joints.hips[0] - cruise[0]!.joints.hips[0],
+      cruise[cruise.length - 1]!.joints.hips[2] - cruise[0]!.joints.hips[2],
+    );
+    for (const hand of ['leftHand', 'rightHand'] as const) {
+      const ahead = cruise.map(
+        (f) =>
+          (f.joints[hand][0] - f.joints.hips[0]) * Math.sin(way) +
+          (f.joints[hand][2] - f.joints.hips[2]) * Math.cos(way),
+      );
+      const swing = Math.max(...ahead) - Math.min(...ahead);
+      expect(Math.max(...ahead) / height, `${hand}: how far ahead it swings, a share of the height`).toBeLessThan(0.17);
+      expect(swing, `${hand}: it swings`).toBeGreaterThan(0.06);
+    }
+    // And the feet still keep the floor.
+    expect(frames[frames.length - 1]!.slide - frames[0]!.slide, 'pinned feet slid').toBeLessThan(0.04);
+    expect(errors).toEqual([]);
+  } finally {
+    await browser.close();
+    server.close();
+  }
+});
+
 test('the living room: an eager dart, a touch and a cheer hold up frame by frame, at any frame rate', async () => {
   test.skip(
     process.env.WW_LIVE_LIVING_BODY !== '1' || !process.env.WW_LIVING_CHARACTER || !process.env.WW_LIVING_MOTIONS,

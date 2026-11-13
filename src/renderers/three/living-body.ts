@@ -106,6 +106,8 @@ const ARM_STRETCH = 0.97;
 const LEAN_MAX = 0.42;
 /** How long a foot takes to its spot in a hard stop. */
 const STOP_STEP_S = 0.17;
+/** How far a walking arm is drawn back toward hanging (0: the motion's own swing, 1: hanging still). */
+const ARM_HANG = 0.45;
 
 function blobShadow() {
   const canvas = new OffscreenCanvas(64, 64);
@@ -273,6 +275,46 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
   };
   const idle = play(idleClip),
     walk = play(walkClip);
+  // A small body walks with short, quick steps. The walk as recorded takes a long stride at a slow
+  // beat (on a body about a metre tall, ~76 steps a minute and the hips riding up and dropping at
+  // each landing: a stomp). So the legs and hips of the walk are mixed with standing still by a
+  // share (`stepShare`), which shortens the stride and the bob, and the cycle turns faster to keep
+  // the ground covered; the arms and trunk keep the whole walk (`walkUpper`), as standing still's
+  // arms are held wide.
+  const lowerNames = new Set(
+    (
+      [
+        'hips',
+        'leftUpperLeg',
+        'leftLowerLeg',
+        'leftFoot',
+        'leftToes',
+        'rightUpperLeg',
+        'rightLowerLeg',
+        'rightFoot',
+        'rightToes',
+      ] as const
+    ).flatMap((name) => {
+      const node = bone(name);
+      return node ? [`${node.name}.quaternion`, `${node.name}.position`] : [];
+    }),
+  );
+  const walkUpper = play(
+    new AnimationClip(
+      'walk-upper',
+      walkClip.duration,
+      walkClip.tracks.filter((track) => !lowerNames.has(track.name)),
+    ),
+  );
+  const idleLower = play(
+    new AnimationClip(
+      'idle-lower',
+      idleClip.duration,
+      idleClip.tracks.filter((track) => lowerNames.has(track.name)),
+    ),
+  );
+  walkUpper.setEffectiveWeight(0);
+  idleLower.setEffectiveWeight(0);
   // A run (optional) shares the walk's cycle: the two are blended by speed, on one phase.
   const runClip = runAnimation ? vrmAnimationClip(runAnimation, vrm) : undefined;
   const runTravel = runClip ? walkInPlace(runClip, hips.name) : 0;
@@ -283,8 +325,13 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
    * motion's hips travel, is the ground the body may cover without its feet sliding: a retargeted
    * run's hips can travel much further in a loop than its legs take it.
    */
-  const feetPace = (action: AnimationAction, clip: AnimationClip) => {
-    for (const other of [idle, walk, run]) other?.setEffectiveWeight(other === action ? 1 : 0);
+  const feetPace = (action: AnimationAction, clip: AnimationClip, share = 1, mean = false) => {
+    for (const other of [idle, walk, run, walkUpper, idleLower])
+      other?.setEffectiveWeight(other === action ? share : 0);
+    // (A walk's legs mixed with standing still: the rest of the legs is standing's, and the foot
+    // lifts by the share only, so "on the floor" is judged at that height.)
+    if (share < 1) idleLower.setEffectiveWeight(1 - share);
+    idleLower.time = 0;
     const steps = 48;
     const toes = sides.map(() => [] as Vector3[]);
     for (let i = 0; i <= steps; i++) {
@@ -298,15 +345,58 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
       for (let i = 0; i < steps; i++) {
         const a = toes[k]![i]!,
           b = toes[k]![i + 1]!;
-        if (a.y - leg.restToe < 0.02 && b.y - leg.restToe < 0.02) speeds.push((a.z - b.z) / (clip.duration / steps));
+        if (a.y - leg.restToe < 0.02 * share && b.y - leg.restToe < 0.02 * share)
+          speeds.push((a.z - b.z) / (clip.duration / steps));
       }
     });
+    if (speeds.length < 4) return 0;
+    // (The mean is the ground a planted foot actually goes back over its whole time down, the
+    // slow touch-down and push-off included: a pin held through that time stays under the foot.)
+    if (mean) return Math.max(0, speeds.reduce((sum, s) => sum + s, 0) / speeds.length);
     speeds.sort((a, b) => a - b);
-    return speeds.length >= 4 ? Math.max(0, speeds[speeds.length >> 1]!) : 0;
+    return Math.max(0, speeds[speeds.length >> 1]!);
   };
   const walkPace = feetPace(walk, walkClip);
   const walkSpeed = walkPace > 0.05 ? walkPace : walkTravel > 0.05 ? walkTravel / (walkClip.duration || 1) : 0.6;
-  const stride = walkSpeed * (walkClip.duration || 1);
+  /** The whole walk's cycle on the floor, by the median pace (the eager start's measure). */
+  const fullStride = walkSpeed * (walkClip.duration || 1);
+  // The ground one cycle covers with the walk's legs at a share (measured, as a mix of two poses
+  // is not a straight line between their strides).
+  // (Not below two thirds: with less of the walk a foot hardly lifts, and its swing cannot be told
+  // from its time down. A start, at less than that, shortens its steps as the walk always has.)
+  const SHARES = [0.65, 0.75, 0.85, 1];
+  const strides = SHARES.map((share) => feetPace(walk, walkClip, share, true) * (walkClip.duration || 1));
+  // (Never longer with less of the walk: a measure that came out so is the one before it.)
+  for (let i = 1; i < strides.length; i++) strides[i] = Math.max(strides[i]!, strides[i - 1]!);
+  /** The cycle's length on the floor with the walk's legs at `share` (between the measured ones). */
+  const strideAt = (share: number): number => {
+    if (share < SHARES[0]!) return strideAt(SHARES[0]!) * (0.55 + 0.45 * (Math.max(0, share) / SHARES[0]!));
+    const s = Math.min(share, 1);
+    let i = 0;
+    while (i < SHARES.length - 2 && s > SHARES[i + 1]!) i++;
+    const k = (s - SHARES[i]!) / (SHARES[i + 1]! - SHARES[i]!);
+    return Math.max(0.05, strides[i]! + (strides[i + 1]! - strides[i]!) * k);
+  };
+  const height = head.getWorldPosition(v).y + 0.12;
+  // A walk's beat by size (dynamic similarity: a body's natural pace and cycle go with the square
+  // root of its height; a person of 1.7 m walks at about 1.3 m/s, a cycle of two steps in about a
+  // second). Slower than that, the cycle lengthens, but less than the speed drops (the steps
+  // shorten too).
+  const naturalSpeed = 1.3 * Math.sqrt(height / 1.7),
+    naturalCycle = 1.0 * Math.sqrt(height / 1.7);
+  /** The share of the walk's legs at which `speed` is walked at the body's own beat. */
+  const shareFor = (speed: number) => {
+    const want = speed * naturalCycle * (naturalSpeed / Math.max(speed, 0.05)) ** 0.4;
+    if (want >= strides[strides.length - 1]!) return 1;
+    let lo = SHARES[0]!,
+      hi = 1;
+    for (let i = 0; i < 12; i++) {
+      const mid = (lo + hi) / 2;
+      if (strideAt(mid) < want) lo = mid;
+      else hi = mid;
+    }
+    return (lo + hi) / 2;
+  };
   const runPace = run && runClip ? feetPace(run, runClip) || runTravel / (runClip.duration || 1) : 0;
   // A "run" no faster than the walk is no use as one.
   if (run && runPace < walkSpeed * 1.15) {
@@ -340,6 +430,8 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
   }
   idle.setEffectiveWeight(1);
   walk.setEffectiveWeight(0);
+  walkUpper.setEffectiveWeight(0);
+  idleLower.setEffectiveWeight(0);
   run?.setEffectiveWeight(0);
   // The run's trunk and arms on their own (the same motion, the legs' tracks left out). At a dart
   // the legs are a blend of walk and run that matches the ground, which leaves the arms hardly
@@ -436,6 +528,7 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
   let time = 0,
     cycle = 0,
     walkWeight = 0,
+    stepShare = 1,
     runWeight = 0,
     scurry = 0,
     moving = false,
@@ -579,13 +672,29 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
       const walkPart = walkWeight * (1 - scurry),
         runPart = runWeight * scurry;
       const moveWeight = Math.min(1, walkPart + runPart);
-      const stepLength =
-        stride * (0.55 + 0.45 * walkWeight) * (1 - scurry) + runStride * Math.max(0.05, runWeight) * scurry;
+      // The legs' share for the pace (eased: a change of pace changes the steps over a step or two).
+      // (A start's first steps are judged at a low walking pace, not at nothing.) An eager body's
+      // quick steps are the scurry's: its walk, a moment's start before the run takes over, keeps
+      // the whole of the walk's legs, as it did before the calm walk was shortened.
+      const eagerLegs = Boolean(run) && intent.mood === 'interest';
+      if (intent.speed > 0)
+        stepShare = approach(
+          stepShare,
+          eagerLegs ? 1 : shareFor(Math.max(intent.speed, walkSpeed * 0.3)),
+          eagerLegs ? 14 : 6,
+          dt,
+        );
+      // The start mixes the whole walk with standing still (walkWeight), which shortens the steps
+      // further; the stride is that of the legs' share of both.
+      const walkStride = eagerLegs ? fullStride * (0.55 + 0.45 * walkWeight) : strideAt(walkWeight * stepShare);
+      const stepLength = walkStride * (1 - scurry) + runStride * Math.max(0.05, runWeight) * scurry;
       // (Never faster than half again the run's own cadence, however the weights lag a burst.)
       const fastest = 1.5 / (runClip?.duration || walkClip.duration || 1);
       if (stepLength > 0.01) cycle = (cycle + Math.min(fastest * dt, (intent.speed * dt) / stepLength)) % 1;
       idle.time = time % (idleClip.duration || 1);
+      idleLower.time = idle.time;
       walk.time = cycle * (walkClip.duration || 1);
+      walkUpper.time = walk.time;
       if (run && runClip) run.time = ((cycle + runShift) % 1) * (runClip.duration || 1);
       // Sitting motions take over from standing ones by their own eased weights (never a cut).
       let sitting = 0;
@@ -607,7 +716,9 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
       const standing = Math.max(0, 1 - sitting * share);
       for (const seat of seatClips) seat.action.setEffectiveWeight(seat.weight * share);
       idle.setEffectiveWeight((1 - moveWeight) * standing);
-      walk.setEffectiveWeight(walkPart * standing);
+      walk.setEffectiveWeight(walkPart * stepShare * standing);
+      walkUpper.setEffectiveWeight(walkPart * (1 - stepShare) * standing);
+      idleLower.setEffectiveWeight(walkPart * (1 - stepShare) * standing);
       run?.setEffectiveWeight(runPart * standing);
       // The trunk and arms are mostly the run's while it scurries (see `runUpper`).
       if (runUpper && runClip) {
@@ -642,6 +753,30 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
       const atEase = (1 - moveWeight) * standing;
       const arm = intent.hand === 'left' ? left : right;
       const reaching = Boolean(intent.reach) && intent.reachWeight !== 0;
+      // The arms in a walk hang and swing low. The walk as recorded throws each arm up in front to
+      // well over 40° (the hands come up near the hips' height, a march); each upper arm is drawn
+      // part of the way back toward hanging (a little out, to clear the sleeves), which keeps its
+      // swing, smaller and lower. (By direction, so the same whatever the motion underneath.)
+      const hang = ARM_HANG * walkPart * standing * (1 - Math.min(1, Math.abs(intent.arms)));
+      if (hang > 1e-3) {
+        root.updateWorldMatrix(true, true);
+        for (const side of sides) {
+          if (reaching && side === arm) continue;
+          const shoulder = side.upperArm.getWorldPosition(new Vector3()),
+            elbow = side.lowerArm.getWorldPosition(new Vector3());
+          const down = v3
+            .set(side.sign * 0.22, -1, 0)
+            .normalize()
+            .applyAxisAngle(UP, intent.heading);
+          const toward = elbow.clone().sub(shoulder).normalize().lerp(down, hang).normalize();
+          aim(side.upperArm, tuple(elbow), tuple(shoulder.addScaledVector(toward, upperArmLength)));
+          // (The forearm too: the walk bends it up in front as the arm comes forward.)
+          const bend = side.lowerArm.getWorldPosition(new Vector3()),
+            wrist = side.hand.getWorldPosition(new Vector3());
+          const fore = wrist.clone().sub(bend).normalize().lerp(down, hang).normalize();
+          aim(side.lowerArm, tuple(wrist), tuple(bend.addScaledVector(fore, lowerArmLength)));
+        }
+      }
       // What is looked at: the thing, or whoever is watching (a glance to share it), or between.
       const lookAt =
         intent.look && viewer && intent.toViewer > 0
@@ -988,7 +1123,9 @@ export async function loadLivingBody(source: VerifiedModelSource, motions: Livin
         // motion's feet, carried round the body by the turn still to come), so each foot takes one
         // step to its final place while the body comes round, instead of many small ones after it.
         const sunk = Math.max(0, squash) * 0.07 * tall + (1 - tall) * 0.1;
-        const lift = intent.hop === undefined ? clamp(moveWeight, 0.35, 1) : 1;
+        // (The walk's legs are themselves only a share of the walk, `stepShare`: their feet lift
+        // by that much less, and judged at full height a foot just leaving the floor reads as down.)
+        const lift = intent.hop === undefined ? clamp(walkPart * stepShare + runPart, 0.35, 1) : 1;
         const ahead = intent.turnAhead;
         const lead = (p: Vector3) => (ahead ? p.sub(root.position).applyAxisAngle(UP, ahead).add(root.position) : p);
         const samples = sides.map((leg) => {
