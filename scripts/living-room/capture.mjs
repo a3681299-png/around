@@ -36,8 +36,9 @@ try {
   const view = process.env.WW_LIVING_VIEW;
   if (view) {
     const views = {
-      desk: { at: [-0.3, 1.25, -1.65], scale: 0.36 },
-      bed: { at: [2.05, 0.65, -1.3], scale: 0.32 },
+      desk: { at: [-0.4, 1.15, -1.9], scale: 0.36 },
+      // (From left of the clothes rack, which stands between the room's own view and the bed.)
+      bed: { at: [1.55, 0.75, -1.0], scale: 0.4 },
     };
     if (!views[view]) throw new Error('WW_LIVING_VIEW must be desk or bed.');
     await page.evaluate(({ at, scale }) => globalThis.__wwLivingRoom.reviewCamera(at, scale), views[view]);

@@ -3,19 +3,22 @@ C=wipe('meta_marks')
 def marker(name,loc,face):
     o=bpy.data.objects.new(name,None);o.empty_display_type='ARROWS';o.empty_display_size=.2
     o.location=loc;o.rotation_euler=(0,0,math.atan2(face[0],-face[1]));C.objects.link(o)
-marker('marker_sit_chair',(-.45,.72,.55),(0,1))
-marker('marker_sit_bed',(1.43,.83,.68),(-1,0))
+# Seats are on the surface as the placed models have it (the chair's seat is toward the desk
+# from its centre; the bed's near edge is the side away from the wall).
+marker('marker_sit_chair',(-.45,1.31,top_at(-.45,1.31,1.0)),(0,1))
+marker('marker_sit_bed',(1.45,1.40,top_at(1.45,1.40,1.2)),(-1,0))
 marker('marker_sit_floor',(-1.25,-.70,.14),(.3,1))
-marker('marker_hide_chair',(-1.04,.67,0),(0,-1))
-# The body needs 0.14 m on every side of a spot (src/world/room-life.ts BODY_M): the trolley
-# and guitar spots sit in the 0.4 m lane between the trolley and the amplifier.
-marker('marker_hide_trolley',(1.80,-1.30,0),(-1,-.2))
-marker('marker_stand_window',(-1.10,.84,0),(0,1))
+marker('marker_hide_chair',(-1.18,.86,0),(0,-1))
+# The body needs 0.14 m on every side of a spot (src/world/room-life.ts BODY_M). The names are
+# the ones the page and the earlier rooms know; the trolley now stands by the door.
+marker('marker_hide_trolley',(-2.02,-1.62,0),(1,.2))
+marker('marker_stand_window',(-1.30,1.28,0),(0,1))
 marker('marker_stand_shelf',(-1.94,.10,0),(-1,0))
 # Keep the established demonstration's UI behind the initial resident, with clear floor ahead.
 marker('marker_stand_center',(.62,-.30,0),(1,-1))
-marker('marker_stand_front',(-.25,-2.35,0),(0,-1))
-marker('marker_stand_guitar',(1.80,-.95,0),(1,.2))
+marker('marker_stand_front',(.20,-2.35,0),(0,-1))
+# (By the music corner in the near right: the rack, the amplifier, the guitar.)
+marker('marker_stand_guitar',(1.62,-1.40,0),(1,-.6))
 # Everyday life (docs/living-life.md). Not markers (the layout reader would take them for seats):
 # `pose_` empties the page reads by name. Where the resident lies on the bed (its chest; the
 # arrow is the way its head points), and where the phone is put down on the bed and on the desk.
@@ -47,21 +50,27 @@ def clear_top(want, radius=.05, step=.02, search=.25, level=.01):
 # Head to the pillows. The resident lands on its front and rolls onto its back: from the room's
 # camera (above the foot of the bed) the face then looks up into the phone's light. The phone is
 # put down by its right hand (on its back, toward +X).
-marker('pose_lie_bed',(1.95,1.42,on_duvet(1.95,1.42)),(0,1))
-marker('pose_phone_bed',(2.26,1.30,on_duvet(2.26,1.30)+.004),(0,1))
+marker('pose_lie_bed',(2.05,1.50,top_at(2.05,1.50,1.2)),(0,1))
+marker('pose_phone_bed',(2.38,1.40,top_at(2.38,1.40,1.2)+.004),(0,1))
 # (The desk's flattest free top is its front right corner, by the right hand.)
-marker('pose_phone_desk',clear_top((.36,1.25,.70),level=.015),(0,-1))
+marker('pose_phone_desk',clear_top((.42,1.68,top_at(.42,1.68,.95)),search=.3,level=.015),(0,-1))
 print('phone on the desk at', tuple(round(v,3) for v in bpy.data.objects['pose_phone_desk'].location))
 # Footprints (x0, y0, x1, y1) of the furniture, measured from the placed models
 # (reference_models.py) where they stand above the rug.
-OBST=[(-3,-1.55,-2.40,2.70),(-2.55,-1.25,-2.25,-.85),(-2.45,2.20,-1.40,2.70),
-      (-1.38,1.08,.78,2.70),(-.83,.30,-.07,1.13),
-      (1.29,-.45,3,2.70),(.83,1.78,1.37,2.29),
-      # the laptop only: the flat books and sketchbook on the rug can be stepped past
-      (-1.75,-2.65,-.45,-1.55),(-.35,-.95,.35,-.25),(-1.95,.33,-1.61,.67),
-      (.78,-1.70,1.60,-.90),(1.20,-2.70,3,-2.12),
-      (2.00,-1.45,2.90,-.45),
-      (-2.96,-2.66,-2.35,-2.10)]
+OBST=[# the left wall: the metal shelf, the binder shelf, the dark bookcase and the magazine box
+      (-3,-1.30,-2.55,2.70),(-3,.90,-2.40,2.05),(-2.58,2.15,-1.42,2.70),(-2.40,1.68,-2.02,2.05),
+      # the trolley by the door, the backpack
+      (-2.92,-1.84,-2.34,-1.26),(-2.62,-1.26,-2.18,-.80),
+      # the desk and the chair
+      (-1.44,1.52,.64,2.70),(-.95,.66,.05,1.56),
+      # the bedside chest, the bed, the sofa at its foot (and the plant by its arm)
+      (.62,2.15,1.18,2.70),(1.15,.68,3,2.70),(1.16,-.16,3,.70),(.82,-.40,1.16,.56),
+      # the clothes rack, the boxes beside it, the music corner (amplifier, crates, guitar)
+      (1.90,-1.80,3,-.72),(1.96,-.72,3,-.16),(1.48,-2.70,3,-2.10),
+      # the low table; the laptop only: the flat books and sketchbooks on the rug can be stepped past
+      (-1.08,-2.18,-.16,-1.26),(-.24,-.98,.20,-.58),(-1.95,.33,-1.61,.67),
+      # the television in the near left corner
+      (-2.62,-2.70,-1.36,-1.80)]
 CELL=.1;n=60;ny=54
 free=[[True]*n for _ in range(ny)]
 for j in range(ny):

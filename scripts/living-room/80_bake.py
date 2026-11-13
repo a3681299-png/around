@@ -16,7 +16,7 @@ sc = bpy.context.scene
 BK = wipe('bake')
 BK.hide_render = False  # the last run left the baked copies hidden from renders
 BK.hide_viewport = False
-SRC = ['shell', 'desk', 'bed', 'left', 'decor', 'right']
+SRC = ['shell', 'desk', 'bed', 'left', 'decor', 'right', 'otaku']
 for n in SRC:
     coll(n).hide_render = False
 dg = bpy.context.evaluated_depsgraph_get()

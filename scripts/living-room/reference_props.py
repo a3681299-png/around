@@ -1,7 +1,17 @@
 C=wipe('decor')
-# The grid rug with the low table, laptop, sketchbook, floor books and the supplies trolley,
-# the backpack and the clothes rack are the user's models (reference_models.py: tex_floorset,
-# tex_backpack, tex_rack). This part keeps the things around them.
+# The low table, the laptop, sketchbooks and floor books, the supplies trolley, the backpack and
+# the clothes rack are the user's models (reference_models.py). This part keeps the things
+# around them, and the grid rug they stand on.
+RUG=mat('rug_charcoal','#1d2233',.98);surface(RUG,(190,190,60),.25,.14)
+woven_grid(RUG,(12,10),'#8e9ab8',.03)
+RUG_AT=(-.35,-1.25,3.0,2.4)
+# (Many small faces: the page dents the rug under a seated body, src/living-room/soft-surface.ts.)
+bm=bmesh.new();grid=[]
+for j in range(25):grid.append([bm.verts.new((RUG_AT[0]-RUG_AT[2]/2+RUG_AT[2]*i/30,RUG_AT[1]-RUG_AT[3]/2+RUG_AT[3]*j/24,.012+.0025*math.sin(i*1.7+j*.9))) for i in range(31)])
+for j in range(24):
+    for i in range(30):bm.faces.new((grid[j][i],grid[j][i+1],grid[j+1][i+1],grid[j+1][i]))
+o=bm_object('grid_rug',bm,RUG,C);o['lm']=1
+solid=o.modifiers.new('pile','SOLIDIFY');solid.thickness=.012
 
 
 def flatbook(name,x,y,z,w=.25,d=.32,angle=0,kind='comic'):
@@ -29,29 +39,13 @@ for i in range(6):
     sphere('tuner_key',.012,(s*.067,z,.04),K,STEEL,scale=(1,.6,.3),seg=12)
 for y in (.16,.23):block('guitar_pickup',(.076,.03,.015),(0,y,.058),K,WHITE,bevel=.004)
 for x,y in [(.13,.10),(.15,.16)]:cyl('guitar_knob',.012,.014,(x,y,.065),K,STEEL,verts=16)
-g=bpy.data.objects.new('guitar_pose',None);K.objects.link(g);g.location=(2.75,-.63,.17);g.rotation_euler=(R90,math.radians(-13),math.radians(-8))
+# The guitar leans on the arm of the sofa (reference_otaku.py); its amplifier and pedals are
+# the user's floor set, in the near right corner (reference_models.py).
+g=bpy.data.objects.new('guitar_pose',None);K.objects.link(g);g.location=(1.03,-.24,.17);g.rotation_euler=(R90,math.radians(-13),math.radians(-8))
 for o in set(K.objects)-before-{g}:o.parent=g
-# Amplifier and plugged-in pedals.
-block('amplifier',(.59,.35,.53),(2.24,-.62,.29),K,INK,bevel=.025)
-GRILLE=mat('amp_grille','#555a70',.85)
-block('speaker_cloth',(.51,.004,.39),(2.24,-.798,.27),K,GRILLE)
-for i in range(29):rod('speaker_weave',(1.995+i*.017,-.802,.075),(1.995+i*.017,-.802,.46),.0015,K,BLACK)
-for j in range(25):rod('speaker_weave',(1.99,-.803,.08+j*.015),(2.49,-.803,.08+j*.015),.0014,K,BLACK)
-for i in range(6):cyl('amp_knob',.009,.012,(2.04+i*.065,-.804,.51),K,WHITE,rot=(R90,0,0),verts=12)
-label('amp_brand','NIGHT TONE',(2.23,-.81,.455),.022,K,PAPER)
-block('pedalboard',(.69,.27,.038),(2.30,-1.27,.063),K,INK,bevel=.015)
-for i,col in enumerate(('#275a9d','#d3a13c','#2d89bb')):
-    x=2.08+i*.22;m=mat('pedal_'+str(i),col,.36)
-    block('guitar_pedal',(.17,.22,.044),(x,-1.27,.10),K,m,bevel=.009)
-    for dx in (-.04,.04):cyl('pedal_knob',.013,.018,(x+dx,-1.21,.132),K,BLACK,verts=12)
-    cyl('footswitch',.012,.012,(x,-1.34,.132),K,STEEL,verts=16)
-tube('instrument_lead',[(2.76,-.69,.28),(2.9,-.9,.035),(2.61,-1.1,.035),(2.62,-1.27,.11)],.004,K,BLACK)
-# Small white magazine box beside the clothes rack, and the front-left moving box.
-block('magazine_bench',(.30,.44,.34),(1.40,-2.42,.17),K,WHITE)
-for i in range(8):
-    block('magazine',(.24,.024,.36+(i%4)*.022),(1.40,-2.60+i*.05,.48),K,PALETTE[i%9],rot=(0,.10,0),bevel=.002)
-boxfile('floor_archive',(-2.53,-2.35,.17),K,size=(.43,.39,.32),color=PALETTE[3])
-flatbook('box_comic',-2.53,-2.35,.34,w=.30,d=.26,angle=.1)
+# The moving box by the sofa.
+boxfile('floor_archive',(2.72,-.44,.17),K,size=(.43,.39,.32),color=PALETTE[3])
+flatbook('box_comic',2.72,-.44,.34,w=.30,d=.26,angle=.1)
 # Rear wall wire display, pins, notes, postcards and headphones.
 for i in range(8):rod('wall_grid',(1.21+i*.105,2.65,1.73),(1.21+i*.105,2.65,2.43),.004,C,INK)
 for j in range(7):rod('wall_grid',(1.21,2.65,1.73+j*.115),(1.945,2.65,1.73+j*.115),.004,C,INK)
@@ -70,5 +64,4 @@ def headphones(name,x,y,z,c):
 
 
 headphones('wall_headphones',1.93,2.60,1.82,C)
-headphones('bed_headphones',2.47,.55,on_duvet(2.47,.55)+.14,C)
 print('reference props ready',len(C.objects),len(K.objects))

@@ -2,7 +2,8 @@
 # (reference_models.py). Run once whenever a source model changes, headless only (it resets the
 # Blender file between models, so never run it inside a live MCP session holding the room):
 #   blender -b --factory-startup --python scripts/living-room/prepare_models.py
-# Environment: WW_TRIPO_SRC = folder of the raw Tripo GLBs (default C:/wwt-private/room/source)
+# Environment: WW_TRIPO_SRC = folder of the first raw Tripo GLBs (default C:/wwt-private/room/source)
+#              WW_TRIPO_NEW = folder of the second set (default C:/wwt_room_work/src)
 #              WW_ONLY=id,id  limits the run to those models
 # The raw GLBs stay outside the repository; only the cleaned results are committed (LFS).
 import bpy, bmesh, os, numpy as np
@@ -18,26 +19,111 @@ os.makedirs(OUT, exist_ok=True)
 # height: metres of the real thing. tex: texture size in the room (from 4096).
 # snap: straighten wavy outer panels – vertices within `eps` of a bound move onto it.
 # inpaint: (box, luminance) – bright print inside the box is painted with the cloth around it.
+# The second set of models (2026-11-13) is in NEW. Tripo names those files
+# "A faithful … #<n>.glb", so they are found by their number (`new`).
+NEW = (os.environ.get('WW_TRIPO_NEW') or 'C:/wwt_room_work/src').rstrip('/\\') + '/'
 MODELS = {
-    'workstation': dict(file='design workstation 3d model.glb', height=.89 * 2.1, tex=2048,
-                        # the bundled task chair (seat, arms, base) and a stray 6-face sliver;
-                        # the room uses the separate chair model at this desk
-                        drop=[((-.48, -.37, 0), (-.17, -.03, .31)), ((.09, -.23, .22), (.14, -.21, .26))],
-                        screens=True),
-    'chair': dict(file='chair.glb', height=1.18, tex=1024),
-    'floorset': dict(file='desk setup 3d model.glb', height=.377 * 3.6, tex=2048),
-    'storage': dict(file='storage bookshelf 3d model.glb', height=.958 * 2.3, tex=2048,
-                    # three loose stickers float in front of the wall
-                    drop=[((-.43, .03, .88), (-.37, .05, .91)), ((-.31, .03, .72), (-.24, .05, .75)),
-                          ((.38, -.02, .67), (.40, .04, .70))]),
+    # width: metres across (X) of the real thing, where that is the known measure.
+    'workstation': dict(new=112, width=2.0, tex=2048, screens=True),
+    'chair': dict(new=114, height=1.22, tex=1024),
+    'storage': dict(new=115, height=2.2, tex=2048),
+    # lift: Tripo printed its own dim studio shading into the colours.
+    'rack': dict(new=109, height=1.6, tex=2048, lift=1.1),
+    # The page lets a body sink into surfaces whose material is named duvet/sheet/pillow
+    # (src/living-room/index.ts): the whole bed is one such material.
+    'bed': dict(new=118, height=1.53, tex=2048, material='duvet_bed'),
+    'nightstand': dict(new=120, height=.89, tex=1024),
+    'table': dict(new=105, height=.575, tex=1024),
+    'cart': dict(new=107, height=.88, tex=1024),
+    # A sheet of separate floor things: split into its loose items (most triangles first), each
+    # sized by its largest dimension and written into one file that shares one texture.
+    'floor_items': dict(new=99, tex=2048, items=[
+        ('plant', .30), ('laptop', .36), ('pedals', .42), ('amp', .42), ('cable', .30),
+        ('spiral_pad', .30), ('magazine_box', .33), ('books_colour', .26), ('open_sketchbook', .42),
+        ('books_dark', .26), ('binder_black', .30), ('binder_blue', .31), ('books_art', .25),
+        ('pads_white', .30)]),
     'dark_shelf': dict(file='dark bookshelf 3d model.glb', height=2.3, tex=2048),
-    # lift: Tripo printed its own dim studio shading into the colours; the white rack and its
-    # clothes read as black in the dark front corner of the room without it.
-    'rack': dict(file='clothing rack 3d model.glb', height=1.5, tex=2048, lift=1.45,
-                 # brand marks on the top bags (outdoor duffel, tennis bag): paint them out
-                 inpaint=[((-.40, -.20, .86), (-.05, .20, 1.0), .38), ((.05, -.20, .78), (.45, .20, 1.0), .38)]),
     'backpack': dict(file='khaki backpack 3d model.glb', height=.52, tex=1024),
 }
+
+
+def source(cfg):
+    if 'new' in cfg:
+        import glob
+        found = glob.glob(NEW + '*#' + str(cfg['new']) + '.glb')
+        if len(found) != 1:
+            raise RuntimeError('expected one model #%s in %s, found %d' % (cfg['new'], NEW, len(found)))
+        return found[0]
+    return SRC + cfg['file']
+
+
+def split_items(o, names):
+    """The loose parts of `o`, grouped where their boxes come within 2 cm, as objects of their
+    own: origin on the floor under the centre, largest dimension as asked."""
+    bm = bmesh.new()
+    bm.from_mesh(o.data)
+    bm.faces.ensure_lookup_table()
+    label = [-1] * len(bm.faces)
+    boxes = []
+    for f0 in bm.faces:
+        if label[f0.index] >= 0:
+            continue
+        k = len(boxes)
+        stack = [f0]
+        label[f0.index] = k
+        lo, hi = Vector((9, 9, 9)), Vector((-9, -9, -9))
+        while stack:
+            f = stack.pop()
+            for v in f.verts:
+                lo = Vector(map(min, lo, v.co))
+                hi = Vector(map(max, hi, v.co))
+            for e in f.edges:
+                for g in e.link_faces:
+                    if label[g.index] < 0:
+                        label[g.index] = k
+                        stack.append(g)
+        boxes.append((lo, hi))
+    parent = list(range(len(boxes)))
+
+    def find(i):
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    for i in range(len(boxes)):
+        for j in range(i):
+            a, b = boxes[i], boxes[j]
+            if all(a[0][k] - .02 <= b[1][k] and b[0][k] - .02 <= a[1][k] for k in range(3)):
+                parent[find(i)] = find(j)
+    groups = {}
+    for f in bm.faces:
+        groups.setdefault(find(label[f.index]), []).append(f.index)
+    bm.free()
+    order = sorted(groups, key=lambda r: -len(groups[r]))
+    if len(order) != len(names):
+        raise RuntimeError('expected %d items, found %d' % (len(names), len(order)))
+    for root, (name, size) in zip(order, names):
+        sub = bmesh.new()
+        sub.from_mesh(o.data)
+        sub.faces.ensure_lookup_table()
+        keep = set(groups[root])
+        bmesh.ops.delete(sub, geom=[f for f in sub.faces if f.index not in keep], context='FACES')
+        me = bpy.data.meshes.new('item_' + name)
+        sub.to_mesh(me)
+        sub.free()
+        me.materials.append(o.data.materials[0])
+        co = np.empty(len(me.vertices) * 3)
+        me.vertices.foreach_get('co', co)
+        co = co.reshape(-1, 3)
+        lo, hi = co.min(0), co.max(0)
+        s = size / (hi - lo).max()
+        me.transform(Matrix.Scale(s, 4) @ Matrix.Translation(Vector((-(lo[0] + hi[0]) / 2, -(lo[1] + hi[1]) / 2, -lo[2]))))
+        for p in me.polygons:
+            p.use_smooth = True
+        bpy.context.scene.collection.objects.link(bpy.data.objects.new('item_' + name, me))
+        print('item', name, 'size', tuple(round(v * s, 3) for v in hi - lo), 'tris', len(keep))
+    bpy.data.objects.remove(o, do_unlink=True)
 
 
 def load(path):
@@ -182,7 +268,7 @@ def clean_texture(o, key, cfg):
     out.reload()
     node.image = out
     bpy.data.images.remove(img)
-    m.name = key
+    m.name = cfg.get('material', key)
 
 
 def mark_screens(o, key):
@@ -223,7 +309,8 @@ def mark_screens(o, key):
             f = stack.pop()
             for e in f.edges:
                 for g in e.link_faces:
-                    if g.index in glow or g.normal.dot(n0) < .97 or abs(g.normal.dot(g.calc_center_median()) - d0) > .006:
+                    # (Loose enough for a panel Tripo left a little wavy.)
+                    if g.index in glow or g.normal.dot(n0) < .93 or abs(n0.dot(g.calc_center_median()) - d0) > .012:
                         continue
                     glow.add(g.index)
                     stack.append(g)
@@ -256,7 +343,7 @@ for key, cfg in MODELS.items():
     if only and key not in only:
         continue
     bpy.ops.wm.read_factory_settings(use_empty=True)
-    o = load(SRC + cfg['file'])
+    o = load(source(cfg))
     o.name = o.data.name = key
     if cfg.get('drop'):
         print(key, 'dropped faces', weld_and_drop(o, cfg['drop']))
@@ -267,16 +354,19 @@ for key, cfg in MODELS.items():
         mark_screens(o, key)
     if cfg.get('snap'):
         print(key, 'straightened vertices', snap(o, *cfg['snap']))
-    # Origin at the floor under the centre, real size.
-    co = np.empty(len(o.data.vertices) * 3)
-    o.data.vertices.foreach_get('co', co)
-    co = co.reshape(-1, 3)
-    lo, hi = co.min(0), co.max(0)
-    s = cfg['height'] / (hi[2] - lo[2])
-    o.data.transform(Matrix.Scale(s, 4) @ Matrix.Translation(Vector((-(lo[0] + hi[0]) / 2, -(lo[1] + hi[1]) / 2, -lo[2]))))
-    for p in o.data.polygons:
-        p.use_smooth = True
-    print(key, 'size', tuple(round(v, 3) for v in o.dimensions), 'tris', sum(len(p.vertices) - 2 for p in o.data.polygons))
+    if cfg.get('items'):
+        split_items(o, cfg['items'])
+    else:
+        # Origin at the floor under the centre, real size.
+        co = np.empty(len(o.data.vertices) * 3)
+        o.data.vertices.foreach_get('co', co)
+        co = co.reshape(-1, 3)
+        lo, hi = co.min(0), co.max(0)
+        s = cfg['width'] / (hi[0] - lo[0]) if cfg.get('width') else cfg['height'] / (hi[2] - lo[2])
+        o.data.transform(Matrix.Scale(s, 4) @ Matrix.Translation(Vector((-(lo[0] + hi[0]) / 2, -(lo[1] + hi[1]) / 2, -lo[2]))))
+        for p in o.data.polygons:
+            p.use_smooth = True
+        print(key, 'size', tuple(round(v, 3) for v in o.dimensions), 'tris', sum(len(p.vertices) - 2 for p in o.data.polygons))
     bpy.ops.export_scene.gltf(filepath=OUT + key + '.glb', export_format='GLB', export_image_format='JPEG',
                               export_jpeg_quality=88, export_normals=True, export_texcoords=True,
                               export_materials='EXPORT', export_animations=False, export_yup=True)

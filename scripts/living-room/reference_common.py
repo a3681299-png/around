@@ -152,6 +152,46 @@ def illustrated(kind):
                 for t in np.linspace(0,math.tau,100):
                     r=.08+k*.014;pts.append((.5+r*math.cos(t)*(1+.25*math.sin(3*t)),.5+r*1.35*math.sin(t)))
                 for p,q in zip(pts,pts[1:]):line(*p,*q,.002,(.34,.44,.62))
+    elif kind=='game':
+        # A side-scrolling game on the old television: dusk sky, hills, blocks, a hero, a score bar.
+        for y in range(n):a[y,:,:3]=np.array((.20,.10,.38))*(1-y/n)+np.array((1,.52,.34))*(y/n)
+        oval(.78,.30,.07,.07,(1,.9,.6))
+        for i in range(60):rect(RNG.random(),RNG.random()*.4,.006,.006,(1,.95,.85))
+        for x in range(n):
+            y=int(n*(.66+.07*math.sin(x*.02)+.03*math.sin(x*.07)));a[y:,x,:3]=(.36,.16,.42)
+        for i in range(16):
+            rect(i*.0625,.84,.06,.075,(.16,.52,.36));rect(i*.0625,.84,.06,.014,(.45,.86,.48));rect(i*.0625,.92,.0625,.08,(.42,.24,.16))
+        for bx,by in [(.14,.56),(.2025,.56),(.265,.56),(.58,.44),(.6425,.44),(.83,.60)]:
+            rect(bx,by,.058,.058,(.95,.68,.22));rect(bx+.006,by+.006,.046,.046,(.78,.46,.12));rect(bx+.022,by+.016,.014,.026,(1,.9,.6))
+        for cx,cy in [(.22,.48),(.61,.36),(.66,.36)]:oval(cx,cy,.018,.024,(1,.86,.3))
+        rect(.40,.745,.05,.095,(.9,.25,.3));rect(.405,.70,.04,.05,(.98,.8,.68));rect(.395,.685,.06,.025,(.9,.25,.3))
+        rect(.40,.80,.02,.04,(.2,.25,.6));rect(.43,.80,.02,.04,(.2,.25,.6))
+        rect(.72,.78,.07,.06,(.55,.3,.75));rect(.735,.795,.012,.012,(1,1,1));rect(.763,.795,.012,.012,(1,1,1))
+        rect(0,0,1,.085,(.05,.04,.12))
+        for i in range(3):rect(.04+i*.045,.028,.03,.03,(.95,.3,.4))
+        for i in range(7):rect(.60+i*.05,.03,.032,.028,(.95,.95,.85) if i%3 else (.5,.5,.6))
+    elif kind.startswith('album'):
+        # Record sleeves and small posters: flat graphic covers, one design a number.
+        k=int(kind[5:] or 0);rnd=random.Random(900+k)
+        inks=[(.93,.32,.42),(.14,.16,.3),(.98,.8,.3),(.25,.7,.75),(.95,.93,.88),(.55,.35,.8),(.98,.55,.25),(.08,.09,.14)]
+        rnd.shuffle(inks);rect(0,0,1,1,inks[0])
+        style=k%5
+        if style==0:
+            for r,c in ((.36,inks[1]),(.27,inks[2]),(.18,inks[3]),(.07,inks[1])):oval(.5,.5,r,r,c)
+        elif style==1:
+            for i in range(9):rect(0,.08+i*.1,1,.045,inks[1+i%3])
+            oval(.68,.36,.2,.2,inks[4])
+        elif style==2:
+            for y in range(n):a[y,:,:3]=np.array(inks[0])*(1-y/n)+np.array(inks[1])*(y/n)
+            oval(.5,.62,.24,.24,inks[2])
+            for i in range(7):rect(0,.62+i*.045,1,.012+i*.004,inks[1])
+        elif style==3:
+            for i in range(5):
+                for j in range(5):
+                    if (i+j+k)%2:rect(.1+i*.16,.1+j*.16,.16,.16,inks[1+(i*j)%3])
+        else:
+            rect(.1,.1,.8,.8,inks[1]);oval(.5,.45,.22,.3,inks[2]);rect(.28,.55,.44,.35,inks[1]);oval(.5,.4,.12,.15,inks[3])
+        rect(.08,.90,.5,.025,inks[4]);rect(.08,.94,.3,.015,inks[4])
     else:
         # A real arrangement of application chrome, tracks, layer stack, thumbnails and panels.
         rect(0,0,1,1,(.66,.72,.85));rect(0,0,1,.055,(.08,.12,.22))
@@ -174,11 +214,13 @@ def illustrated(kind):
     return img
 
 
-def art(name,kind,w,h,loc,c,rot=(R90,0,0),emission=0):
+def art(name,kind,w,h,loc,c,rot=(R90,0,0),emission=0,crop=None):
+    """`crop` (u0, v0, u1, v1) shows that part of the art atlas instead of a whole quadrant."""
     m=mat(name+'_ink','#ffffff',.65,emit='#ffffff' if emission else None,strength=emission)
     nt=m.node_tree;p=next(n for n in nt.nodes if n.type=='BSDF_PRINCIPLED')
     t=nt.nodes.new('ShaderNodeTexImage')
     quadrants={'portrait':(0,.5),'comic':(.5,.5),'sunset':(0,0),'sketch':(.5,0)}
+    if crop:quadrants={kind:(crop[0],crop[1])}
     if kind in quadrants:
         atlas=bpy.data.images.get('studio_art_atlas')
         if atlas is None:
@@ -193,7 +235,8 @@ def art(name,kind,w,h,loc,c,rot=(R90,0,0),emission=0):
     me.from_pydata([(-w/2,-h/2,0),(w/2,-h/2,0),(w/2,h/2,0),(-w/2,h/2,0)],[],[(0,1,2,3)])
     me.materials.append(m);u=me.uv_layers.new(name='ArtUV')
     for v,co in zip(u.data,[(0,0),(1,0),(1,1),(0,1)]):
-        v.uv=tuple(quadrants[kind][i]+co[i]*.5 for i in range(2)) if kind in quadrants else co
+        span=(crop[2]-crop[0],crop[3]-crop[1]) if crop else (.5,.5)
+        v.uv=tuple(quadrants[kind][i]+co[i]*span[i] for i in range(2)) if kind in quadrants else co
     o=bpy.data.objects.new(name,me);c.objects.link(o);o.location=loc;o.rotation_euler=rot
     if not emission:o['lm']=1
     return o

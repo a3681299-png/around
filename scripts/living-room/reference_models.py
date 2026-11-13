@@ -6,15 +6,29 @@ MODEL_DIR = os.path.normpath(WWD + '../../art/living-room/models') + os.sep
 # key: (collection, location, rotation about Z in degrees). Every model's front is -Y, origin
 # on the floor under its centre, real size.
 PLACES = {
-    'workstation': ('desk', (-.30, 1.77, 0), 0),
-    # The separate executive chair replaces the small task chair Tripo fused to the desk.
-    'chair': ('desk', (-.45, .72, 0), 180),
-    'dark_shelf': ('left', (-1.92, 2.47, 0), 0),
+    'workstation': ('desk', (-.40, 2.02, 0), 0),
+    'chair': ('desk', (-.45, 1.17, 0), 180),
+    'dark_shelf': ('left', (-1.99, 2.47, 0), 0),
     'storage': ('left', (-2.80, -.30, 0), 90),
-    'floorset': ('decor', (-.10, -.95, 0), 0),
-    'rack': ('right', (2.31, -2.42, 0), 0),
-    'backpack': ('right', (-2.40, -1.05, 0), 62),
+    'cart': ('left', (-2.62, -1.55, 0), 90),
+    'backpack': ('right', (-2.40, -1.02, 0), 62),
+    'table': ('decor', (-.62, -1.72, 0), 25),
+    'bed': ('bed', (BED_AT[0], BED_AT[1], 0), 0),
+    'nightstand': ('bed', (NIGHTSTAND_AT[0], NIGHTSTAND_AT[1], 0), 0),
+    'rack': ('right', (2.44, -1.25, 0), -90),
 }
+# The floor things of the user's set (one file, one texture; prepare_models.py split them):
+# (item, x, y, rotation about Z in degrees, height of what it stands on).
+ITEMS = [
+    ('laptop', -.02, -.78, 188, .024), ('open_sketchbook', .52, -1.12, -20, .024),
+    ('spiral_pad', -1.34, -1.26, 35, .024), ('pads_white', .86, -.46, 12, .024),
+    ('binder_blue', .28, -1.80, -14, .024), ('binder_black', -1.62, -.52, 28, .024),
+    ('books_colour', -1.78, .52, 10, 0), ('books_dark', .44, 1.46, -8, 0),
+    ('books_art', .93, -1.62, 30, .024), ('magazine_box', -2.20, 1.86, 90, 0),
+    ('plant', 1.04, .44, 0, 0),
+    # the music corner in the near right
+    ('amp', 1.72, -2.40, 0, 0), ('pedals', 1.62, -1.95, 170, 0), ('cable', 1.28, -2.36, 0, 0),
+]
 SCREEN_GLOW = 2.4
 
 
@@ -70,12 +84,41 @@ def place_model(key, collection, loc, yaw):
     return o, s
 
 
+def place_items(collection):
+    c = coll(collection)
+    for o in list(c.objects):
+        if o.name.startswith('tex_item_'):
+            bpy.data.objects.remove(o, do_unlink=True)
+    before = set(bpy.data.objects)
+    bpy.ops.import_scene.gltf(filepath=MODEL_DIR + 'floor_items.glb')
+    new = [o for o in bpy.data.objects if o not in before]
+    source = {}
+    for o in new:
+        if o.type == 'MESH':
+            o.data.transform(o.matrix_world)
+            source[o.name.split('.')[0][len('item_'):]] = o.data
+    for i, (name, x, y, yaw, z) in enumerate(ITEMS):
+        o = bpy.data.objects.new('tex_item_%s_%d' % (name, i), source[name])
+        c.objects.link(o)
+        o.matrix_world = Matrix.Translation(Vector((x, y, z))) @ Matrix.Rotation(math.radians(yaw), 4, 'Z')
+    for o in new:
+        bpy.data.objects.remove(o, do_unlink=True)
+
+
 MODEL_OBJECTS = {}
 SCREEN_OBJECTS = {}
 for _key, (_c, _loc, _yaw) in PLACES.items():
     MODEL_OBJECTS[_key], _screen = place_model(_key, _c, _loc, _yaw)
     if _screen:
         SCREEN_OBJECTS[_key] = _screen
+place_items('decor')
+
+
+def top_at(x, y, above=2.4):
+    """How high the room is at (x, y): the first surface under `above`."""
+    bpy.context.view_layer.update()
+    hit, loc, *_ = bpy.context.scene.ray_cast(bpy.context.evaluated_depsgraph_get(), Vector((x, y, above)), Vector((0, 0, -1)))
+    return loc.z if hit else 0
 
 
 def screen_panels(o):
@@ -105,12 +148,17 @@ def screen_panels(o):
         area = sum(f.calc_area() for f in patch)
         n = sum((f.normal * f.calc_area() for f in patch), Vector()).normalized()
         pts = [v.co for f in patch for v in f.verts]
-        centre = sum(pts, Vector()) / len(pts)
         # extent along the panel's own horizontal and up axes
         side = n.cross(Vector((0, 0, 1))).normalized()
         up = side.cross(n).normalized()
-        w = max(p.dot(side) for p in pts) - min(p.dot(side) for p in pts)
-        h = max(p.dot(up) for p in pts) - min(p.dot(up) for p in pts)
+        across = [p.dot(side) for p in pts]
+        along = [p.dot(up) for p in pts]
+        w = max(across) - min(across)
+        h = max(along) - min(along)
+        # The middle of that extent, not the mean of the vertices: Tripo's triangles are much
+        # denser on one side of a display, which would pull the page's picture off the monitor.
+        depth = sum(p.dot(n) for p in pts) / len(pts)
+        centre = side * (max(across) + min(across)) / 2 + up * (max(along) + min(along)) / 2 + n * depth
         out.append((centre, w, h, n, area))
     bm.free()
     return sorted(out, key=lambda r: -r[4])
@@ -127,16 +175,18 @@ def chair_keys(o):
     o.shape_key_add(name='Basis', from_mix=False)
     sink = o.shape_key_add(name='seat_sink', from_mix=False)
     back = o.shape_key_add(name='back_recline', from_mix=False)
-    hinge_y, hinge_z = .18, .58
+    hinge_y, hinge_z = .12, .62
     tilt = math.radians(-13)
     for i, v in enumerate(me.vertices):
         x, y, z = v.co
         # The cushion: inside the seat's outline, between the frame under it and the armrests.
-        if .40 < z < .62 and -.36 < y < .16 and abs(x) < .27:
-            r = min(1, math.hypot(x / .27, (y + .10) / .27))
+        if .44 < z < .66 and -.42 < y < .10 and abs(x) < .27:
+            r = min(1, math.hypot(x / .27, (y + .16) / .27))
             depth = .040 * (1 - r * r) ** 1.5 - .004 * math.sin(math.pi * r) ** 2
-            sink.data[i].co = (x, y, z - depth * min(1, (z - .40) / .1))
-        if y > .08 and z > hinge_z + .03 and abs(x) < .29:
+            sink.data[i].co = (x, y, z - depth * min(1, (z - .44) / .1))
+        # The back, and the hooded sweatshirt that hangs over it: between the armrests low
+        # down, everything above them.
+        if y > -.14 and z > hinge_z + .03 and (abs(x) < .29 or z > .80):
             w = min(1, (z - hinge_z) / .35) ** 1.3
             a = tilt * w
             dy, dz = y - hinge_y, z - hinge_z

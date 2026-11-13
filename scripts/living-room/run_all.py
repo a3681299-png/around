@@ -51,27 +51,53 @@ except Exception as _error:
 
 for _part in ('lib.py', 'reference_common.py', 'reference_shell.py', 'reference_storage.py',
               'reference_desk.py', 'reference_bed.py', 'reference_props.py', 'reference_models.py',
-              'reference_lighting.py', 'reference_meta.py'):
+              'reference_otaku.py', 'reference_lighting.py', 'reference_meta.py'):
     wwrun(_part)
 
 _sc = bpy.context.scene
-for _name in ('shell', 'desk', 'bed', 'left', 'decor', 'right'):
+for _name in ('shell', 'desk', 'bed', 'left', 'decor', 'right', 'otaku'):
     bpy.data.collections[_name].hide_render = False
 
-_save = os.environ.get('WW_SAVE') or _ART + 'living-room.blend'
-_render = os.environ.get('WW_RENDER')
+# Blender resolves a relative image path from the drive's root, not from where it was started
+# (a render or a lightmap asked for as `art/…` lands in C:/art/…): every path is made absolute.
+_save = os.path.abspath(os.environ.get('WW_SAVE') or _ART + 'living-room.blend')
+_render = os.environ.get('WW_RENDER') and os.path.abspath(os.environ['WW_RENDER'])
 if _render:
+    # The page's own view (src/living-room/index.ts VIEW and SUBJECT): from the open front at eye
+    # height. camera_main, the old look down on the cutaway, now only sees the ceiling.
+    # WW_RENDER_VIEW="x,y,z,tx,ty,tz,fov" looks from somewhere else (Blender's axes, degrees);
+    # several views separated by ";" are written as <name>.png, <name>-1.png, …
+    _views = [[float(_x) for _x in _one.split(',')]
+              for _one in (os.environ.get('WW_RENDER_VIEW') or '.1,-5.6,1.7,-.05,1,.95,42').split(';')]
+    _eye = bpy.data.objects.new('camera_review', bpy.data.cameras.new('camera_review'))
+    _sc.collection.objects.link(_eye)
+    _eye.data.sensor_fit = 'VERTICAL'
+    _eye.data.clip_start = .02
+    _eye.data.clip_end = 80
+    _main, _size = _sc.camera, (_sc.render.resolution_x, _sc.render.resolution_y)
+    _sc.camera = _eye
+    # As the room stands with the desktop closed: without the glow of the page's windows.
+    for _o in bpy.data.collections['lights'].objects:
+        _o.hide_render = _o.get('layer') == 'ui'
+    _sc.render.resolution_x, _sc.render.resolution_y = 1280, 720
     _sc.cycles.samples = int(os.environ.get('WW_RENDER_SAMPLES', '128'))
     _sc.render.resolution_percentage = 100
-    _sc.render.filepath = _render
-    bpy.ops.render.render(write_still=True)
+    for _i, _v in enumerate(_views):
+        _eye.location = _v[:3]
+        _eye.rotation_euler = (Vector(_v[3:6]) - _eye.location).to_track_quat('-Z', 'Y').to_euler()
+        _eye.data.angle_y = math.radians(_v[6])
+        _sc.render.filepath = _render if not _i else _render.rsplit('.', 1)[0] + '-' + str(_i) + '.png'
+        bpy.ops.render.render(write_still=True)
+    _sc.camera = _main
+    _sc.render.resolution_x, _sc.render.resolution_y = _size
+    bpy.data.cameras.remove(_eye.data)
 
 if os.environ.get('WW_SKIP_BAKE') != '1':
     for _key in ('WW_LM_SIZE', 'WW_SAMPLES', 'WW_VC_SAMPLES'):
         if os.environ.get(_key):
             _NS[_key] = int(os.environ[_key])
     if os.environ.get('WW_OUT'):
-        _NS['WW_OUT'] = os.environ['WW_OUT'].rstrip('/\\') + '/'
+        _NS['WW_OUT'] = os.path.abspath(os.environ['WW_OUT']).rstrip('/\\') + '/'
     wwrun('80_bake.py')
 
 # Rebuilds are reproducible from these scripts; Blender's backup would duplicate the large asset.

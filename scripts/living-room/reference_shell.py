@@ -16,8 +16,24 @@ for row in range(29):
         x=end;length=1.15+RNG.random()*.7
 block('left_wall',(.13,5.5,2.9),(-3.065,0,1.45),C,M_WALL,lm=True)
 block('back_wall',(6.15,.13,2.9),(0,2.765,1.45),C,M_WALL,lm=True)
-for size,loc in [((.17,5.55,.06),(-3.065,0,2.9)),((6.2,.17,.06),(0,2.765,2.9)),((.07,5.4,.12),(-2.99,0,.06)),((6,.07,.12),(0,2.69,.06))]:
+for size,loc in [((.07,5.4,.12),(-2.99,0,.06)),((6,.07,.12),(0,2.69,.06)),((.07,5.4,.12),(2.99,0,.06))]:
     block('wall_edge',size,loc,C,TRIM)
+# The room is seen from inside, at eye height (src/living-room/index.ts VIEW): it has its right
+# wall and its ceiling. Both are single sheets on the room's inner faces, a hair inside the box of
+# the other baked surfaces: the page measures the room by that box (the live stage hangs its light
+# on it, enclose.ts puts its own unlit wall and ceiling just outside it, now out of sight).
+def sheet(name,corners,material):
+    bm=bmesh.new();bm.faces.new([bm.verts.new(p) for p in corners])
+    # (Cut up so the baked light has texels to vary over and the vertex tools have vertices.)
+    bmesh.ops.subdivide_edges(bm,edges=bm.edges[:],cuts=7,use_grid_fill=True)
+    o=bm_object(name,bm,material,C,smooth=False);o['lm']=1
+    return o
+sheet('right_wall',[(2.999,-2.7,0),(2.999,2.7,0),(2.999,2.7,2.895),(2.999,-2.7,2.895)],M_WALL)
+M_CEIL=mat('ceiling_paint','#565c70',.95);surface(M_CEIL,(60,60,60),.08,.05)
+sheet('ceiling',[(-3,-2.7,2.895),(-3,2.7,2.895),(2.999,2.7,2.895),(2.999,-2.7,2.895)],M_CEIL)
+# The ceiling lamp is off: the room is lit by its screens.
+cyl('ceiling_lamp_base',.20,.035,(-.2,-.3,2.875),C,WHITE,verts=40)
+lathe('ceiling_lamp_shade',[(.31,0),(.30,-.045),(.24,-.085),(.12,-.105),(0,-.11)],(-.2,-.3,2.86),C,mat('lamp_glass_off','#9aa0b4',.35),steps=40)
 # Door on the near left wall; inset panels, hinge barrels and a working-sized handle.
 block('door_frame',(.09,.99,2.24),(-2.982,-2.05,1.12),C,mat('door_frame','#8590a8',.6))
 block('door',(.10,.88,2.14),(-2.93,-2.05,1.08),C,mat('door_blue','#3c465c',.75),lm=True)
@@ -46,8 +62,6 @@ for i in range(28):
     x=-1.4+i*.086
     tube('curtain_ring',[(x+.022*math.cos(t),2.53,2.76+.027*math.sin(t)) for t in np.linspace(0,math.tau,17)],.004,C,STEEL,cyclic=True,kind='POLY')
 block('pelmet',(2.62,.36,.14),(-.23,2.70,2.91),C,TRIM)
-LED=mat('blue_LED','#1941ff',.3,emit='#174bff',strength=6)
-block('dyn_curtain_cove',(2.45,.02,.008),(-.22,2.56,2.82),C,LED,bevel=.003)
 block('cove_front_lip',(2.60,.045,.09),(-.22,2.49,2.84),C,TRIM)
 # Camera angle is shared with the actual web page, not a render-only composition.
 cam=bpy.data.objects.new('camera_main',bpy.data.cameras.new('camera_main'));coll('meta').objects.link(cam)
