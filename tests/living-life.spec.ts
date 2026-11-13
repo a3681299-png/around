@@ -80,6 +80,25 @@ test('a bed to lie on: it walks beside it, dives on, and lies where the bed says
   expect(Math.max(...frames.slice(-60).map((f) => f.kickLegs))).toBeGreaterThan(0.5);
 });
 
+test('a place to lie and watch from: it stays on its front, feet swinging, and never rolls over', () => {
+  const floor: Seat = { ...bed, lie: { ...bed.lie!, prone: true } };
+  const { frames, phases } = day(14, (t) => (t < 9 ? floor : undefined));
+  expect(phases).toEqual(['toSeat', 'dive', 'lie', 'rise', 'idle']);
+  expect(Math.max(...frames.map((f) => f.roll))).toBe(0);
+  const lying = frames.filter((f) => f.pose === 'lie');
+  expect(Math.max(...lying.slice(-60).map((f) => f.kickLegs))).toBeGreaterThan(0.5);
+  // (The same bed without the mark does roll over: the mark is what keeps it on its front.)
+  expect(Math.max(...day(9, () => bed).frames.map((f) => f.roll))).toBe(1);
+});
+
+test('sat down where it stood and asked to stand there again: it gets up', () => {
+  const sat: Seat = { x: 0.5, y: 0.14, z: -0.2, heading: 0, stand: [0.5, -0.2] };
+  const { phases } = day(12, (t) => (t < 6 ? sat : { ...sat, y: 0, standing: true }));
+  expect(phases).toContain('sit');
+  expect(phases[phases.length - 1]).toBe('idle');
+  expect(phases.indexOf('standUp')).toBeGreaterThan(phases.indexOf('sit'));
+});
+
 test('the bed taken away: it gets up and stands beside the bed again', () => {
   const { state, phases, frames } = day(14, (t) => (t < 7 ? bed : undefined));
   expect(phases).toEqual(['toSeat', 'dive', 'lie', 'rise', 'idle']);

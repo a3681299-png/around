@@ -303,6 +303,94 @@ test('the resident and a live: it leaves what it was at, goes to its place befor
   expect(orders.stand).toBeUndefined();
 });
 
+/** Runs the director for `seconds`, the body doing at once what it is ordered to. */
+function attend(state: ReturnType<typeof startDirector>, seconds: number, energy: number | undefined) {
+  let orders = stepDirector(state, seen()).orders;
+  const said = new Set<string>();
+  for (let i = 0; i < seconds * 30; i++) {
+    const body = orders.rest === 'lie' ? 'lie' : orders.rest === 'sit' ? 'sit' : 'idle';
+    const out = stepDirector(state, seen({ body, ...(energy === undefined ? {} : { live: { ...venue, energy } }) }));
+    state = out.state;
+    orders = out.orders;
+    said.add(orders.says);
+  }
+  return { state, orders, said };
+}
+
+test('worn out at a live it does not just stop: it lies down before the screen, watches on, and gets up rested', () => {
+  let state = startDirector(1);
+  state = attend(state, 5, 0.9).state;
+  // Nearly spent, the music still loud.
+  state = { ...state, mind: { ...state.mind, energy: 0.1 } };
+  let out = attend(state, 3, 0.9);
+  expect(out.orders.activity).toBe('live');
+  expect(out.orders.rest).toBe('lie');
+  // Lying, it is not sent to stand anywhere and is not asleep: its eyes stay on the screen.
+  expect(out.orders.stand).toBeUndefined();
+  expect(out.orders.asleep).toBe(false);
+  expect(out.orders.look).toEqual(venue.look);
+  expect(out.orders.says).toContain('寝転');
+  // Lying mends it (it never runs dry), and rested it is back on its feet with the music.
+  const before = out.state.mind.energy;
+  out = attend(out.state, 20, 0.9);
+  expect(out.state.mind.energy).toBeGreaterThan(before + 0.15);
+  out = attend(out.state, 90, 0.9);
+  expect(out.orders.rest).toBeUndefined();
+  expect(out.orders.stand).toEqual(venue.spot);
+  expect(out.orders.music?.move).toBe('dance');
+  expect(out.state.mind.energy).toBeGreaterThan(0.4);
+});
+
+test('a whole long live: it is never left standing spent, and it both dances and rests', () => {
+  const out = attend(startDirector(1), 900, 0.9);
+  expect(out.state.mind.energy).toBeGreaterThan(0.05);
+  expect([...out.said].some((line) => line.includes('踊'))).toBe(true);
+  expect([...out.said].some((line) => line.includes('寝転'))).toBe(true);
+});
+
+test('a long quiet song is sat through; when it livens it is up again', () => {
+  let out = attend(startDirector(1), 25, 0.1);
+  expect(out.orders.rest).toBe('sit');
+  expect(out.orders.look).toEqual(venue.look);
+  expect(out.orders.says).toContain('座');
+  out = attend(out.state, 6, 0.9);
+  expect(out.orders.rest).toBeUndefined();
+  expect(out.orders.stand).toEqual(venue.spot);
+});
+
+test('the live over and it worn out: it takes itself to bed and sleeps', () => {
+  let state = attend(startDirector(1), 5, 0.9).state;
+  state = { ...state, mind: { ...state.mind, energy: 0.16 } };
+  const out = attend(state, 4, undefined);
+  expect(out.orders.activity).toBe('nap');
+  expect(out.orders.seat).toBe('bed');
+});
+
+test('where the light is in the picture: a bright thing on the right and low is found there', () => {
+  const cells = new Uint8ClampedArray(GRID_W * GRID_H * 4);
+  for (let i = 0; i < GRID_W * GRID_H; i++) cells.set([20, 20, 30, 255], i * 4);
+  // A lamp in the lower right.
+  for (const [x, y] of [
+    [13, 6],
+    [14, 6],
+    [13, 7],
+    [14, 7],
+  ] as const)
+    cells.set([255, 240, 200, 255], (y * GRID_W + x) * 4);
+  const { focus } = readFrame(cells);
+  expect(focus[0]).toBeGreaterThan(0.5);
+  expect(focus[1]).toBeLessThan(-0.3);
+  // An even picture has its light in the middle.
+  const even = new Uint8ClampedArray(GRID_W * GRID_H * 4).fill(128);
+  expect(Math.abs(readFrame(even).focus[0])).toBeLessThan(0.05);
+  expect(Math.abs(readFrame(even).focus[1])).toBeLessThan(0.05);
+  // The found place eases like the rest of the light: a cut does not make it jump.
+  let light = startLight();
+  for (let i = 0; i < 2; i++) light = easeLight(light, readFrame(cells), 1 / 60);
+  expect(light.light.focus[0]).toBeGreaterThan(0);
+  expect(light.light.focus[0]).toBeLessThan(focus[0]);
+});
+
 test('a live is a good time: the mind never picks it by itself, and a drop is a joy', () => {
   const mind = startMind(1);
   expect(scores(mind, { uiOpen: true, window: true, perch: true, ball: true }).live).toBe(0);

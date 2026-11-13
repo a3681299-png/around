@@ -2,10 +2,11 @@ C=wipe('decor')
 # The low table, the laptop, sketchbooks and floor books, the supplies trolley, the backpack and
 # the clothes rack are the user's models (reference_models.py). This part keeps the things
 # around them, and the grid rug they stand on.
-RUG=mat('rug_charcoal','#1d2233',.98);surface(RUG,(190,190,60),.25,.14)
+# (Not named `rug_…`: the page dents surfaces of that name under a body by 7 cm, soft-surface.ts,
+# and this rug is thin and lies on the floor: a dent would put it under the boards.)
+RUG=mat('floor_rug_charcoal','#1d2233',.98);surface(RUG,(190,190,60),.25,.14)
 woven_grid(RUG,(12,10),'#8e9ab8',.03)
 RUG_AT=(-.35,-1.25,3.0,2.4)
-# (Many small faces: the page dents the rug under a seated body, src/living-room/soft-surface.ts.)
 bm=bmesh.new();grid=[]
 for j in range(25):grid.append([bm.verts.new((RUG_AT[0]-RUG_AT[2]/2+RUG_AT[2]*i/30,RUG_AT[1]-RUG_AT[3]/2+RUG_AT[3]*j/24,.012+.0025*math.sin(i*1.7+j*.9))) for i in range(31)])
 for j in range(24):

@@ -23,6 +23,11 @@ export interface FrameLight {
   bottom: Rgb;
   /** How bright the whole is to the eye, 0–1. */
   level: number;
+  /**
+   * Where the picture's light is: the middle of what is brighter than the rest of it, −1 (left,
+   * bottom) to 1 (right, top); [0, 0] for an even picture. The room's light comes from there.
+   */
+  focus: readonly [number, number];
 }
 
 const LIN = Float32Array.from({ length: 256 }, (_, v) => {
@@ -77,14 +82,33 @@ export function readFrame(data: ArrayLike<number>): FrameLight {
   const third = Math.max(1, Math.round(w / 3)),
     band = Math.max(1, Math.ceil(h / 3));
   const all = mean(x0, x1, y0, y1);
+  // Where its light is: each cell weighs in by how much brighter it is than the whole (a stage
+  // lamp, a window, a face in a dark shot: the cells that stand out), so an even picture has its
+  // light in the middle and a dark one with one lamp has it at the lamp.
+  const level = luminance(all);
+  let weight = 0,
+    fx = 0,
+    fy = 0;
+  for (let y = y0; y < y1; y++)
+    for (let x = x0; x < x1; x++) {
+      const i = (y * GRID_W + x) * 4;
+      const over = luminance([LIN[data[i]!]!, LIN[data[i + 1]!]!, LIN[data[i + 2]!]!]) - level;
+      if (over <= 0) continue;
+      weight += over;
+      fx += over * (((x + 0.5 - x0) / w) * 2 - 1);
+      fy += over * (1 - ((y + 0.5 - y0) / h) * 2);
+    }
+  // (Hardly anything stands out: no place to speak of.)
+  const found = weight > 0.02 * w * h * Math.max(level, 0.02);
   return {
+    focus: found ? [fx / weight, fy / weight] : [0, 0],
     all,
     left: mean(x0, x0 + third, y0, y1),
     centre: mean(x0 + third, x1 - third, y0, y1),
     right: mean(x1 - third, x1, y0, y1),
     top: mean(x0, x1, y0, y0 + band),
     bottom: mean(x0, x1, y1 - band, y1),
-    level: luminance(all),
+    level,
   };
 }
 
@@ -96,7 +120,16 @@ export interface LightState {
 }
 
 const ZERO: Rgb = [0, 0, 0];
-export const DARK: FrameLight = { all: ZERO, left: ZERO, centre: ZERO, right: ZERO, top: ZERO, bottom: ZERO, level: 0 };
+export const DARK: FrameLight = {
+  all: ZERO,
+  left: ZERO,
+  centre: ZERO,
+  right: ZERO,
+  top: ZERO,
+  bottom: ZERO,
+  level: 0,
+  focus: [0, 0],
+};
 export const startLight = (): LightState => ({ light: DARK, flips: 0, rising: false });
 
 /** Seconds for the room to come most of the way to a new picture: a cut, and the same held back
@@ -131,6 +164,11 @@ export function easeLight(state: LightState, target: FrameLight, dt: number): Li
       top: mix(from.top, target.top),
       bottom: mix(from.bottom, target.bottom),
       level: luminance(all),
+      // (The place moves more slowly than the colour: a lamp that wanders, not one that jumps.)
+      focus: [
+        from.focus[0] + (target.focus[0] - from.focus[0]) * k * 0.35,
+        from.focus[1] + (target.focus[1] - from.focus[1]) * k * 0.35,
+      ],
     },
     flips,
     rising,

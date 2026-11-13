@@ -68,6 +68,9 @@ interface CharacterManifest {
 export interface LiveCue {
   spot: Stand;
   look: Vec3;
+  /** Where it lies on the floor when it is worn out: its chest, its head the way `heading` points
+   * (toward the screen, which it goes on watching). */
+  rest: Stand;
   /** 0–1: how lively the music is; the beat clock (whole numbers on the beats) and the tempo. */
   energy: number;
   beat: number;
@@ -95,8 +98,12 @@ export interface LivingResident {
   live(on: boolean): void;
   /** Something happened to it (petted, a window flew past…): the mind is told. */
   notice(event: MindEvent): void;
+  /** How rested it is (1 … 0 worn out), set by hand: for the checks and the recordings. */
+  rested(energy: number): void;
   /** It is up on the desktop (riding a window, or thrown off one): drawn in front of the UI. */
   readonly front: boolean;
+  /** At a live, off its feet before the screen: sitting or lying (the view takes the floor in). */
+  readonly resting: 'sit' | 'lie' | undefined;
   /** What of the scene is the resident (its body, its phone, its bubble). */
   objects(): Object3D[];
   /** Where its chest is (the room's metres): what a pointer or a flying window is near. */
@@ -472,30 +479,63 @@ export async function loadLivingResident(
         const asked = orders.stand;
         const floor = asked && nearestFloor(layout, asked.x, asked.z);
         const stand = asked && floor ? { ...asked, x: floor[0], z: floor[1] } : undefined;
+        // At a live, off its feet (docs/living-live.md): sitting on the floor where it stood, the
+        // screen before it; or lying on its front, a step back from the screen. It comes to the
+        // lying place from the viewer's side, so that it drops forward toward the screen.
+        const spot = live && nearestFloor(layout, live.spot.x, live.spot.z);
+        const from = live && nearestFloor(layout, live.rest.x, live.rest.z + 0.8 * scale);
+        const liveSeat: Seat | undefined =
+          !live || !orders.rest
+            ? undefined
+            : orders.rest === 'sit'
+              ? spot && {
+                  x: spot[0],
+                  y: floorSeat?.y ?? layout.floorY + 0.14,
+                  z: spot[1],
+                  heading: live.spot.heading,
+                  stand: spot,
+                }
+              : from && {
+                  x: from[0],
+                  y: layout.floorY,
+                  z: from[1],
+                  heading: live.rest.heading,
+                  stand: from,
+                  lie: {
+                    x: live.rest.x,
+                    // (On the rug, not in it.)
+                    y: layout.floorY + 0.03,
+                    z: live.rest.z,
+                    heading: live.rest.heading,
+                    prone: true,
+                  },
+                };
         seat =
           target || touch || orders.perch
             ? undefined
-            : stand
-              ? {
-                  x: stand.x,
-                  y: layout.floorY,
-                  z: stand.z,
-                  // It watches the screen; dancing, it turns to whoever is watching it.
-                  heading:
-                    orders.music?.move === 'dance'
-                      ? Math.atan2(camera.position.x - stand.x, camera.position.z - stand.z)
-                      : stand.heading,
-                  stand: [stand.x, stand.z],
-                  standing: true,
-                }
-              : place === 'bed'
-                ? bedLie
-                : place === 'chair'
-                  ? chairSeat
-                  : place === 'floor' && floorSeat
-                    ? // Sulking, it sits with its back to the room's open side.
-                      { ...floorSeat, heading: floorSeat.heading + (orders.backTurned ? Math.PI : 0) }
-                    : undefined;
+            : liveSeat
+              ? liveSeat
+              : stand
+                ? {
+                    x: stand.x,
+                    y: layout.floorY,
+                    z: stand.z,
+                    // It watches the screen; dancing, it turns to whoever is watching it.
+                    heading:
+                      orders.music?.move === 'dance'
+                        ? Math.atan2(camera.position.x - stand.x, camera.position.z - stand.z)
+                        : stand.heading,
+                    stand: [stand.x, stand.z],
+                    standing: true,
+                  }
+                : place === 'bed'
+                  ? bedLie
+                  : place === 'chair'
+                    ? chairSeat
+                    : place === 'floor' && floorSeat
+                      ? // Sulking, it sits with its back to the room's open side.
+                        { ...floorSeat, heading: floorSeat.heading + (orders.backTurned ? Math.PI : 0) }
+                      : undefined;
         // How it was treated is kept for the next visit.
         if (Math.abs(director.mind.affinity - savedAffinity) > 0.02) {
           savedAffinity = director.mind.affinity;
@@ -730,6 +770,12 @@ export async function loadLivingResident(
     },
     notice(event) {
       if (living && pending.length < 8) pending.push(event);
+    },
+    rested(energy) {
+      director = { ...director, mind: { ...director.mind, energy: Math.min(1, Math.max(0, energy)) } };
+    },
+    get resting() {
+      return living ? orders?.rest : undefined;
     },
     get front() {
       return (

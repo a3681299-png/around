@@ -20,8 +20,10 @@ PLACES = {
 # The floor things of the user's set (one file, one texture; prepare_models.py split them):
 # (item, x, y, rotation about Z in degrees, height of what it stands on).
 ITEMS = [
-    ('laptop', -.02, -.78, 188, .024), ('open_sketchbook', .52, -1.12, -20, .024),
-    ('spiral_pad', -1.34, -1.26, 35, .024), ('pads_white', .86, -.46, 12, .024),
+    # (The strip of rug at x 0.15–0.75 before the live's screen is kept clear: worn out at a
+    # live, the resident lies there, docs/living-live.md.)
+    ('laptop', -.06, -.78, 188, .024), ('open_sketchbook', 1.12, -1.34, -20, .024),
+    ('spiral_pad', -1.34, -1.26, 35, .024), ('pads_white', 1.06, -.56, 12, .024),
     ('binder_blue', .28, -1.80, -14, .024), ('binder_black', -1.62, -.52, 28, .024),
     ('books_colour', -1.78, .52, 10, 0), ('books_dark', .44, 1.46, -8, 0),
     ('books_art', .93, -1.62, 30, .024), ('magazine_box', -2.20, 1.86, 90, 0),

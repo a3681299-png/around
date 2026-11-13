@@ -74,11 +74,14 @@ export interface LiveStage {
   /** 0 the room as it is, 1 a live (eased). */
   readonly amount: number;
   /** Where the camera goes for a view. */
-  view(name: LiveViewName): LiveView;
+  /** `low`: the resident is off its feet (sitting, lying): the near view takes in the floor. */
+  view(name: LiveViewName, low?: boolean): LiveView;
   /** The screen's size and the room's inner faces, metres (for the checks). */
   readonly metrics: Record<'width' | 'height' | 'bottom' | 'top' | 'leftX' | 'rightX' | 'floorY', number>;
   /** Where the resident stands, facing the screen, and what it watches. */
   readonly spot: { x: number; z: number; heading: number };
+  /** Where it lies on the floor when it is worn out (its chest; its head toward the screen). */
+  readonly rest: { x: number; z: number; heading: number };
   readonly look: [number, number, number];
   /** The screen's four corners on the page (top-left, top-right, bottom-right, bottom-left). */
   corners(camera: PerspectiveCamera): [Point, Point, Point, Point] | undefined;
@@ -100,7 +103,29 @@ export interface LiveStage {
 }
 
 /** How strongly each part shows. Set by eye on the real page, on real videos. */
-const GAIN = { lamps: 0.9, spill: 0.3, halo: 0.3, beam: 0.2, body: 2.2, fill: 0.5, house: 0.3 };
+/** (The house lights go nearly out: the room is what the picture's light finds of it.) */
+const GAIN = {
+  lamps: 1.7,
+  spill: 0.36,
+  halo: 0.3,
+  beam: 0.2,
+  body: 2.2,
+  fill: 0.5,
+  over: 0.7,
+  under: 0.45,
+  house: 0.16,
+};
+/**
+ * Going into a live is a sequence, not a fade (0–1 of `amount`): the house lights go down first,
+ * and only in the dark does the picture's light come up in the room. Coming out, the same in
+ * reverse: the picture's light leaves, then the room's own returns.
+ */
+const HOUSE_DOWN_BY = 0.6;
+const PICTURE_FROM = 0.4;
+const smooth = (k: number) => {
+  const t = Math.min(1, Math.max(0, k));
+  return t * t * (3 - 2 * t);
+};
 /** Metres from the room's middle to the screen (it hangs before the desk), and its bottom edge. */
 const SCREEN_Z = -0.95;
 const SCREEN_BOTTOM = 1.12;
@@ -195,9 +220,21 @@ export function liveStage(env: LiveStageEnv): LiveStage {
       fov: 46,
     },
   };
+  // Near, but with the resident sitting or lying on the floor: a step back and higher, tipped
+  // down, so the screen keeps the top of the view and the floor before it (and who is on it)
+  // comes into the bottom. The camera eases between the two as it gets down and up.
+  const stageLow: LiveView = {
+    position: new Vector3(0.2, bottom + height * 0.78, SCREEN_Z + height * 2.55),
+    target: new Vector3(0.05, bottom - height * 0.2, SCREEN_Z + 0.2),
+    fov: 54,
+  };
   // The resident: on the floor before the screen, a little to one side of its middle.
   const spot = { x: 0.5, z: SCREEN_Z + 0.85, heading: 0 };
   spot.heading = Math.atan2(0 - spot.x, SCREEN_Z - spot.z);
+  // Worn out, it lies a step further back, on the rug, its head to the screen: far enough from
+  // the screen to look up at it, near enough to be under its light.
+  const rest = { x: 0.45, z: SCREEN_Z + 1.3, heading: 0 };
+  rest.heading = Math.atan2(0 - rest.x, SCREEN_Z - rest.z);
 
   // --- the picture, small -----------------------------------------------------------------------
   const pixels = new Uint8Array(GRID_W * GRID_H * 4);
@@ -331,7 +368,15 @@ export function liveStage(env: LiveStageEnv): LiveStage {
   // What comes back off the room at it from the viewer's side: a little, in the picture's colour.
   const fill = new DirectionalLight(0xffffff, 0);
   fill.position.set(0.4, 1.8, 6);
-  if (env.resident) scene.add(lampL, lampR, fill, fill.target);
+  // The picture's top edge from above and behind (a rim on the head and shoulders), its bottom
+  // edge up off the floor before the screen: the body stands in the picture's light, not in
+  // front of a lamp.
+  const over = new DirectionalLight(0xffffff, 0),
+    under = new DirectionalLight(0xffffff, 0);
+  over.position.set(0, 4, SCREEN_Z - 1.2);
+  under.position.set(0, -2.5, SCREEN_Z + 0.4);
+  for (const lamp of [over, under]) lamp.target.position.set(0, midY - 0.6, SCREEN_Z + 1);
+  if (env.resident) scene.add(lampL, lampR, fill, fill.target, over, over.target, under, under.target);
 
   const added = env.added.map((object) => (object as Mesh).material as Material & { color: Color });
   const slotAt = [-1, 0, 1].map((k) => new Vector3(k * width * 0.34, midY, SCREEN_Z + 0.05));
@@ -345,9 +390,10 @@ export function liveStage(env: LiveStageEnv): LiveStage {
     get amount() {
       return amount;
     },
-    view: (name) => views[name],
+    view: (name, low) => (low && name === 'stage' ? stageLow : views[name]),
     metrics: { width, height, bottom, top, leftX, rightX, floorY },
     spot,
+    rest,
     look: [0, midY, SCREEN_Z],
     corners(camera) {
       const out: Point[] = [];
@@ -361,19 +407,20 @@ export function liveStage(env: LiveStageEnv): LiveStage {
     },
     update(dt, input) {
       const target = input.on ? 1 : 0;
-      amount += (target - amount) * (1 - Math.exp(-(input.on ? 2.6 : 3.4) * dt));
+      amount += (target - amount) * (1 - Math.exp(-(input.on ? 1.5 : 2.2) * dt));
       if (Math.abs(target - amount) < 0.002) amount = target;
       energy += (input.energy - energy) * (1 - Math.exp(-dt / 0.6));
       const shown = amount > 0.004;
       for (const part of parts) part.visible = shown;
       halo.visible = back.visible = shown;
-      // The house lights.
-      const house = 1 - (1 - GAIN.house) * amount;
+      // The house lights, first; the picture's light after them.
+      const house = 1 - (1 - GAIN.house) * smooth(amount / HOUSE_DOWN_BY);
+      const picture = smooth((amount - PICTURE_FROM) / (1 - PICTURE_FROM));
       glow.dim(house);
       for (const material of added) material.color.setScalar(house);
       if (!shown) {
         for (const beam of beams) beam.visible = false;
-        lampL.intensity = lampR.intensity = fill.intensity = 0;
+        lampL.intensity = lampR.intensity = fill.intensity = over.intensity = under.intensity = 0;
         return;
       }
       if (input.cells) {
@@ -390,21 +437,31 @@ export function liveStage(env: LiveStageEnv): LiveStage {
         ] as const
       ).forEach(([slot, c], i) => {
         tint.setRGB(c[0], c[1], c[2]);
-        glow.set(slot, slotAt[i]!, ahead, tint, GAIN.lamps * amount);
+        glow.set(slot, slotAt[i]!, ahead, tint, GAIN.lamps * picture);
       });
+      // The middle lamp is where the picture's own light is: a singer in a spot at the left of
+      // the frame lights the room from the left of the screen, a sunset low in it from low down.
+      slotAt[1]!.set(light.focus[0] * width * 0.34, midY + light.focus[1] * height * 0.32, SCREEN_Z + 0.05);
       glow.off(4);
-      for (const part of parts) (part.material as MeshBasicMaterial).color.setScalar(GAIN.spill * amount);
-      (halo.material as MeshBasicMaterial).color.setScalar(GAIN.halo * amount);
+      for (const part of parts) (part.material as MeshBasicMaterial).color.setScalar(GAIN.spill * picture);
+      (halo.material as MeshBasicMaterial).color.setScalar(GAIN.halo * picture);
       lampL.color.setRGB(light.left[0], light.left[1], light.left[2]);
       lampR.color.setRGB(light.right[0], light.right[1], light.right[2]);
-      lampL.intensity = lampR.intensity = GAIN.body * amount;
+      // (The two side lamps lean with the picture's light too: the brighter side is the nearer.)
+      lampL.position.y = lampR.position.y = midY + light.focus[1] * height * 0.3;
+      lampL.intensity = GAIN.body * picture * (1 - 0.35 * light.focus[0]);
+      lampR.intensity = GAIN.body * picture * (1 + 0.35 * light.focus[0]);
       fill.color.setRGB(light.all[0], light.all[1], light.all[2]);
-      fill.intensity = GAIN.fill * amount;
+      fill.intensity = GAIN.fill * picture;
+      over.color.setRGB(light.top[0], light.top[1], light.top[2]);
+      under.color.setRGB(light.bottom[0], light.bottom[1], light.bottom[2]);
+      over.intensity = GAIN.over * picture;
+      under.intensity = GAIN.under * picture;
 
       // Beams: only to lively music; each takes the colour over it at the picture's top, and
       // they lean one way and the other with the beat.
       const lively = Math.max(0, (energy - 0.35) / 0.4);
-      const power = GAIN.beam * amount * Math.min(1, lively) * (0.55 + 0.45 * input.pulse);
+      const power = GAIN.beam * picture * Math.min(1, lively) * (0.55 + 0.45 * input.pulse);
       beams.forEach((beam, i) => {
         beam.visible = power > 0.01;
         if (!beam.visible) return;

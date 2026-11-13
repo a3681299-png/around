@@ -57,7 +57,14 @@ export interface Seat {
    * A bed: instead of sitting, the body dives on from the stand point and lies face down, its
    * chest here (on the surface) and its head the way `heading` points (docs/living-life.md).
    */
-  lie?: { x: number; y: number; z: number; heading: number };
+  lie?: {
+    x: number;
+    y: number;
+    z: number;
+    heading: number;
+    /** It stays on its front, chin up (watching something), instead of rolling onto its back. */
+    prone?: boolean;
+  };
   /**
    * No seat at all but a place to stand (before the screen at a live): the body goes to `stand`,
    * turns to face `heading` and stays on its feet.
@@ -279,7 +286,9 @@ const distance = (a: Vec3, b: Vec3) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2]
 const moved = (wanted: Seat, current: Seat | undefined) =>
   !current ||
   Math.hypot(wanted.x - current.x, wanted.z - current.z) > 0.05 ||
-  Boolean(wanted.lie) !== Boolean(current.lie);
+  Boolean(wanted.lie) !== Boolean(current.lie) ||
+  // (Sat down where it stood, and now asked to stand there again: that is another seat too.)
+  Boolean(wanted.standing) !== Boolean(current.standing);
 
 /**
  * How far from the target (on the floor) the body stands so the hand reaches it with the elbow
@@ -893,11 +902,11 @@ export function approachIntent(s: ApproachState, target: Vec3 | undefined): Body
       // Landed on its front, the feet swing up behind; then it rolls over onto its back to
       // settle in (the phone is held up over the face there), one leg crossed over the other.
       kickLegs = over(0.6, 1.2);
-      roll = over(LIE_ROLL[0], LIE_ROLL[1]);
+      roll = s.seat?.lie?.prone ? 0 : over(LIE_ROLL[0], LIE_ROLL[1]);
       break;
     case 'rise':
       // Back onto its front first, then up and off the bed.
-      roll = 1 - over(0, RISE_S * 0.3);
+      roll = s.seat?.lie?.prone ? 0 : 1 - over(0, RISE_S * 0.3);
       lie = 1 - over(RISE_S * 0.25, RISE_S * 0.8);
       kickLegs = 1 - over(0, 0.3);
       break;

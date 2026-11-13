@@ -31,8 +31,8 @@ export interface Live {
   update(dt: number, now: number, state: DesktopState, camera: PerspectiveCamera): void;
   /** What the resident is to know of the live (undefined when there is none). */
   cue(): LiveCue | undefined;
-  /** Where the camera is to be while the live is on. */
-  camera(): LiveView | undefined;
+  /** Where the camera is to be while the live is on (`low`: the resident is off its feet). */
+  camera(low?: boolean): LiveView | undefined;
   /** 0 the room as it is, 1 a live; the picture's light; the beat's pulse (1 on a beat). */
   readonly amount: number;
   readonly light: FrameLight;
@@ -125,8 +125,10 @@ export function startLive(env: LiveStageEnv & { wake(): void }, view: DesktopVie
       }
     },
     cue: () =>
-      on ? { spot: stage.spot, look: stage.look, energy: beat.energy, beat: beat.beat, bpm: beat.bpm } : undefined,
-    camera: () => (on ? stage.view(viewName) : undefined),
+      on
+        ? { spot: stage.spot, rest: stage.rest, look: stage.look, energy: beat.energy, beat: beat.beat, bpm: beat.bpm }
+        : undefined,
+    camera: (low) => (on ? stage.view(viewName, low) : undefined),
     get amount() {
       return stage.amount;
     },

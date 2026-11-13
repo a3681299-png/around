@@ -279,7 +279,7 @@ for sx,sy,z0,count,kinds in [(1.02,-.98,0,5,('comic','album2')),(-.95,-.42,.024,
                              (-2.18,.18,0,5,('comic','album8'))]:
     for k in range(count):
         flatbook('manga_pile',sx+(RNG.random()-.5)*.05,sy+(RNG.random()-.5)*.05,z0+k*.035,w=.13+.05*(k%2),d=.19+.05*(k%2),angle=RNG.uniform(-.5,.5),kind=kinds[k%2])
-flatbook('manga_open_face_down',.30,-.32,.024,w=.26,d=.19,angle=.9,kind='comic')
+flatbook('manga_open_face_down',-.40,.30,0,w=.26,d=.19,angle=.9,kind='comic')
 
 # The power strip by the desk and the leads that wander off from it across the floor.
 block('power_strip',(.34,.06,.032),(-1.12,1.66,.016),C,WHITE,rot=(0,0,.2),bevel=.006)

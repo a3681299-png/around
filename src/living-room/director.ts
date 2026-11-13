@@ -105,10 +105,19 @@ export interface Orders {
   music?: { move: LiveMove; dance: number; groove: number };
   /** A jump for joy, this frame (the song's big moment). */
   cheer: boolean;
+  /**
+   * At a live, off its feet before the screen: sitting through a long quiet song, or (worn out)
+   * lying on its front on the floor, still watching. The page knows the places.
+   */
+  rest?: 'sit' | 'lie';
 }
 
 export interface DirectorState {
   liveMood: LiveMoodState;
+  /** At a live: how it rests before the screen (see Orders.rest), and how long the music has
+   * been only listened to (seconds). */
+  liveRest: 'sit' | 'lie' | undefined;
+  liveQuiet: number;
   mind: Mind;
   activity: Activity;
   /** Seconds in this activity, and since the body settled into it (0 until then). */
@@ -144,6 +153,8 @@ const GIVE_UP_S = 3.2;
 export const startDirector = (seed = 1, affinity = 0): DirectorState => {
   return {
     liveMood: startLiveMood(),
+    liveRest: undefined,
+    liveQuiet: 0,
     // The page opens on it lying with its phone: that is the room at rest.
     mind: { ...startMind(seed, affinity), did: ['bedPhone'] },
     activity: 'bedPhone',
@@ -192,6 +203,14 @@ const LIVE_SAYS: Record<LiveMove, string> = {
   sway: '音楽に揺れている',
   dance: '音楽に合わせて踊っている',
 };
+const LIVE_REST_SAYS = { sit: '座って音楽を聴いている', lie: '寝転んでライブを眺めている' };
+/**
+ * A live and its strength (1 rested … 0 worn out). It dances itself tired in a few minutes; worn
+ * down to `LIE_AT` it lies down before the screen and watches on from there, which mends it
+ * (most of the way in under a minute); at `UP_AT` it is on its feet again. A song only listened
+ * to for `SIT_AFTER_S` is sat through.
+ */
+const LIVE_REST = { lieAt: 0.14, upAt: 0.62, mendPerS: 1 / 80, sitAfterS: 12, sitMendPerS: 1 / 300 };
 
 /** The wallpaper that suits how it feels (an index into the desktop's wallpapers). */
 function wallpaperFor(mind: Mind): number {
@@ -385,22 +404,42 @@ export function stepDirector(state: DirectorState, seen: Seen): { state: Directo
         tired: Math.max(0, 1 - mind.energy / 0.3),
         joy: mind.joy,
       });
-      stand = live.spot;
       look = live.look;
-      music = { move: moved.move, dance: moved.dance, groove: moved.groove };
-      if (moved.drop) {
-        mind = feel(mind, 'drop');
-        cheer = true;
-        flash('bang', 0.9);
+      // Off its feet: worn out, it lies down where it can still see the screen and stays until
+      // it is rested (not asleep: it is at a live). A song it has only listened to for a while
+      // it sits through, and is up again as soon as the music moves it.
+      let rest = s.liveRest;
+      const quiet = moved.move === 'listen' ? s.liveQuiet + dt : 0;
+      if (rest === 'lie') {
+        if (mind.energy >= LIVE_REST.upAt) rest = undefined;
+      } else if (mind.energy < LIVE_REST.lieAt) {
+        rest = 'lie';
+        flash('dots', 1.4);
+      } else if (rest === 'sit') {
+        if (moved.move !== 'listen') rest = undefined;
+      } else if (quiet > LIVE_REST.sitAfterS) rest = 'sit';
+      // (What `stepMind` took for the live is given back with the rest's own mending on top.)
+      if (rest === 'lie' && seen.body === 'lie')
+        mind = { ...mind, energy: Math.min(1, mind.energy + dt * (LIVE_REST.mendPerS + 1 / 420)) };
+      else if (rest === 'sit' && seen.body === 'sit')
+        mind = { ...mind, energy: Math.min(1, mind.energy + dt * (LIVE_REST.sitMendPerS + 1 / 420)) };
+      if (!rest) {
+        stand = live.spot;
+        music = { move: moved.move, dance: moved.dance, groove: moved.groove };
+        if (moved.drop) {
+          mind = feel(mind, 'drop');
+          cheer = true;
+          flash('bang', 0.9);
+        }
       }
       // Dancing keeps it glad, and now and then it shows.
-      let count = s.count + (moved.move === 'dance' ? dt : 0);
-      if (moved.move === 'dance') mind = { ...mind, joy: Math.min(1, mind.joy + dt / 14) };
+      let count = s.count + (!rest && moved.move === 'dance' ? dt : 0);
+      if (!rest && moved.move === 'dance') mind = { ...mind, joy: Math.min(1, mind.joy + dt / 14) };
       if (count > 7) {
         flash('note', 1.6);
         count = 0;
       }
-      s = { ...s, liveMood: moved, count };
+      s = { ...s, liveMood: moved, liveRest: rest, liveQuiet: quiet, count };
       break;
     }
   }
@@ -411,7 +450,7 @@ export function stepDirector(state: DirectorState, seen: Seen): { state: Directo
   // A live begins: whatever it was at, it comes (the mind is not asked; a sleeper is woken by the
   // music, and not crossly).
   if (seen.live && s.activity !== 'live' && s.next !== 'live' && !falling)
-    s = { ...s, next: 'live', liveMood: startLiveMood() };
+    s = { ...s, next: 'live', liveMood: startLiveMood(), liveRest: undefined, liveQuiet: 0 };
   if ((done || interrupted) && !s.next && !falling) {
     const picked = choose(mind, {
       uiOpen: stage.open,
@@ -470,6 +509,7 @@ export function stepDirector(state: DirectorState, seen: Seen): { state: Directo
               ? 'note'
               : undefined;
   const leaving = Boolean(s.next);
+  const rest = s.activity === 'live' && seen.live && !leaving ? s.liveRest : undefined;
   s = { ...s, mind };
   return {
     state: s,
@@ -497,13 +537,16 @@ export function stepDirector(state: DirectorState, seen: Seen): { state: Directo
         ? 'ほうり出された！'
         : leaving && seen.phone !== 'away'
           ? 'スマホを置いている'
-          : music
-            ? LIVE_SAYS[music.move]
-            : SAYS[s.activity],
+          : rest
+            ? LIVE_REST_SAYS[rest]
+            : music
+              ? LIVE_SAYS[music.move]
+              : SAYS[s.activity],
       mood,
       ...(stand && !leaving ? { stand } : {}),
       ...(music && !leaving ? { music } : {}),
       cheer: cheer && !leaving,
+      ...(rest ? { rest } : {}),
     },
   };
 }

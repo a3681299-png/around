@@ -280,8 +280,11 @@ async function start() {
     // and home again after: eased, never cut (docs/living-live.md).
     const live = desktop.live;
     const staged = live.amount;
-    const to = live.camera() ?? rest;
-    const ease = 1 - Math.exp(-dt * 2.2);
+    const staging = live.camera(Boolean(resident?.resting));
+    const to = staging ?? rest;
+    // (Into a live the camera takes its time: the house lights are down before it has arrived,
+    // and the picture's light comes up as it does. Home again it goes a little quicker.)
+    const ease = 1 - Math.exp(-dt * (staging ? 1.3 : 2.2));
     home.lerp(to.position, ease);
     SUBJECT.lerp(to.target, ease);
     if (!reviewing) reviewSubject.copy(SUBJECT);
@@ -302,10 +305,12 @@ async function start() {
     // A small orbit about the subject follows the pointer: depth without leaving the composition.
     offset.copy(home).sub(SUBJECT);
     if (__WW_LIVING_TEST__) offset.multiplyScalar(reviewDistance).applyAxisAngle(new Vector3(0, 1, 0), reviewTurn);
-    offset.applyAxisAngle(new Vector3(0, 1, 0), -(look.x + driftX) * (0.05 + 0.05 * staged));
+    offset.applyAxisAngle(new Vector3(0, 1, 0), -(look.x + driftX) * (0.05 + 0.08 * staged));
     offset.y += (look.y + driftY) * (0.25 - 0.1 * staged);
-    // (A beat leans the view in by a finger's width.)
-    if (drifting) offset.multiplyScalar(1 - 0.006 * live.pulse);
+    // (A beat leans the view in by a finger's width; and it breathes slowly nearer and further,
+    // which is what makes the floor before the screen and the things on it slide under the
+    // picture: the picture is in the room, not on the glass.)
+    if (drifting) offset.multiplyScalar((1 - 0.006 * live.pulse) * (1 + 0.035 * Math.sin(now * 0.00012 + 0.7)));
     resident?.houseLights(1 - 0.72 * staged);
     camera.position.copy(reviewSubject).add(offset);
     camera.lookAt(reviewSubject);
