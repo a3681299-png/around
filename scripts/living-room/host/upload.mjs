@@ -53,11 +53,16 @@ for (const { file, key } of files) {
   console.log(`${dry ? 'would put' : 'put'} ${key} (${(size / 1048576).toFixed(1)} MiB)`);
   if (dry) continue;
   const type = TYPES[key.slice(key.lastIndexOf('.') + 1).toLowerCase()];
-  // (Fixed arguments only; `shell` is for Windows' npx.cmd.)
+  // (Fixed arguments only; `shell` is for Windows' npx.cmd, which splits an argument at a space or
+  // a semicolon ("text/html; charset=utf-8") unless it is quoted.)
+  const windows = process.platform === 'win32';
+  const quote = (value) => (windows ? `"${value}"` : value);
   const result = spawnSync(
     'npx',
-    ['wrangler@4', 'r2', 'object', 'put', `${BUCKET}/${key}`, '--file', file, '--content-type', type, '--remote'],
-    { stdio: 'inherit', shell: process.platform === 'win32' },
+    ['wrangler@4', 'r2', 'object', 'put', `${BUCKET}/${key}`, '--file', file, '--content-type', type, '--remote'].map(
+      quote,
+    ),
+    { stdio: 'inherit', shell: windows },
   );
   if (result.status !== 0) throw new Error(`Uploading ${key} failed (nothing after it was sent).`);
 }
