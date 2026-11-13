@@ -1,0 +1,17 @@
+# The Worker that serves the living room from R2 (docs/living-room-hosting.md).
+#   cd scripts/living-room/host && npx wrangler@4 deploy
+name = "living-room"
+main = "worker.mjs"
+compatibility_date = "2026-01-01"
+
+# No public *.workers.dev address and no preview addresses: the only way in is the custom domain,
+# and that one is behind Cloudflare Access (who may open it is set there, not in this code).
+workers_dev = false
+preview_urls = false
+
+[[r2_buckets]]
+binding = "ROOM"
+bucket_name = "living-room"
+
+# The custom domain (living-room.<your domain>) is added in the dashboard, so that this file holds
+# nothing of the account: Workers & Pages > living-room > Settings > Domains & Routes.

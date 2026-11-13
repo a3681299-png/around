@@ -11,6 +11,7 @@ const unitSpecs = [
   'space',
   'space-data',
   'room-life',
+  'living-room-host',
   'camera-shots',
   'clean-work',
   'backup-data',
