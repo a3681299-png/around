@@ -42,6 +42,18 @@ test('the page is at the root, and each file is given its own kind', async () =>
   expect((await handle(get('/app.js'), env)).headers.get('content-type')).toContain('text/javascript');
   expect((await handle(get('/style.css'), env)).headers.get('content-type')).toContain('text/css');
   expect((await handle(get('/content/room.glb'), env)).headers.get('content-type')).toBe('model/gltf-binary');
+  // (A character, when the room is put up with one.)
+  const withCharacter = bucket({
+    ...files,
+    'content/character/character.vrm': 'vrm',
+    'content/character/Idle_Loop.vrma': 'a',
+  });
+  expect((await handle(get('/content/character/character.vrm'), withCharacter.env)).headers.get('content-type')).toBe(
+    'model/gltf-binary',
+  );
+  expect((await handle(get('/content/character/Idle_Loop.vrma'), withCharacter.env)).headers.get('content-type')).toBe(
+    'model/gltf-binary',
+  );
 });
 
 test('a path cannot leave the room: dots, encoded slashes, backslashes and nulls never reach the bucket as such', async () => {

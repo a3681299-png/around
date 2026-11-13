@@ -1,6 +1,23 @@
-# 部屋をいつでも URL で開く（Cloudflare、無料、自分だけ）
+# 部屋をいつでも URL で開く（Cloudflare、R2 + Worker）
 
 サーバーを起動せずに、`https://living-room.<自分のドメイン>` で部屋（デスクトップとライブモードを含む）を開く。**フェリスは入らない**（規約が未確認なので、公開用ビルドには入れない決まり）。フェリス入りは今までどおり手元の `npm run living`。
+
+## 今の状態（2026-11-13、翔太の決定）
+
+- **認証なし**：Access を使わず、ドメインを知っていれば誰でも開ける（Worker は `noindex` で検索には出さない）。部屋の家具の Tripo のモデルも、誰でも取れる
+- **フェリス入り**：翔太が「規約上問題ない」と決めたので、フェリスの VRM と動作を載せた。**アドレスを知っている人は、フェリスのモデルと動作のファイルを取れる**（`content/character/`）。権利の判断は翔太のもの。取り込み方を変える（Access をかける、載せるのをやめる）ときは、下の手順
+- アップロードの道具は、**フェリスを載せるときだけ**、明示の印（`--allow-character`）と `.work` の下のビルド（`--from`）を求める。印がなければ、今までどおり拒否する
+
+```bash
+# フェリス入りで載せる（`npm run living` と同じ素材を使い、テスト用の入口を付けずに作る）
+WW_LIVING_OUT=.work/living-room-felis WW_LIVING_TEST=   WW_LIVING_CHARACTER=C:/wwt-private/Felis_v0.8.1/work/felis-1024.vrm   WW_LIVING_MOTIONS=C:/wwt-private/Felis_v0.8.1/motions node scripts/build-living-room.mjs
+node scripts/living-room/host/upload.mjs --from .work/living-room-felis --allow-character
+# キャラなしに戻す（フェリスのファイルを消して、公開用ビルドで上書き）
+node scripts/living-room/host/upload.mjs --remove-character
+node scripts/build-living-room.mjs && node scripts/living-room/host/upload.mjs
+```
+
+> 上の「守っていること」の「`character/`… が混ざっていたら止まる」は、印なしの公開用ビルドの話。
 
 ## 構成
 
