@@ -15,10 +15,10 @@ interface Reference {
 
 // The design system's bundle.js is the reference; the extension's port must draw the same shapes.
 function reference(): Reference {
-  const window: { WWTStudio?: Reference } = {};
-  const source = readFileSync(path.resolve('docs/wwt-studio-design-system/components/bundle.js'), 'utf8');
+  const window: { AroundStudio?: Reference } = {};
+  const source = readFileSync(path.resolve('docs/around-studio-design-system/components/bundle.js'), 'utf8');
   runInNewContext(source, { window, document: {}, Math });
-  return window.WWTStudio!;
+  return window.AroundStudio!;
 }
 
 test('G-pen outline, lines, arcs and the golden spiral match bundle.js point for point', () => {

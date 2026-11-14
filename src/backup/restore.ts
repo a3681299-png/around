@@ -21,8 +21,8 @@ export function planRestore(
   const { manifest } = backup;
   const incoming = new Map(manifest.designs.map((design) => [design.siteId, design]));
   for (const [key, value] of Object.entries(local)) {
-    if (!key.startsWith('webWorldThemes.design.')) continue;
-    const siteId = key.slice('webWorldThemes.design.'.length);
+    if (!key.startsWith('around.design.')) continue;
+    const siteId = key.slice('around.design.'.length);
     if (!isDesignId(siteId)) throw new Error('既存の作品キーが不正です。');
     const existing = parseDesign(value);
     if (existing.siteId !== siteId) throw new Error('既存の作品のサイトが一致しません。');

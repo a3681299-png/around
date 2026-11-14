@@ -25,7 +25,7 @@
   },
   {
     "fault": "idle",
-    "method": "WW_NO_IDLE_RECHECK=1; drop WW_IDLE_RECHECK in app and probe",
+    "method": "AROUND_NO_IDLE_RECHECK=1; drop AROUND_IDLE_RECHECK in app and probe",
     "contentSha256": "14543c67c02ccef4fa379b5f9191a9d132701bf5666bb67fa564fc5b2bab8171"
   }
 ]

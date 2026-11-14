@@ -1,4 +1,4 @@
-/* The Studio page around the editor. Colours and faces are the WWT Studio tokens, which the page's
+/* The Studio page around the editor. Colours and faces are the Around Studio tokens, which the page's
    script declares on :root from editor/studio-tokens.css; Payne's grey or Gesso by the system
    scheme, like the editor. Nothing is set below 12px. */
 :root {
@@ -167,20 +167,20 @@ body[data-sidepanel] .close-panel {
 /* The editor header's safety: 緊急OFF is one ruled word button; 操作チェック joins it only while
    something is restricted (the 45° diamond: 制限中), and opens a floating panel below. Vermilion is
    protection: it marks the restriction, never a decoration. */
-.ww-editor-safety {
+.around-editor-safety {
   position: relative;
   display: inline-flex;
   align-items: center;
   gap: var(--space-4);
   white-space: nowrap;
 }
-.ww-editor-safety > button {
+.around-editor-safety > button {
   height: 28px;
   padding: 0 6px;
   border: 1px solid var(--line-control);
   font-size: 12px;
 }
-.ww-editor-safety .safety-state {
+.around-editor-safety .safety-state {
   position: absolute;
   width: 1px;
   height: 1px;

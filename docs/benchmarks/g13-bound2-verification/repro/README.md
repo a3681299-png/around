@@ -7,9 +7,9 @@
 各ルートで次を実行する。
 
 ```powershell
-$env:WW_BUILD_OUT='.work/bound2-build'
+$env:AROUND_BUILD_OUT='.work/bound2-build'
 npm run build
-$env:WW_TEST_EXTENSION_PATH='.work/bound2-build'
+$env:AROUND_TEST_EXTENSION_PATH='.work/bound2-build'
 ```
 
 既存のブラウザーを共有するなら `PLAYWRIGHT_BROWSERS_PATH` にその格納先を指定する。今回の実行は153.0.8010.12、headless、新規プロファイル。実装者の保存した性能2組は143.0.7499.4だった。
@@ -38,7 +38,7 @@ npm run test:unit -- tests/answer-check.spec.ts
 npm run test:e2e -- tests/g13-bound2-independent.spec.ts tests/g13-bound2-background.spec.ts tests/g13-bound2-visual-pixels.spec.ts tests/g13-bound2-idle-visual.spec.ts
 ```
 
-残件の原因を記録するときだけ `WW_GUARD_TRACE=1` と `WW_BUILD_OUT=.work/bound2-trace` で別ビルドを作り、`WW_TEST_EXTENSION_PATH` に指定する。テストはソースの文字列を置き換えない。`idle-geometry.json` の `origin` と `geometry[].at` から再現区間の時刻を読める。記録用属性を除いた通常ビルドでも2回失敗しており、記録自体で作った隠れではない。
+残件の原因を記録するときだけ `AROUND_GUARD_TRACE=1` と `AROUND_BUILD_OUT=.work/bound2-trace` で別ビルドを作り、`AROUND_TEST_EXTENSION_PATH` に指定する。テストはソースの文字列を置き換えない。`idle-geometry.json` の `origin` と `geometry[].at` から再現区間の時刻を読める。記録用属性を除いた通常ビルドでも2回失敗しており、記録自体で作った隠れではない。
 
 ## 性能
 
@@ -70,4 +70,4 @@ npm run test:e2e -- --config=scripts/g13/verify-config.ts
 - `../youtube-visual.json`：実サイトの全フレームの表示記録。
 - `validate-artifacts.mjs`：ブラウザーを起動せず、生データのSHA、CPU22場面の再集計、96条件の上限、実際のvisibility、長い待ちの全画素差を照合する。
 
-元の全CIログと失敗のPlaywright traceは検証worktreeの `.work/evidence` / `.work/extra-results` に保持した。CIは指定の [41761659925](https://github.com/a3681299-png/web-world-themes/actions/runs/41761659925)。製品・tests・scriptsが対象と一致することも確認した。
+元の全CIログと失敗のPlaywright traceは検証worktreeの `.work/evidence` / `.work/extra-results` に保持した。CIは指定の [41761659925](https://github.com/a3681299-png/around/actions/runs/41761659925)。製品・tests・scriptsが対象と一致することも確認した。

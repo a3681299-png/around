@@ -69,12 +69,12 @@ export function decide(entries, { now, keep = KEEP_PER_FAMILY, recentMs = RECENT
 
 /**
  * The system temp folder (os.tmpdir()): the tests and measurements make a browser profile there
- * for every real-site run (mkdtemp(tmpdir(), 'ww-…')), 20–200 MB each, and nothing removed them,
+ * for every real-site run (mkdtemp(tmpdir(), 'around-…')), 20–200 MB each, and nothing removed them,
  * so they filled the disk while .work stayed small (2026-11-07: 33 GB). Only folders with our
  * prefixes are touched, and only once nothing has written to them for `recentMs` (a run in
  * progress writes all the time). Other programs' temp folders are never touched.
  */
-export const TEMP_PREFIX = /^(ww-|wwt-|c3-|c34-|c4-|g11-|g13-|ui1-|playwright_chromiumdev_profile-)/;
+export const TEMP_PREFIX = /^(around-|c3-|c34-|c4-|g11-|g13-|ui1-|playwright_chromiumdev_profile-)/;
 export const TEMP_RECENT_MS = 6 * HOUR;
 export function decideTemp(entries, { now, recentMs = TEMP_RECENT_MS }) {
   return entries
@@ -329,7 +329,7 @@ export function report(decisions) {
 
 /** Called by scripts/test.mjs and the measurement scripts when they finish. */
 export function autoClean(root) {
-  if (process.env.CI || process.env.WW_CLEAN_WORK === '0') return;
+  if (process.env.CI || process.env.AROUND_CLEAN_WORK === '0') return;
   // The temp folder's old profiles go on every run (throwaway, and a day of runs fills gigabytes):
   // only our prefixes, only untouched for TEMP_RECENT_MS, so a run in progress is never hit.
   try {

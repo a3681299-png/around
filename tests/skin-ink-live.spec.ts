@@ -10,7 +10,7 @@ import { contrastAt } from './helpers/native-youtube';
 const pages = {
   results: { url: 'https://www.youtube.com/results?search_query=lofi+hip+hop', parts: ['filter-chip', 'video-card'] },
   watch: {
-    url: process.env.WW_LIVE_VIDEO_URL ?? 'https://www.youtube.com/watch?v=LC1a-DwUhls',
+    url: process.env.AROUND_LIVE_VIDEO_URL ?? 'https://www.youtube.com/watch?v=LC1a-DwUhls',
     parts: ['subscribe-button', 'like-button', 'description-panel', 'comment-input'],
   },
 };
@@ -35,7 +35,7 @@ async function tagText(page: Page, part: string) {
 
 for (const mode of ['light', 'dark'] as const)
   test(`optional real YouTube: engine text colour keeps native text at 3:1 or more (${mode} mode)`, async ({}, info) => {
-    test.skip(process.env.WW_LIVE_SKIN !== '1', 'Explicit signed-out real YouTube UI1.1 verification.');
+    test.skip(process.env.AROUND_LIVE_SKIN !== '1', 'Explicit signed-out real YouTube UI1.1 verification.');
     test.setTimeout(600_000);
     await mkdir('.work', { recursive: true });
     const context = await launchExtension(await mkdtemp(path.resolve('.work/ui1-ink-')), false);
@@ -43,8 +43,8 @@ for (const mode of ['light', 'dark'] as const)
     if (mode === 'dark')
       await context.addCookies([{ name: 'PREF', value: 'f6=400', domain: '.youtube.com', path: '/' }]);
     const evidence: Record<string, unknown>[] = [];
-    const shots = path.resolve(process.env.WW_LIVE_SKIN_SHOTS ?? 'docs/screenshots/ui1/after');
-    const evidenceRoot = path.resolve(process.env.WW_LIVE_SKIN_DATA ?? '.work/ui1-verification');
+    const shots = path.resolve(process.env.AROUND_LIVE_SKIN_SHOTS ?? 'docs/screenshots/ui1/after');
+    const evidenceRoot = path.resolve(process.env.AROUND_LIVE_SKIN_DATA ?? '.work/ui1-verification');
     await mkdir(shots, { recursive: true });
     try {
       const worker = context.serviceWorkers()[0] ?? (await context.waitForEvent('serviceworker'));
@@ -63,7 +63,7 @@ for (const mode of ['light', 'dark'] as const)
         await storeDesign(popup, allPartsDesign(assetId));
         for (const { url, parts } of Object.values(pages)) {
           await page.goto(url, { waitUntil: 'domcontentloaded' });
-          await expect(page.locator('html')).toHaveAttribute('data-ww-mode', mode, { timeout: 20_000 });
+          await expect(page.locator('html')).toHaveAttribute('data-around-mode', mode, { timeout: 20_000 });
           if (url.includes('/watch')) {
             await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30_000 });
             await waitForAdvertToEnd(page);

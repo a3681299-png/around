@@ -172,7 +172,7 @@ export function createTimelineHost(doc: Document, siteId: string, storage: TakeS
     cancel();
     if (recording?.inputs.length)
       take = parseSignalTake({
-        format: 'ww-signal-take',
+        format: 'around-signal-take',
         formatVersion: 1,
         runtimeVersion: WORLD_RUNTIME_VERSION,
         id: recordingId,

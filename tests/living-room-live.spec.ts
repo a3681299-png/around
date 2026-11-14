@@ -16,13 +16,13 @@ import { DEFAULT_SHOTS } from '../src/world/camera-shots';
  * The living room on real YouTube (docs/living-room.md): Mirdo lives in the test room behind the
  * watch page (walks, sits, hides behind the desk), comes to the front while the room is hidden
  * and back when it opens; the room is flat at the top and opens at the comments and in the theater.
- * Explicit: WW_LIVE_LIVING=1, WW_ROOM_FILE=<packed room .glb>, WW_PLAYGROUND_MIRDO_ROOT=<the
+ * Explicit: AROUND_LIVE_LIVING=1, AROUND_ROOM_FILE=<packed room .glb>, AROUND_PLAYGROUND_MIRDO_ROOT=<the
  * private asset checkout>. Neither the room nor Mirdo is ever in the repository; pictures and the
- * recording go to .work/living-live (not committed). WW_SPACE_SCHEME=light, WW_SPACE_BRIGHT=1.
+ * recording go to .work/living-live (not committed). AROUND_SPACE_SCHEME=light, AROUND_SPACE_BRIGHT=1.
  */
 const shots = path.resolve('.work/living-live');
-// WW_LIVING_VIDEO picks another video (a 4:3 one leaves wide sides in the theater).
-const WATCH = `https://www.youtube.com/watch?v=${process.env.WW_LIVING_VIDEO ?? 'LC1a-DwUhls'}`;
+// AROUND_LIVING_VIDEO picks another video (a 4:3 one leaves wide sides in the theater).
+const WATCH = `https://www.youtube.com/watch?v=${process.env.AROUND_LIVING_VIDEO ?? 'LC1a-DwUhls'}`;
 
 /** The extension's own CPU over a few seconds (a CDP profile's self time in chrome-extension:
  * scripts): a short look, not the verdict (Codex's alternate measurement is). */
@@ -56,7 +56,7 @@ async function extensionCpu(page: Page, ms: number) {
 }
 
 const frame = async (page: Page) =>
-  JSON.parse((await page.locator('html').getAttribute('data-ww-room-frame')) ?? '{}') as {
+  JSON.parse((await page.locator('html').getAttribute('data-around-room-frame')) ?? '{}') as {
     shot: string | null;
     camera: number[];
     resident: { activity: string; spot: string | null; body: boolean; away: string | null; roomSeen: number } | null;
@@ -64,21 +64,23 @@ const frame = async (page: Page) =>
 
 test('real YouTube: Mirdo lives in the room, the room opens from flat at the comments and in the theater', async () => {
   test.skip(
-    process.env.WW_LIVE_LIVING !== '1' || !process.env.WW_ROOM_FILE || !process.env.WW_PLAYGROUND_MIRDO_ROOT,
-    'Explicit real YouTube check (WW_LIVE_LIVING=1, WW_ROOM_FILE, WW_PLAYGROUND_MIRDO_ROOT).',
+    process.env.AROUND_LIVE_LIVING !== '1' ||
+      !process.env.AROUND_ROOM_FILE ||
+      !process.env.AROUND_PLAYGROUND_MIRDO_ROOT,
+    'Explicit real YouTube check (AROUND_LIVE_LIVING=1, AROUND_ROOM_FILE, AROUND_PLAYGROUND_MIRDO_ROOT).',
   );
   test.setTimeout(600000);
   await mkdir(shots, { recursive: true });
-  const extensionPath = await layeringBuild(DEFAULT_LAYERING, { WW_SPACE_PROBE: '1' });
-  const scheme = process.env.WW_SPACE_SCHEME === 'light' ? 'light' : 'dark';
-  const bright = process.env.WW_SPACE_BRIGHT === '1';
+  const extensionPath = await layeringBuild(DEFAULT_LAYERING, { AROUND_SPACE_PROBE: '1' });
+  const scheme = process.env.AROUND_SPACE_SCHEME === 'light' ? 'light' : 'dark';
+  const bright = process.env.AROUND_SPACE_BRIGHT === '1';
   const tag = `${scheme}${bright ? '-bright' : ''}`;
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-living-live-')), false, {
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-living-live-')), false, {
     headed: true,
     width: 1600,
     height: 940,
     extensionPath,
-    ...(process.env.WW_SPACE_VIDEO === '1' ? { videoDir: path.join(shots, `video-${tag}`) } : {}),
+    ...(process.env.AROUND_SPACE_VIDEO === '1' ? { videoDir: path.join(shots, `video-${tag}`) } : {}),
   });
   const log: string[] = [];
   const note = async (page: Page, label: string) => {
@@ -86,9 +88,7 @@ test('real YouTube: Mirdo lives in the room, the room opens from flat at the com
     // The front drawing of the resident (shown only while it is in front).
     const front = await page.evaluate(() => {
       const hosts = [
-        ...document.querySelectorAll(
-          '#web-world-themes-decorations, #web-world-themes-page-decorations, #web-world-themes-video-decorations',
-        ),
+        ...document.querySelectorAll('#around-decorations, #around-page-decorations, #around-video-decorations'),
       ];
       for (const host of hosts) {
         const media = host.shadowRoot?.querySelector<HTMLElement>('.model-media');
@@ -113,7 +113,7 @@ test('real YouTube: Mirdo lives in the room, the room opens from flat at the com
   try {
     const manager = await context.newPage();
     await manager.goto('chrome://extensions/');
-    const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+    const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
     await item.waitFor();
     const id = await item.evaluate((e) => (e as HTMLElement & { data?: { id: string } }).data?.id ?? e.id);
     await manager.close();
@@ -122,8 +122,7 @@ test('real YouTube: Mirdo lives in the room, the room opens from flat at the com
     const page = await context.newPage();
     // The extension's own errors (its content script logs to the page's console).
     page.on('console', (m) => {
-      if (m.type() === 'error' && /Web World Themes|three|vrm/i.test(m.text()))
-        log.push(`console: ${m.text().slice(0, 300)}`);
+      if (m.type() === 'error' && /Around|three|vrm/i.test(m.text())) log.push(`console: ${m.text().slice(0, 300)}`);
     });
     page.on('pageerror', (e) => log.push(`pageerror: ${e.message.slice(0, 300)}`));
     await page.emulateMedia({ colorScheme: scheme });
@@ -139,7 +138,7 @@ test('real YouTube: Mirdo lives in the room, the room opens from flat at the com
     });
     // The room and Mirdo go in through the real import and validation.
     for (let attempt = 0; attempt < 2; attempt++) {
-      await panel.locator('.model-file').setInputFiles(path.resolve(process.env.WW_ROOM_FILE!));
+      await panel.locator('.model-file').setInputFiles(path.resolve(process.env.AROUND_ROOM_FILE!));
       if (
         await expect(panel.locator('.layer'))
           .toHaveCount(1, { timeout: 30000 })
@@ -151,7 +150,7 @@ test('real YouTube: Mirdo lives in the room, the room opens from flat at the com
         break;
     }
     const content = path.resolve('.work/living-live/content');
-    const { models } = writeContent(path.resolve('.'), content, process.env.WW_PLAYGROUND_MIRDO_ROOT);
+    const { models } = writeContent(path.resolve('.'), content, process.env.AROUND_PLAYGROUND_MIRDO_ROOT);
     await panel.locator('.model-file').setInputFiles(
       path.join(
         content,
@@ -179,14 +178,14 @@ test('real YouTube: Mirdo lives in the room, the room opens from flat at the com
     await expect(panel.locator('.dirty')).toHaveText('保存済み');
     await closeEditorPages(page);
     const saved = (await popup.evaluate(
-      async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
+      async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'],
     )) as { decorations: { id: string; assetId: string; source?: { format?: string } }[] } & Record<string, unknown>;
     expect(saved['schemaVersion']).toBe(18);
     const roomId = saved.decorations.find((l) => l.source?.format !== 'vrm')!.assetId;
     const resident = saved.decorations.find((l) => l.source?.format === 'vrm')!;
     const design = JSON.parse(await readFile(path.join(content, 'design.json'), 'utf8'));
     const home = design.decorations.find((l: { id: string }) => l.id === 'resident');
-    const noon = Number(process.env.WW_SPACE_NOON ?? 0.12);
+    const noon = Number(process.env.AROUND_SPACE_NOON ?? 0.12);
     await storeDesign(popup, {
       ...saved,
       decorations: [
@@ -214,7 +213,7 @@ test('real YouTube: Mirdo lives in the room, the room opens from flat at the com
     await page.reload({ waitUntil: 'domcontentloaded' });
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30000 });
     await declinePromotion(page);
-    await expect(page.locator('html')).toHaveAttribute('data-ww-room', 'ready', { timeout: 60000 });
+    await expect(page.locator('html')).toHaveAttribute('data-around-room', 'ready', { timeout: 60000 });
     await page.evaluate(() => {
       const v = document.querySelector<HTMLVideoElement>('video.html5-main-video')!;
       v.muted = true;

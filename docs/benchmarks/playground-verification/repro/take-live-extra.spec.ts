@@ -24,14 +24,14 @@ test('real YouTube: record, save and reload a take through the page port, then e
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 60000 });
     await declinePromotion(page);
     await waitForAdvertToEnd(page);
-    await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+    await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
     await page.bringToFront();
     await expect
       .poll(() =>
         popup.evaluate(async () => {
           const t = (await chrome.tabs.query({ active: true, currentWindow: true }))[0];
           try {
-            return (await chrome.tabs.sendMessage(t!.id!, { type: 'web-world-themes:probe-editor-target' }))?.siteId;
+            return (await chrome.tabs.sendMessage(t!.id!, { type: 'around:probe-editor-target' }))?.siteId;
           } catch {
             return null;
           }
@@ -61,13 +61,13 @@ test('real YouTube: record, save and reload a take through the page port, then e
     await expect(panel.locator('.take-saved')).toHaveText('テイク保存済み');
     const take = await popup.evaluate(async () => {
       const list = await chrome.runtime.sendMessage({
-        type: 'web-world-themes:signal-takes',
+        type: 'around:signal-takes',
         action: 'list',
         siteId: 'youtube',
       });
       if (!list.ok || list.value.length !== 1) throw Error('Expected one stored take');
       const response = await chrome.runtime.sendMessage({
-        type: 'web-world-themes:signal-takes',
+        type: 'around:signal-takes',
         action: 'get',
         siteId: 'youtube',
         id: list.value[0].id,
@@ -78,12 +78,12 @@ test('real YouTube: record, save and reload a take through the page port, then e
     expect(take.inputs.length).toBeGreaterThan(3);
     expect(JSON.stringify(take)).not.toMatch(/https?:|cookie|asset-|signalRules|decorations/);
     const design: any = await popup.evaluate(
-      async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
+      async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'],
     );
     expect(design).not.toHaveProperty('takes');
     result.recordedSamples = take.inputs.length;
     await page.reload({ waitUntil: 'domcontentloaded' });
-    await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+    await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
     await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
     await expect(panel.locator('.take-library-select')).toBeEnabled();
     await expect(panel.locator(`.take-library-select option[value="${take.id}"]`)).toHaveCount(1);
@@ -107,7 +107,7 @@ test('real YouTube: record, save and reload a take through the page port, then e
     await expect(backup.locator('#backup-export')).toBeEnabled();
     const downloaded = backup.waitForEvent('download');
     await backup.locator('#backup-export').click();
-    const archive = path.resolve(`.work/evidence/live-take-${side}.wwbackup`);
+    const archive = path.resolve(`.work/evidence/live-take-${side}.aroundbackup`);
     await (await downloaded).saveAs(archive);
     const { size: bytes } = await stat(archive);
     expect(bytes).toBeGreaterThan(0);
@@ -126,11 +126,9 @@ test('real YouTube: record, save and reload a take through the page port, then e
       await restored.locator('#backup-restore').click();
       await expect(restored.locator('.backup-status')).toContainText('読み込みが完了');
       const restoredData = await restored.evaluate(async (id: string) => {
-        const stored = (await chrome.storage.local.get('webWorldThemes.design.youtube'))[
-          'webWorldThemes.design.youtube'
-        ];
+        const stored = (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'];
         const response = await chrome.runtime.sendMessage({
-          type: 'web-world-themes:signal-takes',
+          type: 'around:signal-takes',
           action: 'get',
           siteId: 'youtube',
           id,

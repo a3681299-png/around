@@ -55,7 +55,7 @@ export function installEditorEntry() {
         ? standalone()
         : // The panel's page connects to the tab; with the theme OFF it explains so and offers settings.
           chrome.sidePanel.open({ tabId: id }).catch(() => standalone(id));
-    void operation.catch((error: unknown) => console.error('[Web World Themes] エディターを開けませんでした。', error));
+    void operation.catch((error: unknown) => console.error('[Around] エディターを開けませんでした。', error));
   };
   chrome.action.onClicked.addListener(open);
   const onCommand = (command: string, tab?: chrome.tabs.Tab) => {
@@ -95,10 +95,10 @@ export function installEditorEntry() {
       if (settings.creatorMode === last) return;
       last = settings.creatorMode;
       void chrome.action.setPopup({ popup: settings.creatorMode ? '' : 'popup/index.html' }).catch((error: unknown) => {
-        console.error('[Web World Themes] 起動先を変更できませんでした。', error);
+        console.error('[Around] 起動先を変更できませんでした。', error);
       });
     },
-    (error) => console.error('[Web World Themes] 起動設定を読み込めませんでした。', error),
+    (error) => console.error('[Around] 起動設定を読み込めませんでした。', error),
   );
   return () => {
     unwatch();

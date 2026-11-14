@@ -18,7 +18,7 @@ for (const realtime of [false, true])
       write: false,
       format: 'iife',
       globalName: 'G13Bound',
-      dropLabels: ['WW_GUARD_TRACE', 'WW_TEST_PAGE_CHANGE'],
+      dropLabels: ['AROUND_GUARD_TRACE', 'AROUND_TEST_PAGE_CHANGE'],
     });
     await youtube.addScriptTag({ content: bundle.outputFiles[0]!.text });
     const result = await youtube.evaluate(async (realtime) => {

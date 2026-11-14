@@ -4,12 +4,12 @@ import type { Page } from '@playwright/test';
 import { test, expect } from './fixtures';
 import { openEditor } from './helpers/editor';
 
-const overlay = '#web-world-themes-decorations',
+const overlay = '#around-decorations',
   images =
-    ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]';
+    ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations) [data-image-id]';
 async function open(popup: Page, page: Page) {
   await showArtwork(popup);
-  await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
+  await expect(page.locator('[data-around-surface~="video-card"]').first()).toBeVisible();
   // UI0-d round 3: the in-page Studio's workbench is the editor page's own (its window).
   return (await openEditor(popup, page)).panel;
 }
@@ -21,16 +21,16 @@ test('tools preserve native playback/navigation and numeric scrubbing is one can
   await youtube.setViewportSize({ width: 1366, height: 900 });
   const panel = await open(popup, youtube);
   await panel.getByRole('button', { name: '動画カードを編集', exact: true }).click();
-  await youtube.locator('[data-ww-surface~="video-card"]').first().click();
+  await youtube.locator('[data-around-surface~="video-card"]').first().click();
   expect(new URL(youtube.url()).pathname).toBe('/');
   await panel.getByLabel('背景色を変更', { exact: true }).check();
   await panel.getByLabel('背景色', { exact: true }).fill('#123456');
-  await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toHaveCSS(
+  await expect(youtube.locator('[data-around-surface~="video-card"]').first()).toHaveCSS(
     'background-color',
     'rgb(18, 52, 86)',
   );
   await panel.getByRole('button', { name: 'サイト操作', exact: true }).click();
-  await youtube.locator('[data-ww-surface~="video-card"]').first().locator('a').first().click();
+  await youtube.locator('[data-around-surface~="video-card"]').first().locator('a').first().click();
   await expect(youtube.locator('#movie_player')).toBeVisible();
   await youtube.locator('#movie_player [aria-label="Play"]').click();
   await expect(youtube.locator('#movie_player video')).toHaveJSProperty('paused', false);
@@ -158,18 +158,17 @@ test('ending immediately after resizing flushes the final workspace preference w
     shadow.querySelector<HTMLButtonElement>('.close')!.click();
   });
   // UI0-d round 3: the editor page stays; ending the edit ends it on the page.
-  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-editing', /.*/);
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-around-editing', /.*/);
   await expect
     .poll(() =>
       popup.evaluate(
-        async () =>
-          (await chrome.storage.local.get('webWorldThemes.studio.workbench.v2'))['webWorldThemes.studio.workbench.v2'],
+        async () => (await chrome.storage.local.get('around.studio.workbench.v2'))['around.studio.workbench.v2'],
       ),
     )
     .toMatchObject({ rightWidth: 340 });
   expect(
     await popup.evaluate(
-      async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
+      async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'],
     ),
   ).toBeUndefined();
   const reopened = await open(popup, youtube);

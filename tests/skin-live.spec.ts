@@ -18,13 +18,13 @@ import { hasFrameColour } from './helpers/skin-pixels';
 
 for (const part of skinParts)
   test(`optional real YouTube: ${part} keeps native operations and paints all nine slices`, async ({}, info) => {
-    test.skip(process.env.WW_LIVE_SKIN !== '1', 'Explicit signed-out real YouTube UI1 verification.');
+    test.skip(process.env.AROUND_LIVE_SKIN !== '1', 'Explicit signed-out real YouTube UI1 verification.');
     test.setTimeout(300_000);
     await mkdir('.work', { recursive: true });
     const context = await launchExtension(await mkdtemp(path.resolve('.work/ui1-live-')), false);
     // A later run can keep earlier evidence by choosing another folder (UI1.1: before/after).
-    const shots = path.resolve(process.env.WW_LIVE_SKIN_SHOTS ?? 'docs/screenshots/ui1/verification');
-    const evidenceRoot = path.resolve(process.env.WW_LIVE_SKIN_DATA ?? '.work/ui1-verification');
+    const shots = path.resolve(process.env.AROUND_LIVE_SKIN_SHOTS ?? 'docs/screenshots/ui1/verification');
+    const evidenceRoot = path.resolve(process.env.AROUND_LIVE_SKIN_DATA ?? '.work/ui1-verification');
     const evidence: Record<string, unknown> = {};
     let livePage: import('@playwright/test').Page | undefined;
     try {
@@ -39,7 +39,7 @@ for (const part of skinParts)
       const url =
         part === 'filter-chip' || part === 'video-card'
           ? 'https://www.youtube.com/results?search_query=lofi+hip+hop'
-          : (process.env.WW_LIVE_VIDEO_URL ?? 'https://www.youtube.com/watch?v=LC1a-DwUhls');
+          : (process.env.AROUND_LIVE_VIDEO_URL ?? 'https://www.youtube.com/watch?v=LC1a-DwUhls');
       await page.goto(url, { waitUntil: 'domcontentloaded' });
       if (url.includes('/watch')) {
         await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30_000 });
@@ -177,9 +177,9 @@ for (const part of skinParts)
       if (livePage && !livePage.isClosed()) {
         evidence.dom = await livePage.evaluate(() => ({
           url: location.href,
-          targets: [...document.querySelectorAll('[data-ww-surface]')].map((element) => ({
+          targets: [...document.querySelectorAll('[data-around-surface]')].map((element) => ({
             tag: element.tagName,
-            surface: element.getAttribute('data-ww-surface'),
+            surface: element.getAttribute('data-around-surface'),
             box: element.getBoundingClientRect().toJSON(),
             html: element.outerHTML.slice(0, 1600),
           })),

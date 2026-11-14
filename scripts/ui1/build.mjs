@@ -23,7 +23,7 @@ if (!/^\.work\/[a-zA-Z0-9_-]+$/.test(name))
 execFileSync(process.execPath, ['scripts/build.mjs'], {
   cwd: source,
   stdio: 'inherit',
-  env: { ...process.env, WW_BUILD_OUT: name, WW_ASSET_PROFILE: '0', WW_WORLD_MODE: 'runtime' },
+  env: { ...process.env, AROUND_BUILD_OUT: name, AROUND_ASSET_PROFILE: '0', AROUND_WORLD_MODE: 'runtime' },
 });
 
 // Isolated-world wrappers: only the extension's own callbacks pass through them.
@@ -41,12 +41,12 @@ await build({
   charset: 'utf8',
   legalComments: 'none',
   loader: { '.css': 'text' },
-  dropLabels: ['WW_TEST_PAGE_CHANGE', 'WW_GUARD_TRACE'],
+  dropLabels: ['AROUND_TEST_PAGE_CHANGE', 'AROUND_GUARD_TRACE'],
   define: {
-    __WW_WORLD_MODE__: '"runtime"',
-    __WW_WORLD_DEVTOOLS__: 'false',
-    __WW_ASSET_PROFILE__: 'false',
-    __WW_G11__: 'false',
+    __AROUND_WORLD_MODE__: '"runtime"',
+    __AROUND_WORLD_DEVTOOLS__: 'false',
+    __AROUND_ASSET_PROFILE__: 'false',
+    __AROUND_G11__: 'false',
   },
   ...instrumentation,
   plugins: disableInk ? [disableInkPlugin(source)] : [],

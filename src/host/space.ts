@@ -241,7 +241,7 @@ export function createSpaceHost(
       schedule();
     })().catch((error: unknown) => {
       if (abort.signal.aborted) return;
-      console.error('[Web World Themes] 部屋の住人を読み込めませんでした。', error);
+      console.error('[Around] 部屋の住人を読み込めませんでした。', error);
     });
   };
 
@@ -531,7 +531,7 @@ export function createSpaceHost(
         const current = session;
         revealing = true;
         void renderer.reveal().then(() => {
-          if (session === current) doc.documentElement.dataset['wwRoom'] = 'ready';
+          if (session === current) doc.documentElement.dataset['aroundRoom'] = 'ready';
         });
       }
       drawnAt = now;
@@ -539,20 +539,20 @@ export function createSpaceHost(
       drawnPlates = plates;
       drawnScheme = scheme;
       drawnLight = light;
-      WW_SPACE_PROBE: {
-        // Tests ask for drawn pixels by writing points (CSS px) to data-ww-room-sample; the answer
+      AROUND_SPACE_PROBE: {
+        // Tests ask for drawn pixels by writing points (CSS px) to data-around-room-sample; the answer
         // (sRGB bytes) is read right after this draw, from the same drawing buffer.
-        const ask = doc.documentElement.dataset['wwRoomSample'];
+        const ask = doc.documentElement.dataset['aroundRoomSample'];
         if (ask && renderer.readPixels) {
           try {
             const points = (JSON.parse(ask) as [number, number][]).slice(0, 4096).map(([x, y]) => ({ x, y }));
-            doc.documentElement.dataset['wwRoomPixels'] = JSON.stringify(renderer.readPixels(points));
+            doc.documentElement.dataset['aroundRoomPixels'] = JSON.stringify(renderer.readPixels(points));
           } catch {
-            doc.documentElement.dataset['wwRoomPixels'] = '[]';
+            doc.documentElement.dataset['aroundRoomPixels'] = '[]';
           }
-          delete doc.documentElement.dataset['wwRoomSample'];
+          delete doc.documentElement.dataset['aroundRoomSample'];
         }
-        doc.documentElement.dataset['wwRoomFrame'] = JSON.stringify({
+        doc.documentElement.dataset['aroundRoomFrame'] = JSON.stringify({
           plates: plates.length,
           // Column plates from the readability's way out (text no known part covers).
           fallback: plates.filter((p) => p.fallback).map((p) => [p.left, p.top, p.right, p.bottom].map(Math.round)),
@@ -608,7 +608,7 @@ export function createSpaceHost(
     drawnCamera = drawnPlates = drawnLight = undefined;
     sized = '';
     camera = CAMERA_REST;
-    delete doc.documentElement.dataset['wwRoom'];
+    delete doc.documentElement.dataset['aroundRoom'];
     onPlace?.();
   };
   const start = (next: DesignSpace) => {
@@ -633,16 +633,16 @@ export function createSpaceHost(
         // The page's background turns transparent only now; the canvas fades in after its first
         // draw (tick), and 'ready' is set once it is fully shown.
         slot.show();
-        doc.documentElement.dataset['wwRoom'] = 'loading';
-        WW_SPACE_PROBE: {
+        doc.documentElement.dataset['aroundRoom'] = 'loading';
+        AROUND_SPACE_PROBE: {
           // A sample request forces the next draw (the page's own attribute change wakes nobody).
           const watch = new MutationObserver(() => {
-            if (doc.documentElement.dataset['wwRoomSample']) {
+            if (doc.documentElement.dataset['aroundRoomSample']) {
               drawnCamera = undefined;
               schedule();
             }
           });
-          watch.observe(doc.documentElement, { attributes: true, attributeFilter: ['data-ww-room-sample'] });
+          watch.observe(doc.documentElement, { attributes: true, attributeFilter: ['data-around-room-sample'] });
           abort.signal.addEventListener('abort', () => watch.disconnect());
         }
         onPlace?.();
@@ -651,8 +651,8 @@ export function createSpaceHost(
       })
       .catch((error: unknown) => {
         if (abort.signal.aborted) return;
-        doc.documentElement.dataset['wwRoom'] = 'error';
-        console.error('[Web World Themes] 部屋を読み込めませんでした。', error);
+        doc.documentElement.dataset['aroundRoom'] = 'error';
+        console.error('[Around] 部屋を読み込めませんでした。', error);
       });
   };
   /** Starts, keeps or ends the resident's life for the artwork now (once the room is there). */

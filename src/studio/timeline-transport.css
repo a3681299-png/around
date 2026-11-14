@@ -1,4 +1,4 @@
-/* Take recording and playback in the WWT Studio design system. Recording is cobalt like any chosen
+/* Take recording and playback in the Around Studio design system. Recording is cobalt like any chosen
    control (red is only the engine's protection); times and labels are mono, nothing below 12px. */
 .take-transport {
   display: flex;

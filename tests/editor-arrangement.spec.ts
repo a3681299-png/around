@@ -6,10 +6,10 @@ import { openEditor } from './helpers/editor';
 /*
  * UI0-d round 2: one editor, arranged by the width it is given. A side panel's width gets the
  * floating editor's arrangement (the tabs, one column); the editor's window gets both panes. The
- * surface (side panel or window) never chooses the arrangement. 表示設定 is the same ww-panel in the
+ * surface (side panel or window) never chooses the arrangement. 表示設定 is the same around-panel in the
  * action popup and in the panel the in-video icon opens.
  */
-const cards = '[data-ww-surface~="video-card"]';
+const cards = '[data-around-surface~="video-card"]';
 
 async function enable(popup: Page, youtube: Page) {
   await showArtwork(popup);
@@ -32,7 +32,7 @@ test('a side panel width gets the tabs and one column; the window width gets bot
   await expect(panel.getByRole('tab', { name: 'プロパティ', exact: true })).toBeVisible();
   await expect(panel.locator('.save-state .dirty')).toHaveText('保存済み');
   await panel.getByLabel('画像素材を追加').setInputFiles('tests/fixtures/motion/petal.png');
-  await expect(youtube.locator('#web-world-themes-decorations [data-image-id]')).toHaveCount(1);
+  await expect(youtube.locator('#around-decorations [data-image-id]')).toHaveCount(1);
   await expect(panel.locator('.save-state .dirty')).toHaveText('未保存');
   await panel.getByRole('tab', { name: 'レイヤー', exact: true }).click();
   expect([await shown(panel, '.layers-pane'), await shown(panel, '.inspector-pane')]).toEqual([true, false]);
@@ -87,7 +87,7 @@ test('the editor wears the design system: tokens follow the scheme, nothing belo
   }
 });
 
-test('設定 is the same ww-panel in the popup and in the in-video panel, with the two ways into the editor', async ({
+test('設定 is the same around-panel in the popup and in the in-video panel, with the two ways into the editor', async ({
   popup,
   youtube,
 }) => {
@@ -96,19 +96,19 @@ test('設定 is the same ww-panel in the popup and in the in-video panel, with t
   const contents = (root: Locator) =>
     root.evaluate((node) => {
       const scope = (node.shadowRoot ?? node) as ParentNode;
-      const header = scope.querySelector('.ww-titlebar')!;
+      const header = scope.querySelector('.around-titlebar')!;
       return {
         title: header.querySelector('h2')!.textContent,
         buttons: [...scope.querySelectorAll('.creator-entry button')].map((button) => button.textContent),
-        retro: Boolean(scope.querySelector('.ww-app-icon, .ww-editor-menu')),
+        retro: Boolean(scope.querySelector('.around-app-icon, .around-editor-menu')),
         background: getComputedStyle(header).backgroundImage,
-        font: getComputedStyle(scope.querySelector('.ww-editor-body')!).fontFamily,
+        font: getComputedStyle(scope.querySelector('.around-editor-body')!).fontFamily,
       };
     });
   const fromPopup = await contents(popup.locator('.popup'));
   await youtube.bringToFront();
-  await youtube.getByRole('button', { name: 'Web World Themes の設定', exact: true }).click();
-  const panel = youtube.getByRole('dialog', { name: 'Web World Themes の設定' });
+  await youtube.getByRole('button', { name: 'Around の設定', exact: true }).click();
+  const panel = youtube.getByRole('dialog', { name: 'Around の設定' });
   await expect(panel).toBeVisible();
   const fromVideo = await contents(panel);
   expect(fromPopup).toEqual(fromVideo);

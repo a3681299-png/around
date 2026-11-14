@@ -22,7 +22,7 @@ import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
-const BUCKET = process.env.WW_LIVING_BUCKET ?? 'living-room';
+const BUCKET = process.env.AROUND_LIVING_BUCKET ?? 'living-room';
 const args = process.argv.slice(2);
 const dry = args.includes('--dry-run');
 const allowCharacter = args.includes('--allow-character');

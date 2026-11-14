@@ -42,7 +42,7 @@ def denoise_atlas(color, albedo, temporary_root):
     tree.links.new(denoise.outputs['Image'], output.inputs[0])
     try:
         # The EXR is a lossless bridge to the compositor result, removed before this call returns.
-        with tempfile.TemporaryDirectory(prefix='ww-room-bake-', dir=os.path.abspath(temporary_root)) as directory:
+        with tempfile.TemporaryDirectory(prefix='around-room-bake-', dir=os.path.abspath(temporary_root)) as directory:
             output.directory = directory
             output.file_name = 'bake'
             bpy.ops.render.render(scene=scene.name)

@@ -12,16 +12,14 @@ import type { DesignDocument, ModelDecoration } from '../src/design/types';
 
 /**
  * A local artwork on real YouTube: a person's own VRM and motion files (never in the repository:
- * WW_CHARACTER_VRM is the .vrm, WW_CHARACTER_MOTIONS the folder of .vrma), sitting at the
+ * AROUND_CHARACTER_VRM is the .vrm, AROUND_CHARACTER_MOTIONS the folder of .vrma), sitting at the
  * player's corner with the autonomy on and a motion assigned to each behaviour
- * (docs/autonomy-plan.md, the motion assignment). Headless; explicit: WW_LIVE_BEHAVIOUR_MOTIONS=1.
+ * (docs/autonomy-plan.md, the motion assignment). Headless; explicit: AROUND_LIVE_BEHAVIOUR_MOTIONS=1.
  * Pictures and the stored artwork stay in .work (they show that model).
  */
 const shots = path.resolve('.work/behaviour-motions-live');
 const media = (page: Page) =>
-  page.locator(
-    ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations) .model-media',
-  );
+  page.locator(':is(#around-decorations, #around-video-decorations, #around-page-decorations) .model-media');
 // The proposal's table, for the behaviours the autonomy has (motion file name, part, speed).
 const ASSIGN = {
   rest: { motion: 'idle', from: 0, to: 10.66, speed: 1 },
@@ -32,12 +30,14 @@ const ASSIGN = {
 
 test('real YouTube: a local character plays its assigned motion for each behaviour', async () => {
   test.skip(
-    process.env.WW_LIVE_BEHAVIOUR_MOTIONS !== '1' || !process.env.WW_CHARACTER_VRM || !process.env.WW_CHARACTER_MOTIONS,
-    'Explicit: WW_LIVE_BEHAVIOUR_MOTIONS=1 with WW_CHARACTER_VRM and WW_CHARACTER_MOTIONS.',
+    process.env.AROUND_LIVE_BEHAVIOUR_MOTIONS !== '1' ||
+      !process.env.AROUND_CHARACTER_VRM ||
+      !process.env.AROUND_CHARACTER_MOTIONS,
+    'Explicit: AROUND_LIVE_BEHAVIOUR_MOTIONS=1 with AROUND_CHARACTER_VRM and AROUND_CHARACTER_MOTIONS.',
   );
   test.setTimeout(300000);
   await mkdir(shots, { recursive: true });
-  const folder = process.env.WW_CHARACTER_MOTIONS!;
+  const folder = process.env.AROUND_CHARACTER_MOTIONS!;
   const files = (await readdir(folder)).filter((f) => Object.values(ASSIGN).some((a) => f === `${a.motion}.vrma`));
   expect(files).toHaveLength(4);
   // Only the corner placement is taken from the Playground's resident.
@@ -49,11 +49,11 @@ test('real YouTube: a local character plays its assigned motion for each behavio
   const resident = (JSON.parse(await readFile(playground, 'utf8')) as DesignDocument).decorations.find(
     (layer) => layer.id === 'resident',
   )!;
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-behaviour-live-')), false);
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-behaviour-live-')), false);
   try {
     const manager = await context.newPage();
     await manager.goto('chrome://extensions/');
-    const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+    const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
     await item.waitFor();
     const id = await item.evaluate((e) => (e as HTMLElement & { data?: { id: string } }).data?.id ?? e.id);
     await manager.close();
@@ -68,7 +68,7 @@ test('real YouTube: a local character plays its assigned motion for each behavio
       await page.waitForTimeout(500);
     await showArtwork(popup);
     const { panel } = await openEditor(popup, page);
-    await panel.locator('.model-file').setInputFiles(process.env.WW_CHARACTER_VRM!);
+    await panel.locator('.model-file').setInputFiles(process.env.AROUND_CHARACTER_VRM!);
     await expect(panel.locator('.layer')).toHaveCount(1, { timeout: 60000 });
     await panel.locator('.character-file').setInputFiles(files.map((f) => path.join(folder, f)));
     await expect(panel.locator('.character-motions li')).toHaveCount(4, { timeout: 60000 });
@@ -76,7 +76,7 @@ test('real YouTube: a local character plays its assigned motion for each behavio
     await expect(panel.locator('.dirty')).toHaveText('保存済み');
     await closeEditorPages(page);
     const saved = (await popup.evaluate(
-      async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
+      async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'],
     )) as DesignDocument;
     const layer = saved.decorations[0] as ModelDecoration;
     const ids = layer.character!.motions.map((m) => m.id);

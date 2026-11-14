@@ -15,7 +15,7 @@ const cases = [
 ];
 for (const scenario of cases) {
   test(`same-profile extension update: ${scenario.name}`, async ({}, info) => {
-    test.skip(process.env.WW_VERIFY_UPGRADE !== '1', 'Needs the historical build at 6ce22ce.');
+    test.skip(process.env.AROUND_VERIFY_UPGRADE !== '1', 'Needs the historical build at 6ce22ce.');
     test.setTimeout(90_000);
     await mkdir('.work', { recursive: true });
     const profile = await mkdtemp(path.resolve('.work/removal-update-profile-'));
@@ -39,16 +39,14 @@ for (const scenario of cases) {
         await popup.locator('#effect-strength').dispatchEvent('change');
         await expect
           .poll(() =>
-            popup.evaluate(
-              async () => (await chrome.storage.local.get('webWorldThemes.strength'))['webWorldThemes.strength'],
-            ),
+            popup.evaluate(async () => (await chrome.storage.local.get('around.strength'))['around.strength']),
           )
           .toBe(scenario.strength);
       }
       if (scenario.artwork) {
         await popup.evaluate(() =>
           chrome.storage.local.set({
-            'webWorldThemes.design.youtube': {
+            'around.design.youtube': {
               schemaVersion: 13,
               id: 'upgrade-artwork',
               siteId: 'youtube',
@@ -68,9 +66,9 @@ for (const scenario of cases) {
       const page = await context.newPage();
       await page.goto('https://www.youtube.com/');
       const before = await popup.evaluate(() => chrome.storage.local.get(null));
-      expect(before['webWorldThemes.enabled']).toBe(scenario.enabled);
+      expect(before['around.enabled']).toBe(scenario.enabled);
       if (scenario.artwork && scenario.enabled && scenario.strength) {
-        await expect(page.locator('#web-world-themes-design-style')).toHaveCount(1);
+        await expect(page.locator('#around-design-style')).toHaveCount(1);
       }
       // This is a fresh export from the real old build, not the checked-in fixture.
       const backup = await context.newPage();
@@ -78,12 +76,12 @@ for (const scenario of cases) {
       await expect(backup.locator('#backup-export')).toBeEnabled();
       const download = backup.waitForEvent('download');
       await backup.locator('#backup-export').click();
-      const archive = path.resolve(`.work/old-${scenario.name}.wwbackup`);
+      const archive = path.resolve(`.work/old-${scenario.name}.aroundbackup`);
       await (await download).saveAs(archive);
       await backup.close();
 
       execFileSync(process.execPath, ['scripts/build.mjs'], {
-        env: { ...process.env, WW_BUILD_OUT: '.work/' + path.basename(extension) },
+        env: { ...process.env, AROUND_BUILD_OUT: '.work/' + path.basename(extension) },
         stdio: 'pipe',
         windowsHide: true,
       });
@@ -95,7 +93,7 @@ for (const scenario of cases) {
       const developer = manager.locator('extensions-toolbar #devMode');
       if (!(await developer.evaluate((node: HTMLElement & { checked: boolean }) => node.checked)))
         await developer.click();
-      const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+      const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
       await item.locator('#dev-reload-button').click();
       await expect
         .poll(() => item.evaluate((node: HTMLElement & { data?: { description: string } }) => node.data?.description))
@@ -107,15 +105,13 @@ for (const scenario of cases) {
       await popup.goto(`chrome-extension://${id}/popup/index.html`);
       await expect(popup.getByRole('switch', { name: '作品を表示する' })).toBeChecked({ checked: scenario.expected });
       await page.reload();
-      if (scenario.expected) await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
-      else await expect(page.locator('html')).not.toHaveAttribute('data-ww-site');
-      await expect(page.locator('#web-world-themes-design-style')).toHaveCount(
-        scenario.expected && scenario.artwork ? 1 : 0,
-      );
+      if (scenario.expected) await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
+      else await expect(page.locator('html')).not.toHaveAttribute('data-around-site');
+      await expect(page.locator('#around-design-style')).toHaveCount(scenario.expected && scenario.artwork ? 1 : 0);
       const after = await popup.evaluate(() => chrome.storage.local.get(null));
-      expect(after['webWorldThemes.enabled']).toBe(before['webWorldThemes.enabled']);
-      expect(after['webWorldThemes.strength']).toBe(before['webWorldThemes.strength']);
-      expect(after['webWorldThemes.showArtwork']).toBe(scenario.strength === 0 ? false : undefined);
+      expect(after['around.enabled']).toBe(before['around.enabled']);
+      expect(after['around.strength']).toBe(before['around.strength']);
+      expect(after['around.showArtwork']).toBe(scenario.strength === 0 ? false : undefined);
       await popup.reload();
       await expect(popup.getByRole('switch', { name: '作品を表示する' })).toBeChecked({ checked: scenario.expected });
       await info.attach('update.json', {
@@ -141,9 +137,7 @@ for (const scenario of cases) {
       const restoredEnabled = scenario.enabled === true && scenario.strength !== 0;
       await expect(popup.getByRole('switch', { name: '作品を表示する' })).toBeChecked({ checked: restoredEnabled });
       await page.reload();
-      await expect(page.locator('#web-world-themes-design-style')).toHaveCount(
-        restoredEnabled && scenario.artwork ? 1 : 0,
-      );
+      await expect(page.locator('#around-design-style')).toHaveCount(restoredEnabled && scenario.artwork ? 1 : 0);
     } finally {
       await context.close();
     }

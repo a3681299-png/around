@@ -24,20 +24,20 @@ const design = (baseThemeId: string | null) => ({
 async function artwork(popup: Page, youtube: Page, baseThemeId: string | null) {
   await storeDesign(popup, design(baseThemeId));
   await youtube.reload();
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-design', 'base-theme-parity');
-  await expect(youtube.locator('#web-world-themes-design-style')).toHaveCount(1);
-  await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-design', 'base-theme-parity');
+  await expect(youtube.locator('#around-design-style')).toHaveCount(1);
+  await expect(youtube.locator('[data-around-surface~="video-card"]').first()).toBeVisible();
   return youtube.evaluate(() => {
     const marks: Record<string, number> = {};
     // YouTube's own parts; the retro theme's added window (title and menu bars) is its own.
-    for (const node of document.querySelectorAll('[data-ww-surface]'))
-      if (!node.closest('[id^="web-world-themes"]'))
-        for (const surface of node.getAttribute('data-ww-surface')!.split(' '))
+    for (const node of document.querySelectorAll('[data-around-surface]'))
+      if (!node.closest('[id^="around"]'))
+        for (const surface of node.getAttribute('data-around-surface')!.split(' '))
           marks[surface] = (marks[surface] ?? 0) + 1;
     return {
-      css: document.getElementById('web-world-themes-design-style')!.textContent,
+      css: document.getElementById('around-design-style')!.textContent,
       marks,
-      card: getComputedStyle(document.querySelector('[data-ww-surface~="video-card"]')!).borderTopLeftRadius,
+      card: getComputedStyle(document.querySelector('[data-around-surface~="video-card"]')!).borderTopLeftRadius,
     };
   });
 }
@@ -54,6 +54,6 @@ test('artwork based on the retro theme and artwork with no base compile, mark an
   // Any other base is still refused: the page keeps no artwork from it.
   await storeDesign(popup, design('another-theme'));
   await youtube.reload();
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
-  await expect(youtube.locator('#web-world-themes-design-style')).toHaveCount(0);
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-site', 'youtube');
+  await expect(youtube.locator('#around-design-style')).toHaveCount(0);
 });

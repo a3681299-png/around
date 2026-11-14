@@ -23,12 +23,12 @@ if (ASSET_PROFILE) installAssetRuntimeHost(document);
 
 // Lives in the isolated content-script world; reinjection leaves just one controller.
 const lifetime = globalThis as typeof globalThis & {
-  __webWorldThemesCleanup?: () => void;
+  __aroundCleanup?: () => void;
 };
 
 const site = getSiteAdapter(document, window);
 if (site) {
-  lifetime.__webWorldThemesCleanup?.();
+  lifetime.__aroundCleanup?.();
   const assetReader = createAssetReadHost(document);
   let creator: CreatorEditor | undefined;
   const controller = createPageController(
@@ -108,7 +108,7 @@ if (site) {
   const reportError = (error: unknown) => {
     controller.destroy();
     creator?.setEnabled(false);
-    console.error('[Web World Themes] 設定を読み込めませんでした。', error);
+    console.error('[Around] 設定を読み込めませんでした。', error);
   };
   const update = (settings: UserSettings) => {
     creatorMode = settings.creatorMode;
@@ -140,7 +140,7 @@ if (site) {
     void chrome.runtime.sendMessage({ type: PREPARE_SIDE_PANEL }).catch(() => undefined);
   };
   window.addEventListener('pageshow', onPageShow);
-  lifetime.__webWorldThemesCleanup = () => {
+  lifetime.__aroundCleanup = () => {
     unwatch();
     unwatchEmergency();
     chrome.runtime.onMessage.removeListener(onMessage);

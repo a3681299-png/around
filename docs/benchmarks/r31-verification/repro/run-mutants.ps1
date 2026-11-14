@@ -11,7 +11,7 @@ $checks = @(
   @{ Fault='hold'; File='tests/g13-look-regression.spec.ts'; Pattern='G1.3'; Config=$false }
 )
 $results = foreach ($check in $checks) {
-  $env:WW_TEST_EXTENSION_PATH = '.work/r31-no-' + $check.Fault
+  $env:AROUND_TEST_EXTENSION_PATH = '.work/r31-no-' + $check.Fault
   $env:PLAYWRIGHT_JSON_OUTPUT_NAME = Join-Path $root ('.work/evidence/mutant-' + $check.Fault + '.json')
   $arguments = @('run','test:e2e','--',$check.File,'--grep',$check.Pattern,'--reporter=list,json',('--output=.work/mutant-' + $check.Fault))
   if ($check.Config) { $arguments += '--config=.work/r31-tools/config.ts' }

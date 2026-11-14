@@ -1,8 +1,8 @@
 import type { AssetMetadata } from './validation';
 
-export const ASSET_READ_MESSAGE = 'web-world-themes:asset-read-v1';
-export const ASSET_READ_PORT = 'web-world-themes:asset-read-port-v1';
-export const ASSET_READ_CONFIRM = 'web-world-themes:asset-read-confirm-v1';
+export const ASSET_READ_MESSAGE = 'around:asset-read-v1';
+export const ASSET_READ_PORT = 'around:asset-read-port-v1';
+export const ASSET_READ_CONFIRM = 'around:asset-read-confirm-v1';
 export const ASSET_READ_FRAME = 'assets/read-frame.html';
 export const ASSET_READ_TTL_MS = 10_000;
 export type AssetReadErrorCode = 'denied' | 'restart' | 'unavailable';

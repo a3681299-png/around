@@ -15,12 +15,12 @@ await build({
   charset: 'utf8',
   legalComments: 'none',
   loader: { '.css': 'text' },
-  dropLabels: ['WW_TEST_PAGE_CHANGE'],
+  dropLabels: ['AROUND_TEST_PAGE_CHANGE'],
   define: {
-    __WW_WORLD_MODE__: '"runtime"',
-    __WW_WORLD_DEVTOOLS__: 'false',
-    __WW_ASSET_PROFILE__: 'false',
-    __WW_PAGE_CHANGE_LEGACY__: 'false',
+    __AROUND_WORLD_MODE__: '"runtime"',
+    __AROUND_WORLD_DEVTOOLS__: 'false',
+    __AROUND_ASSET_PROFILE__: 'false',
+    __AROUND_PAGE_CHANGE_LEGACY__: 'false',
   },
   plugins: [
     {
@@ -38,7 +38,7 @@ await build({
     export function youtubeOperations(doc){const source=original(doc),capture=source.capture.bind(source),rows=[];
       source.capture=(options)=>{const stack=new Error().stack??'',start=performance.now(),snapshot=capture(options);
         if(/\\brecheck\\b/.test(stack)){rows.push({at:start,ms:performance.now()-start,options,generation:snapshot.generation,stack});
-          if(rows.length>100)rows.shift();doc.documentElement.setAttribute('data-ww-g14-rechecks',JSON.stringify(rows));}
+          if(rows.length>100)rows.shift();doc.documentElement.setAttribute('data-around-g14-rechecks',JSON.stringify(rows));}
         return snapshot;};return source;}`,
         }));
       },

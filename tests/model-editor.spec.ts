@@ -5,7 +5,7 @@ import { exposeEditorControls, withCanvas, beginCanvasGesture } from './helpers/
 import { modelFixture } from './helpers/model-fixture';
 import type { DesignDocument } from '../src/design/types';
 import type { ModelEvaluation } from '../src/world/models';
-const overlay = '#web-world-themes-decorations';
+const overlay = '#around-decorations';
 
 test('GLB renders alpha, shares resources, edits/drags/duplicates/undoes, saves and restores original asset', async ({
   popup,
@@ -13,7 +13,7 @@ test('GLB renders alpha, shares resources, edits/drags/duplicates/undoes, saves 
   context,
 }) => {
   await showArtwork(popup);
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
   await panel
@@ -51,7 +51,7 @@ test('GLB renders alpha, shares resources, edits/drags/duplicates/undoes, saves 
   await panel.locator('.duplicate-image').click();
   await expect(media).toHaveCount(2);
   await expect(media.last()).toHaveAttribute('data-renderer', 'three');
-  const stats = () => youtube.locator(overlay).evaluate((h: HTMLElement) => JSON.parse(h.dataset.wwModelStats!));
+  const stats = () => youtube.locator(overlay).evaluate((h: HTMLElement) => JSON.parse(h.dataset.aroundModelStats!));
   expect(await stats()).toMatchObject({ contexts: 1, assets: 1, instances: 2 });
   await panel.locator('.undo').click();
   await expect(media).toHaveCount(1);
@@ -60,10 +60,7 @@ test('GLB renders alpha, shares resources, edits/drags/duplicates/undoes, saves 
   await panel.locator('.save').click();
   await expect(panel.locator('.dirty')).toHaveText('保存済み');
   const saved = await popup.evaluate(
-    async () =>
-      (await chrome.storage.local.get('webWorldThemes.design.youtube'))[
-        'webWorldThemes.design.youtube'
-      ] as DesignDocument,
+    async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'] as DesignDocument,
   );
   expect(saved.schemaVersion).toBe(18);
   expect(saved.decorations[0]).toMatchObject({ kind: 'model3d', model: { rotationY: 35 } });
@@ -87,7 +84,7 @@ test('arbitrary clips animate pixels, pause, crossfade, change speed and preserv
   youtube,
 }) => {
   await showArtwork(popup);
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
   await panel
@@ -123,10 +120,7 @@ test('arbitrary clips animate pixels, pause, crossfade, change speed and preserv
   await expect(media).toHaveAttribute('data-playback', 'playing');
   await expect.poll(async () => (await state()).clip).toBe(2);
   const saved = await popup.evaluate(
-    async () =>
-      (await chrome.storage.local.get('webWorldThemes.design.youtube'))[
-        'webWorldThemes.design.youtube'
-      ] as DesignDocument,
+    async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'] as DesignDocument,
   );
   expect(saved.decorations[0]).toMatchObject({ model: { clip: 2, speed: 1.5, crossFadeMs: 2000, inPlace: true } });
 });
@@ -136,7 +130,7 @@ test('selected head bone adds a bounded look to the paused animated pose and OFF
   youtube,
 }) => {
   await showArtwork(popup);
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
   await panel
@@ -163,7 +157,7 @@ test('selected head bone adds a bounded look to the paused animated pose and OFF
 
 test('optional glTF node names are not required for cloned rig animation', async ({ popup, youtube }) => {
   await showArtwork(popup);
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await panel.locator('.model-file').setInputFiles({
     name: 'Unnamed.glb',

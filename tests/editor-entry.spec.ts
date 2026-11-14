@@ -11,7 +11,7 @@ async function setup() {
   const work = path.resolve('.work');
   await mkdir(work, { recursive: true });
   const extension = await mkdtemp(path.join(work, 'g-entry-extension-'));
-  await cp(path.resolve(process.env.WW_TEST_EXTENSION_PATH ?? 'dist'), extension, { recursive: true });
+  await cp(path.resolve(process.env.AROUND_TEST_EXTENSION_PATH ?? 'dist'), extension, { recursive: true });
   const manifest = JSON.parse(await readFile(path.join(extension, 'manifest.json'), 'utf8'));
   // Chrome's _execute_action invokes the real toolbar action (Popup / onClicked).
   // Bind it only in this private test copy; no synthetic runtime message launches UI.
@@ -31,7 +31,7 @@ async function setup() {
   const page = await context.newPage();
   await page.goto('https://www.youtube.com/watch?v=fixture');
   await showArtwork(popup);
-  await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+  await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
   await expect(popup.locator('#creator-editor-direct')).toBeEnabled();
   await page.bringToFront();
   return { context, page, popup, id, profile, extension };
@@ -48,7 +48,7 @@ test('the emergency accelerator is assigned, latches drawing OFF, and unrelated 
     ).toBe('Alt+Shift+Q');
     await nativeShortcut(page, profile, extension, 'Q');
     await expect(popup.getByRole('button', { name: '描画を再開' })).toBeVisible();
-    await expect(page.locator('html')).not.toHaveAttribute('data-ww-site', 'youtube');
+    await expect(page.locator('html')).not.toHaveAttribute('data-around-site', 'youtube');
     // A previously approved YouTube tab must lose its approval on navigation.
     const unrelated = page;
     await unrelated.goto('https://example.com/');
@@ -140,11 +140,11 @@ test('settings starts clear of the player, remembers a dragged position, and rem
   test.setTimeout(60_000);
   const { context, page, popup } = await setup();
   try {
-    const icon = page.getByRole('button', { name: 'Web World Themes の設定', exact: true });
-    const panel = page.getByRole('dialog', { name: 'Web World Themes の設定' });
+    const icon = page.getByRole('button', { name: 'Around の設定', exact: true });
+    const panel = page.getByRole('dialog', { name: 'Around の設定' });
     for (const enabled of [false, true]) {
       await popup.getByRole('switch', { name: '作品を表示する' }).setChecked(enabled);
-      await expect.poll(() => page.locator('html').getAttribute('data-ww-site')).toBe(enabled ? 'youtube' : null);
+      await expect.poll(() => page.locator('html').getAttribute('data-around-site')).toBe(enabled ? 'youtube' : null);
       for (const [width, height] of [
         [1920, 1080],
         [1100, 760],
@@ -176,7 +176,7 @@ test('settings starts clear of the player, remembers a dragged position, and rem
     }
     await page.setViewportSize({ width: 1100, height: 760 });
     await icon.click();
-    const titlebar = (await panel.locator('.ww-titlebar').boundingBox())!;
+    const titlebar = (await panel.locator('.around-titlebar').boundingBox())!;
     await page.mouse.move(titlebar.x + 80, titlebar.y + 10);
     await page.mouse.down();
     await page.mouse.move(650, 110, { steps: 5 });
@@ -218,9 +218,7 @@ test('the editor opens display settings and hands its unsaved draft back to the 
     const panel = await sidePanelDriver(context, page, id);
     await expect.poll(() => panel.text('.dirty')).toBe('未保存');
     expect(
-      await panel.evaluate(
-        'document.querySelector("#web-world-themes-creator").shadowRoot.querySelectorAll(".layer").length',
-      ),
+      await panel.evaluate('document.querySelector("#around-creator").shadowRoot.querySelectorAll(".layer").length'),
     ).toBe(1);
     await panel.detach();
   } finally {
@@ -232,8 +230,8 @@ test('the in-video icon opens the side panel within its click in 制作モード
   test.setTimeout(60_000);
   const { context, page, popup, id } = await setup();
   try {
-    const icon = page.getByRole('button', { name: 'Web World Themes の設定', exact: true });
-    const settings = page.getByRole('dialog', { name: 'Web World Themes の設定' });
+    const icon = page.getByRole('button', { name: 'Around の設定', exact: true });
+    const settings = page.getByRole('dialog', { name: 'Around の設定' });
     // OFF: the icon opens 表示設定, with the same two ways into the editor as the popup.
     await expect(popup.getByRole('switch', { name: '制作モード', exact: true })).not.toBeChecked();
     await page.bringToFront();

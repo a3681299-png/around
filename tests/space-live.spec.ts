@@ -15,8 +15,8 @@ import { DEFAULT_SPACE_LOOK } from '../src/design/space';
 /**
  * The depth foundation on real YouTube (docs/depth-foundation.md): the test room behind the
  * watch page, the UI over it as glass plates, the room moving with the pointer and the scroll.
- * Explicit: WW_LIVE_SPACE=1 and WW_ROOM_FILE=<packed room .glb> (scripts/room/pack-room.mjs; the
- * room is private and never in the repository). WW_SPACE_BREAK=density runs the same steps on a
+ * Explicit: AROUND_LIVE_SPACE=1 and AROUND_ROOM_FILE=<packed room .glb> (scripts/room/pack-room.mjs; the
+ * room is private and never in the repository). AROUND_SPACE_BREAK=density runs the same steps on a
  * build without the readability density, which must fail the readability check.
  * Pictures and the recording go to .work/space-live (not committed).
  */
@@ -25,37 +25,37 @@ const WATCH = 'https://www.youtube.com/watch?v=LC1a-DwUhls';
 
 async function roomPixels(page: Page, points: [number, number][]) {
   await page.evaluate((p) => {
-    delete document.documentElement.dataset['wwRoomPixels'];
-    document.documentElement.dataset['wwRoomSample'] = JSON.stringify(p);
+    delete document.documentElement.dataset['aroundRoomPixels'];
+    document.documentElement.dataset['aroundRoomSample'] = JSON.stringify(p);
   }, points);
-  await expect(page.locator('html')).toHaveAttribute('data-ww-room-pixels', /\[/, { timeout: 10000 });
-  return JSON.parse((await page.locator('html').getAttribute('data-ww-room-pixels'))!) as number[][];
+  await expect(page.locator('html')).toHaveAttribute('data-around-room-pixels', /\[/, { timeout: 10000 });
+  return JSON.parse((await page.locator('html').getAttribute('data-around-room-pixels'))!) as number[][];
 }
 
 test('real YouTube: the room behind the UI, glass plates that keep text readable, the controls on top', async () => {
   test.skip(
-    process.env.WW_LIVE_SPACE !== '1' || !process.env.WW_ROOM_FILE,
-    'Explicit real YouTube check (WW_LIVE_SPACE=1, WW_ROOM_FILE).',
+    process.env.AROUND_LIVE_SPACE !== '1' || !process.env.AROUND_ROOM_FILE,
+    'Explicit real YouTube check (AROUND_LIVE_SPACE=1, AROUND_ROOM_FILE).',
   );
   test.setTimeout(420000);
   await mkdir(shots, { recursive: true });
-  const variant: Record<string, string> = { WW_SPACE_PROBE: '1' };
-  if (process.env.WW_SPACE_BREAK) variant['WW_SPACE_BREAK'] = process.env.WW_SPACE_BREAK;
+  const variant: Record<string, string> = { AROUND_SPACE_PROBE: '1' };
+  if (process.env.AROUND_SPACE_BREAK) variant['AROUND_SPACE_BREAK'] = process.env.AROUND_SPACE_BREAK;
   const extensionPath = await layeringBuild(DEFAULT_LAYERING, variant);
-  const scheme = process.env.WW_SPACE_SCHEME === 'light' ? 'light' : 'dark';
-  const names = process.env.WW_SPACE_BREAK === 'names';
+  const scheme = process.env.AROUND_SPACE_SCHEME === 'light' ? 'light' : 'dark';
+  const names = process.env.AROUND_SPACE_BREAK === 'names';
   const tag = names ? `${scheme}-names` : scheme;
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-space-live-')), false, {
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-space-live-')), false, {
     headed: true,
     width: 1600,
     height: 940,
     extensionPath,
-    ...(process.env.WW_SPACE_VIDEO === '1' ? { videoDir: path.join(shots, 'video') } : {}),
+    ...(process.env.AROUND_SPACE_VIDEO === '1' ? { videoDir: path.join(shots, 'video') } : {}),
   });
   try {
     const manager = await context.newPage();
     await manager.goto('chrome://extensions/');
-    const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+    const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
     await item.waitFor();
     const id = await item.evaluate((e) => (e as HTMLElement & { data?: { id: string } }).data?.id ?? e.id);
     await manager.close();
@@ -79,7 +79,7 @@ test('real YouTube: the room behind the UI, glass plates that keep text readable
     // On real YouTube the editor sometimes restores its session right after it opens and drops a
     // file chosen in that moment (no error is shown); choose it again once if no layer came.
     for (let attempt = 0; attempt < 2; attempt++) {
-      await panel.locator('.model-file').setInputFiles(path.resolve(process.env.WW_ROOM_FILE!));
+      await panel.locator('.model-file').setInputFiles(path.resolve(process.env.AROUND_ROOM_FILE!));
       if (
         await expect(panel.locator('.layer'))
           .toHaveCount(1, { timeout: 30000 })
@@ -93,7 +93,7 @@ test('real YouTube: the room behind the UI, glass plates that keep text readable
     await expect(panel.locator('.layer')).toHaveCount(1);
     // Mixed artwork (the contest's demo): the room behind, and the Playground's resident in front
     // at the player's bottom edge, under the guard.
-    const mixed = process.env.WW_SPACE_MIXED === '1';
+    const mixed = process.env.AROUND_SPACE_MIXED === '1';
     const content = path.resolve('.work/space-live/content');
     const { models } = mixed ? writeContent(path.resolve('.'), content) : { models: [] as string[] };
     if (mixed) {
@@ -113,15 +113,15 @@ test('real YouTube: the room behind the UI, glass plates that keep text readable
     await expect(panel.locator('.dirty')).toHaveText('保存済み');
     await closeEditorPages(page);
     const saved = (await popup.evaluate(
-      async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
+      async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'],
     )) as { decorations: { assetId: string; source?: { format?: string } }[] } & Record<string, unknown>;
     const assetId = saved.decorations.find((l) => l.source?.format !== 'vrm')!.assetId;
     const residentLayer = saved.decorations.find((l) => l.source?.format === 'vrm');
     const design = JSON.parse(await readFile(path.join(content, 'design.json'), 'utf8').catch(() => '{}'));
     const resident = design.decorations?.find((l: { id: string }) => l.id === 'resident');
-    const bright = process.env.WW_SPACE_BRIGHT === '1';
+    const bright = process.env.AROUND_SPACE_BRIGHT === '1';
     // The room lit so its shape reads (the test room's daylight layer); the night look otherwise.
-    const noon = Number(process.env.WW_SPACE_NOON ?? 0.12);
+    const noon = Number(process.env.AROUND_SPACE_NOON ?? 0.12);
     await storeDesign(popup, {
       ...saved,
       decorations:
@@ -150,7 +150,7 @@ test('real YouTube: the room behind the UI, glass plates that keep text readable
     await page.reload({ waitUntil: 'domcontentloaded' });
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30000 });
     await declinePromotion(page);
-    await expect(page.locator('html')).toHaveAttribute('data-ww-room', 'ready', { timeout: 60000 });
+    await expect(page.locator('html')).toHaveAttribute('data-around-room', 'ready', { timeout: 60000 });
     await page.evaluate(() => {
       const v = document.querySelector<HTMLVideoElement>('video.html5-main-video')!;
       v.muted = true;
@@ -167,7 +167,7 @@ test('real YouTube: the room behind the UI, glass plates that keep text readable
     // The room is under the content: the canvas is never what a point on the page hits (a grid
     // over the whole viewport), and the page background is transparent.
     const stacking = await page.evaluate(() => {
-      const canvas = document.querySelector('canvas[data-ww-room]')!;
+      const canvas = document.querySelector('canvas[data-around-room]')!;
       let hits = 0;
       for (let y = 5; y < innerHeight; y += 40)
         for (let x = 5; x < innerWidth - 20; x += 40) if (document.elementFromPoint(x, y) === canvas) hits++;
@@ -181,7 +181,7 @@ test('real YouTube: the room behind the UI, glass plates that keep text readable
     expect(stacking).toEqual({ z: '-1', parentIsBody: true, canvasHits: 0, app: 'rgba(0, 0, 0, 0)' });
 
     // The pointer and the scroll move the room only.
-    const frame = async () => JSON.parse((await page.locator('html').getAttribute('data-ww-room-frame'))!);
+    const frame = async () => JSON.parse((await page.locator('html').getAttribute('data-around-room-frame'))!);
     // The playing video lights the room (its colour read on the GPU).
     await expect
       .poll(async () => (await frame()).light, { timeout: 15000, message: JSON.stringify(await frame()) })
@@ -198,7 +198,7 @@ test('real YouTube: the room behind the UI, glass plates that keep text readable
     expect(left.camera[0]).toBeLessThan(-0.05);
     if (mixed) {
       // The front character is drawn (guarded), the room-depth part has none here.
-      await expect(page.locator('html')).toHaveAttribute('data-ww-guard', 'on');
+      await expect(page.locator('html')).toHaveAttribute('data-around-guard', 'on');
       await expect(page.locator('.model-media').first()).toHaveAttribute('data-renderer', 'three', { timeout: 60000 });
     }
     // Down to the comments: the left column's gaps between comments show the room.
@@ -220,7 +220,7 @@ test('real YouTube: the room behind the UI, glass plates that keep text readable
       clip: { x: 0, y: 200, width: 760, height: 420 },
     });
 
-    // The readability's way out: a build without the part names (WW_SPACE_BREAK=names) must plate
+    // The readability's way out: a build without the part names (AROUND_SPACE_BREAK=names) must plate
     // the columns. On real YouTube it may plate one too when the page shows text no known part
     // covers (an "Auto-dubbed" label seen 2026-11-08): that is the way out working, not a failure.
     // Either way the check below decides: every visible run of text is on glass at 4.5:1.

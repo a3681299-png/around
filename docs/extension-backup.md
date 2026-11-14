@@ -1,16 +1,16 @@
 # 作品と設定のバックアップ
 
-設定画面の「作品と設定のバックアップ」から専用ページを開く。.wwbackup 1ファイルで、別のChromeプロファイル・別の拡張IDへ移せる。追加権限・外部サーバー・downloads APIは使わない。ファイルは利用者が保存する。
+設定画面の「作品と設定のバックアップ」から専用ページを開く。.aroundbackup 1ファイルで、別のChromeプロファイル・別の拡張IDへ移せる。追加権限・外部サーバー・downloads APIは使わない。ファイルは利用者が保存する。
 
 ## 対象
 
-| 含めるもの                                                 | 保存元                                                   |
-| ---------------------------------------------------------- | -------------------------------------------------------- |
-| 保存済み作品                                               | chrome.storage.local の webWorldThemes.design.\<siteId\> |
-| 原本素材すべて                                             | web-world-themes-assets / assets                         |
-| 保存済みテイク                                             | web-world-themes-signal-takes / takes                    |
-| 表示設定・制作モード                                       | chrome.storage.local の既知の設定キー                    |
-| Studioの配置・タイムライン・ガイド設定、設定ウィンドウ位置 | 既知の制作UI設定キー                                     |
+| 含めるもの                                                 | 保存元                                           |
+| ---------------------------------------------------------- | ------------------------------------------------ |
+| 保存済み作品                                               | chrome.storage.local の around.design.\<siteId\> |
+| 原本素材すべて                                             | around-assets / assets                           |
+| 保存済みテイク                                             | around-signal-takes / takes                      |
+| 表示設定・制作モード                                       | chrome.storage.local の既知の設定キー            |
+| Studioの配置・タイムライン・ガイド設定、設定ウィンドウ位置 | 既知の制作UI設定キー                             |
 
 編集中の下書き、Undo/Redo、タブ番号、接続状態、chrome.storage.sessionの接続復旧情報、実行中のleaseは移さない。操作前に作品とテイクを保存し、編集タブとStudioを閉じる。元のプロファイルは残す。
 

@@ -21,13 +21,13 @@ export async function monitorInk(page: Page) {
         audit.events.push({
           at: performance.now(),
           old: record.oldValue,
-          present: root.hasAttribute('data-ww-ink-off'),
+          present: root.hasAttribute('data-around-ink-off'),
         });
       }
-    }).observe(root, { attributes: true, attributeOldValue: true, attributeFilter: ['data-ww-ink-off'] });
+    }).observe(root, { attributes: true, attributeOldValue: true, attributeFilter: ['data-around-ink-off'] });
     const sample = () => {
       audit.frames++;
-      if (root.hasAttribute('data-ww-ink-off')) audit.exposedFrames++;
+      if (root.hasAttribute('data-around-ink-off')) audit.exposedFrames++;
       if (audit.frames < 36000) requestAnimationFrame(sample);
     };
     requestAnimationFrame(sample);
@@ -58,7 +58,7 @@ export async function monitorSiteObservers(context: BrowserContext) {
         const stack = new Error().stack ?? '';
         super((records, observer) => {
           const ink = records.filter(
-            (record) => record.target === document.documentElement && record.attributeName === 'data-ww-ink-off',
+            (record) => record.target === document.documentElement && record.attributeName === 'data-around-ink-off',
           );
           if (ink.length && stack.includes('youtube.com/s/')) {
             audit.rootCallbacks++;

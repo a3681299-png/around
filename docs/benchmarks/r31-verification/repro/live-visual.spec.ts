@@ -5,11 +5,11 @@ import { openEditor, closeEditorPages } from '../../tests/helpers/editor';
 import { mkdtemp, mkdir, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-const model = process.env.WW_VRM_FILE ?? 'C:/Users/sm787/Desktop/ローポリモデル用/out/trusie.vrm';
-const motionRoot = process.env.WW_VRMA_DIR ?? 'C:/Users/sm787/Desktop/ローポリモデル用/out/anim';
+const model = process.env.AROUND_VRM_FILE ?? 'C:/Users/sm787/Desktop/ローポリモデル用/out/trusie.vrm';
+const motionRoot = process.env.AROUND_VRMA_DIR ?? 'C:/Users/sm787/Desktop/ローポリモデル用/out/anim';
 for (const label of ['before', 'after'])
   test(`R31 live visual ${label}: default placement, player placement, native input and emergency OFF`, async () => {
-    test.skip(process.env.WW_R31_LIVE !== '1');
+    test.skip(process.env.AROUND_R31_LIVE !== '1');
     test.setTimeout(240000);
     const instrumented = process.env.R31_VISUAL_PROBE === '1',
       shot = (instrumented ? 'probe-' : '') + label;
@@ -20,7 +20,7 @@ for (const label of ['before', 'after'])
         ? '../r31-before/.work/' + (instrumented ? 'r31-perf' : 'r31-normal')
         : '.work/' + (instrumented ? 'r31-perf' : 'r31-normal'),
     );
-    const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-r31-visual-')), false, {
+    const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-r31-visual-')), false, {
       headed: true,
       width: 1938,
       height: 1176,
@@ -29,7 +29,7 @@ for (const label of ['before', 'after'])
     try {
       const manager = await context.newPage();
       await manager.goto('chrome://extensions/');
-      const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+      const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
       await item.waitFor();
       const id = await item.evaluate((e: any) => e.data?.id ?? e.id);
       await manager.close();
@@ -164,14 +164,11 @@ for (const label of ['before', 'after'])
       expect(result.overControlHit).toBe(true);
       result.browser = context.browser()?.version();
       // Read the assigned key, then use the real emergency button without an OS-wide keypress.
-      result.shortcut = await popup.evaluate(() =>
-        chrome.runtime.sendMessage({ type: 'web-world-themes:safety-shortcut' }),
-      );
+      result.shortcut = await popup.evaluate(() => chrome.runtime.sendMessage({ type: 'around:safety-shortcut' }));
       await popup.getByRole('button', { name: '緊急OFF', exact: true }).click();
       await youtube.bringToFront();
       result.emergencySaved = await popup.evaluate(
-        async () =>
-          (await chrome.storage.local.get('webWorldThemes.safety.emergencyOff'))['webWorldThemes.safety.emergencyOff'],
+        async () => (await chrome.storage.local.get('around.safety.emergencyOff'))['around.safety.emergencyOff'],
       );
       expect(result.emergencySaved).toBe(true);
       await expect(youtube.locator('.model-media')).toHaveCount(0);

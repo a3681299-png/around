@@ -11,17 +11,18 @@ import { PLATE_TEXT, READABLE_CONTRAST, contrast, luminance } from '../src/world
 
 /**
  * The readability's way out (docs/depth-foundation.md): a build that knows none of YouTube's text
- * parts (WW_SPACE_BREAK=names, standing in for YouTube renaming them) still has a plate under
+ * parts (AROUND_SPACE_BREAK=names, standing in for YouTube renaming them) still has a plate under
  * every visible run of text, dense enough for 4.5:1, because the columns with bare text get one
  * large plate each. Without the way out these points sit on the bare room and the test fails.
  */
 const test = base.extend<object, { extensionPath: string }>({
   extensionPath: [
-    async ({}, use) => use(await layeringBuild(true, { WW_SPACE_PROBE: '1', WW_SPACE_BREAK: 'names', WW_DEV: '1' })),
+    async ({}, use) =>
+      use(await layeringBuild(true, { AROUND_SPACE_PROBE: '1', AROUND_SPACE_BREAK: 'names', AROUND_DEV: '1' })),
     { scope: 'worker' },
   ],
 });
-const key = 'webWorldThemes.design.youtube';
+const key = 'around.design.youtube';
 
 async function showRoom(popup: Page, youtube: Page) {
   await youtube.goto('https://www.youtube.com/watch?v=fixture');
@@ -52,7 +53,7 @@ async function showRoom(popup: Page, youtube: Page) {
   ] as const);
   await youtube.reload();
   await youtube.locator('#movie_player video').waitFor({ state: 'attached' });
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-room', 'ready', { timeout: 30000 });
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-room', 'ready', { timeout: 30000 });
 }
 
 /** Points behind every visible run of text outside the player and the pictures (CSS px). */
@@ -93,11 +94,11 @@ const textPoints = (youtube: Page) =>
 
 async function roomPixels(page: Page, points: [number, number][]) {
   await page.evaluate((p) => {
-    delete document.documentElement.dataset['wwRoomPixels'];
-    document.documentElement.dataset['wwRoomSample'] = JSON.stringify(p);
+    delete document.documentElement.dataset['aroundRoomPixels'];
+    document.documentElement.dataset['aroundRoomSample'] = JSON.stringify(p);
   }, points);
-  await expect(page.locator('html')).toHaveAttribute('data-ww-room-pixels', /\[/, { timeout: 10000 });
-  return JSON.parse((await page.locator('html').getAttribute('data-ww-room-pixels'))!) as number[][];
+  await expect(page.locator('html')).toHaveAttribute('data-around-room-pixels', /\[/, { timeout: 10000 });
+  return JSON.parse((await page.locator('html').getAttribute('data-around-room-pixels'))!) as number[][];
 }
 
 test('without the part names, every visible text still has a plate under it and reads at 4.5:1', async ({
@@ -109,7 +110,7 @@ test('without the part names, every visible text still has a plate under it and 
     if (message.text().includes('読みやすさの逃げ道')) fallbackLogs.push(message.text());
   });
   await showRoom(popup, youtube);
-  const frame = async () => JSON.parse((await youtube.locator('html').getAttribute('data-ww-room-frame'))!);
+  const frame = async () => JSON.parse((await youtube.locator('html').getAttribute('data-around-room-frame'))!);
   // A still page reads its parts once a second: two reads, so a walk has finished.
   await youtube.waitForTimeout(2500);
   for (const scroll of [0, 600]) {

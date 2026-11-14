@@ -4,8 +4,8 @@ import type { Locator, Page } from '@playwright/test';
 import { test, expect } from './fixtures';
 import { openEditor as openEditorPage } from './helpers/editor';
 
-const cards = '[data-ww-surface~="video-card"]';
-const shots = process.env.WW_SKIN_SHOTS;
+const cards = '[data-around-surface~="video-card"]';
+const shots = process.env.AROUND_SKIN_SHOTS;
 
 async function enable(popup: Page, youtube: Page) {
   await showArtwork(popup);
@@ -75,24 +75,24 @@ test('skin tool: hover names parts, click dresses every card, guides and state p
   const card = youtube.locator(cards).first();
   const before = await skinStyle(card);
   // Parts no artwork names are not matched during scans; the skin tool marks them all.
-  await expect(youtube.locator('[data-ww-surface~="search-box"]')).toHaveCount(0);
+  await expect(youtube.locator('[data-around-surface~="search-box"]')).toHaveCount(0);
   await dialog.getByRole('button', { name: 'UIを着せ替え' }).click();
   await expect(dialog.getByRole('region', { name: 'UIの着せ替え' })).toBeVisible();
-  await expect(youtube.locator('[data-ww-surface~="search-box"]')).not.toHaveCount(0);
+  await expect(youtube.locator('[data-around-surface~="search-box"]')).not.toHaveCount(0);
   const layout = await youtube.evaluate(
     (selector) =>
       [...document.querySelectorAll(selector)].map((node) => {
         const rect = node.getBoundingClientRect();
         return [rect.x, rect.y, rect.width, rect.height].map(Math.round);
       }),
-    '[data-ww-surface]',
+    '[data-around-surface]',
   );
   // The part list reports page presence: cards exist here, the subscribe button does not.
   await expect(dialog.locator('.skin-part[data-target="video-card"] .state')).toHaveText(/^[0-9]+個$/);
   await expect(dialog.locator('.skin-part[data-target="subscribe-button"] .state')).toHaveText('見つかりません');
 
   // Hover: a supported part shows its name and count; a plain control says 未対応.
-  const hover = youtube.locator('#web-world-themes-skin-hover');
+  const hover = youtube.locator('#around-skin-hover');
   await card.hover();
   await expect(hover).toBeVisible();
   await expect(hover).toContainText('動画カード');
@@ -107,7 +107,7 @@ test('skin tool: hover names parts, click dresses every card, guides and state p
   // Click: the page does not navigate, and every card of the kind is outlined.
   await card.locator('a').first().click();
   expect(youtube.url()).toBe('https://www.youtube.com/');
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-skin-selected', 'video-card');
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-skin-selected', 'video-card');
   const count = await youtube.locator(cards).count();
   expect(count).toBeGreaterThan(1);
   await expect(dialog.locator('.skin-reach')).toHaveText(`ページ上の${count}個に同時に反映されます`);
@@ -131,7 +131,7 @@ test('skin tool: hover names parts, click dresses every card, guides and state p
           const rect = node.getBoundingClientRect();
           return [rect.x, rect.y, rect.width, rect.height].map(Math.round);
         }),
-      '[data-ww-surface]',
+      '[data-around-surface]',
     ),
   ).toEqual(layout);
 
@@ -167,10 +167,10 @@ test('skin tool: hover names parts, click dresses every card, guides and state p
   await youtube.mouse.move(2, 400);
   expect((await skinStyle(card)).repeat).toBe('stretch');
   await dialog.getByRole('checkbox', { name: 'ページ上でこの状態を表示' }).check();
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-skin-force', 'video-card:hover');
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-skin-force', 'video-card:hover');
   await expect.poll(async () => (await skinStyle(card)).repeat).toBe('round');
   // Outlines step aside so the preview shows the true look.
-  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-skin-selected', /.*/);
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-around-skin-selected', /.*/);
   await shot(youtube, 'skin-state-preview');
   await dialog.getByRole('checkbox', { name: 'ページ上でこの状態を表示' }).uncheck();
   await expect.poll(async () => (await skinStyle(card)).repeat).toBe('stretch');
@@ -211,7 +211,7 @@ test('skin tool: hover names parts, click dresses every card, guides and state p
   await dialog.locator('.skin-compact > summary').click();
   await dialog.getByRole('radio', { name: /色だけにする/ }).check();
   await dialog.getByRole('checkbox', { name: 'ページ上で小さいときの見た目を表示' }).check();
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-skin-force-compact', 'video-card');
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-skin-force-compact', 'video-card');
   await youtube.mouse.move(2, 400);
   await expect.poll(async () => (await skinStyle(card)).source).toBe('none');
   expect((await skinStyle(card)).box).toEqual(before.box);
@@ -224,10 +224,10 @@ test('skin tool: hover names parts, click dresses every card, guides and state p
   await dialog.getByRole('button', { name: '保存', exact: true }).click();
   await expect(dialog.locator('.status')).toHaveText('保存しました。');
   await dialog.getByRole('button', { name: '選択・変形' }).click();
-  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-skin-picking', /.*/);
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-around-skin-picking', /.*/);
   await expect(hover).toBeHidden();
   // Leaving the skin tool keeps only the parts the artwork names (here the video card).
-  await expect(youtube.locator('[data-ww-surface~="search-box"]')).toHaveCount(0);
+  await expect(youtube.locator('[data-around-surface~="search-box"]')).toHaveCount(0);
   await expect(youtube.locator(cards).first()).toHaveCSS('border-image-source', /^url\("blob:/);
   expect(errors).toEqual([]);
 });
@@ -244,9 +244,9 @@ test('the editor window shows the skin editor in its inspector column and picks 
   const region = panel.getByRole('region', { name: 'UIの着せ替え' });
   await expect(region).toBeVisible();
   // Chips are their own part: the innermost part under the pointer wins.
-  const chip = youtube.locator('[data-ww-surface~="filter-chip"]').first();
+  const chip = youtube.locator('[data-around-surface~="filter-chip"]').first();
   await chip.hover();
-  await expect(youtube.locator('#web-world-themes-skin-hover')).toContainText('絞り込みチップ');
+  await expect(youtube.locator('#around-skin-hover')).toContainText('絞り込みチップ');
   await chip.click();
   expect(new URL(youtube.url()).pathname).toBe('/');
   await expect(region.locator('.skin-name')).toHaveText('絞り込みチップ');

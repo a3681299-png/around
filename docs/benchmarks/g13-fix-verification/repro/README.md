@@ -7,9 +7,9 @@
 各 worktree で次を実行する。
 
 ```powershell
-$env:WW_BUILD_OUT='.work/fix-build'
+$env:AROUND_BUILD_OUT='.work/fix-build'
 npm run build
-$env:WW_TEST_EXTENSION_PATH='.work/fix-build'
+$env:AROUND_TEST_EXTENSION_PATH='.work/fix-build'
 ```
 
 ブラウザーの格納先を共有する場合は `PLAYWRIGHT_BROWSERS_PATH` にその絶対パスを指定する。今回の Chromium は143.0.7499.4。Chromeは全てheadlessで、プロファイルは毎回新しいもの。
@@ -80,4 +80,4 @@ npm run test:e2e -- --config=scripts/g13/verify-config.ts
 - `../claude-performance.json`：監査した元の2組。afterはdirty状態で、最終コミットと一致する証拠には使わない。
 - `run-focused.mjs` / `run-additional.mjs`：今回の順次実行の手順。対象を `.work/g13-fix-verify`、比較元を `.work/g13-fix-before` に置き、`.work/` にコピーして使う。途中の補助試行も保存したため、最終結果のラベルは本文を参照する。
 
-CIの件数は対象コミットの [run 41748709512](https://github.com/a3681299-png/web-world-themes/actions/runs/41748709512) から確認した。中間版の失敗は [run 41746176761](https://github.com/a3681299-png/web-world-themes/actions/runs/41746176761)。全CIログと失敗traceは今回のworktreeの `.work/fix-evidence` / `.work/fix-results` にも保持した。
+CIの件数は対象コミットの [run 41748709512](https://github.com/a3681299-png/around/actions/runs/41748709512) から確認した。中間版の失敗は [run 41746176761](https://github.com/a3681299-png/around/actions/runs/41746176761)。全CIログと失敗traceは今回のworktreeの `.work/fix-evidence` / `.work/fix-results` にも保持した。

@@ -115,10 +115,10 @@ export const AUTONOMY = Object.freeze({
   seatAvoidMs: 10000,
 });
 
-declare const __WW_AUTONOMY_PACE__: number | undefined;
-/** 1 in every product build. A development build (WW_AUTONOMY_PACE, scripts/build.mjs, inside .work
+declare const __AROUND_AUTONOMY_PACE__: number | undefined;
+/** 1 in every product build. A development build (AROUND_AUTONOMY_PACE, scripts/build.mjs, inside .work
  * only) speeds the inner states up to see a doze or a change of seat without waiting minutes. */
-const PACE = typeof __WW_AUTONOMY_PACE__ === 'number' ? __WW_AUTONOMY_PACE__ : 1;
+const PACE = typeof __AROUND_AUTONOMY_PACE__ === 'number' ? __AROUND_AUTONOMY_PACE__ : 1;
 const clamp = (v: number, low = 0, high = 1) => Math.max(low, Math.min(high, v));
 const distance = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
 

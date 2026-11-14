@@ -7,9 +7,9 @@
 通常の dist を変更しないよう、作業ブランチの worktree で次を実行する。
 
 ```powershell
-$env:WW_BUILD_OUT = '.work/r31-fix'
+$env:AROUND_BUILD_OUT = '.work/r31-fix'
 npm run build
-$env:WW_TEST_EXTENSION_PATH = (Resolve-Path .work/r31-fix).Path
+$env:AROUND_TEST_EXTENSION_PATH = (Resolve-Path .work/r31-fix).Path
 npm run lint
 npm run test:unit
 npm run test:e2e -- tests/backup.spec.ts tests/character-editor.spec.ts tests/creator-editor.spec.ts tests/effect-editor.spec.ts tests/group-editor.spec.ts tests/media2-editor.spec.ts tests/motion-editor.spec.ts tests/vrma-import.spec.ts --grep 'historical v13|existing legacy VRM|same historical VRM|pick a card, preview all properties locally|effect edits survive|three images group|1080p alpha WebM plays|import, paint actual frames|Studio refuses invalid motion'
@@ -18,7 +18,7 @@ npm run test:e2e
 
 Chromium の共通配置を使う場合は `PLAYWRIGHT_BROWSERS_PATH` を指定する。e2e は workers=1 のまま。`scripts/test.mjs` が表示ありの窓を画面外に出す。ネイティブ操作を含む全件では、実行前にフォーカスを取ることを伝える。
 
-`tests/fixtures/backups/legacy-v13-vrm.wwbackup` は、変更前の拡張が実際に出力した自作素材だけのバックアップ。現在の形式から body を削って生成したものではない。由来は同じフォルダの README に記載した。
+`tests/fixtures/backups/legacy-v13-vrm.aroundbackup` は、変更前の拡張が実際に出力した自作素材だけのバックアップ。現在の形式から body を削って生成したものではない。由来は同じフォルダの README に記載した。
 
 Windows 全件で失敗した2件の反復は、同じテストコードで読み込む拡張だけを `8003738` と修正後で替えて、各々次を実行した。
 
@@ -37,13 +37,13 @@ npm run test:e2e -- tests/operation-safety.spec.ts tests/studio-transfer.spec.ts
 ## 実 YouTube の画像
 
 ```powershell
-$env:WW_VRM_FILE = 'C:\Users\sm787\Desktop\ローポリモデル用\out\trusie.vrm'
-$env:WW_VRMA_DIR = 'C:\Users\sm787\Desktop\ローポリモデル用\out\anim'
-$env:WW_LIVE_CHARACTER = '1'
+$env:AROUND_VRM_FILE = 'C:\Users\sm787\Desktop\ローポリモデル用\out\trusie.vrm'
+$env:AROUND_VRMA_DIR = 'C:\Users\sm787\Desktop\ローポリモデル用\out\anim'
+$env:AROUND_LIVE_CHARACTER = '1'
 npm run test:e2e -- tests/character-live.spec.ts
 ```
 
-`WW_VRMA_DIR` は manifest.json と trusie サブフォルダを含む親フォルダ。専用動作はその下の `trusie/idle.vrma` などを読む。撮影後に `.work/verification/character-idle.png` を開いて、キャラが実際に見えることを確かめる。VRM・VRMA 原本と、それらを含む画像・trace・プロファイルはコミットしない。
+`AROUND_VRMA_DIR` は manifest.json と trusie サブフォルダを含む親フォルダ。専用動作はその下の `trusie/idle.vrma` などを読む。撮影後に `.work/verification/character-idle.png` を開いて、キャラが実際に見えることを確かめる。VRM・VRMA 原本と、それらを含む画像・trace・プロファイルはコミットしない。
 
 ## 交互計測
 

@@ -8,10 +8,10 @@ import { openEditor } from './helpers/editor';
 import type { DesignDocument, GroupLayer } from '../src/design/types';
 import { defaultCircleMask } from '../src/effects/types';
 
-const key = 'webWorldThemes.design.youtube',
-  overlay = '#web-world-themes-decorations';
+const key = 'around.design.youtube',
+  overlay = '#around-decorations';
 const presentation =
-    ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',
+    ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations)',
   images = `${presentation} [data-image-id]`,
   compositions = `${presentation} [data-group-id]`;
 const colors = ['#f04a50', '#3caf78', '#4276ed'],
@@ -19,7 +19,7 @@ const colors = ['#f04a50', '#3caf78', '#4276ed'],
 async function open(popup: Page, page: Page) {
   await showArtwork(popup);
   await page.bringToFront();
-  await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
+  await expect(page.locator('[data-around-surface~="video-card"]').first()).toBeVisible();
   const { panel } = await openEditor(popup, page);
   await exposeEditorControls(panel);
   return panel;
@@ -38,7 +38,7 @@ async function stored(popup: Page): Promise<DesignDocument> {
 }
 async function watch(page: Page) {
   await page.locator('#navigate').evaluate((button: HTMLButtonElement) => button.click());
-  await expect(page.locator('[data-ww-surface~="player-window"]')).toBeVisible();
+  await expect(page.locator('[data-around-surface~="player-window"]')).toBeVisible();
 }
 async function play(page: Page, action: 'Play' | 'Pause') {
   await page.locator(`#movie_player [aria-label="${action}"]`).evaluate((button: HTMLButtonElement) => button.click());
@@ -128,7 +128,7 @@ async function assetCount(popup: Page) {
   return popup.evaluate(
     () =>
       new Promise<number>((resolve, reject) => {
-        const request = indexedDB.open('web-world-themes-assets');
+        const request = indexedDB.open('around-assets');
         request.onerror = () => reject(request.error);
         request.onsuccess = () => {
           const db = request.result;
@@ -673,7 +673,7 @@ test('16 groups / 32 media share effect sources and become idle or fully detache
   // G1 may still be restoring paint after a native geometry change. Measure
   // the stationary scene after that explicit Host transition has completed.
   const stopped = () =>
-    youtube.locator(overlay).evaluate((node: HTMLElement) => JSON.parse(node.dataset.wwSafety!).stopped);
+    youtube.locator(overlay).evaluate((node: HTMLElement) => JSON.parse(node.dataset.aroundSafety!).stopped);
   await expect.poll(stopped).toBe('');
   // A change just before that read may still be held for one coalescing window (200 ms).
   await youtube.waitForTimeout(300);

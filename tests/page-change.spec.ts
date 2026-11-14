@@ -41,7 +41,7 @@ test('small text mutations do not write root variables or recompile artwork', as
       node.textContent = 'LIVE';
     });
   await expect(page.locator('ytd-thumbnail-overlay-time-status-renderer').first()).not.toHaveAttribute(
-    'data-ww-surface',
+    'data-around-surface',
     /duration/,
   );
 });
@@ -52,15 +52,15 @@ test('page following reattaches the artwork sheet and discovers new native surfa
   await mount(page);
   await page.evaluate(() => {
     const runtime = (globalThis as any).__pageTest;
-    (globalThis as any).__sheet = document.getElementById('web-world-themes-design-style');
+    (globalThis as any).__sheet = document.getElementById('around-design-style');
     runtime.reset();
     (globalThis as any).__sheet.remove();
     const card = document.querySelector('ytd-rich-grid-media')!.cloneNode(true) as Element;
-    card.removeAttribute('data-ww-surface');
+    card.removeAttribute('data-around-surface');
     card.id = 'new-native-card';
     document.querySelector('ytd-rich-grid-renderer')!.append(card);
   });
-  await expect(page.locator('#new-native-card')).toHaveAttribute('data-ww-surface', /video-card/);
+  await expect(page.locator('#new-native-card')).toHaveAttribute('data-around-surface', /video-card/);
   await settle(page);
   expect(await page.evaluate(() => (globalThis as any).__sheet.isConnected)).toBe(true);
   expect(await page.evaluate(() => (globalThis as any).__pageTest.counts.compiles)).toBe(0);
@@ -104,10 +104,10 @@ test('settings, artwork, navigation, native modes and fullscreen match the forme
     await page.evaluate(() => document.documentElement.removeAttribute('dark'));
     await capture('light');
     await page.locator('#movie_player [aria-label="Fullscreen"]').click();
-    await expect(page.locator('html')).toHaveAttribute('data-ww-fullscreen', '');
+    await expect(page.locator('html')).toHaveAttribute('data-around-fullscreen', '');
     await capture('fullscreen');
     await page.evaluate(() => document.exitFullscreen());
-    await expect(page.locator('html')).not.toHaveAttribute('data-ww-fullscreen', '');
+    await expect(page.locator('html')).not.toHaveAttribute('data-around-fullscreen', '');
     await capture('exit-fullscreen');
     await page.evaluate(() => {
       const runtime = (globalThis as any).__pageTest;

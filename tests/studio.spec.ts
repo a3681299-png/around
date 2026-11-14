@@ -11,14 +11,14 @@ import type { StudioMessage } from '../src/studio/protocol';
 import type { EditorRevision, EditorSnapshot } from '../src/editor-core/types';
 import { beginCanvasGesture } from './helpers/editor-workspace';
 
-const overlay = '#web-world-themes-decorations',
+const overlay = '#around-decorations',
   presentation =
-    ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',
+    ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations)',
   images = `${presentation} [data-image-id]`,
-  key = 'webWorldThemes.design.youtube';
+  key = 'around.design.youtube';
 async function launch(context: BrowserContext, popup: Page, youtube: Page) {
   await showArtwork(popup);
-  await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
+  await expect(youtube.locator('[data-around-surface~="video-card"]').first()).toBeVisible();
   await youtube.bringToFront();
   const opened = context.waitForEvent('page');
   await popup.locator('#creator-editor-window').evaluate((button: HTMLButtonElement) => button.click());
@@ -47,7 +47,7 @@ async function stored(popup: Page) {
 test('reopening Studio after save ignores a checkpoint from before that save', async ({ context, popup, youtube }) => {
   const { studio, panel } = await launch(context, popup, youtube);
   await importImages(panel, youtube, 1);
-  const recoveryKey = 'webWorldThemes.studio.session.' + new URL(studio.url()).searchParams.get('target');
+  const recoveryKey = 'around.studio.session.' + new URL(studio.url()).searchParams.get('target');
   const readRecovery = () => popup.evaluate(async (key) => (await chrome.storage.session.get(key))[key], recoveryKey);
   await expect.poll(async () => unpackCheckpoint(await readRecovery())?.draft.decorations[0]?.name).toBe('petal.png');
   const beforeSave = await readRecovery();
@@ -57,7 +57,7 @@ test('reopening Studio after save ignores a checkpoint from before that save', a
   await save(panel);
   const origin = unpackCheckpoint(beforeSave)?.origin;
   const savedThrough = await popup.evaluate(async () => {
-    const key = 'webWorldThemes.studio.savedThrough.youtube';
+    const key = 'around.studio.savedThrough.youtube';
     return (await chrome.storage.local.get(key))[key] as EditorRevision;
   });
   expect(savedThrough).toMatchObject({ sessionId: origin?.sessionId, revision: expect.any(Number) });
@@ -89,7 +89,7 @@ for (const decision of ['restore', 'keep saved'] as const)
     await name.fill('未保存の花');
     await name.press('Tab');
     const target = Number(new URL(studio.url()).searchParams.get('target'));
-    const recoveryKey = 'webWorldThemes.studio.session.' + target;
+    const recoveryKey = 'around.studio.session.' + target;
     const readRecovery = () => popup.evaluate(async (key) => (await chrome.storage.session.get(key))[key], recoveryKey);
     await expect
       .poll(async () => unpackCheckpoint(await readRecovery())?.draft.decorations[0]?.name)
@@ -257,10 +257,10 @@ test('standalone Studio edits a real extension target using shared grouping, eff
   await studio.screenshot({ path: info.outputPath('studio-workspace.png') });
   // The page says the edit is in a separate window and offers only ending it (UI0-d: the quick
   // editor it used to open is gone); nothing else of the editor stands on the page.
-  const badge = youtube.locator('#web-world-themes-studio-link');
+  const badge = youtube.locator('#around-studio-link');
   await expect(badge).toContainText('別ウィンドウで編集中');
   await expect(badge.getByRole('button')).toHaveText(['編集を終了']);
-  await expect(youtube.locator('#web-world-themes-creator')).toHaveCount(0);
+  await expect(youtube.locator('#around-creator')).toHaveCount(0);
   await panel.getByRole('button', { name: 'グループを解除', exact: true }).click();
   await expect(panel.locator('.selected-count')).toHaveText('3個選択中');
   await expect(panel.locator('[data-kind="group"]')).toHaveCount(0);
@@ -289,9 +289,8 @@ test('target and Studio reload restore unsaved assets, selection, Undo and works
     .poll(async () => ({
       count: await popup.evaluate(
         async () =>
-          Object.keys(await chrome.storage.session.get(null)).filter((key) =>
-            key.startsWith('webWorldThemes.studio.session.'),
-          ).length,
+          Object.keys(await chrome.storage.session.get(null)).filter((key) => key.startsWith('around.studio.session.'))
+            .length,
       ),
       error: await studio.locator('.recovery-status').textContent(),
     }))
@@ -303,7 +302,7 @@ test('target and Studio reload restore unsaved assets, selection, Undo and works
   expect(await stored(popup)).toBeUndefined();
   await studio.reload();
   await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
-  await expect(panel).toHaveAttribute('data-ww-dock', 'left');
+  await expect(panel).toHaveAttribute('data-around-dock', 'left');
   await expect(panel).toHaveCSS('--panel-width', '340px');
   await expect(panel.locator('[data-layer-id]')).toHaveAttribute('data-layer-id', originalId!);
   await panel.getByRole('button', { name: '元に戻す', exact: true }).click();
@@ -337,16 +336,14 @@ test('multiple targets stay isolated and a second Studio cannot edit or overwrit
     .poll(async () => {
       const value: unknown = await popup.evaluate(
         async (target) =>
-          (await chrome.storage.session.get(`webWorldThemes.studio.session.${target}`))[
-            `webWorldThemes.studio.session.${target}`
-          ],
+          (await chrome.storage.session.get(`around.studio.session.${target}`))[`around.studio.session.${target}`],
         firstTarget,
       );
       return unpackCheckpoint(value)?.draft.decorations.length;
     })
     .toBe(1);
   await studio.getByRole('button', { name: '接続を解除', exact: true }).click();
-  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-editing', '');
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-around-editing', '');
   await expect(youtube.locator(images)).toHaveCount(0);
   await second.getByRole('button', { name: '接続 / 再開', exact: true }).click();
   await expect(second.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
@@ -422,7 +419,7 @@ test('Studio and canvas shortcuts share target geometry, input guards and direct
   await studio.keyboard.press('Escape');
   await expect(panel.locator('.selected-count')).toHaveText('0個選択中');
   await studio.getByRole('button', { name: '接続を解除', exact: true }).click();
-  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-editing', '');
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-around-editing', '');
   const keys = await youtube.locator('html').getAttribute('data-player-key-count');
   await youtube.keyboard.press('ArrowDown');
   await expect(youtube.locator('html')).not.toHaveAttribute('data-player-key-count', keys ?? '0');
@@ -451,7 +448,7 @@ test('animation playback, groups, player anchors, SPA, scrolling and strength ze
   await panel.getByLabel('アニメーションを再生', { exact: true }).check();
   await expect(youtube.locator(`${overlay} video`)).toHaveJSProperty('playbackRate', 1.5);
   await youtube.locator('#navigate').evaluate((button: HTMLButtonElement) => button.click());
-  await expect(youtube.locator('[data-ww-surface~="player-window"]')).toBeVisible();
+  await expect(youtube.locator('[data-around-surface~="player-window"]')).toBeVisible();
   await panel.getByLabel('配置の基準', { exact: true }).selectOption('video-player');
   await expect.poll(async () => (await youtube.locator(`${presentation} video`).boundingBox())!.x).toBeGreaterThan(0);
   await youtube.evaluate(() => window.scrollTo(0, 200));
@@ -469,7 +466,7 @@ test('animation playback, groups, player anchors, SPA, scrolling and strength ze
   await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
   await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
   await expect(youtube.locator(overlay)).toHaveCount(0);
-  await expect(youtube.locator('[data-ww-editing]')).toHaveCount(0);
+  await expect(youtube.locator('[data-around-editing]')).toHaveCount(0);
 });
 
 test('the authenticated Port rejects stale revisions and unrecognized commands without changing the draft', async ({
@@ -479,13 +476,13 @@ test('the authenticated Port rejects stale revisions and unrecognized commands w
   extensionId,
 }) => {
   await showArtwork(popup);
-  await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
+  await expect(youtube.locator('[data-around-surface~="video-card"]').first()).toBeVisible();
   // A Studio extension document supplies the real MV3 sender origin; no page-script bridge exists.
   const control = await context.newPage();
   await control.goto(`chrome-extension://${extensionId}/studio/index.html`);
   await expect(control.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
   await control.getByRole('button', { name: '接続を解除', exact: true }).click();
-  await expect(youtube.locator('[data-ww-editing]')).toHaveCount(0);
+  await expect(youtube.locator('[data-around-editing]')).toHaveCount(0);
   const decoder = createStudioStateDecoder();
   await control.exposeFunction('decodeStudioTestMessage', (message: StudioMessage) =>
     message.type === 'state' || message.type === 'reply' ? decoder.accept(message)?.state : undefined,
@@ -493,7 +490,7 @@ test('the authenticated Port rejects stale revisions and unrecognized commands w
   const result = await control.evaluate(
     async (base64) => {
       const tabs = await chrome.tabs.query({}),
-        probe = 'web-world-themes:studio-probe';
+        probe = 'around:studio-probe';
       let target: number | undefined;
       for (const tab of tabs)
         if (tab.id !== undefined) {
@@ -503,7 +500,7 @@ test('the authenticated Port rejects stale revisions and unrecognized commands w
             /* Unsupported tabs never receive editing commands. */
           }
         }
-      const port = chrome.tabs.connect(target!, { name: 'web-world-themes:studio-v1' });
+      const port = chrome.tabs.connect(target!, { name: 'around:studio-v1' });
       let serial = 0;
       let current: EditorSnapshot | undefined;
       let messages: Promise<void> = Promise.resolve();

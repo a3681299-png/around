@@ -20,12 +20,12 @@ export async function ui0dOperationProbeBuild(native: string, output: string) {
     charset: 'utf8',
     legalComments: 'none',
     loader: { '.css': 'text' },
-    dropLabels: ['WW_TEST_PAGE_CHANGE', 'WW_GUARD_TRACE'],
+    dropLabels: ['AROUND_TEST_PAGE_CHANGE', 'AROUND_GUARD_TRACE'],
     define: {
-      __WW_WORLD_MODE__: '"runtime"',
-      __WW_WORLD_DEVTOOLS__: 'false',
-      __WW_ASSET_PROFILE__: 'false',
-      __WW_G11__: 'false',
+      __AROUND_WORLD_MODE__: '"runtime"',
+      __AROUND_WORLD_DEVTOOLS__: 'false',
+      __AROUND_ASSET_PROFILE__: 'false',
+      __AROUND_G11__: 'false',
     },
     plugins: [
       {

@@ -1,7 +1,7 @@
 {
   "scheme": "light",
   "prefix": "after",
-  "light-hover-hits-card": ["ASIDE#web-world-themes-creator", true, true],
+  "light-hover-hits-card": ["ASIDE#around-creator", true, true],
   "light-skin": "ok",
   "light-card": "ok",
   "light-studio-badge": "ok",

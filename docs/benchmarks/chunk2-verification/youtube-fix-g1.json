@@ -5,7 +5,7 @@
     "topBand": 1748,
     "topBandAllowed": 0,
     "canvasAllowed": 0,
-    "plane": "web-world-themes-video-decorations",
+    "plane": "around-video-decorations",
     "clip": "inset(64px 0px 112px)",
     "pointerEvents": "none",
     "player": {

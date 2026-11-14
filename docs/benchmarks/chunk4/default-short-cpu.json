@@ -1,5 +1,5 @@
 {
-  "note": "Chunk 4 default switch, short check (2 pairs, alternated), real YouTube, headless, corner variant, pointer crossing the player every second (WW_PERF_R32_WIGGLE=1). Extension rAF CPU per frame (ms). layering = the new default build; cutout = WW_LAYERING=0. Not the pass/fail measurement.",
+  "note": "Chunk 4 default switch, short check (2 pairs, alternated), real YouTube, headless, corner variant, pointer crossing the player every second (AROUND_PERF_R32_WIGGLE=1). Extension rAF CPU per frame (ms). layering = the new default build; cutout = AROUND_LAYERING=0. Not the pass/fail measurement.",
   "runs": [
     {
       "pair": 1,

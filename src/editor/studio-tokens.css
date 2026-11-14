@@ -1,4 +1,4 @@
-/* WWT Studio design system (docs/wwt-studio-design-system/tokens.css and the parts of
+/* Around Studio design system (docs/around-studio-design-system/tokens.css and the parts of
    components/bundle.css the editor uses), scoped to the editor's shadow root. Everything is
    declared on :host, so no colour, name or keyframe reaches the page. Payne's grey (dark) is the
    default; Gesso (light) follows the system colour scheme. */
@@ -40,8 +40,8 @@
      then the platform's Japanese UI fonts. IBM Plex Mono is used only when installed. */
   --font-ui: 'BIZ UDPGothic', 'Hiragino Sans', 'Yu Gothic UI', 'Meiryo UI', 'Noto Sans JP', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Consolas, monospace;
-  --ww-frame: 83ms;
-  --ww-pen-h: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 4' preserveAspectRatio='none'%3E%3Cpath d='M0 2C24 .4 52 .1 100 2C52 3.9 24 3.6 0 2Z'/%3E%3C/svg%3E");
+  --around-frame: 83ms;
+  --around-pen-h: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 4' preserveAspectRatio='none'%3E%3Cpath d='M0 2C24 .4 52 .1 100 2C52 3.9 24 3.6 0 2Z'/%3E%3C/svg%3E");
 }
 @media (prefers-color-scheme: light) {
   :host {
@@ -66,7 +66,7 @@
   }
 }
 /* Motion runs on 12fps steps (コマ打ち). */
-@keyframes ww-stroke {
+@keyframes around-stroke {
   from {
     clip-path: inset(0 100% 0 0);
   }
@@ -74,7 +74,7 @@
     clip-path: inset(0 0 0 0);
   }
 }
-@keyframes ww-appear {
+@keyframes around-appear {
   from {
     opacity: 0;
   }
@@ -82,12 +82,12 @@
     opacity: 1;
   }
 }
-@keyframes ww-fade {
+@keyframes around-fade {
   to {
     opacity: 0;
   }
 }
-@keyframes ww-draw {
+@keyframes around-draw {
   from {
     stroke-dashoffset: 1;
   }
@@ -95,7 +95,7 @@
     stroke-dashoffset: 0;
   }
 }
-@keyframes ww-construct-edge {
+@keyframes around-construct-edge {
   from {
     clip-path: inset(0 0 100% 0);
   }

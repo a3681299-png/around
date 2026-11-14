@@ -1,6 +1,6 @@
 {
   "source": "UAL1_Standard_RM.glb",
-  "note": "Root motion version: walks and runs keep their hips' travel in the .vrma. WWT measures it at import (hipsTravel), draws the motion in place (the model's In-place setting) and moves the character at the speed the feet keep (src/world/gait.ts). Names stay the library's own, so WWT recognizes them as any import would.",
+  "note": "Root motion version: walks and runs keep their hips' travel in the .vrma. Around measures it at import (hipsTravel), draws the motion in place (the model's In-place setting) and moves the character at the speed the feet keep (src/world/gait.ts). Names stay the library's own, so Around recognizes them as any import would.",
   "clips": [
     { "source": "Idle_Loop" },
     { "source": "Idle_Talking_Loop" },

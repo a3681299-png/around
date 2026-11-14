@@ -15,15 +15,15 @@ export const DEFAULT_SETTINGS: Readonly<UserSettings> = Object.freeze({
 });
 
 export const SETTINGS_KEYS = {
-  creatorMode: 'webWorldThemes.creatorMode',
-  enabled: 'webWorldThemes.showArtwork',
+  creatorMode: 'around.creatorMode',
+  enabled: 'around.showArtwork',
 } as const;
 
 /** Written until the retro theme was removed (docs/theme-removal.md). They are read only while
  * 作品を表示する has never been saved, and never written or removed. */
 export const LEGACY_SETTINGS_KEYS = Object.freeze({
-  enabled: 'webWorldThemes.enabled',
-  strength: 'webWorldThemes.strength',
+  enabled: 'around.enabled',
+  strength: 'around.strength',
 });
 
 /** The retro strength slider at 0% meant OFF; its stored value was normalized like this. */

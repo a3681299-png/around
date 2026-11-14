@@ -69,7 +69,7 @@ const faults = [];
 for (const n of ['clip', 'input', 'approach', 'hold']) faults.push(await read(`.work/g14-no-${n}/fault.json`));
 faults.push({
   fault: 'idle',
-  method: 'WW_NO_IDLE_RECHECK=1; drop WW_IDLE_RECHECK in app and probe',
+  method: 'AROUND_NO_IDLE_RECHECK=1; drop AROUND_IDLE_RECHECK in app and probe',
   contentSha256: hash(await readFile('.work/g14-no-idle/content/index.js')),
 });
 await write('faults.json', faults);

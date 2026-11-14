@@ -8,7 +8,7 @@
   },
   "id": "ljeihjpffijgceejfgnecadomibobobl",
   "before": {
-    "webWorldThemes.design.youtube": {
+    "around.design.youtube": {
       "baseThemeId": "retro",
       "decorations": [],
       "id": "upgrade-artwork",
@@ -25,11 +25,11 @@
       "schemaVersion": 13,
       "siteId": "youtube"
     },
-    "webWorldThemes.enabled": true,
-    "webWorldThemes.strength": 37
+    "around.enabled": true,
+    "around.strength": 37
   },
   "after": {
-    "webWorldThemes.design.youtube": {
+    "around.design.youtube": {
       "baseThemeId": "retro",
       "decorations": [],
       "id": "upgrade-artwork",
@@ -46,12 +46,12 @@
       "schemaVersion": 13,
       "siteId": "youtube"
     },
-    "webWorldThemes.enabled": true,
-    "webWorldThemes.skinInk.v1": {
+    "around.enabled": true,
+    "around.skinInk.v1": {
       "febad9c3": {
         "light": {}
       }
     },
-    "webWorldThemes.strength": 37
+    "around.strength": 37
   }
 }

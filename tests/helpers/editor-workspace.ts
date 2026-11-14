@@ -22,15 +22,15 @@ export async function exposeEditorControls(panel: Locator) {
 /** Collapsing the panel changes the page layout; protection briefly holds drawing while it
  * re-reads the native surfaces. Screenshots and gestures wait until drawing has resumed. */
 export async function protectionSettled(page: Page) {
-  const host = page.locator('#web-world-themes-decorations');
+  const host = page.locator('#around-decorations');
   if (!(await host.count())) return;
   // The record updates on the next draw, while a new change hides layers at once; require both,
   // twice in a row, so a pending change cannot pass between the two reads.
   const settled = () =>
     page.evaluate(() => {
-      const record = document.querySelector('#web-world-themes-decorations')?.getAttribute('data-ww-safety');
+      const record = document.querySelector('#around-decorations')?.getAttribute('data-around-safety');
       const stopped = record ? (JSON.parse(record).stopped ?? '') : '';
-      const hidden = [...document.querySelectorAll('[id^="web-world-themes-"][id$="decorations"]')].some((host) =>
+      const hidden = [...document.querySelectorAll('[id^="around-"][id$="decorations"]')].some((host) =>
         [...(host.shadowRoot?.querySelectorAll<HTMLElement>('[data-image-id]') ?? [])].some(
           (node) => node.style.visibility === 'hidden' && !node.hasAttribute('data-safety-limited'),
         ),
@@ -92,24 +92,21 @@ export async function beginCanvasGesture(node: Locator, point?: { x: number; y: 
             let at: Node = element;
             while (at.getRootNode() instanceof ShadowRoot) {
               const host = (at.getRootNode() as ShadowRoot).host;
-              if (host.id.startsWith('web-world-themes')) return host.id;
+              if (host.id.startsWith('around')) return host.id;
               at = host;
             }
             return '';
           })(),
-          planeClips: [...document.querySelectorAll<HTMLElement>('[id^="web-world-themes-"][id$="decorations"]')].map(
-            (h) => `${h.id}=${h.style.getPropertyValue('--ww-decoration-clip').slice(0, 60)}`,
+          planeClips: [...document.querySelectorAll<HTMLElement>('[id^="around-"][id$="decorations"]')].map(
+            (h) => `${h.id}=${h.style.getPropertyValue('--around-decoration-clip').slice(0, 60)}`,
           ),
           horizontalScroll: document.documentElement.scrollWidth > document.documentElement.clientWidth,
           visibility: (element as HTMLElement).style.visibility,
           clip:
             root instanceof ShadowRoot
-              ? (root.host as HTMLElement).style.getPropertyValue('--ww-decoration-clip').slice(0, 160)
+              ? (root.host as HTMLElement).style.getPropertyValue('--around-decoration-clip').slice(0, 160)
               : '',
-          safety: document
-            .querySelector('#web-world-themes-decorations')
-            ?.getAttribute('data-ww-safety')
-            ?.slice(0, 600),
+          safety: document.querySelector('#around-decorations')?.getAttribute('data-around-safety')?.slice(0, 600),
           playerControls: [...document.querySelectorAll('#movie_player button, #movie_player [role="button"]')]
             .filter(visible)
             .map((e) => `${String(e.className).slice(0, 40)}@${Math.round(e.getBoundingClientRect().top)}`),

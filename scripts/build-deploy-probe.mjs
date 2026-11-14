@@ -1,7 +1,7 @@
 // Builds a throwaway bundle to learn what a static host (DeployNow) does with large model files,
 // before the Playground goes there (docs/playground-plan.md, 「配置の確かめ」).
 //   node scripts/build-deploy-probe.mjs                 → dist-deploy-probe/
-//   WW_PROBE_OUT=.work/x WW_PROBE_MB=1 node scripts/build-deploy-probe.mjs   (tests: small files)
+//   AROUND_PROBE_OUT=.work/x AROUND_PROBE_MB=1 node scripts/build-deploy-probe.mjs   (tests: small files)
 // The files are seeded noise (incompressible, like real textures), so a host that recompresses
 // or rewrites them changes the hash the page shows. Nothing from the extension or the repo's
 // models goes in.
@@ -11,12 +11,12 @@ import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const output = resolve(root, process.env.WW_PROBE_OUT ?? 'dist-deploy-probe');
+const output = resolve(root, process.env.AROUND_PROBE_OUT ?? 'dist-deploy-probe');
 const inWork = relative(join(root, '.work'), output);
 if (output !== join(root, 'dist-deploy-probe') && (inWork.startsWith('..') || /[\\/]/.test(inWork) || !inWork))
-  throw new Error('WW_PROBE_OUT must be dist-deploy-probe or a direct .work child.');
-const megabytes = Number(process.env.WW_PROBE_MB ?? 20);
-if (!(megabytes > 0 && megabytes <= 64)) throw new Error('WW_PROBE_MB must be 1–64.');
+  throw new Error('AROUND_PROBE_OUT must be dist-deploy-probe or a direct .work child.');
+const megabytes = Number(process.env.AROUND_PROBE_MB ?? 20);
+if (!(megabytes > 0 && megabytes <= 64)) throw new Error('AROUND_PROBE_MB must be 1–64.');
 
 /** Deterministic noise (xorshift32), with a 4-byte magic so the file looks like its kind. */
 function noise(bytes, seed, magic) {
@@ -70,7 +70,7 @@ writeFileSync(
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; media-src 'self' blob:; connect-src 'self' blob:; font-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'" />
     <link rel="icon" href="data:," />
-    <title>配置の確かめ — WWT Playground</title>
+    <title>配置の確かめ — Around Playground</title>
     <style>
       body { font: 14px/1.6 system-ui, sans-serif; margin: 24px; background: #f6f6f2; color: #222; }
       table { border-collapse: collapse; margin-top: 12px; }

@@ -1,4 +1,4 @@
-// WWT skills live in agent-skills/ and are installed per user, so Claude Code and Codex can use
+// Around skills live in agent-skills/ and are installed per user, so Claude Code and Codex can use
 // them on every branch (including branches that do not contain agent-skills/).
 //   node scripts/install-skills.mjs          copy agent-skills/* to ~/.claude/skills and ~/.agents/skills
 //   node scripts/install-skills.mjs --check  fail when an installed copy is missing or out of date
@@ -59,7 +59,8 @@ export async function skillProblems() {
     }
     const front = /^---\r?\n([\s\S]*?)\r?\n---/.exec(text)?.[1] ?? '';
     const field = (key) => new RegExp(`^${key}:\\s*(.+)$`, 'm').exec(front)?.[1]?.trim();
-    if (!/^wwt-[a-z0-9]+(?:-[a-z0-9]+)*$/.test(name)) problems.push(`agent-skills/${name}: name must start with wwt-`);
+    if (!/^around-[a-z0-9]+(?:-[a-z0-9]+)*$/.test(name))
+      problems.push(`agent-skills/${name}: name must start with around-`);
     if (field('name') !== name) problems.push(`agent-skills/${name}: frontmatter name must be "${name}"`);
     const description = field('description');
     if (!description) problems.push(`agent-skills/${name}: description is missing`);
@@ -87,7 +88,7 @@ if (/install-skills\.mjs$/.test(process.argv[1] ?? '')) {
       }
     }
     if (stale.length) throw new Error(`Out of date:\n${stale.join('\n')}\nRun: node scripts/install-skills.mjs`);
-    console.log('WWT skills are installed and up to date for Claude Code and Codex.');
+    console.log('Around skills are installed and up to date for Claude Code and Codex.');
   } else {
     for (const { tool, directory } of destinations) {
       await mkdir(directory, { recursive: true });

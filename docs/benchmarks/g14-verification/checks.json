@@ -661,7 +661,7 @@
           ]
         },
         {
-          "title": "設定 is the same ww-panel in the popup and in the in-video panel, with the two ways into the editor",
+          "title": "設定 is the same around-panel in the popup and in the in-video panel, with the two ways into the editor",
           "file": "editor-arrangement.spec.ts",
           "status": "expected",
           "results": [
@@ -5058,7 +5058,7 @@
                     "column": 24,
                     "line": 88
                   },
-                  "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"クリックがページの操作部品に届くよう、絵の表示を止めました。\"\u001b[39m\nReceived array: \u001b[31m[]\u001b[39m\n\n  86 |   const seen = () => youtube.evaluate(() => (window as unknown as { __g111Stops: string[] }).__g111Stops);\n  87 |   await coveredClick();\n> 88 |   expect(await seen()).toContain('クリックがページの操作部品に届くよう、絵の表示を止めました。');\n     |                        ^\n  89 |   // One failure stops drawing for a moment only: it recovers, and there is nothing to resume.\n  90 |   await expect.poll(() => stopped(youtube)).toBe('');\n  91 |   await expect(studio.locator('.ww-editor-safety .safety-resume')).toBeHidden();\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\g14-verify\\tests\\operation-editing-input.spec.ts:88:24"
+                  "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"クリックがページの操作部品に届くよう、絵の表示を止めました。\"\u001b[39m\nReceived array: \u001b[31m[]\u001b[39m\n\n  86 |   const seen = () => youtube.evaluate(() => (window as unknown as { __g111Stops: string[] }).__g111Stops);\n  87 |   await coveredClick();\n> 88 |   expect(await seen()).toContain('クリックがページの操作部品に届くよう、絵の表示を止めました。');\n     |                        ^\n  89 |   // One failure stops drawing for a moment only: it recovers, and there is nothing to resume.\n  90 |   await expect.poll(() => stopped(youtube)).toBe('');\n  91 |   await expect(studio.locator('.around-editor-safety .safety-resume')).toBeHidden();\n    at C:\\Users\\sm787\\GitHub-Projects\\web-world-themes\\.work\\g14-verify\\tests\\operation-editing-input.spec.ts:88:24"
                 }
               ],
               "attachments": [

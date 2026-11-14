@@ -6,8 +6,8 @@ import { join, resolve } from 'node:path';
 import { createPlaygroundServer } from '../scripts/playground/serve.mjs';
 
 /**
- * The Playground without the extension (docs/playground-plan.md): our own static site, the WWT
- * page runtime, plain headless Chromium. The build carries a read-only test hook (WW_PLAYGROUND_TEST).
+ * The Playground without the extension (docs/playground-plan.md): our own static site, the Around
+ * page runtime, plain headless Chromium. The build carries a read-only test hook (AROUND_PLAYGROUND_TEST).
  */
 const out = resolve('.work/playground-e2e');
 const mirdoOut = resolve('.work/playground-mirdo-e2e');
@@ -20,9 +20,9 @@ test.beforeAll(async () => {
   execFileSync(process.execPath, ['scripts/build-playground.mjs'], {
     env: {
       ...process.env,
-      WW_PLAYGROUND_MIRDO_ROOT: undefined,
-      WW_PLAYGROUND_OUT: '.work/playground-e2e',
-      WW_PLAYGROUND_TEST: '1',
+      AROUND_PLAYGROUND_MIRDO_ROOT: undefined,
+      AROUND_PLAYGROUND_OUT: '.work/playground-e2e',
+      AROUND_PLAYGROUND_TEST: '1',
     },
     stdio: 'pipe',
   });
@@ -39,25 +39,23 @@ async function open(page: Page, basic = true, viewport = { width: 1280, height: 
     if (message.type() === 'error') problems.push(message.text());
   });
   page.on('pageerror', (error) => problems.push(error.message));
-  // A slower machine on purpose (as a busy CI runner): WW_CPU_THROTTLE=4 runs the page 4× slower.
-  const throttle = Number(process.env.WW_CPU_THROTTLE ?? 1);
+  // A slower machine on purpose (as a busy CI runner): AROUND_CPU_THROTTLE=4 runs the page 4× slower.
+  const throttle = Number(process.env.AROUND_CPU_THROTTLE ?? 1);
   if (throttle > 1)
     await (await page.context().newCDPSession(page)).send('Emulation.setCPUThrottlingRate', { rate: throttle });
   await page.setViewportSize(viewport);
   await page.goto(origin + (basic ? '/?basic' : '/'));
-  await expect(page.locator('#apply')).toHaveText('WWT を適用');
+  await expect(page.locator('#apply')).toHaveText('Around を適用');
   return problems;
 }
 const model = (page: Page) =>
-  page.locator(
-    ':is(#web-world-themes-decorations, #web-world-themes-page-decorations, #web-world-themes-video-decorations) .model-media',
-  );
+  page.locator(':is(#around-decorations, #around-page-decorations, #around-video-decorations) .model-media');
 
 test('Mirdo starts on the lower edge and moves to the upper edge with the imported motions', async ({ page }) => {
-  test.skip(!process.env.WW_PLAYGROUND_MIRDO_ROOT, 'Requires the approved external asset checkout.');
+  test.skip(!process.env.AROUND_PLAYGROUND_MIRDO_ROOT, 'Requires the approved external asset checkout.');
   test.setTimeout(60000);
   execFileSync(process.execPath, ['scripts/build-playground.mjs'], {
-    env: { ...process.env, WW_PLAYGROUND_OUT: '.work/playground-mirdo-e2e' },
+    env: { ...process.env, AROUND_PLAYGROUND_OUT: '.work/playground-mirdo-e2e' },
     stdio: 'pipe',
   });
   // Its own server: the shared one serves a single folder (scripts/playground/serve.mjs).
@@ -154,7 +152,7 @@ test('without the extension, 適用 switches the site to the artwork and back', 
   await page.waitForTimeout(500);
   await page.screenshot({ path: join(shots, 'after.png') });
   await page.locator('#apply').click();
-  await expect(page.locator('#apply')).toHaveText('WWT を適用');
+  await expect(page.locator('#apply')).toHaveText('Around を適用');
   await expect.poll(() => page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(plain);
   expect(problems.filter((text) => /Content Security Policy|Refused/.test(text))).toEqual([]);
   expect(problems).toEqual([]);
@@ -237,10 +235,10 @@ test('G1 while the character moves: it takes no input and the controls stay the 
       [x, y, selector] as const,
     );
   // The character's own middle is not a target: whatever is under it is.
-  const under = await page.evaluate(
-    ([x, y]) => document.elementFromPoint(x!, y!)?.closest('[id^="web-world-themes"]') ?? null,
-    [character.x + character.width / 2, character.y + character.height / 2] as const,
-  );
+  const under = await page.evaluate(([x, y]) => document.elementFromPoint(x!, y!)?.closest('[id^="around"]') ?? null, [
+    character.x + character.width / 2,
+    character.y + character.height / 2,
+  ] as const);
   expect(under).toBeNull();
   // Starting the video makes it hop; through the hop every control stays reachable and the
   // body's pose keeps changing (it really is moving while we check).
@@ -254,18 +252,18 @@ test('G1 while the character moves: it takes no input and the controls stay the 
   // centre. Round trips from the test (four hit tests each) are slow on a busy machine (a CI runner)
   // and saw too few frames of a short hop; here no frame of it is missed.
   await page.evaluate((list) => {
-    const w = window as unknown as { wwHop: { height: number; missed: string[] }[] };
-    w.wwHop = [];
+    const w = window as unknown as { aroundHop: { height: number; missed: string[] }[] };
+    w.aroundHop = [];
     const frame = () => {
       let media: HTMLElement | null = null;
-      for (const host of document.querySelectorAll('[id^="web-world-themes"]'))
+      for (const host of document.querySelectorAll('[id^="around"]'))
         media ??= host.shadowRoot?.querySelector<HTMLElement>('.model-media') ?? null;
       const raw = media?.dataset.modelFrame;
-      w.wwHop.push({
+      w.aroundHop.push({
         height: raw ? (JSON.parse(raw).pose?.hips?.[1] ?? 0) : 0,
         missed: list.filter((c) => !document.elementFromPoint(c.x, c.y)?.closest(c.selector)).map((c) => c.selector),
       });
-      if (w.wwHop.length < 600) requestAnimationFrame(frame);
+      if (w.aroundHop.length < 600) requestAnimationFrame(frame);
     };
     requestAnimationFrame(frame);
   }, controls);
@@ -276,14 +274,14 @@ test('G1 while the character moves: it takes no input and the controls stay the 
     .poll(
       () =>
         page.evaluate(
-          () => new Set((window as unknown as { wwHop: { height: number }[] }).wwHop.map((f) => f.height)).size,
+          () => new Set((window as unknown as { aroundHop: { height: number }[] }).aroundHop.map((f) => f.height)).size,
         ),
       { message: 'the body hops', timeout: 15000 },
     )
     .toBeGreaterThan(3);
   // Through every frame of it, each control stayed the hit target.
   const frames = await page.evaluate(
-    () => (window as unknown as { wwHop: { height: number; missed: string[] }[] }).wwHop,
+    () => (window as unknown as { aroundHop: { height: number; missed: string[] }[] }).aroundHop,
   );
   const moving = frames.filter((f) => f.height !== rest);
   // Frames off the rest height: at least three heights besides it (as the check above).
@@ -297,13 +295,13 @@ test('G1 while the character moves: it takes no input and the controls stay the 
 /** Every button, link and input on the page, by its id or text, for a readable failure. */
 const interactive = (page: Page) =>
   page.evaluate(() => {
-    const hook = (globalThis as unknown as { __wwPlayground: { controls(): HTMLElement[] } }).__wwPlayground;
+    const hook = (globalThis as unknown as { __aroundPlayground: { controls(): HTMLElement[] } }).__aroundPlayground;
     const controls = new Set(hook.controls());
     const all = [
       ...document.querySelectorAll<HTMLElement>(
         'a[href], button, input, select, textarea, video, [role="button"], [role="slider"], [tabindex]:not([tabindex="-1"])',
       ),
-    ].filter((element) => !element.closest('[id^="web-world-themes"]'));
+    ].filter((element) => !element.closest('[id^="around"]'));
     return {
       count: all.length,
       missing: all.filter((element) => !controls.has(element)).map((e) => e.id || e.textContent?.trim() || e.tagName),
@@ -316,7 +314,7 @@ test('G1: every button, link and input is an operation surface; an unmarked one 
   expect(covered.count).toBeGreaterThanOrEqual(8);
   expect(covered.missing).toEqual([]);
   // Deliberately forget one mark: the check must name it.
-  await page.evaluate(() => document.querySelector('#play')!.removeAttribute('data-ww-control'));
+  await page.evaluate(() => document.querySelector('#play')!.removeAttribute('data-around-control'));
   expect((await interactive(page)).missing).toEqual(['play']);
 });
 
@@ -457,7 +455,7 @@ async function exerciseSpatialControls(page: Page, mode: 'canvas' | 'css') {
   await expect(page.locator('#watch-page')).not.toHaveAttribute('inert', '');
   await apply.click();
   await expect(stage).toHaveCount(0);
-  await expect(apply).toHaveText('WWT を適用');
+  await expect(apply).toHaveText('Around を適用');
   expect(problems).toEqual([]);
 }
 
@@ -525,7 +523,7 @@ test('HTML-in-Canvas in Chromium 153 syncs pointer drag, focus and keyboard', as
 });
 
 test('HTML-in-Canvas in stable Chrome syncs pointer drag, focus and keyboard', async () => {
-  test.skip(process.env.WW_PLAYGROUND_STABLE !== '1', 'Requires installed Chrome with HTML-in-Canvas.');
+  test.skip(process.env.AROUND_PLAYGROUND_STABLE !== '1', 'Requires installed Chrome with HTML-in-Canvas.');
   const browser = await chromium.launch({ channel: 'chrome' });
   try {
     await exerciseSpatialControls(await browser.newPage({ deviceScaleFactor: 1.5 }), 'canvas');

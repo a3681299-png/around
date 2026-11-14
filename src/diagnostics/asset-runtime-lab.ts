@@ -67,7 +67,7 @@ document.querySelector('#seed')!.addEventListener('click', () => {
 });
 document.querySelector('#stop')!.addEventListener('click', () => scene.clear());
 Object.assign(globalThis, {
-  wwAssetLab: {
+  aroundAssetLab: {
     seed,
     churn,
     seedMany: async () => {

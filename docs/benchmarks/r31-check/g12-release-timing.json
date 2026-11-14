@@ -1,6 +1,6 @@
 {
   "what": "G1.2 ①②④ (operation-safety:850) on 447b2bf, the same 4-step leave path sent one step at a time; times in ms from sending step 1",
-  "build": "447b2bf, WW_BUILD_OUT=.work/rv-dist",
+  "build": "447b2bf, AROUND_BUILD_OUT=.work/rv-dist",
   "account": { "left": 1047.98, "top": 12, "width": 32, "height": 32 },
   "path": [
     { "step": 1, "x": 963, "y": 164 },

@@ -75,7 +75,7 @@ test('real YouTube mannequin clipping and native input, using the same design on
   test.setTimeout(240_000);
   const side = process.env.CHUNK2_LIVE_SIDE ?? 'head';
   const result: Record<string, unknown> = { side };
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'wwt-chunk2-live-')), false);
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-chunk2-live-')), false);
   context.setDefaultNavigationTimeout(35_000);
   try {
     const service = context.serviceWorkers()[0] ?? (await context.waitForEvent('serviceworker', { timeout: 20_000 }));
@@ -90,14 +90,14 @@ test('real YouTube mannequin clipping and native input, using the same design on
     await expect(player).toBeVisible({ timeout: 40_000 });
     await declinePromotion(page);
     await waitForAdvertToEnd(page, 45_000);
-    await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+    await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
     await page.bringToFront();
     await expect
       .poll(() =>
         popup.evaluate(async () => {
           const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
           try {
-            return (await chrome.tabs.sendMessage(tab.id!, { type: 'web-world-themes:probe-editor-target' }))?.siteId;
+            return (await chrome.tabs.sendMessage(tab.id!, { type: 'around:probe-editor-target' }))?.siteId;
           } catch {
             return null;
           }

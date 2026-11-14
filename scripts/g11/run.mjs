@@ -211,13 +211,13 @@ try {
   await popup.evaluate(
     async (reuse) =>
       chrome.storage.local.set({
-        'webWorldThemes.enabled': true,
-        'webWorldThemes.strength': 100,
-        'webWorldThemes.safety.emergencyOff': false,
+        'around.enabled': true,
+        'around.strength': 100,
+        'around.safety.emergencyOff': false,
         ...(reuse
           ? {}
           : {
-              'webWorldThemes.design.youtube': {
+              'around.design.youtube': {
                 schemaVersion: 11,
                 id: 'g11-baseline',
                 siteId: 'youtube',
@@ -354,7 +354,7 @@ try {
       await editor.getByRole('button', { name: '編集を終了', exact: true }).click();
       await studio.close();
       const imported = await popup.evaluate(
-        async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
+        async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'],
       );
       const sample = imported.decorations.find((layer) => layer.kind === 'image');
       if (!sample?.assetId) throw new Error('Validated import was not saved');
@@ -441,14 +441,11 @@ try {
               }
             : {}),
       };
-      await popup.evaluate(
-        async (design) => chrome.storage.local.set({ 'webWorldThemes.design.youtube': design }),
-        design,
-      );
+      await popup.evaluate(async (design) => chrome.storage.local.set({ 'around.design.youtube': design }), design);
     }
     await page.locator('[data-image-id]').first().waitFor({ state: 'attached' });
     const sceneCount = await popup.evaluate(async () => {
-      const s = (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'];
+      const s = (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'];
       return { layers: s.decorations.length, groups: s.groups?.length ?? 0 };
     });
     if (sceneCount.layers !== 32 || sceneCount.groups !== 16)
@@ -678,7 +675,7 @@ try {
           throw new Error('Invalid playback state in comparison block.');
         const summary = summarize(data);
         const state = await evaluate(
-          '({guard:Boolean(__g11Probe.controller.safety),nodes:document.querySelectorAll("#web-world-themes-decorations").length})',
+          '({guard:Boolean(__g11Probe.controller.safety),nodes:document.querySelectorAll("#around-decorations").length})',
         );
         if (state.guard !== guarded || summary.extensionFrameCpuMs.count < 1)
           throw new Error('Invalid comparison block: ' + JSON.stringify({ state, summary }));

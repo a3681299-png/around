@@ -179,16 +179,18 @@ test('skin CSS uses only border-image and background painting, ordered states, a
     ]),
   );
   // Viewers get no preview rules; the editor compiles them while the skin tool is open.
-  expect(compileDesign(design, [target], urls)).not.toContain('data-ww-skin-force=');
+  expect(compileDesign(design, [target], urls)).not.toContain('data-around-skin-force=');
   const css = compileDesign(design, [target], urls, { previews: true });
   // Every rule keys on the part attribute (outside :where) so the browser can bucket it.
-  const key = '[data-ww-surface~="subscribe-button"]';
+  const key = '[data-around-surface~="subscribe-button"]';
   for (const line of css.split(String.fromCharCode(10))) {
     const selector = line.slice(0, line.indexOf('{'));
     const last = selector.slice(selector.lastIndexOf(' ' + key) + 1);
     expect(selector.lastIndexOf(' ' + key), selector).toBeGreaterThan(0);
     expect(
-      last === key || last.startsWith(key + ':where(') || last === key + '[data-ww-skin-compact~="subscribe-button"]',
+      last === key ||
+        last.startsWith(key + ':where(') ||
+        last === key + '[data-around-skin-compact~="subscribe-button"]',
       last,
     ).toBe(true);
   }
@@ -201,7 +203,7 @@ test('skin CSS uses only border-image and background painting, ordered states, a
   // UI1.1: the native background stays under the art. The only background a skin writes is the
   // colour the author chose for small parts; the only colour is the engine's legibility plan.
   for (const line of css.split(String.fromCharCode(10)))
-    if (!line.includes('[data-ww-skin-compact~=') && !line.includes('data-ww-skin-force-compact'))
+    if (!line.includes('[data-around-skin-compact~=') && !line.includes('data-around-skin-force-compact'))
       expect(line, line).not.toMatch(/background|[{;]color:/);
   expect(css).not.toContain('transparent');
   // Geometry and hit-testing properties are never written.
@@ -224,13 +226,13 @@ test('skin CSS uses only border-image and background painting, ordered states, a
   );
   // Natural states follow the adapter's conditions in a fixed priority order; forced previews win.
   const order = [':where(*:hover)', ':where(*:active)'].map((condition) =>
-    css.indexOf('[data-ww-surface~="subscribe-button"]' + condition),
+    css.indexOf('[data-around-surface~="subscribe-button"]' + condition),
   );
   expect(order.every((index) => index > 0)).toBe(true);
   expect(order[0]!).toBeLessThan(order[1]!);
-  expect(css).toContain('[data-ww-skin-force="subscribe-button:pressed"]');
-  expect(css).toContain(':not([data-ww-skin-force^="subscribe-button:"])');
-  expect(css).toContain('[data-ww-skin-compact~="subscribe-button"]');
+  expect(css).toContain('[data-around-skin-force="subscribe-button:pressed"]');
+  expect(css).toContain(':not([data-around-skin-force^="subscribe-button:"])');
+  expect(css).toContain('[data-around-skin-compact~="subscribe-button"]');
   expect(css).toContain('background-color:#112233');
   // Unresolved or unsafe URLs leave the native look instead of writing CSS.
   expect(compileDesign(design, [target], () => undefined)).not.toContain('border-image');
@@ -327,13 +329,13 @@ test('legibility colours are white or black only, per mode, part and state, and 
   });
   const ink = css.split(String.fromCharCode(10)).filter((line) => line.includes('color:'));
   expect(ink).toHaveLength(2);
-  expect(ink[0]).toContain('html[data-ww-design][data-ww-site][data-ww-mode="light"]');
-  expect(ink[0]).toContain('[data-ww-surface~="subscribe-button"] span,');
-  expect(ink[0]).toContain('[data-ww-surface~="subscribe-button"] input::placeholder{color:#000000 !important;}');
+  expect(ink[0]).toContain('html[data-around-design][data-around-site][data-around-mode="light"]');
+  expect(ink[0]).toContain('[data-around-surface~="subscribe-button"] span,');
+  expect(ink[0]).toContain('[data-around-surface~="subscribe-button"] input::placeholder{color:#000000 !important;}');
   // Hover follows normal in source order, as the art does.
   expect(ink[1]).toContain(':where(*:hover)');
   expect(ink[1]).toContain('color:#ffffff');
-  expect(css).not.toContain('data-ww-mode="dark"');
+  expect(css).not.toContain('data-around-mode="dark"');
   // Only the two engine colours; nothing from artwork reaches `color`.
   expect(() =>
     compileDesign(design, [inked], urls, { inks: { light: { 'subscribe-button': { normal: '#123456' as never } } } }),
@@ -349,12 +351,12 @@ test('legibility colours are white or black only, per mode, part and state, and 
     inks: { dark: { 'subscribe-button': { normal: INK.white, compact: INK.black } } },
   });
   expect(previews).toContain(
-    '[data-ww-mode="dark"]:not([data-ww-ink-off])[data-ww-skin-force="subscribe-button:pressed"]',
+    '[data-around-mode="dark"]:not([data-around-ink-off])[data-around-skin-force="subscribe-button:pressed"]',
   );
   // Every colour rule steps aside while the engine reads native colours.
   for (const line of previews.split(String.fromCharCode(10)).filter((item) => item.includes('color:')))
-    expect(line).toContain(':not([data-ww-ink-off])');
-  expect(previews).toMatch(/\[data-ww-skin-compact~="subscribe-button"\] span,[^{]*\{color:#000000/);
+    expect(line).toContain(':not([data-around-ink-off])');
+  expect(previews).toMatch(/\[data-around-skin-compact~="subscribe-button"\] span,[^{]*\{color:#000000/);
 });
 
 test('asset references include skins, and saved skins must reference small static images that fit the slices', () => {
@@ -486,7 +488,7 @@ test('the page renderer loads skin art once, writes CSS only after it is ready, 
   await Promise.resolve();
   expect(renderer.assetStatus(A)).toStrictEqual({ state: 'ready' });
   expect(style.textContent).toContain('0b8f1d3e-0000-4000-8000-00000000000a');
-  expect(attributes.get('data-ww-design')).toBe('skins');
+  expect(attributes.get('data-around-design')).toBe('skins');
   // Replacing the art releases the old object URL; a failed load is a reason, not CSS.
   renderer.update(design(B));
   expect(revoked).toEqual(['blob:https://www.youtube.com/0b8f1d3e-0000-4000-8000-00000000000a']);
@@ -496,7 +498,7 @@ test('the page renderer loads skin art once, writes CSS only after it is ready, 
   expect(renderer.assetStatus(B)).toStrictEqual({ state: 'error', message: '素材が見つかりません。' });
   expect(statusCalls).toBeGreaterThan(0);
   renderer.dispose();
-  expect(attributes.has('data-ww-design')).toBe(false);
+  expect(attributes.has('data-around-design')).toBe(false);
 });
 
 test('compact sizing observes only parts the site just marked; page changes never query the whole document', async () => {
@@ -576,7 +578,7 @@ test('the renderer plans legibility once from the art and the native colours, an
   const style = { id: '', textContent: '', isConnected: true, remove() {} } as unknown as HTMLStyleElement;
   const page = {
     documentElement: {
-      getAttribute: (name: string) => (name === 'data-ww-mode' ? 'light' : null),
+      getAttribute: (name: string) => (name === 'data-around-mode' ? 'light' : null),
       setAttribute() {},
       removeAttribute() {},
     },
@@ -603,7 +605,7 @@ test('the renderer plans legibility once from the art and the native colours, an
   );
   renderer.update(design);
   await expect.poll(() => style.textContent).toContain('color:#000000');
-  expect(style.textContent).toContain('[data-ww-mode="light"]');
+  expect(style.textContent).toContain('[data-around-mode="light"]');
   expect(renderer.inkStatus('subscribe-button')!.normal).toMatchObject({ ink: INK.black, warn: false });
   // A page change does not replan: nothing is read again.
   const settled = reads;
@@ -641,7 +643,7 @@ test('a stored result paints readable text before any native colour is read; a m
   const style = { id: '', textContent: '', isConnected: true, remove() {} } as unknown as HTMLStyleElement;
   const page = {
     documentElement: {
-      getAttribute: (name: string) => (name === 'data-ww-mode' ? 'light' : null),
+      getAttribute: (name: string) => (name === 'data-around-mode' ? 'light' : null),
       setAttribute() {},
       removeAttribute() {},
     },

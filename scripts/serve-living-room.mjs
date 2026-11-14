@@ -8,7 +8,7 @@
 // The server answers this PC only: the character is private (its terms are unconfirmed) and is
 // never put anywhere another machine could reach.
 //
-// The character comes from the private asset repository's clone on this PC: WWT_PRIVATE, or
+// The character comes from the private asset repository's clone on this PC: AROUND_PRIVATE, or
 // C:/wwt-private. Without it (or with its files still Git LFS pointers) the room opens without
 // the character, and says why.
 //
@@ -43,10 +43,10 @@ function real(file) {
 }
 
 function character() {
-  const assets = resolve(process.env.WWT_PRIVATE ?? 'C:/wwt-private');
+  const assets = resolve(process.env.AROUND_PRIVATE ?? 'C:/wwt-private');
   const vrm = join(assets, 'Felis_v0.8.1', 'work', 'felis-1024.vrm');
   const motions = join(assets, 'Felis_v0.8.1', 'motions');
-  if (!existsSync(assets)) return { why: `私用素材のフォルダがありません（${assets}。WWT_PRIVATE で指定できます）` };
+  if (!existsSync(assets)) return { why: `私用素材のフォルダがありません（${assets}。AROUND_PRIVATE で指定できます）` };
   if (!real(vrm) || !real(join(motions, 'Idle_Loop.vrma')))
     return { why: `フェリスの素材がまだありません（${assets} で git pull と git lfs pull をしてください）` };
   return { vrm, motions };
@@ -84,11 +84,11 @@ const built = spawnSync(process.execPath, [join(root, 'scripts', 'build-living-r
   stdio: 'inherit',
   env: {
     ...process.env,
-    WW_LIVING_OUT: '.work/living-room-live-next',
+    AROUND_LIVING_OUT: '.work/living-room-live-next',
     // (Never the test hook in the room people use.)
-    WW_LIVING_TEST: '',
-    WW_LIVING_CHARACTER: felis.vrm ?? '',
-    WW_LIVING_MOTIONS: felis.motions ?? '',
+    AROUND_LIVING_TEST: '',
+    AROUND_LIVING_CHARACTER: felis.vrm ?? '',
+    AROUND_LIVING_MOTIONS: felis.motions ?? '',
   },
 });
 if (built.status === 0) {

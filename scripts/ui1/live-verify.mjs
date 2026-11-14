@@ -48,13 +48,13 @@ for (const [name, file, pattern] of cases.filter((item) => !wanted || wanted.inc
   const child = spawn(process.execPath, args, {
     env: {
       ...process.env,
-      WW_TEST_EXTENSION_PATH: '.work/ui11-test',
-      WW_LIVE_UI11: '1',
-      WW_LIVE_SKIN: '1',
-      WW_LIVE_SKIN_SHOTS: 'docs/screenshots/ui1-1/verification/native',
-      WW_LIVE_SKIN_DATA: '.work/ui11-verification/site-parts',
+      AROUND_TEST_EXTENSION_PATH: '.work/ui11-test',
+      AROUND_LIVE_UI11: '1',
+      AROUND_LIVE_SKIN: '1',
+      AROUND_LIVE_SKIN_SHOTS: 'docs/screenshots/ui1-1/verification/native',
+      AROUND_LIVE_SKIN_DATA: '.work/ui11-verification/site-parts',
       ...(name === 'import-recheck'
-        ? { WW_LIVE_UI11_SHOTS: 'docs/screenshots/ui1-1/verification/import-recheck' }
+        ? { AROUND_LIVE_UI11_SHOTS: 'docs/screenshots/ui1-1/verification/import-recheck' }
         : {}),
     },
     windowsHide: true,

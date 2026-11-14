@@ -11,7 +11,7 @@ git worktree add --detach .work/r31-before 8e63f0d
 git worktree add --detach .work/r31-verify 8003738
 ```
 
-両ツリーで `npm ci` を実行し、`WW_BUILD_OUT=.work/r31-normal` を指定して `npm run build`。Chromiumは同じものを使い、`PLAYWRIGHT_BROWSERS_PATH` に共通の配置場所を指定する。各worktreeの通常のdistを出力先にしない。
+両ツリーで `npm ci` を実行し、`AROUND_BUILD_OUT=.work/r31-normal` を指定して `npm run build`。Chromiumは同じものを使い、`PLAYWRIGHT_BROWSERS_PATH` に共通の配置場所を指定する。各worktreeの通常のdistを出力先にしない。
 
 以降の作業ディレクトリは `.work/r31-verify`。テストは `npm run test:unit` / `npm run test:e2e` を経由し、e2eはworkers=1のまま実行する。表示ありのChromeは、この入口と `launchExtension` により画面外へ出る。
 
@@ -31,7 +31,7 @@ node .work/r31-tools/vrma-loader-check.mjs
 ## UI・互換・G1
 
 ```powershell
-$env:WW_TEST_EXTENSION_PATH = (Resolve-Path .work/r31-normal).Path
+$env:AROUND_TEST_EXTENSION_PATH = (Resolve-Path .work/r31-normal).Path
 npm run test:e2e -- --config=.work/r31-tools/config.ts extra.spec.ts
 ```
 
@@ -49,12 +49,12 @@ faultは `.work/r31-no-*` のみ。`build-mutants` は通常版をコピーし�
 
 ## 実サイトと外部のキャラ
 
-`WW_VRM_FILE` は依頼された `out/trusie.vrm`、`WW_VRMA_DIR` は **manifest.jsonとtrusieサブフォルダを含む `out/anim`** を指す。既存character-liveは、その下に `trusie/idle.vrma` 等がある形を要求する。
+`AROUND_VRM_FILE` は依頼された `out/trusie.vrm`、`AROUND_VRMA_DIR` は **manifest.jsonとtrusieサブフォルダを含む `out/anim`** を指す。既存character-liveは、その下に `trusie/idle.vrma` 等がある形を要求する。
 
 ```powershell
-$env:WW_LIVE_CHARACTER = '1'
+$env:AROUND_LIVE_CHARACTER = '1'
 npm run test:e2e -- tests/character-live.spec.ts
-$env:WW_R31_LIVE = '1'
+$env:AROUND_R31_LIVE = '1'
 npm run test:e2e -- --config=.work/r31-tools/config.ts live-visual.spec.ts
 ```
 

@@ -42,9 +42,9 @@ const QUAD_VERTEX = `
 async function roomLightLayers(gltf: GLTF) {
   const source = gltf.parser.json as {
     textures?: unknown[];
-    extras?: { wwtRoom?: { version?: unknown; layers?: unknown } };
+    extras?: { aroundRoom?: { version?: unknown; layers?: unknown } };
   };
-  const packed = source.extras?.wwtRoom;
+  const packed = source.extras?.aroundRoom;
   if (!packed) return [];
   if (packed.version !== 1 || !Array.isArray(packed.layers) || packed.layers.length > 8)
     throw new Error('部屋の光の層の形式が不正です。');
@@ -243,7 +243,7 @@ export function mountRoom(
           if (localRoom.parent !== scene) VRMUtils.deepDispose(localRoom);
         }
       })
-      .catch((error: unknown) => console.warn('[WWT Playground] Room', error))
+      .catch((error: unknown) => console.warn('[Around Playground] Room', error))
       .finally(() => {
         if (!disposed) invalidate();
       });

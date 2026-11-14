@@ -10,12 +10,12 @@ import { beginCanvasGesture } from './helpers/editor-workspace';
 // UI0-d 3.1: the editor's ease of use in its window (the workbench: both panes side by side, the
 // guide in ヘルプ). The floating editor's own shell (its width, collapse, docking and low-window
 // folding) went with it, and so did those checks (docs/ui0d-3.1.md).
-const key = 'webWorldThemes.design.youtube',
-  overlay = '#web-world-themes-decorations';
+const key = 'around.design.youtube',
+  overlay = '#around-decorations';
 const layers = `${overlay} [data-image-id]`;
 async function open(popup: Page, page: Page) {
   await showArtwork(popup);
-  await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
+  await expect(page.locator('[data-around-surface~="video-card"]').first()).toBeVisible();
   return (await openEditor(popup, page)).panel;
 }
 /** The layer list's own thumbnails (the window's material library shows them too). */
@@ -123,7 +123,7 @@ test('group reasons stay visible for mixed anchors, interleaving and locks; menu
   const panel = await open(popup, youtube);
   await add(panel, youtube);
   await youtube.locator('#navigate').evaluate((button: HTMLButtonElement) => button.click());
-  await expect(youtube.locator('[data-ww-surface~="player-window"]')).toBeVisible();
+  await expect(youtube.locator('[data-around-surface~="player-window"]')).toBeVisible();
   await panel.getByRole('button', { name: '素材2.png', exact: true }).click();
   await panel.getByLabel('配置の基準', { exact: true }).selectOption('video-player');
   await selectThree(panel);
@@ -182,7 +182,7 @@ test('renaming, typing, help and the row menu keys keep selection and page short
   await expect(panel.getByRole('menu', { name: 'レイヤーの操作' })).toBeHidden();
   await expect(panel.locator('.selected-count')).toHaveText('1個選択中');
   await panel.getByRole('button', { name: '編集を終了', exact: true }).click();
-  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-editing', /.*/);
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-around-editing', /.*/);
 });
 
 test('animation thumbnails are static and independent of playback; error feedback survives help', async ({
@@ -221,7 +221,7 @@ test('animation thumbnails are static and independent of playback; error feedbac
   await help.getByRole('button', { name: 'ヘルプを閉じる', exact: true }).click();
   await expect(panel.locator('.status')).toHaveAttribute('data-error', 'true');
   await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
-  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-editing', /.*/);
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-around-editing', /.*/);
   await expect(youtube.locator(overlay)).toHaveCount(0);
 });
 

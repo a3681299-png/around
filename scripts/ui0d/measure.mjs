@@ -10,7 +10,7 @@ import { auditHost } from '../ui1/host-audit.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 process.chdir(root);
-process.env.WW_TEST_WINDOW_OFFSCREEN = '1';
+process.env.AROUND_TEST_WINDOW_OFFSCREEN = '1';
 const inWork = (value) => {
   const full = path.resolve(value),
     relative = path.relative(path.join(root, '.work'), full);
@@ -139,10 +139,10 @@ for (let pair = 0; pair < pairs; pair++) {
       await popup.goto(`chrome-extension://${id}/popup/index.html`);
       await popup.evaluate(() =>
         chrome.storage.local.set({
-          'webWorldThemes.enabled': true,
-          'webWorldThemes.strength': 100,
-          'webWorldThemes.safety.emergencyOff': false,
-          'webWorldThemes.design.youtube': {
+          'around.enabled': true,
+          'around.strength': 100,
+          'around.safety.emergencyOff': false,
+          'around.design.youtube': {
             schemaVersion: 13,
             id: 'ui0d-perf',
             siteId: 'youtube',
@@ -177,14 +177,14 @@ for (let pair = 0; pair < pairs; pair++) {
         throw Error('Missing isolated-world probe.');
       };
       await page.goto(url, { waitUntil: 'domcontentloaded' });
-      await page.locator('[data-ww-surface~="video-card"]').first().waitFor();
+      await page.locator('[data-around-surface~="video-card"]').first().waitFor();
       await declinePromotion(page);
       await page.bringToFront(); // The native panel must attach to this active tab.
       const tab = await popup.evaluate(
         async () => (await chrome.tabs.query({ active: true, currentWindow: true }))[0].id,
       );
       await popup.evaluate(async (tabId) => {
-        const r = await chrome.runtime.sendMessage({ type: 'web-world-themes:open-side-panel', tabId });
+        const r = await chrome.runtime.sendMessage({ type: 'around:open-side-panel', tabId });
         if (!r?.ok) throw Error(r?.error);
       }, tab);
       const panel = await sidePanelDriver(context, page, id, tab);

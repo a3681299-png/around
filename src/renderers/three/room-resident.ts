@@ -137,13 +137,13 @@ export async function loadRoomResident(
     if (Math.abs(opacity - fade) < 1e-3) return;
     fade = opacity;
     for (const m of materials) {
-      m.transparent = opacity < 0.999 || (m.userData['wwTransparent'] ??= m.transparent);
+      m.transparent = opacity < 0.999 || (m.userData['aroundTransparent'] ??= m.transparent);
       m.opacity = opacity;
       m.needsUpdate = true;
     }
     (shadow.material as MeshBasicMaterial).opacity = opacity;
   };
-  for (const m of materials) m.userData['wwTransparent'] = m.transparent;
+  for (const m of materials) m.userData['aroundTransparent'] = m.transparent;
 
   return {
     root,

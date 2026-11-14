@@ -4,7 +4,7 @@ import type { Page, Locator } from '@playwright/test';
 import { expect } from '../fixtures';
 import { openEditor } from './editor';
 
-export const overlay = '#web-world-themes-decorations',
+export const overlay = '#around-decorations',
   media = `${overlay} .media`;
 export async function isolate(page: Page, extensionId: string) {
   const session = await page.context().newCDPSession(page),
@@ -51,7 +51,7 @@ export async function reinject(
     target: 'chrome120',
     format: 'iife',
     loader: { '.css': 'text' },
-    define: { __WW_WORLD_MODE__: JSON.stringify(mode), __WW_WORLD_DEVTOOLS__: String(devtools) },
+    define: { __AROUND_WORLD_MODE__: JSON.stringify(mode), __AROUND_WORLD_DEVTOOLS__: String(devtools) },
     logLevel: 'silent',
   });
   await runtime.evaluate(bundle.outputFiles[0]!.text);
@@ -62,7 +62,7 @@ export async function open(popup: Page, page: Page): Promise<Locator> {
   await expect(showArtwork).toBeEnabled();
   await showArtwork.check();
   await page.bringToFront();
-  await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
+  await expect(page.locator('[data-around-surface~="video-card"]').first()).toBeVisible();
   return (await openEditor(popup, page)).panel;
 }
 export async function image(panel: Locator, page: Page) {
@@ -81,5 +81,5 @@ export async function save(panel: Locator) {
 }
 export async function watch(page: Page) {
   await page.locator('#navigate').evaluate((button: HTMLButtonElement) => button.click());
-  await expect(page.locator('[data-ww-surface~="player-window"]')).toBeVisible();
+  await expect(page.locator('[data-around-surface~="player-window"]')).toBeVisible();
 }

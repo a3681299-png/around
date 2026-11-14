@@ -1,11 +1,11 @@
 // Real-extension screenshots of a full-viewport atmosphere layer at the engine cap (light and dark).
-// Usage: G11_BROWSER_PATH=... WW_EXTENSION=.work/<build> node scripts/g11/atmosphere-screenshots.mjs
+// Usage: G11_BROWSER_PATH=... AROUND_EXTENSION=.work/<build> node scripts/g11/atmosphere-screenshots.mjs
 import { chromium } from '@playwright/test';
 import { mkdtemp, writeFile } from 'node:fs/promises';
 import { workPath } from './environment.mjs';
 import path from 'node:path';
 
-const extension = path.resolve(process.env.WW_EXTENSION ?? '.work/g11-check-dist');
+const extension = path.resolve(process.env.AROUND_EXTENSION ?? '.work/g11-check-dist');
 const out = 'docs/screenshots/operation-g11-atmosphere';
 const video = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
 const results = [];
@@ -44,10 +44,10 @@ for (const scheme of ['light', 'dark']) {
   await popup.goto(`chrome-extension://${id}/popup/index.html`);
   await popup.evaluate(() =>
     chrome.storage.local.set({
-      'webWorldThemes.enabled': true,
-      'webWorldThemes.strength': 100,
-      'webWorldThemes.safety.emergencyOff': false,
-      'webWorldThemes.design.youtube': {
+      'around.enabled': true,
+      'around.strength': 100,
+      'around.safety.emergencyOff': false,
+      'around.design.youtube': {
         schemaVersion: 12,
         id: 'atmosphere-check',
         siteId: 'youtube',
@@ -71,7 +71,7 @@ for (const scheme of ['light', 'dark']) {
   const kinds = scheme === 'light' ? ['#ffffff', 'gradient'] : ['#000000', 'gradient'];
   await popup.locator('#creator-editor-open').evaluate((b) => b.click());
   await page.bringToFront();
-  const editor = page.locator('#web-world-themes-creator');
+  const editor = page.locator('#around-creator');
   await editor.getByRole('tab', { name: 'レイヤー', exact: true }).click();
   const guide = editor.getByRole('button', { name: '操作ガイドを閉じる', exact: true });
   if (await guide.isVisible()) await guide.click();
@@ -96,7 +96,7 @@ for (const scheme of ['light', 'dark']) {
   await editor.locator('.dirty').filter({ hasText: '保存済み' }).waitFor();
   await editor.getByRole('button', { name: '編集を終了', exact: true }).click();
   const saved = await popup.evaluate(
-    async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
+    async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'],
   );
   for (const [index, kind] of kinds.entries()) {
     const layer = saved.decorations[index];
@@ -112,13 +112,13 @@ for (const scheme of ['light', 'dark']) {
         },
       ],
     };
-    await popup.evaluate((d) => chrome.storage.local.set({ 'webWorldThemes.design.youtube': d }), design);
+    await popup.evaluate((d) => chrome.storage.local.set({ 'around.design.youtube': d }), design);
     await page.bringToFront();
     await page.mouse.move(1270, 790);
     try {
       await page.waitForFunction(
         () => {
-          const plane = document.querySelector('#web-world-themes-atmosphere-decorations');
+          const plane = document.querySelector('#around-atmosphere-decorations');
           const node = plane?.shadowRoot?.querySelector('[data-image-id]');
           return node && getComputedStyle(node).visibility !== 'hidden';
         },
@@ -130,11 +130,8 @@ for (const scheme of ['light', 'dark']) {
         'STATE',
         JSON.stringify(
           await page.evaluate(() => ({
-            planes: [...document.querySelectorAll('[id^="web-world-themes-"]')].map((e) => e.id),
-            safety: document
-              .querySelector('#web-world-themes-decorations')
-              ?.getAttribute('data-ww-safety')
-              ?.slice(0, 400),
+            planes: [...document.querySelectorAll('[id^="around-"]')].map((e) => e.id),
+            safety: document.querySelector('#around-decorations')?.getAttribute('data-around-safety')?.slice(0, 400),
             nodes: [...document.querySelectorAll('[id$="decorations"]')].map(
               (h) => h.id + ':' + (h.shadowRoot?.querySelectorAll('[data-image-id]').length ?? 0),
             ),
@@ -147,7 +144,7 @@ for (const scheme of ['light', 'dark']) {
     }
     await page.waitForTimeout(800);
     const state = await page.evaluate(() => {
-      const plane = document.querySelector('#web-world-themes-atmosphere-decorations');
+      const plane = document.querySelector('#around-atmosphere-decorations');
       const node = plane.shadowRoot.querySelector('[data-image-id]');
       const r = node.getBoundingClientRect();
       return {
@@ -155,7 +152,7 @@ for (const scheme of ['light', 'dark']) {
         planeOpacity: getComputedStyle(plane).opacity,
         layerOpacity: getComputedStyle(node).opacity,
         covers: { width: Math.round(r.width), height: Math.round(r.height) },
-        hit: document.elementFromPoint(640, 30)?.closest('#web-world-themes-atmosphere-decorations') === null,
+        hit: document.elementFromPoint(640, 30)?.closest('#around-atmosphere-decorations') === null,
       };
     });
     const name = `real-${scheme}-${kind === 'gradient' ? 'gradient' : kind === '#ffffff' ? 'white' : 'black'}-33`;

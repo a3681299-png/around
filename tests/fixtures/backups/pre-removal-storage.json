@@ -1,6 +1,6 @@
 {
-  "webWorldThemes.creatorMode": true,
-  "webWorldThemes.design.youtube": {
+  "around.creatorMode": true,
+  "around.design.youtube": {
     "baseThemeId": "retro",
     "decorations": [
       {
@@ -29,14 +29,14 @@
     "schemaVersion": 13,
     "siteId": "youtube"
   },
-  "webWorldThemes.enabled": true,
-  "webWorldThemes.features.bbs-comments": false,
-  "webWorldThemes.features.focus-titlebars": true,
-  "webWorldThemes.features.surface-noise": true,
-  "webWorldThemes.features.window-chrome": false,
-  "webWorldThemes.noiseStrength": 55,
-  "webWorldThemes.palette.brightness": 70,
-  "webWorldThemes.palette.hue": 210,
-  "webWorldThemes.palette.saturation": 40,
-  "webWorldThemes.strength": 37
+  "around.enabled": true,
+  "around.features.bbs-comments": false,
+  "around.features.focus-titlebars": true,
+  "around.features.surface-noise": true,
+  "around.features.window-chrome": false,
+  "around.noiseStrength": 55,
+  "around.palette.brightness": 70,
+  "around.palette.hue": 210,
+  "around.palette.saturation": 40,
+  "around.strength": 37
 }

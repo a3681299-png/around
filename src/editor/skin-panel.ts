@@ -92,14 +92,14 @@ export function createSkinPanel(doc: Document, actions: SkinPanelActions, option
     <p class="skin-note" hidden>このパネルでは絵の取り込みと切り位置の編集ができません。</p>`;
   const get = <T extends HTMLElement>(selector: string) => root.querySelector<T>(selector)!;
   // The standing instructions become the heading's tooltip, and until a part is chosen a nine-slice
-  // frame with a part inside it is constructed (ww-empty).
+  // frame with a part inside it is constructed (around-empty).
   const empty = doc.createElement('div');
   {
     const intro = get('.skin-intro');
     get('h3').title = intro.textContent!;
     intro.remove();
-    empty.className = 'skin-empty ww-empty';
-    const drawing = svg(doc, '0 0 236 116', 'ww-empty__drawing'),
+    empty.className = 'skin-empty around-empty';
+    const drawing = svg(doc, '0 0 236 116', 'around-empty__drawing'),
       g = doc.createElementNS('http://www.w3.org/2000/svg', 'g');
     g.setAttribute('transform', 'translate(12 8)');
     drawing.append(g);
@@ -120,11 +120,11 @@ export function createSkinPanel(doc: Document, actions: SkinPanelActions, option
     ].forEach(([a, b], i) => drawPen(g, [...a!, ...b!.slice(1)], { width: 2.4, color: 'var(--cobalt)', delay: 9 + i }));
     const title = doc.createElement('strong'),
       text = doc.createElement('p');
-    title.className = 'ww-empty__title ww-appear';
+    title.className = 'around-empty__title around-appear';
     title.textContent = '部品を選んでください';
-    text.className = 'ww-empty__text ww-appear';
+    text.className = 'around-empty__text around-appear';
     text.textContent = 'ページの部品をクリックするか、下の一覧から選びます。';
-    [title, text].forEach((node, i) => node.style.setProperty('--ww-delay', `${Math.round((13 + i) * 83)}ms`));
+    [title, text].forEach((node, i) => node.style.setProperty('--around-delay', `${Math.round((13 + i) * 83)}ms`));
     empty.append(drawing, title, text);
     get('h3').after(empty);
   }

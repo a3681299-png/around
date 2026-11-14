@@ -12,11 +12,11 @@ import { enterNativeTheater } from './helpers/youtube-theater';
 
 test('real YouTube: private local VRM import, MToon, pointer gaze, Studio transforms, save/reload and OFF', async () => {
   test.skip(
-    !process.env.WW_VRM_FILE || process.env.WW_LIVE_VRM !== '1',
+    !process.env.AROUND_VRM_FILE || process.env.AROUND_LIVE_VRM !== '1',
     'Explicit local-avatar and real YouTube verification; no avatar is bundled.',
   );
   test.setTimeout(240000);
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-vrm-live-')), false, {
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-vrm-live-')), false, {
     headed: true,
     width: 1920,
   });
@@ -33,7 +33,7 @@ test('real YouTube: private local VRM import, MToon, pointer gaze, Studio transf
     report.checks.browser = context.browser()?.version();
     const manager = await context.newPage();
     await manager.goto('chrome://extensions/');
-    const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+    const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
     await item.waitFor();
     const id = await item.evaluate((e) => (e as HTMLElement & { data?: { id: string } }).data?.id ?? e.id);
     await manager.close();
@@ -44,17 +44,17 @@ test('real YouTube: private local VRM import, MToon, pointer gaze, Studio transf
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 25000 });
     await showArtwork(popup);
     await page.bringToFront();
-    await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+    await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
     await openSidePanelFromIcon(popup, page);
     const panel = await sidePanelDriver(context, page, id);
     stage('import private avatar');
     const started = Date.now();
-    await panel.files([path.resolve(process.env.WW_VRM_FILE!)], '.model-file');
+    await panel.files([path.resolve(process.env.AROUND_VRM_FILE!)], '.model-file');
     const media = page.locator(
-        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) .model-media',
+        ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations) .model-media',
       ),
       image = page.locator(
-        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]',
+        ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations) [data-image-id]',
       );
     await expect(media).toHaveAttribute('data-renderer', 'three', { timeout: 100000 });
     report.checks.importAndFirstPaintMs = Date.now() - started;
@@ -106,7 +106,7 @@ test('real YouTube: private local VRM import, MToon, pointer gaze, Studio transf
     expect(alpha.painted).toBeGreaterThan(1000);
     report.checks.alpha = alpha;
     stage('expression and save');
-    const ui = 'document.querySelector("#web-world-themes-creator").shadowRoot';
+    const ui = 'document.querySelector("#around-creator").shadowRoot';
     const expression = await panel.evaluate<string>(
       `${ui}.querySelector('.vrm-expression option[value="happy"]')?.value || ${ui}.querySelector('.vrm-expression option')?.value`,
     );
@@ -118,10 +118,7 @@ test('real YouTube: private local VRM import, MToon, pointer gaze, Studio transf
     await panel.click('.save');
     await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
     const saved = await popup.evaluate(
-      async () =>
-        (await chrome.storage.local.get('webWorldThemes.design.youtube'))[
-          'webWorldThemes.design.youtube'
-        ] as DesignDocument,
+      async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'] as DesignDocument,
     );
     expect(saved.decorations[0]).toMatchObject({
       kind: 'model3d',
@@ -163,8 +160,8 @@ test('real YouTube: private local VRM import, MToon, pointer gaze, Studio transf
       ),
     };
     report.checks.renderStats = await page
-      .locator('#web-world-themes-decorations')
-      .evaluate((e: HTMLElement) => JSON.parse(e.dataset.wwModelStats!));
+      .locator('#around-decorations')
+      .evaluate((e: HTMLElement) => JSON.parse(e.dataset.aroundModelStats!));
     report.checks.youtubePlayback = await playerState();
     async function playerState() {
       return page.locator('#movie_player').evaluate((p) => {
@@ -226,7 +223,7 @@ test('real YouTube: private local VRM import, MToon, pointer gaze, Studio transf
     await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
     await expect(
       page.locator(
-        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',
+        ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations)',
       ),
     ).toHaveCount(0);
     report.checks.zeroCleanup = true;

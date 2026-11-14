@@ -44,7 +44,7 @@ test('signal space keys edit with mouse/numbers, one-step drag history, key-only
   await middle.focus();
   await editorPage.keyboard.press('Delete');
   await expect(panel.locator('.timeline-key')).toHaveCount(2);
-  await expect(youtube.locator('#web-world-themes-decorations [data-image-id]')).toHaveCount(1);
+  await expect(youtube.locator('#around-decorations [data-image-id]')).toHaveCount(1);
   await panel.locator('.undo').click();
   await expect(panel.locator('.timeline-key')).toHaveCount(3);
   await panel.locator('.layer [data-action="lock"]').click();

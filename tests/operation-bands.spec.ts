@@ -11,7 +11,7 @@ import { pngPixels } from './helpers/png-pixels';
  * player carries ytp-autohide. Artwork may paint in the bands only then; the first frame the bars
  * appear already has the band clip, because the clip follows the class in the style system.
  */
-const PLANE = '#web-world-themes-video-decorations';
+const PLANE = '#around-video-decorations';
 const BOTTOM_BAND = 112,
   TOP_BAND = 64;
 

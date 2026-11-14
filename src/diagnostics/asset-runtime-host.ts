@@ -61,7 +61,7 @@ export function installAssetRuntimeHost(doc: Document) {
     generation = reply.generation;
     const f = doc.createElement('iframe');
     frame = f;
-    f.id = 'ww-asset-runtime-lab';
+    f.id = 'around-asset-runtime-lab';
     f.style.cssText =
       'position:fixed;inset:0;width:100%;height:100%;border:0;background:transparent;pointer-events:none;z-index:2147483644';
     f.src = chrome.runtime.getURL('diagnostics/asset-runtime-lab.html') + '?ticket=' + reply.ticket;
@@ -154,7 +154,7 @@ export function installAssetRuntimeHost(doc: Document) {
     const loaded: LoadedAsset =
       mode === 'chunks' ? source : { metadata, blob: new Blob([source.buffer], { type: metadata.mime }) };
     container = doc.createElement('div');
-    container.id = 'ww-asset-runtime-binary';
+    container.id = 'around-asset-runtime-binary';
     container.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:2147483643';
     (doc.fullscreenElement ?? doc.body).append(container);
     scene = createAssetLabScene(container, async () => loaded);
@@ -194,7 +194,7 @@ export function installAssetRuntimeHost(doc: Document) {
   }
   const observer = new MutationObserver(() => {
     // The site mark is present only while artwork is shown (not OFF, emergency OFF or zero).
-    if (!doc.documentElement.hasAttribute('data-ww-site')) destroy();
+    if (!doc.documentElement.hasAttribute('data-around-site')) destroy();
   });
   function destroy() {
     observer.disconnect();
@@ -212,13 +212,13 @@ export function installAssetRuntimeHost(doc: Document) {
   });
   doc.defaultView!.addEventListener('pagehide', destroy);
   Object.assign(globalThis, {
-    wwAssetRuntimeHost: {
+    aroundAssetRuntimeHost: {
       async start(secret: string) {
         destroy();
         session = secret;
         await worker({ action: 'attach' });
         await connect();
-        observer.observe(doc.documentElement, { attributes: true, attributeFilter: ['data-ww-site'] });
+        observer.observe(doc.documentElement, { attributes: true, attributeFilter: ['data-around-site'] });
         return { generation };
       },
       show,

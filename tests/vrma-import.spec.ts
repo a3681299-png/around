@@ -37,10 +37,7 @@ for (const [name, buffer] of [
     await panel.locator('.save').click();
     await expect(panel.locator('.dirty')).toHaveText('保存済み');
     const saved = await popup.evaluate(
-      async () =>
-        (await chrome.storage.local.get('webWorldThemes.design.youtube'))[
-          'webWorldThemes.design.youtube'
-        ] as DesignDocument,
+      async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'] as DesignDocument,
     );
     expect(saved.decorations).toHaveLength(1);
     expect(saved.decorations[0]).not.toHaveProperty('character');

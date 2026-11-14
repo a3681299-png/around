@@ -4,7 +4,7 @@ import { retainStudioAssets, releaseAssets } from './asset-client';
 import { designAssetIds } from '../design/references';
 import type { EditorRevision } from '../editor-core/types';
 
-const prefix = 'webWorldThemes.studio.session.';
+const prefix = 'around.studio.session.';
 const maxBytes = 6 * 1024 * 1024;
 function identity(stored: unknown, origin: EditorRevision | undefined) {
   return origin ? `${origin.sessionId}:${origin.revision}` : JSON.stringify(stored);

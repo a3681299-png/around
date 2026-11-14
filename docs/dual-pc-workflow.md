@@ -7,7 +7,7 @@
 - **作業開始時**：`git fetch --all --prune` で GitHub の最新を確認する。`git status` で未コミットの変更がないこと、作業ブランチが `origin` と同じか進んでいるだけ（fast-forward）であることを見てから始める。別 PC の作業が先にあれば `git pull --ff-only` で取り込む
 - **作業終了時**：重要な変更と引き継ぎ（このファイル、または段階の docs）を更新して、コミット・push する。**LFS の物は `git lfs push origin <ブランチ>`（または push 時の hook）で実体まで届いたことを確かめる**（下の「既知の問題」）
 - **禁止**：`git push --force`、`git reset --hard` や `git checkout --` による未確認のローカル変更の破棄、別 PC の作業を上書きする操作
-- 私用素材（`wwt-private-assets`）は WWT 本体に入れない。`C:\wwt-private` を使い、Felis など `.gitignore` の物（`Felis_v0.8.1/`）はそのまま残す
+- 私用素材（`wwt-private-assets`）は Around 本体に入れない。`C:\wwt-private` を使い、Felis など `.gitignore` の物（`Felis_v0.8.1/`）はそのまま残す
 
 ## 部屋をすぐ開く固定 URL（2026-11-12）
 
@@ -17,13 +17,13 @@
 npm run living
 ```
 
-`.workliving-onboarding` で実行すると、その PC の私用素材（`WWT_PRIVATE`、なければ `C:wwt-private`）からフェリス入りで作り直し、上の URL で出して、ブラウザーで開く。止めるときは Ctrl+C。ブラウザーを開かずに出すときは `npm run living -- --no-open`。
+`.workliving-onboarding` で実行すると、その PC の私用素材（`AROUND_PRIVATE`、なければ `C:around-private`）からフェリス入りで作り直し、上の URL で出して、ブラウザーで開く。止めるときは Ctrl+C。ブラウザーを開かずに出すときは `npm run living -- --no-open`。
 
 - **この PC の中だけで受ける**（127.0.0.1 のみ、ほかの機器からは開けない）。フェリスは規約が未確認なので、外のサーバーや公開の URL には載せない
 - 私用素材がない・まだ LFS の実体がないときは、フェリスなしで開き、理由を表示する。デスクトップで初めて使う前に：
 
   ```bash
-  cd C:wwt-private && git pull --ff-only && git lfs pull
+  cd C:around-private && git pull --ff-only && git lfs pull
   ```
 
 - 開くたびにそのチェックアウトから作り直す（`.workliving-room-live`）。作り直しに失敗したら、前に作った物を出す
@@ -40,7 +40,7 @@ npm run living
 | Node.js / npm        | 24.11.1 / 11.6.2。worktree で `npm ci`                                                                                                                                                         |
 | Git LFS              | 3.8.1。`gh` は `a3681299-png` でログイン済み                                                                                                                                                   |
 | Blender              | 5.2.2 LTS（`C:\Program Files\Blender Foundation\Blender 5.2\blender.exe`）                                                                                                                     |
-| 環境変数             | `WW_VRM_FILE`・`WW_CHARACTER_VRM`・`WW_VRMA_DIR`・`WW_CHARACTER_MOTIONS` は `C:\wwt-private\mirdo\...` を指す設定済み                                                                          |
+| 環境変数             | `AROUND_VRM_FILE`・`AROUND_CHARACTER_VRM`・`AROUND_VRMA_DIR`・`AROUND_CHARACTER_MOTIONS` は `C:\wwt-private\mirdo\...` を指す設定済み                                                          |
 | Blender MCP          | 使える（2026-11-11、アドオン 1.8）。`read_factory_settings` を MCP から呼ぶとアドオンが止まり、Blender で「Start MCP Server」を押し直すことになる。まとまった処理はヘッドレスの Blender で行う |
 | VRM Add-on           | 2026-11-11 に Blender の公式リポジトリから入れた（`blender --online-mode --command extension install vrm --enable`）。`fbx_to_vrm.py`・`retarget_vrma.py` に要る                               |
 

@@ -43,9 +43,9 @@ for (const build of [normal, busy]) {
     await popup.goto(`chrome-extension://${new URL(worker.url()).host}/popup/index.html`);
     await popup.evaluate(() =>
       chrome.storage.local.set({
-        'webWorldThemes.enabled': true,
-        'webWorldThemes.strength': 100,
-        'webWorldThemes.design.youtube': {
+        'around.enabled': true,
+        'around.strength': 100,
+        'around.design.youtube': {
           schemaVersion: 12,
           id: 'probe-control',
           siteId: 'youtube',

@@ -2,7 +2,7 @@
 # Each model keeps its own colour texture: it is named `tex_*`, so the bake gives it vertex
 # light only and the web multiplies that light by the texture (80_bake.py, src/living-room).
 # Screens on the workstation are split off as `dyn_*` so they glow and are never baked.
-MODEL_DIR = os.path.normpath(WWD + '../../art/living-room/models') + os.sep
+MODEL_DIR = os.path.normpath(AROUND_DIR + '../../art/living-room/models') + os.sep
 # key: (collection, location, rotation about Z in degrees). Every model's front is -Y, origin
 # on the floor under its centre, real size.
 PLACES = {

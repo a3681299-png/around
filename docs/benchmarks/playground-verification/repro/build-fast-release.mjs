@@ -12,12 +12,12 @@ await build({
   format: 'iife',
   target: 'chrome120',
   loader: { '.css': 'text' },
-  dropLabels: ['WW_TEST_PAGE_CHANGE', 'WW_GUARD_TRACE'],
+  dropLabels: ['AROUND_TEST_PAGE_CHANGE', 'AROUND_GUARD_TRACE'],
   define: {
-    __WW_PAGE_CHANGE_LEGACY__: 'false',
-    __WW_WORLD_MODE__: '"runtime"',
-    __WW_WORLD_DEVTOOLS__: 'false',
-    __WW_ASSET_PROFILE__: 'false',
+    __AROUND_PAGE_CHANGE_LEGACY__: 'false',
+    __AROUND_WORLD_MODE__: '"runtime"',
+    __AROUND_WORLD_DEVTOOLS__: 'false',
+    __AROUND_ASSET_PROFILE__: 'false',
   },
   banner: {
     js: `{ const native=window.setTimeout.bind(window); window.setTimeout=(fn,ms,...args)=>native(fn,ms===360?60:ms,...args); }`,

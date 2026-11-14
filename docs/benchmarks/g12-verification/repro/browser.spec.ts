@@ -137,7 +137,7 @@ test('real YouTube visual: near root yields, far root moves; wheel visibility sa
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30000 });
     await waitForAdvertToEnd(page);
     await declinePromotion(page);
-    await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+    await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
     const pause = page.getByRole('button', { name: /^Pause|^一時停止/ }).first();
     if (await pause.isVisible()) await pause.click();
     const { studio, panel } = await openEditor(popup, page);
@@ -165,7 +165,7 @@ test('real YouTube visual: near root yields, far root moves; wheel visibility sa
     await panel.locator('.save').click();
     await expect(panel.locator('.dirty')).toHaveText('保存済み');
     const saved: any = await popup.evaluate(
-      async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
+      async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'],
     );
     await studio.close();
     const control = page
@@ -206,7 +206,7 @@ test('real YouTube visual: near root yields, far root moves; wheel visibility sa
         { id: 'end', input: 1, value: 300, easing: 'linear' },
       ],
     }));
-    await popup.evaluate((design) => chrome.storage.local.set({ 'webWorldThemes.design.youtube': design }), {
+    await popup.evaluate((design) => chrome.storage.local.set({ 'around.design.youtube': design }), {
       ...saved,
       decorations,
       signalRules,
@@ -214,9 +214,7 @@ test('real YouTube visual: near root yields, far root moves; wheel visibility sa
     await expect(page.locator('[data-image-id]')).toHaveCount(2);
     await page.mouse.move(r.x + r.width / 2, r.y + r.height / 2, { steps: 3 });
     const state = () =>
-      page
-        .locator('#web-world-themes-decorations')
-        .evaluate((n: HTMLElement) => JSON.parse(n.dataset.wwSafety ?? '{}'));
+      page.locator('#around-decorations').evaluate((n: HTMLElement) => JSON.parse(n.dataset.aroundSafety ?? '{}'));
     await expect.poll(async () => (await state()).stopped, { timeout: 15000 }).toBe('');
     const timeline: any[] = [];
     await page.evaluate(() => {
@@ -225,14 +223,14 @@ test('real YouTube visual: near root yields, far root moves; wheel visibility sa
     for (let i = 0; i < 5; i++) {
       await page.waitForTimeout(180);
       const sample = await page.evaluate(() =>
-        [...document.querySelectorAll('[id^="web-world-themes-"][id$="decorations"]')].flatMap((h) =>
+        [...document.querySelectorAll('[id^="around-"][id$="decorations"]')].flatMap((h) =>
           [...(h.shadowRoot?.querySelectorAll<HTMLElement>('[data-image-id]') ?? [])].map((n) => ({
             id: n.dataset.imageId,
             x: n.getBoundingClientRect().x,
             y: n.getBoundingClientRect().y,
             visibility: getComputedStyle(n).visibility,
             transform: n.style.transform,
-            safety: h.getAttribute('data-ww-safety'),
+            safety: h.getAttribute('data-around-safety'),
           })),
         ),
       );
@@ -245,7 +243,7 @@ test('real YouTube visual: near root yields, far root moves; wheel visibility sa
       ),
     ];
     const pixels = await page.evaluate(() =>
-      [...document.querySelectorAll<HTMLElement>('[id^="web-world-themes-"][id$="decorations"]')].map((h) => ({
+      [...document.querySelectorAll<HTMLElement>('[id^="around-"][id$="decorations"]')].map((h) => ({
         host: h.id,
         style: h.style.cssText,
         opacity: getComputedStyle(h).opacity,
@@ -265,8 +263,8 @@ test('real YouTube visual: near root yields, far root moves; wheel visibility sa
       const rows: any[] = ((window as any).g12WheelFrames = []);
       (window as any).g12WheelRecording = true;
       const sample = (t: number) => {
-        const host = [...document.querySelectorAll<HTMLElement>('[id^="web-world-themes-"][id$="decorations"]')].find(
-          (h) => h.shadowRoot?.querySelector('[data-image-id="visual-1"]'),
+        const host = [...document.querySelectorAll<HTMLElement>('[id^="around-"][id$="decorations"]')].find((h) =>
+          h.shadowRoot?.querySelector('[data-image-id="visual-1"]'),
         );
         const n = host?.shadowRoot?.querySelector<HTMLElement>('[data-image-id="visual-1"]');
         if (n) {
@@ -278,7 +276,7 @@ test('real YouTube visual: near root yields, far root moves; wheel visibility sa
             t,
             scrollY,
             visible,
-            safety: document.querySelector('#web-world-themes-decorations')?.getAttribute('data-ww-safety'),
+            safety: document.querySelector('#around-decorations')?.getAttribute('data-around-safety'),
             x: n.getBoundingClientRect().x,
             y: n.getBoundingClientRect().y,
           });

@@ -8,13 +8,13 @@ import type { WorldGeometry } from '../world/types';
  * it (world/layout.ts) and never decides the form from a size. Adapters without a reduced form
  * never set it.
  */
-export const PART_REDUCED_ATTRIBUTE = 'data-ww-reduced';
+export const PART_REDUCED_ATTRIBUTE = 'data-around-reduced';
 
 /** Per document: each part's height the last time it was shown not reduced. */
 const regularSeen = new WeakMap<Document, Map<string, number>>();
 
 const partElement = (doc: Document, anchor: DesignTarget | undefined) =>
-  anchor && doc.querySelector(`[data-ww-surface~="${anchor.surface}"]`);
+  anchor && doc.querySelector(`[data-around-surface~="${anchor.surface}"]`);
 const frameOf = (element: Element | null | undefined): PlacementFrame | undefined => {
   const rect = element?.getBoundingClientRect();
   return rect && rect.width > 0 && rect.height > 0

@@ -1230,7 +1230,7 @@
         "world": {
           "id": 5,
           "origin": "chrome-extension://bbghnmgfhbekchbcifhflgbogampnopl",
-          "name": "Web World Themes",
+          "name": "Around",
           "uniqueId": "-2410942800457244627.-6788198768352200498",
           "auxData": { "isDefault": false, "type": "isolated", "frameId": "FBEB9C629AA50CB00DEE6A115BC72260" }
         },
@@ -1332,7 +1332,7 @@
         "world": {
           "id": 5,
           "origin": "chrome-extension://kciimfmhhhpdodepijpiednjbdmhadbj",
-          "name": "Web World Themes",
+          "name": "Around",
           "uniqueId": "-8008807122266413638.2053604528618577268",
           "auxData": { "isDefault": false, "type": "isolated", "frameId": "DEEF5806E522B75884674F9E4C549194" }
         },
@@ -6097,7 +6097,7 @@
     ],
     "descriptionExpanded": {
       "matches": true,
-      "parent": "<ytd-watch-metadata is-watch-flexy=\"\" class=\"watch-active-metadata style-scope ytd-watch-flexy style-scope ytd-watch-flexy\" data-ww-surface=\"page reading-panel\" video-id=\"LC1a-DwUhls\" title-headline-xs=\"\" is-two-columns=\"\" action-buttons-update-owner-width=\"\" flex-menu-enabled=\"\" style=\"--yt-saturated-base-background: rgba(255,240,240,1.000); --yt-saturated-raised-background: rgba(255,240,240,1.000); --yt-saturated-additive-background: rgba(201,71,69,0.129); --yt-saturated-text-primary: rgba(54,11,10,1.000); --yt-saturated-text-secondary: rgba(112,57,56,1.000); --yt-saturated-outline: initial;",
+      "parent": "<ytd-watch-metadata is-watch-flexy=\"\" class=\"watch-active-metadata style-scope ytd-watch-flexy style-scope ytd-watch-flexy\" data-around-surface=\"page reading-panel\" video-id=\"LC1a-DwUhls\" title-headline-xs=\"\" is-two-columns=\"\" action-buttons-update-owner-width=\"\" flex-menu-enabled=\"\" style=\"--yt-saturated-base-background: rgba(255,240,240,1.000); --yt-saturated-raised-background: rgba(255,240,240,1.000); --yt-saturated-additive-background: rgba(201,71,69,0.129); --yt-saturated-text-primary: rgba(54,11,10,1.000); --yt-saturated-text-secondary: rgba(112,57,56,1.000); --yt-saturated-outline: initial;",
       "style": "url(\"blob:https://www.youtube.com/c38f7ef1-cc3b-496b-a1d9-4427816f8078\")"
     },
     "emergencyOff": { "sheet": false, "design": null, "compact": 0 }

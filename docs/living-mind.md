@@ -111,10 +111,10 @@ LLM は使っていない（必要にならなかった）。
 ## 10. 再現
 
 ```bash
-WW_LIVING_TEST=1 WW_LIVING_OUT=.work/living-room-preview \
-  WW_LIVING_CHARACTER=C:/wwt-private/Felis_v0.8.1/work/felis-1024.vrm WW_LIVING_MOTIONS=C:/wwt-private/Felis_v0.8.1/motions \
+AROUND_LIVING_TEST=1 AROUND_LIVING_OUT=.work/living-room-preview \
+  AROUND_LIVING_CHARACTER=C:/wwt-private/Felis_v0.8.1/work/felis-1024.vrm AROUND_LIVING_MOTIONS=C:/wwt-private/Felis_v0.8.1/motions \
   node scripts/build-living-room.mjs
 node scripts/playground/serve.mjs .work/living-room-preview 4183
 ```
 
-テスト用の入口：`__wwLivingRoom.resident.readout()`（していること・気分・欲求）、`.notice('petted')` など、`.front`、`__wwLivingRoom.stage()`、`.project(point)`。`resident.live(false)` で心を止める（身体の e2e はこれで以前どおり）。
+テスト用の入口：`__aroundLivingRoom.resident.readout()`（していること・気分・欲求）、`.notice('petted')` など、`.front`、`__aroundLivingRoom.stage()`、`.project(point)`。`resident.live(false)` で心を止める（身体の e2e はこれで以前どおり）。

@@ -55,7 +55,7 @@ const assetRead = createAssetReadService({
     const row = await getAsset(id);
     if (!row) return false;
     if (row.leases.some((lease) => lease.tabId === host.tab && lease.documentId === host.document)) return true;
-    const key = 'webWorldThemes.design.youtube',
+    const key = 'around.design.youtube',
       values = await chrome.storage.local.get(key);
     if (!values[key]) return false;
     try {
@@ -156,7 +156,7 @@ async function prune(current?: AssetLease): Promise<void> {
   const values = await chrome.storage.local.get(null);
   const references = new Set<string>();
   for (const [key, value] of Object.entries(values)) {
-    if (!key.startsWith('webWorldThemes.design.')) continue;
+    if (!key.startsWith('around.design.')) continue;
     try {
       designAssetIds(parseDesign(value)).forEach((id) => references.add(id));
     } catch {

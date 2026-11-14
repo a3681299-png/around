@@ -6,10 +6,10 @@
 # modifiers; the baked copies live in the `bake` collection and are rebuilt every run.
 import numpy as np, json, os, time
 
-OUT = globals().get('WW_OUT') or (WWD + '../../art/living-room/web/')
-LM_SIZE = globals().get('WW_LM_SIZE', 4096)
-SAMPLES = globals().get('WW_SAMPLES', 128)
-VC_SAMPLES = globals().get('WW_VC_SAMPLES', 128)
+OUT = globals().get('AROUND_OUT') or (AROUND_DIR + '../../art/living-room/web/')
+LM_SIZE = globals().get('AROUND_LM_SIZE', 4096)
+SAMPLES = globals().get('AROUND_SAMPLES', 128)
+VC_SAMPLES = globals().get('AROUND_VC_SAMPLES', 128)
 LIGHT_SCALE = 2.0  # More precision in this room's deep shadows; bright screens stay separate.
 os.makedirs(OUT, exist_ok=True)
 sc = bpy.context.scene
@@ -221,7 +221,7 @@ bpy.ops.object.bake(type='DIFFUSE')
 albedo = np.array(img.pixels[:], dtype=np.float32).reshape(LM_SIZE, LM_SIZE, 4)
 for m, node in tmp_nodes:
     m.node_tree.nodes.remove(node)
-wwrun('denoise.py')
+around_run('denoise.py')
 guide = np.repeat((albedo[:, :, :3].max(axis=2) > 0)[:, :, None], 3, axis=2).astype(np.float32)
 rgb = denoise_atlas(rgb, guide, OUT) * albedo[:, :, :3]
 light = np.clip(rgb / LIGHT_SCALE, 0, 1)

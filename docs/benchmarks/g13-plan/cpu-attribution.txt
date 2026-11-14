@@ -180,6 +180,6 @@ applyLayout: 190 ticks ≈ 349.3 ms
     5.5 ms  L53972  const roots = new Map([...layout.groups, ...layout.layers].map((entry) => [entry.layer.id, entry]));
     5.5 ms  L54083  if (container.children[index3] !== node) container.insertBefore(node, container.children[index3] ?? null);
     5.5 ms  L53955  const entry = nodes.get(layer.layer.id);
-    3.7 ms  L54152  if (record5 !== writtenSafety || host.dataset.wwSafety !== record5) {
+    3.7 ms  L54152  if (record5 !== writtenSafety || host.dataset.aroundSafety !== record5) {
     3.7 ms  L54119  layout.layers.filter((l) => l.layer.visible && (!l.frame || l.visible)).map((layer) => {
     3.7 ms  L54157  const entry = nodes.get(layer.layer.id);

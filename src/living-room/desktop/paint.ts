@@ -55,7 +55,7 @@ export function paintDesktop(g: Pen, state: DesktopState, now: Date) {
   g.fillStyle = 'rgba(255,255,255,0.95)';
   g.font = '700 9px system-ui, sans-serif';
   g.textAlign = 'left';
-  g.fillText('WWT', 8, barH / 2 + 0.5);
+  g.fillText('Around', 8, barH / 2 + 0.5);
   g.textAlign = 'center';
   g.font = '600 9px system-ui, sans-serif';
   g.fillText(time, W / 2, barH / 2 + 0.5);

@@ -14,26 +14,26 @@ import { writeContent } from '../scripts/playground/content';
  * bottom-right corner, inside the player's own stacking under its controls. While the pointer
  * comes and goes, k pauses and plays, the settings menu and the context menu open, the character
  * is never stopped, the bars' own pixels stay on top of it and the real buttons work.
- * Explicit: WW_LIVE_LAYERING=1 (the normal build). WW_LIVE_LAYERING_BASELINE=1 with
- * WW_TEST_EXTENSION_PATH set to a WW_LAYERING=0 build runs the same steps the earlier cut-out way
+ * Explicit: AROUND_LIVE_LAYERING=1 (the normal build). AROUND_LIVE_LAYERING_BASELINE=1 with
+ * AROUND_TEST_EXTENSION_PATH set to a AROUND_LAYERING=0 build runs the same steps the earlier cut-out way
  * and only records (the stops it shows are the guard's, as in chunk 3). Pictures go to .work/layering-live.
  */
 const shots = path.resolve('.work/layering-live');
-const baseline = process.env.WW_LIVE_LAYERING_BASELINE === '1';
+const baseline = process.env.AROUND_LIVE_LAYERING_BASELINE === '1';
 
 test('real YouTube: the character under the player controls is never stopped and never covers them', async () => {
-  test.skip(process.env.WW_LIVE_LAYERING !== '1', 'Explicit real YouTube check (WW_LIVE_LAYERING=1).');
+  test.skip(process.env.AROUND_LIVE_LAYERING !== '1', 'Explicit real YouTube check (AROUND_LIVE_LAYERING=1).');
   test.setTimeout(300000);
   await mkdir(shots, { recursive: true });
   const content = path.resolve('.work/layering-live/content');
   const { models } = writeContent(path.resolve('.'), content);
   const file = (name: string) => path.join(content, name);
   const design = JSON.parse(await readFile(file('design.json'), 'utf8'));
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-layering-live-')), false);
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-layering-live-')), false);
   try {
     const manager = await context.newPage();
     await manager.goto('chrome://extensions/');
-    const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+    const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
     await item.waitFor();
     const id = await item.evaluate((e) => (e as HTMLElement & { data?: { id: string } }).data?.id ?? e.id);
     await manager.close();
@@ -83,33 +83,33 @@ test('real YouTube: the character under the player controls is never stopped and
     // Every frame, in the page: is the character stopped (hidden by the guard) in this phase?
     await page.evaluate(() => {
       const w = window as unknown as {
-        wwPhase: string;
-        wwStops: Record<string, [number, number]>;
-        wwWhy: Record<string, string[]>;
+        aroundPhase: string;
+        aroundStops: Record<string, [number, number]>;
+        aroundWhy: Record<string, string[]>;
       };
-      w.wwPhase = 'start';
-      w.wwStops = {};
-      w.wwWhy = {};
+      w.aroundPhase = 'start';
+      w.aroundStops = {};
+      w.aroundWhy = {};
       const node = () => {
-        for (const host of document.querySelectorAll('[id^="web-world-themes"]'))
+        for (const host of document.querySelectorAll('[id^="around"]'))
           for (const n of host.shadowRoot?.querySelectorAll('[data-image-id="resident"]') ?? []) return n;
         return undefined;
       };
       const tick = () => {
         const n = node();
-        const row = (w.wwStops[w.wwPhase] ??= [0, 0]);
+        const row = (w.aroundStops[w.aroundPhase] ??= [0, 0]);
         row[0]++;
         if (!n || n.hasAttribute('data-safety-limited')) {
           row[1]++;
           // Why: the guard's stop entries for the character (surface and reason), once each.
-          const record = document.querySelector<HTMLElement>('[data-ww-safety]')?.dataset.wwSafety;
+          const record = document.querySelector<HTMLElement>('[data-around-safety]')?.dataset.aroundSafety;
           const issues = (JSON.parse(record ?? '{}').issues ?? []) as {
             layerId: string;
             action?: string;
             surfaceId: string;
             reason: string;
           }[];
-          const why = (w.wwWhy[w.wwPhase] ??= []);
+          const why = (w.aroundWhy[w.aroundPhase] ??= []);
           for (const i of issues)
             if (i.layerId === 'resident' && i.action === 'stop') {
               const text = `${i.surfaceId}: ${i.reason}`;
@@ -121,7 +121,7 @@ test('real YouTube: the character under the player controls is never stopped and
       requestAnimationFrame(tick);
     });
     const phase = (name: string) =>
-      page.evaluate((n) => ((window as unknown as { wwPhase: string }).wwPhase = n), name);
+      page.evaluate((n) => ((window as unknown as { aroundPhase: string }).aroundPhase = n), name);
     const shoot = async (name: string) => {
       const clip = (await page.locator('#movie_player').boundingBox())!;
       await page.screenshot({ path: path.join(shots, `${baseline ? 'baseline-' : ''}${name}.png`), clip });
@@ -139,7 +139,7 @@ test('real YouTube: the character under the player controls is never stopped and
     await shoot('idle');
     // Where the plane is: directly after the media, at its level.
     const plane = await page.evaluate(() => {
-      const host = document.querySelector<HTMLElement>('#web-world-themes-video-decorations');
+      const host = document.querySelector<HTMLElement>('#around-video-decorations');
       const before = host?.previousElementSibling as HTMLElement | null;
       return {
         parent: host?.parentElement?.id,
@@ -163,7 +163,7 @@ test('real YouTube: the character under the player controls is never stopped and
     await shoot('paused');
     // The bars' own pixels: the same with the character as without it, where they draw a glyph.
     const hosts = await page.evaluate(() =>
-      [...document.querySelectorAll('[id^="web-world-themes"]')].map(
+      [...document.querySelectorAll('[id^="around"]')].map(
         (h) =>
           `${h.id} in ${h.parentElement?.id || h.parentElement?.tagName} resident:${Boolean(h.shadowRoot?.querySelector('[data-image-id="resident"]'))}`,
       ),
@@ -209,17 +209,20 @@ test('real YouTube: the character under the player controls is never stopped and
     await page.keyboard.press('Escape');
     await phase('end');
     const { stops, why } = await page.evaluate(() => {
-      const w = window as unknown as { wwStops: Record<string, [number, number]>; wwWhy: Record<string, string[]> };
-      return { stops: w.wwStops, why: w.wwWhy };
+      const w = window as unknown as {
+        aroundStops: Record<string, [number, number]>;
+        aroundWhy: Record<string, string[]>;
+      };
+      return { stops: w.aroundStops, why: w.aroundWhy };
     });
     const ad = await page.evaluate(() => document.querySelector('#movie_player')!.classList.contains('ad-showing'));
-    // A WW_GUARD_TRACE build also says why a pending read was not covered by the stacking order.
+    // A AROUND_GUARD_TRACE build also says why a pending read was not covered by the stacking order.
     const trace = await page.evaluate(() => {
-      const host = document.querySelector<HTMLElement>('#web-world-themes-video-decorations');
+      const host = document.querySelector<HTMLElement>('#around-video-decorations');
       return {
-        unsettled: host?.dataset['wwBeneathUnsettled'],
-        why: document.documentElement.dataset['wwBeneathWhy'],
-        ways: document.documentElement.dataset['wwLayeringWays'],
+        unsettled: host?.dataset['aroundBeneathUnsettled'],
+        why: document.documentElement.dataset['aroundBeneathWhy'],
+        ways: document.documentElement.dataset['aroundLayeringWays'],
       };
     });
     const report = { baseline, plane, hosts, stops, why, trace, bars, reach, pausedByClick, ad };
@@ -233,7 +236,7 @@ test('real YouTube: the character under the player controls is never stopped and
     // play button): never the extension's. Which it was is in the report.
     for (const r of reach) {
       expect(r.at, r.s).not.toBeNull();
-      expect(r.at, `${r.s}: the extension takes the point`).not.toMatch(/web-world-themes/);
+      expect(r.at, `${r.s}: the extension takes the point`).not.toMatch(/around/);
       if (!r.hit) test.info().annotations.push({ type: 'covered by YouTube', description: `${r.s}: ${r.at}` });
     }
     expect(reach.some((r) => r.hit)).toBe(true);
@@ -265,7 +268,7 @@ async function barPixels(page: Page) {
   // and the model's element sets visibility:visible, so neither hides it from outside.
   const canvases = (value: string) =>
     page.evaluate((v) => {
-      const root = document.querySelector('#web-world-themes-video-decorations')?.shadowRoot;
+      const root = document.querySelector('#around-video-decorations')?.shadowRoot;
       for (const canvas of root?.querySelectorAll('canvas') ?? []) canvas.style.opacity = v;
     }, value);
   await canvases('0');

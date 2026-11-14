@@ -9,14 +9,14 @@ import type { DesignDocument } from '../src/design/types';
 import { defaultCircleMask } from '../src/effects/types';
 import { isolate } from './helpers/world-host';
 
-const key = 'webWorldThemes.design.youtube',
-  overlay = '#web-world-themes-decorations';
+const key = 'around.design.youtube',
+  overlay = '#around-decorations';
 const layers =
-    ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]',
+    ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations) [data-image-id]',
   media = `${layers} .media`;
 async function open(popup: Page, youtube: Page) {
   await showArtwork(popup);
-  await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
+  await expect(youtube.locator('[data-around-surface~="video-card"]').first()).toBeVisible();
   await youtube.bringToFront();
   const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
@@ -38,7 +38,7 @@ async function setNumber(panel: Locator, label: string, value: number) {
 }
 async function watch(youtube: Page) {
   await youtube.locator('#navigate').evaluate((button: HTMLButtonElement) => button.click());
-  await expect(youtube.locator('[data-ww-surface~="player-window"]')).toBeVisible();
+  await expect(youtube.locator('[data-around-surface~="player-window"]')).toBeVisible();
 }
 async function nativeButton(youtube: Page, name: 'Play' | 'Pause') {
   await youtube.locator(`#movie_player [aria-label="${name}"]`).evaluate((button: HTMLButtonElement) => button.click());

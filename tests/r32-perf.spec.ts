@@ -15,12 +15,12 @@ import { writeContent } from '../scripts/playground/content';
  *   quiet  — the room picture only
  *   vrm    — the mannequin as a plain VRM (redrawn every frame, no computed motion)
  *   body   — the same mannequin with its character: the R3-2 computed motion on top
- * The measurement build is scripts/g11/build.mjs (WW_TEST_EXTENSION_PATH). Explicit: WW_PERF_R32=1.
+ * The measurement build is scripts/g11/build.mjs (AROUND_TEST_EXTENSION_PATH). Explicit: AROUND_PERF_R32=1.
  */
 const out = path.resolve('.work/r32-perf');
 const media = (page: Page) =>
   page.locator(
-    ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) .model-media',
+    ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations) .model-media',
   );
 const quantile = (values: number[], q: number) => {
   const sorted = [...values].sort((a, b) => a - b);
@@ -53,7 +53,7 @@ async function setUp(context: BrowserContext) {
   const file = (name: string) => path.join(content, name);
   const manager = await context.newPage();
   await manager.goto('chrome://extensions/');
-  const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+  const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
   await item.waitFor();
   const id = await item.evaluate((e) => (e as HTMLElement & { data?: { id: string } }).data?.id ?? e.id);
   await manager.close();
@@ -65,13 +65,13 @@ async function setUp(context: BrowserContext) {
   await expect(page.locator('#movie_player')).toBeVisible({ timeout: 25000 });
   await declinePromotion(page);
   await showArtwork(popup);
-  await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+  await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
   const { panel } = await openEditor(popup, page);
-  // WW_PERF_R32_MODEL: another character's VRM in place of the mannequin (outside the repository,
+  // AROUND_PERF_R32_MODEL: another character's VRM in place of the mannequin (outside the repository,
   // e.g. a converted purchased model; docs/characters/mirdo.md), to compare it with the mannequin.
   await panel
     .locator('.model-file')
-    .setInputFiles(process.env.WW_PERF_R32_MODEL ?? file(models.find((name) => name.endsWith('.vrm'))!));
+    .setInputFiles(process.env.AROUND_PERF_R32_MODEL ?? file(models.find((name) => name.endsWith('.vrm'))!));
   await expect(panel.locator('.layer')).toHaveCount(1, { timeout: 30000 });
   await panel.locator('.character-file').setInputFiles(models.filter((name) => name.endsWith('.vrma')).map(file));
   await expect(panel.locator('.character-motions li')).toHaveCount(2, { timeout: 30000 });
@@ -80,11 +80,11 @@ async function setUp(context: BrowserContext) {
   await expect(panel.locator('.layer')).toHaveCount(2, { timeout: 30000 });
   await panel.locator('.save').click();
   await expect(panel.locator('.dirty')).toHaveText('保存済み');
-  if (process.env.WW_PERF_R32_MODEL) {
+  if (process.env.AROUND_PERF_R32_MODEL) {
     // The measured designs are built from the playground's design.json, whose resident points at
     // the mannequin's asset and bones: point it at the imported model instead.
     const saved = (await popup.evaluate(
-      async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
+      async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'],
     )) as Design;
     const imported = saved.decorations.find((layer) => (layer as { kind?: string }).kind === 'model3d') as
       (Layer & { assetId: string; source: unknown }) | undefined;
@@ -147,13 +147,13 @@ async function setUp(context: BrowserContext) {
 const resident = (layer: Layer) => ({ ...layer, placement: { ...layer.placement, y: 0.42 } });
 
 test('R3-2 short check: extension rAF CPU per frame, quiet / plain VRM / computed motion', async () => {
-  test.skip(process.env.WW_PERF_R32 !== '1', 'Explicit short measurement on real YouTube (WW_PERF_R32=1).');
+  test.skip(process.env.AROUND_PERF_R32 !== '1', 'Explicit short measurement on real YouTube (AROUND_PERF_R32=1).');
   test.setTimeout(1500000);
   await mkdir(out, { recursive: true });
-  // WW_PERF_R32_HEADED=1: a real GPU, off the screen (as WW_PERF_SPA_HEADED below).
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-r32-perf-')), false, {
-    extensionPath: process.env.WW_TEST_EXTENSION_PATH ?? '.work/g11-measurement-dist',
-    ...(process.env.WW_PERF_R32_HEADED === '1' ? { headed: true, width: 1920, height: 1080 } : {}),
+  // AROUND_PERF_R32_HEADED=1: a real GPU, off the screen (as AROUND_PERF_SPA_HEADED below).
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-r32-perf-')), false, {
+    extensionPath: process.env.AROUND_TEST_EXTENSION_PATH ?? '.work/g11-measurement-dist',
+    ...(process.env.AROUND_PERF_R32_HEADED === '1' ? { headed: true, width: 1920, height: 1080 } : {}),
   });
   try {
     const { design, popup, page, session, isolated, evaluate, perFrame, play } = await setUp(context);
@@ -177,7 +177,7 @@ test('R3-2 short check: extension rAF CPU per frame, quiet / plain VRM / compute
           : layer,
       ),
       // Chunk 4: at its own place, the player's bottom-right corner, where the bars come and go
-      // (measured with WW_PERF_R32_WIGGLE=1 so they do; compare a WW_LAYERING=1 measurement build).
+      // (measured with AROUND_PERF_R32_WIGGLE=1 so they do; compare a AROUND_LAYERING=1 measurement build).
       corner: layers.map((layer) =>
         layer.id === 'resident' ? { ...layer, character: { ...(layer.character as object), autonomy: false } } : layer,
       ),
@@ -199,8 +199,8 @@ test('R3-2 short check: extension rAF CPU per frame, quiet / plain VRM / compute
           : layer,
       ),
     };
-    // WW_PERF_R32_VARIANTS=body,autonomy measures only those (the chunk 3 short check).
-    const chosen = process.env.WW_PERF_R32_VARIANTS?.split(',').filter((v) => v in variants) ?? [
+    // AROUND_PERF_R32_VARIANTS=body,autonomy measures only those (the chunk 3 short check).
+    const chosen = process.env.AROUND_PERF_R32_VARIANTS?.split(',').filter((v) => v in variants) ?? [
       'quiet',
       'vrm',
       'body',
@@ -232,10 +232,10 @@ test('R3-2 short check: extension rAF CPU per frame, quiet / plain VRM / compute
         await page.waitForTimeout(6000);
         const contextId = await isolated();
         await evaluate(contextId, '__g11Probe.begin(false)');
-        // WW_PERF_R32_PROFILE=1: a CPU profile and each extension function's call count for the
+        // AROUND_PERF_R32_PROFILE=1: a CPU profile and each extension function's call count for the
         // window (.work/r32-perf/r32-<label>-<variant>-<round>.*). They add their own cost: such a
         // run tells where the time goes, not whether a change passes.
-        const profiling = process.env.WW_PERF_R32_PROFILE === '1';
+        const profiling = process.env.AROUND_PERF_R32_PROFILE === '1';
         if (profiling) {
           await session.send('Profiler.enable');
           await session.send('Profiler.setSamplingInterval', { interval: 200 });
@@ -243,7 +243,7 @@ test('R3-2 short check: extension rAF CPU per frame, quiet / plain VRM / compute
           await session.send('Profiler.takePreciseCoverage');
           await session.send('Profiler.start');
         }
-        if (process.env.WW_PERF_R32_WIGGLE === '1') {
+        if (process.env.AROUND_PERF_R32_WIGGLE === '1') {
           // The pointer crosses the picture and leaves every second: the bars fade in and out.
           const box = (await page.locator('#movie_player').boundingBox())!;
           for (let i = 0; i < 5; i++) {
@@ -254,7 +254,7 @@ test('R3-2 short check: extension rAF CPU per frame, quiet / plain VRM / compute
           }
         } else await page.waitForTimeout(5000);
         if (profiling) {
-          const name = `r32-${process.env.WW_PERF_R32_LABEL ?? 'run'}-${variant}-${round}`;
+          const name = `r32-${process.env.AROUND_PERF_R32_LABEL ?? 'run'}-${variant}-${round}`;
           const { profile } = await session.send('Profiler.stop');
           const { result } = await session.send('Profiler.takePreciseCoverage');
           await session.send('Profiler.stopPreciseCoverage');
@@ -281,30 +281,30 @@ test('R3-2 short check: extension rAF CPU per frame, quiet / plain VRM / compute
  * 4.30 ms): one character on the watch page, the cursor brought near it and away (so the autonomy
  * has something to answer), then a search through the masthead (an SPA move to the results), and
  * the 6 s after it measured with the frame probe and a CPU profile of the page's renderer.
- * One build per run (WW_TEST_EXTENSION_PATH); alternate the runs. WW_PERF_SPA_DESIGN=v14 stores the
- * character as v14 (no autonomy keys) for a build before chunk 3. Explicit: WW_PERF_SPA=1.
- * Output: .work/r32-perf/spa-<label>-<round>.{json,cpuprofile}, label from WW_PERF_SPA_LABEL.
+ * One build per run (AROUND_TEST_EXTENSION_PATH); alternate the runs. AROUND_PERF_SPA_DESIGN=v14 stores the
+ * character as v14 (no autonomy keys) for a build before chunk 3. Explicit: AROUND_PERF_SPA=1.
+ * Output: .work/r32-perf/spa-<label>-<round>.{json,cpuprofile}, label from AROUND_PERF_SPA_LABEL.
  */
 test('chunk 3 search SPA: extension CPU per frame and a CPU profile, after one character', async () => {
-  test.skip(process.env.WW_PERF_SPA !== '1', 'Explicit short measurement on real YouTube (WW_PERF_SPA=1).');
+  test.skip(process.env.AROUND_PERF_SPA !== '1', 'Explicit short measurement on real YouTube (AROUND_PERF_SPA=1).');
   test.setTimeout(900000);
   await mkdir(out, { recursive: true });
-  const label = process.env.WW_PERF_SPA_LABEL ?? 'run';
-  // WW_PERF_SPA_HEADED=1: a real GPU (headless draws with SwiftShader on the CPU, which raises
+  const label = process.env.AROUND_PERF_SPA_LABEL ?? 'run';
+  // AROUND_PERF_SPA_HEADED=1: a real GPU (headless draws with SwiftShader on the CPU, which raises
   // both builds alike and hides the difference), in a window kept off the screen by
-  // scripts/test.mjs (WW_TEST_WINDOW_OFFSCREEN), at Codex's 1920×1080.
-  const headed = process.env.WW_PERF_SPA_HEADED === '1';
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-spa-perf-')), false, {
-    extensionPath: process.env.WW_TEST_EXTENSION_PATH ?? '.work/g11-measurement-dist',
+  // scripts/test.mjs (AROUND_TEST_WINDOW_OFFSCREEN), at Codex's 1920×1080.
+  const headed = process.env.AROUND_PERF_SPA_HEADED === '1';
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-spa-perf-')), false, {
+    extensionPath: process.env.AROUND_TEST_EXTENSION_PATH ?? '.work/g11-measurement-dist',
     ...(headed ? { headed: true, width: 1920, height: 1080 } : {}),
   });
   try {
     const { design, popup, page, session, isolated, evaluate, perFrame, play } = await setUp(context);
-    const v14 = process.env.WW_PERF_SPA_DESIGN === 'v14';
+    const v14 = process.env.AROUND_PERF_SPA_DESIGN === 'v14';
     const decorations = design.decorations.map((layer) => {
       if (layer.id !== 'resident') return layer;
-      // WW_PERF_SPA_AUTONOMY=0: the same v15 character with its autonomy off (to tell it apart).
-      const autonomy = process.env.WW_PERF_SPA_AUTONOMY !== '0';
+      // AROUND_PERF_SPA_AUTONOMY=0: the same v15 character with its autonomy off (to tell it apart).
+      const autonomy = process.env.AROUND_PERF_SPA_AUTONOMY !== '0';
       if (!v14) return { ...resident(layer), character: { ...(layer.character as object), autonomy } };
       const {
         personality: _p,
@@ -322,7 +322,7 @@ test('chunk 3 search SPA: extension CPU per frame and a CPU profile, after one c
       rules: [],
       decorations,
     });
-    const rounds = Number(process.env.WW_PERF_SPA_ROUNDS ?? 2);
+    const rounds = Number(process.env.AROUND_PERF_SPA_ROUNDS ?? 2);
     const rows: Record<string, unknown>[] = [];
     await session.send('Profiler.enable');
     await session.send('Profiler.setSamplingInterval', { interval: 200 });
@@ -346,10 +346,10 @@ test('chunk 3 search SPA: extension CPU per frame and a CPU profile, after one c
       await page.mouse.move(80, 860, { steps: 3 });
       const contextId = await isolated();
       await evaluate(contextId, '__g11Probe.begin(false)');
-      // WW_PERF_SPA_COUNTS=1: how many times each extension function ran in the window (precise
+      // AROUND_PERF_SPA_COUNTS=1: how many times each extension function ran in the window (precise
       // coverage), to tell "called more often" from "heavier per call". Its own cost is high:
       // such a run's CPU numbers are not compared.
-      const counting = process.env.WW_PERF_SPA_COUNTS === '1';
+      const counting = process.env.AROUND_PERF_SPA_COUNTS === '1';
       if (counting) {
         await session.send('Profiler.startPreciseCoverage', { callCount: true, detailed: true });
         await session.send('Profiler.takePreciseCoverage');
@@ -378,10 +378,10 @@ test('chunk 3 search SPA: extension CPU per frame and a CPU profile, after one c
           }
         await writeFile(path.join(out, `spa-${label}-${round}.counts-1to3s.json`), JSON.stringify(counts));
       }
-      // Where the character is after the move (WW_PERF_SPA_TRACK=1; the reads and the picture add
+      // Where the character is after the move (AROUND_PERF_SPA_TRACK=1; the reads and the picture add
       // their own cost, so such a run's numbers are not compared).
       const track: unknown[] = [];
-      if (process.env.WW_PERF_SPA_TRACK === '1')
+      if (process.env.AROUND_PERF_SPA_TRACK === '1')
         for (const at of [300, 1000, 2000, 3500]) {
           await page.waitForTimeout(at - (track.length ? [300, 1000, 2000, 3500][track.length - 1]! : 0));
           track.push({

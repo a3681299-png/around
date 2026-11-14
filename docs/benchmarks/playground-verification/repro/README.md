@@ -14,7 +14,7 @@ git worktree add --detach .work/playground-v1-before 447b2bf
 両側で自身のビルドスクリプトを使う。
 
 ```powershell
-$env:WW_BUILD_OUT = '.work/extension'
+$env:AROUND_BUILD_OUT = '.work/extension'
 npm run build
 node scripts/ui1/build.mjs . .work/perf
 ```
@@ -22,7 +22,7 @@ node scripts/ui1/build.mjs . .work/perf
 対象側で Playground と故障ビルドを用意する。
 
 ```powershell
-$env:WW_PLAYGROUND_OUT = '.work/playground'
+$env:AROUND_PLAYGROUND_OUT = '.work/playground'
 node scripts/build-playground.mjs
 node .work/verify-tools/build-faults.mjs
 node .work/verify-tools/static.mjs
@@ -35,7 +35,7 @@ Remove-Item Env:UI1_PROBE_AFTER_AWAIT
 
 `static.mjs` は境界違反の一時ファイルを `src/host/` に作り、lint と unit が非ゼロ終了することを確かめ、finally で削除する。禁止素材の検査には名前と文字列だけの合成ファイルを使う。実物の私用素材は使わない。`build-faults.mjs` は esbuild の依存差替えだけを使い、製品ソースの文字列を置換しない。
 
-Windows 全件は `WW_TEST_EXTENSION_PATH` を対象の `.work/extension` に向けて `npm run test:e2e`。workers=1 を維持し、他のブラウザーテストと同時に走らせない。ネイティブ操作を含む全件の前には、キーボードのフォーカスを取ることを伝える。
+Windows 全件は `AROUND_TEST_EXTENSION_PATH` を対象の `.work/extension` に向けて `npm run test:e2e`。workers=1 を維持し、他のブラウザーテストと同時に走らせない。ネイティブ操作を含む全件の前には、キーボードのフォーカスを取ることを伝える。
 
 全件の終了後に `run-extra.ps1` を実行する。正常系、意図的な故障、前後の比較は別の JSON と log に残る。`pg-no-*` はテストが失敗することが期待値。`no-hysteresis` は 300ms の既存下限を保持したテストであり、成功を期待する試験ではない。`timing.spec.ts` は対象の `operation-safety.spec.ts` のコピーに経過時間の console 出力を1行だけ足したもの。
 
@@ -66,6 +66,6 @@ node .work/verify-tools/model-debug-build.mjs
 
 最初の採取のコードは `perf-first-attempt.spec.ts`。`performance-first-attempt/` は、対象の VRM 読込失敗を含む2組と途中の3組目で、有効な前後4組として使っていない。自動 trace ZIP を有効にした長い診断では、比較版のブラウザーを閉じるときに Playwright の ZIP 読込エラーも出た。エラー記録だけを追加した通常版／計測版の前後4条件は `model-debug.spec.ts`、元の計測の一巡は `R31_MODEL_DIAG=after` または `before` で採取した。これらの診断値を正式な4組に混ぜていない。
 
-300ms の下限そのものを再確認するには `node .work/verify-tools/build-fast-release.mjs` で作った `.work/fault-fast-release` を `WW_TEST_EXTENSION_PATH` に指定し、`timing.spec.ts --grep 'G1.2 ①②④'` を実行する。製品の閾値を置換せず、依存差し替えで解除履歴の時刻を早め、同じ開発版の起床タイマーも短くしたもの。これは失敗することが期待値。
+300ms の下限そのものを再確認するには `node .work/verify-tools/build-fast-release.mjs` で作った `.work/fault-fast-release` を `AROUND_TEST_EXTENSION_PATH` に指定し、`timing.spec.ts --grep 'G1.2 ①②④'` を実行する。製品の閾値を置換せず、依存差し替えで解除履歴の時刻を早め、同じ開発版の起床タイマーも短くしたもの。これは失敗することが期待値。
 
 Chrome は headless または `launchExtension()` の画面外引数で開く。実サイトは未ログインの新しいプロファイルを使う。`PLAYWRIGHT_BROWSERS_PATH` を共用する場合は環境変数で指定する。すべてのテストは `npm run test:unit` / `npm run test:e2e` から実行する。

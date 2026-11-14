@@ -179,9 +179,9 @@ test('a VRM model is not a motion, and a motion is not a model', () => {
 });
 
 // Local only: the private motion files are never in the repository or CI.
-test('local motions: every .vrma in WW_VRMA_DIR passes', () => {
-  const dir = process.env['WW_VRMA_DIR'];
-  test.skip(!dir || !fs.existsSync(dir), 'WW_VRMA_DIR is not set');
+test('local motions: every .vrma in AROUND_VRMA_DIR passes', () => {
+  const dir = process.env['AROUND_VRMA_DIR'];
+  test.skip(!dir || !fs.existsSync(dir), 'AROUND_VRMA_DIR is not set');
   const files = fs.readdirSync(dir!).filter((f) => f.endsWith('.vrma'));
   expect(files.length).toBeGreaterThan(0);
   for (const file of files) {

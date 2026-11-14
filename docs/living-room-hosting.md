@@ -10,7 +10,7 @@
 
 ```bash
 # フェリス入りで載せる（`npm run living` と同じ素材を使い、テスト用の入口を付けずに作る）
-WW_LIVING_OUT=.work/living-room-felis WW_LIVING_TEST=   WW_LIVING_CHARACTER=C:/wwt-private/Felis_v0.8.1/work/felis-1024.vrm   WW_LIVING_MOTIONS=C:/wwt-private/Felis_v0.8.1/motions node scripts/build-living-room.mjs
+AROUND_LIVING_OUT=.work/living-room-felis AROUND_LIVING_TEST=   AROUND_LIVING_CHARACTER=C:/wwt-private/Felis_v0.8.1/work/felis-1024.vrm   AROUND_LIVING_MOTIONS=C:/wwt-private/Felis_v0.8.1/motions node scripts/build-living-room.mjs
 node scripts/living-room/host/upload.mjs --from .work/living-room-felis --allow-character
 # キャラなしに戻す（フェリスのファイルを消して、公開用ビルドで上書き）
 node scripts/living-room/host/upload.mjs --remove-character

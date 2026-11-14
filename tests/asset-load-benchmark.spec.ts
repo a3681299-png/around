@@ -9,7 +9,7 @@ import { vrmFixture } from './helpers/vrm-fixture';
 
 async function extensionId(page: Page) {
   await page.goto('chrome://extensions/');
-  const item = page.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+  const item = page.locator('extensions-item').filter({ hasText: 'Around' });
   await item.waitFor();
   return item.evaluate((e) => (e as HTMLElement & { data?: { id: string } }).data?.id ?? e.id);
 }
@@ -29,16 +29,16 @@ function metricDelta(before: Record<string, number>, after: Record<string, numbe
 }
 
 test('opt-in load benchmark uses the same renderer for transport, File and IDB without persisting diagnostics in works', async () => {
-  test.skip(process.env.WW_ASSET_PROFILE_TEST !== '1', 'Build WW_ASSET_PROFILE=1 and explicitly opt in.');
+  test.skip(process.env.AROUND_ASSET_PROFILE_TEST !== '1', 'Build AROUND_ASSET_PROFILE=1 and explicitly opt in.');
   test.setTimeout(90000);
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-load-smoke-')));
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-load-smoke-')));
   try {
     const page = await context.newPage(),
       id = await extensionId(page);
     await page.goto(`chrome-extension://${id}/diagnostics/asset-benchmark.html`);
     await page.locator('#file').setInputFiles({ name: 'original.vrm', mimeType: 'model/vrm', buffer: vrmFixture() });
     for (const mode of ['transport', 'direct', 'stored']) {
-      const result = await page.evaluate((mode) => (globalThis as any).wwAssetBench.run(mode), mode);
+      const result = await page.evaluate((mode) => (globalThis as any).aroundAssetBench.run(mode), mode);
       expect(result.alphaPixels).toBeGreaterThan(100);
       expect(result.stats.contexts).toBe(1);
       expect(result.stats.instances).toBe(1);
@@ -50,7 +50,7 @@ test('opt-in load benchmark uses the same renderer for transport, File and IDB w
     }
     const data = await page.evaluate(async () => chrome.storage.local.get(null));
     expect(Object.keys(data).some((k) => k.includes('profile'))).toBe(false);
-    await page.evaluate(() => (globalThis as any).wwAssetBench.stop());
+    await page.evaluate(() => (globalThis as any).aroundAssetBench.stop());
     await expect(page.locator('#stage canvas')).toHaveCount(0);
   } finally {
     await context.close();
@@ -59,12 +59,12 @@ test('opt-in load benchmark uses the same renderer for transport, File and IDB w
 
 test('private local avatar: real YouTube A and controlled A-prime/B/C load performance', async () => {
   test.skip(
-    process.env.WW_ASSET_BENCH_LIVE !== '1' || !process.env.WW_VRM_FILE,
+    process.env.AROUND_ASSET_BENCH_LIVE !== '1' || !process.env.AROUND_VRM_FILE,
     'Explicit private-file and real-site performance run only.',
   );
   test.setTimeout(900000);
-  const profiling = process.env.WW_ASSET_BENCH_BASELINE !== '1',
-    file = path.resolve(process.env.WW_VRM_FILE!);
+  const profiling = process.env.AROUND_ASSET_BENCH_BASELINE !== '1',
+    file = path.resolve(process.env.AROUND_VRM_FILE!);
   let report: Record<string, any> = {
     sourceCommit: '90926a6',
     profiling,
@@ -76,15 +76,15 @@ test('private local avatar: real YouTube A and controlled A-prime/B/C load perfo
       'CPU is only the measured page target, not the service worker or the GPU process.',
     ],
   };
-  const queueOnly = process.env.WW_ASSET_BENCH_QUEUE === '1';
-  const repeats = Math.max(3, Math.min(10, Number(process.env.WW_ASSET_REPEATS) || 3));
-  const label = process.env.WW_ASSET_RUN_LABEL;
+  const queueOnly = process.env.AROUND_ASSET_BENCH_QUEUE === '1';
+  const repeats = Math.max(3, Math.min(10, Number(process.env.AROUND_ASSET_REPEATS) || 3));
+  const label = process.env.AROUND_ASSET_RUN_LABEL;
   if (label && !/^[a-z0-9-]+$/.test(label)) throw new Error('Invalid benchmark label');
   const artifact =
     '.work/verification/asset-load-' + (label ?? (queueOnly ? 'queue' : profiling ? 'profile' : 'baseline')) + '.json';
   await mkdir('.work/verification', { recursive: true });
   const persist = () => writeFile(artifact, JSON.stringify(report, null, 2));
-  const controlsOnly = profiling && !queueOnly && process.env.WW_ASSET_BENCH_CONTROLS === '1';
+  const controlsOnly = profiling && !queueOnly && process.env.AROUND_ASSET_BENCH_CONTROLS === '1';
   if (controlsOnly) {
     report = JSON.parse(await readFile(artifact, 'utf8'));
     report.notes.push(
@@ -92,7 +92,7 @@ test('private local avatar: real YouTube A and controlled A-prime/B/C load perfo
     );
   }
   if (!controlsOnly) {
-    const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-load-live-')), false, {
+    const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-load-live-')), false, {
       headed: true,
       width: 1920,
       height: 1000,
@@ -109,7 +109,7 @@ test('private local avatar: real YouTube A and controlled A-prime/B/C load perfo
       await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30000 });
       await showArtwork(popup);
       await page.bringToFront();
-      await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+      await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
       await page
         .locator('video')
         .first()
@@ -130,14 +130,14 @@ test('private local avatar: real YouTube A and controlled A-prime/B/C load perfo
       for (let n = 0; n < (queueOnly ? 1 : repeats); n++) {
         if (n) {
           await panel.click('.delete-image');
-          await expect(page.locator('#web-world-themes-decorations .model-media')).toHaveCount(0);
+          await expect(page.locator('#around-decorations .model-media')).toHaveCount(0);
         }
         if (profiling) await query('clear');
         const before = await metrics(cdp),
           start = performance.now();
         console.log(`Asset load A run ${n + 1}`);
         await panel.files([file], '.model-file');
-        const media = page.locator('#web-world-themes-decorations .model-media');
+        const media = page.locator('#around-decorations .model-media');
         await expect(media).toHaveAttribute(
           profiling ? 'data-profile-ready' : 'data-renderer',
           profiling ? /^ap-/ : 'three',
@@ -172,8 +172,8 @@ test('private local avatar: real YouTube A and controlled A-prime/B/C load perfo
           ...metricDelta(before, after),
           placement: await media.locator('canvas').evaluate((c: HTMLCanvasElement) => [c.width, c.height]),
           stats: await page
-            .locator('#web-world-themes-decorations')
-            .evaluate((e: HTMLElement) => JSON.parse(e.dataset.wwModelStats!)),
+            .locator('#around-decorations')
+            .evaluate((e: HTMLElement) => JSON.parse(e.dataset.aroundModelStats!)),
         });
         await persist();
       }
@@ -187,11 +187,11 @@ test('private local avatar: real YouTube A and controlled A-prime/B/C load perfo
           paused: v.paused,
           error: v.error?.code ?? null,
         }));
-      if (profiling && !queueOnly && process.env.WW_ASSET_SKIP_OLD_IFRAME !== '1') {
+      if (profiling && !queueOnly && process.env.AROUND_ASSET_SKIP_OLD_IFRAME !== '1') {
         const saved = await popup.evaluate(
           async () =>
-            (await chrome.storage.local.get('webWorldThemes.design.youtube'))[
-              'webWorldThemes.design.youtube'
+            (await chrome.storage.local.get('around.design.youtube'))[
+              'around.design.youtube'
             ] as import('../src/design/types').DesignDocument,
         );
         const asset = saved.decorations[0]!.assetId,
@@ -209,7 +209,7 @@ test('private local avatar: real YouTube A and controlled A-prime/B/C load perfo
   }
   if (!profiling || queueOnly) return;
   for (const mode of ['transport', 'direct', 'stored']) {
-    const browser = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-load-direct-')), false, {
+    const browser = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-load-direct-')), false, {
       headed: true,
       width: 1920,
       height: 1000,
@@ -220,7 +220,7 @@ test('private local avatar: real YouTube A and controlled A-prime/B/C load perfo
       await page.goto(`chrome-extension://${id}/diagnostics/asset-benchmark.html`);
       await page.bringToFront();
       await page.locator('#file').setInputFiles(file);
-      if (mode === 'stored') await page.evaluate(() => (globalThis as any).wwAssetBench.seed());
+      if (mode === 'stored') await page.evaluate(() => (globalThis as any).aroundAssetBench.seed());
       const cdp = await browser.newCDPSession(page);
       await cdp.send('Performance.enable');
       const runs: any[] = [];
@@ -228,7 +228,7 @@ test('private local avatar: real YouTube A and controlled A-prime/B/C load perfo
       for (let n = 0; n < repeats; n++) {
         console.log(`Asset load ${mode} run ${n + 1}`);
         const before = await metrics(cdp);
-        const result = await page.evaluate((mode) => (globalThis as any).wwAssetBench.run(mode), mode);
+        const result = await page.evaluate((mode) => (globalThis as any).aroundAssetBench.run(mode), mode);
         const after = await metrics(cdp);
         expect(result.alphaPixels).toBeGreaterThan(1000);
         runs.push({
@@ -259,7 +259,7 @@ async function iframeProbe(
   const control = await context.newPage();
   await control.goto(`chrome-extension://${id}/diagnostics/asset-benchmark.html`);
   const grant = () =>
-    control.evaluate(({ asset, tab }) => (globalThis as any).wwAssetBench.grant(asset, tab), { asset, tab });
+    control.evaluate(({ asset, tab }) => (globalThis as any).aroundAssetBench.grant(asset, tab), { asset, tab });
   const report: Record<string, any> = {};
   try {
     const { nonce } = await grant();
@@ -268,7 +268,7 @@ async function iframeProbe(
     await page.evaluate(
       ({ id, nonce }) => {
         const f = document.createElement('iframe');
-        f.id = 'ww-asset-probe';
+        f.id = 'around-asset-probe';
         f.src = `chrome-extension://${id}/diagnostics/asset-benchmark.html?nonce=${nonce}`;
         f.style.cssText =
           'position:fixed;left:20px;top:200px;width:240px;height:320px;border:0;z-index:2147483645;pointer-events:none';
@@ -286,7 +286,7 @@ async function iframeProbe(
     );
     report.error = await frame.evaluate(() => document.documentElement.dataset.probeError ?? null);
     if (report.error) return report;
-    report.render = await frame.evaluate(() => (globalThis as any).wwAssetBench.latest());
+    report.render = await frame.evaluate(() => (globalThis as any).aroundAssetBench.latest());
     report.extensionOrigin = await frame.evaluate(() => ({
       origin: location.origin,
       chromeId: chrome.runtime.id,
@@ -318,7 +318,7 @@ async function iframeProbe(
           contextId: isolated,
           awaitPromise: true,
           returnByValue: true,
-          expression: `new Promise((resolve,reject)=>{const f=document.querySelector('#ww-asset-probe'),c=new MessageChannel();const timer=setTimeout(()=>reject(Error('channel timeout')),10000);c.port1.onmessage=e=>{if(e.data.byteLength){clearTimeout(timer);resolve({ms:performance.now()-start,received:e.data.byteLength,detached:buffer.byteLength===0});c.port1.close();}};f.contentWindow.postMessage({type:'ww-binary-probe',nonce:${JSON.stringify(nonce)}},'chrome-extension://${id}',[c.port2]);const buffer=new ArrayBuffer(57185776),start=performance.now();c.port1.postMessage(buffer,[buffer]);})`,
+          expression: `new Promise((resolve,reject)=>{const f=document.querySelector('#around-asset-probe'),c=new MessageChannel();const timer=setTimeout(()=>reject(Error('channel timeout')),10000);c.port1.onmessage=e=>{if(e.data.byteLength){clearTimeout(timer);resolve({ms:performance.now()-start,received:e.data.byteLength,detached:buffer.byteLength===0});c.port1.close();}};f.contentWindow.postMessage({type:'around-binary-probe',nonce:${JSON.stringify(nonce)}},'chrome-extension://${id}',[c.port2]);const buffer=new ArrayBuffer(57185776),start=performance.now();c.port1.postMessage(buffer,[buffer]);})`,
         });
         report.binaryTransfers.push(
           result.exceptionDetails ? { error: result.exceptionDetails.text } : result.result.value,
@@ -331,7 +331,7 @@ async function iframeProbe(
     await page.locator('.ytp-fullscreen-button').click();
     await expect.poll(() => page.evaluate(() => Boolean(document.fullscreenElement))).toBe(true);
     report.bodyFrameInsideFullscreen = await page.evaluate(() =>
-      document.fullscreenElement!.contains(document.querySelector('#ww-asset-probe')),
+      document.fullscreenElement!.contains(document.querySelector('#around-asset-probe')),
     );
     report.fullscreenElement = await page.evaluate(() => ({
       tag: document.fullscreenElement!.tagName,
@@ -339,12 +339,12 @@ async function iframeProbe(
     }));
     report.bodyFrameRetained = await frame.evaluate(() => document.documentElement.dataset.probeReady === 'true');
     await page.evaluate(() => document.exitFullscreen());
-    await page.evaluate(() => document.querySelector('#ww-asset-probe')?.remove());
+    await page.evaluate(() => document.querySelector('#around-asset-probe')?.remove());
     const next = await grant();
     await page.evaluate(
       ({ id, nonce }) => {
         const f = document.createElement('iframe');
-        f.id = 'ww-asset-probe';
+        f.id = 'around-asset-probe';
         f.src = `chrome-extension://${id}/diagnostics/asset-benchmark.html?nonce=${nonce}`;
         f.style.cssText = 'position:absolute;inset:0;width:240px;height:320px;border:0;pointer-events:none;z-index:100';
         document.querySelector('#movie_player')!.append(f);
@@ -359,12 +359,12 @@ async function iframeProbe(
     await page.locator('.ytp-fullscreen-button').click();
     await expect.poll(() => page.evaluate(() => Boolean(document.fullscreenElement))).toBe(true);
     report.playerFrameInsideFullscreen = await page.evaluate(() =>
-      document.fullscreenElement!.contains(document.querySelector('#ww-asset-probe')),
+      document.fullscreenElement!.contains(document.querySelector('#around-asset-probe')),
     );
     // Moving a cross-origin frame can detach Playwright's previous Frame handle.
     // Resolve the current iframe again before deciding whether rendering was lost.
     report.playerFrameState = await page
-      .frameLocator('#ww-asset-probe')
+      .frameLocator('#around-asset-probe')
       .locator('html')
       .evaluate((e: HTMLElement) => ({ ready: e.dataset.probeReady === 'true', error: e.dataset.probeError ?? null }));
     report.playerFrameRetained = report.playerFrameState.ready;
@@ -373,7 +373,7 @@ async function iframeProbe(
   } catch (error) {
     report.failure = String(error);
   } finally {
-    await page.evaluate(() => document.querySelector('#ww-asset-probe')?.remove());
+    await page.evaluate(() => document.querySelector('#around-asset-probe')?.remove());
     await control.close();
   }
   return report;
@@ -381,11 +381,11 @@ async function iframeProbe(
 
 test('opt-in real YouTube iframe origin, storage, transfer and fullscreen lifecycle probe', async () => {
   test.skip(
-    process.env.WW_ASSET_IFRAME_TEST !== '1' || !process.env.WW_VRM_FILE,
+    process.env.AROUND_ASSET_IFRAME_TEST !== '1' || !process.env.AROUND_VRM_FILE,
     'Explicit local avatar / real-site iframe probe only.',
   );
   test.setTimeout(180000);
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-load-frame-')), false, {
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-load-frame-')), false, {
     headed: true,
     width: 1920,
     height: 1000,
@@ -396,8 +396,8 @@ test('opt-in real YouTube iframe origin, storage, transfer and fullscreen lifecy
     await manager.close();
     const seed = await context.newPage();
     await seed.goto(`chrome-extension://${id}/diagnostics/asset-benchmark.html`);
-    await seed.locator('#file').setInputFiles(path.resolve(process.env.WW_VRM_FILE!));
-    const asset = await seed.evaluate(() => (globalThis as any).wwAssetBench.seed());
+    await seed.locator('#file').setInputFiles(path.resolve(process.env.AROUND_VRM_FILE!));
+    const asset = await seed.evaluate(() => (globalThis as any).aroundAssetBench.seed());
     const popup = await context.newPage();
     await popup.goto(`chrome-extension://${id}/popup/index.html`);
     const page = await context.newPage();

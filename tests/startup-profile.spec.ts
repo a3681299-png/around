@@ -10,7 +10,7 @@ import { declinePromotion } from './helpers/youtube-live';
  * Diagnosis only (AGENTS.md「性能の調査」): V8 CPU profiles of the extension's content script over
  * the first ~6 s after a reload of a real YouTube watch page, for two builds, alternated. The scene
  * is Codex's "no character" one (docs/playground-verification.md): one PNG layer on the player.
- *   WW_PROFILE_STARTUP=1 WW_PROFILE_BUILDS=before=<dir>,after=<dir> npm run test:e2e -- tests/startup-profile.spec.ts
+ *   AROUND_PROFILE_STARTUP=1 AROUND_PROFILE_BUILDS=before=<dir>,after=<dir> npm run test:e2e -- tests/startup-profile.spec.ts
  * Headless. The profile is diagnostic: its overhead makes it useless as a pass/fail number.
  */
 const out = path.resolve('.work/startup-profile');
@@ -37,25 +37,25 @@ function selfTimes(profile: Profile) {
 }
 
 test('startup CPU profile of the content script, two builds alternated', async () => {
-  test.skip(process.env.WW_PROFILE_STARTUP !== '1', 'Diagnosis only (WW_PROFILE_STARTUP=1).');
+  test.skip(process.env.AROUND_PROFILE_STARTUP !== '1', 'Diagnosis only (AROUND_PROFILE_STARTUP=1).');
   test.setTimeout(1500000);
   const builds = Object.fromEntries(
-    (process.env.WW_PROFILE_BUILDS ?? '').split(',').map((pair) => pair.split('=') as [string, string]),
+    (process.env.AROUND_PROFILE_BUILDS ?? '').split(',').map((pair) => pair.split('=') as [string, string]),
   );
   expect(Object.keys(builds).length).toBe(2);
   await mkdir(out, { recursive: true });
-  const rounds = Number(process.env.WW_PROFILE_ROUNDS ?? 2);
+  const rounds = Number(process.env.AROUND_PROFILE_ROUNDS ?? 2);
   const results: { round: number; build: string; extensionMs: number; top: [string, number][] }[] = [];
   for (let round = 0; round < rounds; round++) {
     const order = round % 2 ? Object.keys(builds).reverse() : Object.keys(builds);
     for (const name of order) {
-      const context = await launchExtension(await mkdtemp(path.join(tmpdir(), `ww-startup-${name}-`)), false, {
+      const context = await launchExtension(await mkdtemp(path.join(tmpdir(), `around-startup-${name}-`)), false, {
         extensionPath: builds[name]!,
       });
       try {
         const manager = await context.newPage();
         await manager.goto('chrome://extensions/');
-        const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+        const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
         await item.waitFor();
         const id = await item.evaluate((e) => (e as HTMLElement & { data?: { id: string } }).data?.id ?? e.id);
         await manager.close();
@@ -69,7 +69,7 @@ test('startup CPU profile of the content script, two builds alternated', async (
         const toggle = popup.getByRole('switch', { name: '作品を表示する' });
         await expect(toggle).toBeEnabled();
         await toggle.check();
-        await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+        await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
         const { panel } = await openEditor(popup, page);
         await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
         await expect(panel.locator('.layer')).toHaveCount(1);

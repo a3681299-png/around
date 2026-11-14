@@ -3,7 +3,7 @@ import { validateAssetBytes } from '../assets/validate-bytes';
 import { validateDocumentAssets } from '../assets/design-assets';
 import type { StoredAsset } from '../assets/repository';
 
-const magic = new TextEncoder().encode('WWT-BACKUP-0001\n');
+const magic = new TextEncoder().encode('AROUND-BACKUP-0001\n');
 export const BACKUP_HEADER_BYTES = magic.length + 4 + 32;
 export interface ValidatedBackup {
   manifest: BackupManifest;

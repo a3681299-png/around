@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// Runs a VRM through WWT's own import check and body measure (src/assets/glb.ts inspectGlb,
-// src/characters/humanoid.ts classifyBody): whether WWT accepts the file within its limits, its
+// Runs a VRM through Around's own import check and body measure (src/assets/glb.ts inspectGlb,
+// src/characters/humanoid.ts classifyBody): whether Around accepts the file within its limits, its
 // proportions, and whether the standard motions apply (stage 2) or only the simple ones (stage 1).
 //   node scripts/characters/measure-vrm.mjs <model.vrm>
 import { build } from 'esbuild';

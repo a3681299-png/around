@@ -63,7 +63,7 @@ function dispose(gltf: GLTF, shared?: SharedModelLease) {
     materials = new Set<Material>(),
     textures = new Set<Texture>(),
     skeletons = new Set<{ dispose(): void }>();
-  for (const texture of gltf.userData['wwTextures'] ?? []) if (texture instanceof Texture) textures.add(texture);
+  for (const texture of gltf.userData['aroundTextures'] ?? []) if (texture instanceof Texture) textures.add(texture);
   gltf.scenes.forEach((scene) =>
     scene.traverse((node) => {
       const mesh = node as Mesh & { skeleton?: { dispose(): void } };
@@ -193,7 +193,7 @@ export function createModelRenderer(
       () => new WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power', premultipliedAlpha: true }),
     );
     renderer.domElement.hidden = true;
-    renderer.domElement.dataset.wwThreeBackend = '';
+    renderer.domElement.dataset.aroundThreeBackend = '';
     parent.append(renderer.domElement);
     const gl = renderer.getContext(),
       debug = gl.getExtension('WEBGL_debug_renderer_info');
@@ -298,12 +298,12 @@ export function createModelRenderer(
             return plugin;
           });
         loader.register((parser) => ({
-          name: 'WW_LOCAL_TEXTURE_GUARD',
+          name: 'AROUND_LOCAL_TEXTURE_GUARD',
           loadTexture(index: number) {
             return profileAsync(trace, 'parse.texture', () => parser.loadTexture(index), { count: 1 }).then(
               (texture) => {
                 if (!texture) throw new Error('GLB内のテクスチャを読み込めません。');
-                if (options?.shared) texture.userData['wwTextureIndex'] = index;
+                if (options?.shared) texture.userData['aroundTextureIndex'] = index;
                 textures.add(texture);
                 if (failed || entry.disposed || closed) releaseTexture(texture);
                 return texture;
@@ -321,7 +321,7 @@ export function createModelRenderer(
           textures.forEach(releaseTexture);
           throw error;
         }
-        gltf.userData['wwTextures'] = [...textures];
+        gltf.userData['aroundTextures'] = [...textures];
         if (entry.disposed || closed) {
           dispose(gltf);
           throw new Error('読み込みを中止しました。');
@@ -349,7 +349,7 @@ export function createModelRenderer(
         gltf.scenes.forEach((scene) =>
           scene.traverse((node) => {
             if (!node.name) {
-              node.name = `ww-node-${node.uuid}`;
+              node.name = `around-node-${node.uuid}`;
               names.set(node.uuid, node.name);
             }
           }),

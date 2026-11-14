@@ -43,7 +43,7 @@ Service Worker API・MessageChannel・転送が使えない場合は、既存の
 32MiB以下のJSONと大容量モデルのチャンク経路を残した。予備経路へ切り替える前にバイナリ転送の許可を解放する。
 構造・MIME・容量・送信元の検証エラーを予備経路や再送で回避することはない。
 
-既存の`WW_ASSET_PROFILE=1`計測ビルドでは、次のspanで経路と試行回数を確認できる。
+既存の`AROUND_ASSET_PROFILE=1`計測ビルドでは、次のspanで経路と試行回数を確認できる。
 
 - `studio.upload.array-buffer`: 転送バイト数、成功した試行番号。
 - `studio.upload.retry`: Worker再起動により再送する試行番号。

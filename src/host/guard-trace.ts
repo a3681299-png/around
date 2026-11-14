@@ -1,6 +1,6 @@
 /**
- * Development only (WW_GUARD_TRACE=1, written to .work): why an input check stopped drawing. Calls
- * sit behind the WW_GUARD_TRACE label, which the normal build drops, so nothing here ships.
+ * Development only (AROUND_GUARD_TRACE=1, written to .work): why an input check stopped drawing. Calls
+ * sit behind the AROUND_GUARD_TRACE label, which the normal build drops, so nothing here ships.
  * Read it in the page's DevTools console, under the extension's content-script context.
  */
 const describe = (element: Element | null | undefined) => {
@@ -27,7 +27,7 @@ export function traceMissedInput(
   expected: readonly { id: string; element: Element }[],
 ) {
   console.info(
-    '[Web World Themes G1] クリック先の照合が合いませんでした',
+    '[Around G1] クリック先の照合が合いませんでした',
     JSON.stringify({
       event: event.type,
       point: { x: event.clientX, y: event.clientY },
@@ -38,7 +38,7 @@ export function traceMissedInput(
 }
 
 /** Changes of the approach rule and of the input state it reads, newest last. Kept on the root
- * element as data-ww-guard-approach as well, so a live test can read it from the page. */
+ * element as data-around-guard-approach as well, so a live test can read it from the page. */
 const approachLog: unknown[] = [];
 export function traceApproach(
   doc: Document,
@@ -95,14 +95,14 @@ export function traceApproach(
   };
   approachLog.push(entry);
   if (approachLog.length > 40) approachLog.shift();
-  doc.documentElement.setAttribute('data-ww-guard-approach', JSON.stringify(approachLog));
-  console.info('[Web World Themes G1] 接近の判定', JSON.stringify(entry));
+  doc.documentElement.setAttribute('data-around-guard-approach', JSON.stringify(approachLog));
+  console.info('[Around G1] 接近の判定', JSON.stringify(entry));
 }
 
 /** G1.3 round 0: why reads during scroll hide the artwork. What reached the source since its last
  * read (page scroll, inner scroll, mutations, resize, focus), then what each read changed, both in
  * viewport and in document coordinates, and the guard's HOLD / SHIFTED with their entry. Kept on
- * the root element as data-ww-guard-geometry, newest last. */
+ * the root element as data-around-guard-geometry, newest last. */
 const geometryLog: unknown[] = [];
 let causes: Record<string, number> = {};
 let mutated: string[] = [],
@@ -113,7 +113,7 @@ let lastGeneration = -1;
 const writeGeometry = (doc: Document, entry: Record<string, unknown>) => {
   geometryLog.push({ at: Math.round(doc.defaultView!.performance.now()), ...entry });
   if (geometryLog.length > 400) geometryLog.shift();
-  doc.documentElement.setAttribute('data-ww-guard-geometry', JSON.stringify(geometryLog));
+  doc.documentElement.setAttribute('data-around-guard-geometry', JSON.stringify(geometryLog));
 };
 export function traceGeometryCause(kind: string, detail?: Event | readonly MutationRecord[]) {
   if (kind === 'scroll' && detail instanceof Event)
@@ -309,7 +309,7 @@ export function traceSubtreeCheck(doc: Document, unchanged: boolean, roots: numb
 
 export function traceMovedInput(event: Event | undefined, held: number, now: number) {
   console.info(
-    '[Web World Themes G1] 入力の直前に操作部品が動きました',
+    '[Around G1] 入力の直前に操作部品が動きました',
     JSON.stringify({ event: event?.type ?? 'commit', heldGeneration: held, currentGeneration: now }),
   );
 }

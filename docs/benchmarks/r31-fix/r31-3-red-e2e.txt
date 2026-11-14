@@ -1,5 +1,5 @@
 
-> web-world-themes@0.1.0 test:e2e
+> around@0.1.0 test:e2e
 > node scripts/test.mjs --project=e2e tests/character-editor.spec.ts
 
 

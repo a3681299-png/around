@@ -12,7 +12,7 @@ async function probe() {
       write: false,
       format: 'iife',
       globalName: 'Bound2',
-      dropLabels: ['WW_GUARD_TRACE', 'WW_TEST_PAGE_CHANGE'],
+      dropLabels: ['AROUND_GUARD_TRACE', 'AROUND_TEST_PAGE_CHANGE'],
     })
   ).outputFiles[0]!.text;
 }

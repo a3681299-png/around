@@ -224,7 +224,7 @@ def art(name,kind,w,h,loc,c,rot=(R90,0,0),emission=0,crop=None):
     if kind in quadrants:
         atlas=bpy.data.images.get('studio_art_atlas')
         if atlas is None:
-            atlas=bpy.data.images.load(os.path.normpath(WWD+'../../art/living-room/textures/studio-art-atlas.png'))
+            atlas=bpy.data.images.load(os.path.normpath(AROUND_DIR+'../../art/living-room/textures/studio-art-atlas.png'))
             atlas.name='studio_art_atlas';atlas.pack()
         t.image=atlas
     else:t.image=illustrated(kind)

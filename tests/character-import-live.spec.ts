@@ -9,33 +9,33 @@ import type { DesignDocument, ModelDecoration } from '../src/design/types';
 
 /**
  * Reading is enough (docs/product-design-snapshot.md, "読み込むだけで、感情に応じて動く"): a person's
- * VRM and a folder of .vrma (never in the repository: WW_CHARACTER_VRM, WW_CHARACTER_MOTIONS) are
+ * VRM and a folder of .vrma (never in the repository: AROUND_CHARACTER_VRM, AROUND_CHARACTER_MOTIONS) are
  * read through the editor with nothing set by hand. On real YouTube the character is then seen while
  * watching (at its home, the player's corner), sits on the edge at rest, plays the motion the import
  * assigned to each behaviour as the autonomy switches, and does not flicker with the pointer on it.
- * Headed off screen (a real GPU, the look a person sees). Explicit: WW_LIVE_CHARACTER_IMPORT=1.
+ * Headed off screen (a real GPU, the look a person sees). Explicit: AROUND_LIVE_CHARACTER_IMPORT=1.
  * Pictures and records stay in .work/character-import-live (they show the person's model).
  */
 const out = path.resolve('.work/character-import-live');
 const media = (page: Page) =>
-  page.locator(
-    ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations) .model-media',
-  );
+  page.locator(':is(#around-decorations, #around-video-decorations, #around-page-decorations) .model-media');
 const wrapper = (page: Page) => media(page).locator('xpath=ancestor::*[@data-image-id][1]');
 
 test('real YouTube: a character read with its motions is seen, sits at home and moves by itself', async () => {
   test.skip(
-    process.env.WW_LIVE_CHARACTER_IMPORT !== '1' || !process.env.WW_CHARACTER_VRM || !process.env.WW_CHARACTER_MOTIONS,
-    'Explicit: WW_LIVE_CHARACTER_IMPORT=1 with WW_CHARACTER_VRM and WW_CHARACTER_MOTIONS.',
+    process.env.AROUND_LIVE_CHARACTER_IMPORT !== '1' ||
+      !process.env.AROUND_CHARACTER_VRM ||
+      !process.env.AROUND_CHARACTER_MOTIONS,
+    'Explicit: AROUND_LIVE_CHARACTER_IMPORT=1 with AROUND_CHARACTER_VRM and AROUND_CHARACTER_MOTIONS.',
   );
   test.setTimeout(420000);
   await mkdir(out, { recursive: true });
-  const folder = process.env.WW_CHARACTER_MOTIONS!;
+  const folder = process.env.AROUND_CHARACTER_MOTIONS!;
   const files = (await readdir(folder)).filter((f) => f.endsWith('.vrma')).map((f) => path.join(folder, f));
   expect(files.length).toBeGreaterThan(0);
   const profile = await mkdtemp(path.resolve('.work/p-'));
-  // WW_CHARACTER_VIDEO=1: the page recorded for a person to watch (feet, sitting down, standing up).
-  const video = process.env.WW_CHARACTER_VIDEO === '1';
+  // AROUND_CHARACTER_VIDEO=1: the page recorded for a person to watch (feet, sitting down, standing up).
+  const video = process.env.AROUND_CHARACTER_VIDEO === '1';
   const context = await launchExtension(profile, false, {
     headed: true,
     width: 1280,
@@ -46,7 +46,7 @@ test('real YouTube: a character read with its motions is seen, sits at home and 
   try {
     const manager = await context.newPage();
     await manager.goto('chrome://extensions/');
-    const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+    const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
     await item.waitFor();
     const id = await item.evaluate((e) => (e as HTMLElement & { data?: { id: string } }).data?.id ?? e.id);
     await manager.close();
@@ -61,7 +61,7 @@ test('real YouTube: a character read with its motions is seen, sits at home and 
     await showArtwork(popup);
     const { panel } = await openEditor(popup, page);
     const started = Date.now();
-    await panel.locator('.model-file').setInputFiles(process.env.WW_CHARACTER_VRM!);
+    await panel.locator('.model-file').setInputFiles(process.env.AROUND_CHARACTER_VRM!);
     await expect(panel.locator('.layer')).toHaveCount(1, { timeout: 60000 });
     await panel.locator('.character-file').setInputFiles(files);
     await expect(panel.locator('.character-motions li')).toHaveCount(files.length, { timeout: 90000 });
@@ -70,7 +70,7 @@ test('real YouTube: a character read with its motions is seen, sits at home and 
     await expect(panel.locator('.dirty')).toHaveText('保存済み');
     await closeEditorPages(page);
     const saved = (await popup.evaluate(
-      async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
+      async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'],
     )) as DesignDocument;
     const layer = saved.decorations[0] as ModelDecoration;
     const ids = layer.character!.motions.map((m) => m.id);
@@ -99,10 +99,10 @@ test('real YouTube: a character read with its motions is seen, sits at home and 
     // Every frame from here: the drawn box, the clip, the behaviour, the seat and its weight, so
     // a jump between two frames (a pose switched at once) can be found afterwards.
     await page.evaluate(() => {
-      const w = window as unknown as { wwRows: unknown[] };
-      w.wwRows = [];
+      const w = window as unknown as { aroundRows: unknown[] };
+      w.aroundRows = [];
       const tick = (at: number) => {
-        const media = [...document.querySelectorAll('[id^="web-world-themes"]')]
+        const media = [...document.querySelectorAll('[id^="around"]')]
           .map((h) => h.shadowRoot?.querySelector<HTMLElement>('.model-media'))
           .find(Boolean);
         const wrap = media?.closest('[data-image-id]');
@@ -110,7 +110,7 @@ test('real YouTube: a character read with its motions is seen, sits at home and 
           const f = JSON.parse(media.dataset.modelFrame ?? '{}');
           const r = wrap.getBoundingClientRect(),
             player = document.querySelector('#movie_player')!.getBoundingClientRect();
-          w.wwRows.push({
+          w.aroundRows.push({
             at,
             clip: f.clip,
             behaviour: f.body?.autonomy?.behaviour,
@@ -124,7 +124,7 @@ test('real YouTube: a character read with its motions is seen, sits at home and 
             host: wrap.getRootNode() instanceof ShadowRoot ? (wrap.getRootNode() as ShadowRoot).host.id : '',
           });
         }
-        if (w.wwRows.length < 20000) requestAnimationFrame(tick);
+        if (w.aroundRows.length < 20000) requestAnimationFrame(tick);
       };
       requestAnimationFrame(tick);
     });
@@ -226,18 +226,18 @@ test('real YouTube: a character read with its motions is seen, sits at home and 
     // The pointer on the character: no frame held, nothing hidden (the flicker).
     const home = await box();
     await page.evaluate(() => {
-      const w = window as unknown as { wwHeld: number; wwFrames: number; wwStop: boolean };
-      w.wwHeld = w.wwFrames = 0;
-      w.wwStop = false;
+      const w = window as unknown as { aroundHeld: number; aroundFrames: number; aroundStop: boolean };
+      w.aroundHeld = w.aroundFrames = 0;
+      w.aroundStop = false;
       const tick = () => {
-        const m = document.querySelector('[id^="web-world-themes"]')
-          ? [...document.querySelectorAll('[id^="web-world-themes"]')]
+        const m = document.querySelector('[id^="around"]')
+          ? [...document.querySelectorAll('[id^="around"]')]
               .map((h) => h.shadowRoot?.querySelector('.model-media')?.closest('[data-image-id]'))
               .find(Boolean)
           : undefined;
-        w.wwFrames++;
-        if (!m || m.hasAttribute('data-safety-limited')) w.wwHeld++;
-        if (!w.wwStop) requestAnimationFrame(tick);
+        w.aroundFrames++;
+        if (!m || m.hasAttribute('data-safety-limited')) w.aroundHeld++;
+        if (!w.aroundStop) requestAnimationFrame(tick);
       };
       requestAnimationFrame(tick);
     });
@@ -249,14 +249,14 @@ test('real YouTube: a character read with its motions is seen, sits at home and 
       await page.waitForTimeout(60);
     }
     report['pointerOnCharacter'] = await page.evaluate(() => {
-      const w = window as unknown as { wwHeld: number; wwFrames: number; wwStop: boolean };
-      w.wwStop = true;
-      return { frames: w.wwFrames, held: w.wwHeld };
+      const w = window as unknown as { aroundHeld: number; aroundFrames: number; aroundStop: boolean };
+      w.aroundStop = true;
+      return { frames: w.aroundFrames, held: w.aroundHeld };
     });
     await page.screenshot({ path: path.join(out, 'pointer-on.png') });
-    // WW_CHARACTER_PACE=1 with a development build (WW_AUTONOMY_PACE, scripts/build.mjs): left
+    // AROUND_CHARACTER_PACE=1 with a development build (AROUND_AUTONOMY_PACE, scripts/build.mjs): left
     // alone, it soon changes edges and dozes, without waiting minutes.
-    if (process.env.WW_CHARACTER_PACE === '1') {
+    if (process.env.AROUND_CHARACTER_PACE === '1') {
       await page.mouse.move(away.x, away.y, { steps: 3 });
       const top = await (async () => {
         let f = await frame();
@@ -276,7 +276,7 @@ test('real YouTube: a character read with its motions is seen, sits at home and 
     }
     // The frames: the box never jumps between two frames except while hopping between edges, and
     // the seat's weight moves a frame's share at most; at rest it sits on its edge.
-    const rows = (await page.evaluate(() => (window as unknown as { wwRows: unknown[] }).wwRows)) as {
+    const rows = (await page.evaluate(() => (window as unknown as { aroundRows: unknown[] }).aroundRows)) as {
       at: number;
       clip: number;
       behaviour: string;

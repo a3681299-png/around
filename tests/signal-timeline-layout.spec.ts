@@ -18,7 +18,7 @@ for (const viewport of [
     await youtube.setViewportSize(viewport);
     await showArtwork(popup);
     // The popup changes optimistically; authoring is enabled after the page receives the save.
-    await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+    await expect(youtube.locator('html')).toHaveAttribute('data-around-site', 'youtube');
     // UI0-d round 3: the in-page Studio's workbench is the editor window's own, at the same sizes.
     const { panel, studio } = await openEditor(popup, youtube, viewport);
     // A narrow window gets the one-column arrangement: the レイヤー tab shows the list, as the

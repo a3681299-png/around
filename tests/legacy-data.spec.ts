@@ -10,10 +10,10 @@ import { test, expect } from './fixtures';
  * had turned the theme off with the strength slider still sees nothing drawn: on the first read
  * 作品を表示する is saved OFF for them, once (src/storage/settings.ts).
  */
-const backupFile = path.resolve('tests/fixtures/backups/pre-removal.wwbackup');
+const backupFile = path.resolve('tests/fixtures/backups/pre-removal.aroundbackup');
 const storage = async (name: string) =>
   JSON.parse(await readFile(path.resolve('tests/fixtures/backups', name), 'utf8')) as Record<string, unknown>;
-const layer = '#web-world-themes-decorations [data-image-id]';
+const layer = '#around-decorations [data-image-id]';
 
 async function restore(popup: Page, settings: boolean) {
   const page = await popup.context().newPage();
@@ -46,7 +46,7 @@ test('a backup made with the retro theme restores its artwork, its original and 
   await popup.reload();
   await expect(popup.getByRole('switch', { name: '制作モード' })).toBeChecked();
   await youtube.reload();
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-site', 'youtube');
   await drawn(youtube);
 });
 
@@ -66,12 +66,12 @@ test('storage written with the retro theme loads: the artwork is drawn and 制�
   await popup.reload();
   await expect(popup.getByRole('switch', { name: '制作モード' })).toBeChecked();
   await youtube.reload();
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-site', 'youtube');
   await drawn(youtube);
   // The strength was 37%: 作品を表示する stays ON, carried over from the old switch, and nothing is
   // written for it.
   await expect(popup.getByRole('switch', { name: '作品を表示する' })).toBeChecked();
-  expect(await stored(popup, 'webWorldThemes.showArtwork')).toBeUndefined();
+  expect(await stored(popup, 'around.showArtwork')).toBeUndefined();
 });
 
 async function seed(popup: Page, values: Record<string, unknown>) {
@@ -98,8 +98,7 @@ test('storage with the strength at 0% is moved to OFF once: nothing is drawn, an
     () =>
       new Promise<boolean>((resolve) => {
         const root = document.documentElement,
-          seen = () =>
-            root.hasAttribute('data-ww-site') || Boolean(document.getElementById('web-world-themes-decorations'));
+          seen = () => root.hasAttribute('data-around-site') || Boolean(document.getElementById('around-decorations'));
         if (seen()) return resolve(true);
         const observer = new MutationObserver(() => seen() && (observer.disconnect(), resolve(true)));
         observer.observe(root, { attributes: true, childList: true, subtree: true });
@@ -107,20 +106,20 @@ test('storage with the strength at 0% is moved to OFF once: nothing is drawn, an
       }),
   );
   expect(appeared).toBe(false);
-  await expect(youtube.locator('#web-world-themes-decorations')).toHaveCount(0);
+  await expect(youtube.locator('#around-decorations')).toHaveCount(0);
   // Saved as OFF; the old keys stay exactly as they were.
-  await expect.poll(() => stored(popup, 'webWorldThemes.showArtwork')).toBe(false);
-  expect(await stored(popup, 'webWorldThemes.strength')).toBe(0);
-  expect(await stored(popup, 'webWorldThemes.enabled')).toBe(true);
+  await expect.poll(() => stored(popup, 'around.showArtwork')).toBe(false);
+  expect(await stored(popup, 'around.strength')).toBe(0);
+  expect(await stored(popup, 'around.enabled')).toBe(true);
   await popup.reload();
   await expect(popup.getByRole('switch', { name: '作品を表示する' })).not.toBeChecked();
   // Once saved, the old strength no longer decides anything: raising it shows nothing.
-  await popup.evaluate(() => chrome.storage.local.set({ 'webWorldThemes.strength': 37 }));
+  await popup.evaluate(() => chrome.storage.local.set({ 'around.strength': 37 }));
   await youtube.reload();
   await popup.reload();
   await expect(popup.getByRole('switch', { name: '作品を表示する' })).not.toBeChecked();
-  expect(await stored(popup, 'webWorldThemes.showArtwork')).toBe(false);
-  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-site', 'youtube');
+  expect(await stored(popup, 'around.showArtwork')).toBe(false);
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-around-site', 'youtube');
   // The same page draws as soon as 作品を表示する is ON: the storage itself was readable.
   await showArtwork(popup);
   await drawn(youtube);
@@ -128,10 +127,10 @@ test('storage with the strength at 0% is moved to OFF once: nothing is drawn, an
 
 test('a saved 作品を表示する is never changed by the old strength', async ({ popup, youtube }) => {
   await restore(popup, false);
-  await seed(popup, { ...(await storage('strength-zero-storage.json')), 'webWorldThemes.showArtwork': true });
+  await seed(popup, { ...(await storage('strength-zero-storage.json')), 'around.showArtwork': true });
   await youtube.reload();
   await drawn(youtube);
   await popup.reload();
   await expect(popup.getByRole('switch', { name: '作品を表示する' })).toBeChecked();
-  expect(await stored(popup, 'webWorldThemes.showArtwork')).toBe(true);
+  expect(await stored(popup, 'around.showArtwork')).toBe(true);
 });

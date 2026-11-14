@@ -129,7 +129,7 @@ export function desktopView(host: HTMLElement, hooks: DesktopHooks): DesktopView
   // life (what the resident is at, whether the screen is mirrored) and the way out.
   const bar = el('header', 'desk-bar');
   const brand = el('span', 'desk-brand');
-  brand.append(icon('mark'), el('b', undefined, 'WWT'));
+  brand.append(icon('mark'), el('b', undefined, 'Around'));
   const active = el('span', 'desk-active');
   const clock = el('time', 'desk-clock');
   const live = el('span', 'desk-live', 'ミラー中');

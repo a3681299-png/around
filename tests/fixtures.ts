@@ -5,7 +5,7 @@ import path from 'node:path';
 import { renderDiagnostics } from './helpers/render-diagnostics';
 import { DEFAULT_LAYERING, layeringBuild } from './helpers/layering-build';
 
-const defaultExtensionPath = path.resolve(process.env.WW_TEST_EXTENSION_PATH ?? 'dist');
+const defaultExtensionPath = path.resolve(process.env.AROUND_TEST_EXTENSION_PATH ?? 'dist');
 
 /**
  * Screenshots keep the text caret as it is. Playwright's default (`caret: 'hide'`) restyles the
@@ -15,12 +15,12 @@ const defaultExtensionPath = path.resolve(process.env.WW_TEST_EXTENSION_PATH ?? 
  */
 function keepCaretInScreenshots(page: Page) {
   for (const proto of [Object.getPrototypeOf(page), Object.getPrototypeOf(page.locator('html'))]) {
-    if (proto.wwKeepCaret) continue;
+    if (proto.aroundKeepCaret) continue;
     const screenshot = proto.screenshot as (options?: object) => Promise<Buffer>;
     proto.screenshot = function (this: unknown, options?: object) {
       return screenshot.call(this, { caret: 'initial', ...options });
     };
-    proto.wwKeepCaret = true;
+    proto.aroundKeepCaret = true;
   }
 }
 const fixturePath = path.resolve('tests/fixtures/youtube.html');
@@ -55,7 +55,7 @@ export async function launchExtension(
       // visible (not occluded), or it stops rendering and media like a minimized window. An
       // off-screen window also loses audible autoplay, so YouTube would start muted and show its
       // central unmute button; keep the on-screen playback state instead.
-      ...(options.headed && process.env.WW_TEST_WINDOW_OFFSCREEN === '1'
+      ...(options.headed && process.env.AROUND_TEST_WINDOW_OFFSCREEN === '1'
         ? [
             '--window-position=-4000,0',
             '--disable-backgrounding-occluded-windows',
@@ -142,8 +142,8 @@ export const test = base.extend<
   },
   {
     /** Which way the player's character is kept clear of the controls (docs/layering-plan.md):
-     * undefined is the build under test (dist, or WW_TEST_EXTENSION_PATH); true or false is a
-     * development build with WW_LAYERING set so, for a project that runs the G1 specs the other way. */
+     * undefined is the build under test (dist, or AROUND_TEST_EXTENSION_PATH); true or false is a
+     * development build with AROUND_LAYERING set so, for a project that runs the G1 specs the other way. */
     layering: boolean | undefined;
     extensionPath: string;
   }
@@ -155,7 +155,7 @@ export const test = base.extend<
   ],
   layeringOn: async ({ layering }, use) => use(layering ?? DEFAULT_LAYERING),
   profile: async ({}, use, info) => {
-    const work = path.resolve(process.env.WW_TEST_PROFILE_ROOT ?? '.work');
+    const work = path.resolve(process.env.AROUND_TEST_PROFILE_ROOT ?? '.work');
     await mkdir(work, { recursive: true });
     // Chrome Storage's LevelDB can fail on Windows when test-title paths exceed MAX_PATH.
     const profile = await mkdtemp(path.join(work, 'p-'));
@@ -192,7 +192,7 @@ export const test = base.extend<
     // No production background worker is needed just to expose an ID for testing.
     const manager = await context.newPage();
     await manager.goto('chrome://extensions/');
-    const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+    const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
     await item.waitFor();
     const id = await item.evaluate((element) => {
       const data = (element as HTMLElement & { data?: { id: string } }).data;

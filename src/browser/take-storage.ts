@@ -1,7 +1,7 @@
 import type { TakeStorage, TakeSummary } from '../timeline/types';
 import { parseSignalTake, type SignalTake } from '../world/takes';
 
-export const TAKE_MESSAGE = 'web-world-themes:signal-takes';
+export const TAKE_MESSAGE = 'around:signal-takes';
 /** Extension storage boundary; no IndexedDB or Chrome calls enter the Studio UI. */
 export function createTakeStorage(siteId: string): TakeStorage {
   const request = async <T>(action: string, extra: Record<string, unknown> = {}): Promise<T> => {

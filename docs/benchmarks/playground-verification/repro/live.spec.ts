@@ -22,7 +22,7 @@ test('same Playground artwork on real YouTube', async () => {
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 60000 });
     await declinePromotion(page);
     await waitForAdvertToEnd(page);
-    await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+    await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
     await page.bringToFront();
     await expect
       .poll(() =>
@@ -30,9 +30,7 @@ test('same Playground artwork on real YouTube', async () => {
           const tab = (await chrome.tabs.query({ active: true, currentWindow: true }))[0];
           if (tab?.id === undefined) return null;
           try {
-            return (
-              (await chrome.tabs.sendMessage(tab.id, { type: 'web-world-themes:probe-editor-target' }))?.siteId ?? null
-            );
+            return (await chrome.tabs.sendMessage(tab.id, { type: 'around:probe-editor-target' }))?.siteId ?? null;
           } catch {
             return null;
           }
@@ -60,7 +58,7 @@ test('same Playground artwork on real YouTube', async () => {
     // (page/primary-heading) are not YouTube target IDs and are deliberately omitted.
     design.rules = design.rules.filter((r: any) => r.target === 'video-card');
     await popup.evaluate(async (d) => {
-      await chrome.storage.local.set({ 'webWorldThemes.design.youtube': d });
+      await chrome.storage.local.set({ 'around.design.youtube': d });
     }, design);
     const media = page.locator('.model-media');
     await expect(media).toHaveAttribute('data-renderer', 'three', { timeout: 60000 });
@@ -88,7 +86,7 @@ test('same Playground artwork on real YouTube', async () => {
       result.states[name] = await media.evaluate((m: HTMLElement) => {
         const layer = m.closest('[data-image-id="resident"]') as HTMLElement;
         const p =
-          document.querySelector('[data-ww-surface~="player-window"]') ?? document.querySelector('#movie_player');
+          document.querySelector('[data-around-surface~="player-window"]') ?? document.querySelector('#movie_player');
         const r = layer.getBoundingClientRect(),
           pr = p!.getBoundingClientRect();
         const canvas = m.querySelector('canvas')!;
@@ -98,7 +96,7 @@ test('same Playground artwork on real YouTube', async () => {
           character: r.toJSON(),
           normalized: { x: (r.x + r.width / 2 - pr.x) / pr.width, y: (r.y + r.height / 2 - pr.y) / pr.height },
           painted: pixels.filter((v, i) => i % 4 === 3 && v > 0).length,
-          safety: document.documentElement.getAttribute('data-ww-safety'),
+          safety: document.documentElement.getAttribute('data-around-safety'),
           viewport: [innerWidth, innerHeight],
           url: location.href,
         };
@@ -129,7 +127,7 @@ test('same Playground artwork on real YouTube', async () => {
     const visible = structuredClone(design);
     visible.decorations.find((d: any) => d.kind === 'model3d').placement.y = 0.45;
     await popup.evaluate(async (d) => {
-      await chrome.storage.local.set({ 'webWorldThemes.design.youtube': d });
+      await chrome.storage.local.set({ 'around.design.youtube': d });
     }, visible);
     await expect
       .poll(() =>

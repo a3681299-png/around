@@ -1493,7 +1493,7 @@
         "world": {
           "id": 7,
           "origin": "chrome-extension://aadhnlklodckeihpghichgadhabbchgd",
-          "name": "Web World Themes",
+          "name": "Around",
           "uniqueId": "1183195951338818545.-3668025423388611459",
           "auxData": {
             "isDefault": false,
@@ -1621,7 +1621,7 @@
         "world": {
           "id": 7,
           "origin": "chrome-extension://fpghhhajajefjojleabkaadolanhjfdn",
-          "name": "Web World Themes",
+          "name": "Around",
           "uniqueId": "-4779879238889858372.5851576187094316208",
           "auxData": {
             "isDefault": false,

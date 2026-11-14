@@ -55,11 +55,11 @@ Chrome 157 は現行の HTML-in-Canvas、Chromium 153 はフラグありで旧 A
 ### ローカルビルド
 
 ```powershell
-$env:WW_PLAYGROUND_PRIVATE_ASSETS = 'C:/wwt-private'
+$env:AROUND_PLAYGROUND_PRIVATE_ASSETS = 'C:/wwt-private'
 npm run build:playground
 ```
 
-通常の Playground ビルドは `wwt-private-assets` のミルドと、ミルド向けに変換した Quaternius の `Sitting_Idle_Loop`・`Walk_Loop` を読む。モデルとモーションの検査に加え、出力検査を通す。CI の `WW_PLAYGROUND_TEST=1` はリポジトリ内の生成フィクスチャでも動く。ビルドの静的配信には WebM の HTTP Range 応答が必要。ミルドを含む画像・録画と生成物はローカルで扱う。
+通常の Playground ビルドは `wwt-private-assets` のミルドと、ミルド向けに変換した Quaternius の `Sitting_Idle_Loop`・`Walk_Loop` を読む。モデルとモーションの検査に加え、出力検査を通す。CI の `AROUND_PLAYGROUND_TEST=1` はリポジトリ内の生成フィクスチャでも動く。ビルドの静的配信には WebM の HTTP Range 応答が必要。ミルドを含む画像・録画と生成物はローカルで扱う。
 
 撮影した画像と録画は隔離チェックアウトの `.work/review-playground-3d/` に置いた。
 

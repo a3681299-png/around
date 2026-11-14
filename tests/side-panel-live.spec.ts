@@ -8,9 +8,9 @@ import { openSidePanelFromIcon } from './helpers/editor';
 import { sidePanelDriver, nativeWindow } from './helpers/side-panel';
 
 test('official side panel on real YouTube preserves controls, layout, authoring and resize anchors', async () => {
-  test.skip(process.env.WW_LIVE_SIDE_PANEL !== '1', 'Explicit real YouTube + native Chrome UI verification.');
+  test.skip(process.env.AROUND_LIVE_SIDE_PANEL !== '1', 'Explicit real YouTube + native Chrome UI verification.');
   test.setTimeout(240_000);
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-panel-live-')), false, {
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-panel-live-')), false, {
     headed: true,
     width: 1920,
   });
@@ -26,7 +26,7 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
     report.browser = context.browser()?.version() ?? 'unknown';
     const manager = await context.newPage();
     await manager.goto('chrome://extensions/');
-    const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+    const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
     await item.waitFor();
     const id = await item.evaluate((node) => (node as HTMLElement & { data?: { id: string } }).data?.id ?? node.id);
     await manager.close();
@@ -39,24 +39,22 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
     );
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 25_000 });
     await showArtwork(popup);
-    await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+    await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
     await page.bringToFront();
     await openSidePanelFromIcon(popup, page);
-    const local = page.locator('#web-world-themes-creator');
+    const local = page.locator('#around-creator');
     const panel = await sidePanelDriver(context, page, id);
     await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
-    await expect(page.locator('#web-world-themes-studio-layout')).toHaveCount(0);
+    await expect(page.locator('#around-studio-layout')).toHaveCount(0);
     await page.evaluate(() => {
-      (window as any).wwResizeCount = 0;
+      (window as any).aroundResizeCount = 0;
       window.addEventListener('resize', () => {
-        (window as any).wwResizeCount++;
+        (window as any).aroundResizeCount++;
       });
     });
     await expect
       .poll(() =>
-        panel.evaluate(
-          'document.querySelector("#web-world-themes-creator").shadowRoot.querySelector(".add-image").disabled',
-        ),
+        panel.evaluate('document.querySelector("#around-creator").shadowRoot.querySelector(".add-image").disabled'),
       )
       .toBe(false);
     await panel.files(Array(3).fill(path.resolve('tests/fixtures/motion/petal.png')));
@@ -65,7 +63,7 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
         async () => ({
           images: await page
             .locator(
-              ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]',
+              ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations) [data-image-id]',
             )
             .count(),
           status: await panel.text('.status'),
@@ -77,7 +75,7 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
     await panel.fill('[data-image-prop="anchor"]', 'video-player');
     // Keep all children on the same anchor, using the existing property command.
     const rowIds = await panel.evaluate<string[]>(
-      'Array.from(document.querySelector("#web-world-themes-creator").shadowRoot.querySelectorAll(".layer")).map(n=>n.dataset.layerId)',
+      'Array.from(document.querySelector("#around-creator").shadowRoot.querySelectorAll(".layer")).map(n=>n.dataset.layerId)',
     );
     for (const rowId of rowIds) {
       await panel.click(`.layer[data-layer-id="${rowId}"] [data-action="select"]`);
@@ -88,7 +86,7 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
     await expect
       .poll(async () => ({
         disabled: await panel.evaluate(
-          'document.querySelector("#web-world-themes-creator").shadowRoot.querySelector(".group-layers").disabled',
+          'document.querySelector("#around-creator").shadowRoot.querySelector(".group-layers").disabled',
         ),
         reason: await panel.text('.grouping-help'),
       }))
@@ -99,12 +97,12 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
     await panel.fill('[data-effect="radiusPx"]', '220');
     if (
       !(await panel.evaluate(
-        'document.querySelector("#web-world-themes-creator").shadowRoot.querySelector("[data-effect=pointer]").checked',
+        'document.querySelector("#around-creator").shadowRoot.querySelector("[data-effect=pointer]").checked',
       ))
     )
       await panel.click('[data-effect="pointer"]');
     const mask = page.locator(
-      ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) .group-content',
+      ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations) .group-content',
     );
     await expect(mask).toHaveCSS('mask-image', /radial-gradient/);
     await page.mouse.move(300, 280);
@@ -149,7 +147,7 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
           innerWidth,
           outerWidth,
           innerHeight,
-          resizeCount: (window as any).wwResizeCount,
+          resizeCount: (window as any).aroundResizeCount,
           player: rect('#movie_player'),
           primary: rect('ytd-watch-flexy #primary'),
           secondary: rect('ytd-watch-flexy #secondary'),
@@ -175,7 +173,7 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
       'not run: manual native panel divider drag; native window resize is tested automatically';
     await nativeWindow(panel.cdp, 1920);
     const beforeResize = await measure('before-resize');
-    if (process.env.WW_NATIVE_RESIZE === '1') {
+    if (process.env.AROUND_NATIVE_RESIZE === '1') {
       await writeFile(
         '.work/verification/sidepanel-manual-ready.json',
         JSON.stringify({ title: await page.title(), metrics: beforeResize }),
@@ -241,7 +239,7 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
     report.checks.fullscreen = true;
     const first = page
         .locator(
-          ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]',
+          ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations) [data-image-id]',
         )
         .first(),
       prior = (await first.boundingBox())!,
@@ -259,12 +257,12 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
     await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
     await expect(
       page.locator(
-        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]',
+        ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations) [data-image-id]',
       ),
     ).toHaveCount(3);
     report.checks.savedReload = true;
     const search = page.locator('ytd-masthead input[name="search_query"], ytd-masthead input#search').first();
-    await search.fill('Web World Themes');
+    await search.fill('Around');
     await search.press('Enter');
     await expect(page).toHaveURL(/results\?search_query=/);
     await expect.poll(() => panel.text('.layer-count')).toContain('グループ1');
@@ -275,11 +273,11 @@ test('official side panel on real YouTube preserves controls, layout, authoring 
     await expect(local).toHaveCount(0);
     await expect(
       page.locator(
-        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',
+        ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations)',
       ),
     ).toHaveCount(0);
-    await expect(page.locator('#web-world-themes-studio-layout')).toHaveCount(0);
-    await expect(page.locator('html')).not.toHaveAttribute('data-ww-editing', '');
+    await expect(page.locator('#around-studio-layout')).toHaveCount(0);
+    await expect(page.locator('html')).not.toHaveAttribute('data-around-editing', '');
     report.checks.strengthZeroCleanup = true;
     report.completed = true;
   } finally {

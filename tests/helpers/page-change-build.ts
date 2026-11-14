@@ -12,7 +12,7 @@ export async function pageChangeBundle(legacyPage = false) {
     loader: { '.css': 'text' },
     // Keeping the development label explicitly enables counters and the comparison route.
     dropLabels: [],
-    define: { __WW_PAGE_CHANGE_LEGACY__: String(legacyPage) },
+    define: { __AROUND_PAGE_CHANGE_LEGACY__: String(legacyPage) },
   });
   return result.outputFiles[0]!.text;
 }

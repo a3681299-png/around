@@ -27,7 +27,7 @@ export interface SafetyStatus {
   overlay: boolean;
 }
 // Stops say what they protected and how to fix it, one sentence each, in the creator's words
-// (docs/wwt-studio-design-system/README.md, Copy).
+// (docs/around-studio-design-system/README.md, Copy).
 const COVERED = 'クリックがページの操作部品に届くよう、絵の表示を止めました。';
 const MOVED = 'ページの操作部品が動いた直後の入力だったため、絵の表示を一時的に止めました。';
 const SHIFTED = 'ページの操作部品の位置が変わったため、絵の表示を一時的に止めました。';
@@ -280,7 +280,7 @@ export function createOperationGuardHost(
       const shadow = overlayHost.shadowRoot!;
       shadow.replaceChildren();
       const style = doc.createElement('style');
-      // ww-protect: the 45° vermilion hatch (the one diagonal, and the one red, in the system), a ruled
+      // around-protect: the 45° vermilion hatch (the one diagonal, and the one red, in the system), a ruled
       // edge, and the part's ID in mono on the first line, kept off the hatch by its own ground.
       // Gesso's values: the marks sit over any picture. YouTube has dozens of overlapping envelopes,
       // so the hatch is fixed to the window (overlaps share the same lines) and there is no wash,
@@ -367,7 +367,7 @@ export function createOperationGuardHost(
   ];
   const activity = (event: Event) => {
     if (event.type === 'visibilitychange' || event.type === 'blur') {
-      WW_GUARD_TRACE: traceApproach(doc, 'forget', { value: interacting, event });
+      AROUND_GUARD_TRACE: traceApproach(doc, 'forget', { value: interacting, event });
       lastActivity = view.performance.now();
       before = point = pressed = undefined;
       interacting = keyed = false;
@@ -376,13 +376,11 @@ export function createOperationGuardHost(
       return;
     }
     lastActivity = view.performance.now();
-    const owned = event
-      .composedPath()
-      .some((node) => node instanceof Element && node.id.startsWith('web-world-themes'));
+    const owned = event.composedPath().some((node) => node instanceof Element && node.id.startsWith('around'));
     if (owned) {
       // Authoring UI owns its input region. Native hit/paint protection remains
       // enforced, while Timeline/numeric previews can show their authored values.
-      WW_GUARD_TRACE: if (interacting || point) traceApproach(doc, 'forget', { value: interacting, event });
+      AROUND_GUARD_TRACE: if (interacting || point) traceApproach(doc, 'forget', { value: interacting, event });
       before = point = pressed = undefined;
       interacting = keyed = false;
       approach = initialApproach();
@@ -393,7 +391,7 @@ export function createOperationGuardHost(
       point = { x: event.clientX, y: event.clientY };
     }
     if (event.type === 'pointerdown' || event.type === 'keydown') {
-      WW_GUARD_TRACE: if (!interacting) traceApproach(doc, 'interacting', { value: true, event });
+      AROUND_GUARD_TRACE: if (!interacting) traceApproach(doc, 'interacting', { value: true, event });
       interacting = true;
       if (event.type === 'keydown') keyed = true;
       else pressed = point;
@@ -404,7 +402,7 @@ export function createOperationGuardHost(
       event.type === 'keyup' ||
       event.type === 'blur'
     ) {
-      WW_GUARD_TRACE: if (interacting) traceApproach(doc, 'interacting', { value: false, event });
+      AROUND_GUARD_TRACE: if (interacting) traceApproach(doc, 'interacting', { value: false, event });
       interacting = keyed = false;
       pressed = undefined;
     }
@@ -420,7 +418,7 @@ export function createOperationGuardHost(
     // Pointer paths are tested immediately, including movement across a control.
     const next = step(lastActivity, source.capture());
     const changed = heldChanged(next);
-    WW_GUARD_TRACE: if (changed || nearChanged(next))
+    AROUND_GUARD_TRACE: if (changed || nearChanged(next))
       traceApproach(doc, 'approach', {
         value: next.near.size > 0,
         event,
@@ -529,7 +527,7 @@ export function createOperationGuardHost(
         // Native changes are still arriving and this snapshot is not current: hold all
         // drawing, keep the boundary comparison pending and come back when the window ends.
         if (!stopped) {
-          WW_GUARD_TRACE: traceGuardStop(doc, 'hold', { wait });
+          AROUND_GUARD_TRACE: traceGuardStop(doc, 'hold', { wait });
           stopped = HOLD;
           stoppedRemedy = remedyFor(false, [], SETTLES);
           stoppedIds = undefined;
@@ -548,7 +546,7 @@ export function createOperationGuardHost(
           boundaryDirty = false;
           const nextBoundary = boundaryKey(surfaces);
           if (nextBoundary !== boundary) {
-            WW_GUARD_TRACE: traceGuardStop(doc, 'shifted', {
+            AROUND_GUARD_TRACE: traceGuardStop(doc, 'shifted', {
               entry: 'boundary',
               before: boundary,
               after: nextBoundary,
@@ -568,14 +566,14 @@ export function createOperationGuardHost(
         (s) => s.availability.editing || s.availability.dragging || s.availability.captured,
       );
       if (stopped && stopped !== HOLD && failures < 3 && !interacting && !nativeEditing && time - stableAt >= 350) {
-        WW_GUARD_TRACE: traceGuardStop(doc, 'release', { reason: stopped });
+        AROUND_GUARD_TRACE: traceGuardStop(doc, 'release', { reason: stopped });
         issues = withoutStops(stopped);
         stopped = '';
       }
       // The world evaluation that follows in this frame reads the result: a root moving onto a
       // near control is held from here, one frame after the paint that put it there.
       const next = step(time, surfaces);
-      WW_GUARD_TRACE: if (heldChanged(next) || nearChanged(next))
+      AROUND_GUARD_TRACE: if (heldChanged(next) || nearChanged(next))
         traceApproach(doc, 'approach', {
           value: next.near.size > 0,
           ...(point ? { point } : {}),
@@ -611,7 +609,7 @@ export function createOperationGuardHost(
       const previousIssues = issues;
       paints = next;
       if (!source.validate(surfaces)) {
-        WW_GUARD_TRACE: traceGuardStop(doc, 'shifted', { entry: 'validate' });
+        AROUND_GUARD_TRACE: traceGuardStop(doc, 'shifted', { entry: 'validate' });
         pause(SHIFTED);
       }
       // A root this paint put onto a near control is held from the next frame, even when nothing
@@ -619,7 +617,7 @@ export function createOperationGuardHost(
       if (approach.near.size) {
         const after = step(view.performance.now(), surfaces);
         if (heldChanged(after)) {
-          WW_GUARD_TRACE: traceApproach(doc, 'approach', {
+          AROUND_GUARD_TRACE: traceApproach(doc, 'approach', {
             value: after.near.size > 0,
             ...(point ? { point } : {}),
             interacting,
@@ -709,7 +707,7 @@ export function createOperationGuardHost(
       );
       shownArt = next.some((p) => p.opacity > 0 && !blocked.has(p.id));
       if (!shownArt) cancelRecheck();
-      WW_IDLE_RECHECK: scheduleRecheck();
+      AROUND_IDLE_RECHECK: scheduleRecheck();
       return blocked;
     },
     snapshot,
@@ -727,7 +725,7 @@ export function createOperationGuardHost(
       overlayHost = undefined;
       if (value) {
         overlayHost = doc.createElement('div');
-        overlayHost.id = 'web-world-themes-operation-check';
+        overlayHost.id = 'around-operation-check';
         overlayHost.attachShadow({ mode: 'open' });
       }
       lastStatus = '';

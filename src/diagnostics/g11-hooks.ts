@@ -1,13 +1,13 @@
 /**
  * Measurement hooks for the G1 harness (scripts/g11). Off in every product build: they turn on
- * only when a build defines `__WW_G11__` as true (scripts/g11/build.mjs). The product builds define
+ * only when a build defines `__AROUND_G11__` as true (scripts/g11/build.mjs). The product builds define
  * it as false and a build that defines nothing is off too (`typeof`), so every hook is a no-op at
  * runtime there. The small hook bodies stay in an unminified bundle; nothing in them runs. The harness itself prepends the frame probe (`globalThis.__g11Probe`); these hooks only hand
  * it what it cannot reach from outside: the controller, the guard switch, the full redraw and the
  * recapture timing. Before this module, the harness rewrote source text to the same effect.
  */
-declare const __WW_G11__: boolean | undefined;
-export const G11_ENABLED: boolean = typeof __WW_G11__ !== 'undefined' && __WW_G11__ === true;
+declare const __AROUND_G11__: boolean | undefined;
+export const G11_ENABLED: boolean = typeof __AROUND_G11__ !== 'undefined' && __AROUND_G11__ === true;
 
 interface G11Probe {
   recording?: boolean;

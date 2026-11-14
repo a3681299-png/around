@@ -1,7 +1,7 @@
 // The character in the living room: loads a local VRM and its motions, and runs its mind (the
 // director, director.ts), the behaviour (src/characters/approach.ts) and the body (src/renderers/
 // three/living-body.ts) on the page's clock. The character's files are not part of the repository
-// or of a public build: the build copies them only when WW_LIVING_CHARACTER names a local folder
+// or of a public build: the build copies them only when AROUND_LIVING_CHARACTER names a local folder
 // (docs/living-body.md).
 //
 // Its life (docs/living-life.md, docs/living-mind.md): the director says where to be, what to
@@ -175,7 +175,7 @@ const MOODS = {
   calm: 'おだやか',
 };
 /** What the page remembers of the viewer between visits: numbers only. */
-const MEMORY_KEY = 'wwt-living-resident';
+const MEMORY_KEY = 'around-living-resident';
 
 const v = (p: readonly number[]) => new Vector3(p[0], p[1], p[2]);
 const tuple = (p: Vector3): Vec3 => [p.x, p.y, p.z];

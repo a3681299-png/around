@@ -5,13 +5,13 @@ import { test, expect, launchExtension } from './fixtures';
 import { closeEditorPages, openEditor } from './helpers/editor';
 import type { DesignDocument } from '../src/design/types';
 
-const key = 'webWorldThemes.design.youtube';
-const overlay = '#web-world-themes-decorations';
+const key = 'around.design.youtube';
+const overlay = '#around-decorations';
 const layers = `${overlay} [data-image-id]`;
 
 async function open(popup: Page, youtube: Page) {
   await showArtwork(popup);
-  await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
+  await expect(youtube.locator('[data-around-surface~="video-card"]').first()).toBeVisible();
   await youtube.bringToFront();
   const { panel: dialog } = await openEditor(popup, youtube);
   await exposeEditorControls(dialog);
@@ -78,7 +78,7 @@ async function assets(context: BrowserContext) {
   return worker.evaluate(
     async () =>
       new Promise<Array<{ id: string; bytes: number; mime: string; leases: number }>>((resolve, reject) => {
-        const request = indexedDB.open('web-world-themes-assets', 1);
+        const request = indexedDB.open('around-assets', 1);
         request.onerror = () => reject(request.error);
         request.onsuccess = () => {
           const db = request.result,
@@ -254,7 +254,7 @@ test('normal decoration is click-through; OFF and zero remove images and ON rest
 }) => {
   const dialog = await open(popup, youtube);
   await importImage(dialog, youtube);
-  const link = youtube.locator('[data-ww-surface~="video-card"]').first().locator('a').first();
+  const link = youtube.locator('[data-around-surface~="video-card"]').first().locator('a').first();
   const box = (await link.boundingBox())!;
   await dialog.getByLabel('画像のX位置').fill(String(Math.round(((box.x + box.width / 2) / 1100) * 10_000) / 100));
   await dialog.getByLabel('画像のY位置').fill(String(Math.round(((box.y + box.height / 2) / 760) * 10_000) / 100));
@@ -327,7 +327,7 @@ test('invalid files and missing assets fail without saving corrupt JSON or distu
   ).toBeUndefined();
   const response = await popup.evaluate(async () =>
     chrome.runtime.sendMessage({
-      type: 'web-world-themes:assets',
+      type: 'around:assets',
       action: 'save',
       session: 'session-test',
       design: {

@@ -21,7 +21,7 @@ export function createPageMarks(doc: Document) {
   const ensure = () => {
     if (shadow) return shadow;
     host = doc.createElement('div');
-    host.id = 'web-world-themes-page-marks';
+    host.id = 'around-page-marks';
     host.setAttribute('aria-hidden', 'true');
     host.toggleAttribute('hidden', suspended);
     shadow = host.attachShadow({ mode: 'open' });
@@ -52,10 +52,10 @@ export function createPageMarks(doc: Document) {
           if (key !== shownKey || kind !== shownKind || tag !== shownTag || group.hidden) {
             // Fresh nodes restart the draw-in; nothing animates while the mark stays.
             const frame = doc.createElement('div');
-            frame.className = kind === 'mark' ? 'ww-mark' : 'ww-unsupported';
+            frame.className = kind === 'mark' ? 'around-mark' : 'around-unsupported';
             const label = tag === undefined ? undefined : doc.createElement('span');
             if (label) {
-              label.className = kind === 'mark' ? 'ww-tag' : 'ww-tag ww-tag--off';
+              label.className = kind === 'mark' ? 'around-tag' : 'around-tag around-tag--off';
               label.textContent = tag!;
             }
             group.replaceChildren(...(label ? [frame, label] : [frame]));

@@ -66,10 +66,10 @@ const startVisibility = (page: Page) =>
   page.evaluate(() => {
     const rows: { t: number; shown: boolean; approach: boolean }[] = ((window as any).g13Shown = []);
     (window as any).g13Recording = true;
-    const host = document.querySelector('#web-world-themes-decorations');
+    const host = document.querySelector('#around-decorations');
     const frame = host?.shadowRoot?.querySelector<HTMLElement>('[data-image-id="g13-perf-0"]');
     const sample = (t: number) => {
-      const safety = host?.getAttribute('data-ww-safety') ?? '';
+      const safety = host?.getAttribute('data-around-safety') ?? '';
       rows.push({
         t,
         shown: Boolean(frame) && frame!.style.visibility !== 'hidden' && !/"stopped":"[^"]/.test(safety),
@@ -111,23 +111,21 @@ async function run(label: string, extensionPath: string, options: { calibration?
     await popup.goto(`chrome-extension://${id}/popup/index.html`);
     const backup = await context.newPage();
     await backup.goto(`chrome-extension://${id}/backup/index.html`);
-    await backup.locator('#backup-file').setInputFiles(path.resolve('tests/fixtures/backups/pre-removal.wwbackup'));
+    await backup.locator('#backup-file').setInputFiles(path.resolve('tests/fixtures/backups/pre-removal.aroundbackup'));
     await backup.locator('#backup-inspect').click();
     await expect(backup.locator('#backup-restore')).toBeEnabled();
     await backup.locator('#backup-restore').click();
     await expect(backup.locator('.backup-status')).toContainText('読み込みが完了');
     await backup.close();
     const read = () =>
-      popup.evaluate(
-        async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
-      );
+      popup.evaluate(async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube']);
     let model: unknown;
     if (options.model) {
       // The public authored test rig (tests/helpers/model-fixture.ts); its clip plays by default.
       const prep = await context.newPage();
       await prep.setViewportSize({ width: 1920, height: 1080 });
       await prep.goto(URL_, { waitUntil: 'domcontentloaded' });
-      await expect(prep.locator('html')).toHaveAttribute('data-ww-site', 'youtube', { timeout: 30000 });
+      await expect(prep.locator('html')).toHaveAttribute('data-around-site', 'youtube', { timeout: 30000 });
       const { studio, panel } = await openEditor(popup, prep);
       const before = ((await read()) as any).decorations.length;
       await panel
@@ -185,8 +183,7 @@ async function run(label: string, extensionPath: string, options: { calibration?
       }),
     );
     await popup.evaluate(
-      (design) =>
-        chrome.storage.local.set({ 'webWorldThemes.design.youtube': design, 'webWorldThemes.creatorMode': false }),
+      (design) => chrome.storage.local.set({ 'around.design.youtube': design, 'around.creatorMode': false }),
       { ...saved, id: 'g13-perf-scene', decorations, signalRules },
     );
     const page = await context.newPage();
@@ -256,7 +253,7 @@ async function run(label: string, extensionPath: string, options: { calibration?
           page: await page
             .evaluate(() => ({
               ready: document.readyState,
-              site: document.documentElement.getAttribute('data-ww-site'),
+              site: document.documentElement.getAttribute('data-around-site'),
               title: document.title,
             }))
             .catch(() => null),
@@ -323,7 +320,7 @@ async function run(label: string, extensionPath: string, options: { calibration?
     await waitForAdvertToEnd(page);
     await declinePromotion(page);
     // A rejected artwork never creates the host; fail here instead of waiting on it forever.
-    await expect(page.locator('#web-world-themes-decorations')).toBeAttached({ timeout: 15000 });
+    await expect(page.locator('#around-decorations')).toBeAttached({ timeout: 15000 });
     await page.evaluate(() => (document.activeElement as HTMLElement)?.blur());
     const player = (await page.locator('#movie_player').boundingBox())!;
     const rest = await clearestPoint(page, {
@@ -357,7 +354,7 @@ async function run(label: string, extensionPath: string, options: { calibration?
       output.phases.calibration = await measure(() => page.waitForTimeout(6000));
       return output;
     }
-    const safetyState = () => page.locator('#web-world-themes-decorations').getAttribute('data-ww-safety');
+    const safetyState = () => page.locator('#around-decorations').getAttribute('data-around-safety');
     const approachIssues = async () =>
       JSON.parse((await safetyState()) ?? '{}').issues?.filter((i: any) => i.surfaceId === 'native.approach').length ??
       0;
@@ -444,8 +441,8 @@ async function run(label: string, extensionPath: string, options: { calibration?
       // the compositor's permitted region, so a clipped-out image cannot count as this scene.
       await page.goto(URL_, { waitUntil: 'domcontentloaded' });
       await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30000 });
-      await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube', { timeout: 30000 });
-      await expect(page.locator('#web-world-themes-decorations')).toBeAttached({ timeout: 30000 });
+      await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube', { timeout: 30000 });
+      await expect(page.locator('#around-decorations')).toBeAttached({ timeout: 30000 });
       await waitForAdvertToEnd(page);
       await declinePromotion(page);
       const video = page.locator('video.html5-main-video');
@@ -455,7 +452,7 @@ async function run(label: string, extensionPath: string, options: { calibration?
       }
       await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
       const current: any = await read();
-      await popup.evaluate((design) => chrome.storage.local.set({ 'webWorldThemes.design.youtube': design }), {
+      await popup.evaluate((design) => chrome.storage.local.set({ 'around.design.youtube': design }), {
         ...current,
         decorations: [current.decorations[0]],
         signalRules: [],
@@ -484,15 +481,15 @@ async function run(label: string, extensionPath: string, options: { calibration?
       await page.setViewportSize({ width: 1920, height: 1080 });
       const settled = () =>
         page
-          .locator('#web-world-themes-decorations')
-          .evaluate((node) => JSON.parse((node as HTMLElement).dataset.wwSafety ?? '{}').stopped ?? '');
+          .locator('#around-decorations')
+          .evaluate((node) => JSON.parse((node as HTMLElement).dataset.aroundSafety ?? '{}').stopped ?? '');
       await expect.poll(settled, { timeout: 45000 }).toBe('');
       const area = await page.evaluate(() => {
         const player = document.querySelector('#movie_player')!.getBoundingClientRect();
         const secondary = document.querySelector('#secondary')!.getBoundingClientRect();
         const clip = document
-          .querySelector<HTMLElement>('#web-world-themes-decorations')!
-          .style.getPropertyValue('--ww-decoration-clip');
+          .querySelector<HTMLElement>('#around-decorations')!
+          .style.getPropertyValue('--around-decoration-clip');
         const regions = [...clip.matchAll(/M(-?[\d.]+) (-?[\d.]+)h(-?[\d.]+)v(-?[\d.]+)/g)]
           .map((m) => m.slice(1).map(Number))
           .filter(([x, y, w, h]) => w! >= 20 && h! >= 20)
@@ -533,10 +530,7 @@ async function run(label: string, extensionPath: string, options: { calibration?
         signalRules: [],
         groups: [],
       };
-      await popup.evaluate(
-        (design) => chrome.storage.local.set({ 'webWorldThemes.design.youtube': design }),
-        staticDesign,
-      );
+      await popup.evaluate((design) => chrome.storage.local.set({ 'around.design.youtube': design }), staticDesign);
       await page.mouse.move(rest.x, rest.y);
       await page.waitForTimeout(2000);
       await expect.poll(settled, { timeout: 45000 }).toBe('');
@@ -546,7 +540,7 @@ async function run(label: string, extensionPath: string, options: { calibration?
       const viewport = await page.evaluate(() => ({
         width: innerWidth,
         height: innerHeight,
-        host: document.querySelector('#web-world-themes-decorations')!.getBoundingClientRect().toJSON(),
+        host: document.querySelector('#around-decorations')!.getBoundingClientRect().toJSON(),
       }));
       await writeFile(
         path.join(out, `${label}-static-geometry-${Date.now()}.json`),
@@ -597,14 +591,14 @@ async function run(label: string, extensionPath: string, options: { calibration?
       );
       const { color, dimensions } = sample;
       const paintState = await image.evaluate((node) => {
-        const host = document.querySelector<HTMLElement>('#web-world-themes-decorations')!;
+        const host = document.querySelector<HTMLElement>('#around-decorations')!;
         return {
           name: node.getAttribute('aria-label'),
           visibility: getComputedStyle(node).visibility,
           opacity: getComputedStyle(node).opacity,
-          clip: host.style.getPropertyValue('--ww-decoration-clip'),
-          safety: host.dataset.wwSafety,
-          media: host.dataset.wwMediaStats,
+          clip: host.style.getPropertyValue('--around-decoration-clip'),
+          safety: host.dataset.aroundSafety,
+          media: host.dataset.aroundMediaStats,
         };
       });
       await writeFile(
@@ -619,7 +613,7 @@ async function run(label: string, extensionPath: string, options: { calibration?
         visibility: getComputedStyle(node).visibility,
         opacity: getComputedStyle(node).opacity,
         stopped:
-          JSON.parse(document.querySelector<HTMLElement>('#web-world-themes-decorations')!.dataset.wwSafety ?? '{}')
+          JSON.parse(document.querySelector<HTMLElement>('#around-decorations')!.dataset.aroundSafety ?? '{}')
             .stopped ?? '',
       }));
       expect(endState).toEqual({ visibility: 'visible', opacity: '1', stopped: '' });

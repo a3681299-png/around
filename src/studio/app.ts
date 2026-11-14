@@ -306,14 +306,14 @@ export function mountStudio(doc: Document, root: HTMLElement, ports: StudioPorts
       !connection.isConnected ||
       !connection.state?.active ||
       connection.state.recoveryPending ||
-      panel?.host.hasAttribute('data-ww-scrubbing') ||
+      panel?.host.hasAttribute('data-around-scrubbing') ||
       event.isComposing ||
       event
         .composedPath()
         .some(
           (node) =>
             node instanceof HTMLElement &&
-            (node.hasAttribute('data-ww-timeline-control') ||
+            (node.hasAttribute('data-around-timeline-control') ||
               node.matches('input,textarea,select,summary,dialog,[role="tab"],[role="separator"],[role="menuitem"]') ||
               node.isContentEditable),
         )

@@ -12,7 +12,7 @@ test('reimporting the same historical VRM measures its existing record and layer
   popup,
   youtube,
 }) => {
-  const archive = await readFile('tests/fixtures/backups/legacy-v13-vrm.wwbackup'),
+  const archive = await readFile('tests/fixtures/backups/legacy-v13-vrm.aroundbackup'),
     length = archive.readUInt32LE(BACKUP_HEADER_BYTES - 36),
     manifest = JSON.parse(archive.subarray(BACKUP_HEADER_BYTES, BACKUP_HEADER_BYTES + length).toString('utf8')),
     original = archive.subarray(BACKUP_HEADER_BYTES + length),
@@ -26,7 +26,7 @@ test('reimporting the same historical VRM measures its existing record and layer
   await popup.evaluate(
     async ({ metadata, original, design, lease }) => {
       await new Promise<void>((resolve, reject) => {
-        const request = indexedDB.open('web-world-themes-assets', 1);
+        const request = indexedDB.open('around-assets', 1);
         request.onupgradeneeded = () => request.result.createObjectStore('assets', { keyPath: 'id' });
         request.onerror = () => reject(request.error);
         request.onsuccess = () => {
@@ -43,7 +43,7 @@ test('reimporting the same historical VRM measures its existing record and layer
           };
         };
       });
-      await chrome.storage.local.set({ 'webWorldThemes.design.youtube': design });
+      await chrome.storage.local.set({ 'around.design.youtube': design });
     },
     { metadata, original: [...original], design: manifest.designs[0], lease: BACKUP_LIBRARY_LEASE },
   );
@@ -54,16 +54,13 @@ test('reimporting the same historical VRM measures its existing record and layer
   await expect(panel.locator('.character-body')).toContainText('体型を測れていません');
   const stored = () =>
     popup.evaluate(
-      async () =>
-        (await chrome.storage.local.get('webWorldThemes.design.youtube'))[
-          'webWorldThemes.design.youtube'
-        ] as DesignDocument,
+      async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'] as DesignDocument,
     );
   const rows = () =>
     popup.evaluate(
       () =>
         new Promise<Omit<StoredAsset, 'blob'>[]>((resolve, reject) => {
-          const request = indexedDB.open('web-world-themes-assets', 1);
+          const request = indexedDB.open('around-assets', 1);
           request.onerror = () => reject(request.error);
           request.onsuccess = () => {
             const db = request.result,

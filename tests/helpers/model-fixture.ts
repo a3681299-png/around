@@ -94,7 +94,7 @@ export function modelFixture(mutate?: (json: Record<string, any>) => void): Buff
   ]);
   const imageView = data(png);
   const json: Record<string, any> = {
-    asset: { version: '2.0', generator: 'Web World Themes original test rig' },
+    asset: { version: '2.0', generator: 'Around original test rig' },
     scene: 0,
     scenes: [{ nodes: [0] }],
     nodes: [

@@ -5,7 +5,7 @@ import { mountSafetyControls } from './safety-controls';
 
 /** Both the extension popup and the in-page panel share this storage binding. */
 export function bindSettingsForm(root: ParentNode): () => void {
-  const safetyRoot = root.querySelector<HTMLElement>('.ww-editor-body');
+  const safetyRoot = root.querySelector<HTMLElement>('.around-editor-body');
   const unmountSafety = safetyRoot ? mountSafetyControls(safetyRoot) : undefined;
   const backup = root.querySelector<HTMLAnchorElement>('.backup-open');
   if (backup) backup.href = extensionPageUrl('backup/index.html');

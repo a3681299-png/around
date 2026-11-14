@@ -126,7 +126,7 @@ await put(
   'sidepanel-visuals.json',
   await Promise.all(['before', 'after'].map((label) => load(`${source}/sidepanel-visual-${label}.json`))),
 );
-for (const file of ['legacy-v13-vrm.wwbackup', 'public-character.wwbackup']) {
+for (const file of ['legacy-v13-vrm.aroundbackup', 'public-character.aroundbackup']) {
   const bytes = await readFile(source + '/' + file);
   assert.ok(bytes.length < 150000, 'Only tiny original public test fixtures may be copied');
   const len = bytes.readUInt32LE(16),

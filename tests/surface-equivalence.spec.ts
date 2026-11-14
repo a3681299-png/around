@@ -69,7 +69,7 @@ for (const url of [
   });
 
 test('optional real YouTube: the same equality on results, watch and home pages', async ({ page }) => {
-  test.skip(process.env.WW_LIVE_SURFACES !== '1', 'Explicit signed-out real YouTube check.');
+  test.skip(process.env.AROUND_LIVE_SURFACES !== '1', 'Explicit signed-out real YouTube check.');
   test.setTimeout(240_000);
   const bundle = await surfaceBundle();
   for (const url of [

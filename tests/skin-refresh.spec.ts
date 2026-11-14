@@ -21,7 +21,7 @@ test('SPA replacement rereads the native ink of an already present kind', async 
   // centre now needs black ink. The adapter's navigation notification must invalidate the plan.
   await like.evaluate((button) => {
     const next = button.cloneNode(true) as HTMLElement;
-    next.removeAttribute('data-ww-surface');
+    next.removeAttribute('data-around-surface');
     next.style.color = '#ffffff';
     button.replaceWith(next);
     history.pushState({}, '', '/watch?v=fixture-next');

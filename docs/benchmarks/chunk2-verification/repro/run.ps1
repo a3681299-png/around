@@ -1,7 +1,7 @@
 param([ValidateSet('calibrate','AA','AB','A-profile','B','B-quiet','B-mannequin','B-trusie','visual','sample','live','live-retry')][string]$Stage)
 $ErrorActionPreference = 'Stop'
-$env:WW_TEST_WINDOW_OFFSCREEN = '1'
-$env:WW_TEST_EXTENSION_PATH = (Resolve-Path '.work/extension').Path
+$env:AROUND_TEST_WINDOW_OFFSCREEN = '1'
+$env:AROUND_TEST_EXTENSION_PATH = (Resolve-Path '.work/extension').Path
 $verificationEvidence = (New-Item -ItemType Directory -Path '.work/verify-evidence' -Force).FullName
 
 function Invoke-Check([string]$Name, [string[]]$Arguments) {
@@ -47,7 +47,7 @@ if ($Stage -eq 'sample') {
   $head = Invoke-Check 'switch-head' $testPaths
   Push-Location '../verify-chunk2-fix'
   try {
-    $env:WW_TEST_EXTENSION_PATH = (Resolve-Path '.work/extension').Path
+    $env:AROUND_TEST_EXTENSION_PATH = (Resolve-Path '.work/extension').Path
     $fix = Invoke-Check 'switch-fix' $testPaths
   } finally { Pop-Location }
   if ($head -or $fix) { exit 1 }
@@ -55,17 +55,17 @@ if ($Stage -eq 'sample') {
 }
 
 if ($Stage -eq 'live') {
-  $env:WW_LIVE_R32 = '1'
+  $env:AROUND_LIVE_R32 = '1'
   $r32 = Invoke-Check 'r32-live-head' @('tests/r32-live.spec.ts')
   $env:CHUNK2_LIVE_SIDE = 'head'
   $g1Head = Invoke-Check 'g1-live-head' @($custom,'live-g1.spec.ts')
-  $env:WW_LIVE_OPERATIONS = '1'
-  $env:WW_TEST_EXTENSION_PATH = (Resolve-Path '../verify-chunk2-fix/.work/extension').Path
+  $env:AROUND_LIVE_OPERATIONS = '1'
+  $env:AROUND_TEST_EXTENSION_PATH = (Resolve-Path '../verify-chunk2-fix/.work/extension').Path
   $env:CHUNK2_LIVE_SIDE = 'fix'
   $g1Fix = Invoke-Check 'g1-live-fix' @($custom,'live-g1.spec.ts')
   $opFix = Invoke-Check 'operation-live-fix' @('tests/operation-live.spec.ts')
   $opFault = Invoke-Check 'operation-volume-fault' @($custom,'volume-fault.spec.ts')
-  $env:WW_TEST_EXTENSION_PATH = (Resolve-Path '.work/extension').Path
+  $env:AROUND_TEST_EXTENSION_PATH = (Resolve-Path '.work/extension').Path
   $opHead = Invoke-Check 'operation-live-head' @('tests/operation-live.spec.ts')
   if ($r32 -or $g1Head -or $g1Fix -or $opFix -or $opHead -or $opFault -eq 0) { exit 1 }
   exit 0
@@ -74,10 +74,10 @@ if ($Stage -eq 'live') {
 if ($Stage -eq 'live-retry') {
   $env:CHUNK2_LIVE_SIDE = 'head'
   $g1Head = Invoke-Check 'g1-live-head-retry' @($custom,'live-g1.spec.ts')
-  $env:WW_TEST_EXTENSION_PATH = (Resolve-Path '../verify-chunk2-fix/.work/extension').Path
+  $env:AROUND_TEST_EXTENSION_PATH = (Resolve-Path '../verify-chunk2-fix/.work/extension').Path
   $env:CHUNK2_LIVE_SIDE = 'fix'
   $g1Fix = Invoke-Check 'g1-live-fix-retry' @($custom,'live-g1.spec.ts')
-  $env:WW_LIVE_OPERATIONS = '1'
+  $env:AROUND_LIVE_OPERATIONS = '1'
   $env:CHUNK2_VOLUME_FAULT = 'target'
   $opTarget = Invoke-Check 'operation-volume-target-fault' @($custom,'volume-fault.spec.ts')
   if ($g1Head -or $g1Fix -or $opTarget -eq 0) { exit 1 }

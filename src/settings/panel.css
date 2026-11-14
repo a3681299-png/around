@@ -1,17 +1,17 @@
-/* The 表示設定 panel the in-video icon opens: a floating ww-panel over someone else's page, so it
+/* The 表示設定 panel the in-video icon opens: a floating around-panel over someone else's page, so it
    keeps the one shadow the system allows (shadow-float) and radius-float. Its contents are
    settings.css. */
 :host {
   /* Important host rules outrank the page's player-wide div resets. */
   all: initial !important;
   position: fixed !important;
-  left: var(--ww-settings-x, 12px) !important;
-  top: var(--ww-settings-y, 12px) !important;
+  left: var(--around-settings-x, 12px) !important;
+  top: var(--around-settings-y, 12px) !important;
   z-index: 2147483645 !important;
   display: block !important;
   width: 340px !important;
   max-width: calc(100vw - 24px) !important;
-  max-height: var(--ww-settings-height, calc(100vh - 24px)) !important;
+  max-height: var(--around-settings-height, calc(100vh - 24px)) !important;
   overflow: auto !important;
   overscroll-behavior: contain !important;
   color: var(--ink) !important;
@@ -25,7 +25,7 @@
 :host([hidden]) {
   display: none !important;
 }
-.ww-titlebar {
+.around-titlebar {
   cursor: move;
   touch-action: none;
 }

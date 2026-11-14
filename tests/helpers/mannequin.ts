@@ -243,7 +243,7 @@ export function mannequinVrm(): Buffer {
   const humanBones = Object.fromEntries(joints.map((name, i) => [name, { node: 2 + i }]));
   const range = { inputMaxValue: 90, outputScale: 10 };
   const json = {
-    asset: { version: '2.0', generator: 'Web World Themes original mannequin' },
+    asset: { version: '2.0', generator: 'Around original mannequin' },
     scene: 0,
     scenes: [{ nodes: [0] }],
     nodes,
@@ -280,7 +280,7 @@ export function mannequinVrm(): Buffer {
         meta: {
           name: 'WW original mannequin',
           version: '1',
-          authors: ['Web World Themes tests'],
+          authors: ['Around tests'],
           licenseUrl: 'https://vrm.dev/licenses/1.0/',
         },
         humanoid: { humanBones },
@@ -363,7 +363,7 @@ export function mannequinPoseVrma(name: string, pose: MannequinPose): Buffer {
   });
   for (const node of nodes) if (Array.isArray(node['children']) && !node['children'].length) delete node['children'];
   const json = {
-    asset: { version: '2.0', generator: 'Web World Themes original mannequin pose' },
+    asset: { version: '2.0', generator: 'Around original mannequin pose' },
     scene: 0,
     scenes: [{ nodes: [0] }],
     nodes,

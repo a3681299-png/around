@@ -9,7 +9,7 @@ import { openEditor } from './helpers/editor';
  * underneath and keep it from YouTube; サイト操作 leaves it to YouTube. Other layers over a card
  * (a menu) are not the card's.
  */
-const cards = '[data-ww-surface~="video-card"]';
+const cards = '[data-around-surface~="video-card"]';
 
 /** Lays a site element over the first card's thumbnail, outside the card, counting the clicks
  * YouTube would get. */
@@ -54,7 +54,7 @@ test('the card tool takes a click on the inline preview as the card underneath, 
   const { card, at } = await overlay(youtube, 'ytd-video-preview');
   const before = youtube.url();
   await youtube.mouse.click(at.x, at.y);
-  await expect(card).toHaveAttribute('data-ww-editor-selected', '');
+  await expect(card).toHaveAttribute('data-around-editor-selected', '');
   expect(await clicks(youtube)).toBe('0');
   expect(youtube.url()).toBe(before);
 });
@@ -73,7 +73,7 @@ test('a preview that appears between press and release still completes the press
   // The press lands on the card; the release on the preview, so the click goes to an ancestor.
   await overlay(youtube, 'ytd-video-preview');
   await youtube.mouse.up();
-  await expect(card).toHaveAttribute('data-ww-editor-selected', '');
+  await expect(card).toHaveAttribute('data-around-editor-selected', '');
   expect(await clicks(youtube)).toBe('0');
   expect(youtube.url()).toBe(before);
 });
@@ -88,9 +88,9 @@ test('the skin tool frames and picks the card under the inline preview, and YouT
   const before = youtube.url();
   await youtube.mouse.move(at.x - 10, at.y);
   await youtube.mouse.move(at.x, at.y, { steps: 3 });
-  await expect(youtube.locator('#web-world-themes-skin-hover')).toContainText('動画カード');
+  await expect(youtube.locator('#around-skin-hover')).toContainText('動画カード');
   await youtube.mouse.click(at.x, at.y);
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-skin-selected', 'video-card');
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-skin-selected', 'video-card');
   expect(await clicks(youtube)).toBe('0');
   expect(youtube.url()).toBe(before);
 });
@@ -110,5 +110,5 @@ test('サイト操作 leaves the inline preview to YouTube, and a menu over a ca
   layer = await overlay(youtube, 'tp-yt-iron-dropdown');
   await youtube.mouse.click(layer.at.x, layer.at.y);
   await expect.poll(() => clicks(youtube)).toBe('2');
-  await expect(layer.card).not.toHaveAttribute('data-ww-editor-selected', '');
+  await expect(layer.card).not.toHaveAttribute('data-around-editor-selected', '');
 });

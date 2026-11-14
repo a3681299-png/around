@@ -54,7 +54,7 @@ const button = (className: string, text: string) => {
   return node;
 };
 
-const REMEMBERED = 'wwt-living-video';
+const REMEMBERED = 'around-living-video';
 const ERRORS: Record<number, string> = {
   2: 'この動画のアドレスを読めませんでした。',
   5: 'この動画は、このプレイヤーでは再生できません。',
@@ -235,7 +235,7 @@ export function playerUi(hooks: PlayerHooks): PlayerUi {
         // Once it is there, it is asked to tell of its state and its errors.
         frame.addEventListener('load', () => {
           mine.contentWindow?.postMessage(
-            JSON.stringify({ event: 'listening', id: 'wwt-living', channel: 'widget' }),
+            JSON.stringify({ event: 'listening', id: 'around-living', channel: 'widget' }),
             PLAYER_ORIGIN,
           );
           for (const name of ['onStateChange', 'onError'])

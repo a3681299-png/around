@@ -34,7 +34,7 @@
 | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 骨           | 112 本。人型は `Hips`・`Spine`・`Chest`・`Neck`・`Head`・`Shoulder/UpperArm/LowerArm/Hand.L/R`・`UpperLeg/LowerLeg/Foot/Toes.L/R`・指・`Eye.L/R`。VRM の人型 53 本にそのまま対応（upperChest なし）。ほかは髪・耳・尻尾・袖・紐・頬 |
 | 休止姿勢     | T ポーズ。骨の向きは素直。FBX のアーマチュアが上の軸で半回転している（後ろ向きで読まれる）ので、足の向きを見て戻す処理を `fbx_to_vrm.py` に足した                                                                                   |
-| 大きさ       | 身長 約1.19m、頭身 5.1、足の比 0.43、腰の比 0.56 → WWT の判定は段階2（標準の動作が使える体型）                                                                                                                                      |
+| 大きさ       | 身長 約1.19m、頭身 5.1、足の比 0.43、腰の比 0.56 → Around の判定は段階2（標準の動作が使える体型）                                                                                                                                   |
 | 重み         | 全メッシュ、重みなしの頂点 0。影響は最大 4（髪だけ 6）                                                                                                                                                                              |
 | シェイプキー | 顔（`Body`）に 54：口（あいうえお・VRChat の口）、目（まばたき・笑い・ウィンク・じと目など）、眉。体（`Skin`）に体型の 10                                                                                                           |
 | 動作         | FBX に動作なし。unitypackage の `.anim` は表情と手の形（Unity 専用）                                                                                                                                                                |
@@ -73,16 +73,16 @@ blender -b --python scripts/characters/fbx_to_vrm.py -- scripts/characters/felis
 # 3. 動作を当てる
 blender -b -P scripts/characters/retarget_vrma.py -- C:/wwt-private/Felis_v0.8.1/work/felis-1024.vrm "<…/Unreal-Godot/UAL1_Standard_RM.glb>" scripts/characters/rigs/ual.json scripts/characters/clips/ual.json C:/wwt-private/Felis_v0.8.1/motions
 # 4. 部屋のページにキャラを入れて作る（.work の中だけ。dist-living-room には入らない）
-WW_LIVING_TEST=1 WW_LIVING_OUT=.work/living-room-preview \
-  WW_LIVING_CHARACTER=C:/wwt-private/Felis_v0.8.1/work/felis-1024.vrm WW_LIVING_MOTIONS=C:/wwt-private/Felis_v0.8.1/motions \
+AROUND_LIVING_TEST=1 AROUND_LIVING_OUT=.work/living-room-preview \
+  AROUND_LIVING_CHARACTER=C:/wwt-private/Felis_v0.8.1/work/felis-1024.vrm AROUND_LIVING_MOTIONS=C:/wwt-private/Felis_v0.8.1/motions \
   node scripts/build-living-room.mjs
 # 5. 見る：クリックした所に目印が出る。Escape で消える
 node scripts/playground/serve.mjs .work/living-room-preview 4181
-# 6. 録画（画面の外の窓）。x y z を並べると順に触りに行く。WW_RECORD_CLOSE=0.42 で近くから
+# 6. 録画（画面の外の窓）。x y z を並べると順に触りに行く。AROUND_RECORD_CLOSE=0.42 で近くから
 PLAYWRIGHT_BROWSERS_PATH=<本体>/.work/browsers node scripts/living-room/record.mjs <出力先> -0.9 0.95 -0.55 0.9 0.45 0.2
 ```
 
-テスト用の入口（`WW_LIVING_TEST=1`）：`__wwLivingRoom.resident.setTarget([x,y,z])`・`.sit('sit_bed')`・`.state()`・`.facts()`、`__wwLivingRoom.closeUp(0.42)`。
+テスト用の入口（`AROUND_LIVING_TEST=1`）：`__aroundLivingRoom.resident.setTarget([x,y,z])`・`.sit('sit_bed')`・`.state()`・`.facts()`、`__aroundLivingRoom.closeUp(0.42)`。
 
 **出力先はリポジトリの外にする**（フェリスが写る）。今回の物は `C:\wwt-private\Felis_v0.8.1\work\living-body\`（`room`・`close`・`sit`、動画 3 本と場面ごとの画像、43MB）。
 
@@ -210,7 +210,7 @@ Blender の部屋には、布団の折り目・キルトの膨らみ・枕の膨
 # 改善前のビルド（.work の中。素材は入れない）
 mkdir -p .work/before-src && git archive 7110e82 src scripts art/living-room/web THIRD_PARTY_NOTICES.md assets/licenses package.json tsconfig.json | tar -x -C .work/before-src
 cp art/living-room/web/room.glb .work/before-src/art/living-room/web/room.glb   # archive は LFS のポインターなので実体を置く
-(cd .work/before-src && WW_LIVING_TEST=1 WW_LIVING_OUT=.work/preview WW_LIVING_CHARACTER=<vrm> WW_LIVING_MOTIONS=<dir> node scripts/build-living-room.mjs)
+(cd .work/before-src && AROUND_LIVING_TEST=1 AROUND_LIVING_OUT=.work/preview AROUND_LIVING_CHARACTER=<vrm> AROUND_LIVING_MOTIONS=<dir> node scripts/build-living-room.mjs)
 # 録る（出力はリポジトリの外へ）
 node scripts/living-room/compare.mjs .work/before-src/.work/preview <外>/before
 node scripts/living-room/compare.mjs .work/living-room-preview <外>/after
@@ -267,7 +267,7 @@ node scripts/living-room/compare.mjs --join <外>/before <外>/after <外>/side-
 - 30fps・60fps：ページの描画を間引いて確かめた。場面の順番・時間・最高速は同じ。30fps でも足は掴まれない
 - 喜びのシルエット：跳びの頂点で腰が立ち姿より 20cm 以上高く、両手が頭より上、足が床から 12cm 以上（e2e）
 - 通常視点（部屋全体のカメラ）でも、沈む → 腕を上げて跳ぶ → 回る、がコマで読み取れた
-- テスト：unit 666 件通過・2 件スキップ（`tests/living-body.spec.ts` は 22 件）。e2e `tests/living-room-body-live.spec.ts` 1 件（`WW_LIVE_LIVING_BODY=1`、素材は環境変数。表示の速さと 30fps の両方で通過）
+- テスト：unit 666 件通過・2 件スキップ（`tests/living-body.spec.ts` は 22 件）。e2e `tests/living-room-body-live.spec.ts` 1 件（`AROUND_LIVE_LIVING_BODY=1`、素材は環境変数。表示の速さと 30fps の両方で通過）
 
 負荷（Ryzen 5 5600X・Radeon RX 6800、1600×900、165Hz の画面）：
 
@@ -295,7 +295,7 @@ node scripts/living-room/compare.mjs --join <外>/before <外>/after <外>/side-
 
 ### 道具
 
-- `scripts/living-room/compare.mjs`：`WW_COMPARE_CLOSE=0` で通常視点。今回の比較は `C:\wwt-private\Felis_v0.8.1\work\compare\side-by-side-3\`（左が `85ad6bb`、右が今回）。通常視点は `after3-room\`、解析のコマは `analysis\`
+- `scripts/living-room/compare.mjs`：`AROUND_COMPARE_CLOSE=0` で通常視点。今回の比較は `C:\wwt-private\Felis_v0.8.1\work\compare\side-by-side-3\`（左が `85ad6bb`、右が今回）。通常視点は `after3-room\`、解析のコマは `analysis\`
 - テスト用の入口に足したもの：`resident.trace()`（フレームごとの記録）、`room.frameRate(n)`（描く速さの制限）、`facts().feet`・`groundSlide`
 
 ## 11. 軽い歩き（2026-11-13、ノート PC）

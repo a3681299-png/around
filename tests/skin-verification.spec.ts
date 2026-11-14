@@ -108,17 +108,15 @@ test('forced state and compact previews survive neither save/reload nor an Undo/
   await editor.getByRole('button', { name: '保存', exact: true }).click();
   await expect(editor.locator('.status')).toHaveText('保存しました。');
   const read = () =>
-    popup.evaluate(
-      async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
-    );
+    popup.evaluate(async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube']);
   const saved = await read();
   await editor.getByRole('tab', { name: 'ホバー' }).click();
   await editor.getByRole('checkbox', { name: 'ページ上でこの状態を表示' }).check();
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-skin-force', 'video-card:hover');
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-skin-force', 'video-card:hover');
   expect(await read()).toEqual(saved);
   await editor.getByRole('checkbox', { name: 'ページ上で小さいときの見た目を表示' }).check();
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-skin-force-compact', 'video-card');
-  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-skin-force', /.*/);
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-skin-force-compact', 'video-card');
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-around-skin-force', /.*/);
   await expect(editor.getByRole('button', { name: '保存', exact: true })).toBeDisabled();
   // A real authoring edit makes Save available while the temporary compact preview is active.
   await editor.getByRole('tab', { name: '通常' }).click();
@@ -134,13 +132,13 @@ test('forced state and compact previews survive neither save/reload nor an Undo/
   expect(await read()).toEqual(authored);
   await editor.getByRole('button', { name: '元に戻す' }).click();
   await expect(editor.locator('.skin-scale')).toHaveValue('100');
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-skin-force-compact', 'video-card');
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-skin-force-compact', 'video-card');
   await editor.getByRole('button', { name: 'やり直す' }).click();
   await expect(editor.locator('.skin-scale')).toHaveValue('30');
   await editor.getByRole('button', { name: /編集を終了/ }).click();
   await youtube.reload();
-  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-skin-force', /.*/);
-  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-skin-force-compact', /.*/);
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-around-skin-force', /.*/);
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-around-skin-force-compact', /.*/);
   expect(await read()).toEqual(authored);
 });
 
@@ -149,7 +147,7 @@ test('emergency OFF removes every skin, compact mark and surface sheet and resto
   await mkdir('.work', { recursive: true });
   const profile = await mkdtemp(path.resolve('.work/g-entry-profile-'));
   const extension = await mkdtemp(path.resolve('.work/g-entry-extension-'));
-  await cp(path.resolve(process.env.WW_TEST_EXTENSION_PATH ?? 'dist'), extension, { recursive: true });
+  await cp(path.resolve(process.env.AROUND_TEST_EXTENSION_PATH ?? 'dist'), extension, { recursive: true });
   const context = await launchExtension(profile, true, {
     headed: true,
     width: 1920,
@@ -172,8 +170,8 @@ test('emergency OFF removes every skin, compact mark and surface sheet and resto
       await expect(partLocator(youtube, part).first()).toHaveCSS('border-image-width', '6px');
     const handles = await Promise.all(skinParts.map((part) => partLocator(youtube, part).first().elementHandle()));
     await nativeShortcut(youtube, profile, extension, 'Q');
-    await expect(youtube.locator('#web-world-themes-design-style')).toHaveCount(0);
-    await expect(youtube.locator('[data-ww-skin-compact]')).toHaveCount(0);
+    await expect(youtube.locator('#around-design-style')).toHaveCount(0);
+    await expect(youtube.locator('[data-around-skin-compact]')).toHaveCount(0);
     for (const [index, part] of skinParts.entries()) {
       const style = await handles[index]!.evaluate((node) => ({
         source: getComputedStyle(node).borderImageSource,

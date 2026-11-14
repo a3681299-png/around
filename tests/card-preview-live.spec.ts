@@ -10,11 +10,11 @@ import { openEditor } from './helpers/editor';
  * G1.1.1 on the real YouTube (signed out): a resting pointer on a thumbnail makes YouTube draw its
  * inline preview over the card, as an element outside the card. With the card or skin tool that
  * click chooses the card underneath and never reaches YouTube (no navigation, no playback); with
- * サイト操作 (browse) it is YouTube's again. WW_LIVE_CARD_PREVIEW=1.
+ * サイト操作 (browse) it is YouTube's again. AROUND_LIVE_CARD_PREVIEW=1.
  */
 const url = 'https://www.youtube.com/results?search_query=lofi+hip+hop';
-const cards = '[data-ww-surface~="video-card"]';
-const shots = path.resolve(process.env.WW_LIVE_CARD_PREVIEW_SHOTS ?? 'docs/screenshots/g111');
+const cards = '[data-around-surface~="video-card"]';
+const shots = path.resolve(process.env.AROUND_LIVE_CARD_PREVIEW_SHOTS ?? 'docs/screenshots/g111');
 
 /** Rests on the card's thumbnail until something outside the card is under the pointer. */
 async function previewOver(page: Page, index: number) {
@@ -63,12 +63,13 @@ async function previewOver(page: Page, index: number) {
 }
 const selectedCard = (page: Page) =>
   page.evaluate(
-    (cards) => [...document.querySelectorAll(cards)].findIndex((card) => card.hasAttribute('data-ww-editor-selected')),
+    (cards) =>
+      [...document.querySelectorAll(cards)].findIndex((card) => card.hasAttribute('data-around-editor-selected')),
     cards,
   );
 
 test('optional real YouTube G1.1.1: a click on the inline preview chooses the card underneath', async ({}, info) => {
-  test.skip(process.env.WW_LIVE_CARD_PREVIEW !== '1', 'Explicit signed-out real YouTube check.');
+  test.skip(process.env.AROUND_LIVE_CARD_PREVIEW !== '1', 'Explicit signed-out real YouTube check.');
   test.setTimeout(240_000);
   await mkdir('.work', { recursive: true });
   await mkdir(shots, { recursive: true });
@@ -115,20 +116,20 @@ test('optional real YouTube G1.1.1: a click on the inline preview chooses the ca
     record.cardUrl = new URL(page.url()).pathname;
     record.selectedCard = await selectedCard(page);
     expect(new URL(page.url()).pathname).toBe('/results');
-    await expect(card.card).toHaveAttribute('data-ww-editor-selected', '');
+    await expect(card.card).toHaveAttribute('data-around-editor-selected', '');
     await page.screenshot({ path: path.join(shots, 'card-tool-preview-selected.png') });
 
     // The skin tool: the same click picks the video card part.
     await panel.getByRole('button', { name: 'UIを着せ替え', exact: true }).click();
     const skin = await previewOver(page, 2);
     record.skinPreview = skin.chain;
-    await expect(page.locator('#web-world-themes-skin-hover')).toContainText('動画カード');
+    await expect(page.locator('#around-skin-hover')).toContainText('動画カード');
     await page.screenshot({ path: path.join(shots, 'skin-tool-preview-hover.png') });
     await page.mouse.down();
     await page.mouse.up();
     await page.waitForTimeout(1500);
     expect(new URL(page.url()).pathname).toBe('/results');
-    await expect(page.locator('html')).toHaveAttribute('data-ww-skin-selected', 'video-card');
+    await expect(page.locator('html')).toHaveAttribute('data-around-skin-selected', 'video-card');
 
     // サイト操作: the click is YouTube's again.
     await panel.getByRole('button', { name: 'サイト操作', exact: true }).click();

@@ -4,8 +4,8 @@ import type { Page, Locator } from '@playwright/test';
 import { test, expect } from './fixtures';
 import { openEditor as openEditorPage } from './helpers/editor';
 
-const cards = '[data-ww-surface~="video-card"]';
-const key = 'webWorldThemes.design.youtube';
+const cards = '[data-around-surface~="video-card"]';
+const key = 'around.design.youtube';
 // The open editor, so a card pick can first choose the card tool (UI0-d decision 2).
 let editor: Locator | undefined;
 
@@ -25,7 +25,7 @@ async function selectCard(youtube: Page, card = youtube.locator(cards).first()) 
   // From the editor page, a page click picks a card only with the card tool.
   await editor!.getByRole('button', { name: '動画カードを編集', exact: true }).click();
   await card.locator('a').first().click();
-  await expect(card).toHaveAttribute('data-ww-editor-selected', '');
+  await expect(card).toHaveAttribute('data-around-editor-selected', '');
   return card;
 }
 
@@ -129,12 +129,12 @@ test('pick a card, preview all properties locally, save across tabs, discard, re
   await expect(card).toHaveCSS('background-color', 'rgb(235, 223, 255)');
   await background(dialog, '#ffccaa');
   await dialog.getByRole('button', { name: '編集を終了' }).click();
-  await expect(youtube.locator('[data-ww-editor-selected]')).toHaveCount(0);
-  await expect(youtube.locator('#web-world-themes-selection-style')).toHaveCount(0);
+  await expect(youtube.locator('[data-around-editor-selected]')).toHaveCount(0);
+  await expect(youtube.locator('#around-selection-style')).toHaveCount(0);
   await expect(card).toHaveCSS('background-color', 'rgb(235, 223, 255)');
   await youtube.reload();
   await expect(youtube.locator(cards).first()).toHaveCSS('border-radius', '14px');
-  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-editing');
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-around-editing');
   await youtube.locator(cards).first().locator('#video-title').click();
   await expect(youtube).toHaveURL(/\/watch\?v=fixture/);
 });
@@ -161,12 +161,12 @@ test('OFF and 緊急OFF remove editing UI, selection, styles, variables and surf
     else await popup.getByRole('button', { name: '緊急OFF', exact: true }).click();
     await expect(
       youtube.locator(
-        '[data-ww-surface], [data-ww-editor-selected], #web-world-themes-creator, #web-world-themes-design-style, #web-world-themes-selection-style, #web-world-themes-style',
+        '[data-around-surface], [data-around-editor-selected], #around-creator, #around-design-style, #around-selection-style, #around-style',
       ),
     ).toHaveCount(0);
-    await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-editing');
-    await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-design');
-    expect((await youtube.locator('html').getAttribute('style')) ?? '').not.toContain('--ww-');
+    await expect(youtube.locator('html')).not.toHaveAttribute('data-around-editing');
+    await expect(youtube.locator('html')).not.toHaveAttribute('data-around-design');
+    expect((await youtube.locator('html').getAttribute('style')) ?? '').not.toContain('--around-');
     expect(
       await youtube
         .locator('ytd-rich-grid-media')
@@ -197,22 +197,22 @@ test('home, search and recommendations keep the draft across SPA and release sta
 }) => {
   await enable(popup, youtube);
   const dialog = await openEditor(popup, youtube);
-  await expect(youtube.locator('ytd-rich-grid-media').first()).toHaveAttribute('data-ww-surface', /video-card/);
+  await expect(youtube.locator('ytd-rich-grid-media').first()).toHaveAttribute('data-around-surface', /video-card/);
   await selectCard(youtube);
   await background(dialog, '#ddeeff');
   await youtube.getByRole('textbox', { name: 'Search', exact: true }).fill('fixture');
   await youtube.getByRole('textbox', { name: 'Search', exact: true }).press('Enter');
   await expect(youtube).toHaveURL(/\/results\?/);
-  await expect(youtube.locator('ytd-video-renderer').first()).toHaveAttribute('data-ww-surface', /video-card/);
+  await expect(youtube.locator('ytd-video-renderer').first()).toHaveAttribute('data-around-surface', /video-card/);
   await expect(youtube.locator(cards).first()).toHaveCSS('background-color', 'rgb(221, 238, 255)');
-  await expect(youtube.locator('[data-ww-editor-selected]')).toHaveCount(0);
+  await expect(youtube.locator('[data-around-editor-selected]')).toHaveCount(0);
   await expect(dialog.locator('.properties')).toBeHidden();
   await selectCard(youtube);
   // UI0-d: the editor is its own page; nothing needs moving off the page (was: パネルを左へ).
   await youtube.locator('#navigate').click();
   await expect(youtube).toHaveURL(/\/watch\?/);
   await expect(youtube.locator('.related yt-lockup-view-model').first()).toHaveAttribute(
-    'data-ww-surface',
+    'data-around-surface',
     /video-card/,
   );
   await expect(youtube.locator('.related yt-lockup-view-model').first()).toHaveCSS(
@@ -220,11 +220,11 @@ test('home, search and recommendations keep the draft across SPA and release sta
     'rgb(221, 238, 255)',
   );
   await expect(youtube.locator('ytd-playlist-panel-video-renderer').first()).not.toHaveAttribute(
-    'data-ww-surface',
+    'data-around-surface',
     /video-card/,
   );
   await selectCard(youtube, youtube.locator('.related yt-lockup-view-model').first());
-  await expect(youtube.locator('#web-world-themes-design-style')).toHaveCount(1);
+  await expect(youtube.locator('#around-design-style')).toHaveCount(1);
   await save(dialog);
 });
 
@@ -249,7 +249,7 @@ test('target classification excludes non-video cards, avoids nested targets, and
     document.querySelector('ytd-page-manager')!.append(box);
   });
   for (const id of ['legacy-grid', 'legacy-recommended', 'outer-card']) {
-    await expect(youtube.locator(`#${id}`)).toHaveAttribute('data-ww-surface', /video-card/);
+    await expect(youtube.locator(`#${id}`)).toHaveAttribute('data-around-surface', /video-card/);
   }
   for (const id of [
     'inner-card',
@@ -260,12 +260,12 @@ test('target classification excludes non-video cards, avoids nested targets, and
     'ad-card',
     'delayed-card',
   ]) {
-    await expect(youtube.locator(`#${id}`)).not.toHaveAttribute('data-ww-surface', /video-card/);
+    await expect(youtube.locator(`#${id}`)).not.toHaveAttribute('data-around-surface', /video-card/);
   }
   await youtube.locator('#delayed-card a').evaluate((link) => link.setAttribute('href', '/watch?v=delayed'));
-  await expect(youtube.locator('#delayed-card')).toHaveAttribute('data-ww-surface', /video-card/);
+  await expect(youtube.locator('#delayed-card')).toHaveAttribute('data-around-surface', /video-card/);
   await youtube.locator('#delayed-card a').evaluate((link) => link.setAttribute('href', '/playlist?list=changed'));
-  await expect(youtube.locator('#delayed-card')).not.toHaveAttribute('data-ww-surface', /video-card/);
+  await expect(youtube.locator('#delayed-card')).not.toHaveAttribute('data-around-surface', /video-card/);
 });
 
 test('external saves update clean tabs, preserve another tab draft and let discard load the latest saved design', async ({
@@ -354,8 +354,8 @@ for (const baseThemeId of [null, 'retro'] as const) {
       { designKey: key, baseThemeId },
     );
     await expect(youtube.locator(cards).first()).toHaveCSS('background-color', 'rgb(221, 238, 255)');
-    await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-theme');
-    expect((await youtube.locator('html').getAttribute('style')) ?? '').not.toContain('--ww-');
+    await expect(youtube.locator('html')).not.toHaveAttribute('data-around-theme');
+    expect((await youtube.locator('html').getAttribute('style')) ?? '').not.toContain('--around-');
     await expect(youtube.locator('ytd-thumbnail #thumbnail').first()).toHaveCSS('border-radius', '16px');
     const dialog = await openEditor(popup, youtube);
     await selectCard(youtube);
@@ -369,9 +369,7 @@ for (const baseThemeId of [null, 'retro'] as const) {
       }, key),
     ).toBe(baseThemeId);
     await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
-    await expect(
-      youtube.locator('[data-ww-surface], #web-world-themes-design-style, #web-world-themes-creator'),
-    ).toHaveCount(0);
+    await expect(youtube.locator('[data-around-surface], #around-design-style, #around-creator')).toHaveCount(0);
   });
 }
 
@@ -392,7 +390,7 @@ test('unknown versions remain stored, disable editing and recover after a suppor
   await refused.goto(new URL(`../studio/index.html?target=${tab}`, popup.url()).href);
   await expect(refused.locator('.connection-status')).toContainText('バージョン');
   await expect(refused.locator('.connection-status')).toHaveAttribute('data-connected', 'false');
-  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-editing', /.*/);
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-around-editing', /.*/);
   await refused.close();
   expect(
     await popup.evaluate(async (designKey) => (await chrome.storage.local.get(designKey))[designKey], key),
@@ -417,7 +415,7 @@ test('resetting overrides restores the native card and persists the reset; only 
   await dialog.getByRole('button', { name: 'カードの変更をリセット' }).click();
   expect(await card.evaluate((node) => getComputedStyle(node).background)).toBe(initial);
   await save(dialog);
-  await expect(youtube.locator('#web-world-themes-design-style')).toHaveCount(0);
+  await expect(youtube.locator('#around-design-style')).toHaveCount(0);
   await youtube.reload();
   await expect(youtube.locator(cards).first()).toHaveCSS('border-radius', radius);
   expect(

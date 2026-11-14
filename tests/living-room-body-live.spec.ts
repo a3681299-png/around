@@ -11,8 +11,8 @@ import { createPlaygroundServer } from '../scripts/playground/serve.mjs';
  * hand gets to the thing, the cheer leaves the floor with the arms above the head and comes back
  * to standing as it stood; and the same at 30 frames a second.
  *
- * The character is never in the repository: WW_LIVING_CHARACTER (a .vrm) and WW_LIVING_MOTIONS (a
- * folder of .vrma) name it. Explicit: WW_LIVE_LIVING_BODY=1. Headed off screen (a real GPU).
+ * The character is never in the repository: AROUND_LIVING_CHARACTER (a .vrm) and AROUND_LIVING_MOTIONS (a
+ * folder of .vrma) name it. Explicit: AROUND_LIVE_LIVING_BODY=1. Headed off screen (a real GPU).
  */
 interface Frame {
   t: number;
@@ -25,12 +25,12 @@ interface Frame {
 }
 const built = path.resolve('.work/living-body-e2e');
 const hook = <T>(page: Page, body: string) =>
-  page.evaluate(`(() => { const room = globalThis.__wwLivingRoom; ${body} })()`) as Promise<T>;
+  page.evaluate(`(() => { const room = globalThis.__aroundLivingRoom; ${body} })()`) as Promise<T>;
 
 async function perform(page: Page, frameRate: number) {
   await page.reload();
   await page.waitForFunction(
-    'globalThis.__wwLivingRoom?.resident && document.querySelector("#room[data-ready]")',
+    'globalThis.__aroundLivingRoom?.resident && document.querySelector("#room[data-ready]")',
     null,
     {
       timeout: 90000,
@@ -63,7 +63,7 @@ async function perform(page: Page, frameRate: number) {
 async function calmWalk(page: Page) {
   await page.reload();
   await page.waitForFunction(
-    'globalThis.__wwLivingRoom?.resident && document.querySelector("#room[data-ready]")',
+    'globalThis.__aroundLivingRoom?.resident && document.querySelector("#room[data-ready]")',
     null,
     { timeout: 90000 },
   );
@@ -85,12 +85,14 @@ async function calmWalk(page: Page) {
 
 test('the living room: a calm walk is light, short quick steps and a small bob, not a stomp', async () => {
   test.skip(
-    process.env.WW_LIVE_LIVING_BODY !== '1' || !process.env.WW_LIVING_CHARACTER || !process.env.WW_LIVING_MOTIONS,
-    'Explicit: WW_LIVE_LIVING_BODY=1 with WW_LIVING_CHARACTER and WW_LIVING_MOTIONS.',
+    process.env.AROUND_LIVE_LIVING_BODY !== '1' ||
+      !process.env.AROUND_LIVING_CHARACTER ||
+      !process.env.AROUND_LIVING_MOTIONS,
+    'Explicit: AROUND_LIVE_LIVING_BODY=1 with AROUND_LIVING_CHARACTER and AROUND_LIVING_MOTIONS.',
   );
   test.setTimeout(240000);
   execFileSync(process.execPath, ['scripts/build-living-room.mjs'], {
-    env: { ...process.env, WW_LIVING_TEST: '1', WW_LIVING_OUT: '.work/living-body-e2e' },
+    env: { ...process.env, AROUND_LIVING_TEST: '1', AROUND_LIVING_OUT: '.work/living-body-e2e' },
     stdio: 'inherit',
   });
   const server = createPlaygroundServer(built);
@@ -175,12 +177,14 @@ test('the living room: a calm walk is light, short quick steps and a small bob, 
 
 test('the living room: an eager dart, a touch and a cheer hold up frame by frame, at any frame rate', async () => {
   test.skip(
-    process.env.WW_LIVE_LIVING_BODY !== '1' || !process.env.WW_LIVING_CHARACTER || !process.env.WW_LIVING_MOTIONS,
-    'Explicit: WW_LIVE_LIVING_BODY=1 with WW_LIVING_CHARACTER and WW_LIVING_MOTIONS.',
+    process.env.AROUND_LIVE_LIVING_BODY !== '1' ||
+      !process.env.AROUND_LIVING_CHARACTER ||
+      !process.env.AROUND_LIVING_MOTIONS,
+    'Explicit: AROUND_LIVE_LIVING_BODY=1 with AROUND_LIVING_CHARACTER and AROUND_LIVING_MOTIONS.',
   );
   test.setTimeout(240000);
   execFileSync(process.execPath, ['scripts/build-living-room.mjs'], {
-    env: { ...process.env, WW_LIVING_TEST: '1', WW_LIVING_OUT: '.work/living-body-e2e' },
+    env: { ...process.env, AROUND_LIVING_TEST: '1', AROUND_LIVING_OUT: '.work/living-body-e2e' },
     stdio: 'inherit',
   });
   const server = createPlaygroundServer(built);

@@ -121,7 +121,7 @@ export function createLayerTree(doc: Document, container: HTMLElement, actions: 
       draggedId = undefined;
       return;
     }
-    event.dataTransfer?.setData('application/x-ww-layer', draggedId);
+    event.dataTransfer?.setData('application/x-around-layer', draggedId);
     if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
   });
   container.addEventListener('dragover', (event) => {

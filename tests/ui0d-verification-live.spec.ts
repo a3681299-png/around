@@ -12,7 +12,7 @@ import { enterNativeTheater } from './helpers/youtube-theater';
 const shots = path.resolve('docs/screenshots/ui0d-verification');
 for (const scheme of ['light', 'dark'] as const)
   test(`UI0-d independent real-site appearance: ${scheme}`, async ({}, info) => {
-    test.skip(process.env.WW_LIVE_UI0D !== '1', 'Explicit signed-out real YouTube verification.');
+    test.skip(process.env.AROUND_LIVE_UI0D !== '1', 'Explicit signed-out real YouTube verification.');
     test.setTimeout(180_000);
     await mkdir(shots, { recursive: true });
     let context = await launchExtension(await mkdtemp(path.resolve('.work/ui0dv-')), false, {
@@ -34,14 +34,14 @@ for (const scheme of ['light', 'dark'] as const)
       const page = await context.newPage();
       await page.emulateMedia({ colorScheme: scheme });
       await page.goto('https://www.youtube.com/results?search_query=lofi+hip+hop', { waitUntil: 'domcontentloaded' });
-      await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible({ timeout: 30_000 });
+      await expect(page.locator('[data-around-surface~="video-card"]').first()).toBeVisible({ timeout: 30_000 });
       await declinePromotion(page);
       await page.bringToFront(); // Required: the panel edits the active target tab.
       const tab = await popup.evaluate(
         async () => (await chrome.tabs.query({ active: true, currentWindow: true }))[0]!.id!,
       );
       await popup.evaluate(async (tabId) => {
-        const reply = await chrome.runtime.sendMessage({ type: 'web-world-themes:open-side-panel', tabId });
+        const reply = await chrome.runtime.sendMessage({ type: 'around:open-side-panel', tabId });
         if (!reply?.ok) throw new Error(reply?.error ?? 'Panel did not open');
       }, tab);
       const side = await sidePanelDriver(context, page, id, tab);
@@ -50,11 +50,11 @@ for (const scheme of ['light', 'dark'] as const)
         .toBe('true');
       await side.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: scheme }] });
       await side.files([path.resolve('tests/fixtures/motion/petal.png')]);
-      await expect(page.locator('#web-world-themes-decorations [data-image-id]')).toHaveCount(1);
+      await expect(page.locator('#around-decorations [data-image-id]')).toHaveCount(1);
       await expect
         .poll(() =>
           side.evaluate(
-            'Boolean(document.querySelector("#web-world-themes-creator").shadowRoot.querySelector("[data-thumbnail] img")?.naturalWidth)',
+            'Boolean(document.querySelector("#around-creator").shadowRoot.querySelector("[data-thumbnail] img")?.naturalWidth)',
           ),
         )
         .toBe(true);
@@ -77,7 +77,7 @@ for (const scheme of ['light', 'dark'] as const)
         record[`s-${width}`] = await side.evaluate('({width:innerWidth,height:innerHeight,title:document.title})');
       }
       await side.send('Page.close');
-      await expect(page.locator('html')).not.toHaveAttribute('data-ww-editing', /.*/);
+      await expect(page.locator('html')).not.toHaveAttribute('data-around-editing', /.*/);
       await context.close();
       // Chrome rejects off-screen bounds in windows.create. Exercise the real W entry in a
       // separate headless browser; its popup window never appears on the user's desktop.
@@ -88,7 +88,7 @@ for (const scheme of ['light', 'dark'] as const)
       await storeDesign(popup2, plainSkinDesign);
       const page2 = await context.newPage();
       await page2.goto('https://www.youtube.com/results?search_query=lofi+hip+hop', { waitUntil: 'domcontentloaded' });
-      await expect(page2.locator('[data-ww-surface~="video-card"]').first()).toBeVisible({ timeout: 30_000 });
+      await expect(page2.locator('[data-around-surface~="video-card"]').first()).toBeVisible({ timeout: 30_000 });
       await declinePromotion(page2);
       await page2.bringToFront();
       const opened = context.waitForEvent('page');
@@ -100,7 +100,7 @@ for (const scheme of ['light', 'dark'] as const)
       await expect(windowPage.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
       const panel = windowPage.getByRole('dialog', { name: 'デザインエディター' });
       await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
-      await expect(page2.locator('#web-world-themes-decorations [data-image-id]')).toHaveCount(1);
+      await expect(page2.locator('#around-decorations [data-image-id]')).toHaveCount(1);
       await expect
         .poll(() =>
           panel
@@ -123,10 +123,10 @@ for (const scheme of ['light', 'dark'] as const)
   });
 
 test('UI0-d real side-panel viewport changes keep the published G1 bands and native hit targets current through modes and SPA', async ({}, info) => {
-  test.skip(process.env.WW_LIVE_UI0D !== '1', 'Explicit real YouTube operation verification.');
+  test.skip(process.env.AROUND_LIVE_UI0D !== '1', 'Explicit real YouTube operation verification.');
   test.setTimeout(240_000);
   const extension = path.resolve('.work/ui0d-verify-g1');
-  await ui0dOperationProbeBuild(path.resolve(process.env.WW_TEST_EXTENSION_PATH ?? 'dist'), extension);
+  await ui0dOperationProbeBuild(path.resolve(process.env.AROUND_TEST_EXTENSION_PATH ?? 'dist'), extension);
   const context = await launchExtension(await mkdtemp(path.resolve('.work/ui0dv-g1-')), false, {
     headed: true,
     width: 1920,
@@ -151,7 +151,7 @@ test('UI0-d real side-panel viewport changes keep the published G1 bands and nat
     );
     const open = async () => {
       await popup.evaluate(async (tabId) => {
-        const r = await chrome.runtime.sendMessage({ type: 'web-world-themes:open-side-panel', tabId });
+        const r = await chrome.runtime.sendMessage({ type: 'around:open-side-panel', tabId });
         if (!r?.ok) throw Error(r?.error);
       }, tab);
       return sidePanelDriver(context, page, id, tab);
@@ -166,7 +166,7 @@ test('UI0-d real side-panel viewport changes keep the published G1 bands and nat
       await chrome.sidePanel.setOptions({ tabId, enabled: false });
       await chrome.sidePanel.setOptions({ tabId, enabled: true });
     }, tab);
-    await expect(page.locator('html')).not.toHaveAttribute('data-ww-editing', /.*/);
+    await expect(page.locator('html')).not.toHaveAttribute('data-around-editing', /.*/);
     const cdp = await context.newCDPSession(page);
     let isolated = 0;
     cdp.on('Runtime.executionContextCreated', ({ context: c }) => {
@@ -196,7 +196,7 @@ test('UI0-d real side-panel viewport changes keep the published G1 bands and nat
       await expect
         .poll(async () => {
           const s = await guard(),
-            r = await page.locator('[data-ww-surface~="player-window"]').boundingBox();
+            r = await page.locator('[data-around-surface~="player-window"]').boundingBox();
           const top = s?.surfaces.find((v: any) => v.id === 'player.controls.top');
           return Boolean(
             r &&
@@ -211,11 +211,11 @@ test('UI0-d real side-panel viewport changes keep the published G1 bands and nat
         bottom = s.surfaces.find((v: any) => v.id === 'player.controls.bottom');
       expect(top.protectedEnvelope.height).toBe(64);
       expect(bottom.protectedEnvelope.height).toBe(112);
-      const player = await page.locator('[data-ww-surface~="player-window"]').boundingBox();
+      const player = await page.locator('[data-around-surface~="player-window"]').boundingBox();
       expect(bottom.protectedEnvelope.top).toBeCloseTo(player!.y + player!.height - 112, 0);
-      await page.locator('[data-ww-surface~="player-window"]').hover();
+      await page.locator('[data-around-surface~="player-window"]').hover();
       const hits = await page.evaluate(() =>
-        [...document.querySelectorAll('[data-ww-surface~="player-window"] button')]
+        [...document.querySelectorAll('[data-around-surface~="player-window"] button')]
           .filter((node) =>
             /^(Play|Pause|再生|一時停止|Settings|設定|Theater mode|Default view|シアター|デフォルト|Full screen|Exit full screen|全画面)/i.test(
               node.getAttribute('aria-label') ?? '',
@@ -257,7 +257,7 @@ test('UI0-d real side-panel viewport changes keep the published G1 bands and nat
     await leaveTheater();
     await snapshot('normal-S');
     await page
-      .locator('[data-ww-surface~="player-window"]')
+      .locator('[data-around-surface~="player-window"]')
       .getByRole('button', { name: /^(Full screen|全画面)/i })
       .click();
     await expect.poll(() => page.evaluate(() => Boolean(document.fullscreenElement))).toBe(true);
@@ -266,12 +266,12 @@ test('UI0-d real side-panel viewport changes keep the published G1 bands and nat
     await snapshot('exit-fullscreen-S');
     const old = page.url();
     await page
-      .locator('[data-ww-surface~="video-card"] a[href*="/watch?v="]')
+      .locator('[data-around-surface~="video-card"] a[href*="/watch?v="]')
       .filter({ visible: true })
       .first()
       .click();
     await expect.poll(() => page.url()).not.toBe(old);
-    await expect(page.locator('[data-ww-surface~="player-window"]')).toBeVisible();
+    await expect(page.locator('[data-around-surface~="player-window"]')).toBeVisible();
     await declinePromotion(page);
     await waitForAdvertToEnd(page);
     await snapshot('SPA-S');
@@ -283,22 +283,22 @@ test('UI0-d real side-panel viewport changes keep the published G1 bands and nat
     await panel.click('.skin-part[data-target="video-card"]');
     await panel.files([path.resolve('tests/fixtures/skins/frame-light.png')], '.skin-file');
     const nativeCard = (await page
-      .locator('[data-ww-surface~="video-card"]')
+      .locator('[data-around-surface~="video-card"]')
       .filter({ visible: true })
       .first()
       .elementHandle())!;
     const paint = () => nativeCard.evaluate((node) => getComputedStyle(node).borderImageSource);
     await expect.poll(paint).toMatch(/^url\("blob:/);
-    await panel.evaluate('document.querySelector(".ww-editor-safety > .emergency-off").click()');
-    await expect(page.locator('html')).not.toHaveAttribute('data-ww-editing', /.*/);
-    await expect(page.locator('html')).not.toHaveAttribute('data-ww-skin-picking', /.*/);
+    await panel.evaluate('document.querySelector(".around-editor-safety > .emergency-off").click()');
+    await expect(page.locator('html')).not.toHaveAttribute('data-around-editing', /.*/);
+    await expect(page.locator('html')).not.toHaveAttribute('data-around-skin-picking', /.*/);
     await expect(page.locator('[data-image-id]')).toHaveCount(0);
-    await expect(page.locator('#web-world-themes-page-marks')).toHaveCount(0);
+    await expect(page.locator('#around-page-marks')).toHaveCount(0);
     await expect.poll(paint).toBe('none');
     await expect.poll(() => panel.evaluate('document.querySelector(".emergency-resume").hidden')).toBe(false);
     records.push({ label: 'emergency-off-S', editing: false, drawing: false, skin: 'none', marks: 0, resume: true });
     await panel.evaluate('document.querySelector(".emergency-resume").click()');
-    await expect(page.locator('html')).toHaveAttribute('data-ww-editing', '');
+    await expect(page.locator('html')).toHaveAttribute('data-around-editing', '');
     await expect.poll(paint).toMatch(/^url\("blob:/);
     await expect(page.locator('[data-image-id]')).toHaveCount(1);
     records.push({ label: 'resume-S', editing: true, drawing: true, skin: 'blob' });

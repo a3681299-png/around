@@ -26,7 +26,7 @@ export function snapTargets(
 ): Bounds[] {
   const viewport = { left: 0, top: 0, right: doc.defaultView!.innerWidth, bottom: doc.defaultView!.innerHeight };
   const surfaces = anchors.flatMap((anchor) => {
-    const rect = doc.querySelector(`[data-ww-surface~="${anchor.surface}"]`)?.getBoundingClientRect();
+    const rect = doc.querySelector(`[data-around-surface~="${anchor.surface}"]`)?.getBoundingClientRect();
     return rect && rect.width > 0 && rect.height > 0
       ? [{ left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom }]
       : [];

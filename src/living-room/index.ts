@@ -35,8 +35,8 @@ import { screenGlow, type GlowKind } from './screen-glow';
 import { startRoomDesktop } from './desktop';
 import { enclose } from './enclose';
 
-declare const __WW_LIVING_TEST__: boolean;
-declare const __WW_LIVING_CHARACTER__: boolean;
+declare const __AROUND_LIVING_TEST__: boolean;
+declare const __AROUND_LIVING_CHARACTER__: boolean;
 
 interface RoomManifest {
   bakedColor?: boolean;
@@ -193,7 +193,7 @@ async function start() {
     { ...(layerUi ? { ui: layerUi } : {}), ...(layerScreen ? { screen: layerScreen } : {}) },
     manifest.lightScale,
   );
-  if (__WW_LIVING_CHARACTER__)
+  if (__AROUND_LIVING_CHARACTER__)
     resident = await loadLivingResident(scene, base, layout, softSurface(soft), { root: gltf.scene, glow });
 
   const home = VIEW.position.clone();
@@ -262,7 +262,7 @@ async function start() {
     frame = undefined;
     // For checking the motion at a slower display (the test hook): frames that come sooner than
     // the asked rate are passed over, as a 30 or 60 Hz screen would not have shown them.
-    if (__WW_LIVING_TEST__ && frameRate && last && now - last < 1000 / frameRate - 1) {
+    if (__AROUND_LIVING_TEST__ && frameRate && last && now - last < 1000 / frameRate - 1) {
       wake();
       return;
     }
@@ -304,7 +304,7 @@ async function start() {
       driftY = drifting ? 0.3 * Math.sin(now * 0.00016 + 1.3) : 0;
     // A small orbit about the subject follows the pointer: depth without leaving the composition.
     offset.copy(home).sub(SUBJECT);
-    if (__WW_LIVING_TEST__) offset.multiplyScalar(reviewDistance).applyAxisAngle(new Vector3(0, 1, 0), reviewTurn);
+    if (__AROUND_LIVING_TEST__) offset.multiplyScalar(reviewDistance).applyAxisAngle(new Vector3(0, 1, 0), reviewTurn);
     offset.applyAxisAngle(new Vector3(0, 1, 0), -(look.x + driftX) * (0.05 + 0.08 * staged));
     offset.y += (look.y + driftY) * (0.25 - 0.1 * staged);
     // (A beat leans the view in by a finger's width; and it breathes slowly nearer and further,
@@ -322,11 +322,11 @@ async function start() {
       camera.lookAt(subject);
     }
     camera.updateMatrixWorld();
-    const began = __WW_LIVING_TEST__ ? performance.now() : 0;
+    const began = __AROUND_LIVING_TEST__ ? performance.now() : 0;
     // The resident sees what the desktop offers, acts on it, and the desktop takes that in.
     const acts = resident?.update(dt, camera, desktop.stage(), live.cue()) ?? [];
     desktop.update(dt, now, acts);
-    const posed = __WW_LIVING_TEST__ ? performance.now() : 0;
+    const posed = __AROUND_LIVING_TEST__ ? performance.now() : 0;
     // Up on the desktop (riding a window, thrown off one) the resident is in front of the UI: it
     // is drawn on its own, clear behind it, and that picture is put on a canvas over the page's
     // windows; the room is then drawn without it. One WebGL context, the body drawn once.
@@ -358,7 +358,7 @@ async function start() {
       composer.render();
     }
     draws++;
-    if (__WW_LIVING_TEST__ && dt > 0) {
+    if (__AROUND_LIVING_TEST__ && dt > 0) {
       // For the load measurement (the test hook): the frame's interval, the body's and the draw's
       // time on the main thread.
       timing.frames++;
@@ -431,9 +431,9 @@ async function start() {
   tick(performance.now());
   canvas.toggleAttribute('data-ready', true);
   status.textContent = '';
-  if (__WW_LIVING_TEST__)
+  if (__AROUND_LIVING_TEST__)
     Object.assign(globalThis, {
-      __wwLivingRoom: {
+      __aroundLivingRoom: {
         layout,
         // Every place must be on the walkable floor and reachable on foot from the first standing
         // place: the same functions the room's resident uses (src/world/room-life.ts).

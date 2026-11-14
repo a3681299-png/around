@@ -143,22 +143,22 @@ async function characterOverBar(popup: Page, youtube: Page) {
 /** Frames, in the page, where the image is stopped by the guard (hidden). */
 async function countStops(youtube: Page) {
   await youtube.evaluate(() => {
-    const w = window as unknown as { wwFrames: number; wwStopped: number };
-    w.wwFrames = w.wwStopped = 0;
+    const w = window as unknown as { aroundFrames: number; aroundStopped: number };
+    w.aroundFrames = w.aroundStopped = 0;
     const tick = () => {
-      const host = document.querySelector('#web-world-themes-video-decorations');
+      const host = document.querySelector('#around-video-decorations');
       const node = host?.shadowRoot?.querySelector('[data-image-id]');
-      w.wwFrames++;
-      if (!node || node.hasAttribute('data-safety-limited')) w.wwStopped++;
+      w.aroundFrames++;
+      if (!node || node.hasAttribute('data-safety-limited')) w.aroundStopped++;
       requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
   });
   return () =>
     youtube.evaluate(() => {
-      const w = window as unknown as { wwFrames: number; wwStopped: number };
-      const out = { frames: w.wwFrames, stopped: w.wwStopped };
-      w.wwFrames = w.wwStopped = 0;
+      const w = window as unknown as { aroundFrames: number; aroundStopped: number };
+      const out = { frames: w.aroundFrames, stopped: w.aroundStopped };
+      w.aroundFrames = w.aroundStopped = 0;
       return out;
     });
 }
@@ -172,7 +172,7 @@ layered(
     await expect
       .poll(() =>
         youtube.evaluate(() => {
-          const host = document.querySelector<HTMLElement>('#web-world-themes-video-decorations');
+          const host = document.querySelector<HTMLElement>('#around-video-decorations');
           return Boolean(
             host?.shadowRoot?.querySelector('[data-image-id]') &&
             host.previousElementSibling?.classList.contains('html5-video-container') &&
@@ -186,7 +186,7 @@ layered(
         youtube.evaluate(
           () =>
             !document
-              .querySelector('#web-world-themes-video-decorations')
+              .querySelector('#around-video-decorations')
               ?.shadowRoot?.querySelector('[data-image-id]')
               ?.hasAttribute('data-safety-limited'),
         ),
@@ -251,7 +251,7 @@ layered(
  * out (the plane over the player's parts, its bands and overlays clipped). */
 const planeWay = (youtube: Page) =>
   youtube.evaluate(() => {
-    const host = document.querySelector<HTMLElement>('#web-world-themes-video-decorations');
+    const host = document.querySelector<HTMLElement>('#around-video-decorations');
     if (!host?.shadowRoot?.querySelector('[data-image-id]')) return 'none';
     const before = host.previousElementSibling as HTMLElement | null;
     return before?.classList.contains('html5-video-container') &&
@@ -264,7 +264,7 @@ const planeWay = (youtube: Page) =>
  * character's box, `gap` px from its left edge (negative: overlapping), or in the player's
  * top-left corner (`far`). */
 async function unprovenControl(youtube: Page, where: { gap: number } | 'far') {
-  const box = (await youtube.locator('#web-world-themes-video-decorations [data-image-id]').boundingBox())!;
+  const box = (await youtube.locator('#around-video-decorations [data-image-id]').boundingBox())!;
   const player = (await youtube.locator('#movie_player').boundingBox())!;
   await youtube.evaluate(
     ({ where, box, player }) => {
@@ -331,7 +331,7 @@ layered(
     // YouTube's large play button is: proven while the container is opaque. A fade (opacity below
     // 1) makes the container a context at level 0, under the media: the button is then not proven,
     // and nothing in the page's records says so (chunk 4: why proofs are not kept across draws).
-    const box = (await youtube.locator('#web-world-themes-video-decorations [data-image-id]').boundingBox())!;
+    const box = (await youtube.locator('#around-video-decorations [data-image-id]').boundingBox())!;
     const player = (await youtube.locator('#movie_player').boundingBox())!;
     const place = (fade: boolean) =>
       youtube.evaluate(
@@ -341,13 +341,13 @@ layered(
             const style = document.createElement('style');
             style.id = 'fading-keys';
             style.textContent =
-              '@keyframes ww-test-fade { from { opacity: 1 } 10% { opacity: .4 } to { opacity: .4 } }';
+              '@keyframes around-test-fade { from { opacity: 1 } 10% { opacity: .4 } to { opacity: .4 } }';
             document.head.append(style);
           }
           const wrap = document.createElement('div');
           wrap.id = 'fading';
           // The fade starts after the read that the insertion brings (a delay, no record).
-          wrap.style.cssText = `position:absolute;inset:0;pointer-events:none${fade ? ';animation:ww-test-fade 6s linear 700ms both' : ''}`;
+          wrap.style.cssText = `position:absolute;inset:0;pointer-events:none${fade ? ';animation:around-test-fade 6s linear 700ms both' : ''}`;
           wrap.innerHTML = `<button style="position:absolute;z-index:20;pointer-events:auto;left:${box.x - player.x - 50}px;top:${box.y - player.y + 10}px;width:30px;height:24px">x</button>`;
           document.querySelector('#movie_player')!.append(wrap);
         },
@@ -367,10 +367,10 @@ layered(
   },
 );
 
-/** The layering build with its stacking proof removed on purpose (WW_NO_STACKING_PROOF=1). */
+/** The layering build with its stacking proof removed on purpose (AROUND_NO_STACKING_PROOF=1). */
 const unproofed = test.extend({
   extensionPath: [
-    async ({}, use) => use(await layeringBuild(true, { WW_NO_STACKING_PROOF: '1' })),
+    async ({}, use) => use(await layeringBuild(true, { AROUND_NO_STACKING_PROOF: '1' })),
     { scope: 'worker' },
   ],
 });
@@ -419,7 +419,7 @@ async function editingOverBar(popup: Page, youtube: Page) {
   await editor.getByLabel('画像の高さ').fill('170');
   await editor.getByLabel('画像のX位置').fill('86');
   await editor.getByLabel('画像のY位置').fill('76');
-  const node = youtube.locator('#web-world-themes-video-decorations [data-image-id]');
+  const node = youtube.locator('#around-video-decorations [data-image-id]');
   await expect.poll(() => planeWay(youtube)).toBe('beneath');
   return node;
 }

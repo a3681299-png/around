@@ -31,7 +31,7 @@
 - 保存後のYouTube再読み込み、3素材とグループ／マスクの復元。
 - 強さ0%で装飾・編集用DOM・イベント／レイアウト予約の撤去。
 
-実サイトテストは明示的に WW_LIVE_SIDE_PANEL=1 として実行し、成功した最終 run の completed=true と各チェックを .work/verification/sidepanel-live.json に残した。最終のアセット保護修正を含む実サイト＋fixture 4件は42.7秒でPASS。初期に見つかった不具合と失敗試行は成功扱いしていない。
+実サイトテストは明示的に AROUND_LIVE_SIDE_PANEL=1 として実行し、成功した最終 run の completed=true と各チェックを .work/verification/sidepanel-live.json に残した。最終のアセット保護修正を含む実サイト＋fixture 4件は42.7秒でPASS。初期に見つかった不具合と失敗試行は成功扱いしていない。
 
 サイドパネル内のフォーム／コマンドは本物のネイティブ WebContents に CDP で接続し、DOMイベントで検証する。YouTube側のボタンは Playwright のマウス操作と hit test で確認している。ネイティブパネルを通常のタブへ置き換えたfixtureではない。
 

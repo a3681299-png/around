@@ -120,13 +120,13 @@
 ## 8. 再現
 
 ```bash
-WW_LIVING_TEST=1 WW_LIVING_OUT=.work/living-room-preview \
-  WW_LIVING_CHARACTER=C:/wwt-private/Felis_v0.8.1/work/felis-1024.vrm WW_LIVING_MOTIONS=C:/wwt-private/Felis_v0.8.1/motions \
+AROUND_LIVING_TEST=1 AROUND_LIVING_OUT=.work/living-room-preview \
+  AROUND_LIVING_CHARACTER=C:/wwt-private/Felis_v0.8.1/work/felis-1024.vrm AROUND_LIVING_MOTIONS=C:/wwt-private/Felis_v0.8.1/motions \
   node scripts/build-living-room.mjs
 node scripts/playground/serve.mjs .work/living-room-preview 4183
 ```
 
-テスト用の入口：`__wwLivingRoom.live()`（取り込みの状態・盛り上がり・テンポ）、`.liveFeed(cells, bands)`（タブの代わりに、絵と音を手で与える）、`.dispatch({ type: 'video', id })`・`.dispatch({ type: 'live', on })`、`.resident.rested(0〜1)`（体力を手で決める）。
+テスト用の入口：`__aroundLivingRoom.live()`（取り込みの状態・盛り上がり・テンポ）、`.liveFeed(cells, bands)`（タブの代わりに、絵と音を手で与える）、`.dispatch({ type: 'video', id })`・`.dispatch({ type: 'live', on })`、`.resident.rested(0〜1)`（体力を手で決める）。
 
 ## 9. 没入感の改修と、体力が切れたときの暮らし（2026-11-13、ノート PC、Claude Code）
 

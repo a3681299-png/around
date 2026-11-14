@@ -45,7 +45,7 @@ Claude Code。`codex/living-room`（`eca7c0a`）から。コンテスト用の�
 - 立つ：`marker_stand_window`・`_shelf`・`_center`・`_front`・`_guitar`
 - 画面は `dyn_monitor_screen`・`dyn_monitor2_screen` を別のメッシュにしてある（あとで本物の UI を映せる）
 - 目印の向きは glTF の +Z（Blender では物の -Y）。`readLayout` でそのまま読める
-- ページのテスト用の入口（`WW_LIVING_TEST=1`）で、12 か所すべてが歩ける床の上にあり、歩いて届くことを確かめた（`room-life.ts` の `standPoint`・`walkable`・`floorPath`）
+- ページのテスト用の入口（`AROUND_LIVING_TEST=1`）で、12 か所すべてが歩ける床の上にあり、歩いて届くことを確かめた（`room-life.ts` の `standPoint`・`walkable`・`floorPath`）
 
 ## 5. 確かめ方
 

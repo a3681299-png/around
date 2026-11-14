@@ -6,7 +6,7 @@
   },
   "id": "pinngekjkfjnbhglabnaingjnimjfkdf",
   "before": {
-    "webWorldThemes.design.youtube": {
+    "around.design.youtube": {
       "baseThemeId": "retro",
       "decorations": [],
       "id": "upgrade-artwork",
@@ -25,7 +25,7 @@
     }
   },
   "after": {
-    "webWorldThemes.design.youtube": {
+    "around.design.youtube": {
       "baseThemeId": "retro",
       "decorations": [],
       "id": "upgrade-artwork",
@@ -42,7 +42,7 @@
       "schemaVersion": 13,
       "siteId": "youtube"
     },
-    "webWorldThemes.skinInk.v1": {
+    "around.skinInk.v1": {
       "febad9c3": {
         "light": {}
       }

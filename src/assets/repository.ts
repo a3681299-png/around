@@ -1,6 +1,6 @@
 import type { AssetMetadata } from './validation';
 
-export const ASSET_DATABASE = 'web-world-themes-assets';
+export const ASSET_DATABASE = 'around-assets';
 export interface AssetLease {
   session: string;
   tabId: number;

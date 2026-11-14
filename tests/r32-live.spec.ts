@@ -13,16 +13,16 @@ import { writeContent } from '../scripts/playground/content';
  * R3-2 on real YouTube: the Playground's own artwork (scripts/playground/content.ts), with only the
  * site ID changed, sits on the same anchor and moves the same way. The assets go in through the
  * editor's real import (validation, leases); the artwork is then the Playground's file itself.
- * Headless, so no window or keyboard focus is taken. Explicit: WW_LIVE_R32=1.
+ * Headless, so no window or keyboard focus is taken. Explicit: AROUND_LIVE_R32=1.
  */
 const shots = path.resolve('.work/r32-live');
 const media = (page: Page) =>
   page.locator(
-    ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) .model-media',
+    ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations) .model-media',
   );
 
 test('real YouTube: the Playground artwork sits on the player edge and moves as in the Playground', async () => {
-  test.skip(process.env.WW_LIVE_R32 !== '1', 'Explicit real YouTube verification (WW_LIVE_R32=1).');
+  test.skip(process.env.AROUND_LIVE_R32 !== '1', 'Explicit real YouTube verification (AROUND_LIVE_R32=1).');
   test.setTimeout(240000);
   await mkdir(shots, { recursive: true });
   const content = path.resolve('.work/r32-live/content');
@@ -32,11 +32,11 @@ test('real YouTube: the Playground artwork sits on the player edge and moves as 
   };
   const file = (name: string) => path.join(content, name);
   const design = JSON.parse(await readFile(file('design.json'), 'utf8'));
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-r32-live-')), false);
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-r32-live-')), false);
   try {
     const manager = await context.newPage();
     await manager.goto('chrome://extensions/');
-    const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+    const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
     await item.waitFor();
     const id = await item.evaluate((e) => (e as HTMLElement & { data?: { id: string } }).data?.id ?? e.id);
     await manager.close();
@@ -48,7 +48,7 @@ test('real YouTube: the Playground artwork sits on the player edge and moves as 
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 25000 });
     await declinePromotion(page);
     await showArtwork(popup);
-    await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+    await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
     // The real import: the VRM, its two poses and the room picture, each checked and leased.
     const { panel } = await openEditor(popup, page);
     const vrm = models.find((name) => name.endsWith('.vrm'))!;
@@ -63,7 +63,7 @@ test('real YouTube: the Playground artwork sits on the player edge and moves as 
     await expect(panel.locator('.dirty')).toHaveText('保存済み');
     // Every asset the Playground artwork names is now in the extension's store under the same ID.
     const saved = await popup.evaluate(
-      async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
+      async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'],
     );
     const ids = (value: unknown): string[] => JSON.stringify(value).match(/asset-[0-9a-f]{64}/g) ?? [];
     expect(new Set(ids(saved))).toEqual(new Set(ids(design)));
@@ -118,10 +118,10 @@ test('real YouTube: the Playground artwork sits on the player edge and moves as 
       await video('pause');
       await page.waitForTimeout(2600);
       const on = await page.screenshot({ clip, path: path.join(shots, `${name}-on.png`) });
-      await popup.evaluate(() => chrome.storage.local.set({ 'webWorldThemes.safety.emergencyOff': true }));
+      await popup.evaluate(() => chrome.storage.local.set({ 'around.safety.emergencyOff': true }));
       await expect(media(page)).toHaveCount(0);
       const off = await page.screenshot({ clip, path: path.join(shots, `${name}-off.png`) });
-      await popup.evaluate(() => chrome.storage.local.set({ 'webWorldThemes.safety.emergencyOff': false }));
+      await popup.evaluate(() => chrome.storage.local.set({ 'around.safety.emergencyOff': false }));
       await expect(media(page)).toHaveAttribute('data-renderer', 'three', { timeout: 30000 });
       return popup.evaluate(
         async ([a, b]) => {

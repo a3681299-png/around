@@ -69,12 +69,10 @@ function traceFrameTimes(events: any[]) {
 function browserState() {
   const v = document.querySelector('video'),
     q = v?.getVideoPlaybackQuality(),
-    roots = [...document.querySelectorAll<HTMLElement>('[data-ww-model-stats]')];
+    roots = [...document.querySelectorAll<HTMLElement>('[data-around-model-stats]')];
   // Statistics stay on the main host; player/page planes own separate open shadow roots.
   const planes = [
-    ...document.querySelectorAll(
-      '#web-world-themes-decorations,#web-world-themes-video-decorations,#web-world-themes-page-decorations',
-    ),
+    ...document.querySelectorAll('#around-decorations,#around-video-decorations,#around-page-decorations'),
   ];
   const media = planes.flatMap((root) => [
     ...(root.shadowRoot ?? root).querySelectorAll<HTMLElement>('.model-media'),
@@ -82,7 +80,7 @@ function browserState() {
   const all = roots
     .map((e) => {
       try {
-        return JSON.parse(e.dataset.wwModelStats!);
+        return JSON.parse(e.dataset.aroundModelStats!);
       } catch {
         return undefined;
       }
@@ -123,7 +121,7 @@ async function oneRun(label: string, extensionPath: string, pair: number, calibr
   // User decision during this repair: ordinary browser background load is reference data,
   // not a 5% rejection gate. Ad/visibility/window/GPU checks are unchanged.
   console.log('R31_PERF_START', idLabel);
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-r31-perf-')), false, {
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-r31-perf-')), false, {
     headed: true,
     width: 1920,
     height: 1241,
@@ -139,7 +137,7 @@ async function oneRun(label: string, extensionPath: string, pair: number, calibr
   try {
     const manager = await context.newPage();
     await manager.goto('chrome://extensions/');
-    const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+    const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
     await item.waitFor();
     const id = await item.evaluate((e: any) => e.data?.id ?? e.id);
     await manager.close();
@@ -189,7 +187,7 @@ async function oneRun(label: string, extensionPath: string, pair: number, calibr
       dpr: 1,
     });
     await waitForAdvertToEnd(page);
-    await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+    await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
     const { panel } = await openEditor(popup, page);
     await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
     await expect(panel.locator('.layer')).toHaveCount(1);
@@ -312,7 +310,7 @@ async function oneRun(label: string, extensionPath: string, pair: number, calibr
         await page.goto(URL_, { waitUntil: 'domcontentloaded' });
         await expect(page.locator('#movie_player')).toBeVisible({ timeout: 45000 });
         await waitForAdvertToEnd(page);
-        await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+        await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
         const editor = await openEditor(popup, page);
         result.modelInputEnabled = await editor.panel.locator('.model-file').isEnabled();
         await editor.panel
@@ -338,7 +336,7 @@ async function oneRun(label: string, extensionPath: string, pair: number, calibr
         await editor.panel.locator('.save').click();
         await expect(editor.panel.locator('.dirty')).toHaveText('保存済み');
         result.character = await popup.evaluate(async () => {
-          const d = (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'];
+          const d = (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'];
           const m = d.decorations.find((l: any) => l.kind === 'model3d');
           return {
             embeddedClips: m.source.clips,

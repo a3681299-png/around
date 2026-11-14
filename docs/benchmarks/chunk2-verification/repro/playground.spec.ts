@@ -92,7 +92,7 @@ test('room-only underlay leaves every pixel of the paused picture intact', async
   const after = await page.screenshot({ clip: box, path: path.join(out, `pg-${mode}-picture-after.png`) });
   await page.screenshot({ path: path.join(out, `pg-${mode}-page-after.png`) });
   const css = await page.evaluate(() => {
-    const layer = document.querySelector<HTMLElement>('#web-world-themes-atmosphere-decorations');
+    const layer = document.querySelector<HTMLElement>('#around-atmosphere-decorations');
     const heading = document.querySelector<HTMLElement>('h1')!;
     return {
       atmosphereParent: layer?.parentElement?.tagName,

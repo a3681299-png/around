@@ -10,7 +10,7 @@ import { pngPixels } from './helpers/png-pixels';
 
 /**
  * G1, chunk 3, on real YouTube: the control bands are protected exactly while the bars are shown.
- * A magenta layer sits in the player's bottom-right corner. Headless; explicit: WW_LIVE_BANDS=1.
+ * A magenta layer sits in the player's bottom-right corner. Headless; explicit: AROUND_LIVE_BANDS=1.
  * Every situation keeps the bars up (pointer, keys, pause, adverts, the end screen) and must show
  * no artwork in the band, from the frame the bars appear (the computed clip, read at the class
  * change and on every frame) and on screen (pixels, once the drawing is not held).
@@ -47,7 +47,7 @@ async function watch(page: Page) {
       const check = (when: string) => {
         // While the bars are shown (no ytp-autohide), every plane over the player must cut the bands.
         if (player.classList.contains('ytp-autohide')) return;
-        for (const host of document.querySelectorAll<HTMLElement>('#web-world-themes-video-decorations')) {
+        for (const host of document.querySelectorAll<HTMLElement>('#around-video-decorations')) {
           w.bandChecks++;
           const clip = getComputedStyle(host).clipPath;
           if (clip !== `inset(${top}px 0px ${bottom}px)`) w.bandProblems.push(`${when}: ${clip}`);
@@ -82,15 +82,15 @@ const adShowing = (page: Page) =>
   page.evaluate(() => document.querySelector('#movie_player')!.classList.contains('ad-showing'));
 
 test('real YouTube: the bands are free only while the bars are hidden, from the first shown frame', async () => {
-  test.skip(process.env.WW_LIVE_BANDS !== '1', 'Explicit real YouTube verification (WW_LIVE_BANDS=1).');
+  test.skip(process.env.AROUND_LIVE_BANDS !== '1', 'Explicit real YouTube verification (AROUND_LIVE_BANDS=1).');
   test.setTimeout(420000);
   await mkdir(shots, { recursive: true });
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-bands-live-')), false);
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-bands-live-')), false);
   const report: Record<string, unknown> = {};
   try {
     const manager = await context.newPage();
     await manager.goto('chrome://extensions/');
-    const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+    const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
     await item.waitFor();
     const id = await item.evaluate((e) => (e as HTMLElement & { data?: { id: string } }).data?.id ?? e.id);
     await manager.close();
@@ -98,7 +98,7 @@ test('real YouTube: the bands are free only while the bars are hidden, from the 
     await popup.goto(`chrome-extension://${id}/popup/index.html`);
     const page = await context.newPage();
     await page.setViewportSize({ width: 1280, height: 800 });
-    await page.goto(process.env.WW_LIVE_VIDEO_URL ?? 'https://www.youtube.com/watch?v=LC1a-DwUhls', {
+    await page.goto(process.env.AROUND_LIVE_VIDEO_URL ?? 'https://www.youtube.com/watch?v=LC1a-DwUhls', {
       waitUntil: 'domcontentloaded',
     });
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30000 });
@@ -107,7 +107,7 @@ test('real YouTube: the bands are free only while the bars are hidden, from the 
     // check below opens other videos once the artwork is in place.
     for (let i = 0; i < 60 && (await adShowing(page)); i++) await page.waitForTimeout(500);
     await showArtwork(popup);
-    await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+    await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
     const { panel } = await openEditor(popup, page);
     const data = await page.evaluate(() => {
       const c = document.createElement('canvas');

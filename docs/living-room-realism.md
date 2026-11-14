@@ -42,15 +42,15 @@ Blender 5.2 で全作り直し（PowerShell、worktree 直下）：
 
 ```powershell
 & 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' -b --factory-startup --python-exit-code 1 --python scripts/living-room/run_all.py
-$env:WW_LIVING_TEST='1'
-$env:WW_LIVING_OUT='.work/living-room-preview'
+$env:AROUND_LIVING_TEST='1'
+$env:AROUND_LIVING_OUT='.work/living-room-preview'
 node scripts/build-living-room.mjs
 node scripts/playground/serve.mjs .work/living-room-preview 4181
 ```
 
-既定はライトマップ 4096²、照明 128 samples、頂点照明 128 samples。`WW_SKIP_BAKE=1` と `WW_SAVE=<path.blend>` で造形だけ確認できる。`WW_RENDER=<path.png>` は Blender のカメラレンダー。通常版の `dist` は使わない。
+既定はライトマップ 4096²、照明 128 samples、頂点照明 128 samples。`AROUND_SKIP_BAKE=1` と `AROUND_SAVE=<path.blend>` で造形だけ確認できる。`AROUND_RENDER=<path.png>` は Blender のカメラレンダー。通常版の `dist` は使わない。
 
-Web の画像は `scripts/living-room/capture.mjs <out.png> 1600 1000`。`WW_LIVING_OUT` をビルド先、`PLAYWRIGHT_BROWSERS_PATH` を本体の `.work/browsers` に指定する。近景は `WW_LIVING_VIEW=desk` または `bed`。画面外・本物の GPU で撮る。
+Web の画像は `scripts/living-room/capture.mjs <out.png> 1600 1000`。`AROUND_LIVING_OUT` をビルド先、`PLAYWRIGHT_BROWSERS_PATH` を本体の `.work/browsers` に指定する。近景は `AROUND_LIVING_VIEW=desk` または `bed`。画面外・本物の GPU で撮る。
 
 ## 描画と素材の約束
 

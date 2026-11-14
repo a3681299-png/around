@@ -26,7 +26,7 @@
 | 画角   | 縦 42°（16:9 以上で）。それより縦長の画面では横幅を保つ |
 
 - **壁と天井を足した**（`src/living-room/enclose.ts`）：部屋は切り欠きの模型で、右の壁は腰の高さまで、天井はない。中から見ると右と上が空になる。部屋の大きな面（ライトマップの面）の箱から、右の壁と天井を光を持たない板として足した。色は部屋の暗い隅の色で、明るい側から暗い側へ少し変える。光は受けない（そのため壁紙の色では変わらない）
-- 部屋のファイルのカメラは使わなくなった（ファイルには残っている）。テスト用の `reviewCamera`・`closeUp` は今の視点を基準に動く。視点を試す入口 `__wwLivingRoom.view(position, target, fov)` を足した
+- 部屋のファイルのカメラは使わなくなった（ファイルには残っている）。テスト用の `reviewCamera`・`closeUp` は今の視点を基準に動く。視点を試す入口 `__aroundLivingRoom.view(position, target, fov)` を足した
 
 ### 視点が水平になって変えた計算（`src/living-room/desktop/index.ts`）
 
@@ -110,8 +110,8 @@ OS の真似で終わらせないために、フェリスの存在を UI の側�
 ## 7. 再現
 
 ```bash
-WW_LIVING_TEST=1 WW_LIVING_OUT=.work/living-room-preview \
-  WW_LIVING_CHARACTER=C:/wwt-private/Felis_v0.8.1/work/felis-1024.vrm WW_LIVING_MOTIONS=C:/wwt-private/Felis_v0.8.1/motions \
+AROUND_LIVING_TEST=1 AROUND_LIVING_OUT=.work/living-room-preview \
+  AROUND_LIVING_CHARACTER=C:/wwt-private/Felis_v0.8.1/work/felis-1024.vrm AROUND_LIVING_MOTIONS=C:/wwt-private/Felis_v0.8.1/motions \
   node scripts/build-living-room.mjs
 node scripts/playground/serve.mjs .work/living-room-preview 4183
 ```

@@ -175,7 +175,7 @@
         "world": {
           "id": 5,
           "origin": "chrome-extension://lklggfoekdppadhfakanbohegoabdjce",
-          "name": "Web World Themes",
+          "name": "Around",
           "uniqueId": "3684358762735343056.-6448344283831426969",
           "auxData": { "isDefault": false, "type": "isolated", "frameId": "86588C44225EFC57702C631CB198123D" }
         },
@@ -363,7 +363,7 @@
         "world": {
           "id": 7,
           "origin": "chrome-extension://cjbfkkdimbgikjdhcbiibchcpfhhnlcf",
-          "name": "Web World Themes",
+          "name": "Around",
           "uniqueId": "2172921750345038938.6614328543602909281",
           "auxData": { "isDefault": false, "type": "isolated", "frameId": "4F395EBD6A92DAD1D74F490DB64A23D1" }
         },
@@ -6836,13 +6836,13 @@
     "raw": ".work/ui12-verification/",
     "instrumentation": "Native product build, DevTools trace, 1ms CPU samples, and a document-start observer mark; not the transformed performance build.",
     "thresholdMs": 50,
-    "cacheKey": "webWorldThemes.skinInk.v1"
+    "cacheKey": "around.skinInk.v1"
   },
   "ci": {
     "revision": "bb25217f0fdaa69ac8e70e6e45d6c710c6a07241",
     "run": 40654154708,
     "conclusion": "success",
-    "url": "https://github.com/a3681299-png/web-world-themes/actions/runs/40654154708",
+    "url": "https://github.com/a3681299-png/around/actions/runs/40654154708",
     "note": "Existing CI on the implementation revision; this verification runs only the two requested checks."
   }
 }

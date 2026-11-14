@@ -228,17 +228,17 @@ mainは`022a576e5fb486b5c2fe5632feee66fcb018c953`のまま。mainと実験worktr
 実行例（専用worktreeでPowerShell）:
 
 ```powershell
-$env:WW_ASSET_PROFILE='1'
+$env:AROUND_ASSET_PROFILE='1'
 node scripts/build.mjs
-$env:WW_TEST_EXTENSION_PATH='.work/asset-profile-dist'
+$env:AROUND_TEST_EXTENSION_PATH='.work/asset-profile-dist'
 $env:PLAYWRIGHT_BROWSERS_PATH='C:/Users/sm787/GitHub-Projects/web-world-themes/.work/browsers'
-$env:WW_VRM_FILE='<ローカル原本のフルパス>'
+$env:AROUND_VRM_FILE='<ローカル原本のフルパス>'
 # 機能検証
-$env:WW_ASSET_LAB_TEST='1'
+$env:AROUND_ASSET_LAB_TEST='1'
 node scripts/test.mjs tests/asset-runtime-lab.spec.ts --workers=1
 # 実サイト測定は必要なflagだけ明示し、直列実行する
-# WW_ASSET_RESIDENT_LIVE / WW_ASSET_BINARY_LIVE / WW_ASSET_CACHE_LIVE
-# WW_ASSET_GPU_LIVE / WW_ASSET_SCENARIOS_LIVE / WW_ASSET_QUALITY_LIVE
+# AROUND_ASSET_RESIDENT_LIVE / AROUND_ASSET_BINARY_LIVE / AROUND_ASSET_CACHE_LIVE
+# AROUND_ASSET_GPU_LIVE / AROUND_ASSET_SCENARIOS_LIVE / AROUND_ASSET_QUALITY_LIVE
 node scripts/test.mjs tests/asset-runtime-performance.spec.ts --workers=1
 node scripts/summarize-asset-runtime.mjs
 ```

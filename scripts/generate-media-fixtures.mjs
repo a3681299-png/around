@@ -64,7 +64,7 @@ await writeFile(
     Buffer.from([0x3b]),
   ]),
 );
-const ffmpeg = process.env.WW_FFMPEG;
+const ffmpeg = process.env.AROUND_FFMPEG;
 if (ffmpeg) {
   for (const [file, seconds, size] of [
     ['alpha1080.webm', 2, '1920:1080'],

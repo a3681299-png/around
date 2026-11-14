@@ -20,22 +20,22 @@ Signal Timelineの性能比較テストは、整形済みのJavaScriptを基準�
 
 ## 開発の道具（Claude Code のスキル・プラグイン・MCP）
 
-2026-11-03 に整えた。外部の道具はリポジトリにコミットしない。ユーザーのフォルダ（`~/.claude/`）か、プラグインとして入れる。WWT のスキルは `agent-skills/` にあり、`node scripts/install-skills.mjs` で Claude Code（`~/.claude/skills`）と Codex（`~/.agents/skills`）に入れる。
+2026-11-03 に整えた。外部の道具はリポジトリにコミットしない。ユーザーのフォルダ（`~/.claude/`）か、プラグインとして入れる。Around のスキルは `agent-skills/` にあり、`node scripts/install-skills.mjs` で Claude Code（`~/.claude/skills`）と Codex（`~/.agents/skills`）に入れる。
 
 対象のPC：ノートPC（Intel i7-13650HX、Windows 11、Node 24.16、npm 11.13、Claude Code 2.1.316）。
 
 ### 入れたもの
 
-| もの                                                                                                                                                                                 | 入れた場所                                                                                       | 版（コミット）                                                                                                | 理由                                                                                                                                             |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `threejs-fundamentals`・`threejs-loaders`・`threejs-animation`・`threejs-materials`・`threejs-lighting`・`threejs-shaders`・`threejs-performance`（`CloudAI-X/threejs-skills`、MIT） | `~/.claude/skills/threejs-*`（`SKILL.md` と `LICENSE` をそのまま写した。Codex には入れていない） | `0e181866f095b5f06d005133876e926515390d95`（2026-10-19）。対象は three r186 で、WWT の `three@0.186.1` と合う | 3D の層・キャラ・光の作業で、今の版の API を引けるようにする                                                                                     |
-| `typescript-lsp`（公式の `anthropics/claude-plugins-official`）                                                                                                                      | プラグイン（ユーザー）                                                                           | 1.0.0、`a7ba5b93db0c7c8d17f3f1d25853adca79598a1a`                                                             | 定義・参照・記号の検索（`LSP` ツール）。grep より確実に型の上の参照を追える                                                                      |
-| `typescript-language-server` と `typescript`（言語サーバー）                                                                                                                         | npm のグローバル                                                                                 | 6.0.3 と **6.0.3 に固定**                                                                                     | `typescript` の最新（7.0.2）には `tsserver` がなく、言語サーバーが動かない。リポジトリの `@typescript/typescript6` にも `lib/tsserver.js` がない |
-| `chrome-devtools-mcp`                                                                                                                                                                | npm のグローバル（1.12.0 に固定）、MCP は `chrome-devtools-wwt`（ユーザー）                      | 1.12.0（タグ `chrome-devtools-mcp-v1.12.0`、`af2834411a564d366f9cab63efb046d9084f4dba`）                      | 開いたページの DOM・コンソール・ネットワーク・拡張の service worker を、作業の中で見る。**合否の計測には使わない**（`scripts/g11` のまま）       |
+| もの                                                                                                                                                                                 | 入れた場所                                                                                       | 版（コミット）                                                                                                   | 理由                                                                                                                                             |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `threejs-fundamentals`・`threejs-loaders`・`threejs-animation`・`threejs-materials`・`threejs-lighting`・`threejs-shaders`・`threejs-performance`（`CloudAI-X/threejs-skills`、MIT） | `~/.claude/skills/threejs-*`（`SKILL.md` と `LICENSE` をそのまま写した。Codex には入れていない） | `0e181866f095b5f06d005133876e926515390d95`（2026-10-19）。対象は three r186 で、Around の `three@0.186.1` と合う | 3D の層・キャラ・光の作業で、今の版の API を引けるようにする                                                                                     |
+| `typescript-lsp`（公式の `anthropics/claude-plugins-official`）                                                                                                                      | プラグイン（ユーザー）                                                                           | 1.0.0、`a7ba5b93db0c7c8d17f3f1d25853adca79598a1a`                                                                | 定義・参照・記号の検索（`LSP` ツール）。grep より確実に型の上の参照を追える                                                                      |
+| `typescript-language-server` と `typescript`（言語サーバー）                                                                                                                         | npm のグローバル                                                                                 | 6.0.3 と **6.0.3 に固定**                                                                                        | `typescript` の最新（7.0.2）には `tsserver` がなく、言語サーバーが動かない。リポジトリの `@typescript/typescript6` にも `lib/tsserver.js` がない |
+| `chrome-devtools-mcp`                                                                                                                                                                | npm のグローバル（1.12.0 に固定）、MCP は `chrome-devtools-wwt`（ユーザー）                      | 1.12.0（タグ `chrome-devtools-mcp-v1.12.0`、`af2834411a564d366f9cab63efb046d9084f4dba`）                         | 開いたページの DOM・コンソール・ネットワーク・拡張の service worker を、作業の中で見る。**合否の計測には使わない**（`scripts/g11` のまま）       |
 
 #### 入れる前に読んだこと
 
-- threejs-skills：7つとも `SKILL.md` が1つずつで、references のフォルダはない。先頭の説明・コード以外の文・コードの中を確かめた。外部への通信、破壊的なコマンド、エージェントへの「説明せずに実行」などの指示、宣伝はない。コードは javascript・glsl・html だけで、シェルのコマンドはない。気になる点：例に `cdn.jsdelivr.net` の import map で three を読む書き方があり、新しいシェーダーは WebGPU と TSL を勧めている。WWT は three を同梱し（拡張は外のコードを読めない）、`WebGLRenderer` を使い、作品データからシェーダーを受け取らない。この違いは `wwt-world-runtime` スキルに書いた
+- threejs-skills：7つとも `SKILL.md` が1つずつで、references のフォルダはない。先頭の説明・コード以外の文・コードの中を確かめた。外部への通信、破壊的なコマンド、エージェントへの「説明せずに実行」などの指示、宣伝はない。コードは javascript・glsl・html だけで、シェルのコマンドはない。気になる点：例に `cdn.jsdelivr.net` の import map で three を読む書き方があり、新しいシェーダーは WebGPU と TSL を勧めている。Around は three を同梱し（拡張は外のコードを読めない）、`WebGLRenderer` を使い、作品データからシェーダーを受け取らない。この違いは `around-world-runtime` スキルに書いた
 - typescript-lsp：プラグインの中身は、言語サーバーを起動する設定（`typescript-language-server --stdio`）と README だけ
 - chrome-devtools-mcp：初期設定では、使用統計と、性能の記録の URL（CrUX）を Google に送る。どちらも止めた（下）
 
@@ -43,26 +43,26 @@ Signal Timelineの性能比較テストは、整形済みのJavaScriptを基準�
 
 `claude mcp` には、起動スクリプト `~/.claude/mcp/chrome-devtools-wwt.mjs` を登録した（`node` で起動）。スクリプトが付ける引数：
 
-| 引数                                                                                                            | 理由                                                                                                                                                   |
-| --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `--headless`・`--isolated`                                                                                      | 翔太の作業の前に窓を出さない（AGENTS.md）。プロファイルは使い捨て                                                                                      |
-| `--no-usage-statistics`・`--no-performance-crux`（と環境変数 `CHROME_DEVTOOLS_MCP_NO_USAGE_STATISTICS=1`）      | Google へ何も送らない                                                                                                                                  |
-| `--executablePath=<Playwright の Chromium>`                                                                     | 市販の Chrome（このPCは 156）は、137 以降、コマンドラインから未公開の拡張を読み込まない。Playwright の Chromium は読み込める                           |
-| `--categoryExtensions`・`--chromeArg=--disable-extensions-except=<dist>`・`--chromeArg=--load-extension=<dist>` | WWT の `dist` を読み込んだ状態で開く。`WWT_EXTENSION=0` で読み込まない。`WWT_CHECKOUT` で対象の作業ツリーを変えられる（既定は `.work/creator-editor`） |
+| 引数                                                                                                            | 理由                                                                                                                                                            |
+| --------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--headless`・`--isolated`                                                                                      | 翔太の作業の前に窓を出さない（AGENTS.md）。プロファイルは使い捨て                                                                                               |
+| `--no-usage-statistics`・`--no-performance-crux`（と環境変数 `CHROME_DEVTOOLS_MCP_NO_USAGE_STATISTICS=1`）      | Google へ何も送らない                                                                                                                                           |
+| `--executablePath=<Playwright の Chromium>`                                                                     | 市販の Chrome（このPCは 156）は、137 以降、コマンドラインから未公開の拡張を読み込まない。Playwright の Chromium は読み込める                                    |
+| `--categoryExtensions`・`--chromeArg=--disable-extensions-except=<dist>`・`--chromeArg=--load-extension=<dist>` | Around の `dist` を読み込んだ状態で開く。`AROUND_EXTENSION=0` で読み込まない。`AROUND_CHECKOUT` で対象の作業ツリーを変えられる（既定は `.work/creator-editor`） |
 
-確かめたこと：別のセッションから使い、`HeadlessChrome/143` で開き、WWT の拡張の service worker が一覧に出た。終わったあと、Chromium のプロセスは残らなかった。`list_extensions` は、この Chromium（143）に CDP の `Extensions` ドメインがなく使えない（ほかの道具は使える）。
+確かめたこと：別のセッションから使い、`HeadlessChrome/143` で開き、Around の拡張の service worker が一覧に出た。終わったあと、Chromium のプロセスは残らなかった。`list_extensions` は、この Chromium（143）に CDP の `Extensions` ドメインがなく使えない（ほかの道具は使える）。
 
 **Playwright の Chromium の版が変わったとき**：Playwright は、`install` のたびに、どの Playwright からも使われなくなった版のフォルダを消す（`playwright-core` の `_validateInstallationCache`。`PLAYWRIGHT_SKIP_BROWSER_GC=1` で止まる）。そのため、`.work/browsers/chromium-1243` のようにパスを固定すると、`@playwright/test` を更新して `npm run test:setup` を回した時点で切れる。起動スクリプトは、起動のたびに `.work/browsers` の中で番号の一番大きい `chromium-*` を探すので、**版が変わっても自動で追う**。1つもないときは、`npm run test:setup` を回すよう出して止まる。
 
 ### 入れなかったもの
 
-| もの                                                                                                                     | 理由                                                                                                                           |
-| ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
-| `threejs-react-three-fiber` と、残りの threejs スキル（geometry・textures・postprocessing・interaction・asset-pipeline） | WWT は React Three Fiber を使わない。残りは今の段階で要らない（入れた7つの本文から参照されているが、読まれないだけで害はない） |
-| `cesartevisual/threejs-skills`                                                                                           | 入れないと決めた（レビュー役の調べ）                                                                                           |
-| `quangpl/browser-extension-skills`                                                                                       | 宣伝と「説明せずに実行」の指示がある                                                                                           |
-| `webgl-animation-skills`・`vercel-labs/agent-skills`・`every-frame-is-code`・Context7                                    | 入れないと決めた（レビュー役の調べ）                                                                                           |
-| Blender Web 3D                                                                                                           | 段階6で、部屋の素材を作る場所に入れる。起動の条件が広く、WWT の性能の作業で勝手に読まれるため                                  |
+| もの                                                                                                                     | 理由                                                                                                                              |
+| ------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| `threejs-react-three-fiber` と、残りの threejs スキル（geometry・textures・postprocessing・interaction・asset-pipeline） | Around は React Three Fiber を使わない。残りは今の段階で要らない（入れた7つの本文から参照されているが、読まれないだけで害はない） |
+| `cesartevisual/threejs-skills`                                                                                           | 入れないと決めた（レビュー役の調べ）                                                                                              |
+| `quangpl/browser-extension-skills`                                                                                       | 宣伝と「説明せずに実行」の指示がある                                                                                              |
+| `webgl-animation-skills`・`vercel-labs/agent-skills`・`every-frame-is-code`・Context7                                    | 入れないと決めた（レビュー役の調べ）                                                                                              |
+| Blender Web 3D                                                                                                           | 段階6で、部屋の素材を作る場所に入れる。起動の条件が広く、Around の性能の作業で勝手に読まれるため                                  |
 
 ### 外したもの
 
@@ -75,23 +75,23 @@ Signal Timelineの性能比較テストは、整形済みのJavaScriptを基準�
 
 ### スキルが読まれる順の確認
 
-`claude -p` の別のセッションで、Skill ツールだけを許して、最初に読まれたスキルを見た（2026-11-03）。12 個（threejs の7つと WWT の5つ。のちに `wwt-world-runtime` を足して 13 個）がすべて一覧に出た。
+`claude -p` の別のセッションで、Skill ツールだけを許して、最初に読まれたスキルを見た（2026-11-03）。12 個（threejs の7つと Around の5つ。のちに `around-world-runtime` を足して 13 個）がすべて一覧に出た。
 
-| 言い方                                                                       | 最初に読まれたスキル                                             |
-| ---------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| 「YouTube でスクロールすると拡張が重い。原因を調べたい」                     | `wwt-perf`（`wwt-perf` を広げる前と後の両方）                    |
-| 「SPA 遷移の直後に拡張の CPU 時間が増えた。どこが重いか調べて」              | `wwt-perf`                                                       |
-| 「3D のキャラを置いたページで、スクロールがカクつく」                        | `wwt-perf`（広げる前と後の両方。`threejs-performance` ではない） |
-| 「キャラの歩く速さを作品ごとに変えられるように、作品データに項目を足したい」 | `wwt-design-version`、続けて `wwt-world-runtime`                 |
-| 「カメラの視点の切り替えを world と Host のどちらに作るか決めたい」          | `wwt-world-runtime`                                              |
+| 言い方                                                                       | 最初に読まれたスキル                                                |
+| ---------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| 「YouTube でスクロールすると拡張が重い。原因を調べたい」                     | `around-perf`（`around-perf` を広げる前と後の両方）                 |
+| 「SPA 遷移の直後に拡張の CPU 時間が増えた。どこが重いか調べて」              | `around-perf`                                                       |
+| 「3D のキャラを置いたページで、スクロールがカクつく」                        | `around-perf`（広げる前と後の両方。`threejs-performance` ではない） |
+| 「キャラの歩く速さを作品ごとに変えられるように、作品データに項目を足したい」 | `around-design-version`、続けて `around-world-runtime`              |
+| 「カメラの視点の切り替えを world と Host のどちらに作るか決めたい」          | `around-world-runtime`                                              |
 
 ### claude-mem が各フォルダに書く CLAUDE.md
 
 - claude-mem（9.0.2）は、触ったファイルのフォルダごとに `CLAUDE.md`（`<claude-mem-context>` のメモ）を書く。Claude Code はフォルダの中の `CLAUDE.md` を指示として読むので、AGENTS.md と並ぶルールとして効いてしまい、Codex との前提もずれる
 - claude-mem 9.0.2 には、これを止める設定がない。書き込みの処理（`worker-service.cjs`）が飛ばすのは、`.git` があるフォルダ（リポジトリの直下）だけ
 - `.gitignore` に、直下以外の `CLAUDE.md` を足した（直下の `CLAUDE.md` は `@AGENTS.md` のまま追跡する）。G1.2 の1回目でうっかりコミットした `tests/fixtures/takes/CLAUDE.md` は、追跡だけ外した
-- `scripts/install-skills.mjs` は、スキルのフォルダの `CLAUDE.md` を写さず、比べもしない（claude-mem が `agent-skills/wwt-perf/` にも書き、入れた先へ写っていた）
-- `.gitignore` はコミットを防ぐだけで、Claude Code が読むのは止めない。そこで、Claude Code の設定 `claudeMdExcludes`（読まない `CLAUDE.md` の glob。絶対パスで照合）を、作業ツリーの `.claude/settings.local.json` に入れた（2026-11-03、翔太の決定）。値は `["**/web-world-themes/.work/creator-editor/*/**/CLAUDE.md"]`。直下の `CLAUDE.md`（`@AGENTS.md`）は外れない。このファイルはコミットしない（`.git/info/exclude` に足した。作業ツリーごとの設定なので、別の作業ツリーでは入れ直す）
+- `scripts/install-skills.mjs` は、スキルのフォルダの `CLAUDE.md` を写さず、比べもしない（claude-mem が `agent-skills/around-perf/` にも書き、入れた先へ写っていた）
+- `.gitignore` はコミットを防ぐだけで、Claude Code が読むのは止めない。そこで、Claude Code の設定 `claudeMdExcludes`（読まない `CLAUDE.md` の glob。絶対パスで照合）を、作業ツリーの `.claude/settings.local.json` に入れた（2026-11-03、翔太の決定）。値は `["**/around/.work/creator-editor/*/**/CLAUDE.md"]`。直下の `CLAUDE.md`（`@AGENTS.md`）は外れない。このファイルはコミットしない（`.git/info/exclude` に足した。作業ツリーごとの設定なので、別の作業ツリーでは入れ直す）
 - 確かめたこと：`src/zz-canary/CLAUDE.md`（目印の語を書いた一時のファイル）を置き、新しいセッション（`claude -p`）に `src/host/operation-guard.ts` と同じフォルダのファイルを読ませた。設定の前は目印の語が届いた。設定の後は、受け取ったのがグローバルの `CLAUDE.md`・作業ツリー直下の `CLAUDE.md`・`AGENTS.md` の3つだけで、`src/host/CLAUDE.md` と目印の語は届かなかった。目印のフォルダは消した
 - 設定が効くのは、設定を入れた後に始めたセッションだけ。すでに動いているセッションは、フォルダの `CLAUDE.md` を読み続ける
 
@@ -105,7 +105,7 @@ Signal Timelineの性能比較テストは、整形済みのJavaScriptを基準�
 
 `.work` は計測・テストの出力の置き場で、2026-11-03 には約 54GB（3,385 個）まで育っていた。`scripts/clean-work.mjs` が、次の規則で古いものを消す。
 
-**システムの一時フォルダ（2026-11-07）**：実サイトのテストと計測は、ブラウザーのプロファイルを `os.tmpdir()` に作る（`mkdtemp(tmpdir(), 'ww-…')`、1回 20〜200MB）。だれも消しておらず、`.work` が小さいままノート PC の一時フォルダが 33GB になった。`clean-work.mjs` は、一時フォルダの中で名前が `ww-`・`wwt-`・`c3-`・`c34-`・`c4-`・`g11-`・`g13-`・`ui1-`・`playwright_chromiumdev_profile-` で始まり、6時間書かれていないフォルダを消す。自動の整理（テストと計測の終わり）では、`.work` の大きさや1日1回の決まりによらず毎回消す。ほかのプログラムの一時フォルダには触らない。新しいテストや計測でプロファイルを一時フォルダに作るときは、名前を `ww-` で始める。
+**システムの一時フォルダ（2026-11-07）**：実サイトのテストと計測は、ブラウザーのプロファイルを `os.tmpdir()` に作る（`mkdtemp(tmpdir(), 'around-…')`、1回 20〜200MB）。だれも消しておらず、`.work` が小さいままノート PC の一時フォルダが 33GB になった。`clean-work.mjs` は、一時フォルダの中で名前が `around-`・`around-`・`c3-`・`c34-`・`c4-`・`g11-`・`g13-`・`ui1-`・`playwright_chromiumdev_profile-` で始まり、6時間書かれていないフォルダを消す。自動の整理（テストと計測の終わり）では、`.work` の大きさや1日1回の決まりによらず毎回消す。ほかのプログラムの一時フォルダには触らない。新しいテストや計測でプロファイルを一時フォルダに作るときは、名前を `around-` で始める。
 
 ### 残す規則（上から順に当てはめる）
 
@@ -141,7 +141,7 @@ node scripts/clean-work.mjs
 - 1日に1回まで（`.work/.clean-work-stamp` の時刻で判断）
 - `.work` が **20GB** を超えていたときだけ、同じ規則で消す
 - worktree は外さない（手で実行したときだけ）
-- CI と、`WW_CLEAN_WORK=0` を付けたときは動かない
+- CI と、`AROUND_CLEAN_WORK=0` を付けたときは動かない
 
 ### 2026-11-04 の整理（実行済み）
 
@@ -186,13 +186,13 @@ worktree は比べる基準の2つ（`g13-g12head`＝`4d3f39b`・`g13-before`＝
 
 ### セットアップと運用
 
-- `npm ci` と `npm run test:setup` を実行し、Chromium をデスクトップのチェックアウト直下の `.work/browsers` に用意した。検証用 worktree からは `PLAYWRIGHT_BROWSERS_PATH` にその絶対パスを指定する。検証ビルドは worktree 内の `WW_BUILD_OUT=.work/test-dist` に作り、テストには `WW_TEST_EXTENSION_PATH=.work/test-dist` を指定する。
-- 作業ブランチの `a8a4b5d` から `node scripts/install-skills.mjs` を実行し、Codex の `~/.agents/skills` と Claude Code の `~/.claude/skills` に WWT の6スキルをインストールした。`node scripts/install-skills.mjs --check` は成功。
+- `npm ci` と `npm run test:setup` を実行し、Chromium をデスクトップのチェックアウト直下の `.work/browsers` に用意した。検証用 worktree からは `PLAYWRIGHT_BROWSERS_PATH` にその絶対パスを指定する。検証ビルドは worktree 内の `AROUND_BUILD_OUT=.work/test-dist` に作り、テストには `AROUND_TEST_EXTENSION_PATH=.work/test-dist` を指定する。
+- 作業ブランチの `a8a4b5d` から `node scripts/install-skills.mjs` を実行し、Codex の `~/.agents/skills` と Claude Code の `~/.claude/skills` に Around の6スキルをインストールした。`node scripts/install-skills.mjs --check` は成功。
 - FFmpeg 9.0.1 Essentials を WinGet の `Gyan.FFmpeg.Essentials` でユーザー単位に導入した。ユーザー PATH から `ffmpeg -version` が通り、短い合成映像を VP9/WebM でエンコードできた。[FFmpeg の配布案内](https://ffmpeg.org/download.html)
 - 私用素材は次の手順で取得し、ユーザー環境変数で参照する。
-- スクリーンショットと計測は headless を基本にする。表示が必要な Chrome は `WW_TEST_WINDOW_OFFSCREEN=1` で画面外に置く。e2e 全件を回す場合は、フォーカスを取る前に翔太に伝える。
+- スクリーンショットと計測は headless を基本にする。表示が必要な Chrome は `AROUND_TEST_WINDOW_OFFSCREEN=1` で画面外に置く。e2e 全件を回す場合は、フォーカスを取る前に翔太に伝える。
 - ネイティブのキー送信と画面の検出に頼る5件（`editor-entry.spec.ts` の3件・`skin-verification.spec.ts` の緊急 OFF・`ui0d-emergency.spec.ts`）は、デスクトップでは `c5cbb68` でも `c69d9bb` でも落ちる。ノート PC（1画面）では同じ版で5件とも通る（2026-11-07、Claude Code。1度だけフォーカスの取り合いでキー送信が失敗し、単独で回し直すと通った）。デスクトップの2画面・画面外の窓へのキー送信の環境の問題で、製品の不具合ではない。デスクトップで落ちても、ノート PC で通れば合格として扱い、報告にそう書く
-- 私用素材の共有は、WWT とは別の非公開リポジトリ `a3681299-png/wwt-private-assets`（人は招待しない。大きいファイルは Git LFS）で行う。中身はミルド（元の unitypackage・取り出した中身・変換した VRM・ミルドに当てた .vrma と判定の結果）と Quaternius の Universal Animation Library。トルーシェ・pokke・LP_BaseBody・Mixamo 由来の物は入れていない。ノート PC の `C:\wwt-private\` がこのリポジトリそのもの。WWT 本体のリポジトリには、今までどおり素材を入れない（2026-11-07、翔太の決定）
+- 私用素材の共有は、Around とは別の非公開リポジトリ `a3681299-png/wwt-private-assets`（人は招待しない。大きいファイルは Git LFS）で行う。中身はミルド（元の unitypackage・取り出した中身・変換した VRM・ミルドに当てた .vrma と判定の結果）と Quaternius の Universal Animation Library。トルーシェ・pokke・LP_BaseBody・Mixamo 由来の物は入れていない。ノート PC の `C:\wwt-private\` がこのリポジトリそのもの。Around 本体のリポジトリには、今までどおり素材を入れない（2026-11-07、翔太の決定）
 - デスクトップでの取得（環境変数は今のパス `C:\wwt-private\...` のまま使える）：
   1. Git LFS を入れる（`git lfs version` が通れば済み。なければ `winget install GitHub.GitLFS`）。`gh auth status` で同じアカウントに入っていること
   2. 今の `C:\wwt-private\` を退避する（中身を手で置いた場合。例：`C:\wwt-private.old` へ名前を変える）
@@ -204,7 +204,7 @@ worktree は比べる基準の2つ（`g13-g12head`＝`4d3f39b`・`g13-before`＝
 
 ### 非公開素材のセットアップ（Windows）
 
-WWT と別の非公開リポジトリ `a3681299-png/wwt-private-assets` を使う。Git と Git LFS をインストールし、この非公開リポジトリを読める GitHub アカウントで認証する。旧フォルダーの中身を確認し、退避先がすでにある場合は作業を止めて別の退避先を選ぶ。既存の内容を保持したまま切り替えられるよう、別フォルダーで LFS の確認まで済ませる。
+Around と別の非公開リポジトリ `a3681299-png/wwt-private-assets` を使う。Git と Git LFS をインストールし、この非公開リポジトリを読める GitHub アカウントで認証する。旧フォルダーの中身を確認し、退避先がすでにある場合は作業を止めて別の退避先を選ぶ。既存の内容を保持したまま切り替えられるよう、別フォルダーで LFS の確認まで済ませる。
 
 ```powershell
 git lfs install
@@ -219,15 +219,15 @@ git -C C:\wwt-private-new lfs ls-files
 ```powershell
 $vrm = 'C:\wwt-private\mirdo\work\mirdo-1024.vrm'
 $motions = 'C:\wwt-private\mirdo\motions-pass'
-[Environment]::SetEnvironmentVariable('WW_VRM_FILE', $vrm, 'User')
-[Environment]::SetEnvironmentVariable('WW_CHARACTER_VRM', $vrm, 'User')
-[Environment]::SetEnvironmentVariable('WW_VRMA_DIR', $motions, 'User')
-[Environment]::SetEnvironmentVariable('WW_CHARACTER_MOTIONS', $motions, 'User')
+[Environment]::SetEnvironmentVariable('AROUND_VRM_FILE', $vrm, 'User')
+[Environment]::SetEnvironmentVariable('AROUND_CHARACTER_VRM', $vrm, 'User')
+[Environment]::SetEnvironmentVariable('AROUND_VRMA_DIR', $motions, 'User')
+[Environment]::SetEnvironmentVariable('AROUND_CHARACTER_MOTIONS', $motions, 'User')
 ```
 
-新しいターミナルで `Get-ChildItem Env:WW*` と `Get-Item -LiteralPath $env:WW_CHARACTER_VRM` を実行する。VRM は約1.85 MB。数百バイトしかない場合は LFS のポインターを見ているため、`git lfs pull` を確認する。`Get-ChildItem -LiteralPath $env:WW_CHARACTER_MOTIONS -Filter *.vrma` でミルド用の合格クリップを確認する。判定を再実行するときは対応する JSON がそろった `mirdo/motions` を使う。トルーシェの旧 `character-live` は `manifest.json` と専用サブフォルダーを含む別の動作ディレクトリが必要なので、その実行時だけトルーシェ用の変数を指定する。
+新しいターミナルで `Get-ChildItem Env:WW*` と `Get-Item -LiteralPath $env:AROUND_CHARACTER_VRM` を実行する。VRM は約1.85 MB。数百バイトしかない場合は LFS のポインターを見ているため、`git lfs pull` を確認する。`Get-ChildItem -LiteralPath $env:AROUND_CHARACTER_MOTIONS -Filter *.vrma` でミルド用の合格クリップを確認する。判定を再実行するときは対応する JSON がそろった `mirdo/motions` を使う。トルーシェの旧 `character-live` は `manifest.json` と専用サブフォルダーを含む別の動作ディレクトリが必要なので、その実行時だけトルーシェ用の変数を指定する。
 
-退避先だけにある素材はその場で保管し、必要なときは環境変数で参照する。WWT 本体のリポジトリには素材を入れない。
+退避先だけにある素材はその場で保管し、必要なときは環境変数で参照する。Around 本体のリポジトリには素材を入れない。
 
 ### 動作確認
 
@@ -235,10 +235,10 @@ $motions = 'C:\wwt-private\mirdo\motions-pass'
 | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 型チェック | `npm run typecheck` 成功                                                                                                                                                                                                                                                                                 |
 | lint       | `npm run lint` 成功                                                                                                                                                                                                                                                                                      |
-| unit 全件  | 572 件通過、1 件スキップ。比較用の素体を使う任意の `WW_VRM_COMPARE_FILE` テストが対象。指定したキャラクターと VRMA の unit テストは通過                                                                                                                                                                  |
+| unit 全件  | 572 件通過、1 件スキップ。比較用の素体を使う任意の `AROUND_VRM_COMPARE_FILE` テストが対象。指定したキャラクターと VRMA の unit テストは通過                                                                                                                                                              |
 | e2e        | `npm run test:e2e -- tests/layering.spec.ts` で 1 spec・9 件通過。1 ワーカー                                                                                                                                                                                                                             |
 | 実サイト   | G11 の `smoke` 1 回成功。未ログインの headless Chromium で YouTube の視聴ページを撮影し、動画・操作バー・タイトルが表示されることと、操作保護が有効なことを確認。画像1枚はデスクトップの `.work/verify-desktop-20261107/watch-top.png`。私用素材を使う実サイトテストと `flicker-live` は今回の確認範囲外 |
-| CI         | 対象 `9432b78` は `[skip ci]` の docs コミットで実行履歴なし。報告ブランチの基点 `a8a4b5d` のジョブは、請求または支出上限に関する GitHub 側の制約で開始前に失敗。[CI の実行結果](https://github.com/a3681299-png/web-world-themes/actions/runs/42245038538)                                              |
+| CI         | 対象 `9432b78` は `[skip ci]` の docs コミットで実行履歴なし。報告ブランチの基点 `a8a4b5d` のジョブは、請求または支出上限に関する GitHub 側の制約で開始前に失敗。[CI の実行結果](https://github.com/a3681299-png/around/actions/runs/42245038538)                                                        |
 
 ### G11 同一版の振れ幅
 

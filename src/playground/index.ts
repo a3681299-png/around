@@ -1,4 +1,4 @@
-// The Playground (docs/playground-plan.md): the WWT page runtime on our own video site, with no
+// The Playground (docs/playground-plan.md): the Around page runtime on our own video site, with no
 // extension. Only this entry and its two ports differ from the extension's content script; the
 // renderers, world, operation safety and artwork validation are the same code.
 import { createPageController } from '../host/page-controller';
@@ -11,8 +11,8 @@ import { openSpatial } from './spatial';
 import { mountDesktopShell } from './desktop';
 import { parseDesktopLayout } from './desktop-layout';
 
-declare const __WW_PLAYGROUND_TEST__: boolean;
-declare const __WW_PLAYGROUND_MIRDO__: boolean;
+declare const __AROUND_PLAYGROUND_TEST__: boolean;
+declare const __AROUND_PLAYGROUND_MIRDO__: boolean;
 
 async function start() {
   mountPlayer(document);
@@ -32,15 +32,15 @@ async function start() {
   controller.updateDesign(design);
   const apply = document.querySelector<HTMLButtonElement>('#apply')!;
   const page = document.querySelector<HTMLElement>('#watch-page')!;
-  const video = document.querySelector<HTMLVideoElement>('video[data-ww-video]')!;
+  const video = document.querySelector<HTMLVideoElement>('video[data-around-video]')!;
   const openDesktop = document.querySelector<HTMLButtonElement>('#open-desktop')!;
   const closeDesktop = document.querySelector<HTMLButtonElement>('#close-desktop')!;
   const shell = mountDesktopShell(video);
   const layout = parseDesktopLayout(manifest.desktop);
   if (layout.room) void assets.load(layout.room.asset).catch(() => undefined);
   const desktopHash = () => location.hash === '#desktop';
-  const basicOnly = __WW_PLAYGROUND_TEST__ && new URLSearchParams(location.search).has('basic');
-  // The demo opens on the plain site and the viewer presses「WWT を適用」(design, demo scene 1→2);
+  const basicOnly = __AROUND_PLAYGROUND_TEST__ && new URLSearchParams(location.search).has('basic');
+  // The demo opens on the plain site and the viewer presses「Around を適用」(design, demo scene 1→2);
   // only a direct #desktop link starts applied.
   let applied = desktopHash(),
     stopped = false;
@@ -52,11 +52,11 @@ async function start() {
     spatial?.setDesktop(desktop);
     controller.update({ enabled: applied && !spatial, creatorMode: false });
     apply.setAttribute('aria-pressed', String(applied));
-    apply.textContent = applied ? '元に戻す' : 'WWT を適用';
-    document.documentElement.toggleAttribute('data-ww-applied', applied);
+    apply.textContent = applied ? '元に戻す' : 'Around を適用';
+    document.documentElement.toggleAttribute('data-around-applied', applied);
     // Set only after enter() had its chance: the 3D board measures the page without the
     // basic layout's extra room for the seated feet (style.css).
-    document.documentElement.toggleAttribute('data-ww-basic', applied && !spatial && !stopped);
+    document.documentElement.toggleAttribute('data-around-basic', applied && !spatial && !stopped);
   };
   function enter(preferCanvas = true) {
     if (basicOnly || stopped || spatial || !applied) return;
@@ -119,17 +119,17 @@ async function start() {
       render();
     }
   });
-  document.querySelector<HTMLElement>('#mirdo-credits')!.hidden = !__WW_PLAYGROUND_MIRDO__;
+  document.querySelector<HTMLElement>('#mirdo-credits')!.hidden = !__AROUND_PLAYGROUND_MIRDO__;
   route();
   apply.disabled = false;
-  if (__WW_PLAYGROUND_TEST__)
+  if (__AROUND_PLAYGROUND_TEST__)
     Object.assign(globalThis, {
-      __wwPlayground: { controls: () => playgroundControls(document) },
+      __aroundPlayground: { controls: () => playgroundControls(document) },
     });
 }
 
 void start().catch((error: unknown) => {
   const status = document.querySelector<HTMLElement>('#status');
   if (status) status.textContent = error instanceof Error ? error.message : '読み込めませんでした。';
-  console.error('[WWT Playground]', error);
+  console.error('[Around Playground]', error);
 });

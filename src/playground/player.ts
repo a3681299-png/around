@@ -1,6 +1,6 @@
 /** The site's own player and list (not the engine): play, seek, volume and switching videos. */
 export function mountPlayer(doc: Document): void {
-  const video = doc.querySelector<HTMLVideoElement>('video[data-ww-video]')!,
+  const video = doc.querySelector<HTMLVideoElement>('video[data-around-video]')!,
     play = doc.querySelector<HTMLButtonElement>('#play')!,
     seek = doc.querySelector<HTMLInputElement>('#seek')!,
     volume = doc.querySelector<HTMLInputElement>('#volume')!,
@@ -34,7 +34,7 @@ export function mountPlayer(doc: Document): void {
   volume.addEventListener('input', () => {
     video.volume = Number(volume.value) / 100;
   });
-  const links = [...doc.querySelectorAll<HTMLAnchorElement>('[data-ww-list] a[data-video]')];
+  const links = [...doc.querySelectorAll<HTMLAnchorElement>('[data-around-list] a[data-video]')];
   const search = doc.querySelector<HTMLInputElement>('#search')!;
   search.addEventListener('input', () => {
     const query = search.value.trim().toLocaleLowerCase();

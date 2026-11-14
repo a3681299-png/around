@@ -16,10 +16,7 @@ test('shared motion UI pursues, stops, rotates, keeps handles aligned and preser
   await expect(panel.locator('.dirty')).toHaveText('保存済み');
   const stored = () =>
     popup.evaluate(
-      async () =>
-        (await chrome.storage.local.get('webWorldThemes.design.youtube'))[
-          'webWorldThemes.design.youtube'
-        ] as DesignDocument,
+      async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'] as DesignDocument,
     );
   const before = (await stored()).decorations[0]!.placement;
   await panel.getByLabel('レイヤーのマウス追跡').check();
@@ -29,7 +26,7 @@ test('shared motion UI pursues, stops, rotates, keeps handles aligned and preser
   await panel.getByLabel('追従の遅延').press('Tab');
   await panel.getByLabel('マウスとの停止距離').fill('40');
   await panel.getByLabel('マウスとの停止距離').press('Tab');
-  const image = youtube.locator('#web-world-themes-decorations .image');
+  const image = youtube.locator('#around-decorations .image');
   const point = () =>
     image.evaluate((node: HTMLElement) => ({
       x: Number.parseFloat(node.style.left),
@@ -92,7 +89,7 @@ test('shared motion UI pursues, stops, rotates, keeps handles aligned and preser
     .poll(async () => {
       const value: unknown = await popup.evaluate(
         async (key) => (await chrome.storage.session.get(key))[key],
-        'webWorldThemes.studio.session.' + target,
+        'around.studio.session.' + target,
       );
       return unpackCheckpoint(value)?.draft.decorations[0]?.locked;
     })
@@ -133,7 +130,7 @@ test('shared motion UI pursues, stops, rotates, keeps handles aligned and preser
   await expect(panel.locator('.dirty')).toHaveText('保存済み');
   expect((await stored()).decorations[0]!.placement.x).toBeCloseTo(before.x + 60 / scale, 3);
   await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
-  await expect(youtube.locator('#web-world-themes-decorations')).toHaveCount(0);
+  await expect(youtube.locator('#around-decorations')).toHaveCount(0);
   await showArtwork(popup);
   await expect(image).toBeVisible();
   await youtube.emulateMedia({ reducedMotion: 'reduce' });

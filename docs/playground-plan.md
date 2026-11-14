@@ -1,6 +1,6 @@
 # Playground（コンテスト用の公開サイト）：調べと設計案
 
-2026-11-05、Claude Code。コードは変えていない。ロリポップ!「デプロイナウコンテスト2026」（締切 12/8、目標は **12/5 に応募**）に向けて、拡張なしで WWT のエンジンを動かす自前の動画サイトを作れるかを調べた。キャラの自律行動は [autonomy-plan.md](autonomy-plan.md)。
+2026-11-05、Claude Code。コードは変えていない。ロリポップ!「デプロイナウコンテスト2026」（締切 12/8、目標は **12/5 に応募**）に向けて、拡張なしで Around のエンジンを動かす自前の動画サイトを作れるかを調べた。キャラの自律行動は [autonomy-plan.md](autonomy-plan.md)。
 
 ## 塊1の独立検証（2026-11-05、Codex）
 
@@ -20,7 +20,7 @@
 
 ### 1. 起動の p95：プロファイルで分かったこと
 
-`tests/startup-profile.spec.ts`（`WW_PROFILE_STARTUP=1`、診断用）で、447b2bf と 0638453 の通常のビルド（Codex の worktree のもの）を交互に、実 YouTube の視聴ページを再読込してからの6秒の V8 の CPU プロファイルを取った。場面は Codex と同じ「キャラなし」（`petal.png` の1層、プレーヤー基準）。headless、200µs ごとの標本。
+`tests/startup-profile.spec.ts`（`AROUND_PROFILE_STARTUP=1`、診断用）で、447b2bf と 0638453 の通常のビルド（Codex の worktree のもの）を交互に、実 YouTube の視聴ページを再読込してからの6秒の V8 の CPU プロファイルを取った。場面は Codex と同じ「キャラなし」（`petal.png` の1層、プレーヤー基準）。headless、200µs ごとの標本。
 
 | 組（交互）          | 447b2bf の拡張の自分の時間                  | 0638453                                     |
 | ------------------- | ------------------------------------------- | ------------------------------------------- |
@@ -60,8 +60,8 @@
 | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 型チェック・lint  | 通った（新しい ESLint の規則を含む）                                                                                                                            |
 | unit              | 全件（下の CI）。`browser-boundary` 3件                                                                                                                         |
-| e2e（触った部分） | `operation-live`（`WW_LIVE_OPERATIONS=1`、実 YouTube）1件通過                                                                                                   |
-| 診断              | `startup-profile`（`WW_PROFILE_STARTUP=1`）2回・計8組                                                                                                           |
+| e2e（触った部分） | `operation-live`（`AROUND_LIVE_OPERATIONS=1`、実 YouTube）1件通過                                                                                               |
+| 診断              | `startup-profile`（`AROUND_PROFILE_STARTUP=1`）2回・計8組                                                                                                       |
 | CI                | `7688942` 成功（unit と e2e 4台）。塊2（`codex/chunk2-r3-2`）はこの上に載せ直した（型チェック・lint・unit 546 通過、塊2で触った部分の e2e 37 通過・1 スキップ） |
 
 後回しにした2件（`operation-live` の `k`、`signal-timeline-live` の wheel）は [r3-plan.md の「後回し」](r3-plan.md)に1行ずつ書いた。
@@ -72,7 +72,7 @@
 
 | #   | 確かめたこと               | 結果                                                                                                                                                                                                                                                                                                         |
 | --- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1   | 拡張なしでエンジンが動くか | **動いた**。拡張を読み込まないふつうの headless Chromium で、自前の動画サイト（みるばこ）に作品を当て、「WWT を適用」で切り替えて戻せた。素材は `fetch`、作品は `parseDesign`、素材の検査は拡張と同じ `validateAssetBytes`。CSP の違反とコンソールのエラーは0件（`tests/playground.spec.ts`）                |
+| 1   | 拡張なしでエンジンが動くか | **動いた**。拡張を読み込まないふつうの headless Chromium で、自前の動画サイト（みるばこ）に作品を当て、「Around を適用」で切り替えて戻せた。素材は `fetch`、作品は `parseDesign`、素材の検査は拡張と同じ `validateAssetBytes`。CSP の違反とコンソールのエラーは0件（`tests/playground.spec.ts`）             |
 | 2   | VRM を縁に置けたか         | **置けた**。リポジトリの試験用の骨組み（`vrmFixture`、私用 VRM・トルーシェ・Mixamo なし）を、拡張と同じ three.js の描画でプレーヤーの上辺の右寄りに置いた。キャラの箱がプレーヤーの上辺をまたぐこと、中心が右から2割以内にあることを e2e で確かめた。作品の位置の基準は YouTube と同じ定数（`video-player`） |
 | 3   | 配置の確かめの束を作ったか | **作った**。`npm run build:deploy-probe` → `dist-deploy-probe/`（20MB の `.vrm` と `.glb`、表を出すページ）。手元の静的サーバーでは3件とも読めて中身一致。**DeployNow に置いたあとの確かめは翔太の手元で**（手順は 10 節「確かめの束」）                                                                     |
 
@@ -103,7 +103,7 @@
 
 - **素材の照合**（`src/playground/assets.ts`）：素材の ID は中身の SHA-256 なので、`fetch` したバイトの SHA-256 が ID と一致しなければ使わない。そのあと拡張と同じ `validateAssetBytes` と `prepareVerifiedSource` を通す。配信側が中身を変えても、名前を変えても、別物は入らない
 - **出力の検査**（`scripts/playground/check-output.mjs`）：出力の全ファイルの名前と中身（latin1 と UTF-8 で読む）に、トルーシェ・`PochibyKT`・`mixamo`・`usamimi` がないか、ビルドが作っていないモデルや動作（`.vrm`・`.vrma`・`.glb`・`.fbx` など）がないかを見る。違反があれば出力を消して止まる。unit（`tests/playground-output.spec.ts`）で、きれいな出力・各違反・名前を変えた Mixamo の glb を確かめた
-- **G1**：アダプターはページの `data-ww-control` を全部、操作面として渡す。e2e で、ページのボタン・リンク・入力・動画が全部一覧にあること、`#play` から印を外すと `['play']` が漏れとして出ることを確かめた。作品を当てた状態でも、各操作部品の中心で `elementFromPoint` が本物の部品に当たり、再生ボタンで再生と停止ができる
+- **G1**：アダプターはページの `data-around-control` を全部、操作面として渡す。e2e で、ページのボタン・リンク・入力・動画が全部一覧にあること、`#play` から印を外すと `['play']` が漏れとして出ることを確かめた。作品を当てた状態でも、各操作部品の中心で `elementFromPoint` が本物の部品に当たり、再生ボタンで再生と停止ができる
 - **CSP**：`script-src 'self'`（インラインのスクリプトなし）。`connect-src` に `blob:` が要る（glTF の読み込みが、自分で展開したテクスチャを blob URL で読むため）
 - **位置の基準の共有**：YouTube と Playground のアダプターは同じ `SHARED_DECORATION_ANCHORS` を使う。同じ作品が、アダプターを替えるだけで両方に乗る
 
@@ -172,7 +172,7 @@
 - **9節（素材の扱い）**：部屋の素材に、焼き込んだ光の画像や、描いた絵と奥行きの画像が加わる見込み。どれも画像のファイルなので、「取り出せる」の扱いは同じ。案 a・b・d の考え方は変わらない。描いた絵の形なら、部屋の glTF そのものを公開せずに済むので、案 a（公開してよい物だけ使う）がしやすくなる
 - **部屋の層**：今の Playground の部屋の層は「雰囲気」（atmosphere）として、ページの上に上限の不透明度で重ねている（上の「適用後」の見え方）。新しい空間では、部屋は **UI の奥**に置き、UI はガラスの板として手前に浮かぶ。Playground はページが自前なので、部屋を UI の奥に置く形を先に試しやすい（`codex/chunk4-layering` の docs/layering-plan.md、Playground の節）
 - **R5 の大きさ**：R5「世界の層」と R6 は、新しい方針で組み直すことになった。下の「本体の R3〜R5 との並べ方」の「R5 の大きさ次第」は、さらに分からなくなった。コンテストの範囲には入れない（設計書）
-- 最初の作品の中身とデモの台本は、これから決まる。Playground の見せ場（「WWT を適用」でただの動画サイトが別の世界に変わる）は変わらない
+- 最初の作品の中身とデモの台本は、これから決まる。Playground の見せ場（「Around を適用」でただの動画サイトが別の世界に変わる）は変わらない
 
 ## 0. 結論
 
@@ -198,7 +198,7 @@
 
 | 何                     | 今（拡張）                                                                                 | Playground                                                                                       | 境界                                                                                                                                                                                     |
 | ---------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 設定（作品を表示する） | `src/storage/settings.ts`（`chrome.storage.local`）                                        | 「WWT を適用」ボタンの状態（ページのメモリー。残したければ `localStorage`）                      | `storage/` は `browser/` の外で chrome.* を使っている                                                                                                                                    |
+| 設定（作品を表示する） | `src/storage/settings.ts`（`chrome.storage.local`）                                        | 「Around を適用」ボタンの状態（ページのメモリー。残したければ `localStorage`）                   | `storage/` は `browser/` の外で chrome.* を使っている                                                                                                                                    |
 | 緊急 OFF               | `src/storage/safety.ts`（`chrome.storage`）＋ Alt+Shift+Q                                  | 同じキーと「元に戻す」ボタン。メモリーだけ                                                       | 同上                                                                                                                                                                                     |
 | 作品の読み込み         | `src/storage/designs.ts`（`chrome.storage`）                                               | サイトに置いた作品の JSON を `fetch` し、`parseDesign` で検証                                    | 同上                                                                                                                                                                                     |
 | 素材の読み込み         | `src/assets/client.ts`（`chrome.runtime` で background と IndexedDB、読み取り用の iframe） | サイトに置いたファイルを `fetch`。**同じ `inspectAsset` を通す**（自分の素材でも検証は省かない） | **描画（`renderers/three/models.ts`・`media/resources.ts`・`renderers/dom/scene.ts`）が `assets/client` を直接 import している。** `models.ts` だけは `readAsset` を引数で差し替えられる |
@@ -229,7 +229,7 @@
 | 要るもの     | 中身                                                                                                                                                                                                                                                |
 | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 部品の位置   | プレーヤー・タイトル・動画の一覧のカード。`designTargets`・`decorationAnchors`（`video-player`）                                                                                                                                                    |
-| 操作面（G1） | 再生ボタン・シークバー・音量・一覧のリンク・「WWT を適用」ボタン。`operationSurfaces` に自分の印で渡す。プレーヤーの操作帯は、YouTube の上 64px・下 112px ではなく、**自分のプレーヤーの実際の範囲**にする                                          |
+| 操作面（G1） | 再生ボタン・シークバー・音量・一覧のリンク・「Around を適用」ボタン。`operationSurfaces` に自分の印で渡す。プレーヤーの操作帯は、YouTube の上 64px・下 112px ではなく、**自分のプレーヤーの実際の範囲**にする                                       |
 | 重なりの層   | 拡張の層をどこに入れるか（YouTube の `overlaySlot`・`pageSlot` にあたるもの）。自分のサイトなので、層の要素を最初から置いておける                                                                                                                   |
 | ページの変化 | 一覧の差し替え（次の動画を選んだとき）だけ。`connect` の通知に、差し替えた要素を渡す                                                                                                                                                                |
 | 動画の再生   | 自分の `<video>` を `PlaybackSource` として渡す                                                                                                                                                                                                     |
@@ -269,7 +269,7 @@
 ### 形
 
 1. 自前の動画サイト：プレーヤー（自前のシークバー）・タイトル・一覧の1ページ。YouTube に似せない
-2. 「WWT を適用」ボタンで、着せ替え（色・枠）と背景の絵の層が切り替わる（今のエンジンでできる）
+2. 「Around を適用」ボタンで、着せ替え（色・枠）と背景の絵の層が切り替わる（今のエンジンでできる）
 3. 再配布できる VRM が1体、プレーヤーの上の縁に座る
 4. 内部状態は**退屈と驚き（警戒）の2つ**。退屈 → 足をぶらぶら・見回す。カーソルの急接近 → びくっとして身を引く。何度も驚くと警戒が上がる
 5. 動画の明るさで背景の光が変わる
@@ -349,7 +349,7 @@ gantt
 
 #### 置いて確かめた結果（2026-11-05、Claude Code）
 
-**静的なファイルのまま置けて、20MB の `.vrm`・`.glb` も中身を変えずに読めた。** Next.js の入れ物は要らない（`deploy/` は作っていない）。公開の URL は `https://wwt-deploy-probe.lolipop-now.app/`（プロジェクト `wwt-deploy-probe`、Free プラン）。
+**静的なファイルのまま置けて、20MB の `.vrm`・`.glb` も中身を変えずに読めた。** Next.js の入れ物は要らない（`deploy/` は作っていない）。公開の URL は `https://wwt-deploy-probe.lolipop-now.app/`（プロジェクト `around-deploy-probe`、Free プラン）。
 
 ![公開した確かめのページ（headless で開いた表）](screenshots/playground/deploy-probe-live.png)
 
@@ -377,9 +377,9 @@ gantt
 
 **Playground 本番を置くときの手順**
 
-3D 版のローカルビルドには、[Playground の3Dの板](playground-3d.md) の素材設定を使う（`WW_PLAYGROUND_PRIVATE_ASSETS` は `WW_PLAYGROUND_MIRDO_ROOT` と同じ意味で、どちらも許可した素材のハッシュで照合する）。公開に進む場合は、ビルドに含まれる素材の配布条件を確認する。
+3D 版のローカルビルドには、[Playground の3Dの板](playground-3d.md) の素材設定を使う（`AROUND_PLAYGROUND_PRIVATE_ASSETS` は `AROUND_PLAYGROUND_MIRDO_ROOT` と同じ意味で、どちらも許可した素材のハッシュで照合する）。公開に進む場合は、ビルドに含まれる素材の配布条件を確認する。
 
-1. 作業ブランチで `WW_PLAYGROUND_MIRDO_ROOT` に `wwt-private-assets` のローカルチェックアウトを指定し、`npm run build:playground`。許可した素材とその内容を照合し、出力検査（トルーシェ・私用 VRM・Mixamo・一覧にないモデル）に失敗した場合は出力を消して止まる。[ミルドのビルドと確認結果](playground-mirdo.md)
+1. 作業ブランチで `AROUND_PLAYGROUND_MIRDO_ROOT` に `wwt-private-assets` のローカルチェックアウトを指定し、`npm run build:playground`。許可した素材とその内容を照合し、出力検査（トルーシェ・私用 VRM・Mixamo・一覧にないモデル）に失敗した場合は出力を消して止まる。[ミルドのビルドと確認結果](playground-mirdo.md)
 2. `dist-playground/` を、リポジトリの外の空のフォルダに写す（`.gitignore` の対象なので、中からは置けない）
 3. そのフォルダで、初回は `npx -y lolipop@2.0.8 deploy --name <名前> --framework static --org <組織の ID>`。2回目からは `--project <ID>`（`npx -y lolipop@2.0.8 project list`）
 4. `npx -y lolipop@2.0.8 deployment show <デプロイの ID>` が READY になってから、1分ほど待って開く。Playground の e2e と同じ確かめ（適用・解除・Alt+Shift+Q・コンソールのエラー0件）を、公開の URL で headless に回す

@@ -38,14 +38,14 @@ for (const [side, kind] of [
         await expect(page.locator('#movie_player')).toBeVisible({ timeout: 45000 });
         await declinePromotion(page);
         await waitForAdvertToEnd(page);
-        await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+        await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
       }
       async function state(stage: string) {
         result.stages.push({
           stage,
           html: await page.locator('html').evaluate((e: HTMLElement) => ({
             errors: e.getAttribute('data-verification-model-errors'),
-            safety: e.getAttribute('data-ww-safety'),
+            safety: e.getAttribute('data-around-safety'),
           })),
           media: await page
             .locator('.model-media')
@@ -53,8 +53,8 @@ for (const [side, kind] of [
               es.map((e) => ({ ...e.dataset, visibility: getComputedStyle(e).visibility })),
             ),
           stats: await page
-            .locator('[data-ww-model-stats]')
-            .evaluateAll((es: HTMLElement[]) => es.map((e) => e.dataset.wwModelStats)),
+            .locator('[data-around-model-stats]')
+            .evaluateAll((es: HTMLElement[]) => es.map((e) => e.dataset.aroundModelStats)),
         });
       }
       await page.goto(url, { waitUntil: 'domcontentloaded' });

@@ -21,7 +21,7 @@ test('G1.4 live shot', async () => {
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto('https://www.youtube.com/watch?v=LC1a-DwUhls', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30000 });
-    await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube', { timeout: 30000 });
+    await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube', { timeout: 30000 });
     await page.waitForTimeout(1000);
     await waitForAdvertToEnd(page);
     await declinePromotion(page);
@@ -44,7 +44,7 @@ test('G1.4 live shot', async () => {
     await panel.locator('.save').click();
     await expect(panel.locator('.dirty')).toHaveText('保存済み');
     const saved: any = await popup.evaluate(
-      async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
+      async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'],
     );
     await studio.close();
     const bar = await page.evaluate(() => {
@@ -60,7 +60,7 @@ test('G1.4 live shot', async () => {
     });
     follow.keyframes[0]!.value = 0;
     follow.keyframes[1]!.value = 40;
-    await popup.evaluate((design) => chrome.storage.local.set({ 'webWorldThemes.design.youtube': design }), {
+    await popup.evaluate((design) => chrome.storage.local.set({ 'around.design.youtube': design }), {
       ...saved,
       decorations: [
         // One over the picture (drawn whole), one across the like/share row (cut around the buttons).
@@ -89,8 +89,8 @@ test('G1.4 live shot', async () => {
     // that churn is a different reason for invisibility; compare the settled compositor itself.
     const stopped = () =>
       page
-        .locator('#web-world-themes-decorations')
-        .evaluate((node) => JSON.parse((node as HTMLElement).dataset.wwSafety ?? '{}').stopped ?? '');
+        .locator('#around-decorations')
+        .evaluate((node) => JSON.parse((node as HTMLElement).dataset.aroundSafety ?? '{}').stopped ?? '');
     await expect.poll(stopped, { timeout: 45000 }).toBe('');
     const noInputSince = await page.evaluate(() => performance.now());
     await page.waitForTimeout(Number(process.env.G14_IDLE_MS ?? 3000));
@@ -98,12 +98,12 @@ test('G1.4 live shot', async () => {
     const state: any = await page.evaluate(() => ({
       at: performance.now(),
       hidden: document.hidden,
-      geometry: JSON.parse(document.documentElement.getAttribute('data-ww-guard-geometry') ?? '[]'),
-      rechecks: JSON.parse(document.documentElement.getAttribute('data-ww-g14-rechecks') ?? '[]'),
+      geometry: JSON.parse(document.documentElement.getAttribute('data-around-guard-geometry') ?? '[]'),
+      rechecks: JSON.parse(document.documentElement.getAttribute('data-around-g14-rechecks') ?? '[]'),
       clip: document
-        .querySelector<HTMLElement>('#web-world-themes-decorations')
-        ?.style.getPropertyValue('--ww-decoration-clip'),
-      safety: document.querySelector('#web-world-themes-decorations')?.getAttribute('data-ww-safety'),
+        .querySelector<HTMLElement>('#around-decorations')
+        ?.style.getPropertyValue('--around-decoration-clip'),
+      safety: document.querySelector('#around-decorations')?.getAttribute('data-around-safety'),
       layers: [...document.querySelectorAll<HTMLElement>('[id$="decorations"]')].flatMap((host) =>
         [...(host.shadowRoot?.querySelectorAll<HTMLElement>('[data-image-id]') ?? [])].map((node) => ({
           host: host.id,
@@ -131,7 +131,7 @@ test('G1.4 live shot', async () => {
       write: false,
       format: 'iife',
       globalName: 'G14Native',
-      dropLabels: ['WW_GUARD_TRACE', 'WW_TEST_PAGE_CHANGE'],
+      dropLabels: ['AROUND_GUARD_TRACE', 'AROUND_TEST_PAGE_CHANGE'],
     });
     const expression =
       bundle.outputFiles[0]!.text +

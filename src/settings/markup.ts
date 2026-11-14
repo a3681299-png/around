@@ -1,11 +1,11 @@
-/** One markup template for the popup and the panel the in-video icon opens. It wears the WWT Studio
+/** One markup template for the popup and the panel the in-video icon opens. It wears the Around Studio
  * design system (settings.css). 緊急OFF and 操作チェック are added by safety-controls.ts. */
 export const SETTINGS_MARKUP = `
-  <header class="ww-titlebar">
+  <header class="around-titlebar">
     <h2>設定</h2>
     <button type="button" class="close" aria-label="設定を閉じる"></button>
   </header>
-  <div class="ww-editor-body">
+  <div class="around-editor-body">
     <section class="creator-entry">
       <div class="editor-actions">
         <button type="button" id="creator-editor-direct" class="primary" disabled>エディターを開く</button>
@@ -18,7 +18,7 @@ export const SETTINGS_MARKUP = `
       </div>
       <p id="creator-mode-help" class="feature-description">ONのとき、拡張アイコンと動画の中のアイコンから直接エディターを開きます。設定はエディター内から開けます。</p>
     </section>
-    <fieldset class="ww-group">
+    <fieldset class="around-group">
       <legend>作品</legend>
       <div class="control-row">
         <label for="show-artwork">作品を表示する</label>

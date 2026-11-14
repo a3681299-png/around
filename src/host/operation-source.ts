@@ -234,12 +234,11 @@ export function createOperationSource(
         fullScan = true;
         return;
       }
-      if (r.target.closest('[id^="web-world-themes"]')) continue;
+      if (r.target.closest('[id^="around"]')) continue;
       if (r.type === 'attributes') {
         if (MATCHING_ATTRIBUTES.has(r.attributeName ?? '')) touched.add(r.target);
       } else
-        for (const node of r.addedNodes)
-          if (node instanceof Element && !node.id.startsWith('web-world-themes')) added.add(node);
+        for (const node of r.addedNodes) if (node instanceof Element && !node.id.startsWith('around')) added.add(node);
       if (added.size + touched.size > MAX_INCREMENTAL_ROOTS) {
         fullScan = true;
         added.clear();
@@ -252,14 +251,14 @@ export function createOperationSource(
   /** Resize, fonts and ResizeObserver (a surface's size changed): anything may have moved. */
   const changed = () => {
     // The trace tells scroll, resize and fonts apart with its own listeners; the rest is resize-observer.
-    WW_GUARD_TRACE: traceGeometryCause('changed');
+    AROUND_GUARD_TRACE: traceGeometryCause('changed');
     geometryDirty = true;
     change('layout');
   };
   /** A page scroll moves every surface that scrolls with the page by the same amount, which a
    * shifted snapshot follows exactly. A scroll inside an element moves only its contents. */
   const scrolled = (event: Event) => {
-    WW_GUARD_TRACE: traceGeometryCause('changed');
+    AROUND_GUARD_TRACE: traceGeometryCause('changed');
     frameScroll = undefined;
     geometryDirty = true;
     change(event.target === doc ? 'scroll' : 'layout');
@@ -296,7 +295,7 @@ export function createOperationSource(
     if (!relevant(records)) return;
     geometryDirty = true;
     const kind = classify(records);
-    WW_GUARD_TRACE: traceGeometryCause(`mutation-${kind}`, records);
+    AROUND_GUARD_TRACE: traceGeometryCause(`mutation-${kind}`, records);
     change(kind, deliver);
   };
   /** True when every one of these read controls is where the last read put it (moved only by the
@@ -349,9 +348,9 @@ export function createOperationSource(
     for (const sweepGroup of due) {
       const group = elements.slice(sweepGroup * size, (sweepGroup + 1) * size);
       let started = 0;
-      WW_GUARD_TRACE: started = doc.defaultView!.performance.now();
+      AROUND_GUARD_TRACE: started = doc.defaultView!.performance.now();
       const differs = group.find((element) => !same(element, false));
-      WW_GUARD_TRACE: traceSweep(
+      AROUND_GUARD_TRACE: traceSweep(
         doc,
         sweepGroup,
         SWEEP_GROUPS,
@@ -385,10 +384,10 @@ export function createOperationSource(
     const looks: HTMLElement[] = [];
     let kind: PendingChange = 'look';
     for (const r of records) {
-      if (!(r.target instanceof Element) || r.target.closest('[id^="web-world-themes"]')) continue;
+      if (!(r.target instanceof Element) || r.target.closest('[id^="around"]')) continue;
       const target = r.target;
       if (r.type === 'childList') {
-        const own = (n: Node): n is Element => n instanceof Element && !n.id.startsWith('web-world-themes');
+        const own = (n: Node): n is Element => n instanceof Element && !n.id.startsWith('around');
         const addedElements = [...r.addedNodes].filter(own),
           removedElements = [...r.removedNodes].filter(own);
         if (!addedElements.length && !removedElements.length) continue;
@@ -428,22 +427,20 @@ export function createOperationSource(
       ),
     ];
     const result = roots.every((root) => root.isConnected) && unchanged(inside);
-    WW_GUARD_TRACE: traceSubtreeCheck(doc, result, roots.length, inside.length);
+    AROUND_GUARD_TRACE: traceSubtreeCheck(doc, result, roots.length, inside.length);
     return result;
   };
   const relevant = (records: readonly MutationRecord[]) =>
     records.some(
       (r) =>
         r.target instanceof Element &&
-        !r.target.closest('[id^="web-world-themes"]') &&
+        !r.target.closest('[id^="around"]') &&
         ((r.type === 'attributes' &&
           // While composition is unverified, any observed attribute may restore it.
           (cached?.supported === false ||
             ['role', 'tabindex', 'contenteditable'].includes(r.attributeName ?? '') ||
             rows.some((row) => r.target === row.element || (r.target as Element).contains(row.element)))) ||
-          [...r.addedNodes, ...r.removedNodes].some(
-            (n) => n instanceof Element && !n.id.startsWith('web-world-themes'),
-          )),
+          [...r.addedNodes, ...r.removedNodes].some((n) => n instanceof Element && !n.id.startsWith('around'))),
     );
   const observer = new MutationObserver((records) => handle(records, true));
   const root = doc.documentElement;
@@ -482,12 +479,12 @@ export function createOperationSource(
   // The extension's own UI (editor handles, panels) is never a native surface; its gestures
   // must not mark the page as changed, or a drag would hold and hide its own handles.
   const owned = (event: Event) =>
-    event.composedPath().some((node) => node instanceof Element && node.id.startsWith('web-world-themes'));
+    event.composedPath().some((node) => node instanceof Element && node.id.startsWith('around'));
   // Focus moving between the extension's own nodes (a layer, its handle) is not native state.
   const focusChanged = (event: Event) => {
     const related = (event as FocusEvent).relatedTarget;
-    if (owned(event) && (!(related instanceof Element) || related.closest('[id^="web-world-themes"]'))) return;
-    WW_GUARD_TRACE: traceGeometryCause('focus');
+    if (owned(event) && (!(related instanceof Element) || related.closest('[id^="around"]'))) return;
+    AROUND_GUARD_TRACE: traceGeometryCause('focus');
     mark();
   };
   doc.addEventListener('scroll', scrolled, { capture: true, passive: true });
@@ -495,7 +492,7 @@ export function createOperationSource(
   doc.addEventListener('focusout', focusChanged, true);
   doc.defaultView!.addEventListener('resize', changed);
   doc.fonts?.addEventListener('loadingdone', changed);
-  WW_GUARD_TRACE: {
+  AROUND_GUARD_TRACE: {
     doc.addEventListener('scroll', (event) => traceGeometryCause('scroll', event), { capture: true, passive: true });
     doc.defaultView!.addEventListener('resize', () => traceGeometryCause('resize'));
     doc.fonts?.addEventListener('loadingdone', () => traceGeometryCause('fonts'));
@@ -665,7 +662,7 @@ export function createOperationSource(
         return shifted(cached);
       }
     }
-    WW_GUARD_TRACE: if (shiftable && cached)
+    AROUND_GUARD_TRACE: if (shiftable && cached)
       traceSkipSweep(doc, {
         geometryDirty,
         forced,
@@ -710,7 +707,7 @@ export function createOperationSource(
     readActive = doc.activeElement;
     readFocus = doc.hasFocus();
     // Focus on the extension's own hosts (some live inside the player) is not native focus.
-    const active = doc.activeElement?.closest('[id^="web-world-themes"]') ? null : doc.activeElement;
+    const active = doc.activeElement?.closest('[id^="around"]') ? null : doc.activeElement;
     const activeRect = active?.getBoundingClientRect();
     // A band reserved on a larger element (the player's control bars) is focused only through a
     // focused descendant inside that band, not by focus on the container itself.
@@ -794,7 +791,7 @@ export function createOperationSource(
       readRows.set(row.element, list);
     });
     cached = seal(surfaces, scroll, { width: doc.defaultView!.innerWidth, height: doc.defaultView!.innerHeight });
-    WW_GUARD_TRACE: traceGeometryRead(doc, cached, rows);
+    AROUND_GUARD_TRACE: traceGeometryRead(doc, cached, rows);
     g11CaptureEnd(g11Start, surfaces.length);
     return cached;
   }
@@ -955,7 +952,7 @@ export function createOperationSource(
       // A page scroll keeps the layout: what was drawn for the snapshot still avoids every surface
       // (G1.3, D3). The point of an input is checked against the page itself below.
       if (layoutOf(next) !== layoutOf(snapshot) || !next.supported) {
-        WW_GUARD_TRACE: if (event) traceMovedInput(event, layoutOf(snapshot), layoutOf(next));
+        AROUND_GUARD_TRACE: if (event) traceMovedInput(event, layoutOf(snapshot), layoutOf(next));
         return false;
       }
       if (!(event instanceof MouseEvent)) return true;
@@ -985,7 +982,7 @@ export function createOperationSource(
           (row.element.contains(hit) || hit.contains(row.element) || event.composedPath().includes(row.element))
         );
       });
-      WW_GUARD_TRACE: if (missed.length) traceMissedInput(event, hit, missed);
+      AROUND_GUARD_TRACE: if (missed.length) traceMissedInput(event, hit, missed);
       return !missed.length;
     },
     videoSlot,

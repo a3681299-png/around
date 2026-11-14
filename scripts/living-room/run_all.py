@@ -1,11 +1,11 @@
 # Rebuilds the reference room in Blender MCP, or with the same script headlessly:
 #   blender -b --python scripts/living-room/run_all.py
 # Environment (all optional):
-#   WW_SAVE=<path.blend>   save the built room here (default: art/living-room/living-room.blend)
-#   WW_RENDER=<path.png>   also render camera_main there (Cycles, WW_RENDER_SAMPLES, default 128)
-#   WW_SKIP_BAKE=1         stop before the bake (no GLB/lightmap written)
-#   WW_OUT=<dir>           where the bake writes room.glb, lightmap.png, room.json
-#   WW_LM_SIZE / WW_SAMPLES / WW_VC_SAMPLES   bake quality (4096 / 128 / 128 for the committed room)
+#   AROUND_SAVE=<path.blend>   save the built room here (default: art/living-room/living-room.blend)
+#   AROUND_RENDER=<path.png>   also render camera_main there (Cycles, AROUND_RENDER_SAMPLES, default 128)
+#   AROUND_SKIP_BAKE=1         stop before the bake (no GLB/lightmap written)
+#   AROUND_OUT=<dir>           where the bake writes room.glb, lightmap.png, room.json
+#   AROUND_LM_SIZE / AROUND_SAMPLES / AROUND_VC_SAMPLES   bake quality (4096 / 128 / 128 for the committed room)
 # The parts are the numbered scripts next to this file; each one wipes and rebuilds its collection.
 import bpy, os, builtins
 
@@ -14,16 +14,16 @@ import bpy, os, builtins
 _DIR = os.path.dirname(os.path.abspath(__file__)) + os.sep
 _ART = os.path.normpath(_DIR + '../../art/living-room') + os.sep
 _NS = globals()
-_NS['WWD'] = _DIR
-builtins.WWD = _DIR
+_NS['AROUND_DIR'] = _DIR
+builtins.AROUND_DIR = _DIR
 
 
-def wwrun(name):
+def around_run(name):
     exec(compile(open(_DIR + name, encoding='utf-8').read(), name, 'exec'), _NS)
 
 
-_NS['wwrun'] = wwrun
-builtins.wwrun = wwrun
+_NS['around_run'] = around_run
+builtins.around_run = around_run
 
 # a clean scene: the parts rebuild everything they need (camera, world, lights)
 for _o in list(bpy.data.objects):
@@ -52,7 +52,7 @@ except Exception as _error:
 for _part in ('lib.py', 'reference_common.py', 'reference_shell.py', 'reference_storage.py',
               'reference_desk.py', 'reference_bed.py', 'reference_props.py', 'reference_models.py',
               'reference_otaku.py', 'reference_lighting.py', 'reference_meta.py'):
-    wwrun(_part)
+    around_run(_part)
 
 _sc = bpy.context.scene
 for _name in ('shell', 'desk', 'bed', 'left', 'decor', 'right', 'otaku'):
@@ -60,15 +60,15 @@ for _name in ('shell', 'desk', 'bed', 'left', 'decor', 'right', 'otaku'):
 
 # Blender resolves a relative image path from the drive's root, not from where it was started
 # (a render or a lightmap asked for as `art/…` lands in C:/art/…): every path is made absolute.
-_save = os.path.abspath(os.environ.get('WW_SAVE') or _ART + 'living-room.blend')
-_render = os.environ.get('WW_RENDER') and os.path.abspath(os.environ['WW_RENDER'])
+_save = os.path.abspath(os.environ.get('AROUND_SAVE') or _ART + 'living-room.blend')
+_render = os.environ.get('AROUND_RENDER') and os.path.abspath(os.environ['AROUND_RENDER'])
 if _render:
     # The page's own view (src/living-room/index.ts VIEW and SUBJECT): from the open front at eye
     # height. camera_main, the old look down on the cutaway, now only sees the ceiling.
-    # WW_RENDER_VIEW="x,y,z,tx,ty,tz,fov" looks from somewhere else (Blender's axes, degrees);
+    # AROUND_RENDER_VIEW="x,y,z,tx,ty,tz,fov" looks from somewhere else (Blender's axes, degrees);
     # several views separated by ";" are written as <name>.png, <name>-1.png, …
     _views = [[float(_x) for _x in _one.split(',')]
-              for _one in (os.environ.get('WW_RENDER_VIEW') or '.1,-5.6,1.7,-.05,1,.95,42').split(';')]
+              for _one in (os.environ.get('AROUND_RENDER_VIEW') or '.1,-5.6,1.7,-.05,1,.95,42').split(';')]
     _eye = bpy.data.objects.new('camera_review', bpy.data.cameras.new('camera_review'))
     _sc.collection.objects.link(_eye)
     _eye.data.sensor_fit = 'VERTICAL'
@@ -80,7 +80,7 @@ if _render:
     for _o in bpy.data.collections['lights'].objects:
         _o.hide_render = _o.get('layer') == 'ui'
     _sc.render.resolution_x, _sc.render.resolution_y = 1280, 720
-    _sc.cycles.samples = int(os.environ.get('WW_RENDER_SAMPLES', '128'))
+    _sc.cycles.samples = int(os.environ.get('AROUND_RENDER_SAMPLES', '128'))
     _sc.render.resolution_percentage = 100
     for _i, _v in enumerate(_views):
         _eye.location = _v[:3]
@@ -92,13 +92,13 @@ if _render:
     _sc.render.resolution_x, _sc.render.resolution_y = _size
     bpy.data.cameras.remove(_eye.data)
 
-if os.environ.get('WW_SKIP_BAKE') != '1':
-    for _key in ('WW_LM_SIZE', 'WW_SAMPLES', 'WW_VC_SAMPLES'):
+if os.environ.get('AROUND_SKIP_BAKE') != '1':
+    for _key in ('AROUND_LM_SIZE', 'AROUND_SAMPLES', 'AROUND_VC_SAMPLES'):
         if os.environ.get(_key):
             _NS[_key] = int(os.environ[_key])
-    if os.environ.get('WW_OUT'):
-        _NS['WW_OUT'] = os.path.abspath(os.environ['WW_OUT']).rstrip('/\\') + '/'
-    wwrun('80_bake.py')
+    if os.environ.get('AROUND_OUT'):
+        _NS['AROUND_OUT'] = os.path.abspath(os.environ['AROUND_OUT']).rstrip('/\\') + '/'
+    around_run('80_bake.py')
 
 # Rebuilds are reproducible from these scripts; Blender's backup would duplicate the large asset.
 for _o in bpy.data.collections['lighting_baffles'].objects:

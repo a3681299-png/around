@@ -69,7 +69,7 @@ Gitの各導入コミットで実在する型、パーサー、テストのデ�
 
 配置と階層を `evaluateLayout`、親子共通のマスクを `evaluateEffects`、時刻付き入力からの評価を `evaluateWorld` として接続。動画状態とイベント、フェード状態は作品とは別に保持する。Hostのライフサイクルは `host.lifecycle` イベントでフェードのリセットを指示し、外部で評価状態を書き換えない。消えたレイヤーの評価状態も除去する。
 
-`WW_WORLD_MODE=legacy|compare|runtime` をビルド時に指定できる（既定runtime）。legacyは旧DOMマスク制御へ戻す。compareは旧draw/paintの数値参照と新結果の差を例外として検出し、新結果を描画する。旧経路は実YouTube検証まで一時的に残す。通常ビルドでは重複評価しない。
+`AROUND_WORLD_MODE=legacy|compare|runtime` をビルド時に指定できる（既定runtime）。legacyは旧DOMマスク制御へ戻す。compareは旧draw/paintの数値参照と新結果の差を例外として検出し、新結果を描画する。旧経路は実YouTube検証まで一時的に残す。通常ビルドでは重複評価しない。
 
 標準runtimeビルドの関連44件（カード・グループ・マスク・保存・破棄・Undo/Redoを含む）成功、compareビルド18件成功。32メディア/16グループと固定180入力の新旧比較、決定性、不変性、アンカー消失、背景復帰、reduced-motionを追加検証。型チェック・lint・ビルド成功。マスク強度と親の不透明度は別に評価し、CSSで合成する従来の挙動を維持した。
 
@@ -95,25 +95,25 @@ Gitの各導入コミットで実在する型、パーサー、テストのデ�
 実験用worktreeで次の開発ビルドを作り、拡張機能と対象タブを再読み込みする。
 
 ```powershell
-$env:WW_WORLD_DEVTOOLS = '1'
-$env:WW_WORLD_MODE = 'runtime'
+$env:AROUND_WORLD_DEVTOOLS = '1'
+$env:AROUND_WORLD_MODE = 'runtime'
 npm run build
 ```
 
 画像などを最低1枚配置した状態で、DevToolsの**拡張機能のisolated world**から呼び出す（ページ側のworldには公開しない）。
 
 ```javascript
-__wwWorldRuntime.startRecording();
+__aroundWorldRuntime.startRecording();
 // マウス移動、再生/一時停止、スクロール、ウィンドウサイズ変更などを行う
-const recording = __wwWorldRuntime.stopRecording();
+const recording = __aroundWorldRuntime.stopRecording();
 const json = JSON.stringify(recording);
-const replay = __wwWorldRuntime.replay(json); // DOMを操作しない純粋な再評価
-__wwWorldRuntime.status();
+const replay = __aroundWorldRuntime.replay(json); // DOMを操作しない純粋な再評価
+__aroundWorldRuntime.status();
 ```
 
 自動開始・保存・通信はない。記録は最大3600入力、10分、JSONで8M文字。描画に必要な作品スナップショット（名前とasset IDを含む）と初期評価状態、数値の入力だけを保持する。ページ本文、ページURL、認証情報、フォーム値、キー入力、素材のバイト列は取得しない。クリックは座標と種類だけ。作品変更で記録を停止し、記録用の購読も解除する。OFF/0%でAPIとメモリー上の記録を撤去するため、必要な記録は先にstopして手元へ取り出す。
 
-通常ビルドへ戻すときは `WW_WORLD_DEVTOOLS` を削除して再ビルドする。開発用の新しいChrome権限やメッセージ受付はない。
+通常ビルドへ戻すときは `AROUND_WORLD_DEVTOOLS` を削除して再ビルドする。開発用の新しいChrome権限やメッセージ受付はない。
 
 ### 再現性の範囲
 

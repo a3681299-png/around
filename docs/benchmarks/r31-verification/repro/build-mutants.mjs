@@ -6,10 +6,10 @@ import { createHash } from 'node:crypto';
 import { inspectVrma, vrmaFixture } from './after.mjs';
 const root = process.cwd();
 const definitions = {
-  __WW_WORLD_MODE__: '"runtime"',
-  __WW_WORLD_DEVTOOLS__: 'false',
-  __WW_ASSET_PROFILE__: 'false',
-  __WW_PAGE_CHANGE_LEGACY__: 'false',
+  __AROUND_WORLD_MODE__: '"runtime"',
+  __AROUND_WORLD_DEVTOOLS__: 'false',
+  __AROUND_ASSET_PROFILE__: 'false',
+  __AROUND_PAGE_CHANGE_LEGACY__: 'false',
 };
 for (const fault of ['vrma', 'facts', 'clip', 'input', 'approach', 'hold']) {
   const out = path.resolve('.work/r31-no-' + fault);
@@ -80,7 +80,7 @@ for (const fault of ['vrma', 'facts', 'clip', 'input', 'approach', 'hold']) {
       format: 'iife',
       target: 'chrome120',
       loader: { '.css': 'text' },
-      dropLabels: ['WW_TEST_PAGE_CHANGE', 'WW_GUARD_TRACE'],
+      dropLabels: ['AROUND_TEST_PAGE_CHANGE', 'AROUND_GUARD_TRACE'],
       define: definitions,
       plugins: [plugin],
       logLevel: 'silent',

@@ -10,18 +10,20 @@ import { DEFAULT_SPACE_LOOK } from '../src/design/space';
 /**
  * The depth foundation on the test page (docs/depth-foundation.md): the room is drawn under the
  * page's content, and artwork at `depth: 'room'` goes behind the UI with it, where the browser's
- * stacking keeps every control over it and no guard runs. WW_SPACE_BREAK=stacking (a .work build
+ * stacking keeps every control over it and no guard runs. AROUND_SPACE_BREAK=stacking (a .work build
  * that draws room-depth artwork over the UI instead) must fail these tests.
  */
-const broken = process.env.WW_SPACE_BREAK === 'stacking';
+const broken = process.env.AROUND_SPACE_BREAK === 'stacking';
 const test = base.extend<object, { extensionPath: string }>({
   extensionPath: [
     async ({}, use) =>
-      use(await layeringBuild(true, { WW_SPACE_PROBE: '1', ...(broken ? { WW_SPACE_BREAK: 'stacking' } : {}) })),
+      use(
+        await layeringBuild(true, { AROUND_SPACE_PROBE: '1', ...(broken ? { AROUND_SPACE_BREAK: 'stacking' } : {}) }),
+      ),
     { scope: 'worker' },
   ],
 });
-const key = 'webWorldThemes.design.youtube';
+const key = 'around.design.youtube';
 
 /** The room and a magenta image, imported through the editor; the stored artwork puts the image
  * at room depth over the player's Play button. */
@@ -86,7 +88,7 @@ async function roomArtwork(popup: Page, youtube: Page, mixed = false) {
   ] as const);
   await youtube.reload();
   await youtube.locator('#movie_player video').waitFor({ state: 'attached' });
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-room', 'ready', { timeout: 30000 });
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-room', 'ready', { timeout: 30000 });
 }
 
 test('the page keeps its background while the room prepares; the room then fades in over it', async ({
@@ -101,8 +103,8 @@ test('the page keeps its background while the room prepares; the room then fades
     let canvasSeen = false,
       styleSeen = false;
     new MutationObserver(() => {
-      const canvas = document.querySelector('canvas[data-ww-room]'),
-        style = document.getElementById('web-world-themes-backdrop');
+      const canvas = document.querySelector('canvas[data-around-room]'),
+        style = document.getElementById('around-backdrop');
       if (canvas && !canvasSeen) {
         canvasSeen = true;
         order.push(['canvas', Boolean(style), getComputedStyle(canvas).opacity]);
@@ -116,7 +118,7 @@ test('the page keeps its background while the room prepares; the room then fades
   await roomArtwork(popup, youtube);
   const shown = await youtube.evaluate(() => ({
     order: (globalThis as typeof globalThis & { __roomOrder?: unknown[] }).__roomOrder,
-    opacity: getComputedStyle(document.querySelector('canvas[data-ww-room]')!).opacity,
+    opacity: getComputedStyle(document.querySelector('canvas[data-around-room]')!).opacity,
   }));
   // The canvas comes first, transparent; the page's background turns transparent after it; at
   // 'ready' the room is fully shown.
@@ -135,10 +137,10 @@ test('the room is under the content and room-depth artwork stays behind every co
 }) => {
   await roomArtwork(popup, youtube);
   // Room-only artwork: the guard does not observe the page at all.
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-guard', 'off');
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-guard', 'off');
   // The canvas and the artwork's host: under the content, never what a point hits.
   const placed = await youtube.evaluate(() => {
-    const canvas = document.querySelector('canvas[data-ww-room]')!;
+    const canvas = document.querySelector('canvas[data-around-room]')!;
     const host = [...document.body.children].find((e) => e !== canvas && e.shadowRoot?.querySelector('img, .image')) as
       HTMLElement | undefined;
     let hits = 0;
@@ -157,7 +159,7 @@ test('the room is under the content and room-depth artwork stays behind every co
       hits,
       playHit: document.elementFromPoint(play.x + play.width / 2, play.y + play.height / 2)?.getAttribute('aria-label'),
       // Room-only artwork draws without the guard: it never writes a guard verdict.
-      guardVerdict: host?.dataset['wwSafety'] ?? null,
+      guardVerdict: host?.dataset['aroundSafety'] ?? null,
     };
   });
   // Soft: the pixel check below runs too, so a broken build shows what a person would see.
@@ -179,11 +181,11 @@ test('mixed artwork: the room-depth part stays behind the UI unguarded, the fron
 }) => {
   await roomArtwork(popup, youtube, true);
   // Something is in front: the guard observes the page.
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-guard', 'on');
-  await expect(youtube.locator('#web-world-themes-room-decorations')).toBeAttached();
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-guard', 'on');
+  await expect(youtube.locator('#around-room-decorations')).toBeAttached();
   const placed = await youtube.evaluate(() => {
-    const canvas = document.querySelector('canvas[data-ww-room]')!;
-    const plane = document.getElementById('web-world-themes-room-decorations')!;
+    const canvas = document.querySelector('canvas[data-around-room]')!;
+    const plane = document.getElementById('around-room-decorations')!;
     return {
       planeZ: getComputedStyle(plane).zIndex,
       planeAfterCanvas: plane.previousElementSibling === canvas,
@@ -217,7 +219,7 @@ async function magentaOverPlay(youtube: Page) {
 
 test('the room follows the pointer and stops drawing in fullscreen', async ({ popup, youtube }) => {
   await roomArtwork(popup, youtube);
-  const frame = async () => JSON.parse((await youtube.locator('html').getAttribute('data-ww-room-frame'))!);
+  const frame = async () => JSON.parse((await youtube.locator('html').getAttribute('data-around-room-frame'))!);
   const size = youtube.viewportSize()!;
   await youtube.mouse.move(size.width - 5, size.height / 2, { steps: 4 });
   await expect.poll(async () => (await frame()).camera[0]).toBeGreaterThan(0.05);
@@ -230,8 +232,8 @@ test('the room follows the pointer and stops drawing in fullscreen', async ({ po
       .catch(() => undefined),
   );
   if (await youtube.evaluate(() => Boolean(document.fullscreenElement))) {
-    await expect(youtube.locator('canvas[data-ww-room]')).toBeHidden();
+    await expect(youtube.locator('canvas[data-around-room]')).toBeHidden();
     await youtube.evaluate(() => document.exitFullscreen());
-    await expect(youtube.locator('canvas[data-ww-room]')).toBeVisible();
+    await expect(youtube.locator('canvas[data-around-room]')).toBeVisible();
   }
 });

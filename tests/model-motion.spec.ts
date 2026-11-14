@@ -32,7 +32,7 @@ test('G1.2: a held root plays its take at rest; every other layer keeps the take
   }
   const recording = recorder.stop()!;
   const take = parseSignalTake({
-    format: 'ww-signal-take',
+    format: 'around-signal-take',
     formatVersion: 1,
     runtimeVersion: state.runtimeVersion,
     id: 'g12-mix',
@@ -192,7 +192,7 @@ test('pursuit and clip/heading histories replay and reverse-seek exactly, includ
   const recording = recorder.stop()!;
   expect(replayWorld(recording)).toEqual({ state, frames });
   const take = parseSignalTake({
-      format: 'ww-signal-take',
+      format: 'around-signal-take',
       formatVersion: 1,
       runtimeVersion: state.runtimeVersion,
       id: 'model-pursuit',

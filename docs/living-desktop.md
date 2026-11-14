@@ -2,12 +2,12 @@
 
 `feat/living-onboarding`。翔太の方針（優先 1「UI と 3D 空間の融合」・優先 2「仮想デスクトップ」）と 4 つの基準を、1 つの塊で実装した。
 
-| 基準                                   | 実装                                                                                                                                         |
-| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| 操作可能な WWT 独自の仮想デスクトップ  | 部屋の上に重なるガラス調の窓・バー・ドック。窓はドラッグと矢印キーで動かせ、閉じる・前に出すができる。アプリは「壁紙と光」「ミラー」「住人」 |
-| その画面と部屋の 3D モニターの連動     | 同じ状態を、机のモニターの面にも描く。閉じている間は壁紙と時計、開くと窓の配置がそのまま映る                                                 |
-| 任意で現実の画面を映すミラーモード     | 「ミラー」の窓のボタンを押したときだけ、ブラウザーの画面共有の確認が出る。映像は部屋のモニターと窓の中のプレビューに映る                     |
-| 映し出した画面の色による部屋の照明変化 | 部屋の光を 3 層に分けて焼き直した。モニターの光と、手前のデスクトップからの光を、表示中の色で染めて足す                                      |
+| 基準                                     | 実装                                                                                                                                         |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| 操作可能な Around 独自の仮想デスクトップ | 部屋の上に重なるガラス調の窓・バー・ドック。窓はドラッグと矢印キーで動かせ、閉じる・前に出すができる。アプリは「壁紙と光」「ミラー」「住人」 |
+| その画面と部屋の 3D モニターの連動       | 同じ状態を、机のモニターの面にも描く。閉じている間は壁紙と時計、開くと窓の配置がそのまま映る                                                 |
+| 任意で現実の画面を映すミラーモード       | 「ミラー」の窓のボタンを押したときだけ、ブラウザーの画面共有の確認が出る。映像は部屋のモニターと窓の中のプレビューに映る                     |
+| 映し出した画面の色による部屋の照明変化   | 部屋の光を 3 層に分けて焼き直した。モニターの光と、手前のデスクトップからの光を、表示中の色で染めて足す                                      |
 
 （2026-11-12 深夜の追記：見た目と視点は作り直した。今の姿は [living-shell.md](living-shell.md)。下の画像と「窓の縁に手をかける」計算の説明は、俯瞰の視点だった頃のもの。状態・モニター・光の層の仕組みは今も同じ。）
 
@@ -101,14 +101,14 @@
 # 部屋を焼き直す（約 4 分。層が 2 つ増えた）
 "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" -b --factory-startup --python scripts/living-room/run_all.py
 # 公開用
-WW_LIVING_TEST=1 WW_LIVING_OUT=.work/living-room-public node scripts/build-living-room.mjs
+AROUND_LIVING_TEST=1 AROUND_LIVING_OUT=.work/living-room-public node scripts/build-living-room.mjs
 # フェリス入り（.work の中だけ）
-WW_LIVING_TEST=1 WW_LIVING_OUT=.work/living-room-preview \
-  WW_LIVING_CHARACTER=C:/wwt-private/Felis_v0.8.1/work/felis-1024.vrm WW_LIVING_MOTIONS=C:/wwt-private/Felis_v0.8.1/motions \
+AROUND_LIVING_TEST=1 AROUND_LIVING_OUT=.work/living-room-preview \
+  AROUND_LIVING_CHARACTER=C:/wwt-private/Felis_v0.8.1/work/felis-1024.vrm AROUND_LIVING_MOTIONS=C:/wwt-private/Felis_v0.8.1/motions \
   node scripts/build-living-room.mjs
 node scripts/playground/serve.mjs .work/living-room-preview 4183
 ```
 
 （2026-11-12 深夜の追記：`resident.setUi`・`says`・`touching` は、心と演出役への置き換えでなくなった。今の入口は [living-mind.md](living-mind.md) の 10。）
 
-テスト用の入口：`__wwLivingRoom.desktop()`（状態）、`resident.says()`・`resident.touching()`・`resident.setUi(point)`。unit は `tests/living-desktop.spec.ts`（8 件：窓の管理、はみ出さないこと、光の色、縁の点）。
+テスト用の入口：`__aroundLivingRoom.desktop()`（状態）、`resident.says()`・`resident.touching()`・`resident.setUi(point)`。unit は `tests/living-desktop.spec.ts`（8 件：窓の管理、はみ出さないこと、光の色、縁の点）。

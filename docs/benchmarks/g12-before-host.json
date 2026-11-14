@@ -1,7 +1,7 @@
 {
   "stage": "G1.2 before the Host change",
   "harness": "scripts/g11/run.mjs (popup flow and guard switch fixed; scroll mode added)",
-  "code": "0aa2737 (+ WW_GUARD_TRACE-only lines, dropped from this build)",
+  "code": "0aa2737 (+ AROUND_GUARD_TRACE-only lines, dropped from this build)",
   "browser": "Playwright Chromium (.work/browsers), headless, 1920x1080",
   "url": "https://www.youtube.com/watch?v=M7lc1UVf-VE",
   "date": "2026-11-02",

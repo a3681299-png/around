@@ -6,8 +6,8 @@ import type { TimelineCommand, TimelineUpdate } from '../timeline/types';
 import type { SkinSlot } from '../editor-core/skins';
 import type { SkinPageInfo } from '../editor/skin-status';
 
-export const STUDIO_PORT = 'web-world-themes:studio-v1';
-export const STUDIO_PROBE = 'web-world-themes:studio-probe';
+export const STUDIO_PORT = 'around:studio-v1';
+export const STUDIO_PROBE = 'around:studio-probe';
 export interface StudioTarget {
   id: number;
   title: string;

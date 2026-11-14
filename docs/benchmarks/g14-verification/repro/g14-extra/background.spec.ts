@@ -52,7 +52,7 @@ test('G1.4 real background and cancellation transitions read no rectangles', asy
       write: false,
       format: 'iife',
       globalName: 'G14Extra',
-      dropLabels: ['WW_GUARD_TRACE', 'WW_TEST_PAGE_CHANGE'],
+      dropLabels: ['AROUND_GUARD_TRACE', 'AROUND_TEST_PAGE_CHANGE'],
     });
     await page.addScriptTag({ content: bundle.outputFiles[0]!.text });
     await expect.poll(() => page.evaluate(() => document.hidden)).toBe(false);

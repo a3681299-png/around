@@ -1,4 +1,4 @@
-# Web World Themes
+# Around
 
 既存サイトの上に、作者が自分で作った世界を表示するChrome拡張機能です。最初の対象はデスクトップ版YouTubeです。エディターで、YouTubeの部品（動画カード・検索欄・ボタンなど）の着せ替え、画像・アニメーション・3Dモデルの配置、マウスや再生状態への反応を作り、そのままページの上に表示します。Manifest V3とTypeScriptで構築しています。
 
@@ -72,8 +72,8 @@ TypeScriptとCSSの変更を監視して`dist`を更新します。変更後は`
 npm run lint
 npm run typecheck
 npm run test:unit
-$env:WW_BUILD_OUT = '.work/test-dist'
-$env:WW_TEST_EXTENSION_PATH = '.work/test-dist'
+$env:AROUND_BUILD_OUT = '.work/test-dist'
+$env:AROUND_TEST_EXTENSION_PATH = '.work/test-dist'
 npm run build
 npm run test:setup
 npm run test:e2e
@@ -83,7 +83,7 @@ npm run test:e2e
 
 `test:setup`はe2e用のPlaywright公式Chromiumを`.work/browsers`へダウンロードします。e2eは独立したブラウザープロファイルを使い、ユーザーのChromeプロファイルは変更しません。CIはunitとe2eを別jobで実行します。実サイト・非公開素材・診断ビルドを使うオプトイン検証は、必要な環境変数を指定した場合に実行します。
 
-VRMの通常テストは小さな自作データで描画を確認します。33MiBのVRMは、実GPU環境で`WW_REAL_GPU_VRM=1`を指定した場合にだけ実行します。SwiftShaderなどのソフトウェア描画では実行できません。整形・lintの使い方は[tooling.md](docs/tooling.md)を参照してください。作業の決まりは[AGENTS.md](AGENTS.md)にあります。
+VRMの通常テストは小さな自作データで描画を確認します。33MiBのVRMは、実GPU環境で`AROUND_REAL_GPU_VRM=1`を指定した場合にだけ実行します。SwiftShaderなどのソフトウェア描画では実行できません。整形・lintの使い方は[tooling.md](docs/tooling.md)を参照してください。作業の決まりは[AGENTS.md](AGENTS.md)にあります。
 
 ## ファイル構成
 
@@ -124,7 +124,7 @@ Popupまたはプレイヤー設定パネル → `chrome.storage.local` → `sto
 
 「作品を表示する」と「制作モード」は別々のキーに保存します。複数のPopupから異なる設定を変更しても、もう一方の値を上書きしません。初期読込中に届いた変更は読込結果へ合流させ、古い設定への巻き戻りを防ぎます。
 
-YouTube用Adapterが対象要素に`data-ww-surface`を付けます。作品の着せ替えはYouTubeのセレクタやDOM操作を持たず、この共通属性を使います。作品が使う部品だけを探し、ページの変化では新しく付いた部分だけを調べます（[AGENTS.md](AGENTS.md)の「繰り返さない設計」）。
+YouTube用Adapterが対象要素に`data-around-surface`を付けます。作品の着せ替えはYouTubeのセレクタやDOM操作を持たず、この共通属性を使います。作品が使う部品だけを探し、ページの変化では新しく付いた部分だけを調べます（[AGENTS.md](AGENTS.md)の「繰り返さない設計」）。
 
 設定アイコンは作品の表示と別のライフサイクルで配置します。`sites/youtube-player.ts`だけがプレイヤーと右側の操作欄のセレクタを持ち、`settings/panel.ts`はサイトのDOM構造を知りません。プレイヤーが遅れて生成された場合やSPAで交換された場合に配置を確認し、右側の操作欄の先頭へ1つだけ置きます。設定パネルはShadow DOMでスタイルを分け、キー入力が動画のシークに伝わるのを防ぎます。
 

@@ -119,7 +119,8 @@ export function createPageController(
     safety?.setActive(active);
     // The depth foundation's test probe (a .work build): whether the guard observes the page.
     // (Unit tests run the source unbuilt, with stand-in documents: the label is not dropped there.)
-    WW_SPACE_PROBE: if (doc.documentElement?.dataset) doc.documentElement.dataset['wwGuard'] = active ? 'on' : 'off';
+    AROUND_SPACE_PROBE: if (doc.documentElement?.dataset)
+      doc.documentElement.dataset['aroundGuard'] = active ? 'on' : 'off';
   };
   let disconnect: (() => void) | undefined;
   let current: UserSettings | undefined;
@@ -137,7 +138,7 @@ export function createPageController(
   };
 
   const followPage = (change?: SitePageChange, marked?: readonly Element[]) => {
-    WW_TEST_PAGE_CHANGE: if (legacyPageChange()) return render();
+    AROUND_TEST_PAGE_CHANGE: if (legacyPageChange()) return render();
     if (!shown()) return;
     designRenderer.refresh(change, marked);
     space?.changed();

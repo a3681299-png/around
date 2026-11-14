@@ -7,10 +7,10 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 for (const label of ['before', 'after'])
   test(`R31 matched side panel default VRM picture: ${label}`, async () => {
-    test.skip(process.env.WW_R31_LIVE !== '1');
+    test.skip(process.env.AROUND_R31_LIVE !== '1');
     test.setTimeout(240000);
     await mkdir('.work/r31-private', { recursive: true });
-    const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-r31-panel-')), false, {
+    const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-r31-panel-')), false, {
       headed: true,
       width: 1920,
       extensionPath: path.resolve(label === 'before' ? '../r31-before/.work/r31-normal' : '.work/r31-normal'),
@@ -19,7 +19,7 @@ for (const label of ['before', 'after'])
     try {
       const manager = await context.newPage();
       await manager.goto('chrome://extensions/');
-      const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+      const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
       await item.waitFor();
       const id = await item.evaluate((e: any) => e.data?.id ?? e.id);
       await manager.close();
@@ -33,7 +33,7 @@ for (const label of ['before', 'after'])
       await openSidePanelFromIcon(popup, page);
       const panel = await sidePanelDriver(context, page, id);
       await panel.files(
-        [process.env.WW_VRM_FILE ?? 'C:/Users/sm787/Desktop/ローポリモデル用/out/trusie.vrm'],
+        [process.env.AROUND_VRM_FILE ?? 'C:/Users/sm787/Desktop/ローポリモデル用/out/trusie.vrm'],
         '.model-file',
       );
       const media = page.locator('.model-media');
@@ -53,7 +53,7 @@ for (const label of ['before', 'after'])
         await panel.files(
           [
             path.join(
-              process.env.WW_VRMA_DIR ?? 'C:/Users/sm787/Desktop/ローポリモデル用/out/anim',
+              process.env.AROUND_VRMA_DIR ?? 'C:/Users/sm787/Desktop/ローポリモデル用/out/anim',
               'trusie',
               'idle.vrma',
             ),

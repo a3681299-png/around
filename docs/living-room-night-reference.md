@@ -89,15 +89,15 @@ Blender MCP で `run_all.py` を実行した。同じ処理はヘッドレスで
 
 ```powershell
 & 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' -b --factory-startup --python-exit-code 1 --python scripts/living-room/run_all.py
-$env:WW_LIVING_TEST='1'
-$env:WW_LIVING_OUT='.work/living-room-preview'
+$env:AROUND_LIVING_TEST='1'
+$env:AROUND_LIVING_OUT='.work/living-room-preview'
 node scripts/build-living-room.mjs
 node scripts/playground/serve.mjs .work/living-room-preview 4181
 ```
 
 ## 検証
 
-型チェック・lint は通過。unit は **665 件通過・3 件スキップ**。最初の実行は sparse checkout にテストが読む参照資料がなく失敗したため、追跡済みの `agent-skills` と `docs/wwt-studio-design-system/components` だけを追加し、全件をやり直した。サンドボックスで長いプロセスが中断された検査は通常環境で完了した。テストの条件や判定は緩めていない。
+型チェック・lint は通過。unit は **665 件通過・3 件スキップ**。最初の実行は sparse checkout にテストが読む参照資料がなく失敗したため、追跡済みの `agent-skills` と `docs/around-studio-design-system/components` だけを追加し、全件をやり直した。サンドボックスで長いプロセスが中断された検査は通常環境で完了した。テストの条件や判定は緩めていない。
 
 実ページの全景・机・ベッド・430×900 の縦長画面を開いて比較した。白く広がりすぎたモニターの bloom、毛布と布団の交差、枕の浮いた縞、格子の欠け、手前の暗さを修正した。画面のエラーは 0。床は 48 三角形、10 か所の目印はすべて歩ける床にあり、到達できる。リュックの位置とノート PC の足元に合わせて通路を調整した。
 

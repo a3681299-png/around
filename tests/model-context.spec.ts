@@ -4,7 +4,7 @@ import { test, expect } from './fixtures';
 import { modelFixture } from './helpers/model-fixture';
 import { vrmFixture } from './helpers/vrm-fixture';
 
-const backend = '#model-runtime-test [data-ww-three-backend]';
+const backend = '#model-runtime-test [data-around-three-backend]';
 async function mount(page: Page, bytes: Uint8Array) {
   const bundle = await build({
     entryPoints: ['tests/helpers/model-runtime.ts'],

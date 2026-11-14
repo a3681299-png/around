@@ -1,5 +1,5 @@
 
-> web-world-themes@0.1.0 test:e2e
+> around@0.1.0 test:e2e
 > node scripts/test.mjs --project=e2e tests/backup.spec.ts --grep backup refreshes an existing legacy VRM --output=.work/r31-fix-evidence/refresh-red-results
 
 
@@ -23,7 +23,7 @@ Running 1 test using 1 worker
           |                                             ^
       154 |   const restored = await readCounts(page);
       155 |   expect(restored.assets).toBe(1);
-      156 |   expect(restored.local['webWorldThemes.design.youtube']).toEqual(expected);
+      156 |   expect(restored.local['around.design.youtube']).toEqual(expected);
         at WORKTREE\tests\backup.spec.ts:153:45
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────

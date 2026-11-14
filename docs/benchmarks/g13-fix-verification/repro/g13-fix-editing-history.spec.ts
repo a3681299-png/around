@@ -8,8 +8,8 @@ import { openEditor } from './helpers/editor';
  * drawing, while a click a page element takes from a visible control still does; the editor's
  * 操作チェック brings a latched stop back with 描画を再開, and the same click stops it again.
  */
-const cards = '[data-ww-surface~="video-card"]';
-const overlay = '#web-world-themes-decorations';
+const cards = '[data-around-surface~="video-card"]';
+const overlay = '#around-decorations';
 test.beforeEach(async ({ youtube, context }) => {
   await context.addInitScript(() => {
     (window as any).__safetyMessages = [];
@@ -33,25 +33,25 @@ test.beforeEach(async ({ youtube, context }) => {
     (window as any).__resumePhase = 'setup';
     new MutationObserver((batch) => {
       for (const record of batch) {
-        if (record.attributeName !== 'data-ww-safety') continue;
+        if (record.attributeName !== 'data-around-safety') continue;
         const node = record.target as HTMLElement;
         (window as any).__resumeHistory.push({
           t: performance.now(),
           phase: (window as any).__resumePhase,
           before: JSON.parse(record.oldValue ?? '{}'),
-          after: JSON.parse(node.dataset.wwSafety ?? '{}'),
+          after: JSON.parse(node.dataset.aroundSafety ?? '{}'),
         });
       }
     }).observe(document, {
       subtree: true,
       attributes: true,
       attributeOldValue: true,
-      attributeFilter: ['data-ww-safety'],
+      attributeFilter: ['data-around-safety'],
     });
   });
 });
 const stopped = (youtube: Page) =>
-  youtube.locator(overlay).evaluate((node: HTMLElement) => JSON.parse(node.dataset.wwSafety ?? '{}').stopped ?? '');
+  youtube.locator(overlay).evaluate((node: HTMLElement) => JSON.parse(node.dataset.aroundSafety ?? '{}').stopped ?? '');
 
 /** One image layer keeps the guard watching from load, as on a page with artwork. */
 async function editWithLayer(popup: Page, youtube: Page) {
@@ -76,7 +76,7 @@ test('dressing a card and picking cards to edit never stop drawing', async ({ po
   const region = panel.getByRole('region', { name: 'UIの着せ替え' });
   const card = youtube.locator(cards).first();
   await card.click({ position: { x: 20, y: 20 } });
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-skin-selected', 'video-card');
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-skin-selected', 'video-card');
   const chooser = studio.waitForEvent('filechooser');
   await region.locator('.main-drop').click();
   await (await chooser).setFiles(path.resolve('tests/fixtures/skins/frame-light.png'));
@@ -87,7 +87,7 @@ test('dressing a card and picking cards to edit never stop drawing', async ({ po
     // Longer than the guard's recovery wait: a stop here would still be showing.
     await youtube.waitForTimeout(800);
     expect(await stopped(youtube), tool).toBe('');
-    await expect(studio.locator('.ww-editor-safety .safety-resume')).toBeHidden();
+    await expect(studio.locator('.around-editor-safety .safety-resume')).toBeHidden();
   }
 });
 
@@ -119,23 +119,23 @@ test('a covered control stops drawing until 描画を再開, and the same covere
   await youtube.locator(overlay).evaluate((node: HTMLElement) => {
     const seen: string[] = ((window as unknown as { __g111Stops: string[] }).__g111Stops = []);
     new MutationObserver(() => {
-      const value = JSON.parse(node.dataset.wwSafety ?? '{}').stopped ?? '';
+      const value = JSON.parse(node.dataset.aroundSafety ?? '{}').stopped ?? '';
       if (value) seen.push(value);
-    }).observe(node, { attributes: true, attributeFilter: ['data-ww-safety'] });
+    }).observe(node, { attributes: true, attributeFilter: ['data-around-safety'] });
   });
   const seen = () => youtube.evaluate(() => (window as unknown as { __g111Stops: string[] }).__g111Stops);
   await coveredClick();
   expect(await seen()).toContain('クリックがページの操作部品に届くよう、絵の表示を止めました。');
   // One failure stops drawing for a moment only: it recovers, and there is nothing to resume.
   await expect.poll(() => stopped(youtube)).toBe('');
-  await expect(studio.locator('.ww-editor-safety .safety-resume')).toBeHidden();
+  await expect(studio.locator('.around-editor-safety .safety-resume')).toBeHidden();
   for (let i = 0; i < 2; i++) await coveredClick();
   await youtube.waitForTimeout(800);
   expect(await stopped(youtube)).toBe('クリックがページの操作部品に届くよう、絵の表示を止めました。');
   // A stopped layer shows no editing handles (G1.2 keeps this whatever an approach holds).
   await expect(youtube.locator(overlay + ' [data-image-id]')).toHaveAttribute('data-safety-limited', '');
   await expect(youtube.locator(overlay + ' [data-frame-id]')).toBeHidden();
-  const check = studio.locator('.ww-editor-safety .safety-check');
+  const check = studio.locator('.around-editor-safety .safety-check');
   await check.locator('summary').click();
   const resume = check.getByRole('button', { name: '描画を再開', exact: true });
   await expect(resume).toBeVisible();
@@ -158,7 +158,7 @@ test('a covered control stops drawing until 描画を再開, and the same covere
   await check.locator('summary').click();
   await expect(check).toHaveJSProperty('open', true);
   await studio.getByLabel('操作面の保護範囲を表示').check();
-  await expect(youtube.locator('#web-world-themes-operation-check')).toHaveCount(1);
+  await expect(youtube.locator('#around-operation-check')).toHaveCount(1);
   await check.locator('summary').press('Escape');
   await expect(check).toHaveJSProperty('open', false);
   await youtube.evaluate(() => {

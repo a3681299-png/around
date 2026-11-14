@@ -25,14 +25,14 @@ import { installOutsetAudit, outsetAudit, outsetPaintDiff } from './helpers/skin
 import { nativeShortcut } from './helpers/native-shortcut';
 
 const resultsUrl = 'https://www.youtube.com/results?search_query=lofi+hip+hop';
-const watchUrl = process.env.WW_LIVE_VIDEO_URL ?? 'https://www.youtube.com/watch?v=LC1a-DwUhls';
-const shots = path.resolve(process.env.WW_LIVE_UI11_SHOTS ?? 'docs/screenshots/ui1-1/verification');
+const watchUrl = process.env.AROUND_LIVE_VIDEO_URL ?? 'https://www.youtube.com/watch?v=LC1a-DwUhls';
+const shots = path.resolve(process.env.AROUND_LIVE_UI11_SHOTS ?? 'docs/screenshots/ui1-1/verification');
 
 async function live(headed = false) {
   await mkdir('.work', { recursive: true });
   await mkdir(shots, { recursive: true });
   const profile = await mkdtemp(path.resolve(headed ? '.work/g-entry-profile-' : '.work/ui11-live-'));
-  const base = path.resolve(process.env.WW_TEST_EXTENSION_PATH ?? 'dist');
+  const base = path.resolve(process.env.AROUND_TEST_EXTENSION_PATH ?? 'dist');
   const extension = headed ? await mkdtemp(path.resolve('.work/g-entry-extension-')) : base;
   if (headed) await cp(base, extension, { recursive: true });
   const context = await launchExtension(profile, false, {
@@ -68,7 +68,7 @@ async function evidence(name: string, data: unknown, info: TestInfo) {
 }
 
 test('optional real YouTube UI1.1: checker warning, ink sampling, modes, replacement art and SPA settle without a feedback loop', async ({}, info) => {
-  test.skip(process.env.WW_LIVE_UI11 !== '1', 'Explicit signed-out UI1.1 lifecycle verification.');
+  test.skip(process.env.AROUND_LIVE_UI11 !== '1', 'Explicit signed-out UI1.1 lifecycle verification.');
   test.setTimeout(600_000);
   const { context, page, popup } = await live();
   const records: Record<string, unknown>[] = [];
@@ -100,9 +100,9 @@ test('optional real YouTube UI1.1: checker warning, ink sampling, modes, replace
     await expect.poll(async () => (await inkAudit(page)).plans).toBeGreaterThan(checkerPlan.plans);
     for (const mode of ['light', 'dark', 'light'] as const) {
       const before = (await inkAudit(page)).plans;
-      const previousMode = await page.locator('html').getAttribute('data-ww-mode');
+      const previousMode = await page.locator('html').getAttribute('data-around-mode');
       await page.locator('html').evaluate((node, dark) => node.toggleAttribute('dark', dark), mode === 'dark');
-      await expect(page.locator('html')).toHaveAttribute('data-ww-mode', mode);
+      await expect(page.locator('html')).toHaveAttribute('data-around-mode', mode);
       if (previousMode !== mode) await expect.poll(async () => (await inkAudit(page)).plans).toBeGreaterThan(before);
       await presentedFrames(page);
       const settled = await inkAudit(page);
@@ -147,7 +147,7 @@ test('optional real YouTube UI1.1: checker warning, ink sampling, modes, replace
 });
 
 test('optional real YouTube UI1.1: petal import explains all three actionable frame warnings', async ({}, info) => {
-  test.skip(process.env.WW_LIVE_UI11 !== '1', 'Explicit signed-out UI1.1 import verification.');
+  test.skip(process.env.AROUND_LIVE_UI11 !== '1', 'Explicit signed-out UI1.1 import verification.');
   test.setTimeout(180_000);
   const { context, page, popup } = await live();
   const records: Record<string, unknown> = {};
@@ -180,7 +180,7 @@ test('optional real YouTube UI1.1: petal import explains all three actionable fr
 });
 
 test('optional real YouTube UI1.1: outward frames stay clear at 1280, 1920 and 2560 in normal and theater views', async ({}, info) => {
-  test.skip(process.env.WW_LIVE_UI11 !== '1', 'Explicit signed-out UI1.1 outward-frame verification.');
+  test.skip(process.env.AROUND_LIVE_UI11 !== '1', 'Explicit signed-out UI1.1 outward-frame verification.');
   test.setTimeout(600_000);
   const { context, page, popup } = await live();
   const records: Record<string, unknown>[] = [];
@@ -255,7 +255,7 @@ test('optional real YouTube UI1.1: outward frames stay clear at 1280, 1920 and 2
 });
 
 test('optional real YouTube UI1.1: measure self-filled search icons against light and dark artwork', async ({}, info) => {
-  test.skip(process.env.WW_LIVE_UI11 !== '1', 'Explicit signed-out UI1.1 native-icon investigation.');
+  test.skip(process.env.AROUND_LIVE_UI11 !== '1', 'Explicit signed-out UI1.1 native-icon investigation.');
   test.setTimeout(300_000);
   const { context, page, popup } = await live();
   const records: Record<string, unknown>[] = [];
@@ -270,7 +270,7 @@ test('optional real YouTube UI1.1: measure self-filled search icons against ligh
       const input = search.locator('input');
       for (const mode of ['light', 'dark'] as const) {
         await page.locator('html').evaluate((node, dark) => node.toggleAttribute('dark', dark), mode === 'dark');
-        await expect(page.locator('html')).toHaveAttribute('data-ww-mode', mode);
+        await expect(page.locator('html')).toHaveAttribute('data-around-mode', mode);
         await input.focus();
         await presentedFrames(page, 30);
         const paths = search.locator('svg path').filter({ visible: true });
@@ -322,15 +322,15 @@ test('optional real YouTube UI1.1: measure self-filled search icons against ligh
 });
 
 test('optional real YouTube UI1.1: lazy marks, SPA, native fullscreen and emergency off settle correctly', async ({}, info) => {
-  test.skip(process.env.WW_LIVE_UI11 !== '1', 'Explicit signed-out UI1.1 native lifecycle verification.');
+  test.skip(process.env.AROUND_LIVE_UI11 !== '1', 'Explicit signed-out UI1.1 native lifecycle verification.');
   test.setTimeout(300_000);
   const { context, page, popup, profile, extension } = await live(true);
   const records: Record<string, unknown> = {};
-  const optional = page.locator('[data-ww-surface~="search-box"], [data-ww-surface~="filter-chip"]');
+  const optional = page.locator('[data-around-surface~="search-box"], [data-around-surface~="filter-chip"]');
   try {
     await storeDesign(popup, { ...plainSkinDesign, rules: [] });
     await page.goto(resultsUrl, { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+    await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
     await declinePromotion(page);
     await expect(optional).toHaveCount(0);
     await page.screenshot({ path: path.join(shots, 'lazy-unused-search.png') });
@@ -356,7 +356,7 @@ test('optional real YouTube UI1.1: lazy marks, SPA, native fullscreen and emerge
     await expect(partLocator(page, 'like-button').first()).toHaveCSS('border-image-source', /blob:/);
     records.previousCard = await old!.evaluate((node) => ({
       connected: node.isConnected,
-      marked: node.getAttribute('data-ww-surface'),
+      marked: node.getAttribute('data-around-surface'),
       visible: node.getBoundingClientRect().height > 0,
     }));
     if (!(records.previousCard as any).connected) expect((records.previousCard as any).marked).toBeNull();
@@ -367,7 +367,7 @@ test('optional real YouTube UI1.1: lazy marks, SPA, native fullscreen and emerge
       .first()
       .click();
     await expect.poll(() => page.evaluate(() => Boolean(document.fullscreenElement))).toBe(true);
-    await expect(page.locator('html')).toHaveAttribute('data-ww-fullscreen', '');
+    await expect(page.locator('html')).toHaveAttribute('data-around-fullscreen', '');
     records.fullscreen = await outsetAudit(page);
     for (const [id, height] of [
       ['player.controls.top', 64],
@@ -382,7 +382,7 @@ test('optional real YouTube UI1.1: lazy marks, SPA, native fullscreen and emerge
       .first()
       .click();
     await expect.poll(() => page.evaluate(() => Boolean(document.fullscreenElement))).toBe(false);
-    await expect(page.locator('html')).not.toHaveAttribute('data-ww-fullscreen');
+    await expect(page.locator('html')).not.toHaveAttribute('data-around-fullscreen');
     await expect(partLocator(page, 'like-button').first()).toHaveCSS('border-image-source', /blob:/);
     await storeDesign(popup, { ...plainSkinDesign, rules: [] });
     await expect(optional).toHaveCount(0);
@@ -395,16 +395,16 @@ test('optional real YouTube UI1.1: lazy marks, SPA, native fullscreen and emerge
       .poll(() =>
         page.evaluate(
           () =>
-            [...document.querySelectorAll('[data-ww-surface]')].filter(
+            [...document.querySelectorAll('[data-around-surface]')].filter(
               (node) => getComputedStyle(node).borderImageSource !== 'none',
             ).length,
         ),
       )
       .toBe(0);
     records.emergency = await page.evaluate(() => ({
-      design: document.documentElement.getAttribute('data-ww-design'),
-      force: document.documentElement.getAttribute('data-ww-skin-force'),
-      inkOff: document.documentElement.hasAttribute('data-ww-ink-off'),
+      design: document.documentElement.getAttribute('data-around-design'),
+      force: document.documentElement.getAttribute('data-around-skin-force'),
+      inkOff: document.documentElement.hasAttribute('data-around-ink-off'),
     }));
     expect(records.emergency).toEqual({ design: null, force: null, inkOff: false });
     await page.screenshot({ path: path.join(shots, 'native-after-emergency-off.png') });
@@ -412,7 +412,7 @@ test('optional real YouTube UI1.1: lazy marks, SPA, native fullscreen and emerge
     records.dom = await page.evaluate(() => ({
       visibility: document.visibilityState,
       focused: document.hasFocus(),
-      parts: [...document.querySelectorAll('[data-ww-surface~="search-box"]')].map((node) => ({
+      parts: [...document.querySelectorAll('[data-around-surface~="search-box"]')].map((node) => ({
         tag: node.tagName,
         classes: node.className,
         box: node.getBoundingClientRect().toJSON(),
@@ -426,7 +426,7 @@ test('optional real YouTube UI1.1: lazy marks, SPA, native fullscreen and emerge
             parents.push({
               tag: current.tagName,
               classes: current.className,
-              mark: current.getAttribute('data-ww-surface'),
+              mark: current.getAttribute('data-around-surface'),
               box: current.getBoundingClientRect().toJSON(),
               visibility: getComputedStyle(current).visibility,
             });

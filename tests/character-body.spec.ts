@@ -126,12 +126,12 @@ test('VRM facts: a GLB without VRMC_vrm humanoid gives none', () => {
 
 // Local only: the private model files are never in the repository or CI.
 for (const [name, variable, heads, stage] of [
-  ['trusie', 'WW_VRM_FILE', 3.0, 1],
-  ['base body', 'WW_VRM_COMPARE_FILE', 5.89, 2],
+  ['trusie', 'AROUND_VRM_FILE', 3.0, 1],
+  ['base body', 'AROUND_VRM_COMPARE_FILE', 5.89, 2],
 ] as const)
   test(`local ${name}: head-weighted measure and stage`, () => {
     const file = process.env[variable];
-    // WW_VRM_FILE may name another private model; these numbers belong to the named files only.
+    // AROUND_VRM_FILE may name another private model; these numbers belong to the named files only.
     const expected = name === 'trusie' ? 'trusie.vrm' : 'lp_basebody.vrm';
     test.skip(!file || !fs.existsSync(file) || !file.endsWith(expected), `${variable} is not ${expected}`);
     const { json, bin } = inspectGlb(new Uint8Array(fs.readFileSync(file!)));

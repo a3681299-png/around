@@ -1,6 +1,6 @@
 // The G1 measurement build: the extension of a source tree, with the frame probe prepended to the
 // content script and the tree's own measurement hooks (src/diagnostics/g11-hooks.ts) turned on by
-// the build flag __WW_G11__. Product sources are never rewritten: a tree without the hooks module
+// the build flag __AROUND_G11__. Product sources are never rewritten: a tree without the hooks module
 // is refused instead of patched.
 //   node scripts/g11/build.mjs                    → .work/g11-measurement-dist (this checkout)
 //   node scripts/g11/build.mjs <source root>      → <source root>/.work/g11-measurement-dist
@@ -26,9 +26,9 @@ if (!existsSync(hooks))
 const version = /G11_HOOKS_VERSION = (\d+);/.exec(await readFile(hooks, 'utf8'))?.[1];
 if (Number(version) !== HOOKS_VERSION)
   throw new Error(`Measurement hooks version ${version} in ${source}; this harness expects ${HOOKS_VERSION}.`);
-// WW_LAYERING=0: the earlier cut-out way (docs/layering-plan.md, chunk 4), in its own folder so the
+// AROUND_LAYERING=0: the earlier cut-out way (docs/layering-plan.md, chunk 4), in its own folder so the
 // two ways can be measured alternately. The tree's own default otherwise (layering from chunk 4).
-const layering = process.env.WW_LAYERING !== '0';
+const layering = process.env.AROUND_LAYERING !== '0';
 const out = path.join(source, layering ? '.work/g11-measurement-dist' : '.work/g11-cutout-dist');
 workPath(out);
 
@@ -73,9 +73,9 @@ execFileSync(process.execPath, ['scripts/build.mjs'], {
   stdio: 'inherit',
   env: {
     ...process.env,
-    WW_BUILD_OUT: path.relative(source, out).replaceAll('\\', '/'),
-    WW_ASSET_PROFILE: '0',
-    WW_WORLD_MODE: 'runtime',
+    AROUND_BUILD_OUT: path.relative(source, out).replaceAll('\\', '/'),
+    AROUND_ASSET_PROFILE: '0',
+    AROUND_WORLD_MODE: 'runtime',
   },
 });
 // The frame probe: every extension rAF callback timed and grouped by its frame time. It wraps
@@ -128,20 +128,20 @@ await build({
   banner: { js: banner },
   // As the normal build: the test probe of the room (a JSON written to the page on every draw) and
   // the development log are not measured.
-  dropLabels: ['WW_TEST_PAGE_CHANGE', 'WW_GUARD_TRACE', 'WW_SPACE_PROBE', 'WW_DEV_LOG'],
+  dropLabels: ['AROUND_TEST_PAGE_CHANGE', 'AROUND_GUARD_TRACE', 'AROUND_SPACE_PROBE', 'AROUND_DEV_LOG'],
   define: {
-    __WW_PAGE_CHANGE_LEGACY__: 'false',
-    __WW_WORLD_MODE__: '"runtime"',
-    __WW_WORLD_DEVTOOLS__: 'false',
-    __WW_ASSET_PROFILE__: 'false',
-    __WW_G11__: 'true',
-    __WW_LAYERING__: String(layering),
+    __AROUND_PAGE_CHANGE_LEGACY__: 'false',
+    __AROUND_WORLD_MODE__: '"runtime"',
+    __AROUND_WORLD_DEVTOOLS__: 'false',
+    __AROUND_ASSET_PROFILE__: 'false',
+    __AROUND_G11__: 'true',
+    __AROUND_LAYERING__: String(layering),
   },
 });
 // The hooks must have survived bundling: the registration is what run.mjs reads first.
 const bundled = await readFile(path.join(out, 'content/index.js'), 'utf8');
 if (!bundled.includes('__g11DisableGuard') || !bundled.includes('__g11Probe'))
-  throw new Error('The measurement hooks were not bundled; check __WW_G11__ in src/diagnostics/g11-hooks.ts.');
+  throw new Error('The measurement hooks were not bundled; check __AROUND_G11__ in src/diagnostics/g11-hooks.ts.');
 const manifest = JSON.parse(await readFile(path.join(source, 'manifest.json'), 'utf8'));
 const builtManifest = JSON.parse(await readFile(path.join(out, 'manifest.json'), 'utf8'));
 if (JSON.stringify(manifest) !== JSON.stringify(builtManifest)) throw new Error('Manifest changed');

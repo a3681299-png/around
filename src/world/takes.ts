@@ -11,7 +11,7 @@ export { TAKE_LIMITS } from '../assets/limits';
 
 /** Inputs only: rules and asset references belong to the artwork, never the take. */
 export interface SignalTake {
-  format: 'ww-signal-take';
+  format: 'around-signal-take';
   formatVersion: 1;
   runtimeVersion: typeof WORLD_RUNTIME_VERSION;
   id: string;
@@ -38,7 +38,7 @@ export function parseSignalTake(value: unknown): SignalTake {
   const data = value as Record<string, unknown>;
   const id = (value: unknown): value is string => typeof value === 'string' && /^[a-z][a-z0-9-]{0,63}$/.test(value);
   if (
-    data['format'] !== 'ww-signal-take' ||
+    data['format'] !== 'around-signal-take' ||
     data['formatVersion'] !== 1 ||
     ![WORLD_RUNTIME_VERSION, '1.2.0', '1.1.0'].includes(data['runtimeVersion'] as string) ||
     !id(data['id']) ||
@@ -60,7 +60,7 @@ export function parseSignalTake(value: unknown): SignalTake {
     previous = input.timeMs;
   }
   const take: SignalTake = {
-    format: 'ww-signal-take',
+    format: 'around-signal-take',
     formatVersion: 1,
     runtimeVersion: WORLD_RUNTIME_VERSION,
     id: data['id'],

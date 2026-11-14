@@ -42,7 +42,7 @@ export function createStudioWorkbench(
     help = get('.help-pane'),
     selection = get('.selection-bar');
   const storage = options.preferences ?? transientPreferences,
-    preferenceKey = options.sidePanel ? 'webWorldThemes.studio.sidepanel.v1' : 'webWorldThemes.studio.workbench.v2';
+    preferenceKey = options.sidePanel ? 'around.studio.sidepanel.v1' : 'around.studio.workbench.v2';
   let leftWidth = 176,
     rightWidth = 320,
     ratio = 0.56,
@@ -62,7 +62,7 @@ export function createStudioWorkbench(
         ratio,
         leftClosed,
         rightClosed,
-        dock: host.dataset.wwDock ?? 'right',
+        dock: host.dataset.aroundDock ?? 'right',
         folds: [...inspector.querySelectorAll<HTMLDetailsElement>('details')].map((item) => [
           item.className,
           item.open,
@@ -170,7 +170,7 @@ export function createStudioWorkbench(
             ratio = 0.56;
             leftClosed = rightClosed = undefined;
             allClosed = false;
-            host.dataset.wwDock = 'right';
+            host.dataset.aroundDock = 'right';
             layout();
             remember();
           },
@@ -446,7 +446,7 @@ export function createStudioWorkbench(
   function layout() {
     if (!alive) return;
     const width = doc.defaultView!.innerWidth,
-      flip = host.dataset.wwDock === 'left' && width >= 860;
+      flip = host.dataset.aroundDock === 'left' && width >= 860;
     const lc = options.sidePanel ? false : allClosed || (leftClosed ?? width < 1100),
       rc = options.sidePanel ? false : allClosed || (rightClosed ?? width < 860);
     const l = lc ? 36 : leftWidth,
@@ -496,7 +496,7 @@ export function createStudioWorkbench(
       if (gesture)
         change(
           gesture.start +
-            (side === 'left' ? 1 : -1) * (host.dataset.wwDock === 'left' ? -1 : 1) * (event.clientX - gesture.x),
+            (side === 'left' ? 1 : -1) * (host.dataset.aroundDock === 'left' ? -1 : 1) * (event.clientX - gesture.x),
         );
     });
     const end = () => {
@@ -660,7 +660,7 @@ export function createStudioWorkbench(
           ratio = Math.max(0.25, Math.min(0.75, value.ratio));
         if (typeof value.leftClosed === 'boolean') leftClosed = value.leftClosed;
         if (typeof value.rightClosed === 'boolean') rightClosed = value.rightClosed;
-        if (value.dock === 'left' || value.dock === 'right') host.dataset.wwDock = value.dock;
+        if (value.dock === 'left' || value.dock === 'right') host.dataset.aroundDock = value.dock;
         if (Array.isArray(value.folds))
           for (const entry of value.folds) {
             if (!Array.isArray(entry) || typeof entry[0] !== 'string' || typeof entry[1] !== 'boolean') continue;

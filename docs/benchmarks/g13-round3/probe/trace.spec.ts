@@ -1,6 +1,6 @@
 // G1.3 round 0 probe (not a product test): real YouTube, two moving layers (Codex's G1.2 visual
-// condition), real wheel input at ~90ms, every rAF's visibility, and the WW_GUARD_TRACE geometry log.
-// Run with WW_TEST_EXTENSION_PATH=.work/g13r0-trace, G13_POINTER=codex|near|far, G13_LABEL=<name>.
+// condition), real wheel input at ~90ms, every rAF's visibility, and the AROUND_GUARD_TRACE geometry log.
+// Run with AROUND_TEST_EXTENSION_PATH=.work/g13r0-trace, G13_POINTER=codex|near|far, G13_LABEL=<name>.
 import { test, expect } from '@playwright/test';
 import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -27,7 +27,7 @@ test('G1.3 round 0: wheel scroll visibility and geometry trace', async () => {
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30000 });
     await waitForAdvertToEnd(page);
     await declinePromotion(page);
-    await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+    await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
     const pause = page.getByRole('button', { name: /^Pause|^一時停止/ }).first();
     if (await pause.isVisible()) await pause.click();
     const { studio, panel } = await openEditor(popup, page);
@@ -47,7 +47,7 @@ test('G1.3 round 0: wheel scroll visibility and geometry trace', async () => {
     await panel.locator('.save').click();
     await expect(panel.locator('.dirty')).toHaveText('保存済み');
     const saved: any = await popup.evaluate(
-      async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
+      async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'],
     );
     await studio.close();
     // Two layers as in Codex's run: one high on the right (atmosphere, over anything), one normal
@@ -82,7 +82,7 @@ test('G1.3 round 0: wheel scroll visibility and geometry trace', async () => {
         { id: 'end', input: 1, value: 300, easing: 'linear' },
       ],
     }));
-    await popup.evaluate((design) => chrome.storage.local.set({ 'webWorldThemes.design.youtube': design }), {
+    await popup.evaluate((design) => chrome.storage.local.set({ 'around.design.youtube': design }), {
       ...saved,
       decorations,
       signalRules,
@@ -101,14 +101,12 @@ test('G1.3 round 0: wheel scroll visibility and geometry trace', async () => {
           : { x: 700, y: 650 };
     await page.mouse.move(point.x, point.y, { steps: 3 });
     await page.waitForTimeout(1500);
-    await page.evaluate(() => document.documentElement.removeAttribute('data-ww-guard-geometry'));
+    await page.evaluate(() => document.documentElement.removeAttribute('data-around-guard-geometry'));
     await page.evaluate(() => {
       const rows: any[] = ((window as any).g13Frames = []);
       (window as any).g13Recording = true;
       const sample = (t: number) => {
-        const layers = [
-          ...document.querySelectorAll<HTMLElement>('[id^="web-world-themes-"][id$="decorations"]'),
-        ].flatMap((h) =>
+        const layers = [...document.querySelectorAll<HTMLElement>('[id^="around-"][id$="decorations"]')].flatMap((h) =>
           [...(h.shadowRoot?.querySelectorAll<HTMLElement>('[data-image-id]') ?? [])].map((n) => {
             let visible = getComputedStyle(h).visibility !== 'hidden';
             for (let e: Element | null = n; e; e = e.parentElement)
@@ -120,9 +118,8 @@ test('G1.3 round 0: wheel scroll visibility and geometry trace', async () => {
           t,
           scrollY,
           layers: Object.fromEntries(layers),
-          safety: JSON.parse(
-            document.querySelector('#web-world-themes-decorations')?.getAttribute('data-ww-safety') ?? '{}',
-          ).stopped,
+          safety: JSON.parse(document.querySelector('#around-decorations')?.getAttribute('data-around-safety') ?? '{}')
+            .stopped,
         });
         if ((window as any).g13Recording) requestAnimationFrame(sample);
       };
@@ -157,8 +154,8 @@ test('G1.3 round 0: wheel scroll visibility and geometry trace', async () => {
       return {
         frames: (window as any).g13Frames,
         wheel: (window as any).g13Wheel,
-        geometry: JSON.parse(document.documentElement.getAttribute('data-ww-guard-geometry') ?? '[]'),
-        approach: JSON.parse(document.documentElement.getAttribute('data-ww-guard-approach') ?? 'null'),
+        geometry: JSON.parse(document.documentElement.getAttribute('data-around-guard-geometry') ?? '[]'),
+        approach: JSON.parse(document.documentElement.getAttribute('data-around-guard-approach') ?? 'null'),
       };
     });
     await page.screenshot({ path: path.join(out, `${label}-settled.png`) });

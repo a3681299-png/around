@@ -20,7 +20,7 @@ import { inspectAsset } from '../src/assets/inspect';
 
 function manifest(): BackupManifest {
   return {
-    format: 'web-world-themes-backup',
+    format: 'around-backup',
     version: 1,
     createdAt: '2026-10-22T00:00:00Z',
     settings: mergeSettings(DEFAULT_SETTINGS, {}),
@@ -79,10 +79,8 @@ test('older backups fill missing settings with defaults while rejecting unknown 
 });
 
 test('export identifies the site of a corrupt saved design', () => {
-  expect(() => backupDesigns({ 'webWorldThemes.design.youtube': { broken: true } })).toThrow('サイトID「youtube」');
-  expect(() => backupDesigns({ 'webWorldThemes.design.other': emptyDesign('youtube', 'retro') })).toThrow(
-    'サイトID「other」',
-  );
+  expect(() => backupDesigns({ 'around.design.youtube': { broken: true } })).toThrow('サイトID「youtube」');
+  expect(() => backupDesigns({ 'around.design.other': emptyDesign('youtube', 'retro') })).toThrow('サイトID「other」');
 });
 function untexturedModel() {
   return new Uint8Array(
@@ -96,7 +94,7 @@ function untexturedModel() {
 async function uncheckedArchive(value: unknown, payload: Uint8Array<ArrayBuffer> = new Uint8Array()) {
   const bytes = new TextEncoder().encode(JSON.stringify(value)),
     header = new Uint8Array(BACKUP_HEADER_BYTES);
-  header.set(new TextEncoder().encode('WWT-BACKUP-0001\n'));
+  header.set(new TextEncoder().encode('AROUND-BACKUP-0001\n'));
   new DataView(header.buffer).setUint32(BACKUP_HEADER_BYTES - 36, bytes.length, true);
   header.set(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), BACKUP_HEADER_BYTES - 32);
   return new Blob([header, bytes, payload]);
@@ -137,9 +135,9 @@ test('backup rejects unknown versions, unknown keys, coerced types and excessive
     expect(() => parseBackupManifest({ ...manifest(), ...patch })).toThrow();
   for (const strength of [NaN, Infinity, ['60'], '60', -1, 101])
     expect(() => parseBackupManifest({ ...manifest(), settings: { ...DEFAULT_SETTINGS, strength } })).toThrow();
-  expect(() => parseBackupManifest({ ...manifest(), preferences: { 'webWorldThemes.design.youtube': {} } })).toThrow();
+  expect(() => parseBackupManifest({ ...manifest(), preferences: { 'around.design.youtube': {} } })).toThrow();
   expect(() =>
-    parseBackupManifest({ ...manifest(), preferences: { 'webWorldThemes.studio.workspace.v1': { area: ['layers'] } } }),
+    parseBackupManifest({ ...manifest(), preferences: { 'around.studio.workspace.v1': { area: ['layers'] } } }),
   ).toThrow();
 });
 test('backup enforces archive and metadata byte bounds before allocating a payload', async () => {
@@ -177,7 +175,7 @@ test('backup requires all referenced originals and validates take contents', asy
   value.designs.push(doc);
   await expect(decodeBackup(await uncheckedArchive(value))).rejects.toThrow('素材');
   expect(() =>
-    parseBackupManifest({ ...manifest(), takes: [{ format: 'ww-signal-take', formatVersion: 99 }] }),
+    parseBackupManifest({ ...manifest(), takes: [{ format: 'around-signal-take', formatVersion: 99 }] }),
   ).toThrow();
 });
 test('restore is additive, idempotent, and never overwrites a different saved artwork', () => {
@@ -187,9 +185,9 @@ test('restore is additive, idempotent, and never overwrites a different saved ar
   const backup: ValidatedBackup = { manifest: value, assets: [] };
   const first = planRestore(backup, {}, [], [], true);
   expect(planRestore(backup, first.values, [], [], true).values).toEqual(first.values);
-  expect(planRestore(backup, {}, [], [], false).values).toEqual({ 'webWorldThemes.design.youtube': doc });
+  expect(planRestore(backup, {}, [], [], false).values).toEqual({ 'around.design.youtube': doc });
   const changed = { ...doc, baseThemeId: null };
-  expect(() => planRestore(backup, { 'webWorldThemes.design.youtube': changed }, [], [], true)).toThrow('衝突');
+  expect(() => planRestore(backup, { 'around.design.youtube': changed }, [], [], true)).toThrow('衝突');
   expect(() => planRestore(backup, { ignored: 'x'.repeat(BACKUP_LIMITS.localBytes) }, [], [], true)).toThrow('10MiB');
 });
 test('restore rejects combined material quotas and retains spare originals without transferring live leases', () => {
@@ -260,7 +258,7 @@ test('backup worker authenticates its live top-level page and refuses other exte
  */
 /** The archive's JSON as written (its originals are decoded with the browser in legacy-data.spec.ts). */
 async function historyManifest(): Promise<unknown> {
-  const bytes = await readFile('tests/fixtures/backups/pre-removal.wwbackup'),
+  const bytes = await readFile('tests/fixtures/backups/pre-removal.aroundbackup'),
     length = new DataView(bytes.buffer, bytes.byteOffset).getUint32(BACKUP_HEADER_BYTES - 36, true);
   return JSON.parse(new TextDecoder().decode(bytes.subarray(BACKUP_HEADER_BYTES, BACKUP_HEADER_BYTES + length)));
 }
@@ -271,22 +269,22 @@ test('a backup made with the retro theme still parses, restores its artwork and 
   const manifest = parseBackupManifest(await historyManifest()),
     storage = await historyStorage();
   // The stored v13 artwork reads as the current version with nothing else changed.
-  const stored = parseDesign(storage['webWorldThemes.design.youtube']);
-  expect({ ...stored, schemaVersion: 13 }).toEqual(storage['webWorldThemes.design.youtube']);
+  const stored = parseDesign(storage['around.design.youtube']);
+  expect({ ...stored, schemaVersion: 13 }).toEqual(storage['around.design.youtube']);
   expect(manifest.designs).toEqual([stored]);
   expect(manifest.designs[0]!.baseThemeId).toBe('retro');
   expect(manifest.settings).toEqual({ enabled: true, creatorMode: true });
   for (const applySettings of [false, true]) {
     const { values } = planRestore({ manifest, assets: [] }, {}, [], [], applySettings);
-    expect(values['webWorldThemes.design.youtube']).toEqual(stored);
+    expect(values['around.design.youtube']).toEqual(stored);
     // The switch is restored as 作品を表示する; the retro items are not written back.
     if (applySettings)
       expect(values).toEqual({
-        'webWorldThemes.design.youtube': stored,
-        'webWorldThemes.showArtwork': true,
-        'webWorldThemes.creatorMode': true,
+        'around.design.youtube': stored,
+        'around.showArtwork': true,
+        'around.creatorMode': true,
       });
-    else expect(Object.keys(values)).toEqual(['webWorldThemes.design.youtube']);
+    else expect(Object.keys(values)).toEqual(['around.design.youtube']);
   }
 });
 
@@ -307,7 +305,7 @@ test('the retro settings in an old backup are still checked: an invalid value re
 
 test('old backup archives with valid hashes still reject every invalid legacy settings family', async () => {
   const valid = (await historyManifest()) as { settings: Record<string, unknown> };
-  const bytes = await readFile('tests/fixtures/backups/pre-removal.wwbackup');
+  const bytes = await readFile('tests/fixtures/backups/pre-removal.aroundbackup');
   const length = new DataView(bytes.buffer, bytes.byteOffset).getUint32(BACKUP_HEADER_BYTES - 36, true);
   const payload = new Uint8Array(bytes.subarray(BACKUP_HEADER_BYTES + length));
   for (const patch of [

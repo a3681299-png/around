@@ -1,10 +1,10 @@
 # UI0-d 独立検証
 
-2026-11-01、Codex。`codex/creator-editor-spike` を `pull --ff-only` し、実装の先端 `d9984ea3afd68c3fee5e7eb2c77273a84b22cad0` を固定して検証した。比較の変更前は `3cfa6ae701d02b5be7d97c63e61193b3360950d5`。`ui0d-plan.md`、`ui0d-1.md`、`ui0d-2.md`、`ui0d-3.md` の一覧、`ui0d-3.1.md` を読み、wwt-verify / wwt-perf / wwt-live-test に従った。
+2026-11-01、Codex。`codex/creator-editor-spike` を `pull --ff-only` し、実装の先端 `d9984ea3afd68c3fee5e7eb2c77273a84b22cad0` を固定して検証した。比較の変更前は `3cfa6ae701d02b5be7d97c63e61193b3360950d5`。`ui0d-plan.md`、`ui0d-1.md`、`ui0d-2.md`、`ui0d-3.md` の一覧、`ui0d-3.1.md` を読み、around-verify / around-perf / around-live-test に従った。
 
 **機能・見た目・追加の性能2場面は合格。緊急OFFの停止／再開を直した。最終CIは全5ジョブ成功（下記）。** main・通常のdist・manifest・作品データの形式は変更していない。
 
-境界も確認した。mainは `673228ec` のまま、mainと検証worktreeの通常dist計48ファイルは作業前のSHA-256と全一致。通常ビルドには `__ui1Probe`・`__ui0dGuard`・ページ変更の計測フックが入っていない。`WW_VRM_FILE` は未設定で、`git log --all` のファイル名にも `PochibyKT_Pochi*` はなかった。
+境界も確認した。mainは `673228ec` のまま、mainと検証worktreeの通常dist計48ファイルは作業前のSHA-256と全一致。通常ビルドには `__ui1Probe`・`__ui0dGuard`・ページ変更の計測フックが入っていない。`AROUND_VRM_FILE` は未設定で、`git log --all` のファイル名にも `PochibyKT_Pochi*` はなかった。
 
 ## 主張と結果
 
@@ -29,7 +29,7 @@
 
 `138298f`：緊急OFFでも残っていたページの入力横取りを解除。
 
-影響×頻度は **操作が破綻する × 条件がそろうと**。Sで着せ替えツールを選んだまま緊急OFFすると、絵や印は消えても `html[data-ww-editing][data-ww-skin-picking]` が残った。`createCreatorEditor.refresh()` が `marksSuspended` を入力のbind条件に含めず、`onPick()` がクリックを引き続き `preventDefault()` / `stopImmediatePropagation()` していたため。OFF後も本物の操作を遮るので、この段階で直した。
+影響×頻度は **操作が破綻する × 条件がそろうと**。Sで着せ替えツールを選んだまま緊急OFFすると、絵や印は消えても `html[data-around-editing][data-around-skin-picking]` が残った。`createCreatorEditor.refresh()` が `marksSuspended` を入力のbind条件に含めず、`onPick()` がクリックを引き続き `preventDefault()` / `stopImmediatePropagation()` していたため。OFF後も本物の操作を遮るので、この段階で直した。
 
 失敗する `ui0d-emergency.spec.ts` を先に追加した。修正では、OFF中にページの選択イベント・キーボード・ドロップ・画像編集の入力を外し、強制プレビューも解除した。Coreの文書・下書き・履歴とパネルの接続は残す。作業台を切断する仕様には変えていない。見出し／実ショートカットの各OFF後にネイティブボタンを押し、クリックが届くことも検証する。10回反復で失敗0件。実YouTubeでも着せ替え・印・絵が消え、再開後に戻った。
 
@@ -88,14 +88,14 @@
 
 ## テストとCI
 
-| 層             | この検証で確認した結果                                                                                                                                                                                                                                                                       |
-| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| unit           | 手元で403件成功（製品の小修正後、S拒否時の拡張アクションのunit1件を追加）。実装のCIは402件成功をログで確認                                                                                                                                                                                   |
-| 追加e2e        | `ui0d-emergency.spec.ts` 1件、`ui0d-verification.spec.ts` 3件、計4件成功。緊急OFFは別に10回反復し全成功                                                                                                                                                                                      |
-| 関連e2e        | `editor-entry.spec.ts` の実アクション2件と動画内入口1件、`editor-arrangement.spec.ts` の表示設定1件、`operation-controls.spec.ts`・`operation-safety.spec.ts`・`page-marks.spec.ts` の緊急OFF各1件、計7件成功                                                                                |
-| 実サイト       | `WW_LIVE_UI0D=1`、`ui0d-verification-live.spec.ts` の見た目2ケースとG1/緊急OFF1ケース、最終3ケースすべて成功                                                                                                                                                                                 |
-| 実装の全件CI   | `332de59`、[run 41213235416・attempt 2](https://github.com/a3681299-png/web-world-themes/actions/runs/41213235416)。unit402成功、e2e4分割は65+74+72+57=268成功、49件は明示的skip。別の入口スモーク4件も成功。`d9984ea` までの差分は `docs/ui0d-3.1.md` だけで、製品コードは同じ              |
-| 検証後の全件CI | `2e9ec57`、[run 41281562019・attempt 1](https://github.com/a3681299-png/web-world-themes/actions/runs/41281562019)。全5ジョブ成功。lint・型チェック・unit403成功、e2e4分割は65+77+73+57=272成功、52件は明示的skip（実サイトを含む）。入口スモーク4件も成功。新規e2e4件と選択復元もCI上で成功 |
+| 層             | この検証で確認した結果                                                                                                                                                                                                                                                             |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| unit           | 手元で403件成功（製品の小修正後、S拒否時の拡張アクションのunit1件を追加）。実装のCIは402件成功をログで確認                                                                                                                                                                         |
+| 追加e2e        | `ui0d-emergency.spec.ts` 1件、`ui0d-verification.spec.ts` 3件、計4件成功。緊急OFFは別に10回反復し全成功                                                                                                                                                                            |
+| 関連e2e        | `editor-entry.spec.ts` の実アクション2件と動画内入口1件、`editor-arrangement.spec.ts` の表示設定1件、`operation-controls.spec.ts`・`operation-safety.spec.ts`・`page-marks.spec.ts` の緊急OFF各1件、計7件成功                                                                      |
+| 実サイト       | `AROUND_LIVE_UI0D=1`、`ui0d-verification-live.spec.ts` の見た目2ケースとG1/緊急OFF1ケース、最終3ケースすべて成功                                                                                                                                                                   |
+| 実装の全件CI   | `332de59`、[run 41213235416・attempt 2](https://github.com/a3681299-png/around/actions/runs/41213235416)。unit402成功、e2e4分割は65+74+72+57=268成功、49件は明示的skip。別の入口スモーク4件も成功。`d9984ea` までの差分は `docs/ui0d-3.1.md` だけで、製品コードは同じ              |
+| 検証後の全件CI | `2e9ec57`、[run 41281562019・attempt 1](https://github.com/a3681299-png/around/actions/runs/41281562019)。全5ジョブ成功。lint・型チェック・unit403成功、e2e4分割は65+77+73+57=272成功、52件は明示的skip（実サイトを含む）。入口スモーク4件も成功。新規e2e4件と選択復元もCI上で成功 |
 
 最終の追記コミットは報告書と計測JSONだけの `[skip ci]`。CIで確かめた製品・テスト・道具の先端は `2e9ec57faf10a61327d90f4466bfe50b7c4f5ca9` で、その後これらは変更していない。
 

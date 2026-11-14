@@ -41,11 +41,15 @@ test('without the build flag the hooks are off: the guard cannot be switched off
 });
 
 test('the product builds define the flag false; only the measurement build turns the hooks on', async () => {
-  expect(await bundled({ __WW_G11__: 'false' })).toEqual({
+  expect(await bundled({ __AROUND_G11__: 'false' })).toEqual({
     enabled: false,
     guardDisabled: false,
     refresh: 'undefined',
   });
   expect(await bundled({})).toEqual({ enabled: false, guardDisabled: false, refresh: 'undefined' });
-  expect(await bundled({ __WW_G11__: 'true' })).toEqual({ enabled: true, guardDisabled: true, refresh: 'function' });
+  expect(await bundled({ __AROUND_G11__: 'true' })).toEqual({
+    enabled: true,
+    guardDisabled: true,
+    refresh: 'function',
+  });
 });

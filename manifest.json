@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Web World Themes",
+  "name": "Around",
   "version": "0.1.0",
   "description": "YouTubeの上に、自分で作った世界（UIの着せ替え・画像・3Dモデル）を表示する拡張機能です。",
   "minimum_chrome_version": "120",
@@ -9,7 +9,7 @@
     "service_worker": "background/index.js"
   },
   "action": {
-    "default_title": "Web World Themes",
+    "default_title": "Around",
     "default_popup": "popup/index.html"
   },
   "commands": {

@@ -1,0 +1,945 @@
+/* Around Studio — construction (ruler + G-pen)
+   Ruler lines are uniform 1px borders. G-pen marks are tapered shapes used as masks over a colour,
+   so they scale with the element and never wobble. Motion runs on 12fps steps. */
+
+:root {
+  --around-frame: 83ms;
+  /* G-pen shapes: lens strokes thinnest at both tips, widest a little before the middle. */
+  --around-pen-h: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 4' preserveAspectRatio='none'%3E%3Cpath d='M0 2C24 .4 52 .1 100 2C52 3.9 24 3.6 0 2Z'/%3E%3C/svg%3E");
+  --around-pen-v: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 100' preserveAspectRatio='none'%3E%3Cpath d='M2 0C.4 24 .1 52 2 100C3.9 52 3.6 24 2 0Z'/%3E%3C/svg%3E");
+  --around-pen-ring: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'%3E%3Cpath d='M28.1 6.2L30.1 7.4L31.9 8.7L33.5 10.3L34.9 12L36.1 13.9L37 15.9L37.6 18L37.9 20.1L38 22.3L37.7 24.4L37.2 26.5L36.4 28.5L35.4 30.3L34.1 32L32.7 33.6L31 34.9L29.2 36L27.2 36.8L25.2 37.4L23.1 37.7L21 37.7L18.9 37.4L16.8 36.9L14.8 36.1L13 35L11.3 33.7L9.8 32.2L8.5 30.4L7.5 28.6L6.7 26.6L6.1 24.5L5.9 22.3L5.9 20.1L6.3 18L6.9 15.8L7.8 13.8L8.9 11.9L10.3 10.2L12 8.6L13.8 7.2L13.7 7.1L11.6 8.2L9.8 9.6L8.1 11.3L6.7 13.2L5.6 15.3L4.8 17.6L4.3 19.9L4.1 22.3L4.3 24.7L4.8 27.1L5.6 29.4L6.7 31.6L8.1 33.6L9.7 35.4L11.6 37L13.7 38.2L16 39.2L18.4 39.9L20.8 40.2L23.3 40.2L25.7 39.9L28.1 39.3L30.4 38.3L32.5 37L34.4 35.4L36.1 33.6L37.5 31.6L38.6 29.4L39.4 27.1L39.9 24.7L40 22.3L39.9 19.9L39.3 17.5L38.5 15.2L37.4 13.1L36 11.2L34.3 9.5L32.4 8L30.4 6.9L28.2 6.1Z'/%3E%3C/svg%3E");
+  --around-hatch: repeating-linear-gradient(45deg, var(--vermilion) 0 1.2px, transparent 1.2px 6px);
+}
+
+/* ---------- base ---------- */
+.ww {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--ink);
+}
+.ww .num,
+.around-num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.ww :focus-visible {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 1px;
+}
+.around-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+}
+
+/* ---------- G-pen and ruler, the two lines ---------- */
+/* Inline SVG drawings: ruler strokes and G-pen fills. */
+.around-rule {
+  fill: none;
+  stroke: var(--ink-faint);
+  stroke-width: 1;
+}
+.around-pen {
+  fill: currentColor;
+  stroke: none;
+}
+/* Draw-in: put pathLength="1" on the stroke (or on the mask centreline of a G-pen fill). */
+.around-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: around-draw calc(var(--around-frame) * var(--around-frames, 4)) steps(var(--around-frames, 4), end)
+    var(--around-delay, 0ms) forwards;
+}
+@keyframes around-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.around-appear {
+  opacity: 0;
+  animation: around-appear calc(var(--around-frame) * 3) steps(3, end) var(--around-delay, 0ms) forwards;
+}
+@keyframes around-appear {
+  to {
+    opacity: 1;
+  }
+}
+/* A free-standing horizontal G-pen line (dividers in empty states, signatures). */
+.around-penline {
+  display: block;
+  height: 3px;
+  background: currentColor;
+  -webkit-mask: var(--around-pen-h) center / 100% 100% no-repeat;
+  mask: var(--around-pen-h) center / 100% 100% no-repeat;
+}
+
+/* ---------- buttons ---------- */
+.around-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  height: var(--control);
+  padding: 0 var(--space-12);
+  border: 1px solid var(--line-control);
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  transition: background-color calc(var(--around-frame) * 2) steps(2, end);
+}
+.around-btn:hover {
+  background: var(--surface-raised);
+}
+.around-btn:active {
+  background: var(--cobalt-wash);
+}
+.around-btn[disabled] {
+  color: var(--ink-faint);
+  border-color: var(--line);
+  cursor: default;
+  background: transparent;
+}
+.around-btn--primary {
+  background: var(--cobalt);
+  border-color: var(--cobalt);
+  color: var(--on-cobalt);
+  font-weight: 700;
+}
+.around-btn--primary:hover {
+  background: var(--cobalt);
+  filter: brightness(1.12);
+}
+.around-btn--ghost {
+  border-color: transparent;
+  color: var(--ink-muted);
+}
+.around-btn--ghost:hover {
+  color: var(--ink);
+}
+.around-btn--danger {
+  border-color: var(--vermilion);
+  color: var(--vermilion);
+}
+.around-btn--dense {
+  height: var(--control-dense);
+  padding: 0 var(--space-8);
+  font-size: 12px;
+}
+.around-kbd {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+.around-btn--primary .around-kbd {
+  color: inherit;
+  opacity: 0.8;
+}
+
+.around-icon-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--control);
+  height: var(--control);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition: background-color calc(var(--around-frame) * 2) steps(2, end);
+}
+.around-icon-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.around-icon-btn:hover {
+  background: var(--surface-raised);
+  color: var(--ink);
+}
+.around-icon-btn[aria-pressed='true'] {
+  color: var(--cobalt);
+}
+.around-icon-btn--dense {
+  width: var(--control-dense);
+  height: var(--control-dense);
+}
+
+/* ---------- tool rail: the active tool gets a G-pen circle ---------- */
+.around-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8);
+  width: var(--bar);
+  padding: var(--space-12) 0;
+  background: var(--surface-sunk);
+  border-right: 1px solid var(--line);
+  box-sizing: border-box;
+}
+.around-rail--row {
+  flex-direction: row;
+  width: auto;
+  height: var(--bar);
+  padding: 0 var(--space-12);
+  border-right: 0;
+  border-bottom: 1px solid var(--line);
+}
+.around-rail hr {
+  width: 20px;
+  height: 0;
+  margin: var(--space-4) 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+.around-rail--row hr {
+  width: 0;
+  height: 20px;
+  margin: 0 var(--space-4);
+  border-top: 0;
+  border-left: 1px solid var(--line);
+}
+@property --around-sweep {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 360deg;
+}
+.around-rail .around-icon-btn[aria-pressed='true']::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  background: var(--cobalt);
+  pointer-events: none;
+  -webkit-mask:
+    var(--around-pen-ring) center / 100% 100% no-repeat,
+    conic-gradient(from 20deg, #000 var(--around-sweep), transparent 0);
+  -webkit-mask-composite: source-in;
+  mask:
+    var(--around-pen-ring) center / 100% 100% no-repeat,
+    conic-gradient(from 20deg, #000 var(--around-sweep), transparent 0);
+  mask-composite: intersect;
+  animation: around-sweep calc(var(--around-frame) * 4) steps(4, end);
+}
+@keyframes around-sweep {
+  from {
+    --around-sweep: 0deg;
+  }
+  to {
+    --around-sweep: 360deg;
+  }
+}
+
+/* ---------- panels ---------- */
+.around-panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-sizing: border-box;
+}
+.around-panel--float {
+  border: 0;
+  border-radius: var(--radius-float);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-float);
+  padding: var(--space-4);
+}
+.around-panel--float > .around-panel__body {
+  border-radius: var(--radius-control);
+  background: var(--surface);
+}
+.around-panel__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  height: var(--control);
+  padding: 0 var(--space-4) 0 var(--space-12);
+  background: var(--surface-sunk);
+  border-bottom: 1px solid var(--line);
+}
+.around-panel--float > .around-panel__header {
+  background: transparent;
+  border-bottom: 0;
+  padding-left: var(--space-8);
+}
+.around-panel__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+}
+.around-panel__title {
+  flex: 1;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.around-panel__body {
+  display: flex;
+  flex-direction: column;
+}
+.around-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-12) var(--space-20) var(--space-20);
+}
+.around-section + .around-section {
+  border-top: 1px solid var(--line);
+}
+.around-section__head {
+  font-weight: 700;
+}
+/* Opening: the panel's ruler edges are drawn in 4 frames, then the content appears. */
+.around-construct {
+  animation: around-construct-edge calc(var(--around-frame) * 4) steps(4, end);
+}
+.around-construct > * {
+  opacity: 0;
+  animation: around-appear calc(var(--around-frame) * 3) steps(3, end) calc(var(--around-frame) * 4) forwards;
+}
+@keyframes around-construct-edge {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* ---------- tabs: the selected tab gets a G-pen stroke ---------- */
+.around-tabs {
+  display: flex;
+  height: var(--control);
+  background: var(--surface-sunk);
+  border-bottom: 1px solid var(--line);
+}
+.around-tab {
+  position: relative;
+  flex: 1;
+  border: 0;
+  background: transparent;
+  color: var(--ink-muted);
+  font: inherit;
+  cursor: pointer;
+}
+.around-tab:hover {
+  color: var(--ink);
+}
+.around-tab[aria-selected='true'] {
+  color: var(--ink);
+  font-weight: 700;
+}
+.around-tab[aria-selected='true']::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 1px;
+  width: 84px;
+  max-width: calc(100% - var(--space-8));
+  height: 3px;
+  transform: translateX(-50%);
+  background: var(--cobalt);
+  -webkit-mask: var(--around-pen-h) center / 100% 100% no-repeat;
+  mask: var(--around-pen-h) center / 100% 100% no-repeat;
+  animation: around-stroke calc(var(--around-frame) * 4) steps(4, end);
+}
+@keyframes around-stroke {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* ---------- fields ---------- */
+.around-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.around-field__label {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+.around-input {
+  height: var(--control);
+  box-sizing: border-box;
+  padding: 0 var(--space-8);
+  border: 1px solid var(--line-control);
+  border-radius: var(--radius-control);
+  background: var(--surface-sunk);
+  color: var(--ink);
+  font: inherit;
+}
+.around-input::placeholder {
+  color: var(--ink-faint);
+}
+.around-scrub {
+  display: flex;
+  align-items: center;
+  height: var(--control);
+  box-sizing: border-box;
+  border: 1px solid var(--line-control);
+  border-radius: var(--radius-control);
+  background: var(--surface-sunk);
+}
+.around-scrub__axis {
+  width: 20px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-muted);
+  cursor: ew-resize;
+  user-select: none;
+}
+.around-scrub__value {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+}
+.around-scrub__unit {
+  padding: 0 var(--space-8) 0 var(--space-4);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+.around-scrub--active {
+  border-color: var(--cobalt);
+}
+.around-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-12);
+}
+.around-segs {
+  display: flex;
+}
+.around-seg {
+  flex: 1;
+  height: var(--control);
+  border: 1px solid var(--line-control);
+  margin-left: -1px;
+  background: transparent;
+  color: var(--ink-muted);
+  font: inherit;
+  cursor: pointer;
+}
+.around-seg:first-child {
+  margin-left: 0;
+  border-radius: var(--radius-control) 0 0 var(--radius-control);
+}
+.around-seg:last-child {
+  border-radius: 0 var(--radius-control) var(--radius-control) 0;
+}
+.around-seg[aria-pressed='true'] {
+  position: relative;
+  z-index: 1;
+  border-color: var(--cobalt);
+  background: var(--cobalt-wash);
+  color: var(--cobalt);
+}
+
+/* ---------- toggle and checkbox ---------- */
+.around-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  cursor: pointer;
+}
+.around-toggle input:not(.around-check) {
+  appearance: none;
+  position: relative;
+  width: 32px;
+  height: var(--control-dense);
+  margin: 0;
+  border: 1px solid var(--line-control);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  cursor: pointer;
+}
+.around-toggle input:not(.around-check)::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--ink-muted);
+  transition: transform calc(var(--around-frame) * 3) steps(3, end);
+}
+.around-toggle input:not(.around-check):checked {
+  border-color: var(--cobalt);
+  background: var(--cobalt-wash);
+}
+.around-toggle input:not(.around-check):checked::after {
+  background: var(--cobalt);
+  transform: translateX(12px);
+}
+.around-check {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  margin: 0;
+  border: 1px solid var(--line-control);
+  border-radius: 2px;
+  background: transparent;
+  display: inline-grid;
+  place-content: center;
+}
+.around-check:checked {
+  border-color: var(--cobalt);
+  background: var(--cobalt);
+}
+.around-check:checked::after {
+  content: '';
+  width: 6px;
+  height: 3px;
+  border: 1.5px solid var(--on-cobalt);
+  border-top: 0;
+  border-right: 0;
+  transform: rotate(-45deg) translate(0, -1px);
+}
+
+/* ---------- status chips: a word plus a shape ---------- */
+.around-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  height: var(--control-dense);
+  padding: 0 var(--space-8);
+  border-radius: var(--radius-control);
+  background: var(--surface-raised);
+  color: var(--ink-muted);
+  font-size: 12px;
+  line-height: 20px;
+  white-space: nowrap;
+}
+.around-chip::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  flex: none;
+}
+.around-chip--saved::before {
+  border-radius: 50%;
+  background: var(--ok-green);
+}
+.around-chip--dirty::before {
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 1px dashed var(--ink-muted);
+}
+.around-chip--limited {
+  color: var(--vermilion);
+}
+.around-chip--limited::before {
+  background: var(--vermilion);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+.around-chip--advice {
+  color: var(--lamp-amber);
+}
+.around-chip--advice::before {
+  background: var(--lamp-amber);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+.around-chip--atmos {
+  color: var(--lamp-amber);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--lamp-amber);
+}
+.around-chip--atmos::before {
+  display: none;
+}
+.around-chip--off {
+  color: var(--ink-faint);
+}
+.around-chip--off::before {
+  width: 4px;
+  height: 4px;
+  margin: 0 2px;
+  border-radius: 50%;
+  background: var(--ink-faint);
+}
+.around-notice {
+  display: flex;
+  gap: var(--space-12);
+  padding: var(--space-12);
+  border-radius: var(--radius-control);
+  background: var(--vermilion-wash);
+  box-shadow: inset 0 0 0 1px var(--vermilion);
+}
+.around-notice::before {
+  content: '';
+  flex: none;
+  width: 12px;
+  height: 12px;
+  margin-top: 4px;
+  background: var(--vermilion);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+
+/* ---------- layer rows ---------- */
+.around-tree {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4) 0;
+}
+.around-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  height: var(--control);
+  padding: 0 var(--space-12) 0 calc(var(--space-12) + var(--depth, 0) * var(--space-20));
+  cursor: pointer;
+}
+.around-row:hover {
+  background: var(--surface-raised);
+}
+.around-row[aria-selected='true'] {
+  background: var(--cobalt-wash);
+  box-shadow: inset 0 0 0 1px var(--cobalt);
+}
+.around-row__glyph {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  fill: none;
+  stroke: var(--ink-muted);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.around-row__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.around-row__meta {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+.around-row--hidden .around-row__name {
+  color: var(--ink-faint);
+}
+.around-row--limited {
+  box-shadow: inset 0 0 0 1px var(--vermilion);
+}
+
+/* ---------- part cards (UIの着せ替え) ---------- */
+.around-parts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(136px, 1fr));
+  gap: var(--space-12);
+}
+.around-part {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-8);
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.around-part:hover {
+  background: var(--surface-raised);
+}
+.around-part[aria-pressed='true'] {
+  border-color: var(--cobalt);
+  background: var(--cobalt-wash);
+}
+.around-part__thumb {
+  position: relative;
+  height: 84px;
+  border-radius: var(--radius-control);
+  background: var(--ground);
+  overflow: visible;
+}
+.around-part__name {
+  font-size: 13px;
+}
+.around-part__meta {
+  display: flex;
+  gap: var(--space-4);
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+.around-part--none .around-part__meta {
+  color: var(--ink-faint);
+}
+
+/* ---------- on the page: the G-pen frame and its tag ---------- */
+/* Place .around-mark over the part's box grown by the overshoot (4px) on every side.
+   Each side is a G-pen stroke that runs 4px past the corners. */
+.around-mark {
+  position: absolute;
+  pointer-events: none;
+  background: var(--cobalt);
+  -webkit-mask:
+    var(--around-pen-h) 0 2.5px / 100% 3px no-repeat,
+    var(--around-pen-h) 0 calc(100% - 2.5px) / 100% 3px no-repeat,
+    var(--around-pen-v) 2.5px 0 / 3px 100% no-repeat,
+    var(--around-pen-v) calc(100% - 2.5px) 0 / 3px 100% no-repeat;
+  mask:
+    var(--around-pen-h) 0 2.5px / 100% 3px no-repeat,
+    var(--around-pen-h) 0 calc(100% - 2.5px) / 100% 3px no-repeat,
+    var(--around-pen-v) 2.5px 0 / 3px 100% no-repeat,
+    var(--around-pen-v) calc(100% - 2.5px) 0 / 3px 100% no-repeat;
+  animation: around-stroke calc(var(--around-frame) * 4) steps(4, end);
+}
+/* Other instances of the part are ruled, not inked: 1px solid cobalt at 50%, never drawn in.
+   In the extension it is a CSS outline on each part (offset 4px), so the page never tracks them. */
+.around-mark--sibling {
+  background: none;
+  -webkit-mask: none;
+  mask: none;
+  animation: none;
+  border: 1px solid color-mix(in srgb, var(--cobalt) 50%, transparent);
+}
+.around-tag {
+  position: absolute;
+  display: inline-flex;
+  gap: var(--space-4);
+  height: var(--control-dense);
+  padding: 0 var(--space-8);
+  border-radius: var(--radius-control);
+  background: var(--cobalt);
+  color: var(--on-cobalt);
+  font-size: 12px;
+  line-height: 20px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.around-tag--off {
+  background: var(--surface-raised);
+  color: var(--ink-muted);
+}
+.around-unsupported {
+  position: absolute;
+  pointer-events: none;
+  border: 1px dashed var(--ink-faint);
+  border-radius: var(--radius-control);
+}
+
+/* G1 protection: the 45° hatch is the one diagonal in the system. */
+.around-protect {
+  position: absolute;
+  pointer-events: none;
+  background: var(--around-hatch);
+  opacity: 0.9;
+  box-shadow: inset 0 1px 0 var(--vermilion);
+}
+.around-protect::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--vermilion-wash);
+}
+.around-protect__label {
+  position: absolute;
+  left: var(--space-12);
+  bottom: var(--space-12);
+  height: var(--control-dense);
+  padding: 0 var(--space-8);
+  background: var(--surface-sunk);
+  color: var(--vermilion);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 20px;
+}
+
+/* ---------- timesheet: 12px per frame, keys are squares ---------- */
+.around-sheet {
+  display: grid;
+  grid-template-columns: 212px 1fr;
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+}
+.around-sheet__corner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  height: var(--control);
+  padding: 0 var(--space-12);
+  background: var(--surface-sunk);
+  border-bottom: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+.around-sheet__ruler {
+  position: relative;
+  height: var(--control);
+  background: var(--surface-sunk);
+  border-bottom: 1px solid var(--line);
+  background-image: repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 12px);
+  background-size: 100% 4px;
+  background-repeat: repeat-x;
+  background-position: 0 100%;
+}
+.around-sheet__tick {
+  position: absolute;
+  top: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--ink-faint);
+}
+.around-sheet__name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  height: var(--control-dense);
+  padding: 0 var(--space-12);
+  border-right: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+.around-sheet__name small {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+.around-sheet__track {
+  position: relative;
+  height: var(--control-dense);
+  border-bottom: 1px solid var(--line);
+}
+.around-hold {
+  position: absolute;
+  top: 4px;
+  height: 12px;
+  background: var(--pen-bone);
+  opacity: 0.22;
+}
+.around-key {
+  position: absolute;
+  top: 6px;
+  width: 8px;
+  height: 8px;
+  background: var(--pen-bone);
+}
+.around-key[aria-selected='true'] {
+  background: var(--cobalt);
+}
+.around-playhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1.5px;
+  background: var(--cobalt);
+  pointer-events: none;
+}
+
+/* ---------- swatches: φ rectangles ---------- */
+.around-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+}
+.around-swatch {
+  width: 52px;
+  height: 32px;
+  border: 1px solid var(--line-control);
+  border-radius: var(--radius-control);
+  background: var(--swatch, transparent);
+  cursor: pointer;
+  padding: 0;
+}
+.around-swatch[aria-pressed='true'] {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 2px;
+}
+
+/* ---------- empty state: a construction drawn, then the words ---------- */
+.around-empty {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-20);
+  padding: var(--space-84) var(--space-32) var(--space-32);
+  text-align: center;
+  /* Graph paper on a 20px pitch: the only texture in the system, and only behind empty states. */
+  background-image:
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--ink) 5%, transparent) 0 1px, transparent 1px 20px),
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--ink) 5%, transparent) 0 1px, transparent 1px 20px);
+}
+.around-empty__drawing {
+  width: 236px;
+  height: 152px;
+  color: var(--cobalt);
+}
+.around-empty__title {
+  margin: 0;
+  font-size: 20px;
+  line-height: 32px;
+  font-weight: 700;
+}
+.around-empty__text {
+  margin: 0;
+  max-width: 300px;
+  color: var(--ink-muted);
+}
+.around-empty__actions {
+  display: flex;
+  gap: var(--space-12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .around-draw {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+  .around-appear,
+  .around-construct > * {
+    animation: none;
+    opacity: 1;
+  }
+  .around-construct,
+  .around-mark,
+  .around-tab[aria-selected='true']::after,
+  .around-rail .around-icon-btn[aria-pressed='true']::after {
+    animation: none;
+  }
+  .ww *,
+  .around-btn,
+  .around-icon-btn,
+  .around-toggle input::after {
+    transition: none;
+  }
+}

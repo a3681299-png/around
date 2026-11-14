@@ -5,15 +5,15 @@ import { test, expect } from './fixtures';
 import { openEditor } from './helpers/editor';
 import type { DesignDocument } from '../src/design/types';
 
-const key = 'webWorldThemes.design.youtube';
-const overlay = '#web-world-themes-decorations';
+const key = 'around.design.youtube';
+const overlay = '#around-decorations';
 const images =
-  ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]';
+  ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations) [data-image-id]';
 const rows = '[data-layer-id]';
 
 async function open(popup: Page, page: Page) {
   await showArtwork(popup);
-  await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
+  await expect(page.locator('[data-around-surface~="video-card"]').first()).toBeVisible();
   const dialog = (await openEditor(popup, page)).panel;
   await exposeEditorControls(dialog);
   return dialog;
@@ -90,7 +90,7 @@ async function drag(page: Page, node: Locator, dx: number, dy: number) {
 async function assetExists(popup: Page, id: string) {
   return popup.evaluate(
     async (assetId) =>
-      (await chrome.runtime.sendMessage({ type: 'web-world-themes:assets', action: 'get', id: assetId })).ok as boolean,
+      (await chrome.runtime.sendMessage({ type: 'around:assets', action: 'get', id: assetId })).ok as boolean,
     id,
   );
 }
@@ -251,9 +251,9 @@ test('optional snapping shows guides at screen/player/other layer bounds and Alt
   await dialog.getByLabel('画像のX位置', { exact: true }).fill('90');
   await youtube.locator('#navigate').evaluate((node: HTMLButtonElement) => node.click());
   await expect(youtube).toHaveURL(/\/watch\?/);
-  await expect(youtube.locator('[data-ww-surface~="player-window"]')).toBeVisible();
+  await expect(youtube.locator('[data-around-surface~="player-window"]')).toBeVisible();
   await dialog.getByRole('checkbox', { name: 'スナップを有効にする' }).check();
-  const player = (await youtube.locator('[data-ww-surface~="player-window"]').boundingBox())!;
+  const player = (await youtube.locator('[data-around-surface~="player-window"]').boundingBox())!;
   const from = await point(first),
     target = { x: player.x + player.width / 2, y: player.y + player.height / 2 };
   await drag(youtube, first, target.x - from.x + 4, target.y - from.y - 3);
@@ -498,7 +498,7 @@ test('mixed player/viewport selections share pixel movement and resizing cancels
 }) => {
   const dialog = await seed(popup, youtube, 2);
   await youtube.locator('#navigate').evaluate((node: HTMLButtonElement) => node.click());
-  await expect(youtube.locator('[data-ww-surface~="player-window"]')).toBeVisible();
+  await expect(youtube.locator('[data-around-surface~="player-window"]')).toBeVisible();
   await row(dialog, 0).locator('[data-action="select"]').click();
   await dialog.getByLabel('画像のX位置').fill('40');
   await dialog.getByLabel('画像のY位置').fill('40');

@@ -29,7 +29,7 @@ import { boardSeat, loadResident, type ResidentAssets } from './resident';
 import { createRoomCache, mountRoom, positionMonitor } from './room';
 import type { DesktopLayout } from './desktop-layout';
 
-declare const __WW_PLAYGROUND_TEST__: boolean;
+declare const __AROUND_PLAYGROUND_TEST__: boolean;
 
 type Spatial = { exit: (immediate?: boolean) => void; cancelExit: () => void; setDesktop: (active: boolean) => void };
 
@@ -43,7 +43,7 @@ function flatHandoff(page: HTMLElement, video: HTMLVideoElement) {
   cover.querySelector('video')!.replaceWith(frame);
   for (const element of [cover, ...cover.querySelectorAll('*')]) {
     element.removeAttribute('id');
-    for (const name of element.getAttributeNames()) if (name.startsWith('data-ww-')) element.removeAttribute(name);
+    for (const name of element.getAttributeNames()) if (name.startsWith('data-around-')) element.removeAttribute(name);
   }
   cover.className = 'playground-handoff';
   cover.inert = true;
@@ -79,10 +79,10 @@ export function openSpatial(
     antialias: true,
     powerPreference: 'low-power',
     // Software rendering stays available to browser tests. In the demo it can stall native input.
-    failIfMajorPerformanceCaveat: !__WW_PLAYGROUND_TEST__,
+    failIfMajorPerformanceCaveat: !__AROUND_PLAYGROUND_TEST__,
   });
   if (!context) return null;
-  if (!__WW_PLAYGROUND_TEST__) {
+  if (!__AROUND_PLAYGROUND_TEST__) {
     const info = context.getExtension('WEBGL_debug_renderer_info');
     const rendererName = info ? String(context.getParameter(info.UNMASKED_RENDERER_WEBGL)) : '';
     if (/swiftshader|llvmpipe|softpipe|software rasterizer|microsoft basic render/i.test(rendererName)) {
@@ -315,7 +315,7 @@ export function openSpatial(
       board.add(result.root);
       wake();
     })
-    .catch((error: unknown) => console.warn('[WWT Playground] Resident', error));
+    .catch((error: unknown) => console.warn('[Around Playground] Resident', error));
 
   function restore(reason?: 'graphics' | 'resize') {
     if (!alive) return;

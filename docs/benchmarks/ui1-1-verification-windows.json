@@ -6050,7 +6050,7 @@
         "world": {
           "id": 5,
           "origin": "chrome-extension://mdjonegjakgncooligkelkjlcknnhgci",
-          "name": "Web World Themes",
+          "name": "Around",
           "uniqueId": "-5937960730813738457.-6968879307738895225",
           "auxData": { "isDefault": false, "type": "isolated", "frameId": "307B21EA18CDAFB4E33BD41D438B62BB" }
         },
@@ -6237,7 +6237,7 @@
         "world": {
           "id": 5,
           "origin": "chrome-extension://ominpijcedlfighkdglgfdnfdncldgdp",
-          "name": "Web World Themes",
+          "name": "Around",
           "uniqueId": "-5346178410781819341.4274383173770213692",
           "auxData": { "isDefault": false, "type": "isolated", "frameId": "9DEF39741AC33BFB4234136C4DD01577" }
         },
@@ -15188,7 +15188,7 @@
           "world": {
             "id": 7,
             "origin": "chrome-extension://hfcdbaadafceacimgmfdjedfdggpebpl",
-            "name": "Web World Themes",
+            "name": "Around",
             "uniqueId": "-6362141198160507844.6254044255506615910",
             "auxData": { "isDefault": false, "type": "isolated", "frameId": "82A82EC7D99A157D857A8D5C2E21A4F5" }
           },
@@ -15374,7 +15374,7 @@
           "world": {
             "id": 5,
             "origin": "chrome-extension://gbibpiiagkooghnpifncnaaalnilngpn",
-            "name": "Web World Themes",
+            "name": "Around",
             "uniqueId": "-2016477592952919366.4503135058642613557",
             "auxData": { "isDefault": false, "type": "isolated", "frameId": "98366B6FB5A1553ADC1B9451EE8BDCAC" }
           },
@@ -15557,7 +15557,7 @@
           "world": {
             "id": 5,
             "origin": "chrome-extension://hfcdbaadafceacimgmfdjedfdggpebpl",
-            "name": "Web World Themes",
+            "name": "Around",
             "uniqueId": "-4468629658261217709.2158006495141881906",
             "auxData": { "isDefault": false, "type": "isolated", "frameId": "BF22B593BFB6CDE7BB9B544DC031D74B" }
           },
@@ -15733,7 +15733,7 @@
           "world": {
             "id": 7,
             "origin": "chrome-extension://ofingblmgaclelgmmilocdkdijbgnoik",
-            "name": "Web World Themes",
+            "name": "Around",
             "uniqueId": "612474918251616288.8749116178490013320",
             "auxData": { "isDefault": false, "type": "isolated", "frameId": "41388E825050A7F11C1AB7D04B195C4C" }
           },
@@ -36243,8 +36243,8 @@
     "iconAfter": { "passed": 20, "failed": 0, "skipped": 0 },
     "targetedAfterIcons": { "passed": 9, "failed": 0, "skipped": 0 },
     "liveRuns": [
-      { "flag": "WW_LIVE_UI11=1", "case": "checker warning / ink / modes / SPA", "passed": 1, "failed": 0 },
-      { "flag": "WW_LIVE_UI11=1", "case": "petal import", "passed": 1, "failed": 0 }
+      { "flag": "AROUND_LIVE_UI11=1", "case": "checker warning / ink / modes / SPA", "passed": 1, "failed": 0 },
+      { "flag": "AROUND_LIVE_UI11=1", "case": "petal import", "passed": 1, "failed": 0 }
     ],
     "resumedLiveRuns": {
       "startedAt": "2026-10-28T01:38:49.473Z",
@@ -36596,7 +36596,7 @@
     "ci": {
       "revision": "77a5595e623ac2c8687def752f9a7245a693a5f6",
       "run": 40623604571,
-      "url": "https://github.com/a3681299-png/web-world-themes/actions/runs/40623604571",
+      "url": "https://github.com/a3681299-png/around/actions/runs/40623604571",
       "conclusion": "success",
       "attempt": 1,
       "startedAt": "2026-10-28T02:54:04Z",

@@ -5,8 +5,8 @@ import type { SkinPreview } from '../editor-core/types';
 import type { SkinPageInfo } from './skin-panel';
 import type { PageMarks } from './page-marks';
 
-const PICKING = 'data-ww-skin-picking',
-  SELECTED = 'data-ww-skin-selected';
+const PICKING = 'data-around-skin-picking',
+  SELECTED = 'data-around-skin-selected';
 // Generic native controls; a site adds its own (custom elements, thumbnails) through the adapter.
 const CONTROL =
   'button, a[href], input, textarea, select, [role="button"], [role="tab"], [role="link"], [role="checkbox"], [role="switch"], [contenteditable="true"], img';
@@ -48,7 +48,7 @@ export function createSkinPicker(
 ) {
   const controls = siteControls ? `${CONTROL}, ${siteControls}` : CONTROL;
   const parts = targets.filter((target) => target.skin && isDesignId(target.surface));
-  const selector = (target: DesignTarget) => `[data-ww-surface~="${target.surface}"]`;
+  const selector = (target: DesignTarget) => `[data-around-surface~="${target.surface}"]`;
   const root = doc.documentElement;
   let active = false,
     pointer: Element | undefined,
@@ -56,10 +56,10 @@ export function createSkinPicker(
     request: number | undefined,
     shownKey = '',
     tag = '';
-  const hover = marks.mark('web-world-themes-skin-hover');
+  const hover = marks.mark('around-skin-hover');
 
   const hit = (node: Element | undefined): SkinHit | undefined => {
-    if (!node || node.closest('[data-ww-signal-control], [id^="web-world-themes-"]')) return;
+    if (!node || node.closest('[data-around-signal-control], [id^="around-"]')) return;
     let best: SkinHit | undefined;
     for (const target of parts) {
       const element = node.closest(selector(target));

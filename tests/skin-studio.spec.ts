@@ -8,8 +8,8 @@ import { openEditor } from './helpers/editor';
  * the YouTube tab through the Studio port. The page keeps its own part of the work: the marks, the
  * part under the pointer and the forced previews.
  */
-const cards = '[data-ww-surface~="video-card"]';
-const key = 'webWorldThemes.design.youtube';
+const cards = '[data-around-surface~="video-card"]';
+const key = 'around.design.youtube';
 
 async function enable(popup: Page, youtube: Page) {
   await showArtwork(popup);
@@ -65,17 +65,17 @@ for (const width of [1440, 400])
     await panel.getByRole('button', { name: 'UIを着せ替え' }).click();
     const region = panel.getByRole('region', { name: 'UIの着せ替え' });
     await expect(region).toBeVisible();
-    await expect(youtube.locator('html')).toHaveAttribute('data-ww-skin-picking', '');
+    await expect(youtube.locator('html')).toHaveAttribute('data-around-skin-picking', '');
     await expect(region.locator('.skin-part[data-target="video-card"] .state')).toHaveText(/^[0-9]+個$/);
     await expect(region.locator('.skin-part[data-target="subscribe-button"] .state')).toHaveText('見つかりません');
 
     // Parts are picked on the page itself.
     const card = youtube.locator(cards).first();
     await card.hover();
-    await expect(youtube.locator('#web-world-themes-skin-hover')).toContainText('動画カード');
+    await expect(youtube.locator('#around-skin-hover')).toContainText('動画カード');
     await card.locator('a').first().click();
     expect(youtube.url()).toBe('https://www.youtube.com/');
-    await expect(youtube.locator('html')).toHaveAttribute('data-ww-skin-selected', 'video-card');
+    await expect(youtube.locator('html')).toHaveAttribute('data-around-skin-selected', 'video-card');
     const count = await youtube.locator(cards).count();
     await expect(region.locator('.skin-reach')).toHaveText(`ページ上の${count}個に同時に反映されます`);
 
@@ -98,7 +98,7 @@ for (const width of [1440, 400])
     );
     await region.locator('.skin-center').selectOption('repeat');
     await region.getByRole('checkbox', { name: 'ページ上でこの状態を表示' }).check();
-    await expect(youtube.locator('html')).toHaveAttribute('data-ww-skin-force', 'video-card:hover');
+    await expect(youtube.locator('html')).toHaveAttribute('data-around-skin-force', 'video-card:hover');
     await expect.poll(async () => (await skinStyle(card)).repeat).toBe('round');
     const hoverSource = (await skinStyle(card)).source;
 
@@ -118,7 +118,7 @@ for (const width of [1440, 400])
       .toBe(true);
     await expect(youtube.locator('[data-image-id]')).toHaveCount(0);
     await region.getByRole('checkbox', { name: 'ページ上でこの状態を表示' }).uncheck();
-    await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-skin-force', /.*/);
+    await expect(youtube.locator('html')).not.toHaveAttribute('data-around-skin-force', /.*/);
 
     // Undo from the Studio page removes the dropped art, then the hover slot, one step each.
     await panel.getByRole('button', { name: '元に戻す' }).first().click();
@@ -136,8 +136,8 @@ for (const width of [1440, 400])
 
     // Leaving the tool releases the page.
     await panel.getByRole('button', { name: '選択・変形' }).click();
-    await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-skin-picking', /.*/);
-    await expect(youtube.locator('#web-world-themes-skin-hover')).toBeHidden();
+    await expect(youtube.locator('html')).not.toHaveAttribute('data-around-skin-picking', /.*/);
+    await expect(youtube.locator('#around-skin-hover')).toBeHidden();
     expect(errors).toEqual([]);
   });
 
@@ -150,18 +150,18 @@ test('from the Studio page, a click on the page picks a video card only with the
   const card = youtube.locator(cards).first();
   // The select tool leaves the page's own clicks alone: no card is chosen.
   await panel.getByRole('button', { name: '選択・変形' }).click();
-  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-editor-card-picking', /.*/);
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-around-editor-card-picking', /.*/);
   await card.locator('a').first().click();
   // The click was YouTube's: it navigated (in-page), and no card was chosen.
   await expect(youtube).toHaveURL(/\/watch\?/);
-  await expect(youtube.locator('[data-ww-editor-selected]')).toHaveCount(0);
+  await expect(youtube.locator('[data-around-editor-selected]')).toHaveCount(0);
   // The card tool picks a card and never navigates.
   const next = youtube.locator(cards).first();
   await expect(next).toBeVisible();
   const url = youtube.url();
   await panel.getByRole('button', { name: '動画カードを編集' }).click();
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-editor-card-picking', '');
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-editor-card-picking', '');
   await next.locator('a').first().click();
-  await expect(next).toHaveAttribute('data-ww-editor-selected', '');
+  await expect(next).toHaveAttribute('data-around-editor-selected', '');
   expect(youtube.url()).toBe(url);
 });

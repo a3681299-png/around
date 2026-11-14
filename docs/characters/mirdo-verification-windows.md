@@ -1,6 +1,6 @@
 # ミルドの独立検証（Windows）
 
-2026-11-07。対象は `codex/mirdo-character` の `b3db85e`、比較は分岐元 `c69d9bb`。塊4の再検証後に実施した。製品とテストは変更せず、試験用の計測と動画収録は検証環境に限った。 [実装報告](https://github.com/a3681299-png/web-world-themes/blob/b3db85e/docs/characters/mirdo.md) · [塊4の再検証](../chunk4-reverification-windows.md)
+2026-11-07。対象は `codex/mirdo-character` の `b3db85e`、比較は分岐元 `c69d9bb`。塊4の再検証後に実施した。製品とテストは変更せず、試験用の計測と動画収録は検証環境に限った。 [実装報告](https://github.com/a3681299-png/around/blob/b3db85e/docs/characters/mirdo.md) · [塊4の再検証](../chunk4-reverification-windows.md)
 
 **判定は不合格。** 実サイトでミルドの取り込み、下の縁での着座、座る・立つ動作を確認した。起動直後の長い処理と動画の落ち、検索 SPA の長い処理と CPU 合計が、同版の振れを超えた。定常は A/B の増加が基準内だったが、同版の振れが p95 の許容差を超えたため、デスクトップでの合否は保留。
 

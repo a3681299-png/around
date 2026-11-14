@@ -13,30 +13,28 @@ import { writeContent } from '../scripts/playground/content';
  * Chunk 3 on real YouTube: the Playground's artwork (the resident at the player's bottom-right
  * corner, autonomy on) with only the site ID changed. Home, a fast rush (it flees inside the
  * player), the pointer gone (it comes home) and a slow approach (it edges closer). Headless;
- * explicit: WW_LIVE_AUTONOMY=1. Screenshots are kept in .work/autonomy-live for a person to look at.
+ * explicit: AROUND_LIVE_AUTONOMY=1. Screenshots are kept in .work/autonomy-live for a person to look at.
  */
 const shots = path.resolve('.work/autonomy-live');
 const media = (page: Page) =>
-  page.locator(
-    ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations) .model-media',
-  );
+  page.locator(':is(#around-decorations, #around-video-decorations, #around-page-decorations) .model-media');
 
 test('real YouTube: the resident sits at the player corner, flees a rush, comes home and edges closer', async () => {
-  test.skip(process.env.WW_LIVE_AUTONOMY !== '1', 'Explicit real YouTube verification (WW_LIVE_AUTONOMY=1).');
+  test.skip(process.env.AROUND_LIVE_AUTONOMY !== '1', 'Explicit real YouTube verification (AROUND_LIVE_AUTONOMY=1).');
   test.setTimeout(300000);
   await residentOnYouTube('autonomy');
 });
 
 // Its own page: a headless player that has played for a minute can fail ("Something went wrong").
 test('real YouTube: the resident stays at the corner in theater mode and fullscreen', async () => {
-  test.skip(process.env.WW_LIVE_AUTONOMY !== '1', 'Explicit real YouTube verification (WW_LIVE_AUTONOMY=1).');
+  test.skip(process.env.AROUND_LIVE_AUTONOMY !== '1', 'Explicit real YouTube verification (AROUND_LIVE_AUTONOMY=1).');
   test.setTimeout(300000);
   await residentOnYouTube('corners');
 });
 
 // Chunk 4 fix (docs/layering-plan.md 9): the page is the adapter's, not the address.
 test('real YouTube: t= on the same video keeps a fled resident where it is; another video brings it home', async () => {
-  test.skip(process.env.WW_LIVE_AUTONOMY !== '1', 'Explicit real YouTube verification (WW_LIVE_AUTONOMY=1).');
+  test.skip(process.env.AROUND_LIVE_AUTONOMY !== '1', 'Explicit real YouTube verification (AROUND_LIVE_AUTONOMY=1).');
   test.setTimeout(300000);
   await residentOnYouTube('address');
 });
@@ -47,11 +45,11 @@ async function residentOnYouTube(mode: 'autonomy' | 'corners' | 'address') {
   const { models } = writeContent(path.resolve('.'), content);
   const file = (name: string) => path.join(content, name);
   const design = JSON.parse(await readFile(file('design.json'), 'utf8'));
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-autonomy-live-')), false);
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-autonomy-live-')), false);
   try {
     const manager = await context.newPage();
     await manager.goto('chrome://extensions/');
-    const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+    const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
     await item.waitFor();
     const id = await item.evaluate((e) => (e as HTMLElement & { data?: { id: string } }).data?.id ?? e.id);
     await manager.close();
@@ -111,8 +109,8 @@ async function residentOnYouTube(mode: 'autonomy' | 'corners' | 'address') {
           bars: !document.querySelector('#movie_player')!.classList.contains('ytp-autohide'),
           // Why it was stopped, if it was: the guard's stop entries (surface and reason).
           stops: (
-            (JSON.parse(document.querySelector<HTMLElement>('[data-ww-safety]')?.dataset.wwSafety ?? '{}').issues ??
-              []) as { action?: string; surfaceId: string; reason: string }[]
+            (JSON.parse(document.querySelector<HTMLElement>('[data-around-safety]')?.dataset.aroundSafety ?? '{}')
+              .issues ?? []) as { action?: string; surfaceId: string; reason: string }[]
           )
             .filter((i) => i.action === 'stop')
             .map((i) => `${i.surfaceId}: ${i.reason}`),
@@ -185,7 +183,7 @@ async function residentOnYouTube(mode: 'autonomy' | 'corners' | 'address') {
         const clip = (await page.locator('#movie_player').boundingBox())!;
         const recording = page.evaluate(async (next) => {
           const node = () =>
-            [...document.querySelectorAll('[id^="web-world-themes"]')]
+            [...document.querySelectorAll('[id^="around"]')]
               .map((host) => host.shadowRoot?.querySelector('[data-image-id="resident"]'))
               .find(Boolean);
           const rows: { t: number; x: number; y: number; address: string }[] = [];
@@ -253,8 +251,8 @@ async function residentOnYouTube(mode: 'autonomy' | 'corners' | 'address') {
     const near = await box();
     report['approached'] = { box: near, ...(await state()), shownAfterMs: await shoot('approached') };
     console.log('AUTONOMY LIVE ' + JSON.stringify(report));
-    // Only in a WW_GUARD_TRACE build (.work): why the guard held drawing, if it did.
-    const geometry = await page.evaluate(() => document.documentElement.getAttribute('data-ww-guard-geometry'));
+    // Only in a AROUND_GUARD_TRACE build (.work): why the guard held drawing, if it did.
+    const geometry = await page.evaluate(() => document.documentElement.getAttribute('data-around-guard-geometry'));
     if (geometry)
       console.log(
         'GUARD GEOMETRY ' +

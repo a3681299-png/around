@@ -1,5 +1,5 @@
-/* The two lines of the WWT Studio design system, ported from docs/wwt-studio-design-system/components/
-   bundle.js (WWTStudio). A G-pen line is a filled outline (入り抜き): thin at both tips, fullest a little
+/* The two lines of the Around Studio design system, ported from docs/around-studio-design-system/components/
+   bundle.js (AroundStudio). A G-pen line is a filled outline (入り抜き): thin at both tips, fullest a little
    before the middle. It is never a stroked path or a border. tests/studio-pen.spec.ts keeps this port
    point for point equal to the reference. */
 
@@ -125,7 +125,7 @@ export interface DrawOptions extends PenOptions {
 /** Draws a G-pen line into an <svg> (or <g>), revealed from its start on 12fps steps. */
 export function drawPen(target: SVGElement, points: readonly Point[], opts: DrawOptions = {}): SVGPathElement {
   const doc = target.ownerDocument;
-  const id = 'ww-pen-' + ++uid;
+  const id = 'around-pen-' + ++uid;
   const mask = doc.createElementNS(SVG, 'mask');
   mask.setAttribute('id', id);
   mask.setAttribute('maskUnits', 'userSpaceOnUse');
@@ -140,13 +140,13 @@ export function drawPen(target: SVGElement, points: readonly Point[], opts: Draw
   reveal.setAttribute('stroke', '#fff');
   reveal.setAttribute('stroke-linecap', 'round');
   reveal.setAttribute('stroke-width', String((opts.width || 2.4) * 4));
-  reveal.setAttribute('class', 'ww-draw');
-  reveal.style.setProperty('--ww-frames', String(opts.frames || 4));
-  reveal.style.setProperty('--ww-delay', Math.round((opts.delay || 0) * FRAME_MS) + 'ms');
+  reveal.setAttribute('class', 'around-draw');
+  reveal.style.setProperty('--around-frames', String(opts.frames || 4));
+  reveal.style.setProperty('--around-delay', Math.round((opts.delay || 0) * FRAME_MS) + 'ms');
   mask.appendChild(reveal);
   const pen = doc.createElementNS(SVG, 'path');
   pen.setAttribute('d', penOutline(points, opts));
-  pen.setAttribute('class', 'ww-pen');
+  pen.setAttribute('class', 'around-pen');
   pen.setAttribute('mask', 'url(#' + id + ')');
   if (opts.color) pen.style.color = opts.color;
   target.appendChild(mask);
@@ -159,9 +159,9 @@ export function drawRule(target: SVGElement, d: string, delay = 0, frames = 4): 
   const rule = target.ownerDocument.createElementNS(SVG, 'path');
   rule.setAttribute('d', d);
   rule.setAttribute('pathLength', '1');
-  rule.setAttribute('class', 'ww-rule ww-draw');
-  rule.style.setProperty('--ww-frames', String(frames));
-  rule.style.setProperty('--ww-delay', Math.round(delay * FRAME_MS) + 'ms');
+  rule.setAttribute('class', 'around-rule around-draw');
+  rule.style.setProperty('--around-frames', String(frames));
+  rule.style.setProperty('--around-delay', Math.round(delay * FRAME_MS) + 'ms');
   target.appendChild(rule);
   return rule;
 }

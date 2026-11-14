@@ -9,10 +9,10 @@ import { beginCanvasGesture, visiblePart } from './helpers/editor-workspace';
 import { errorSummary, waitForAdvertToEnd } from './helpers/youtube-live';
 
 test('optional signed-out YouTube: save and reopen Studio three times', async ({}, info) => {
-  test.skip(process.env.WW_LIVE_STUDIO_RECOVERY !== '1', 'Explicit real YouTube Studio recovery validation.');
+  test.skip(process.env.AROUND_LIVE_STUDIO_RECOVERY !== '1', 'Explicit real YouTube Studio recovery validation.');
   test.setTimeout(120_000);
-  const profileRoot = process.env.WW_TEST_PROFILE_ROOT ?? tmpdir();
-  const context = await launchExtension(await mkdtemp(path.join(profileRoot, 'ww-recovery-')), false, {
+  const profileRoot = process.env.AROUND_TEST_PROFILE_ROOT ?? tmpdir();
+  const context = await launchExtension(await mkdtemp(path.join(profileRoot, 'around-recovery-')), false, {
     headed: true,
     width: 1440,
     height: 950,
@@ -22,11 +22,11 @@ test('optional signed-out YouTube: save and reopen Studio three times', async ({
     const popup = await context.newPage();
     await popup.goto(`chrome-extension://${new URL(worker.url()).host}/popup/index.html`);
     const page = await context.newPage();
-    await page.goto(process.env.WW_LIVE_VIDEO_URL ?? 'https://www.youtube.com/watch?v=LC1a-DwUhls', {
+    await page.goto(process.env.AROUND_LIVE_VIDEO_URL ?? 'https://www.youtube.com/watch?v=LC1a-DwUhls', {
       waitUntil: 'domcontentloaded',
     });
     await showArtwork(popup);
-    await expect(page.locator('[data-ww-surface~="player-window"]')).toBeVisible({ timeout: 20_000 });
+    await expect(page.locator('[data-around-surface~="player-window"]')).toBeVisible({ timeout: 20_000 });
     let editor = await openEditor(popup, page);
     await editor.panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
     for (const round of [1, 2, 3]) {
@@ -55,10 +55,10 @@ test('optional signed-out YouTube: save and reopen Studio three times', async ({
 });
 
 test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and cleanup', async () => {
-  test.skip(process.env.WW_LIVE_EDITOR_UX !== '1', 'Explicit real YouTube UI validation.');
+  test.skip(process.env.AROUND_LIVE_EDITOR_UX !== '1', 'Explicit real YouTube UI validation.');
   test.setTimeout(120_000);
   await mkdir('.work/verification', { recursive: true });
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-ux-live-')), false);
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-ux-live-')), false);
   context.setDefaultTimeout(8000);
   context.setDefaultNavigationTimeout(30_000);
   const results: { name: string; status: string; detail?: string }[] = [];
@@ -73,7 +73,7 @@ test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and 
   try {
     const manager = await context.newPage();
     await manager.goto('chrome://extensions/');
-    const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+    const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
     await item.waitFor();
     const id = await item.evaluate(
       (element) => (element as HTMLElement & { data?: { id: string } }).data?.id ?? element.id,
@@ -86,12 +86,12 @@ test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and 
     await page.goto('https://www.youtube.com/watch?v=AS4q9yaWJkI', { waitUntil: 'domcontentloaded' });
     await showArtwork(popup);
     await page.bringToFront();
-    await expect(page.locator('[data-ww-surface~="player-window"]')).toBeVisible({ timeout: 20_000 });
+    await expect(page.locator('[data-around-surface~="player-window"]')).toBeVisible({ timeout: 20_000 });
     // UI0-d 3.1: the editor's window (as a tab); the artwork and its checks stay on the YouTube page.
     let { panel } = await openEditor(popup, page);
-    const overlay = '#web-world-themes-decorations';
+    const overlay = '#around-decorations';
     const presentation =
-      ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)';
+      ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations)';
     await check('mouse-only import, selection, grouping and drag', async () => {
       await panel
         .getByLabel('画像素材を追加')
@@ -157,7 +157,7 @@ test('optional signed-out YouTube: mouse-only grouping, mask, save, restore and 
       await expect.poll(() => video.evaluate((node: HTMLVideoElement) => node.paused)).not.toBe(paused);
       await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
       await expect(page.locator(presentation)).toHaveCount(0);
-      await expect(page.locator('html')).not.toHaveAttribute('data-ww-editing', /.*/);
+      await expect(page.locator('html')).not.toHaveAttribute('data-around-editing', /.*/);
     });
   } catch (error) {
     results.push({

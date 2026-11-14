@@ -26,7 +26,7 @@ export async function isolatedLab(page: Page, cdp: CDPSession, id: string) {
       return async (method: string, ...args: unknown[]) => {
         const r = await cdp.send('Runtime.evaluate', {
           contextId: c.id,
-          expression: `globalThis.wwAssetRuntimeHost[${JSON.stringify(method)}](...${JSON.stringify(args)})`,
+          expression: `globalThis.aroundAssetRuntimeHost[${JSON.stringify(method)}](...${JSON.stringify(args)})`,
           returnByValue: true,
           awaitPromise: true,
         });
@@ -41,21 +41,21 @@ export async function isolatedLab(page: Page, cdp: CDPSession, id: string) {
 
 export async function openAssetLab(live = false, file?: string) {
   const context = await launchExtension(
-    await mkdtemp(path.join(tmpdir(), 'ww-ar-lab-')),
+    await mkdtemp(path.join(tmpdir(), 'around-ar-lab-')),
     !live,
     live ? { headed: true, width: 1920, height: 1000 } : {},
   );
   try {
     const control = await context.newPage();
     await control.goto('chrome://extensions/');
-    const item = control.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+    const item = control.locator('extensions-item').filter({ hasText: 'Around' });
     await item.waitFor();
     const id = await item.evaluate((e) => (e as HTMLElement & { data?: { id: string } }).data?.id ?? e.id);
     await control.goto(`chrome-extension://${id}/diagnostics/asset-runtime-lab.html`);
     await control
       .locator('#file')
       .setInputFiles(file ?? { name: 'original.vrm', mimeType: 'model/vrm', buffer: vrmFixture() });
-    const asset = await control.evaluate(() => (globalThis as any).wwAssetLab.seed());
+    const asset = await control.evaluate(() => (globalThis as any).aroundAssetLab.seed());
     const popup = await context.newPage();
     await popup.goto(`chrome-extension://${id}/popup/index.html`);
     const page = await context.newPage();
@@ -66,11 +66,11 @@ export async function openAssetLab(live = false, file?: string) {
     await expect(showArtwork).toBeEnabled();
     await showArtwork.check();
     await page.bringToFront();
-    await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+    await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
     const tab = await control.evaluate(
       async () => (await chrome.tabs.query({ active: true, lastFocusedWindow: true }))[0]!.id!,
     );
-    const { session } = await control.evaluate(({ id, tab }) => (globalThis as any).wwAssetLab.open([id], tab), {
+    const { session } = await control.evaluate(({ id, tab }) => (globalThis as any).aroundAssetLab.open([id], tab), {
       id: asset.id,
       tab,
     });

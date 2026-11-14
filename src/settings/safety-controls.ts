@@ -22,7 +22,7 @@ function describeShortcut(key: HTMLElement, alive: () => boolean) {
 export function mountSafetyControls(root: HTMLElement) {
   const doc = root.ownerDocument,
     section = doc.createElement('section');
-  section.className = 'ww-safety-controls';
+  section.className = 'around-safety-controls';
   section.style.cssText =
     'flex:0 0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:4px 8px;max-height:160px;overflow:auto';
   section.setAttribute('aria-label', '操作性と緊急停止');
@@ -71,7 +71,7 @@ export function mountSafetyControls(root: HTMLElement) {
 export function mountEditorSafety(root: HTMLElement, connection: StudioConnection) {
   const doc = root.ownerDocument,
     header = doc.createElement('div');
-  header.className = 'ww-editor-safety';
+  header.className = 'around-editor-safety';
   header.slot = 'safety';
   const off = doc.createElement('button'),
     resume = doc.createElement('button'),
@@ -146,7 +146,7 @@ export function mountEditorSafety(root: HTMLElement, connection: StudioConnectio
     check.toggleAttribute('data-restricted', issues > 0 || Boolean(latest?.stopped));
   };
   const badges = () => {
-    const host = root.querySelector<HTMLElement>('#web-world-themes-creator');
+    const host = root.querySelector<HTMLElement>('#around-creator');
     if (host?.shadowRoot) observer.observe(host.shadowRoot, { childList: true, subtree: true });
     for (const row of host?.shadowRoot?.querySelectorAll<HTMLElement>('[data-layer-id]') ?? []) {
       const issues = latest?.issues.filter((i) => i.layerId === row.dataset.layerId) ?? [];

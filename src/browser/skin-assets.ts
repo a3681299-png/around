@@ -6,7 +6,7 @@ import type { ArtPixels } from '../design/contrast';
 // Enough to tell light, dark and mixed centres apart; the original can be up to 1024px.
 const SAMPLE_EDGE = 96;
 /** Where the last white/black results live; a cache, not artwork, and not part of backups. */
-const INK_CACHE_KEY = 'webWorldThemes.skinInk.v1';
+const INK_CACHE_KEY = 'around.skinInk.v1';
 
 async function staticImage(assetId: string) {
   const { metadata, blob } = await loadAsset(assetId);

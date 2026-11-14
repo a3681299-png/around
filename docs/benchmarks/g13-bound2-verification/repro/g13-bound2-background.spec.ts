@@ -54,7 +54,7 @@ test('real hidden tab and return with no Playwright focus emulation', async ({},
       write: false,
       format: 'iife',
       globalName: 'Bound2',
-      dropLabels: ['WW_GUARD_TRACE', 'WW_TEST_PAGE_CHANGE'],
+      dropLabels: ['AROUND_GUARD_TRACE', 'AROUND_TEST_PAGE_CHANGE'],
     });
     await page.addScriptTag({ content: bundle.outputFiles[0]!.text });
     await expect.poll(() => page.evaluate(() => document.hidden)).toBe(false);

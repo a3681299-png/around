@@ -49,7 +49,7 @@ test('G1.3: a control moved after its group was checked is not drawn over on spa
   await expect(panel.locator('.status')).toHaveText('保存しました。');
   await panel.getByRole('button', { name: '編集を終了', exact: true }).click();
   const viewport = await youtube.evaluate(() => ({ width: innerWidth, height: innerHeight }));
-  const key = 'webWorldThemes.design.youtube';
+  const key = 'around.design.youtube';
   const base = await popup.evaluate(async (k) => (await chrome.storage.local.get(k))[k] as DesignDocument, key);
   // x 275–725, y 190–350: over both buttons (cut out by the clip) and where Second moves to.
   const follow = defaultSignalRule('g13-sparse', 'position.x', {
@@ -84,7 +84,7 @@ test('G1.3: a control moved after its group was checked is not drawn over on spa
   };
   parseDesign(design);
   await popup.evaluate(async ({ key, design }) => chrome.storage.local.set({ [key]: design }), { key, design });
-  const layer = '#web-world-themes-decorations';
+  const layer = '#around-decorations';
   await expect
     .poll(() =>
       youtube.evaluate(
@@ -123,7 +123,7 @@ test('G1.3: a control moved after its group was checked is not drawn over on spa
         y = r.top + r.height / 2;
       const regions = [
         ...host.style
-          .getPropertyValue('--ww-decoration-clip')
+          .getPropertyValue('--around-decoration-clip')
           .matchAll(/M(-?[\d.]+) (-?[\d.]+)h(-?[\d.]+)v(-?[\d.]+)/g),
       ].map((m) => m.slice(1).map(Number));
       const shown = getComputedStyle(node);
@@ -174,9 +174,7 @@ test('G1.3: a control moved after its group was checked is not drawn over on spa
   const drawn = await cdp.send('Page.captureScreenshot', { format: 'png', fromSurface: true });
   const native = await youtube.evaluate(() => {
     const r = document.querySelector('#g13-second')!.getBoundingClientRect();
-    document
-      .querySelector<HTMLElement>('#web-world-themes-decorations')!
-      .style.setProperty('visibility', 'hidden', 'important');
+    document.querySelector<HTMLElement>('#around-decorations')!.style.setProperty('visibility', 'hidden', 'important');
     return { x: Math.ceil(r.left), y: Math.ceil(r.top), width: Math.floor(r.width), height: Math.floor(r.height) };
   });
   const reference = await cdp.send('Page.captureScreenshot', { format: 'png', fromSurface: true });

@@ -1,4 +1,4 @@
-/* The Studio workbench's arrangement over the WWT Studio design system (studio-tokens.css and
+/* The Studio workbench's arrangement over the Around Studio design system (studio-tokens.css and
    editor/panel.css, which style every control). This sheet places the menu, toolbar, library,
    canvas, inspectors and footer, and draws the ruled lines between them; it does not restyle
    controls. Colours are tokens; nothing is set below 12px. */
@@ -162,7 +162,7 @@
   border-right: 1px solid var(--line);
   pointer-events: auto;
 }
-/* ww-rail: the tools down the left edge. */
+/* around-rail: the tools down the left edge. */
 .interaction-tools {
   display: flex;
   flex-direction: column;

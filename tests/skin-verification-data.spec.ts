@@ -255,9 +255,9 @@ test('navigation removes compact marks from detached native parts before forgett
     [{ target: old, borderBoxSize: [{ inlineSize: 1, blockSize: 1 }] } as unknown as ResizeObserverEntry],
     {} as ResizeObserver,
   );
-  expect(old.getAttribute('data-ww-skin-compact')).toBe('subscribe-button');
+  expect(old.getAttribute('data-around-skin-compact')).toBe('subscribe-button');
   old.isConnected = false;
   renderer.refresh('navigation', []);
-  expect(old.getAttribute('data-ww-skin-compact')).toBeNull();
+  expect(old.getAttribute('data-around-skin-compact')).toBeNull();
   renderer.dispose();
 });

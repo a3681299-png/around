@@ -22,7 +22,7 @@ const buildPaths = {
 type Build = keyof typeof buildPaths;
 type Scene = 'quiet' | 'mannequin' | 'trusie';
 type Phase = 'startup' | 'steady' | 'spa';
-const profiles = path.join(tmpdir(), 'wwt-chunk2-verification-profiles');
+const profiles = path.join(tmpdir(), 'around-chunk2-verification-profiles');
 const frame = { width: 1920, height: 1080 };
 
 function stats(values: number[]) {
@@ -41,8 +41,8 @@ function stats(values: number[]) {
 function snapshot() {
   const video = document.querySelector<HTMLVideoElement>('video.html5-main-video');
   const q = video?.getVideoPlaybackQuality();
-  const model = [...document.querySelectorAll<HTMLElement>('[data-ww-model-stats]')]
-    .map((node) => JSON.parse(node.dataset.wwModelStats!))
+  const model = [...document.querySelectorAll<HTMLElement>('[data-around-model-stats]')]
+    .map((node) => JSON.parse(node.dataset.aroundModelStats!))
     .find((item) => item.instances > 0);
   return {
     t: performance.now(),
@@ -112,7 +112,7 @@ async function ready(page: Page) {
   await expect(page.locator('#movie_player')).toBeVisible({ timeout: 35_000 });
   await declinePromotion(page);
   await waitForAdvertToEnd(page, 35_000);
-  await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+  await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
 }
 
 async function play(page: Page) {
@@ -129,7 +129,7 @@ async function importPicture(popup: Page, page: Page) {
       popup.evaluate(async () => {
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
         try {
-          return (await chrome.tabs.sendMessage(tab.id!, { type: 'web-world-themes:probe-editor-target' }))?.siteId;
+          return (await chrome.tabs.sendMessage(tab.id!, { type: 'around:probe-editor-target' }))?.siteId;
         } catch {
           return null;
         }
@@ -150,9 +150,7 @@ async function importPicture(popup: Page, page: Page) {
 }
 
 async function readDesign(popup: Page) {
-  return popup.evaluate(
-    async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
-  );
+  return popup.evaluate(async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube']);
 }
 
 async function importModel(popup: Page, page: Page, scene: Exclude<Scene, 'quiet'>, quiet: any) {
@@ -164,9 +162,9 @@ async function importModel(popup: Page, page: Page, scene: Exclude<Scene, 'quiet
   const publicManifest = JSON.parse(await readFile(path.join(publicDir, 'manifest.json'), 'utf8'));
   const publicFile = (name: string) =>
     path.join(publicDir, (Object.values(publicManifest.assets) as any[]).find((a) => a.name === name).file);
-  const vrm = scene === 'mannequin' ? publicFile('WW mannequin.vrm') : process.env.WW_VRM_FILE;
-  const idle = scene === 'mannequin' ? publicFile('stand.vrma') : path.join(process.env.WW_VRMA_DIR!, 'idle.vrma');
-  if (!vrm) throw Error('WW_VRM_FILE is required for Trusie');
+  const vrm = scene === 'mannequin' ? publicFile('WW mannequin.vrm') : process.env.AROUND_VRM_FILE;
+  const idle = scene === 'mannequin' ? publicFile('stand.vrma') : path.join(process.env.AROUND_VRMA_DIR!, 'idle.vrma');
+  if (!vrm) throw Error('AROUND_VRM_FILE is required for Trusie');
   await panel.locator('.model-file').setInputFiles(vrm);
   await expect(panel.locator('.layer')).toHaveCount(2, { timeout: 45_000 });
   await panel.locator('.character-file').setInputFiles(idle);

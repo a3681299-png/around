@@ -132,8 +132,8 @@ for (const file of [
   'windows-g12-timing.json',
 ])
   await copyFile(path.join(work, file), path.join(out, file));
-const fixture = await readFile('tests/fixtures/backups/legacy-v13-vrm.wwbackup');
-if (!fixture.equals(await readFile('docs/benchmarks/r31-verification/legacy-v13-vrm.wwbackup')))
+const fixture = await readFile('tests/fixtures/backups/legacy-v13-vrm.aroundbackup');
+if (!fixture.equals(await readFile('docs/benchmarks/r31-verification/legacy-v13-vrm.aroundbackup')))
   throw Error('The historical fixture changed');
 
 const campaign = await json(path.join(perfRoot, 'runs.json')),

@@ -38,8 +38,8 @@ test.afterAll(async () => {
 const model = (p: Page) => p.locator('.model-media');
 async function open(p: Page) {
   await p.goto(origin);
-  await expect(p.locator('#apply')).toHaveText('WWT を適用');
-  await expect.poll(() => p.evaluate(() => Boolean((globalThis as any).__wwPlayground))).toBe(true);
+  await expect(p.locator('#apply')).toHaveText('Around を適用');
+  await expect.poll(() => p.evaluate(() => Boolean((globalThis as any).__aroundPlayground))).toBe(true);
 }
 test('Playground refuses malformed artwork through parseDesign', async ({ page }) => {
   const good = JSON.parse(await readFile(path.join(root, 'content/design.json'), 'utf8'));
@@ -106,16 +106,16 @@ test('G1 missing mark causes the coverage assertion to fail', async ({ page }) =
   if (process.env.PG_REMOVE_MARK === '1')
     await page.route('**/index.html', async (r) => {
       const html = await readFile(path.join(root, 'index.html'), 'utf8');
-      const broken = html.replace('id="play" type="button" data-ww-control="click"', 'id="play" type="button"');
+      const broken = html.replace('id="play" type="button" data-around-control="click"', 'id="play" type="button"');
       expect(broken).not.toBe(html);
       await r.fulfill({ body: broken, contentType: 'text/html' });
     });
   await page.goto(origin + '/index.html');
-  await expect.poll(() => page.evaluate(() => Boolean((globalThis as any).__wwPlayground))).toBe(true);
+  await expect.poll(() => page.evaluate(() => Boolean((globalThis as any).__aroundPlayground))).toBe(true);
   const missing = await page.evaluate(() => {
-    const c = new Set((globalThis as any).__wwPlayground.controls());
+    const c = new Set((globalThis as any).__aroundPlayground.controls());
     return [...document.querySelectorAll('button,a[href],input,video')]
-      .filter((e) => !e.closest('[id^="web-world-themes"]') && !c.has(e))
+      .filter((e) => !e.closest('[id^="around"]') && !c.has(e))
       .map((e) => e.id || e.textContent?.trim());
   });
   records.push({ case: 'controls', missing });

@@ -11,7 +11,7 @@ git worktree add --detach .work/verify-chunk2-head 842e42f
 各 worktree で `npm ci` と `npm run test:setup` を行う。同じ lockfile の依存関係と Chromium を共用してもよい。各ツリーで次を実行する。
 
 ```powershell
-$env:WW_BUILD_OUT = '.work/extension'
+$env:AROUND_BUILD_OUT = '.work/extension'
 npm run build
 node scripts/ui1/build.mjs . .work/perf
 ```
@@ -19,14 +19,14 @@ node scripts/ui1/build.mjs . .work/perf
 以下は対象側の `.work/verify-chunk2-head` がカレントディレクトリ。ここにある `repro` のファイルは、対象側の `.work/verify/` へコピーする。`run.ps1` はテストを1件ずつ実行し、JSON とログを `.work/verify-evidence` に保存する。Chromium を共用する場合は `PLAYWRIGHT_BROWSERS_PATH` をその場所に設定する。
 
 ```powershell
-$env:WW_TEST_WINDOW_OFFSCREEN = '1'
-$env:WW_PLAYGROUND_OUT = '.work/playground'
+$env:AROUND_TEST_WINDOW_OFFSCREEN = '1'
+$env:AROUND_PLAYGROUND_OUT = '.work/playground'
 npm run build:playground
 node scripts/g11/build.mjs
 node .work/verify/faults.mjs
 node .work/verify/static.mjs
 
-$env:WW_TEST_EXTENSION_PATH = (Resolve-Path .work/extension).Path
+$env:AROUND_TEST_EXTENSION_PATH = (Resolve-Path .work/extension).Path
 $env:PLAYWRIGHT_JSON_OUTPUT_NAME = Join-Path (Get-Location) '.work/windows-all.json'
 npm run test:e2e -- --reporter=list,json
 npm run test:unit -- --config=.work/verify/config.ts author.spec.ts
@@ -53,9 +53,9 @@ Remove-Item Env:CHUNK2_FAULT
 
 ```powershell
 $assetRoot = Join-Path ([Environment]::GetFolderPath('Desktop')) 'ローポリモデル用\out'
-$env:WW_VRM_FILE = Join-Path $assetRoot 'trusie.vrm'
-$env:WW_VRMA_DIR = Join-Path $assetRoot 'anim\trusie'
+$env:AROUND_VRM_FILE = Join-Path $assetRoot 'trusie.vrm'
+$env:AROUND_VRMA_DIR = Join-Path $assetRoot 'anim\trusie'
 & .work/verify/run.ps1 B
 ```
 
-`B` は場面ごとに新しいプロファイルを使い、トルーシェ1体、マネキン1体、キャラなしの順で起動・8秒待ち後の定常・検索 SPA を各6秒採る。各場面で前後を4組交互に回す。`WW_VRMA_DIR` の `idle.vrma` のみを使う。素材の読込は製品の Studio を使い、プロファイルは Windows の一時ディレクトリに分離する。GPU は `EXT_disjoint_timer_query_webgl2` の直近の値。SPA の動画カウンターは動画が変わった区間を無効とする。`aggregate.mjs` で集計し、設定した出力先に組別の表と圧縮 JSON を作る。CI は `gh run view` の対象 SHA とログの件数で照合する。
+`B` は場面ごとに新しいプロファイルを使い、トルーシェ1体、マネキン1体、キャラなしの順で起動・8秒待ち後の定常・検索 SPA を各6秒採る。各場面で前後を4組交互に回す。`AROUND_VRMA_DIR` の `idle.vrma` のみを使う。素材の読込は製品の Studio を使い、プロファイルは Windows の一時ディレクトリに分離する。GPU は `EXT_disjoint_timer_query_webgl2` の直近の値。SPA の動画カウンターは動画が変わった区間を無効とする。`aggregate.mjs` で集計し、設定した出力先に組別の表と圧縮 JSON を作る。CI は `gh run view` の対象 SHA とログの件数で照合する。

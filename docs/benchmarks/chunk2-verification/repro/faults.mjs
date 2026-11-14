@@ -5,12 +5,12 @@ import path from 'node:path';
 const root = process.cwd();
 const tools = path.resolve('.work/verify');
 const define = {
-  __WW_WORLD_MODE__: '"runtime"',
-  __WW_WORLD_DEVTOOLS__: 'false',
-  __WW_ASSET_PROFILE__: 'false',
-  __WW_PAGE_CHANGE_LEGACY__: 'false',
-  __WW_G11__: 'false',
-  __WW_PLAYGROUND_TEST__: 'false',
+  __AROUND_WORLD_MODE__: '"runtime"',
+  __AROUND_WORLD_DEVTOOLS__: 'false',
+  __AROUND_ASSET_PROFILE__: 'false',
+  __AROUND_PAGE_CHANGE_LEGACY__: 'false',
+  __AROUND_G11__: 'false',
+  __AROUND_PLAYGROUND_TEST__: 'false',
 };
 
 function replaceImport(relative, wrapper) {
@@ -71,7 +71,7 @@ for (const [name, [relative, wrapper]] of Object.entries(faults)) {
     target: 'chrome120',
     charset: 'utf8',
     loader: { '.css': 'text' },
-    dropLabels: ['WW_TEST_PAGE_CHANGE', 'WW_GUARD_TRACE'],
+    dropLabels: ['AROUND_TEST_PAGE_CHANGE', 'AROUND_GUARD_TRACE'],
     define,
     plugins: [fault.plugin],
   });

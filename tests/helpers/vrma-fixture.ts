@@ -31,7 +31,7 @@ export function vrmaFixture(
   const hipsOut = floats(hips.flat(), 'VEC3', hips.length);
   const spineOut = floats(rotations.flat(), 'VEC4', rotations.length);
   const json: Record<string, any> = {
-    asset: { version: '2.0', generator: 'Web World Themes original test motion' },
+    asset: { version: '2.0', generator: 'Around original test motion' },
     scene: 0,
     scenes: [{ nodes: [0] }],
     nodes: [

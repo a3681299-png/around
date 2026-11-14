@@ -1,6 +1,6 @@
 // Records the character in the living room doing the approach (notice → walk → touch → back to
 // standing) for the eye: a video, a picture per phase and a log of what the body did.
-//   WW_LIVING_TEST=1 WW_LIVING_OUT=.work/living-room-preview WW_LIVING_CHARACTER=<vrm> WW_LIVING_MOTIONS=<dir> \
+//   AROUND_LIVING_TEST=1 AROUND_LIVING_OUT=.work/living-room-preview AROUND_LIVING_CHARACTER=<vrm> AROUND_LIVING_MOTIONS=<dir> \
 //     node scripts/build-living-room.mjs
 //   PLAYWRIGHT_BROWSERS_PATH=<main checkout>/.work/browsers \
 //     node scripts/living-room/record.mjs <out-dir> [x y z] [x y z …]
@@ -17,12 +17,12 @@ const numbers = process.argv.slice(3).map(Number);
 const targets = [];
 for (let i = 0; i + 2 < numbers.length; i += 3) targets.push(numbers.slice(i, i + 3));
 if (!targets.length) targets.push([-0.9, 0.95, -0.55]);
-const width = Number(process.env.WW_RECORD_WIDTH ?? 1280);
-const height = Number(process.env.WW_RECORD_HEIGHT ?? 720);
+const width = Number(process.env.AROUND_RECORD_WIDTH ?? 1280);
+const height = Number(process.env.AROUND_RECORD_HEIGHT ?? 720);
 mkdirSync(out, { recursive: true });
 // The phase pictures of an earlier run would mix with this one's (they are numbered alike).
 for (const file of readdirSync(out)) if (/^\d\d-t\d+-\w+\.png$/.test(file)) rmSync(join(out, file));
-const server = createPlaygroundServer(resolve(process.env.WW_LIVING_OUT ?? '.work/living-room-preview'));
+const server = createPlaygroundServer(resolve(process.env.AROUND_LIVING_OUT ?? '.work/living-room-preview'));
 await new Promise((done) => server.listen(0, '127.0.0.1', done));
 const { port } = server.address();
 const browser = await chromium.launch({
@@ -46,19 +46,22 @@ try {
   page.on('pageerror', (error) => errors.push(String(error)));
   await page.goto(`http://127.0.0.1:${port}/`);
   await page.waitForFunction(
-    () => globalThis.__wwLivingRoom?.resident && document.querySelector('#room[data-ready]'),
+    () => globalThis.__aroundLivingRoom?.resident && document.querySelector('#room[data-ready]'),
     null,
     {
       timeout: 90000,
     },
   );
-  await page.evaluate(() => globalThis.__wwLivingRoom.still());
-  // WW_RECORD_CLOSE=0.4 follows the character from nearer (to judge the feet and the hand).
-  if (process.env.WW_RECORD_CLOSE)
-    await page.evaluate((scale) => globalThis.__wwLivingRoom.closeUp(scale), Number(process.env.WW_RECORD_CLOSE));
+  await page.evaluate(() => globalThis.__aroundLivingRoom.still());
+  // AROUND_RECORD_CLOSE=0.4 follows the character from nearer (to judge the feet and the hand).
+  if (process.env.AROUND_RECORD_CLOSE)
+    await page.evaluate(
+      (scale) => globalThis.__aroundLivingRoom.closeUp(scale),
+      Number(process.env.AROUND_RECORD_CLOSE),
+    );
   const sample = () =>
     page.evaluate(() => {
-      const r = globalThis.__wwLivingRoom.resident;
+      const r = globalThis.__aroundLivingRoom.resident;
       const s = r.state();
       return {
         t: s.t,
@@ -76,7 +79,7 @@ try {
   let n = 0;
   for (const target of targets) {
     n++;
-    await page.evaluate((t) => globalThis.__wwLivingRoom.resident.setTarget(t), target);
+    await page.evaluate((t) => globalThis.__aroundLivingRoom.resident.setTarget(t), target);
     let phase = '';
     const started = Date.now();
     let touched = false;
@@ -97,11 +100,11 @@ try {
     }
     await page.waitForTimeout(1200);
   }
-  await page.evaluate(() => globalThis.__wwLivingRoom.resident.setTarget(undefined));
+  await page.evaluate(() => globalThis.__aroundLivingRoom.resident.setTarget(undefined));
   await page.waitForTimeout(800);
   const facts = await page.evaluate(() => ({
-    facts: globalThis.__wwLivingRoom.resident.facts(),
-    metrics: globalThis.__wwLivingRoom.resident.metrics(),
+    facts: globalThis.__aroundLivingRoom.resident.facts(),
+    metrics: globalThis.__aroundLivingRoom.resident.metrics(),
   }));
   await context.close();
   const video = readdirSync(out).find((f) => f.endsWith('.webm') && f !== 'approach.webm');

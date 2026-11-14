@@ -45,7 +45,7 @@ const RETRO_FEATURES = [
 ];
 const featureValues =
   process.env.UI0C_FEATURES === 'off'
-    ? Object.fromEntries(RETRO_FEATURES.map((id) => [`webWorldThemes.features.${id}`, false]))
+    ? Object.fromEntries(RETRO_FEATURES.map((id) => [`around.features.${id}`, false]))
     : {};
 
 function stats(values) {
@@ -94,10 +94,10 @@ async function launch(build) {
   await popup.evaluate(
     ({ design, features }) =>
       chrome.storage.local.set({
-        'webWorldThemes.enabled': true,
-        'webWorldThemes.strength': 100,
-        'webWorldThemes.safety.emergencyOff': false,
-        'webWorldThemes.design.youtube': design,
+        'around.enabled': true,
+        'around.strength': 100,
+        'around.safety.emergencyOff': false,
+        'around.design.youtube': design,
         ...features,
       }),
     { design: plain, features: featureValues },
@@ -167,7 +167,7 @@ async function measure(browser, run) {
 async function scenarios(browser) {
   const { page } = browser;
   await page.goto(url, { waitUntil: 'domcontentloaded' });
-  const cards = page.locator('[data-ww-surface~="video-card"]');
+  const cards = page.locator('[data-around-surface~="video-card"]');
   await cards.nth(3).waitFor();
   await page.waitForTimeout(8000);
   // The skin tool, the pointer crossing cards and controls.
@@ -192,7 +192,7 @@ async function scenarios(browser) {
     .locator('a')
     .first()
     .click({ position: { x: 20, y: 20 } });
-  await page.locator('[data-ww-editor-selected]').waitFor();
+  await page.locator('[data-around-editor-selected]').waitFor();
   await page.waitForTimeout(1500);
   const scroll = await measure(browser, async () => {
     for (let i = 0; i < 40; i++) {
@@ -225,7 +225,7 @@ async function openStudio({ context, popup, page }) {
 async function skinSurface(browser, surface) {
   const { page } = browser;
   await page.goto(url, { waitUntil: 'domcontentloaded' });
-  await page.locator('[data-ww-surface~="video-card"]').nth(3).waitFor();
+  await page.locator('[data-around-surface~="video-card"]').nth(3).waitFor();
   await page.waitForTimeout(8000);
   const editor = surface === 'window' ? await openStudio(browser) : await openEditor(browser);
   await editor.getByRole('button', { name: 'UIを着せ替え' }).click();
@@ -251,7 +251,7 @@ async function ui0d3(browser) {
   const startup = await measure(browser, async () => {
     await page.waitForTimeout(6000);
   });
-  await page.locator('[data-ww-surface~="video-card"]').nth(3).waitFor();
+  await page.locator('[data-around-surface~="video-card"]').nth(3).waitFor();
   await page.waitForTimeout(4000);
   const steady = await measure(browser, async () => {
     for (let i = 0; i < 20; i++) {
@@ -277,12 +277,12 @@ async function ui0d3(browser) {
   await editor.getByRole('button', { name: '動画カードを編集' }).click();
   await page.mouse.move(1700, 300);
   await page
-    .locator('[data-ww-surface~="video-card"]')
+    .locator('[data-around-surface~="video-card"]')
     .nth(1)
     .locator('a')
     .first()
     .click({ position: { x: 20, y: 20 } });
-  await page.locator('[data-ww-editor-selected]').waitFor();
+  await page.locator('[data-around-editor-selected]').waitFor();
   await page.waitForTimeout(1500);
   const scroll = await measure(browser, async () => {
     for (let i = 0; i < 40; i++) {

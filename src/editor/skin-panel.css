@@ -27,7 +27,7 @@ main[data-skin-tool] .studio-inspectors > .skin {
   border-top: 0;
   padding-top: 0;
 }
-/* ww-part: ruled cards; the chosen one is a cobalt edge on cobalt wash. */
+/* around-part: ruled cards; the chosen one is a cobalt edge on cobalt wash. */
 .skin-parts {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -69,7 +69,7 @@ main[data-skin-tool] .studio-inspectors > .skin {
 .skin-part .state:empty {
   display: none;
 }
-.skin-empty.ww-empty {
+.skin-empty.around-empty {
   margin: 0 0 var(--space-12);
 }
 .skin-part .state::before {
@@ -140,7 +140,7 @@ main[data-skin-tool] .studio-inspectors > .skin {
   box-shadow: inset 0 0 0 1px var(--line-control);
   color: var(--ink);
 }
-/* The skin's states are tabs (ww-tabs), wrapped when there are many. */
+/* The skin's states are tabs (around-tabs), wrapped when there are many. */
 .skin-tabs {
   display: flex;
   flex-wrap: wrap;
@@ -187,7 +187,7 @@ main[data-skin-tool] .studio-inspectors > .skin {
   background: var(--surface-sunk);
   text-align: center;
   cursor: pointer;
-  transition: background-color calc(var(--ww-frame) * 2) steps(2, end);
+  transition: background-color calc(var(--around-frame) * 2) steps(2, end);
 }
 .skin-drop:hover,
 .skin-drop[data-over] {

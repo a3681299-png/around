@@ -1,7 +1,7 @@
 /**
  * YouTube's side of the room behind the UI (docs/depth-foundation.md). Only YouTube's own page
  * background turns transparent (the app shell; the masthead, the guide and every part keep their
- * looks), its ambient glow around the player stops while the room is shown (WWT's video light
+ * looks), its ambient glow around the player stops while the room is shown (Around's video light
  * takes its place), and the regions are the parts with text or controls, each with its importance.
  */
 import type { SiteBackdrop } from './types';
@@ -20,7 +20,7 @@ const BACKDROP_CSS =
   // control): the room shows there instead. The picture, the bars and their gradients stay.
   'ytd-watch-flexy[theater] #full-bleed-container,ytd-watch-flexy[theater] #player-full-bleed-container,' +
   'ytd-watch-flexy[theater] #movie_player,ytd-watch-flexy[theater] .html5-video-container{background:transparent!important}';
-const STYLE_ID = 'web-world-themes-backdrop';
+const STYLE_ID = 'around-backdrop';
 
 interface RegionSource {
   selector: string;
@@ -138,7 +138,7 @@ const TIGHT_PER_READ = 4;
 /** A part's measured text bounds are trusted this long, then measured again. */
 const TIGHT_TTL_MS = 1000;
 
-/** The known parts, or none in a build that stands in for YouTube renaming them (WW_SPACE_BREAK=names):
+/** The known parts, or none in a build that stands in for YouTube renaming them (AROUND_SPACE_BREAK=names):
  * the picture stays (it lights the room), the text parts go. */
 const singles = SPACE_BREAK === 'names' ? SINGLES.filter((s) => s.video) : SINGLES;
 const lists = SPACE_BREAK === 'names' ? [] : LISTS;
@@ -508,7 +508,7 @@ export function youtubeBackdrop(doc: Document): SiteBackdrop {
         if (r.width > 0 && r.height > 0)
           out.push({ left: r.left, top: r.top, width: r.width, height: r.height, importance: 'read', fallback: true });
       }
-      WW_DEV_LOG: {
+      AROUND_DEV_LOG: {
         // The way out working means a known part's name no longer matches YouTube's page: the
         // small plates were lost silently. Said once per change of the plated columns.
         const names = [...columns].map((e) => `${e.localName}${e.id ? `#${e.id}` : ''}`);
@@ -517,7 +517,7 @@ export function youtubeBackdrop(doc: Document): SiteBackdrop {
           loggedColumns = key;
           if (names.length)
             console.info(
-              `[Web World Themes] 読みやすさの逃げ道：名前の分からない部品の文字に、列ごとの板を敷きました（列 ${names.length} 本: ${key}）`,
+              `[Around] 読みやすさの逃げ道：名前の分からない部品の文字に、列ごとの板を敷きました（列 ${names.length} 本: ${key}）`,
             );
         }
       }

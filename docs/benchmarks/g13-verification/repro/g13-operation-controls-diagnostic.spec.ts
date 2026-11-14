@@ -155,16 +155,14 @@ test('native drag, text, keyboard and fullscreen controls remain usable with opa
   await expect
     .poll(async () =>
       JSON.parse(
-        (await youtube.locator('#web-world-themes-decorations').getAttribute('data-ww-safety')) ?? '{}',
+        (await youtube.locator('#around-decorations').getAttribute('data-around-safety')) ?? '{}',
       ).issues?.some((i: any) => i.severity === 'enforced'),
     )
     .toBe(true);
   await expect
-    .poll(() => youtube.locator('#web-world-themes-decorations').evaluate((host) => getComputedStyle(host).clipPath))
+    .poll(() => youtube.locator('#around-decorations').evaluate((host) => getComputedStyle(host).clipPath))
     .not.toBe('none');
-  expect(await youtube.locator('#web-world-themes-decorations').evaluate((host) => getComputedStyle(host).zIndex)).toBe(
-    '1',
-  );
+  expect(await youtube.locator('#around-decorations').evaluate((host) => getComputedStyle(host).zIndex)).toBe('1');
   await preserved('native-seek-screen');
   expect(await run()).toEqual(baseline);
   // Repeat against the other production composition path: moving the original
@@ -180,14 +178,14 @@ test('native drag, text, keyboard and fullscreen controls remain usable with opa
   await editor.locator('.save').click();
   await expect(editor.locator('.dirty')).toHaveText('保存済み');
   await editor.getByRole('button', { name: '編集を終了', exact: true }).first().click();
-  const playerPaint = youtube.locator('#web-world-themes-video-decorations');
+  const playerPaint = youtube.locator('#around-video-decorations');
   await expect(playerPaint.locator('[data-image-id]')).toBeVisible();
   await expect(playerPaint).toHaveCSS('clip-path', 'inset(64px 0px 112px)');
   await preserved('native-seek-player');
   expect(await run()).toEqual(baseline);
   // G1.2: the same opaque layer, now moving (it follows the pointer). Only the roots over a near
   // control are held; the controls stay usable while it moves everywhere else.
-  const key = 'webWorldThemes.design.youtube';
+  const key = 'around.design.youtube';
   const saved = await popup.evaluate(async (k) => (await chrome.storage.local.get(k))[k] as DesignDocument, key);
   const moving: DesignDocument = {
     ...saved,
@@ -198,8 +196,7 @@ test('native drag, text, keyboard and fullscreen controls remain usable with opa
   await expect
     .poll(
       async () =>
-        JSON.parse((await youtube.locator('#web-world-themes-decorations').getAttribute('data-ww-safety')) ?? '{}')
-          .stopped,
+        JSON.parse((await youtube.locator('#around-decorations').getAttribute('data-around-safety')) ?? '{}').stopped,
     )
     .toBe('');
   await expect(playerPaint.locator('[data-image-id]')).toBeVisible();
@@ -210,7 +207,7 @@ test('native drag, text, keyboard and fullscreen controls remain usable with opa
     .poll(
       async () =>
         JSON.parse(
-          (await youtube.locator('#web-world-themes-decorations').getAttribute('data-ww-safety')) ?? '{}',
+          (await youtube.locator('#around-decorations').getAttribute('data-around-safety')) ?? '{}',
         ).issues?.filter((i: any) => i.surfaceId === 'native.approach').length,
     )
     .toBe(1);
@@ -247,10 +244,7 @@ test('fullscreen keeps authored painting order across viewport and player anchor
   await expect(editor.locator('.dirty')).toHaveText('保存済み');
   await editor.getByRole('button', { name: '編集を終了', exact: true }).first().click();
   const design = await popup.evaluate(
-    async () =>
-      (await chrome.storage.local.get('webWorldThemes.design.youtube'))[
-        'webWorldThemes.design.youtube'
-      ] as DesignDocument,
+    async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'] as DesignDocument,
   );
   design.decorations.forEach((layer, i) => {
     layer.placement = {
@@ -264,7 +258,7 @@ test('fullscreen keeps authored painting order across viewport and player anchor
     layer.zIndex = i;
   });
   const store = () =>
-    popup.evaluate(async (design) => chrome.storage.local.set({ 'webWorldThemes.design.youtube': design }), design);
+    popup.evaluate(async (design) => chrome.storage.local.set({ 'around.design.youtube': design }), design);
   await store();
   await youtube.getByRole('button', { name: 'Fullscreen', exact: true }).click();
   await expect.poll(() => youtube.evaluate(() => Boolean(document.fullscreenElement))).toBe(true);
@@ -323,20 +317,20 @@ test('Studio exposes protection overlays, per-layer restrictions and emergency O
   const studio = await context.newPage();
   await studio.goto(`chrome-extension://${extensionId}/studio/index.html`);
   await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
-  const panel = studio.locator('#web-world-themes-creator');
+  const panel = studio.locator('#around-creator');
   await panel.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await panel.getByLabel('画像の幅', { exact: true }).fill('1600');
   await panel.getByLabel('画像の幅', { exact: true }).press('Tab');
   // UI0-d round 3: 操作チェック sits in the editor's header while a layer is restricted.
-  await expect(studio.locator('.ww-editor-safety li[data-issue-layer]')).toContainText(['制限中']);
+  await expect(studio.locator('.around-editor-safety li[data-issue-layer]')).toContainText(['制限中']);
   await expect(panel.locator('.safety-limited-badge')).toHaveText('制限中');
-  await studio.locator('.ww-editor-safety .safety-check > summary').click();
+  await studio.locator('.around-editor-safety .safety-check > summary').click();
   await studio.getByLabel('操作面の保護範囲を表示').check();
-  await expect(youtube.locator('#web-world-themes-operation-check')).toHaveCount(1);
+  await expect(youtube.locator('#around-operation-check')).toHaveCount(1);
   await studio.screenshot({ path: info.outputPath('studio-operation-restriction.png') });
   await youtube.screenshot({ path: info.outputPath('operation-envelopes.png') });
   await studio.getByRole('button', { name: '緊急OFF', exact: true }).click();
-  await expect(youtube.locator('#web-world-themes-decorations')).toHaveCount(0);
+  await expect(youtube.locator('#around-decorations')).toHaveCount(0);
   // UI0-d: one save chip, in the design system's words (was 未保存の変更 in the Studio).
   await expect(panel.locator('.dirty')).toHaveText('未保存');
 });

@@ -136,7 +136,7 @@ export function youtubeOperations(doc: Document) {
   // its parts, so the next draw is not held for want of a read.
   const beneathPlace = (sized = true) => {
     const why = (reason: string) => {
-      WW_GUARD_TRACE: doc.documentElement.setAttribute('data-ww-beneath-place', reason);
+      AROUND_GUARD_TRACE: doc.documentElement.setAttribute('data-around-beneath-place', reason);
       return undefined;
     };
     if (!overlaySlot()) return why('no overlay slot');
@@ -164,11 +164,11 @@ export function youtubeOperations(doc: Document) {
    * order of the player's parts is proven per control, so an opacity fade changes nothing here.
    */
   /** The stacking proof, the one place it is asked. A development build without it on purpose
-   * (WW_NO_STACKING_PROOF=1, scripts/build.mjs) drops the labelled line and takes everything as
+   * (AROUND_NO_STACKING_PROOF=1, scripts/build.mjs) drops the labelled line and takes everything as
    * proven, to see the layering tests fail; every other build keeps the line. */
   const provenOver = (composition: CompositionReader, element: Element, media: HTMLElement) => {
     let proven = true;
-    WW_STACKING_PROOF: proven = composition.paintsAbove(element, media);
+    AROUND_STACKING_PROOF: proven = composition.paintsAbove(element, media);
     return proven;
   };
   const unprovenControls = (
@@ -181,7 +181,7 @@ export function youtubeOperations(doc: Document) {
       ? [root, ...root.querySelectorAll(candidateSelector)]
       : [...root.querySelectorAll(candidateSelector)];
     return candidates.filter((element) => {
-      if (element.closest('[id^="web-world-themes"]') || media.contains(element)) return false;
+      if (element.closest('[id^="around"]') || media.contains(element)) return false;
       const r = element.getBoundingClientRect();
       if (r.width <= 0 || r.height <= 0) return false;
       // Only a control near a paint can hold it (the Host's 40 px): one elsewhere needs no proof
@@ -241,7 +241,7 @@ export function youtubeOperations(doc: Document) {
       const seen = new Set<Element>();
       const buckets = selectors.map(() => [] as HTMLElement[]);
       for (const element of candidates(scan)) {
-        if (element.closest('[id^="web-world-themes"]')) continue;
+        if (element.closest('[id^="around"]')) continue;
         seen.add(element);
         buckets[selectors.findIndex(([, , selector]) => element.matches(selector))]!.push(element);
       }
@@ -279,7 +279,7 @@ export function youtubeOperations(doc: Document) {
         active !== doc.body &&
         active !== root &&
         !seen.has(active) &&
-        !active.closest('[id^="web-world-themes"]')
+        !active.closest('[id^="around"]')
       )
         rows.push({ id: 'native.focus', kind: 'gesture', element: active });
       // Chunk 4: which surfaces the beneath plane cannot cover. The plane is clipped to the
@@ -318,11 +318,11 @@ export function youtubeOperations(doc: Document) {
             // player's box changes (fullscreen, theater, the miniplayer) before the next read, and
             // a part left without a proof would then stop a paint it is drawn over.
             row.aboveBeneath = provenOver(composition, row.element, place.media);
-            WW_GUARD_TRACE: {
-              const kept = (doc.documentElement.dataset['wwBeneathRows'] ?? '').split('\n').filter(Boolean);
+            AROUND_GUARD_TRACE: {
+              const kept = (doc.documentElement.dataset['aroundBeneathRows'] ?? '').split('\n').filter(Boolean);
               const note = `${row.id} ${row.element.tagName.toLowerCase()}.${[...row.element.classList].slice(0, 3).join('.')} ${row.aboveBeneath ? 'proven' : 'NOT'}`;
               if (!row.aboveBeneath && !kept.includes(note) && kept.length < 40)
-                doc.documentElement.dataset['wwBeneathRows'] = [...kept, note].join('\n');
+                doc.documentElement.dataset['aroundBeneathRows'] = [...kept, note].join('\n');
             }
             // Only one shown over the player's box can be under a paint.
             if (row.visible === false) continue;
@@ -343,7 +343,7 @@ export function youtubeOperations(doc: Document) {
             });
             // Why it was not proven: the element and its ancestors up to the player as read now,
             // and the media's own level (the trace build only; first 8 kept).
-            WW_GUARD_TRACE: {
+            AROUND_GUARD_TRACE: {
               // On the document: the plane may not exist yet at the first read.
               const host = doc.documentElement;
               const chain: string[] = [];
@@ -355,9 +355,9 @@ export function youtubeOperations(doc: Document) {
               }
               const media = composition.style(place.media);
               const note = `${performance.now().toFixed(0)}ms ${row.id} [${chain.join(' < ')}] media ${media.position}/${media.zIndex} player ${composition.style(place.parent).zIndex}`;
-              const kept = (host.dataset['wwBeneathWhy'] ?? '').split('\n').filter(Boolean);
+              const kept = (host.dataset['aroundBeneathWhy'] ?? '').split('\n').filter(Boolean);
               if (kept.length < 8 && !kept.some((k) => k.includes(row.id)))
-                host.dataset['wwBeneathWhy'] = [...kept, note].join('\n');
+                host.dataset['aroundBeneathWhy'] = [...kept, note].join('\n');
             }
           }
         }
@@ -472,11 +472,11 @@ export function youtubeOperations(doc: Document) {
         return false;
       })();
       // On the extension's own host (its mutations are not the page's): every reason seen so far.
-      WW_GUARD_TRACE: if (everywhere || found.length) {
-        const host = doc.getElementById('web-world-themes-video-decorations');
-        const seen = new Set((host?.dataset['wwBeneathUnsettled'] ?? '').split('|').filter(Boolean));
+      AROUND_GUARD_TRACE: if (everywhere || found.length) {
+        const host = doc.getElementById('around-video-decorations');
+        const seen = new Set((host?.dataset['aroundBeneathUnsettled'] ?? '').split('|').filter(Boolean));
         for (const why of everywhere ? ['no read'] : found.map((f) => f.why)) seen.add(why);
-        host?.setAttribute('data-ww-beneath-unsettled', [...seen].join('|'));
+        host?.setAttribute('data-around-beneath-unsettled', [...seen].join('|'));
       }
       return {
         ...slot,

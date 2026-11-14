@@ -68,13 +68,13 @@
 
 ## 検証結果
 
-[修正後のCI](https://github.com/a3681299-png/web-world-themes/actions/runs/37186991527)（`d521800`）で、lint・型チェック・ビルドと**43件の回帰テスト**がPASS。10件の新規回帰は実際の描画背景を画素で採取した文字コントラスト、行内パネル衝突、タイトルバーの遮蔽、動画画素・寸法・親要素の保持、プレイリストの折り畳み、OFF／0%を含みます。
+[修正後のCI](https://github.com/a3681299-png/around/actions/runs/37186991527)（`d521800`）で、lint・型チェック・ビルドと**43件の回帰テスト**がPASS。10件の新規回帰は実際の描画背景を画素で採取した文字コントラスト、行内パネル衝突、タイトルバーの遮蔽、動画画素・寸法・親要素の保持、プレイリストの折り畳み、OFF／0%を含みます。
 
 同じCIの独立したChromiumで、HTMLを差し替えず公開YouTubeへ実MV3拡張機能を読み込み、ライトとダークの**2件の実サイト表示チェック**もPASSしました。ダークはブラウザーの配色設定だけでは切り替わらなかったため、YouTubeの実際の設定メニューから変更し、`html[dark]` を確認しています。動画名付きバー、紺地・白文字の選択行、銀色の動画情報背景を画像で確認しました。ユーザーのログイン状態は使用していません。
 
 動画配信はYouTubeの「Sign in to confirm you’re not a bot」表示で止まっています。これは表示確認を可能にしているだけで、実動画再生の成功ではありません。認証の要求を回避していません。再生・停止・全画面・入力の回帰はローカル素材を使う実MV3テストで別に確認しています。
 
-この記録と実サイトの読込待ち・コメント位置の画像確認を追加後も、[専用ブランチのCI](https://github.com/a3681299-png/web-world-themes/actions?query=branch%3Afix%2Fyoutube-silver-native-surfaces)で最終コミットを再確認します。ローカルでもlint・build・11件のブラウザー不要テストはPASS。ローカルブラウザーの既存制限は尊重し、別経路で回避していません。mainのマージ・配備は行いません。
+この記録と実サイトの読込待ち・コメント位置の画像確認を追加後も、[専用ブランチのCI](https://github.com/a3681299-png/around/actions?query=branch%3Afix%2Fyoutube-silver-native-surfaces)で最終コミットを再確認します。ローカルでもlint・build・11件のブラウザー不要テストはPASS。ローカルブラウザーの既存制限は尊重し、別経路で回避していません。mainのマージ・配備は行いません。
 
 ---
 
@@ -96,7 +96,7 @@
 
 ## 今回の実装とCI
 
-[Theme checks / 初回実装](https://github.com/a3681299-png/web-world-themes/actions/runs/37174658385)（`6f8e99ed9decea0ecf9f5e530ead79db3ecc761b`）で、lint・型チェック・ビルド・**33件すべてPASS**。標準Ubuntu runnerへ実MV3拡張機能を読み込み、Chrome Storageも実物を使っています。
+[Theme checks / 初回実装](https://github.com/a3681299-png/around/actions/runs/37174658385)（`6f8e99ed9decea0ecf9f5e530ead79db3ecc761b`）で、lint・型チェック・ビルド・**33件すべてPASS**。標準Ubuntu runnerへ実MV3拡張機能を読み込み、Chrome Storageも実物を使っています。
 
 - ブラウザー不要11件、従来のブラウザー操作16件、新しいshell回帰5件、画像／レイアウト1件
 - native light／darkそれぞれ、強さ1／25／60／100%でも同じシルバー背景と暗い本文。0%では元のダーク背景・角丸・文字へ復帰
@@ -114,7 +114,7 @@ CIで**16枚**を出力。デスクトップ1360pxのホーム／動画／プレ
 
 これらは**合成YouTube DOMに対する実MV3／Storageテスト**です。今回の変更をログイン済み実YouTubeへ適用した目視結果ではありません。実際の動画配信、広告、各アカウントやA/B版の全DOM、Shorts専用再生画面までは保証しません。従来の実サイト確認記録は今回のPASSとして扱いません。
 
-この記録と最終の文字／fixture調整を追加後も、[専用ブランチのCI一覧](https://github.com/a3681299-png/web-world-themes/actions?query=branch%3Afeat%2Fheisei-silver-shell)で最終コミットを再検証します。artifact `theme-test-results`は7日保持。mainへのマージ・デプロイは行いません。
+この記録と最終の文字／fixture調整を追加後も、[専用ブランチのCI一覧](https://github.com/a3681299-png/around/actions?query=branch%3Afeat%2Fheisei-silver-shell)で最終コミットを再検証します。artifact `theme-test-results`は7日保持。mainへのマージ・デプロイは行いません。
 
 ## オフラインフォント
 
@@ -139,7 +139,7 @@ PixelMplus12 Regularの完全な字形セット（7,253 glyphs）を同梱WOFF2�
 
 ## GitHub CIでの最終確認
 
-[Theme checks / run 2](https://github.com/a3681299-png/web-world-themes/actions/runs/37169672828)（commit `96d8812`）で`npm run check`が成功しました。UbuntuのChrome for Testing 153、Playwright 1.63.0へ実際のMV3拡張機能を読み込み、**28件すべてPASS**です。
+[Theme checks / run 2](https://github.com/a3681299-png/around/actions/runs/37169672828)（commit `96d8812`）で`npm run check`が成功しました。UbuntuのChrome for Testing 153、Playwright 1.63.0へ実際のMV3拡張機能を読み込み、**28件すべてPASS**です。
 
 - ブラウザー操作16件 + スクリーンショット／レイアウト1件 + ブラウザー不要の設定／機能テスト11件
 - ホームのライト60%／100%、ダーク100%、動画ページ、プレイヤー内設定、Popup、900px幅を画像として出力し、実際のピクセルを確認。ヘッダーとの重なり・横方向のはみ出しなし
@@ -274,16 +274,16 @@ Windows 95/98風のテーマへ変更後、同じ独立した未ログインのC
 
 作業ブランチは `codex/creator-editor-spike`、専用worktreeは `.work/creator-editor`。完成作業用の `codex/extension-completion` も作成した。元の `main` は `022a576` のままcleanで、元の `dist` 全12ファイルのSHA-256が作業前後で一致した。
 
-| 確認                                     | 結果                                |
-| ---------------------------------------- | ----------------------------------- |
-| `npm run typecheck`                      | PASS                                |
-| `npm run lint`                           | PASS                                |
-| `npm run build`（型チェックを含む）      | PASS                                |
-| `git diff --check`                       | PASS                                |
-| 既存機能の自動テスト                     | 73件PASS                            |
-| デザイン文書・Renderer・保存の自動テスト | 6件PASS                             |
-| 編集体験の自動テスト                     | 修正後の再実行で9件PASS             |
-| 任意実行の実YouTube検証                  | 2件SKIP（`WW_LIVE_YOUTUBE` 未指定） |
+| 確認                                     | 結果                                    |
+| ---------------------------------------- | --------------------------------------- |
+| `npm run typecheck`                      | PASS                                    |
+| `npm run lint`                           | PASS                                    |
+| `npm run build`（型チェックを含む）      | PASS                                    |
+| `git diff --check`                       | PASS                                    |
+| 既存機能の自動テスト                     | 73件PASS                                |
+| デザイン文書・Renderer・保存の自動テスト | 6件PASS                                 |
+| 編集体験の自動テスト                     | 修正後の再実行で9件PASS                 |
+| 任意実行の実YouTube検証                  | 2件SKIP（`AROUND_LIVE_YOUTUBE` 未指定） |
 
 全体実行の `npm test` は87件PASS、2件SKIP、1件FAILだった。失敗したSPAテストでは編集パネルがfixtureの遷移ボタンに重なっていた。パネルを左へ移動してから遷移する操作手順に修正し、`npm test -- tests/creator-editor.spec.ts --output=.work/creator-editor-recheck` を再実行して9件すべてPASS（16.3秒）。重複を除く88件が通過し、未解決のテスト失敗はない。
 
@@ -354,7 +354,7 @@ Windows 95/98風のテーマへ変更後、同じ独立した未ログインのC
 
 最終再実行は `npm test -- tests/creator-editor.spec.ts tests/image-editor.spec.ts tests/layer-editor.spec.ts`。全体実行後に、長い内容をスクロールしてもUndo／Redo・未保存表示・保存欄を維持するUI調整と、編集で消費したキーのkeyupもページへ渡さない修正を行い、関連29件を再検証した。未解決のテスト失敗はない。
 
-自動検証は隔離したChromiumプロファイル、実MV3拡張、実Chrome Storage、拡張オリジンの実IndexedDB、ローカルのYouTube相当HTMLで実施した。YouTubeへの通信はfixtureで遮断した。実サイトの任意テストは `WW_LIVE_YOUTUBE` を指定せずSKIPしたため、実YouTube確認としては数えない。
+自動検証は隔離したChromiumプロファイル、実MV3拡張、実Chrome Storage、拡張オリジンの実IndexedDB、ローカルのYouTube相当HTMLで実施した。YouTubeへの通信はfixtureで遮断した。実サイトの任意テストは `AROUND_LIVE_YOUTUBE` を指定せずSKIPしたため、実YouTube確認としては数えない。
 
 - レイヤー一覧とキャンバスの選択同期、名前変更、実ドラッグでの並べ替え、表示・ロック・複製・削除、保存後の再読み込み。
 - Ctrl／Shiftでの複数選択と解除、1px／10px移動、一括ドラッグ、Ctrl＋D、Delete、Esc。
@@ -391,7 +391,7 @@ Windows 95/98風のテーマへ変更後、同じ独立した未ログインのC
 
 全体再実行後、低速なデコーダーでもループOFFの最終フレームを落とさないよう、描画待ちは最新の1要求だけ保持する処理と回帰テストを追加した。最終コマンドは `npm test -- tests/creator-editor.spec.ts tests/image-editor.spec.ts tests/layer-editor.spec.ts tests/motion-data.spec.ts tests/motion-editor.spec.ts`。未解決のテスト失敗はない。
 
-自動テストは隔離Chromiumプロファイル、実MV3拡張、実Chrome Storage、拡張オリジンの実IndexedDB、ローカルのYouTube相当HTMLで行った。実サイト向けの `WW_LIVE_YOUTUBE` は指定していない。GIF／WebPはCanvasのピクセル、LottieはSVGの変化で実フレームの描画を確認し、各形式でChrome再起動後の復元も検証した。
+自動テストは隔離Chromiumプロファイル、実MV3拡張、実Chrome Storage、拡張オリジンの実IndexedDB、ローカルのYouTube相当HTMLで行った。実サイト向けの `AROUND_LIVE_YOUTUBE` は指定していない。GIF／WebPはCanvasのピクセル、LottieはSVGの変化で実フレームの描画を確認し、各形式でChrome再起動後の復元も検証した。
 
 - ファイル選択とドロップ、移動・拡縮・回転、不透明度、静止画との混在、独立した再生状態。
 - 再生・一時停止、ループON／OFF、Lottieの速度、保存・破棄・再読み込み・Chrome再起動。

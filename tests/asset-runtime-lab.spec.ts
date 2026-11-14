@@ -4,7 +4,7 @@ import { openAssetLab, compactLabResult } from './helpers/asset-runtime-lab';
 import { vrmFixture } from './helpers/vrm-fixture';
 
 test('opt-in resident iframe uses IDB, rejects page messages and reconnects with new generations', async () => {
-  test.skip(process.env.WW_ASSET_LAB_TEST !== '1', 'Explicit profiling build only');
+  test.skip(process.env.AROUND_ASSET_LAB_TEST !== '1', 'Explicit profiling build only');
   test.setTimeout(180000);
   const lab = await openAssetLab();
   try {
@@ -12,12 +12,12 @@ test('opt-in resident iframe uses IDB, rejects page messages and reconnects with
     expect(result.alphaPixels).toBeGreaterThan(100);
     expect(result.stats.instances).toBe(3);
     expect(result.binaryBytes).toBe(0);
-    expect(await lab.page.locator('#ww-asset-runtime-lab').evaluate((e) => getComputedStyle(e).pointerEvents)).toBe(
+    expect(await lab.page.locator('#around-asset-runtime-lab').evaluate((e) => getComputedStyle(e).pointerEvents)).toBe(
       'none',
     );
     // Verify the supported band boundary using our original fixture, not the private avatar.
     const point = await lab.page
-      .frameLocator('#ww-asset-runtime-lab')
+      .frameLocator('#around-asset-runtime-lab')
       .locator('.model-media canvas')
       .first()
       .evaluate((c: HTMLCanvasElement) => {
@@ -72,25 +72,25 @@ test('opt-in resident iframe uses IDB, rejects page messages and reconnects with
       generation = r.generation;
     }
     for (let n = 0; n < 5; n++) {
-      await lab.page.locator('#ww-asset-runtime-lab').evaluate((f: HTMLIFrameElement) => {
+      await lab.page.locator('#around-asset-runtime-lab').evaluate((f: HTMLIFrameElement) => {
         f.src = f.src;
       });
       await expect.poll(async () => (await lab.call('state')).generation).toBeGreaterThan(generation);
       await expect
-        .poll(() => lab.page.frameLocator('#ww-asset-runtime-lab').locator('canvas').count())
+        .poll(() => lab.page.frameLocator('#around-asset-runtime-lab').locator('canvas').count())
         .toBeGreaterThan(0);
       generation = (await lab.call('state')).generation;
     }
     await lab.page.locator('#movie_player').evaluate((e: HTMLElement) => e.requestFullscreen());
     await expect.poll(async () => (await lab.call('state')).generation).toBeGreaterThan(generation);
     await expect
-      .poll(() => lab.page.frameLocator('#ww-asset-runtime-lab').locator('canvas').count())
+      .poll(() => lab.page.frameLocator('#around-asset-runtime-lab').locator('canvas').count())
       .toBeGreaterThan(0);
     await lab.page.evaluate(() => document.exitFullscreen());
     await lab.call('clear');
-    await expect(lab.page.frameLocator('#ww-asset-runtime-lab').locator('canvas')).toHaveCount(0);
+    await expect(lab.page.frameLocator('#around-asset-runtime-lab').locator('canvas')).toHaveCount(0);
     await lab.popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
-    await expect(lab.page.locator('#ww-asset-runtime-lab')).toHaveCount(0);
+    await expect(lab.page.locator('#around-asset-runtime-lab')).toHaveCount(0);
   } finally {
     await lab.context.close();
   }
@@ -98,11 +98,11 @@ test('opt-in resident iframe uses IDB, rejects page messages and reconnects with
 
 test('opt-in resident benchmark: private original, five reloads and fullscreen reconnections', async () => {
   test.skip(
-    process.env.WW_ASSET_RESIDENT_LIVE !== '1' || !process.env.WW_VRM_FILE,
+    process.env.AROUND_ASSET_RESIDENT_LIVE !== '1' || !process.env.AROUND_VRM_FILE,
     'Explicit real-site/private-file benchmark',
   );
   test.setTimeout(600000);
-  const lab = await openAssetLab(true, process.env.WW_VRM_FILE),
+  const lab = await openAssetLab(true, process.env.AROUND_VRM_FILE),
     report: Record<string, any> = {
       browser: lab.context.browser()?.version(),
       bytes: lab.asset.byteLength,
@@ -145,7 +145,7 @@ test('opt-in resident benchmark: private original, five reloads and fullscreen r
       await expect.poll(() => lab.page.evaluate(() => Boolean(document.fullscreenElement))).toBe(true);
       report.fullscreen.push(
         await lab.page.evaluate(() => ({
-          inside: document.fullscreenElement!.contains(document.querySelector('#ww-asset-runtime-lab')),
+          inside: document.fullscreenElement!.contains(document.querySelector('#around-asset-runtime-lab')),
           element: document.fullscreenElement!.tagName,
         })),
       );
@@ -163,7 +163,7 @@ test('opt-in resident benchmark: private original, five reloads and fullscreen r
 });
 
 test('opt-in binary route transfers actual model ownership and preserves pixels', async () => {
-  test.skip(process.env.WW_ASSET_LAB_TEST !== '1', 'Explicit profiling build only');
+  test.skip(process.env.AROUND_ASSET_LAB_TEST !== '1', 'Explicit profiling build only');
   test.setTimeout(120000);
   const lab = await openAssetLab();
   try {
@@ -176,8 +176,8 @@ test('opt-in binary route transfers actual model ownership and preserves pixels'
     expect(binary.senderDetached).toBe(true);
     expect(binary.spans.some((s: any) => s.id === binary.trace && s.name === 'rpc.get-part')).toBe(false);
     await lab.call('destroy');
-    await expect(lab.page.locator('#ww-asset-runtime-lab')).toHaveCount(0);
-    await expect(lab.page.locator('#ww-asset-runtime-binary')).toHaveCount(0);
+    await expect(lab.page.locator('#around-asset-runtime-lab')).toHaveCount(0);
+    await expect(lab.page.locator('#around-asset-runtime-binary')).toHaveCount(0);
   } finally {
     await lab.context.close();
   }
@@ -185,11 +185,11 @@ test('opt-in binary route transfers actual model ownership and preserves pixels'
 
 test('opt-in private original: matched saved-source chunks, binary and resident comparison', async () => {
   test.skip(
-    process.env.WW_ASSET_BINARY_LIVE !== '1' || !process.env.WW_VRM_FILE,
+    process.env.AROUND_ASSET_BINARY_LIVE !== '1' || !process.env.AROUND_VRM_FILE,
     'Explicit real-site/private-file benchmark',
   );
   test.setTimeout(600000);
-  const lab = await openAssetLab(true, process.env.WW_VRM_FILE),
+  const lab = await openAssetLab(true, process.env.AROUND_VRM_FILE),
     report: Record<string, any> = { browser: lab.context.browser()?.version(), bytes: lab.asset.byteLength, modes: {} };
   const persist = async () => {
     await mkdir('.work/verification', { recursive: true });
@@ -223,7 +223,7 @@ test('opt-in private original: matched saved-source chunks, binary and resident 
 });
 
 test('opt-in shared VRM geometry/textures keep independent expressions and release references', async () => {
-  test.skip(process.env.WW_ASSET_LAB_TEST !== '1', 'Explicit profiling build only');
+  test.skip(process.env.AROUND_ASSET_LAB_TEST !== '1', 'Explicit profiling build only');
   test.setTimeout(120000);
   const lab = await openAssetLab();
   try {
@@ -235,7 +235,7 @@ test('opt-in shared VRM geometry/textures keep independent expressions and relea
     expect(result.stats.shared.sharedGeometries).toBe(1);
     expect(result.stats.geometries).toBe(1);
     await lab.call('pose', 0, 1);
-    const media = lab.page.frameLocator('#ww-asset-runtime-lab').locator('.model-media');
+    const media = lab.page.frameLocator('#around-asset-runtime-lab').locator('.model-media');
     await expect
       .poll(async () => JSON.parse((await media.nth(0).getAttribute('data-vrm-pose')) ?? '{}').expressions?.happy)
       .toBe(1);
@@ -258,11 +258,11 @@ test('opt-in shared VRM geometry/textures keep independent expressions and relea
 
 test('opt-in private cache: three avatars, mixed five-model scene, 20 add/remove cycles', async () => {
   test.skip(
-    process.env.WW_ASSET_CACHE_LIVE !== '1' || !process.env.WW_VRM_FILE,
+    process.env.AROUND_ASSET_CACHE_LIVE !== '1' || !process.env.AROUND_VRM_FILE,
     'Explicit real-site/private-file benchmark',
   );
   test.setTimeout(900000);
-  const lab = await openAssetLab(true, process.env.WW_VRM_FILE),
+  const lab = await openAssetLab(true, process.env.AROUND_VRM_FILE),
     report: Record<string, any> = {
       browser: lab.context.browser()?.version(),
       bytes: lab.asset.byteLength,
@@ -320,12 +320,15 @@ test('opt-in private cache: three avatars, mixed five-model scene, 20 add/remove
         }),
       })),
     );
-    const other = await lab.control.evaluate(() => (globalThis as any).wwAssetLab.seedMany());
+    const other = await lab.control.evaluate(() => (globalThis as any).aroundAssetLab.seedMany());
     const ids = [lab.asset.id, ...other.map((a: any) => a.id)];
-    const { session } = await lab.control.evaluate(({ ids, tab }) => (globalThis as any).wwAssetLab.open(ids, tab), {
-      ids,
-      tab: lab.tab,
-    });
+    const { session } = await lab.control.evaluate(
+      ({ ids, tab }) => (globalThis as any).aroundAssetLab.open(ids, tab),
+      {
+        ids,
+        tab: lab.tab,
+      },
+    );
     await lab.call('start', session);
     await lab.call('configure', { shared: true });
     for (let n = 0; n < 5; n++) {

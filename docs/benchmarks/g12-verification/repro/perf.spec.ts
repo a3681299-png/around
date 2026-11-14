@@ -47,13 +47,13 @@ async function run(label: string, extensionPath: string, calibration = false) {
     await popup.goto(`chrome-extension://${id}/popup/index.html`);
     const backup = await context.newPage();
     await backup.goto(`chrome-extension://${id}/backup/index.html`);
-    await backup.locator('#backup-file').setInputFiles(path.resolve('tests/fixtures/backups/pre-removal.wwbackup'));
+    await backup.locator('#backup-file').setInputFiles(path.resolve('tests/fixtures/backups/pre-removal.aroundbackup'));
     await backup.locator('#backup-inspect').click();
     await expect(backup.locator('#backup-restore')).toBeEnabled();
     await backup.locator('#backup-restore').click();
     await expect(backup.locator('.backup-status')).toContainText('読み込みが完了');
     const saved: any = await popup.evaluate(
-      async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
+      async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'],
     );
     const decorations = Array.from({ length: 32 }, (_, i) => ({
       ...saved.decorations[0],
@@ -79,8 +79,8 @@ async function run(label: string, extensionPath: string, calibration = false) {
     await popup.evaluate(
       (design) =>
         chrome.storage.local.set({
-          'webWorldThemes.design.youtube': design,
-          'webWorldThemes.creatorMode': false,
+          'around.design.youtube': design,
+          'around.creatorMode': false,
         }),
       { ...saved, id: 'g12-perf-scene', decorations, signalRules },
     );
@@ -157,7 +157,7 @@ async function run(label: string, extensionPath: string, calibration = false) {
       output.phases.calibration = { ...summarize(raw), raw };
       return output;
     }
-    const safetyState = () => page.locator('#web-world-themes-decorations').getAttribute('data-ww-safety');
+    const safetyState = () => page.locator('#around-decorations').getAttribute('data-around-safety');
     await expect
       .poll(
         async () =>

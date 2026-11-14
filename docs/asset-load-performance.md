@@ -61,7 +61,7 @@ flowchart TD
 | `src/assets/client.ts`                                                           | `importAssets`, `request`, `loadAsset`, `loadAssetMetadata`。原本のBase64送信・取得と再結合                                                                   |
 | `src/assets/validation.ts`, `transfers.ts`                                       | ネイティブtoBase64/fromBase64、検証用正規表現、4MiB断片、順序検査、事前確保バッファ                                                                           |
 | `src/background/index.ts`                                                        | `enqueue`, `handle`, `importBatch`, `owner`, `leaseAssets`, `prune`。読み出しと書き込み・保持・整理が同じPromiseキューに入る                                  |
-| `src/assets/repository.ts`                                                       | `getAsset`, `changeAssets`。DB `web-world-themes-assets` v1 / object store `assets`。Blobとleaseを同じ行で保持                                                |
+| `src/assets/repository.ts`                                                       | `getAsset`, `changeAssets`。DB `around-assets` v1 / object store `assets`。Blobとleaseを同じ行で保持                                                          |
 | `src/assets/inspect.ts`, `glb.ts`, `vrm.ts`, `decode.ts`                         | コンテナ、参照、URI、資源予算の検証。`inspectGlb`はBINをsliceしてコピー。`validateModelTextures`は再びinspectし、埋め込み画像をcreateImageBitmapで検証・close |
 | `src/browser/studio-host.ts`, `storage-adapter.ts`, `src/editor-core/session.ts` | `import-assets` → stored-assets参照、lease、作品全体照合、model3d追加。54.5MiB原本をHostから再アップロードする経路は既に除去されている                        |
 | `src/renderers/three/models.ts`, `vrm-player.ts`                                 | `acquire`, `attach`, `paint`。GLTF/VRM構築、bounds、1個のWebGLコンテキスト、レイヤーcanvasへのコピー、VRM固有更新                                             |
@@ -180,7 +180,7 @@ Three.jsには`compileAsync`があり、`KHR_parallel_shader_compile`を利用�
 | GPU負荷              | iframeも1個のWebGL contextを作り、同じ推定168.3MiBを必要とする。現行表示と並行させたプローブでは2つのcontext/モデルが存在し、資源は共有されない。iframe化だけでGPU/VRAMを節約できるとはしない                                                                                                                                                                                                                                                                      |
 | SPA・移動・復旧      | iframe方式についてはSPA/全ての全画面対象/通常Chromeプロファイル/マルチモデルの長時間試験は未実施。取り外すとWebContentsと資源を失う前提で、世代管理と再ロードが必要                                                                                                                                                                                                                                                                                                |
 
-再現: プロファイル用拡張を読み込む → 原本を保存 → 実YouTube用にgrantを発行 → bodyへiframeを作成してstored表示 → 全画面・解除 → 原iframeを削除 → 新grantでmovie_player配下へ作成 → 全画面。自動プローブは`tests/asset-load-benchmark.spec.ts`の`iframeProbe`。`WW_ASSET_IFRAME_TEST=1`で単独実行できる。成功した部分と、player配下の失敗をJSONへ別々に残す。今回の単独プローブはplayerFrameRetainedのassertで1件失敗した。安全な再接続を実装せずに、grantの使い回しで通す変更は行っていない。これは全画面対応済みの製品実装ではない。
+再現: プロファイル用拡張を読み込む → 原本を保存 → 実YouTube用にgrantを発行 → bodyへiframeを作成してstored表示 → 全画面・解除 → 原iframeを削除 → 新grantでmovie_player配下へ作成 → 全画面。自動プローブは`tests/asset-load-benchmark.spec.ts`の`iframeProbe`。`AROUND_ASSET_IFRAME_TEST=1`で単独実行できる。成功した部分と、player配下の失敗をJSONへ別々に残す。今回の単独プローブはplayerFrameRetainedのassertで1件失敗した。安全な再接続を実装せずに、grantの使い回しで通す変更は行っていない。これは全画面対応済みの製品実装ではない。
 
 ## 短期の推奨実装順序
 
@@ -219,28 +219,28 @@ Workerはまず検証・ハッシュ・準備から導入し、Rendererを移す
 - `src/diagnostics/asset-profile.ts`: 共有ID、コンテキスト実体ID、最大8,192区間/コンテキスト、batch送信。ファイル名やページ情報は記録しない。永続保存・通常の行動追跡はしない。
 - `src/diagnostics/asset-profile-summary.ts`: 同一時計内の区間和集合、転送回数/文字数の集計。
 - `src/diagnostics/asset-benchmark.html/ts`: A′/B/C比較。既存ModelRendererに読み出し関数だけを渡し、描画を共用する。これはRenderer移設ではない。
-- `scripts/build.mjs`: `WW_ASSET_PROFILE=1`のみ`.work/asset-profile-dist`に診断ページ/限定WARを出す。通常manifestと既存distはそのまま。通常構成の検証も`WW_BUILD_OUT=.work/asset-regression-dist`で別出力可能。
+- `scripts/build.mjs`: `AROUND_ASSET_PROFILE=1`のみ`.work/asset-profile-dist`に診断ページ/限定WARを出す。通常manifestと既存distはそのまま。通常構成の検証も`AROUND_BUILD_OUT=.work/asset-regression-dist`で別出力可能。
 - `tests/asset-load-benchmark.spec.ts`: 自作fixture、明示opt-inの実YouTube/原本比較、iframeプローブ。
 - `scripts/summarize-asset-load.mjs`: 数値だけの[集計JSON](benchmarks/vrm-load-2026-10-19.json)を生成する。完全なlocal spanはignored `.work/verification/asset-load-*.json`。
 
 ```powershell
-$env:WW_ASSET_PROFILE='1'
+$env:AROUND_ASSET_PROFILE='1'
 npm run build
 ```
 
 コマンドは専用worktree `.work/creator-editor`で実行する。Chromeでこのworktreeの`.work/asset-profile-dist`を読み込み、`chrome-extension://<extension-id>/diagnostics/asset-benchmark.html`を開く。Fileを選び、A′/Bを実行する。Cは「保存のみ」で準備してから実行する。実アバターをソースへコピーする必要はない。
 
 ```powershell
-$env:WW_TEST_EXTENSION_PATH='.work/asset-profile-dist'
-$env:WW_ASSET_PROFILE_TEST='1'
-$env:WW_ASSET_BENCH_LIVE='1'
-$env:WW_VRM_FILE='<ローカルVRMの絶対パス>'
+$env:AROUND_TEST_EXTENSION_PATH='.work/asset-profile-dist'
+$env:AROUND_ASSET_PROFILE_TEST='1'
+$env:AROUND_ASSET_BENCH_LIVE='1'
+$env:AROUND_VRM_FILE='<ローカルVRMの絶対パス>'
 $env:PLAYWRIGHT_BROWSERS_PATH='<インストール済みPlaywright Chromiumの親ディレクトリ>'
 npm test -- tests/asset-profile.spec.ts tests/asset-load-benchmark.spec.ts
 node scripts/summarize-asset-load.mjs
 ```
 
-追加のキュー調査は`WW_ASSET_BENCH_QUEUE=1`（1回・別JSON）、既存distの参考値は`WW_ASSET_BENCH_BASELINE=1`かつ`WW_TEST_EXTENSION_PATH=dist`。比較器3条件だけを再測定する場合は`WW_ASSET_BENCH_CONTROLS=1`で既存Aのレポートを保持する。単独iframeの全画面ゲートは`WW_ASSET_IFRAME_TEST=1`を設定し、`--grep 'fullscreen lifecycle probe'`で実行する（現時点では上記の再読み込みによって失敗する）。通常版の検証に戻る際はこれらのopt-in環境変数を解除する。
+追加のキュー調査は`AROUND_ASSET_BENCH_QUEUE=1`（1回・別JSON）、既存distの参考値は`AROUND_ASSET_BENCH_BASELINE=1`かつ`AROUND_TEST_EXTENSION_PATH=dist`。比較器3条件だけを再測定する場合は`AROUND_ASSET_BENCH_CONTROLS=1`で既存Aのレポートを保持する。単独iframeの全画面ゲートは`AROUND_ASSET_IFRAME_TEST=1`を設定し、`--grep 'fullscreen lifecycle probe'`で実行する（現時点では上記の再読み込みによって失敗する）。通常版の検証に戻る際はこれらのopt-in環境変数を解除する。
 
 ## 検証の区分
 

@@ -81,8 +81,8 @@ export interface CreatorEditor {
   thumbnail(id: string): Promise<string | undefined>;
 }
 const PICK_EVENTS = ['pointerdown', 'pointerup', 'mousedown', 'mouseup', 'click', 'auxclick', 'dblclick'] as const;
-const SELECTION_CSS = `html[data-ww-editor-card-picking] [data-ww-surface~="video-card"] { cursor:crosshair !important; }`;
-/** The window's badge: a small ww-panel in its own shadow root, so the page's styles never reach it. */
+const SELECTION_CSS = `html[data-around-editor-card-picking] [data-around-surface~="video-card"] { cursor:crosshair !important; }`;
+/** The window's badge: a small around-panel in its own shadow root, so the page's styles never reach it. */
 const BADGE_CSS = `:host{all:initial!important;position:fixed!important;left:12px!important;bottom:12px!important;z-index:2147483001!important}
 .badge{display:flex;align-items:center;gap:var(--space-8);padding:var(--space-4) var(--space-4) var(--space-4) var(--space-12);border:1px solid var(--line);border-radius:var(--radius-float);background:var(--surface);color:var(--ink);box-shadow:var(--shadow-float);font:13px/20px var(--font-ui)}
 button{height:var(--control-dense);padding:0 var(--space-8);border:1px solid var(--line-control);border-radius:var(--radius-control);background:var(--surface-raised);color:var(--ink);font:12px/18px var(--font-ui);cursor:pointer}
@@ -116,7 +116,7 @@ export function createCreatorEditor(
     site.skinControls,
     site.beneathOverlay?.bind(site),
   );
-  const selectionMark = marks.mark('web-world-themes-selection-mark');
+  const selectionMark = marks.mark('around-selection-mark');
   let marksSuspended = false,
     followed: Element | undefined,
     followRequest: number | undefined,
@@ -186,7 +186,7 @@ export function createCreatorEditor(
     });
   };
   const removeSelection = () => {
-    selectedElement?.removeAttribute('data-ww-editor-selected');
+    selectedElement?.removeAttribute('data-around-editor-selected');
     selectedElement = undefined;
     follow(undefined);
   };
@@ -204,11 +204,11 @@ export function createCreatorEditor(
     installed = active;
     if (active) {
       selectionStyle = doc.createElement('style');
-      selectionStyle.id = 'web-world-themes-selection-style';
+      selectionStyle.id = 'around-selection-style';
       selectionStyle.textContent = SELECTION_CSS + '\n' + picker.css();
       (doc.head ?? doc.documentElement).append(selectionStyle);
-      doc.documentElement.setAttribute('data-ww-editing', '');
-      selectedElement?.setAttribute('data-ww-editor-selected', '');
+      doc.documentElement.setAttribute('data-around-editing', '');
+      selectedElement?.setAttribute('data-around-editor-selected', '');
       PICK_EVENTS.forEach((name) => doc.addEventListener(name, onPick, true));
       doc.addEventListener('keydown', onKeyDown, true);
       doc.addEventListener('keyup', onKeyUp, true);
@@ -225,14 +225,14 @@ export function createCreatorEditor(
       consumedKeys.clear();
       if (marksSuspended && editing()) {
         // The suspended page takes no input, but resume must frame the same selected part.
-        selectedElement?.removeAttribute('data-ww-editor-selected');
+        selectedElement?.removeAttribute('data-around-editor-selected');
         follow(undefined);
       } else removeSelection();
       selectionStyle?.remove();
       selectionStyle = undefined;
-      doc.documentElement.removeAttribute('data-ww-editing');
-      doc.documentElement.removeAttribute('data-ww-editor-tool');
-      doc.documentElement.removeAttribute('data-ww-editor-card-picking');
+      doc.documentElement.removeAttribute('data-around-editing');
+      doc.documentElement.removeAttribute('data-around-editor-tool');
+      doc.documentElement.removeAttribute('data-around-editor-card-picking');
       picker.setActive(false);
       picker.setSelection(undefined, false);
       picker.setPreview(undefined, undefined);
@@ -288,15 +288,15 @@ export function createCreatorEditor(
     picker.setPreview(skinning ? state.view.target : undefined, preview);
     if (skinning) scheduleSkinInfo();
     if (active && !marksSuspended) {
-      doc.documentElement.setAttribute('data-ww-editor-tool', state.view.tool ?? 'select');
-      doc.documentElement.toggleAttribute('data-ww-editor-card-picking', state.view.tool === 'card');
+      doc.documentElement.setAttribute('data-around-editor-tool', state.view.tool ?? 'select');
+      doc.documentElement.toggleAttribute('data-around-editor-card-picking', state.view.tool === 'card');
     }
     // Only a separate window needs saying: the side panel stands beside the page it edits.
     const windowed = Boolean(remoteOwner) && remoteSurface === 'window' && state.active;
     if (windowed && !badge) {
       badge = doc.createElement('div');
-      badge.id = 'web-world-themes-studio-link';
-      badge.setAttribute('data-ww-signal-control', '');
+      badge.id = 'around-studio-link';
+      badge.setAttribute('data-around-signal-control', '');
       const shadow = badge.attachShadow({ mode: 'open' }),
         style = doc.createElement('style'),
         box = doc.createElement('div');
@@ -347,7 +347,7 @@ export function createCreatorEditor(
     refresh();
   }
   const ownUi = (event: Event) =>
-    event.composedPath().some((node) => node instanceof Element && node.hasAttribute('data-ww-signal-control'));
+    event.composedPath().some((node) => node instanceof Element && node.hasAttribute('data-around-signal-control'));
   /** The element a pick lands on. A click on a layer the site draws over its parts (YouTube's
    * inline preview over a card) lands on the part beneath it, found from the site's marks. */
   const pickedNode = (event: Event) => {
@@ -368,7 +368,7 @@ export function createCreatorEditor(
     const node = pickedNode(event);
     if (state.view.tool === 'skin') return picker.hit(node);
     for (const target of site.designTargets ?? []) {
-      const element = node?.closest(`[data-ww-surface~="${target.surface}"]`);
+      const element = node?.closest(`[data-around-surface~="${target.surface}"]`);
       if (element) return { element, target };
     }
   }
@@ -376,7 +376,7 @@ export function createCreatorEditor(
     removeSelection();
     dispatch({ type: 'select-target', target: id });
     selectedElement = element;
-    selectedElement.setAttribute('data-ww-editor-selected', '');
+    selectedElement.setAttribute('data-around-editor-selected', '');
     syncSelectionMark();
   };
   /** What the last press landed on. When the site's layer appears between press and release (the
@@ -419,7 +419,7 @@ export function createCreatorEditor(
         .some(
           (node) =>
             node instanceof HTMLElement &&
-            (node.hasAttribute('data-ww-timeline-control') ||
+            (node.hasAttribute('data-around-timeline-control') ||
               node.matches('input,textarea,select,summary,dialog,[role="tab"],[role="separator"],[role="menuitem"]') ||
               node.isContentEditable),
         )
@@ -497,7 +497,8 @@ export function createCreatorEditor(
         (!selectedElement.isConnected ||
           !site.designTargets?.some(
             (target) =>
-              target.id === state.selectedTarget && selectedElement!.matches(`[data-ww-surface~="${target.surface}"]`),
+              target.id === state.selectedTarget &&
+              selectedElement!.matches(`[data-around-surface~="${target.surface}"]`),
           ))
       ) {
         removeSelection();
@@ -508,7 +509,7 @@ export function createCreatorEditor(
           doc.defaultView!.innerWidth,
           doc.defaultView!.innerHeight,
           ...(site.decorationAnchors ?? []).map((target) => {
-            const rect = doc.querySelector(`[data-ww-surface~="${target.surface}"]`)?.getBoundingClientRect();
+            const rect = doc.querySelector(`[data-around-surface~="${target.surface}"]`)?.getBoundingClientRect();
             return rect ? [rect.x, rect.y, rect.width, rect.height] : null;
           }),
         ]);

@@ -71,12 +71,12 @@ assert.ok(rec.rechecks.every((r) => r.stack.includes('at recheck')));
 assert.equal(new Set(rec.rechecks.map((r) => r.generation.geometry)).size, 1);
 const ci = await read('ci-clip-timeline.json');
 const hosts = ci.snapshots.flatMap((s) =>
-  s.rows.filter((r) => r[1]?.id === 'web-world-themes-decorations').map((r) => ({ at: s.at, ...r[1] })),
+  s.rows.filter((r) => r[1]?.id === 'around-decorations').map((r) => ({ at: s.at, ...r[1] })),
 );
 const before = hosts.filter((s) => s.at < ci.movePlayerCall).at(-1),
   after = hosts.find((s) => s.at > ci.twoRaf.end);
 assert.ok(after.at < ci.staleHitAssert);
-assert.equal(JSON.parse(after['data-ww-safety']).stopped, '');
+assert.equal(JSON.parse(after['data-around-safety']).stopped, '');
 assert.ok(contains(before.style, 484, 253.764));
 assert.equal(contains(after.style, 484, 253.764), false);
 

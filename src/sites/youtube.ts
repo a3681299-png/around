@@ -11,7 +11,7 @@ import { createSelectorIndex } from './surface-index';
 import { LOWER_SEAT_ANCHORS } from './anchors';
 import { surfacesFor, YOUTUBE_BASE_INDEX, YOUTUBE_BASE_SELECTORS, YOUTUBE_SURFACE_TARGETS } from './youtube-surfaces';
 
-const SURFACE_ATTRIBUTE = 'data-ww-surface';
+const SURFACE_ATTRIBUTE = 'data-around-surface';
 /** YouTube's hover preview player, drawn over a card's thumbnail outside the card. */
 const INLINE_PREVIEW = 'ytd-video-preview';
 /** YouTube's miniplayer, into which it moves the player: the player window's reduced form. */
@@ -78,12 +78,12 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
       let partsRemoved = false;
       let change: SitePageChange = 'content';
       const owned = (node: Node) =>
-        Boolean((node instanceof Element ? node : node.parentElement)?.closest('[id^="web-world-themes-"]'));
+        Boolean((node instanceof Element ? node : node.parentElement)?.closest('[id^="around-"]'));
 
       const setMode = () => {
-        root.setAttribute('data-ww-mode', root.hasAttribute('dark') ? 'dark' : 'light');
+        root.setAttribute('data-around-mode', root.hasAttribute('dark') ? 'dark' : 'light');
         root.toggleAttribute(
-          'data-ww-fullscreen',
+          'data-around-fullscreen',
           Boolean(doc.fullscreenElement || doc.querySelector('ytd-watch-flexy[fullscreen]')),
         );
       };
@@ -185,7 +185,7 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
         schedule();
       };
 
-      root.setAttribute('data-ww-site', 'youtube');
+      root.setAttribute('data-around-site', 'youtube');
       setMode();
       scan(doc);
 
@@ -267,9 +267,9 @@ export function createYouTubeAdapter(doc: Document, view: Window): SiteAdapter {
         marked.clear();
         players.forEach((element) => element.removeAttribute(PART_REDUCED_ATTRIBUTE));
         players.clear();
-        root.removeAttribute('data-ww-site');
-        root.removeAttribute('data-ww-mode');
-        root.removeAttribute('data-ww-fullscreen');
+        root.removeAttribute('data-around-site');
+        root.removeAttribute('data-around-mode');
+        root.removeAttribute('data-around-fullscreen');
       };
     },
   };

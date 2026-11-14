@@ -38,7 +38,7 @@ test('G1.3: a resized group must not expose a control outside the group', async 
   await expect(panel.locator('.status')).toHaveText('保存しました。');
   await panel.getByRole('button', { name: '編集を終了', exact: true }).click();
   const viewport = await youtube.evaluate(() => ({ width: innerWidth, height: innerHeight }));
-  const key = 'webWorldThemes.design.youtube';
+  const key = 'around.design.youtube';
   const base = await popup.evaluate(async (k) => (await chrome.storage.local.get(k))[k] as DesignDocument, key);
   const design: DesignDocument = {
     ...base,
@@ -67,9 +67,7 @@ test('G1.3: a resized group must not expose a control outside the group', async 
     .poll(() =>
       youtube.evaluate(() =>
         Boolean(
-          document
-            .querySelector('#web-world-themes-decorations')
-            ?.shadowRoot?.querySelector('[data-image-id="g13-witness"]'),
+          document.querySelector('#around-decorations')?.shadowRoot?.querySelector('[data-image-id="g13-witness"]'),
         ),
       ),
     )
@@ -79,8 +77,7 @@ test('G1.3: a resized group must not expose a control outside the group', async 
     .poll(() =>
       youtube.evaluate(
         () =>
-          JSON.parse(document.querySelector('#web-world-themes-decorations')?.getAttribute('data-ww-safety') ?? '{}')
-            .stopped,
+          JSON.parse(document.querySelector('#around-decorations')?.getAttribute('data-around-safety') ?? '{}').stopped,
       ),
     )
     .toBe('');
@@ -91,7 +88,7 @@ test('G1.3: a resized group must not expose a control outside the group', async 
         () =>
           getComputedStyle(
             document
-              .querySelector('#web-world-themes-decorations')!
+              .querySelector('#around-decorations')!
               .shadowRoot!.querySelector<HTMLElement>('[data-image-id="g13-witness"]')!,
           ).visibility,
       ),
@@ -105,7 +102,7 @@ test('G1.3: a resized group must not expose a control outside the group', async 
   await screenshot('before.png');
   await youtube.evaluate((mode) => {
     const button = document.querySelector<HTMLElement>('#g13-second')!;
-    const host = document.querySelector<HTMLElement>('#web-world-themes-decorations')!;
+    const host = document.querySelector<HTMLElement>('#around-decorations')!;
     const node = host.shadowRoot!.querySelector<HTMLElement>('[data-image-id="g13-witness"]')!;
     const sample = () => {
       const r = button.getBoundingClientRect(),
@@ -113,7 +110,7 @@ test('G1.3: a resized group must not expose a control outside the group', async 
         y = r.top + r.height / 2;
       const regions = [
         ...host.style
-          .getPropertyValue('--ww-decoration-clip')
+          .getPropertyValue('--around-decoration-clip')
           .matchAll(/M(-?[\d.]+) (-?[\d.]+)h(-?[\d.]+)v(-?[\d.]+)/g),
       ].map((m) => m.slice(1).map(Number));
       return {
@@ -124,7 +121,7 @@ test('G1.3: a resized group must not expose a control outside the group', async 
         inDrawableClip: regions.some(([l, t, w, h]) => x > l! && x < l! + w! && y > t! && y < t! + h!),
         visible: getComputedStyle(node).visibility === 'visible',
         opacity: getComputedStyle(node).opacity,
-        safety: JSON.parse(host.dataset.wwSafety ?? '{}'),
+        safety: JSON.parse(host.dataset.aroundSafety ?? '{}'),
       };
     };
     const samples = [{ phase: 'before', ...sample() }];

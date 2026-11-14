@@ -8,8 +8,8 @@ import { openEditor, openSidePanelFromIcon } from './helpers/editor';
 import { sidePanelDriver } from './helpers/side-panel';
 import type { DesignDocument } from '../src/design/types';
 
-const key = 'webWorldThemes.design.youtube',
-  overlay = '#web-world-themes-decorations';
+const key = 'around.design.youtube',
+  overlay = '#around-decorations';
 
 /** The page's cost of 60 keyboard nudges of 32 selected layers, while one editor holds the edit. */
 async function nudge(page: Page) {
@@ -61,13 +61,13 @@ test('32 layers remain editable with locked/hidden selection; measure the page w
   // UI0-d 3.1: the comparison is now the editor's two places, the side panel (S) and its window (W),
   // on one extension, one document and one nudge trace. The side panel needs a headed browser.
   test.setTimeout(120_000);
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-workspace-perf-')), true, {
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-workspace-perf-')), true, {
     headed: true,
   });
   try {
     const manager = await context.newPage();
     await manager.goto('chrome://extensions/');
-    const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+    const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
     await item.waitFor();
     const id = await item.evaluate((node) => (node as HTMLElement & { data?: { id: string } }).data?.id ?? node.id);
     await manager.close();
@@ -144,7 +144,7 @@ test('32 layers remain editable with locked/hidden selection; measure the page w
     await expect(panel.locator('.dirty')).toHaveText('保存済み');
     await studio.screenshot({ path: info.outputPath('window-32-layers.png') });
     await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
-    await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-editing', /.*/);
+    await expect(youtube.locator('html')).not.toHaveAttribute('data-around-editing', /.*/);
     await expect(youtube.locator(overlay)).toHaveCount(0);
     const report = {
       browser: context.browser()?.version(),

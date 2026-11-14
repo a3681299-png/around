@@ -90,7 +90,7 @@ test('official binary reads detach the original, reject page-forged ports and ex
   expect(calls.some((c) => c.action === 'get' || c.action === 'get-part')).toBe(false);
   const forged = await youtube.evaluate(
     async ({ type }) => {
-      const frame = document.querySelector<HTMLIFrameElement>('[data-ww-asset-reader]')!,
+      const frame = document.querySelector<HTMLIFrameElement>('[data-around-asset-reader]')!,
         channel = new MessageChannel();
       return new Promise((resolve) => {
         channel.port1.onmessage = (event) => {
@@ -131,13 +131,13 @@ test('a real frame grant cannot be authorized by a different tab or for an unapp
   await dialog.locator('.save').click();
   await expect(dialog.locator('.status')).toHaveText('保存しました。');
   const saved = (await popup.evaluate(
-    async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
+    async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'],
   )) as DesignDocument;
   const foreign = (await popup.evaluate(
     async (base64) =>
       (
         await chrome.runtime.sendMessage({
-          type: 'web-world-themes:assets',
+          type: 'around:assets',
           action: 'import',
           session: 'c3-unapproved',
           files: [{ name: 'unapproved', mime: '', base64 }],
@@ -275,7 +275,7 @@ test('fullscreen leaves the storage frame in place and reads new originals befor
   await expect.poll(() => youtube.evaluate(() => Boolean(document.fullscreenElement))).toBe(true);
   expect(
     await youtube
-      .locator('[data-ww-asset-reader]')
+      .locator('[data-around-asset-reader]')
       .evaluate(
         (node) => node.parentElement === document.documentElement && !document.fullscreenElement!.contains(node),
       ),
@@ -288,7 +288,7 @@ test('fullscreen leaves the storage frame in place and reads new originals befor
       async (base64) =>
         (
           await chrome.runtime.sendMessage({
-            type: 'web-world-themes:assets',
+            type: 'around:assets',
             action: 'import',
             session: 'c3-test-models',
             files: [{ name: 'fixture', mime: '', base64 }],
@@ -297,7 +297,7 @@ test('fullscreen leaves the storage frame in place and reads new originals befor
       bytes.toString('base64'),
     )) as AssetMetadata;
     const doc = (await popup.evaluate(
-      async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
+      async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'],
     )) as DesignDocument;
     doc.decorations = [
       ...doc.decorations.filter((layer) => layer.kind !== 'model3d'),
@@ -315,7 +315,7 @@ test('fullscreen leaves the storage frame in place and reads new originals befor
         model: defaultModelSettings(metadata.model!),
       },
     ];
-    await popup.evaluate((value) => chrome.storage.local.set({ 'webWorldThemes.design.youtube': value }), doc);
+    await popup.evaluate((value) => chrome.storage.local.set({ 'around.design.youtube': value }), doc);
     await expect(youtube.locator('.model-media')).toHaveAttribute('data-renderer', 'three');
   }
   await addModel('inside-fullscreen');

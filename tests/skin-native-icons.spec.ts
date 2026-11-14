@@ -17,7 +17,7 @@ for (const mode of ['light', 'dark'] as const)
     await storeDesign(popup, plainSkinDesign);
     await nativeFixtureParts(youtube);
     await youtube.locator('html').evaluate((node, dark) => node.toggleAttribute('dark', dark), mode === 'dark');
-    await expect(youtube.locator('html')).toHaveAttribute('data-ww-mode', mode);
+    await expect(youtube.locator('html')).toHaveAttribute('data-around-mode', mode);
     const expected = mode === 'light' ? '#ffffff' : '#000000';
     const native = mode === 'light' ? '#0f0f0f' : '#f1f1f1';
     const search = partLocator(youtube, 'search-box').first();

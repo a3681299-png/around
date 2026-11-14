@@ -1,4 +1,4 @@
-export const SETTINGS_POSITION_KEY = 'webWorldThemes.settings.position.v1';
+export const SETTINGS_POSITION_KEY = 'around.settings.position.v1';
 export interface SettingsRect {
   left: number;
   top: number;

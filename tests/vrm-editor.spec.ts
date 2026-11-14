@@ -15,11 +15,11 @@ test('VRM1 renders MToon with alpha, follows the pointer, edits expressions and 
   await mkdir(path.dirname(file), { recursive: true });
   await writeFile(file, vrmFixture());
   await showArtwork(popup);
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await exposeEditorControls(panel);
   await panel.locator('.model-file').setInputFiles(file);
-  const media = youtube.locator('#web-world-themes-decorations .model-media');
+  const media = youtube.locator('#around-decorations .model-media');
   await expect(media).toHaveAttribute('data-renderer', 'three');
   await expect(media).toHaveAttribute('data-format', 'vrm');
   const pixels = await media.locator('canvas').evaluate((c: HTMLCanvasElement) => {
@@ -58,10 +58,7 @@ test('VRM1 renders MToon with alpha, follows the pointer, edits expressions and 
   await panel.locator('.save').click();
   await expect(panel.locator('.dirty')).toHaveText('保存済み');
   const saved = await popup.evaluate(
-    async () =>
-      (await chrome.storage.local.get('webWorldThemes.design.youtube'))[
-        'webWorldThemes.design.youtube'
-      ] as DesignDocument,
+    async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'] as DesignDocument,
   );
   expect(saved.schemaVersion).toBe(18);
   expect(saved.decorations[0]).toMatchObject({
@@ -73,10 +70,7 @@ test('VRM1 renders MToon with alpha, follows the pointer, edits expressions and 
   await panel.locator('.select-all').click();
   await panel.locator('.group-layers').click();
   await panel.getByLabel('円形マスクを使う', { exact: true }).check();
-  await expect(youtube.locator('#web-world-themes-decorations .group-content')).toHaveCSS(
-    'mask-image',
-    /radial-gradient/,
-  );
+  await expect(youtube.locator('#around-decorations .group-content')).toHaveCSS('mask-image', /radial-gradient/);
   await panel.getByLabel('グループの不透明度', { exact: true }).fill('0');
   await expect
     .poll(() =>
@@ -105,12 +99,12 @@ test('VRM1 renders MToon with alpha, follows the pointer, edits expressions and 
   await expect(media.first()).toHaveAttribute('data-renderer', 'three');
   expect(
     await youtube
-      .locator('#web-world-themes-decorations [data-image-id]')
+      .locator('#around-decorations [data-image-id]')
       .first()
       .evaluate((e) => getComputedStyle(e).pointerEvents),
   ).toBe('none');
   await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
-  await expect(youtube.locator('#web-world-themes-decorations')).toHaveCount(0);
+  await expect(youtube.locator('#around-decorations')).toHaveCount(0);
 });
 
 function largeVrmFixture() {
@@ -142,10 +136,10 @@ for (const large of [false, true])
   }, info) => {
     // SwiftShader CI covers rendering with the small original rig. Large imports
     // also stress browser memory/readback and require an explicitly opted-in real
-    // GPU run: WW_REAL_GPU_VRM=1 npm run test:e2e -- tests/vrm-editor.spec.ts
+    // GPU run: AROUND_REAL_GPU_VRM=1 npm run test:e2e -- tests/vrm-editor.spec.ts
     test.skip(
-      large && process.env.WW_REAL_GPU_VRM !== '1',
-      '33MiB VRM rendering requires WW_REAL_GPU_VRM=1 and a real GPU; SwiftShader uses the small fixture.',
+      large && process.env.AROUND_REAL_GPU_VRM !== '1',
+      '33MiB VRM rendering requires AROUND_REAL_GPU_VRM=1 and a real GPU; SwiftShader uses the small fixture.',
     );
     if (large) {
       test.setTimeout(60000);
@@ -165,14 +159,14 @@ for (const large of [false, true])
     await mkdir(path.dirname(file), { recursive: true });
     await writeFile(file, bytes);
     await showArtwork(popup);
-    await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+    await expect(youtube.locator('html')).toHaveAttribute('data-around-site', 'youtube');
     await youtube.bringToFront();
     const opened = context.waitForEvent('page');
     await popup.locator('#creator-editor-window').evaluate((b: HTMLButtonElement) => b.click());
     const studio = await opened;
     await studio.setViewportSize({ width: 1440, height: 1000 });
     await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
-    const panel = studio.locator('#web-world-themes-creator');
+    const panel = studio.locator('#around-creator');
     // Capture before the panel's change handler clears the input. The real file
     // goes through the OS MIME database and the actual import/rendering path.
     await panel.locator('.model-file').evaluate((input: HTMLInputElement) => {
@@ -190,7 +184,7 @@ for (const large of [false, true])
     expect(mime).not.toBeNull();
     await writeFile(report, JSON.stringify({ pathOnlyMime: mime, bytes: bytes.length }, null, 2));
     await info.attach('vrm-fixture-mime', { path: report, contentType: 'application/json' });
-    const media = youtube.locator('#web-world-themes-decorations .model-media');
+    const media = youtube.locator('#around-decorations .model-media');
     await expect(media).toHaveAttribute('data-renderer', 'three', large ? { timeout: 40000 } : {});
     await panel.locator('.duplicate-image').click();
     await expect(media).toHaveCount(2);
@@ -198,15 +192,12 @@ for (const large of [false, true])
     await panel.locator('.save').click();
     await expect(panel.locator('.dirty')).toHaveText('保存済み');
     const saved = await popup.evaluate(
-      async () =>
-        (await chrome.storage.local.get('webWorldThemes.design.youtube'))[
-          'webWorldThemes.design.youtube'
-        ] as DesignDocument,
+      async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'] as DesignDocument,
     );
     expect(saved.decorations[0]!.assetId).toBe(saved.decorations[1]!.assetId);
     await youtube.reload();
     await expect(media.first()).toHaveAttribute('data-renderer', 'three', large ? { timeout: 30000 } : {});
     await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
     await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
-    await expect(youtube.locator('#web-world-themes-decorations')).toHaveCount(0);
+    await expect(youtube.locator('#around-decorations')).toHaveCount(0);
   });

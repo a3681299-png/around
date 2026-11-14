@@ -7,7 +7,7 @@ import { openEditor } from './editor';
 
 export const skinParts = YOUTUBE_DESIGN_TARGETS.map((target) => target.id);
 export const partLocator = (page: Page, part: string) =>
-  page.locator(`[data-ww-surface~="${part}"]`).filter({ visible: true });
+  page.locator(`[data-around-surface~="${part}"]`).filter({ visible: true });
 /** Public signed-out native shapes, shared by the fixture operation and lifecycle checks. */
 export async function nativeFixtureParts(page: Page) {
   await page.goto('https://www.youtube.com/watch?v=fixture');
@@ -59,16 +59,16 @@ export const plainSkinDesign = {
 export async function storeDesign(popup: Page, design: object) {
   await popup.evaluate(async (design) => {
     await chrome.storage.local.set({
-      'webWorldThemes.showArtwork': true,
-      'webWorldThemes.safety.emergencyOff': false,
-      'webWorldThemes.design.youtube': design,
+      'around.showArtwork': true,
+      'around.safety.emergencyOff': false,
+      'around.design.youtube': design,
     });
   }, design);
 }
 /** Use the real import/validation/lease path; no synthetic blob URL enters the renderer. */
 export async function importSkinArt(page: Page, popup: Page, filename: string) {
   await page.bringToFront();
-  await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+  await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
   await expect(popup.locator('#creator-editor-direct')).toBeEnabled();
   const { studio, panel: editor } = await openEditor(popup, page);
   await editor.getByRole('button', { name: 'UIを着せ替え' }).click();
@@ -82,14 +82,14 @@ export async function importSkinArt(page: Page, popup: Page, filename: string) {
   await editor.getByRole('button', { name: '保存', exact: true }).click();
   await expect(editor.locator('.status')).toHaveText('保存しました。');
   const saved = await popup.evaluate(
-    async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
+    async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'],
   );
   await editor
     .getByRole('button', { name: /編集を終了/ })
     .first()
     .click();
   // The editing session ends on the page itself; then the editor's page goes.
-  await expect(page.locator('html')).not.toHaveAttribute('data-ww-editing', /.*/);
+  await expect(page.locator('html')).not.toHaveAttribute('data-around-editing', /.*/);
   await studio.close();
   return parseDesign(saved).rules.find((rule) => rule.target === 'video-card')!.skin!.states.normal.assetId;
 }
@@ -168,7 +168,7 @@ export async function partSnapshot(part: Locator) {
       text: (node as HTMLElement).innerText,
       focusables: focusable.map((element) => ({ ...key(element), tabIndex: element.tabIndex })),
       hits: points.map(([x, y]) => key(document.elementFromPoint(box.x + box.width * x!, box.y + box.height * y!))),
-      compact: node.getAttribute('data-ww-skin-compact'),
+      compact: node.getAttribute('data-around-skin-compact'),
       style: Object.fromEntries(properties.map((property) => [property, style[property]])),
     };
   });

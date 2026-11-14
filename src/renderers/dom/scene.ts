@@ -44,7 +44,7 @@ export interface ImageEditing {
   error(message: string): void;
 }
 
-// Editing marks are ruled (docs/wwt-studio-design-system): 1px cobalt with a white edge, square
+// Editing marks are ruled (docs/around-studio-design-system): 1px cobalt with a white edge, square
 // handles. They use Gesso's values whatever the colour scheme, since they sit over any picture.
 // Handles keep a 14px hit area around their 12px square; rotation is a square with its glyph,
 // because a circle means 保存済み.
@@ -74,7 +74,7 @@ function beneathSettled(
 
 const CSS = `
 :host { --cobalt:#2b51b8; --ink-muted:#53575f; --edge:rgba(255,255,255,.85); --rotate:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 6 6'%3E%3Cpath d='M5 3A2 2 0 1 1 3 1' fill='none' stroke='black' stroke-width='1' stroke-linecap='round'/%3E%3Cpath d='M2.6 0L4.2 1L2.6 2Z'/%3E%3C/svg%3E"); }
-:host { all:initial !important; position:fixed !important; inset:0 !important; width:100vw !important; height:100vh !important; margin:0 !important; padding:0 !important; border:0 !important; background:transparent !important; overflow:hidden !important; pointer-events:none !important; z-index:var(--ww-decoration-z,2147482000) !important; clip-path:var(--ww-decoration-clip,none) !important; }
+:host { all:initial !important; position:fixed !important; inset:0 !important; width:100vw !important; height:100vh !important; margin:0 !important; padding:0 !important; border:0 !important; background:transparent !important; overflow:hidden !important; pointer-events:none !important; z-index:var(--around-decoration-z,2147482000) !important; clip-path:var(--around-decoration-clip,none) !important; }
 * { box-sizing:border-box; }
 .image, .selection-frame { position:absolute; transform-origin:center; pointer-events:none; touch-action:none; }
 .composition { position:absolute; pointer-events:none; }
@@ -88,7 +88,7 @@ const CSS = `
 [data-group-edge="left"] { left:-4px; } [data-group-edge="right"] { right:-4px; }
 [hidden] { display:none !important; }
 .image[data-editable] { pointer-events:auto; cursor:move; }
-:host(:not([data-ww-model-press])) .image[data-video-hover] { pointer-events:none; }
+:host(:not([data-around-model-press])) .image[data-video-hover] { pointer-events:none; }
 .selection-frame { z-index:1000; border:1px solid var(--cobalt); box-shadow:0 0 0 1px var(--edge), inset 0 0 0 1px var(--edge); }
 .selection-frame[data-locked] { border-color:var(--ink-muted); border-style:dashed; box-shadow:none; outline:1px dashed var(--edge); }
 .group-frame { position:absolute; border:1px dashed var(--cobalt); box-shadow:0 0 0 1px var(--edge); pointer-events:none; z-index:1001; }
@@ -108,7 +108,7 @@ const CSS = `
 // Plane hosts reuse the screen CSS; later !important rules in the same sheet win.
 const PAGE_CSS =
   CSS +
-  ':host{position:absolute!important;inset:auto!important;left:var(--ww-page-left,0)!important;top:var(--ww-page-top,0)!important;width:1px!important;height:1px!important;overflow:visible!important}';
+  ':host{position:absolute!important;inset:auto!important;left:var(--around-page-left,0)!important;top:var(--around-page-top,0)!important;width:1px!important;height:1px!important;overflow:visible!important}';
 // One opacity on the whole plane bounds the composite of any number of atmosphere layers.
 const ATMOSPHERE_CSS =
   CSS +
@@ -348,10 +348,10 @@ export function createImageRenderer(
           ? safety.source.videoSlot()
           : undefined;
       // Which way each protected draw took, on the document (the trace build only).
-      WW_GUARD_TRACE: if (LAYERING && needsVideoSlot) {
+      AROUND_GUARD_TRACE: if (LAYERING && needsVideoSlot) {
         const way = `${beneath ? 'beneath' : offered ? 'way-out' : slot ? 'cutout' : 'none'}${editing ? (editing.locked ? '/locked' : '/editing') : ''}`;
-        const seen = (doc.documentElement.dataset['wwLayeringWays'] ?? '').split('|').filter(Boolean);
-        if (seen[seen.length - 1] !== way) doc.documentElement.dataset['wwLayeringWays'] = [...seen, way].join('|');
+        const seen = (doc.documentElement.dataset['aroundLayeringWays'] ?? '').split('|').filter(Boolean);
+        if (seen[seen.length - 1] !== way) doc.documentElement.dataset['aroundLayeringWays'] = [...seen, way].join('|');
       }
       // Explicit editing only: the verified video centre (no menu, error or advert over it), where
       // screen- and page-plane handles may take input over the video. The bands and any native
@@ -362,8 +362,8 @@ export function createImageRenderer(
       // centre is the exception, and every gesture there is claimed after a fresh read.
       const { regions, path } = protectionClip(safety.source.capture(), Boolean(editing), editorRegion);
       const clip = path ? `path('${path}')` : 'inset(100%)';
-      if (clip !== writtenClip || host!.style.getPropertyValue('--ww-decoration-clip') !== clip) {
-        host!.style.setProperty('--ww-decoration-clip', clip);
+      if (clip !== writtenClip || host!.style.getPropertyValue('--around-decoration-clip') !== clip) {
+        host!.style.setProperty('--around-decoration-clip', clip);
         writtenClip = clip;
       }
       // Read once at the start of this draw, before this renderer's own writes.
@@ -429,14 +429,10 @@ export function createImageRenderer(
         atmospherePlane = undefined;
       }
       if (used.has(ATMOSPHERE) && !atmospherePlane) {
-        atmospherePlane = createPlane(
-          'web-world-themes-atmosphere-decorations',
-          underlay ? UNDERLAY_CSS : ATMOSPHERE_CSS,
-          false,
-        );
+        atmospherePlane = createPlane('around-atmosphere-decorations', underlay ? UNDERLAY_CSS : ATMOSPHERE_CSS, false);
         atmospherePlane.under = Boolean(underlay);
       }
-      if (used.has(PAGE)) pagePlane ??= createPlane('web-world-themes-page-decorations', PAGE_CSS, true);
+      if (used.has(PAGE)) pagePlane ??= createPlane('around-page-decorations', PAGE_CSS, true);
       const parent = host!.parentElement;
       // DOM order in the shared overlay parent is the paint order: atmosphere, page, screen.
       for (const [plane, value] of [
@@ -452,13 +448,13 @@ export function createImageRenderer(
           // First in its parent: painted before (under) every sibling of the same stacking level.
           if (plane.host.parentElement !== underlay.parent || plane.host !== underlay.parent.firstChild)
             underlay.parent.insertBefore(plane.host, underlay.parent.firstChild);
-          plane.host.style.setProperty('--ww-decoration-z', String(underlay.zIndex));
+          plane.host.style.setProperty('--around-decoration-z', String(underlay.zIndex));
           continue;
         }
         const before = value === PAGE ? host! : (used.has(PAGE) && pagePlane?.host) || host!;
         if (plane.host.parentElement !== parent || plane.host.nextSibling !== before)
           parent.insertBefore(plane.host, before);
-        if (overlaySlot) plane.host.style.setProperty('--ww-decoration-z', String(overlaySlot.zIndex));
+        if (overlaySlot) plane.host.style.setProperty('--around-decoration-z', String(overlaySlot.zIndex));
       }
       if (!used.has(PAGE)) pagePlane = undefined;
       if (!used.has(ATMOSPHERE)) atmospherePlane = undefined;
@@ -466,21 +462,21 @@ export function createImageRenderer(
       // out of the page while the room is loading or hidden ('pending').
       const roomRoots = new Set(layout.roots.filter(roomRoot));
       if (roomRoots.size) {
-        roomPlane ??= createPlane('web-world-themes-room-decorations', UNDERLAY_CSS, false);
+        roomPlane ??= createPlane('around-room-decorations', UNDERLAY_CSS, false);
         if (behind && behind !== 'pending') {
           const after = behind.after?.parentElement === behind.parent ? behind.after : undefined;
           if (SPACE_BREAK === 'stacking') {
-            // A broken build (WW_SPACE_BREAK=stacking): over the UI, unguarded, to see the tests fail.
+            // A broken build (AROUND_SPACE_BREAK=stacking): over the UI, unguarded, to see the tests fail.
             if (roomPlane.host.parentElement !== behind.parent || roomPlane.host.nextSibling)
               behind.parent.append(roomPlane.host);
-            roomPlane.host.style.setProperty('--ww-decoration-z', '2147482000');
+            roomPlane.host.style.setProperty('--around-decoration-z', '2147482000');
           } else {
             if (
               roomPlane.host.parentElement !== behind.parent ||
               (after ? roomPlane.host.previousElementSibling !== after : roomPlane.host !== behind.parent.firstChild)
             )
               behind.parent.insertBefore(roomPlane.host, after ? after.nextSibling : behind.parent.firstChild);
-            roomPlane.host.style.setProperty('--ww-decoration-z', String(behind.zIndex));
+            roomPlane.host.style.setProperty('--around-decoration-z', String(behind.zIndex));
           }
         } else roomPlane.host.remove();
       } else if (roomPlane) {
@@ -497,8 +493,8 @@ export function createImageRenderer(
           dy = -scroll.y - r.top;
         if (Math.abs(dx) > 0.01 || Math.abs(dy) > 0.01) {
           pageOffset = { left: pageOffset.left + dx, top: pageOffset.top + dy };
-          pagePlane.host.style.setProperty('--ww-page-left', `${pageOffset.left}px`);
-          pagePlane.host.style.setProperty('--ww-page-top', `${pageOffset.top}px`);
+          pagePlane.host.style.setProperty('--around-page-left', `${pageOffset.left}px`);
+          pagePlane.host.style.setProperty('--around-page-top', `${pageOffset.top}px`);
         }
         const bounds = layout.roots
           .filter((id) => inPlane(id, PAGE))
@@ -517,18 +513,18 @@ export function createImageRenderer(
           .map((r) => `M${r.left + scroll.x} ${r.top + scroll.y}h${r.width}v${r.height}h${-r.width}Z`)
           .join('');
         const pageClip = pagePath ? `path('${pagePath}')` : 'inset(100%)';
-        if (pagePlane.host.style.getPropertyValue('--ww-decoration-clip') !== pageClip)
-          pagePlane.host.style.setProperty('--ww-decoration-clip', pageClip);
+        if (pagePlane.host.style.getPropertyValue('--around-decoration-clip') !== pageClip)
+          pagePlane.host.style.setProperty('--around-decoration-clip', pageClip);
       }
       if (localRoots.size && !videoSlot) {
         const localHost = doc.createElement('div');
-        localHost.id = 'web-world-themes-video-decorations';
+        localHost.id = 'around-video-decorations';
         const localShadow = localHost.attachShadow({ mode: 'open' }),
           style = doc.createElement('style'),
           content = doc.createElement('div');
         style.textContent =
           CSS +
-          ':host{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;z-index:var(--ww-local-z,1)!important}.image{pointer-events:none!important}.image[data-editable]{pointer-events:auto!important}';
+          ':host{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;z-index:var(--around-local-z,1)!important}.image{pointer-events:none!important}.image[data-editable]{pointer-events:auto!important}';
         content.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:0';
         localShadow.append(style, content);
         wireGestures(localShadow);
@@ -545,8 +541,8 @@ export function createImageRenderer(
           )
             beneath.parent.insertBefore(videoSlot.host, beneath.after.nextSibling);
         } else if (videoSlot.host.parentElement !== slot.parent) slot.parent.append(videoSlot.host);
-        videoSlot.host.style.setProperty('--ww-decoration-clip', `inset(${slot.top}px 0 ${slot.bottom}px 0)`);
-        videoSlot.host.style.setProperty('--ww-local-z', String(slot.zIndex));
+        videoSlot.host.style.setProperty('--around-decoration-clip', `inset(${slot.top}px 0 ${slot.bottom}px 0)`);
+        videoSlot.host.style.setProperty('--around-local-z', String(slot.zIndex));
         // What can be pressed over the picture (end screen cards, the "next" card, the cards
         // teaser, products, an advert's links) is normally above this plane by stacking order.
         // So it stays clear even where an overlay's own z-index were lower: the plane's content
@@ -764,13 +760,13 @@ export function createImageRenderer(
       if (
         status.issues !== recordedIssues ||
         status.stopped !== recordedStopped ||
-        host!.dataset.wwSafety !== writtenSafety
+        host!.dataset.aroundSafety !== writtenSafety
       ) {
         const record = JSON.stringify({ stopped: status.stopped, issues: status.issues });
         recordedIssues = status.issues;
         recordedStopped = status.stopped;
-        if (record !== writtenSafety || host!.dataset.wwSafety !== record) {
-          host!.dataset.wwSafety = record;
+        if (record !== writtenSafety || host!.dataset.aroundSafety !== record) {
+          host!.dataset.aroundSafety = record;
           writtenSafety = record;
         }
       }
@@ -866,22 +862,22 @@ export function createImageRenderer(
       // artwork and the page's content is over both. No clip: there is nothing it could cover.
       const after = place.after?.parentElement === place.parent ? place.after : undefined;
       if (SPACE_BREAK === 'stacking') {
-        // A broken build (WW_SPACE_BREAK=stacking): over the UI, unguarded, to see the tests fail.
+        // A broken build (AROUND_SPACE_BREAK=stacking): over the UI, unguarded, to see the tests fail.
         if (host.parentElement !== place.parent || host.nextSibling) place.parent.append(host);
-        host.style.setProperty('--ww-decoration-z', '2147482000');
+        host.style.setProperty('--around-decoration-z', '2147482000');
       } else if (
         host.parentElement !== place.parent ||
         (after ? host.previousElementSibling !== after : host !== place.parent.firstChild)
       )
         place.parent.insertBefore(host, after ? after.nextSibling : place.parent.firstChild);
-      if (SPACE_BREAK !== 'stacking') host.style.setProperty('--ww-decoration-z', String(place.zIndex));
-      if (host.style.getPropertyValue('--ww-decoration-clip') !== 'none') {
-        host.style.setProperty('--ww-decoration-clip', 'none');
+      if (SPACE_BREAK !== 'stacking') host.style.setProperty('--around-decoration-z', String(place.zIndex));
+      if (host.style.getPropertyValue('--around-decoration-clip') !== 'none') {
+        host.style.setProperty('--around-decoration-clip', 'none');
         writtenClip = 'none';
       }
       // A verdict from a guarded draw before the room appeared no longer applies.
-      if (host.dataset.wwSafety !== undefined) {
-        delete host.dataset.wwSafety;
+      if (host.dataset.aroundSafety !== undefined) {
+        delete host.dataset.aroundSafety;
         writtenSafety = '';
         recordedIssues = recordedStopped = undefined;
       }
@@ -902,7 +898,7 @@ export function createImageRenderer(
         }
     } else {
       const parent = overlaySlot?.parent ?? doc.fullscreenElement ?? doc.body ?? doc.documentElement;
-      if (overlaySlot) host.style.setProperty('--ww-decoration-z', String(overlaySlot.zIndex));
+      if (overlaySlot) host.style.setProperty('--around-decoration-z', String(overlaySlot.zIndex));
       if (host.parentElement !== parent) parent.append(host);
     }
     const nextObserved = new Set<Element>();
@@ -966,7 +962,7 @@ export function createImageRenderer(
       if (item.placement.anchor.kind === 'surface') {
         const id = item.placement.anchor.target;
         const target = anchors.find((candidate) => candidate.id === id);
-        const element = target && doc.querySelector(`[data-ww-surface~="${target.surface}"]`);
+        const element = target && doc.querySelector(`[data-around-surface~="${target.surface}"]`);
         if (element) nextObserved.add(element);
       }
       if (!rect || item.id === awayId) {
@@ -1104,9 +1100,9 @@ export function createImageRenderer(
     if (event.composedPath().includes(host)) return;
     // Restore hit testing only for this synchronous lookup. This honours the native clip,
     // rotation and paint order without dispatching a hover transition or probing on mousemove.
-    host.toggleAttribute('data-ww-model-press', true);
+    host.toggleAttribute('data-around-model-press', true);
     const target = doc.elementFromPoint(x, y) === host ? shadow.elementFromPoint(x, y) : null;
-    host.removeAttribute('data-ww-model-press');
+    host.removeAttribute('data-around-model-press');
     const node = target?.closest<HTMLElement>('.image[data-video-hover]');
     if (!node) return;
     beginPointerGesture(event, node);
@@ -1235,7 +1231,7 @@ export function createImageRenderer(
   };
   const mount = () => {
     host = doc.createElement('div');
-    host.id = 'web-world-themes-decorations';
+    host.id = 'around-decorations';
     shadow = host.attachShadow({ mode: 'open' });
     const style = doc.createElement('style');
     style.textContent = CSS;
@@ -1245,7 +1241,7 @@ export function createImageRenderer(
       assets.load,
       (message) => editing?.error(message),
       (stats) => {
-        if (host) host.dataset.wwMediaStats = JSON.stringify(stats);
+        if (host) host.dataset.aroundMediaStats = JSON.stringify(stats);
       },
     );
     models = createModelRenderer(
@@ -1255,7 +1251,7 @@ export function createImageRenderer(
         if (message.includes('コンテキスト')) safety?.pause(message);
       },
       (stats) => {
-        if (host) host.dataset.wwModelStats = JSON.stringify(stats);
+        if (host) host.dataset.aroundModelStats = JSON.stringify(stats);
       },
       shadow,
       assets.load,

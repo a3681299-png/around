@@ -21,12 +21,12 @@ test('UI0-d in-video entry falls back to W when Chrome refuses S', async ({ popu
   });
   await youtube.bringToFront();
   const opened = extensionContext.waitForEvent('page');
-  await youtube.getByRole('button', { name: 'Web World Themes の設定', exact: true }).click();
+  await youtube.getByRole('button', { name: 'Around の設定', exact: true }).click();
   const window = await opened;
   await expect(window).toHaveURL(/\/studio\/index\.html\?target=\d+/);
   await expect(window.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
   await expect(window.getByRole('dialog', { name: 'デザインエディター' })).toBeVisible();
-  await expect(youtube.getByRole('dialog', { name: 'Web World Themes の設定' })).toBeHidden();
+  await expect(youtube.getByRole('dialog', { name: 'Around の設定' })).toBeHidden();
 });
 
 test('UI0-d rejects forged skin channels, slots, bytes and another target session without document or history changes', async ({
@@ -54,7 +54,7 @@ test('UI0-d rejects forged skin channels, slots, bytes and another target sessio
   const result = await studio.evaluate(
     async ({ first, second }) => {
       async function client(tab: number, owner: string, key: number) {
-        const port = chrome.tabs.connect(tab, { name: 'web-world-themes:studio-v1' });
+        const port = chrome.tabs.connect(tab, { name: 'around:studio-v1' });
         let serial = 0,
           state: any,
           queue = Promise.resolve();
@@ -159,7 +159,7 @@ test('UI0-d native panel Undo and Redo each act once across both focus locations
     );
     const open = () =>
       popup.evaluate(async (tabId) => {
-        const reply = await chrome.runtime.sendMessage({ type: 'web-world-themes:open-side-panel', tabId });
+        const reply = await chrome.runtime.sendMessage({ type: 'around:open-side-panel', tabId });
         if (!reply?.ok) throw Error(reply?.error);
       }, tab);
     await open();
@@ -169,7 +169,7 @@ test('UI0-d native panel Undo and Redo each act once across both focus locations
       .toBe('true');
     await panel.files([path.resolve('tests/fixtures/motion/petal.png')]);
     await expect(page.locator('[data-image-id]')).toHaveCount(1);
-    const ui = 'document.querySelector("#web-world-themes-creator").shadowRoot';
+    const ui = 'document.querySelector("#around-creator").shadowRoot';
     const opacity = () => panel.text('.opacity-value');
     async function key(where: 'page' | 'panel', redo: boolean) {
       if (where === 'page') {
@@ -209,7 +209,7 @@ test('UI0-d native panel Undo and Redo each act once across both focus locations
     await expect.poll(opacity).toBe('70%');
     // Connection controls are slotted from the extension document, outside the editor shadow root.
     await panel.evaluate('document.querySelector(".disconnect-target").click()');
-    await expect(page.locator('html')).not.toHaveAttribute('data-ww-editing', /.*/);
+    await expect(page.locator('html')).not.toHaveAttribute('data-around-editing', /.*/);
     await panel.evaluate('document.querySelector(".connect-target").click()');
     await expect
       .poll(() => panel.evaluate('document.querySelector(".connection-status")?.dataset.connected'))
@@ -225,7 +225,7 @@ test('UI0-d native panel Undo and Redo each act once across both focus locations
       await chrome.sidePanel.setOptions({ tabId, enabled: false });
       await chrome.sidePanel.setOptions({ tabId, enabled: true });
     }, tab);
-    await expect(page.locator('html')).not.toHaveAttribute('data-ww-editing', /.*/);
+    await expect(page.locator('html')).not.toHaveAttribute('data-around-editing', /.*/);
     await open();
     panel = await sidePanelDriver(context, page, id, tab);
     await expect.poll(opacity).toBe('60%');

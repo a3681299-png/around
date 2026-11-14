@@ -19,7 +19,7 @@ export function buttonIcon(
   }
 }
 
-/* The WWT Studio icon set. Every glyph is ruled on one construction in a 16px box: the 14px square (1–15), its
+/* The Around Studio icon set. Every glyph is ruled on one construction in a 16px box: the 14px square (1–15), its
    circumscribed circle (r 7, so 45° points at 3.05 / 12.95), the circle r 7/φ (4.33: 3.67 / 12.33)
    and the φ split lines (9.65, and 6.35 from the other side). 1.5px ruler stroke, round caps and
    joins, currentColor. No fills, no G-pen: the pen is for marks, not glyphs. */

@@ -52,7 +52,7 @@ test('G1.4: a silent move stays protected through a longer interval without a ne
   await expect(panel.locator('.status')).toHaveText('保存しました。');
   await panel.getByRole('button', { name: '編集を終了', exact: true }).click();
   const viewport = await youtube.evaluate(() => ({ width: innerWidth, height: innerHeight }));
-  const key = 'webWorldThemes.design.youtube';
+  const key = 'around.design.youtube';
   const base = await popup.evaluate(async (k) => (await chrome.storage.local.get(k))[k] as DesignDocument, key);
   // x 275–725, y 190–350: over both buttons (cut out by the clip) and where Second moves to.
   const follow = defaultSignalRule('g13-sparse', 'position.x', {
@@ -87,7 +87,7 @@ test('G1.4: a silent move stays protected through a longer interval without a ne
   };
   parseDesign(design);
   await popup.evaluate(async ({ key, design }) => chrome.storage.local.set({ [key]: design }), { key, design });
-  const layer = '#web-world-themes-decorations';
+  const layer = '#around-decorations';
   await expect
     .poll(() =>
       youtube.evaluate(
@@ -118,7 +118,7 @@ test('G1.4: a silent move stays protected through a longer interval without a ne
     const button = document.querySelector<HTMLElement>('#g13-second')!;
     const host = document.querySelector<HTMLElement>(l)!;
     const node = host.shadowRoot!.querySelector<HTMLElement>('[data-image-id="g13-sparse"]')!;
-    document.documentElement.removeAttribute('data-ww-guard-geometry');
+    document.documentElement.removeAttribute('data-around-guard-geometry');
     const origin = performance.now();
     const rows: any[] = [];
     (window as any).g13Sparse = { origin, rows, done: false };
@@ -128,7 +128,7 @@ test('G1.4: a silent move stays protected through a longer interval without a ne
         y = r.top + r.height / 2;
       const regions = [
         ...host.style
-          .getPropertyValue('--ww-decoration-clip')
+          .getPropertyValue('--around-decoration-clip')
           .matchAll(/M(-?[\d.]+) (-?[\d.]+)h(-?[\d.]+)v(-?[\d.]+)/g),
       ].map((m) => m.slice(1).map(Number));
       const shown = getComputedStyle(node);
@@ -175,10 +175,10 @@ test('G1.4: a silent move stays protected through a longer interval without a ne
   const rows = await youtube.evaluate(() => (window as any).g13Sparse.rows);
   const diagnostics = await youtube.evaluate(() => ({
     origin: (window as any).g13Sparse.origin,
-    geometry: JSON.parse(document.documentElement.getAttribute('data-ww-guard-geometry') ?? '[]'),
-    safety: document.querySelector('#web-world-themes-decorations')?.getAttribute('data-ww-safety'),
+    geometry: JSON.parse(document.documentElement.getAttribute('data-around-guard-geometry') ?? '[]'),
+    safety: document.querySelector('#around-decorations')?.getAttribute('data-around-safety'),
   }));
-  // Kept next to the images, so a passing run can be read too (with WW_GUARD_TRACE=1 builds).
+  // Kept next to the images, so a passing run can be read too (with AROUND_GUARD_TRACE=1 builds).
   await writeFile(info.outputPath('idle-geometry.json'), JSON.stringify(diagnostics, null, 2));
   const movedAt = await youtube.evaluate(() => (window as any).g13SparseMovedAt);
   await info.attach('sparse-visual.json', {
@@ -188,9 +188,7 @@ test('G1.4: a silent move stays protected through a longer interval without a ne
   const drawn = await cdp.send('Page.captureScreenshot', { format: 'png', fromSurface: true });
   const native = await youtube.evaluate(() => {
     const r = document.querySelector('#g13-second')!.getBoundingClientRect();
-    document
-      .querySelector<HTMLElement>('#web-world-themes-decorations')!
-      .style.setProperty('visibility', 'hidden', 'important');
+    document.querySelector<HTMLElement>('#around-decorations')!.style.setProperty('visibility', 'hidden', 'important');
     return { x: Math.ceil(r.left), y: Math.ceil(r.top), width: Math.floor(r.width), height: Math.floor(r.height) };
   });
   const reference = await cdp.send('Page.captureScreenshot', { format: 'png', fromSurface: true });
@@ -260,9 +258,9 @@ async function probeCode() {
     format: 'iife',
     globalName: 'G14Probe',
     dropLabels: [
-      'WW_GUARD_TRACE',
-      'WW_TEST_PAGE_CHANGE',
-      ...(process.env.WW_NO_IDLE_RECHECK === '1' ? ['WW_IDLE_RECHECK'] : []),
+      'AROUND_GUARD_TRACE',
+      'AROUND_TEST_PAGE_CHANGE',
+      ...(process.env.AROUND_NO_IDLE_RECHECK === '1' ? ['AROUND_IDLE_RECHECK'] : []),
     ],
   });
   return result.outputFiles[0]!.text;

@@ -6,7 +6,7 @@ import { createSharedModelPool } from '../src/diagnostics/shared-model-pool';
 function fixture() {
   const geometry = new BoxGeometry(),
     texture = new Texture();
-  texture.userData['wwTextureIndex'] = 0;
+  texture.userData['aroundTextureIndex'] = 0;
   geometry.morphAttributes['position'] = [geometry.attributes['position']!.clone()];
   const material = new MeshBasicMaterial({ map: texture }),
     mesh = new Mesh(geometry, material),
@@ -17,7 +17,7 @@ function fixture() {
     scenes: [scene],
     animations: [],
     asset: { version: '2.0' },
-    userData: { wwTextures: [texture] },
+    userData: { aroundTextures: [texture] },
   } as unknown as GLTF;
   return { gltf, mesh, geometry, texture, material };
 }

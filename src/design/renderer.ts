@@ -23,28 +23,28 @@ import {
   type SurfaceStyleRule,
 } from './types';
 
-export const DESIGN_STYLE_ID = 'web-world-themes-design-style';
+export const DESIGN_STYLE_ID = 'around-design-style';
 /** Root attributes the editor sets to preview one skin state or the compact look on the real page. */
-export const SKIN_FORCE_ATTRIBUTE = 'data-ww-skin-force';
-export const SKIN_FORCE_COMPACT_ATTRIBUTE = 'data-ww-skin-force-compact';
+export const SKIN_FORCE_ATTRIBUTE = 'data-around-skin-force';
+export const SKIN_FORCE_COMPACT_ATTRIBUTE = 'data-around-skin-force-compact';
 /** Element attribute the renderer maintains for parts smaller than their frame's edges. */
-export const SKIN_COMPACT_ATTRIBUTE = 'data-ww-skin-compact';
+export const SKIN_COMPACT_ATTRIBUTE = 'data-around-skin-compact';
 /** Root attribute held only while the engine reads native text colours for its legibility plan. */
-export const INK_OFF_ATTRIBUTE = 'data-ww-ink-off';
+export const INK_OFF_ATTRIBUTE = 'data-around-ink-off';
 
 export type AssetUrl = (assetId: string) => string | undefined;
 // Only object URLs the engine created itself are written into CSS.
 const OBJECT_URL =
   /^blob:https?:\/\/[a-z0-9.-]+(?::\d{1,5})?\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
-const ROOT = 'html[data-ww-design][data-ww-site]';
+const ROOT = 'html[data-around-design][data-around-site]';
 // Two ID-weight guards keep every skin rule above theme selectors that use IDs. The adapter's
 // conditions sit inside :where(), so all states weigh the same and source order decides.
-const BOOST = ':not(#ww-skin-a):not(#ww-skin-b)';
+const BOOST = ':not(#around-skin-a):not(#around-skin-b)';
 const px = (value: number) => `${Math.round(value * 100) / 100}px`;
 
 function surfaceSelector(target: DesignTarget): string {
   if (!isDesignId(target.surface)) throw new Error('このページでは編集対象を利用できません。');
-  return `[data-ww-surface~="${target.surface}"]`;
+  return `[data-around-surface~="${target.surface}"]`;
 }
 
 function compileStyle(rule: SurfaceStyleRule, target: DesignTarget): string {
@@ -59,7 +59,7 @@ function compileStyle(rule: SurfaceStyleRule, target: DesignTarget): string {
     declarations.push(`border-radius:${rule.style.borderRadiusPx}px !important;`);
   if (declarations.length === 0) return '';
   // The explicit hover rule also replaces the built-in card bevel on hover.
-  const selector = `html[data-ww-design][data-ww-site] ${surfaceSelector(target)}`;
+  const selector = `html[data-around-design][data-around-site] ${surfaceSelector(target)}`;
   return `${selector},${selector}:hover{${declarations.join('')}}`;
 }
 
@@ -182,7 +182,7 @@ function compileInk(
   for (const mode of ['light', 'dark'] as const) {
     const slots = inks?.[mode]?.[id];
     if (!slots) continue;
-    const root = `${ROOT}[data-ww-mode="${mode}"]:not([${INK_OFF_ATTRIBUTE}])`;
+    const root = `${ROOT}[data-around-mode="${mode}"]:not([${INK_OFF_ATTRIBUTE}])`;
     for (const state of SKIN_STATES)
       if (slots[state] && states[state] !== undefined)
         lines.push(rule(`${root}:not([${SKIN_FORCE_ATTRIBUTE}^="${id}:"])${BOOST}`, states[state], slots[state]));
@@ -208,7 +208,7 @@ export function compileDesign(
   options: { previews?: boolean; inks?: InkPlan } = {},
 ): string {
   const design = readDesign(input);
-  WW_TEST_PAGE_CHANGE: countPageChange('compiles');
+  AROUND_TEST_PAGE_CHANGE: countPageChange('compiles');
   return design.rules
     .map((rule) => {
       const target = targets.find((candidate) => candidate.id === rule.target);
@@ -329,8 +329,8 @@ export function createDesignRenderer(
   };
   const refresh = (change?: string, marked?: readonly Element[]) => {
     if (!style || !designId) return;
-    if (doc.documentElement.getAttribute('data-ww-design') !== designId)
-      doc.documentElement.setAttribute('data-ww-design', designId);
+    if (doc.documentElement.getAttribute('data-around-design') !== designId)
+      doc.documentElement.setAttribute('data-around-design', designId);
     if (!style.isConnected) (doc.head ?? doc.documentElement).append(style);
     // A new page may reuse a kind with different native ink/backdrops. Its presence in the
     // previous page's plan does not make those samples valid after navigation.
@@ -364,7 +364,7 @@ export function createDesignRenderer(
     style = undefined;
     designId = undefined;
     stopCompact();
-    doc.documentElement.removeAttribute('data-ww-design');
+    doc.documentElement.removeAttribute('data-around-design');
   };
   const release = (keep: ReadonlySet<string>) => {
     for (const [id, url] of urls)
@@ -416,7 +416,7 @@ export function createDesignRenderer(
   const decisions = new Map<string, Record<string, InkDecision>>(),
     art = new Map<string, Promise<ArtPixels | undefined>>(),
     pending = new Set<string>();
-  const mode = () => (doc.documentElement.getAttribute('data-ww-mode') === 'dark' ? 'dark' : 'light');
+  const mode = () => (doc.documentElement.getAttribute('data-around-mode') === 'dark' ? 'dark' : 'light');
   /** Up to eight visible parts of the kind: one colour must suit each of them on its own backdrop. */
   const visibleParts = (target: DesignTarget) => {
     const found: Element[] = [];

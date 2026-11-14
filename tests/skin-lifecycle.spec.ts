@@ -23,7 +23,7 @@ test('unused parts stay unmarked; the skin tool and each named kind acquire and 
   const only = async (part?: string) => {
     for (const kind of optional)
       if (kind === part) await expect(partLocator(youtube, kind).first()).toBeVisible();
-      else await expect(youtube.locator(`[data-ww-surface~="${kind}"]`)).toHaveCount(0);
+      else await expect(youtube.locator(`[data-around-surface~="${kind}"]`)).toHaveCount(0);
     await expect(partLocator(youtube, 'video-card').first()).toBeVisible();
   };
   await storeDesign(popup, empty);
@@ -44,15 +44,15 @@ test('unused parts stay unmarked; the skin tool and each named kind acquire and 
       .first()
       .evaluate((node) => {
         const replacement = node.cloneNode(true) as Element;
-        [replacement, ...replacement.querySelectorAll('[data-ww-surface]')].forEach((element) =>
-          element.removeAttribute('data-ww-surface'),
+        [replacement, ...replacement.querySelectorAll('[data-around-surface]')].forEach((element) =>
+          element.removeAttribute('data-around-surface'),
         );
         node.replaceWith(replacement);
         history.pushState({}, '', '/watch?v=next-fixture');
         document.dispatchEvent(new Event('yt-navigate-finish'));
       });
     await only(part);
-    await expect.poll(() => old!.getAttribute('data-ww-surface')).toBeNull();
+    await expect.poll(() => old!.getAttribute('data-around-surface')).toBeNull();
     await old!.dispose();
     await storeDesign(popup, empty);
     await only();
@@ -82,7 +82,7 @@ test('native-ink sampling is absent at presentation and settles after mode and a
   await presentedFrames(youtube);
   expect((await inkAudit(youtube)).plans).toBe(first.plans);
   await youtube.locator('html').evaluate((node) => node.setAttribute('dark', ''));
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-mode', 'dark');
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-mode', 'dark');
   await expect.poll(async () => (await inkAudit(youtube)).plans).toBe(first.plans + 1);
   const dark = await importSkinArt(youtube, popup, 'tests/fixtures/skins/frame-dark.png');
   await storeDesign(popup, forDescription(dark));

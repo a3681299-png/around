@@ -36,7 +36,7 @@ export async function openEditor(
 export async function closeEditorPages(youtube: Page) {
   for (const page of youtube.context().pages())
     if (/^chrome-extension:\/\/[a-p]{32}\/studio\/index\.html/.test(page.url())) await page.close();
-  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-editing', /.*/);
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-around-editing', /.*/);
 }
 
 /** The in-video icon opens Chrome's side panel within its click while 制作モード is ON (a headed
@@ -48,7 +48,7 @@ export async function openSidePanelFromIcon(popup: Page, youtube: Page) {
   const mode = popup.getByRole('switch', { name: '制作モード', exact: true });
   if (!(await mode.isChecked())) await mode.check();
   await youtube.bringToFront();
-  await youtube.getByRole('button', { name: 'Web World Themes の設定', exact: true }).click();
+  await youtube.getByRole('button', { name: 'Around の設定', exact: true }).click();
   await youtube.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
   const viewport = await youtube.evaluate(() => ({ width: innerWidth, height: innerHeight }));
   const away = await clearestPoint(youtube, { left: 0, top: 0, right: viewport.width, bottom: viewport.height });

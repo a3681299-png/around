@@ -61,10 +61,10 @@ const startVisibility = (page: Page) =>
   page.evaluate(() => {
     const rows: { t: number; shown: boolean; approach: boolean }[] = ((window as any).g13Shown = []);
     (window as any).g13Recording = true;
-    const host = document.querySelector('#web-world-themes-decorations');
+    const host = document.querySelector('#around-decorations');
     const frame = host?.shadowRoot?.querySelector<HTMLElement>('[data-image-id="g13-perf-0"]');
     const sample = (t: number) => {
-      const safety = host?.getAttribute('data-ww-safety') ?? '';
+      const safety = host?.getAttribute('data-around-safety') ?? '';
       rows.push({
         t,
         shown: Boolean(frame) && frame!.style.visibility !== 'hidden' && !/"stopped":"[^"]/.test(safety),
@@ -96,23 +96,21 @@ async function run(label: string, extensionPath: string, options: { calibration?
     await popup.goto(`chrome-extension://${id}/popup/index.html`);
     const backup = await context.newPage();
     await backup.goto(`chrome-extension://${id}/backup/index.html`);
-    await backup.locator('#backup-file').setInputFiles(path.resolve('tests/fixtures/backups/pre-removal.wwbackup'));
+    await backup.locator('#backup-file').setInputFiles(path.resolve('tests/fixtures/backups/pre-removal.aroundbackup'));
     await backup.locator('#backup-inspect').click();
     await expect(backup.locator('#backup-restore')).toBeEnabled();
     await backup.locator('#backup-restore').click();
     await expect(backup.locator('.backup-status')).toContainText('読み込みが完了');
     await backup.close();
     const read = () =>
-      popup.evaluate(
-        async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
-      );
+      popup.evaluate(async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube']);
     let model: unknown;
     if (options.model) {
       // The public authored test rig (tests/helpers/model-fixture.ts); its clip plays by default.
       const prep = await context.newPage();
       await prep.setViewportSize({ width: 1920, height: 1080 });
       await prep.goto(URL_, { waitUntil: 'domcontentloaded' });
-      await expect(prep.locator('html')).toHaveAttribute('data-ww-site', 'youtube', { timeout: 30000 });
+      await expect(prep.locator('html')).toHaveAttribute('data-around-site', 'youtube', { timeout: 30000 });
       const { studio, panel } = await openEditor(popup, prep);
       const before = ((await read()) as any).decorations.length;
       await panel
@@ -170,8 +168,7 @@ async function run(label: string, extensionPath: string, options: { calibration?
       }),
     );
     await popup.evaluate(
-      (design) =>
-        chrome.storage.local.set({ 'webWorldThemes.design.youtube': design, 'webWorldThemes.creatorMode': false }),
+      (design) => chrome.storage.local.set({ 'around.design.youtube': design, 'around.creatorMode': false }),
       { ...saved, id: 'g13-perf-scene', decorations, signalRules },
     );
     const page = await context.newPage();
@@ -228,7 +225,7 @@ async function run(label: string, extensionPath: string, options: { calibration?
     await waitForAdvertToEnd(page);
     await declinePromotion(page);
     // A rejected artwork never creates the host; fail here instead of waiting on it forever.
-    await expect(page.locator('#web-world-themes-decorations')).toBeAttached({ timeout: 15000 });
+    await expect(page.locator('#around-decorations')).toBeAttached({ timeout: 15000 });
     await page.evaluate(() => (document.activeElement as HTMLElement)?.blur());
     const player = (await page.locator('#movie_player').boundingBox())!;
     const rest = await clearestPoint(page, {
@@ -262,7 +259,7 @@ async function run(label: string, extensionPath: string, options: { calibration?
       output.phases.calibration = await measure(() => page.waitForTimeout(6000));
       return output;
     }
-    const safetyState = () => page.locator('#web-world-themes-decorations').getAttribute('data-ww-safety');
+    const safetyState = () => page.locator('#around-decorations').getAttribute('data-around-safety');
     const approachIssues = async () =>
       JSON.parse((await safetyState()) ?? '{}').issues?.filter((i: any) => i.surfaceId === 'native.approach').length ??
       0;

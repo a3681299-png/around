@@ -203,7 +203,7 @@ window.addEventListener('pagehide', () => {
   void releaseAssets(session);
 });
 Object.assign(globalThis, {
-  wwAssetBench: {
+  aroundAssetBench: {
     run,
     seed,
     stop,
@@ -234,7 +234,7 @@ if (parent !== window) {
     if (
       event.origin !== 'https://www.youtube.com' ||
       event.source !== parent ||
-      event.data?.type !== 'ww-binary-probe' ||
+      event.data?.type !== 'around-binary-probe' ||
       event.data.nonce !== nonce ||
       event.ports.length !== 1
     )

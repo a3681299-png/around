@@ -60,20 +60,20 @@
 ## 再現
 
 ```powershell
-# 元の GLB から models/*.glb を作る（新しい 9 個は WW_TRIPO_NEW、既定は C:/wwt_room_work/src）
+# 元の GLB から models/*.glb を作る（新しい 9 個は AROUND_TRIPO_NEW、既定は C:/wwt_room_work/src）
 & 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' -b --factory-startup --python scripts/living-room/prepare_models.py
 # 組み立てて、ページの視点で試し描き（焼かない）。保存先と画像は絶対パスで渡す
-$env:WW_SKIP_BAKE='1'; $env:WW_SAVE="$PWD/.work/room-preview/test.blend"; $env:WW_RENDER="$PWD/.work/room-preview/view.png"
+$env:AROUND_SKIP_BAKE='1'; $env:AROUND_SAVE="$PWD/.work/room-preview/test.blend"; $env:AROUND_RENDER="$PWD/.work/room-preview/view.png"
 & 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' -b --factory-startup --python scripts/living-room/run_all.py
 # 焼いて GLB まで
-$env:WW_SKIP_BAKE=''; $env:WW_SAVE=''; $env:WW_RENDER=''
-$env:WW_LM_SIZE='4096'; $env:WW_SAMPLES='128'; $env:WW_VC_SAMPLES='128'; $env:WW_OUT='art/living-room/web'
+$env:AROUND_SKIP_BAKE=''; $env:AROUND_SAVE=''; $env:AROUND_RENDER=''
+$env:AROUND_LM_SIZE='4096'; $env:AROUND_SAMPLES='128'; $env:AROUND_VC_SAMPLES='128'; $env:AROUND_OUT='art/living-room/web'
 & 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' -b --factory-startup --python scripts/living-room/run_all.py
 ```
 
-Blender は、相対パスで渡した画像の保存先をドライブの直下から解決する（`art/…` が `C:/art/…` になる）。`run_all.py` は `WW_SAVE`・`WW_RENDER`・`WW_OUT` を絶対パスに直してから使う。
+Blender は、相対パスで渡した画像の保存先をドライブの直下から解決する（`art/…` が `C:/art/…` になる）。`run_all.py` は `AROUND_SAVE`・`AROUND_RENDER`・`AROUND_OUT` を絶対パスに直してから使う。
 
-`WW_RENDER` は、ページと同じ視点（手前・目の高さ）で描くようにした。`WW_RENDER_VIEW="x,y,z,tx,ty,tz,fov"` を `;` で並べると、近景もまとめて描ける。`camera_main`（上から見下ろす昔の視点）は天井ができたので絵には使えない（書き出しには残る）。
+`AROUND_RENDER` は、ページと同じ視点（手前・目の高さ）で描くようにした。`AROUND_RENDER_VIEW="x,y,z,tx,ty,tz,fov"` を `;` で並べると、近景もまとめて描ける。`camera_main`（上から見下ろす昔の視点）は天井ができたので絵には使えない（書き出しには残る）。
 
 ## 確かめた結果
 

@@ -10,7 +10,7 @@ test('UI0-d header and real emergency accelerator stop skins, page marks and the
   test.setTimeout(120_000);
   await mkdir('.work', { recursive: true });
   const extension = await mkdtemp(path.resolve('.work/g-entry-extension-'));
-  await cp(path.resolve(process.env.WW_TEST_EXTENSION_PATH ?? 'dist'), extension, { recursive: true });
+  await cp(path.resolve(process.env.AROUND_TEST_EXTENSION_PATH ?? 'dist'), extension, { recursive: true });
   const profile = await mkdtemp(path.resolve('.work/g-entry-profile-'));
   const context = await launchExtension(profile, true, {
     headed: true,
@@ -31,7 +31,7 @@ test('UI0-d header and real emergency accelerator stop skins, page marks and the
       async () => (await chrome.tabs.query({ active: true, currentWindow: true }))[0]!.id!,
     );
     await popup.evaluate(async (tabId) => {
-      const r = await chrome.runtime.sendMessage({ type: 'web-world-themes:open-side-panel', tabId });
+      const r = await chrome.runtime.sendMessage({ type: 'around:open-side-panel', tabId });
       if (!r?.ok) throw Error(r?.error);
     }, tab);
     const panel = await sidePanelDriver(context, page, id, tab);
@@ -40,7 +40,7 @@ test('UI0-d header and real emergency accelerator stop skins, page marks and the
     await panel.click('[data-tool="skin"]');
     await panel.click('.skin-part[data-target="video-card"]');
     await panel.files([path.resolve('tests/fixtures/skins/frame-light.png')], '.skin-file');
-    const card = page.locator('[data-ww-surface~="video-card"]').first();
+    const card = page.locator('[data-around-surface~="video-card"]').first();
     const nativeCard = (await card.elementHandle())!;
     // Emergency OFF also removes adapter surface marks; retain the native node, not that locator.
     const painted = () => nativeCard.evaluate((node) => getComputedStyle(node).borderImageSource);
@@ -58,13 +58,13 @@ test('UI0-d header and real emergency accelerator stop skins, page marks and the
     let clicks = 0;
     for (const method of ['header', 'accelerator']) {
       if (method === 'header')
-        await panel.evaluate('document.querySelector(".ww-editor-safety > .emergency-off").click()');
+        await panel.evaluate('document.querySelector(".around-editor-safety > .emergency-off").click()');
       else await nativeShortcut(page, profile, extension, 'Q');
       await expect.poll(() => panel.evaluate('document.querySelector(".emergency-resume").hidden')).toBe(false);
       await expect(page.locator('[data-image-id]')).toHaveCount(0);
-      await expect(page.locator('html')).not.toHaveAttribute('data-ww-editing', /.*/);
-      await expect(page.locator('html')).not.toHaveAttribute('data-ww-skin-picking', /.*/);
-      await expect(page.locator('#web-world-themes-skin-selected')).toHaveCount(0);
+      await expect(page.locator('html')).not.toHaveAttribute('data-around-editing', /.*/);
+      await expect(page.locator('html')).not.toHaveAttribute('data-around-skin-picking', /.*/);
+      await expect(page.locator('#around-skin-selected')).toHaveCount(0);
       await expect.poll(painted).toBe('none');
       await page.locator('#native-emergency-input').click();
       await expect(page.locator('#native-emergency-input')).toHaveAttribute('data-clicked', String(++clicks));
@@ -74,18 +74,18 @@ test('UI0-d header and real emergency accelerator stop skins, page marks and the
       await expect.poll(() => panel.evaluate('document.querySelector(".emergency-off").hidden')).toBe(false);
       await expect(page.locator('[data-image-id]')).toHaveCount(1);
       await expect.poll(painted).toMatch(/^url\("blob:/);
-      await expect(page.locator('html')).toHaveAttribute('data-ww-editing', '');
+      await expect(page.locator('html')).toHaveAttribute('data-around-editing', '');
     }
     await panel.click('[data-tool="card"]');
     await card.click();
-    await expect(card).toHaveAttribute('data-ww-editor-selected', '');
-    await expect(page.locator('#web-world-themes-selection-mark')).toBeVisible();
-    await panel.evaluate('document.querySelector(".ww-editor-safety > .emergency-off").click()');
-    await expect(page.locator('#web-world-themes-page-marks')).toHaveCount(0);
-    await expect.poll(() => nativeCard.getAttribute('data-ww-editor-selected')).toBe(null);
+    await expect(card).toHaveAttribute('data-around-editor-selected', '');
+    await expect(page.locator('#around-selection-mark')).toBeVisible();
+    await panel.evaluate('document.querySelector(".around-editor-safety > .emergency-off").click()');
+    await expect(page.locator('#around-page-marks')).toHaveCount(0);
+    await expect.poll(() => nativeCard.getAttribute('data-around-editor-selected')).toBe(null);
     await panel.evaluate('document.querySelector(".emergency-resume").click()');
-    await expect(card).toHaveAttribute('data-ww-editor-selected', '');
-    await expect(page.locator('#web-world-themes-selection-mark')).toBeVisible();
+    await expect(card).toHaveAttribute('data-around-editor-selected', '');
+    await expect(page.locator('#around-selection-mark')).toBeVisible();
   } finally {
     await context.close();
   }

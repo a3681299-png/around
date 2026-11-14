@@ -1,5 +1,5 @@
 $ErrorActionPreference = 'Stop'
-$env:WW_TEST_WINDOW_OFFSCREEN = '1'
+$env:AROUND_TEST_WINDOW_OFFSCREEN = '1'
 $env:R31_PERF = '1'
 $env:UI1_HOST_AUDIT = '1'
 $env:R31_CAPTURE_MODEL_ERRORS = '1'

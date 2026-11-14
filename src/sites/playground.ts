@@ -7,13 +7,13 @@ import { SHARED_DECORATION_ANCHORS } from './anchors';
 
 /**
  * The Playground's own video site (docs/playground-plan.md). The page carries its marks itself:
- * `data-ww-surface` names a part's kind (the same kinds as on YouTube), `data-ww-control` names an
- * operation surface's kind, and `data-ww-video` is the main video. Everything site-specific stays
+ * `data-around-surface` names a part's kind (the same kinds as on YouTube), `data-around-control` names an
+ * operation surface's kind, and `data-around-video` is the main video. Everything site-specific stays
  * here: characters and artwork speak only of part kinds, anchors and common signals, so the same
  * artwork works with this adapter or the YouTube one.
  */
 export const PLAYGROUND_SITE_ID = 'playground';
-const CONTROL = 'data-ww-control';
+const CONTROL = 'data-around-control';
 const KINDS = ['click', 'drag', 'text-input', 'gesture'] as const;
 type ControlKind = (typeof KINDS)[number];
 
@@ -25,15 +25,13 @@ export const PLAYGROUND_DESIGN_TARGETS: readonly DesignTarget[] = Object.freeze(
 
 /** Every operation surface the page marked, in document order. */
 export function playgroundControls(doc: Document): HTMLElement[] {
-  return [...doc.querySelectorAll<HTMLElement>(`[${CONTROL}]`)].filter(
-    (element) => !element.closest('[id^="web-world-themes"]'),
-  );
+  return [...doc.querySelectorAll<HTMLElement>(`[${CONTROL}]`)].filter((element) => !element.closest('[id^="around"]'));
 }
 
 function playgroundPlayback(doc: Document): PlaybackSource {
   return {
     connect(emit) {
-      const video = doc.querySelector<HTMLVideoElement>('video[data-ww-video]');
+      const video = doc.querySelector<HTMLVideoElement>('video[data-around-video]');
       const events = ['play', 'playing', 'pause', 'ended', 'emptied'] as const;
       let previous: boolean | undefined;
       const publish = (event?: Event) => {
@@ -82,7 +80,7 @@ function playgroundOperations(doc: Document) {
           visible,
           scrolls: visible ? composition.scrolls(element) : true,
           // The video picture itself may be painted over (as on YouTube); its controls may not.
-          ...(element.hasAttribute('data-ww-video') ? { occlusion: 'allow' as const } : {}),
+          ...(element.hasAttribute('data-around-video') ? { occlusion: 'allow' as const } : {}),
         };
       });
       const active = doc.activeElement;
@@ -109,11 +107,11 @@ export function createPlaygroundAdapter(doc: Document): SiteAdapter {
     mountSettings: () => () => undefined,
     connect(onPageChange) {
       const root = doc.documentElement;
-      // Artwork CSS is scoped to html[data-ww-site]; the site names itself while connected.
-      root.setAttribute('data-ww-site', PLAYGROUND_SITE_ID);
-      root.setAttribute('data-ww-mode', 'light');
+      // Artwork CSS is scoped to html[data-around-site]; the site names itself while connected.
+      root.setAttribute('data-around-site', PLAYGROUND_SITE_ID);
+      root.setAttribute('data-around-mode', 'light');
       // The list is the only part that changes after load; report the inserted nodes only.
-      const list = doc.querySelector('[data-ww-list]');
+      const list = doc.querySelector('[data-around-list]');
       const observer = new MutationObserver((records) => {
         const added = records.flatMap((record) =>
           [...record.addedNodes].filter((n): n is Element => n instanceof Element),
@@ -126,8 +124,8 @@ export function createPlaygroundAdapter(doc: Document): SiteAdapter {
       return () => {
         observer.disconnect();
         doc.defaultView?.removeEventListener('resize', resize);
-        root.removeAttribute('data-ww-site');
-        root.removeAttribute('data-ww-mode');
+        root.removeAttribute('data-around-site');
+        root.removeAttribute('data-around-mode');
       };
     },
   };

@@ -6,12 +6,12 @@
 
 リポジトリの下へ `git worktree add --detach .work/g14-verify ed03b29`、同様に `.work/g14-before` と `.work/g14-g12-before` を作る。各ツリーで `npm ci --ignore-scripts --no-audit --no-fund`。ブラウザーは `PLAYWRIGHT_BROWSERS_PATH` に共通の Chromium の保存先を指定する。今回の版は `153.0.8010.12`。
 
-各ツリーで `$env:WW_BUILD_OUT='.work/g14-normal'; node scripts/build.mjs`。以下は検証ツリーを作業ディレクトリにする。`repro/g14-extra`、`repro/g14-live`、`repro/g14-perf` をそれぞれ `.work/` へコピーする。ビルド用の `build-faults.mjs` と `build-record.mjs` も `.work/` へコピーする。`.work/<名前>/` に置いたときだけ、テスト内の相対 import が検証ツリーの helpers を指す。
+各ツリーで `$env:AROUND_BUILD_OUT='.work/g14-normal'; node scripts/build.mjs`。以下は検証ツリーを作業ディレクトリにする。`repro/g14-extra`、`repro/g14-live`、`repro/g14-perf` をそれぞれ `.work/` へコピーする。ビルド用の `build-faults.mjs` と `build-record.mjs` も `.work/` へコピーする。`.work/<名前>/` に置いたときだけ、テスト内の相対 import が検証ツリーの helpers を指す。
 
 ## Windows 全件・長い待ち
 
 ```powershell
-$env:WW_TEST_EXTENSION_PATH='.work/g14-normal'
+$env:AROUND_TEST_EXTENSION_PATH='.work/g14-normal'
 $env:PLAYWRIGHT_JSON_OUTPUT_NAME='.work/evidence/windows-all.json'
 npm run test:e2e -- --reporter=list,json --output=.work/windows-all
 $env:PLAYWRIGHT_JSON_OUTPUT_NAME='.work/evidence/timing20-complete.json'
@@ -20,20 +20,20 @@ npm run test:e2e -- tests/g14-idle-recheck.spec.ts --grep 'silent move stays' --
 
 全件には画面外の native Chrome の試験がある。実行前に、1〜2分キーボードのフォーカスを取ることを利用者へ伝える。各回の `sparse-visual.json` と `native-pixel-comparison.json` は JSON reporter の attachments に入る。`analyze.mjs timing <report.json>` で取り出せる。途中で落ちた回を消して成功率を作らない。
 
-同じ実描画テストに `WW_TEST_EXTENSION_PATH='../g14-before/.work/g14-normal'` を渡すと、G1.3 の長い待ちを再現できる。2件目はテスト自身が source をビルドするため、この指定だけでは旧版にならない。
+同じ実描画テストに `AROUND_TEST_EXTENSION_PATH='../g14-before/.work/g14-normal'` を渡すと、G1.3 の長い待ちを再現できる。2件目はテスト自身が source をビルドするため、この指定だけでは旧版にならない。
 
 ## 守りを止める
 
 ```powershell
-$env:WW_BUILD_OUT='.work/g14-no-idle'; $env:WW_NO_IDLE_RECHECK='1'
+$env:AROUND_BUILD_OUT='.work/g14-no-idle'; $env:AROUND_NO_IDLE_RECHECK='1'
 node scripts/build.mjs
-$env:WW_TEST_EXTENSION_PATH='.work/g14-no-idle'
+$env:AROUND_TEST_EXTENSION_PATH='.work/g14-no-idle'
 npm run test:e2e -- tests/g14-idle-recheck.spec.ts
-$env:WW_NO_IDLE_RECHECK='0'
+$env:AROUND_NO_IDLE_RECHECK='0'
 node .work/build-faults.mjs
 ```
 
-`WW_NO_IDLE_RECHECK=1` はテスト内の probe にも同じラベルを落とす。ほかの fault は esbuild のモジュール差し替えで公開関数を包む。ソースの文字列置換をしない。
+`AROUND_NO_IDLE_RECHECK=1` はテスト内の probe にも同じラベルを落とす。ほかの fault は esbuild のモジュール差し替えで公開関数を包む。ソースの文字列置換をしない。
 
 | ビルド                  | 実行する spec / grep                                                             | 止める範囲                                      |
 | ----------------------- | -------------------------------------------------------------------------------- | ----------------------------------------------- |
@@ -48,9 +48,9 @@ HOLD の2件は止めても通った。全 HOLD 試験を検出不能と結論�
 
 `npm run test:e2e -- --config=.work/g14-extra/config.ts background.spec.ts`。専用の headless Chrome と `connectOverCDP(..., {noDefaults:true})` を使い、本当の同一ウィンドウ内タブ切替を行う。`document.hidden` を置き換えない。`viewport.spec.ts` は計測準備の寸法診断用。
 
-`npm run test:e2e -- --config=.work/g14-live/config.ts` は新しい未ログインのプロファイルで、画像を Studio から追加する。`G14_LABEL` は after/before/g12、`WW_TEST_EXTENSION_PATH` と `G14_SOURCE_ROOT` は各比較ツリーのビルド・ソースをそろえる。初期読み込みの安全停止が終わってから撮る。
+`npm run test:e2e -- --config=.work/g14-live/config.ts` は新しい未ログインのプロファイルで、画像を Studio から追加する。`G14_LABEL` は after/before/g12、`AROUND_TEST_EXTENSION_PATH` と `G14_SOURCE_ROOT` は各比較ツリーのビルド・ソースをそろえる。初期読み込みの安全停止が終わってから撮る。
 
-`node .work/build-record.mjs` の後は `WW_TEST_EXTENSION_PATH='.work/g14-record'`、`G14_LABEL='record'`、`G14_IDLE_MS='6000'`。公開 source の capture を包み、呼び出し元の stack に `recheck` があるときだけ記録する。動作を上書きしない。記録ビルドの時間を正式性能に使わない。
+`node .work/build-record.mjs` の後は `AROUND_TEST_EXTENSION_PATH='.work/g14-record'`、`G14_LABEL='record'`、`G14_IDLE_MS='6000'`。公開 source の capture を包み、呼び出し元の stack に `recheck` があるときだけ記録する。動作を上書きしない。記録ビルドの時間を正式性能に使わない。
 
 ## 実 YouTube の性能
 

@@ -137,10 +137,10 @@ async function launch(build) {
   page.on('pageerror', (error) => errors.push(error.message));
   const store = (values) => popup.evaluate((values) => chrome.storage.local.set(values), values);
   await store({
-    'webWorldThemes.enabled': true,
-    'webWorldThemes.strength': 100,
-    'webWorldThemes.safety.emergencyOff': false,
-    'webWorldThemes.design.youtube': plain,
+    'around.enabled': true,
+    'around.strength': 100,
+    'around.safety.emergencyOff': false,
+    'around.design.youtube': plain,
   });
   async function probe(expression) {
     for (let attempt = 0; attempt < 60; attempt++) {
@@ -202,7 +202,7 @@ async function phases(browser) {
   // Visible cards only: hidden cards of a previous page are 0×0 and correctly use the compact look.
   const dressed = await page.evaluate(
     () =>
-      [...document.querySelectorAll('[data-ww-surface~="video-card"]')].filter(
+      [...document.querySelectorAll('[data-around-surface~="video-card"]')].filter(
         (node) => node.getBoundingClientRect().width > 0 && getComputedStyle(node).borderImageSource.startsWith('url('),
       ).length,
   );
@@ -282,7 +282,7 @@ async function skinned(browser) {
   // saved design still references the image, before any design without it is stored.
   await page.waitForTimeout(3000);
   const saved = await popup.evaluate(
-    async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
+    async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'],
   );
   const assetId = saved.rules[0].skin.states.normal.assetId;
   const frame = { assetId, slices: { top: 12, right: 16, bottom: 12, left: 16 }, center: 'stretch', scalePct: 100 };
@@ -364,7 +364,7 @@ try {
       const browser = mode === 'build' ? await launch(builds[condition]) : shared;
       try {
         if (mode === 'skin')
-          await browser.store({ 'webWorldThemes.design.youtube': condition === 'skinned' ? skinDesign : plain });
+          await browser.store({ 'around.design.youtube': condition === 'skinned' ? skinDesign : plain });
         await browser.page.goto('about:blank');
         let host = await auditHost();
         while (host && !host.CodeQuiet) {

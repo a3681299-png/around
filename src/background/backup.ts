@@ -39,7 +39,7 @@ export function createBackupService(ports: BackupPorts) {
       const settings = await readSettings();
       const rows = await changeAssets((rows) => ({ value: rows }));
       const manifest: BackupManifest = {
-        format: 'web-world-themes-backup',
+        format: 'around-backup',
         version: 1,
         createdAt: new Date().toISOString(),
         settings,

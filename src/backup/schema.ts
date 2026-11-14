@@ -22,12 +22,12 @@ export const BACKUP_MESSAGES = Object.freeze({
   localSize: '復元後のChrome設定と作品が保存上限' + mib(BACKUP_LIMITS.localBytes) + 'を超えます。',
 });
 export const BACKUP_PREFERENCE_KEYS = [
-  'webWorldThemes.creator.guideDismissed',
-  'webWorldThemes.studio.workspace.v1',
-  'webWorldThemes.studio.workbench.v2',
-  'webWorldThemes.studio.sidepanel.v1',
-  'webWorldThemes.studio.timeline.v1',
-  'webWorldThemes.settings.position.v1',
+  'around.creator.guideDismissed',
+  'around.studio.workspace.v1',
+  'around.studio.workbench.v2',
+  'around.studio.sidepanel.v1',
+  'around.studio.timeline.v1',
+  'around.settings.position.v1',
 ] as const;
 export interface BackupAsset {
   id: string;
@@ -36,7 +36,7 @@ export interface BackupAsset {
   byteLength: number;
 }
 export interface BackupManifest {
-  format: 'web-world-themes-backup';
+  format: 'around-backup';
   version: 1;
   createdAt: string;
   settings: UserSettings;
@@ -91,9 +91,9 @@ export function parseBackupSettings(raw: unknown): UserSettings {
 
 export function backupDesigns(local: Record<string, unknown>): DesignDocument[] {
   return Object.entries(local)
-    .filter(([key]) => key.startsWith('webWorldThemes.design.'))
+    .filter(([key]) => key.startsWith('around.design.'))
     .map(([key, raw]) => {
-      const site = key.slice('webWorldThemes.design.'.length);
+      const site = key.slice('around.design.'.length);
       try {
         const design = parseDesign(raw);
         if (site !== design.siteId) throw new Error('作品の保存先が不正です。');
@@ -171,7 +171,7 @@ export function parseBackupManifest(raw: unknown): BackupManifest {
     'assets',
   ]);
   if (
-    value['format'] !== 'web-world-themes-backup' ||
+    value['format'] !== 'around-backup' ||
     value['version'] !== 1 ||
     typeof value['createdAt'] !== 'string' ||
     value['createdAt'].length > 40 ||
@@ -221,7 +221,7 @@ export function parseBackupManifest(raw: unknown): BackupManifest {
   )
     throw failure();
   return {
-    format: 'web-world-themes-backup',
+    format: 'around-backup',
     version: 1,
     createdAt: value['createdAt'],
     settings: parseBackupSettings(value['settings']),

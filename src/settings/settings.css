@@ -1,18 +1,18 @@
-/* 表示設定 as a WWT Studio ww-panel: the same sheet in the action popup and in the panel the in-video
+/* 表示設定 as a Around Studio around-panel: the same sheet in the action popup and in the panel the in-video
    icon opens. Tokens come from editor/studio-tokens.css (declared on :host in the shadow root and on
    :root in the popup). Ruled controls, cobalt the one accent, nothing below 12px. */
-.ww-editor {
+.around-editor {
   display: block;
   font: 13px/20px var(--font-ui);
   color: var(--ink);
   background: var(--surface);
 }
-.ww-editor *,
-.ww-editor *::before,
-.ww-editor *::after {
+.around-editor *,
+.around-editor *::before,
+.around-editor *::after {
   box-sizing: border-box;
 }
-.ww-editor .ww-titlebar {
+.around-editor .around-titlebar {
   display: flex;
   align-items: center;
   gap: var(--space-8);
@@ -21,20 +21,20 @@
   border-bottom: 1px solid var(--line);
   background: var(--surface);
 }
-.ww-editor .ww-titlebar h2 {
+.around-editor .around-titlebar h2 {
   flex: 1;
   margin: 0;
   font-size: 20px;
   line-height: 32px;
   font-weight: 700;
 }
-.ww-editor-body {
+.around-editor-body {
   display: flex;
   flex-direction: column;
   gap: var(--space-12);
   padding: var(--space-12) var(--space-20) var(--space-20);
 }
-.ww-editor button {
+.around-editor button {
   font: inherit;
   font-size: 13px;
   min-height: var(--control);
@@ -44,27 +44,27 @@
   background: var(--surface-raised);
   color: var(--ink);
   cursor: pointer;
-  transition: background-color calc(var(--ww-frame) * 2) steps(2, end);
+  transition: background-color calc(var(--around-frame) * 2) steps(2, end);
 }
-.ww-editor button:hover:not(:disabled) {
+.around-editor button:hover:not(:disabled) {
   background: var(--cobalt-wash);
 }
-.ww-editor button:disabled {
+.around-editor button:disabled {
   color: var(--ink-faint);
   cursor: default;
 }
-.ww-editor button.primary {
+.around-editor button.primary {
   border-color: var(--cobalt);
   background: var(--cobalt);
   color: var(--on-cobalt);
   font-weight: 700;
 }
-.ww-editor button.primary:disabled {
+.around-editor button.primary:disabled {
   border-color: var(--line-control);
   background: var(--surface-sunk);
   color: var(--ink-faint);
 }
-.ww-editor .icon-button {
+.around-editor .icon-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -74,57 +74,57 @@
   background: transparent;
   color: var(--ink-muted);
 }
-.ww-editor :focus-visible {
+.around-editor :focus-visible {
   outline: 2px solid var(--cobalt);
   outline-offset: 1px;
 }
-.ww-editor .creator-entry {
+.around-editor .creator-entry {
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
   padding-bottom: var(--space-12);
   border-bottom: 1px solid var(--line);
 }
-.ww-editor .editor-actions {
+.around-editor .editor-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-8);
 }
-.ww-editor .status {
+.around-editor .status {
   margin: 0;
   min-height: 0;
   font-size: 12px;
   color: var(--ink-muted);
 }
-.ww-editor .status:empty {
+.around-editor .status:empty {
   display: none;
 }
-.ww-editor .control-row {
+.around-editor .control-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-8);
   min-height: var(--control);
 }
-.ww-editor .toggle-group {
+.around-editor .toggle-group {
   display: flex;
   align-items: center;
   gap: var(--space-8);
 }
-.ww-editor output {
+.around-editor output {
   font-family: var(--font-mono);
   font-size: 12px;
   font-variant-numeric: tabular-nums;
   color: var(--ink-muted);
 }
-.ww-editor fieldset {
+.around-editor fieldset {
   margin: 0;
   padding: 0 0 var(--space-12);
   border: 0;
   border-bottom: 1px solid var(--line);
   min-width: 0;
 }
-.ww-editor legend {
+.around-editor legend {
   padding: 0;
   margin-bottom: var(--space-4);
   font-family: var(--font-mono);
@@ -133,13 +133,13 @@
   letter-spacing: 0.06em;
   color: var(--ink-muted);
 }
-.ww-editor .feature-description {
+.around-editor .feature-description {
   margin: 0;
   font-size: 12px;
   color: var(--ink-muted);
 }
-/* ww-toggle: a ruled track, cobalt when on, a knob that steps across in 3 frames. */
-.ww-editor input[type='checkbox'][role='switch'] {
+/* around-toggle: a ruled track, cobalt when on, a knob that steps across in 3 frames. */
+.around-editor input[type='checkbox'][role='switch'] {
   appearance: none;
   position: relative;
   flex: none;
@@ -151,7 +151,7 @@
   background: var(--surface-sunk);
   cursor: pointer;
 }
-.ww-editor input[type='checkbox'][role='switch']::after {
+.around-editor input[type='checkbox'][role='switch']::after {
   content: '';
   position: absolute;
   top: 3px;
@@ -160,29 +160,29 @@
   height: 12px;
   border-radius: 50%;
   background: var(--ink-muted);
-  transition: transform calc(var(--ww-frame) * 3) steps(3, end);
+  transition: transform calc(var(--around-frame) * 3) steps(3, end);
 }
-.ww-editor input[type='checkbox'][role='switch']:checked {
+.around-editor input[type='checkbox'][role='switch']:checked {
   border-color: var(--cobalt);
   background: var(--cobalt);
 }
-.ww-editor input[type='checkbox'][role='switch']:checked::after {
+.around-editor input[type='checkbox'][role='switch']:checked::after {
   background: var(--on-cobalt);
   transform: translateX(12px);
 }
-.ww-editor input[type='checkbox'][role='switch']:disabled {
+.around-editor input[type='checkbox'][role='switch']:disabled {
   opacity: 0.5;
   cursor: default;
 }
-.ww-editor a {
+.around-editor a {
   color: var(--cobalt);
 }
-.ww-editor details summary {
+.around-editor details summary {
   cursor: pointer;
 }
 @media (prefers-reduced-motion: reduce) {
-  .ww-editor button,
-  .ww-editor input[type='checkbox'][role='switch']::after {
+  .around-editor button,
+  .around-editor input[type='checkbox'][role='switch']::after {
     transition: none;
   }
 }

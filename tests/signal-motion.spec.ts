@@ -234,7 +234,7 @@ test('record/replay and backward seeking reproduce every motion state at recorde
   expect(replayWorld(JSON.stringify(recording))).toEqual({ state, frames });
   expect(parseWorldState(state)).toEqual(state);
   const take = parseSignalTake({
-      format: 'ww-signal-take',
+      format: 'around-signal-take',
       formatVersion: 1,
       runtimeVersion: '1.2.0',
       id: 'test-take',
@@ -261,7 +261,7 @@ test('v8 artwork and Runtime 1.1 takes migrate without mutation; malformed motio
   expect(parseDesign(doc).schemaVersion).toBe(18);
   expect(JSON.stringify(doc)).toBe(before);
   const old = {
-    format: 'ww-signal-take',
+    format: 'around-signal-take',
     formatVersion: 1,
     runtimeVersion: '1.1.0',
     id: 'old-take',
@@ -302,7 +302,7 @@ test('mouse ghost projections use raw normalized values and skip angle wrap; sig
   rule.keyframes.splice(1, 0, { id: 'middle', input: 0.5, value: 0, easing: 'ease-in' });
   const inputs = [input(0, 100), input(100, 900), input(200, 100)],
     take = parseSignalTake({
-      format: 'ww-signal-take',
+      format: 'around-signal-take',
       formatVersion: 1,
       runtimeVersion: '1.2.0',
       id: 'mouse-take',

@@ -64,7 +64,7 @@ test('reads each GUID folder: its pathname, asset and meta', () => {
 });
 
 test('extracts the assets under their original names and filters by extension', async () => {
-  const out = await mkdtemp(path.join(tmpdir(), 'ww-unitypackage-'));
+  const out = await mkdtemp(path.join(tmpdir(), 'around-unitypackage-'));
   try {
     const source = path.join(out, 'in.unitypackage');
     await writeFile(
@@ -108,7 +108,7 @@ test('tar names written as ./GUID/file, in ustar prefix form or as GNU long name
 });
 
 test('a pathname that leaves the target folder is refused, not written', async () => {
-  const out = await mkdtemp(path.join(tmpdir(), 'ww-unitypackage-'));
+  const out = await mkdtemp(path.join(tmpdir(), 'around-unitypackage-'));
   try {
     for (const bad of [
       '../evil.fbx',

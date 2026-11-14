@@ -13,7 +13,7 @@
 - **G1 の判定の仕組みは、レトロテーマに頼っていない**。レトロテーマが動かしていたのは、YouTube の部品の位置だけ。G1 は位置を毎回測り直しているので、撤去で正しさは変わらない。変わるのは次の2つ
   - 窓の飾り専用の保護（下のステータスバーが操作部品を避ける仕組み）が、要らなくなる
   - 時計が毎秒書き換えていた自前の要素がなくなる。そのぶん、ページの変化の監視が軽くなる
-- テストのうち、レトロテーマの見た目だけを確かめているもの（9ファイル・約1,900行）は消す。ほかは、主に「ON かどうか」の印を `data-ww-theme` から別の印へ替える書き直しで済む
+- テストのうち、レトロテーマの見た目だけを確かめているもの（9ファイル・約1,900行）は消す。ほかは、主に「ON かどうか」の印を `data-around-theme` から別の印へ替える書き直しで済む
 
 ---
 
@@ -31,17 +31,17 @@
 
 ### サイトアダプターの中のテーマ専用の部分
 
-| ファイル                        |  行 | 中身                                                                                                                                    | 撤去後                                      |
-| ------------------------------- | --: | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
-| `src/sites/youtube-chrome.ts`   | 308 | 窓の飾り（`YouTube.exe` バー・動画と再生リストのタイトルバー・ステータスバー・時計）。下の帯の高さを測る                                | 消す                                        |
-| `src/sites/youtube-chrome.css`  |  38 | 窓の飾りのための位置の調整（下の余白・プレーヤーの最大の高さ）                                                                          | 消す                                        |
-| `src/sites/youtube.css`         | 217 | YouTube の色の変数への橋渡しと、窓の飾りのための位置の調整。先頭の8行（`--ww-native-*`）以外は、すべて `html[data-ww-theme]` の下にある | 先頭8行も使い手がなければ、ファイルごと消す |
-| `src/sites/youtube-details.ts`  | 205 | 日替わりの飾り・操作中の小窓の色                                                                                                        | 消す                                        |
-| `src/sites/youtube-comments.ts` | 327 | 掲示板風のコメント（正確な日時の整形を含む）                                                                                            | 消す                                        |
-| `src/sites/youtube.ts`          | ～6 | `stylesheet` に上の2本の CSS を渡す部分と、`features` の4項目                                                                           | その部分だけ消す                            |
-| `src/sites/types.ts`            | ～8 | `stylesheet`・`features`・`SiteFeatureCapability`                                                                                       | 消す（アダプターの型が短くなる）            |
+| ファイル                        |  行 | 中身                                                                                                                                            | 撤去後                                      |
+| ------------------------------- | --: | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| `src/sites/youtube-chrome.ts`   | 308 | 窓の飾り（`YouTube.exe` バー・動画と再生リストのタイトルバー・ステータスバー・時計）。下の帯の高さを測る                                        | 消す                                        |
+| `src/sites/youtube-chrome.css`  |  38 | 窓の飾りのための位置の調整（下の余白・プレーヤーの最大の高さ）                                                                                  | 消す                                        |
+| `src/sites/youtube.css`         | 217 | YouTube の色の変数への橋渡しと、窓の飾りのための位置の調整。先頭の8行（`--around-native-*`）以外は、すべて `html[data-around-theme]` の下にある | 先頭8行も使い手がなければ、ファイルごと消す |
+| `src/sites/youtube-details.ts`  | 205 | 日替わりの飾り・操作中の小窓の色                                                                                                                | 消す                                        |
+| `src/sites/youtube-comments.ts` | 327 | 掲示板風のコメント（正確な日時の整形を含む）                                                                                                    | 消す                                        |
+| `src/sites/youtube.ts`          | ～6 | `stylesheet` に上の2本の CSS を渡す部分と、`features` の4項目                                                                                   | その部分だけ消す                            |
+| `src/sites/types.ts`            | ～8 | `stylesheet`・`features`・`SiteFeatureCapability`                                                                                               | 消す（アダプターの型が短くなる）            |
 
-`youtube.ts` の `durationSelector`（再生時間の表示の追跡）は、着せ替えの部品「再生時間」（`data-ww-surface="duration"`）が使っている。レトロテーマ専用ではないので残す。`data-ww-mode`（明暗）も、作品の文字色の判定（`design/renderer.ts`）が使っているので残す。`data-ww-fullscreen` は、テーマの CSS だけが読んでいる。消すかどうかは2回目で決める（ページの変化の種類 `fullscreen` の判定は、属性とは別に残す）。
+`youtube.ts` の `durationSelector`（再生時間の表示の追跡）は、着せ替えの部品「再生時間」（`data-around-surface="duration"`）が使っている。レトロテーマ専用ではないので残す。`data-around-mode`（明暗）も、作品の文字色の判定（`design/renderer.ts`）が使っているので残す。`data-around-fullscreen` は、テーマの CSS だけが読んでいる。消すかどうかは2回目で決める（ページの変化の種類 `fullscreen` の判定は、属性とは別に残す）。
 
 ### features（表示オプション）
 
@@ -59,13 +59,13 @@
 | `src/settings/form.ts`                  | 上の欄の結び付け。`palette.ts` を import                                                                                 | 欄に合わせて短くする                                         |
 | `src/storage/settings.ts`               | `UserSettings` の `strength`・`features`・`palette`・`noiseStrength`。`palette.ts` を import                             | 項目を減らす（下の「3」）                                    |
 | `src/backup/schema.ts`                  | `parseBackupSettings` が `features`・`palette`・`strength`・`noiseStrength` を検査する。未知の項目は**拒否**する         | 古い項目を読み捨てる形に変える（下の「3」）                  |
-| `src/backup/page.ts`                    | バックアップの画面の見た目に、レトロテーマの `editorStylesheets`（tokens・chrome・editor.css）とピクセル書体を使っている | WWT Studio の見た目（`studio-tokens.css`）に替える           |
-| `src/backup/backup.css`                 | `--ww-panel`・`--ww-ink`（レトロテーマの色の変数）                                                                       | Studio の変数に替える                                        |
+| `src/backup/page.ts`                    | バックアップの画面の見た目に、レトロテーマの `editorStylesheets`（tokens・chrome・editor.css）とピクセル書体を使っている | Around Studio の見た目（`studio-tokens.css`）に替える        |
+| `src/backup/backup.css`                 | `--around-panel`・`--around-ink`（レトロテーマの色の変数）                                                               | Studio の変数に替える                                        |
 | `src/content/index.ts`                  | `themes[DEFAULT_THEME]` を制御に渡す。`DEFAULT_THEME` を新しい作品の `baseThemeId` に渡す。ピクセル書体を読み込む        | 3つとも外す                                                  |
 | `src/ui/pixel-font.ts`                  | ピクセル書体の読み込み（窓の飾り・時計・バックアップの画面だけが使う）                                                   | 消す                                                         |
 | `assets/fonts/`（6ファイル）            | PixelMplus の woff2・ライセンス・作り直しのスクリプト                                                                    | 消す（ライセンスの表示も一緒に消える）                       |
 | `manifest.json`                         | `web_accessible_resources` にフォント1つ。`description` に「仮のretroテーマ」                                            | フォントの行を消す（権限は増えない。むしろ減る）。説明を直す |
-| `src/diagnostics/asset-runtime-host.ts` | 計測用。`data-ww-theme` が消えたら自分を片付ける                                                                         | ON の印を替える                                              |
+| `src/diagnostics/asset-runtime-host.ts` | 計測用。`data-around-theme` が消えたら自分を片付ける                                                                     | ON の印を替える                                              |
 | `scripts/lint.mjs`                      | `src/themes/` と `src/themes/retro/` 専用の検査                                                                          | その検査を消す                                               |
 | `tests/build-preview.mjs`               | `youtube-chrome.ts` の文字列の置き換え（AGENTS.md で禁止の方式の名残）                                                   | 対象がなくなるので、その部分を消す                           |
 | `README.md`                             | 冒頭の紹介・使い方・構成図・設計の説明の大半がレトロテーマ                                                               | 書き直す                                                     |
@@ -80,15 +80,15 @@
 
 `createThemeController()` は、引数でテーマを1つ受け取る。その上で、次をすべて起動して持っている。
 
-| 持っているもの                                                                    | テーマとの関係                                                                             |
-| --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `createDesignRenderer`（着せ替えの CSS）                                          | なし。`html[data-ww-design][data-ww-site]` の下に出す。テーマの属性を見ない                |
-| `createImageRenderer`（画像・モデルの層）                                         | なし                                                                                       |
-| `createOperationGuardHost`（G1）                                                  | なし。ただし、動かす条件 `guardWanted()` に `strength > 0` が入っている                    |
-| `createTimelineHost`                                                              | なし                                                                                       |
-| `site.connect(followPage)`（ページの変化の購読）                                  | なし。ただし、`followPage` の中でテーマの CSS の付け直しと `features.refresh()` をしている |
-| `createFeatureController`（表示オプション）                                       | テーマそのもの                                                                             |
-| `<style id="web-world-themes-style">`・CSS 変数・`data-ww-theme`・`--ww-strength` | テーマそのもの                                                                             |
+| 持っているもの                                                                  | テーマとの関係                                                                             |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `createDesignRenderer`（着せ替えの CSS）                                        | なし。`html[data-around-design][data-around-site]` の下に出す。テーマの属性を見ない        |
+| `createImageRenderer`（画像・モデルの層）                                       | なし                                                                                       |
+| `createOperationGuardHost`（G1）                                                | なし。ただし、動かす条件 `guardWanted()` に `strength > 0` が入っている                    |
+| `createTimelineHost`                                                            | なし                                                                                       |
+| `site.connect(followPage)`（ページの変化の購読）                                | なし。ただし、`followPage` の中でテーマの CSS の付け直しと `features.refresh()` をしている |
+| `createFeatureController`（表示オプション）                                     | テーマそのもの                                                                             |
+| `<style id="around-style">`・CSS 変数・`data-around-theme`・`--around-strength` | テーマそのもの                                                                             |
 
 作品が `baseThemeId: null` のときは、もうテーマを使わない道ができている（`render()` の「Independent designs」の分岐）。撤去は、**すべての作品をこの道に通し、もう一方の分岐を消すこと**に当たる。新しい道は書かない。
 
@@ -106,16 +106,16 @@
 
 ### chrome.storage の設定
 
-| キー                                                                                        | 使い道                                  | 撤去後                                                                                         |
-| ------------------------------------------------------------------------------------------- | --------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `webWorldThemes.enabled`                                                                    | 「テーマを使う」。**拡張全体の ON/OFF** | 残す。作品の表示とエディターの入口を決める主スイッチ。名前と表示は変える（決めてもらうこと 2） |
-| `webWorldThemes.creatorMode`                                                                | 制作モード                              | 残す                                                                                           |
-| `webWorldThemes.strength`                                                                   | 強さ。**0% は OFF と同じ扱い**          | 読まなくする。ただし 0% の人の扱いが要る（下）                                                 |
-| `webWorldThemes.noiseStrength`                                                              | 粒子の強さ                              | 読まなくする                                                                                   |
-| `webWorldThemes.palette.{hue,saturation,brightness}`                                        | 自動配色                                | 読まなくする                                                                                   |
-| `webWorldThemes.features.<10項目>`                                                          | 表示オプション                          | 読まなくする                                                                                   |
-| `webWorldThemes.safety.emergencyOff`                                                        | 緊急OFF                                 | 変えない（`src/storage/safety.ts`。作品・Undo・バックアップから独立）                          |
-| `webWorldThemes.design.*`・`webWorldThemes.studio.*`・`webWorldThemes.settings.position.v1` | 作品・エディターの配置・設定の位置      | 変えない                                                                                       |
+| キー                                                                | 使い道                                  | 撤去後                                                                                         |
+| ------------------------------------------------------------------- | --------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `around.enabled`                                                    | 「テーマを使う」。**拡張全体の ON/OFF** | 残す。作品の表示とエディターの入口を決める主スイッチ。名前と表示は変える（決めてもらうこと 2） |
+| `around.creatorMode`                                                | 制作モード                              | 残す                                                                                           |
+| `around.strength`                                                   | 強さ。**0% は OFF と同じ扱い**          | 読まなくする。ただし 0% の人の扱いが要る（下）                                                 |
+| `around.noiseStrength`                                              | 粒子の強さ                              | 読まなくする                                                                                   |
+| `around.palette.{hue,saturation,brightness}`                        | 自動配色                                | 読まなくする                                                                                   |
+| `around.features.<10項目>`                                          | 表示オプション                          | 読まなくする                                                                                   |
+| `around.safety.emergencyOff`                                        | 緊急OFF                                 | 変えない（`src/storage/safety.ts`。作品・Undo・バックアップから独立）                          |
+| `around.design.*`・`around.studio.*`・`around.settings.position.v1` | 作品・エディターの配置・設定の位置      | 変えない                                                                                       |
 
 - 読まなくなったキーが残っていても、壊れない。`readSettings()` は決まったキーだけを読む。`watchSettings()` は知らないキーの変化を捨てる
 - 残ったキーを消すかどうかは、決めてもらうこと 4
@@ -125,7 +125,7 @@
   - 案：撤去の版で一度だけ、`strength === 0` なら `enabled = false` を書いてから `strength` を読まなくする（`chrome.runtime.onInstalled` の更新時）
   - 別の案：`strength` を「表示の ON/OFF」の一部として、読み続ける
 
-### バックアップの形式（`format: 'web-world-themes-backup', version: 1`）
+### バックアップの形式（`format: 'around-backup', version: 1`）
 
 - `settings` は `UserSettings` をそのまま持つ。`parseBackupSettings()` は、決まった項目以外があると**バックアップ全体を拒否**する（`backupObject()`）
 - そのため、`UserSettings` から項目を消すときに、検査の許可の一覧からも消すと、**撤去前に作ったバックアップがすべて復元できなくなる**
@@ -162,7 +162,7 @@
 
 ### G1 の計算・保護の範囲に入っているか
 
-- 入っていない。操作面は `youtube-operations.ts` が YouTube の本物の部品から毎回測る。窓の飾りのような自前の要素（`id` が `web-world-themes` で始まる）は、操作面からも、ページの変化からも、入力の照合からも除かれている（`operation-source.ts`・`operation-guard.ts`・`youtube.ts` の `owned`）
+- 入っていない。操作面は `youtube-operations.ts` が YouTube の本物の部品から毎回測る。窓の飾りのような自前の要素（`id` が `around` で始まる）は、操作面からも、ページの変化からも、入力の照合からも除かれている（`operation-source.ts`・`operation-guard.ts`・`youtube.ts` の `owned`）
 - G1 は、レトロテーマで動いたあとの位置をそのまま測る。撤去で位置が変わっても、測った結果が変わるだけで、判定の正しさは変わらない
 - `guardWanted()` の条件に `strength > 0` が入っている。`strength` をなくすなら、ここから外す（`enabled` だけにする）
 
@@ -203,7 +203,7 @@ G1.2（接近の判定がページ全体の効果を止める件）は、レト�
   1. 緊急OFF は、エディターを開けない状態（エディターが壊れた・開きたくない）でも押せる必要がある
   2. 制作モードが OFF の人は、拡張アイコンを押すとこの画面が出る。最初に ON にする場所がほかにない
   3. 動画の中のアイコンから開く欄は、エディターを開く前の入口になっている
-- ただし「表示設定」という名前は、見た目の設定が残らないので合わなくなる。「WWT」や「かんたん設定」などへの改名が考えられる（決めてもらうこと 5）
+- ただし「表示設定」という名前は、見た目の設定が残らないので合わなくなる。「Around」や「かんたん設定」などへの改名が考えられる（決めてもらうこと 5）
 - 欄が5つになるので、ポップアップの高さは今のおよそ3分の1になる
 
 ---
@@ -231,19 +231,19 @@ G1.2（接近の判定がページ全体の効果を止める件）は、レト�
 
 ### 書き直す（レトロテーマの部分を外し、残る機能を確かめ続ける）
 
-| spec                                                                                                      | 書き直す中身                                                                                                                                                                                                                                                     |
-| --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `extension.spec.ts`（16件）                                                                               | ON/OFF が既存のタブに届く・設定が再起動後も残る・他のサイトに触れない・保存の失敗・アイコン・全画面のエディター、は残す。窓の飾り・強さ 0%・シルバーの配色・表示オプションの件は消す。「ON/OFF で元の見た目に戻る」は、作品の CSS と層が消えることの確認に替える |
-| `features.spec.ts`（unit・17件）                                                                          | 設定の読み書き・合流・購読の解除・制作モード・保存の競合は残す（`enabled`・`creatorMode` で確かめ直す）。features の登録・配色・粒子の件は消す。**古いキーが残っていても読み込める**件と、**強さ 0% の移行**の件を足す                                           |
-| `backup-data.spec.ts`（unit）                                                                             | **撤去前のバックアップ（強さ・配色・表示オプション入り）が復元できる**件と、**不正な値の古い項目は今と同じく拒否する**件を足す                                                                                                                                   |
-| `creator-editor.spec.ts`                                                                                  | 「OFF と 0% で編集の UI が消える」から 0% を外す。「独立した作品にはレトロの CSS が付かない」「上書きを戻すとレトロに戻る」は、`'retro'` の作品と `null` の作品が同じに描かれることの確認に替える                                                                |
-| `native-surfaces.spec.ts`                                                                                 | 素の YouTube の読みやすさと、再生エラーの表示の件。追加したタイトルバーに関するものは消し、作品の層が操作部品を隠さない確認として残せるかを1件ずつ見る                                                                                                           |
-| `page-change.spec.ts`・`tests/helpers/page-change-runtime.ts`                                             | 「テーマの変数を書かない」「キャッシュした CSS を付け直す」「自前の飾りを付け直す」の件は消す。「ページの変化のたびに作品を作り直さない」の件は、テーマなしで残す                                                                                                |
-| `editor-entry.spec.ts`・`operation-safety.spec.ts`（緊急OFF）・`message-validation.spec.ts` ほか 23 本    | ON かどうかを `data-ww-theme="retro"` で確かめている（39 か所）。撤去後も残る ON の印（`data-ww-site`。接続中だけ付く）に替える。判定の中身は変えない                                                                                                            |
-| `editor-arrangement.spec.ts`                                                                              | 「エディターにレトロの部品がない」の確認。テーマがなくなるので、その項目を消す                                                                                                                                                                                   |
-| `design.spec.ts`                                                                                          | 「作品の CSS にレトロの文字が出ない」はそのまま残せる（撤去後も成り立つ）                                                                                                                                                                                        |
-| `asset-load-benchmark`・`asset-runtime-performance`・`tests/helpers/asset-runtime-lab.ts`                 | ON の印を替える（計測用のホストの `data-ww-theme` と合わせて）                                                                                                                                                                                                   |
-| `scroll-chrome` 以外で `fixtures/youtube.html` の `html[data-ww-theme][data-ww-window-chrome]` を使う箇所 | 模擬ページの1行（`.fixture-tools` の位置）を消す                                                                                                                                                                                                                 |
+| spec                                                                                                              | 書き直す中身                                                                                                                                                                                                                                                     |
+| ----------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `extension.spec.ts`（16件）                                                                                       | ON/OFF が既存のタブに届く・設定が再起動後も残る・他のサイトに触れない・保存の失敗・アイコン・全画面のエディター、は残す。窓の飾り・強さ 0%・シルバーの配色・表示オプションの件は消す。「ON/OFF で元の見た目に戻る」は、作品の CSS と層が消えることの確認に替える |
+| `features.spec.ts`（unit・17件）                                                                                  | 設定の読み書き・合流・購読の解除・制作モード・保存の競合は残す（`enabled`・`creatorMode` で確かめ直す）。features の登録・配色・粒子の件は消す。**古いキーが残っていても読み込める**件と、**強さ 0% の移行**の件を足す                                           |
+| `backup-data.spec.ts`（unit）                                                                                     | **撤去前のバックアップ（強さ・配色・表示オプション入り）が復元できる**件と、**不正な値の古い項目は今と同じく拒否する**件を足す                                                                                                                                   |
+| `creator-editor.spec.ts`                                                                                          | 「OFF と 0% で編集の UI が消える」から 0% を外す。「独立した作品にはレトロの CSS が付かない」「上書きを戻すとレトロに戻る」は、`'retro'` の作品と `null` の作品が同じに描かれることの確認に替える                                                                |
+| `native-surfaces.spec.ts`                                                                                         | 素の YouTube の読みやすさと、再生エラーの表示の件。追加したタイトルバーに関するものは消し、作品の層が操作部品を隠さない確認として残せるかを1件ずつ見る                                                                                                           |
+| `page-change.spec.ts`・`tests/helpers/page-change-runtime.ts`                                                     | 「テーマの変数を書かない」「キャッシュした CSS を付け直す」「自前の飾りを付け直す」の件は消す。「ページの変化のたびに作品を作り直さない」の件は、テーマなしで残す                                                                                                |
+| `editor-entry.spec.ts`・`operation-safety.spec.ts`（緊急OFF）・`message-validation.spec.ts` ほか 23 本            | ON かどうかを `data-around-theme="retro"` で確かめている（39 か所）。撤去後も残る ON の印（`data-around-site`。接続中だけ付く）に替える。判定の中身は変えない                                                                                                    |
+| `editor-arrangement.spec.ts`                                                                                      | 「エディターにレトロの部品がない」の確認。テーマがなくなるので、その項目を消す                                                                                                                                                                                   |
+| `design.spec.ts`                                                                                                  | 「作品の CSS にレトロの文字が出ない」はそのまま残せる（撤去後も成り立つ）                                                                                                                                                                                        |
+| `asset-load-benchmark`・`asset-runtime-performance`・`tests/helpers/asset-runtime-lab.ts`                         | ON の印を替える（計測用のホストの `data-around-theme` と合わせて）                                                                                                                                                                                               |
+| `scroll-chrome` 以外で `fixtures/youtube.html` の `html[data-around-theme][data-around-window-chrome]` を使う箇所 | 模擬ページの1行（`.fixture-tools` の位置）を消す                                                                                                                                                                                                                 |
 
 ### そのまま（`baseThemeId: 'retro'` を作品のデータとして使っているだけ）
 
@@ -290,7 +290,7 @@ G1.2（接近の判定がページ全体の効果を止める件）は、レト�
 
 撤去で壊しやすい箇所を、撤去の前に失敗しない形で固定する。
 
-- ON の印を `data-ww-theme` から `data-ww-site` へ替える（テスト 23 本と `asset-runtime-host.ts`）。`data-ww-site` は今も接続中だけ付くので、製品の挙動は変わらない
+- ON の印を `data-around-theme` から `data-around-site` へ替える（テスト 23 本と `asset-runtime-host.ts`）。`data-around-site` は今も接続中だけ付くので、製品の挙動は変わらない
 - `baseThemeId: 'retro'` と `null` の作品で、作品の CSS・層・G1 の操作面が同じになる e2e を足す（今は `'retro'` 側にテーマの CSS が乗るので、作品の部分だけを比べる）
 - 撤去前の版で作ったバックアップと設定の実物を fixture にする（`tests/fixtures/backups/`）。今の版で復元できる unit を足す
 - 計測の基準値を、表示オプションを全部 OFF にした状態でも取っておく（撤去後との比較用に、2組だけ）
@@ -306,7 +306,7 @@ G1.2（接近の判定がページ全体の効果を止める件）は、レト�
 - この回では、設定の項目（strength など）は型に残して読み続け、使わないだけにする。保存データの変更は3回目に分ける
 - 見た目：本物の YouTube で、ホーム・検索・動画ページ・全画面を撮って目で確かめる。素の YouTube と同じであること。作品の着せ替え・画像・モデルが今までどおり出ること
 - 性能：ページの上の処理を変えるので測る。1回目に取った基準と、撤去後を、本物の YouTube で交互に測る（起動直後・定常・SPA 遷移直後）。改善のはずだが、劣化していないことを合否にする
-- テスト：unit 全件 ＋ e2e 全件。実サイトは `WW_LIVE_YOUTUBE`・`WW_LIVE_CARD_PREVIEW`・G1 の実サイトの確認を1回ずつ
+- テスト：unit 全件 ＋ e2e 全件。実サイトは `AROUND_LIVE_YOUTUBE`・`AROUND_LIVE_CARD_PREVIEW`・G1 の実サイトの確認を1回ずつ
 
 ### 3回目：設定・保存・バックアップ
 
@@ -321,7 +321,7 @@ G1.2（接近の判定がページ全体の効果を止める件）は、レト�
 
 ### 4回目（必要なら）：仕上げ
 
-- 撤去で使われなくなった型・定数・CSS 変数（`--ww-native-*` など）の掃除
+- 撤去で使われなくなった型・定数・CSS 変数（`--around-native-*` など）の掃除
 - `docs/` の索引に、この撤去とタグを書き足す
 - テスト：unit 全件 ＋ 触った部分の e2e
 
@@ -346,7 +346,7 @@ G1.2（接近の判定がページ全体の効果を止める件）は、レト�
 
 1. **タグを付けるコミット**：今の先頭（`cddb3eb`、この文書の push 後ならその次）でよいか。タグは push してよいか
 2. **ON/OFF と強さ 0%**
-   - 「テーマを使う」は撤去後、拡張全体の ON/OFF になる。名前の案は「作品を表示する」「WWT を使う」。既定値は今の OFF のままでよいか
+   - 「テーマを使う」は撤去後、拡張全体の ON/OFF になる。名前の案は「作品を表示する」「Around を使う」。既定値は今の OFF のままでよいか
    - 強さ 0% で OFF にしていた人を、撤去の更新のときに一度だけ OFF へ移すか（推奨）、`strength` を読み続けるか
 3. **新しい作品の `baseThemeId`**：`null` で作るように変えるか（推奨。意味のない `'retro'` が増え続けないため）、`'retro'` のままにするか。どちらでも、既存の作品は書き換えない
 4. **読まなくなった保存キー**（強さ・粒子・配色・表示オプションの計 15 キー）：残すか（推奨。小さく、害がなく、戻すときに使える）、撤去の更新で消すか

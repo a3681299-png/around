@@ -12,10 +12,12 @@ import { unpackCheckpoint } from '../src/studio/checkpoint-codec';
 import { beginCanvasGesture } from './helpers/editor-workspace';
 
 async function setup() {
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-panel-test-')), true, { headed: true });
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-panel-test-')), true, {
+    headed: true,
+  });
   const manager = await context.newPage();
   await manager.goto('chrome://extensions/');
-  const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+  const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
   await item.waitFor();
   const id = await item.evaluate((node) => (node as HTMLElement & { data?: { id: string } }).data?.id ?? node.id);
   await manager.close();
@@ -25,7 +27,7 @@ async function setup() {
   await page.goto('https://www.youtube.com/watch?v=fixture');
   await showArtwork(popup);
   // UI0-d: `local` is where the retired in-page editors stood; nothing of the editor may appear there.
-  return { context, page, popup, id, local: page.locator('#web-world-themes-creator') };
+  return { context, page, popup, id, local: page.locator('#around-creator') };
 }
 
 const openFromIcon = openSidePanelFromIcon;
@@ -40,22 +42,20 @@ test('native Chrome panel uses the same draft, group masks, selection, history, 
     await panel.files(Array(3).fill(path.resolve('tests/fixtures/motion/petal.png')));
     await expect
       .poll(() =>
-        panel.evaluate(
-          'document.querySelector("#web-world-themes-creator").shadowRoot.querySelectorAll(".layer").length',
-        ),
+        panel.evaluate('document.querySelector("#around-creator").shadowRoot.querySelectorAll(".layer").length'),
       )
       .toBe(3);
     await panel.click('.select-all');
     await expect.poll(() => panel.text('.selected-count')).toBe('3個選択中');
     // The panel's tools replace the page's: no editor or toolbar is drawn over YouTube.
     await expect(local).toHaveCount(0);
-    await expect(page.locator('#web-world-themes-studio-layout')).toHaveCount(0);
+    await expect(page.locator('#around-studio-layout')).toHaveCount(0);
     await expect.poll(() => panel.evaluate('innerWidth')).toBeGreaterThan(250);
     await expect
       .poll(async () => {
         const values = await popup.evaluate(async () =>
           Object.entries(await chrome.storage.session.get(null))
-            .filter(([key]) => key.startsWith('webWorldThemes.studio.session.'))
+            .filter(([key]) => key.startsWith('around.studio.session.'))
             .map(([, value]) => value as unknown),
         );
         return values.some((value) => unpackCheckpoint(value)?.draft.decorations.length === 3);
@@ -66,23 +66,21 @@ test('native Chrome panel uses the same draft, group masks, selection, history, 
     const recoveryTarget = await panel.evaluate<number>('Number(new URL(location.href).searchParams.get("target"))');
     const recoveryValue: unknown = await popup.evaluate(
       async (target) =>
-        (await chrome.storage.session.get('webWorldThemes.studio.session.' + target))[
-          'webWorldThemes.studio.session.' + target
-        ],
+        (await chrome.storage.session.get('around.studio.session.' + target))['around.studio.session.' + target],
       recoveryTarget,
     );
     const assetId = unpackCheckpoint(recoveryValue)!.draft.decorations[0]!.assetId;
     const retained = await panel.evaluate<boolean>(`(async()=>{
       const target=Number(new URL(location.href).searchParams.get('target'));
       const id=${JSON.stringify(assetId)};
-      await chrome.runtime.sendMessage({type:'web-world-themes:assets',action:'lease',session:'session-studio-'+target+'-'+target,ownerTabId:target,ids:[]});
-      return (await chrome.runtime.sendMessage({type:'web-world-themes:assets',action:'get',id})).ok;
+      await chrome.runtime.sendMessage({type:'around:assets',action:'lease',session:'session-studio-'+target+'-'+target,ownerTabId:target,ids:[]});
+      return (await chrome.runtime.sendMessage({type:'around:assets',action:'get',id})).ok;
     })()`);
     expect(retained).toBe(true);
     await expect.poll(() => page.evaluate(() => innerWidth)).toBeLessThan(1200);
     const width = await page.evaluate(() => innerWidth);
     for (const rowId of await panel.evaluate<string[]>(
-      'Array.from(document.querySelector("#web-world-themes-creator").shadowRoot.querySelectorAll(".layer"),n=>n.dataset.layerId)',
+      'Array.from(document.querySelector("#around-creator").shadowRoot.querySelectorAll(".layer"),n=>n.dataset.layerId)',
     )) {
       await panel.click(`[data-layer-id="${rowId}"] [data-action="select"]`);
       await panel.fill('[data-image-prop="x"]', '70');
@@ -92,20 +90,17 @@ test('native Chrome panel uses the same draft, group masks, selection, history, 
     await expect
       .poll(() =>
         panel.evaluate(
-          'document.querySelector("#web-world-themes-creator").shadowRoot.querySelectorAll(".layer[data-kind=group]").length',
+          'document.querySelector("#around-creator").shadowRoot.querySelectorAll(".layer[data-kind=group]").length',
         ),
       )
       .toBe(1);
     await panel.click('[data-effect="enabled"]');
-    await expect(page.locator('#web-world-themes-decorations .group-content')).toHaveCSS(
-      'mask-image',
-      /radial-gradient/,
-    );
+    await expect(page.locator('#around-decorations .group-content')).toHaveCSS('mask-image', /radial-gradient/);
     await panel.screenshot('.work/verification/sidepanel-fixture.png');
     const groupX = await panel.evaluate(
-      'document.querySelector("#web-world-themes-creator").shadowRoot.querySelector("[data-image-prop=x]").value',
+      'document.querySelector("#around-creator").shadowRoot.querySelector("[data-image-prop=x]").value',
     );
-    const first = page.locator('#web-world-themes-decorations [data-image-id]').first();
+    const first = page.locator('#around-decorations [data-image-id]').first();
     const before = (await first.boundingBox())!;
     await beginCanvasGesture(first);
     await page.mouse.move(before.x + before.width / 2 + 30, before.y + before.height / 2 + 10, { steps: 6 });
@@ -114,7 +109,7 @@ test('native Chrome panel uses the same draft, group masks, selection, history, 
     await expect
       .poll(() =>
         panel.evaluate(
-          'document.querySelector("#web-world-themes-creator").shadowRoot.querySelector("[data-image-prop=x]").value',
+          'document.querySelector("#around-creator").shadowRoot.querySelector("[data-image-prop=x]").value',
         ),
       )
       .not.toBe(groupX);
@@ -132,18 +127,18 @@ test('native Chrome panel uses the same draft, group masks, selection, history, 
     await nativeWindow(panel.cdp, 1920);
     await expect.poll(() => page.evaluate(() => innerWidth)).toBeGreaterThan(width);
     const stored = await popup.evaluate(
-      async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
+      async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'],
     );
     expect((stored as { schemaVersion: number }).schemaVersion).toBe(18);
     await page.reload();
     await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
-    await expect(page.locator('#web-world-themes-decorations [data-image-id]')).toHaveCount(3);
+    await expect(page.locator('#around-decorations [data-image-id]')).toHaveCount(3);
     await panel.click('.studio-menu-item > summary');
     await panel.clickAndLeave('[data-source="close"]');
-    await expect(page.locator('[data-ww-editing]')).toHaveCount(0);
+    await expect(page.locator('[data-around-editing]')).toHaveCount(0);
     await expect(local).toHaveCount(0);
     await expect.poll(() => page.evaluate(() => innerWidth)).toBeGreaterThan(1750);
-    await expect(page.locator('#web-world-themes-studio-layout')).toHaveCount(0);
+    await expect(page.locator('#around-studio-layout')).toHaveCount(0);
   } finally {
     await context.close();
   }
@@ -161,7 +156,7 @@ test('side panel and standalone hand off unsaved Undo and asset leases, while ta
       const post = ServiceWorker.prototype.postMessage;
       ServiceWorker.prototype.postMessage = function(message, ...args) {
         const result = Reflect.apply(post, this, [message, ...args]);
-        if (message?.type === 'web-world-themes:studio-assets-v1')
+        if (message?.type === 'around:studio-assets-v1')
           __studioNativeTransfers.push(message.files.every(file => file.buffer.byteLength === 0));
         return result;
       };
@@ -175,9 +170,7 @@ test('side panel and standalone hand off unsaved Undo and asset leases, while ta
     await expect
       .poll(async () => ({
         retained: await popup.evaluate(async () =>
-          Object.keys(await chrome.storage.session.get(null)).some((key) =>
-            key.startsWith('webWorldThemes.studio.session.'),
-          ),
+          Object.keys(await chrome.storage.session.get(null)).some((key) => key.startsWith('around.studio.session.')),
         ),
         status: await panel.evaluate('document.querySelector(".recovery-status").textContent'),
         contexts: await panel.evaluate(
@@ -187,13 +180,13 @@ test('side panel and standalone hand off unsaved Undo and asset leases, while ta
       .toMatchObject({ retained: true, status: '' });
     await page.reload();
     await expect.poll(() => panel.text('.dirty')).toBe('未保存');
-    await expect(page.locator('#web-world-themes-decorations [data-image-id]')).toHaveCount(1);
+    await expect(page.locator('#around-decorations [data-image-id]')).toHaveCount(1);
     const opened = context.waitForEvent('page');
     await panel.clickAndLeave('[aria-label="別ウィンドウで開く"]');
     const standalone = await opened;
     await standalone.setViewportSize({ width: 1440, height: 900 });
     await expect(standalone.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
-    const shared = standalone.locator('#web-world-themes-creator');
+    const shared = standalone.locator('#around-creator');
     await expect(shared.locator('.dirty')).toHaveText('未保存');
     await shared.locator('.undo').click();
     await expect(shared.locator('[data-image-prop="rotationDeg"]')).toHaveValue('0');
@@ -209,17 +202,17 @@ test('side panel and standalone hand off unsaved Undo and asset leases, while ta
     await expect(local).toHaveCount(0);
     const value = (selector: string) =>
       next.evaluate<string>(
-        `document.querySelector("#web-world-themes-creator").shadowRoot.querySelector(${JSON.stringify(selector)}).value`,
+        `document.querySelector("#around-creator").shadowRoot.querySelector(${JSON.stringify(selector)}).value`,
       );
     await expect.poll(() => value('[data-image-prop="rotationDeg"]')).toBe('20');
     await next.click('.undo');
     await expect.poll(() => value('[data-image-prop="rotationDeg"]')).toBe('0');
     await next.click('.discard');
-    await expect(page.locator('#web-world-themes-decorations [data-image-id]')).toHaveCount(0);
+    await expect(page.locator('#around-decorations [data-image-id]')).toHaveCount(0);
     await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
-    await expect(page.locator('[data-ww-editing]')).toHaveCount(0);
+    await expect(page.locator('[data-around-editing]')).toHaveCount(0);
     await expect(local).toHaveCount(0);
-    await expect(page.locator('#web-world-themes-decorations')).toHaveCount(0);
+    await expect(page.locator('#around-decorations')).toHaveCount(0);
   } finally {
     await context.close();
   }
@@ -244,10 +237,10 @@ test('tab-specific panels isolate drafts and recovery; a closed panel leaves no 
     // The native panel may already be visible on a newly enabled YouTube tab.
     // Open that tab directly, rather than racing an unrelated legacy close/open.
     await popup.evaluate(async (tabId) => {
-      const result = await chrome.runtime.sendMessage({ type: 'web-world-themes:open-side-panel', tabId });
+      const result = await chrome.runtime.sendMessage({ type: 'around:open-side-panel', tabId });
       if (!result?.ok) throw new Error(result?.error ?? 'Native panel did not open.');
     }, target);
-    const secondLocal = secondPage.locator('#web-world-themes-creator');
+    const secondLocal = secondPage.locator('#around-creator');
     const second = await sidePanelDriver(context, secondPage, id, target);
     await expect.poll(() => second.text('.dirty')).toBe('保存済み');
     await second.files([path.resolve('tests/fixtures/motion/petal.png')]);
@@ -258,7 +251,7 @@ test('tab-specific panels isolate drafts and recovery; a closed panel leaves no 
         popup.evaluate(
           async () =>
             Object.keys(await chrome.storage.session.get(null)).filter((key) =>
-              key.startsWith('webWorldThemes.studio.session.'),
+              key.startsWith('around.studio.session.'),
             ).length,
         ),
       )
@@ -276,9 +269,9 @@ test('tab-specific panels isolate drafts and recovery; a closed panel leaves no 
       await chrome.sidePanel.setOptions({ tabId, enabled: true });
     }, target);
     await expect(secondLocal).toHaveCount(0);
-    await expect(secondPage.locator('[data-ww-editing]')).toHaveCount(0);
+    await expect(secondPage.locator('[data-around-editing]')).toHaveCount(0);
     await popup.evaluate(async (tabId) => {
-      const result = await chrome.runtime.sendMessage({ type: 'web-world-themes:open-side-panel', tabId });
+      const result = await chrome.runtime.sendMessage({ type: 'around:open-side-panel', tabId });
       if (!result?.ok) throw new Error(result?.error ?? 'Native panel did not open.');
     }, target);
     const reopened = await sidePanelDriver(context, secondPage, id, target);
@@ -286,8 +279,8 @@ test('tab-specific panels isolate drafts and recovery; a closed panel leaves no 
     await expect.poll(() => reopened.text('.layer-title')).toBe('次のタブ');
     await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
     for (const targetPage of [page, secondPage]) {
-      await expect(targetPage.locator('[data-ww-editing]')).toHaveCount(0);
-      await expect(targetPage.locator('#web-world-themes-decorations')).toHaveCount(0);
+      await expect(targetPage.locator('[data-around-editing]')).toHaveCount(0);
+      await expect(targetPage.locator('#around-decorations')).toHaveCount(0);
     }
   } finally {
     await context.close();
@@ -303,12 +296,12 @@ test('in fullscreen the panel closes itself with its own button (the toolbar is 
       async () => (await chrome.tabs.query({ active: true, currentWindow: true }))[0]!.id!,
     );
     await popup.evaluate(async (tabId) => {
-      const result = await chrome.runtime.sendMessage({ type: 'web-world-themes:open-side-panel', tabId });
+      const result = await chrome.runtime.sendMessage({ type: 'around:open-side-panel', tabId });
       if (!result?.ok) throw new Error(result?.error ?? 'Native panel did not open.');
     }, target);
     const panel = await sidePanelDriver(context, page, id, target);
     await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
-    await expect(page.locator('[data-ww-editing]')).toHaveCount(1);
+    await expect(page.locator('[data-around-editing]')).toHaveCount(1);
     // The player goes fullscreen (its own button: a real gesture), and Chrome's toolbar with it.
     await page.locator('#movie_player [aria-label="Fullscreen"]').click();
     await expect.poll(() => page.evaluate(() => Boolean(document.fullscreenElement))).toBe(true);
@@ -325,7 +318,7 @@ test('in fullscreen the panel closes itself with its own button (the toolbar is 
     await panel.screenshot('.work/verification/side-panel-close-button.png');
     await panel.evaluate('setTimeout(() => document.querySelector(".close-panel").click(), 50); true');
     // The panel is gone (its page and the page's editing with it); the draft is kept as with the toolbar.
-    await expect(page.locator('[data-ww-editing]')).toHaveCount(0);
+    await expect(page.locator('[data-around-editing]')).toHaveCount(0);
     const cdp = await context.newCDPSession(page);
     await expect
       .poll(async () =>
@@ -380,9 +373,9 @@ test('panel tools replace floating tools; the tabbed column and empty controls s
     // The panel's tools replace the page's: no editor surface is shown over YouTube, and the
     // 「別ウィンドウで編集中」 badge is for the window only.
     await expect(local).not.toBeVisible();
-    await expect(page.locator('#web-world-themes-studio-link')).toHaveCount(0);
-    await expect(page.locator('#web-world-themes-studio-layout')).toHaveCount(0);
-    const ui = 'document.querySelector("#web-world-themes-creator").shadowRoot';
+    await expect(page.locator('#around-studio-link')).toHaveCount(0);
+    await expect(page.locator('#around-studio-layout')).toHaveCount(0);
+    const ui = 'document.querySelector("#around-creator").shadowRoot';
     const key = async (keyName: string, code: string, keyCode: number, modifiers = 0) => {
       for (const type of ['rawKeyDown', 'keyUp'])
         await panel.send('Input.dispatchKeyEvent', {
@@ -419,10 +412,10 @@ test('panel tools replace floating tools; the tabbed column and empty controls s
       const rect=s=>{const r=root.querySelector(s).getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom}};
       const slider=root.querySelector('[data-image-prop=opacity]');
       const toolButtons=Array.from(root.querySelector('main > .toolbar').querySelectorAll('button, summary')).filter(n=>n.checkVisibility()).map(n=>n.getBoundingClientRect());
-      const headerItems=[...Array.from(root.querySelectorAll('.studio-menu summary, .studio-menu .menu-end button')),...Array.from(document.querySelectorAll('.ww-editor-safety > button, .ww-editor-safety summary'))].filter(n=>n.checkVisibility()).map(n=>n.getBoundingClientRect());
+      const headerItems=[...Array.from(root.querySelectorAll('.studio-menu summary, .studio-menu .menu-end button')),...Array.from(document.querySelectorAll('.around-editor-safety > button, .around-editor-safety summary'))].filter(n=>n.checkVisibility()).map(n=>n.getBoundingClientRect());
       // Rows by centre line: items of 28 and 32px on one line share their middle.
       const rows=rects=>new Set(rects.map(r=>Math.round((r.top+r.height/2)/16))).size;
-      const off=document.querySelector('.ww-editor-safety > .emergency-off');
+      const off=document.querySelector('.around-editor-safety > .emergency-off');
       const lines=[root.querySelector('footer .status'),document.querySelector('.connection-status')].filter(n=>n&&n.textContent);
       const tipButton=root.querySelector('footer .status-tip');
       const statusLine={cut:lines.filter(n=>!n.hasAttribute('data-tip')&&n.scrollWidth>n.clientWidth+1).map(n=>n.textContent),tipped:lines.filter(n=>n.hasAttribute('data-tip')).map(n=>n.textContent.trim()),tip:tipButton&&!tipButton.hidden?tipButton.title:''};
@@ -464,7 +457,7 @@ test('panel tools replace floating tools; the tabbed column and empty controls s
       expect(info.tools.rows, JSON.stringify({ width, info })).toBe(1);
       expect(info.header.rows, JSON.stringify({ width, info })).toBe(1);
       expect(info.header.emergency).toBe(true);
-      expect(await panel.evaluate('document.querySelectorAll(".ww-safety-controls").length')).toBe(0);
+      expect(await panel.evaluate('document.querySelectorAll(".around-safety-controls").length')).toBe(0);
       // No status line is cut: one that does not fit is in the ⓘ tooltip, word for word.
       expect(info.statusLine.cut).toEqual([]);
       for (const text of info.statusLine.tipped) expect(info.statusLine.tip).toContain(text);
@@ -533,18 +526,18 @@ test('panel tools replace floating tools; the tabbed column and empty controls s
     expect(restricted.header.rows).toBe(1);
     expect(restricted.statusLine.cut).toEqual([]);
     await expect
-      .poll(() => panel.evaluate('document.querySelector(".ww-editor-safety .safety-check").hidden'))
+      .poll(() => panel.evaluate('document.querySelector(".around-editor-safety .safety-check").hidden'))
       .toBe(false);
-    await panel.evaluate('document.querySelector(".ww-editor-safety .safety-check > summary").click()');
+    await panel.evaluate('document.querySelector(".around-editor-safety .safety-check > summary").click()');
     await expect
       .poll(() =>
         panel.evaluate(
-          'Boolean(document.querySelector(".ww-editor-safety .safety-popover input[type=checkbox]").getClientRects().length)',
+          'Boolean(document.querySelector(".around-editor-safety .safety-popover input[type=checkbox]").getClientRects().length)',
         ),
       )
       .toBe(true);
     await panel.screenshot('.work/verification/sidepanel-ux-safety-open.png');
-    await panel.evaluate('document.querySelector(".ww-editor-safety .safety-check").open = false');
+    await panel.evaluate('document.querySelector(".around-editor-safety .safety-check").open = false');
     // Ctrl+Z goes back exactly one step wherever the focus is: in the panel, then on the page.
     for (const focus of ['panel', 'page'] as const) {
       await panel.fill('[data-image-prop="opacity"]', '40');
@@ -565,9 +558,7 @@ test('panel tools replace floating tools; the tabbed column and empty controls s
       .poll(async () => {
         const value: unknown = await popup.evaluate(
           async (tabId) =>
-            (await chrome.storage.session.get('webWorldThemes.studio.session.' + tabId))[
-              'webWorldThemes.studio.session.' + tabId
-            ],
+            (await chrome.storage.session.get('around.studio.session.' + tabId))['around.studio.session.' + tabId],
           target,
         );
         return unpackCheckpoint(value)?.draft.decorations[0]?.opacity;
@@ -621,7 +612,7 @@ test('the official panel edits scroll keyframes through the shared Core and reta
     await expect
       .poll(() =>
         panel.evaluate(
-          'document.querySelector("#web-world-themes-creator").shadowRoot.querySelector(".timeline-key-value").value',
+          'document.querySelector("#around-creator").shadowRoot.querySelector(".timeline-key-value").value',
         ),
       )
       .toBe('70');
@@ -629,14 +620,14 @@ test('the official panel edits scroll keyframes through the shared Core and reta
     await expect
       .poll(() =>
         panel.evaluate(
-          'document.querySelector("#web-world-themes-creator").shadowRoot.querySelector(".timeline-key-value").value',
+          'document.querySelector("#around-creator").shadowRoot.querySelector(".timeline-key-value").value',
         ),
       )
       .toBe('100');
     await panel.click('.redo');
     // Preview a point on the timeline, then return to the live page: the layer follows the page's
     // own scroll again at once, even when the page does not scroll afterwards.
-    const ui = 'document.querySelector("#web-world-themes-creator").shadowRoot';
+    const ui = 'document.querySelector("#around-creator").shadowRoot';
     const head = await panel.evaluate<{ x: number; y: number }>(
       `(()=>{const r=${ui}.querySelector('.timeline-canvas').getBoundingClientRect();return {x:r.left+28+(r.width-44)*.5,y:r.top+55}})()`,
     );
@@ -651,13 +642,13 @@ test('the official panel edits scroll keyframes through the shared Core and reta
     await panel.screenshot('.work/verification/signal-stage2-sidepanel.png');
     const saved = await popup.evaluate(
       async () =>
-        (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'] as {
+        (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'] as {
           signalRules: { keyframes: { input: number; value: number }[] }[];
         },
     );
     expect(saved.signalRules[0]!.keyframes[1]!.value).toBe(0.7);
     const keys = saved.signalRules[0]!.keyframes;
-    const media = page.locator('#web-world-themes-decorations .media');
+    const media = page.locator('#around-decorations .media');
     await expect
       .poll(() =>
         media.evaluate((node: HTMLElement, keys) => {
@@ -690,7 +681,7 @@ test('timeline keeps layer controls reachable in narrow and wide native panels',
     await expect
       .poll(() =>
         panel.evaluate(
-          'document.querySelector("#web-world-themes-creator").shadowRoot.querySelector(".timeline-connect").disabled',
+          'document.querySelector("#around-creator").shadowRoot.querySelector(".timeline-connect").disabled',
         ),
       )
       .toBe(false);
@@ -709,12 +700,10 @@ test('timeline keeps layer controls reachable in narrow and wide native panels',
       // Wait for the responsive layout before measuring the real pointer target. (UI0-d: below 720px
       // the side panel's arrangement, above it the window's; the editor is rebuilt between them.)
       await expect
-        .poll(() =>
-          panel.evaluate('document.querySelector("#web-world-themes-creator")?.hasAttribute("data-sidepanel")'),
-        )
+        .poll(() => panel.evaluate('document.querySelector("#around-creator")?.hasAttribute("data-sidepanel")'))
         .toBe(!wide);
       if (!wide) await panel.click('[data-area="layers"]');
-      const ui = 'document.querySelector("#web-world-themes-creator").shadowRoot';
+      const ui = 'document.querySelector("#around-creator").shadowRoot';
       const rowHeight = await panel.evaluate<number>(
         `Math.ceil(${ui}.querySelector('.layer').getBoundingClientRect().height)`,
       );
@@ -771,11 +760,11 @@ test('official panel records raw signals, plays/seeks without live input, and re
     await panel.click('.save');
     await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
     await panel.click('.take-record');
-    const ui = 'document.querySelector("#web-world-themes-creator").shadowRoot';
+    const ui = 'document.querySelector("#around-creator").shadowRoot';
     await expect
       .poll(() =>
         panel.evaluate(
-          'document.querySelector("#web-world-themes-creator").shadowRoot.querySelector(".signal-timeline").hasAttribute("data-recording")',
+          'document.querySelector("#around-creator").shadowRoot.querySelector(".signal-timeline").hasAttribute("data-recording")',
         ),
       )
       .toBe(true);
@@ -792,11 +781,11 @@ test('official panel records raw signals, plays/seeks without live input, and re
     await panel.click('.take-store');
     await expect.poll(() => panel.text('.take-saved')).toBe('テイク保存済み');
     const library = await panel.evaluate<{ id: string }[]>(
-      'chrome.runtime.sendMessage({type:"web-world-themes:signal-takes",action:"list",siteId:"youtube"}).then(r=>r.value)',
+      'chrome.runtime.sendMessage({type:"around:signal-takes",action:"list",siteId:"youtube"}).then(r=>r.value)',
     );
     expect(library).toHaveLength(1);
     const take = await panel.evaluate<SignalTake>(
-      `chrome.runtime.sendMessage({type:"web-world-themes:signal-takes",action:"get",siteId:"youtube",id:${JSON.stringify(library[0]!.id)}}).then(r=>r.value)`,
+      `chrome.runtime.sendMessage({type:"around:signal-takes",action:"get",siteId:"youtube",id:${JSON.stringify(library[0]!.id)}}).then(r=>r.value)`,
     );
     expect(take.inputs.length).toBeGreaterThan(5);
     expect(take.inputs.every((input) => input.signals.scroll && input.viewport.width > 0)).toBe(true);
@@ -804,10 +793,7 @@ test('official panel records raw signals, plays/seeks without live input, and re
       /PRIVATE_TIMELINE_FORM_SECRET|asset-|decorations|signalRules|https?:|cookie|authorization/,
     );
     const design = await popup.evaluate(
-      async () =>
-        (await chrome.storage.local.get('webWorldThemes.design.youtube'))[
-          'webWorldThemes.design.youtube'
-        ] as DesignDocument,
+      async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'] as DesignDocument,
     );
     expect(design).not.toHaveProperty('takes');
     // End the real native text edit before checking an unrestricted playback
@@ -821,9 +807,9 @@ test('official panel records raw signals, plays/seeks without live input, and re
     await expect
       .poll(() =>
         page
-          .locator('#web-world-themes-decorations')
+          .locator('#around-decorations')
           .evaluate((host: HTMLElement) =>
-            JSON.parse(host.dataset.wwSafety!).issues.some(
+            JSON.parse(host.dataset.aroundSafety!).issues.some(
               (i: { surfaceId: string }) => i.surfaceId === 'native.approach',
             ),
           ),
@@ -850,7 +836,7 @@ test('official panel records raw signals, plays/seeks without live input, and re
     const position = sample.timeMs - take.inputs[0]!.timeMs,
       expected = createTakeSampler(design, take).at(position).frame.layout.layers[0]!.layer.opacity;
     await panel.fill('.take-position', String(position / 1000));
-    const media = page.locator('#web-world-themes-decorations .media');
+    const media = page.locator('#around-decorations .media');
     await expect.poll(() => media.evaluate((node: HTMLElement) => Number(node.style.opacity))).toBeCloseTo(expected, 5);
     await page.evaluate(() => scrollTo(0, 0));
     await page.waitForTimeout(80);
@@ -875,7 +861,7 @@ test('official panel records raw signals, plays/seeks without live input, and re
     await expect.poll(() => panel.text('.take-source')).toBe('PREVIEW');
     await panel.click('.take-live');
     await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
-    await expect(page.locator('#web-world-themes-decorations')).toHaveCount(0);
+    await expect(page.locator('#around-decorations')).toHaveCount(0);
   } finally {
     await context.close();
   }
@@ -889,14 +875,14 @@ test('the official panel dresses UI parts: page part list, picking on the page a
     const panel = await sidePanelDriver(context, page, id);
     await expect.poll(() => panel.text('.dirty')).toBe('保存済み');
     await panel.click('[data-tool="skin"]');
-    await expect(page.locator('html')).toHaveAttribute('data-ww-skin-picking', '');
+    await expect(page.locator('html')).toHaveAttribute('data-around-skin-picking', '');
     // The page measures its parts and the panel lists them.
     await expect.poll(() => panel.text('.skin-part[data-target="video-card"] .state')).toMatch(/^[0-9]+個$/);
-    const card = page.locator('[data-ww-surface~="video-card"]').first();
+    const card = page.locator('[data-around-surface~="video-card"]').first();
     await card.hover();
-    await expect(page.locator('#web-world-themes-skin-hover')).toContainText('動画カード');
+    await expect(page.locator('#around-skin-hover')).toContainText('動画カード');
     await card.locator('a').first().click();
-    await expect(page.locator('html')).toHaveAttribute('data-ww-skin-selected', 'video-card');
+    await expect(page.locator('html')).toHaveAttribute('data-around-skin-selected', 'video-card');
     await expect.poll(() => panel.text('.skin-name')).toBe('動画カード');
     // The side panel's upload is leased to its tab only after the background finds the real panel.
     await panel.files([path.resolve('tests/fixtures/skins/frame-light.png')], '.skin-file');
@@ -904,7 +890,7 @@ test('the official panel dresses UI parts: page part list, picking on the page a
     await expect
       .poll(() =>
         panel.evaluate<number>(
-          'document.querySelector("#web-world-themes-creator").shadowRoot.querySelector(".slice-image").naturalWidth',
+          'document.querySelector("#around-creator").shadowRoot.querySelector(".slice-image").naturalWidth',
         ),
       )
       .toBe(96);

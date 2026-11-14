@@ -26,7 +26,7 @@ export function createSignalTimeline(
   const root = doc.createElement('section');
   root.className = 'signal-timeline';
   root.setAttribute('aria-label', 'Signal Timeline');
-  root.setAttribute('data-ww-timeline-control', '');
+  root.setAttribute('data-around-timeline-control', '');
   root.innerHTML = `<div class="timeline-resize" tabindex="0" role="separator" aria-label="タイムラインの高さ" aria-orientation="horizontal" aria-valuemin="240" aria-valuemax="480"></div>
     <div class="timeline-heading"><button type="button" class="timeline-toggle" aria-expanded="false">▸ Signal Timeline</button><span class="timeline-connection">スクロール ↔ 不透明度</span><span class="timeline-selection"></span></div>
     <div class="timeline-body" hidden><div class="timeline-routing"><label>対象<select class="timeline-property" aria-label="キーの対象プロパティ"><option value="opacity">不透明度</option><option value="position.x">X 位置</option><option value="position.y">Y 位置</option><option value="rotation">回転</option></select></label><label>入力<select class="timeline-driver" aria-label="駆動元シグナル"></select></label></div><div class="timeline-lane"><button type="button" class="timeline-connect">スクロールに接続</button><label class="timeline-enabled"><input type="checkbox" aria-label="スクロールルールを有効化">接続</label><span class="timeline-source">ページ Y / 往復</span><button type="button" class="timeline-remove"></button></div>
@@ -93,7 +93,7 @@ export function createSignalTimeline(
     | { pointer: number; id: string; x: number; y: number; key: SignalKeyframe; rule: SignalRule; moved: boolean }
     | undefined;
   let sizeGesture: { pointer: number; y: number; height: number } | undefined;
-  const preferenceKey = 'webWorldThemes.studio.timeline.v1';
+  const preferenceKey = 'around.studio.timeline.v1';
   const persist = () => {
     saveTimer = undefined;
     void preferences.write(preferenceKey, { open, height, zoom }).catch(() => undefined);

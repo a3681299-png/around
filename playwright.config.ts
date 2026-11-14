@@ -109,7 +109,7 @@ const g1Specs = [
 export default defineConfig<object, { layering: boolean | undefined }>({
   testDir: './tests',
   outputDir: './.work/test-results',
-  // Removes `%TEMP%\ww-*` profiles left by tests that ended without closing their browser.
+  // Removes `%TEMP%\around-*` profiles left by tests that ended without closing their browser.
   globalSetup: './tests/temporary-profiles.ts',
   fullyParallel: false,
   workers: 4,
@@ -129,7 +129,7 @@ export default defineConfig<object, { layering: boolean | undefined }>({
       use: { trace: 'retain-on-failure', screenshot: 'only-on-failure' },
     },
     // The G1 specs again, with the player's character kept clear of the controls the other way
-    // (docs/layering-plan.md): the earlier cut-out way, a WW_LAYERING=0 development build
+    // (docs/layering-plan.md): the earlier cut-out way, a AROUND_LAYERING=0 development build
     // (tests/helpers/layering-build.ts). It stays as the way out where a part cannot be proven, so
     // both ways must keep every control visible and reachable; a failure here is the product's.
     // `npm run test:e2e` runs both projects with --workers=1: a project's own `workers` does not

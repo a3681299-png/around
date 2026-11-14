@@ -4,13 +4,13 @@
 
 ## 1. 作品の目的
 
-WWT をもとにした、コンテスト用の**独立した Web 作品**。3D の部屋で生活するキャラクターが、Web 上に現れた UI を認識し、近づき、触れ、ユーザーの操作に感情的な反応を返す。
+Around をもとにした、コンテスト用の**独立した Web 作品**。3D の部屋で生活するキャラクターが、Web 上に現れた UI を認識し、近づき、触れ、ユーザーの操作に感情的な反応を返す。
 
 最初の到達目標は、次の一連の動きが通ること。
 
 > 部屋で生活 → UI が出現 → 気づいて接近 → クリックで喜ぶ → UI を閉じると生活に戻る
 
-- **今回の対象外**：Chrome 拡張、YouTube 対応、汎用エディター。WWT 本体（拡張・`dist`・Playground）は壊さない
+- **今回の対象外**：Chrome 拡張、YouTube 対応、汎用エディター。Around 本体（拡張・`dist`・Playground）は壊さない
 - 過剰設計と新しい汎用基盤は避ける。美術の品質が機能の数より先（Parallax City の反省：簡素な物の大量の組み合わせでは目標の品質に届かなかった）
 
 ## 2. 前版の部屋（2026-11-11）
@@ -32,7 +32,7 @@ WWT をもとにした、コンテスト用の**独立した Web 作品**。3D �
 - 座る：`marker_sit_chair`・`_bed`・`_beanbag`・`_cushion`。隠れる：`marker_hide_beanbag`・`_chair`・`_dresser`。立つ：`marker_stand_window`・`_shelf`・`_center`・`_front`・`_guitar`（合計 12 か所）
 - 目印の向きは glTF の +Z（Blender では物の -Y）。`readLayout`（`src/renderers/three/room-layout.ts`）がそのまま読む
 - 画面は `dyn_monitor_screen`・`dyn_monitor2_screen` の別メッシュ。あとで本物の UI を映せる
-- 12 か所すべてが歩ける床の上にあり、中央から歩いて届くことを、ページのテスト用の入口 `__wwLivingRoom.reach()` で確かめた。席から次の席へ向かう経路の残りは [living-room-realism.md](living-room-realism.md) に記録した
+- 12 か所すべてが歩ける床の上にあり、中央から歩いて届くことを、ページのテスト用の入口 `__aroundLivingRoom.reach()` で確かめた。席から次の席へ向かう経路の残りは [living-room-realism.md](living-room-realism.md) に記録した
 
 ## 3. キャラクターの設計
 
@@ -66,10 +66,10 @@ WWT をもとにした、コンテスト用の**独立した Web 作品**。3D �
 
 ### 使うキャラクター
 
-| 候補     | 状態                                                                                                                                                                                                                              |
-| -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ミルド   | VRM（`C:\wwt-private\mirdo\work\mirdo-1024.vrm`）と、判定に通った .vrma 16 本（`C:\wwt-private\mirdo\motions-pass`）がある。規約は翔太が確認済み。WWT の既存の経路（ハッシュ承認）で載せられる。記録は `docs/characters/mirdo.md` |
-| フェリス | `C:\wwt-private\Felis_v0.8.1\FBX\Felis.fbx`・`Felis_Android.fbx`（両 PC にある、未追跡）。VRM への変換と動作の割り当てが要る。**利用条件の記録がなく、規約を確認できていない**（下の「7. 保留」）                                 |
+| 候補     | 状態                                                                                                                                                                                                                                 |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ミルド   | VRM（`C:\wwt-private\mirdo\work\mirdo-1024.vrm`）と、判定に通った .vrma 16 本（`C:\wwt-private\mirdo\motions-pass`）がある。規約は翔太が確認済み。Around の既存の経路（ハッシュ承認）で載せられる。記録は `docs/characters/mirdo.md` |
+| フェリス | `C:\wwt-private\Felis_v0.8.1\FBX\Felis.fbx`・`Felis_Android.fbx`（両 PC にある、未追跡）。VRM への変換と動作の割り当てが要る。**利用条件の記録がなく、規約を確認できていない**（下の「7. 保留」）                                    |
 
 ## 4. 使用素材
 
@@ -78,7 +78,7 @@ WWT をもとにした、コンテスト用の**独立した Web 作品**。3D �
 | 部屋のすべての造形・材質           | `scripts/living-room/` のスクリプトで作った自作。外部の 3D 素材・写真・テクスチャは使っていない | 入る（`room.glb`）                       |
 | three.js 0.186.1                   | MIT（`assets/licenses/three-MIT.txt`）                                                          | 入る                                     |
 | 部屋の古い検証用の机・椅子・ランプ | 翔太の Tripo の物（`C:\wwt-private\room\source`）。今の部屋では使っていない                     | 入れない                                 |
-| ミルド、Quaternius の動作          | 私用の素材リポジトリ `wwt-private-assets`（LFS）。WWT 本体には入れない                          | 入れない（公開に載せる経路は別に決める） |
+| ミルド、Quaternius の動作          | 私用の素材リポジトリ `wwt-private-assets`（LFS）。Around 本体には入れない                       | 入れない（公開に載せる経路は別に決める） |
 | フェリス                           | 上のとおり、規約が未確認                                                                        | 確認できるまで入れない                   |
 
 `art/living-room/living-room.blend` からは、確認のために読み込んだ古い部屋のテクスチャを取り除いて保存した（別の Blender で開いて画像が空であることを確かめた）。
@@ -100,7 +100,7 @@ npm ci
 部屋のページを作って見る：
 
 ```bash
-WW_LIVING_TEST=1 WW_LIVING_OUT=.work/living-room-preview node scripts/build-living-room.mjs
+AROUND_LIVING_TEST=1 AROUND_LIVING_OUT=.work/living-room-preview node scripts/build-living-room.mjs
 node scripts/playground/serve.mjs .work/living-room-preview 4181     # http://127.0.0.1:4181/
 ```
 
@@ -114,10 +114,10 @@ node scripts/living-room/capture.mjs art/living-room/renders/web_new.png
 
 ```bash
 # 作るだけ（焼かない）
-WW_SKIP_BAKE=1 WW_SAVE=.work/room-test.blend WW_RENDER=.work/room-test.png \
+AROUND_SKIP_BAKE=1 AROUND_SAVE=.work/room-test.blend AROUND_RENDER=.work/room-test.png \
   "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" -b --python scripts/living-room/run_all.py
 # 焼いて GLB まで（コミットした部屋と同じ画質）
-WW_LM_SIZE=4096 WW_SAMPLES=128 WW_VC_SAMPLES=128 WW_OUT=art/living-room/web \
+AROUND_LM_SIZE=4096 AROUND_SAMPLES=128 AROUND_VC_SAMPLES=128 AROUND_OUT=art/living-room/web \
   "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" -b --python scripts/living-room/run_all.py
 ```
 
@@ -127,7 +127,7 @@ WW_LM_SIZE=4096 WW_SAMPLES=128 WW_VC_SAMPLES=128 WW_OUT=art/living-room/web \
 
 | 判断                                                                                                      | 理由                                                                                                   |
 | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| 拡張・作品データ・Playground の描画に載せず、独立したページにした                                         | 今回の対象外が多く、WWT 本体を壊さないため。共有したのは部屋の読み取り（`readLayout`）だけ             |
+| 拡張・作品データ・Playground の描画に載せず、独立したページにした                                         | 今回の対象外が多く、Around 本体を壊さないため。共有したのは部屋の読み取り（`readLayout`）だけ          |
 | 色と光は Cycles で別々に焼き、ノイズ除去後に合成。`bakedColor: true` の Web の色＝焼いた色 × `lightScale` | 木目を保って光の粒を除く。指定のない旧データは従来の材質の色 × 焼いた光のまま                          |
 | 光る物（名前が `dyn_`）は焼かず自分の色で描き、ブルームをかける                                           | 画面・電球・ネオンがにじむ。焼くときは小さな光源のメッシュを外し、代わりの光（`60_lights.py`）で照らす |
 | 部屋の既存の描画（`renderers/three/room.ts`）は使わなかった                                               | ライトマップを 1024 に縮め、作品データと結び付いている                                                 |
@@ -141,7 +141,7 @@ WW_LM_SIZE=4096 WW_SAMPLES=128 WW_VC_SAMPLES=128 WW_OUT=art/living-room/web \
 - 現行の美術は、2026-11-11 に届いた窓際の制作机の参考画像をもとに作り直した。窓の外、布の輪郭、床や陶器の反射など、残りは [living-room-realism.md](living-room-realism.md) にまとめた
 - `room.glb` は未圧縮で 14.54MB。短い実 GPU の参考計測は記録済み。公開前の圧縮とノート PC での確認は残る
 - 縦長 430×900 の実画面は確認済み。部屋は収まるが細部は小さくなる。専用ページの身体 e2e は `tests/living-room-body-live.spec.ts` がある（ローカル素材が要る）
-- **フェリスの保存（2026-11-12 に一部解決）**：翔太の指示で、変換した VRM と動作だけを `wwt-private-assets` に入れた（購入元の配布物は入れていない）。公開ビルドと WWT 本体に入れない扱いは変わらない。以下は当時の記録。両 PC の `C:\wwt-private\Felis_v0.8.1\`（約 82MB、FBX 2・unitypackage・PSD・案内のリンク）は `wwt-private-assets` の `git status` で未追跡のまま。フォルダに**規約の文書がなく**（`.url` のリンクだけ）、`wwt-private-assets` は「入れるのはミルドと Quaternius だけ」という翔太の決定（`.gitignore` のコメント、2026-11-07）なので、**保存してよいと確認できないため入れていない**。進めるには、(1) 購入元の規約で、私用のリポジトリへの保存・変換・公開物への使い方を確認、(2) 翔太が `wwt-private-assets` に入れると決める、(3) `.gitignore` に例外を足して `git add`（LFS の指定は `.fbx`・`.unitypackage` にすでにある）、の順。デスクトップで続けるときは、まず (1) の確認を取る
+- **フェリスの保存（2026-11-12 に一部解決）**：翔太の指示で、変換した VRM と動作だけを `wwt-private-assets` に入れた（購入元の配布物は入れていない）。公開ビルドと Around 本体に入れない扱いは変わらない。以下は当時の記録。両 PC の `C:\wwt-private\Felis_v0.8.1\`（約 82MB、FBX 2・unitypackage・PSD・案内のリンク）は `wwt-private-assets` の `git status` で未追跡のまま。フォルダに**規約の文書がなく**（`.url` のリンクだけ）、`wwt-private-assets` は「入れるのはミルドと Quaternius だけ」という翔太の決定（`.gitignore` のコメント、2026-11-07）なので、**保存してよいと確認できないため入れていない**。進めるには、(1) 購入元の規約で、私用のリポジトリへの保存・変換・公開物への使い方を確認、(2) 翔太が `wwt-private-assets` に入れると決める、(3) `.gitignore` に例外を足して `git add`（LFS の指定は `.fbx`・`.unitypackage` にすでにある）、の順。デスクトップで続けるときは、まず (1) の確認を取る
 
 ## 8. 次の作業
 
@@ -197,7 +197,7 @@ WW_LM_SIZE=4096 WW_SAMPLES=128 WW_VC_SAMPLES=128 WW_OUT=art/living-room/web \
 
 - 走りは「走り×待機」の小走りに、急停止は足を踏ん張る形に、普段の大きな方向転換は左右1歩ずつの踏み替えに、接触は「触る → もう一度ぽん → 振り向く」に、喜びは「息をのむ → 溜める → 腕を上げて大きく跳ぶ → 着地 → 1回転 → 余韻」にした
 - 足の滑り（見た目）は興味の一連で 125cm → 約 12cm、普段で約 1.5cm。ページが毎フレーム2回描いていた不具合も直した
-- e2e を足した：`WW_LIVE_LIVING_BODY=1 WW_LIVING_CHARACTER=<vrm> WW_LIVING_MOTIONS=<dir> npm run test:e2e -- tests/living-room-body-live.spec.ts`（素材が要るので、ふだんはスキップされる）
+- e2e を足した：`AROUND_LIVE_LIVING_BODY=1 AROUND_LIVING_CHARACTER=<vrm> AROUND_LIVING_MOTIONS=<dir> npm run test:e2e -- tests/living-room-body-live.spec.ts`（素材が要るので、ふだんはスキップされる）
 - 動画は通して見ていない。参考の作品の動画も見ていない。**翔太が比較動画（`C:\wwt-private\Felis_v0.8.1\work\compare\side-by-side-3\`、通常視点は `after3-room\`）を見て判断してほしい**
 - 次：動画を見ての直し（走りの1歩の滑り、止まったあとの立ち姿、余韻）、驚き・不機嫌・眠気、暮らし（`room-life.ts`）から気分を決める、UI カードとの配線
 
@@ -231,5 +231,5 @@ WW_LM_SIZE=4096 WW_SAMPLES=128 WW_VC_SAMPLES=128 WW_OUT=art/living-room/web \
 - 2026-11-12 深夜 2（Claude Code）：**デスクトップの見た目の作り直しと、部屋の中からの視点**。翔太の指示で、俯瞰をやめて部屋の手前・目の高さから見る視点にした（ページの側の定数 `VIEW`。Blender の再ベイクなし。切り欠きの部屋に、光を持たない右の壁と天井を足した：`enclose.ts`）。デスクトップは全幅の上部バー・大きな時計・すりガラスのカード・タイルのドックに作り直し、壁紙の色がガラス・ドック・画面の上下・モニター・部屋の光にそろって出る。バーとドックにフェリスの今と気分が出る。水平な視点に合わせて、手が届く所・座る所・光と影・叩く向きの計算を直した。心・演出役・物理はそのまま。中核の変更・版上げ・LFS の変更なし。設計・画像・残りは [living-shell.md](living-shell.md)。次の候補：部屋の手前の物の配置を視点に合わせる（Blender）、壁と天井を焼く、フェリスカム、縦長の画面
 - 2026-11-12 深夜（Claude Code）：**フェリスの心と、物としての UI**。1 日の固定の流れ（`life-script.ts`）をやめ、Utility AI（欲求・感情・短期記憶・仲の数値。`src/characters/mind.ts`）と演出役（`src/living-room/director.ts`）に置き換えた。フェリスは自分でデスクトップを開いて使い、画面を内側から叩き、ボールを追い、窓に飛び乗って座る（その間は UI より手前に描く）。窓とボールは投げられ、光と影が付いて動く。乗っている窓を投げると振り落とされ、繰り返すとすねる。なでると機嫌が直る。吹き出しと体で眠い・不機嫌・混乱・驚きを見せる。LLM は使っていない。中核は `playwright.config.ts`（unit の一覧に 1 行）だけ触った。DesignDocument の版上げなし、美術（LFS）の変更なし。設計・確かめた結果・残りは [living-mind.md](living-mind.md)。次の候補：フェリスカム（顔のアップ）、掴んだまま引く動き、窓の上の座り姿、縦長の画面、身体の e2e の足の固定（以前からの失敗）
 - 2026-11-12 夜（Claude Code）：**仮想デスクトップと部屋の融合**（翔太の優先 1・2）。ガラス調の窓の仮想デスクトップを部屋の上に開ける。同じ状態が机のモニターに映り、壁紙やミラー（画面共有。押したときだけ確認が出る）の色が部屋の照明になる。そのために部屋の光を「土台・モニター・手前の UI」の 3 層に焼き直した（`light-ui.png`・`light-screen.png`、頂点属性 `_UI`・`_SCREEN`）。フェリスは開くとイヤホンを外してスマホを置き、窓の縁に手をかけに来る。届かない場所なら眺める。閉じると生活に戻る。設計・画像・残りは [living-desktop.md](living-desktop.md)。次の候補：アプリの中身、Utility AI（1 日の固定の流れ `life-script.ts` の置き換え）、記憶と性格（数値）
-- 2026-11-12 夕方（Claude Code、`feat/living-onboarding` に `codex/living-room-reference` を取り込んで続けた）：**フェリスの暮らし**。ベッドに飛び込んで寝転ぶ（うつ伏せでパタパタ → 寝返りして仰向け）、椅子の座面が沈み背もたれが反り揺れる、スマホを取ってイヤホンを自分で付け外しし、寝転んで・座って見る、画面の光が顔と枕・布団に届く、を1日の流れ（約 2 分半で一周）にした。設計・確かめた結果・残りは [living-life.md](living-life.md)。フェリスの VRM と動作 19 本は翔太の指示で私用の素材リポジトリ `wwt-private-assets` に入れた（`Felis_v0.8.1/work/felis-1024.vrm`・`Felis_v0.8.1/motions`）。WWT 本体と公開ビルドには入れていない。身体の e2e は足の固定の検査で落ちるが、変更前のコミットでも同じ値で落ちる（living-life.md の 5b）
+- 2026-11-12 夕方（Claude Code、`feat/living-onboarding` に `codex/living-room-reference` を取り込んで続けた）：**フェリスの暮らし**。ベッドに飛び込んで寝転ぶ（うつ伏せでパタパタ → 寝返りして仰向け）、椅子の座面が沈み背もたれが反り揺れる、スマホを取ってイヤホンを自分で付け外しし、寝転んで・座って見る、画面の光が顔と枕・布団に届く、を1日の流れ（約 2 分半で一周）にした。設計・確かめた結果・残りは [living-life.md](living-life.md)。フェリスの VRM と動作 19 本は翔太の指示で私用の素材リポジトリ `wwt-private-assets` に入れた（`Felis_v0.8.1/work/felis-1024.vrm`・`Felis_v0.8.1/motions`）。Around 本体と公開ビルドには入れていない。身体の e2e は足の固定の検査で落ちるが、変更前のコミットでも同じ値で落ちる（living-life.md の 5b）
 - 2026-11-12 午後（Claude Code）：翔太の Tripo モデル7つ（制作机・独立した椅子・ラグ一式・左の金属棚・暗い本棚・服のラック・リュック）に置き換えた。整えた GLB は `art/living-room/models/`、手順は `prepare_models.py`→`run_all.py`。Web は `texturedMesh` で「テクスチャ×焼いた光」を描く。10 か所に到達可、unit 665 件通過（3 件スキップ）。記録は [living-room-night-reference.md](living-room-night-reference.md) の冒頭。

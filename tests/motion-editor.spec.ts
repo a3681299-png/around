@@ -9,14 +9,14 @@ import { closeEditorPages, openEditor } from './helpers/editor';
 import type { DesignDocument } from '../src/design/types';
 import { emptyDesign } from '../src/design/schema';
 
-const key = 'webWorldThemes.design.youtube',
-  overlay = '#web-world-themes-decorations';
+const key = 'around.design.youtube',
+  overlay = '#around-decorations';
 const layers =
-  ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) [data-image-id]';
+  ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations) [data-image-id]';
 const fixture = (extension: string) => path.resolve(`tests/fixtures/motion/petal.${extension}`);
 async function open(popup: Page, page: Page) {
   await showArtwork(popup);
-  await expect(page.locator('[data-ww-surface~="video-card"]').first()).toBeVisible();
+  await expect(page.locator('[data-around-surface~="video-card"]').first()).toBeVisible();
   await page.bringToFront();
   const { panel } = await openEditor(popup, page);
   await exposeEditorControls(panel);
@@ -213,7 +213,7 @@ test('player anchors follow SPA; normal animation stays click-through and OFF/ze
   await panel.getByLabel('アニメーション素材を追加').setInputFiles(fixture('gif'));
   await ready(youtube, 1);
   await youtube.locator('#navigate').evaluate((node: HTMLButtonElement) => node.click());
-  await expect(youtube.locator('[data-ww-surface~="player-window"]')).toBeVisible();
+  await expect(youtube.locator('[data-around-surface~="player-window"]')).toBeVisible();
   await panel.getByLabel('配置の基準').selectOption('video-player');
   await save(panel);
   await panel.getByRole('button', { name: '編集を終了' }).click();
@@ -262,7 +262,7 @@ test('untrusted Lottie is rejected in content and worker; native page classes ca
   const result = await popup.evaluate(
     async (base64) =>
       chrome.runtime.sendMessage({
-        type: 'web-world-themes:assets',
+        type: 'around:assets',
         action: 'import',
         session: 'session-invalid',
         files: [{ name: 'bad.json', mime: 'application/json', base64 }],
@@ -444,7 +444,7 @@ test('an external save during asset preflight is preserved and the unfinished im
     rules: [{ kind: 'surface-style', target: 'video-card', style: { backgroundColor: '#cceeff' } }],
   };
   await popup.evaluate(async ({ k, design }) => chrome.storage.local.set({ [k]: design }), { k: key, design: foreign });
-  await expect(youtube.locator('[data-ww-surface~="video-card"]').first()).toHaveCSS(
+  await expect(youtube.locator('[data-around-surface~="video-card"]').first()).toHaveCSS(
     'background-color',
     'rgb(204, 238, 255)',
   );
@@ -462,7 +462,7 @@ test('an external save during asset preflight is preserved and the unfinished im
   await expect
     .poll(() =>
       popup.evaluate(
-        async (id) => (await chrome.runtime.sendMessage({ type: 'web-world-themes:assets', action: 'get', id })).ok,
+        async (id) => (await chrome.runtime.sendMessage({ type: 'around:assets', action: 'get', id })).ok,
         assetId,
       ),
     )

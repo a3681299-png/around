@@ -9,15 +9,15 @@ import path from 'node:path';
 import { tmpdir } from 'node:os';
 
 const evidence = path.resolve('.work/evidence'),
-  normal = path.resolve(process.env.WW_TEST_EXTENSION_PATH ?? '.work/r31-normal');
+  normal = path.resolve(process.env.AROUND_TEST_EXTENSION_PATH ?? '.work/r31-normal');
 const modelFile = { name: 'Original.vrm', mimeType: 'model/gltf-binary', buffer: vrmFixture() };
 async function setup(extensionPath = normal, profile?: string, live = false, reload = false) {
-  const context = await launchExtension(profile ?? (await mkdtemp(path.join(tmpdir(), 'ww-r31-extra-'))), !live, {
+  const context = await launchExtension(profile ?? (await mkdtemp(path.join(tmpdir(), 'around-r31-extra-'))), !live, {
     extensionPath,
   });
   const manager = await context.newPage();
   await manager.goto('chrome://extensions/');
-  const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+  const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
   await item.waitFor();
   const id = await item.evaluate((e: any) => e.data?.id ?? e.id);
   await manager.close();
@@ -37,9 +37,7 @@ async function setup(extensionPath = normal, profile?: string, live = false, rel
   return { context, popup, youtube, id };
 }
 const storage = (page: Page) =>
-  page.evaluate(
-    async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
-  );
+  page.evaluate(async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube']);
 async function report(name: string, value: unknown) {
   await mkdir(evidence, { recursive: true });
   await writeFile(path.join(evidence, name + '.json'), JSON.stringify(value, null, 2));
@@ -58,7 +56,7 @@ async function metadata(page: Page) {
   return page.evaluate(
     () =>
       new Promise<any[]>((resolve, reject) => {
-        const r = indexedDB.open('web-world-themes-assets', 1);
+        const r = indexedDB.open('around-assets', 1);
         r.onsuccess = () => {
           const db = r.result,
             q = db.transaction('assets').objectStore('assets').getAll();
@@ -84,7 +82,7 @@ test('actual Studio popup window imports 36 motions, preserves history, saves an
     const target = targetTab.id!;
     const opened = context.waitForEvent('page');
     result.openReply = await popup.evaluate(
-      (tabId) => chrome.runtime.sendMessage({ type: 'web-world-themes:open-studio-window', tabId }),
+      (tabId) => chrome.runtime.sendMessage({ type: 'around:open-studio-window', tabId }),
       target,
     );
     const studio = await opened;
@@ -129,7 +127,7 @@ test('actual Studio popup window imports 36 motions, preserves history, saves an
     await backup.goto(await popup.evaluate(() => chrome.runtime.getURL('backup/index.html')));
     const downloaded = backup.waitForEvent('download');
     await backup.locator('#backup-export').click();
-    const file = path.join(evidence, 'public-character.wwbackup');
+    const file = path.join(evidence, 'public-character.aroundbackup');
     await (await downloaded).saveAs(file);
     const bytes = await readFile(file),
       length = bytes.readUInt32LE(16),
@@ -165,7 +163,7 @@ test('actual Studio popup window imports 36 motions, preserves history, saves an
 
 test('v13 VRM records from before build still render and can reimport the same original then save', async () => {
   const build = path.resolve('.work/r31-upgrade'),
-    profile = await mkdtemp(path.join(tmpdir(), 'ww-r31-upgrade-'));
+    profile = await mkdtemp(path.join(tmpdir(), 'around-r31-upgrade-'));
   const result: any = {};
   await cp(path.resolve('../r31-before/.work/r31-normal'), build, { recursive: true });
   let browser = await setup(build, profile);
@@ -180,7 +178,7 @@ test('v13 VRM records from before build still render and can reimport the same o
     expect(result.before.schemaVersion).toBe(13);
     expect(result.before.decorations[0].source.vrm.body).toBeUndefined();
     const oldBackup = await backupPage(browser.popup);
-    await downloadBackup(oldBackup, path.join(evidence, 'legacy-v13-vrm.wwbackup'));
+    await downloadBackup(oldBackup, path.join(evidence, 'legacy-v13-vrm.aroundbackup'));
     await oldBackup.close();
     await browser.context.close();
     // Preserve the old parser's actual metadata, not a v14 record with body deleted. A fresh
@@ -189,7 +187,7 @@ test('v13 VRM records from before build still render and can reimport the same o
     await browser.popup.evaluate(
       async ({ design, rows, bytes }) => {
         await new Promise<void>((resolve, reject) => {
-          const r = indexedDB.open('web-world-themes-assets', 1);
+          const r = indexedDB.open('around-assets', 1);
           r.onupgradeneeded = () => r.result.createObjectStore('assets', { keyPath: 'id' });
           r.onsuccess = () => {
             const db = r.result,
@@ -208,7 +206,7 @@ test('v13 VRM records from before build still render and can reimport the same o
           };
           r.onerror = () => reject(r.error);
         });
-        await chrome.storage.local.set({ 'webWorldThemes.design.youtube': design });
+        await chrome.storage.local.set({ 'around.design.youtube': design });
       },
       { design: result.before, rows: result.beforeMetadata, bytes: [...modelFile.buffer] },
     );
@@ -248,14 +246,14 @@ for (const label of ['before', 'after'])
     const result: any = { label };
     try {
       const p = await backupPage(popup);
-      await p.locator('#backup-file').setInputFiles(path.join(evidence, 'legacy-v13-vrm.wwbackup'));
+      await p.locator('#backup-file').setInputFiles(path.join(evidence, 'legacy-v13-vrm.aroundbackup'));
       await p.locator('#backup-inspect').click();
       try {
         await expect(p.locator('#backup-restore')).toBeEnabled();
         await p.locator('#backup-restore').click();
         await expect(p.locator('.backup-status')).toContainText('読み込みが完了');
         result.restored = await storage(popup);
-        await downloadBackup(p, path.join(evidence, 'reexport-' + label + '.wwbackup'));
+        await downloadBackup(p, path.join(evidence, 'reexport-' + label + '.aroundbackup'));
         result.exported = true;
       } finally {
         result.status = await p.locator('.backup-status').textContent();

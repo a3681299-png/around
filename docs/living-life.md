@@ -47,15 +47,15 @@
 
 ```bash
 # Felis（私用の素材リポジトリ wwt-private-assets、2026-11-12 から）
-WW_LIVING_TEST=1 WW_LIVING_OUT=.work/living-room-preview \
-  WW_LIVING_CHARACTER=C:/wwt-private/Felis_v0.8.1/work/felis-1024.vrm WW_LIVING_MOTIONS=C:/wwt-private/Felis_v0.8.1/motions \
+AROUND_LIVING_TEST=1 AROUND_LIVING_OUT=.work/living-room-preview \
+  AROUND_LIVING_CHARACTER=C:/wwt-private/Felis_v0.8.1/work/felis-1024.vrm AROUND_LIVING_MOTIONS=C:/wwt-private/Felis_v0.8.1/motions \
   node scripts/build-living-room.mjs
 # 1日の流れを録る（画面の外の窓。出力はリポジトリの外へ。フェリスが写る）
-PLAYWRIGHT_BROWSERS_PATH=<本体>/.work/browsers WW_RECORD_CLOSE=0.3 \
+PLAYWRIGHT_BROWSERS_PATH=<本体>/.work/browsers AROUND_RECORD_CLOSE=0.3 \
   node scripts/living-room/record-life.mjs C:/wwt-private/Felis_v0.8.1/work/living-life/<名前> 160
 ```
 
-テスト用の入口：`__wwLivingRoom.resident.life()`（段取り・スマホ・体の段階、椅子のばね、光、スマホと頭の位置）、`.live(false)`（暮らしを止める。`sit()` も止める）、`.sit('lie_bed')`、`__wwLivingRoom.reviewCamera(at, scale, turn)`（`turn` で横から）。
+テスト用の入口：`__aroundLivingRoom.resident.life()`（段取り・スマホ・体の段階、椅子のばね、光、スマホと頭の位置）、`.live(false)`（暮らしを止める。`sit()` も止める）、`.sit('lie_bed')`、`__aroundLivingRoom.reviewCamera(at, scale, turn)`（`turn` で横から）。
 
 ## 4. 確かめた結果（ノート PC、Chromium 画面の外・本物の GPU、144Hz）
 
@@ -68,7 +68,7 @@ PLAYWRIGHT_BROWSERS_PATH=<本体>/.work/browsers WW_RECORD_CLOSE=0.3 \
 
 ## 5. 負荷（ノート PC、短い確かめ。合否の計測ではない）
 
-`__wwLivingRoom.timing()` の体の処理（`resident.update`、1 フレームあたり）。
+`__aroundLivingRoom.timing()` の体の処理（`resident.update`、1 フレームあたり）。
 
 | 場面                                       |             直す前 | 直した後 |
 | ------------------------------------------ | -----------------: | -------: |

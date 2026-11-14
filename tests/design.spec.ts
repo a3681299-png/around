@@ -61,7 +61,7 @@ test('unsupported versions, executable fields, arbitrary CSS and invalid dimensi
 test('renderer uses registered semantic targets, replaces gradients and hover bevels, and never changes geometry', () => {
   const design = { ...sample(), baseThemeId: null };
   const css = compileDesign(design, targets);
-  expect(css).toContain('[data-ww-surface~="video-card"]');
+  expect(css).toContain('[data-around-surface~="video-card"]');
   expect(css).toContain(':hover');
   expect(css).toContain('background:#abcdef !important');
   expect(css).toContain('box-shadow:inset 0 0 0 4px #443366');
@@ -106,7 +106,7 @@ test.afterEach(() => {
 });
 
 test('design storage leaves legacy settings untouched and notifies multiple subscribers', async () => {
-  const storage = fakeStorage({ 'webWorldThemes.enabled': true, 'webWorldThemes.strength': 37 });
+  const storage = fakeStorage({ 'around.enabled': true, 'around.strength': 37 });
   const a: Array<DesignDocument | undefined> = [];
   const b: Array<DesignDocument | undefined> = [];
   const errors: unknown[] = [];
@@ -125,8 +125,8 @@ test('design storage leaves legacy settings untouched and notifies multiple subs
   expect(a.at(-1)).toEqual(parseDesign(sample()));
   expect(b.at(-1)).toEqual(parseDesign(sample()));
   expect(await readDesign('youtube')).toEqual(parseDesign(sample()));
-  expect(storage.stored['webWorldThemes.strength']).toBe(37);
-  expect(storage.stored['webWorldThemes.enabled']).toBe(true);
+  expect(storage.stored['around.strength']).toBe(37);
+  expect(storage.stored['around.enabled']).toBe(true);
   expect(errors).toEqual([]);
   stopA();
   stopB();

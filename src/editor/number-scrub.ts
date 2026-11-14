@@ -30,7 +30,7 @@ export function mountNumberScrub(
   const finish = (cancel = false) => {
     const current = gesture;
     gesture = undefined;
-    host.removeAttribute('data-ww-scrubbing');
+    host.removeAttribute('data-around-scrubbing');
     if (!current) return;
     if (current.label.hasPointerCapture(current.pointer)) current.label.releasePointerCapture(current.pointer);
     if (current.active) end(cancel);
@@ -46,7 +46,7 @@ export function mountNumberScrub(
     if (!gesture.active && Math.abs(delta) < 3) return;
     if (!gesture.active) {
       gesture.active = true;
-      host.setAttribute('data-ww-scrubbing', '');
+      host.setAttribute('data-around-scrubbing', '');
       begin();
     }
     const input = gesture.input,

@@ -13,7 +13,7 @@ test.use({ channel: 'chromium', headless: true });
 
 test.beforeAll(async () => {
   execFileSync(process.execPath, ['scripts/build-deploy-probe.mjs'], {
-    env: { ...process.env, WW_PROBE_OUT: '.work/deploy-probe-e2e', WW_PROBE_MB: '1' },
+    env: { ...process.env, AROUND_PROBE_OUT: '.work/deploy-probe-e2e', AROUND_PROBE_MB: '1' },
     stdio: 'pipe',
   });
   server = createServer((request, response) => {

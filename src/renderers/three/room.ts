@@ -6,7 +6,7 @@
  *
  * Everything drawn is a fixed engine effect; the artwork only gives numbers (RoomLook). The room
  * comes from a verified model asset: its light layers are textures the .glb lists in its root
- * extras (`wwtRoom`, scripts/room/pack-room.mjs), checked here before use.
+ * extras (`aroundRoom`, scripts/room/pack-room.mjs), checked here before use.
  *
  * Nothing here reads the page: the Host passes the plates, the camera and the video's light.
  */
@@ -104,7 +104,7 @@ interface LightLayer {
 /** The room's own list of light layers, checked: the names follow the asset contract, the
  * textures exist, the scales are finite. Anything else and the room is refused. */
 async function lightLayers(gltf: GLTF): Promise<LightLayer[]> {
-  const extras = (gltf.parser.json as { extras?: { wwtRoom?: unknown } }).extras?.wwtRoom as
+  const extras = (gltf.parser.json as { extras?: { aroundRoom?: unknown } }).extras?.aroundRoom as
     { version?: unknown; layers?: unknown } | undefined;
   if (!extras || extras.version !== 1 || !Array.isArray(extras.layers) || !extras.layers.length)
     throw new Error('部屋の素材に光の層がありません。');
@@ -349,7 +349,7 @@ export async function createRoomRenderer(
     await new Promise<void>((resolve) => view.addEventListener('load', () => resolve(), { once: true }));
   await quiet(view, 3000, signal);
   const canvas = doc.createElement('canvas');
-  canvas.dataset['wwRoom'] = '';
+  canvas.dataset['aroundRoom'] = '';
   canvas.setAttribute('aria-hidden', 'true');
   // Under the content (the adapter's backdrop slot): it takes no input and covers nothing. It
   // starts transparent and fades in (reveal) over the page's own background colour.
@@ -659,7 +659,7 @@ export async function createRoomRenderer(
       marks.forEach((m, i) => (u['marks']!.value as Vector4[])[i]!.set(m.x, m.y, m.size, m.strength));
       u['markCount']!.value = marks.length;
       u['dark']!.value = frame.scheme === 'dark' ? 1 : 0;
-      // A broken build (WW_SPACE_BREAK=density) drops the readability density, to see its tests fail.
+      // A broken build (AROUND_SPACE_BREAK=density) drops the readability density, to see its tests fail.
       // The limit keeps a margin for the 8-bit output: rounding a pixel to the nearest byte can move
       // it half a step past an exact limit (measured 4.47:1 without it on real YouTube).
       const limit = plateLimit(frame.scheme);

@@ -20,7 +20,7 @@ export const RECORDING_LIMITS = Object.freeze({
   events: 64,
 });
 export interface WorldRecording {
-  format: 'ww-world-inputs';
+  format: 'around-world-inputs';
   formatVersion: 3;
   runtimeVersion: typeof WORLD_RUNTIME_VERSION;
   scene: WorldScene;
@@ -297,7 +297,7 @@ export function parseWorldRecording(value: unknown): WorldRecording {
   }
   const data = record(value, ['format', 'formatVersion', 'runtimeVersion', 'scene', 'initialState', 'inputs']);
   if (
-    data['format'] !== 'ww-world-inputs' ||
+    data['format'] !== 'around-world-inputs' ||
     ![1, 2, 3].includes(data['formatVersion'] as number) ||
     (data['runtimeVersion'] !== WORLD_RUNTIME_VERSION &&
       data['runtimeVersion'] !== '1.2.0' &&
@@ -317,7 +317,7 @@ export function parseWorldRecording(value: unknown): WorldRecording {
     time = input.timeMs;
   }
   const result: WorldRecording = {
-    format: 'ww-world-inputs',
+    format: 'around-world-inputs',
     formatVersion: 3,
     runtimeVersion: WORLD_RUNTIME_VERSION,
     scene,
@@ -354,7 +354,7 @@ export function createWorldRecorder(maxInputs: number = RECORDING_LIMITS.frames)
     start(scene: WorldScene, state: WorldState) {
       const parsed = parseWorldScene(scene);
       current = {
-        format: 'ww-world-inputs',
+        format: 'around-world-inputs',
         formatVersion: 3,
         runtimeVersion: WORLD_RUNTIME_VERSION,
         scene: parsed,

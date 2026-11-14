@@ -36,7 +36,7 @@
 
 ## 古い位置の上限
 
-通常版と同じく記録用の `WW_GUARD_TRACE` を外して source をブラウザーへ読み込み、実時間で2回確認した。source の読み取りそのものを観測して、対象の最後の `getBoundingClientRect` の時刻を取った。CSS アニメーションを1msの終端で pause し、DOM mutation を起こさずに対象を150px動かした。時計を制御した試しでも同じ経路を先に確認している。
+通常版と同じく記録用の `AROUND_GUARD_TRACE` を外して source をブラウザーへ読み込み、実時間で2回確認した。source の読み取りそのものを観測して、対象の最後の `getBoundingClientRect` の時刻を取った。CSS アニメーションを1msの終端で pause し、DOM mutation を起こさずに対象を150px動かした。時計を制御した試しでも同じ経路を先に確認している。
 
 | 実時間の回 | 最後に対象を確認した時刻 | 古い位置を返した時刻 | その確認からの経過 | snapshot / 実際の left | DOM mutation |
 | ---------- | -----------------------: | -------------------: | -----------------: | ---------------------- | -----------: |
@@ -65,9 +65,9 @@
 
 ### 再開後の折りたたみ（④）
 
-`a6593d5` の [CI 41746176761](https://github.com/a3681299-png/web-world-themes/actions/runs/41746176761) は、`operation-editing-input.spec.ts:54` のテストで失敗していた。実際の失敗行は110行の `check.open === false`。停止解除と再開ボタンの非表示は通ったあと、`open=true` のままになっていた。`d9fce76` は期待値を変えず、再開の要求が成功したら閉じて見出しへフォーカスを戻す処理を足している。成功はページ側の `safety.resume()` 後の reply で返る。
+`a6593d5` の [CI 41746176761](https://github.com/a3681299-png/around/actions/runs/41746176761) は、`operation-editing-input.spec.ts:54` のテストで失敗していた。実際の失敗行は110行の `check.open === false`。停止解除と再開ボタンの非表示は通ったあと、`open=true` のままになっていた。`d9fce76` は期待値を変えず、再開の要求が成功したら閉じて見出しへフォーカスを戻す処理を足している。成功はページ側の `safety.resume()` 後の reply で返る。
 
-実際に Studio が使う `chrome.tabs.connect` の受信を記録した。再開直後、前は `issues=0, stopped=""`（3456.3ms）、その7.2ms後に `issues=1`。後は最初から `issues=1, stopped=""`（3586.5ms）で、制作ハンドルの clip が残った。ページの `data-ww-safety` だけの観測ではこの一瞬の0件を拾えなかったため、ポートで届く一覧まで確認した。中間版の CI の失敗と合わせて、説明の経緯は正しい。[`focused.json` の `resume-tabs-before/after`](benchmarks/g13-fix-verification/focused.json)。
+実際に Studio が使う `chrome.tabs.connect` の受信を記録した。再開直後、前は `issues=0, stopped=""`（3456.3ms）、その7.2ms後に `issues=1`。後は最初から `issues=1, stopped=""`（3586.5ms）で、制作ハンドルの clip が残った。ページの `data-around-safety` だけの観測ではこの一瞬の0件を拾えなかったため、ポートで届く一覧まで確認した。中間版の CI の失敗と合わせて、説明の経緯は正しい。[`focused.json` の `resume-tabs-before/after`](benchmarks/g13-fix-verification/focused.json)。
 
 ④の影響は、再開した直後に制限の一覧を続けて読みたい場合、見出しをもう一度押す必要があること。元のテストが期待していた折りたたみ方を保っている。成功後に閉じてフォーカスを summary に戻し、制限そのものや保護範囲表示の ON/OFF は消さない。実接続の前後比較でも、開き直しと保護範囲の ON、折りたたんだあとの ON の保持、同じ覆われたクリックでの再停止を確認した。
 
@@ -99,7 +99,7 @@ Chromium 143.0.7499.4、Windows、1920×1080、未ログインの新規プロフ
 
 ## テストと CI
 
-対象 `d9fce76` の [CI 41748709512](https://github.com/a3681299-png/web-world-themes/actions/runs/41748709512) は全ジョブ成功。unit 415成功。e2e は4 shard の29＋119＋53＋62＝263成功、16＋3＋22＋19＝60スキップ。別枠のネイティブ操作4件も成功した。CI の成功を実サイトの独立確認として数えていない。手元で全 unit / e2e は回し直していない。
+対象 `d9fce76` の [CI 41748709512](https://github.com/a3681299-png/around/actions/runs/41748709512) は全ジョブ成功。unit 415成功。e2e は4 shard の29＋119＋53＋62＝263成功、16＋3＋22＋19＝60スキップ。別枠のネイティブ操作4件も成功した。CI の成功を実サイトの独立確認として数えていない。手元で全 unit / e2e は回し直していない。
 
 | 手元の確認                       | 件数と結果                                                                                   |
 | -------------------------------- | -------------------------------------------------------------------------------------------- |

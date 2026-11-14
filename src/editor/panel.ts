@@ -86,14 +86,14 @@ export function createCreatorPanel(
   options: PanelOptions = {},
 ) {
   const host = doc.createElement('aside');
-  host.id = 'web-world-themes-creator';
-  host.setAttribute('data-ww-signal-control', '');
+  host.id = 'around-creator';
+  host.setAttribute('data-around-signal-control', '');
   host.lang = 'ja';
   host.setAttribute('role', 'dialog');
   host.setAttribute('aria-label', 'デザインエディター');
   const shadow = host.attachShadow({ mode: 'open' });
   const sheet = doc.createElement('style');
-  // The WWT Studio system; the workbench adds its arrangement on top.
+  // The Around Studio system; the workbench adds its arrangement on top.
   sheet.textContent = tokens + styles + (options.skin ? SKIN_PANEL_STYLES : '');
   const main = doc.createElement('main');
   main.innerHTML = `
@@ -116,8 +116,8 @@ export function createCreatorPanel(
     <p class="selection" role="status">カードが選択されていません</p>
     <label class="snap-toggle"><input class="snap" type="checkbox">スナップを有効にする</label>
     <p class="hint">画面・プレイヤー・他レイヤーに吸着。Altを押している間は自由配置。</p>
-    <div class="selection-actions"><button class="group-layers" type="button" aria-describedby="ww-group-reason">選択をグループ化</button><button class="ungroup-layers" type="button" hidden>グループを解除</button><button class="duplicate-image" type="button" title="選択を複製（Ctrl＋D）">複製</button><button class="delete-image" type="button" title="選択を削除（Delete）" aria-label="画像を削除">削除</button><button class="inspect" type="button">プロパティを編集</button></div>
-    <p class="hint grouping-help" id="ww-group-reason"></p>
+    <div class="selection-actions"><button class="group-layers" type="button" aria-describedby="around-group-reason">選択をグループ化</button><button class="ungroup-layers" type="button" hidden>グループを解除</button><button class="duplicate-image" type="button" title="選択を複製（Ctrl＋D）">複製</button><button class="delete-image" type="button" title="選択を削除（Delete）" aria-label="画像を削除">削除</button><button class="inspect" type="button">プロパティを編集</button></div>
+    <p class="hint grouping-help" id="around-group-reason"></p>
     <fieldset class="layout-tools" aria-label="整列と配置" hidden>
       <div class="align-row"><button type="button" data-align="left">左揃え</button><button type="button" data-align="center-x">左右中央揃え</button><button type="button" data-align="right">右揃え</button></div>
       <div class="align-row"><button type="button" data-align="top">上揃え</button><button type="button" data-align="center-y">上下中央揃え</button><button type="button" data-align="bottom">下揃え</button></div>
@@ -217,7 +217,7 @@ export function createCreatorPanel(
   saveFailure.append(reason, retry);
   saveState.append(get('.dirty'), saveFailure);
   get('.toolbar').append(saveState);
-  // ww-rail: the chosen tool gets a G-pen circle, drawn round in 4 frames when it is chosen.
+  // around-rail: the chosen tool gets a G-pen circle, drawn round in 4 frames when it is chosen.
   let ringTool: string | undefined;
   const ringOn = (button: HTMLButtonElement | null) => {
     if (ringTool === button?.dataset.tool) return;
@@ -399,7 +399,7 @@ export function createCreatorPanel(
   discard.addEventListener('click', actions.discard);
   close.addEventListener('click', actions.close);
   dock.addEventListener('click', () => {
-    host.dataset.wwDock = host.dataset.wwDock !== 'left' ? 'left' : 'right';
+    host.dataset.aroundDock = host.dataset.aroundDock !== 'left' ? 'left' : 'right';
     workspace.layoutChanged();
   });
   get<HTMLButtonElement>('.reset').addEventListener('click', actions.reset);

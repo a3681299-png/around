@@ -6,7 +6,7 @@ import { TAKE_MESSAGES } from '../assets/limits';
 import { oneOf } from '../validation';
 import { sameBackupData } from '../backup/data';
 
-export const TAKE_DATABASE = 'web-world-themes-signal-takes';
+export const TAKE_DATABASE = 'around-signal-takes';
 interface Row {
   id: string;
   chars: number;

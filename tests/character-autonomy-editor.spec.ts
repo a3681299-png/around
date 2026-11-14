@@ -53,7 +53,7 @@ test('the editor shows and saves the computed motion and autonomy switches and t
   await panel.locator('.save').click();
   await expect(panel.locator('.dirty')).toHaveText('保存済み');
   const saved = (await popup.evaluate(
-    async () => (await chrome.storage.local.get('webWorldThemes.design.youtube'))['webWorldThemes.design.youtube'],
+    async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'],
   )) as DesignDocument;
   expect(saved.schemaVersion).toBe(18);
   const character = (saved.decorations[0] as ModelDecoration).character!;

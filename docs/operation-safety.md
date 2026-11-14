@@ -76,7 +76,7 @@ G1で未確認の領域を安全と仮定して上端の予約を外すことは
 
 ## 停止・復帰と環境設定
 
-緊急OFFは作品・設定のON/OFFより優先するHostの禁止状態で、`webWorldThemes.safety.emergencyOff` に保存する。
+緊急OFFは作品・設定のON/OFFより優先するHostの禁止状態で、`around.safety.emergencyOff` に保存する。
 Alt+Shift+Q、設定画面、Studio/サイドパネルから実行できる。候補Xは隔離Chromeで未割当だったため、実割当を確認できたQを採用した。
 任意の環境で競合しないという保証は置かず、実際の割当または未割当をUIに表示し、chrome://extensions/shortcutsで変更できる。
 手動OFFは、明示的な「描画を再開」まで保持する。設定の変更・バックアップ復元・作品のシグナルでは解除しない。
@@ -90,13 +90,13 @@ WebGLコンテキスト喪失では3Dレイヤーだけを停止する。同じ�
 
 止めたときの文は、デザインシステムの Copy に従い、何を守ったかと直し方を1文ずつにする（`SafetyStatus.stopped` と `remedy`）。クリック点に作品の層があれば、直し方にその層の名前を出す。世代・照合などの内部の言葉は出さない。
 
-開発用に `WW_GUARD_TRACE=1`（出力先は `.work` の下だけ）でビルドすると、照合が合わなかったときの「予想したクリック先」と「実際のクリック先」を、ページのDevToolsのコンソール（拡張の content script の文脈）に `[Web World Themes G1]` で出す。
+開発用に `AROUND_GUARD_TRACE=1`（出力先は `.work` の下だけ）でビルドすると、照合が合わなかったときの「予想したクリック先」と「実際のクリック先」を、ページのDevToolsのコンソール（拡張の content script の文脈）に `[Around G1]` で出す。
 
 ```bash
-WW_GUARD_TRACE=1 WW_BUILD_OUT=.work/guard-trace npm run build
+AROUND_GUARD_TRACE=1 AROUND_BUILD_OUT=.work/guard-trace npm run build
 ```
 
-記録の処理は `WW_GUARD_TRACE` ラベルの中にあり、通常のビルドと計測用ビルドは `dropLabels` で落とす（`tests/skin-build-flags.spec.ts` で確認）。
+記録の処理は `AROUND_GUARD_TRACE` ラベルの中にあり、通常のビルドと計測用ビルドは `dropLabels` で落とす（`tests/skin-build-flags.spec.ts` で確認）。
 
 接近は本物の未変形の矩形とポインター線分を使い、部品ごとに、40 pxで近いに入り、72 pxを越えて350 ms安定すると戻す（G1.2）。
 フォーカス・ドラッグ・capture の部品も近い。押している間は押した点の周り 40 px、フォーカスのある部品がないキー操作（YouTube の k・j・l など）はプレイヤーを近いとする。
@@ -139,7 +139,7 @@ Service Worker再起動直後でその通知がない場合だけ、自拡張con
 unitには不透明なクリック透過描画、影の広がり、未対応の合成、編集所有領域でも解除できないシーク保護、接近の線分とヒステリシス、idle、作品からの解除拒否、reduced-motion、VRMの揺れのresetを含める。
 
 e2eは通常対象の既存212件とG1追加11件で、Chromeの実入力、ネイティブキー、全画面、保存・破棄・Undo/Redo・Studio復旧を検証する。
-新しい主な試験は次のとおり。通常の全e2eとCIの最終結果は変更の完了報告と[当該ブランチのActions](https://github.com/a3681299-png/web-world-themes/actions?query=branch%3Acodex%2Fcreator-editor-spike)を参照する。
+新しい主な試験は次のとおり。通常の全e2eとCIの最終結果は変更の完了報告と[当該ブランチのActions](https://github.com/a3681299-png/around/actions?query=branch%3Acodex%2Fcreator-editor-spike)を参照する。
 
 - 不透明PNGを正式な取り込み経路で追加し、通常/プレイヤー内の両方の描画先でシークバーのスクリーンショットが完全に一致する。native rangeのドラッグとキー、検索/コメント入力、全画面の結果も作品なしと一致。5回連続成功。
 - 数値スナップショットのDOM交換/偽造、反映前の世代不一致、停止後の安定待ち、3Dだけの反復停止、停止中の他の2D描画を確認。
@@ -158,8 +158,8 @@ G1の保護範囲へ絵を置く旧テストは、遮蔽の専用試験と、保
 ### 実サイト
 
 ```powershell
-$env:WW_TEST_EXTENSION_PATH = '.work/g1-dist'
-$env:WW_LIVE_OPERATIONS = '1'
+$env:AROUND_TEST_EXTENSION_PATH = '.work/g1-dist'
+$env:AROUND_LIVE_OPERATIONS = '1'
 # 今回成功した隔離ブラウザー。普段のプロファイルは使わない。
 $env:PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH = 'C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe'
 npm run test:e2e -- tests/operation-live.spec.ts --output=.work/g1-live-brave-results

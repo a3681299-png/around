@@ -4,8 +4,8 @@ import path from 'node:path';
 import { launchExtension } from './fixtures';
 
 test('audit every surviving page element and extension listener after OFF and emergency OFF', async () => {
-  test.skip(process.env.WW_VERIFY_BOUNDARIES !== '1', 'Compare current and 6ce22ce with the same image backup.');
-  const old = process.env.WW_VERIFY_BOUNDARY_OLD === '1';
+  test.skip(process.env.AROUND_VERIFY_BOUNDARIES !== '1', 'Compare current and 6ce22ce with the same image backup.');
+  const old = process.env.AROUND_VERIFY_BOUNDARY_OLD === '1';
   await mkdir('.work/verification', { recursive: true });
   const context = await launchExtension(await mkdtemp(path.resolve('.work/removal-boundaries-')));
   try {
@@ -15,7 +15,7 @@ test('audit every surviving page element and extension listener after OFF and em
     await popup.goto(`chrome-extension://${id}/popup/index.html`);
     const backup = await context.newPage();
     await backup.goto(`chrome-extension://${id}/backup/index.html`);
-    await backup.locator('#backup-file').setInputFiles(path.resolve('tests/fixtures/backups/pre-removal.wwbackup'));
+    await backup.locator('#backup-file').setInputFiles(path.resolve('tests/fixtures/backups/pre-removal.aroundbackup'));
     await backup.locator('#backup-inspect').click();
     await expect(backup.locator('#backup-restore')).toBeEnabled();
     await backup.locator('#backup-restore').click();
@@ -48,8 +48,7 @@ test('audit every surviving page element and extension listener after OFF and em
         elements: [...document.querySelectorAll('*')]
           .filter(
             (node) =>
-              node.id.startsWith('web-world-themes') ||
-              node.getAttributeNames().some((name) => name.startsWith('data-ww-')),
+              node.id.startsWith('around') || node.getAttributeNames().some((name) => name.startsWith('data-around-')),
           )
           .map((node) => ({
             tag: node.tagName,
@@ -57,7 +56,7 @@ test('audit every surviving page element and extension listener after OFF and em
             attributes: Object.fromEntries(
               node
                 .getAttributeNames()
-                .filter((name) => name.startsWith('data-ww-'))
+                .filter((name) => name.startsWith('data-around-'))
                 .map((name) => [name, node.getAttribute(name)]),
             ),
             hidden: (node as HTMLElement).hidden,
@@ -83,14 +82,14 @@ test('audit every surviving page element and extension listener after OFF and em
     const toggle = popup.getByRole('switch', { name: old ? 'テーマを使う' : '作品を表示する' });
     await toggle.uncheck();
     await expect(page.locator('[data-image-id]')).toHaveCount(0);
-    await expect(page.locator('html')).not.toHaveAttribute('data-ww-site');
+    await expect(page.locator('html')).not.toHaveAttribute('data-around-site');
     const off = await snapshot();
     expect(off.listeners.some((entry) => entry.type === 'pagehide')).toBe(true);
     await toggle.check();
     await expect(page.locator('[data-image-id]')).toHaveCount(1);
     await popup.getByRole('button', { name: '緊急OFF', exact: true }).click();
     await expect(page.locator('[data-image-id]')).toHaveCount(0);
-    await expect(page.locator('html')).not.toHaveAttribute('data-ww-site');
+    await expect(page.locator('html')).not.toHaveAttribute('data-around-site');
     const emergency = await snapshot();
     expect(emergency).toEqual(off);
     await writeFile(

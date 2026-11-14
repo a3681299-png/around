@@ -94,14 +94,14 @@ Windows・Chromium 143。同時には1実行・1ワーカーのみ。mainは `67
 
 ## CI・互換性・安全の確認
 
-[Theme checks 40271139708](https://github.com/a3681299-png/web-world-themes/actions/runs/40271139708)は `b705f16` に対して成功した。
+[Theme checks 40271139708](https://github.com/a3681299-png/around/actions/runs/40271139708)は `b705f16` に対して成功した。
 
 - lint・型検査・ビルド：成功。
 - 単体：336件成功。
 - E2E：246件成功、28件スキップ。スキップは実サイトなどのオプトインで、実サイト13件は上記のローカル試験で別に実行した。
 - ネイティブ入力の先行確認4件も成功（全件E2Eに含まれるため合計に重ねて数えない）。
 
-Chromeのpermissions・host_permissions・optional permissionsは旧mainと一致する。固定層の縦帯、入力直前の幾何取得・世代とヒットの確認、接近判定、350msの安定待ちを維持した。作品からJavaScriptは実行しない。追跡ファイルに私用VRM、`.work`、`dist`、`node_modules`、`.env`、秘密鍵は含めていない。一時プロファイルは成功・失敗・タイムアウトを含め実行後に削除する。最後の確認で、今回のブラウザープロセスと`%TEMP%\ww-*`は0件。今回作った動作確認用プロファイル37個も、保存先と所有を確認して削除した。
+Chromeのpermissions・host_permissions・optional permissionsは旧mainと一致する。固定層の縦帯、入力直前の幾何取得・世代とヒットの確認、接近判定、350msの安定待ちを維持した。作品からJavaScriptは実行しない。追跡ファイルに私用VRM、`.work`、`dist`、`node_modules`、`.env`、秘密鍵は含めていない。一時プロファイルは成功・失敗・タイムアウトを含め実行後に削除する。最後の確認で、今回のブラウザープロセスと`%TEMP%\around-*`は0件。今回作った動作確認用プロファイル37個も、保存先と所有を確認して削除した。
 
 ## 通常版で確認する
 
@@ -110,7 +110,7 @@ Chromeのpermissions・host_permissions・optional permissionsは旧mainと一�
 mainでの再ビルド：
 
 ```powershell
-$env:WW_BUILD_OUT = 'dist'
+$env:AROUND_BUILD_OUT = 'dist'
 npm run build
 ```
 

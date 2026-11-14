@@ -133,7 +133,7 @@ applyLayout: 149 ticks ≈ 102.1 ms
     2.7 ms  L54164  if (entry.node.style.pointerEvents !== (stopped ? "none" : ""))
     2.1 ms  L54166  if (stopped) entry.controls.hidden = true;
     2.1 ms  L54096  if (entry.controls.parentNode !== root) root.append(entry.controls);
-    2.1 ms  L54152  if (record5 !== writtenSafety || host.dataset.wwSafety !== record5) {
+    2.1 ms  L54152  if (record5 !== writtenSafety || host.dataset.aroundSafety !== record5) {
     1.4 ms  L53956  if (!entry || !layer.frame || !layer.position || !layer.localPosition) continue;
     1.4 ms  L54118  const blocked = safety.commit(
     1.4 ms  L53955  const entry = nodes.get(layer.layer.id);

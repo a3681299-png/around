@@ -4,7 +4,7 @@ import { openEditor } from './helpers/editor';
 import { modelFixture } from './helpers/model-fixture';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-const overlay = '#web-world-themes-decorations';
+const overlay = '#around-decorations';
 
 test('8 rigged models share one context/assets, respect surface budgets and suspend mixed group masks', async ({
   popup,
@@ -13,7 +13,7 @@ test('8 rigged models share one context/assets, respect surface budgets and susp
 }) => {
   test.setTimeout(60000);
   await showArtwork(popup);
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await panel.locator('.file').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await expect(youtube.locator(`${overlay} img`)).toBeVisible();
@@ -28,7 +28,7 @@ test('8 rigged models share one context/assets, respect surface budgets and susp
   const media = youtube.locator(`${overlay} .model-media`);
   await expect(media).toHaveCount(8);
   for (const item of await media.all()) await expect(item).toHaveAttribute('data-renderer', 'three');
-  const stats = () => youtube.locator(overlay).evaluate((e: HTMLElement) => JSON.parse(e.dataset.wwModelStats!));
+  const stats = () => youtube.locator(overlay).evaluate((e: HTMLElement) => JSON.parse(e.dataset.aroundModelStats!));
   await expect.poll(stats).toMatchObject({ contexts: 1, assets: 1, instances: 8, geometries: 1 });
   const cdp = await context.newCDPSession(youtube);
   await cdp.send('Performance.enable');
@@ -91,7 +91,7 @@ test('real WebGL loss recreates a context, deletion releases resources and Undo 
   youtube,
 }) => {
   await showArtwork(popup);
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-site', 'youtube');
   const { panel } = await openEditor(popup, youtube);
   await panel.locator('.file').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await expect(youtube.locator(`${overlay} img`)).toBeVisible();
@@ -101,7 +101,7 @@ test('real WebGL loss recreates a context, deletion releases resources and Undo 
     .setInputFiles({ name: 'Recover.glb', mimeType: 'model/gltf-binary', buffer: modelFixture() });
   const media = youtube.locator(`${overlay} .model-media`);
   await expect(media).toHaveAttribute('data-renderer', 'three');
-  const backend = youtube.locator(`${overlay} [data-ww-three-backend]`),
+  const backend = youtube.locator(`${overlay} [data-around-three-backend]`),
     handle = (await backend.elementHandle())!;
   expect(
     await backend.evaluate((canvas: HTMLCanvasElement) => {
@@ -121,7 +121,7 @@ test('real WebGL loss recreates a context, deletion releases resources and Undo 
   await expect(youtube.locator(`${overlay} img`)).toBeVisible();
   await expect(backend).toHaveCount(1);
   await expect
-    .poll(() => youtube.locator(overlay).evaluate((e: HTMLElement) => JSON.parse(e.dataset.wwModelStats!)))
+    .poll(() => youtube.locator(overlay).evaluate((e: HTMLElement) => JSON.parse(e.dataset.aroundModelStats!)))
     .toMatchObject({ contexts: 1, assets: 0, instances: 0, geometries: 0, textures: 0, programs: 0 });
   expect(await recovered.evaluate((canvas) => canvas.isConnected)).toBe(true);
   await panel.locator('.undo').click();

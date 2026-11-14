@@ -54,7 +54,7 @@ export async function clearestPoint(
         'button, a[href], [role="button"], [role="slider"], [role="menu"], [role="dialog"], [role="listbox"], input, textarea, select, [contenteditable="true"], ytd-searchbox, yt-searchbox',
       ),
     ]
-      .filter((e) => !e.closest('[id^="web-world-themes"]') && getComputedStyle(e).visibility !== 'hidden')
+      .filter((e) => !e.closest('[id^="around"]') && getComputedStyle(e).visibility !== 'hidden')
       .map((e) => e.getBoundingClientRect())
       .filter((b) => b.width > 0 && b.height > 0);
     const player = document.querySelector('#movie_player')?.getBoundingClientRect();

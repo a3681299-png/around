@@ -20,7 +20,7 @@ async function probeCode(trace = true) {
     write: false,
     format: 'iife',
     globalName: 'G1Probe',
-    ...(trace ? {} : { dropLabels: ['WW_GUARD_TRACE'] }),
+    ...(trace ? {} : { dropLabels: ['AROUND_GUARD_TRACE'] }),
   });
   return result.outputFiles[0]!.text;
 }
@@ -53,9 +53,9 @@ test('default artwork retains its decoder while the compositor clips protected r
   });
   await expect(editor.locator('.dirty')).toHaveText('未保存');
   try {
-    await expect(youtube.locator('#web-world-themes-decorations img')).toBeVisible();
+    await expect(youtube.locator('#around-decorations img')).toBeVisible();
   } catch (error) {
-    console.log('Safety state:', await youtube.locator('#web-world-themes-decorations').getAttribute('data-ww-safety'));
+    console.log('Safety state:', await youtube.locator('#around-decorations').getAttribute('data-around-safety'));
     throw error;
   }
 });
@@ -84,17 +84,16 @@ const settled = (youtube: Page) =>
   expect
     .poll(
       async () =>
-        JSON.parse((await youtube.locator('#web-world-themes-decorations').getAttribute('data-ww-safety')) ?? '{}')
-          .stopped,
+        JSON.parse((await youtube.locator('#around-decorations').getAttribute('data-around-safety')) ?? '{}').stopped,
     )
     .toBe('');
 const planeOf = (youtube: Page) =>
   youtube.evaluate(() => {
     const node = [
-      '#web-world-themes-decorations',
-      '#web-world-themes-page-decorations',
-      '#web-world-themes-atmosphere-decorations',
-      '#web-world-themes-video-decorations',
+      '#around-decorations',
+      '#around-page-decorations',
+      '#around-atmosphere-decorations',
+      '#around-video-decorations',
     ].find((id) => document.querySelector(id)?.shadowRoot?.querySelector('[data-image-id]'));
     return node ?? null;
   });
@@ -107,13 +106,13 @@ test('atmosphere artwork crosses protected controls under one capped plane and n
   await editor.getByLabel('画像の幅').fill('1800');
   await editor.getByLabel('画像の高さ').fill('1000');
   await editor.getByLabel('描画モード').selectOption('atmosphere');
-  await expect.poll(() => planeOf(youtube)).toBe('#web-world-themes-atmosphere-decorations');
+  await expect.poll(() => planeOf(youtube)).toBe('#around-atmosphere-decorations');
   await settled(youtube);
   const result = await youtube.evaluate(() => {
-    const plane = document.querySelector<HTMLElement>('#web-world-themes-atmosphere-decorations')!,
-      screen = document.querySelector<HTMLElement>('#web-world-themes-decorations')!;
+    const plane = document.querySelector<HTMLElement>('#around-atmosphere-decorations')!,
+      screen = document.querySelector<HTMLElement>('#around-decorations')!;
     const node = plane.shadowRoot!.querySelector<HTMLElement>('[data-image-id]')!;
-    const safety = JSON.parse(screen.dataset.wwSafety ?? '{}');
+    const safety = JSON.parse(screen.dataset.aroundSafety ?? '{}');
     return {
       opacity: Number(getComputedStyle(plane).opacity),
       clip: getComputedStyle(plane).clipPath,
@@ -161,9 +160,9 @@ test('editing owns the center of a real-style player whose media sits on its own
   // In the middle of the video, well inside the bands.
   await editor.getByLabel('画像のX位置').fill('50');
   await editor.getByLabel('画像のY位置').fill('50');
-  await expect.poll(() => planeOf(youtube)).toBe('#web-world-themes-video-decorations');
+  await expect.poll(() => planeOf(youtube)).toBe('#around-video-decorations');
   await settled(youtube);
-  const node = youtube.locator('#web-world-themes-video-decorations [data-image-id]');
+  const node = youtube.locator('#around-video-decorations [data-image-id]');
   const hit = (point: { x: number; y: number }) =>
     node.evaluate((element, p) => {
       let target = element.ownerDocument.elementFromPoint(p.x, p.y);
@@ -204,9 +203,9 @@ async function viewportArtworkOverVideo(popup: Page, youtube: Page) {
   });
   await editor.getByLabel('画像のX位置').fill(at.x.toFixed(2));
   await editor.getByLabel('画像のY位置').fill(at.y.toFixed(2));
-  await expect.poll(() => planeOf(youtube)).toBe('#web-world-themes-decorations');
+  await expect.poll(() => planeOf(youtube)).toBe('#around-decorations');
   await settled(youtube);
-  const node = youtube.locator('#web-world-themes-decorations [data-image-id]');
+  const node = youtube.locator('#around-decorations [data-image-id]');
   const hit = (point: { x: number; y: number }) =>
     node.evaluate((element, p) => {
       let target = element.ownerDocument.elementFromPoint(p.x, p.y);
@@ -246,7 +245,9 @@ const withoutIdleRecheck = test.extend({
   context: async ({ profile, layering }, use) => {
     // The same way as the project (docs/layering-plan.md): the build under test, or the other one.
     const extensionPath =
-      layering === undefined ? await noIdleRecheckBuild() : await layeringBuild(layering, { WW_NO_IDLE_RECHECK: '1' });
+      layering === undefined
+        ? await noIdleRecheckBuild()
+        : await layeringBuild(layering, { AROUND_NO_IDLE_RECHECK: '1' });
     const context = await launchExtension(profile, true, { extensionPath });
     try {
       await use(context);
@@ -277,8 +278,7 @@ withoutIdleRecheck(
         const w = window as unknown as { nativeClicks: number };
         w.nativeClicks = 0;
         player.addEventListener('click', (event) => {
-          if (!event.composedPath().some((n) => n instanceof Element && n.id.startsWith('web-world-themes')))
-            w.nativeClicks++;
+          if (!event.composedPath().some((n) => n instanceof Element && n.id.startsWith('around'))) w.nativeClicks++;
         });
         return { shift };
       }, center.y);
@@ -355,8 +355,8 @@ test('editing keeps the video centre while a central native button is visible, a
   await editor.getByLabel('画像の幅').fill('120');
   await editor.getByLabel('画像の高さ').fill('80');
   await besideCentre(youtube, editor, 'viewport');
-  await expect.poll(() => planeOf(youtube)).toBe('#web-world-themes-decorations');
-  const node = youtube.locator('#web-world-themes-decorations [data-image-id]');
+  await expect.poll(() => planeOf(youtube)).toBe('#around-decorations');
+  const node = youtube.locator('#around-decorations [data-image-id]');
   await withCanvas(youtube, async () => {
     await settled(youtube);
     const box = (await node.boundingBox())!;
@@ -389,7 +389,7 @@ test('player artwork moved to the page plane by a central button can still be ed
   // Cut out: a central native control keeps the player-local plane unavailable, the artwork follows
   // the page. Layering (chunk 4): it stays under the controls while editing, the button (z 20) over
   // it by stacking order.
-  const plane = layeringOn ? '#web-world-themes-video-decorations' : '#web-world-themes-page-decorations';
+  const plane = layeringOn ? '#around-video-decorations' : '#around-page-decorations';
   await expect.poll(() => planeOf(youtube)).toBe(plane);
   const node = youtube.locator(`${plane} [data-image-id]`);
   await withCanvas(youtube, async () => {
@@ -426,12 +426,12 @@ test('player artwork follows the page when the player-local plane is unavailable
   await youtube.locator('#movie_player').evaluate((player: HTMLElement) => {
     player.style.height = '150px';
   });
-  await expect.poll(() => planeOf(youtube)).toBe('#web-world-themes-page-decorations');
+  await expect.poll(() => planeOf(youtube)).toBe('#around-page-decorations');
   await settled(youtube);
   const result = await youtube.evaluate(async () => {
     const frame = () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    const plane = document.querySelector<HTMLElement>('#web-world-themes-page-decorations')!,
-      screen = document.querySelector<HTMLElement>('#web-world-themes-decorations')!;
+    const plane = document.querySelector<HTMLElement>('#around-page-decorations')!,
+      screen = document.querySelector<HTMLElement>('#around-decorations')!;
     const node = plane.shadowRoot!.querySelector<HTMLElement>('[data-image-id]')!;
     await frame();
     const before = node.getBoundingClientRect().top;
@@ -442,7 +442,7 @@ test('player artwork follows the page when the player-local plane is unavailable
     return {
       moved: before - node.getBoundingClientRect().top,
       origin: { left: origin.left + scrollX, top: origin.top + scrollY - 120 },
-      clip: plane.style.getPropertyValue('--ww-decoration-clip'),
+      clip: plane.style.getPropertyValue('--around-decoration-clip'),
       order: Boolean(plane.compareDocumentPosition(screen) & Node.DOCUMENT_POSITION_FOLLOWING),
       sameParent: plane.parentElement === screen.parentElement,
     };
@@ -474,22 +474,22 @@ test('redraws over unchanged protection geometry leave the clip and safety recor
     mimeType: 'image/png',
     buffer: Buffer.from(data.split(',')[1]!, 'base64'),
   });
-  await expect(youtube.locator('#web-world-themes-decorations img')).toBeVisible();
+  await expect(youtube.locator('#around-decorations img')).toBeVisible();
   const result = await youtube.evaluate(async () => {
-    const host = document.querySelector('#web-world-themes-decorations')!;
+    const host = document.querySelector('#around-decorations')!;
     const frame = () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     // The new layer's reads arrive in a burst and are held until their coalescing window ends; wait
     // for that hold to clear (any stop, whatever its wording), then let one more window pass so the
     // first resize, like the others, is read on its own rather than inside the last read's window.
-    for (let i = 0; i < 60 && !host.getAttribute('data-ww-safety')?.includes('"stopped":""'); i++) await frame();
+    for (let i = 0; i < 60 && !host.getAttribute('data-around-safety')?.includes('"stopped":""'); i++) await frame();
     await new Promise((resolve) => setTimeout(resolve, 250));
     await frame();
     // An exhausted wait must fail even when an already-stopped renderer makes no further writes.
-    const ready = JSON.parse(host.getAttribute('data-ww-safety') ?? '{}').stopped;
-    const clip = (host as HTMLElement).style.getPropertyValue('--ww-decoration-clip');
+    const ready = JSON.parse(host.getAttribute('data-around-safety') ?? '{}').stopped;
+    const clip = (host as HTMLElement).style.getPropertyValue('--around-decoration-clip');
     const writes: string[] = [];
     const observer = new MutationObserver((records) => records.forEach((r) => writes.push(r.attributeName!)));
-    observer.observe(host, { attributes: true, attributeFilter: ['style', 'data-ww-safety'] });
+    observer.observe(host, { attributes: true, attributeFilter: ['style', 'data-around-safety'] });
     // Each resize marks the source and forces a redraw; the geometry itself is unchanged.
     // They are spaced past the coalescing window, so each one is read on its own.
     for (let i = 0; i < 5; i++) {
@@ -790,7 +790,7 @@ async function seedLayers(
   await expect(editor.locator('.status')).toHaveText('保存しました。');
   await editor.getByRole('button', { name: '編集を終了', exact: true }).click();
   const viewport = await youtube.evaluate(() => ({ width: innerWidth, height: innerHeight }));
-  const key = 'webWorldThemes.design.youtube';
+  const key = 'around.design.youtube';
   const base = await popup.evaluate(async (k) => (await chrome.storage.local.get(k))[k] as DesignDocument, key);
   const design: DesignDocument = {
     ...base,
@@ -819,7 +819,7 @@ async function seedLayers(
       youtube.evaluate(() =>
         [
           ...(document
-            .querySelector('#web-world-themes-decorations')
+            .querySelector('#around-decorations')
             ?.shadowRoot?.querySelectorAll<HTMLElement>('[data-image-id]') ?? []),
         ]
           .map((node) => node.dataset.imageId)
@@ -831,8 +831,8 @@ async function seedLayers(
 }
 /** Layers flattened by an approach (G1.2): only the held roots. */
 const heldLayers = (youtube: Page) =>
-  youtube.locator('#web-world-themes-decorations').evaluate((host: HTMLElement) =>
-    (JSON.parse(host.dataset.wwSafety ?? '{"issues":[]}').issues as { layerId: string; surfaceId: string }[])
+  youtube.locator('#around-decorations').evaluate((host: HTMLElement) =>
+    (JSON.parse(host.dataset.aroundSafety ?? '{"issues":[]}').issues as { layerId: string; surfaceId: string }[])
       .filter((issue) => issue.surfaceId === 'native.approach')
       .map((issue) => issue.layerId)
       .sort(),
@@ -841,7 +841,7 @@ const heldLayers = (youtube: Page) =>
 const alphaOf = (youtube: Page, id: string) =>
   youtube.evaluate((id) => {
     const node = document
-      .querySelector('#web-world-themes-decorations')!
+      .querySelector('#around-decorations')!
       .shadowRoot!.querySelector<HTMLElement>(`[data-image-id="${id}"]`)!;
     let alpha = 1;
     for (
@@ -895,9 +895,7 @@ test('G1.2 ①②④: near a control, only the layer over it is held; a layer el
   await scrollToProgress(youtube, 0.25);
   await expect.poll(() => alphaOf(youtube, 'elsewhere')).toBeCloseTo(0.5, 1);
   await expect.poll(() => alphaOf(youtube, 'over-account')).toBeCloseTo(0.5, 1);
-  const clipBefore = await youtube
-    .locator('#web-world-themes-decorations')
-    .evaluate((host) => getComputedStyle(host).clipPath);
+  const clipBefore = await youtube.locator('#around-decorations').evaluate((host) => getComputedStyle(host).clipPath);
   // ② The pointer rests on the Account button: only the layer painted over it is held.
   await youtube.mouse.move(centreOf(account).x, centreOf(account).y, { steps: 4 });
   await expect.poll(() => heldLayers(youtube)).toEqual(['over-account']);
@@ -913,9 +911,9 @@ test('G1.2 ①②④: near a control, only the layer over it is held; a layer el
   }
   expect(new Set(followed).size).toBe(3);
   // ④ The clip is the same whether or not a layer is held, and the button stays the hit target.
-  expect(
-    await youtube.locator('#web-world-themes-decorations').evaluate((host) => getComputedStyle(host).clipPath),
-  ).toBe(clipBefore);
+  expect(await youtube.locator('#around-decorations').evaluate((host) => getComputedStyle(host).clipPath)).toBe(
+    clipBefore,
+  );
   expect(
     await youtube
       .getByRole('button', { name: 'Account' })
@@ -970,18 +968,18 @@ test('G1.2 ③: a layer that moves onto a near control is held within two frames
   await expect.poll(() => heldLayers(youtube)).toEqual([]);
   // Every frame: where the mover is painted, and whether the guard holds it.
   await youtube.evaluate((account) => {
-    const host = document.querySelector<HTMLElement>('#web-world-themes-decorations')!;
+    const host = document.querySelector<HTMLElement>('#around-decorations')!;
     const node = host.shadowRoot!.querySelector<HTMLElement>('[data-image-id="mover"]')!;
     const held = () =>
-      (JSON.parse(host.dataset.wwSafety ?? '{"issues":[]}').issues as { layerId: string; surfaceId: string }[]).some(
-        (issue) => issue.layerId === 'mover' && issue.surfaceId === 'native.approach',
-      );
+      (
+        JSON.parse(host.dataset.aroundSafety ?? '{"issues":[]}').issues as { layerId: string; surfaceId: string }[]
+      ).some((issue) => issue.layerId === 'mover' && issue.surfaceId === 'native.approach');
     const log = ((window as any).g12Frames = [] as { over: boolean; held: boolean }[]);
     const changes = ((window as any).g12Changes = [] as boolean[]);
     let last = held();
     new MutationObserver(() => {
       if (held() !== last) changes.push((last = held()));
-    }).observe(host, { attributes: true, attributeFilter: ['data-ww-safety'] });
+    }).observe(host, { attributes: true, attributeFilter: ['data-around-safety'] });
     const tick = () => {
       const r = node.getBoundingClientRect();
       log.push({
@@ -1022,15 +1020,15 @@ test('manual emergency OFF releases drawing and preserves an unsaved editor and 
   await editor.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
   await expect(editor.locator('.dirty')).toHaveText('未保存');
   await popup.getByRole('button', { name: '緊急OFF', exact: true }).click();
-  await expect(youtube.locator('#web-world-themes-decorations')).toHaveCount(0);
-  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-site', 'youtube');
+  await expect(youtube.locator('#around-decorations')).toHaveCount(0);
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-around-site', 'youtube');
   await expect(editor.locator('.dirty')).toHaveText('未保存');
   await expect(editor.getByRole('button', { name: '元に戻す', exact: true })).toBeEnabled();
   await popup.getByRole('switch', { name: '制作モード' }).check();
-  await expect(youtube.locator('html')).not.toHaveAttribute('data-ww-site', 'youtube');
+  await expect(youtube.locator('html')).not.toHaveAttribute('data-around-site', 'youtube');
   await popup.getByRole('button', { name: '描画を再開', exact: true }).click();
-  await expect(youtube.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
-  await expect(youtube.locator('#web-world-themes-decorations')).toHaveCount(1);
+  await expect(youtube.locator('html')).toHaveAttribute('data-around-site', 'youtube');
+  await expect(youtube.locator('#around-decorations')).toHaveCount(1);
   await expect(editor.locator('.dirty')).toHaveText('未保存');
 });
 
@@ -1082,7 +1080,7 @@ test('candidate discovery assigns each element to its first matching selector in
     for (const [id, kind, selector] of selectors) {
       let index = 0;
       for (const element of document.querySelectorAll<HTMLElement>(selector)) {
-        if (seen.has(element) || element.closest('[id^="web-world-themes"]')) continue;
+        if (seen.has(element) || element.closest('[id^="around"]')) continue;
         seen.add(element);
         const r = element.getBoundingClientRect();
         const finalKind = element.matches('input[type="range"],[role="slider"]') ? 'drag' : kind;
@@ -1268,7 +1266,7 @@ test('a stylesheet-only change to an overlay ancestor is seen by the next frame 
     const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
     // A quiet document isolates the slot read from unrelated snapshot reissues.
     const iframe = document.createElement('iframe');
-    iframe.id = 'web-world-themes-test-quiet';
+    iframe.id = 'around-test-quiet';
     document.body.append(iframe);
     const doc = iframe.contentDocument!;
     doc.body.innerHTML = '<div id="app"></div>';
@@ -1450,10 +1448,10 @@ const click = (x: number) => {
 test('a click over a hidden native control is not a failure; a visible control a page element covers still stops drawing', async ({
   youtube,
 }) => {
-  // The probe keeps the WW_GUARD_TRACE label, as the development build does.
+  // The probe keeps the AROUND_GUARD_TRACE label, as the development build does.
   const traces: string[] = [];
   youtube.on('console', (message) => {
-    if (message.text().startsWith('[Web World Themes G1] クリック先')) traces.push(message.text());
+    if (message.text().startsWith('[Around G1] クリック先')) traces.push(message.text());
   });
   await clickFixture(youtube);
   const result = await youtube.evaluate(async (clickSource) => {
@@ -1617,7 +1615,7 @@ test('focus inside the extension own player-local host never counts as focus on 
     const player = document.querySelector<HTMLElement>('#movie_player')!;
     // The player-local paint host lives inside the player; the editor focuses layers in it.
     const own = document.createElement('div');
-    own.id = 'web-world-themes-video-decorations';
+    own.id = 'around-video-decorations';
     own.tabIndex = -1;
     player.append(own);
     const native = document.createElement('button');
@@ -1686,7 +1684,7 @@ test('focus that silently leaves with a removed element is not kept by the cache
     // Removing the focused element moves focus to body without any focusout event; a
     // mutation inside the extension's own host is the kind of change the observer skips.
     const own = document.createElement('div');
-    own.id = 'web-world-themes-test-focus';
+    own.id = 'around-test-focus';
     own.tabIndex = -1;
     player.append(own);
     own.focus();
@@ -1706,7 +1704,7 @@ test('focus moving inside the extension own UI does not notify the guard', async
     // A quiet document isolates focus notifications from unrelated page mutations. The probe
     // is loaded inside it so element checks run in the document's own realm, as in production.
     const iframe = document.createElement('iframe');
-    iframe.id = 'web-world-themes-test-focus-frame';
+    iframe.id = 'around-test-focus-frame';
     document.body.append(iframe);
     const win = iframe.contentWindow as any;
     const doc = iframe.contentDocument!;
@@ -1717,10 +1715,10 @@ test('focus moving inside the extension own UI does not notify the guard', async
     doc.body.insertAdjacentHTML('beforeend', '<button id="native">native</button>');
     // Two of the extension's own hosts, like the editor panel and the player-local layers.
     const own = doc.createElement('div');
-    own.id = 'web-world-themes-test-own';
+    own.id = 'around-test-own';
     own.attachShadow({ mode: 'open' }).innerHTML = '<div tabindex="-1">layer</div>';
     const panel = doc.createElement('div');
-    panel.id = 'web-world-themes-test-panel';
+    panel.id = 'around-test-panel';
     panel.attachShadow({ mode: 'open' }).innerHTML = '<div tabindex="-1">panel</div>';
     doc.body.append(own, panel);
     const source = api.createOperationSource(
@@ -1857,7 +1855,7 @@ test('opaque click-through paint is compositor-clipped away from native controls
     const composition = source.overlaySlot();
     if (!composition) throw new Error('No verified composition slot');
     const overlay = document.createElement('div');
-    overlay.id = 'web-world-themes-test-opaque';
+    overlay.id = 'around-test-opaque';
     overlay.style.cssText = `position:fixed;inset:0;background:red;pointer-events:none;z-index:${composition.zIndex};clip-path:path('${regions.map((r: any) => `M${r.left} ${r.top}h${r.width}v${r.height}h${-r.width}Z`).join('')}')`;
     composition.parent.append(overlay);
     const issues = api.guardPaint(snapshot, [
@@ -1903,10 +1901,10 @@ test('operation guard frame overhead alternates baseline and guarded frames (inf
         composition: 'overlay',
       }));
     const element = document.createElement('div');
-    element.id = 'web-world-themes-benchmark';
+    element.id = 'around-benchmark';
     const shadow = element.attachShadow({ mode: 'open' }),
       style = document.createElement('style');
-    style.textContent = ':host{clip-path:var(--ww-decoration-clip,none)}';
+    style.textContent = ':host{clip-path:var(--around-decoration-clip,none)}';
     shadow.append(style);
     document.body.append(element);
     const workloads = [];
@@ -1924,7 +1922,7 @@ test('operation guard frame overhead alternates baseline and guarded frames (inf
           host.commit(paints);
           const regions = api.safePaintRegions(source.capture(), false);
           element.style.setProperty(
-            '--ww-decoration-clip',
+            '--around-decoration-clip',
             `path('${regions.map((r: any) => `M${r.left} ${r.top}h${r.width}v${r.height}h${-r.width}Z`).join('')}')`,
           );
         }
@@ -2231,11 +2229,11 @@ test('G1.3 (D11): elements added without controls are checked in their subtree o
         host.sample(await frame());
         host.commit(paints);
       }
-      document.documentElement.removeAttribute('data-ww-guard-geometry');
+      document.documentElement.removeAttribute('data-around-guard-geometry');
     };
     // The trace keeps earlier entries: only those after `since` belong to this change.
     const checks = (since: number) =>
-      (JSON.parse(document.documentElement.getAttribute('data-ww-guard-geometry') ?? '[]') as any[]).filter(
+      (JSON.parse(document.documentElement.getAttribute('data-around-guard-geometry') ?? '[]') as any[]).filter(
         (entry) => entry.change === 'subtree-check' && entry.at >= since,
       );
     const run = async (change: () => void) => {
@@ -2361,12 +2359,12 @@ test('G1.3: a screen-plane layer stays shown while the wheel scrolls, and its cl
   await youtube.addScriptTag({ content: await probeCode() });
   await youtube.evaluate(() => {
     const reader = (window as any).G1Probe.youtubeOperations(document);
-    const host = document.querySelector<HTMLElement>('#web-world-themes-decorations')!;
+    const host = document.querySelector<HTMLElement>('#around-decorations')!;
     const frame = host.shadowRoot!.querySelector<HTMLElement>('[data-image-id="over-grid"]')!;
     const rows: Record<string, unknown>[] = ((window as any).g13Rows = []);
     (window as any).g13Recording = true;
     const sample = () => {
-      const clip = host.style.getPropertyValue('--ww-decoration-clip');
+      const clip = host.style.getPropertyValue('--around-decoration-clip');
       const regions = [...clip.matchAll(/M(-?[\d.]+) (-?[\d.]+)h(-?[\d.]+)v(-?[\d.]+)/g)].map((m) =>
         m.slice(1).map(Number),
       );
@@ -2389,8 +2387,8 @@ test('G1.3: a screen-plane layer stays shown while the wheel scrolls, and its cl
       });
       rows.push({
         shown:
-          frame.style.visibility !== 'hidden' && !/"stopped":"[^"]/.test(host.getAttribute('data-ww-safety') ?? ''),
-        stopped: JSON.parse(host.getAttribute('data-ww-safety') ?? '{}').stopped ?? '',
+          frame.style.visibility !== 'hidden' && !/"stopped":"[^"]/.test(host.getAttribute('data-around-safety') ?? ''),
+        stopped: JSON.parse(host.getAttribute('data-around-safety') ?? '{}').stopped ?? '',
         under: under.length,
         inClip: inClip.map((s) => [s.id, [s.shape.left, s.shape.top, s.shape.width, s.shape.height].map(Math.round)]),
       });
@@ -2448,7 +2446,7 @@ test('G1.3: a look change that resizes a control hides everything and draws next
       }
     };
     const reads = (since: number) =>
-      (JSON.parse(document.documentElement.getAttribute('data-ww-guard-geometry') ?? '[]') as any[]).filter(
+      (JSON.parse(document.documentElement.getAttribute('data-around-guard-geometry') ?? '[]') as any[]).filter(
         (entry) => entry.change === 'read' && entry.at >= since,
       ).length;
     const playSurface = () =>
@@ -2502,7 +2500,7 @@ test('G1.3 (D14②): while the page scrolls, the answer check reads one group of
     await new Promise((resolve) => setTimeout(resolve, 450));
     for (let i = 0; i < 3; i++) host.sample(await frame());
     const log = (since: number) =>
-      (JSON.parse(document.documentElement.getAttribute('data-ww-guard-geometry') ?? '[]') as any[]).filter(
+      (JSON.parse(document.documentElement.getAttribute('data-around-guard-geometry') ?? '[]') as any[]).filter(
         (entry) => entry.at >= since,
       );
     // The phases last as long as 40 and 60 frames at 60Hz, whatever the display's rate: the answer

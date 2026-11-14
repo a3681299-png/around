@@ -4,7 +4,7 @@ import type { DesignDocument } from '../design/types';
 import type { EditorRevision } from '../editor-core/types';
 import { designKey } from '../storage/designs';
 
-const savedThroughKey = (siteId: string) => `webWorldThemes.studio.savedThrough.${siteId}`;
+const savedThroughKey = (siteId: string) => `around.studio.savedThrough.${siteId}`;
 
 export async function readDesign(siteId: string): Promise<DesignDocument | undefined> {
   const key = designKey(siteId);

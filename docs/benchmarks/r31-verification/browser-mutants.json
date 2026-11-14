@@ -94,7 +94,7 @@
           "title": "a covered control stops drawing until 描画を再開, and the same covered click stops it again",
           "status": "unexpected",
           "errors": [
-            "Error: expect(received).toContain(expected) // indexOf\n\nExpected value: \"クリックがページの操作部品に届くよう、絵の表示を止めました。\"\nReceived array: []\n\n  86 |   const seen = () => youtube.evaluate(() => (window as unknown as { __g111Stops: string[] }).__g111Stops);\n  87 |   await coveredClick();\n> 88 |   expect(await seen()).toContain('クリックがページの操作部品に届くよう、絵の表示を止めました。');\n     |                        ^\n  89 |   // One failure stops drawing for a moment only: it recovers, and there is nothing to resume.\n  90 |   await expect.poll(() => stopped(youtube)).toBe('');\n  91 |   await expect(studio.locator('.ww-editor-safety .safety-resume')).toBeHidden();\n    at WORKTREE\\tests\\operation-editing-input.spec.ts:88:24"
+            "Error: expect(received).toContain(expected) // indexOf\n\nExpected value: \"クリックがページの操作部品に届くよう、絵の表示を止めました。\"\nReceived array: []\n\n  86 |   const seen = () => youtube.evaluate(() => (window as unknown as { __g111Stops: string[] }).__g111Stops);\n  87 |   await coveredClick();\n> 88 |   expect(await seen()).toContain('クリックがページの操作部品に届くよう、絵の表示を止めました。');\n     |                        ^\n  89 |   // One failure stops drawing for a moment only: it recovers, and there is nothing to resume.\n  90 |   await expect.poll(() => stopped(youtube)).toBe('');\n  91 |   await expect(studio.locator('.around-editor-safety .safety-resume')).toBeHidden();\n    at WORKTREE\\tests\\operation-editing-input.spec.ts:88:24"
           ]
         }
       ]

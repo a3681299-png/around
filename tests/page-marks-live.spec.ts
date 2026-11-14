@@ -11,16 +11,16 @@ import { exposeEditorControls } from './helpers/editor-workspace';
  * UI0-c evidence: the editor's marks on the real page (skin hover, 未対応, the selected kind, the
  * selected video card, layer selection, group, lock, snap guides and protection), on a light and a
  * dark YouTube and over a bright and a dark video frame. The same spec runs against the build
- * before the change (WW_TEST_EXTENSION_PATH) and after it; WW_LIVE_PAGE_MARKS_PREFIX names the set.
+ * before the change (AROUND_TEST_EXTENSION_PATH) and after it; AROUND_LIVE_PAGE_MARKS_PREFIX names the set.
  */
-const prefix = process.env.WW_LIVE_PAGE_MARKS_PREFIX ?? 'after';
-const shots = path.resolve(process.env.WW_LIVE_PAGE_MARKS_SHOTS ?? 'docs/screenshots/ui0c');
+const prefix = process.env.AROUND_LIVE_PAGE_MARKS_PREFIX ?? 'after';
+const shots = path.resolve(process.env.AROUND_LIVE_PAGE_MARKS_SHOTS ?? 'docs/screenshots/ui0c');
 const dialogName = 'デザインエディター';
 // Two frames of public videos: a bright outdoor scene and a dark one, paused at a fixed time.
 // The first search result for each query; the record keeps the URL and the measured luminance.
 const videos = [
-  { name: 'bright', url: process.env.WW_LIVE_BRIGHT_URL, query: 'snow skiing powder day 4k', at: 30 },
-  { name: 'dark', url: process.env.WW_LIVE_DARK_URL, query: 'night sky stars timelapse 4k', at: 30 },
+  { name: 'bright', url: process.env.AROUND_LIVE_BRIGHT_URL, query: 'snow skiing powder day 4k', at: 30 },
+  { name: 'dark', url: process.env.AROUND_LIVE_DARK_URL, query: 'night sky stars timelapse 4k', at: 30 },
 ];
 async function resolveVideo(page: Page, video: (typeof videos)[number]) {
   if (video.url) return video.url;
@@ -98,7 +98,7 @@ async function frameLuminance(page: Page) {
 
 for (const scheme of ['light', 'dark'] as const)
   test(`optional real YouTube UI0-c: page marks on a ${scheme} YouTube`, async ({}, info) => {
-    test.skip(process.env.WW_LIVE_PAGE_MARKS !== '1', 'Explicit signed-out real YouTube UI0-c evidence.');
+    test.skip(process.env.AROUND_LIVE_PAGE_MARKS !== '1', 'Explicit signed-out real YouTube UI0-c evidence.');
     test.setTimeout(600_000);
     await mkdir(shots, { recursive: true });
     await mkdir('.work', { recursive: true });
@@ -131,8 +131,8 @@ for (const scheme of ['light', 'dark'] as const)
 
       // Results page: the skin tool's marks and a selected video card.
       await page.goto('https://www.youtube.com/results?search_query=lofi+hip+hop', { waitUntil: 'domcontentloaded' });
-      await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
-      const cards = page.locator('[data-ww-surface~="video-card"]');
+      await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
+      const cards = page.locator('[data-around-surface~="video-card"]');
       await expect(cards.first()).toBeVisible({ timeout: 30_000 });
       await declinePromotion(page);
       let editor = await openEditor(page, popup);
@@ -141,7 +141,7 @@ for (const scheme of ['light', 'dark'] as const)
         const card = cards.nth(1);
         await card.scrollIntoViewIfNeeded();
         await card.hover({ position: { x: 20, y: 20 } });
-        const hover = page.locator('#web-world-themes-skin-hover');
+        const hover = page.locator('#around-skin-hover');
         await expect(hover).toContainText('動画カード');
         await page.waitForTimeout(600);
         await clip(page, `${scheme}-skin-hover`, (await card.boundingBox())!);
@@ -164,7 +164,7 @@ for (const scheme of ['light', 'dark'] as const)
         await page.waitForTimeout(600);
         await clip(page, `${scheme}-skin-unsupported`, (await control.boundingBox())!);
         await card.click({ position: { x: 20, y: 20 } });
-        await expect(page.locator('html')).toHaveAttribute('data-ww-skin-selected', 'video-card');
+        await expect(page.locator('html')).toHaveAttribute('data-around-skin-selected', 'video-card');
         await moveAway(page);
         await page.waitForTimeout(600);
         const first = (await cards.nth(1).boundingBox())!,
@@ -182,7 +182,7 @@ for (const scheme of ['light', 'dark'] as const)
         const card = cards.nth(2);
         await card.scrollIntoViewIfNeeded();
         await card.click({ position: { x: 20, y: 20 } });
-        await expect(card).toHaveAttribute('data-ww-editor-selected', '');
+        await expect(card).toHaveAttribute('data-around-editor-selected', '');
         await moveAway(page);
         await page.waitForTimeout(600);
         await clip(page, `${scheme}-card-selected`, (await card.boundingBox())!);
@@ -197,7 +197,7 @@ for (const scheme of ['light', 'dark'] as const)
         await studio.goto(`chrome-extension://${extensionId}/studio/index.html`);
         await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
         await page.bringToFront();
-        const badge = page.locator('#web-world-themes-studio-link');
+        const badge = page.locator('#around-studio-link');
         await expect(badge).toContainText('別ウィンドウで編集中');
         await expect(badge.getByRole('button', { name: '編集を終了' })).toBeVisible();
         await clip(page, `${scheme}-studio-badge`, (await badge.boundingBox())!);
@@ -236,7 +236,7 @@ for (const scheme of ['light', 'dark'] as const)
         });
         await step(`${name}-layers`, async () => {
           await editor.getByLabel('画像素材を追加').setInputFiles(path.resolve('tests/fixtures/motion/petal.png'));
-          const images = page.locator('#web-world-themes-decorations [data-image-id]');
+          const images = page.locator('#around-decorations [data-image-id]');
           await expect(images).toHaveCount(1);
           const player = (await page.locator('#movie_player').boundingBox())!;
           // Move the layer into the clear middle of the frame and keep it selected.
@@ -247,7 +247,7 @@ for (const scheme of ['light', 'dark'] as const)
           await page.mouse.up();
           await moveAway(page);
           await page.waitForTimeout(600);
-          const frame = page.locator('#web-world-themes-decorations .selection-frame:visible').first();
+          const frame = page.locator('#around-decorations .selection-frame:visible').first();
           await clip(page, `${name}-layer-selected`, (await frame.boundingBox())!);
           // The handles' hit boxes, and whether each one is what its own centre hits.
           record[`${name}-handles`] = await frame.evaluate((node) =>
@@ -270,7 +270,7 @@ for (const scheme of ['light', 'dark'] as const)
           await editor.getByRole('button', { name: '選択をグループ化', exact: true }).click();
           await moveAway(page);
           await page.waitForTimeout(600);
-          const group = page.locator('#web-world-themes-decorations .selection-frame[data-group]:visible').first();
+          const group = page.locator('#around-decorations .selection-frame[data-group]:visible').first();
           await clip(page, `${name}-layer-group`, (await group.boundingBox())!);
           await editor.getByRole('button', { name: 'グループを解除', exact: true }).click();
           await rows.nth(0).click();
@@ -281,7 +281,7 @@ for (const scheme of ['light', 'dark'] as const)
             .click();
           await moveAway(page);
           await page.waitForTimeout(600);
-          const locked = page.locator('#web-world-themes-decorations .selection-frame[data-locked]:visible').first();
+          const locked = page.locator('#around-decorations .selection-frame[data-locked]:visible').first();
           await clip(page, `${name}-layer-locked`, (await locked.boundingBox())!);
           await editor.locator('[data-kind="image"]').nth(0).getByRole('button', { name: 'ロック解除' }).click();
           await exposeEditorControls(editor);
@@ -293,7 +293,7 @@ for (const scheme of ['light', 'dark'] as const)
           await page.mouse.down();
           await page.mouse.move(player.x + player.width / 2 + 3, player.y + player.height * 0.4, { steps: 12 });
           await page.waitForTimeout(400);
-          const guide = page.locator('#web-world-themes-decorations [data-snap-guide]:visible').first();
+          const guide = page.locator('#around-decorations [data-snap-guide]:visible').first();
           await expect(guide).toBeVisible();
           const g = (await guide.boundingBox())!;
           await clip(page, `${name}-layer-snap`, {
@@ -309,10 +309,10 @@ for (const scheme of ['light', 'dark'] as const)
           await studio.goto(`chrome-extension://${extensionId}/studio/index.html`);
           await expect(studio.locator('.connection-status')).toHaveAttribute('data-connected', 'true');
           // UI0-d round 3: 操作チェック sits in the editor's header while a layer is restricted.
-          await studio.locator('.ww-editor-safety .safety-check > summary').click();
+          await studio.locator('.around-editor-safety .safety-check > summary').click();
           await studio.getByLabel('操作面の保護範囲を表示').check();
           await page.bringToFront();
-          await expect(page.locator('#web-world-themes-operation-check')).toHaveCount(1);
+          await expect(page.locator('#around-operation-check')).toHaveCount(1);
           await moveAway(page);
           await page.waitForTimeout(600);
           await clip(page, `${name}-protect`, (await page.locator('#movie_player').boundingBox())!);

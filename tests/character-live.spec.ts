@@ -11,19 +11,19 @@ import { sidePanelDriver } from './helpers/side-panel';
 /**
  * R3-1b on real YouTube with a private local character: a VRM, its own .vrma motions and an
  * any-model motion. Never in CI: the model and the Mixamo-derived motions are not redistributable.
- * WW_VRM_FILE = the VRM, WW_VRMA_DIR = the motion folder with manifest.json and trusie/.
+ * AROUND_VRM_FILE = the VRM, AROUND_VRMA_DIR = the motion folder with manifest.json and trusie/.
  */
 test('real YouTube: a VRM character plays its own .vrma motions; the body measure gates standard ones', async () => {
-  const dir = process.env.WW_VRMA_DIR;
+  const dir = process.env.AROUND_VRMA_DIR;
   test.skip(
-    !process.env.WW_VRM_FILE || !dir || process.env.WW_LIVE_CHARACTER !== '1',
+    !process.env.AROUND_VRM_FILE || !dir || process.env.AROUND_LIVE_CHARACTER !== '1',
     'Explicit local character and real YouTube verification; no avatar or motion is bundled.',
   );
   const own = (name: string) => path.resolve(dir!, 'trusie', name),
     any = (name: string) => path.resolve(dir!, name);
   test.skip(!existsSync(own('sit.vrma')) || !existsSync(any('manifest.json')), 'motion folder layout differs');
   test.setTimeout(240000);
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-character-live-')), false, {
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-character-live-')), false, {
     headed: true,
     width: 1920,
   });
@@ -33,7 +33,7 @@ test('real YouTube: a VRM character plays its own .vrma motions; the body measur
   try {
     const manager = await context.newPage();
     await manager.goto('chrome://extensions/');
-    const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+    const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
     await item.waitFor();
     const id = await item.evaluate((e) => (e as HTMLElement & { data?: { id: string } }).data?.id ?? e.id);
     await manager.close();
@@ -46,9 +46,9 @@ test('real YouTube: a VRM character plays its own .vrma motions; the body measur
     await page.bringToFront();
     await openSidePanelFromIcon(popup, page);
     const panel = await sidePanelDriver(context, page, id);
-    await panel.files([path.resolve(process.env.WW_VRM_FILE!)], '.model-file');
+    await panel.files([path.resolve(process.env.AROUND_VRM_FILE!)], '.model-file');
     const media = page.locator(
-      ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations) .model-media',
+      ':is(#around-decorations, #around-video-decorations, #around-page-decorations) .model-media',
     );
     await expect(media).toHaveAttribute('data-renderer', 'three', { timeout: 100000 });
     await panel.fill('[data-image-prop="widthPx"]', '300');

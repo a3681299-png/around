@@ -8,7 +8,7 @@
   },
   "id": "cppaebpfnlmghlgiglljoogedgdjcnje",
   "before": {
-    "webWorldThemes.design.youtube": {
+    "around.design.youtube": {
       "baseThemeId": "retro",
       "decorations": [],
       "id": "upgrade-artwork",
@@ -25,11 +25,11 @@
       "schemaVersion": 13,
       "siteId": "youtube"
     },
-    "webWorldThemes.enabled": false,
-    "webWorldThemes.strength": 37
+    "around.enabled": false,
+    "around.strength": 37
   },
   "after": {
-    "webWorldThemes.design.youtube": {
+    "around.design.youtube": {
       "baseThemeId": "retro",
       "decorations": [],
       "id": "upgrade-artwork",
@@ -46,7 +46,7 @@
       "schemaVersion": 13,
       "siteId": "youtube"
     },
-    "webWorldThemes.enabled": false,
-    "webWorldThemes.strength": 37
+    "around.enabled": false,
+    "around.strength": 37
   }
 }

@@ -124,7 +124,7 @@ async function nativeInputs(page: Page) {
 
 test('optional real YouTube operation checks with and without authored paint', async ({}, info) => {
   test.skip(
-    process.env.WW_LIVE_OPERATIONS !== '1',
+    process.env.AROUND_LIVE_OPERATIONS !== '1',
     'Explicit public-network operation verification; fixtures cover signed-in input behavior without posting.',
   );
   test.setTimeout(180_000);
@@ -136,11 +136,11 @@ test('optional real YouTube operation checks with and without authored paint', a
     const popup = await context.newPage();
     await popup.goto(`chrome-extension://${id}/popup/index.html`);
     const page = await context.newPage();
-    const url = process.env.WW_LIVE_VIDEO_URL ?? 'https://www.youtube.com/watch?v=LC1a-DwUhls';
+    const url = process.env.AROUND_LIVE_VIDEO_URL ?? 'https://www.youtube.com/watch?v=LC1a-DwUhls';
     await page.goto(url, { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 30_000 });
     await showArtwork(popup);
-    if (process.env.WW_LIVE_OPERATIONS_OFF === '1')
+    if (process.env.AROUND_LIVE_OPERATIONS_OFF === '1')
       await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
     await page.bringToFront();
     const before = await nativeInputs(page);
@@ -177,8 +177,8 @@ test('optional real YouTube operation checks with and without authored paint', a
         .catch(async (error: Error) => {
           // Keep why protection hides the restored artwork on the live page.
           const state = await page.evaluate(() => ({
-            safety: document.querySelector('#web-world-themes-decorations')?.getAttribute('data-ww-safety'),
-            planes: [...document.querySelectorAll('[id^="web-world-themes-"][id$="decorations"]')].map((h) => h.id),
+            safety: document.querySelector('#around-decorations')?.getAttribute('data-around-safety'),
+            planes: [...document.querySelectorAll('[id^="around-"][id$="decorations"]')].map((h) => h.id),
             video: (() => {
               const v = document.querySelector<HTMLVideoElement>('video.html5-main-video');
               return v && { paused: v.paused, readyState: v.readyState, currentTime: v.currentTime };

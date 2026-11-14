@@ -9,9 +9,9 @@ import { createTakeSampler, type SignalTake } from '../src/world/takes';
 import type { DesignDocument } from '../src/design/types';
 
 test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, replay isolation and reload', async () => {
-  test.skip(process.env.WW_LIVE_SIGNAL_TIMELINE !== '1', 'Explicit real YouTube Signal Timeline verification.');
+  test.skip(process.env.AROUND_LIVE_SIGNAL_TIMELINE !== '1', 'Explicit real YouTube Signal Timeline verification.');
   test.setTimeout(180_000);
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-signal-live-')), false, {
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-signal-live-')), false, {
     headed: true,
     width: 1920,
   });
@@ -31,7 +31,7 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
     stage('extension');
     const manager = await context.newPage();
     await manager.goto('chrome://extensions/');
-    const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+    const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
     await item.waitFor();
     const id = await item.evaluate((node) => (node as HTMLElement & { data?: { id: string } }).data?.id ?? node.id);
     await manager.close();
@@ -43,13 +43,13 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
     await expect(page.locator('#movie_player')).toBeVisible({ timeout: 25_000 });
     await popup.getByRole('switch', { name: '作品を表示する' }).check();
     await page.bringToFront();
-    await expect(page.locator('html')).toHaveAttribute('data-ww-site', 'youtube');
+    await expect(page.locator('html')).toHaveAttribute('data-around-site', 'youtube');
     stage('open Studio');
     await openSidePanelFromIcon(popup, page);
-    const local = page.locator('#web-world-themes-creator');
+    const local = page.locator('#around-creator');
     stage('side panel');
     const panel = await sidePanelDriver(context, page, id),
-      ui = 'document.querySelector("#web-world-themes-creator").shadowRoot';
+      ui = 'document.querySelector("#around-creator").shadowRoot';
     stage('import GIF');
     await panel.files([path.resolve('tests/fixtures/motion/petal.gif')], '.animation-file');
     await expect.poll(() => panel.text('.selected-count')).toBe('1個選択中');
@@ -91,7 +91,7 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
     report.checks.gifRuleEditedAndSaved = true;
     stage('live scroll');
     const media = page.locator(
-      ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations) .media',
+      ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations) .media',
     );
     // G1.2 (D9): the pointer rests where the page's links scroll under it, as a person's does while
     // scrolling with the wheel: the left edge of the column below the player (descriptions, comment
@@ -135,7 +135,7 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
         }, pointer)),
       });
       // G1.3: the GIF follows the scroll and is shown at the same time. An opacity that follows
-      // while the guard hides the layer (its frame's visibility, a stop in data-ww-safety) is not a
+      // while the guard hides the layer (its frame's visibility, a stop in data-around-safety) is not a
       // pass. The media element itself is hidden at opacity 0 by the renderer, which is not a stop.
       await expect
         .poll(() =>
@@ -145,7 +145,7 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
               value = range > 0 ? root.scrollTop / range : 0;
             const host = (node.getRootNode() as ShadowRoot).host,
               frame = node.closest<HTMLElement>('[data-image-id]');
-            const stopped = JSON.parse(host?.getAttribute('data-ww-safety') ?? '{}').stopped ?? '';
+            const stopped = JSON.parse(host?.getAttribute('data-around-safety') ?? '{}').stopped ?? '';
             if (frame?.style.visibility === 'hidden' || getComputedStyle(host).visibility === 'hidden' || stopped)
               return 1;
             return Math.abs(Number(node.style.opacity) - (1 - Math.abs(value * 2 - 1)));
@@ -163,7 +163,7 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
                   'a[href], button, [role="button"], input, textarea, [contenteditable="true"], [role="slider"], [role="dialog"], [role="menu"], tp-yt-paper-dialog, ytd-searchbox, yt-searchbox',
                 ),
               ]
-                .filter((e) => !e.closest('[id^="web-world-themes"]'))
+                .filter((e) => !e.closest('[id^="around"]'))
                 .map((e) => ({ e, r: e.getBoundingClientRect() }))
                 .filter(
                   ({ r }) =>
@@ -179,20 +179,20 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
               range: root.scrollHeight - root.clientHeight,
               visibility: (node.closest('[data-frame-id]') as HTMLElement | null)?.style.visibility,
               frameVisibility: node.closest<HTMLElement>('[data-image-id]')?.style.visibility ?? null,
-              safety: [...document.querySelectorAll('[id^="web-world-themes-"][id$="decorations"]')].map((host) => [
+              safety: [...document.querySelectorAll('[id^="around-"][id$="decorations"]')].map((host) => [
                 host.id,
-                host.getAttribute('data-ww-safety'),
+                host.getAttribute('data-around-safety'),
               ]),
               active: document.activeElement?.tagName,
-              // Only a WW_GUARD_TRACE build writes this: why the approach rule turned on or off.
-              approach: JSON.parse(document.documentElement.getAttribute('data-ww-guard-approach') ?? 'null'),
+              // Only a AROUND_GUARD_TRACE build writes this: why the approach rule turned on or off.
+              approach: JSON.parse(document.documentElement.getAttribute('data-around-guard-approach') ?? 'null'),
             };
           }, pointer);
           throw error;
         });
-      // A WW_GUARD_TRACE build records the near controls and the roots they hold at this scroll.
+      // A AROUND_GUARD_TRACE build records the near controls and the roots they hold at this scroll.
       under.at(-1)!.approach = await page.evaluate(() => {
-        const log = JSON.parse(document.documentElement.getAttribute('data-ww-guard-approach') ?? 'null') as
+        const log = JSON.parse(document.documentElement.getAttribute('data-around-guard-approach') ?? 'null') as
           { change: string; near?: string[]; held?: Record<string, string[]> }[] | null;
         const last = log?.filter((entry) => entry.change === 'approach').at(-1);
         return last ? { near: last.near ?? [], held: last.held ?? {} } : null;
@@ -207,8 +207,8 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
           // Why drawing is held at this moment (the guard's record), if it is.
           stopped:
             JSON.parse(
-              (node.getRootNode() as ShadowRoot).host?.getAttribute('data-ww-safety') ??
-                document.querySelector('#web-world-themes-decorations')?.getAttribute('data-ww-safety') ??
+              (node.getRootNode() as ShadowRoot).host?.getAttribute('data-around-safety') ??
+                document.querySelector('#around-decorations')?.getAttribute('data-around-safety') ??
                 '{}',
             ).stopped ?? null,
           viewport: [innerWidth, innerHeight],
@@ -221,7 +221,7 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
             'a[href], button, [role="button"], input, textarea, [contenteditable="true"], [role="slider"], ytd-searchbox, yt-searchbox',
           ),
         ]
-          .filter((e) => !e.closest('[id^="web-world-themes"]'))
+          .filter((e) => !e.closest('[id^="around"]'))
           .map((e) => ({ e, r: e.getBoundingClientRect() }))
           .filter(
             ({ r }) =>
@@ -250,7 +250,7 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
       await page.waitForTimeout(100);
       await verifyScroll(progress);
     }
-    // With the record (a WW_GUARD_TRACE build): whenever a control passed under the resting pointer,
+    // With the record (a AROUND_GUARD_TRACE build): whenever a control passed under the resting pointer,
     // the approach held only roots over it, never the GIF.
     for (const step of under.filter((entry) => entry.control && entry.approach))
       expect(Object.keys(step.approach!.held), JSON.stringify(step)).not.toContain(gifId);
@@ -258,7 +258,7 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
     stage('wheel scroll');
     // G1.3: real wheel input at about 90ms, as a person scrolls, with the pointer resting at the D9
     // point. Every presented frame between the first and the last wheel records whether the GIF is
-    // shown. A WW_GUARD_TRACE build also records why the guard stopped; only a stop that follows a
+    // shown. A AROUND_GUARD_TRACE build also records why the guard stopped; only a stop that follows a
     // read where the page's controls really changed (added, removed or moved in document
     // coordinates) is explained. Every other hidden frame fails the test (D5).
     await page.evaluate(() => scrollTo(0, 0));
@@ -267,19 +267,20 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
       .poll(() =>
         media.evaluate(
           (node: HTMLElement) =>
-            JSON.parse((node.getRootNode() as ShadowRoot).host?.getAttribute('data-ww-safety') ?? '{}').stopped ?? '',
+            JSON.parse((node.getRootNode() as ShadowRoot).host?.getAttribute('data-around-safety') ?? '{}').stopped ??
+            '',
         ),
       )
       .toBe('');
     await page.waitForTimeout(250);
     await media.first().evaluate((node: HTMLElement) => {
-      document.documentElement.removeAttribute('data-ww-guard-geometry');
-      const frames: unknown[] = ((window as any).wwWheelFrames = []);
-      (window as any).wwWheelEvents = [];
-      (window as any).wwWheelRecording = true;
+      document.documentElement.removeAttribute('data-around-guard-geometry');
+      const frames: unknown[] = ((window as any).aroundWheelFrames = []);
+      (window as any).aroundWheelEvents = [];
+      (window as any).aroundWheelRecording = true;
       document.addEventListener(
         'wheel',
-        (event) => (window as any).wwWheelEvents.push({ t: performance.now(), deltaY: event.deltaY }),
+        (event) => (window as any).aroundWheelEvents.push({ t: performance.now(), deltaY: event.deltaY }),
         { capture: true, passive: true },
       );
       const host = (node.getRootNode() as ShadowRoot).host,
@@ -291,10 +292,10 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
           scrollY,
           // The guard hides the layer's frame; the media alone is hidden at opacity 0 (not a stop).
           visible: frame?.style.visibility !== 'hidden' && getComputedStyle(host).visibility !== 'hidden',
-          stopped: JSON.parse(host.getAttribute('data-ww-safety') ?? '{}').stopped ?? '',
+          stopped: JSON.parse(host.getAttribute('data-around-safety') ?? '{}').stopped ?? '',
           rect: [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)],
         });
-        if ((window as any).wwWheelRecording) requestAnimationFrame(sample);
+        if ((window as any).aroundWheelRecording) requestAnimationFrame(sample);
       };
       requestAnimationFrame(sample);
     });
@@ -312,7 +313,7 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
                   'a[href], button, [role="button"], input, textarea, [contenteditable="true"], [role="slider"], ytd-searchbox, yt-searchbox',
                 ),
               ]
-                .filter((e) => !e.closest('[id^="web-world-themes"]'))
+                .filter((e) => !e.closest('[id^="around"]'))
                 .map((e) => e.getBoundingClientRect())
                 .filter(
                   (r) =>
@@ -325,11 +326,11 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
         );
     }
     const wheel = await page.evaluate(() => {
-      (window as any).wwWheelRecording = false;
+      (window as any).aroundWheelRecording = false;
       return {
-        frames: (window as any).wwWheelFrames as { t: number; visible: boolean; stopped: string }[],
-        events: (window as any).wwWheelEvents as { t: number }[],
-        geometry: JSON.parse(document.documentElement.getAttribute('data-ww-guard-geometry') ?? 'null') as
+        frames: (window as any).aroundWheelFrames as { t: number; visible: boolean; stopped: string }[],
+        events: (window as any).aroundWheelEvents as { t: number }[],
+        geometry: JSON.parse(document.documentElement.getAttribute('data-around-guard-geometry') ?? 'null') as
           { at: number; change: string; added?: number; removed?: number; documentMoved?: number }[] | null,
       };
     });
@@ -381,16 +382,13 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
     await panel.click('.take-store');
     await expect.poll(() => panel.text('.take-saved')).toBe('テイク保存済み');
     const library = await panel.evaluate<{ id: string }[]>(
-      'chrome.runtime.sendMessage({type:"web-world-themes:signal-takes",action:"list",siteId:"youtube"}).then(r=>r.value)',
+      'chrome.runtime.sendMessage({type:"around:signal-takes",action:"list",siteId:"youtube"}).then(r=>r.value)',
     );
     const take = await panel.evaluate<SignalTake>(
-      `chrome.runtime.sendMessage({type:"web-world-themes:signal-takes",action:"get",siteId:"youtube",id:${JSON.stringify(library[0]!.id)}}).then(r=>r.value)`,
+      `chrome.runtime.sendMessage({type:"around:signal-takes",action:"get",siteId:"youtube",id:${JSON.stringify(library[0]!.id)}}).then(r=>r.value)`,
     );
     const design = await popup.evaluate(
-      async () =>
-        (await chrome.storage.local.get('webWorldThemes.design.youtube'))[
-          'webWorldThemes.design.youtube'
-        ] as DesignDocument,
+      async () => (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'] as DesignDocument,
     );
     expect(design.schemaVersion).toBe(13);
     expect(design).not.toHaveProperty('takes');
@@ -447,7 +445,7 @@ test('real YouTube: GIF scroll rule, explicit take recording, ghost projection, 
     await popup.getByRole('switch', { name: '作品を表示する' }).uncheck();
     await expect(
       page.locator(
-        ':is(#web-world-themes-decorations, #web-world-themes-video-decorations, #web-world-themes-page-decorations, #web-world-themes-atmosphere-decorations)',
+        ':is(#around-decorations, #around-video-decorations, #around-page-decorations, #around-atmosphere-decorations)',
       ),
     ).toHaveCount(0);
     await expect(local).toHaveCount(0);

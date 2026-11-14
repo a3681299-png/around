@@ -1,8 +1,8 @@
 $ErrorActionPreference = 'Stop'
-$env:WW_TEST_WINDOW_OFFSCREEN = '1'
+$env:AROUND_TEST_WINDOW_OFFSCREEN = '1'
 $verificationRuns = @()
 function Invoke-Verification([string]$Label, [string[]]$TestArguments, [string]$Extension = '.work/extension') {
-  $env:WW_TEST_EXTENSION_PATH = (Resolve-Path $Extension).Path
+  $env:AROUND_TEST_EXTENSION_PATH = (Resolve-Path $Extension).Path
   $env:PLAYWRIGHT_JSON_OUTPUT_NAME = Join-Path (Get-Location).Path ".work/evidence/$Label.json"
   $verificationArgs = $TestArguments + @('--reporter=list,json', "--output=.work/evidence/$Label-traces")
   & npm run test:e2e -- @verificationArgs *> ".work/evidence/$Label.log"

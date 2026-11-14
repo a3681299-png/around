@@ -25,29 +25,29 @@ export interface SettingsEditorEntry {
 export function createSettingsPanel(doc: Document, editor?: SettingsEditorEntry): SettingsPanel {
   const button = doc.createElement('button');
   button.type = 'button';
-  button.dataset.wwSettingsButton = '';
-  button.title = 'Web World Themes の設定';
+  button.dataset.aroundSettingsButton = '';
+  button.title = 'Around の設定';
   button.setAttribute('aria-label', button.title);
   button.setAttribute('aria-haspopup', 'dialog');
   button.setAttribute('aria-expanded', 'false');
-  button.setAttribute('aria-controls', 'web-world-themes-panel');
+  button.setAttribute('aria-controls', 'around-panel');
   button.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;color:#fff;';
   // Temporary sliders icon, independent of a theme's eventual visual identity.
   button.innerHTML =
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/><path d="M8 3v6M16 9v6M10 15v6" stroke-width="4"/></g></svg>';
 
   const panel = doc.createElement('div');
-  panel.id = 'web-world-themes-panel';
+  panel.id = 'around-panel';
   panel.hidden = true;
   panel.lang = 'ja';
   panel.setAttribute('role', 'dialog');
-  panel.setAttribute('aria-label', 'Web World Themes の設定');
+  panel.setAttribute('aria-label', 'Around の設定');
   const shadow = panel.attachShadow({ mode: 'open' });
   const style = doc.createElement('style');
   style.textContent = tokens + settingsStyles + panelStyles;
   shadow.append(style);
   const main = doc.createElement('div');
-  main.className = 'settings ww-editor';
+  main.className = 'settings around-editor';
   main.innerHTML = SETTINGS_MARKUP;
   shadow.append(main);
   const closeButton = main.querySelector<HTMLButtonElement>('.close')!;
@@ -62,7 +62,7 @@ export function createSettingsPanel(doc: Document, editor?: SettingsEditorEntry)
   };
   direct.addEventListener('click', onEditor);
   separate.addEventListener('click', onEditor);
-  const titlebar = main.querySelector<HTMLElement>('.ww-titlebar')!,
+  const titlebar = main.querySelector<HTMLElement>('.around-titlebar')!,
     view = doc.defaultView!;
   let avoidRect: (() => SettingsRect | undefined) | undefined;
   let saved: { x: number; y: number } | undefined,
@@ -70,9 +70,9 @@ export function createSettingsPanel(doc: Document, editor?: SettingsEditorEntry)
     alive = true;
   let gesture: { x: number; y: number; left: number; top: number } | undefined;
   const place = (x: number, y: number, maxHeight: number) => {
-    panel.style.setProperty('--ww-settings-x', x + 'px');
-    panel.style.setProperty('--ww-settings-y', y + 'px');
-    panel.style.setProperty('--ww-settings-height', Math.max(80, maxHeight) + 'px');
+    panel.style.setProperty('--around-settings-x', x + 'px');
+    panel.style.setProperty('--around-settings-y', y + 'px');
+    panel.style.setProperty('--around-settings-height', Math.max(80, maxHeight) + 'px');
   };
   const clampSaved = () => {
     if (!saved) return;

@@ -3,7 +3,7 @@ import { BACKUP_LIMITS, BACKUP_MESSAGES } from './schema';
 import settingsStyles from '../settings/settings.css';
 import tokens from '../editor/studio-tokens.css';
 
-// The same WWT Studio sheet as the settings; here the page itself is the token host.
+// The same Around Studio sheet as the settings; here the page itself is the token host.
 const style = document.createElement('style');
 style.textContent = tokens.replaceAll(':host', ':root') + settingsStyles;
 document.head.append(style);
@@ -87,11 +87,11 @@ get('#backup-export').addEventListener('click', () => {
     downloadURL = URL.createObjectURL(result.file);
     output.href = downloadURL;
     output.download =
-      'web-world-themes-' +
+      'around-' +
       chrome.runtime.id.slice(0, 8) +
       '-' +
       new Date().toISOString().replace(/[:.]/g, '-') +
-      '.wwbackup';
+      '.aroundbackup';
     output.hidden = false;
     output.textContent = '検証済みバックアップを保存（' + describe(result.summary) + '）';
     status.textContent = '書き出しが完了しました。「バックアップを保存」のリンクからファイルを保存してください。';

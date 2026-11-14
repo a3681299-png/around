@@ -57,9 +57,9 @@ async function magentaArtwork(popup: Page, youtube: Page) {
 async function place(youtube: Page, html: string) {
   await youtube.evaluate((html) => {
     const player = document.querySelector<HTMLElement>('#movie_player')!;
-    document.querySelector('#ww-test-overlay')?.remove();
+    document.querySelector('#around-test-overlay')?.remove();
     const host = document.createElement('div');
-    host.id = 'ww-test-overlay';
+    host.id = 'around-test-overlay';
     // At the media's level (z-index 10, like YouTube's seek and speed overlays), after it: over the
     // picture, under the cut-out way's plane (media + 1 = 11), the case only the cut-out saves. The
     // layering way's plane sits directly after the media at 10, so this overlay is over it by tree
@@ -144,7 +144,7 @@ test('G1: an overlay link the adapter does not recognise is covered (the check i
   test.skip(layeringOn, 'Cut-out way only: under the controls by stacking, it is not covered (next test).');
   await magentaArtwork(popup, youtube);
   // Deliberately unmarked: the same box, but neither a link nor focusable nor a known part.
-  await place(youtube, '<div class="ww-unknown" id="target">Next video</div>');
+  await place(youtube, '<div class="around-unknown" id="target">Next video</div>');
   expect((await covered(youtube)).over).toBeGreaterThan(1000);
 });
 
@@ -156,13 +156,13 @@ test('G1 (layering): an overlay the adapter does not recognise is still over the
   test.skip(!layeringOn, 'The layering way only.');
   await magentaArtwork(popup, youtube);
   // The adapter knows nothing of it; the browser paints it over the plane all the same.
-  await place(youtube, '<div class="ww-unknown" id="target">Next video</div>');
+  await place(youtube, '<div class="around-unknown" id="target">Next video</div>');
   const result = await covered(youtube);
   expect(result.drawn).toBe(true);
   expect(result.over).toBe(0);
   // The check is real: with the plane deliberately put over the player's parts, it is covered.
   await youtube.evaluate(() => {
-    const shadow = document.querySelector<HTMLElement>('#web-world-themes-video-decorations')!.shadowRoot!;
+    const shadow = document.querySelector<HTMLElement>('#around-video-decorations')!.shadowRoot!;
     const broken = document.createElement('style');
     broken.textContent = ':host{z-index:5000!important}';
     shadow.append(broken);

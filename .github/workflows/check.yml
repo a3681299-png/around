@@ -85,8 +85,8 @@ jobs:
     timeout-minutes: 25
     env:
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.work/browsers
-      WW_BUILD_OUT: .work/test-dist
-      WW_TEST_EXTENSION_PATH: .work/test-dist
+      AROUND_BUILD_OUT: .work/test-dist
+      AROUND_TEST_EXTENSION_PATH: .work/test-dist
     steps:
       - uses: actions/checkout@v6
         with:

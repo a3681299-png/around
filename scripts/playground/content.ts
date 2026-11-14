@@ -182,10 +182,10 @@ export function writeContent(root: string, out: string, mirdoRoot?: string): { m
     ? { sitDown: clip('Sitting_Enter', 'sit'), walk: clip('Walk_Loop', 'stand'), hop: clip('Jump_Land', 'stand') }
     : {};
   const resident = { model: vrmId, sit, stand, ...extras, mannequin: !mirdoRoot };
-  const localRoom = process.env.WW_PLAYGROUND_LOCAL_ROOM;
+  const localRoom = process.env.AROUND_PLAYGROUND_LOCAL_ROOM;
   const layout = JSON.parse(
     readFileSync(
-      process.env.WW_PLAYGROUND_LOCAL_LAYOUT ?? join(root, 'scripts/playground/desktop-layout.json'),
+      process.env.AROUND_PLAYGROUND_LOCAL_LAYOUT ?? join(root, 'scripts/playground/desktop-layout.json'),
       'utf8',
     ),
   );

@@ -12,7 +12,7 @@ import { writeContent } from '../scripts/playground/content';
  * the default imported mannequin's box with autonomy on and off, and sweep the player with the
  * original mannequin at its corner. Watch normally and edit in a connected editor.
  * Every frame records the composition, guard, position and pose. Explicit:
- * WW_LIVE_FLICKER=1 (headless; WW_TEST_EXTENSION_PATH for another build). Records go to .work/flicker-live.
+ * AROUND_LIVE_FLICKER=1 (headless; AROUND_TEST_EXTENSION_PATH for another build). Records go to .work/flicker-live.
  */
 const out = path.resolve('.work/flicker-live');
 type Point = { x: number; y: number };
@@ -35,9 +35,9 @@ type Row = {
 /** Installed once: per frame, the way, the stop and its reasons, for the current phase. */
 async function sampler(page: Page) {
   await page.evaluate(() => {
-    const w = window as unknown as { wwPhase: string; wwFrames: Record<string, Row[]> };
-    w.wwPhase = 'start';
-    w.wwFrames = {};
+    const w = window as unknown as { aroundPhase: string; aroundFrames: Record<string, Row[]> };
+    w.aroundPhase = 'start';
+    w.aroundFrames = {};
     let pointer: Point | null = null;
     let layerId: string | null = null;
     let lastSafety = '';
@@ -49,7 +49,7 @@ async function sampler(page: Page) {
       let node: Element | undefined,
         media: HTMLElement | null | undefined,
         hostId = '';
-      for (const host of document.querySelectorAll('[id^="web-world-themes"]')) {
+      for (const host of document.querySelectorAll('[id^="around"]')) {
         // The layer drawing the 3D character (the editor's working copy has its own layer id).
         const model = host.shadowRoot?.querySelector<HTMLElement>('.model-media');
         const found = model?.closest('[data-image-id]');
@@ -63,15 +63,15 @@ async function sampler(page: Page) {
       const before = host?.previousElementSibling as HTMLElement | null;
       const way = !node
         ? 'none'
-        : hostId !== 'web-world-themes-video-decorations'
-          ? hostId.replace('web-world-themes-', '')
+        : hostId !== 'around-video-decorations'
+          ? hostId.replace('around-', '')
           : before?.classList.contains('html5-video-container') &&
               getComputedStyle(host!).zIndex === getComputedStyle(before).zIndex
             ? 'beneath'
             : 'cut-out';
       const stopped = !node || node.hasAttribute('data-safety-limited');
       layerId = node?.getAttribute('data-image-id') ?? layerId;
-      const safety = document.querySelector<HTMLElement>('[data-ww-safety]')?.dataset.wwSafety ?? '';
+      const safety = document.querySelector<HTMLElement>('[data-around-safety]')?.dataset.aroundSafety ?? '';
       if (safety !== lastSafety) {
         lastSafety = safety;
         issues = JSON.parse(safety || '{}').issues ?? [];
@@ -81,7 +81,7 @@ async function sampler(page: Page) {
         .map((i) => `${i.action ?? 'stop'} ${i.surfaceId}: ${i.reason}`)
         .join(' / ');
       const why = stopped ? layerIssues : '';
-      const trace = document.documentElement.dataset.wwGuardGeometry ?? '';
+      const trace = document.documentElement.dataset.aroundGuardGeometry ?? '';
       if (trace !== lastGeometry) {
         lastGeometry = trace;
         const entries = JSON.parse(trace || '[]') as { change: string }[];
@@ -97,7 +97,7 @@ async function sampler(page: Page) {
       const failed = [...document.querySelectorAll<HTMLElement>('#movie_player .ytp-error')].some(
         (e) => e.getBoundingClientRect().height > 0 && getComputedStyle(e).display !== 'none',
       );
-      (w.wwFrames[w.wwPhase] ??= []).push({
+      (w.aroundFrames[w.aroundPhase] ??= []).push({
         at,
         way,
         stopped,
@@ -118,7 +118,7 @@ async function sampler(page: Page) {
   });
 }
 const phase = (page: Page, name: string) =>
-  page.evaluate((n) => ((window as unknown as { wwPhase: string }).wwPhase = n), name);
+  page.evaluate((n) => ((window as unknown as { aroundPhase: string }).aroundPhase = n), name);
 
 /** The pointer across the player at three heights, around and over the character, then off. */
 async function sweep(page: Page, rounds = 3) {
@@ -163,7 +163,7 @@ async function overCharacter(page: Page, scene: string, run: string) {
     if (mode === 'still') {
       for (let i = 0; i < 4; i++) {
         await page.waitForTimeout(300);
-        if (process.env.WW_FLICKER_SHOTS === '1') await shoot(name, i);
+        if (process.env.AROUND_FLICKER_SHOTS === '1') await shoot(name, i);
       }
     } else {
       const extent = mode === 'slow' ? box.width / 8 : box.width * 0.6;
@@ -172,7 +172,7 @@ async function overCharacter(page: Page, scene: string, run: string) {
         const wave = Math.sin((i / 12) * Math.PI);
         await page.mouse.move(x - extent * (mode === 'cross' ? wave * wave : wave), y);
         await page.waitForTimeout(50);
-        if (process.env.WW_FLICKER_SHOTS === '1' && [3, 9, 15, 21].includes(i)) await shoot(name, i);
+        if (process.env.AROUND_FLICKER_SHOTS === '1' && [3, 9, 15, 21].includes(i)) await shoot(name, i);
       }
     }
   }
@@ -237,13 +237,13 @@ function count(rows: Row[]) {
 
 for (const autonomy of [true, false])
   test(`real YouTube: the character does not flicker while watching or editing (autonomy ${autonomy ? 'on' : 'off'})`, async () => {
-    test.skip(process.env.WW_LIVE_FLICKER !== '1', 'Explicit real YouTube check (WW_LIVE_FLICKER=1).');
+    test.skip(process.env.AROUND_LIVE_FLICKER !== '1', 'Explicit real YouTube check (AROUND_LIVE_FLICKER=1).');
     test.setTimeout(300000);
     await cursorFlicker(autonomy, false);
   });
 
 test('real YouTube: the character at the player corner does not flicker while watching or editing', async () => {
-  test.skip(process.env.WW_LIVE_FLICKER !== '1', 'Explicit real YouTube check (WW_LIVE_FLICKER=1).');
+  test.skip(process.env.AROUND_LIVE_FLICKER !== '1', 'Explicit real YouTube check (AROUND_LIVE_FLICKER=1).');
   test.setTimeout(300000);
   await cursorFlicker(true, true);
 });
@@ -254,10 +254,11 @@ async function cursorFlicker(autonomy: boolean, playerCorner: boolean) {
   const { models } = writeContent(path.resolve('.'), content);
   const file = (name: string) => path.join(content, name);
   const design = JSON.parse(await readFile(file('design.json'), 'utf8'));
-  // WW_FLICKER_VIDEO=1: a headed window kept off screen (scripts/test.mjs sets WW_TEST_WINDOW_OFFSCREEN=1),
+  // AROUND_FLICKER_VIDEO=1: a headed window kept off screen (scripts/test.mjs sets AROUND_TEST_WINDOW_OFFSCREEN=1),
   // recorded to .work/flicker-live/video for a person to watch.
-  const video = process.env.WW_FLICKER_VIDEO === '1' && process.env.WW_TEST_WINDOW_OFFSCREEN === '1';
-  const headed = video || (process.env.WW_FLICKER_HEADED === '1' && process.env.WW_TEST_WINDOW_OFFSCREEN === '1');
+  const video = process.env.AROUND_FLICKER_VIDEO === '1' && process.env.AROUND_TEST_WINDOW_OFFSCREEN === '1';
+  const headed =
+    video || (process.env.AROUND_FLICKER_HEADED === '1' && process.env.AROUND_TEST_WINDOW_OFFSCREEN === '1');
   const run = path.join(out, playerCorner ? 'player-corner' : autonomy ? 'on' : 'off');
   await mkdir(run, { recursive: true });
   const profile = await mkdtemp(path.resolve('.work/p-'));
@@ -271,7 +272,7 @@ async function cursorFlicker(autonomy: boolean, playerCorner: boolean) {
   try {
     const manager = await context.newPage();
     await manager.goto('chrome://extensions/');
-    const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+    const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
     await item.waitFor();
     const id = await item.evaluate((e) => (e as HTMLElement & { data?: { id: string } }).data?.id ?? e.id);
     await manager.close();
@@ -286,10 +287,10 @@ async function cursorFlicker(autonomy: boolean, playerCorner: boolean) {
     await showArtwork(popup);
     const { panel } = await openEditor(popup, page);
     const model =
-      process.env.WW_FLICKER_PRIVATE === '1'
-        ? process.env.WW_VRM_FILE
+      process.env.AROUND_FLICKER_PRIVATE === '1'
+        ? process.env.AROUND_VRM_FILE
         : file(models.find((name) => name.endsWith('.vrm'))!);
-    expect(model, 'Set WW_VRM_FILE for a private-model run').toBeTruthy();
+    expect(model, 'Set AROUND_VRM_FILE for a private-model run').toBeTruthy();
     await panel.locator('.model-file').setInputFiles(model!);
     await expect(panel.locator('.layer')).toHaveCount(1, { timeout: 30000 });
     await panel.locator('.character-file').setInputFiles(models.filter((name) => name.endsWith('.vrma')).map(file));
@@ -334,9 +335,9 @@ async function cursorFlicker(autonomy: boolean, playerCorner: boolean) {
       .inputValue()
       .catch(() => null);
     report['storedAnchor'] = await popup.evaluate(async () => {
-      const design = (await chrome.storage.local.get('webWorldThemes.design.youtube'))[
-        'webWorldThemes.design.youtube'
-      ] as { decorations: { id: string; placement: { anchor: unknown } }[] };
+      const design = (await chrome.storage.local.get('around.design.youtube'))['around.design.youtube'] as {
+        decorations: { id: string; placement: { anchor: unknown } }[];
+      };
       return design.decorations.map((d) => ({ id: d.id, anchor: d.placement.anchor }));
     });
     // The reopened editor restores its own earlier working copy (anchored to the viewport, as just
@@ -348,14 +349,14 @@ async function cursorFlicker(autonomy: boolean, playerCorner: boolean) {
     await page.waitForTimeout(2500);
     // What is on the page while editing (the hosts and the layers they hold), for the report.
     report['editingHosts'] = await page.evaluate(() =>
-      [...document.querySelectorAll('[id^="web-world-themes"]')].map((h) => ({
+      [...document.querySelectorAll('[id^="around"]')].map((h) => ({
         id: h.id,
         parent: h.parentElement?.id || h.parentElement?.tagName,
         layers: [...(h.shadowRoot?.querySelectorAll('[data-image-id]') ?? [])].map((n) =>
           n.getAttribute('data-image-id'),
         ),
         hidden: document.hidden,
-        editing: document.documentElement.getAttribute('data-ww-editing'),
+        editing: document.documentElement.getAttribute('data-around-editing'),
       })),
     );
     if (playerCorner) {
@@ -367,16 +368,16 @@ async function cursorFlicker(autonomy: boolean, playerCorner: boolean) {
       () =>
         (
           window as unknown as {
-            wwFrames: Record<string, Row[]>;
+            aroundFrames: Record<string, Row[]>;
           }
-        ).wwFrames,
+        ).aroundFrames,
     );
     for (const [name, rows] of Object.entries(frames)) report[name] = count(rows);
-    report['ways'] = await page.evaluate(() => document.documentElement.dataset['wwLayeringWays'] ?? null);
+    report['ways'] = await page.evaluate(() => document.documentElement.dataset['aroundLayeringWays'] ?? null);
     report['unprovenControls'] = await page.evaluate(() => ({
-      rows: document.documentElement.dataset.wwBeneathRows,
-      why: document.documentElement.dataset.wwBeneathWhy,
-      pending: document.getElementById('web-world-themes-video-decorations')?.dataset.wwBeneathUnsettled,
+      rows: document.documentElement.dataset.aroundBeneathRows,
+      why: document.documentElement.dataset.aroundBeneathWhy,
+      pending: document.getElementById('around-video-decorations')?.dataset.aroundBeneathUnsettled,
     }));
     await writeFile(path.join(run, 'frames.json'), JSON.stringify(frames));
     console.log('FLICKER ' + JSON.stringify(report));

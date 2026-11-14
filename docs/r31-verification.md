@@ -116,9 +116,9 @@ SPAは検索結果へ移りモデルが外れるため、残った直近GPU値�
 | 別ウィンドウの公開画像の採取  | 同じ1件を再実行して成功。自作の試験モデル・動作だけの画像を添付                                       |
 | 性能の計測・後検査            | 初回はtest全体30分でtimeout、補完も成立組数不足で失敗。区間データの参考集計と全場面の正式合否を分けた |
 
-CIは [run 41808012068](https://github.com/a3681299-png/web-world-themes/actions/runs/41808012068)。対象SHAが `8003738` であることを確認した。4分割のe2eは順に61/117/29/53成功、2/6/0/0失敗、20/3/16/22スキップ。8件とも版番号の期待値13と実値14の不一致である。
+CIは [run 41808012068](https://github.com/a3681299-png/around/actions/runs/41808012068)。対象SHAが `8003738` であることを確認した。4分割のe2eは順に61/117/29/53成功、2/6/0/0失敗、20/3/16/22スキップ。8件とも版番号の期待値13と実値14の不一致である。
 
-既存character-liveのディレクトリ指定は、manifest.jsonと標準版も読むspecの構成に合わせ、`WW_VRMA_DIR=out/anim` とした。専用の動作はその下の `trusie/` を読んでいる。[公開用のStudio画像](benchmarks/r31-verification/studio-window-public.png)は別の自作素材であり、トルーシェの画像ではない。
+既存character-liveのディレクトリ指定は、manifest.jsonと標準版も読むspecの構成に合わせ、`AROUND_VRMA_DIR=out/anim` とした。専用の動作はその下の `trusie/` を読んでいる。[公開用のStudio画像](benchmarks/r31-verification/studio-window-public.png)は別の自作素材であり、トルーシェの画像ではない。
 
 ## 変更したもの・手動確認と引き継ぎ
 

@@ -1,4 +1,4 @@
-/* The editor's controls in the WWT Studio system (studio-tokens.css): ruled controls on a 4px grid,
+/* The editor's controls in the Around Studio system (studio-tokens.css): ruled controls on a 4px grid,
    cobalt as the only accent, 12fps steps. Sizes stay on the scale 4·8·12·20·32·52·84·136. The
    workbench (studio/workbench.css) places them in the side panel or the window. */
 :host {
@@ -76,7 +76,7 @@ input,
 select {
   font: inherit;
 }
-/* ww-btn: a ruled 1px edge, radius-control, height control. */
+/* around-btn: a ruled 1px edge, radius-control, height control. */
 button {
   display: inline-flex;
   align-items: center;
@@ -90,7 +90,7 @@ button {
   color: var(--ink);
   line-height: 20px;
   cursor: pointer;
-  transition: background-color calc(var(--ww-frame) * 2) steps(2, end);
+  transition: background-color calc(var(--around-frame) * 2) steps(2, end);
 }
 button:hover:not(:disabled) {
   background: var(--surface-raised);
@@ -134,7 +134,7 @@ summary:focus-visible,
 .primary:disabled {
   background: transparent;
 }
-/* ww-icon-btn: 32 square, a 16px ruled icon (icons.ts `glyph`). */
+/* around-icon-btn: 32 square, a 16px ruled icon (icons.ts `glyph`). */
 .icon-button {
   position: relative;
   min-width: 32px;
@@ -153,7 +153,7 @@ summary:focus-visible,
   height: 16px;
   flex: none;
 }
-/* ww-rail: the chosen tool is cobalt with a G-pen circle round it (an open ring, thin where it starts
+/* around-rail: the chosen tool is cobalt with a G-pen circle round it (an open ring, thin where it starts
    and ends), drawn round in 4 frames. The ring is a filled outline from pen.ts, never a stroke. */
 .icon-button[aria-pressed='true'],
 .icon-button[aria-pressed='true']:hover:not(:disabled) {
@@ -186,7 +186,7 @@ summary:focus-visible,
   height: 20px;
   background: var(--line);
 }
-/* ww-chip: the word carries the state, the shape repeats it. The one place the save state is shown. */
+/* around-chip: the word carries the state, the shape repeats it. The one place the save state is shown. */
 .save-state {
   display: flex;
   flex-wrap: wrap;
@@ -253,7 +253,7 @@ summary:focus-visible,
 .retry-save {
   flex: none;
 }
-/* ww-tabs: the selected tab gets a G-pen stroke, drawn in 4 frames. */
+/* around-tabs: the selected tab gets a G-pen stroke, drawn in 4 frames. */
 .workspace-nav {
   display: flex;
   align-items: center;
@@ -296,9 +296,9 @@ summary:focus-visible,
   height: 3px;
   transform: translateX(-50%);
   background: var(--cobalt);
-  -webkit-mask: var(--ww-pen-h) center / 100% 100% no-repeat;
-  mask: var(--ww-pen-h) center / 100% 100% no-repeat;
-  animation: ww-stroke calc(var(--ww-frame) * 4) steps(4, end);
+  -webkit-mask: var(--around-pen-h) center / 100% 100% no-repeat;
+  mask: var(--around-pen-h) center / 100% 100% no-repeat;
+  animation: around-stroke calc(var(--around-frame) * 4) steps(4, end);
 }
 .split {
   min-height: 20px;
@@ -515,7 +515,7 @@ ol {
     overscroll-behavior: auto;
   }
 }
-/* ww-row: ruled rows; the selection is a cobalt wash inside a 1px cobalt edge. */
+/* around-row: ruled rows; the selection is a cobalt wash inside a 1px cobalt edge. */
 .layer {
   display: grid;
   grid-template-columns: 12px 12px minmax(52px, 1fr) 20px 20px 20px 20px;
@@ -556,7 +556,7 @@ ol {
   text-align: left;
   color: var(--ink);
 }
-/* ww-check: 12px, ruled edge, cobalt when on. */
+/* around-check: 12px, ruled edge, cobalt when on. */
 input[type='checkbox'] {
   appearance: none;
   display: inline-grid;
@@ -587,7 +587,7 @@ input[type='checkbox']:disabled {
   border-color: var(--line);
   background: transparent;
 }
-/* ww-toggle: an on/off setting that applies at once. */
+/* around-toggle: an on/off setting that applies at once. */
 .snap-toggle input[type='checkbox'] {
   position: relative;
   display: inline-block;
@@ -607,7 +607,7 @@ input[type='checkbox']:disabled {
   border-radius: 50%;
   background: var(--ink-muted);
   transform: none;
-  transition: transform calc(var(--ww-frame) * 3) steps(3, end);
+  transition: transform calc(var(--around-frame) * 3) steps(3, end);
 }
 .snap-toggle input[type='checkbox']:checked {
   border-color: var(--cobalt);
@@ -679,9 +679,9 @@ input[type='checkbox']:disabled {
   grid-row: 1;
   width: 100%;
 }
-/* ww-empty: a construction drawn on graph paper (guides → main lines → accent), then the words and
+/* around-empty: a construction drawn on graph paper (guides → main lines → accent), then the words and
    the action appear. Graph paper (20px, 5% ink) is the only texture, and only here. */
-.ww-empty {
+.around-empty {
   display: flex;
   flex: none;
   flex-direction: column;
@@ -695,7 +695,7 @@ input[type='checkbox']:disabled {
     repeating-linear-gradient(0deg, color-mix(in srgb, var(--ink) 5%, transparent) 0 1px, transparent 1px 20px),
     repeating-linear-gradient(90deg, color-mix(in srgb, var(--ink) 5%, transparent) 0 1px, transparent 1px 20px);
 }
-.ww-empty__drawing {
+.around-empty__drawing {
   width: 236px;
   max-width: 100%;
   height: auto;
@@ -703,42 +703,42 @@ input[type='checkbox']:disabled {
 }
 /* On a low window the construction is drawn at 136 wide, so the words and the list keep their room. */
 @media (max-height: 800px) {
-  .ww-empty__drawing {
+  .around-empty__drawing {
     width: 136px;
   }
 }
-.ww-empty__title {
+.around-empty__title {
   display: block;
   font-size: 20px;
   line-height: 32px;
 }
-.ww-empty__text {
+.around-empty__text {
   max-width: 300px;
   margin: 0;
   color: var(--ink-muted);
 }
-.ww-empty__actions {
+.around-empty__actions {
   display: flex;
   gap: var(--space-12);
 }
 /* The two lines in drawings: the ruler (uniform, ink-faint) and the G-pen (a filled outline). */
-.ww-rule {
+.around-rule {
   fill: none;
   stroke: var(--ink-faint);
   stroke-width: 1;
 }
-.ww-pen {
+.around-pen {
   fill: currentColor;
   stroke: none;
 }
 /* Drawn in on 12fps steps from the start of its path; under reduced motion it is simply there. */
-.ww-draw {
+.around-draw {
   stroke-dasharray: 1;
-  animation: ww-draw calc(var(--ww-frame) * var(--ww-frames, 4)) steps(var(--ww-frames, 4), end) var(--ww-delay, 0ms)
-    both;
+  animation: around-draw calc(var(--around-frame) * var(--around-frames, 4)) steps(var(--around-frames, 4), end)
+    var(--around-delay, 0ms) both;
 }
-.ww-appear {
-  animation: ww-appear calc(var(--ww-frame) * 3) steps(3, end) var(--ww-delay, 0ms) both;
+.around-appear {
+  animation: around-appear calc(var(--around-frame) * 3) steps(3, end) var(--around-delay, 0ms) both;
 }
 details {
   margin: 0;
@@ -780,7 +780,7 @@ input[type='range'] {
   min-width: 0;
   width: 100%;
 }
-/* ww-swatch: a flat 52 × 32 colour with a ruled edge. */
+/* around-swatch: a flat 52 × 32 colour with a ruled edge. */
 input[type='color'] {
   width: 52px;
   height: 32px;
@@ -800,7 +800,7 @@ input[type='color']::-webkit-color-swatch {
 input[type='color']:disabled {
   opacity: 0.4;
 }
-/* ww-input: sunk, ruled, numbers in mono. */
+/* around-input: sunk, ruled, numbers in mono. */
 input[type='number'],
 input[type='text'],
 select {

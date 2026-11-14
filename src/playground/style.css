@@ -92,7 +92,7 @@ body {
 /* The basic Playground: leave room for a seated character's feet before the native controls.
    Not before applying, nor on the 3D board: the board opens only when the page fits the
    window (spatial.ts), and its resident sits on the board's edges instead. */
-:root[data-ww-basic] .controls {
+:root[data-around-basic] .controls {
   margin-top: 48px;
 }
 .controls button {

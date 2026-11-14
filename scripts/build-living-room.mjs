@@ -1,10 +1,10 @@
 // Builds the living room page as static files only. Separate from the extension and the
 // Playground: scripts/build.mjs, dist/ and dist-playground/ are not touched.
 //   node scripts/build-living-room.mjs                 → dist-living-room/
-//   WW_LIVING_OUT=.work/x node scripts/build-living-room.mjs
-//   WW_LIVING_TEST=1 adds the read-only test hook (window.__wwLivingRoom).
-//   WW_LIVING_ROOM=<dir> the baked room (room.glb, room.json, lightmap.png); default art/living-room/web
-//   WW_LIVING_CHARACTER=<model.vrm> WW_LIVING_MOTIONS=<dir with Idle_Loop.vrma, Walk_Loop.vrma>
+//   AROUND_LIVING_OUT=.work/x node scripts/build-living-room.mjs
+//   AROUND_LIVING_TEST=1 adds the read-only test hook (window.__aroundLivingRoom).
+//   AROUND_LIVING_ROOM=<dir> the baked room (room.glb, room.json, lightmap.png); default art/living-room/web
+//   AROUND_LIVING_CHARACTER=<model.vrm> AROUND_LIVING_MOTIONS=<dir with Idle_Loop.vrma, Walk_Loop.vrma>
 //     adds a local character (docs/living-body.md). Only into a .work output: a character whose
 //     terms are not confirmed must never reach dist-living-room, which is what gets published.
 import { build } from 'esbuild';
@@ -13,25 +13,25 @@ import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const output = resolve(root, process.env.WW_LIVING_OUT ?? 'dist-living-room');
+const output = resolve(root, process.env.AROUND_LIVING_OUT ?? 'dist-living-room');
 const inWork = relative(join(root, '.work'), output);
 if (
   output !== join(root, 'dist-living-room') &&
   (inWork.startsWith('..') || inWork.includes('/') || inWork.includes('\\') || !inWork)
 )
-  throw new Error('WW_LIVING_OUT must be dist-living-room or a direct .work child.');
-const room = resolve(root, process.env.WW_LIVING_ROOM ?? 'art/living-room/web');
+  throw new Error('AROUND_LIVING_OUT must be dist-living-room or a direct .work child.');
+const room = resolve(root, process.env.AROUND_LIVING_ROOM ?? 'art/living-room/web');
 const files = ['room.glb', 'room.json', 'lightmap.png'];
 for (const file of files)
   if (!existsSync(join(room, file)))
     throw new Error(`The baked room is missing ${file} (scripts/living-room/80_bake.py).`);
 
-const character = process.env.WW_LIVING_CHARACTER;
-const motions = process.env.WW_LIVING_MOTIONS;
+const character = process.env.AROUND_LIVING_CHARACTER;
+const motions = process.env.AROUND_LIVING_MOTIONS;
 if (character && output === join(root, 'dist-living-room'))
-  throw new Error('A local character is only built into a .work output (set WW_LIVING_OUT).');
+  throw new Error('A local character is only built into a .work output (set AROUND_LIVING_OUT).');
 if (character && (!motions || !existsSync(character)))
-  throw new Error('WW_LIVING_CHARACTER needs an existing .vrm and WW_LIVING_MOTIONS.');
+  throw new Error('AROUND_LIVING_CHARACTER needs an existing .vrm and AROUND_LIVING_MOTIONS.');
 
 rmSync(output, { recursive: true, force: true });
 mkdirSync(join(output, 'content'), { recursive: true });
@@ -44,11 +44,11 @@ await build({
   target: 'chrome120',
   charset: 'utf8',
   legalComments: 'none',
-  minify: process.env.WW_LIVING_TEST !== '1',
+  minify: process.env.AROUND_LIVING_TEST !== '1',
   logLevel: 'warning',
   define: {
-    __WW_LIVING_TEST__: String(process.env.WW_LIVING_TEST === '1'),
-    __WW_LIVING_CHARACTER__: String(Boolean(character)),
+    __AROUND_LIVING_TEST__: String(process.env.AROUND_LIVING_TEST === '1'),
+    __AROUND_LIVING_CHARACTER__: String(Boolean(character)),
   },
 });
 for (const file of ['index.html', 'style.css']) copyFileSync(join(root, 'src/living-room', file), join(output, file));

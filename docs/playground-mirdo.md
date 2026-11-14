@@ -7,11 +7,11 @@
 外部の非公開素材リポジトリ `wwt-private-assets` の `d778429` を使用した。Git LFS を取り込んだチェックアウトをビルド時に指定する。
 
 ```powershell
-$env:WW_PLAYGROUND_MIRDO_ROOT = 'C:\wwt-private'
+$env:AROUND_PLAYGROUND_MIRDO_ROOT = 'C:\wwt-private'
 npm run build:playground
 ```
 
-通常ビルドは外部チェックアウトの指定が必要。出力は `dist-playground/`。既存の試験用ビルドは `WW_PLAYGROUND_TEST=1` で外部素材を渡さずに生成できる。承認済みの変換 VRM 1体と Quaternius Universal Animation Library から変換した合格 VRMA 16本だけを、ファイルの SHA-256 で照合して取り込む。出力でもモデル・動作の許可リストと内容のハッシュを照合する。トルーシェ、私用 VRM、Mixamo の名前と内容の検査も適用する。バイナリ素材は WWT の Git に入れない。
+通常ビルドは外部チェックアウトの指定が必要。出力は `dist-playground/`。既存の試験用ビルドは `AROUND_PLAYGROUND_TEST=1` で外部素材を渡さずに生成できる。承認済みの変換 VRM 1体と Quaternius Universal Animation Library から変換した合格 VRMA 16本だけを、ファイルの SHA-256 で照合して取り込む。出力でもモデル・動作の許可リストと内容のハッシュを照合する。トルーシェ、私用 VRM、Mixamo の名前と内容の検査も適用する。バイナリ素材は Around の Git に入れない。
 
 翔太が確認した VN3 の許諾範囲で、変換済みのミルドを Playground に組み込む。ページ下部にモデルの作者と配布元、動作の出典を表示した。 [ミルド／ragooou（らぐー）](https://booth.pm/ja/items/6614116) · [Quaternius Universal Animation Library（CC0）](https://quaternius.com/packs/universalanimationlibrary.html)
 

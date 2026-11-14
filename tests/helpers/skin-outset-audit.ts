@@ -47,7 +47,7 @@ export async function outsetAudit(page: Page) {
       .map((node) => ({ node, box: rect(node) }))
       .filter(({ box }) => box.width > 0 && box.height > 0 && area(box, viewport) > 0);
     const nodes = [
-      ...document.querySelectorAll('[data-ww-surface~="video-card"],[data-ww-surface~="comment-input"]'),
+      ...document.querySelectorAll('[data-around-surface~="video-card"],[data-around-surface~="comment-input"]'),
     ].filter((node) => area(rect(node), viewport) > 0);
     const parts = nodes.map((node, index) => {
       const box = rect(node);
@@ -103,7 +103,7 @@ export async function outsetAudit(page: Page) {
       return {
         index,
         kind: node
-          .getAttribute('data-ww-surface')!
+          .getAttribute('data-around-surface')!
           .split(' ')
           .find((id) => id === 'video-card' || id === 'comment-input')!,
         box,

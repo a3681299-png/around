@@ -18,7 +18,7 @@ async function run(label, root, args, extra = {}) {
       env: {
         ...process.env,
         PLAYWRIGHT_BROWSERS_PATH: path.resolve(after, '../../.work/browsers'),
-        WW_TEST_EXTENSION_PATH: path.join(root, '.work/fix-build'),
+        AROUND_TEST_EXTENSION_PATH: path.join(root, '.work/fix-build'),
         PLAYWRIGHT_JSON_OUTPUT_NAME: json,
         ...extra,
       },

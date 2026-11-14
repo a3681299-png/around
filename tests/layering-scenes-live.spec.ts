@@ -16,8 +16,8 @@ import { writeContent } from '../scripts/playground/content';
  * In each, the character is not stopped (or takes the cut-out way where a part is not proven),
  * YouTube's parts are over it and the point of a button is never the extension's. Fullscreen is
  * headless only: an off-screen headed window would go fullscreen on the nearest monitor, over the
- * person's work. WW_LIVE_HEADED=1 opens the other scenes in an off-screen window. Explicit:
- * WW_LIVE_LAYERING=1 (the normal build; a WW_GUARD_TRACE build also records why). Pictures go to
+ * person's work. AROUND_LIVE_HEADED=1 opens the other scenes in an off-screen window. Explicit:
+ * AROUND_LIVE_LAYERING=1 (the normal build; a AROUND_GUARD_TRACE build also records why). Pictures go to
  * .work/layering-scenes.
  */
 const shots = path.resolve('.work/layering-scenes');
@@ -31,17 +31,17 @@ async function residentOnYouTube(
   const { models } = writeContent(path.resolve('.'), content);
   const file = (name: string) => path.join(content, name);
   const design = JSON.parse(await readFile(file('design.json'), 'utf8'));
-  // Headed only off screen (scripts/test.mjs sets WW_TEST_WINDOW_OFFSCREEN=1), and never for
+  // Headed only off screen (scripts/test.mjs sets AROUND_TEST_WINDOW_OFFSCREEN=1), and never for
   // fullscreen: a headless player often fails to load the video after an advert.
-  const headed = process.env.WW_LIVE_HEADED === '1' && process.env.WW_TEST_WINDOW_OFFSCREEN === '1';
-  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'ww-layering-scenes-')), false, {
+  const headed = process.env.AROUND_LIVE_HEADED === '1' && process.env.AROUND_TEST_WINDOW_OFFSCREEN === '1';
+  const context = await launchExtension(await mkdtemp(path.join(tmpdir(), 'around-layering-scenes-')), false, {
     headed,
     width: 1280,
     height: 860,
   });
   const manager = await context.newPage();
   await manager.goto('chrome://extensions/');
-  const item = manager.locator('extensions-item').filter({ hasText: 'Web World Themes' });
+  const item = manager.locator('extensions-item').filter({ hasText: 'Around' });
   await item.waitFor();
   const id = await item.evaluate((e) => (e as HTMLElement & { data?: { id: string } }).data?.id ?? e.id);
   await manager.close();
@@ -89,36 +89,36 @@ async function residentOnYouTube(
   // Every frame: is the character stopped, in this phase? (as in layering-live.spec.ts)
   await page.evaluate(() => {
     const w = window as unknown as {
-      wwPhase: string;
-      wwStops: Record<string, [number, number]>;
-      wwWhy: Record<string, string[]>;
+      aroundPhase: string;
+      aroundStops: Record<string, [number, number]>;
+      aroundWhy: Record<string, string[]>;
     };
-    w.wwPhase = 'start';
-    w.wwStops = {};
-    w.wwWhy = {};
+    w.aroundPhase = 'start';
+    w.aroundStops = {};
+    w.aroundWhy = {};
     const tick = () => {
       let node: Element | undefined;
-      for (const host of document.querySelectorAll('[id^="web-world-themes"]'))
+      for (const host of document.querySelectorAll('[id^="around"]'))
         node ??= host.shadowRoot?.querySelector('[data-image-id="resident"]') ?? undefined;
-      const row = (w.wwStops[w.wwPhase] ??= [0, 0]);
+      const row = (w.aroundStops[w.aroundPhase] ??= [0, 0]);
       row[0]++;
       if (!node || node.hasAttribute('data-safety-limited')) {
         row[1]++;
         // Why: the guard's stop entries for it, and where its node was (once each).
-        const record = document.querySelector<HTMLElement>('[data-ww-safety]')?.dataset.wwSafety;
+        const record = document.querySelector<HTMLElement>('[data-around-safety]')?.dataset.aroundSafety;
         const issues = (JSON.parse(record ?? '{}').issues ?? []) as {
           layerId: string;
           action?: string;
           surfaceId: string;
           reason: string;
         }[];
-        const why = (w.wwWhy[w.wwPhase] ??= []);
+        const why = (w.aroundWhy[w.aroundPhase] ??= []);
         const texts = [
           ...issues
             .filter((i) => i.layerId === 'resident' && i.action === 'stop')
             .map((i) => `${i.surfaceId}: ${i.reason}`),
           `node in ${node ? (node.getRootNode() as ShadowRoot).host?.id : 'none'}`,
-          `ways ${document.documentElement.dataset['wwLayeringWays']?.split('|').slice(-3).join('|') ?? ''}`,
+          `ways ${document.documentElement.dataset['aroundLayeringWays']?.split('|').slice(-3).join('|') ?? ''}`,
         ];
         for (const text of texts) if (!why.includes(text)) why.push(text);
       }
@@ -130,10 +130,11 @@ async function residentOnYouTube(
 }
 
 const phase = (page: Page, name: string) =>
-  page.evaluate((n) => ((window as unknown as { wwPhase: string }).wwPhase = n), name);
+  page.evaluate((n) => ((window as unknown as { aroundPhase: string }).aroundPhase = n), name);
 const stops = (page: Page) =>
-  page.evaluate(() => (window as unknown as { wwStops: Record<string, [number, number]> }).wwStops);
-const whys = (page: Page) => page.evaluate(() => (window as unknown as { wwWhy: Record<string, string[]> }).wwWhy);
+  page.evaluate(() => (window as unknown as { aroundStops: Record<string, [number, number]> }).aroundStops);
+const whys = (page: Page) =>
+  page.evaluate(() => (window as unknown as { aroundWhy: Record<string, string[]> }).aroundWhy);
 /** Waits out an advert (pressing its own Skip when it offers one), up to 90 s. */
 async function afterAdverts(page: Page) {
   for (let i = 0; i < 180 && (await page.locator('#movie_player.ad-showing').count()); i++) {
@@ -145,7 +146,7 @@ async function afterAdverts(page: Page) {
 /** Where the plane is: in the player, directly after its media, at its level. */
 const plane = (page: Page) =>
   page.evaluate(() => {
-    const host = document.querySelector<HTMLElement>('#web-world-themes-video-decorations');
+    const host = document.querySelector<HTMLElement>('#around-video-decorations');
     const before = host?.previousElementSibling as HTMLElement | null;
     return {
       inPlayer: host?.parentElement?.id === 'movie_player',
@@ -158,7 +159,7 @@ const share = (page: Page) =>
   page.evaluate(() => {
     const player = document.querySelector('#movie_player')!.getBoundingClientRect();
     let node: Element | undefined;
-    for (const host of document.querySelectorAll('[id^="web-world-themes"]'))
+    for (const host of document.querySelectorAll('[id^="around"]'))
       node ??= host.shadowRoot?.querySelector('[data-image-id="resident"]') ?? undefined;
     return (node?.getBoundingClientRect().height ?? 0) / player.height;
   });
@@ -191,7 +192,7 @@ async function ownPixels(page: Page, selector: string) {
   if (!box || box.width < 4 || box.height < 4) return undefined;
   const canvases = (value: string) =>
     page.evaluate((v) => {
-      const root = document.querySelector('#web-world-themes-video-decorations')?.shadowRoot;
+      const root = document.querySelector('#around-video-decorations')?.shadowRoot;
       for (const c of root?.querySelectorAll('canvas') ?? []) c.style.opacity = v;
     }, value);
   const a = await page.screenshot({ clip: box });
@@ -249,7 +250,7 @@ async function scene(
   body: (page: Page, report: Record<string, unknown>) => Promise<void>,
   video?: string,
 ) {
-  test.skip(process.env.WW_LIVE_LAYERING !== '1', 'Explicit real YouTube check (WW_LIVE_LAYERING=1).');
+  test.skip(process.env.AROUND_LIVE_LAYERING !== '1', 'Explicit real YouTube check (AROUND_LIVE_LAYERING=1).');
   test.setTimeout(300000);
   const { context, page } = await residentOnYouTube(placement, video);
   const report: Record<string, unknown> = {};
@@ -271,14 +272,14 @@ async function scene(
     // A trace build: why a read was not covered, and each part not proven (src/sites/youtube-operations.ts).
     report['unsettled'] = await page
       .evaluate(
-        () => document.querySelector<HTMLElement>('#web-world-themes-video-decorations')?.dataset['wwBeneathUnsettled'],
+        () => document.querySelector<HTMLElement>('#around-video-decorations')?.dataset['aroundBeneathUnsettled'],
       )
       .catch(() => undefined);
     report['place'] = await page
-      .evaluate(() => document.documentElement.getAttribute('data-ww-beneath-place'))
+      .evaluate(() => document.documentElement.getAttribute('data-around-beneath-place'))
       .catch(() => undefined);
     report['notProven'] = await page
-      .evaluate(() => document.documentElement.dataset['wwBeneathRows']?.split('\n'))
+      .evaluate(() => document.documentElement.dataset['aroundBeneathRows']?.split('\n'))
       .catch(() => undefined);
     await writeFile(path.join(shots, `${name}-report.json`), JSON.stringify(report, null, 1));
     console.log(`LAYERING SCENE ${name} ` + JSON.stringify(report));
@@ -294,7 +295,7 @@ async function scene(
 }
 const pointsOk = (scene: string, r: { plane: unknown; points: { s: string; at: string | null }[] }, wayOut = false) => {
   if (!wayOut) expect(r.plane, scene).toEqual({ inPlayer: true, afterMedia: true, sameLevel: true });
-  for (const p of r.points) expect(p.at ?? '', `${scene} ${p.s}`).not.toMatch(/web-world-themes/);
+  for (const p of r.points) expect(p.at ?? '', `${scene} ${p.s}`).not.toMatch(/around/);
 };
 
 test('real YouTube: captions are drawn over the character', async () => {
@@ -356,15 +357,15 @@ test('real YouTube: captions are drawn over the character', async () => {
         path: path.join(shots, 'captions.png'),
         clip: (await page.locator('#movie_player').boundingBox())!,
       });
-      // A video with captions of its own (the song's automatic ones did not show): WW_CAPTION_VIDEO.
+      // A video with captions of its own (the song's automatic ones did not show): AROUND_CAPTION_VIDEO.
     },
-    process.env.WW_CAPTION_VIDEO ?? 'dQw4w9WgXcQ',
+    process.env.AROUND_CAPTION_VIDEO ?? 'dQw4w9WgXcQ',
   );
 });
 
 test('real YouTube: fullscreen and the miniplayer keep the character under the player parts', async () => {
   // An off-screen window would go fullscreen on the nearest monitor, over the person's work.
-  test.skip(process.env.WW_LIVE_HEADED === '1', 'Fullscreen is checked headless only.');
+  test.skip(process.env.AROUND_LIVE_HEADED === '1', 'Fullscreen is checked headless only.');
   await scene('fullscreen', { x: 0.5, y: 0.78, widthPx: 340, heightPx: 420 }, async (page, report) => {
     // Fullscreen (f): the player is the same stacking; the plane stays after the media.
     await phase(page, 'fullscreen');
@@ -397,7 +398,7 @@ test('real YouTube: fullscreen and the miniplayer keep the character under the p
         Boolean(document.querySelector('#movie_player')?.closest('ytd-miniplayer')),
       ),
       // The adapter reports the reduced form on the part (chunk 4 fix, docs/layering-plan.md 9).
-      reduced: await page.locator('#movie_player').evaluate((player) => player.hasAttribute('data-ww-reduced')),
+      reduced: await page.locator('#movie_player').evaluate((player) => player.hasAttribute('data-around-reduced')),
       regularShare,
       share: await share(page),
       plane: await plane(page),
@@ -414,7 +415,7 @@ test('real YouTube: fullscreen and the miniplayer keep the character under the p
     await page.keyboard.press('i');
     await page.waitForTimeout(2500);
     report['miniplayer-exit'] = {
-      reduced: await page.locator('#movie_player').evaluate((player) => player.hasAttribute('data-ww-reduced')),
+      reduced: await page.locator('#movie_player').evaluate((player) => player.hasAttribute('data-around-reduced')),
       share: await share(page),
     };
     expect(report['miniplayer-exit']).toMatchObject({ reduced: false });
@@ -491,14 +492,14 @@ test('real YouTube: the end screen and its autoplay card stay over the character
       // The autoplay card sits in a container without a z-index, under the media's level (the media
       // is gone once the video ends): not proven, so the character takes the way out (cut out, as
       // before) while they meet. Either way, its buttons are never the extension's.
-      const ways = await page.evaluate(() => document.documentElement.dataset['wwLayeringWays'] ?? '');
+      const ways = await page.evaluate(() => document.documentElement.dataset['aroundLayeringWays'] ?? '');
       const out = /way-out/.test(ways) || !(report['endScreen'] as { plane: { afterMedia: boolean } }).plane.afterMedia;
       report['endWays'] = ways;
       if (out) report['wayOut'] = ['end-screen'];
       pointsOk('end screen', report['endScreen'] as Parameters<typeof pointsOk>[1], out);
       if (!ended) test.info().annotations.push({ type: 'not seen', description: 'the video did not end' });
-      // A short video (19 s), so it ends without a seek: WW_END_VIDEO.
+      // A short video (19 s), so it ends without a seek: AROUND_END_VIDEO.
     },
-    process.env.WW_END_VIDEO ?? 'jNQXAC9IVRw',
+    process.env.AROUND_END_VIDEO ?? 'jNQXAC9IVRw',
   );
 });

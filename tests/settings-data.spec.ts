@@ -146,7 +146,7 @@ test('the initial read merges intervening changes and ignores other areas and fo
   );
   storage.emit({ [SETTINGS_KEYS.creatorMode]: { newValue: true } });
   storage.emit({ [show]: { newValue: false } }, 'sync');
-  storage.emit({ 'webWorldThemes.features.window-chrome': { newValue: true } });
+  storage.emit({ 'around.features.window-chrome': { newValue: true } });
   finishRead({ [show]: true, [SETTINGS_KEYS.creatorMode]: false });
   await expect.poll(() => snapshots.length).toBe(1);
   expect(snapshots[0]).toEqual({ creatorMode: true, enabled: true });

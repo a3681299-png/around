@@ -2,15 +2,15 @@
 # (reference_models.py). Run once whenever a source model changes, headless only (it resets the
 # Blender file between models, so never run it inside a live MCP session holding the room):
 #   blender -b --factory-startup --python scripts/living-room/prepare_models.py
-# Environment: WW_TRIPO_SRC = folder of the first raw Tripo GLBs (default C:/wwt-private/room/source)
-#              WW_TRIPO_NEW = folder of the second set (default C:/wwt_room_work/src)
-#              WW_ONLY=id,id  limits the run to those models
+# Environment: AROUND_TRIPO_SRC = folder of the first raw Tripo GLBs (default C:/wwt-private/room/source)
+#              AROUND_TRIPO_NEW = folder of the second set (default C:/wwt_room_work/src)
+#              AROUND_ONLY=id,id  limits the run to those models
 # The raw GLBs stay outside the repository; only the cleaned results are committed (LFS).
 import bpy, bmesh, os, numpy as np
 from mathutils import Vector, Matrix
 
-_HERE = os.path.dirname(os.path.abspath(globals().get('__file__') or (WWD + 'prepare_models.py')))
-SRC = (os.environ.get('WW_TRIPO_SRC') or 'C:/wwt-private/room/source').rstrip('/\\') + '/'
+_HERE = os.path.dirname(os.path.abspath(globals().get('__file__') or (AROUND_DIR + 'prepare_models.py')))
+SRC = (os.environ.get('AROUND_TRIPO_SRC') or 'C:/wwt-private/room/source').rstrip('/\\') + '/'
 OUT = os.path.normpath(_HERE + '/../../art/living-room/models') + os.sep
 os.makedirs(OUT, exist_ok=True)
 
@@ -21,7 +21,7 @@ os.makedirs(OUT, exist_ok=True)
 # inpaint: (box, luminance) – bright print inside the box is painted with the cloth around it.
 # The second set of models (2026-11-13) is in NEW. Tripo names those files
 # "A faithful … #<n>.glb", so they are found by their number (`new`).
-NEW = (os.environ.get('WW_TRIPO_NEW') or 'C:/wwt_room_work/src').rstrip('/\\') + '/'
+NEW = (os.environ.get('AROUND_TRIPO_NEW') or 'C:/wwt_room_work/src').rstrip('/\\') + '/'
 MODELS = {
     # width: metres across (X) of the real thing, where that is the known measure.
     'workstation': dict(new=112, width=2.0, tex=2048, screens=True),
@@ -338,7 +338,7 @@ def mark_screens(o, key):
     print(key, 'screen faces', len(kept), 'of', len(glow), 'from seeds', len(seeds))
 
 
-only = set(filter(None, os.environ.get('WW_ONLY', '').split(',')))
+only = set(filter(None, os.environ.get('AROUND_ONLY', '').split(',')))
 for key, cfg in MODELS.items():
     if only and key not in only:
         continue

@@ -1,13 +1,13 @@
 // Packs a baked room (scripts/room/build_room.py) into the one .glb the engine reads
 // (docs/depth-foundation.md, "部屋の素材"). The light layers, baked to 16-bit EXR, go into the
 // .glb as embedded PNG textures in a square-root encoding with one scale per layer, listed in the
-// root's extras under `wwtRoom`. The engine never reads EXR: the room is one model asset, checked
+// root's extras under `aroundRoom`. The engine never reads EXR: the room is one model asset, checked
 // by the same GLB inspection as any other.
 //
 //   node scripts/room/pack-room.mjs <room.glb> <lightmap dir> <size> <out.glb>
 //
 // The room's files are private (docs/product-design-snapshot.md, 部屋の素材の約束): the inputs and
-// the output stay outside the repository (WW_ROOM_OUT, wwt-private-assets).
+// the output stay outside the repository (AROUND_ROOM_OUT, wwt-private-assets).
 import fs from 'node:fs';
 import path from 'node:path';
 import { zlibSync } from 'fflate';
@@ -139,7 +139,7 @@ export function packRoom(glbBytes, layers) {
   }
   align();
   json.buffers = [{ byteLength: length }];
-  json.extras = { ...(json.extras ?? {}), wwtRoom: { version: 1, layers: listed } };
+  json.extras = { ...(json.extras ?? {}), aroundRoom: { version: 1, layers: listed } };
   return writeGlb(json, Buffer.concat(parts));
 }
 

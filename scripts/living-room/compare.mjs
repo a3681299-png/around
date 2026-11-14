@@ -7,7 +7,7 @@
 // Scenes: start, notice, turns, stop, joy, bed (default: all). Each scene is a fresh page, a fixed
 // list of timed calls on the page's test hook, and a fixed length. Calls a build does not have are
 // skipped, so an older build records the same scene without the newer behaviour.
-// WW_COMPARE_CLOSE=0 records from the room's own camera (what a visitor sees) instead of each
+// AROUND_COMPARE_CLOSE=0 records from the room's own camera (what a visitor sees) instead of each
 // scene's close-up; any other number is the close-up's distance for every scene.
 // The window is real (GPU) but off screen, as tests/fixtures.ts places it. The output shows a
 // local character: keep it out of the repository (docs/living-body.md).
@@ -132,19 +132,19 @@ try {
     page.on('pageerror', (error) => errors.push(String(error)));
     await page.goto(`http://127.0.0.1:${port}/`);
     await page.waitForFunction(
-      () => globalThis.__wwLivingRoom?.resident && document.querySelector('#room[data-ready]'),
+      () => globalThis.__aroundLivingRoom?.resident && document.querySelector('#room[data-ready]'),
       null,
       { timeout: 90000 },
     );
     await page.evaluate(
       ([close, mood]) => {
-        const room = globalThis.__wwLivingRoom;
+        const room = globalThis.__aroundLivingRoom;
         room.still();
         room.closeUp(close);
         if (mood) room.resident.setMood?.(mood);
       },
       [
-        process.env.WW_COMPARE_CLOSE === undefined ? scene.close : Number(process.env.WW_COMPARE_CLOSE),
+        process.env.AROUND_COMPARE_CLOSE === undefined ? scene.close : Number(process.env.AROUND_COMPARE_CLOSE),
         scene.mood ?? null,
       ],
     );
@@ -155,9 +155,9 @@ try {
     while (Date.now() - began < scene.seconds * 1000) {
       const t = (Date.now() - began) / 1000;
       while (steps.length && steps[0][0] <= t)
-        await page.evaluate(`(${steps.shift()[1]})(globalThis.__wwLivingRoom.resident)`);
+        await page.evaluate(`(${steps.shift()[1]})(globalThis.__aroundLivingRoom.resident)`);
       const s = await page.evaluate(() => {
-        const r = globalThis.__wwLivingRoom.resident;
+        const r = globalThis.__aroundLivingRoom.resident;
         const state = r.state();
         const f = r.facts();
         return {

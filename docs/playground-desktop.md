@@ -7,19 +7,19 @@
 ブランチ `codex/playground-desktop` のチェックアウトで実行する。昼のテスト部屋を使う例。
 
 ```powershell
-$env:WW_PLAYGROUND_PRIVATE_ASSETS = 'C:/wwt-private'
+$env:AROUND_PLAYGROUND_PRIVATE_ASSETS = 'C:/wwt-private'
 $roomFile = 'C:/wwt-private/room/packed/room-packed-noon.glb'
 if ((Get-Item -LiteralPath $roomFile -ErrorAction SilentlyContinue).Length -ne 5810192) {
   $roomFile = 'C:/wwt-private/.git/lfs/objects/fe/e7/fee76579a89478499486c08b5ce75d71cb0c5bda55861e67f5274f10ee8ebfb0'
 }
-$env:WW_PLAYGROUND_LOCAL_ROOM = $roomFile
-$env:WW_PLAYGROUND_LOCAL_LAYOUT = 'scripts/playground/desktop-layout-noon.json'
-$env:WW_PLAYGROUND_OUT = '.work/desktop-preview'
+$env:AROUND_PLAYGROUND_LOCAL_ROOM = $roomFile
+$env:AROUND_PLAYGROUND_LOCAL_LAYOUT = 'scripts/playground/desktop-layout-noon.json'
+$env:AROUND_PLAYGROUND_OUT = '.work/desktop-preview'
 npm run build:playground
 node scripts/playground/serve.mjs .work/desktop-preview
 ```
 
-[Playground](http://127.0.0.1:4173/) で「WWT を適用」し、再生してから「デスクトップへ」を押す。デスクトップで再生・シーク・音量・検索を試し、ブラウザーの戻るかタスクバーの「ブラウザーに戻る」で復帰する。[デスクトップを直接開く](http://127.0.0.1:4173/#desktop) こともできる。直リンクからの復帰はタスクバーを使う。
+[Playground](http://127.0.0.1:4173/) で「Around を適用」し、再生してから「デスクトップへ」を押す。デスクトップで再生・シーク・音量・検索を試し、ブラウザーの戻るかタスクバーの「ブラウザーに戻る」で復帰する。[デスクトップを直接開く](http://127.0.0.1:4173/#desktop) こともできる。直リンクからの復帰はタスクバーを使う。
 
 昼の部屋の原本はローカル確認用の `.work` 出力にだけ含める。原本の展開先がないデスクトップでは、同じ SHA-256 のローカル LFS オブジェクトから読んだ。部屋の指定を外すと簡易の部屋で動く。
 

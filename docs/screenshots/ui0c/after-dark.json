@@ -1,7 +1,7 @@
 {
   "scheme": "dark",
   "prefix": "after",
-  "dark-hover-hits-card": ["ASIDE#web-world-themes-creator", true, true],
+  "dark-hover-hits-card": ["ASIDE#around-creator", true, true],
   "dark-skin": "ok",
   "dark-card": "ok",
   "dark-studio-badge": "ok",

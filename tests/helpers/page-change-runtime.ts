@@ -13,7 +13,7 @@ export function mount() {
     nativeSet = root.style.setProperty.bind(root.style);
   // Nothing on the page follows a text change by writing variables on the root.
   root.style.setProperty = (name, value, priority) => {
-    if (name.startsWith('--ww-')) counts.variables++;
+    if (name.startsWith('--around-')) counts.variables++;
     nativeSet(name, value, priority);
   };
   const controller = createPageController(
